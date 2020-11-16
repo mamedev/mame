@@ -87,9 +87,14 @@ license:CC0
 
 
 	<element name="dotmatrixdot">
-		<dotmatrixdot>
-			<color red="1.0" green="0" blue="0" />
-		</dotmatrixdot>
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="1" red="1.0" green="0.0" blue="0.0" />
+			<color state="0" red="0.125" green="0.0" blue="0.0" />
+		</disk>
 	</element>
 	<element name="digit" defstate="10">
 		<led7seg>

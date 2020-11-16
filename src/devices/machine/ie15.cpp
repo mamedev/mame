@@ -637,7 +637,8 @@ void ie15_device::scanline_callback()
 uint32_t ie15_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_leds();
-	memcpy(&bitmap.pix32(0), &m_tmpbmp[0], sizeof(uint32_t) * IE15_TOTAL_HORZ * IE15_TOTAL_VERT);
+	for (int y = 0; y < IE15_TOTAL_VERT; y++)
+		std::copy_n(&m_tmpbmp[y * IE15_TOTAL_HORZ], IE15_TOTAL_HORZ, &bitmap.pix(y));
 	return 0;
 }
 

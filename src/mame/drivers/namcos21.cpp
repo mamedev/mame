@@ -433,20 +433,19 @@ uint16_t namcos21_state::winrun_gpu_videoram_r(offs_t offset)
 
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_gpu_videoram.get();
+	uint8_t const *const videoram = m_gpu_videoram.get();
 	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
-	int yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
-	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
-	int base = 0x1000+0x100*(m_winrun_color&0xf);
-	int sx,sy;
-	for( sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
+	int const yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
+	int const xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
+	int const base = 0x1000+0x100*(m_winrun_color&0xf);
+	for( int sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
 	{
-		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
-		uint16_t *pDest = &bitmap.pix16(sy);
-		for( sx=cliprect.left(); sx<=cliprect.right(); sx++ )
+		uint8_t const *const pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint16_t *const pDest = &bitmap.pix(sy);
+		for( int sx=cliprect.left(); sx<=cliprect.right(); sx++ )
 		{
-			int pen = pSource[(sx+xscroll) & 0x1ff];
+			int const pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )
 			{
 			case 0xff:

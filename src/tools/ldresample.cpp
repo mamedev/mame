@@ -237,8 +237,8 @@ static chd_error create_chd(chd_file_compressor &file, const char *filename, chd
 static bool read_chd(chd_file &file, uint32_t field, movie_info &info, uint32_t soundoffs)
 {
 	// configure the codec
-	avhuff_decompress_config avconfig;
-	avconfig.video.wrap(info.bitmap, info.bitmap.cliprect());
+	avhuff_decoder::config avconfig;
+	avconfig.video = &info.bitmap;
 	avconfig.maxsamples = info.lsound.size();
 	avconfig.actsamples = &info.samples;
 	avconfig.audio[0] = &info.lsound[soundoffs];

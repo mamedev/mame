@@ -439,11 +439,9 @@ uint8_t pc9801_state::fdc_2hd_ctrl_r()
 void pc9801_state::fdc_2hd_ctrl_w(uint8_t data)
 {
 	//logerror("%02x ctrl\n",data);
-	if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
-		m_fdc_2hd->soft_reset();
+	m_fdc_2hd->reset_w(BIT(data, 7));
 
 	m_fdc_2hd_ctrl = data;
-
 	if(data & 0x40)
 	{
 		m_fdc_2hd->set_ready_line_connected(0);
@@ -475,8 +473,7 @@ uint8_t pc9801_state::fdc_2dd_ctrl_r()
 void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
 {
 	logerror("%02x ctrl\n",data);
-	if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-		m_fdc_2dd->soft_reset();
+	m_fdc_2dd->reset_w(BIT(data, 7));
 
 	m_fdc_2dd_ctrl = data;
 	m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);

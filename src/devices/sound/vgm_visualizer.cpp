@@ -158,7 +158,7 @@ void vgmviz_device::apply_fft()
 
 void vgmviz_device::apply_waterfall()
 {
-	int total_bars = FFT_LENGTH / 2;
+	const int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX* bins[2] = { (WDL_FFT_COMPLEX*)m_fft_buf[0], (WDL_FFT_COMPLEX*)m_fft_buf[1] };
 	for (int bar = 0; bar < std::min<int>(total_bars, SCREEN_HEIGHT); bar++)
 	{
@@ -555,7 +555,7 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 		m_clear_pending = false;
 	}
 
-	const pen_t *pal = m_palette->pens();
+	pen_t const *const pal = m_palette->pens();
 
 	int width = SCREEN_WIDTH;
 	switch (SpecMode)
@@ -563,31 +563,26 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 	case SPEC_VIZ_PILLAR:
 		for (int y = 2; y < SCREEN_HEIGHT; y++)
 		{
-			uint32_t *src = &m_bitmap.pix32(y);
-			uint32_t *dst = &bitmap.pix32(y - 2);
+			uint32_t const *const src = &m_bitmap.pix(y);
+			uint32_t *const dst = &bitmap.pix(y - 2);
 			for (int x = SCREEN_WIDTH - 1; x >= 1; x--)
 			{
 				dst[x] = src[x - 1];
 			}
 		}
-		width = (int)(SCREEN_WIDTH * 0.75f);
+		width = int(SCREEN_WIDTH * 0.75f);
 		break;
 	case SPEC_VIZ_TOP:
 		for (int y = 1; y < SCREEN_HEIGHT; y++)
 		{
-			uint32_t *src = &m_bitmap.pix32(y);
-			uint32_t *dst = &bitmap.pix32(y - 1);
-			for (int x = 0; x < SCREEN_WIDTH; x++)
-			{
-				dst[x] = src[x];
-			}
+			std::copy_n(&m_bitmap.pix(y), SCREEN_WIDTH, &bitmap.pix(y - 1));
 		}
 		break;
 	default:
 		break;
 	}
 
-	int total_bars = FFT_LENGTH / 2;
+	const int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX *bins[2] = { (WDL_FFT_COMPLEX *)m_fft_buf[0], (WDL_FFT_COMPLEX *)m_fft_buf[1] };
 
 	for (int bar = 2; bar < total_bars && bar < width; bar += BarSize)
@@ -614,8 +609,8 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 			}
 			for (int y = 0; y < SCREEN_HEIGHT; y++)
 			{
-				int bar_y = SCREEN_HEIGHT - y;
-				uint32_t *line = &bitmap.pix32(y);
+				const int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *const line = &bitmap.pix(y);
 				for (int x = 0; x < BarSize; x++)
 				{
 					line[(bar - 2) + x] = bar_y <= level ? pal[256 + pal_index] : pal[black_index];
@@ -631,8 +626,8 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 
 			for (int y = 0; y < SCREEN_HEIGHT; y++)
 			{
-				int bar_y = SCREEN_HEIGHT - y;
-				uint32_t *line = &bitmap.pix32(y);
+				const int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *const line = &bitmap.pix(y);
 				line[0] = 0;
 				if (bar_y > level)
 				{
@@ -643,9 +638,9 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 				{
 					if (bar_y < (level - 1))
 					{
-						const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.75f);
-						const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.75f);
-						const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.75f);
+						const uint8_t r = uint8_t(((entry >> 16) & 0xff) * 0.75f);
+						const uint8_t g = uint8_t(((entry >>  8) & 0xff) * 0.75f);
+						const uint8_t b = uint8_t(((entry >>  0) & 0xff) * 0.75f);
 						line[(bar - 2) + x] = 0xff000000 | (r << 16) | (g << 8) | b;
 					}
 					else
@@ -653,9 +648,9 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 						line[(bar - 2) + x] = pal[256 + pal_index];
 					}
 				}
-				const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.5f);
-				const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.5f);
-				const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.5f);
+				const uint8_t r = uint8_t(((entry >> 16) & 0xff) * 0.5f);
+				const uint8_t g = uint8_t(((entry >>  8) & 0xff) * 0.5f);
+				const uint8_t b = uint8_t(((entry >>  0) & 0xff) * 0.5f);
 				line[(bar - 2) + (BarSize - 1)] = 0xff000000 | (r << 16) | (g << 8) | b;
 				if (bar_y < level)
 				{
@@ -664,10 +659,11 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 			}
 			for (int x = 0; x < SCREEN_WIDTH; x++)
 			{
-				bitmap.pix32(SCREEN_HEIGHT - 1, x) = 0;
-				bitmap.pix32(SCREEN_HEIGHT - 2, x) = 0;
+				bitmap.pix(SCREEN_HEIGHT - 1, x) = 0;
+				bitmap.pix(SCREEN_HEIGHT - 2, x) = 0;
 			}
-			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+				std::copy_n(&bitmap.pix(y), SCREEN_WIDTH, &m_bitmap.pix(y));
 			break;
 		case SPEC_VIZ_TOP:
 			level = int(raw_level * 63.0f);
@@ -678,10 +674,11 @@ template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap
 
 			for (int x = 0; x < BarSize; x++)
 			{
-				bitmap.pix32(SCREEN_HEIGHT - 1, (bar - 2) + x) = level > 0 ? pal[256 + pal_index] : pal[black_index];
+				bitmap.pix(SCREEN_HEIGHT - 1, (bar - 2) + x) = level > 0 ? pal[256 + pal_index] : pal[black_index];
 			}
 
-			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+				std::copy_n(&bitmap.pix(y), SCREEN_WIDTH, &m_bitmap.pix(y));
 			break;
 		}
 	}
@@ -700,7 +697,7 @@ void vgmviz_device::draw_waterfall(bitmap_rgb32 &bitmap)
 		const int v0_index = (int)v0h;
 		const int v1_index = (int)v1h;
 		const float interp = v0h - (float)v0_index;
-		uint32_t* line = &bitmap.pix32(y);
+		uint32_t* line = &bitmap.pix(y);
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
 			if (m_waterfall_length < SCREEN_WIDTH)
@@ -736,8 +733,8 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 
 	for (int x = 0; x < SCREEN_WIDTH; x++)
 	{
-		bitmap.pix32(CHANNEL_CENTER, x) = MED_GRAY;
-		bitmap.pix32(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
+		bitmap.pix(CHANNEL_CENTER, x) = MED_GRAY;
+		bitmap.pix(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
 
 		const float raw_l = m_audio_buf[1 - m_audio_fill_index][0][((int)m_history_length + 1 + x) % FFT_LENGTH];
 		const int sample_l = (int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1));
@@ -746,7 +743,7 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		int y = endy_l - sample_l;
 		do
 		{
-			bitmap.pix32(y, x) = LEFT_COLOR;
+			bitmap.pix(y, x) = LEFT_COLOR;
 			y += dy_l;
 		} while(y != endy_l);
 
@@ -757,11 +754,11 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		y = endy_r - sample_r;
 		do
 		{
-			bitmap.pix32(y, x) = RIGHT_COLOR;
+			bitmap.pix(y, x) = RIGHT_COLOR;
 			y += dy_r;
 		} while(y != endy_r);
 
-		bitmap.pix32(CHANNEL_HEIGHT, x) = WHITE;
-		bitmap.pix32(CHANNEL_HEIGHT + 1, x) = WHITE;
+		bitmap.pix(CHANNEL_HEIGHT, x) = WHITE;
+		bitmap.pix(CHANNEL_HEIGHT + 1, x) = WHITE;
 	}
 }

@@ -204,8 +204,8 @@ NETLIST_START(tailg)
 	D_1N914(D8)
 	D_1N914(D9)
 
-	Q_2N3904(Q1)            // NPN
-	Q_2N3904(Q2)            // NPN
+//  Q_2N3904(Q1)            // NPN -- not used
+//  Q_2N3904(Q2)            // NPN -- not used
 	Q_2N3906(Q3)            // PNP
 	Q_2N3906(Q4)            // PNP
 	Q_2N3906(Q5)            // PNP

@@ -207,7 +207,7 @@ void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect
 			if (cliprect.contains(xloc, yloc) && (hcond == vcond))
 			{
 				if (((state & 0x000ff) == 0x000ff) && !feedback && (xloc >= firstx) && (xloc <= lastx))
-					bitmap.pix16(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
+					bitmap.pix(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
 			}
 
 			// update LFSR state

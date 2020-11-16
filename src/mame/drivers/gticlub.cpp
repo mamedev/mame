@@ -909,7 +909,7 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 			for (x=0; x < 512; x++)
 			{
 				uint8_t pixel = rom[index + (y*512) + x];
-				bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
+				bitmap.pix(y, x) = K001006_palette[tp][(pal * 256) + pixel];
 			}
 		}
 

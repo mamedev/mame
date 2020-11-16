@@ -153,14 +153,14 @@ So far, the AA-016 and AA-017 MCUs have been dumped successfully.
 
 At least two Great Swordsman boards have been seen with a UVEPROM-based
 D8741A-8 MCU for AA-013 at 9.5A.  This suggests the developers made some
-last-minute change to the code that only the main CPU.
+last-minute change to the code that only affects the main CPU.
 
 It appears that during development, the developers worked with three
 copies of what became the AA-016 MCU.  Protection code was added to the
 I/O MCU program, and this became AA-017.  At this point they intended to
 use two copies of AA-016 for communications, and one AA-017 for I/O.  It
-turned out that some last-minute change was required for the master CPU,
-but it was too late to order new mask ROM MUCs.  This resulted in the
+turned out that some last-minute change was required for the main CPU,
+but it was too late to order new mask ROM MCUs.  This resulted in the
 use of UVEPROM parts for AA-013.
 
 There are problems with sound.  Many effects aren't playing or are cut
@@ -255,9 +255,9 @@ contained within a single page.  The initialisation/self test and mode
 selection, the subroutine for receiving configuration, and an unused
 subroutine for sending a negated program byte to the host are in page 0.
 The subroutines that implement coin handling are in page 1.  There are
-three input handling and protection programs of increasing of increasing
-complexity in page 2 and page 3.  The host selects the input handling
-program to use with the high nybble of the first command.
+three input handling and protection programs of increasing complexity in
+page 2 and page 3.  The host selects the input handling program to use
+with the high nybble of the first command.
 
 The subroutine for receiving configuration from the host is identical to
 the one in the AA-016 MCU besides being shifted to a different address.
@@ -310,11 +310,11 @@ command:
 The MCU keeps an internal credit counter ($2D).  Each time the MCU
 receives a polling command, if the credit counter is non-zero it will be
 decremented and bit 7 of the response will be set; if the credit counter
-is zero, but 7 of the response will be clear.
+is zero, bit 7 of the response will be clear.
 
 After terminating the setup phase, any byte written to the data port
 will cause the MCU to check the coin inputs, update the credit counter
-if necessary, and return the desired data.  A byte written to the
+if necessary, and return the requested data.  A byte written to the
 control port after the setup phase terminates causes the MCU to read a
 byte of program memory from page 2 using the received byte as the
 offset, twos-complement it, return it, and then immediately re-execute

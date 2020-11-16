@@ -151,16 +151,16 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 		// calculate target increment for horizontal scanlines which is exactly one
 		dst_adv = 1;
 		dst_offset = dst_length;
-		pri_base = &priority.pix8(linepos, dst_start + dst_offset);
-		dst_base = &bitmap.pix32(linepos, dst_start + dst_length);
+		pri_base = &priority.pix(linepos, dst_start + dst_offset);
+		dst_base = &bitmap.pix(linepos, dst_start + dst_length);
 	}
 	else
 	{
 		// calculate target increment for vertical scanlines which is the bitmap's pitch value
 		dst_adv = bitmap.rowpixels();
 		dst_offset= dst_length * dst_adv;
-		pri_base = &priority.pix8(dst_start, linepos + dst_offset);
-		dst_base = &bitmap.pix32(dst_start, linepos + dst_offset);
+		pri_base = &priority.pix(dst_start, linepos + dst_offset);
+		dst_base = &bitmap.pix(dst_start, linepos + dst_offset);
 	}
 
 	// generalized

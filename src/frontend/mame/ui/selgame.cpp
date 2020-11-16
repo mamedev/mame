@@ -786,32 +786,33 @@ void menu_select_game::inkey_select(const event *menu_event)
 	else
 	{
 		// anything else is a driver
-
-		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *driver);
 		enumerator.next();
+
+		// if there are software entries, show a software selection menu
+		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		{
+			if (!swlistdev.get_info().empty())
+			{
+				menu::stack_push<menu_select_software>(ui(), container(), *driver);
+				return;
+			}
+		}
+
+		// audit the system ROMs first to see if we're going to work
 		media_auditor auditor(enumerator);
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-			{
-				if (!swlistdev.get_info().empty())
-				{
-					menu::stack_push<menu_select_software>(ui(), container(), *driver);
-					return;
-				}
-			}
-
 			if (!select_bios(*driver, false))
 				launch_system(*driver);
 		}
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 }
@@ -858,23 +859,25 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
-		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *ui_swinfo->driver);
 		enumerator.next();
+
+		// if there are software entries, show a software selection menu
+		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		{
+			if (!swlistdev.get_info().empty())
+			{
+				menu::stack_push<menu_select_software>(ui(), container(), *ui_swinfo->driver);
+				return;
+			}
+		}
+
+		// audit the system ROMs first to see if we're going to work
 		media_auditor auditor(enumerator);
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-			{
-				if (!swlistdev.get_info().empty())
-				{
-					menu::stack_push<menu_select_software>(ui(), container(), *ui_swinfo->driver);
-					return;
-				}
-			}
-
 			// if everything looks good, schedule the new driver
 			if (!select_bios(*ui_swinfo->driver, false))
 			{
@@ -885,7 +888,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 	else
@@ -907,7 +910,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_POSITION, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_POSITION, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 }
@@ -1453,20 +1456,6 @@ void menu_select_game::filter_selected()
 					reset(reset_options::SELECT_FIRST);
 				});
 	}
-}
-
-
-std::string menu_select_game::make_error_text(bool summary, media_auditor const &auditor)
-{
-	std::ostringstream str;
-	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
-	if (summary)
-	{
-		auditor.summarize(nullptr, &str);
-		str << "\n";
-	}
-	str << _("Press any key to continue.");
-	return str.str();
 }
 
 } // namespace ui

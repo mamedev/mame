@@ -2,7 +2,7 @@
 // copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina
 /********************************************************************
 
-Enigma 2 (c) Zilec Electronics
+Enigma 2 (C) Game Plan / Zilec Electronics
 
 driver by Pierpaolo Prazzoli and Tomasz Slanina
 
@@ -12,7 +12,7 @@ enigma2 (1981)
  Original dedicated board
 
 enigma2a (1984?)
- Conversion applied to a Taito Space Invaders Part II board set with 1984 copyrighy. hack / Bootleg ?
+ Conversion applied to a Taito Space Invaders Part II board set with 1984 copyright. hack / Bootleg ?
 
 enigma2b (1981)
  Conversion like enigma2a, but boots with 1981 copyright and Phantoms II title
@@ -20,6 +20,106 @@ enigma2b (1981)
 TODO:
  - enigma2  - Star blinking frequency
  - enigma2a + enigma2b - bad sound ROM?
+
+
+*********************************************************************
+Enigma II, Game Plan, 1981
+PCB hardware notes by Guru
+
+GAME PLAN (C) 1981
+|------------------------------------------------------------------------------------------------------------|
+|     18   17   16    15    14    13    12   11    10    9     8     7     6     5     4     3    2     1    |
+|   LS157 LS32 LS283 LS86  LS86  LS86  LS86       LS27  LS32  LS02  LS161 LS161 LS161 LS161 LS74 LS107 LS04 A|
+|                                                                                                       10MHz|
+|                                                                                            |---|           |
+|   LS165 LS10 LS157 LS157 LS157 LS157 LS42 2114  2114  2114  2114  2114  2114  2114  2114   |   |          B|
+|                                                                                            |Z80|     LS161 |
+|                                                                                            |   |           |
+|         LS08                              2114  2114  2114  2114  2114  2114  2114  2114   |   |          C|
+|   LS165                                                                                    |---|     LS161 |
+|                                                                                                            |
+|         LS74                      6.13D   5.11D   4.10D    3.8D     2.7D     1.5D   LS138   LS244    LS04 D|
+|             LS245                                                                                          |
+|                                                                                                            |
+|         LS42                                                                |---|                    LS32 E|
+|                                                                  DIPSW(8)   | A |                          |
+|                                                                             | Y |              9.2F        |
+|2  LS240 LS21    LS04    LS08      8.13F   7.11F                  LS244      | 3 |                         F|
+|2                                                                            | 8 |              2114        |
+|W                                                  LS175    LS04             | 9 |                          |
+|A  LS240            LS07  LS08  LS157 LS08 LS174                             | 1 |              2114       G|
+|Y                                                                            | 0 |                    LS42  |
+|                                                                             |---|          |----------|    |
+|                                                                           LS164            |   Z80    |   H|
+|        LM380N        VOLUME                                      LS02     4040             |----------|    |
+|                                                                                                            |
+|------------------------------------------------------------------------------------------------------------|
+Notes: (all IC's shown)
+           Z80 - Clock 2.5MHz (both) [10/4]
+      AY3-8910 - Clock 1.25MHz [10/8]
+        LM380N - 2.5w Audio Power Amp IC (DIP14)
+          2114 - 1kx4-bit SRAM
+  1.xx to 8.xx - 2716 EPROM
+          9.2F - 2532 EPROM
+         HSync - 15.0539kHz
+         VSync - measured between 52Hz and 53Hz (moving)
+
+
+Edge Connector
+--------------
+
+             Parts   Solder
+             ------|------
+             +5V 1 | A +5V
+             +5V 2 | B +5V
+               - 3 | C -
+       2P THRUST 4 | D -
+               - 5 | E -
+               - 6 | F 2P RIGHT
+         2P LEFT 7 | H 2P FIRE
+       1P THRUST 8 | J 1P START
+        2P START 9 | K COIN
+              - 10 | L 1P RIGHT
+        1P LEFT 11 | M 1P FIRE
+           BLUE 12 | N GREEN
+           SYNC 13 | P RED
+COMPOSITE VIDEO 14 | R -
+              - 15 | S -
+              - 16 | T -
+           SLAM 17 | U -
+              - 18 | V -
+       SPEAKER+ 19 | W SPEAKER-
+           +12V 20 | X +12V
+            GND 21 | Y GND
+            GND 22 | Z GND
+
+DIP Switches
+------------
+
++-----------------+---+---+---+---+---+---+---+---+
+| Default=*       | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
++-----------------+---+---+---+---+---+---+---+---+
+|Coinage   1C 1P* |           |ON |               |
+|          2C 1P  |           |OFF|               |
++-----------------+-------+---+---+---------------+
+|Cabinet Upright* |       |ON |                   |
+|        Cocktail |       |OFF|                   |
++-----------------+---+---+---+-------------------+
+|Lives         3* |ON |ON |                       |
+|              4  |OFF|ON |                       |
+|              5  |ON |OFF|                       |
+|              6  |OFF|OFF|                       |
++-----------------+---+---+-----------+---+---+---+
+|Difficulty    1  |                   |OFF|ON |OFF|
+|              2  |                   |OFF|ON |ON |
+|              3* |                   |OFF|OFF|OFF|
+|              4  |                   |OFF|OFF|ON |
+|              5  |                   |ON |OFF|OFF|
+|              6  |                   |ON |OFF|ON |
++-----------------+---------------+---+---+---+---+
+|# OF INVADERS 16*|               |OFF|           |
+|              32 |               |ON |           |
++-----------------+---------------+---+-----------+
 
 *********************************************************************/
 
@@ -34,7 +134,7 @@ TODO:
 #define LOG_PROT    (0)
 
 /* these values provide a fairly low refresh rate of around 53Hz, but
-   they were derived from the schemtics.  The horizontal synch chain
+   they were derived from the schematics.  The horizontal synch chain
    counts from 0x0c0-0x1ff and the vertical one from 0x0d8-0x1ff.  */
 
 #define MASTER_CLOCK        (10000000)
@@ -282,7 +382,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			/* stars only appear at certain positions */
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
 
-		bitmap.pix32(bitmap_y, x) = m_palette->pen_color(color);
+		bitmap.pix(bitmap_y, x) = m_palette->pen_color(color);
 
 		/* next pixel */
 		x = x + 1;
@@ -344,7 +444,7 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		}
 
 		pen = bit ? rgb_t::white() : rgb_t::black();
-		bitmap.pix32(bitmap_y, x) = pen;
+		bitmap.pix(bitmap_y, x) = pen;
 
 		/* next pixel */
 		x = x + 1;
@@ -513,25 +613,25 @@ static INPUT_PORTS_START( enigma2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, "Skill level" )
+	PORT_DIPNAME( 0x1c, 0x00, "Skill Level" )         PORT_DIPLOCATION("DSW:6,7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x14, "6" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Number of invaders" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Invaders" )  PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x40, "16" )
 	PORT_DIPSETTING(    0x00, "32" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
@@ -569,25 +669,25 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, "Skill level" )
+	PORT_DIPNAME( 0x1c, 0x00, "Skill Level" )         PORT_DIPLOCATION("DSW:6,7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x14, "6" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )    PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
@@ -621,7 +721,7 @@ void enigma2_state::enigma2(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
 
-	PALETTE(config, m_palette, palette_device::BGR_3BIT);
+	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -671,7 +771,7 @@ ROM_START( enigma2 )
 	ROM_LOAD( "6.13d",        0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
+	ROM_LOAD( "9.2f",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
 	ROM_REGION( 0x0800, "colors", 0 )
 	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )

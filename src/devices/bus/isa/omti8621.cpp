@@ -1333,8 +1333,7 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 	m_moten = data;
 
-	if (!BIT(data, 2))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 2));
 
 	for (int i = 0; i < 2; i++)
 	{

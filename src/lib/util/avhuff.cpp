@@ -691,24 +691,19 @@ avhuff_decoder::avhuff_decoder()
 }
 
 /**
- * @fn  void avhuff_decoder::configure(const avhuff_decompress_config &config)
+ * @fn  void avhuff_decoder::configure(const config &cfg)
  *
  * @brief   -------------------------------------------------
  *            configure - configure decompression parameters
  *          -------------------------------------------------.
  *
- * @param   config  The configuration.
+ * @param   cfg     The configuration.
  */
 
-void avhuff_decoder::configure(const avhuff_decompress_config &config)
+void avhuff_decoder::configure(const config &cfg)
 {
-	m_config.video.wrap(config.video, config.video.cliprect());
-	m_config.maxsamples = config.maxsamples;
-	m_config.actsamples = config.actsamples;
-	memcpy(m_config.audio, config.audio, sizeof(m_config.audio));
-	m_config.maxmetalength = config.maxmetalength;
-	m_config.actmetalength = config.actmetalength;
-	m_config.metadata = config.metadata;
+	m_video.wrap(*cfg.video, cfg.video->cliprect());
+	m_config = cfg;
 }
 
 /**
@@ -792,9 +787,9 @@ avhuff_error avhuff_decoder::decode_data(const uint8_t *source, uint32_t complen
 		// determine the start of each piece of data
 		metastart = m_config.metadata;
 		for (int chnum = 0; chnum < channels; chnum++)
-			audiostart[chnum] = (uint8_t *)m_config.audio[chnum];
-		videostart = (m_config.video.valid()) ? reinterpret_cast<uint8_t *>(&m_config.video.pix(0)) : nullptr;
-		videostride = (m_config.video.valid()) ? m_config.video.rowpixels() * 2 : 0;
+			audiostart[chnum] = reinterpret_cast<uint8_t *>(m_config.audio[chnum]);
+		videostart = m_video.valid() ? reinterpret_cast<uint8_t *>(&m_video.pix(0)) : nullptr;
+		videostride = m_video.valid() ? m_video.rowpixels() * 2 : 0;
 
 		// data is assumed to be native-endian
 		uint16_t betest = 0;
@@ -802,7 +797,7 @@ avhuff_error avhuff_decoder::decode_data(const uint8_t *source, uint32_t complen
 		audioxor = videoxor = (betest == 1) ? 1 : 0;
 
 		// verify against sizes
-		if (m_config.video.valid() && (m_config.video.width() < width || m_config.video.height() < height))
+		if (m_video.valid() && (m_video.width() < width || m_video.height() < height))
 			return AVHERR_VIDEO_TOO_LARGE;
 		for (int chnum = 0; chnum < channels; chnum++)
 			if (m_config.audio[chnum] != nullptr && m_config.maxsamples < samples)

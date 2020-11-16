@@ -52,6 +52,26 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_beep(*this, "beeper")
 		, m_serial(*this, PCE220SERIAL_TAG)
+		, m_keyboard(*this, "LINE%u", 0)
+		, m_io_on(*this, "ON")
+		, m_busy(*this, "BUSY")
+		, m_caps(*this, "CAPS")
+		, m_kana(*this, "KANA")
+		, m_syo(*this, "SYO")
+		, m_2ndf(*this, "2ndF")
+		, m_text(*this, "TEXT")
+		, m_casl(*this, "CASL")
+		, m_pro(*this, "PRO")
+		, m_run(*this, "RUN")
+		, m_batt(*this, "BATT")
+		, m_e(*this, "E")
+		, m_m(*this, "M")
+		, m_const(*this, "CONST")
+		, m_rad(*this, "RAD")
+		, m_g(*this, "G")
+		, m_de(*this, "DE")
+		, m_stat(*this, "STAT")
+		, m_print(*this, "PRINT")
 	{ }
 
 	void pce220(machine_config &config);
@@ -64,6 +84,28 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beep;
 	required_device<pce220_serial_device> m_serial;
+
+	required_ioport_array<10> m_keyboard;
+	required_ioport m_io_on;
+
+	output_finder<> m_busy;
+	output_finder<> m_caps;
+	output_finder<> m_kana;
+	output_finder<> m_syo;
+	output_finder<> m_2ndf;
+	output_finder<> m_text;
+	output_finder<> m_casl;
+	output_finder<> m_pro;
+	output_finder<> m_run;
+	output_finder<> m_batt;
+	output_finder<> m_e;
+	output_finder<> m_m;
+	output_finder<> m_const;
+	output_finder<> m_rad;
+	output_finder<> m_g;
+	output_finder<> m_de;
+	output_finder<> m_stat;
+	output_finder<> m_print;
 
 	// HD61202 LCD controller
 	uint8_t m_lcd_index_row;
@@ -82,6 +124,7 @@ protected:
 	uint8_t m_port15;
 	uint8_t m_port18;
 
+	virtual void device_resolve_objects() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -125,14 +168,16 @@ public:
 	void pcg850v(machine_config &config);
 	void pcg815(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t m_g850v_bank_num;
 	uint8_t m_lcd_effects;
 	uint8_t m_lcd_contrast;
 	uint8_t m_lcd_read_mode;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t g850v_bank_r();
 	void g850v_bank_w(uint8_t data);
@@ -161,11 +206,11 @@ uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					{
 						//first 12 columns
 						int panel1_addr = ((m_lcd_start_line>>3) + y)*0x40 + row_pos;
-						bitmap.pix16(y*8 + yi, x*6 + xi) = (m_vram[panel1_addr & 0x1ff] >> yi) & 1;
+						bitmap.pix(y*8 + yi, x*6 + xi) = (m_vram[panel1_addr & 0x1ff] >> yi) & 1;
 
 						//last 12 columns
 						int panel2_addr = ((m_lcd_start_line>>3) + y + 4)*0x40 + (59-row_pos);
-						bitmap.pix16(y*8 + yi, (x+12)*6 + xi) = (m_vram[panel2_addr & 0x1ff] >> yi) & 1;
+						bitmap.pix(y*8 + yi, (x+12)*6 + xi) = (m_vram[panel2_addr & 0x1ff] >> yi) & 1;
 					}
 
 					row_pos++;
@@ -184,24 +229,24 @@ uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 
-	output().set_value("BUSY" , (lcd_symbols[0] & 0x01) ? 1 : 0);
-	output().set_value("CAPS" , (lcd_symbols[0] & 0x02) ? 1 : 0);
-	output().set_value("KANA" , (lcd_symbols[0] & 0x04) ? 1 : 0);
-	output().set_value("SYO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
-	output().set_value("2ndF" , (lcd_symbols[0] & 0x10) ? 1 : 0);
-	output().set_value("TEXT" , (lcd_symbols[1] & 0x08) ? 1 : 0);
-	output().set_value("CASL" , (lcd_symbols[1] & 0x10) ? 1 : 0);
-	output().set_value("PRO"  , (lcd_symbols[1] & 0x20) ? 1 : 0);
-	output().set_value("RUN"  , (lcd_symbols[1] & 0x40) ? 1 : 0);
-	output().set_value("BATT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
-	output().set_value("E"    , (lcd_symbols[2] & 0x02) ? 1 : 0);
-	output().set_value("M"    , (lcd_symbols[2] & 0x04) ? 1 : 0);
-	output().set_value("CONST", (lcd_symbols[2] & 0x08) ? 1 : 0);
-	output().set_value("RAD"  , (lcd_symbols[2] & 0x10) ? 1 : 0);
-	output().set_value("G"    , (lcd_symbols[2] & 0x20) ? 1 : 0);
-	output().set_value("DE"   , (lcd_symbols[2] & 0x40) ? 1 : 0);
-	output().set_value("STAT" , (lcd_symbols[3] & 0x20) ? 1 : 0);
-	output().set_value("PRINT", (lcd_symbols[3] & 0x40) ? 1 : 0);
+	m_busy = (lcd_symbols[0] & 0x01) ? 1 : 0;
+	m_caps = (lcd_symbols[0] & 0x02) ? 1 : 0;
+	m_kana = (lcd_symbols[0] & 0x04) ? 1 : 0;
+	m_syo  = (lcd_symbols[0] & 0x08) ? 1 : 0;
+	m_2ndf = (lcd_symbols[0] & 0x10) ? 1 : 0;
+	m_text = (lcd_symbols[1] & 0x08) ? 1 : 0;
+	m_casl = (lcd_symbols[1] & 0x10) ? 1 : 0;
+	m_pro  = (lcd_symbols[1] & 0x20) ? 1 : 0;
+	m_run  = (lcd_symbols[1] & 0x40) ? 1 : 0;
+	m_batt = (lcd_symbols[2] & 0x01) ? 1 : 0;
+	m_e    = (lcd_symbols[2] & 0x02) ? 1 : 0;
+	m_m    = (lcd_symbols[2] & 0x04) ? 1 : 0;
+	m_const= (lcd_symbols[2] & 0x08) ? 1 : 0;
+	m_rad  = (lcd_symbols[2] & 0x10) ? 1 : 0;
+	m_g    = (lcd_symbols[2] & 0x20) ? 1 : 0;
+	m_de   = (lcd_symbols[2] & 0x40) ? 1 : 0;
+	m_stat = (lcd_symbols[3] & 0x20) ? 1 : 0;
+	m_print= (lcd_symbols[3] & 0x40) ? 1 : 0;
 
 	return 0;
 }
@@ -245,7 +290,7 @@ uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					for (int yi = 0; yi < 8; yi++)
 					{
 						int addr = ((m_lcd_start_line>>3) + y)*0x100 + row_pos;
-						bitmap.pix16(y*8 + yi, x*6 + xi) = ((m_vram[addr & 0x7ff] >> yi) & 1 ) ? color1 : color0;
+						bitmap.pix(y*8 + yi, x*6 + xi) = ((m_vram[addr & 0x7ff] >> yi) & 1 ) ? color1 : color0;
 					}
 
 					row_pos++;
@@ -266,23 +311,23 @@ uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 
-	output().set_value("RUN"  , (lcd_symbols[0] & 0x02) ? 1 : 0);
-	output().set_value("PRO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
-	output().set_value("TEXT" , (lcd_symbols[0] & 0x40) ? 1 : 0);
-	output().set_value("CASL" , (lcd_symbols[1] & 0x08) ? 1 : 0);
-	output().set_value("STAT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
-	output().set_value("2ndF" , (lcd_symbols[2] & 0x20) ? 1 : 0);
-	output().set_value("M"    , (lcd_symbols[2] & 0x80) ? 1 : 0);
-	output().set_value("CAPS" , (lcd_symbols[3] & 0x04) ? 1 : 0);
-	output().set_value("KANA" , (lcd_symbols[3] & 0x80) ? 1 : 0);
-	output().set_value("SYO"  , (lcd_symbols[4] & 0x02) ? 1 : 0);
-	output().set_value("DE"   , (lcd_symbols[4] & 0x10) ? 1 : 0);
-	output().set_value("G"    , (lcd_symbols[4] & 0x40) ? 1 : 0);
-	output().set_value("RAD"  , (lcd_symbols[5] & 0x01) ? 1 : 0);
-	output().set_value("CONST", (lcd_symbols[5] & 0x04) ? 1 : 0);
-	output().set_value("PRINT", (lcd_symbols[5] & 0x10) ? 1 : 0);
-	output().set_value("BUSY" , (lcd_symbols[5] & 0x40) ? 1 : 0);
-	output().set_value("BATT" , (lcd_symbols[5] & 0x80) ? 1 : 0);
+	m_run  = (lcd_symbols[0] & 0x02) ? 1 : 0;
+	m_pro  = (lcd_symbols[0] & 0x08) ? 1 : 0;
+	m_text = (lcd_symbols[0] & 0x40) ? 1 : 0;
+	m_casl = (lcd_symbols[1] & 0x08) ? 1 : 0;
+	m_stat = (lcd_symbols[2] & 0x01) ? 1 : 0;
+	m_2ndf = (lcd_symbols[2] & 0x20) ? 1 : 0;
+	m_m    = (lcd_symbols[2] & 0x80) ? 1 : 0;
+	m_caps = (lcd_symbols[3] & 0x04) ? 1 : 0;
+	m_kana = (lcd_symbols[3] & 0x80) ? 1 : 0;
+	m_syo  = (lcd_symbols[4] & 0x02) ? 1 : 0;
+	m_de   = (lcd_symbols[4] & 0x10) ? 1 : 0;
+	m_g    = (lcd_symbols[4] & 0x40) ? 1 : 0;
+	m_rad  = (lcd_symbols[5] & 0x01) ? 1 : 0;
+	m_const= (lcd_symbols[5] & 0x04) ? 1 : 0;
+	m_print= (lcd_symbols[5] & 0x10) ? 1 : 0;
+	m_busy = (lcd_symbols[5] & 0x40) ? 1 : 0;
+	m_batt = (lcd_symbols[5] & 0x80) ? 1 : 0;
 
 	return 0;
 }
@@ -423,7 +468,7 @@ uint8_t pce220_state::port1f_r()
 	data |= m_serial->in_ack()<<1;
 	data |= m_serial->in_xin()<<2;
 
-	data |= ioport("ON")->read()<<7;
+	data |= m_io_on->read()<<7;
 
 	return data;
 }
@@ -445,26 +490,9 @@ uint8_t pce220_state::kb_r()
 {
 	uint8_t data = 0x00;
 
-	if (m_kb_matrix & 0x01)
-		data |= ioport("LINE0")->read();
-	if (m_kb_matrix & 0x02)
-		data |= ioport("LINE1")->read();
-	if (m_kb_matrix & 0x04)
-		data |= ioport("LINE2")->read();
-	if (m_kb_matrix & 0x08)
-		data |= ioport("LINE3")->read();
-	if (m_kb_matrix & 0x10)
-		data |= ioport("LINE4")->read();
-	if (m_kb_matrix & 0x20)
-		data |= ioport("LINE5")->read();
-	if (m_kb_matrix & 0x40)
-		data |= ioport("LINE6")->read();
-	if (m_kb_matrix & 0x80)
-		data |= ioport("LINE7")->read();
-	if (m_kb_matrix & 0x100)
-		data |= ioport("LINE8")->read();
-	if (m_kb_matrix & 0x200)
-		data |= ioport("LINE9")->read();
+	for (int i = 0; i < 10; i++)
+		if (BIT(m_kb_matrix, i))
+			data |= m_keyboard[i]->read();
 
 	return data;
 }
@@ -866,6 +894,28 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_START("ON")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_PGUP)         PORT_NAME("ON")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  on_irq, 0 )
 INPUT_PORTS_END
+
+void pce220_state::device_resolve_objects()
+{
+	m_busy.resolve();
+	m_caps.resolve();
+	m_kana.resolve();
+	m_syo.resolve();
+	m_2ndf.resolve();
+	m_text.resolve();
+	m_casl.resolve();
+	m_pro.resolve();
+	m_run.resolve();
+	m_batt.resolve();
+	m_e.resolve();
+	m_m.resolve();
+	m_const.resolve();
+	m_rad.resolve();
+	m_g.resolve();
+	m_de.resolve();
+	m_stat.resolve();
+	m_print.resolve();
+}
 
 void pce220_state::machine_start()
 {

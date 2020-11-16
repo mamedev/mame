@@ -59,7 +59,11 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 {
 	bitmap_argb32 bitmap;
 	emu_file file(path.c_str(), OPEN_FLAG_READ);
-	render_load_png(bitmap, file, nullptr, file_name.c_str());
+	if (file.open(file_name) == osd_file::error::NONE)
+	{
+		render_load_png(bitmap, file);
+		file.close();
+	}
 
 	if (bitmap.width() == 0 || bitmap.height() == 0)
 	{

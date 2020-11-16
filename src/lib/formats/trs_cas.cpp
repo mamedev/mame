@@ -5,17 +5,17 @@
 Support for TRS80 .cas cassette images
 
 ********************************************************************/
+#include "formats/trs_cas.h"
 
 #include <cassert>
 
-#include "formats/trs_cas.h"
 
 #define SILENCE 0
 #define SMPLO   -32768
 #define SMPHI   32767
 
 
-static int cas_size;
+static int cas_size; // FIXME: global variable prevents mutliple instances
 
 
 /*******************************************************************
@@ -99,7 +99,7 @@ static int trs80l2_cas_to_wav_size(const uint8_t *casdata, int caslen)
 	return trs80l2_handle_cas( nullptr, casdata );
 }
 
-static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller trs80l2_cas_legacy_fill_wave =
 {
 	trs80l2_cas_fill_wave,                  /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -111,19 +111,19 @@ static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
 };
 
 
-static cassette_image::error trs80l2_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error trs80l2_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &trs80l2_cas_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &trs80l2_cas_legacy_fill_wave);
 }
 
 
 static cassette_image::error trs80l2_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &trs80l2_cas_legacy_fill_wave);
+	return cassette->legacy_construct(&trs80l2_cas_legacy_fill_wave);
 }
 
 
-static const struct CassetteFormat trs80l2_cas_format =
+static const cassette_image::Format trs80l2_cas_format =
 {
 	"cas",
 	trs80l2_cas_identify,

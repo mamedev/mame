@@ -12,8 +12,8 @@
 
 #include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
-#include "plib/pmatrix_cr.h"
 #include "plib/pdynlib.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
 
@@ -93,10 +93,7 @@ namespace solver
 			// FIXME: Move me
 			//
 
-			// During extended validation there is no reason to check for
-			// differences in the generated code since during
-			// extended validation this will be different (and non-functional)
-			if (!this->state().is_extended_validation() && this->state().static_solver_lib().isLoaded())
+			if (this->state().static_solver_lib().isLoaded())
 			{
 				pstring symname = static_compile_name();
 				m_proc.load(this->state().static_solver_lib(), symname);

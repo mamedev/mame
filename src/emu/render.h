@@ -46,6 +46,7 @@
 #ifndef MAME_EMU_RENDER_H
 #define MAME_EMU_RENDER_H
 
+#include "rendertypes.h"
 #include "screen.h"
 
 #include <array>
@@ -61,28 +62,9 @@
 #include <vector>
 
 
-namespace emu { namespace render { namespace detail {
-
-class layout_environment;
-class view_environment;
-
-} } } // namespace emu::render::detail
-
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// blending modes
-enum
-{
-	BLENDMODE_NONE = 0,                                 // no blending
-	BLENDMODE_ALPHA,                                    // standard alpha blend
-	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
-
-	BLENDMODE_COUNT
-};
 
 
 // render creation flags
@@ -174,48 +156,6 @@ constexpr u32 PRIMFLAG_GET_VECTORBUF(u32 x) { return (x & PRIMFLAG_VECTORBUF_MAS
 // texture scaling callback
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
-// render_bounds - floating point bounding rectangle
-struct render_bounds
-{
-	float               x0;                 // leftmost X coordinate
-	float               y0;                 // topmost Y coordinate
-	float               x1;                 // rightmost X coordinate
-	float               y1;                 // bottommost Y coordinate
-
-	constexpr float width() const { return x1 - x0; }
-	constexpr float height() const { return y1 - y0; }
-	constexpr float aspect() const { return width() / height(); }
-	constexpr bool includes(float x, float y) const { return (x >= x0) && (x <= x1) && (y >= y0) && (y <= y1); }
-};
-
-
-// render_color - floating point set of ARGB values
-struct render_color
-{
-	float               a;                  // alpha component (0.0 = transparent, 1.0 = opaque)
-	float               r;                  // red component (0.0 = none, 1.0 = max)
-	float               g;                  // green component (0.0 = none, 1.0 = max)
-	float               b;                  // blue component (0.0 = none, 1.0 = max)
-};
-
-
-// render_texuv - floating point set of UV texture coordinates
-struct render_texuv
-{
-	float               u;                  // U coordinate (0.0-1.0)
-	float               v;                  // V coordinate (0.0-1.0)
-};
-
-
-// render_quad_texuv - floating point set of UV texture coordinates
-struct render_quad_texuv
-{
-	render_texuv        tl;                 // top-left UV coordinate
-	render_texuv        tr;                 // top-right UV coordinate
-	render_texuv        bl;                 // bottom-left UV coordinate
-	render_texuv        br;                 // bottom-right UV coordinate
-};
-
 
 // render_texinfo - texture information
 struct render_texinfo
@@ -230,6 +170,31 @@ struct render_texinfo
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
 	u32                 palette_length;
 };
+
+
+namespace emu { namespace render { namespace detail {
+
+struct bounds_step
+{
+	int             state;
+	render_bounds   bounds;
+	render_bounds   delta;
+};
+using bounds_vector = std::vector<bounds_step>;
+
+struct color_step
+{
+	int             state;
+	render_color    color;
+	render_color    delta;
+};
+using color_vector = std::vector<color_step>;
+
+
+class layout_environment;
+class view_environment;
+
+} } } // namespace emu::render::detail
 
 
 // ======================> render_layer_config
@@ -411,8 +376,8 @@ private:
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
 	{
-		bitmap_argb32 *     bitmap;                 // final bitmap
-		u32                 seqid;                  // sequence number
+		std::unique_ptr<bitmap_argb32>  bitmap;     // final bitmap
+		u32                             seqid;      // sequence number
 	};
 
 	// internal state
@@ -573,13 +538,16 @@ public:
 	using environment = emu::render::detail::layout_environment;
 
 	// construction/destruction
-	layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname);
+	layout_element(environment &env, util::xml::data_node const &elemnode);
 	virtual ~layout_element();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int default_state() const { return m_defstate; }
 	render_texture *state_texture(int state);
+
+	// operations
+	void preload();
 
 private:
 	/// \brief An image, rectangle, or disk in an element
@@ -595,7 +563,7 @@ private:
 		typedef std::unique_ptr<component> ptr;
 
 		// construction/destruction
-		component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+		component(environment &env, util::xml::data_node const &compnode);
 		virtual ~component() = default;
 
 		// setup
@@ -610,11 +578,13 @@ private:
 		render_color color(int state) const;
 
 		// operations
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
+		virtual void preload(running_machine &machine);
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, int state);
 
 	protected:
-		// helper
-		virtual int maxstate() const { return -1; }
+		// helpers
+		virtual int maxstate() const;
+		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
 		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
@@ -629,21 +599,8 @@ private:
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 	private:
-		struct bounds_step
-		{
-			int             state;
-			render_bounds   bounds;
-			render_bounds   delta;
-		};
-		using bounds_vector = std::vector<bounds_step>;
-
-		struct color_step
-		{
-			int             state;
-			render_color    color;
-			render_color    delta;
-		};
-		using color_vector = std::vector<color_step>;
+		using bounds_vector = emu::render::detail::bounds_vector;
+		using color_vector = emu::render::detail::color_vector;
 
 		// internal state
 		int const           m_statemask;                // bits of state used to control visibility
@@ -685,13 +642,13 @@ private:
 		int                 m_state;        // associated state number
 	};
 
-	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode);
 	typedef std::map<std::string, make_component_func> make_component_map;
 
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode);
+	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 
@@ -787,16 +744,16 @@ public:
 		// getters
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
-		const render_bounds &bounds() const { return m_bounds; }
-		const render_color &color() const { return m_color; }
+		render_bounds bounds() const;
+		render_color color() const;
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
-		render_container *screen_container(running_machine &machine) const;
+		render_container *screen_container() const { return m_screen ? &m_screen->container() : nullptr; }
 
 		// interactivity
 		bool has_input() const { return bool(m_input_port); }
-		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
+		std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
@@ -806,16 +763,30 @@ public:
 		void resolve_tags();
 
 	private:
+		using bounds_vector = emu::render::detail::bounds_vector;
+		using color_vector = emu::render::detail::color_vector;
+
+		int animation_state() const;
+
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
-		static render_bounds make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static color_vector make_color(view_environment &env, util::xml::data_node const &itemnode, render_color const &mult);
+		static std::string make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode);
+		static std::string make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode);
+		static ioport_value make_animmask(view_environment &env, util::xml::data_node const &itemnode);
 		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
 		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
-		static unsigned get_input_shift(ioport_value mask);
+		static unsigned get_state_shift(ioport_value mask);
 
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
 		output_finder<>         m_output;           // associated output
+		output_finder<>         m_animoutput;       // associated output for animation if different
 		bool const              m_have_output;      // whether we actually have an output
+		bool const              m_have_animoutput;  // whether we actually have an output for animation
+		ioport_port *           m_animinput_port;   // input port used for animation
+		ioport_value const      m_animmask;         // mask for animation state
+		u8 const                m_animshift;        // shift for animation state
 		ioport_port *           m_input_port;       // input port of this item
 		ioport_field const *    m_input_field;      // input port field of this item
 		ioport_value const      m_input_mask;       // input mask of this item
@@ -824,14 +795,15 @@ public:
 		bool                    m_clickthrough;     // should click pass through to lower elements
 		screen_device *         m_screen;           // pointer to screen
 		int                     m_orientation;      // orientation of this item
-		render_bounds           m_bounds;           // bounds of the item
-		render_color            m_color;            // color of the item
+		bounds_vector           m_bounds;           // bounds of the item
+		color_vector const      m_color;            // color of the item
 		int                     m_blend_mode;       // blending mode to use when drawing
 		u32                     m_visibility_mask;  // combined mask of parent visibility groups
 
 		// cold items
 		std::string const       m_input_tag;        // input tag of this item
-		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
+		std::string const       m_animinput_tag;    // tag of input port for animation state
+		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
 		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};
 	using item_list = std::list<item>;
@@ -901,22 +873,25 @@ public:
 
 	// getters
 	item_list &items() { return m_items; }
+	bool has_screen(screen_device &screen);
 	const std::string &name() const { return m_name; }
-	size_t screen_count() const { return m_screens.size(); }
+	size_t visible_screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
-	bool has_screen(screen_device &screen) const;
-	const item_ref_vector &screen_items() const { return m_screen_items; }
+	bool has_visible_screen(screen_device &screen) const;
+	const item_ref_vector &visible_items() const { return m_visible_items; }
+	const item_ref_vector &visible_screen_items() const { return m_screen_items; }
 	const item_ref_vector &interactive_items() const { return m_interactive_items; }
 	const edge_vector &interactive_edges_x() const { return m_interactive_edges_x; }
 	const edge_vector &interactive_edges_y() const { return m_interactive_edges_y; }
-	const screen_ref_vector &screens() const { return m_screens; }
+	const screen_ref_vector &visible_screens() const { return m_screens; }
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
 
 	// operations
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
+	void preload();
 
 	// resolve tags, if any
 	void resolve_tags();
@@ -945,6 +920,7 @@ private:
 	float                       m_effaspect;        // X/Y of the layout in current configuration
 	render_bounds               m_bounds;           // computed bounds of the view in current configuration
 	item_list                   m_items;            // list of layout items
+	item_ref_vector             m_visible_items;    // all visible items
 	item_ref_vector             m_screen_items;     // visible items that represent screens to draw
 	item_ref_vector             m_interactive_items;// visible items that can accept pointer input
 	edge_vector                 m_interactive_edges_x;
@@ -971,7 +947,7 @@ public:
 	using view_list = std::list<layout_view>;
 
 	// construction/destruction
-	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname);
+	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *searchpath, char const *dirname);
 	~layout_file();
 
 	// getters
@@ -984,7 +960,6 @@ private:
 
 	// add elements and parameters
 	void add_elements(
-			char const *dirname,
 			environment &env,
 			util::xml::data_node const &parentnode,
 			group_map &groupmap,
@@ -1093,7 +1068,7 @@ private:
 	void load_additional_layout_files(const char *basename, bool have_artwork);
 	bool load_layout_file(const char *dirname, const char *filename);
 	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
-	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
+	bool load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
@@ -1192,8 +1167,7 @@ public:
 	void texture_free(render_texture *texture);
 
 	// fonts
-	render_font *font_alloc(const char *filename = nullptr);
-	void font_free(render_font *font);
+	std::unique_ptr<render_font> font_alloc(const char *filename = nullptr);
 
 	// reference tracking
 	void invalidate_all(void *refptr);

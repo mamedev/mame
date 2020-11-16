@@ -600,7 +600,6 @@ ROM_START(pcipctx)
 ROM_END
 
 static INPUT_PORTS_START(pcipc)
-	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)

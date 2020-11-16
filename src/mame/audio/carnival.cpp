@@ -253,8 +253,5 @@ void carnival_state::carnivalb_audio(machine_config &config)
 	m_pit->out_handler<2>().set(m_dac[2], FUNC(dac_bit_interface::write));
 
 	for (int i = 0; i < 3; i++)
-	{
 		DAC_1BIT(config, m_dac[i]).add_route(ALL_OUTPUTS, "mono", 0.15);
-		VOLTAGE_REGULATOR(config, m_vref[i]).add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
-	}
 }

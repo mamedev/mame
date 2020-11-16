@@ -20,6 +20,8 @@
 
 #include "screen.h"
 
+#include <algorithm>
+
 
 /*****************************************************************************
     CONSTANTS
@@ -424,105 +426,93 @@ TIMER_CALLBACK_MEMBER( vic3_device::timer_timeout )
 
 void vic3_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color, int start_x, int end_x )
 {
-	int code;
-
 	for (int y = ybegin; y <= yend; y++)
 	{
-		code = m_dma_read_cb(m_chargenaddr + ch * 8 + y);
+		int code = m_dma_read_cb(m_chargenaddr + ch * 8 + y);
 		m_screenptr[y + yoff][xoff >> 3] = code;
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
-		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
-		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
-		if ((xoff + 3 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
-		if ((xoff + 4 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
-		if ((xoff + 5 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
-		if ((xoff + 6 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
-		if ((xoff + 7 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
 	}
 }
 
 void vic3_device::draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
-	int code;
-
 	for (int y = ybegin; y <= yend; y++)
 	{
-		code = m_dma_read_cb(m_chargenaddr + ch * 8 + y);
+		int code = m_dma_read_cb(m_chargenaddr + ch * 8 + y);
 		m_screenptr[y + yoff][xoff >> 3] = m_foreground[code];
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_multi[code >> 6];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_multi[code >> 6];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_multi[(code >> 4) & 3];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = m_multi[(code >> 4) & 3];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = m_multi[(code >> 2) & 3];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = m_multi[(code >> 2) & 3];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = m_multi[code & 3];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = m_multi[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 0) = m_multi[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 1) = m_multi[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 2) = m_multi[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 3) = m_multi[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 4) = m_multi[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 5) = m_multi[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 6) = m_multi[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 7) = m_multi[code & 3];
 	}
 }
 
 void vic3_device::draw_bitmap( int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
-	int code;
-
 	for (int y = ybegin; y <= yend; y++)
 	{
-		code = m_dma_read_cb((m_chargenaddr & 0x2000) + ch * 8 + y);
+		int code = m_dma_read_cb((m_chargenaddr & 0x2000) + ch * 8 + y);
 		m_screenptr[y + yoff][xoff >> 3] = code;
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_c64_bitmap[code >> 7];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_c64_bitmap[(code >> 6) & 1];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_c64_bitmap[(code >> 5) & 1];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = m_c64_bitmap[(code >> 4) & 1];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = m_c64_bitmap[(code >> 3) & 1];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = m_c64_bitmap[(code >> 2) & 1];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = m_c64_bitmap[(code >> 1) & 1];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = m_c64_bitmap[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 0) = m_c64_bitmap[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 1) = m_c64_bitmap[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 2) = m_c64_bitmap[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 3) = m_c64_bitmap[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 4) = m_c64_bitmap[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 5) = m_c64_bitmap[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 6) = m_c64_bitmap[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 7) = m_c64_bitmap[code & 1];
 	}
 }
 
 void vic3_device::draw_bitmap_multi( int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
-	int code;
-
 	for (int y = ybegin; y <= yend; y++)
 	{
-		code = m_dma_read_cb((m_chargenaddr & 0x2000) + ch * 8 + y);
+		int code = m_dma_read_cb((m_chargenaddr & 0x2000) + ch * 8 + y);
 		m_screenptr[y + yoff][xoff >> 3] = m_foreground[code];
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_bitmapmulti[code >> 6];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_bitmapmulti[code >> 6];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_bitmapmulti[(code >> 4) & 3];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = m_bitmapmulti[(code >> 4) & 3];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = m_bitmapmulti[(code >> 2) & 3];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = m_bitmapmulti[(code >> 2) & 3];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = m_bitmapmulti[code & 3];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = m_bitmapmulti[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 0) = m_bitmapmulti[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 1) = m_bitmapmulti[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 2) = m_bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 3) = m_bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 4) = m_bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 5) = m_bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 6) = m_bitmapmulti[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) m_bitmap->pix(y + yoff + FIRSTLINE, xoff + 7) = m_bitmapmulti[code & 3];
 	}
 }
 
 void vic3_device::draw_sprite_code( int y, int xbegin, int code, int color, int start_x, int end_x )
 {
-	int mask, x;
-
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
 
-	for (x = 0, mask = 0x80; x < 8; x++, mask >>= 1)
+	for (int x = 0, mask = 0x80; x < 8; x++, mask >>= 1)
 	{
 		if (code & mask)
 		{
 			if ((xbegin + x > start_x) && (xbegin + x < end_x))
-				m_bitmap->pix16(y + FIRSTLINE, xbegin + x) = color;
+				m_bitmap->pix(y + FIRSTLINE, xbegin + x) = color;
 		}
 	}
 }
 
 void vic3_device::draw_sprite_code_multi( int y, int xbegin, int code, int prior, int start_x, int end_x )
 {
-	int x, mask, shift;
-
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
 
-	for (x = 0, mask = 0xc0, shift = 6; x < 8; x += 2, mask >>= 2, shift -= 2)
+	for (int x = 0, mask = 0xc0, shift = 6; x < 8; x += 2, mask >>= 2, shift -= 2)
 	{
 		if (code & mask)
 		{
@@ -530,17 +520,17 @@ void vic3_device::draw_sprite_code_multi( int y, int xbegin, int code, int prior
 			{
 			case 1:
 				if ((xbegin + x + 1 > start_x) && (xbegin + x + 1 < end_x))
-					m_bitmap->pix16(y + FIRSTLINE, xbegin + x + 1) = m_spritemulti[(code >> shift) & 3];
+					m_bitmap->pix(y + FIRSTLINE, xbegin + x + 1) = m_spritemulti[(code >> shift) & 3];
 				break;
 			case 2:
 				if ((xbegin + x > start_x) && (xbegin + x < end_x))
-					m_bitmap->pix16(y + FIRSTLINE, xbegin + x) = m_spritemulti[(code >> shift) & 3];
+					m_bitmap->pix(y + FIRSTLINE, xbegin + x) = m_spritemulti[(code >> shift) & 3];
 				break;
 			case 3:
 				if ((xbegin + x > start_x) && (xbegin + x < end_x))
-					m_bitmap->pix16(y + FIRSTLINE, xbegin + x) = m_spritemulti[(code >> shift) & 3];
+					m_bitmap->pix(y + FIRSTLINE, xbegin + x) = m_spritemulti[(code >> shift) & 3];
 				if ((xbegin + x + 1> start_x) && (xbegin + x + 1< end_x))
-					m_bitmap->pix16(y + FIRSTLINE, xbegin + x + 1) = m_spritemulti[(code >> shift) & 3];
+					m_bitmap->pix(y + FIRSTLINE, xbegin + x + 1) = m_spritemulti[(code >> shift) & 3];
 				break;
 			}
 		}
@@ -549,8 +539,6 @@ void vic3_device::draw_sprite_code_multi( int y, int xbegin, int code, int prior
 
 void vic3_device::sprite_collision( int nr, int y, int x, int mask )
 {
-	int value, xdiff;
-
 	for (int i = 7; i > nr; i--)
 	{
 		if (!SPRITEON(i) || !m_sprites[i].paintedline[y] || (SPRITE_COLLISION(i) && SPRITE_COLLISION(nr)))
@@ -559,8 +547,9 @@ void vic3_device::sprite_collision( int nr, int y, int x, int mask )
 		if ((x + 7 < SPRITE_X_POS(i)) || (x >= SPRITE_X_POS(i) + SPRITE_X_SIZE(i)))
 			continue;
 
-		xdiff = x - SPRITE_X_POS(i);
+		int xdiff = x - SPRITE_X_POS(i);
 
+		int value;
 		if ((x & 7) == (SPRITE_X_POS(i) & 7))
 			value = m_sprites[i].bitmap[y][xdiff >> 3];
 		else if (xdiff < 0)
@@ -785,17 +774,6 @@ void vic3_device::draw_sprite_multi( int nr, int yoff, int ybegin, int yend, int
 	}
 }
 
-#ifndef memset16
-static void *memset16(void *dest, int value, size_t size)
-{
-	int i;
-
-	for (i = 0; i < size; i++)
-		((short *) dest)[i] = value;
-	return dest;
-}
-#endif
-
 void vic3_device::drawlines( int first, int last, int start_x, int end_x )
 {
 	int line, vline, end;
@@ -825,7 +803,7 @@ void vic3_device::drawlines( int first, int last, int start_x, int end_x )
 	{
 		for (line = first; (line < last) && (line < m_bitmap->height()); line++)
 		{
-			memset16(&m_bitmap->pix16(line + FIRSTLINE), 0, m_bitmap->width());
+			std::fill_n(&m_bitmap->pix(line + FIRSTLINE), m_bitmap->width(), 0);
 		}
 		return;
 	}
@@ -841,7 +819,7 @@ void vic3_device::drawlines( int first, int last, int start_x, int end_x )
 
 	for (line = first; line < end; line++)
 	{
-		memset16(&m_bitmap->pix16(line + FIRSTLINE), FRAMECOLOR, m_bitmap->width());
+		std::fill_n(&m_bitmap->pix(line + FIRSTLINE), m_bitmap->width(), FRAMECOLOR);
 	}
 
 	if (LINES25)
@@ -1013,20 +991,14 @@ void vic3_device::drawlines( int first, int last, int start_x, int end_x )
 
 	for (; line < end; line++)
 	{
-		memset16(&m_bitmap->pix16(line + FIRSTLINE), FRAMECOLOR, m_bitmap->width());
+		std::fill_n(&m_bitmap->pix(line + FIRSTLINE), m_bitmap->width(), FRAMECOLOR);
 	}
 }
 
 void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 {
-	int line, vline, end;
-	int attr, ch, ecm;
-	int syend;
-	int offs, yoff, xoff, ybegin, yend, xbegin, xend;
-	int i;
-
 	if (VIC3_BITPLANES)
-		return ;
+		return;
 
 	/* temporary allowing vic3 displaying 80 columns */
 	if (m_reg[0x31] & 0x80)
@@ -1040,8 +1012,8 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 	/* top part of display not rastered */
 	first -= VIC2_YPOS - YPOS;
 
-	xbegin = VIC2_STARTVISIBLECOLUMNS;
-	xend = xbegin + VIC2_VISIBLECOLUMNS;
+	int xbegin = VIC2_STARTVISIBLECOLUMNS;
+	int xend = xbegin + VIC2_VISIBLECOLUMNS;
 	if (!SCREENON)
 	{
 		xbegin = VIC2_STARTVISIBLECOLUMNS;
@@ -1068,12 +1040,13 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 		xend = xbegin + 304;
 	}
 
+	int end;
 	if (first + 1 < m_y_begin)
 		end = first + 1;
 	else
 		end = m_y_begin + YPOS;
 
-	line = first;
+	int line = first;
 	// top border
 	if (line < end)
 	{
@@ -1088,7 +1061,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 		line = end;
 	}
 
-	vline = line - YPOS + 3 - VERTICALPOS;
+	int vline = line - YPOS + 3 - VERTICALPOS;
 
 	if (first + 1 < m_y_end + YPOS)
 		end = first + 1;
@@ -1097,23 +1070,23 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 
 	if (line < end)
 	{
-		offs = (vline >> 3) * 40;
-		ybegin = vline & 7;
-		yoff = line - ybegin;
-		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
+		int offs = (vline >> 3) * 40;
+		int ybegin = vline & 7;
+		int yoff = line - ybegin;
+		int yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
 
 		/* rendering 39 characters */
 		/* left and right borders are overwritten later */
 
 		m_shift[line] = HORIZONTALPOS;
-		for (xoff = m_x_begin + XPOS; xoff < m_x_end + XPOS; xoff += 8, offs++)
+		for (int xoff = m_x_begin + XPOS; xoff < m_x_end + XPOS; xoff += 8, offs++)
 		{
-			ch = m_dma_read_cb(m_videoaddr + offs);
+			int ch = m_dma_read_cb(m_videoaddr + offs);
 #if 0
-			attr = m_dma_read_color_cb(m_videoaddr + offs);
+			int attr = m_dma_read_color_cb(m_videoaddr + offs);
 #else
 			/* temporary until vic3 finished */
-			attr = m_dma_read_color_cb((m_videoaddr + offs)&0x3ff)&0x0f;
+			int attr = m_dma_read_color_cb((m_videoaddr + offs)&0x3ff)&0x0f;
 #endif
 			if (HIRESON)
 			{
@@ -1131,7 +1104,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 			}
 			else if (ECMON)
 			{
-				ecm = ch >> 6;
+				int ecm = ch >> 6;
 				m_ecmcolor[0] = m_colors[ecm];
 				m_ecmcolor[1] = attr;
 				draw_character(ybegin, yend, ch & ~0xC0, yoff, xoff, m_ecmcolor, start_x, end_x);
@@ -1149,7 +1122,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 		}
 
 		/* sprite priority, sprite overwrites lowerprior pixels */
-		for (i = 7; i >= 0; i--)
+		for (int i = 7; i >= 0; i--)
 		{
 			if (SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
@@ -1158,7 +1131,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 			{
 				int wrapped = - SPRITE_Y_POS (i) + 6;
 
-				syend = yend;
+				int syend = yend;
 
 				if (SPRITE_Y_EXPAND (i))
 				{
@@ -1187,7 +1160,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
 			{
 				int wrapped = yoff + ybegin - SPRITE_Y_POS (i);
 
-				syend = yend;
+				int syend = yend;
 
 				if (SPRITE_Y_EXPAND (i))
 				{
@@ -1659,77 +1632,76 @@ uint8_t vic3_device::port_r(offs_t offset)
 }
 
 
-#define VIC3_MASK(M)                                            \
-	if (M)                                                      \
-	{                                                           \
-		if (M & 0x01)                                           \
-			colors[0] = m_c64_mem_r_cb(VIC3_ADDR(0) + offset);        \
-		if (M & 0x02)                                           \
-			colors[1] = m_c64_mem_r_cb(VIC3_ADDR(1) + offset) << 1;     \
-		if (M & 0x04)                                           \
-			colors[2] = m_c64_mem_r_cb(VIC3_ADDR(2) + offset) << 2;     \
-		if (M & 0x08)                                           \
-			colors[3] = m_c64_mem_r_cb(VIC3_ADDR(3) + offset) << 3;     \
-		if (M & 0x10)                                           \
-			colors[4] = m_c64_mem_r_cb(VIC3_ADDR(4) + offset) << 4;     \
-		if (M & 0x20)                                           \
-			colors[5] = m_c64_mem_r_cb(VIC3_ADDR(5) + offset) << 5;     \
-		if (M & 0x40)                        \
-			colors[6] = m_c64_mem_r_cb(VIC3_ADDR(6) + offset) << 6;     \
-		if (M & 0x80)                        \
-			colors[7] = m_c64_mem_r_cb(VIC3_ADDR(7) + offset) << 7;     \
-		for (i = 7; i >= 0; i--)                                \
-		{                                                       \
-			p = 0;                                              \
-			if (M & 0x01)                                       \
-			{                                                   \
-				p = colors[0] & 0x01;                           \
-				colors[0] >>= 1;                                \
-			}                                                   \
-			if (M & 0x02)                                       \
-			{                                                   \
-				p |= colors[1] & 0x02;                          \
-				colors[1] >>= 1;                                \
-			}                                                   \
-			if (M & 0x04)                                       \
-			{                                                   \
-				p |= colors[2] & 0x04;                          \
-				colors[2] >>= 1;                                \
-			}                                                   \
-			if (M & 0x08)                                       \
-			{                                                   \
-				p |= colors[3] & 0x08;                          \
-				colors[3] >>= 1;                                \
-			}                                                   \
-			if (M & 0x10)                                       \
-			{                                                   \
-				p |= colors[4] & 0x10;                          \
-				colors[4] >>= 1;                                \
-			}                                                   \
-			if (M & 0x20)                                       \
-			{                                                   \
-				p |= colors[5] & 0x20;                          \
-				colors[5] >>= 1;                                \
-			}                                                   \
-			if (M & 0x40)                                       \
-			{                                                   \
-				p |= colors[6] & 0x40;                          \
-				colors[6] >>= 1;                                \
-			}                                                   \
-			if (M & 0x80)                                       \
-			{                                                   \
-				p |= colors[7] & 0x80;                          \
-				colors[7] >>= 1;                                \
-			}                                                   \
-			m_bitmap->pix16(YPOS + y, XPOS + x + i) = p; \
-		}                                                       \
+#define VIC3_MASK(M)                                                \
+	if (M)                                                          \
+	{                                                               \
+		if (M & 0x01)                                               \
+			colors[0] = m_c64_mem_r_cb(VIC3_ADDR(0) + offset);      \
+		if (M & 0x02)                                               \
+			colors[1] = m_c64_mem_r_cb(VIC3_ADDR(1) + offset) << 1; \
+		if (M & 0x04)                                               \
+			colors[2] = m_c64_mem_r_cb(VIC3_ADDR(2) + offset) << 2; \
+		if (M & 0x08)                                               \
+			colors[3] = m_c64_mem_r_cb(VIC3_ADDR(3) + offset) << 3; \
+		if (M & 0x10)                                               \
+			colors[4] = m_c64_mem_r_cb(VIC3_ADDR(4) + offset) << 4; \
+		if (M & 0x20)                                               \
+			colors[5] = m_c64_mem_r_cb(VIC3_ADDR(5) + offset) << 5; \
+		if (M & 0x40)                                               \
+			colors[6] = m_c64_mem_r_cb(VIC3_ADDR(6) + offset) << 6; \
+		if (M & 0x80)                                               \
+			colors[7] = m_c64_mem_r_cb(VIC3_ADDR(7) + offset) << 7; \
+		for (int i = 7; i >= 0; i--)                                \
+		{                                                           \
+			int p = 0;                                              \
+			if (M & 0x01)                                           \
+			{                                                       \
+				p = colors[0] & 0x01;                               \
+				colors[0] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x02)                                           \
+			{                                                       \
+				p |= colors[1] & 0x02;                              \
+				colors[1] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x04)                                           \
+			{                                                       \
+				p |= colors[2] & 0x04;                              \
+				colors[2] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x08)                                           \
+			{                                                       \
+				p |= colors[3] & 0x08;                              \
+				colors[3] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x10)                                           \
+			{                                                       \
+				p |= colors[4] & 0x10;                              \
+				colors[4] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x20)                                           \
+			{                                                       \
+				p |= colors[5] & 0x20;                              \
+				colors[5] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x40)                                           \
+			{                                                       \
+				p |= colors[6] & 0x40;                              \
+				colors[6] >>= 1;                                    \
+			}                                                       \
+			if (M & 0x80)                                           \
+			{                                                       \
+				p |= colors[7] & 0x80;                              \
+				colors[7] >>= 1;                                    \
+			}                                                       \
+			m_bitmap->pix(YPOS + y, XPOS + x + i) = p;              \
+		}                                                           \
 	}
 
 #define VIC3_ADDR(a) VIC3_BITPLANE_IADDR(a)
 void vic3_device::interlace_draw_block( int x, int y, int offset )
 {
 	int colors[8] = {0};
-	int i, p;
 
 	switch (VIC3_BITPLANES_MASK)
 	{
@@ -1776,13 +1748,13 @@ void vic3_device::interlace_draw_block( int x, int y, int offset )
 		if (VIC3_BITPLANES_MASK & 0x80)
 			colors[7] = m_c64_mem_r_cb(VIC3_BITPLANE_IADDR(7) + offset) << 7;
 
-		for (i = 7; i >= 0; i--)
+		for (int i = 7; i >= 0; i--)
 		{
-			m_bitmap->pix16(YPOS + y, XPOS + x + i) =
-				(colors[0] & 0x01) | (colors[1] & 0x02)
-								| (colors[2] & 0x04) | (colors[3] & 0x08)
-								| (colors[4] & 0x10) | (colors[5] & 0x20)
-								| (colors[6] & 0x40) | (colors[7] & 0x80);
+			m_bitmap->pix(YPOS + y, XPOS + x + i) =
+					(colors[0] & 0x01) | (colors[1] & 0x02) |
+					(colors[2] & 0x04) | (colors[3] & 0x08) |
+					(colors[4] & 0x10) | (colors[5] & 0x20) |
+					(colors[6] & 0x40) | (colors[7] & 0x80);
 			colors[0] >>= 1;
 			colors[1] >>= 1;
 			colors[2] >>= 1;
@@ -1800,7 +1772,6 @@ void vic3_device::interlace_draw_block( int x, int y, int offset )
 void vic3_device::draw_block( int x, int y, int offset )
 {
 	int colors[8] = {0};
-	int i, p;
 
 	switch (VIC3_BITPLANES_MASK)
 	{
@@ -1847,13 +1818,13 @@ void vic3_device::draw_block( int x, int y, int offset )
 		if (VIC3_BITPLANES_MASK & 0x80)
 			colors[7] = m_c64_mem_r_cb(VIC3_BITPLANE_ADDR(7) + offset) << 7;
 
-		for (i = 7; i >= 0; i--)
+		for (int i = 7; i >= 0; i--)
 		{
-			m_bitmap->pix16(YPOS + y, XPOS + x + i) =
-				(colors[0] & 0x01) | (colors[1] & 0x02)
-								| (colors[2] & 0x04) | (colors[3] & 0x08)
-								| (colors[4] & 0x10) | (colors[5] & 0x20)
-								| (colors[6] & 0x40) | (colors[7] & 0x80);
+			m_bitmap->pix(YPOS + y, XPOS + x + i) =
+					(colors[0] & 0x01) | (colors[1] & 0x02) |
+					(colors[2] & 0x04) | (colors[3] & 0x08) |
+					(colors[4] & 0x10) | (colors[5] & 0x20) |
+					(colors[6] & 0x40) | (colors[7] & 0x80);
 			colors[0] >>= 1;
 			colors[1] >>= 1;
 			colors[2] >>= 1;
@@ -1869,17 +1840,15 @@ void vic3_device::draw_block( int x, int y, int offset )
 
 void vic3_device::draw_bitplanes()
 {
-	int x, y, y1s, offset;
-	rectangle vis;
 	const rectangle &visarea = screen().visible_area();
 
 	if (VIC3_LINES == 400)
 	{ /* interlaced! */
-		for (y1s = 0, offset = 0; y1s < 400; y1s += 16)
+		for (int y1s = 0, offset = 0; y1s < 400; y1s += 16)
 		{
-			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
+			for (int x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
 			{
-				for (y = y1s; y < y1s + 16; y += 2, offset++)
+				for (int y = y1s; y < y1s + 16; y += 2, offset++)
 				{
 					if (m_interlace)
 						draw_block(x, y, offset);
@@ -1892,11 +1861,11 @@ void vic3_device::draw_bitplanes()
 	}
 	else
 	{
-		for (y1s = 0, offset = 0; y1s < 200; y1s += 8)
+		for (int y1s = 0, offset = 0; y1s < 200; y1s += 8)
 		{
-			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
+			for (int x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
 			{
-				for (y = y1s; y < y1s + 8; y++, offset++)
+				for (int y = y1s; y < y1s + 8; y++, offset++)
 				{
 					draw_block(x, y, offset);
 				}
@@ -1906,25 +1875,25 @@ void vic3_device::draw_bitplanes()
 
 	if (XPOS > 0)
 	{
-		vis.set(0, XPOS - 1, 0, visarea.bottom());
+		rectangle vis(0, XPOS - 1, 0, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.right())
 	{
-		vis.set(XPOS + VIC3_BITPLANES_WIDTH, visarea.right(), 0, visarea.bottom());
+		rectangle vis(XPOS + VIC3_BITPLANES_WIDTH, visarea.right(), 0, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS > 0)
 	{
-		vis.set(0, visarea.right(), 0, YPOS - 1);
+		rectangle vis(0, visarea.right(), 0, YPOS - 1);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS + VIC3_LINES < visarea.bottom())
 	{
-		vis.set(0, visarea.right(), YPOS + VIC3_LINES, visarea.bottom());
+		rectangle vis(0, visarea.right(), YPOS + VIC3_LINES, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 }

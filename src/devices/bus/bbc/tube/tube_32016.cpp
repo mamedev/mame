@@ -38,10 +38,6 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_32016L, bbc_tube_32016l_device, "bbc_tube_32016l", "
 
 void bbc_tube_32016_device::tube_32016_mem(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(FUNC(bbc_tube_32016_device::read), FUNC(bbc_tube_32016_device::write));
-	map(0xf00000, 0xf07fff).rom().region("rom", 0).mirror(0x0f8000);
-	map(0xf90000, 0xf90001).portr("CONFIG");
-	map(0xfffff0, 0xffffff).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
 }
 
 //-------------------------------------------------
@@ -76,36 +72,36 @@ ROM_END
 
 static INPUT_PORTS_START(tube_32016)
 	PORT_START("CONFIG")
-	PORT_DIPNAME(0x80, 0x80, "H") PORT_DIPLOCATION("LKS:1")
-	PORT_DIPSETTING(0x80, "FPU")
+	PORT_DIPNAME(0x01, 0x01, "H") PORT_DIPLOCATION("LKS:1")
+	PORT_DIPSETTING(0x01, "FPU")
 	PORT_DIPSETTING(0x00, "No FPU")
 
-	PORT_DIPNAME(0x40, 0x00, "G") PORT_DIPLOCATION("LKS:2")
-	PORT_DIPSETTING(0x40, "MMU")
+	PORT_DIPNAME(0x02, 0x00, "G") PORT_DIPLOCATION("LKS:2")
+	PORT_DIPSETTING(0x02, "MMU")
 	PORT_DIPSETTING(0x00, "No MMU")
 
-	PORT_DIPNAME(0x20, 0x00, "F") PORT_DIPLOCATION("LKS:3")
-	PORT_DIPSETTING(0x20, "Reserved")
-	PORT_DIPSETTING(0x00, "Reserved")
-
-	PORT_DIPNAME(0x10, 0x00, "E") PORT_DIPLOCATION("LKS:4")
-	PORT_DIPSETTING(0x10, "Reserved")
-	PORT_DIPSETTING(0x00, "Reserved")
-
-	PORT_DIPNAME(0x08, 0x00, "D") PORT_DIPLOCATION("LKS:5")
-	PORT_DIPSETTING(0x08, "Reserved")
-	PORT_DIPSETTING(0x00, "Reserved")
-
-	PORT_DIPNAME(0x04, 0x00, "C") PORT_DIPLOCATION("LKS:6")
+	PORT_DIPNAME(0x04, 0x00, "F") PORT_DIPLOCATION("LKS:3")
 	PORT_DIPSETTING(0x04, "Reserved")
 	PORT_DIPSETTING(0x00, "Reserved")
 
-	PORT_DIPNAME(0x02, 0x00, "B") PORT_DIPLOCATION("LKS:7")
-	PORT_DIPSETTING(0x02, "Reserved")
+	PORT_DIPNAME(0x08, 0x00, "E") PORT_DIPLOCATION("LKS:4")
+	PORT_DIPSETTING(0x08, "Reserved")
 	PORT_DIPSETTING(0x00, "Reserved")
 
-	PORT_DIPNAME(0x01, 0x00, "A") PORT_DIPLOCATION("LKS:8")
-	PORT_DIPSETTING(0x01, "Reserved")
+	PORT_DIPNAME(0x10, 0x00, "D") PORT_DIPLOCATION("LKS:5")
+	PORT_DIPSETTING(0x10, "Reserved")
+	PORT_DIPSETTING(0x00, "Reserved")
+
+	PORT_DIPNAME(0x20, 0x00, "C") PORT_DIPLOCATION("LKS:6")
+	PORT_DIPSETTING(0x20, "Reserved")
+	PORT_DIPSETTING(0x00, "Reserved")
+
+	PORT_DIPNAME(0x40, 0x00, "B") PORT_DIPLOCATION("LKS:7")
+	PORT_DIPSETTING(0x40, "Reserved")
+	PORT_DIPSETTING(0x00, "Reserved")
+
+	PORT_DIPNAME(0x80, 0x00, "A") PORT_DIPLOCATION("LKS:8")
+	PORT_DIPSETTING(0x80, "Reserved")
 	PORT_DIPSETTING(0x00, "Reserved")
 INPUT_PORTS_END
 
@@ -117,13 +113,16 @@ void bbc_tube_32016_device::device_add_mconfig(machine_config &config)
 {
 	NS32016(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_32016_device::tube_32016_mem);
+	m_maincpu->set_fpu(m_ns32081);
+
+	NS32081(config, m_ns32081, 12_MHz_XTAL / 2);
 
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("1M").set_extra_options("256K");
+	RAM(config, m_ram).set_default_size("1M").set_extra_options("256K").set_default_value(0);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
@@ -137,7 +136,7 @@ void bbc_tube_32016l_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_clock(16_MHz_XTAL / 2);
 
 	/* internal ram */
-	m_ram->set_default_size("4M");
+	m_ram->set_default_size("4M").set_extra_options("1M").set_default_value(0);
 }
 
 //-------------------------------------------------
@@ -175,10 +174,10 @@ bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
+	, m_ns32081(*this, "ns32081")
 	, m_ula(*this, "ula")
 	, m_ram(*this, "ram")
 	, m_rom(*this, "rom")
-	, m_rom_enabled(true)
 {
 }
 
@@ -198,7 +197,6 @@ bbc_tube_32016l_device::bbc_tube_32016l_device(const machine_config &mconfig, co
 
 void bbc_tube_32016_device::device_start()
 {
-	save_item(NAME(m_rom_enabled));
 }
 
 //-------------------------------------------------
@@ -207,7 +205,23 @@ void bbc_tube_32016_device::device_start()
 
 void bbc_tube_32016_device::device_reset()
 {
-	m_rom_enabled = true;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	// address map during booting
+	program.install_rom(0x000000, 0x007fff, 0xff8000, m_rom->base());
+
+	m_rom_shadow_tap = program.install_write_tap(0x000000, 0xffffff, "rom_shadow_w",[this](offs_t offset, u16 &data, u16 mem_mask)
+	{
+		// delete this tap
+		m_rom_shadow_tap->remove();
+
+		// address map after booting
+		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x000000, 0xffffff);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x000000, m_ram->mask(), 0x7fffff ^ m_ram->mask(), m_ram->pointer());
+		m_maincpu->space(AS_PROGRAM).install_rom(0xf00000, 0xf07fff, 0x038000, m_rom->base());
+		m_maincpu->space(AS_PROGRAM).install_read_port(0xf90000, 0xf90001, 0x00fffe, "CONFIG");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfffff0, 0xffffff, read8sm_delegate(*m_ula, FUNC(tube_device::parasite_r)), write8sm_delegate(*m_ula, FUNC(tube_device::parasite_w)), 0xff);
+	});
 }
 
 
@@ -223,25 +237,4 @@ uint8_t bbc_tube_32016_device::host_r(offs_t offset)
 void bbc_tube_32016_device::host_w(offs_t offset, uint8_t data)
 {
 	m_ula->host_w(offset, data);
-}
-
-
-uint8_t bbc_tube_32016_device::read(offs_t offset)
-{
-	uint16_t data;
-
-	if (m_rom_enabled)
-		data = m_rom->base()[offset & 0x7fff];
-	else
-		data = m_ram->pointer()[offset & m_ram->mask()];
-
-	return data;
-}
-
-void bbc_tube_32016_device::write(offs_t offset, uint8_t data)
-{
-	/* clear ROM select on first write */
-	m_rom_enabled = false;
-
-	m_ram->pointer()[offset & m_ram->mask()] = data;
 }

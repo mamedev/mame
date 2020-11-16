@@ -226,7 +226,7 @@ uint32_t qvt70_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				// 8 pixels of the character
 				for (int p = 0; p < 8; p++)
-					bitmap.pix32(y * 16 + i, x * 8 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y * 16 + i, x * 8 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}

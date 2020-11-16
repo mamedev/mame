@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -20,6 +21,7 @@ public:
 	sidepckt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -33,10 +35,14 @@ public:
 	void sidepckt(machine_config &config);
 
 	void init_sidepckt();
-	void init_sidepcktj();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	optional_device<i8751_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -47,16 +53,20 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
-	const uint8_t* m_prot_table[3];
-	uint8_t m_i8751_return;
-	uint8_t m_current_ptr;
-	uint8_t m_current_table;
-	uint8_t m_in_math;
-	uint8_t m_math_param;
+
+	uint8_t m_mcu_p1;
+	uint8_t m_mcu_p2;
+	uint8_t m_mcu_p3;
+
 	uint8_t m_scroll_y;
 
-	uint8_t i8751_r();
-	void i8751_w(uint8_t data);
+	uint8_t mcu_r();
+	void mcu_w(uint8_t data);
+
+	void mcu_p1_w(uint8_t data);
+	uint8_t mcu_p2_r();
+	void mcu_p3_w(uint8_t data);
+
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t scroll_y_r();
@@ -64,8 +74,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void sidepckt_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

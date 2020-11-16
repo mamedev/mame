@@ -110,6 +110,17 @@ public:
 	{
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(p1_s1);
+	DECLARE_INPUT_CHANGED_MEMBER(p1_s2);
+	DECLARE_INPUT_CHANGED_MEMBER(p2_s1);
+	DECLARE_INPUT_CHANGED_MEMBER(p2_s2);
+
+	void gladiatr(machine_config &config);
+	void greatgur(machine_config &config);
+
+	void init_gladiatr();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
 	void gladiatr_video_registers_w(offs_t offset, u8 data);
 
@@ -131,25 +142,17 @@ public:
 	void csnd_p1_w(u8 data);
 	u8 csnd_p2_r();
 
-	DECLARE_INPUT_CHANGED_MEMBER(p1_s1);
-	DECLARE_INPUT_CHANGED_MEMBER(p1_s2);
-	DECLARE_INPUT_CHANGED_MEMBER(p2_s1);
-	DECLARE_INPUT_CHANGED_MEMBER(p2_s2);
-
-	void init_gladiatr();
-
 	DECLARE_MACHINE_RESET(gladiator);
 	DECLARE_VIDEO_START(gladiatr);
 
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void swap_block(u8 *src1,u8 *src2,int len);
+	static void swap_block(u8 *src1, u8 *src2, int len);
 
-	void gladiatr(machine_config &config);
 	void gladiatr_cpu1_io(address_map &map);
 	void gladiatr_cpu1_map(address_map &map);
 	void gladiatr_cpu2_io(address_map &map);
 	void gladiatr_cpu3_map(address_map &map);
-private:
+
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
 	required_ioport m_coins;

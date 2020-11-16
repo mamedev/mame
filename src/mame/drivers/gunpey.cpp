@@ -295,9 +295,6 @@ void gunpey_state::video_start()
 
 uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)
 {
-	int x,y;
-	int bpp_sel;
-	int color;
 	const int ZOOM_SHIFT = 15;
 	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
 	// do they get decompressed at blit time instead? of are there other registers we need to look at
@@ -326,12 +323,12 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 
 	if(!(m_wram[count+0] & 1))
 	{
-		x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
-		y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
+		int x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
+		int y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
 		uint32_t zoomheight = (m_wram[count+5] >> 8);
 		uint32_t zoomwidth = (m_wram[count+5] & 0xff);
-		bpp_sel = (m_wram[count+0] & 0x18);
-		color = (m_wram[count+0] >> 8);
+		int bpp_sel = (m_wram[count+0] & 0x18);
+		int color = (m_wram[count+0] >> 8);
 
 		x-=0x160;
 		y-=0x188;
@@ -379,8 +376,6 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
 					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
 					uint8_t pix;
-					uint32_t col_offs;
-					uint16_t color_data;
 
 					if (xi2 & 1)
 					{
@@ -391,19 +386,17 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 						pix = (data & 0x0f);
 					}
 
-					col_offs = ((pix + color*0x10) & 0xff) << 1;
+					uint32_t col_offs = ((pix + color*0x10) & 0xff) << 1;
 					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					uint16_t color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
 						if(scene_gradient & 0x40)
 						{
-							int r,g,b;
-
-							r = (color_data & 0x7c00) >> 10;
-							g = (color_data & 0x03e0) >> 5;
-							b = (color_data & 0x001f) >> 0;
+							int r = (color_data & 0x7c00) >> 10;
+							int g = (color_data & 0x03e0) >> 5;
+							int b = (color_data & 0x001f) >> 0;
 							r-= (scene_gradient & 0x1f);
 							g-= (scene_gradient & 0x1f);
 							b-= (scene_gradient & 0x1f);
@@ -418,11 +411,11 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
 							{
-								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
 							}
 							else
 							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+xi);
+								uint16_t basecolor = bitmap.pix(y+yi, x+xi);
 								int base_r = ((basecolor >> 10)&0x1f)*alpha;
 								int base_g = ((basecolor >> 5)&0x1f)*alpha;
 								int base_b = ((basecolor >> 0)&0x1f)*alpha;
@@ -433,7 +426,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								g = (base_g+g)/0x1f;
 								b = (base_b+b)/0x1f;
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
 							}
 						}
 					}
@@ -460,24 +453,19 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
 
 					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
-					uint8_t pix;
-					uint32_t col_offs;
-					uint16_t color_data;
 
-					pix = (data & 0xff);
-					col_offs = ((pix + color*0x100) & 0xff) << 1;
+					uint8_t pix = (data & 0xff);
+					uint32_t col_offs = ((pix + color*0x100) & 0xff) << 1;
 					col_offs+= ((pix + color*0x100) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					uint16_t color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
 						if(scene_gradient & 0x40)
 						{
-							int r,g,b;
-
-							r = (color_data & 0x7c00) >> 10;
-							g = (color_data & 0x03e0) >> 5;
-							b = (color_data & 0x001f) >> 0;
+							int r = (color_data & 0x7c00) >> 10;
+							int g = (color_data & 0x03e0) >> 5;
+							int b = (color_data & 0x001f) >> 0;
 							r-= (scene_gradient & 0x1f);
 							g-= (scene_gradient & 0x1f);
 							b-= (scene_gradient & 0x1f);
@@ -492,11 +480,11 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
 							{
-								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
 							}
 							else
 							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+xi);
+								uint16_t basecolor = bitmap.pix(y+yi, x+xi);
 								int base_r = ((basecolor >> 10)&0x1f)*alpha;
 								int base_g = ((basecolor >> 5)&0x1f)*alpha;
 								int base_b = ((basecolor >> 0)&0x1f)*alpha;
@@ -507,7 +495,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								g = (base_g+g)/0x1f;
 								b = (base_b+b)/0x1f;
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
 							}
 						}
 					}

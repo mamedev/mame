@@ -59,7 +59,7 @@
         8 to 64 (independently for width and height) with an 8 pixel
         granularity. The "tile" address is a multiple of 8x8 pixels.
 
-        Each sprite can be shrinked to ~1/4 or enlarged to ~32x following
+        Each sprite can be shrunk to ~1/4 or enlarged to ~32x following
         an exponential curve of sizes (with one zoom value for both width
         and height)
 
@@ -295,7 +295,7 @@ imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, cons
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
-//  configuration addiitons
+//  configuration additions
 //-------------------------------------------------
 
 void imagetek_i4100_device::device_add_mconfig(machine_config &config)
@@ -331,6 +331,10 @@ void imagetek_i4100_device::expand_gfx1()
 void imagetek_i4100_device::device_start()
 {
 	m_inited_hack = false;
+
+	m_screen_blank = false;
+	m_screen_flip = false;
+
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_crtc_unlock));
 	save_item(NAME(m_sprite_count));
@@ -395,7 +399,7 @@ void imagetek_i4100_device::vram_2_w(offs_t offset, uint16_t data, uint16_t mem_
 /* Some game uses almost only the blitter to write to the tilemaps.
    The CPU can only access a "window" of 512x256 pixels in the upper
    left corner of the big tilemap */
-// TODO: Puzzlet, Sankokushi & Lady Killer contradicts with aformentioned description (more like RMW?)
+// TODO: Puzzlet, Sankokushi & Lady Killer contradicts with aforementioned description (more like RMW?)
 
 static inline offs_t RMW_OFFS(offs_t offset)
 {
@@ -923,8 +927,8 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &
 				for (int y = sy; y < ey; y++)
 				{
 					const u8 *source = source_base + (y_index >> 16) * width;
-					u32 *dest = &bitmap.pix32(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u32 *dest = &bitmap.pix(y);
+					u8 *pri = &priority_bitmap.pix(y);
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)
 					{
@@ -1200,8 +1204,8 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 		int const srctilerow = srcline >> tileshift;
 		srcline &= tilemask;
 
-		u32 *dst = &bitmap.pix32(y);
-		u8 *priority_baseaddr = &priority_bitmap.pix8(y);
+		u32 *dst = &bitmap.pix(y);
+		u8 *priority_baseaddr = &priority_bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

@@ -80,6 +80,7 @@ protected:
 	O(rrf_zpg);
 	O(bra_rel);
 	O(jmp_zpi);
+	O(jsr_zpi);
 
 	O(adct_aba); O(adct_abx); O(adct_aby); O(adct_idx); O(adct_idy); O(adct_imm); O(adct_zpg); O(adct_zpx);
 	O(andt_aba); O(andt_abx); O(andt_aby); O(andt_imm); O(andt_idx); O(andt_idy); O(andt_zpg); O(andt_zpx);
@@ -93,6 +94,7 @@ protected:
 	O(ldt_aba); O(ldt_abx); O(ldt_aby); O(ldt_idx); O(ldt_idy); O(ldt_imm); O(ldt_zpg); O(ldt_zpx);
 	O(ort_aba); O(ort_abx); O(ort_aby); O(ort_imm); O(ort_idx); O(ort_idy); O(ort_zpg); O(ort_zpx);
 	O(sbct_aba); O(sbct_abx); O(sbct_aby); O(sbct_idx); O(sbct_idy); O(sbct_imm); O(sbct_zpg); O(sbct_zpx);
+	O(tst_zpg);
 
 #undef O
 

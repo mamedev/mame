@@ -6,9 +6,10 @@
 
 **************************************************************************/
 
-
 #include "emu.h"
 #include "includes/dcheese.h"
+
+#include <algorithm>
 
 
 /*************************************
@@ -116,8 +117,8 @@ u32 dcheese_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	/* update the pixels */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *dest = &bitmap.pix16(y);
-		u16 *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) & 0x1ff);
+		u16 *const dest = &bitmap.pix(y);
+		u16 const *const src = &m_dstbitmap->pix((y + m_blitter_vidparam[0x28/2]) & 0x1ff);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];
@@ -137,7 +138,7 @@ void dcheese_state::do_clear()
 {
 	/* clear the requested scanlines */
 	for (int y = m_blitter_vidparam[0x2c/2]; y < m_blitter_vidparam[0x2a/2]; y++)
-		memset(&m_dstbitmap->pix16(y & 0x1ff), 0, DSTBITMAP_WIDTH * 2);
+		std::fill_n(&m_dstbitmap->pix(y & 0x1ff), DSTBITMAP_WIDTH, 0);
 
 	/* signal an IRQ when done (timing is just a guess) */
 	m_signal_irq_timer->adjust(m_screen->scan_period(), 1);
@@ -168,7 +169,7 @@ void dcheese_state::do_blit()
 	/* loop over target rows */
 	for (int y = ystart; y <= yend; y++)
 	{
-		u16 *dst = &m_dstbitmap->pix16(y & 0x1ff);
+		u16 *const dst = &m_dstbitmap->pix(y & 0x1ff);
 
 		/* loop over target columns */
 		for (int x = xstart; x <= xend; x++)

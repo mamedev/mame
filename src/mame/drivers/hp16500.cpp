@@ -143,12 +143,11 @@ WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 {
-	uint32_t *p = &bitmap.pix32(y);
-	int i, pos;
+	uint32_t *p = &bitmap.pix(y);
 
-	pos =  y * 144;
+	int pos =  y * 144;
 
-	for (i = 0; i < x_count; i++)
+	for (int i = 0; i < x_count; i++)
 	{
 		*p++  = m_palette[m_vram[pos+0x00000]];
 		*p++  = m_palette[m_vram[pos+0x10000]];
@@ -165,12 +164,11 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 {
-	uint32_t *p = &bitmap.pix32(y);
-	int i, pos;
+	uint32_t *p = &bitmap.pix(y);
 
-	pos =  y * 148;
+	int pos =  y * 148;
 
-	for (i = 0; i < x_count; i++)
+	for (int i = 0; i < x_count; i++)
 	{
 		*p++  = m_palette[m_vram[pos+0x00000]];
 		*p++  = m_palette[m_vram[pos+0x10000]];
@@ -400,7 +398,7 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 	int pos = 0;
 	for (int y = 0; y < 384; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 
 		for (int x = 0; x < 576; x+=4)
 		{

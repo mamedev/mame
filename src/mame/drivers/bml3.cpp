@@ -575,7 +575,7 @@ INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
 
 MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
 	// 0: blue
 	// 1: red
@@ -583,13 +583,9 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	// 3: reverse/inverse video
 	// 4: graphic (not character)
 
-	u8 x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2]={0,0},color=0,pen=0;
-	bool reverse=0,graphic=0,lowres=0;
-	u16 mem=0;
-
-	interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
-	lowres = BIT(m_hres_reg, 6);
-	bgcolor = m_hres_reg & 7;
+	u8 const interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
+	bool const lowres = BIT(m_hres_reg, 6);
+	u8 const bgcolor = m_hres_reg & 7;
 
 	if (interlace)
 	{
@@ -597,19 +593,21 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 		if (y > 0x191) return;
 	}
 
-	for(x=0; x<x_count; x++)
+	for(u8 x=0; x<x_count; x++)
 	{
+		u16 mem;
 		if (lowres)
 			mem = (ma + x - 0x400) & 0x3fff;
 		else
 			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
 
-		color = m_aram[mem] & 7;
-		reverse = BIT(m_aram[mem], 3) ^ (x == cursor_x);
-		graphic = BIT(m_aram[mem], 4);
+		u8 const color = m_aram[mem] & 7;
+		bool const reverse = BIT(m_aram[mem], 3) ^ (x == cursor_x);
+		bool const graphic = BIT(m_aram[mem], 4);
 
-		rawbits = m_vram[mem];
+		u8 const rawbits = m_vram[mem];
 
+		u8 dots[2] = { 0, 0 };
 		if (graphic)
 		{
 			if (lowres)
@@ -629,8 +627,8 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 		else
 		{
 			// character mode
-			int tile = rawbits & 0x7f;
-			int tile_bank = BIT(rawbits, 7);
+			int const tile = rawbits & 0x7f;
+			int const tile_bank = BIT(rawbits, 7);
 			if (interlace)
 			{
 				dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
@@ -642,18 +640,19 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 			}
 		}
 
-		for(hf=0;hf<=interlace;hf++)
+		for(u8 hf=0;hf<=interlace;hf++)
 		{
-			for(xi=0;xi<8;xi++)
+			for(u8 xi=0;xi<8;xi++)
 			{
+				u8 pen;
 				if(reverse)
 					pen = (dots[hf] >> (7-xi) & 1) ? bgcolor : color;
 				else
 					pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
 
-				bitmap.pix32(y, x*8+xi) = palette[pen];
+				bitmap.pix(y, x*8+xi) = palette[pen];
 				// when the mc6845 device gains full interlace&video support, replace the line above with the line below
-				// bitmap.pix32(y*(interlace+1)+hf, x*8+xi) = palette[pen];
+				// bitmap.pix(y*(interlace+1)+hf, x*8+xi) = palette[pen];
 			}
 		}
 	}

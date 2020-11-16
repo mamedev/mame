@@ -113,6 +113,7 @@ bebox.cpp
 bert.cpp
 besta.cpp
 beta.cpp
+betacam.cpp
 bigbord2.cpp
 binbug.cpp
 bitel.cpp
@@ -155,6 +156,7 @@ cd100.cpp
 cd2650.cpp
 cdc721.cpp
 cdsys5.cpp
+ceres.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -218,6 +220,7 @@ debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dfs500.cpp
 dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
@@ -255,6 +258,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+emax.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
@@ -332,6 +336,7 @@ gb.cpp
 gba.cpp
 gem_rp.cpp
 generalplus_gpl_unknown.cpp
+generalplus_gpl162xx_lcdtype.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
@@ -522,6 +527,9 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+macprtb.cpp
+macpwrbk030.cpp
+macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
@@ -643,7 +651,10 @@ neogeocd.cpp
 nes.cpp
 nes_clone.cpp
 nes_sh6578.cpp
-nes_vt.cpp
+nes_vt02_vt03.cpp
+nes_vt09.cpp
+nes_vt32.cpp
+nes_vt369_vtunknown.cpp
 newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
@@ -1037,6 +1048,7 @@ tx0.cpp
 uchroma68.cpp
 uknc.cpp
 ultim809.cpp
+umatic.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp

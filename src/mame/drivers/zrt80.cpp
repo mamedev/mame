@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -38,17 +39,12 @@ public:
 		, m_beep(*this, "beeper")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+		, m_beep_timer(*this, "beep_timer")
+	{ }
 
 	void zrt80(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	uint8_t zrt80_10_r();
 	void zrt80_30_w(uint8_t data);
 	void zrt80_38_w(uint8_t data);
@@ -58,7 +54,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 	uint8_t m_term_data;
 	void machine_reset() override;
 	void machine_start() override;
@@ -69,6 +65,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<timer_device> m_beep_timer;
 };
 
 
@@ -79,28 +76,21 @@ uint8_t zrt80_state::zrt80_10_r()
 	return ret;
 }
 
-void zrt80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(zrt80_state::beep_timer)
 {
-	switch (id)
-	{
-	case TIMER_BEEP_OFF:
-		m_beep->set_state(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in zrt80_state::device_timer");
-	}
+	m_beep->set_state(0);
 }
 
 
 void zrt80_state::zrt80_30_w(uint8_t data)
 {
-	timer_set(attotime::from_msec(100), TIMER_BEEP_OFF);
+	m_beep_timer->adjust(attotime::from_msec(100));
 	m_beep->set_state(1);
 }
 
 void zrt80_state::zrt80_38_w(uint8_t data)
 {
-	timer_set(attotime::from_msec(400), TIMER_BEEP_OFF);
+	m_beep_timer->adjust(attotime::from_msec(400));
 	m_beep->set_state(1);
 }
 
@@ -224,18 +214,16 @@ void zrt80_state::machine_reset()
 
 MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
-	uint8_t polarity = ioport("DIPSW1")->read() & 4 ? 0xff : 0;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const polarity = ioport("DIPSW1")->read() & 4 ? 0xff : 0;
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		inv = polarity;
+		uint8_t inv = polarity;
 		if (x == cursor_x) inv ^= 0xff;
-		mem = (ma + x) & 0x1fff;
-		chr = m_p_videoram[mem];
+		uint16_t const mem = (ma + x) & 0x1fff;
+		uint8_t chr = m_p_videoram[mem];
 
 		if (BIT(chr, 7))
 		{
@@ -243,7 +231,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 			chr &= 0x7f;
 		}
 
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7)];
@@ -304,6 +292,7 @@ void zrt80_state::zrt80(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(zrt80_state::beep_timer));
 
 	/* Devices */
 	MC6845(config, m_crtc, XTAL(20'000'000) / 8);

@@ -37247,4 +37247,42 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="negotedg">
+		<description>The Negotiation Edge (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Human Edge Software</publisher>
+		<info name="release" value="2020-09-20"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the negotiation edge (4am crack) disk 1 - program disk.dsk" size="143360" crc="019a642c" sha1="51d1b458cb904d49175233a55d26accce91bebf0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Output disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the negotiation edge (4am crack) disk 2 - output disk 1.dsk" size="143360" crc="c69cfc78" sha1="9cba14180450d186eba8046575de7b3b4e96da0d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Output disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the negotiation edge (4am crack) disk 3 - output disk 2.dsk" size="143360" crc="1f52f587" sha1="2eff69bb1d2ac0a6a8cc2ab835083a48ecbc7a55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathtwst">
+		<description>The Math Twister (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>The Ellen Nelson Learning Library</publisher>
+		<info name="release" value="2020-09-29"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math 3- advanced word problems- the math twister (4am crack).dsk" size="143360" crc="322cd089" sha1="18c4dc9ce12dc7f4ecd3d9ffdbef0e56f1b62e59"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

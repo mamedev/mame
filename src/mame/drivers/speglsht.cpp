@@ -374,18 +374,16 @@ VIDEO_START_MEMBER(speglsht_state,speglsht)
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
 { \
-		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
+		bitmap.pix(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
 uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,dy;
+	int dy=(m_videoreg&0x20)?(256*512):0; //visible frame
 
-	dy=(m_videoreg&0x20)?(256*512):0; //visible frame
-
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<512;x++)
+		for(int x=0;x<512;x++)
 		{
 			int tmp=dy+y*512+x;
 			PLOT_PIXEL_RGB(x-67,y-5,(m_framebuffer[tmp]>>0)&0xff,(m_framebuffer[tmp]>>8)&0xff,(m_framebuffer[tmp]>>16)&0xff);
@@ -397,10 +395,10 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(y=cliprect.min_y; y<cliprect.max_y;y++)
+	for(int y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
-		uint16_t *srcline = &m_bitmap->pix16(y);
-		for(x=cliprect.min_x; x<cliprect.max_x;x++)
+		uint16_t const *const srcline = &m_bitmap->pix(y);
+		for(int x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
 			if(srcline[x])
 			{

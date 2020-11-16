@@ -11,9 +11,109 @@
 #include "emu.h"
 #include "rendutil.h"
 
+#include "msdib.h"
 #include "png.h"
 
 #include "jpeglib.h"
+#include "jerror.h"
+
+
+namespace {
+
+struct jpeg_corefile_source : public jpeg_source_mgr
+{
+	static void source(j_decompress_ptr cinfo, util::core_file &file);
+
+private:
+	static constexpr unsigned INPUT_BUF_SIZE = 4096;
+
+	static void do_init(j_decompress_ptr cinfo)
+	{
+		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
+		src.start_of_file = true;
+	}
+
+	static boolean do_fill(j_decompress_ptr cinfo)
+	{
+		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
+
+		size_t nbytes = src.infile->read(src.buffer, INPUT_BUF_SIZE);
+
+		if (0 >= nbytes)
+		{
+			if (src.start_of_file)
+				ERREXIT(cinfo, JERR_INPUT_EMPTY);
+			WARNMS(cinfo, JWRN_JPEG_EOF);
+			src.buffer[0] = JOCTET(0xff);
+			src.buffer[1] = JOCTET(JPEG_EOI);
+			nbytes = 2;
+		}
+
+		src.next_input_byte = src.buffer;
+		src.bytes_in_buffer = nbytes;
+		src.start_of_file = false;
+
+		return TRUE;
+	}
+
+	static void do_skip(j_decompress_ptr cinfo, long num_bytes)
+	{
+		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
+
+		if (0 < num_bytes)
+		{
+			while (long(src.bytes_in_buffer) < num_bytes)
+			{
+				num_bytes -= long(src.bytes_in_buffer);
+				(void)(*src.fill_input_buffer)(cinfo);
+			}
+			src.next_input_byte += size_t(num_bytes);
+			src.bytes_in_buffer -= size_t(num_bytes);
+		}
+	}
+
+	static void do_term(j_decompress_ptr cinfo)
+	{
+	}
+
+	util::core_file *infile;
+	JOCTET *buffer;
+	bool start_of_file;
+};
+
+void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::core_file &file)
+{
+	jpeg_corefile_source *src;
+	if (!cinfo->src)
+	{
+		src = reinterpret_cast<jpeg_corefile_source *>(
+				(*cinfo->mem->alloc_small)(
+					reinterpret_cast<j_common_ptr>(cinfo),
+					JPOOL_PERMANENT,
+					sizeof(jpeg_corefile_source)));
+		cinfo->src = src;
+		src->buffer = reinterpret_cast<JOCTET *>(
+				(*cinfo->mem->alloc_small)(
+					reinterpret_cast<j_common_ptr>(cinfo),
+					JPOOL_PERMANENT,
+					INPUT_BUF_SIZE * sizeof(JOCTET)));
+	}
+	else
+	{
+		src = static_cast<jpeg_corefile_source *>(cinfo->src);
+	}
+
+	src->init_source = &jpeg_corefile_source::do_init;
+	src->fill_input_buffer = &jpeg_corefile_source::do_fill;
+	src->skip_input_data = &jpeg_corefile_source::do_skip;
+	src->resync_to_restart = jpeg_resync_to_restart;
+	src->term_source = &jpeg_corefile_source::do_term;
+	src->infile = &file;
+	src->bytes_in_buffer = 0;
+	src->next_input_byte = nullptr;
+}
+
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -23,7 +123,7 @@
 /* utilities */
 static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
 static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
-static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png);
+static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png);
 
 
 
@@ -42,7 +142,7 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 		return;
 
 	/* adjust the source base */
-	const u32 *sbase = &source.pix32(0);
+	const u32 *sbase = &source.pix(0);
 
 	/* determine the steppings */
 	u32 swidth = source.width();
@@ -543,81 +643,103 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 
 
 /*-------------------------------------------------
-    render_load_jpeg - load a JPG file into a
-    bitmap
+    render_load_msdib - load a Microsoft DIB file
+    into a bitmap
 -------------------------------------------------*/
 
-void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
+void render_load_msdib(bitmap_argb32 &bitmap, util::core_file &file)
 {
 	// deallocate previous bitmap
 	bitmap.reset();
 
-	// define file's full name
-	std::string fname;
+	// read the DIB data
+	util::msdib_error const result = util::msdib_read_bitmap(file, bitmap);
+	if (result != util::msdib_error::NONE)
+	{
+		osd_printf_error("Error reading Microsoft DIB file\n");
+		bitmap.reset();
+	}
+}
 
-	if (dirname == nullptr)
-		fname = filename;
-	else
-		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 
-	if (file.open(fname) != osd_file::error::NONE)
-		return;
+/*-------------------------------------------------
+    render_load_jpeg - load a JPEG file into a
+    bitmap
+-------------------------------------------------*/
 
-	// define standard JPEG structures
+void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file)
+{
+	// deallocate previous bitmap
+	bitmap.reset();
+
+	// create a JPEG source for the file
 	jpeg_decompress_struct cinfo;
 	jpeg_error_mgr jerr;
 	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_decompress(&cinfo);
-
-	// allocates a buffer for the image
-	u32 jpg_size = file.size();
-	std::unique_ptr<unsigned char[]> jpg_buffer = std::make_unique<unsigned char[]>(jpg_size);
-
-	// read data from the file and set them in the buffer
-	file.read(jpg_buffer.get(), jpg_size);
-	jpeg_mem_src(&cinfo, jpg_buffer.get(), jpg_size);
-
-	// read JPEG header and start decompression
-	jpeg_read_header(&cinfo, TRUE);
-	jpeg_start_decompress(&cinfo);
-
-	// allocates the destination bitmap
-	int w = cinfo.output_width;
-	int h = cinfo.output_height;
-	int s = cinfo.output_components;
-	bitmap.allocate(w, h);
-
-	// allocates a buffer to receive the information and copy them into the bitmap
-	int row_stride = cinfo.output_width * cinfo.output_components;
-	JSAMPARRAY buffer = (JSAMPARRAY)malloc(sizeof(JSAMPROW));
-	buffer[0] = (JSAMPROW)malloc(sizeof(JSAMPLE) * row_stride);
-
-	while ( cinfo.output_scanline < cinfo.output_height )
+	jerr.error_exit = [] (j_common_ptr cinfo) { throw cinfo->err; };
+	JSAMPARRAY buffer = nullptr;
+	try
 	{
-		int j = cinfo.output_scanline;
-		jpeg_read_scanlines(&cinfo, buffer, 1);
+		jpeg_create_decompress(&cinfo);
+		cinfo.mem->max_memory_to_use = 128 * 1024 * 1024;
+		jpeg_corefile_source::source(&cinfo, file);
 
-		if (s == 1)
-			for (int i = 0; i < w; ++i)
-				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
+		// read JPEG header and start decompression
+		jpeg_read_header(&cinfo, TRUE);
+		jpeg_start_decompress(&cinfo);
 
-		else if (s == 3)
-			for (int i = 0; i < w; ++i)
-				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
-		else
+		// allocates the destination bitmap
+		int w = cinfo.output_width;
+		int h = cinfo.output_height;
+		int s = cinfo.output_components;
+		bitmap.allocate(w, h);
+
+		// allocates a buffer to receive the information and copy them into the bitmap
+		int row_stride = cinfo.output_width * cinfo.output_components;
+		JSAMPARRAY buffer = reinterpret_cast<JSAMPARRAY>(malloc(sizeof(JSAMPROW)));
+		buffer[0] = reinterpret_cast<JSAMPROW>(malloc(sizeof(JSAMPLE) * row_stride));
+
+		while (cinfo.output_scanline < cinfo.output_height)
 		{
-			osd_printf_error("Cannot read JPEG data from %s file.\n", fname);
-			bitmap.reset();
-			break;
-		}
-	}
+			int j = cinfo.output_scanline;
+			jpeg_read_scanlines(&cinfo, buffer, 1);
 
-	// finish decompression and frees the memory
-	jpeg_finish_decompress(&cinfo);
+			if (s == 1)
+			{
+				for (int i = 0; i < w; ++i)
+					bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
+
+			}
+			else if (s == 3)
+			{
+				for (int i = 0; i < w; ++i)
+					bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+			}
+			else
+			{
+				osd_printf_error("Cannot read JPEG data from file.\n");
+				bitmap.reset();
+				break;
+			}
+		}
+
+		// finish decompression and frees the memory
+		jpeg_finish_decompress(&cinfo);
+	}
+	catch (jpeg_error_mgr *)
+	{
+		char msg[1024];
+		(cinfo.err->format_message)(reinterpret_cast<j_common_ptr>(&cinfo), msg);
+		osd_printf_error("JPEG error reading data from file: %s\n", msg);
+		bitmap.reset();
+	}
 	jpeg_destroy_decompress(&cinfo);
-	file.close();
-	free(buffer[0]);
-	free(buffer);
+	if (buffer)
+	{
+		if (buffer[0])
+			free(buffer[0]);
+		free(buffer);
+	}
 }
 
 
@@ -626,36 +748,25 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
     bitmap
 -------------------------------------------------*/
 
-bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing)
+bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_alpha_to_existing)
 {
 	// deallocate if we're not overlaying alpha
 	if (!load_as_alpha_to_existing)
 		bitmap.reset();
 
-	// open the file
-	std::string fname;
-	if (dirname)
-		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	else
-		fname.assign(filename);
-	osd_file::error const filerr = file.open(fname);
-	if (filerr != osd_file::error::NONE)
-		return false;
-
 	// read the PNG data
-	png_info png;
-	png_error const result = png.read_file(file);
-	file.close();
-	if (result != PNGERR_NONE)
+	util::png_info png;
+	util::png_error const result = png.read_file(file);
+	if (result != util::png_error::NONE)
 	{
-		osd_printf_error("%s: Error reading PNG file\n", filename);
+		osd_printf_error("Error reading PNG file\n");
 		return false;
 	}
 
 	// if less than 8 bits, upsample
-	if (PNGERR_NONE != png.expand_buffer_8bit())
+	if (util::png_error::NONE != png.expand_buffer_8bit())
 	{
-		osd_printf_error("%s: Error upsampling PNG bitmap\n", filename);
+		osd_printf_error("Error upsampling PNG bitmap\n");
 		return false;
 	}
 
@@ -663,9 +774,9 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	if (!load_as_alpha_to_existing)
 	{
 		// non-alpha case
-		if (PNGERR_NONE != png.copy_to_bitmap(bitmap, hasalpha))
+		if (util::png_error::NONE != png.copy_to_bitmap(bitmap, hasalpha))
 		{
-			osd_printf_error("%s: Error copying PNG bitmap to MAME bitmap\n", filename);
+			osd_printf_error("Error copying PNG bitmap to MAME bitmap\n");
 			return false;
 		}
 	}
@@ -674,7 +785,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		// verify we can handle this PNG
 		if (png.bit_depth > 8)
 		{
-			osd_printf_error("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
+			osd_printf_error("Unsupported bit depth %d (8 bit max)\n", png.bit_depth);
 			return false;
 		}
 
@@ -692,7 +803,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
     to the alpha channel of a bitmap
 -------------------------------------------------*/
 
-static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
+static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png)
 {
 	// FIXME: this function is basically copy/pasted from the PNG code in util, and should be unified with it
 	u8 accumalpha = 0xff;
@@ -726,7 +837,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, ++src)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(png.palette[*src * 3], png.palette[*src * 3 + 1], png.palette[*src * 3 + 2]).brightness());
 					accumalpha &= alpha;
@@ -741,7 +852,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, ++src)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					accumalpha &= *src;
 					dest = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
@@ -755,7 +866,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 2)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					accumalpha &= *src;
 					dest = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
@@ -769,7 +880,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 3)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
 					accumalpha &= alpha;
@@ -784,7 +895,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 4)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
 					accumalpha &= alpha;
@@ -803,29 +914,41 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
     render_detect_image - detect image format
 -------------------------------------------------*/
 
-ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char *filename)
+ru_imgformat render_detect_image(util::core_file &file)
 {
-	// open the file
-	std::string fname;
-	if (dirname)
-		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	else
-		fname.assign(filename);
-	osd_file::error const filerr = file.open(fname);
-	if (filerr != osd_file::error::NONE)
-		return RENDUTIL_IMGFORMAT_ERROR;
-
 	// PNG: check for valid header
-	png_error const result = png_info::verify_header(file);
-	if (result == PNGERR_NONE)
-	{
-		file.close();
+	util::png_error const png = util::png_info::verify_header(file);
+	file.seek(0, SEEK_SET);
+	if (util::png_error::NONE == png)
 		return RENDUTIL_IMGFORMAT_PNG;
+
+	// JPEG: attempt to read header with libjpeg
+	jpeg_decompress_struct cinfo;
+	jpeg_error_mgr jerr;
+	cinfo.err = jpeg_std_error(&jerr);
+	jerr.error_exit = [] (j_common_ptr cinfo) { throw cinfo->err; };
+	try
+	{
+		jpeg_create_decompress(&cinfo);
+		cinfo.mem->max_memory_to_use = 128 * 1024 * 1024;
+		jpeg_corefile_source::source(&cinfo, file);
+		jpeg_read_header(&cinfo, TRUE);
+		jpeg_destroy_decompress(&cinfo);
+		file.seek(0, SEEK_SET);
+		return RENDUTIL_IMGFORMAT_JPEG;
+	}
+	catch (jpeg_error_mgr *)
+	{
+		jpeg_destroy_decompress(&cinfo);
+		file.seek(0, SEEK_SET);
 	}
 
+	// Microsoft DIB: check for valid header
+	util::msdib_error const msdib = util::msdib_verify_header(file);
 	file.seek(0, SEEK_SET);
-	// TODO: add more when needed
+	if (util::msdib_error::NONE == msdib)
+		return RENDUTIL_IMGFORMAT_MSDIB;
 
-	file.close();
+	// TODO: add more as necessary
 	return RENDUTIL_IMGFORMAT_UNKNOWN;
 }

@@ -417,7 +417,7 @@ MC6845_UPDATE_ROW(mtx_sdxcpm_device::crtc_update_row)
 
 			int color = BIT(data, 7) ? fg : bg;
 
-			bitmap.pix32(y, x) = pen[de ? color : 0];
+			bitmap.pix(y, x) = pen[de ? color : 0];
 
 			data <<= 1;
 		}

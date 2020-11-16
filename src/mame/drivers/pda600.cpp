@@ -132,7 +132,7 @@ uint32_t pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 			for (int px=0; px<8; px++)
 			{
-				bitmap.pix16(y, (x * 8) + px) = BIT(data, 7);
+				bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
 				data <<= 1;
 			}
 		}

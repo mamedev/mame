@@ -166,25 +166,25 @@ GFXDECODE_END
 
 u32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,inv;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (u8 ra = 0; ra < 16; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 64; x++)
+			for (u16 x = 0; x < 64; x++)
 			{
-				inv = 0;
+				u8 inv = 0;
 
-				chr = m_p_videoram[x+ma];
+				u8 chr = m_p_videoram[x+ma];
 
 				if (BIT(chr, 7)) inv = 0xff;
 
 				chr &= 0x7f; // cursor
 
+				u8 gfx;
 				if (ra < 8)
 					gfx = m_p_chargen[(chr<<3) | ra ];
 				else

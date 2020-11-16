@@ -356,28 +356,25 @@ void pasha2_state::video_start()
 
 uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, count;
-	int color;
-
 	/* 2 512x256 bitmaps */
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		count = cliprect.min_x | (y << 9);
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		int count = cliprect.min_x | (y << 9);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			bitmap.pix16(y, x) = m_bitmap0[(m_vbuffer ^ 1)][count++] | 0x100;
+			bitmap.pix(y, x) = m_bitmap0[(m_vbuffer ^ 1)][count++] | 0x100;
 		}
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		count = cliprect.min_x | (y << 9);
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		int count = cliprect.min_x | (y << 9);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			color = m_bitmap1[(m_vbuffer ^ 1)][count++];
+			int color = m_bitmap1[(m_vbuffer ^ 1)][count++];
 			if (color != 0)
-				bitmap.pix16(y, x) = color;
+				bitmap.pix(y, x) = color;
 
 		}
 	}

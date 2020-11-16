@@ -347,7 +347,7 @@ u32 tc0090lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				const int res_x = (global_flip()) ? 320 - x : x;
 
-				bitmap.pix16(y, x) = palette().pen(m_bitmap_ram[count + (res_x & 0x1ff)]);
+				bitmap.pix(y, x) = palette().pen(m_bitmap_ram[count + (res_x & 0x1ff)]);
 			}
 		}
 	}
@@ -398,7 +398,7 @@ u32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				const int res_x = (global_flip()) ? 320 - x : x;
 
-				bitmap.pix16(y, x) = palette().pen(m_bitmap_ram[count + (res_x & 0x1ff)]);
+				bitmap.pix(y, x) = palette().pen(m_bitmap_ram[count + (res_x & 0x1ff)]);
 			}
 		}
 	}

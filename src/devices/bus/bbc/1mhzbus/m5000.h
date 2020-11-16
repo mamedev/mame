@@ -63,8 +63,8 @@ private:
 	bool m_disable;
 	bool m_modulate;
 
-	stream_sample_t m_sam_l[16];
-	stream_sample_t m_sam_r[16];
+	int32_t m_sam_l[16];
+	int32_t m_sam_r[16];
 
 	emu_timer *m_dsp_timer;
 

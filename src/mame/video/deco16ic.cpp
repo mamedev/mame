@@ -494,21 +494,21 @@ void deco16ic_device::custom_tilemap_draw(
 			else
 				column_offset = 0;
 
-			u16 p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
-			u8 f = src_flagsmap0->pix8((src_y + column_offset) & height_mask, src_x);
+			u16 p = src_bitmap0->pix((src_y + column_offset) & height_mask, src_x);
+			u8 f = src_flagsmap0->pix((src_y + column_offset) & height_mask, src_x);
 
 			if (src_bitmap1)
 			{
-				f |= src_flagsmap1->pix8((src_y + column_offset) & height_mask, src_x) & ~TILEMAP_DRAW_CATEGORY_MASK;
+				f |= src_flagsmap1->pix((src_y + column_offset) & height_mask, src_x) & ~TILEMAP_DRAW_CATEGORY_MASK;
 				if (!m_mix_cb.isnull())
 				{
-					const u16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
+					const u16 p2 = src_bitmap1->pix((src_y + column_offset) & height_mask, src_x);
 					p = m_mix_cb(p, p2);
 				}
 				else
 				{
 					// does boogie wings actually use this, or is the tattoo assassin code correct in this mode?
-					p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
+					p |= (src_bitmap1->pix((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 				}
 			}
 			src_x = (src_x + 1) & width_mask;
@@ -525,7 +525,7 @@ void deco16ic_device::custom_tilemap_draw(
 				else dest[x] = m_gfxdecode->palette().pen(p);
 				if (screen.priority().valid())
 				{
-					u8 *pri = &screen.priority().pix8(y);
+					u8 *const pri = &screen.priority().pix(y);
 					pri[x] = (pri[x] & pmask) | priority;
 				}
 			}

@@ -340,7 +340,7 @@ u32 primo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	for (u8 y = 0; y < 192; y++)
 	{
-		u16 *p = &bitmap.pix16(y);
+		u16 *p = &bitmap.pix(y);
 		for (u16 x = 0; x < 32; x++)
 		{
 			u8 data = m_vram[ma+x];

@@ -143,7 +143,7 @@ void resource_pool::remove(void *ptr)
 			// delete the object and break
 			if (LOG_ALLOCS)
 				fprintf(stderr, "#%06d, delete %d bytes\n", u32(deleteme->m_id), u32(deleteme->m_size));
-			global_free(deleteme);
+			delete deleteme;
 			break;
 		}
 }

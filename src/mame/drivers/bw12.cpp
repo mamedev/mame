@@ -29,7 +29,6 @@
 #include "includes/bw12.h"
 #include "bus/rs232/rs232.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -302,13 +301,12 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-	int column, bit;
+	pen_t const *const pen = m_palette->pens();
 
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
-		uint16_t addr = code << 4 | (ra & 0x0f);
+		uint8_t const code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		uint16_t const addr = code << 4 | (ra & 0x0f);
 		uint8_t data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
@@ -316,12 +314,12 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 			data = 0xff;
 		}
 
-		for (bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) && de;
+			int const x = (column * 8) + bit;
+			int const color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}
@@ -540,9 +538,6 @@ void bw12_state::common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // ls273.ic5 + mc1408.ic4
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));

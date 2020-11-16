@@ -85,6 +85,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
+#include "machine/timer.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -106,16 +107,12 @@ public:
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_beep_timer(*this, "beep_timer")
 	{ }
 
 	void amust(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	u8 port04_r();
 	void port04_w(u8 data);
 	u8 port05_r();
@@ -133,6 +130,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -151,7 +149,6 @@ private:
 	bool m_hsync;
 	bool m_vsync;
 	std::unique_ptr<u8[]> m_vram;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
@@ -163,18 +160,12 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<timer_device> m_beep_timer;
 };
 
-void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(amust_state::beep_timer)
 {
-	switch (id)
-	{
-	case TIMER_BEEP_OFF:
-		m_beep->set_state(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in amust_state::device_timer");
-	}
+	m_beep->set_state(0);
 }
 
 //void amust_state::port00_w(u8 data)
@@ -346,7 +337,7 @@ void amust_state::port0a_w(u8 data)
 	if (!BIT(data, 4))
 	{
 		m_beep->set_state(1);
-		timer_set(attotime::from_msec(150), TIMER_BEEP_OFF);
+		m_beep_timer->adjust(attotime::from_msec(150));
 	}
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
@@ -384,16 +375,15 @@ GFXDECODE_END
 
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,inv;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
-		mem = (ma + x) & 0x7ff;
-		chr = m_vram[mem];
+		u8 inv = (x == cursor_x) ? 0xff : 0;
+		u16 mem = (ma + x) & 0x7ff;
+		u8 chr = m_vram[mem];
+		u8 gfx;
 		if (ra < 8)
 			gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 		else
@@ -481,6 +471,7 @@ void amust_state::amust(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(amust_state::beep_timer));
 
 	/* Devices */
 	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'318'181) / 8));

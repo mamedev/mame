@@ -50,7 +50,7 @@ template <typename X> constexpr TIME_TYPE MULTIPLY_TIME_BY_INT(TIME_TYPE const &
 #endif
 
 
-typedef stream_sample_t FMSAMPLE;
+typedef s32 FMSAMPLE;
 /*
 #if (FM_SAMPLE_BITS==16)
 typedef int16_t FMSAMPLE;

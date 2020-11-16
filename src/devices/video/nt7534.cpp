@@ -148,7 +148,7 @@ uint32_t nt7534_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint8_t py = (y + m_display_start_line - 32) % 65;
 			uint8_t page = py/8;
-			bitmap.pix16(y, x) = BIT(m_ddram[page*132 + px], py%8);
+			bitmap.pix(y, x) = BIT(m_ddram[page*132 + px], py%8);
 		}
 	}
 

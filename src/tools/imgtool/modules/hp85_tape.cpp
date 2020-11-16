@@ -866,7 +866,7 @@ namespace {
 	tape_image_85& get_tape_image(tape_state_t& ts)
 	{
 		if (ts.img == nullptr) {
-			ts.img = global_alloc(tape_image_85);
+			ts.img = new tape_image_85;
 		}
 
 		return *(ts.img);
@@ -916,7 +916,7 @@ namespace {
 		delete state.stream;
 
 		// Free tape_image
-		global_free(&tape_image);
+		delete &tape_image;
 	}
 
 	imgtoolerr_t hp85_tape_begin_enum (imgtool::directory &enumeration, const char *path)

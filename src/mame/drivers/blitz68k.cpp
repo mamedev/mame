@@ -12,6 +12,7 @@ Year  Game                        Manufacturer
 ----------------------------------------------------------------------
 1990  Mega Double Poker           Blitz Systems Inc.
 1990  Mega Double Poker Jackpot   Blitz Systems Inc.
+1992  Mega Double Strip           Blitz Systems Inc.
 1993  Bank Robbery                Entertainment Technology Corp.
 1993? Poker 52                    Blitz Systems Inc.
 1993  Strip Teaser                <unknown>
@@ -94,6 +95,7 @@ public:
 	void init_megadblj();
 	void init_hermit();
 	void init_dualgame();
+	void init_megastrp();
 
 	void hermit(machine_config &config);
 	void bankrob(machine_config &config);
@@ -274,13 +276,13 @@ VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 
 uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *src = m_blit_buffer.get();
+	const uint8_t *src = m_blit_buffer.get();
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; x++)
 		{
-			bitmap.pix32(y, x) = m_palette->pen(*src++);
+			bitmap.pix(y, x) = m_palette->pen(*src++);
 		}
 	}
 
@@ -292,17 +294,17 @@ uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rg
 
 uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *src = m_frame_buffer;
+	const uint16_t *src = m_frame_buffer;
 
 	for(int y = 0; y < 256; y++)
 	{
 		for(int x = 0; x < 512; )
 		{
-			uint16_t pen = *src++;
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >> 12) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  0) & 0xf);
-			bitmap.pix32(y, x++) = m_palette->pen((pen >>  4) & 0xf);
+			const uint16_t pen = *src++;
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  8) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >> 12) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  0) & 0xf);
+			bitmap.pix(y, x++) = m_palette->pen((pen >>  4) & 0xf);
 		}
 	}
 
@@ -2211,6 +2213,32 @@ ROM_START( bankrobb ) // DK-B main PCB + 8L74 sub PCB
 	ROM_LOAD( "palce16v8h.u71", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+// Mega Strip on ROM labels
+// Maxi Strip Poker and both copyright 91 and 1992 in ROMs
+// Mega Double Strip on title screen, 1992 copyright on following screen
+// English and French strings in ROMs
+// Main PCB: DK-B Copyright 1991 Blitz System inc.
+// Sub PCB: BLZ AB1 Copyright 1992, Blitz System Inc.
+
+ROM_START( megastrp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code, on main board
+	ROM_LOAD16_BYTE( "1992_mega_strip_1.10b_b.u32", 0x00000, 0x20000, CRC(aaac8916) SHA1(74320bdf8b0f4de8a571fc6494252f01eff32cf9) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1992_mega_strip_1.10b_a.u31", 0x00001, 0x20000, CRC(7661bd45) SHA1(b25b20b893ca428e0364f6b6d0ad435354958c31) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code, on main board
+	ROM_LOAD( "1992_mega_strip_control_1.0.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code, on sub board
+	ROM_LOAD( "blz_10b-4.01.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // on main board
+	ROM_LOAD( "1992_mega_strip_1.10b_c.u46", 0x00000, 0x80000, CRC(d3813101) SHA1(80c6311ddea1b161a03fcd69c1b8d4e8a2d99636) )
+	ROM_LOAD( "1992_mega_strip_1.10b_d.u51", 0x80000, 0x80000, CRC(ee45ca2f) SHA1(9d1faeac17f60f1ea72d3fd3355544ea2d89a2bb) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // on main board
+	ROM_LOAD( "1992_mega_strip_1.10_sound.u18", 0x00000, 0x80000, CRC(8c345dc2) SHA1(2ad9dea4543d2c16f42a38653d740ff0c0fa1798) )
+ROM_END
+
 /*************************************************************************************************************
 
 Triple Play
@@ -3018,11 +3046,22 @@ void blitz68k_state::init_megadble()
 	ROM[0x1d40/2] = 0x4e71;
 }
 
+void blitz68k_state::init_megastrp()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// skip loops until the MCUs are dumped and the hardware better understood
+	ROM[0x1678/2] = 0x4e71;
+
+	ROM[0x10c80/2] = 0x4e71;
+}
+
 
 
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
 GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
 GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1992,  megastrp, 0,       bankroba, bankrob,  blitz68k_state, init_megastrp, ROT0, "Blitz Systems Inc.",             "Mega Double Strip (Ver. 1.10b)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
 GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993

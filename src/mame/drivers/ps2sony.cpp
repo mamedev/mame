@@ -914,6 +914,12 @@ ROM_START( ps2 )
 	ROMX_LOAD( "scph_bios_v12_rus_200.bin", 0x000000, 0x400000, CRC(92aa71a2) SHA1(cce6fac0f7e682ad167e1e828b2d53192c3d5051), ROM_BIOS(59) )
 	ROM_SYSTEM_BIOS( 60, "unknown6", "Unknown6" )
 	ROMX_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a), ROM_BIOS(60) )
+
+	// These came from Guru
+	ROM_SYSTEM_BIOS( 61, "scph50000_j2", "SCPH-50000 (Version 5.0 08/22/03 J)" )
+	ROMX_LOAD( "ps2-0190j-20030822.bin", 0x000000, 0x400000, CRC(79d60546) SHA1(0ea98a25a32145dda514de2f0d4bfbbd806bd00c), ROM_BIOS(61) )
+	ROM_SYSTEM_BIOS( 62, "scph70002_a", "SCPH-70002/SCPH-75002 (Version 5.0 06/14/04 A)" )
+	ROMX_LOAD( "ps2-0200a-20040614_alt.bin", 0x000000, 0x400000, CRC(3e0aa788) SHA1(597841bfea6e334f5ec4116299091ae2ed3da479), ROM_BIOS(62) )
 ROM_END
 
 CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

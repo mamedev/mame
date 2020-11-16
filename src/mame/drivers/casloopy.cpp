@@ -255,7 +255,6 @@ void casloopy_state::video_start()
 uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
-	int x,y;
 	int count;
 
 	static int test;
@@ -279,9 +278,9 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	#endif
 
 	count = test;
-	for (y=0;y<32;y++)
+	for (int y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
 			uint16_t tile = (m_vram[count+1])|(m_vram[count]<<8);
 
@@ -295,15 +294,13 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	count = test;
 
-	for (y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for (int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
-		for(x=0;x<256;x++)
+		for(int x=0;x<256;x++)
 		{
-			uint8_t pix;
-
-			pix = m_bitmap_vram[count];
+			uint8_t pix = m_bitmap_vram[count];
 			if(pix)
-				bitmap.pix16(y, x) = pix + 0x100;
+				bitmap.pix(y, x) = pix + 0x100;
 
 			count++;
 		}

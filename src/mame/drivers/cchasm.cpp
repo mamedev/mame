@@ -23,7 +23,6 @@
 #include "machine/z80ctc.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #define CCHASM_68K_CLOCK (XTAL(8'000'000))
@@ -186,9 +185,6 @@ void cchasm_state::cchasm(machine_config &config)
 
 	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", CCHASM_68K_CLOCK/10));

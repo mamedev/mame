@@ -667,8 +667,8 @@ void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_i
 		}
 		unsigned on_pen = BIT(attrs , 3) ? 1 : 2;
 		for (unsigned x = 0; x < VIDEO_CHAR_WIDTH * 2; x += 2) {
-			m_bitmap.pix32(video_scanline , x_left + x) = m_palette->pen(BIT(pixels_e , 0) ? on_pen : 0);
-			m_bitmap.pix32(video_scanline , x_left + x + 1) = m_palette->pen(BIT(pixels_o , 0) ? on_pen : 0);
+			m_bitmap.pix(video_scanline , x_left + x) = m_palette->pen(BIT(pixels_e , 0) ? on_pen : 0);
+			m_bitmap.pix(video_scanline , x_left + x + 1) = m_palette->pen(BIT(pixels_o , 0) ? on_pen : 0);
 			pixels_e >>= 1;
 			pixels_o >>= 1;
 		}

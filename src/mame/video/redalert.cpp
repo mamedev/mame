@@ -260,16 +260,11 @@ VIDEO_START_MEMBER(redalert_state,ww3)
 uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
-	offs_t offs;
 
 	get_redalert_pens(pens);
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-		uint8_t charmap_data_1;
-		uint8_t charmap_data_2;
-
 		uint8_t y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
 
@@ -280,6 +275,7 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
+		uint8_t charmap_data_1, charmap_data_2;
 		if (charmap_code & 0x80)
 		{
 			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
@@ -291,30 +287,29 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
 			charmap_data_2 = m_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			pen_t pen;
-
 			int bitmap_bit = bitmap_data & 0x80;
 			uint8_t color_prom_a0_a1 = ((charmap_data_2 & 0x80) >> 6) | ((charmap_data_1 & 0x80) >> 7);
 
 			/* determine priority */
+			pen_t pen;
 			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
 				pen = bitmap_bit ? pens[NUM_CHARMAP_PENS + bitmap_color] : pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS];
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if ((*m_video_control ^ m_control_xor) & 0x04)
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 			else
-				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
 
 			/* next pixel */
-			x = x + 1;
+			x++;
 
-			bitmap_data    = bitmap_data    << 1;
-			charmap_data_1 = charmap_data_1 << 1;
-			charmap_data_2 = charmap_data_2 << 1;
+			bitmap_data    <<= 1;
+			charmap_data_1 <<= 1;
+			charmap_data_2 <<= 1;
 		}
 	}
 
@@ -351,16 +346,11 @@ void redalert_state::demoneye_bitmap_layer_w(offs_t offset, uint8_t data)
 uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
-	offs_t offs;
 
 	get_demoneye_pens(pens);
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-		uint8_t charmap_data_1;
-		uint8_t charmap_data_2;
-
 		uint8_t y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
 
@@ -371,6 +361,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
+		uint8_t charmap_data_1, charmap_data_2;
 		if (charmap_code & 0x80)
 		{
 			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
@@ -386,30 +377,29 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 		//charmap_data_1 = m_charmap_videoram[0x1400 | charmap_data_base];
 		//charmap_data_2 = m_charmap_videoram[0x1800 | charmap_data_base];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			pen_t pen;
-
 			int bitmap_bit = bitmap_data & 0x80;
 			uint8_t color_prom_a0_a1 = ((charmap_data_2 & 0x80) >> 6) | ((charmap_data_1 & 0x80) >> 7);
 
 			/* determine priority */
+			pen_t pen;
 			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
 				pen = bitmap_bit ? pens[NUM_CHARMAP_PENS + bitmap_color] : pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS];
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if (*m_video_control & 0x04)
-				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
 			else
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 
 			/* next pixel */
-			x = x + 1;
+			x++;
 
-			bitmap_data    = bitmap_data    << 1;
-			charmap_data_1 = charmap_data_1 << 1;
-			charmap_data_2 = charmap_data_2 << 1;
+			bitmap_data    <<= 1;
+			charmap_data_1 <<= 1;
+			charmap_data_2 <<= 1;
 		}
 	}
 
@@ -450,7 +440,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 								int y_dst = 8*width - (y_block*8+iy);
 								int x_dst = 8*width - (x_block*8+7-ix);
 								ccc=pens[NUM_CHARMAP_PENS+ccc];
-								bitmap.pix32(y+y_dst, x+x_dst) = ccc;
+								bitmap.pix(y+y_dst, x+x_dst) = ccc;
 							}
 
 							l0<<=1;
@@ -478,16 +468,11 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
-	offs_t offs;
 
 	get_panther_pens(pens);
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-		uint8_t charmap_data_1;
-		uint8_t charmap_data_2;
-
 		uint8_t y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
 
@@ -498,6 +483,7 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
+		uint8_t charmap_data_1, charmap_data_2;
 		if (charmap_code & 0x80)
 		{
 			charmap_data_1 = m_charmap_videoram[0x0400 | charmap_data_base];
@@ -509,30 +495,29 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb
 			charmap_data_2 = m_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			pen_t pen;
-
 			int bitmap_bit = bitmap_data & 0x80;
 			uint8_t color_prom_a0_a1 = ((charmap_data_2 & 0x80) >> 6) | ((charmap_data_1 & 0x80) >> 7);
 
 			/* determine priority */
+			pen_t pen;
 			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
 				pen = bitmap_bit ? pens[NUM_CHARMAP_PENS + bitmap_color] : pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS];
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if ((*m_video_control ^ m_control_xor) & 0x04)
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 			else
-				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
 
 			/* next pixel */
-			x = x + 1;
+			x++;
 
-			bitmap_data    = bitmap_data    << 1;
-			charmap_data_1 = charmap_data_1 << 1;
-			charmap_data_2 = charmap_data_2 << 1;
+			bitmap_data    <<= 1;
+			charmap_data_1 <<= 1;
+			charmap_data_2 <<= 1;
 		}
 	}
 

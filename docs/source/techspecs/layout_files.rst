@@ -64,7 +64,7 @@ in the rightward and downward directions.  The origin (0,0) has no particular
 significance, and you may freely use negative coordinates in layouts.
 Coordinates are supplied as floating-point numbers.
 
-MAME assumes that view coordinates have the same aspect ratio as pixel on the
+MAME assumes that view coordinates have the same aspect ratio as pixels on the
 output device (host screen or window).  Assuming square pixels and no rotation,
 this means equal distances in X and Y axes correspond to equal horizontal and
 vertical distances in the rendered output.
@@ -73,20 +73,30 @@ Views, groups and elements all have their own internal coordinate systems.  When
 an element or group is referenced from a view or another group, its coordinates
 are scaled as necessary to fit the specified bounds.
 
-Objects are positioned and sized using ``bounds`` elements.  A bounds element
-may specify the position of the top left corner and the size using ``x``, ``y``,
-``width`` and ``height`` attributes, or it may specify the coordinates of the
-edges with the ``left``, ``top``, ``right`` and ``bottom`` attributes.  These
-two ``bounds`` elements are equivalent::
+Objects are positioned and sized using ``bounds`` elements.  The horizontal
+position and size may be specified in three ways: left edge and width using
+``x`` and ``width`` attributes, horizontal centre and width using ``xc`` and
+``width`` attributes, or left and right edges using ``left`` and ``right``
+attributes.  Similarly, the vertical position and size may be specified in terms
+of the top edge and height using ``y`` and ``height`` attributes, vertical
+centre and height using ``yc`` and ``height`` attributes, or top and bottom
+edges using ``top`` and ``bottom`` attributes.
 
-    <bounds x="455" y="120" width="11" height="7" />
-    <bounds left="455" top="120" right="466" bottom="127" />
+These three ``bounds`` elements are equivalent::
 
-Either the ``x`` or ``left`` attribute must be present to distinguish between
-the two schemes.  The ``width`` and ``height`` or ``right`` and ``bottom``
-default to 1.0 if not supplied.  It is an error if ``width`` or ``height`` are
-negative, if ``right`` is less than ``left``, or if ``bottom`` is less than
-``top``.
+    <bounds x="455" y="120" width="12" height="8" />
+    <bounds xc="461" yc="124" width="12" height="8" />
+    <bounds left="455" top="120" right="467" bottom="128" />
+
+It’s possible to use different schemes in the horizontal and vertical
+directions.  For example, these equivalent ``bounds`` elements are also valid::
+
+    <bounds x="455" top="120" width="12" bottom="128" />
+    <bounds left="455" yc="124" right="467" height="8" />
+
+The ``width``/``height`` or ``right``/``bottom`` default to 1.0 if not supplied.
+It is an error if ``width`` or ``height`` are negative, if ``right`` is less
+than ``left``, or if ``bottom`` is less than ``top``.
 
 
 .. _layout-concepts-colours:
@@ -376,12 +386,12 @@ and rendering.  An element may be used in multiple views, and may be used
 multiple times within a view.
 
 An element’s appearance depends on its *state*.  The state is an integer which
-usually comes from an I/O port field or an emulated output (see the discussion
-of :ref:`layout-parts-views` for information on connecting an element to an I/O
-port or output).  Any component of an element may be restricted to only drawing
-when the element’s state is a particular value.  Some components (e.g.
-multi-segment displays and reels) use the state directly to determine their
-appearance.
+usually comes from an I/O port field or an emulated output (see
+:ref:`layout-interact-elemstate` for information on connecting an element to an
+emulated I/O port or output).  Any component of an element may be restricted to
+only drawing when the element’s state is a particular value.  Some components
+(e.g.  multi-segment displays and reels) use the state directly to determine
+their appearance.
 
 Each element has its own internal coordinate system.  The bounds of the
 element’s coordinate system are computed as the union of the bounds of the
@@ -395,8 +405,9 @@ attribute, to be used if not connected to an emulated output or I/O port.  If
 present, the ``defstate`` attribute must be a non-negative integer.
 
 Child elements of the ``element`` element instantiate components, which are
-drawn in reading order from first to last (components draw on top of components
-that come before them).  All components support a few common features:
+drawn into the element texture in reading order from first to last using alpha
+blending (components draw over and may obscure components that come before
+them).  All components support a few common features:
 
 * Components may be conditionally drawn depending on the element’s state by
   supplying ``state`` and/or ``statemask`` attributes.  If present, these
@@ -459,18 +470,25 @@ rect
 disk
     Draws a uniform colour ellipse fitted to its bounds.
 image
-    Draws an image loaded from a PNG or JPEG file.  The name of the file to load
-    (including the file name extension) is supplied with the required ``file``
-    attribute.  Additionally, an optional ``alphafile`` attribute may be used to
-    specify the name of a PNG file (including the file name extension) to load
-    into the alpha channel of the image.  The image file(s) should be placed in
-    the same directory/archive as the layout file.  If the ``alphafile``
-    attribute refers  refers to a file, it must have the same dimensions as the
-    file referred to by the ``file`` attribute, and must have a bit depth no
-    greater than eight bits per channel per pixel.  The intensity from this
-    image (brightness) is copied to the alpha channel, with full intensity (white
-    in a greyscale image) corresponding to fully opaque, and black corresponding
-    to fully transparent.
+    Draws an image loaded from a PNG, JPEG, Windows DIB (BMP) or SVG file.  The
+    name of the file to load (including the file name extension) is supplied
+    using the required ``file`` attribute.  Additionally, an optional
+    ``alphafile`` attribute may be used to specify the name of a PNG file
+    (including the file name extension) to load into the alpha channel of the
+    image.
+
+    If the ``alphafile`` attribute refers  refers to a file, it must have the
+    same dimensions (in pixels) as the file referred to by the ``file``
+    attribute, and must have a bit depth no greater than eight bits per channel
+    per pixel.  The intensity from this image (brightness) is copied to the
+    alpha channel, with full intensity (white in a greyscale image)
+    corresponding to fully opaque, and black corresponding to fully transparent.
+    The ``alphafile`` attribute will be ignored if the ``file`` attribute refers
+    to an SVG image; it is only used in conjunction with bitmap images.
+
+    The image file(s) should be placed in the same directory/archive as the
+    layout file.  Image file formats are detected by examining the content of
+    the files, file name extensions are ignored.
 text
     Draws text in using the UI font in the specified colour.  The text to draw
     must be supplied using a ``string`` attribute.  An ``align`` attribute may
@@ -680,11 +698,15 @@ param
 element
     Adds an element to the view (see :ref:`layout-parts-elements`).  The name of
     the element to add is specified using the required ``ref`` attribute.  It is
-    an error if no element with this name is defined in the layout file.  May
-    optionally be connected to an emulated I/O port using ``inputtag`` and
+    an error if no element with this name is defined in the layout file.  Within
+    a view, elements are drawn in the order they appear in the layout file, from
+    front to back.  See below for more details.
+
+    May optionally be connected to an emulated I/O port using ``inputtag`` and
     ``inputmask`` attributes, and/or an emulated output using a ``name``
-    attribute.  Within a layer, elements are drawn in the order they appear in
-    the layout file, from front to back.  See below for more details.
+    attribute.  See :ref:`layout-interact-clickable` for details.  See
+    :ref:`layout-interact-elemstate` for details on supplying a state value to
+    the instantiated element.
 screen
     Adds an emulated screen image to the view.  The screen must be identified
     using either an ``index`` attribute or a ``tag`` attribute (it is an error
@@ -694,6 +716,10 @@ screen
     zero (0).  If present, the ``tag`` attribute must be the tag path to the
     screen relative to the device that causes the layout to be loaded.  Screens
     are drawn in the order they appear in the layout file, from front to back.
+
+    May optionally be connected to an emulated I/O port using ``inputtag`` and
+    ``inputmask`` attributes, and/or an emulated output using a ``name``
+    attribute.  See :ref:`layout-interact-clickable` for details.
 collection
     Adds screens and/or items in a collection that can be shown or hidden by the
     user (see :ref:`layout-parts-collections`).  The name of the collection is
@@ -765,51 +791,10 @@ Screens (``screen`` elements), layout elements (``element`` elements) and groups
 :ref:`layout-concepts-colours`) specifying a modifier colour.  The component
 colours of the screen or layout element(s) are multiplied by this colour.
 
-If an ``element`` element has ``inputtag`` and ``inputmask`` attributes,
-clicking it is equivalent to pressing a key/button mapped to the corresponding
-input(s).  The ``inputtag`` specifies the tag path of an I/O port relative to
-the device that caused the layout file to be loaded.  The ``inputmask``
-attribute must be an integer specifying the bits of the I/O port that the
-element should activate.  This sample shows instantiation of clickable buttons::
-
-    <element ref="btn_3" inputtag="X2" inputmask="0x10">
-        <bounds x="2.30" y="4.325" width="1.0" height="1.0" />
-    </element>
-    <element ref="btn_0" inputtag="X0" inputmask="0x20">
-        <bounds x="0.725" y="5.375" width="1.0" height="1.0" />
-    </element>
-    <element ref="btn_rst" inputtag="RESET" inputmask="0x01">
-        <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
-    </element>
-
-If an ``element`` element has a ``name`` attribute, it will take its state from
-the value of the correspondingly named emulated output.  Note that output names
-are global, which can become an issue when a machine uses multiple instances of
-the same type of device.  See :ref:`layout-parts-elements` for details on how an
-element’s state affects its appearance.  This example shows how digital displays
-may be connected to emulated outputs::
-
-    <element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
-    <element name="digit5" ref="digit"><bounds x="64" y="16" width="48" height="80" /></element>
-    <element name="digit4" ref="digit"><bounds x="112" y="16" width="48" height="80" /></element>
-    <element name="digit3" ref="digit"><bounds x="160" y="16" width="48" height="80" /></element>
-    <element name="digit2" ref="digit"><bounds x="208" y="16" width="48" height="80" /></element>
-    <element name="digit1" ref="digit"><bounds x="256" y="16" width="48" height="80" /></element>
-
-If an element instantiating a layout element has ``inputtag`` and ``inputmask``
-attributes but lacks a ``name`` attribute, it will take its state from the value
-of the corresponding I/O port, masked with the ``inputmask`` value and XORed
-with the I/O port default field value.  The latter is useful for inputs that are
-active-low.  If the result is non-zero, the state is 1, otherwise it’s 0.  This
-is often used to allow clickable buttons and toggle switches to provide visible
-feedback.  By using ``inputraw="1"``, it’s possible to obtain the raw data from
-the I/O port, masked with the ``inputmask`` value and shifted to the right to
-remove trailing zeroes (for example a mask of 0x05 will result in no shift, while
-a mask of 0xb0 will result in the value being shifted four bits to the right).
-
-When handling mouse input, MAME treats all layout elements as being rectangular,
-and only activates the frontmost element whose area includes the location of the
-mouse pointer.
+Screens (``screen`` elements) and layout elements (``element`` elements) may
+have their colour and position/size animated by supplying multiple ``color``
+and/or ``bounds`` child elements with ``state`` attributes.  See
+:ref:`layout-interact-itemanim` for details.
 
 
 .. _layout-parts-collections:
@@ -1085,6 +1070,207 @@ iteration; the next ``repeat`` element generates an individual row on each
 iteration; the innermost ``repeat`` element produces two horizontally adjacent
 tiles on each iteration.  Rows are connected to I/O ports ``board:IN.7`` at the
 top to ``board.IN.0`` at the bottom.
+
+
+.. _layout-interact:
+
+Interactivity
+-------------
+
+Interactive views are supported by allowing items to be bound to emulated
+outputs and I/O ports.  Five kinds of interactivity are supported:
+
+Clickable items
+    If an item in a view is bound to an I/O port switch field, clicking the
+    item will activate the emulated switch.
+State-dependent components
+    Some components will be drawn differently depending on the containing
+    element’s state.  These include the dot matrix, multi-segment LED display,
+    simple counter and reel elements.  See :ref:`layout-parts-elements` for
+    details.
+Conditionally-drawn components
+    Components may be conditionally drawn or hidden depending on the containing
+    element’s state by supplying ``state`` and/or ``statemask`` attributes.  See
+    :ref:`layout-parts-elements` for details.
+Component parameter animation
+    Components’ colour and position/size within their containing element may be
+    animated according the element’s state by providing multiple ``color``
+    and/or ``bounds`` elements with ``state`` attributes.  See
+    :ref:`layout-parts-elements` for details.
+Item parameter animation
+    Items’ colour and position/size within their containing view may be animated
+    according to their animation state.
+
+
+.. _layout-interact-clickable:
+
+Clickable items
+~~~~~~~~~~~~~~~
+
+If a view item (``element`` or ``screen`` element) has ``inputtag`` and
+``inputmask`` attribute values that correspond to a digital switch field in the
+emulated system, clicking the element will activate the switch.  The switch
+will remain active as long as the mouse button is held down and the pointer is
+within the item’s current bounds.  (Note that the bounds may change depending on
+the item’s animation state, see :ref:`layout-interact-itemanim`).
+
+The ``inputtag`` attribute specifies the tag path of an I/O port relative to the
+device that caused the layout file to be loaded.  The ``inputmask`` attribute
+must be an integer specifying the bits of the I/O port field that the item
+should activate.  This sample shows instantiation of clickable buttons::
+
+    <element ref="btn_3" inputtag="X2" inputmask="0x10">
+        <bounds x="2.30" y="4.325" width="1.0" height="1.0" />
+    </element>
+    <element ref="btn_0" inputtag="X0" inputmask="0x20">
+        <bounds x="0.725" y="5.375" width="1.0" height="1.0" />
+    </element>
+    <element ref="btn_rst" inputtag="RESET" inputmask="0x01">
+        <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
+    </element>
+
+When handling mouse input, MAME treats all layout elements as being rectangular,
+and only activates the first clickable item whose area includes the location of
+the mouse pointer.
+
+
+.. _layout-interact-elemstate:
+
+Element state
+~~~~~~~~~~~~~
+
+A view item that instantiates an element (``element`` element) may supply a
+state value to the element from an emulated I/O port or output.  See
+:ref:`layout-parts-elements` for details on how an element’s state affects its
+appearance.
+
+If the ``element`` element has a ``name`` attribute, the element state value
+will be taken from the value of the correspondingly named emulated output.  Note
+that output names are global, which can become an issue when a machine uses
+multiple instances of the same type of device.  This example shows how digital
+displays may be connected to emulated outputs::
+
+    <element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
+    <element name="digit5" ref="digit"><bounds x="64" y="16" width="48" height="80" /></element>
+    <element name="digit4" ref="digit"><bounds x="112" y="16" width="48" height="80" /></element>
+    <element name="digit3" ref="digit"><bounds x="160" y="16" width="48" height="80" /></element>
+    <element name="digit2" ref="digit"><bounds x="208" y="16" width="48" height="80" /></element>
+    <element name="digit1" ref="digit"><bounds x="256" y="16" width="48" height="80" /></element>
+
+If the ``element`` element has ``inputtag`` and ``inputmask`` attributes but
+lacks a ``name`` attribute, the element state value will be taken from the value
+of the corresponding I/O port, masked with the ``inputmask`` value.  The
+``inputtag`` attribute specifies the tag path of an I/O port relative to the
+device that caused the layout file to be loaded.  The ``inputmask`` attribute
+must be an integer specifying the bits of the I/O port field to use.
+
+If the ``element`` element has no ``inputraw`` attribute, or if the value of the
+``inputraw`` attribute is ``no``, the I/O port’s value is masked with the
+``inputmask`` value and XORed with the I/O port default field value.  If the
+result is non-zero, the element state is 1, otherwise it’s 0.  This is often
+used or provide visual feedback for clickable buttons, as values for active-high
+and active-low switches are normalised.
+
+If the ``element`` element has an ``inputraw`` attribute with the value ``yes``,
+the element state will be taken from the I/O port’s value masked with the
+``inputmask`` value and shifted to the right to remove trailing zeroes (for
+example a mask of 0x05 will result in no shift, while a mask of 0xb0 will result
+in the value being shifted four bits to the right).  This is useful for
+obtaining the value of analog or positional inputs.
+
+
+.. _layout-interact-itemanim:
+
+View item animation
+~~~~~~~~~~~~~~~~~~~
+
+Items’ colour and position/size within their containing view may be animated.
+This is achieved by supplying multiple ``color`` and/or ``bounds`` child
+elements with ``state`` attributes.  The ``state`` attribute of each ``color``
+or ``bounds`` child element must be a non-negative integer.  Withing a view
+item, no two ``color`` elements may have equal state ``state`` attributes, and
+no two ``bounds`` elements may have equal ``state`` attributes.
+
+If the item’s animation state is lower than the ``state`` value of any
+``bounds`` child element, the position/size specified by the ``bounds`` child
+element with the lowest ``state`` value will be used.  If the item’s
+animation state is higher than the ``state`` value of any ``bounds`` child
+element, the position/size specified by the ``bounds`` child element with the
+highest ``state`` value will be used.  If the item’s animation state is between
+the ``state`` values of two ``bounds`` child elements, the position/size will be
+interpolated linearly.
+
+If the item’s animation state is lower than the ``state`` value of any ``color``
+child element, the colour specified by the ``color`` child element with the
+lowest ``state`` value will be used.  If the item’s animation state is higher
+than the ``state`` value of any ``color`` child element, the colour specified by
+the ``color`` child element with the highest ``state`` value will be used.  If
+the item’s animation state is between the ``state`` values of two ``color``
+child elements, the RGBA colour components will be interpolated linearly.
+
+An item’s animation state may be bound to an emulated output or input port by
+supplying an ``animate`` child element.  If present, the ``animate`` element
+must have either an ``inputtag`` attribute or a ``name`` attribute (but not
+both).  If the ``animate`` child element is not present, the item’s animation
+state is the same as its element state (see :ref:`layout-interact-elemstate`).
+
+If the ``animate`` child element is present and has an ``inputtag``
+attribute, the item’s animation state will be taken from the value of the
+corresponding I/O port.  The ``inputtag`` attribute specifies the tag path of an
+I/O port relative to the device that caused the layout file to be loaded.  The
+raw value from the input port is used, active-low switch values are not
+normalised.
+
+If the ``animate`` child element is present and has a ``name`` attribute, the
+item’s animation state will be taken from the value of the correspondingly named
+emulated output.  Note that output names are global, which can become an issue
+when a machine uses multiple instances of the same type of device.
+
+If the ``animate`` child element has a ``mask`` attribute, the item’s animation
+state will be masked with the ``mask`` value and shifted to the right to remove
+trailing zeroes (for example a mask of 0x05 will result in no shift, while a
+mask of 0xb0 will result in the value being shifted four bits to the right).
+Note that the ``mask`` attribute applies to output value (specified with the
+``name`` attribute) as well as input port values (specified with the
+``inputtag`` attribute).  If the ``mask`` attribute is present, it must be an
+integer value.  If the ``mask`` attribute is not present, it is equivalent to
+all 32 bits being set.
+
+This example shows elements with independent element state and animation state,
+using the animation state taken from emulated outputs to control their
+position::
+
+    <repeat count="5">
+        <param name="x" start="10" increment="9" />
+        <param name="i" start="0" increment="1" />
+        <param name="mask" start="0x01" lshift="1" />
+
+        <element name="cg_sol~i~" ref="cosmo">
+            <animate name="cg_count~i~" />
+            <bounds state="0" x="~x~" y="10" width="6" height="7" />
+            <bounds state="255" x="~x~" y="48.5" width="6" height="7" />
+        </element>
+
+        <element ref="nothing" inputtag="FAKE1" inputmask="~mask~">
+            <animate name="cg_count~i~" />
+            <bounds state="0" x="~x~" y="10" width="6" height="7" />
+            <bounds state="255" x="~x~" y="48.5" width="6" height="7" />
+        </element>
+    </repeat>
+
+This example shows elements with independent element state and animation state,
+using the animation state taken from an emulated positional input to control
+their positions::
+
+        <repeat count="4">
+            <param name="y" start="1" increment="3" />
+            <param name="n" start="0" increment="1" />
+            <element ref="ledr" name="~n~.7">
+                <animate inputtag="IN.1" mask="0x0f" />
+                <bounds state="0" x="0" y="~y~" width="1" height="1" />
+                <bounds state="11" x="16.5" y="~y~" width="1" height="1" />
+            </element>
+        </repeat>
 
 
 .. _layout-errors:

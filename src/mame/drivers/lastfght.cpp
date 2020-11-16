@@ -165,9 +165,7 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
-	int x, y, count = 0;
-	uint8_t *gfxdata = memregion("gfx1")->base();
-	uint8_t data;
+	uint8_t const *const gfxdata = memregion("gfx1")->base();
 
 	if (machine().input().code_pressed_once(KEYCODE_ENTER)) m_view_roms ^= 1;
 	if (m_view_roms)
@@ -176,15 +174,15 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (machine().input().code_pressed_once(KEYCODE_PGUP))  m_base -= 512 * 256;
 		m_base %= memregion("gfx1")->bytes();
 
-		count = m_base;
+		int count = m_base;
 
 		bitmap.fill(m_palette->black_pen(), cliprect );
-		for (y = 0 ; y < 256; y++)
+		for (int y = 0 ; y < 256; y++)
 		{
-			for (x = 0; x < 512; x++)
+			for (int x = 0; x < 512; x++)
 			{
-				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
-				bitmap.pix16(y, x) = data;
+				uint8_t data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
+				bitmap.pix(y, x) = data;
 				count++;
 			}
 		}
@@ -317,7 +315,6 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		int x, y, addr;
 		uint8_t *gfxdata = memregion( "gfx1" )->base();
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
@@ -330,18 +327,18 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				data >> 8);
 #endif
 
-		for (y = 0; y <= m_h; y++)
+		for (int y = 0; y <= m_h; y++)
 		{
-			for (x = 0; x <= m_w; x++)
+			for (int x = 0; x <= m_w; x++)
 			{
-				addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
+				int addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
 							(((m_sy + m_sy1 + m_dsy * y) >> 6) & 0xff) * 0x200 +
 							m_sp * 0x200 * 0x100 + m_sr * 0x200000;
 
 				data = gfxdata[addr];
 
 				if (data && (m_x + x >= 0) && (m_x + x < 512) && (m_y + y >= 0) && (m_y + y < 256))
-					dest.pix16(m_y + y, m_x + x) = data;
+					dest.pix(m_y + y, m_x + x) = data;
 			}
 		}
 	}

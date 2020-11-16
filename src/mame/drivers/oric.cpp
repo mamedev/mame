@@ -235,7 +235,7 @@ uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bit
 		uint32_t fgcol = m_palette->pen_color(7);
 		uint32_t bgcol = m_palette->pen_color(0);
 
-		uint32_t *p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix(y);
 
 		for(int x=0; x<40; x++) {
 			// Lookup the byte and, if needed, the pattern data

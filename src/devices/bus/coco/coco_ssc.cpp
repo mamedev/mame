@@ -130,7 +130,7 @@ namespace
 		virtual void device_start() override;
 
 		// sound stream update overrides
-		virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
+		virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	private:
 		sound_stream*  m_stream;
@@ -535,25 +535,25 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 
 void cocossc_sac_device::device_start()
 {
-	m_stream = stream_alloc_legacy(1, 1, machine().sample_rate());
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cocossc_sac_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t const *src = inputs[0];
-	stream_sample_t *dst = outputs[0];
+	auto &src = inputs[0];
+	auto &dst = outputs[0];
 
-	double n = samples;
+	double n = dst.samples();
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < n; sampindex++)
 	{
-		m_rms[m_index] += ( (double)*src * (double)*src );
-		*dst++ = (*src++);
+		m_rms[m_index] += src.get(sampindex) * src.get(sampindex);
+		dst.put(sampindex, src.get(sampindex));
 	}
 
 	m_rms[m_index] = m_rms[m_index] / n;
@@ -576,7 +576,7 @@ bool cocossc_sac_device::sound_activity_circuit_output()
 
 	average /= 16.0;
 
-	if( average > 10400.0 )
+	if( average > 0.317 )
 		return true;
 
 	return false;

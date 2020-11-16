@@ -1786,7 +1786,7 @@ void chd_avhuff_decompressor::configure(int param, void *config)
 {
 	// if we're getting the decompression configuration, apply it now
 	if (param == AVHUFF_CODEC_DECOMPRESS_CONFIG)
-		m_decoder.configure(*reinterpret_cast<avhuff_decompress_config *>(config));
+		m_decoder.configure(*reinterpret_cast<avhuff_decoder::config const *>(config));
 
 	// anything else is invalid
 	else

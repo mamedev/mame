@@ -27,7 +27,6 @@
 
 #include "emu.h"
 #include "epson_lx810l.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 //#define VERBOSE 1
@@ -152,8 +151,6 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* gate array */
 	e05a30_device &e05a30(E05A30(config, m_e05a30, 0));
@@ -575,9 +572,9 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 */
 		if (m_real_cr_pos < m_bitmap.width()) {
 			for (int i = 0; i < 9; i++) {
-				unsigned int y = bitmap_line(i);
+				unsigned int const y = bitmap_line(i);
 				if ((m_printhead & (1<<(8-i))) != 0)
-					m_bitmap.pix32(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
+					m_bitmap.pix(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
 			}
 		}
 	}

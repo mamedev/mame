@@ -22,6 +22,7 @@
 #include "machine/upd765.h"
 #include "machine/7474.h"
 #include "machine/74123.h"
+#include "machine/74259.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
 #include "imagedev/floppy.h"
@@ -71,7 +72,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hsklatch_out);
 
 	uint8_t cruread(offs_t offset);
-	void cruwrite(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(nocomp_w);
+	DECLARE_WRITE_LINE_MEMBER(diren_w);
+	DECLARE_WRITE_LINE_MEMBER(dacken_w);
+	DECLARE_WRITE_LINE_MEMBER(stepen_w);
+	DECLARE_WRITE_LINE_MEMBER(ds1_w);
+	DECLARE_WRITE_LINE_MEMBER(ds2_w);
+	DECLARE_WRITE_LINE_MEMBER(ds3_w);
+	DECLARE_WRITE_LINE_MEMBER(ds4_w);
+	DECLARE_WRITE_LINE_MEMBER(aux_motor_w);
+	DECLARE_WRITE_LINE_MEMBER(wait_w);
+	void update_drive_select();
 
 	// Operate the floppy motors
 	bool m_motor_on;
@@ -96,6 +107,7 @@ private:
 
 	required_device<ibc_device> m_hexbus_ctrl;
 	required_device<i8272a_device> m_floppy_ctrl;
+	required_device_array<ls259_device, 2> m_crulatch;
 	required_device<ttl74123_device> m_motormf;
 	required_device<ttl74123_device> m_speedmf;
 	required_device<ttl7474_device> m_readyff;

@@ -153,8 +153,6 @@ void jpmsys5v_state::ramdac_w(offs_t offset, uint16_t data)
 
 uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	m_tms34061->get_display_state();
 
 	if (m_tms34061->m_display.blanked)
@@ -163,14 +161,14 @@ uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rg
 		return 0;
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint8_t const *const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
+		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x +=2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x +=2)
 		{
-			uint8_t pen = src[(x-cliprect.min_x)>>1];
+			uint8_t const pen = src[(x-cliprect.min_x)>>1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen((pen >> 4) & 0xf);

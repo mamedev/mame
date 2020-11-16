@@ -48,8 +48,8 @@ int apridisk_format::identify(io_generic *io, uint32_t form_factor)
 bool apridisk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	desc_pc_sector sectors[80][2][18];
-	uint8_t sector_data[MAX_SECTORS * SECTOR_SIZE];
-	uint8_t *data_ptr = sector_data;
+	std::unique_ptr<uint8_t []> sector_data(new uint8_t [MAX_SECTORS * SECTOR_SIZE]);
+	uint8_t *data_ptr = sector_data.get();
 	int track_count = 0, head_count = 0, sector_count = 0;
 
 	uint64_t file_size = io_generic_size(io);

@@ -299,39 +299,35 @@ private:
 // bit 7 = subscript (superscript and subscript combined produces strikethrough)
 uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,vy,start,bit,scan,data;
-	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
-							// as it can start on either odd or even character cells.
-
 	// Graphics output (if enabled)
 	if(m_gfx_enabled)
 	{
-		const pen_t *pen = m_palette->pens();
+		pen_t const *const pen = m_palette->pens();
 
-		for(y=0;y<(bitmap.height()-1)/10;y++)
+		for(uint8_t y=0;y<(bitmap.height()-1)/10;y++)
 		{
-			for(x=0;x<(bitmap.width()-1)/8;x++)
+			for(uint8_t x=0;x<(bitmap.width()-1)/8;x++)
 			{
 				// graphics pixels use half the clock of text, so 4 graphics pixels per character
-				for(scan=0;scan<10;scan+=2)
+				for(uint8_t scan=0;scan<10;scan+=2)
 				{
-					data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
-					bitmap.pix32(y*10+scan,x*8)   = pen[BIT(data,7)];
-					bitmap.pix32(y*10+scan,x*8+1) = pen[BIT(data,7)];
-					bitmap.pix32(y*10+scan,x*8+2) = pen[BIT(data,6)];
-					bitmap.pix32(y*10+scan,x*8+3) = pen[BIT(data,6)];
-					bitmap.pix32(y*10+scan,x*8+4) = pen[BIT(data,5)];
-					bitmap.pix32(y*10+scan,x*8+5) = pen[BIT(data,5)];
-					bitmap.pix32(y*10+scan,x*8+6) = pen[BIT(data,4)];
-					bitmap.pix32(y*10+scan,x*8+7) = pen[BIT(data,4)];
-					bitmap.pix32(y*10+scan+1,x*8)   = pen[BIT(data,3)];
-					bitmap.pix32(y*10+scan+1,x*8+1) = pen[BIT(data,3)];
-					bitmap.pix32(y*10+scan+1,x*8+2) = pen[BIT(data,2)];
-					bitmap.pix32(y*10+scan+1,x*8+3) = pen[BIT(data,2)];
-					bitmap.pix32(y*10+scan+1,x*8+4) = pen[BIT(data,1)];
-					bitmap.pix32(y*10+scan+1,x*8+5) = pen[BIT(data,1)];
-					bitmap.pix32(y*10+scan+1,x*8+6) = pen[BIT(data,0)];
-					bitmap.pix32(y*10+scan+1,x*8+7) = pen[BIT(data,0)];
+					uint8_t const data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
+					bitmap.pix(y*10+scan,x*8)   = pen[BIT(data,7)];
+					bitmap.pix(y*10+scan,x*8+1) = pen[BIT(data,7)];
+					bitmap.pix(y*10+scan,x*8+2) = pen[BIT(data,6)];
+					bitmap.pix(y*10+scan,x*8+3) = pen[BIT(data,6)];
+					bitmap.pix(y*10+scan,x*8+4) = pen[BIT(data,5)];
+					bitmap.pix(y*10+scan,x*8+5) = pen[BIT(data,5)];
+					bitmap.pix(y*10+scan,x*8+6) = pen[BIT(data,4)];
+					bitmap.pix(y*10+scan,x*8+7) = pen[BIT(data,4)];
+					bitmap.pix(y*10+scan+1,x*8)   = pen[BIT(data,3)];
+					bitmap.pix(y*10+scan+1,x*8+1) = pen[BIT(data,3)];
+					bitmap.pix(y*10+scan+1,x*8+2) = pen[BIT(data,2)];
+					bitmap.pix(y*10+scan+1,x*8+3) = pen[BIT(data,2)];
+					bitmap.pix(y*10+scan+1,x*8+4) = pen[BIT(data,1)];
+					bitmap.pix(y*10+scan+1,x*8+5) = pen[BIT(data,1)];
+					bitmap.pix(y*10+scan+1,x*8+6) = pen[BIT(data,0)];
+					bitmap.pix(y*10+scan+1,x*8+7) = pen[BIT(data,0)];
 				}
 			}
 		}
@@ -340,12 +336,14 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		bitmap.fill(0);
 
 	// Text output
-	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
+	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
+							// as it can start on either odd or even character cells.
+	for(uint8_t y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
-		start = m_crtc->upscroll_offset();
-		vy = (start + y) % 24;
+		uint8_t const start = m_crtc->upscroll_offset();
+		uint8_t const vy = (start + y) % 24;
 
-		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
+		for(uint8_t x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
 			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < ARRAY_LENGTH(m_char_ram));
@@ -356,9 +354,9 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			else
 				dbl_mode = 0;
 
-			for(scan=0;scan<10;scan++)  // 10 scanlines per line
+			for(uint8_t scan=0;scan<10;scan++)  // 10 scanlines per line
 			{
-				data = m_char_rom->base()[(ch*16+scan)];
+				uint8_t data = m_char_rom->base()[(ch*16+scan)];
 				if((m_attr_ram[(vy*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
 				{
 					if(m_attr_ram[(vy*128)+x] & 0x40)  // superscript
@@ -402,13 +400,13 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 					data = newdata;
 				}
 
-				for(bit=0;bit<8;bit++)  // 8 pixels per character
+				for(uint8_t bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					uint16_t xpos = x*8+bit;
-					uint16_t ypos = y*10+scan;
+					uint16_t const xpos = x*8+bit;
+					uint16_t const ypos = y*10+scan;
 
 					if(BIT(data,7-bit))
-						bitmap.pix32(ypos,xpos) = fg;
+						bitmap.pix(ypos,xpos) = fg;
 				}
 			}
 		}

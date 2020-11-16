@@ -274,7 +274,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, 
 		if (m_lines <= 2)
 		{
 			if (pos < m_chars)
-				bitmap.pix16(line * (line_height + 1) + y, pos * 6 + x) = state;
+				bitmap.pix(line * (line_height + 1) + y, pos * 6 + x) = state;
 		}
 		else if (m_lines <= 4)
 		{
@@ -287,7 +287,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, 
 				}
 
 				if (line < m_lines)
-					bitmap.pix16(line * (line_height + 1) + y, pos * 6 + x) = state;
+					bitmap.pix(line * (line_height + 1) + y, pos * 6 + x) = state;
 			}
 		}
 		else

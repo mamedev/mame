@@ -240,7 +240,7 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 	{
 		for(int32_t j = 0; j < vres; j++)
 		{
-			uint32_t* d = &bitmap.pix32(j);
+			uint32_t *const d = &bitmap.pix(j);
 
 			for(int32_t i = 0; i < hres; i++)
 			{
@@ -289,7 +289,7 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 	{
 		for (int32_t j = 0; j < vres; j++)
 		{
-			uint32_t* d = &bitmap.pix32(j);
+			uint32_t *const d = &bitmap.pix(j);
 			for (int32_t i = 0; i < hres; i++)
 			{
 				uint32_t pix = *frame_buffer32++;

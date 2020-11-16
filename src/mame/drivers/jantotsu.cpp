@@ -166,28 +166,23 @@ void jantotsu_state::video_start()
 
 uint32_t jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y, i;
-	int count = 0;
-	uint8_t pen_i;
-
 	if(!m_display_on)
 		return 0;
 
-	for (y = 0; y < 256; y++)
+	int count = 0;
+	for (int y = 0; y < 256; y++)
 	{
-		for (x = 0; x < 256; x += 8)
+		for (int x = 0; x < 256; x += 8)
 		{
-			uint8_t color;
-
-			for (i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
-				color = m_col_bank;
+				uint8_t color = m_col_bank;
 
-				for(pen_i = 0;pen_i<4;pen_i++)
+				for (uint8_t pen_i = 0;pen_i<4;pen_i++)
 					color |= (((m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if (cliprect.contains(x + i, y))
-					bitmap.pix32(y, x + i) = m_palette->pen(color);
+					bitmap.pix(y, x + i) = m_palette->pen(color);
 			}
 
 			count++;

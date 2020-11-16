@@ -24,7 +24,6 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -244,7 +243,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 
 	int y = 0;
 	int x = 0;
-	uint16_t *bmpptr = &m_update_bitmap.pix16(0, 0);
+	uint16_t *bmpptr = &m_update_bitmap.pix(0, 0);
 
 	while (y < 240)
 	{
@@ -918,12 +917,6 @@ void rastersp_state::rastersp(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.add_route(0, "ldac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "rdac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

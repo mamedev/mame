@@ -149,7 +149,7 @@ uint8_t tanbus_mpvdu_device::videoram_r(offs_t offset)
 
 MC6845_UPDATE_ROW(tanbus_mpvdu_device::crtc_update_row)
 {
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	m_trom->lose_w(1);
 	m_trom->lose_w(0);
@@ -165,11 +165,11 @@ MC6845_UPDATE_ROW(tanbus_mpvdu_device::crtc_update_row)
 			m_trom->tr6_w(1);
 			m_trom->tr6_w(0);
 
-			int col = m_trom->get_rgb() ^ ((column == cursor_x) ? 7 : 0);
+			int const col = m_trom->get_rgb() ^ ((column == cursor_x) ? 7 : 0);
 
-			int r = BIT(col, 0) * 0xff;
-			int g = BIT(col, 1) * 0xff;
-			int b = BIT(col, 2) * 0xff;
+			int const r = BIT(col, 0) * 0xff;
+			int const g = BIT(col, 1) * 0xff;
+			int const b = BIT(col, 2) * 0xff;
 
 			*p++ = rgb_t(r, g, b);
 		}

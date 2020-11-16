@@ -106,6 +106,8 @@ void emulator_info::periodic_check() { }
 
 bool emulator_info::frame_hook() { return false; }
 
+void emulator_info::sound_hook() { }
+
 void emulator_info::layout_file_cb(util::xml::data_node const &layout) { }
 
 const char * emulator_info::get_appname() { return nullptr; }

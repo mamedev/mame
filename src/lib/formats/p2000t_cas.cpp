@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#include <cassert>
-
-#include "cassimg.h"
 #include "p2000t_cas.h"
+
+#include <cassert>
 #include <ostream>
+
 
 // This code will reproduce the timing of a P2000 mini cassette tape.
 constexpr double P2000_CLOCK_PERIOD = 0.000084;
@@ -156,7 +156,7 @@ std::ostream &operator<<(std::ostream &os, P2000T_Header const &hdr)
 			  << std::string(hdr.ext, 3) << "  " << hdr.file_length;
 }
 
-static cassette_image::error p2000t_cas_identify(cassette_image *cass, struct CassetteOptions *opts)
+static cassette_image::error p2000t_cas_identify(cassette_image *cass, cassette_image::Options *opts)
 {
 	opts->bits_per_sample  = 32;
 	opts->channels         = 1;
@@ -215,10 +215,10 @@ cassette_image::error p2000t_put_bit(cassette_image *cass, double *time_index, b
 {
 	const int channel         = 0;
 	cassette_image::error err = cassette_image::error::SUCCESS;
-	CHR(cassette_put_sample(cass, channel, *time_index, P2000_CLOCK_PERIOD, bit ? P2000_HIGH : P2000_LOW));
+	CHR(cass->put_sample(channel, *time_index, P2000_CLOCK_PERIOD, bit ? P2000_HIGH : P2000_LOW));
 	*time_index += P2000_CLOCK_PERIOD;
 
-	CHR(cassette_put_sample(cass, channel, *time_index, P2000_CLOCK_PERIOD, bit ? P2000_LOW : P2000_HIGH));
+	CHR(cass->put_sample(channel, *time_index, P2000_CLOCK_PERIOD, bit ? P2000_LOW : P2000_HIGH));
 	*time_index += P2000_CLOCK_PERIOD;
 	return err;
 }
@@ -251,7 +251,7 @@ cassette_image::error p2000t_silence(cassette_image *cassette,
 double *time_index,
 double time)
 {
-	auto err = cassette_put_sample(cassette, 0, *time_index, time, 0);
+	auto err = cassette->put_sample(0, *time_index, time, 0);
 	*time_index += time;
 	return err;
 }
@@ -259,7 +259,7 @@ double time)
 static cassette_image::error p2000t_cas_load(cassette_image *cassette)
 {
 	cassette_image::error err = cassette_image::error::SUCCESS;
-	uint64_t image_size       = cassette_image_size(cassette);
+	uint64_t image_size       = cassette->image_size();
 	constexpr int CAS_BLOCK   = 1280;
 
 	/*
@@ -290,7 +290,7 @@ static cassette_image::error p2000t_cas_load(cassette_image *cassette)
 	for (int i = 0; i < blocks; i++)
 	{
 		uint16_t crc = 0, unused = 0;
-		cassette_image_read(cassette, &block, CAS_BLOCK * i, CAS_BLOCK);
+		cassette->image_read(&block, CAS_BLOCK * i, CAS_BLOCK);
 
 		// Insert sync header.. 0xAA, 0x00, 0x00, 0xAA
 		CHR(p2000t_silence(cassette, &time_idx, P2000_BOB_GAP));
@@ -312,7 +312,7 @@ static cassette_image::error p2000t_cas_load(cassette_image *cassette)
 	return p2000t_silence(cassette, &time_idx, P2000_EOT_GAP);
 }
 
-static const struct CassetteFormat p2000t_cas = {
+static const cassette_image::Format p2000t_cas = {
 	"cas", p2000t_cas_identify, p2000t_cas_load, nullptr /* no save */
 };
 

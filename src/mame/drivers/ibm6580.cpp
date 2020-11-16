@@ -144,12 +144,18 @@ public:
 		, m_screen(*this, "screen")
 		, m_kbd(*this, "kbd")
 		, m_fdc(*this, UPD765_TAG)
-		, m_flop0(*this, UPD765_TAG ":0")
-		, m_flop1(*this, UPD765_TAG ":1")
+		, m_flop(*this, UPD765_TAG ":%u", 0U)
 		, m_p_chargen(*this, "chargen")
+		, m_io_dump(*this, "DUMP")
+		, m_leds(*this, "led%u", 5U)
 	{ }
 
 	void ibm6580(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	void pic_latch_w(uint16_t data);
@@ -185,10 +191,6 @@ private:
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	uint8_t m_p40, m_p50, m_e000, m_kb_data, m_ppi_c;
 	bool m_kb_data_bit, m_kb_strobe;
 	util::fifo<uint8_t, 4> m_kb_fifo;
@@ -213,9 +215,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<dw_keyboard_device> m_kbd;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_flop0;
-	required_device<floppy_connector> m_flop1;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport m_io_dump;
+	output_finder<4> m_leds;
 };
 
 
@@ -326,7 +329,7 @@ WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 //  if (state)
 //      m_pic8259->ir6_w(state);
 
-	if (ioport("DUMP")->read())
+	if (m_io_dump->read())
 		m_p40 |= 4;
 }
 
@@ -356,10 +359,8 @@ void ibm6580_state::unk_latch_w(uint16_t data)
 
 void ibm6580_state::led_w(uint8_t data)
 {
-	output().set_value("led5", BIT(data, 7));
-	output().set_value("led6", BIT(data, 6));
-	output().set_value("led7", BIT(data, 5));
-	output().set_value("led8", BIT(data, 4));
+	for (int i = 0; i < 4; i++)
+		m_leds[i] = BIT(data, 7 - i);
 
 	if (data & 0xf)
 		return;
@@ -533,8 +534,8 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	// 1 byte -- get status?
 	case 5:
 		m_floppy_mcu_sr.enqueue(0x00);
-		if (m_flop0->get_device()->exists())
-			m_floppy_mcu_sr.enqueue( m_flop0->get_device()->idx_r() ? 0x08 : 0);
+		if (m_flop[0]->get_device()->exists())
+			m_floppy_mcu_sr.enqueue( m_flop[0]->get_device()->idx_r() ? 0x08 : 0);
 		else
 			m_floppy_mcu_sr.enqueue(0x08);
 		break;
@@ -564,10 +565,10 @@ uint8_t ibm6580_state::floppy_mcu_command()
 	case 0xd:
 		m_floppy_mcu_sr.enqueue(0x00);
 		i = 0;
-		if (m_flop0->get_device()->exists())
-			i |= m_flop0->get_device()->ready_r() ? 0 : 0x40;
-		if (m_flop1->get_device()->exists())
-			i |= m_flop1->get_device()->ready_r() ? 0 : 0x80;
+		if (m_flop[0]->get_device()->exists())
+			i |= m_flop[0]->get_device()->ready_r() ? 0 : 0x40;
+		if (m_flop[1]->get_device()->exists())
+			i |= m_flop[1]->get_device()->ready_r() ? 0 : 0x80;
 		m_floppy_mcu_sr.enqueue(i);
 		break;
 
@@ -577,9 +578,9 @@ uint8_t ibm6580_state::floppy_mcu_command()
 		i = m_floppy_mcu_cr.dequeue();
 #if 1
 		if (i & 1)
-			m_fdc->set_floppy(m_flop0->get_device());
+			m_fdc->set_floppy(m_flop[0]->get_device());
 		else if (i & 2)
-			m_fdc->set_floppy(m_flop1->get_device());
+			m_fdc->set_floppy(m_flop[1]->get_device());
 #endif
 		break;
 
@@ -659,7 +660,7 @@ uint8_t ibm6580_state::floppy_r(offs_t offset)
 	if (offset)
 		LOG("Floppy %02x == %02x\n", 0x8150 + (offset << 1), data);
 	else {
-		floppy_image_device *f = m_flop0->get_device();
+		floppy_image_device *f = m_flop[0]->get_device();
 
 		if (f)
 			LOG("Floppy %02x == %02x (empty %d hdl %d + idle %d irq %d drq %d + dskchg %d idx %d cyl %d)\n",
@@ -717,23 +718,24 @@ INPUT_PORTS_END
 
 uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,gfx,fg,bg,chr,attr;
-	uint16_t sy=0,ma=25,x,ca;
+	uint16_t sy=0,ma=25;
 
-	fg = 1; bg = 0;
+	uint8_t fg = 1, bg = 0;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (uint8_t ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			// graphics mode
-			if (m_p_videoram[ma] & 0x100) {
-				for (x = ma; x < ma + 80; x++)
+			if (m_p_videoram[ma] & 0x100)
+			{
+				// graphics mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint8_t gfx;
 
 					switch (ra >> 1)
 					{
@@ -764,13 +766,16 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						*p++ = BIT(gfx, i) ? fg : bg;
 					}
 				}
-			} else {
-			// text mode
-				for (x = ma; x < ma + 80; x++)
+			}
+			else
+			{
+				// text mode
+				for (uint16_t x = ma; x < ma + 80; x++)
 				{
-					chr = m_p_videoram[x];
-					attr = m_p_videoram[x] >> 8;
-					ca = (chr<<4);
+					uint8_t const chr = m_p_videoram[x];
+					uint8_t const attr = m_p_videoram[x] >> 8;
+					uint16_t ca = (chr<<4);
+					uint8_t gfx;
 
 					// font 2
 					if (attr & 0x02)
@@ -828,6 +833,8 @@ void ibm6580_state::machine_start()
 	membank("bank10")->set_base(m_ram->pointer());
 
 	m_fdc->set_rate(500000); // XXX workaround
+
+	m_leds.resolve();
 }
 
 void ibm6580_state::machine_reset()
@@ -839,12 +846,12 @@ void ibm6580_state::machine_reset()
 
 	m_pit8253->set_clockin(0, 0.0);
 
-	if (ioport("DUMP")->read())
+	if (m_io_dump->read())
 		m_p40 |= 4;
 
-	m_flop0->get_device()->mon_w(!m_flop0->get_device()->exists());
-	m_flop1->get_device()->mon_w(!m_flop1->get_device()->exists());
-	m_fdc->set_floppy(m_flop0->get_device());
+	m_flop[0]->get_device()->mon_w(!m_flop[0]->get_device()->exists());
+	m_flop[1]->get_device()->mon_w(!m_flop[1]->get_device()->exists());
+	m_fdc->set_floppy(m_flop[0]->get_device());
 	m_floppy_mcu_sr.clear();
 	m_floppy_mcu_cr.clear();
 	m_floppy_mcu_cr_fifo = 0;

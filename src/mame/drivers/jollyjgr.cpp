@@ -514,13 +514,13 @@ void jollyjgr_state::draw_bitmap(bitmap_rgb32 &bitmap)
 				if (color)
 				{
 					if (m_flip_x && m_flip_y)
-						bitmap.pix32(y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (m_flip_x && !m_flip_y)
-						bitmap.pix32(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
 					else if (!m_flip_x && m_flip_y)
-						bitmap.pix32(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 					else
-						bitmap.pix32(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+						bitmap.pix(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
 				}
 			}
 
@@ -602,7 +602,7 @@ uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb
 		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
 			for (int x=sx-4;x<sx;x++)
 				if (x>=cliprect.min_x && x<=cliprect.max_x)
-					bitmap.pix32(sy, x) = m_bm_palette->pen_color(bc);
+					bitmap.pix(sy, x) = m_bm_palette->pen_color(bc);
 	}
 
 	return 0;

@@ -110,20 +110,17 @@ void skyraid_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void skyraid_state::draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src)
 {
-	const uint8_t* p = memregion("user2")->base();
+	uint8_t const *const p = memregion("user2")->base();
 
-	int x;
-	int y;
-
-	for (y = 0; y < dst.height(); y++)
+	for (int y = 0; y < dst.height(); y++)
 	{
-		uint16_t* pSrc = &src.pix16(y);
-		uint16_t* pDst = &dst.pix16(y);
+		uint16_t const *const pSrc = &src.pix(y);
+		uint16_t *const pDst = &dst.pix(y);
 
-		int x1 = 0x000 + p[(y & ~1) + 0];
-		int x2 = 0x100 + p[(y & ~1) + 1];
+		int const x1 = 0x000 + p[(y & ~1) + 0];
+		int const x2 = 0x100 + p[(y & ~1) + 1];
 
-		for (x = x1; x < x2; x++)
+		for (int x = x1; x < x2; x++)
 			pDst[x] = pSrc[128 * (x - x1) / (x2 - x1)];
 	}
 }

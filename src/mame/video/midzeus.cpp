@@ -281,7 +281,7 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		int xoffs = screen.visible_area().min_x;
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t *dest = &bitmap.pix16(y);
+			uint16_t *const dest = &bitmap.pix(y);
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
 		}
@@ -302,10 +302,10 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t *dest = &bitmap.pix16(y);
+			uint16_t *const dest = &bitmap.pix(y);
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				uint8_t tex = get_texel_8bit(base, y, x, m_texel_width);
+				uint8_t const tex = get_texel_8bit(base, y, x, m_texel_width);
 				dest[x] = (tex << 8) | tex;
 			}
 		}

@@ -87,7 +87,7 @@ void sk101bl_state::machine_reset()
 HD44780_PIXEL_UPDATE(sk101bl_state::pixel_update)
 {
 	if (pos < 16 && line == 0)
-		bitmap.pix16(line * 10 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 10 + y, pos * 6 + x) = state;
 }
 
 u8 sk101bl_state::p1_r()

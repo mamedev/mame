@@ -125,8 +125,8 @@ void m58_state::scroll_panel_w(offs_t offset, uint8_t data)
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		m_scroll_panel_bitmap.pix16(sy, sx + i) = 0x100 + (sy & 0xfc) + col;
-		m_scroll_panel_bitmap.pix16(sy, sx + i + 0x2c8) = 0x100 + (sy & 0xfc) + col; // for flipscreen
+		m_scroll_panel_bitmap.pix(sy, sx + i) = 0x100 + (sy & 0xfc) + col;
+		m_scroll_panel_bitmap.pix(sy, sx + i + 0x2c8) = 0x100 + (sy & 0xfc) + col; // for flipscreen
 	}
 }
 

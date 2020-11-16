@@ -50,7 +50,7 @@ void taitof2_state::core_vh_start(int sprite_type, int hide, int flip_hide)
 
 	m_spriteram_delayed = make_unique_clear<u16[]>(m_spriteram.bytes() / 2);
 	m_spriteram_buffered = make_unique_clear<u16[]>(m_spriteram.bytes() / 2);
-	m_spritelist = make_unique_clear<struct f2_tempsprite[]>(0x400);
+	m_spritelist = std::make_unique<f2_tempsprite[]>(0x400);
 
 	for (int i = 0; i < 8; i ++)
 	{
@@ -357,9 +357,9 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			{
 				for (int y = sy; y < ey; y++)
 				{
-					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-					u16 *dest = &dest_bmp.pix16(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *const dest = &dest_bmp.pix(y);
+					u8 *const pri = &priority_bitmap.pix(y);
 
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)
@@ -419,9 +419,9 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			{
 				for (int y = sy; y < ey; y++)
 				{
-					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-					u16 *dest = &dest_bmp.pix16(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *const dest = &dest_bmp.pix(y);
+					u8 *const pri = &priority_bitmap.pix(y);
 
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)
@@ -508,7 +508,7 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct f2_tempsprite *sprite_ptr = m_spritelist.get();
+	f2_tempsprite *sprite_ptr = m_spritelist.get();
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */

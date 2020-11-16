@@ -47,7 +47,6 @@ SOUNDS["RF5C68"] = true
 SOUNDS["SAA1099"] = true
 SOUNDS["SCSP"] = true
 SOUNDS["DAC"] = true
-SOUNDS["VOLT_REG"] = true
 SOUNDS["SEGAPCM"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["UPD7759"] = true

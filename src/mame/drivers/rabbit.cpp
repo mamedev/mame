@@ -340,26 +340,21 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 /* the sprite bitmap can probably be handled better than this ... */
 void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int startx, starty;
-	int y;
-	int amountx,amounty;
-	uint16_t *dstline;
-
 	/* clears a *sensible* amount of the sprite bitmap */
-	startx = (m_spriteregs[0]&0x00000fff);
-	starty = (m_spriteregs[1]&0x0fff0000)>>16;
+	int startx = (m_spriteregs[0]&0x00000fff);
+	int starty = (m_spriteregs[1]&0x0fff0000)>>16;
 
 	startx-=200;
 	starty-=200;
-	amountx =650;
-	amounty =600;
+	int amountx =650;
+	int amounty =600;
 
 	if (startx < 0) { amountx += startx; startx = 0; }
 	if ((startx+amountx)>=0x1000) amountx-=(0x1000-(startx+amountx));
 
-	for (y=0; y<amounty;y++)
+	for (int y=0; y<amounty;y++)
 	{
-		dstline = &m_sprite_bitmap->pix16((starty+y)&0xfff);
+		uint16_t *const dstline = &m_sprite_bitmap->pix((starty+y)&0xfff);
 		memset(dstline+startx,0x00,amountx*2);
 	}
 }
@@ -367,17 +362,11 @@ void rabbit_state::clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cli
 /* todo: fix zoom, it's inaccurate and this code is ugly */
 void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint32_t x,y;
-	uint16_t *srcline;
-	uint16_t *dstline;
-	uint16_t pixdata;
 	uint32_t xsize, ysize;
-	uint32_t xdrawpos, ydrawpos;
 	uint32_t xstep,ystep;
 
-	int startx, starty;
-	startx = ((m_spriteregs[0]&0x00000fff));
-	starty = ((m_spriteregs[1]&0x0fff0000)>>16);
+	int startx = ((m_spriteregs[0]&0x00000fff));
+	int starty = ((m_spriteregs[1]&0x0fff0000)>>16);
 
 	/* zoom compensation? */
 	startx-=((m_spriteregs[1]&0x000001ff)>>1);
@@ -390,22 +379,21 @@ void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cl
 	ysize+=0x80;
 	xstep = ((320*128)<<16) / xsize;
 	ystep = ((224*128)<<16) / ysize;
-	ydrawpos = 0;
-	for (y=0;y<ysize;y+=0x80)
+	for (uint32_t y=0;y<ysize;y+=0x80)
 	{
-		ydrawpos = ((y>>7)*ystep);
+		uint32_t ydrawpos = ((y>>7)*ystep);
 		ydrawpos >>=16;
 
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
-			srcline = &m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
-			dstline = &bitmap.pix16(ydrawpos);
+			uint16_t const *const srcline = &m_sprite_bitmap->pix((starty+(y>>7))&0xfff);
+			uint16_t *const dstline = &bitmap.pix(ydrawpos);
 
-			for (x=0;x<xsize;x+=0x80)
+			for (uint32_t x=0;x<xsize;x+=0x80)
 			{
-				xdrawpos = ((x>>7)*xstep);
+				uint32_t xdrawpos = ((x>>7)*xstep);
 				xdrawpos >>=16;
-				pixdata = srcline[(startx+(x>>7))&0xfff];
+				uint16_t const pixdata = srcline[(startx+(x>>7))&0xfff];
 
 				if (pixdata)
 					if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))

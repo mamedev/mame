@@ -117,9 +117,6 @@ void pzletime_state::video_start()
 
 uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count;
-	int y, x;
-
 	bitmap.fill(m_palette[0]->pen(0), cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
@@ -130,14 +127,14 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 
 	if (m_video_regs[2] & 1)
 	{
-		count = 0;
+		int count = 0;
 
-		for (y = 255; y >= 0; y--)
+		for (int y = 255; y >= 0; y--)
 		{
-			for (x = 0; x < 512; x++)
+			for (int x = 0; x < 512; x++)
 			{
 				if (m_bg_videoram[count] & 0x8000)
-					bitmap.pix32((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
+					bitmap.pix((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}
@@ -146,24 +143,20 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 
 	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
+	uint16_t const *const spriteram = m_spriteram;
+	for (int offs = 0; offs < 0x2000 / 2; offs += 4)
 	{
-		uint16_t *spriteram = m_spriteram;
-		int offs, spr_offs, colour, sx, sy;
+		if(spriteram[offs + 0] == 8)
+			break;
 
-		for(offs = 0; offs < 0x2000 / 2; offs += 4)
-		{
-			if(spriteram[offs + 0] == 8)
-				break;
+		int spr_offs = spriteram[offs + 3] & 0x0fff;
+		int sy = 0x200 - (spriteram[offs + 0] & 0x1ff) - 35;
+		int sx = (spriteram[offs + 1] & 0x1ff) - 30;
+		int colour = (spriteram[offs + 0] & 0xf000) >> 12;
 
-			spr_offs = spriteram[offs + 3] & 0x0fff;
-			sy = 0x200 - (spriteram[offs + 0] & 0x1ff) - 35;
-			sx = (spriteram[offs + 1] & 0x1ff) - 30;
-			colour = (spriteram[offs + 0] & 0xf000) >> 12;
+		// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			// is spriteram[offs + 0] & 0x200 flipy? it's always set
-
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
-		}
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
 	}
 
 	m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);

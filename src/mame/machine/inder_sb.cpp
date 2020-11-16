@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "machine/inder_sb.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -166,15 +165,10 @@ void inder_sb_device::device_add_mconfig(machine_config &config)
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac3", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "dac0vol", 0).add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	DAC_8BIT_R2R(config, "dac1vol", 0).add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2vol", 0).add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	DAC_8BIT_R2R(config, "dac3vol", 0).add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac0vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT);
+	DAC_8BIT_R2R(config, "dac0vol", 0).set_output_range(0, 1).add_route(0, "dac0", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac0", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1vol", 0).set_output_range(0, 1).add_route(0, "dac1", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac1", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2vol", 0).set_output_range(0, 1).add_route(0, "dac2", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac2", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac3vol", 0).set_output_range(0, 1).add_route(0, "dac3", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac3", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 }
 
 

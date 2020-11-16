@@ -33,8 +33,6 @@
 
     Known issues:
         * Mystery items in Ali Baba don't work correctly because of protection.
-        * Pacman Club controls need to be demultiplexed for 2-players simultaneous mode.
-          Also need 4-players extra inputs.
 
     Known to exist but dumps needed
         * Ms Pac Plus
@@ -1094,6 +1092,28 @@ void pacman_state::woodpek_map(address_map &map)
 }
 
 
+void clubpacm_state::clubpacm_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(clubpacm_state::pacman_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(clubpacm_state::pacman_colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(clubpacm_state::pacman_read_nop)).nopw();
+	map(0x4c00, 0x4fef).mirror(0xa000).ram();
+	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
+	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
+	map(0x5070, 0x507f).mirror(0xaf00).nopw();
+	map(0x5080, 0x5080).mirror(0xaf3f).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0x50c0, 0x50c0).mirror(0xaf3f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x5000, 0x5000).mirror(0xaf3f).portr("IN0");
+	map(0x5040, 0x5040).mirror(0xaf3f).portr("IN1");
+	map(0x5080, 0x5080).mirror(0xaf3f).portr("DSW1");
+	map(0x50c0, 0x50c0).mirror(0xaf3f).r(m_sublatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xbfff).rom();
+}
+
+
 void pacman_state::numcrash_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
@@ -1716,6 +1736,86 @@ static INPUT_PORTS_START( mschamp )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/* Pacman Club inputs are similar to Ms. Pac-Man, except:
+    - P1/P2 joystick inputs are multiplexed via $5004/5005 to allow 2P simultaneous play in "double command" mode
+    - no rack test switch
+    - different service mode inputs (bit 3 of DSW1 enables the test screen, bit 4 of IN1 just resets the game)
+    - different bonus life values and only two lives options
+    - difficulty switch is read, but has no effect. instead, higher difficulty is enabled in double command mode
+    - free play mode is bugged; game is supposed to set up pointers to $5080/50c0 in RAM for later,
+      but this only happens during the attract mode, which is skipped over if free play is enabled
+*/
+static INPUT_PORTS_START( clubpacm )
+	PORT_START("IN0")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clubpacm_state, clubpacm_input_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Cocktail ) )
+
+	/* multiplexed player inputs */
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (Invalid)" ) /* causes watchdog reset at title screen, see comments above */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "40000" ) /* service mode incorrectly says 20000 */
+	PORT_DIPSETTING(    0x10, "60000" ) /* service mode incorrectly says 40000 */
+	PORT_DIPSETTING(    0x20, "80000" )
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+/* Same as clubpacm, but Double Command mode is removed and normal inputs are used */
+static INPUT_PORTS_START( clubpacma )
+	PORT_INCLUDE( clubpacm )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3643,6 +3743,18 @@ void pacman_state::woodpek(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::woodpek_map);
 }
 
+
+void clubpacm_state::clubpacm(machine_config &config)
+{
+	mspacman(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &clubpacm_state::clubpacm_map);
+
+	GENERIC_LATCH_8(config, m_sublatch);
+}
+
+
 void pacman_state::numcrash(machine_config &config)
 {
 	pacman(config);
@@ -4501,27 +4613,8 @@ ROM_START( clubpacma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "new_club.bin",  0x0000, 0x4000, CRC(6d79d3f2) SHA1(61ac436b4dc30b074e6c95f13efbf66f9aa1e2f7) )
 	ROM_CONTINUE(0x8000,0x4000)
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "12.5e",   0x0000, 0x0800, CRC(93933d1d) SHA1(fa38d2cb87e872bb9a3158a4df98f38360dc85ec) )
-	ROM_LOAD( "14.5h",   0x0800, 0x0800, CRC(7409fbec) SHA1(f440f08ba026ae6172666e1bdc0894ce33bba420) )
-	ROM_LOAD( "13.5f",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
-	ROM_LOAD( "15.5j",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
-
-	// Color PROMs have been dumped. They match the pacman/mspacman ones
-	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "n82s123n.7f",  0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "m7611.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
-
-	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
-	ROM_LOAD( "m7611.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "m7611.3m",     0x0100, 0x0100, CRC(0e307106) SHA1(6140b5339008dd3110cd5be2e2fb4813779dfe28) )    /* timing - not used */
-ROM_END
-
-ROM_START( clubpacmb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "new_club_d.bin",  0x0000, 0x4000, CRC(3c8ce103) SHA1(1d3fd485f68c2c1ed6f19dcee51456a4d0ab0a01) )
-	ROM_CONTINUE(0x8000,0x4000)
+	// there is also a bad dump with the following hashes
+	// CRC(3c8ce103) SHA1(1d3fd485f68c2c1ed6f19dcee51456a4d0ab0a01)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "12.5e",   0x0000, 0x0800, CRC(93933d1d) SHA1(fa38d2cb87e872bb9a3158a4df98f38360dc85ec) )
@@ -7648,7 +7741,19 @@ void pacman_state::init_pengomc1()
 		romdata[i] = buf[i^0xff];
 }
 
-void pacman_state::init_clubpacma()
+CUSTOM_INPUT_MEMBER(clubpacm_state::clubpacm_input_r)
+{
+	ioport_value data = 0x0f;
+
+	if (!m_mainlatch->q5_r())
+		data &= m_players[0]->read();
+	if (!m_mainlatch->q4_r())
+		data &= m_players[1]->read();
+
+	return data ^ 0x0f;
+}
+
+void clubpacm_state::init_clubpacma()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -7732,9 +7837,8 @@ GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,  
 
 
 
-GAME( 1989, clubpacm,  0,        woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1990, clubpacma, clubpacm, woodpek, mspacman, pacman_state,  init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // resets during at title screen
-GAME( 1990, clubpacmb, clubpacm, woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted
+GAME( 1989, clubpacm,  0,        clubpacm,clubpacm, clubpacm_state,empty_init,    ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacma, clubpacm, clubpacm,clubpacma,clubpacm_state,init_clubpacma,ROT90,  "Miky SRL", "Pacman Club (Argentina)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )

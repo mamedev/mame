@@ -141,7 +141,7 @@ void fs3216_state::machine_reset()
 
 MC6845_UPDATE_ROW(fs3216_state::crt_update_row)
 {
-	u32 *px = &bitmap.pix32(y);
+	u32 *px = &bitmap.pix(y);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -343,9 +343,9 @@ void fs3216_state::floppy_control_w(u8 data)
 		m_floppy_status &= 0xef;
 	}
 
+	m_fdc->reset_w(!BIT(data, 1));
 	if (!BIT(data, 1))
 	{
-		m_fdc->soft_reset();
 		m_fdc_dma_count = 0;
 		m_fdc->tc_w(0);
 	}

@@ -181,6 +181,7 @@ files {
 	MAME_DIR .. "src/emu/recording.h",
 	MAME_DIR .. "src/emu/render.cpp",
 	MAME_DIR .. "src/emu/render.h",
+	MAME_DIR .. "src/emu/rendertypes.h",
 	MAME_DIR .. "src/emu/rendfont.cpp",
 	MAME_DIR .. "src/emu/rendfont.h",
 	MAME_DIR .. "src/emu/rendlay.cpp",

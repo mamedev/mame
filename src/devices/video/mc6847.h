@@ -81,7 +81,7 @@ protected:
 
 	pixel_t *bitmap_addr(bitmap_rgb32 &bitmap, int y, int x)
 	{
-		return &bitmap.pix32(y, x);
+		return &bitmap.pix(y, x);
 	}
 
 	static uint8_t simplify_mode(uint8_t data, uint8_t mode)
@@ -183,8 +183,8 @@ protected:
 
 			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
 			{
-				pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
-				pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+				pixel_t *line1 = &bitmap.pix(y + base_y, base_x);
+				pixel_t *line2 = &bitmap.pix(y + base_y + 1, base_x);
 				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
 
 				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )

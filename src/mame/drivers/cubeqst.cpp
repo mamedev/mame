@@ -25,7 +25,6 @@
 #include "machine/ldpr8210.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 class cubeqst_state : public driver_device
@@ -130,8 +129,6 @@ void cubeqst_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 /* TODO: This is a simplified version of what actually happens */
 uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	/*
 	 * Clear the display with palette RAM entry 0xff
 	 * This will be either transparent or an actual colour
@@ -141,13 +138,11 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 	bitmap.fill(m_colormap[255], cliprect);
 
 	/* TODO: Add 1 for linebuffering? */
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		int i;
 		int num_entries = m_linecpu->cubeqcpu_get_ptr_ram_val(y);
-		uint32_t *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
-		uint32_t *dest = &bitmap.pix32(y);
-		uint32_t pen;
+		uint32_t const *const stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* Zap the depth buffer */
 		memset(m_depth_buffer.get(), 0xff, 512);
@@ -155,11 +150,10 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 		/* Process all the spans on this scanline */
 		if (y < 256)
 		{
-			for (i = 0; i < num_entries; i += 2)
+			for (int i = 0; i < num_entries; i += 2)
 			{
 				int color = 0, depth = 0;
 				int h1 = 0, h2 = 0;
-				int x;
 
 				int entry1 = stk_ram[(y << 7) | ((i + 0) & 0x7f)];
 				int entry2 = stk_ram[(y << 7) | ((i + 1) & 0x7f)];
@@ -187,8 +181,8 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 				}
 
 				/* Draw the span, testing for depth */
-				pen = m_colormap[m_generic_paletteram_16[color]];
-				for (x = h1; x <= h2; ++x)
+				uint32_t pen = m_colormap[m_generic_paletteram_16[color]];
+				for (int x = h1; x <= h2; ++x)
 				{
 					if (!(m_depth_buffer[x] < depth))
 					{
@@ -565,18 +559,13 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 8; i++)
 	{
 		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
 		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
-		vref.add_route(0, m_dacs[i*2+0], 1.0, DAC_VREF_POS_INPUT);
-		vref.add_route(0, m_dacs[i*2+0], -1.0, DAC_VREF_NEG_INPUT);
 
 		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
 		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
-		vref.add_route(0, m_dacs[i*2+1], 1.0, DAC_VREF_POS_INPUT);
-		vref.add_route(0, m_dacs[i*2+1], -1.0, DAC_VREF_NEG_INPUT);
 	}
 }
 

@@ -34,9 +34,9 @@ e. A checksum byte (8-bit addition)
 
 ********************************************************************/
 
-#include <cassert>
-
 #include "formats/apf_apt.h"
+
+#include <cassert>
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -184,7 +184,7 @@ static int apf_cpf_calculate_size_in_samples(const uint8_t *bytes, int length)
 
 //*********************************************************************************
 
-static const struct CassetteLegacyWaveFiller apf_cpf_fill_intf =
+static const cassette_image::LegacyWaveFiller apf_cpf_fill_intf =
 {
 	apf_cpf_fill_wave,                      /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -195,17 +195,17 @@ static const struct CassetteLegacyWaveFiller apf_cpf_fill_intf =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error apf_cpf_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error apf_cpf_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &apf_cpf_fill_intf);
+	return cassette->legacy_identify(opts, &apf_cpf_fill_intf);
 }
 
 static cassette_image::error apf_cpf_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &apf_cpf_fill_intf);
+	return cassette->legacy_construct(&apf_cpf_fill_intf);
 }
 
-static const struct CassetteFormat apf_cpf_format =
+static const cassette_image::Format apf_cpf_format =
 {
 	"cas,cpf",
 	apf_cpf_identify,
@@ -215,7 +215,7 @@ static const struct CassetteFormat apf_cpf_format =
 
 //*********************************************************************************
 
-static const struct CassetteLegacyWaveFiller apf_apt_fill_intf =
+static const cassette_image::LegacyWaveFiller apf_apt_fill_intf =
 {
 	apf_apt_fill_wave,                      /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -226,17 +226,17 @@ static const struct CassetteLegacyWaveFiller apf_apt_fill_intf =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error apf_apt_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error apf_apt_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &apf_apt_fill_intf);
+	return cassette->legacy_identify(opts, &apf_apt_fill_intf);
 }
 
 static cassette_image::error apf_apt_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &apf_apt_fill_intf);
+	return cassette->legacy_construct(&apf_apt_fill_intf);
 }
 
-static const struct CassetteFormat apf_apt_format =
+static const cassette_image::Format apf_apt_format =
 {
 	"apt",
 	apf_apt_identify,

@@ -47,18 +47,18 @@
 
 static int synccount;
 
-const struct CassetteModulation coco_cas_modulation =
+const cassette_image::Modulation coco_cas_modulation =
 {
-	CASSETTE_MODULATION_SINEWAVE,
+	cassette_image::MODULATION_SINEWAVE,
 	600.0,  1200.0, 1500.0,
 	1500.0, 2400.0, 3000.0
 };
 
 
 
-static cassette_image::error coco_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error coco_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_modulation_identify(cassette, &coco_cas_modulation, opts);
+	return cassette->modulation_identify(coco_cas_modulation, opts);
 }
 
 
@@ -76,12 +76,12 @@ static bool get_cas_block(cassette_image *cassette, uint64_t *offset, uint8_t *b
 
 	synccount = 0;
 	p.w.l = 0;
-	image_size = cassette_image_size(cassette);
+	image_size = cassette->image_size();
 	current_offset = *offset;
 
 	while(current_offset < image_size)
 	{
-		cassette_image_read(cassette, &p.b.h, current_offset, 1);
+		cassette->image_read(&p.b.h, current_offset, 1);
 		current_offset++;
 
 		for (i = 0; i < 8; i++)
@@ -192,18 +192,18 @@ static cassette_image::error cas_load(cassette_image *cassette, uint8_t silence)
 			0x3C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A
 		};
 		time_index = 10.0;
-		return cassette_put_modulated_data(cassette, 0, time_index, dummy_bytes, sizeof(dummy_bytes), &coco_cas_modulation, &time_displacement);
+		return cassette_put_modulated_data(cassette, 0, time_index, dummy_bytes, sizeof(dummy_bytes), coco_cas_modulation, &time_displacement);
 	}
 #endif
 
-	err = cassette_put_sample(cassette, 0, time_index, COCO_WAVESAMPLES_HEADER, 0);
+	err = cassette->put_sample(0, time_index, COCO_WAVESAMPLES_HEADER, 0);
 	if (err != cassette_image::error::SUCCESS)
 		return err;
 	time_index += COCO_WAVESAMPLES_HEADER;
 
 	offset = 0;
 	last_blocktype = 0;
-	image_size = cassette_image_size(cassette);
+	image_size = cassette->image_size();
 
 	/* try to find a block that we can untangle */
 	while(get_cas_block(cassette, &offset, block, &block_length))
@@ -214,13 +214,13 @@ static cassette_image::error cas_load(cassette_image *cassette, uint8_t silence)
 		if ((last_blocktype == 0) || (last_blocktype == 0xFF) || (block[0] == 0))
 		{
 			/* silence */
-			err = cassette_put_sample(cassette, 0, time_index, silence, 0);
+			err = cassette->put_sample(0, time_index, silence, 0);
 			if (err != cassette_image::error::SUCCESS)
 				return err;
 			time_index += silence;
 
 			/* sync data */
-			err = cassette_put_modulated_filler(cassette, 0, time_index, 0x55, 128, &coco_cas_modulation, &time_displacement);
+			err = cassette->put_modulated_filler(0, time_index, 0x55, 128, coco_cas_modulation, &time_displacement);
 			if (err != cassette_image::error::SUCCESS)
 				return err;
 			time_index += time_displacement;
@@ -228,26 +228,26 @@ static cassette_image::error cas_load(cassette_image *cassette, uint8_t silence)
 		else if (synccount != 0)        /* If we have multiple sync bytes in cas file, make sure they */
 		{               /* are passed through */
 			/* sync data */
-			err = cassette_put_modulated_filler(cassette, 0, time_index, 0x55, synccount, &coco_cas_modulation, &time_displacement);
+			err = cassette->put_modulated_filler(0, time_index, 0x55, synccount, coco_cas_modulation, &time_displacement);
 			if (err != cassette_image::error::SUCCESS)
 				return err;
 			time_index += time_displacement;
 		}
 
 		/* now fill in the magic bytes */
-		err = cassette_put_modulated_data(cassette, 0, time_index, magic_bytes, sizeof(magic_bytes), &coco_cas_modulation, &time_displacement);
+		err = cassette->put_modulated_data(0, time_index, magic_bytes, sizeof(magic_bytes), coco_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS)
 			return err;
 		time_index += time_displacement;
 
 		/* now fill in the block */
-		err = cassette_put_modulated_data(cassette, 0, time_index, block, block_length, &coco_cas_modulation, &time_displacement);
+		err = cassette->put_modulated_data(0, time_index, block, block_length, coco_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS)
 			return err;
 		time_index += time_displacement;
 
 		/* and the last magic byte */
-		err = cassette_put_modulated_filler(cassette, 0, time_index, 0x55, 1, &coco_cas_modulation, &time_displacement);
+		err = cassette->put_modulated_filler(0, time_index, 0x55, 1, coco_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS)
 			return err;
 		time_index += time_displacement;
@@ -256,7 +256,7 @@ static cassette_image::error cas_load(cassette_image *cassette, uint8_t silence)
 	}
 
 	/* all futher data is undecipherable, so output it verbatim */
-	err = cassette_read_modulated_data(cassette, 0, time_index, offset, image_size - offset, &coco_cas_modulation, &time_displacement);
+	err = cassette->read_modulated_data(0, time_index, offset, image_size - offset, coco_cas_modulation, &time_displacement);
 	if (err != cassette_image::error::SUCCESS)
 		return err;
 	time_index += time_displacement;
@@ -274,7 +274,7 @@ static cassette_image::error alice32_cas_load(cassette_image *cassette)
 	return cas_load(cassette, ALICE32_WAVESAMPLES_HEADER);
 }
 
-const struct CassetteFormat coco_cas_format =
+const cassette_image::Format coco_cas_format =
 {
 	"cas",
 	coco_cas_identify,
@@ -282,7 +282,7 @@ const struct CassetteFormat coco_cas_format =
 	nullptr
 };
 
-const struct CassetteFormat alice32_cas_format =
+const cassette_image::Format alice32_cas_format =
 {
 	"cas,c10,k7",
 	coco_cas_identify,

@@ -146,7 +146,7 @@ void astrocade_io_device::sound_stream_update(sound_stream &stream, std::vector<
 	constexpr stream_buffer::sample_t sample_scale = 1.0f / 60.0f;
 	for (int sampindex = 0; sampindex < dest.samples(); sampindex += samples_this_time)
 	{
-		stream_sample_t cursample = 0;
+		s32 cursample = 0;
 
 		/* compute the number of cycles until the next master oscillator reset */
 		/* or until the next noise boundary */

@@ -680,7 +680,7 @@ uint8_t *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
 			result = apple3_bankaddr(~0, offset & 0x7FFF);
 		else if (offset < 0x2000)
-			result = apple3_bankaddr(~0, offset - 0x2000);
+			result = apple3_bankaddr(~0, offset);
 		else if (offset > 0x9FFF)
 			result = apple3_bankaddr(~0, offset - 0x8000);
 		else
@@ -1367,24 +1367,24 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 {
 	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
-	m_via[0]->write_ca1(state);
+	m_via[0]->write_ca1(!state);
 
 	if (irq_mask & (1<<4))
 	{
-		m_via[1]->write_pa4(ASSERT_LINE);
+		m_via[1]->write_pa4(CLEAR_LINE);
 	}
 	else
 	{
-		m_via[1]->write_pa4(CLEAR_LINE);
+		m_via[1]->write_pa4(ASSERT_LINE);
 	}
 
 	if (irq_mask & (1<<3))
 	{
-		m_via[1]->write_pa5(ASSERT_LINE);
+		m_via[1]->write_pa5(CLEAR_LINE);
 	}
 	else
 	{
-		m_via[1]->write_pa5(CLEAR_LINE);
+		m_via[1]->write_pa5(ASSERT_LINE);
 	}
 }
 

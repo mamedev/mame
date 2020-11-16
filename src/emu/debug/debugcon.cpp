@@ -86,24 +86,15 @@ debugger_console::debugger_console(running_machine &machine)
 
 void debugger_console::exit()
 {
-	/* free allocated memory */
-	if (m_console_textbuf)
-	{
-		text_buffer_free(m_console_textbuf);
-	}
-	m_console_textbuf = nullptr;
+	// free allocated memory
+	m_console_textbuf.reset();
+	m_errorlog_textbuf.reset();
 
-	if (m_errorlog_textbuf)
-	{
-		text_buffer_free(m_errorlog_textbuf);
-	}
-	m_errorlog_textbuf = nullptr;
-
-	/* free the command list */
+	// free the command list
 	m_commandlist.clear();
 
-	/* close the logfile, if any */
-	m_logfile = nullptr;
+	// close the logfile, if any
+	m_logfile.reset();
 }
 
 
@@ -167,7 +158,7 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 		return;
 	}
 
-	for (auto line_info : text_buffer_get_lines(m_console_textbuf))
+	for (auto line_info : text_buffer_lines(*m_console_textbuf))
 	{
 		fwrite(line_info.text, sizeof(char), line_info.length, f);
 		fputc('\n', f);
@@ -259,7 +250,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 
 	/* no params is an error */
 	if (params == 0)
-		return CMDERR_NONE;
+		return CMDERR::none();
 
 	/* the first parameter has the command and the real first parameter; separate them */
 	for (p = param[0]; *p && isspace(u8(*p)); p++) { }
@@ -296,9 +287,9 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 
 	/* error if not found */
 	if (!found)
-		return MAKE_CMDERR_UNKNOWN_COMMAND(0);
+		return CMDERR::unknown_command(0);
 	if (foundcount > 1)
-		return MAKE_CMDERR_AMBIGUOUS_COMMAND(0);
+		return CMDERR::ambiguous_command(0);
 
 	/* NULL-terminate and trim space around all the parameters */
 	for (i = 1; i < params; i++)
@@ -310,9 +301,9 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 
 	/* see if we have the right number of parameters */
 	if (params < found->minparams)
-		return MAKE_CMDERR_NOT_ENOUGH_PARAMS(0);
+		return CMDERR::not_enough_params(0);
 	if (params > found->maxparams)
-		return MAKE_CMDERR_TOO_MANY_PARAMS(0);
+		return CMDERR::too_many_params(0);
 
 	/* execute the handler */
 	if (execute)
@@ -320,7 +311,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 		std::vector<std::string> params_vec(param, param + params);
 		found->handler(found->ref, params_vec);
 	}
-	return CMDERR_NONE;
+	return CMDERR::none();
 }
 
 
@@ -333,7 +324,6 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS] = { nullptr };
-	CMDERR result;
 	char *command_start;
 	char *p, c = 0;
 
@@ -363,9 +353,9 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 					case '(':
 					case '[':
 					case '{':   parens[parendex++] = c; break;
-					case ')':   if (parendex == 0 || parens[--parendex] != '(') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
-					case ']':   if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
-					case '}':   if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
+					case ')':   if (parendex == 0 || parens[--parendex] != '(') return CMDERR::unbalanced_parens(p - command); break;
+					case ']':   if (parendex == 0 || parens[--parendex] != '[') return CMDERR::unbalanced_parens(p - command); break;
+					case '}':   if (parendex == 0 || parens[--parendex] != '{') return CMDERR::unbalanced_parens(p - command); break;
 					case ',':   if (parendex == 0) params[paramcount++] = p; break;
 					case ';':   if (parendex == 0) foundend = true; break;
 					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = true; *p = c; break;
@@ -379,9 +369,9 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 
 		/* check for unbalanced parentheses or quotes */
 		if (instring)
-			return MAKE_CMDERR_UNBALANCED_QUOTES(p - command);
+			return CMDERR::unbalanced_quotes(p - command);
 		if (parendex != 0)
-			return MAKE_CMDERR_UNBALANCED_PARENS(p - command);
+			return CMDERR::unbalanced_parens(p - command);
 
 		/* NULL-terminate if we ended in a semicolon */
 		p--;
@@ -406,17 +396,17 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 			}
 			catch (expression_error &err)
 			{
-				return MAKE_CMDERR_EXPRESSION_ERROR(err);
+				return CMDERR::expression_error(err);
 			}
 		}
 		else
 		{
-			result = internal_execute_command(execute, paramcount, &params[0]);
-			if (result != CMDERR_NONE)
-				return MAKE_CMDERR(CMDERR_ERROR_CLASS(result), command_start - command);
+			const CMDERR result = internal_execute_command(execute, paramcount, &params[0]);
+			if (result.error_class() != CMDERR::NONE)
+				return CMDERR(result.error_class(), command_start - command);
 		}
 	}
-	return CMDERR_NONE;
+	return CMDERR::none();
 }
 
 
@@ -426,21 +416,19 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 
 CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 {
-	CMDERR result;
-
 	/* echo if requested */
 	if (echo)
 		printf(">%s\n", command.c_str());
 
 	/* parse and execute */
-	result = internal_parse_command(command, true);
+	const CMDERR result = internal_parse_command(command, true);
 
 	/* display errors */
-	if (result != CMDERR_NONE)
+	if (result.error_class() != CMDERR::NONE)
 	{
 		if (!echo)
 			printf(">%s\n", command.c_str());
-		printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
+		printf(" %*s^\n", result.error_offset(), "");
 		printf("%s\n", cmderr_to_string(result).c_str());
 	}
 
@@ -559,16 +547,16 @@ void debugger_console::process_source_file()
 
 std::string debugger_console::cmderr_to_string(CMDERR error)
 {
-	int offset = CMDERR_ERROR_OFFSET(error);
-	switch (CMDERR_ERROR_CLASS(error))
+	const int offset = error.error_offset();
+	switch (error.error_class())
 	{
-		case CMDERR_UNKNOWN_COMMAND:        return "unknown command";
-		case CMDERR_AMBIGUOUS_COMMAND:      return "ambiguous command";
-		case CMDERR_UNBALANCED_PARENS:      return "unbalanced parentheses";
-		case CMDERR_UNBALANCED_QUOTES:      return "unbalanced quotes";
-		case CMDERR_NOT_ENOUGH_PARAMS:      return "not enough parameters for command";
-		case CMDERR_TOO_MANY_PARAMS:        return "too many parameters for command";
-		case CMDERR_EXPRESSION_ERROR:       return string_format("error in assignment expression: %s",
+		case CMDERR::UNKNOWN_COMMAND:       return "unknown command";
+		case CMDERR::AMBIGUOUS_COMMAND:     return "ambiguous command";
+		case CMDERR::UNBALANCED_PARENS:     return "unbalanced parentheses";
+		case CMDERR::UNBALANCED_QUOTES:     return "unbalanced quotes";
+		case CMDERR::NOT_ENOUGH_PARAMS:     return "not enough parameters for command";
+		case CMDERR::TOO_MANY_PARAMS:       return "too many parameters for command";
+		case CMDERR::EXPRESSION_ERROR:      return string_format("error in assignment expression: %s",
 																 expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
@@ -591,7 +579,7 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 void debugger_console::print_core(const char *text)
 {
 	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
-	text_buffer_print(m_console_textbuf, text);
+	text_buffer_print(*m_console_textbuf, text);
 	if (m_logfile)
 		m_logfile->write(text, strlen(text));
 }
@@ -605,7 +593,7 @@ void debugger_console::print_core_wrap(const char *text, int wrapcol)
 {
 	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
 	// FIXME: also look into honoring wrapcol for the logfile
-	text_buffer_print_wrap(m_console_textbuf, text, wrapcol);
+	text_buffer_print_wrap(*m_console_textbuf, text, wrapcol);
 	if (m_logfile)
 		m_logfile->write(text, strlen(text));
 }
@@ -627,7 +615,7 @@ void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 {
 	print_core(util::string_format(std::move(args)).c_str());
 
-	/* force an update of any console views */
+	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
@@ -641,7 +629,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std:
 {
 	print_core_wrap(util::string_format(args).c_str(), wrapcol);
 
-	/* force an update of any console views */
+	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
@@ -649,7 +637,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std:
 {
 	print_core_wrap(util::string_format(std::move(args)).c_str(), wrapcol);
 
-	/* force an update of any console views */
+	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
@@ -662,10 +650,8 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std:
 void debugger_console::errorlog_write_line(const char *line)
 {
 	if (m_errorlog_textbuf)
-	{
-		text_buffer_print(m_errorlog_textbuf, line);
-	}
+		text_buffer_print(*m_errorlog_textbuf, line);
 
-	/* force an update of any log views */
+	// force an update of any log views
 	m_machine.debug_view().update_all(DVT_LOG);
 }

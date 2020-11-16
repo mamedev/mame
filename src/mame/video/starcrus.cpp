@@ -105,7 +105,7 @@ int starcrus_state::collision_check_s1s2()
 	for (int sy = 0; sy < 16; sy++)
 		for (int sx = 0; sx < 16; sx++)
 		/* Condition 1 - ship 1 = ship 2 */
-		if ((m_ship1_vid->pix16(sy, sx) == 1) && (m_ship2_vid->pix16(sy, sx) == 1))
+		if ((m_ship1_vid->pix(sy, sx) == 1) && (m_ship2_vid->pix(sy, sx) == 1))
 			return 1;
 
 	return 0;
@@ -158,7 +158,7 @@ int starcrus_state::collision_check_p1p2()
 	for (int sy = 0; sy < 16; sy++)
 		for (int sx = 0; sx < 16; sx++)
 			/* Condition 1 - proj 1 = proj 2 */
-			if ((m_proj1_vid->pix16(sy, sx) == 1) && (m_proj2_vid->pix16(sy, sx) == 1))
+			if ((m_proj1_vid->pix(sy, sx) == 1) && (m_proj2_vid->pix(sy, sx) == 1))
 				return 1;
 
 	return 0;
@@ -219,13 +219,13 @@ int starcrus_state::collision_check_s1p1p2()
 	/* Now check for collisions */
 	for (int sy = 0; sy < 16; sy++)
 		for (int sx = 0; sx < 16; sx++)
-			if (m_ship1_vid->pix16(sy, sx) == 1)
+			if (m_ship1_vid->pix(sy, sx) == 1)
 			{
 				/* Condition 1 - ship 1 = proj 1 */
-				if (m_proj1_vid->pix16(sy, sx) == 1)
+				if (m_proj1_vid->pix(sy, sx) == 1)
 					return 1;
 				/* Condition 2 - ship 1 = proj 2 */
-				if (m_proj2_vid->pix16(sy, sx) == 1)
+				if (m_proj2_vid->pix(sy, sx) == 1)
 					return 1;
 			}
 
@@ -286,13 +286,13 @@ int starcrus_state::collision_check_s2p1p2()
 	/* Now check for collisions */
 	for (int sy = 0; sy < 16; sy++)
 		for (int sx = 0; sx < 16; sx++)
-			if (m_ship2_vid->pix16(sy, sx) == 1)
+			if (m_ship2_vid->pix(sy, sx) == 1)
 			{
 				/* Condition 1 - ship 2 = proj 1 */
-				if (m_proj1_vid->pix16(sy, sx) == 1)
+				if (m_proj1_vid->pix(sy, sx) == 1)
 					return 1;
 				/* Condition 2 - ship 2 = proj 2 */
-				if (m_proj2_vid->pix16(sy, sx) == 1)
+				if (m_proj2_vid->pix(sy, sx) == 1)
 					return 1;
 			}
 

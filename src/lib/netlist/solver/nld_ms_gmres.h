@@ -12,8 +12,8 @@
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 #include "plib/gmres.h"
-#include "plib/pmatrix_cr.h"
 #include "plib/parray.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/vector_ops.h"
 
 #include <algorithm>

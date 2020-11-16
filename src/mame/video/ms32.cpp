@@ -243,12 +243,25 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
-	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
+	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
+	// Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
+	// nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
+	//             0x4*   0x5*  ROZ should wrap?
+	// bbbxing:  0xffff 0x0000  0 (match presentation)
+	// gratia:   0x0000 0x0000  1 (sky in stage 2)
+	// p47aces:  0xffff 0x0651  0 (title screen)
+	// desertwr: 0xffff 0x0651  1 (any stage)
+	// f1superb: 0xffff 0x0000  ?
+	// suchie2:  0x0000 0x0000  0?
+	// bnstars:  0x0000 0x0000  ?
+	// hayaosi3: 0x0000 0x0000  ?
+	// Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
+	// Are we missing a ROZ plane size as well?
 
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
-		int y,maxy;
+		int y, maxy;
 
 		my_clip.min_x = cliprect.min_x;
 		my_clip.max_x = cliprect.max_x;
@@ -422,28 +435,20 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	   the priority ram, probably for per-pixel / pen mixing, or more levels
 	   than are supported here..  I don't know, it will need hw tests I think */
 	{
-		int xx, yy;
 		int width = screen.width();
 		int height = screen.height();
-		const pen_t *paldata = m_palette->pens();
-
-		u16* srcptr_tile;
-		u8* srcptr_tilepri;
-		u16* srcptr_spri;
-		//u8* srcptr_spripri;
-
-		u32* dstptr_bitmap;
+		pen_t const *const paldata = m_palette->pens();
 
 		bitmap.fill(0, cliprect);
 
-		for (yy=0;yy<height;yy++)
+		for (int yy=0;yy<height;yy++)
 		{
-			srcptr_tile =     &m_temp_bitmap_tilemaps.pix16(yy);
-			srcptr_tilepri =  &screen.priority().pix8(yy);
-			srcptr_spri =     &m_temp_bitmap_sprites.pix16(yy);
-			//srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix8(yy);
-			dstptr_bitmap  =  &bitmap.pix32(yy);
-			for (xx=0;xx<width;xx++)
+			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
+			u8 const *const  srcptr_tilepri =  &screen.priority().pix(yy);
+			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
+			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
+			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
+			for (int xx=0;xx<width;xx++)
 			{
 				u16 src_tile  = srcptr_tile[xx];
 				u8 src_tilepri = srcptr_tilepri[xx];

@@ -496,7 +496,6 @@ Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -1562,9 +1561,6 @@ void williams_state::williams_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -1769,15 +1765,11 @@ void blaster_state::blaster(machine_config &config)
 	// sound hardware
 	config.device_remove("speaker");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1813,9 +1805,6 @@ void williams2_state::williams2_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
@@ -1904,7 +1893,8 @@ void joust2_state::joust2(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &joust2_state::d000_map);
 
-	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	S11_OBG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 2.0); // D-11298-3035 'pinbot style' older BG sound board
+	// Jumpers for the board: W1=? W2=open W3=present W4=open W5=open W6=open W7=present
 
 	// pia
 	m_pia[0]->readpa_handler().set_ioport("IN0").mask(0xf0);
@@ -1912,11 +1902,15 @@ void joust2_state::joust2(machine_config &config)
 	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_device::select_w));
 
 	m_pia[1]->readpa_handler().set_ioport("IN2");
-	m_pia[1]->writepb_handler().set(FUNC(joust2_state::snd_cmd_w));
-	m_pia[1]->ca2_handler().set(FUNC(joust2_state::pia_3_cb1_w));
+	m_pia[1]->writepb_handler().set(FUNC(joust2_state::snd_cmd_w)); // this goes both to the sound cpu AND to the s11 bg cpu
+	m_pia[1]->ca2_handler().set(FUNC(joust2_state::pia_s11_bg_strobe_w));
 	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	// these (and ca2 above) are educated guesses, as we have no schematics for joust 2's pcb which has the 20 pin system 11 bg sound connector on it; inferno, which we have schematics to, lacks this connector. All of pia[1] ca2, pia[2] cb1, and pia[2] cb2 are unconnected/grounded on inferno.
+	m_bg->cb2_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
+	m_pia[2]->cb2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w)); // inverted?
 
 	LS157(config, m_mux, 0);
 	m_mux->a_in_callback().set_ioport("INP1");
@@ -3518,19 +3512,19 @@ ROM_START( joust2 )
 	ROM_LOAD( "cpu_2764_ic8_rom1_rev1.0f", 0x0E000, 0x2000, CRC(84517c3c) SHA1(de0b6473953783c091ddcc7aaa89fc1ec3b9d378) )
 
 	// sound board
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
-	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_REGION( 0x80000, "bg:cpu", 0 )
+	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x00000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_RELOAD(             0x08000, 0x8000 )
+	ROM_RELOAD(             0x10000, 0x8000 )
 	ROM_RELOAD(             0x18000, 0x8000 )
-	ROM_RELOAD(             0x20000, 0x8000 )
+	ROM_LOAD( "snd_27256_rom24_rev1.u19", 0x20000, 0x8000, CRC(e7f9ed2e) SHA1(6b9ef5189650f0b6b2866da7f532cdf851f02ead) )
 	ROM_RELOAD(             0x28000, 0x8000 )
-	ROM_LOAD( "snd_27256_rom24_rev1.u19", 0x30000, 0x8000, CRC(e7f9ed2e) SHA1(6b9ef5189650f0b6b2866da7f532cdf851f02ead) )
+	ROM_RELOAD(             0x30000, 0x8000 )
 	ROM_RELOAD(             0x38000, 0x8000 )
-	ROM_RELOAD(             0x40000, 0x8000 )
+	ROM_LOAD( "snd_27256_rom25_rev1.u20", 0x40000, 0x8000, CRC(c85b29f7) SHA1(b37e1890bd0dfa0c7db19fc878450718b60c1ca0) )
 	ROM_RELOAD(             0x48000, 0x8000 )
-	ROM_LOAD( "snd_27256_rom25_rev1.u20", 0x50000, 0x8000, CRC(c85b29f7) SHA1(b37e1890bd0dfa0c7db19fc878450718b60c1ca0) )
+	ROM_RELOAD(             0x50000, 0x8000 )
 	ROM_RELOAD(             0x58000, 0x8000 )
-	ROM_RELOAD(             0x60000, 0x8000 )
-	ROM_RELOAD(             0x68000, 0x8000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "vid_27128_ic57_rom20_rev1.8f", 0x00000, 0x4000, CRC(572c6b01) SHA1(651df3223c1dc42543f57a7204ae492eb15a4999) )
@@ -3574,19 +3568,19 @@ ROM_START( joust2r1 )
 	ROM_LOAD( "cpu_2764_ic8_rom1_rev1.0f", 0x0E000, 0x2000, CRC(84517c3c) SHA1(de0b6473953783c091ddcc7aaa89fc1ec3b9d378) )
 
 	// sound board
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
-	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_REGION( 0x80000, "bg:cpu", 0 )
+	ROM_LOAD( "snd_27256_rom23_rev1.u4",  0x00000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )
+	ROM_RELOAD(             0x08000, 0x8000 )
+	ROM_RELOAD(             0x10000, 0x8000 )
 	ROM_RELOAD(             0x18000, 0x8000 )
-	ROM_RELOAD(             0x20000, 0x8000 )
+	ROM_LOAD( "snd_27256_rom24_rev1.u19", 0x20000, 0x8000, CRC(e7f9ed2e) SHA1(6b9ef5189650f0b6b2866da7f532cdf851f02ead) )
 	ROM_RELOAD(             0x28000, 0x8000 )
-	ROM_LOAD( "snd_27256_rom24_rev1.u19", 0x30000, 0x8000, CRC(e7f9ed2e) SHA1(6b9ef5189650f0b6b2866da7f532cdf851f02ead) )
+	ROM_RELOAD(             0x30000, 0x8000 )
 	ROM_RELOAD(             0x38000, 0x8000 )
-	ROM_RELOAD(             0x40000, 0x8000 )
+	ROM_LOAD( "snd_27256_rom25_rev1.u20", 0x40000, 0x8000, CRC(c85b29f7) SHA1(b37e1890bd0dfa0c7db19fc878450718b60c1ca0) )
 	ROM_RELOAD(             0x48000, 0x8000 )
-	ROM_LOAD( "snd_27256_rom25_rev1.u20", 0x50000, 0x8000, CRC(c85b29f7) SHA1(b37e1890bd0dfa0c7db19fc878450718b60c1ca0) )
+	ROM_RELOAD(             0x50000, 0x8000 )
 	ROM_RELOAD(             0x58000, 0x8000 )
-	ROM_RELOAD(             0x60000, 0x8000 )
-	ROM_RELOAD(             0x68000, 0x8000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "vid_27128_ic57_rom20_rev1.8f", 0x00000, 0x4000, CRC(572c6b01) SHA1(651df3223c1dc42543f57a7204ae492eb15a4999) )

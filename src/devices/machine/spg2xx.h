@@ -123,8 +123,6 @@ protected:
 
 	devcb_write8 m_chip_sel;
 
-	emu_timer *m_screenpos_timer;
-
 	uint8_t m_fiq_vector;
 
 	required_device<screen_device> m_screen;

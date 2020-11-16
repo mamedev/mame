@@ -216,24 +216,22 @@ void highvdeo_state::machine_start()
 
 uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-
-	for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
-		for(x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
+		int count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
+		for(int x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
 		{
 			uint32_t color;
 
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix32(y, (x*2)+0) = m_palette->pen(color);
+				bitmap.pix(y, (x*2)+0) = m_palette->pen(color);
 
 			color = ((m_blit_ram[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix32(y, (x*2)+1) = m_palette->pen(color);
+				bitmap.pix(y, (x*2)+1) = m_palette->pen(color);
 
 			count++;
 		}
@@ -245,16 +243,14 @@ uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rg
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
 uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
+	pen_t const *const rgb = m_palette->pens(); // 16 bit RGB
 
-	const pen_t *rgb = m_palette->pens(); // 16 bit RGB
-
-	for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		count = (y * 400) + cliprect.min_x;
-		for(x=cliprect.min_x;x<=cliprect.max_x;x++)
+		int count = (y * 400) + cliprect.min_x;
+		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			bitmap.pix32(y, x) = rgb[m_blit_ram[count++]];
+			bitmap.pix(y, x) = rgb[m_blit_ram[count++]];
 		}
 	}
 

@@ -79,7 +79,7 @@ void dac76_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 {
 	// get current output level
 	int step_size = (2 << m_chord);
-	stream_sample_t vout = m_level[m_chord] + m_step * step_size;
+	s32 vout = m_level[m_chord] + m_step * step_size;
 
 	// apply sign bit
 	vout *= (m_sb ? +1 : -1);

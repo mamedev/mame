@@ -548,7 +548,7 @@ uint32_t midvunit_state::midvunit_textureram_r(offs_t offset)
 
 uint32_t midvunit_state::screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, width, xoffs;
+	int width, xoffs;
 	uint32_t offset;
 
 	m_poly->wait("Refresh Time");
@@ -574,10 +574,10 @@ uint32_t midvunit_state::screen_update_midvunit(screen_device &screen, bitmap_in
 	offset += 512 * (cliprect.min_y - screen.visible_area().min_y);
 
 	/* loop over rows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
-		for (x = 0; x < width; x++)
+		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
+		for (int x = 0; x < width; x++)
 			*dest++ = m_videoram[offset + x] & 0x7fff;
 		offset += 512;
 	}

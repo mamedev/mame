@@ -200,7 +200,7 @@ void hnayayoi_state::draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangl
 {
 	uint8_t *src1 = &m_pixmap[left_pixmap][(row & 255) * 256];
 	uint8_t *src2 = &m_pixmap[right_pixmap][(row & 255) * 256];
-	uint32_t *dst = &bitmap.pix32(y);
+	uint32_t *dst = &bitmap.pix(y);
 
 	const pen_t *pal = &m_palette->pens()[palbase * 16];
 

@@ -14953,4 +14953,625 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="swmwre21">
+		<description>Swimware (Version 2.1)</description>
+		<year>1988</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="release" value="2020-09-21"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="swimware v2.1 side a.woz" size="234815" crc="ed0742c0" sha1="f1949d5ca927a7f0dd59f62afa2c9e851b131528"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234815">
+				<rom name="swimware v2.1 side b.woz" size="234815" crc="38316b19" sha1="c7b5c1a6132231ba67533c28b26cff32c1f8548a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puffair">
+		<description>A Puff of Air: The Respiratory System</description>
+		<year>1983</year>
+		<publisher>MarshWare</publisher>
+		<info name="release" value="2020-10-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241489">
+				<rom name="a puff of air- the respiratory system.woz" size="241489" crc="c004c5c4" sha1="01c836d53b0f2c2f8319400c5f85c7462b97bce4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fathom40">
+		<description>Fathom's 40</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-10-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="fathom's 40.woz" size="234778" crc="42d8b151" sha1="a653a356581c9d008a406cd1756c1b700b8e321f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bopabet">
+		<description>Bop-A-Bet</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-10-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="bop-a-bet.woz" size="234786" crc="9ff0b003" sha1="974b47183ef19b4e451b81568dbd3479acfe6c6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltmdlr">
+		<description>Flight: The Aerodynamics of Model Rockets</description>
+		<year>1986</year>
+		<publisher>Estes Industries</publisher>
+		<info name="release" value="2020-10-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234798">
+				<rom name="flight the aerodynamics of model rockets disk 1a.woz" size="234798" crc="fcbfafda" sha1="c0bfa9c27aa0b5e9b4a8873e6e9565bf3e1a4e77"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234798">
+				<rom name="flight the aerodynamics of model rockets disk 1b.woz" size="234798" crc="3d117e31" sha1="c9c41922675bca5a916da682538741480b840863"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234798">
+				<rom name="flight the aerodynamics of model rockets disk 2a.woz" size="234798" crc="32d24648" sha1="7acc990b2c8c2e3faa4d17db57b745dfac364b0a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234798">
+				<rom name="flight the aerodynamics of model rockets disk 2b.woz" size="234798" crc="f978206d" sha1="7b88cf7d0ab8af8a10f86dea287515bbe00d4c3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcalbum">
+		<description>Bill Budge's Space Album</description>
+		<year>1980</year>
+		<publisher>California Pacific Computer</publisher>
+		<info name="release" value="2020-10-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81679">
+				<rom name="bill budge's space album.woz" size="81679" crc="a6297ea6" sha1="ee9071adbb82e57b2166487eaa93560411e09e40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbtrilgy">
+		<description>Bill Budge's Trilogy of Games</description>
+		<year>1979</year>
+		<publisher>California Pacific Computer</publisher>
+		<info name="release" value="2020-10-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 32K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="75028">
+				<rom name="bill budge's trilogy of games.woz" size="75028" crc="d01399cc" sha1="65e5ee01e0be2e28180a8d90ae3f8e1458b6d63b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timelord">
+		<description>Time Lord</description>
+		<year>????</year>
+		<publisher>Ramware</publisher>
+		<info name="release" value="2020-10-07"/>
+		<sharedfeat name="compatibility" value="A2"/>
+		<!-- It requires an original Apple ][ with 48K and Integer BASIC in ROM. -->
+		<!-- The program is undated and release year is unknown. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234747">
+				<rom name="time lord.woz" size="234747" crc="fa1c5503" sha1="43fedd3aaa4af0329f220686518f05f2152ec2b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="humanfly">
+		<description>The Human Fly</description>
+		<year>1982</year>
+		<publisher>CPU Software</publisher>
+		<info name="release" value="2020-10-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="the human fly.woz" size="234771" crc="b248ab0a" sha1="afb9be7cea4a01f4b6ea815ba852518790c4b109"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnlahs">
+		<description>The Time Tunnel: American History Series</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2020-10-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241504">
+				<rom name="the time tunnel- american history series.woz" size="241504" crc="f8108dc8" sha1="e65d7b54cc7397d988ea11533b77244778577854"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnlane">
+		<description>The Time Tunnel: A Nation Emerges</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2020-10-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234872">
+				<rom name="the time tunnel- a nation emerges.woz" size="234872" crc="34abd88d" sha1="21163d163b379f9198aae8a6792a46a2004a553a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beaglbsc">
+		<description>Beagle BASIC</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241471">
+				<rom name="beagle basic.woz" size="241471" crc="c5d8316f" sha1="200310469a1c5b5116791e59389101f4a377e1d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosboss">
+		<description>DOS Boss</description>
+		<year>1981</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="dos boss.woz" size="234794" crc="4cb6c764" sha1="41270cd717af008832518dc7f9d65a8742646bdd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tipdisk1">
+		<description>Tip Disk #1</description>
+		<year>1982</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234793">
+				<rom name="tip disk 1.woz" size="234793" crc="d0df82c8" sha1="e273cc4bd94dfec583cf3f114a82e841a7fd3f3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmup14">
+		<description>Frame-Up (Version 1.4)</description>
+		<year>1982</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241452">
+				<rom name="frame-up v1.4.woz" size="241452" crc="144d3cfb" sha1="fc901a491ca52c7fd37e3a3db2b36f8166b2ac10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaplt">
+		<description>Alpha Plot</description>
+		<year>1982</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="alpha plot.woz" size="234796" crc="22c5cf88" sha1="d2f10de59ad98db170a50f01e357984ac93463f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dcodev11">
+		<description>D Code (Version 1.1)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="d code v1.1.woz" size="234789" crc="ca8e9f7e" sha1="c775600c00e62400fe5698a11cc32e525e36b21b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trpdmp33">
+		<description>Triple-Dump (DOS 3.3)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!-- This is the DOS 3.3 version. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241477">
+				<rom name="triple-dump side a.woz" size="241477" crc="aeae3e95" sha1="1aaa376a7896286c25f5b605ffec5993664122f5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234821">
+				<rom name="triple-dump side b.woz" size="234821" crc="a95efa38" sha1="9b6fbc125aef5f68f456185fd1a41e62d6ea25d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fntmch33">
+		<description>Font Mechanic (DOS 3.3)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!-- This is the DOS 3.3 version. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241479">
+				<rom name="font mechanic side a.woz" size="241479" crc="63124d43" sha1="699a3c9f1c6c49bd1c94d221ac7c76e764e9317b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234823">
+				<rom name="font mechanic side b.woz" size="234823" crc="fe0ae908" sha1="36f362dbf4397e2e8ea4fa2ec80386d824aed225"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtke2133">
+		<description>Double-Take (Version 2.1) (DOS 3.3)</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- The 48K DOS 3.3 version is on side A; the 64K ProDOS version is on side B.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 48K DOS 3.3 version"/>
+			<dataarea name="flop" size="234816">
+				<rom name="double-take v2.1 side a.woz" size="234816" crc="a48ac0b7" sha1="012f2632bfcbe6feb89686ea12839d477b4661e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 64K ProDOS version"/>
+			<dataarea name="flop" size="234815">
+				<rom name="double-take v2.1 side b.woz" size="234815" crc="6e3560eb" sha1="29b3af6837fa8cdf5245f58fe81f95ec5fbb5353"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskquik">
+		<description>DiskQuik</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241445">
+				<rom name="diskquik.woz" size="241445" crc="8ceb180b" sha1="6c62d39948c6113abfcfba44ef1bb1f7f251e703"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beagrafx">
+		<description>Beagle Graphics (Version 1985-03-01)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - DOS 3.3 version"/>
+			<dataarea name="flop" size="241460">
+				<rom name="beagle graphics side a - dos 3.3.woz" size="241460" crc="1c373aea" sha1="99bfebda36a6179b821958b56c24ffdae5bb0e18"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - ProDOS version"/>
+			<dataarea name="flop" size="234803">
+				<rom name="beagle graphics side b - prodos.woz" size="234803" crc="15a72816" sha1="d25652fb110ef71df11066a3fd5dd2cd3bd5d5b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pron8408">
+		<description>ProntoDOS (Version 1984-08-22)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241444">
+				<rom name="prontodos v1984-08-22.woz" size="241444" crc="e6f450d2" sha1="396b41ae7ca54d79b85b12eb421b8ff7794d80b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prgwr8904">
+		<description>Program Writer (Version 2.0-1989-04-21)</description>
+		<year>1989</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple //e or later. Some features require 128K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="program writer v2.0-1989-04-21.woz" size="234780" crc="219d11b9" sha1="ba328a840536d9144b336456ed011dcd50bd5eef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beacmp10">
+		<description>The Beagle Compiler (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="the beagle compiler v1.0.woz" size="234781" crc="97620009" sha1="6e08ded974d65131821029a59562cf86e5277e49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utcty8408">
+		<description>Utility City (Version 1984-08-22)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241439">
+				<rom name="utility city v1984-08-22.woz" size="241439" crc="4f1fcf30" sha1="31e7dd6af7eb2ba381ad350b16cd03fe0d262091"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigu8512">
+		<description>The Big U (Version 1985-12-02)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="the big u v1985-12-02.woz" size="234779" crc="0a170abc" sha1="842ae5aee7a96a1e9dffbdd41d58a056050c8426"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpr10">
+		<description>Power Print (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="power print.woz" size="234776" crc="e4961053" sha1="46c00f0f930d57959088439b0c0b27ad50f3d902"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplm8410">
+		<description>Apple Mechanic (Version 1984-10-05)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="apple mechanic v1984-10-05.woz" size="234785" crc="e74d532a" sha1="181c566c7a64f95d749285398c77d4114da2e325"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typfaplm">
+		<description>Typefaces for Apple Mechanic</description>
+		<year>1982</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--This requires the  Apple Mechanic program disk.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+				<rom name="typefaces for apple mechanic.woz" size="234760" crc="a468affb" sha1="083aac7286443696ea91fa605649211dbcba1e6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="probyter">
+		<description>Pro-Byter</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="pro-byter.woz" size="234795" crc="d4735f2c" sha1="3671ccb36513bbb415a020c744644772ce8a494a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silisald">
+		<description>Silicon Salad</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="silicon salad.woz" size="234800" crc="7856dc6b" sha1="b2e436822ea8111f335f2dc5d378b0f3ffd4df8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beaglbag">
+		<description>Beagle Bag</description>
+		<year>1983</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="beagle bag.woz" size="234783" crc="2213d092" sha1="e8ea3c10c6c7e834e7c9b18322c52d8c67ba7013"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gplev41">
+		<description>G.P.L.E. (Version 4.1, November 1st 1985)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="g.p.l.e. v4.1.woz" size="234793" crc="5d06e737" sha1="bdd42fd6484b99d8e7d5102c6c8b38216c902e6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minipx1">
+		<description>Mini-Pix #1 (DOS 3.3 Version)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234849">
+				<rom name="mini-pix #1 side a.woz" size="234849" crc="88fd4c16" sha1="c37d112f65c6cdbf7af55edb272961ea54a0c536"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234849">
+				<rom name="mini-pix #1 side b.woz" size="234849" crc="58d198e7" sha1="026136efc1a6883e78cafc414c254228d2b17ef6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatc8410">
+		<description>FatCat (Version 2.0-1984-10-26)</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234759">
+				<rom name="fatcat v2.0-1984-10-26.woz" size="234759" crc="c485ef99" sha1="5d40bf83227a3f4974eb48d23378f2e1075410af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flxtst10">
+		<description>Flex Text (Version 1.0)</description>
+		<year>1982</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234755">
+				<rom name="flex text.woz" size="234755" crc="ea4bf197" sha1="6190993b79d5d444671c73945004d6a8343b8342"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

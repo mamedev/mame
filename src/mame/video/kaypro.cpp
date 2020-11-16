@@ -29,24 +29,23 @@ u32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bi
     During the "off" period of blanking, the first half is used. Only 5 pixels are
     connected from the rom to the shift register, the remaining pixels are held high. */
 
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
 	m_framecnt++;
 
-	for (y = 0; y < 24; y++)
+	for (u8 y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (u16 x = ma; x < ma + 80; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 
 				if (ra < 8)
 				{
-					chr = m_vram[x]^0x80;
+					u8 chr = m_vram[x]^0x80;
 
 					/* Take care of flashing characters */
 					if ((chr < 0x80) && (m_framecnt & 0x08))
@@ -73,24 +72,23 @@ u32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bi
 
 u32 kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 
 	m_framecnt++;
 
-	for (y = 0; y < 24; y++)
+	for (u8 y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (u8 ra = 0; ra < 10; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (u16 x = ma; x < ma + 80; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 
 				if (ra < 8)
 				{
-					chr = m_vram[x];
+					u8 chr = m_vram[x];
 
 					/* Take care of flashing characters */
 					if ((chr > 0x7f) && (m_framecnt & 0x08))
@@ -137,32 +135,29 @@ u32 kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &b
 
 MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u32 *p = &bitmap.pix32(y);
-	u16 x;
-	u8 gfx,fg,bg;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)               // for each character
+	for (u16 x = 0; x < x_count; x++)           // for each character
 	{
 		u8 inv=0;
 		if (x == cursor_x) inv=0xff;
-		u16 mem = (ma + x) & 0x7ff;
-		u8 chr = m_vram[mem];
-		u8 attr = m_vram[mem | 0x800];
+		u16 const mem = (ma + x) & 0x7ff;
+		u8 const chr = m_vram[mem];
+		u8 const attr = m_vram[(mem+1) | 0x800];
 
+		u8 fg, bg;
 		if ((attr & 3) == 3)
 		{
 			fg = 0;
 			bg = 2;
 		}
-		else
-		if ((attr & 3) == 2)
+		else if ((attr & 3) == 2)
 		{
 			fg = 2;
 			bg = 0;
 		}
-		else
-		if ((attr & 3) == 1)
+		else if ((attr & 3) == 1)
 		{
 			fg = 0;
 			bg = 1;
@@ -178,6 +173,7 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 			fg = bg;
 
 		/* get pattern of pixels for that character scanline */
+		u8 gfx;
 		if ( (ra == 15) & (BIT(attr, 3)) )  /* underline */
 			gfx = 0xff;
 		else

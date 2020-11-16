@@ -873,7 +873,7 @@ void address_map::global_mask(offs_t mask)
 
 address_map_entry &address_map::operator()(offs_t start, offs_t end)
 {
-	address_map_entry *ptr = global_alloc(address_map_entry(*m_device, *this, start, end));
+	address_map_entry *ptr = new address_map_entry(*m_device, *this, start, end);
 	m_entrylist.append(*ptr);
 	return *ptr;
 }

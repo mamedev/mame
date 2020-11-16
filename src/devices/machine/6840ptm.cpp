@@ -156,6 +156,11 @@ void ptm6840_device::device_reset()
 	}
 }
 
+void ptm6840_device::device_resolve_objects()
+{
+	for (int i = 0; i < 3; i++)
+		m_gate[i]  = 0;
+}
 
 //-------------------------------------------------
 //  device_timer - handle timer callbacks

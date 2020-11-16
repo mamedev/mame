@@ -245,12 +245,12 @@ uint32_t pmd85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			int pen = BIT(line[x], 7) ? 1 : 2;
 
-			bitmap.pix16(y, x * 6 + 0) = BIT(line[x], 0) ? pen : 0;
-			bitmap.pix16(y, x * 6 + 1) = BIT(line[x], 1) ? pen : 0;
-			bitmap.pix16(y, x * 6 + 2) = BIT(line[x], 2) ? pen : 0;
-			bitmap.pix16(y, x * 6 + 3) = BIT(line[x], 3) ? pen : 0;
-			bitmap.pix16(y, x * 6 + 4) = BIT(line[x], 4) ? pen : 0;
-			bitmap.pix16(y, x * 6 + 5) = BIT(line[x], 5) ? pen : 0;
+			bitmap.pix(y, x * 6 + 0) = BIT(line[x], 0) ? pen : 0;
+			bitmap.pix(y, x * 6 + 1) = BIT(line[x], 1) ? pen : 0;
+			bitmap.pix(y, x * 6 + 2) = BIT(line[x], 2) ? pen : 0;
+			bitmap.pix(y, x * 6 + 3) = BIT(line[x], 3) ? pen : 0;
+			bitmap.pix(y, x * 6 + 4) = BIT(line[x], 4) ? pen : 0;
+			bitmap.pix(y, x * 6 + 5) = BIT(line[x], 5) ? pen : 0;
 		}
 
 	}

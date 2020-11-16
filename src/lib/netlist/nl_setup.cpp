@@ -6,6 +6,7 @@
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
+#include "nl_errstr.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
@@ -164,7 +165,7 @@ namespace netlist
 
 	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
 	{
-		register_link_fqn(build_fqn(sin), build_fqn(sout));
+		register_link_fqn(build_fqn(plib::trim(sin)), build_fqn(plib::trim(sout)));
 	}
 
 	void nlparse_t::register_link_arr(const pstring &terms)
@@ -551,10 +552,10 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	}
 }
 
-void setup_t::register_term(terminal_t &term, terminal_t &other_term)
+void setup_t::register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms)
 {
 	this->register_term(term);
-	m_connected_terminals.insert({&term, &other_term});
+	m_connected_terminals.insert({&term, {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
 }
 
 void setup_t::register_param_t(param_t &param)
@@ -731,7 +732,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 	m_proxy_cnt++;
 	// connect all existing terminals to new net
 
-	for (auto & p : out.net().core_terms())
+	for (auto & p : nlstate().core_terms(out.net()))
 	{
 		p->clear_net(); // de-link from all nets ...
 		if (!connect(new_proxy->proxy_term(), *p))
@@ -742,7 +743,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 					new_proxy->proxy_term().name(), (*p).name()));
 		}
 	}
-	out.net().core_terms().clear();
+	nlstate().core_terms(out.net()).clear();
 
 	add_terminal(out.net(), new_proxy->in());
 
@@ -783,7 +784,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 
 	if (inp.has_net())
 	{
-		for (detail::core_terminal_t * p : inp.net().core_terms())
+		for (detail::core_terminal_t * p : nlstate().core_terms(inp.net()))
 		{
 			// inp may already belongs to the logic net. Thus skip it here.
 			// It will be removed by the clear further down.
@@ -799,7 +800,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 				}
 			}
 		}
-		inp.net().core_terms().clear(); // clear the list
+		nlstate().core_terms(inp.net()).clear(); // clear the list
 	}
 	inp.clear_net();
 	add_terminal(ret->out().net(), inp);
@@ -973,7 +974,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
-			for (auto & t : t1.net().core_terms())
+			for (auto & t : nlstate().core_terms(t1.net()))
 			{
 				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t2, *t);
@@ -988,7 +989,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
-			for (auto & t : t2.net().core_terms())
+			for (auto & t : nlstate().core_terms(t2.net()))
 			{
 				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t1, *t);
@@ -1174,7 +1175,7 @@ void setup_t::resolve_inputs()
 			log().error(ME_TERMINAL_1_WITHOUT_NET(name_da));
 			err = true;
 		}
-		else if (!term->net().has_connections())
+		else if (nlstate().core_terms(term->net()).empty())
 		{
 			if (term->is_logic_input())
 				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(name_da));
@@ -1192,6 +1193,7 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(name_da));
 		}
 	}
+
 	log().verbose("checking tristate consistency  ...");
 	for (auto & i : m_terminals)
 	{
@@ -1224,7 +1226,7 @@ void setup_t::resolve_inputs()
 
 void setup_t::add_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false)
 {
-	for (auto &t : net.core_terms())
+	for (auto &t : nlstate().core_terms(net))
 		if (t == &terminal)
 		{
 			log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(net.name(), t->name()));
@@ -1233,15 +1235,15 @@ void setup_t::add_terminal(detail::net_t &net, detail::core_terminal_t &terminal
 
 	terminal.set_net(&net);
 
-	net.core_terms().push_back(&terminal);
+	nlstate().core_terms(net).push_back(&terminal);
 }
 
 void setup_t::remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false)
 {
-	if (plib::container::contains(net.core_terms(), &terminal))
+	if (plib::container::contains(nlstate().core_terms(net), &terminal))
 	{
 		terminal.set_net(nullptr);
-		plib::container::remove(net.core_terms(), &terminal);
+		plib::container::remove(nlstate().core_terms(net), &terminal);
 	}
 	else
 	{
@@ -1252,9 +1254,9 @@ void setup_t::remove_terminal(detail::net_t &net, detail::core_terminal_t &termi
 
 void setup_t::move_connections(detail::net_t &net, detail::net_t &dest_net)
 {
-	for (auto &ct : net.core_terms())
+	for (auto &ct : nlstate().core_terms(net))
 		add_terminal(dest_net, *ct);
-	net.core_terms().clear();
+	nlstate().core_terms(net).clear();
 }
 
 
@@ -1529,8 +1531,9 @@ void setup_t::delete_empty_nets()
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
 			[](device_arena::owned_ptr<detail::net_t> &net)
 			{
-				if (!net->has_connections())
+				if (net->state().core_terms(*net).empty())
 				{
+					// FIXME: need to remove from state->m_core_terms as well.
 					net->state().log().verbose("Deleting net {1} ...", net->name());
 					net->state().run_state_manager().remove_save_items(net.get());
 					return true;
@@ -1681,7 +1684,7 @@ void setup_t::prepare_to_run()
 
 	for (auto &n : m_nlstate.nets())
 	{
-		for (auto & term : n->core_terms())
+		for (auto & term : m_nlstate.core_terms(*n))
 			if (!term->delegate())
 			{
 				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));
@@ -1731,7 +1734,7 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 
 plib::istream_uptr source_pattern_t::stream(const pstring &name)
 {
-	pstring filename = plib::pfmt(m_pattern)(name);
+	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{

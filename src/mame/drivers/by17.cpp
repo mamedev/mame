@@ -26,7 +26,6 @@ ToDo:
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
-#include "render.h"
 
 class by17_state : public genpin_class
 {
@@ -979,10 +978,6 @@ void by17_state::machine_start()
 void by17_state::machine_reset()
 {
 	genpin_class::machine_reset();
-
-	render_target *target = machine().render().first_target();
-
-	target->set_view(0);
 
 	m_u10a = 0;
 	m_u10b = 0;

@@ -39,7 +39,6 @@
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 
 #define NARC_MASTER_CLOCK       XTAL(8'000'000)
@@ -76,6 +75,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
+		m_ym2151(*this, "ym2151"),
 		m_hc55516(*this, "cvsd"),
 		m_rombank(*this, "rombank"),
 		m_talkback(0)
@@ -185,17 +185,15 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->writepb_handler().set(FUNC(williams_cvsd_sound_device::talkback_w));
+	m_pia->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
 	m_pia->irqa_handler().set_inputline(m_cpu, M6809_FIRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
 
-	ym2151_device &ym(YM2151(config, "ym2151", CVSD_FM_CLOCK));
-	ym.irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
-	ym.add_route(ALL_OUTPUTS, *this, 0.10);
+	YM2151(config, m_ym2151, CVSD_FM_CLOCK);
+	m_ym2151->irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.10);
 
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	HC55516(config, m_hc55516, 0);
 	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
@@ -514,9 +512,6 @@ void williams_narc_sound_device::device_add_mconfig(machine_config &config)
 
 	AD7224(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	AD7224(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.60);
 }
@@ -767,9 +762,6 @@ void williams_adpcm_sound_device::device_add_mconfig(machine_config &config)
 	ym2151.add_route(ALL_OUTPUTS, *this, 0.10);
 
 	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.10);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	okim6295_device &oki(OKIM6295(config, "oki", ADPCM_MASTER_CLOCK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.set_addrmap(0, &williams_adpcm_sound_device::williams_adpcm_oki_map);

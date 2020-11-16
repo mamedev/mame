@@ -123,11 +123,13 @@ NETLIST_START(barrier)
 	D_1N914(CR5)
 	D_1N914(CR6)
 
+#if !(HLE_NOISE_GEN)
 	Q_2N3906(Q1)    // PNP
 	Q_2N3904(Q2)    // NPN
+#endif
 	Q_2N6426(Q3)    // NPN Darlington
-	Q_2N6292(Q4)    // NPN
-	Q_2N6107(Q5)    // PNP
+//  Q_2N6292(Q4)    // NPN -- not used
+//  Q_2N6107(Q5)    // PNP -- not used
 	Q_2N6426(Q6)    // NPN Darlington
 	Q_2N3904(Q7)    // NPN
 

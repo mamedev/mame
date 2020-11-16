@@ -111,8 +111,7 @@ void duet16_state::fdcctrl_w(u8 data)
 
 	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
 	m_fd[1]->get_device()->mon_w(!BIT(data, 0));
-	if(!BIT(data, 1))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 1));
 
 	// TODO: bit 3 = LSPD
 }
@@ -194,7 +193,7 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 {
 	if(!de)
 		return;
-	u8 *gvram = (u8 *)&m_gvram[0];
+	u8 const *const gvram = (u8 *)&m_gvram[0];
 	for(int i = 0; i < x_count; i++)
 	{
 		u16 coffset = (ma + i) & 0x07ff;
@@ -235,7 +234,7 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 				color = m_pal->pen_color((BIT(g2, 7 - xi) << 2) | (BIT(g1, 7 - xi) << 1) | BIT(g0, 7 - xi));
 			else
 				color = 0;
-			bitmap.pix32(y, (i * 8) + xi) = color;
+			bitmap.pix(y, (i * 8) + xi) = color;
 		}
 	}
 }

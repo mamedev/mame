@@ -236,7 +236,6 @@ Todo:
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "polepos.lh"
@@ -1058,10 +1057,6 @@ void polepos_state::topracern(machine_config &config)
 	dac_4bit_r2r_device &dac(DAC_4BIT_R2R(config, "dac", 0)); // unknown resistor configuration
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.12);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.12);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void polepos_state::polepos2bi(machine_config &config)

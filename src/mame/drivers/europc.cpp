@@ -366,7 +366,9 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( europc_keyboard )
 	PORT_INCLUDE(pc_keyboard)
 	PORT_MODIFY("pc_keyboard_2") /* IN6 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_BACKSLASH) /* `                           29  A9 */
@@ -382,6 +384,28 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP Enter") PORT_CODE(KEYCODE_ENTER_PAD)       /* PAD Enter                   60  e0 */
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
+
+class europc_keyboard_device : public pc_keyboard_device
+{
+public:
+	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_KEYB, europc_keyboard_device, "europc_keyb", "EURO PC Keyboard")
+
+europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, EUROPC_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor europc_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(europc_keyboard);
+}
 
 void europc_pc_state::europc_map(address_map &map)
 {
@@ -471,7 +495,7 @@ void europc_pc_state::europc(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
-	PC_KEYB(config, m_keyboard);
+	EUROPC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
@@ -498,6 +522,9 @@ void europc_pc_state::euroxt(machine_config &config)
 	europc(config);
 
 	config.device_remove("kbdctrl");
+
+	PC_KEYB(config.replace(), m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	m_ram->set_default_size("768K");
 

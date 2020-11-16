@@ -4,10 +4,10 @@
 license:CC0
 
   To investigate:
-  - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
+    - Gargoyle's Quest - Ghosts'n Goblins (Rev 1)   <-  Unreleased in USA?
 
   Undumped pirate carts:
-  - GOWIN carts (see below the list of known games)
+    - GOWIN carts (see below the list of known games)
 
 
  Info on the PCB codes, based on Tauwasser's notes and research
@@ -264,6 +264,22 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
+				<rom name="dmg-rye-0.u1" size="131072" crc="362c841c" sha1="0ce98889e5d9d6167338e91119394537318810da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockybwunk" cloneof="rockybw">
+		<!--    Old dump of unknown origin  -->
+		<!--    Three different bytes in the header -->
+		<description>The Adventures of Rocky and Bullwinkle (USA, bad dump?)</description>
+		<year>1992</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="DMG-RY-USA" />
+		<info name="alt_title" value="The Adventures of Rocky and Bullwinkle and Friends (Box)" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
 				<rom name="adventures of rocky and bullwinkle and friends, the (usa).bin" size="131072" crc="74c700a4" sha1="924a9bd18328da81b5554e42db873d1981ee9b20" />
 			</dataarea>
 		</part>
@@ -345,7 +361,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="agrosoar" cloneof="wereback">
+	<software name="agrosoar" cloneof="babytrex">
 		<description>Agro Soar (Australia)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -581,7 +597,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="all-star baseball '99 (usa).bin" size="524288" crc="d51ee6d3" sha1="49d13eef514d26cee37b10ff602e21a92b87b69d" />
+				<rom name="dmg-ab9e-0.u1" size="524288" crc="d51ee6d3" sha1="49d13eef514d26cee37b10ff602e21a92b87b69d" />
 			</dataarea>
 		</part>
 	</software>
@@ -741,7 +757,21 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="amoudan2">
+	<software name="amoudan2a">
+		<description>America Oudan Ultra Quiz Part 2 (Japan, Rev 1)</description>
+		<year>1991</year>
+		<publisher>Tomy</publisher>
+		<info name="serial" value="DMG-AUJ" />
+		<info name="alt_title" value="アメリカ横断ウルトラクイズ PART2" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-auj-1.u1" size="262144" crc="739c26fc" sha1="cb3ed70f4d095405df2c322c528cab2a00d56557"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amoudan2" cloneof="amoudan2a">
 		<description>America Oudan Ultra Quiz Part 2 (Japan)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
@@ -1286,7 +1316,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="babytrex" cloneof="wereback">
+	<software name="babytrex">
 		<description>Baby T-Rex (Europe)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -1414,7 +1444,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bamse" cloneof="wereback">
+	<software name="bamse" cloneof="babytrex">
 		<description>Bamse (Sweden)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -1804,33 +1834,33 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards (all EAN-13):
-	    1 (up):
-	        4905672306367
-	    1 (down):
-	        4902776809367
-	    2 (up):
-	        4908052808369
-	    2 (down):
-	        4907981000301
-	    3 (up):
-	        4911826551347
-	    3 (down):
-	        4909062206350
-	    4 (up):
-	        4913508504399
-	    4 (down):
-	        4912713004366
-	    5 (up):
-	        4918156001351
-	    5 (down):
-	        4916911302309
-	There is also a "free card" without barcodes.
-	-->
 	<software name="bspace" supported="no">
+		<!--
+		Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards (all EAN-13):
+		    1 (up):
+		        4905672306367
+		    1 (down):
+		        4902776809367
+		    2 (up):
+		        4908052808369
+		    2 (down):
+		        4907981000301
+		    3 (up):
+		        4911826551347
+		    3 (down):
+		        4909062206350
+		    4 (up):
+		        4913508504399
+		    4 (down):
+		        4912713004366
+		    5 (up):
+		        4918156001351
+		    5 (down):
+		        4916911302309
+		There is also a "free card" without barcodes.
+		-->
 		<description>Battle Space (Japan)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -2025,6 +2055,7 @@ license:CC0
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="alt_title" value="Beethoven - The Ultimate Canine Caper (Box)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<dataarea name="rom" size="131072">
 				<rom name="beethoven's 2nd (europe).bin" size="131072" crc="637e54e3" sha1="a175778faca00f096f0bfdbaa844a38816bbeb0f" />
 			</dataarea>
@@ -2380,11 +2411,10 @@ license:CC0
 
 	<software name="bokujom" cloneof="harvmoon">
 		<!-- Also released via the Nintendo Power service in 2000-08 -->
-		<description>Bokujou Monogatari GB (Japan, Rev. 1)</description>
+		<description>Bokujou Monogatari GB (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-AYWJ-JPN" />
-		<info name="release" value="19971219" />
 		<info name="alt_title" value="牧場物語GB" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
@@ -2424,6 +2454,25 @@ license:CC0
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-aywj-0.u1" size="524288" crc="d3e2fd02" sha1="60ecafdb13213b3ac2daa3d71431ef8a89754edb" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bokujomnp" cloneof="harvmoon">
+		<!--    Planned for physical release?   -->
+		<description>Bokujou Monogatari GB (Japan, NP)</description>
+		<year>1997</year>
+		<publisher>Victor Interactive Software</publisher>
+		<info name="serial" value="DMG-BYWJ-JPN?" />
+		<info name="alt_title" value="牧場物語GB" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-bywj-0.u1" size="524288" crc="0424df85" sha1="551df2021d0e433e7f07cf881c7b1d534f54f6ad"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2558,7 +2607,7 @@ license:CC0
 	</software>
 
 	<software name="bombman3">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Bomberman GB 3 (Japan)</description>
 		<year>1996</year>
 		<publisher>Hudson Soft</publisher>
@@ -2691,8 +2740,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="boxxle">
-		<description>Boxxle (Europe, USA, Rev. 1)</description>
+	<software name="boxxlea">
+		<!--    European release is a relabeled USA version -->
+		<description>Boxxle (Europe, USA, Rev 1)</description>
 		<year>1990</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="DMG-SO-UKV, DMG-SO-USA" />
@@ -2701,6 +2751,19 @@ license:CC0
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-soe-1.u1" size="32768" crc="c09cee99" sha1="f9d5287bc9d6eda9ec36e9b5a8dbc38cf2cffecf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxxle" cloneof="boxxlea">
+		<description>Boxxle (USA)</description>
+		<year>1990</year>
+		<publisher>FCI</publisher>
+		<info name="serial" value="DMG-SO-USA" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="32768">
+				<rom name="dmg-soe-0.u1" size="32768" crc="24843867" sha1="3e169f1db16cc1c3ffbc8645aa7ce28194033d26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2969,7 +3032,7 @@ license:CC0
 	</software>
 
 	<software name="bugsbcol">
-		<description>Bugs Bunny Collection (Japan, Rev. 1)</description>
+		<description>Bugs Bunny Collection (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AWBJ-JPN" />
@@ -2979,7 +3042,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="bugs bunny collection (japan) (rev a).bin" size="262144" crc="8244220b" sha1="9d69d72b7de0377cb0439aa301b1fb82d3ce786a" />
+				<rom name="bugs bunny collection (japan) (rev 1).bin" size="262144" crc="8244220b" sha1="9d69d72b7de0377cb0439aa301b1fb82d3ce786a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3128,7 +3191,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bust-a-move 3 dx (europe).bin" size="131072" crc="e555c612" sha1="e89dc67087205c4113a4d152347eba38204e270b" />
+				<rom name="dmg-a3vp-0.u1" size="131072" crc="e555c612" sha1="e89dc67087205c4113a4d152347eba38204e270b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3211,7 +3274,7 @@ license:CC0
 	</software>
 
 	<software name="caesarsu" cloneof="caesars">
-		<description>Caesars Palace (USA, Rev. 1)</description>
+		<description>Caesars Palace (USA, Rev 1)</description>
 		<year>1991</year>
 		<publisher>Arcadia Systems</publisher>
 		<info name="serial" value="DMG-CE-USA-1" />
@@ -3500,7 +3563,7 @@ license:CC0
 	</software>
 
 	<software name="centiped">
-		<description>Centipede (Euro, USA, Accolade)</description>
+		<description>Centipede (Europe, USA, Accolade)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-CZ-USA, DMG-CZ-FRG" />
@@ -3633,14 +3696,14 @@ license:CC0
 	</software>
 
 	<software name="chessmstu" cloneof="chessmst">
-		<description>The Chessmaster (USA, Rev. 1)</description>
+		<description>The Chessmaster (USA, Rev 1)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-EM-USA?" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="chessmaster, the (usa) (rev a).bin" size="65536" crc="59ed370c" sha1="f0351faab8b912967552684d4160f5cf94540d41" />
+				<rom name="chessmaster, the (usa) (rev 1).bin" size="65536" crc="59ed370c" sha1="f0351faab8b912967552684d4160f5cf94540d41" />
 			</dataarea>
 		</part>
 	</software>
@@ -3659,7 +3722,7 @@ license:CC0
 	</software>
 
 	<software name="chibimdx">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-11 -->
+		<!-- Notes: Also released by NP in 2000-11 -->
 		<description>Chibi Maruko-chan - Maruko Deluxe Gekijou (Japan)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
@@ -3873,7 +3936,7 @@ license:CC0
 	</software>
 
 	<software name="mazemon2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
+		<!-- Notes: Also released by NP in 2000-08 -->
 		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
@@ -3897,8 +3960,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Game cart has an integrated infrared port for multiplayer play. -->
 	<software name="spinner">
+		<!-- Game cart has an integrated infrared port for multiplayer play. -->
 		<description>Chousoku Spinner (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -4041,7 +4104,7 @@ license:CC0
 	</software>
 
 	<software name="coolhanda" cloneof="coolhand" supported="partial">
-		<description>Cool Hand (Euro, French / German)</description>
+		<description>Cool Hand (Europe, French / German)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
 		<info name="serial" value="DMG-ACDX-EUR" />
@@ -4396,12 +4459,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	The Miracle of the Zone supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-	-->
 	<software name="miraclzn">
+		<!--
+		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		-->
 		<description>Daikaijuu Monogatari - The Miracle of the Zone (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -4729,7 +4792,7 @@ license:CC0
 	</software>
 
 	<software name="dinobred">
-		<description>Dino Breeder (Japan, Rev. 1)</description>
+		<description>Dino Breeder (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AWDJ-JPN-1" />
@@ -4830,7 +4893,7 @@ license:CC0
 
 	<software name="dkong">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Donkey Kong (World, Rev. 1)</description>
+		<description>Donkey Kong (World, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-QDA, DMG-QD-ESP-1, DMG-QD-EUR, DMG-QD-FRG, DMG-QD-NOE, DMG-QD-SCN, DMG-QD-USA" />
@@ -4943,7 +5006,7 @@ license:CC0
 	</software>
 
 	<software name="dkland3">
-		<description>Donkey Kong Land III (Australia, Europe, USA, Rev. 1)</description>
+		<description>Donkey Kong Land III (Australia, Europe, USA, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-AUS, DMG-AD3P-EUR" />
@@ -5038,7 +5101,7 @@ license:CC0
 	</software>
 
 	<software name="dorakart" supported="partial">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
+		<!-- Notes: Also released by NP in 2000-08 -->
 		<description>Doraemon Kart (Japan)</description>
 		<year>1998</year>
 		<publisher>Epoch</publisher>
@@ -5062,7 +5125,7 @@ license:CC0
 	</software>
 
 	<software name="doradx10">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
+		<!-- Notes: Also released by NP in 2000-08 -->
 		<description>Doraemon no Game Boy de Asobouyo Deluxe 10 (Japan)</description>
 		<year>1998</year>
 		<publisher>Epoch</publisher>
@@ -5377,7 +5440,7 @@ license:CC0
 
 	<software name="drmario">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Dr. Mario (World, Rev. 1)</description>
+		<description>Dr. Mario (World, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-VUA, DMG-VU-EUR, DMG-VU-ITA, DMG-VU-UKV, DMG-VU-USA" />
@@ -5757,7 +5820,7 @@ license:CC0
 	</software>
 
 	<software name="dxbakeno">
-		<description>DX Bakenou Z (Japan, Rev. 1)</description>
+		<description>DX Bakenou Z (Japan, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-DZJ" />
@@ -5766,7 +5829,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dx bakenou z (japan) (rev a).bin" size="131072" crc="fadfd0f6" sha1="6e2b9b21ea7d8d482be1f17722a579f720f2029d" />
+				<rom name="dx bakenou z (japan) (rev 1).bin" size="131072" crc="fadfd0f6" sha1="6e2b9b21ea7d8d482be1f17722a579f720f2029d" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -5877,6 +5940,7 @@ license:CC0
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-YK-USA" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="elite soccer (usa).bin" size="131072" crc="f54158a6" sha1="4576881ea25e29ebba91c49c89f8e70e105fbc60" />
@@ -5916,7 +5980,7 @@ license:CC0
 
 	<software name="f1race" supported="partial">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>F-1 Race (World, Rev. 1)</description>
+		<description>F-1 Race (World, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-F1A, DMG-F1-EUR, DMG-F1-NOE, DMG-F1-USA" />
@@ -6020,6 +6084,7 @@ license:CC0
 	</software>
 
 	<software name="f1polepo" supported="partial">
+		<!--    Region code "E" (USA)   -->
 		<description>F1 Pole Position (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -6063,25 +6128,25 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Family Jockey 2 is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards:
-	    バーコードカード No. 1 (barcode card #1)
-	        競争馬 A (Racehorse A): 5893713522816 (EAN-13)
-	        競争馬 B (Racehorse B): 1509843019075 (EAN-13)
-	    バーコードカード No. 2 (barcode card #2)
-	        繁殖馬 A (Breeding horse A): 2378649896765 (EAN-13)
-	        繁殖馬 B (Breeding horse B): 4232978865152 (EAN-13)
-	    バーコードカード No. 3 (barcode card #3)
-	        繁殖馬 C (Breeding horse C): 7164625542390 (EAN-13)
-	    バーコードカード No. 4 (barcode card #4)
-	        種馬 A (Stallion A): 9845554422318 (EAN-13)
-	        種馬 B (Stallion B): 3572821107673 (EAN-13)
-	    バーコードカード No. 5 (barcode card #5)
-	        種馬 C (Stallion C) : 6319537443513 (EAN-13)
-	-->
 	<software name="famjock2">
+		<!--
+		Family Jockey 2 is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards:
+		    バーコードカード No. 1 (barcode card #1)
+		        競争馬 A (Racehorse A): 5893713522816 (EAN-13)
+		        競争馬 B (Racehorse B): 1509843019075 (EAN-13)
+		    バーコードカード No. 2 (barcode card #2)
+		        繁殖馬 A (Breeding horse A): 2378649896765 (EAN-13)
+		        繁殖馬 B (Breeding horse B): 4232978865152 (EAN-13)
+		    バーコードカード No. 3 (barcode card #3)
+		        繁殖馬 C (Breeding horse C): 7164625542390 (EAN-13)
+		    バーコードカード No. 4 (barcode card #4)
+		        種馬 A (Stallion A): 9845554422318 (EAN-13)
+		        種馬 B (Stallion B): 3572821107673 (EAN-13)
+		    バーコードカード No. 5 (barcode card #5)
+		        種馬 C (Stallion C) : 6319537443513 (EAN-13)
+		-->
 		<description>Family Jockey 2 - Meiba no Kettou (Japan)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
@@ -6140,20 +6205,20 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Family Stadium 3 (Famista 3) is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards (all EAN-13):
-	    No. 1: ホームランバッター
-	        8357933639923
-	    No. 2: 高打率バッター
-	        7814374127798
-	    No. 3: 駿足バッター
-	        9880692151263
-	    No. 4: ピッチャー
-	        1414213562177
-	-->
 	<software name="famista3">
+		<!--
+		Family Stadium 3 (Famista 3) is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards (all EAN-13):
+		    No. 1: ホームランバッター
+		        8357933639923
+		    No. 2: 高打率バッター
+		        7814374127798
+		    No. 3: 駿足バッター
+		        9880692151263
+		    No. 4: ピッチャー
+		        1414213562177
+		-->
 		<description>Famista 3 (Japan)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
@@ -6176,12 +6241,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fastlap">
-		<description>Fastest Lap (Japan, USA)</description>
+	<software name="fastlapu">
+		<description>Fastest Lap (USA)</description>
 		<year>1991</year>
-		<publisher>Vap ~ NTVIC</publisher>
-		<info name="serial" value="DMG-F2A, DMG-F2-USA" />
-		<info name="release" value="19910320 (JPN)" />
+		<publisher>NTVIC</publisher>
+		<info name="serial" value="DMG-F2-USA" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-f2e-0.u1" size="131072" crc="a9ba7875" sha1="25bf89b112c9b134b2e4d07354d1a762ab0d4e92"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastlap" cloneof="fastlapu">
+		<description>Fastest Lap (Japan)</description>
+		<year>1991</year>
+		<publisher>Vap</publisher>
+		<info name="serial" value="DMG-F2A" />
+		<info name="release" value="19910320" />
 		<info name="alt_title" value="ファーステスト・ラップ" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
@@ -6284,7 +6364,7 @@ license:CC0
 	</software>
 
 	<software name="fifa98">
-		<description>FIFA Road to the World Cup '98 (Euro, Rev. A)</description>
+		<description>FIFA Road to the World Cup '98 (Europe, Rev 1)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU" />
@@ -6620,7 +6700,7 @@ license:CC0
 	</software>
 
 	<software name="foreman">
-		<!-- Notes: SGB enhanced? (the box claims it supports SGB!) -->
+		<!-- Notes: The box claims it supports SGB, but it doesn't -->
 		<description>Foreman for Real (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -6682,7 +6762,6 @@ license:CC0
 	</software>
 
 	<software name="friskyto">
-		<!-- Notes: SGB enhanced? (the box claims it supports SGB!) -->
 		<description>Frisky Tom (Japan)</description>
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
@@ -6690,6 +6769,7 @@ license:CC0
 		<info name="release" value="19950714" />
 		<info name="alt_title" value="フリスキー・トム" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="frisky tom (japan).bin" size="131072" crc="0bef84a1" sha1="4162ca88c94c40e3fa6e09067b956cf4953ccf89" />
@@ -6780,7 +6860,7 @@ license:CC0
 	</software>
 
 	<software name="furaishi">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
+		<!-- Notes: Also released by NP in 2000-08 -->
 		<description>Fushigi no Dungeon - Fuurai no Shiren GB - Tsukikage Mura no Kaibutsu (Japan)</description>
 		<year>1996</year>
 		<publisher>ChunSoft</publisher>
@@ -6843,7 +6923,7 @@ license:CC0
 	</software>
 
 	<software name="gwatchu" cloneof="gwatch">
-		<description>Game &amp; Watch Gallery (USA, Rev. A)</description>
+		<description>Game &amp; Watch Gallery (USA, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA" />
@@ -6851,7 +6931,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="game &amp; watch gallery (usa) (rev a).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" />
+				<rom name="game &amp; watch gallery (usa) (rev 1).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6903,7 +6983,7 @@ license:CC0
 	</software>
 
 	<software name="gbgallj" cloneof="gwatch">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Game Boy Gallery (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -6950,7 +7030,7 @@ license:CC0
 	</software>
 
 	<software name="gbgall2">
-		<!-- Notes: SGB enhanced, Euro/US version in gbcolor.xml -->
+		<!-- Notes: Euro/US version in gbcolor.xml -->
 		<description>Game Boy Gallery 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -7208,7 +7288,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gargoylea">
+		<!--    European release is a relabeled USA version -->
+		<!--    Unreleased in USA?  -->
+		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev 1)</description>
+		<year>1990</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="DMG-RA-NOE-1" />
+		<info name="alt_title" value="Gargoyle's Quest (Box)" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-rae-1.u1" size="131072" crc="b86ef7a5" sha1="21fbe39014ffed80d0de2092517522d3cb9b03f9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gargoyle">
+		<!--    European release is a relabeled USA version -->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
@@ -7278,7 +7375,7 @@ license:CC0
 	</software>
 
 	<software name="gbgenjn2" cloneof="bckid2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>GB Genjin 2 (China, Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
@@ -7335,12 +7432,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	"GBKiss" is an integrated infrared port for cart-to-cart multiplayer play, but also for PC connection
-	with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel port (DB25) modem/adaptor for PC-DOS
-	for transfering files between the game and a computer.
-	-->
 	<software name="gbkiss">
+		<!--
+		"GBKiss" is an integrated infrared port for cart-to-cart multiplayer play, but also for PC connection
+		with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel port (DB25) modem/adaptor for PC-DOS
+		for transfering files between the game and a computer.
+		-->
 		<description>GBKiss Mini Games (Japan)</description>
 		<year>1997</year> <!-- Year printed on the cart label -->
 		<publisher>Hudson Soft</publisher>
@@ -7840,7 +7937,7 @@ license:CC0
 	</software>
 
 	<software name="gbsjousse" cloneof="gbsjous">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn, Special Edition)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BS4J-JPN" />
@@ -7862,8 +7959,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gbskjtat">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn, Special Edition)</description>
+	<software name="gbskjtatie">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Alt)</description>
+		<year>2003</year>
+		<publisher>IE Institute</publisher>
+		<info name="serial" value="DMG-BQ2J-JPN?" />
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 読み 書き 筆順 熟語 漢字の達人" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-bq2j-0.u1" size="1048576" crc="180d54a7" sha1="7dce0adcbac61f0caae33646847fd06ced8c8b67"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbskjtat" cloneof="gbskjtatie">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Special Edition)</description>
 		<year>2001</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-BK4J-JPN" />
@@ -7885,7 +7998,23 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gbskstat">
+	<software name="gbskstatie">
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Japan, Alt)</description>
+		<year>2003</year>
+		<publisher>IE Institute</publisher>
+		<info name="serial" value="DMG-BC6J-JPN?" />
+		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 整数 小数 分数 単位 計算の達人" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-bc6j-0.u1" size="1048576" crc="04214f92" sha1="6b8726c69a31e674a4c5ab02631de073d42e7d52"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbskstat" cloneof="gbskstatie">
 		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Japan)</description>
 		<year>2001</year>
 		<publisher>Imagineer</publisher>
@@ -8028,7 +8157,7 @@ license:CC0
 	</software>
 
 	<software name="gbsyoji">
-		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Japan, Rev. 1)</description>
+		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AY3J-JPN" />
@@ -8325,7 +8454,7 @@ license:CC0
 	</software>
 
 	<software name="gbsasob">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Japan, Rev. 1)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AM5J-JPN" />
@@ -8334,7 +8463,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - suuji de asobou sansuu hen (japan) (rev a).bin" size="262144" crc="74821248" sha1="b1626c1fe162a7b0292d292e8ba60a1c6823fc8d" />
+				<rom name="goukaku boy series - shikakui atama o marukusuru - suuji de asobou sansuu hen (japan) (rev 1).bin" size="262144" crc="74821248" sha1="b1626c1fe162a7b0292d292e8ba60a1c6823fc8d" />
 			</dataarea>
 		</part>
 	</software>
@@ -9032,7 +9161,7 @@ license:CC0
 
 	<software name="kirbyj" cloneof="kirby">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Hoshi no Kirby (Japan, Rev. 1)</description>
+		<description>Hoshi no Kirby (Japan, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-KYJ" />
@@ -9044,7 +9173,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="hoshi no kirby (japan) (rev a).bin" size="262144" crc="04342c83" sha1="5fe35fab25299b6c53b40decfe2b1827b4a64d2a" />
+				<rom name="hoshi no kirby (japan) (rev 1).bin" size="262144" crc="04342c83" sha1="5fe35fab25299b6c53b40decfe2b1827b4a64d2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -9262,18 +9391,33 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hyperlod">
-		<description>Hyper Lode Runner (World, Rev. 1)</description>
+	<software name="hyperloda">
+		<!--    Region code "A" -->
+		<description>Hyper Lode Runner (World, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-HLA, DMG-HL-UKV, DMG-HL-USA" />
-		<info name="release" value="19890921 (JPN)" />
 		<info name="alt_title" value="ハイパーロードランナー" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-AAA-03" /> <!-- Also found with DMG-AAA-01 and DMG-AAA-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-hla-1.u1" size="32768" crc="b3a86164" sha1="261da795c7b4155f1b8083acc55da78699c8a0de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperlod" cloneof="hyperloda">
+		<!--    Region code "A" -->
+		<description>Hyper Lode Runner (Japan?)</description>
+		<year>1989</year>
+		<publisher>Bandai</publisher>
+		<info name="release" value="19890921 (JPN)" />
+		<info name="alt_title" value="ハイパーロードランナー" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="32768">
+				<rom name="dmg-hla-0.u1" size="32768" crc="3fc21b74" sha1="37d0f2cbac0f95af8b22dea0c882612681ec5cc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9884,7 +10028,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="jelly boy (europe).bin" size="262144" crc="7e6598bb" sha1="579579d660cdc84af2428ccd1b30b40a2fb592fa" />
+				<rom name="dmg-ajbp-0.u1" size="262144" crc="7e6598bb" sha1="579579d660cdc84af2428ccd1b30b40a2fb592fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -9911,7 +10055,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy - platinum edition (usa).bin" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
+				<rom name="dmg-ajpe-0.u1" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
 			</dataarea>
 		</part>
 	</software>
@@ -9938,12 +10082,26 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy - teen tournament (usa).bin" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
+				<rom name="dmg-ajqe-0.u1" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jetsons">
+	<software name="jetsonsa">
+		<description>The Jetsons - Robot Panic (USA, Rev 1)</description>
+		<year>1992</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="DMG-JS-USA?" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-jse-1.u1" size="131072" crc="cc38cf0d" sha1="38b5ec2c74316696b7731cd88e56be4519084168"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetsons" cloneof="jetsonsa">
+		<!--    European release is a relabeled USA version -->
 		<description>The Jetsons - Robot Panic (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -10011,7 +10169,7 @@ license:CC0
 	</software>
 
 	<software name="jinsei">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Jinsei Game (Japan)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
@@ -10185,18 +10343,31 @@ license:CC0
 	</software>
 
 	<software name="jstrike">
-		<description>Jungle Strike (Europe, USA)</description>
+		<description>Jungle Strike (Europe)</description>
 		<year>1995</year>
-		<publisher>Ocean</publisher> <!-- Malibu Games in USA -->
-		<info name="serial" value="DMG-AJGE-USA, DMG-AJGP-UKV" />
+		<publisher>Ocean</publisher>
+		<info name="serial" value="DMG-AJGP-UKV" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
-			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-ajgp-0.u1" size="262144" crc="763ababb" sha1="b4c53804f6d7ed230c092232148e69b53f9eb597" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jstrikeu" cloneof="jstrike">
+		<description>Jungle Strike (USA)</description>
+		<year>1995</year>
+		<publisher>Malibu Games</publisher>
+		<info name="serial" value="DMG-AJGE-USA" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-ajge-0.u1" size="262144" crc="7a8cdbe8" sha1="ea8b7a5d8d16b4448a3d758fff1f91f27db60292"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10455,7 +10626,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kaseki">
+	<software name="kasekia">
+		<description>Kaseki Sousei Reborn (Japan, Rev 1)</description>
+		<year>1998</year>
+		<publisher>Starfish</publisher>
+		<info name="serial" value="DMG-AKRJ-JPN?" />
+		<info name="alt_title" value="化石創世リボーン" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-akrj-1.u1" size="524288" crc="7c94197c" sha1="5759394e2e8bfd68ccf5519362572daaba003573"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaseki" cloneof="kasekia">
 		<description>Kaseki Sousei Reborn (Japan)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
@@ -10479,24 +10667,24 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Kattobi Road is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards (all EAN-13):
-	    No. 1:
-	        4903301160625
-	    No. 2:
-	        4987084410924
-	    No. 3:
-	        4902888119101
-	    No. 4:
-	        4901121110004
-	    No. 5 (up):
-	        4902105002063
-	    No. 5 (down):
-	        4901780161157
-	-->
 	<software name="kattobi">
+		<!--
+		Kattobi Road is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards (all EAN-13):
+		    No. 1:
+		        4903301160625
+		    No. 2:
+		        4987084410924
+		    No. 3:
+		        4902888119101
+		    No. 4:
+		        4901121110004
+		    No. 5 (up):
+		        4902105002063
+		    No. 5 (down):
+		        4901780161157
+		-->
 		<description>Kattobi Road (Japan)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
@@ -10520,7 +10708,7 @@ license:CC0
 	</software>
 
 	<software name="kawanus3" cloneof="rivking">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Kawa no Nushi Tsuri 3 (Japan)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -10825,14 +11013,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kininkoa">
+		<description>Kinin Koumaroku Oni (Japan, Rev 1)</description>
+		<year>1990</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-ONJ?" />
+		<info name="alt_title" value="鬼忍降魔録  ＯＮＩ　人々は、かれを「隠れ忍ぶ者－隠忍－」と呼んだ..." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc2" />
+			<dataarea name="rom" size = "131072">
+				<rom name="dmg-onj-1.u1" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kininko" cloneof="kininkoa">
 <!-- does it have the battery? -->
-	<software name="kininko">
 		<description>Kinin Koumaroku Oni (Japan)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ONJ" />
 		<info name="release" value="19901208" />
-		<info name="alt_title" value="鬼忍降魔録 ONI" />
+		<info name="alt_title" value="鬼忍降魔録  ＯＮＩ　人々は、かれを「隠れ忍ぶ者－隠忍－」と呼んだ..." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -10864,7 +11068,7 @@ license:CC0
 	</software>
 
 	<software name="kirbyblcj" cloneof="kirbyblc">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Kirby no Block Ball (Japan)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -10889,7 +11093,7 @@ license:CC0
 	</software>
 
 	<software name="kirbykk">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Kirby no Kirakira Kids (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -10963,6 +11167,8 @@ license:CC0
 	</software>
 
 	<software name="kirby2">
+		<!--    USA version released as "dmg-akbe-0"    -->
+		<!--    Retail cartridge of USA version not yet secured -->
 		<description>Kirby's Dream Land 2 (Australia, Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -11146,7 +11352,7 @@ license:CC0
 	</software>
 
 	<software name="konamic1">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Konami GB Collection Vol.1 (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -11163,7 +11369,7 @@ license:CC0
 	</software>
 
 	<software name="konamic2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Konami GB Collection Vol.2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -11196,7 +11402,7 @@ license:CC0
 	</software>
 
 	<software name="konamic4">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Konami GB Collection Vol.4 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -11290,7 +11496,7 @@ license:CC0
 	</software>
 
 	<software name="konchuhk">
-		<description>Konchuu Hakase (Japan, Rev. 1)</description>
+		<description>Konchuu Hakase (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AKJJ-JPN" />
@@ -11300,7 +11506,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="konchuu hakase (japan) (rev a).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" />
+				<rom name="konchuu hakase (japan) (rev 1).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11599,7 +11805,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of the river king gb (usa).bin" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" />
+				<rom name="dmg-afhe-0.u1" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11607,14 +11813,15 @@ license:CC0
 	</software>
 
 	<software name="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev. 2)</description>
+		<!--    Region code "E" (USA)   -->
+		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev b).bin" size="524288" crc="34d08e7b" sha1="5ab63def958728933571c3b4f6af54db14f3f8b2" />
+				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev 2).bin" size="524288" crc="34d08e7b" sha1="5ab63def958728933571c3b4f6af54db14f3f8b2" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11622,14 +11829,15 @@ license:CC0
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev. 1)</description>
+		<!--    Region code "E" (USA)   -->
+		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-UKV, DMG-ZL-ESP-1, DMG-ZL-CAN" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev a).bin" size="524288" crc="7d1b6cd6" sha1="5259e68522225a7a830e29ea17dfddc33263ced5" />
+				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev 1).bin" size="524288" crc="7d1b6cd6" sha1="5259e68522225a7a830e29ea17dfddc33263ced5" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11637,6 +11845,7 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
+		<!--    Region code "E" (USA)   -->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -11657,9 +11866,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Bad dump? -->
 	<software name="zeldalnkc" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Canada)</description>
+		<description>The Legend of Zelda - Link's Awakening (Canada, French)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZC-CAN" />
@@ -11722,7 +11930,7 @@ license:CC0
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Europe, Rev. 1)</description>
+		<description>Lemmings (Europe, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-L8-NOE" />
@@ -11786,7 +11994,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="lemmings 2 - the tribes (europe).bin" size="524288" crc="9800bd49" sha1="76ccf9ac82faebc7f9c4a4c8b5cd47ddea46c486" />
+				<rom name="dmg-al2p-0.u1" size="524288" crc="9800bd49" sha1="76ccf9ac82faebc7f9c4a4c8b5cd47ddea46c486" />
 			</dataarea>
 		</part>
 	</software>
@@ -11944,7 +12152,7 @@ license:CC0
 		<publisher>Data East</publisher>
 		<info name="serial" value="DMG-LCA, DMG-LC-USA, DMG-LC-UKV, DMG-128 CHN" />
 		<info name="release" value="19900511 (JPN)" />
-		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)" />
+		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Japan Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found with DMG-BBA-02 -->
 			<feature name="u1" value="U1 PRG" />
@@ -12175,7 +12383,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="madden '97 (usa).bin" size="524288" crc="88a837a2" sha1="e1d92b6afdd7dc2254c895ad8a9a066262fb214b" />
+				<rom name="dmg-a7me-0.u1" size="524288" crc="88a837a2" sha1="e1d92b6afdd7dc2254c895ad8a9a066262fb214b" />
 			</dataarea>
 		</part>
 	</software>
@@ -12300,7 +12508,7 @@ license:CC0
 	</software>
 
 	<software name="saga" cloneof="ffantleg">
-		<description>Makai Toushi Sa-Ga (Japan, Rev. 1)</description>
+		<description>Makai Toushi Sa-Ga (Japan, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-SAJ" />
@@ -12628,7 +12836,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="maui mallard (usa).bin" size="262144" crc="6f30a43a" sha1="eb401c5ddff1488013ff032918ed365e82104ae0" />
+				<rom name="dmg-amie-0.u1" size="262144" crc="6f30a43a" sha1="eb401c5ddff1488013ff032918ed365e82104ae0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12682,8 +12890,8 @@ license:CC0
 	</software>
 
 	<software name="medakabu">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Medarot - Kabuto Version (Japan, Rev. 1)</description>
+		<!-- Notes: Also released by NP in 2000-03 -->
+		<description>Medarot - Kabuto Version (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMXJ-JPN" />
@@ -12707,7 +12915,7 @@ license:CC0
 	</software>
 
 	<software name="medakabua" cloneof="medakabu">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Medarot - Kabuto Version (Japan)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
@@ -12732,8 +12940,8 @@ license:CC0
 	</software>
 
 	<software name="medakuwa">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Medarot - Kuwagata Version (Japan, Rev. 1)</description>
+		<!-- Notes: Also released by NP in 2000-03 -->
+		<description>Medarot - Kuwagata Version (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMYJ-JPN" />
@@ -12757,7 +12965,7 @@ license:CC0
 	</software>
 
 	<software name="medakuwaa" cloneof="medakuwa">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Medarot - Kuwagata Version (Japan)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
@@ -12776,7 +12984,7 @@ license:CC0
 	</software>
 
 	<software name="medacol">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-12 -->
+		<!-- Notes: Also released by NP in 2000-12 -->
 		<description>Medarot - Parts Collection (Japan)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
@@ -13092,7 +13300,7 @@ license:CC0
 	</software>
 
 	<software name="metroid2">
-		<!-- Also released via the Nintendo Power service in 2000-03 (Jpn) -->
+		<!-- Also released via the Nintendo Power service in 2000-03 (Japan) -->
 		<description>Metroid II - Return of Samus (World)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -13212,6 +13420,20 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="mickey mouse v (japan).bin" size="131072" crc="44cd01dd" sha1="b8537bef22696feadf51343b6e1697370c4a8d5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickey5a" cloneof="mickeymw">
+		<description>Mickey Mouse V (Japan, Rev 1)</description>
+		<year>1993</year>
+		<publisher>Kemco</publisher>
+		<info name="serial" value="DMG-I5J?" />
+		<info name="alt_title" value="ミッキーマウスV 魔法のステッキ ~ Mickey Mouse V - Mahou no Stick (Box)" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-i5j-1.u1" size="131072" crc="464eaa5d" sha1="095285ec078124e3a4cbbfa3ac0d7680ee491e2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13623,7 +13845,7 @@ license:CC0
 	</software>
 
 	<software name="mogurany" cloneof="mole">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Moguranya (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -13734,7 +13956,7 @@ license:CC0
 	</software>
 
 	<software name="momoden2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Momotarou Dengeki 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
@@ -13768,7 +13990,7 @@ license:CC0
 	</software>
 
 	<software name="momojr">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-12 -->
+		<!-- Notes: Also released by NP in 2000-12 -->
 		<description>Momotarou Dentetsu Jr. - Zenkoku Ramen Meguri no Maki (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -13849,29 +14071,29 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Monster Maker requires Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards (all EAN-13):
-	    1 (fg up):
-	        9120153954577
-	    1 (fg down):
-	        9022038781998
-	    1 (bg up):
-	        9362462085911
-	    1 (bg down):
-	        9752412234900
-	    2 (fg up):
-	        9052091324955
-	    2 (fg down):
-	        9322158686716
-	    2 (bg up):
-	        9447410810323
-	    2 (bg down):
-	        9998017308336
-	Cards 3, 4 and 5 contains no barcodes.
-	-->
 	<software name="monstmkr">
+		<!--
+		Monster Maker requires Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards (all EAN-13):
+		    1 (fg up):
+		        9120153954577
+		    1 (fg down):
+		        9022038781998
+		    1 (bg up):
+		        9362462085911
+		    1 (bg down):
+		        9752412234900
+		    2 (fg up):
+		        9052091324955
+		    2 (fg down):
+		        9322158686716
+		    2 (bg up):
+		        9447410810323
+		    2 (bg down):
+		        9998017308336
+		Cards 3, 4 and 5 contains no barcodes.
+		-->
 		<description>Monster Maker (Japan)</description>
 		<year>1990</year>
 		<publisher>Sofel</publisher>
@@ -13888,29 +14110,29 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
-	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
-	It came bundled with the following barcode cards (all EAN-13):
-	    1 (fg up):
-	        9120153954577
-	    1 (fg down):
-	        9022038781998
-	    1 (bg up):
-	        9362462085911
-	    1 (bg down):
-	        9752412234900
-	    2 (fg up):
-	        9052091324955
-	    2 (fg down):
-	        9322158686716
-	    2 (bg up):
-	        9447410810323
-	    2 (bg down):
-	        9998017308336
-	Cards 3, 4 and 5 contains no barcodes.
-	-->
 	<software name="monstmkb" supported="no">
+		<!--
+		Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
+		The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+		It came bundled with the following barcode cards (all EAN-13):
+		    1 (fg up):
+		        9120153954577
+		    1 (fg down):
+		        9022038781998
+		    1 (bg up):
+		        9362462085911
+		    1 (bg down):
+		        9752412234900
+		    2 (fg up):
+		        9052091324955
+		    2 (fg down):
+		        9322158686716
+		    2 (bg up):
+		        9447410810323
+		    2 (bg down):
+		        9998017308336
+		Cards 3, 4 and 5 contains no barcodes.
+		-->
 		<description>Monster Maker - Barcode Saga (Japan)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
@@ -14182,7 +14404,7 @@ license:CC0
 	</software>
 
 	<software name="motoxman">
-		<description>Motocross Maniacs (Euro, re-release)</description>
+		<description>Motocross Maniacs (Europe, re-release)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-MX-NOE-1" />
@@ -14254,7 +14476,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="mr nutz (europe).bin" size="262144" crc="03b64a35" sha1="c3dc8fa1aebc92b07eacd6c78aece7c6dd33429d" />
+				<rom name="dmg-an8p-0.u1" size="262144" crc="03b64a35" sha1="c3dc8fa1aebc92b07eacd6c78aece7c6dd33429d" />
 			</dataarea>
 		</part>
 	</software>
@@ -14362,10 +14584,10 @@ license:CC0
 	</software>
 
 	<software name="mulan">
-		<description>Disney's Mulan (Europe, USA)</description>
+		<description>Disney's Mulan (Europe)</description>
 		<year>1998</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR, DMG-AMLP-EUR-1" />
+		<info name="serial" value="DMG-AMLP-EUR, DMG-AMLP-EUR-1" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
@@ -14374,6 +14596,20 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-amlp-0.u1" size="524288" crc="e285cf30" sha1="b039f13d7a4eac290ab2d0bf4a4a740cfc517959" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulanu" cloneof="mulan">
+		<description>Disney's Mulan (USA)</description>
+		<year>1998</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="DMG-AMLE-USA" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-amle-0.u1" size="524288" crc="bfcf71a1" sha1="7832fcc373ff752e757550079519b39583665c82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14584,7 +14820,7 @@ license:CC0
 	</software>
 
 	<software name="namcogl1">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Namco Gallery Vol.1 (Japan)</description>
 		<year>1996</year>
 		<publisher>Namco</publisher>
@@ -14617,7 +14853,7 @@ license:CC0
 	</software>
 
 	<software name="namcogl3">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Namco Gallery Vol.3 (Japan)</description>
 		<year>1997</year>
 		<publisher>Namco</publisher>
@@ -14816,12 +15052,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Nectaris supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-	-->
 	<software name="nectaris">
+		<!--
+		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		-->
 		<description>Nectaris GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -15016,7 +15252,7 @@ license:CC0
 	</software>
 
 	<software name="samspir">
-		<description>Nettou Samurai Spirits (China, Japan, Rev. 1)</description>
+		<description>Nettou Samurai Spirits (China, Japan, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-406 CHN, DMG-X4J" />
@@ -15110,8 +15346,8 @@ license:CC0
 	</software>
 
 	<software name="toshinj" cloneof="toshin">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Nettou Toushinden (Japan, Rev. 1)</description>
+		<!-- Notes: Also released by NP in 2000-03 -->
+		<description>Nettou Toushinden (Japan, Rev 1)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ATDJ-JPN" />
@@ -15121,13 +15357,13 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="nettou toushinden (japan) (rev a).bin" size="524288" crc="d5a6b132" sha1="5fd55a5d01817c770b251dbb9a0dc73a02d8c566" />
+				<rom name="nettou toushinden (japan) (rev 1).bin" size="524288" crc="d5a6b132" sha1="5fd55a5d01817c770b251dbb9a0dc73a02d8c566" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toshinja" cloneof="toshin">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Nettou Toushinden (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
@@ -15158,6 +15394,21 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-awjj-0.u1" size="524288" crc="0a12f53c" sha1="0dd04ca0ac61b449d3040587918b63d649fbbcc2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wh2ja" cloneof="wh2">
+		<description>Nettou World Heroes 2 Jet (Japan, Rev 1)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="DMG-AWJJ-JPN?" />
+		<info name="alt_title" value="熱闘ワールドヒーローズ2JET" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-awjj-1.u1" size="524288" crc="7c5ffe52" sha1="14bc507f479e814b0131febfab19f2ef30eb23a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15872,7 +16123,7 @@ license:CC0
 	</software>
 
 	<software name="othellow">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-05 -->
+		<!-- Notes: Also released by NP in 2000-05 -->
 		<description>Othello World (Japan)</description>
 		<year>1994</year>
 		<publisher>Tsukuda Original</publisher>
@@ -16004,7 +16255,21 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintimu" cloneof="pacintim">
+	<software name="pacintima">
+		<description>Pac-In-Time (Europe, Rev 1)</description>
+		<year>1995</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="DMG-APTP-?" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-aptp-1.u1" size="262144" crc="7ff79df9" sha1="f30108b8e422c4b9776c90c884710194508545ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacintimu" cloneof="pacintima">
 		<description>Pac-In-Time (USA)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -16021,7 +16286,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintimj" cloneof="pacintim">
+	<software name="pacintimj" cloneof="pacintima">
 		<description>Pac-In-Time (Japan)</description>
 		<year>1995</year>
 		<publisher>Namcot</publisher>
@@ -16037,7 +16302,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintim">
+	<software name="pacintim" cloneof="pacintima">
 		<description>Pac-In-Time (Europe)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -16071,6 +16336,7 @@ license:CC0
 	</software>
 
 	<software name="pacmanj" cloneof="pacman">
+		<!--    Region code "A" -->
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Pac-Man (Japan)</description>
 		<year>1990</year>
@@ -16488,7 +16754,7 @@ license:CC0
 	</software>
 
 	<software name="pang">
-		<description>Pang (Europe)</description>
+		<description>Pang (UK)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AG-NOE" />
@@ -16498,7 +16764,25 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-agx-0.u1" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" />
+				<rom name="dmg-agx-0.u1" size="131072" crc="ea9615b4" sha1="7ca64a45ea6a68770658ae39ef21c41f806988c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pangunk" cloneof="pang">
+		<!--    Old dump of unknown origin  -->
+		<!--    One different byte in the header, different padding at the end -->
+		<description>Pang (UK, bad dump?)</description>
+		<year>1993</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="DMG-AG-NOE" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="pang (uk).bin" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" />
 			</dataarea>
 		</part>
 	</software>
@@ -16823,8 +17107,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- is this a clone of pinbalfn? -->
 	<software name="pinbaldx">
+		<!--    Enhanced version of Pinball Fantasies with 3 extra tables   -->
 		<description>Pinball Deluxe (Europe)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -16860,7 +17144,7 @@ license:CC0
 		<description>Pinball Fantasies (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
-		<info name="serial" value="DMG-APFE-USA, DMG-APFP-EUR" />
+		<info name="serial" value="DMG-APFP-EUR, DMG-APFE-USA" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -17055,17 +17339,17 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="pocket bomberman (europe).bin" size="524288" crc="0fd1ae54" sha1="34f377a6de2961fe16bfb854e0cebc7fdba7cf4b" />
+				<rom name="dmg-akop-0.u1" size="524288" crc="0fd1ae54" sha1="34f377a6de2961fe16bfb854e0cebc7fdba7cf4b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!--
-	Pocket Bomberman (Jpn) supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-	-->
 	<software name="pockbmanj" cloneof="pockbman">
+		<!--
+		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		-->
 		<description>Pocket Bomberman (Japan)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -17105,12 +17389,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Pocket Family supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-	-->
 	<software name="pockfam">
+		<!--
+		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		-->
 		<description>Pocket Family (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -17258,7 +17542,7 @@ license:CC0
 	</software>
 
 	<software name="pokepika" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 3)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev 3)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -17282,7 +17566,7 @@ license:CC0
 	</software>
 
 	<software name="pokepikaa" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 2)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -17306,7 +17590,7 @@ license:CC0
 	</software>
 
 	<software name="pokepikab" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 1)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -17354,7 +17638,7 @@ license:CC0
 	</software>
 
 	<software name="pokeaka" cloneof="pokered">
-		<description>Pocket Monsters Aka (Japan, Rev. 1)</description>
+		<description>Pocket Monsters Aka (Japan, Rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAJ-JPN (G743404)" />
@@ -17420,7 +17704,7 @@ license:CC0
 	</software>
 
 	<software name="pokemido">
-		<description>Pocket Monsters Midori (Japan, Rev. 1)</description>
+		<description>Pocket Monsters Midori (Japan, Rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APBJ-JPN (G743412)" />
@@ -17461,7 +17745,25 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="poktpuyo">
+	<software name="poktpuyoa">
+		<!-- NP only -->
+		<!--    Planned for physical release?   -->
+		<description>Pocket Puyo Puyo Tsuu (Japan, Rev 1, NP)</description>
+		<year>1996</year>
+		<publisher>Compile</publisher>
+		<info name="serial" value="DMG-APYJ-JPN?" />
+		<info name="release" value="19961213" />
+		<info name="alt_title" value="ぽけっとぷよぷよ通" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-apyj-1.u1" size="262144" crc="cae8a317" sha1="36b677b76af12287cdbdec9ae06ca3f9dbfc1e67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poktpuyo" cloneof="poktpuyoa">
 		<description>Pocket Puyo Puyo Tsuu (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
@@ -17941,6 +18243,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="popeye2ja" cloneof="popeye2">
+		<description>Popeye 2 (Japan, Rev 1)</description>
+		<year>1991</year>
+		<publisher>Sigma</publisher>
+		<info name="serial" value="DMG-PGJ" />
+		<info name="release" value="19911122" />
+		<info name="alt_title" value="ポパイ2" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-pgj-1.u1" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popeye2u" cloneof="popeye2">
 		<description>Popeye 2 (USA)</description>
 		<year>1993</year>
@@ -17986,7 +18303,7 @@ license:CC0
 	</software>
 
 	<software name="powermisj" cloneof="powermis">
-		<description>Power Mission (Japan, Rev. 1)</description>
+		<description>Power Mission (Japan, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Vap</publisher>
 		<info name="serial" value="DMG-XCA" />
@@ -17995,7 +18312,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="power mission (japan) (rev a).bin" size="131072" crc="e30ef8ab" sha1="89b2306ad9c9e296884354ec3be039b944d52d13" />
+				<rom name="power mission (japan) (rev 1).bin" size="131072" crc="e30ef8ab" sha1="89b2306ad9c9e296884354ec3be039b944d52d13" />
 			</dataarea>
 		</part>
 	</software>
@@ -18032,7 +18349,7 @@ license:CC0
 	</software>
 
 	<software name="powerpro">
-		<description>Power Pro GB (Japan, Rev. 1)</description>
+		<description>Power Pro GB (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-APWJ-JPN (RK144-J1)" />
@@ -18042,7 +18359,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="power pro gb (japan) (rev a).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" />
+				<rom name="power pro gb (japan) (rev 1).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -18186,7 +18503,7 @@ license:CC0
 	</software>
 
 	<software name="mjkiwame">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Pro Mahjong Kiwame GB (Japan)</description>
 		<year>1994</year>
 		<publisher>Athena</publisher>
@@ -18232,7 +18549,6 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Does this have a battery?!? -->
 	<software name="proyak91">
 		<description>Higashio Osamu Kanshuu Pro Yakyuu Stadium '91 (Japan)</description>
 		<year>1991</year>
@@ -18250,7 +18566,7 @@ license:CC0
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-pij-0.u1" size="131072" crc="420881ae" sha1="cc6cbbcaabce4a63106da3c9b5e4a761511cae38" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="8192"> <!-- unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -18303,7 +18619,7 @@ license:CC0
 	</software>
 
 	<software name="probot2s" cloneof="probot2">
-		<description>Probotector 2 (Euro, Sample)</description>
+		<description>Probotector 2 (Europe, Sample)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -18357,8 +18673,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="purikura">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+	<software name="purikuraa">
+		<!-- NP only -->
+		<!--    Planned for physical release?   -->
+		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev 1, NP)</description>
+		<year>1997</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="DMG-APPJ-JPN?" />
+		<info name="alt_title" value="プリクラポケット 不完全女子高生マニュアル" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-appj-1.u1" size="524288" crc="57e9c17d" sha1="90929296b16d89130969041271327bcaa2b6a73e"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="purikura" cloneof="purikuraa">
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
@@ -18377,7 +18712,7 @@ license:CC0
 	</software>
 
 	<software name="purikur2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Purikura Pocket 2 - Kareshi Kaizou Daisakusen (Japan)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
@@ -18396,7 +18731,7 @@ license:CC0
 	</software>
 
 	<software name="purikur3">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Purikura Pocket 3 - Talent Debut Daisakusen (Japan)</description>
 		<year>1998</year>
 		<publisher>Atlus</publisher>
@@ -18415,7 +18750,7 @@ license:CC0
 	</software>
 
 	<software name="puyopuyo">
-		<description>Puyo Puyo (Japan, Rev. 1)</description>
+		<description>Puyo Puyo (Japan, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-QQJ" />
@@ -19255,7 +19590,7 @@ license:CC0
 	</software>
 
 	<software name="robocop">
-		<description>RoboCop (Europe, USA, Rev. 1)</description>
+		<description>RoboCop (Europe, USA, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-CP-FAH, DMG-CP-NOE, DMG-CP-USA" />
@@ -19450,7 +19785,7 @@ license:CC0
 	</software>
 
 	<software name="rockman5" cloneof="megaman5">
-		<!-- Notes: SGB enhanced, also released by NP in 2001-04 -->
+		<!-- Notes: Also released by NP in 2001-04 -->
 		<description>Rockman World 5 (Japan)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -19458,6 +19793,7 @@ license:CC0
 		<info name="release" value="19940722" />
 		<info name="alt_title" value="ロックマンワールド5" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="rockman world 5 (japan).bin" size="524288" crc="eeabd3c6" sha1="f3904d2069a888e45ca44878461324e4c2a8b03d" />
@@ -19496,7 +19832,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mvpbbj" cloneof="mvpbb">
+	<software name="mvpbbj" cloneof="mvpbba">
 		<description>Roger Clemens MVP Baseball (Japan)</description>
 		<year>1993</year>
 		<publisher>Acclaim Japan</publisher>
@@ -19511,8 +19847,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mvpbb">
-		<description>Roger Clemens MVP Baseball (USA)</description>
+	<software name="mvpbba">
+		<description>Roger Clemens' MVP Baseball (USA, Rev 1)</description>
+		<year>1992</year>
+		<publisher>LJN</publisher>
+		<info name="serial" value="DMG-VM-USA?" />
+		<info name="alt_title" value="Roger Clemens' MVP Baseball (Box)" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-vme-1.u1" size="262144" crc="fa955b39" sha1="678ea6ec765c467862be861d2c61fbb3a582c1f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mvpbb" cloneof="mvpbba">
+		<description>Roger Clemens' MVP Baseball (USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-VM-USA" />
@@ -19598,7 +19948,7 @@ license:CC0
 	</software>
 
 	<software name="saga2" cloneof="ffantlg2">
-		<description>Sa-Ga 2 - Hihou Densetsu (Japan, Rev. 1)</description>
+		<description>Sa-Ga 2 - Hihou Densetsu (Japan, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-S2J" />
@@ -19730,7 +20080,7 @@ license:CC0
 	</software>
 
 	<software name="samegame">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Same Game (Japan)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -19821,7 +20171,7 @@ license:CC0
 	</software>
 
 	<software name="sanrioup">
-		<description>Sanrio Uranai Party (Japan, Rev. 1)</description>
+		<description>Sanrio Uranai Party (Japan, Rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AG7J-JPN" />
@@ -20263,8 +20613,8 @@ license:CC0
 		<description>Shanghai Pocket (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-ASEJ?" />
-		<info name="release" value="19980806?" />
+		<info name="serial" value="DMG-ASEJ-JPN?"/>
+		<info name="release" value="19980806"/>
 		<info name="alt_title" value="上海 ポケット" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
@@ -20474,7 +20824,7 @@ license:CC0
 	</software>
 
 	<software name="shogisai">
-		<description>Shougi Saikyou (Japan, Rev. 1)</description>
+		<description>Shougi Saikyou (Japan, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Magical Company</publisher>
 		<info name="serial" value="DMG-AMSJ-JPN" />
@@ -20484,7 +20834,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="shougi saikyou (japan) (rev a).bin" size="262144" crc="a074bf7e" sha1="1c5a97aa3a09362c94fdd630456e5e59ae3af5fa" />
+				<rom name="shougi saikyou (japan) (rev 1).bin" size="262144" crc="a074bf7e" sha1="1c5a97aa3a09362c94fdd630456e5e59ae3af5fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -20712,7 +21062,7 @@ license:CC0
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Europe, USA, Rev. 1)</description>
+		<description>The Smurfs (Europe, USA, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-UF-FAH-1, DMG-UF-NOE-1, DMG-UF-USA)" />
@@ -20772,12 +21122,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- "Snoopy's Magic Show"? -->
 	<software name="snoopy">
 		<description>Snoopy - Magic Show (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-SN-ESP, DMG-SN-USA" />
+		<info name="alt_title" value="Snoopy's Magic Show" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -21064,7 +21414,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sokoban" cloneof="boxxle">
+	<software name="sokoban" cloneof="boxxlea">
 		<description>Soukoban (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
@@ -21109,9 +21459,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- is this really a clone of the 1994 release?? -->
 	<software name="spaceinvj" cloneof="spaceinv">
-		<!-- Notes: Also release by NP in 2000-03 -->
+		<!--    The 1994 release is technically an improved localization of this, since it shares its "SP" code -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Space Invaders (Japan)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -21318,11 +21668,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- how is this related to Splitz?? -->
-	<software name="uchiiwai">
+	<software name="uchiiwai" cloneof="splitz">
+		<!--    Reskinned version of Splitz, based on the manga Kyoudaijingi    -->
 		<description>Uchiiwai - Kyoudaijingi no Puzzle Game (Japan)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="DMG-AWNJ-?" />
+		<info name="alt_title" value="内祝　兄弟神技のパズルゲーム" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -21553,6 +21905,7 @@ license:CC0
 	</software>
 
 	<software name="stng">
+		<!--    Region code "E" (USA)   -->
 		<description>Star Trek - The Next Generation (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -21629,7 +21982,7 @@ license:CC0
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Europe, USA, Rev. 1)</description>
+		<description>Star Wars (Europe, USA, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WS-EUR, DMG-WS-USA-1" />
@@ -21736,7 +22089,7 @@ license:CC0
 	</software>
 
 	<software name="sf2j" cloneof="sf2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Street Fighter II (Japan)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
@@ -21753,7 +22106,7 @@ license:CC0
 	</software>
 
 	<software name="sf2">
-		<description>Street Fighter II (Europe, USA, Rev. 1)</description>
+		<description>Street Fighter II (Europe, USA, Rev 1)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA, DMG-ASFE-USA-1, DMG-ASFP-EUR, DMG-ASFP-NOE" />
@@ -21863,12 +22216,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	Super B-Daman - Fighting Phoenix supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-	-->
 	<software name="sbdaman">
+		<!--
+		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		-->
 		<description>Super B-Daman - Fighting Phoenix (Japan)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -22224,7 +22577,7 @@ license:CC0
 
 	<software name="sml">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land (World, Rev. 1)</description>
+		<description>Super Mario Land (World, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-101 CHN, DMG-MLA, DMG-ML-CAN, DMG-ML-ESP-1, DMG-ML-FAH, DMG-ML-ITA, DMG-ML-NOE, DMG-ML-UKV, DMG-ML-USA, DMG-ML-USA-1" />
@@ -22263,7 +22616,7 @@ license:CC0
 	</software>
 
 	<software name="sml2">
-		<description>Super Mario Land 2 - 6 Golden Coins (Australia, China, Europe, USA, Rev. 2)</description>
+		<description>Super Mario Land 2 - 6 Golden Coins (Australia, China, Europe, USA, Rev 2)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-401 CHN, DMG-MQ-AUS, DMG-MQ-EUR, DMG-MQ-UKV, DMG-MQ-USA, DMG-MQ-USA-1" />
@@ -22288,7 +22641,7 @@ license:CC0
 	</software>
 
 	<software name="sml2a" cloneof="sml2">
-		<description>Super Mario Land 2 - 6 Golden Coins (Europe, USA, Rev. 1)</description>
+		<description>Super Mario Land 2 - 6 Golden Coins (Europe, USA, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-ESP-1" />
@@ -22301,7 +22654,7 @@ license:CC0
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev a).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" />
+				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev 1).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -22331,7 +22684,7 @@ license:CC0
 
 	<software name="sml2j" cloneof="sml2">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev. 2)</description>
+		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev 2)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-L6J" />
@@ -22355,7 +22708,7 @@ license:CC0
 
 	<software name="sml2ja" cloneof="sml2">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev. 1)</description>
+		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-L6J" />
@@ -22618,6 +22971,21 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
+				<rom name="dmg-fqj-0.u1" size="262144" crc="7fe42a7f" sha1="40f1280c87918307ebc2a3f2ec1ce9b66ff9a67b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suzukif1unk" cloneof="suzukif1">
+		<!--    Old dump of unknown origin  -->
+		<!--    Possible prototype? -->
+		<description>Suzuki Aguri no F-1 Super Driving (Japan, prototype?)</description>
+		<year>1993</year>
+		<publisher>Logic</publisher>
+		<info name="alt_title" value="鈴木亜久里のF-1スーパードライビング" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
 				<rom name="suzuki aguri no f-1 super driving (japan).bin" size="262144" crc="e82692d9" sha1="98d0e39251413f2f3bf2f001c48ccf88f27190ba" />
 			</dataarea>
 		</part>
@@ -22705,7 +23073,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="sword of hope ii, the (usa).bin" size="262144" crc="5b7ff38c" sha1="3ccb37fd8e6e39a9e8421ee6f1ae199b4586afc1" />
+				<rom name="dmg-sie-0.u1" size="262144" crc="5b7ff38c" sha1="3ccb37fd8e6e39a9e8421ee6f1ae199b4586afc1" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -22874,8 +23242,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- is this a clone of goal too, or a real sequel to Jaleco J.Cup Soccer? -->
 	<software name="acestrik">
+		<!-- Is this a rebranded clone of Goal too or a sequel to Jaleco J.Cup Soccer, released half a year earlier? -->
 		<description>Takeda Nobuhiro no Ace Striker (Japan)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -23000,7 +23368,7 @@ license:CC0
 	</software>
 
 	<software name="tazdevl">
-		<description>Taz-Mania (Euro, USA, Sunsoft)</description>
+		<description>Taz-Mania (Europe, USA, Sunsoft)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-ZT-USA, DMG-ZT-NOE" />
@@ -23017,7 +23385,7 @@ license:CC0
 	</software>
 
 	<software name="tazmania">
-		<description>Taz-Mania (Euro, THQ)</description>
+		<description>Taz-Mania (Europe, THQ)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ZM-UKV" />
@@ -23037,7 +23405,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="taz-mania 2 (usa).bin" size="131072" crc="4ccb65e0" sha1="60116a304e85f04209dc7eb64d9649dc41c963f6" />
+				<rom name="dmg-atze-0.u1" size="131072" crc="4ccb65e0" sha1="60116a304e85f04209dc7eb64d9649dc41c963f6" />
 			</dataarea>
 		</part>
 	</software>
@@ -23111,6 +23479,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="teenage mutant hero turtles iii - radical rescue (europe).bin" size="131072" crc="9f3245f3" sha1="bd0aecb9b752eef5a9628ac9c649cad1efb8cb62" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnt3a" cloneof="tmnt3">
+		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="DMG-K8-UKV?" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-k8x-1.u1" size="131072" crc="5b7c9a54" sha1="5f01016c06c7d52bb434540b9ca327abe5039936"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23342,7 +23723,7 @@ license:CC0
 
 	<software name="tetris">
 		<!-- Also released via the Nintendo Power service in 2000-09 -->
-		<description>Tetris (World, Rev. 1)</description>
+		<description>Tetris (World, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-104 CHN, DMG-TRA, DMG-TR-AUS, DMG-TR-CAN, DMG-TR-ESP, DMG-TR-ESP-1, DMG-TR-EUR, DMG-TR-HKG, DMG-TR-NOE, DMG-TR-SCN-1, DMG-TR-UKV, DMG-TR-USA" />
@@ -23374,7 +23755,21 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetris2">
+	<software name="tetris2a">
+		<description>Tetris 2 (Europe, Rev 1)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmg-ehx-1.u1" size="131072" crc="25c3100a" sha1="51bdceed8fc384b593444a5306b6a46a4672c96b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris2" cloneof="tetris2a">
+		<!--    USA rerelease is a relabeled European cartridge?    -->
 		<description>Tetris 2 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23391,7 +23786,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetris2u" cloneof="tetris2">
+	<software name="tetris2u" cloneof="tetris2a">
+		<!--    Original USA-only release   -->
 		<description>Tetris 2 (USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23418,7 +23814,7 @@ license:CC0
 	</software>
 
 	<software name="tetrisat">
-		<description>Tetris Attack (Europe, USA, Rev. 1)</description>
+		<description>Tetris Attack (Europe, USA, Rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYLE-USA, DMG-AYLP-EUR" />
@@ -23446,7 +23842,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisfl" cloneof="tetris2">
+	<software name="tetrisfl" cloneof="tetris2a">
 		<description>Tetris Flash (Japan)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23517,11 +23913,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tintin">
-		<description>Tintin in Tibet (Europe)</description>
+	<software name="tintinx">
+		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
+		<info name="serial" value="DMG-AT6X-?"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-at6x-0.u1" size="262144" crc="7a7d820f" sha1="a69bee8c26a520b648a780c67e4a73d54e1bf812"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tintin" cloneof="tintinx">
+		<description>Tintin in Tibet (Europe, En / Fr / De / Nl)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="DMG-AT6P-?"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="tintin in tibet (europe) (en,fr,de,nl).bin" size="262144" crc="5d2bd778" sha1="8d8978fbd5a5634e2cce940122039d575e7b3646" />
@@ -23959,7 +24371,7 @@ license:CC0
 	</software>
 
 	<software name="toystoryu" cloneof="toystory">
-		<description>Disney's Toy Story (USA, Rev. 1)</description>
+		<description>Disney's Toy Story (USA, Rev 1)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA" />
@@ -23967,7 +24379,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="toy story (usa) (rev a).bin" size="524288" crc="6f36b6ed" sha1="04227fcd3e049465f4499fefe6519322ee492a82" />
+				<rom name="toy story (usa) (rev 1).bin" size="524288" crc="6f36b6ed" sha1="04227fcd3e049465f4499fefe6519322ee492a82" />
 			</dataarea>
 		</part>
 	</software>
@@ -24548,7 +24960,7 @@ license:CC0
 	</software>
 
 	<software name="uminus2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Umi no Nushi Tsuri 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -24907,7 +25319,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="water world (europe).bin" size="262144" crc="4786fd6e" sha1="e669d47b124a1e12d73f4ac80d8b4c0f917cb058" />
+				<rom name="dmg-awep-0.u1" size="262144" crc="4786fd6e" sha1="e669d47b124a1e12d73f4ac80d8b4c0f917cb058" />
 			</dataarea>
 		</part>
 	</software>
@@ -24956,7 +25368,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wereback">
+	<software name="wereback" cloneof="babytrex">
 		<description>We're Back! - A Dinosaur's Story (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -25392,7 +25804,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="worms (europe).bin" size="262144" crc="2ebc40c2" sha1="26137ca97b840c63a462bcf85677a5f3db67fadf" />
+				<rom name="dmg-aw3p-0.u1" size="262144" crc="2ebc40c2" sha1="26137ca97b840c63a462bcf85677a5f3db67fadf" />
 			</dataarea>
 		</part>
 	</software>
@@ -25520,7 +25932,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xj" cloneof="xu">
+	<software name="xj">
 		<description>X (Japan)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -25542,9 +25954,10 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xu">
-		<description>X (USA, prototype)</description>
-		<year>1992</year>
+	<software name="lunchasep" cloneof="xj">
+		<!--    Very early prototype with different gameplay    -->
+		<description>Lunar Chase (USA, prototype)</description>
+		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -25602,7 +26015,7 @@ license:CC0
 
 	<software name="yakuman">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Yakuman (Japan, Rev. 1)</description>
+		<description>Yakuman (Japan, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-MJJ" />
@@ -25738,7 +26151,7 @@ license:CC0
 	</software>
 
 	<software name="yossypnp" cloneof="tetrisat">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Yossy no Panepon (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -25876,16 +26289,15 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkj" cloneof="zeldalnk">
-		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev. 1)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZLJ, DMG-407 CHN" />
-		<info name="release" value="19930606" />
 		<info name="alt_title" value="ゼルダの伝説 夢をみる島" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="zelda no densetsu - yume o miru shima (japan) (rev a).bin" size="524288" crc="ea20b82a" sha1="80f5d111c7e2d79d39f6c25a37b54c3196d2bd12" />
+				<rom name="zelda no densetsu - yume o miru shima (japan) (rev 1).bin" size="524288" crc="ea20b82a" sha1="80f5d111c7e2d79d39f6c25a37b54c3196d2bd12" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -26072,6 +26484,10 @@ license:CC0
 		</part>
 	</software>
 
+<!--
+    List of pirate cartridges
+-->
+
 <!-- Sachen multi-carts -->
 
 	<software name="4in1_001">
@@ -26101,7 +26517,7 @@ license:CC0
 			<!-- TG-001 version has an epoxy blob ROM and an epoxy blob Sachen MMC1. -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
-				<rom name="mx27c512pc-70.u1" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" /> <!-- raal label: MX27C512PC-70 -->
+				<rom name="mx27c512pc-70.u1" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" /> <!-- real label: MX27C512PC-70 -->
 			</dataarea>
 		</part>
 	</software>
@@ -26219,111 +26635,6 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Other Asian pirate carts -->
-
-	<software name="smw7" cloneof="advisln2">
-		<description>Super Mario World 7 (China, ripped from 18 in 1 multicart)</description>
-		<year>1998</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="262144">
-				<rom name="super mario world 7 (unlicensed) (multicart rip).bin" size="262144" crc="aad1226e" sha1="0ee89297e9d24c1b4247765c8561a2cc90e383c9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockman8">
-		<description>Rockman 8 (China)</description>
-		<year>1999</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_rock8" />
-			<dataarea name="rom" size="262144">
-				<rom name="rockman 8 (hong kong) [p1].bin" size="262144" crc="cc131a94" sha1="496575adfb1296f2f99c00e06e5ca5ee4daf1a12" />
-			</dataarea>
-			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sml4" cloneof="crayon4">
-		<description>Super Mario Land 4 (China)</description>
-		<year>1997?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="131072">
-				<rom name="super mario land 4 (unl).bin" size="131072" crc="d9f3eb9f" sha1="f0da6eced7492bf51ae5575522cca58726c34feb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonic3d5">
-		<description>Sonic 3D Blast 5 (China)</description>
-		<year>1998</year>
-		<publisher>Yong Yong</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_yong" />
-			<dataarea name="rom" size="262144">
-				<rom name="sonic 3d blast 5 (unl).bin" size="262144" crc="5fed0068" sha1="1eb403ee2550106cbb2e3e1d0715b7c9bc07d6be" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonic6" cloneof="speedy">
-		<description>Sonic 6</description>
-		<year>1998?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="524288">
-				<rom name="sonic 6 (unl).bin" size="524288" crc="aa4e9379" sha1="5f70ee1a1265536c6ed3657bfd5e54516add287d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffant4" cloneof="ffantlg3">
-		<description>Final Fantasy 4 (China)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="524288">
-				<rom name="final fantasy 4 (unl).bin" size="524288" crc="a6b6e233" sha1="0968289212c4ed0a4fb77d1b31e8eaf8663e6ed7" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhzx">
-		<description>Meng Huan Zhi Xing (China, set 1)</description>
-		<year>19??</year>
-		<publisher>SKOB</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="262144">
-				<rom name="meng huan zhi xing (unl).bin" size="262144" crc="76fd8bc5" sha1="40bf296ee9d89a8c4e7bd8ca9f19cd4e449dfd6c" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhzxa" cloneof="mhzx">
-		<description>Meng Huan Zhi Xing (China, set 2)</description>
-		<year>19??</year>
-		<publisher>SKOB</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="262144">
-				<rom name="meng huan zhi xing (alt) (unl).bin" size="262144" crc="e498d751" sha1="726158dc176c82cf02b8838a672a5206b72ae9d8" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
 
 <!-- GOWIN games -->
 <!--
@@ -26471,14 +26782,108 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 
-	<software name="188in1" supported="partial">
-		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
-		<year>199?</year>
+<!-- Other Asian pirate carts -->
+
+	<software name="smw7" cloneof="advisln2">
+		<description>Super Mario World 7 (China, ripped from 18 in 1 multicart)</description>
+		<year>1998</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_188in1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="m29w640ft.u2" size="8388608" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="super mario world 7 (unlicensed) (multicart rip).bin" size="262144" crc="aad1226e" sha1="0ee89297e9d24c1b4247765c8561a2cc90e383c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman8">
+		<description>Rockman 8 (China)</description>
+		<year>1999</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_rock8" />
+			<dataarea name="rom" size="262144">
+				<rom name="rockman 8 (hong kong) [p1].bin" size="262144" crc="cc131a94" sha1="496575adfb1296f2f99c00e06e5ca5ee4daf1a12" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sml4" cloneof="crayon4">
+		<description>Super Mario Land 4 (China)</description>
+		<year>1997?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="super mario land 4 (unl).bin" size="131072" crc="d9f3eb9f" sha1="f0da6eced7492bf51ae5575522cca58726c34feb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic3d5">
+		<description>Sonic 3D Blast 5 (China)</description>
+		<year>1998</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_yong" />
+			<dataarea name="rom" size="262144">
+				<rom name="sonic 3d blast 5 (unl).bin" size="262144" crc="5fed0068" sha1="1eb403ee2550106cbb2e3e1d0715b7c9bc07d6be" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic6" cloneof="speedy">
+		<description>Sonic 6</description>
+		<year>1998?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="sonic 6 (unl).bin" size="524288" crc="aa4e9379" sha1="5f70ee1a1265536c6ed3657bfd5e54516add287d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffant4" cloneof="ffantlg3">
+		<description>Final Fantasy 4 (China)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="final fantasy 4 (unl).bin" size="524288" crc="a6b6e233" sha1="0968289212c4ed0a4fb77d1b31e8eaf8663e6ed7" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhzx">
+		<description>Meng Huan Zhi Xing (China, set 1)</description>
+		<year>19??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="262144">
+				<rom name="meng huan zhi xing (unl).bin" size="262144" crc="76fd8bc5" sha1="40bf296ee9d89a8c4e7bd8ca9f19cd4e449dfd6c" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhzxa" cloneof="mhzx">
+		<description>Meng Huan Zhi Xing (China, set 2)</description>
+		<year>19??</year>
+		<publisher>SKOB</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="262144">
+				<rom name="meng huan zhi xing (alt) (unl).bin" size="262144" crc="e498d751" sha1="726158dc176c82cf02b8838a672a5206b72ae9d8" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -26541,6 +26946,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="GBD-USA, GBD-EUR" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="MGB-MGBD-10" />
 			<feature name="u1" value="U1 [MAC-GBD 9808 SA]" />
 			<feature name="u2" value="U2 [MX23C8004-12]" />
@@ -26556,16 +26962,17 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="pockcam" cloneof="gboycam" supported="no">
-		<description>Pocket Camera (Japan, Rev. 1)</description>
+		<description>Pocket Camera (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="MGB-006" />
 		<info name="release" value="19980221" />
 		<info name="alt_title" value="ポケットカメラ" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_camera" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocket camera (japan) (rev a).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" />
+				<rom name="pocket camera (japan) (rev 1).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
@@ -26577,6 +26984,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_camera" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera gold (usa).bin" size="1048576" crc="a1a3f786" sha1="53a0dd6de3ebd0d3495f8bdc377ab08e5074c0ef" />
@@ -26586,14 +26994,14 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<!--
-	The game cart includes a real 200MHz fishing sonar (developed in cooperation with Honda Electronics).
-	There is a separated PCB labeled "HD0B220002" for the sonar components and a jack connector for attaching the
-	sonar (20 meters cable with its head on the other end).
-	There is a Game Boy prototype version (undumped) named "Handy Watcher", and also a WonderSwan version named "Handy Sonar".
-	It's a Nintendo officially licensed product from Bandai.
-	-->
 	<software name="pocksonr">
+		<!--
+		The game cart includes a real 200MHz fishing sonar (developed in cooperation with Honda Electronics).
+		There is a separated PCB labeled "HD0B220002" for the sonar components and a jack connector for attaching the
+		sonar (20 meters cable with its head on the other end).
+		There is a Game Boy prototype version (undumped) named "Handy Watcher", and also a WonderSwan version named "Handy Sonar".
+		It's a Nintendo officially licensed product from Bandai.
+		-->
 		<description>Pocket Sonar (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
@@ -26636,7 +27044,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<!-- There is official Game Boy flash cart where players could load official games on stores.
+	<!-- There's an official Game Boy flash cart where players could load official games on stores.
 	    pcb="DMG-A20-01"
 	    u1="G-MMC1 (MX15002) [MX15002UCA]"
 	    u2="8M-FLASH [29F008ATC-14]"

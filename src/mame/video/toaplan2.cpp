@@ -274,8 +274,8 @@ u32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			u16* src_vdp0 = &bitmap.pix16(y);
-			const u16* src_vdp1 = &m_secondary_render_bitmap.pix16(y);
+			u16 *const src_vdp0 = &bitmap.pix(y);
+			u16 const *const src_vdp1 = &m_secondary_render_bitmap.pix(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{

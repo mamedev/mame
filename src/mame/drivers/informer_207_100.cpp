@@ -108,7 +108,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( informer_207_100_state::crtc_addr )
 
 MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int x = 0; x < x_count; x++)
 	{
@@ -120,14 +120,14 @@ MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 			data = 0xff;
 
 		// draw 8 pixels of the character
-		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
-		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix32(y, x * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix32(y, x * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix32(y, x * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix32(y, x * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, x * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, x * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, x * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, x * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, x * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, x * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, x * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, x * 8 + 0) = pen[BIT(data, 7)];
 	}
 }
 
@@ -209,7 +209,7 @@ ROM_START( in207100 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	// 79496  REV 1.01  12-29-83
-	ROM_LOAD("79496.bin", 0x0000, 0x1000, CRC(930AC23A) SHA1(74e6bf81b60e3504cb2b9f14a33e7c3e367dc825))
+	ROM_LOAD("79496.bin", 0x0000, 0x1000, CRC(930ac23a) SHA1(74e6bf81b60e3504cb2b9f14a33e7c3e367dc825))
 ROM_END
 
 

@@ -311,25 +311,18 @@ void pc8801_state::video_start()
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int x,y,xi;
-	uint32_t count;
-	uint16_t y_size;
-	uint16_t y_double;
+	uint32_t count = 0;
 
-	count = 0;
+	uint16_t y_double = (pc8801_pixel_clock());
+	uint16_t y_size = (y_double+1) * 200;
 
-	y_double = (pc8801_pixel_clock());
-	y_size = (y_double+1) * 200;
-
-	for(y=0;y<y_size;y+=(y_double+1))
+	for(int y=0;y<y_size;y+=(y_double+1))
 	{
-		for(x=0;x<640;x+=8)
+		for(int x=0;x<640;x+=8)
 		{
-			for(xi=0;xi<8;xi++)
+			for(int xi=0;xi<8;xi++)
 			{
-				int pen;
-
-				pen = 0;
+				int pen = 0;
 
 				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
 				pen |= ((m_gvram[count+0x0000] >> (7-xi)) & 1) << 0;
@@ -339,15 +332,15 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				if(y_double)
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y+0, x+xi) = m_palette->pen(pen & 7);
+						bitmap.pix(y+0, x+xi) = m_palette->pen(pen & 7);
 
 					if(cliprect.contains(x+xi, y+1))
-						bitmap.pix16(y+1, x+xi) = m_palette->pen(pen & 7);
+						bitmap.pix(y+1, x+xi) = m_palette->pen(pen & 7);
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y, x+xi) = m_palette->pen(pen & 7);
+						bitmap.pix(y, x+xi) = m_palette->pen(pen & 7);
 				}
 			}
 
@@ -358,42 +351,35 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int x,y,xi;
-	uint32_t count;
-	uint8_t color;
-	uint8_t is_cursor;
+	uint32_t count = 0;
+	uint8_t color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
+	uint8_t is_cursor = 0;
 
-	count = 0;
-	color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
-	is_cursor = 0;
-
-	for(y=0;y<200;y++)
+	for(int y=0;y<200;y++)
 	{
-		for(x=0;x<640;x+=8)
+		for(int x=0;x<640;x+=8)
 		{
 			if(!(m_gfx_ctrl & 1))
 				is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
 
-			for(xi=0;xi<8;xi++)
+			for(int xi=0;xi<8;xi++)
 			{
-				int pen;
-
-				pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
+				int pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
 				if(is_cursor)
 					pen^=1;
 
 				if((m_gfx_ctrl & 1))
 				{
 					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix16(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
 
 					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix16(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = m_palette->pen(pen ? color : 0);
+						bitmap.pix(y, x+xi) = m_palette->pen(pen ? color : 0);
 				}
 			}
 
@@ -405,23 +391,21 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		count = 0;
 
-		for(y=200;y<400;y++)
+		for(int y=200;y<400;y++)
 		{
-			for(x=0;x<640;x+=8)
+			for(int x=0;x<640;x+=8)
 			{
 				if(!(m_gfx_ctrl & 1))
 					is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
 
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					int pen;
-
-					pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
+					int pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
 					if(is_cursor)
 						pen^=1;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = m_palette->pen(pen ? 7 : 0);
+						bitmap.pix(y, x+xi) = m_palette->pen(pen ? 7 : 0);
 				}
 
 				count++;
@@ -496,84 +480,73 @@ uint8_t pc8801_state::extract_text_attribute(uint32_t address,int x, uint8_t wid
 
 void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,uint8_t gfx_mode,uint8_t reverse,uint8_t secret,uint8_t blink,uint8_t upper,uint8_t lower,int y_size,int width, uint8_t non_special)
 {
-	int xi,yi;
 	uint8_t *vram = m_work_ram.get();
-	uint8_t is_cursor;
-	uint8_t y_height, y_double;
-	uint8_t y_step;
 
-	y_height = lines_per_char;
-	y_double = (pc8801_pixel_clock());
-	y_step = (non_special) ? 80 : 120; // trusted by Elthlead
-	is_cursor = 0;
+	uint8_t y_height = lines_per_char;
+	uint8_t y_double = (pc8801_pixel_clock());
+	uint8_t y_step = (non_special) ? 80 : 120; // trusted by Elthlead
+	uint8_t is_cursor = 0;
 
-	for(yi=0;yi<y_height;yi++)
+	for(int yi=0;yi<y_height;yi++)
 	{
 		if(m_gfx_ctrl & 1)
 			is_cursor = calc_cursor_pos(x,y,yi);
 
-		for(xi=0;xi<8;xi++)
+		for(int xi=0;xi<8;xi++)
 		{
-			int res_x,res_y;
-			int tile;
+			int tile = vram[x+(y*y_step)+m_dma_address[2]];
+
+			int res_x = x*8+xi*(width+1);
+			int res_y = y*y_height+yi;
+
+			if(!m_screen->visible_area().contains(res_x, res_y))
+				continue;
+
 			int color;
-
+			if(gfx_mode)
 			{
-				tile = vram[x+(y*y_step)+m_dma_address[2]];
+				uint8_t mask;
 
-				res_x = x*8+xi*(width+1);
-				res_y = y*y_height+yi;
+				mask = (xi & 4) ? 0x10 : 0x01;
+				mask <<= ((yi & (0x6 << y_double)) >> (1+y_double));
+				color = (tile & mask) ? pal : -1;
+			}
+			else
+			{
+				uint8_t blink_mask = 0;
+				if(blink && ((m_screen->frame_number() / blink_speed) & 3) == 1)
+					blink_mask = 1;
 
-				if(!m_screen->visible_area().contains(res_x, res_y))
-					continue;
-
-				if(gfx_mode)
-				{
-					uint8_t mask;
-
-					mask = (xi & 4) ? 0x10 : 0x01;
-					mask <<= ((yi & (0x6 << y_double)) >> (1+y_double));
-					color = (tile & mask) ? pal : -1;
-				}
+				uint8_t char_data;
+				if(yi >= (1 << (y_double+3)) || secret || blink_mask)
+					char_data = 0;
 				else
+					char_data = (m_cg_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
+
+				if(yi == 0 && upper)
+					char_data = 1;
+
+				if(yi == y_height && lower)
+					char_data = 1;
+
+				if(is_cursor)
+					char_data^=1;
+
+				if(reverse)
+					char_data^=1;
+
+				color = char_data ? pal : -1;
+			}
+
+			if(color != -1)
+			{
+				bitmap.pix(res_y, res_x) = m_palette->pen(color);
+				if(width)
 				{
-					uint8_t char_data;
-					uint8_t blink_mask;
+					if(!m_screen->visible_area().contains(res_x+1, res_y))
+						continue;
 
-					blink_mask = 0;
-					if(blink && ((m_screen->frame_number() / blink_speed) & 3) == 1)
-						blink_mask = 1;
-
-					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
-						char_data = 0;
-					else
-						char_data = (m_cg_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
-
-					if(yi == 0 && upper)
-						char_data = 1;
-
-					if(yi == y_height && lower)
-						char_data = 1;
-
-					if(is_cursor)
-						char_data^=1;
-
-					if(reverse)
-						char_data^=1;
-
-					color = char_data ? pal : -1;
-				}
-
-				if(color != -1)
-				{
-					bitmap.pix16(res_y, res_x) = m_palette->pen(color);
-					if(width)
-					{
-						if(!m_screen->visible_area().contains(res_x+1, res_y))
-							continue;
-
-						bitmap.pix16(res_y, res_x+1) = m_palette->pen(color);
-					}
+					bitmap.pix(res_y, res_x+1) = m_palette->pen(color);
 				}
 			}
 		}

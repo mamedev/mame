@@ -8,14 +8,6 @@
 #include "m740.h"
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// internal ROM region
-#define M5074X_INTERNAL_ROM_REGION "internal"
-#define M5074X_INTERNAL_ROM(_tag) (_tag ":" M5074X_INTERNAL_ROM_REGION)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -25,6 +17,7 @@ class m5074x_device :  public m740_device
 {
 	friend class m50740_device;
 	friend class m50741_device;
+	friend class m50753_device;
 
 	enum
 	{
@@ -57,7 +50,7 @@ public:
 
 protected:
 	// construction/destruction
-	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,10 +65,10 @@ protected:
 	void recalc_irqs();
 	void recalc_timer(int timer);
 
-	devcb_read8::array<4>  m_read_p;
-	devcb_write8::array<4> m_write_p;
+	devcb_read8::array<5>  m_read_p;
+	devcb_write8::array<5> m_write_p;
 
-	uint8_t m_ports[6], m_ddrs[6];
+	uint8_t m_ports[5], m_ddrs[5];
 	uint8_t m_intctrl, m_tmrctrl;
 	uint8_t m_tmr12pre, m_tmr1, m_tmr2, m_tmrxpre, m_tmrx;
 	uint8_t m_tmr1latch, m_tmr2latch, m_tmrxlatch;
@@ -90,9 +83,11 @@ class m50740_device : public m5074x_device
 public:
 	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void m50740_map(address_map &map);
 protected:
 	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	void m50740_map(address_map &map);
 };
 
 class m50741_device : public m5074x_device
@@ -100,12 +95,55 @@ class m50741_device : public m5074x_device
 public:
 	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void m50741_map(address_map &map);
 protected:
 	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	void m50741_map(address_map &map);
+};
+
+class m50753_device : public m5074x_device
+{
+public:
+	m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	enum
+	{
+		M50753_INT1_LINE = INPUT_LINE_IRQ0,
+		M50753_INT2_LINE = INPUT_LINE_IRQ1,
+
+		M5074X_SET_OVERFLOW = M740_SET_OVERFLOW
+	};
+
+	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
+
+protected:
+	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void execute_set_input(int inputnum, int state) override;
+
+private:
+	void m50753_map(address_map &map);
+
+	uint8_t ad_r();
+	void ad_start_w(uint8_t data);
+	uint8_t ad_control_r();
+	void ad_control_w(uint8_t data);
+	uint8_t pwm_control_r();
+	void pwm_control_w(uint8_t data);
+
+	devcb_read8::array<8> m_ad_in;
+
+	uint8_t m_ad_control;
+	bool m_pwm_enabled;
 };
 
 DECLARE_DEVICE_TYPE(M50740, m50740_device)
 DECLARE_DEVICE_TYPE(M50741, m50741_device)
+DECLARE_DEVICE_TYPE(M50753, m50753_device)
 
 #endif // MAME_CPU_M6502_M5074X_H

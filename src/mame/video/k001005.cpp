@@ -782,7 +782,7 @@ void k001005_renderer::render_polygons()
 				render_triangle(visarea, rd_scan_tex2d, 5, v[2], v[3], v[0]);
 			}
 		}
-		else if (cmd == 0x80000121 || cmd == 0x80000126)
+		else if (cmd == 0x80000106 || cmd == 0x80000121 || cmd == 0x80000126)
 		{
 			// no texture, color gouraud, Z
 
@@ -880,12 +880,11 @@ void k001005_renderer::render_polygons()
 
 void k001005_renderer::draw_scanline_2d(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb[m_fb_page]->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	uint32_t color = extradata.color;
-	int x;
 
-	for (x = extent.startx; x < extent.stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (color & 0xff000000)
 		{
@@ -906,8 +905,8 @@ void k001005_renderer::draw_scanline_2d_tex(int32_t scanline, const extent_t &ex
 	float v = extent.param[POLY_V].start;
 	float du = extent.param[POLY_U].dpdx;
 	float dv = extent.param[POLY_V].dpdx;
-	uint32_t *fb = &m_fb[m_fb_page]->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	uint32_t color = extradata.color;
 	int texture_mirror_x = extradata.texture_mirror_x;
 	int texture_mirror_y = extradata.texture_mirror_y;
@@ -949,8 +948,8 @@ void k001005_renderer::draw_scanline(int32_t scanline, const extent_t &extent, c
 	float dbri = extent.param[POLY_BRI].dpdx;
 	float fog = extent.param[POLY_FOG].start;
 	float dfog = extent.param[POLY_FOG].dpdx;
-	uint32_t *fb = &m_fb[m_fb_page]->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	uint32_t color = extradata.color;
 
 	int poly_light_r = extradata.light_r + extradata.ambient_r;
@@ -1039,8 +1038,8 @@ void k001005_renderer::draw_scanline_tex(int32_t scanline, const extent_t &exten
 	int poly_fog_g = extradata.fog_g;
 	int poly_fog_b = extradata.fog_b;
 
-	uint32_t *fb = &m_fb[m_fb_page]->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 
 	int *x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
 	int *y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
@@ -1113,8 +1112,8 @@ void k001005_renderer::draw_scanline_gouraud_blend(int32_t scanline, const exten
 	float db = extent.param[POLY_B].dpdx;
 	float a = extent.param[POLY_A].start;
 	float da = extent.param[POLY_A].dpdx;
-	uint32_t *fb = &m_fb[m_fb_page]->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb[m_fb_page]->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -1161,14 +1160,12 @@ void k001005_renderer::draw_scanline_gouraud_blend(int32_t scanline, const exten
 
 void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
-	for (j = cliprect.min_y; j <= cliprect.max_y; j++)
+	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
-		uint32_t *bmp = &bitmap.pix32(j);
-		uint32_t *src = &m_fb[m_fb_page^1]->pix32(j);
+		uint32_t *const bmp = &bitmap.pix(j);
+		uint32_t const *const src = &m_fb[m_fb_page^1]->pix(j);
 
-		for (i = cliprect.min_x; i <= cliprect.max_x; i++)
+		for (int i = cliprect.min_x; i <= cliprect.max_x; i++)
 		{
 			if (src[i] & 0xff000000)
 			{

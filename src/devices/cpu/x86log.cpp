@@ -37,7 +37,7 @@ x86log_context *x86log_create_context(const char *filename)
 	x86log_context *log;
 
 	/* allocate the log */
-	log = global_alloc_clear<x86log_context>();
+	log = new x86log_context;
 
 	/* allocate the filename */
 	log->filename.assign(filename);
@@ -59,7 +59,7 @@ void x86log_free_context(x86log_context *log) noexcept
 		fclose(log->file);
 
 	/* free the structure */
-	global_free(log);
+	delete log;
 }
 
 

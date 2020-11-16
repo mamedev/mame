@@ -206,7 +206,7 @@ HD44780_PIXEL_UPDATE( rz1_state::lcd_pixel_update )
 		return;
 
 	if (line < 1 && pos < 16)
-		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
 }
 
 uint8_t rz1_state::upd934g_c_data_r(offs_t offset)

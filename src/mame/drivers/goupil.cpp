@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
 MC6845_UPDATE_ROW(goupil_g2_state::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 	for (uint8_t x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = ( 0x400 + ( ma + x ) ) & 0x7FF;

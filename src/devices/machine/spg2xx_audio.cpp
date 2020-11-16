@@ -76,7 +76,7 @@ void spg2xx_audio_device::device_start()
 	m_audio_beat = timer_alloc(TIMER_BEAT);
 	m_audio_beat->adjust(attotime::never);
 
-	m_stream = stream_alloc_legacy(0, 2, 281250/4);
+	m_stream = stream_alloc(0, 2, 281250/4);
 
 	m_channel_debug = -1;
 
@@ -887,12 +887,12 @@ void spg2xx_audio_device::audio_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_audio_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void spg2xx_audio_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *out_l = outputs[0];
-	stream_sample_t *out_r = outputs[1];
+	auto &out_l = outputs[0];
+	auto &out_r = outputs[1];
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < out_l.samples(); i++)
 	{
 		int32_t left_total = 0;
 		int32_t right_total = 0;
@@ -992,8 +992,8 @@ void spg2xx_audio_device::sound_stream_update_legacy(sound_stream &stream, strea
 		int32_t left_final = (int16_t)((left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
 		int32_t right_final = (int16_t)((right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
 
-		*out_l++ = (int16_t)left_final;
-		*out_r++ = (int16_t)right_final;
+		out_l.put_int(i, int16_t(left_final), 32768);
+		out_r.put_int(i, int16_t(right_final), 32768);
 	}
 }
 

@@ -130,7 +130,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				else ressy = ycnt;
 
 				const u32 srcoffs = address + (ressy * xsize);
-				u16* dstptr = &m_sprite_bitmap.pix16(drawy);
+				u16 *const dstptr = &m_sprite_bitmap.pix(drawy);
 
 				for (int drawx = drawx_base, xcnt = srcx; (drawx <= cliprect.max_x) && (xcnt < xsize); xcnt++, drawx++)
 				{
@@ -184,7 +184,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				else ressy = ycnt;
 
 				const u32 srcoffs = address + (ressy * xsize);
-				u16* dstptr = &m_sprite_bitmap.pix16(drawy >> 8);
+				u16 *const dstptr = &m_sprite_bitmap.pix(drawy >> 8);
 
 				for (int drawx = drawx_base, xcnt = srcx; (drawx < scaled_cliprect.max_x) && (xcnt < xsize); xcnt++, drawx += zoomx)
 				{
@@ -204,17 +204,14 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 
 void tecmosys_state::tilemap_copy_to_compose(u16 pri, const rectangle &cliprect)
 {
-	int y,x;
-	u16 *srcptr;
-	u16 *dstptr;
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		srcptr = &m_tmp_tilemap_renderbitmap.pix16(y);
-		dstptr = &m_tmp_tilemap_composebitmap.pix16(y);
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		u16 const *const srcptr = &m_tmp_tilemap_renderbitmap.pix(y);
+		u16 *const dstptr = &m_tmp_tilemap_composebitmap.pix(y);
+		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
-				dstptr[x] =  (srcptr[x]&0x7ff) | pri;
+				dstptr[x] = (srcptr[x]&0x7ff) | pri;
 		}
 	}
 }
@@ -226,10 +223,10 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		u16 const *const srcptr = &m_tmp_tilemap_composebitmap.pix16(y);
-		u16 const *const srcptr2 = &m_sprite_bitmap.pix16(y);
+		u16 const *const srcptr = &m_tmp_tilemap_composebitmap.pix(y);
+		u16 const *const srcptr2 = &m_sprite_bitmap.pix(y);
 
-		u32 *const dstptr = &bitmap.pix32(y);
+		u32 *const dstptr = &bitmap.pix(y);
 		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			u16 const pri = srcptr[x] & 0xc000;

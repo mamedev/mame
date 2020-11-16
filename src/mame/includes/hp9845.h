@@ -63,6 +63,9 @@ protected:
 	required_device_array<hp9845_io_slot_device, 4> m_io_slot;
 	required_device<ram_device> m_ram;
 	output_finder<8> m_softkeys;
+	output_finder<> m_shift_lock_led;
+	output_finder<> m_prt_all_led;
+	output_finder<> m_auto_st_led;
 
 	void setup_ram_block(unsigned block , unsigned offset);
 

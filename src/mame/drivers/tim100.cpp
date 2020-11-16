@@ -118,11 +118,10 @@ GFXDECODE_END
 
 I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t pixels;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	for (uint8_t i = 0; i < 2; i++)
 	{
-		pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
+		uint8_t pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
 		if (vsp)
 			pixels = 0;
 
@@ -132,12 +131,12 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 		if (rvv)
 			pixels ^= 0xff;
 
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 7) ? (hlgt ? 2 : 1) : 0];
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 6) ? (hlgt ? 2 : 1) : 0];
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 5) ? (hlgt ? 2 : 1) : 0];
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 4) ? (hlgt ? 2 : 1) : 0];
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 3) ? (hlgt ? 2 : 1) : 0];
-		bitmap.pix32(y, x++) = palette[BIT(pixels, 2) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 7) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 6) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 5) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 4) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 3) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x++) = palette[BIT(pixels, 2) ? (hlgt ? 2 : 1) : 0];
 	}
 }
 

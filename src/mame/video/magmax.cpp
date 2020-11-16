@@ -145,7 +145,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					m_bitmap.pix16(v, h) = line_data[h];
+					m_bitmap.pix(v, h) = line_data[h];
 			}
 
 			if (m_flipscreen)

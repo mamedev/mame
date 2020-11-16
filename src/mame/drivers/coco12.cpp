@@ -42,7 +42,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
-#include "sound/volt_reg.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -443,12 +442,9 @@ void coco_state::coco_sound(machine_config &config)
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "sbs", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "sbs", -1.0, DAC_VREF_NEG_INPUT);
 
 	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 

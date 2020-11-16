@@ -15,7 +15,7 @@ xmlwf \- Determines if an XML document is well-formed
 \fBxmlwf\fR \kx
 .if (\nx>(\n(.l/2)) .nr x (\n(.l/5)
 'in \n(.iu+\nxu
-[\fB-s\fR] [\fB-n\fR] [\fB-p\fR] [\fB-x\fR] [\fB-e \fIencoding\fB\fR] [\fB-w\fR] [\fB-d \fIoutput-dir\fB\fR] [\fB-c\fR] [\fB-m\fR] [\fB-r\fR] [\fB-t\fR] [\fB-v\fR] [file ...]
+[\fB-s\fR] [\fB-n\fR] [\fB-p\fR] [\fB-x\fR] [\fB-e \fIencoding\fB\fR] [\fB-w\fR] [\fB-d \fIoutput-dir\fB\fR] [\fB-c\fR] [\fB-m\fR] [\fB-r\fR] [\fB-t\fR] [\fB-N\fR] [\fB-v\fR] [file ...]
 'in \n(.iu-\nxu
 .ad b
 'hy
@@ -71,15 +71,15 @@ If the input file is well-formed and \fBxmlwf\fR
 doesn't encounter any errors, the input file is simply copied to
 the output directory unchanged.
 This implies no namespaces (turns off \*(T<\fB\-n\fR\*(T>) and
-requires \*(T<\fB\-d\fR\*(T> to specify an output file.
+requires \*(T<\fB\-d\fR\*(T> to specify an output directory.
 .TP 
 \*(T<\fB\-d output\-dir\fR\*(T>
 Specifies a directory to contain transformed
 representations of the input files.
 By default, \*(T<\fB\-d\fR\*(T> outputs a canonical representation
 (described below).
-You can select different output formats using \*(T<\fB\-c\fR\*(T>
-and \*(T<\fB\-m\fR\*(T>.
+You can select different output formats using \*(T<\fB\-c\fR\*(T>,
+\*(T<\fB\-m\fR\*(T> and \*(T<\fB\-N\fR\*(T>.
 
 The output filenames will
 be exactly the same as the input filenames or "STDIN" if the input is
@@ -114,6 +114,11 @@ Requires \*(T<\fB\-d\fR\*(T> to specify an output file.
 \*(T<\fB\-n\fR\*(T>
 Turns on namespace processing. (describe namespaces)
 \*(T<\fB\-c\fR\*(T> disables namespaces.
+.TP 
+\*(T<\fB\-N\fR\*(T>
+Adds a doctype and notation declarations to canonical XML output.
+This matches the example output used by the formal XML test cases.
+Requires \*(T<\fB\-d\fR\*(T> to specify an output file.
 .TP 
 \*(T<\fB\-p\fR\*(T>
 Tells xmlwf to process external DTDs and parameter
@@ -177,12 +182,14 @@ data from outside the XML file currently being parsed.
 This is an example of an internal entity:
 
 .nf
+
 <!ENTITY vers '1.0.2'>
 .fi
 
 And here are some examples of external entities:
 
 .nf
+
 <!ENTITY header SYSTEM "header\-&vers;.xml">  (parsed)
 <!ENTITY logo SYSTEM "logo.png" PNG>         (unparsed)
 .fi
@@ -193,6 +200,7 @@ Terminates the list of options. This is only needed if a filename
 starts with a hyphen. For example:
 
 .nf
+
 xmlwf \-\- \-myfile.xml
 .fi
 
@@ -206,14 +214,21 @@ If an input file is not well-formed,
 \fBxmlwf\fR prints a single line describing
 the problem to standard output. If a file is well formed,
 \fBxmlwf\fR outputs nothing.
-Note that the result code is \fInot\fR set.
+.SH "EXIT STATUS"
+For option \*(T<\fB\-v\fR\*(T> or \*(T<\fB\-h\fR\*(T>, \fBxmlwf\fR always exits with status code 0. For other cases, the following exit status codes are returned:
+.TP 
+\*(T<\fB0\fR\*(T>
+The input files are well-formed.
+.TP 
+\*(T<\fB1\fR\*(T>
+An internal error occurred.
+.TP 
+\*(T<\fB2\fR\*(T>
+An input file was not well-formed or could not be parsed.
+.TP 
+\*(T<\fB3\fR\*(T>
+If using the \*(T<\fB\-d\fR\*(T> option, an error occurred opening an output file.
 .SH BUGS
-\fBxmlwf\fR returns a 0 - noerr result,
-even if the file is not well-formed. There is no good way for
-a program to use \fBxmlwf\fR to quickly
-check a file -- it must parse \fBxmlwf\fR's
-standard output.
-.PP
 The errors should go to standard error, not standard output.
 .PP
 There should be a way to get \*(T<\fB\-d\fR\*(T> to send its
@@ -228,6 +243,7 @@ me, I'd like to add this information to this manpage.
 Here are some XML validators on the web:
 
 .nf
+
 http://www.hcrc.ed.ac.uk/~richard/xml\-check.html
 http://www.stg.brown.edu/service/xmlvalid/
 http://www.scripting.com/frontier5/xml/code/xmlValidator.html
@@ -235,6 +251,7 @@ http://www.xml.com/pub/a/tools/ruwf/check.html
 .fi
 .SH "SEE ALSO"
 .nf
+
 The Expat home page:        http://www.libexpat.org/
 The W3 XML specification:   http://www.w3.org/TR/REC\-xml
 .fi

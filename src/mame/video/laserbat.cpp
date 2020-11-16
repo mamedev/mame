@@ -177,8 +177,8 @@ uint32_t laserbat_state_base::screen_update_laserbat(screen_device &screen, bitm
 
 	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
 	{
-		uint16_t const *const src = &m_bitmap.pix16(flip_y ? (offs_y - y) : y);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &m_bitmap.pix(flip_y ? (offs_y - y) : y);
+		uint16_t *dst = &bitmap.pix(y);
 		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
 		{
 			dst[x] = uint16_t(m_gfxmix->read(src[flip_x ? (offs_x - x) : x]));
@@ -223,7 +223,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	int const max_x = m_screen->visible_area().max_x;
 	int const x_offset = min_x - (8 * 3);
 	int const y_offset = m_screen->visible_area().min_y - 8;
-	uint16_t *const row = &m_bitmap.pix16(y);
+	uint16_t *const row = &m_bitmap.pix(y);
 
 	// wait for next scanline
 	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
@@ -241,9 +241,9 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		m_pvi[1]->render_next_line();
 		m_pvi[2]->render_next_line();
 	}
-	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix16(y);
-	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix16(y);
-	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix16(y);
+	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix(y);
+	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix(y);
+	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix(y);
 
 	// don't draw outside the visible area
 	m_bitmap.plot_box(0, y, m_bitmap.width(), 1, 0);

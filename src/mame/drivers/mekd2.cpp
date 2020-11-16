@@ -89,11 +89,6 @@ TODO
 class mekd2_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TRACE
-	};
-
 	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -101,6 +96,7 @@ public:
 		, m_pia_u(*this, "pia_u")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
+		, m_trace_timer(*this, "trace_timer")
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
@@ -115,10 +111,10 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(trace_timer);
 
 	void mem_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
 	uint8_t m_segment;
 	uint8_t m_digit;
@@ -131,6 +127,7 @@ private:
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
+	required_device<timer_device> m_trace_timer;
 	output_finder<6> m_digits;
 };
 
@@ -203,16 +200,9 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::trace_timer)
 {
-	switch (id)
-	{
-	case TIMER_TRACE:
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mekd2_state::device_timer");
-	}
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -221,7 +211,7 @@ WRITE_LINE_MEMBER( mekd2_state::nmi_w )
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		timer_set(attotime::from_usec(18), TIMER_TRACE);
+		m_trace_timer->adjust(attotime::from_usec(18));
 }
 
 
@@ -406,6 +396,7 @@ void mekd2_state::mekd2(machine_config &config)
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(mekd2_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd2_state::kansas_r), attotime::from_hz(40000));
+	TIMER(config, m_trace_timer).configure_generic(FUNC(mekd2_state::trace_timer));
 
 	QUICKLOAD(config, "quickload", "d2", attotime::from_seconds(1)).set_load_callback(FUNC(mekd2_state::quickload_cb));
 }

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+#include "mz_cas.h"
+
 #include <cstring>
 #include <cassert>
-#include "mz_cas.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -301,7 +302,7 @@ static int fill_wave(int16_t *buffer, int length, uint8_t *code)
 
 
 
-static const struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller mz700_legacy_fill_wave =
 {
 	fill_wave,                  /* fill_wave */
 	1,                          /* chunk_size */
@@ -314,21 +315,21 @@ static const struct CassetteLegacyWaveFiller mz700_legacy_fill_wave =
 
 
 
-static cassette_image::error mz700_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error mz700_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &mz700_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &mz700_legacy_fill_wave);
 }
 
 
 
 static cassette_image::error mz700_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &mz700_legacy_fill_wave);
+	return cassette->legacy_construct(&mz700_legacy_fill_wave);
 }
 
 
 
-static const struct CassetteFormat mz700_cas_format =
+static const cassette_image::Format mz700_cas_format =
 {
 	"m12,mzf,mzt",
 	mz700_cas_identify,

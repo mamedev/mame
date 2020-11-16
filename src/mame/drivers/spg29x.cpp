@@ -245,8 +245,8 @@ uint32_t spg29x_game_state::spg290_screen_update(screen_device &screen, bitmap_r
 		for (int y=0; y <= cliprect.max_y; y++)
 			for (int x=0; x <= cliprect.max_x; x++)
 			{
-				auto pix = rgb_t(bitmap.pix32(y, x));
-				bitmap.pix32(y, x) = rgb_t(pix.r() * fade_offset / 255, pix.g() * fade_offset / 255, pix.b() * fade_offset / 255);
+				rgb_t pix(bitmap.pix(y, x));
+				bitmap.pix(y, x) = rgb_t(pix.r() * fade_offset / 255, pix.g() * fade_offset / 255, pix.b() * fade_offset / 255);
 			}
 	}
 

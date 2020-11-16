@@ -76,15 +76,14 @@ void tvgame_state::speaker_w(uint8_t data)
 
 uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,gfx;
-	uint16_t sy=0,ma=241,x;
+	uint16_t sy=0,ma=241;
 
-	for (y = 0; y < 213; y++)
+	for (uint8_t y = 0; y < 213; y++)
 	{
-		uint16_t *p = &bitmap.pix16(sy++);
-		for (x = ma; x < ma+27; x++)
+		uint16_t *p = &bitmap.pix(sy++);
+		for (uint16_t x = ma; x < ma+27; x++)
 		{
-			gfx = m_p_videoram[x];
+			uint8_t gfx = m_p_videoram[x];
 
 			/* Display a scanline of a character (8 pixels) */
 			*p++ = BIT(gfx, 0);

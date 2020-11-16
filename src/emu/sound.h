@@ -576,10 +576,7 @@ private:
 };
 
 
-// ======================> stream_update_legacy_delegate/stream_update_delegate
-
-// old-style callback; eventually should be deprecated
-using stream_update_legacy_delegate = delegate<void (sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)>;
+// ======================> stream_update_delegate
 
 // new-style callback
 using stream_update_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)>;
@@ -614,7 +611,6 @@ class sound_stream
 
 public:
 	// construction/destruction
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
 	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
 	virtual ~sound_stream();
 
@@ -680,9 +676,6 @@ private:
 	// timer callback for synchronous streams
 	void sync_update(void *, s32);
 
-	// new callback which wrapps calls through to the old-style callbacks
-	void stream_update_legacy(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
-
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);
 
@@ -702,7 +695,6 @@ private:
 
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
-	std::vector<stream_sample_t *> m_input_array;  // array of inputs for passing to the callback
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
 	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
 	stream_buffer m_empty_buffer;                  // empty buffer for invalid inputs
@@ -710,12 +702,10 @@ private:
 	// output information
 	u32 m_output_base;                             // base index of our outputs, relative to our device
 	std::vector<sound_stream_output> m_output;     // list of streams which directly depend upon us
-	std::vector<stream_sample_t *> m_output_array; // array of outputs for passing to the callback
 	std::vector<write_stream_view> m_output_view;  // array of output views for passing to the callback
 
 	// callback information
-	stream_update_legacy_delegate m_callback;             // callback function
-	stream_update_delegate m_callback_ex;       // extended callback function
+	stream_update_delegate m_callback_ex;          // extended callback function
 };
 
 
@@ -773,9 +763,6 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
-
-	// allocate a new stream with the old-style callback
-	sound_stream *stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback);
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);

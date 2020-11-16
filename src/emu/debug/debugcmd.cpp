@@ -650,12 +650,12 @@ bool debugger_commands::debug_command_parameter_command(const char *param)
 
 	/* validate the comment; success if no error */
 	CMDERR err = m_console.validate_command(param);
-	if (err == CMDERR_NONE)
+	if (err.error_class() == CMDERR::NONE)
 		return true;
 
 	/* output an error */
 	m_console.printf("Error in command: %s\n", param);
-	m_console.printf("                  %*s^", CMDERR_ERROR_OFFSET(err), "");
+	m_console.printf("                  %*s^", err.error_offset(), "");
 	m_console.printf("%s\n", debugger_console::cmderr_to_string(err));
 	return 0;
 }

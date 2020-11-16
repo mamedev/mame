@@ -10,38 +10,44 @@
 
 #include "emu.h"
 #include "mame.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "pluginopts.h"
-#include "osdepend.h"
-#include "validity.h"
-#include "clifront.h"
-#include "luaengine.h"
-#include <ctime>
-#include "ui/ui.h"
+
+#include "ui/inifile.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
+#include "ui/ui.h"
+
 #include "cheat.h"
-#include "ui/inifile.h"
+#include "clifront.h"
+#include "emuopts.h"
+#include "luaengine.h"
+#include "mameopts.h"
+#include "pluginopts.h"
+#include "validity.h"
+
 #include "xmlfile.h"
+
+#include "osdepend.h"
+
+#include <ctime>
+
 
 //**************************************************************************
 //  MACHINE MANAGER
 //**************************************************************************
 
-mame_machine_manager* mame_machine_manager::m_manager = nullptr;
+mame_machine_manager *mame_machine_manager::s_manager = nullptr;
 
 mame_machine_manager* mame_machine_manager::instance(emu_options &options, osd_interface &osd)
 {
-	if (!m_manager)
-		m_manager = global_alloc(mame_machine_manager(options, osd));
+	if (!s_manager)
+		s_manager = new mame_machine_manager(options, osd);
 
-	return m_manager;
+	return s_manager;
 }
 
 mame_machine_manager* mame_machine_manager::instance()
 {
-	return m_manager;
+	return s_manager;
 }
 
 //-------------------------------------------------
@@ -51,7 +57,7 @@ mame_machine_manager* mame_machine_manager::instance()
 mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &osd) :
 	machine_manager(options, osd),
 	m_plugins(std::make_unique<plugin_options>()),
-	m_lua(global_alloc(lua_engine)),
+	m_lua(std::make_unique<lua_engine>()),
 	m_new_driver_pending(nullptr),
 	m_firstrun(true),
 	m_autoboot_timer(nullptr)
@@ -65,8 +71,8 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
-	global_free(m_lua);
-	m_manager = nullptr;
+	m_lua.reset();
+	s_manager = nullptr;
 }
 
 
@@ -261,9 +267,9 @@ int mame_machine_manager::execute()
 
 #if defined(__LIBRETRO__)
 
-		retro_global_config= global_alloc(machine_config(*system, m_options));
+		retro_global_config = new machine_config(*system, m_options);
 
-	        retro_global_machine=global_alloc(running_machine(*retro_global_config, *this));
+		retro_global_machine = new running_machine(*retro_global_config, *this);
 
 		set_machine(&(*retro_global_machine));
 
@@ -337,10 +343,10 @@ void mame_machine_manager::mmchange()
  
 void free_machineconfig(){
 
-		global_free(retro_global_machine);
-		global_free(retro_global_config);
+	delete retro_global_machine;
+	delete retro_global_config;
 
-		retro_manager->set_machine(nullptr);
+	retro_manager->set_machine(nullptr);
 }
 
 extern void free_man();
@@ -372,8 +378,8 @@ void retro_main_loop()
 		else{ 
 			RLOOP=0;
 			
-			global_free(retro_global_machine);
-			global_free(retro_global_config);
+			delete retro_global_machine;
+			delete retro_global_config;
 			retro_manager->set_machine(nullptr);
 
 			printf("exit scope, restart empty driver\n");

@@ -375,7 +375,7 @@ void cdp1864_device::dma_w(uint8_t data)
 			color = (gdata << 2) | (bdata << 1) | rdata;
 		}
 
-		m_bitmap.pix32(y, sx + x) = m_palette[color];
+		m_bitmap.pix(y, sx + x) = m_palette[color];
 
 		data <<= 1;
 	}

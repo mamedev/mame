@@ -14,10 +14,9 @@
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 uint32_t trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,gfxbit;
-	uint16_t sy=0,ma=0,x;
-	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
-	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	uint16_t sy=0,ma=0;
+	uint8_t const cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t const skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -25,19 +24,19 @@ uint32_t trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &b
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	for (uint8_t y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (uint8_t ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x+=skip)
+			for (uint16_t x = ma; x < ma + 64; x+=skip)
 			{
-				chr = m_p_videoram[x];
+				uint8_t chr = m_p_videoram[x];
 
 				if (chr & 0x80)
 				{
-					gfxbit = (ra & 0x0c)>>1;
+					uint8_t gfxbit = (ra & 0x0c)>>1;
 					/* Display one line of a lores character (6 pixels) */
 					*p++ = BIT(chr, gfxbit);
 					*p++ = BIT(chr, gfxbit);
@@ -52,6 +51,7 @@ uint32_t trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &b
 					if (BIT(m_mode, 1) & (chr < 32)) chr+=64;
 
 					// if g,j,p,q,y; lower the descender
+					uint8_t gfx;
 					if ((chr==0x2c)||(chr==0x3b)||(chr==0x67)||(chr==0x6a)||(chr==0x70)||(chr==0x71)||(chr==0x79))
 					{
 						if ((ra < 10) && (ra > 1))
@@ -86,10 +86,9 @@ uint32_t trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &b
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 uint32_t trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,gfxbit;
-	uint16_t sy=0,ma=0,x;
-	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
-	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	uint16_t sy=0,ma=0;
+	uint8_t const cols = BIT(m_mode, 0) ? 32 : 64;
+	uint8_t const skip = BIT(m_mode, 0) ? 2 : 1;
 
 	if (m_mode != m_size_store)
 	{
@@ -97,19 +96,19 @@ uint32_t trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	for (uint8_t y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (uint8_t ra = 0; ra < 12; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x+=skip)
+			for (uint16_t x = ma; x < ma + 64; x+=skip)
 			{
-				chr = m_p_videoram[x];
+				uint8_t chr = m_p_videoram[x];
 
 				if (chr & 0x80)
 				{
-					gfxbit = (ra & 0x0c)>>1;
+					uint8_t gfxbit = (ra & 0x0c)>>1;
 					/* Display one line of a lores character (6 pixels) */
 					*p++ = BIT(chr, gfxbit);
 					*p++ = BIT(chr, gfxbit);
@@ -124,7 +123,7 @@ uint32_t trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 
 					if (BIT(m_mode, 1) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<4) | ra ];
+					uint8_t gfx = m_p_chargen[(chr<<4) | ra ];
 
 					/* Display a scanline of a character (6 pixels) */
 					*p++ = BIT(gfx, 7);
@@ -145,8 +144,7 @@ uint32_t trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 
 uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const uint16_t rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
-	uint8_t chr,gfx,gfxbit,bg=7,fg=0;
-	uint16_t sy=0,ma=0,x,y,ra;
+	uint16_t sy=0,ma=0;
 	uint8_t cols = BIT(m_lnw_mode, 1) ? 80 : 64;
 
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
@@ -156,6 +154,7 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
+	uint8_t bg=7,fg=0;
 	if (BIT(m_lnw_mode, 1))
 	{
 		bg = 0;
@@ -165,19 +164,19 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 	switch (m_lnw_mode & 0x06)
 	{
 		case 0:                 // MODE 0
-			for (y = 0; y < 16; y++)
+			for (uint16_t y = 0; y < 16; y++)
 			{
-				for (ra = 0; ra < 12; ra++)
+				for (uint16_t ra = 0; ra < 12; ra++)
 				{
-					uint16_t *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix(sy++);
 
-					for (x = ma; x < ma + 64; x++)
+					for (uint16_t x = ma; x < ma + 64; x++)
 					{
-						chr = m_p_videoram[x];
+						uint8_t chr = m_p_videoram[x];
 
 						if (chr & 0x80)
 						{
-							gfxbit = (ra & 0x0c)>>1;
+							uint8_t gfxbit = (ra & 0x0c)>>1;
 							/* Display one line of a lores character (6 pixels) */
 							*p++ = BIT(chr, gfxbit) ? fg : bg;
 							*p++ = BIT(chr, gfxbit) ? fg : bg;
@@ -190,6 +189,7 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 						else
 						{
 							/* get pattern of pixels for that character scanline */
+							uint8_t gfx;
 							if (ra < 8)
 								gfx = m_p_chargen[(chr<<1) | rows[ra] ];
 							else
@@ -210,15 +210,15 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 			break;
 
 		case 0x02:                  // MODE 1
-			for (y = 0; y < 0x400; y+=0x40)
+			for (uint16_t y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0; ra < 0x3000; ra+=0x400)
+				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix(sy++);
 
-					for (x = 0; x < 0x40; x++)
+					for (uint16_t x = 0; x < 0x40; x++)
 					{
-						gfx = m_p_gfxram[ y | x | ra];
+						uint8_t gfx = m_p_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
@@ -228,9 +228,9 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 						*p++ = BIT(gfx, 5) ? fg : bg;
 					}
 
-					for (x = 0; x < 0x10; x++)
+					for (uint16_t x = 0; x < 0x10; x++)
 					{
-						gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						uint8_t gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						/* Display 6 pixels in extended region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
@@ -246,15 +246,15 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 		case 0x04:                  // MODE 2
 			/* it seems the text video ram can have an effect in this mode,
 			    not explained clearly, so not emulated */
-			for (y = 0; y < 0x400; y+=0x40)
+			for (uint16_t y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0; ra < 0x3000; ra+=0x400)
+				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix(sy++);
 
-					for (x = 0; x < 0x40; x++)
+					for (uint16_t x = 0; x < 0x40; x++)
 					{
-						gfx = m_p_gfxram[ y | x | ra];
+						uint8_t gfx = m_p_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						fg = (gfx & 0x38) >> 3;
 						*p++ = fg;
@@ -273,15 +273,15 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 			/* the manual does not explain at all how colour is determined
 			    for the extended area. Further, the background colour
 			    is not mentioned anywhere. Black is assumed. */
-			for (y = 0; y < 0x400; y+=0x40)
+			for (uint16_t y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0; ra < 0x3000; ra+=0x400)
+				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix16(sy++);
+					uint16_t *p = &bitmap.pix(sy++);
 
-					for (x = 0; x < 0x40; x++)
+					for (uint16_t x = 0; x < 0x40; x++)
 					{
-						gfx = m_p_gfxram[ y | x | ra];
+						uint8_t gfx = m_p_gfxram[ y | x | ra];
 						fg = (m_p_videoram[ x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in normal region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
@@ -293,9 +293,9 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 						*p++ = BIT(gfx, 5) ? fg : bg;
 					}
 
-					for (x = 0; x < 0x10; x++)
+					for (uint16_t x = 0; x < 0x10; x++)
 					{
-						gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						uint8_t gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						fg = (m_p_gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
 						/* Display 6 pixels in extended region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
@@ -316,8 +316,7 @@ uint32_t trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &b
 /* lores characters are in the character generator. Each character is 8x16. */
 uint32_t trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
 	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
 
@@ -327,18 +326,18 @@ uint32_t trs80_state::screen_update_radionic(screen_device &screen, bitmap_ind16
 		screen.set_visible_area(0, cols*8-1, 0, 16*16-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	for (uint8_t y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 16; ra++)
+		for (uint8_t ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x+=skip)
+			for (uint16_t x = ma; x < ma + 64; x+=skip)
 			{
-				chr = m_p_videoram[x];
+				uint8_t chr = m_p_videoram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
+				uint8_t gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 0);

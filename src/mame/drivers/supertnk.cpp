@@ -281,12 +281,8 @@ WRITE_LINE_MEMBER(supertnk_state::bitplane_select_1_w)
 
 uint32_t supertnk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 
@@ -294,16 +290,16 @@ uint32_t supertnk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		uint8_t data1 = m_videoram[1][offs];
 		uint8_t data2 = m_videoram[2][offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			uint8_t color = ((data0 & 0x80) >> 5) | ((data1 & 0x80) >> 6) | ((data2 & 0x80) >> 7);
-			bitmap.pix32(y, x) = m_pens[color];
+			bitmap.pix(y, x) = m_pens[color];
 
-			data0 = data0 << 1;
-			data1 = data1 << 1;
-			data2 = data2 << 1;
+			data0 <<= 1;
+			data1 <<= 1;
+			data2 <<= 1;
 
-			x = x + 1;
+			x++;
 		}
 	}
 

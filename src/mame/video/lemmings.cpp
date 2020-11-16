@@ -68,22 +68,20 @@ WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
 // RAM based
 void lemmings_state::lemmings_pixel_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int sx, sy, src, old;
-
-	old = m_pixel_data[0][offset];
+	int const old = m_pixel_data[0][offset];
 	COMBINE_DATA(&m_pixel_data[0][offset]);
-	src = m_pixel_data[0][offset];
+	int const src = m_pixel_data[0][offset];
 	if (old == src)
 		return;
 
-	sy = (offset << 1) >> 11;
-	sx = (offset << 1) & 0x7ff;
+	int const sy = (offset << 1) >> 11;
+	int const sx = (offset << 1) & 0x7ff;
 
 	if (sx > 2047 || sy > 255)
 		return;
 
-	m_bitmap0.pix16(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
-	m_bitmap0.pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
+	m_bitmap0.pix(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
+	m_bitmap0.pix(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
 }
 
 // RAM based tiles for the FG tilemap
@@ -115,16 +113,15 @@ void lemmings_state::lemmings_vram_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
-	int y,x;
-	const pen_t *paldata = m_palette->pens();
+	pen_t const *const paldata = m_palette->pens();
 
-	for (y=cliprect.top(); y<cliprect.bottom();y++)
+	for (int y=cliprect.top(); y<cliprect.bottom();y++)
 	{
-		uint32_t* dst = &bitmap.pix32(y,0);
+		uint32_t *const dst = &bitmap.pix(y,0);
 
-		for (x=cliprect.left(); x<cliprect.right();x++)
+		for (int x=cliprect.left(); x<cliprect.right();x++)
 		{
-			uint16_t src = m_bitmap0.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
+			uint16_t const src = m_bitmap0.pix((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
 			if (src!=0x100)
 				dst[x] = paldata[src];

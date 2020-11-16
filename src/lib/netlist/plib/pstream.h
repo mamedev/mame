@@ -64,7 +64,7 @@ namespace plib {
 		}
 		istream_uptr(const istream_uptr &) = delete;
 		istream_uptr &operator=(const istream_uptr &) = delete;
-		istream_uptr(istream_uptr &&rhs)
+		istream_uptr(istream_uptr &&rhs) noexcept
 		{
 			m_strm = std::move(rhs.m_strm);
 			m_filename = std::move(rhs.m_filename);

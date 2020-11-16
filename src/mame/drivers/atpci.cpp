@@ -155,7 +155,6 @@ void at586_state::at586x3(machine_config &config)
 }
 
 static INPUT_PORTS_START(at586m55)
-	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
 void at586_state::at586m55(machine_config &config)

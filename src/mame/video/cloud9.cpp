@@ -223,22 +223,21 @@ void cloud9_state::cloud9_bitmode_addr_w(offs_t offset, uint8_t data)
 
 uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteaddr = m_spriteram;
-	int flip = m_videolatch->q5_r() ? 0xff : 0x00;    /* PLAYER2 */
-	pen_t black = m_palette->black_pen();
-	int x, y, offs;
+	uint8_t const *const spriteaddr = m_spriteram;
+	int const flip = m_videolatch->q5_r() ? 0xff : 0x00;    /* PLAYER2 */
+	pen_t const black = m_palette->black_pen();
 
 	/* draw the sprites */
 	m_spritebitmap.fill(0x00, cliprect);
-	for (offs = 0; offs < 0x20; offs++)
+	for (int offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{
-			int x = spriteaddr[offs + 0x60];
-			int y = 256 - 15 - spriteaddr[offs + 0x00];
-			int xflip = spriteaddr[offs + 0x40] & 0x80;
-			int yflip = spriteaddr[offs + 0x40] & 0x40;
-			int which = spriteaddr[offs + 0x20];
-			int color = 0;
+			int const x = spriteaddr[offs + 0x60];
+			int const y = 256 - 15 - spriteaddr[offs + 0x00];
+			int const xflip = spriteaddr[offs + 0x40] & 0x80;
+			int const yflip = spriteaddr[offs + 0x40] & 0x40;
+			int const which = spriteaddr[offs + 0x20];
+			int const color = 0;
 
 			m_gfxdecode->gfx(0)->transpen(m_spritebitmap,cliprect, which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
@@ -246,30 +245,28 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~m_syncprom[y] & 2)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = black;
 		}
 
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			uint16_t *mosrc = &m_spritebitmap.pix16(y);
-			int effy = y ^ flip;
-			uint8_t *src[2];
+			uint16_t const *const mosrc = &m_spritebitmap.pix(y);
+			int const effy = y ^ flip;
 
 			/* two videoram arrays */
-			src[0] = &m_videoram[0x4000 | (effy * 64)];
-			src[1] = &m_videoram[0x0000 | (effy * 64)];
+			uint8_t const *const src[2]{ &m_videoram[0x4000 | (effy * 64)], &m_videoram[0x0000 | (effy * 64)] };
 
 			/* loop over X */
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)
@@ -278,11 +275,11 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 				/* otherwise, process normally */
 				else
 				{
-					int effx = x ^ flip;
+					int const effx = x ^ flip;
 
 					/* low 4 bits = left pixel, high 4 bits = right pixel */
 					uint8_t pix = (src[(effx >> 1) & 1][effx / 4] >> ((~effx & 1) * 4)) & 0x0f;
-					uint8_t mopix = mosrc[x];
+					uint8_t const mopix = mosrc[x];
 
 					/* sprites have priority if sprite pixel != 0 or some other condition */
 					if (mopix != 0)

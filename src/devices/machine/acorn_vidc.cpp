@@ -111,12 +111,10 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < m_sound_max_channels; i++)
 	{
 		// custom DAC
 		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain);
-		vref.add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT);
 	}
 }
 
@@ -492,9 +490,9 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 				if (is_cursor == true && dot == 0)
 					continue;
 				dot += pen_base;
-				bitmap.pix32(dsty, dstx+xi) = this->pen(dot);
+				bitmap.pix(dsty, dstx+xi) = this->pen(dot);
 				if (m_crtc_interlace)
-					bitmap.pix32(dsty+1, dstx+xi) = this->pen(dot);
+					bitmap.pix(dsty+1, dstx+xi) = this->pen(dot);
 			}
 		}
 	}

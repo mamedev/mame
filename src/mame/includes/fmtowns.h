@@ -26,6 +26,8 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
+#include "bus/fmt_scsi/fmt_scsi.h"
+#include "bus/fmt_scsi/fmt121.h"
 
 #include "formats/fmtowns_dsk.h"
 
@@ -111,6 +113,7 @@ class towns_state : public driver_device
 		, m_dma_1(*this, "dma_1")
 		, m_cdrom(*this, "cdrom")
 		, m_cdda(*this, "cdda")
+		, m_scsi_slot(*this, "scsislot")
 		, m_bank_cb000_r(*this, "bank_cb000_r")
 		, m_bank_cb000_w(*this, "bank_cb000_w")
 		, m_bank_f8000_r(*this, "bank_f8000_r")
@@ -150,6 +153,7 @@ protected:
 	void pcm_mem(address_map &map);
 	void towns16_io(address_map &map);
 	void towns_io(address_map &map);
+	void towns_1g_io(address_map &map);
 	void towns2_io(address_map &map);
 	void townsux_io(address_map &map);
 	void towns_mem(address_map &map);
@@ -167,8 +171,6 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	uint16_t towns_scsi_dma_r();
-	void towns_scsi_dma_w(uint16_t data);
 
 private:
 	/* devices */
@@ -187,6 +189,7 @@ private:
 	required_device<upd71071_device> m_dma_1;
 	required_device<cdrom_image_device> m_cdrom;
 	required_device<cdda_device> m_cdda;
+	optional_device<fmt_scsi_slot_device> m_scsi_slot;
 
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;

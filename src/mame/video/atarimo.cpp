@@ -234,7 +234,7 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 //  a stop or the end of line.
 //-------------------------------------------------
 
-void atari_motion_objects_device::apply_stain(bitmap_ind16 &bitmap, uint16_t *pf, uint16_t *mo, int x, int y)
+void atari_motion_objects_device::apply_stain(bitmap_ind16 &bitmap, uint16_t *pf, uint16_t const *mo, int x, int y)
 {
 	const uint16_t START_MARKER = ((4 << PRIORITY_SHIFT) | 2);
 	const uint16_t END_MARKER =   ((4 << PRIORITY_SHIFT) | 4);

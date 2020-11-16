@@ -111,9 +111,9 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 	{
 		for (int x = 0; x < 192; x++)
 		{
-			uint16_t* dstptr_bitmap  =  &bitmap.pix16(y);
-			uint8_t data = m_ram[count];
-			uint8_t data2 = m_ram2[count];
+			uint16_t *const dstptr_bitmap = &bitmap.pix(y);
+			uint8_t const data = m_ram[count];
+			uint8_t const data2 = m_ram2[count];
 
 			count++;
 

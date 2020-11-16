@@ -130,7 +130,7 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			if ((x & 7) == 0)
 				m_vram_latch = m_vram[x >> 3 | y >> 1 << 4];
 
-			bitmap.pix16(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_color & 7 : m_color >> 3;
+			bitmap.pix(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_color & 7 : m_color >> 3;
 		}
 	}
 

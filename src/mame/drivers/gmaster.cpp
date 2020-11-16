@@ -280,30 +280,20 @@ void gmaster_state::gmaster_palette(palette_device &palette) const
 
 uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
+	for (int y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
+		for (int x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
 		{
-			uint8_t d = m_video.pixels[y][x];
-			uint16_t *line;
+			uint8_t const d = m_video.pixels[y][x];
 
-			line = &bitmap.pix16((y * 8), x);
-			line[0] = BIT(d, 0);
-			line = &bitmap.pix16((y * 8 + 1), x);
-			line[0] = BIT(d, 1);
-			line = &bitmap.pix16((y * 8 + 2), x);
-			line[0] = BIT(d, 2);
-			line = &bitmap.pix16((y * 8 + 3), x);
-			line[0] = BIT(d, 3);
-			line = &bitmap.pix16((y * 8 + 4), x);
-			line[0] = BIT(d, 4);
-			line = &bitmap.pix16((y * 8 + 5), x);
-			line[0] = BIT(d, 5);
-			line = &bitmap.pix16((y * 8 + 6), x);
-			line[0] = BIT(d, 6);
-			line = &bitmap.pix16((y * 8 + 7), x);
-			line[0] = BIT(d, 7);
+			bitmap.pix((y * 8 + 0), x) = BIT(d, 0);
+			bitmap.pix((y * 8 + 1), x) = BIT(d, 1);
+			bitmap.pix((y * 8 + 2), x) = BIT(d, 2);
+			bitmap.pix((y * 8 + 3), x) = BIT(d, 3);
+			bitmap.pix((y * 8 + 4), x) = BIT(d, 4);
+			bitmap.pix((y * 8 + 5), x) = BIT(d, 5);
+			bitmap.pix((y * 8 + 6), x) = BIT(d, 6);
+			bitmap.pix((y * 8 + 7), x) = BIT(d, 7);
 		}
 	}
 	return 0;

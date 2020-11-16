@@ -192,7 +192,7 @@ uint32_t hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bit
 				acc += m_screens[ i ][ y ][ x+8 ];
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
-			bitmap.pix16(y, x ) = acc;
+			bitmap.pix(y, x ) = acc;
 		}
 	}
 

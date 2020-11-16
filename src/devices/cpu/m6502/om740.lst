@@ -113,6 +113,18 @@ jmp_zpi
 	PC = TMP;
 	prefetch();
 
+jsr_zpi
+	TMP2 = read_pc_noinc();
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	PC = TMP;
+	prefetch();
+
 reset740
 	P |= F_I; PC = read_arg(0xfffe);
 	PC = set_h(PC, read_arg(0xffff));
@@ -748,4 +760,10 @@ sbct_zpx
 	TMP2 = read(X);
 	do_sbct(TMP);
 	write(X, TMP2);
+	prefetch();
+
+tst_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	set_nz(TMP2);
 	prefetch();

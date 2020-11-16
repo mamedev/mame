@@ -199,32 +199,27 @@ uint8_t isa8_cga_tetriskr_device::bg_bank_r()
 
 uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int yi;
-	const uint8_t *bg_rom = memregion("gfx2")->base();
+	uint8_t const *const bg_rom = memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	for(y=0;y<200/8;y++)
+	for(int y=0;y<200/8;y++)
 	{
-		for(yi=0;yi<8;yi++)
+		for(int yi=0;yi<8;yi++)
 		{
-			for(x=0;x<320/8;x++)
+			for(int x=0;x<320/8;x++)
 			{
-				uint8_t color;
-				int xi,pen_i;
-
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					color = 0;
+					uint8_t color = 0;
 					/* TODO: first byte seems bogus? */
-					for(pen_i = 0;pen_i<4;pen_i++)
+					for(int pen_i = 0;pen_i<4;pen_i++)
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
 					if(cliprect.contains(x*8+xi, y*8+yi))
-						bitmap.pix32(y*8+yi, x*8+xi) = m_palette->pen(color);
+						bitmap.pix(y*8+yi, x*8+xi) = m_palette->pen(color);
 				}
 			}
 		}

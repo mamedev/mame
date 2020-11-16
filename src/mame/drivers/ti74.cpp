@@ -201,7 +201,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
 	{
 		// internal: 2*16, external: 1*31
 		if (y == 7) y++; // the cursor is slightly below the character
-		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -220,7 +220,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 	{
 		// 1st line is simply 16 chars
 		if (y == 7) y++; // the cursor is slightly below the char
-		bitmap.pix16(10 + y, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(10 + y, 1 + pos*6 + x) = state ? 1 : 2;
 	}
 	else if (line == 1 && pos < 15 && y < 7)
 	{
@@ -228,7 +228,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 		// note: the chars are smaller than on the 1st line (this is handled in .lay file)
 		const int gap = 9;
 		int group = pos / 3;
-		bitmap.pix16(1 + y, 1 + group*gap + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + group*gap + pos*6 + x) = state ? 1 : 2;
 	}
 }
 

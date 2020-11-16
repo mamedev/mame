@@ -56,12 +56,20 @@ public:
 		m_vram(*this, "vram"),
 		m_keybd1(*this, "LINE1.%u", 0),
 		m_keybd2(*this, "LINE2.%u", 0),
+		m_shiftlock_led(*this, "shiftlock_led"),
+		m_capslock_led(*this, "capslock_led"),
 		m_ch00rom_enabled(true)
 	{ }
 
 	void accomm(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
+protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -77,8 +85,6 @@ private:
 	void accomm_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void main_map(address_map &map);
 
 	// devices
@@ -92,9 +98,8 @@ private:
 	required_device<mc6854_device> m_adlc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_ioport_array<14> m_keybd1, m_keybd2;
-
-	// driver_device overrides
-	virtual void video_start() override;
+	output_finder<> m_shiftlock_led;
+	output_finder<> m_capslock_led;
 
 	void interrupt_handler(int mode, int interrupt);
 	inline uint8_t read_vram( uint16_t addr );
@@ -207,6 +212,9 @@ void accomm_state::machine_reset()
 
 void accomm_state::machine_start()
 {
+	m_shiftlock_led.resolve();
+	m_capslock_led.resolve();
+
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
 }
@@ -234,7 +242,7 @@ inline uint8_t accomm_state::read_vram(uint16_t addr)
 
 inline void accomm_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -580,9 +588,9 @@ void accomm_state::sheila_w(offs_t offset, uint8_t data)
 		m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.shiftlock_mode = !BIT(data, 6);
-		output().set_value("shiftlock_led", m_ula.shiftlock_mode);
+		m_shiftlock_led = m_ula.shiftlock_mode;
 		m_ula.capslock_mode = BIT(data, 7);
-		output().set_value("capslock_led", m_ula.capslock_mode);
+		m_capslock_led = m_ula.capslock_mode;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
 		// video_update

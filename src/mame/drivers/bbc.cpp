@@ -1074,8 +1074,8 @@ void bbc_state::bbca(machine_config &config)
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set(FUNC(bbc_state::snd_enable_w));
 	m_latch->q_out_cb<3>().set(FUNC(bbc_state::kbd_enable_w));
-	m_latch->q_out_cb<6>().set(FUNC(bbc_state::capslock_led_w));
-	m_latch->q_out_cb<7>().set(FUNC(bbc_state::shiftlock_led_w));
+	m_latch->q_out_cb<6>().set_output("capslock_led");
+	m_latch->q_out_cb<7>().set_output("shiftlock_led");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0xff);
@@ -1405,6 +1405,33 @@ void bbcbp_state::bbcbp128(machine_config &config)
 }
 
 
+void bbcbp_state::cfa3000bp(machine_config &config)
+{
+	bbcbp(config);
+
+	/* fdc */
+	m_wd_fdc->subdevice<floppy_connector>("0")->set_default_option(nullptr);
+	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+
+	/* keyboard */
+	m_userport->set_default_option("cfa3000kbd");
+	m_userport->set_fixed(true);
+
+	/* option board */
+	m_1mhzbus->set_default_option("cfa3000opt");
+	m_1mhzbus->set_fixed(true);
+
+	/* analogue dials/sensors */
+	m_analog->set_default_option("cfa3000a");
+	m_analog->set_fixed(true);
+
+	/* software lists */
+	config.device_remove("cass_ls");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
+
+
 /***************************************************************************
 
     Acorn Business Computers
@@ -1563,8 +1590,8 @@ void bbcm_state::bbcm(machine_config &config)
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set(FUNC(bbc_state::snd_enable_w));
 	m_latch->q_out_cb<3>().set(FUNC(bbc_state::kbd_enable_w));
-	m_latch->q_out_cb<6>().set(FUNC(bbc_state::capslock_led_w));
-	m_latch->q_out_cb<7>().set(FUNC(bbc_state::shiftlock_led_w));
+	m_latch->q_out_cb<6>().set_output("capslock_led");
+	m_latch->q_out_cb<7>().set_output("shiftlock_led");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_default_value(0xff);
@@ -2870,11 +2897,60 @@ ROM_START(mpc900gx)
 ROM_END
 
 
+ROM_START(cfa3000bp)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	ROM_LOAD("bpos2.ic71", 0x3c000, 0x8000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))
+	/* rom page 0  00000 SWRAM (B+ 128K only) */
+	/* rom page 1  04000 SWRAM (B+ 128K only) */
+	/* rom page 2  08000 IC35 32K IN PAGE 3 */
+	/* rom page 3  0c000 IC35 SPARE SOCKET */
+	/* rom page 4  10000 IC44 32K IN PAGE 5 */
+	/* rom page 5  14000 IC44 SPARE SOCKET */
+	/* rom page 6  18000 IC57 32K IN PAGE 7 */
+	/* rom page 7  1c000 IC57 SPARE SOCKET */
+	/* rom page 8  20000 IC62 32K IN PAGE 9 */
+	/* rom page 9  24000 IC62 SPARE SOCKET */
+	/* rom page 10 28000 IC68 32K IN PAGE 11 */
+	/* rom page 11 2c000 IC68 SPARE SOCKET */
+	/* rom page 12 30000 SWRAM (B+ 128K only) */
+	/* rom page 13 34000 SWRAM (B+ 128K only) */
+	/* rom page 14 38000 IC71 32K IN PAGE 15 */
+	/* rom page 15 3C000 IC71 BASIC */
+	ROM_SYSTEM_BIOS(0, "4", "Issue 4")
+	ROMX_LOAD("cfa3000_3.rom", 0x14000, 0x4000, CRC(4f246cd5) SHA1(6ba9625248c585deed5c651a889eecc86384a60d), ROM_BIOS(0))
+	ROMX_LOAD("cfa3000_4.rom", 0x1c000, 0x4000, CRC(ca0e30fd) SHA1(abddc7ba6d16855ebda2ef55fe8662bc545ae755), ROM_BIOS(0))
+	ROMX_LOAD("cfa3000_s.rom", 0x24000, 0x4000, CRC(71fd4c8a) SHA1(5bad70ee55403bc0191f6b189c9b6e5effdbca4c), ROM_BIOS(0))
+
+	/* link S13 set for BASIC to take low priority ROM numbers 0/1 */
+	ROM_COPY("swr", 0x3c000, 0x4000, 0x4000)
+	ROM_FILL(0x3c000, 0x4000, 0xff)
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
+ROM_END
+
+
 ROM_START(cfa3000)
 	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
-	ROM_LOAD("cfa3000_3_4_iss10.3.ic41",           0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973))
-	ROM_LOAD("cfa3000_sm_iss10.3.ic37",            0x18000, 0x08000, CRC(c07aee5f) SHA1(1994e3755dc15d1ea7e105bc19cd57893b719779))
-	ROM_LOAD("acorn_mos,tinsley_64k,iss10.3.ic24", 0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54))
+	ROM_SYSTEM_BIOS(0, "103", "Issue 10.3")
+	ROMX_LOAD("cfa3000_3m4_iss10.3.ic41",           0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973), ROM_BIOS(0))
+	ROMX_LOAD("cfa3000_sm_iss10.3.ic37",            0x18000, 0x08000, CRC(c07aee5f) SHA1(1994e3755dc15d1ea7e105bc19cd57893b719779), ROM_BIOS(0))
+	ROMX_LOAD("acorn_mos,tinsley_64k,iss10.3.ic24", 0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "102", " Issue 10.2")
+	ROMX_LOAD("cfa3000_3m4_iss10.2.ic41",           0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973), ROM_BIOS(1))
+	ROMX_LOAD("cfa3000_sm_iss10.2.ic37",            0x18000, 0x08000, CRC(e733d5b3) SHA1(07e89943c6ac0953b75686ee06e947f33119dbed), ROM_BIOS(1))
+	ROMX_LOAD("acorn_mos,tinsley_64k,iss10.2.ic24", 0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "9", " Issue 9")
+	ROMX_LOAD("cfa3000_3m4_iss9.ic41",              0x10000, 0x08000, CRC(a4bd5d53) SHA1(90747ff7bd81ac1e124bae964c206d8df163e1d6), ROM_BIOS(2))
+	ROMX_LOAD("cfa3000_sm_iss9.ic37",               0x18000, 0x08000, CRC(559d1fae) SHA1(271e1ab9b53e82028e92e7cdb8c517df06e76477), ROM_BIOS(2))
+	ROMX_LOAD("acorn_mos,tinsley_64k,iss9.ic24",    0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "7", "Issue 7")
+	ROMX_LOAD("cfa3000_3m4_iss7.ic41",              0x10000, 0x08000, CRC(a0b32288) SHA1(83b047e9eb35f0644bd8f0acb1a56e1428bacc0b), ROM_BIOS(3))
+	ROMX_LOAD("cfa3000_sm_iss7.ic37",               0x18000, 0x08000, CRC(3cd42bbd) SHA1(17f6c66039d20a364cc9e1377c7ced14d5302603), ROM_BIOS(3))
+	ROMX_LOAD("acorn_mos,tinsley_64k,iss7.ic24",    0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54), ROM_BIOS(3))
 	ROM_COPY("swr", 0x20000, 0x30000, 0x10000) /* Mirror MOS */
 	ROM_COPY("swr", 0x30000, 0x40000, 0x04000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xff)
@@ -2908,39 +2984,50 @@ ROM_END
 #define rom_ltmpm rom_bbcm
 
 
-/*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT   CLASS        INIT       COMPANY            FULLNAME                              FLAGS */
-COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1983, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1984, torch301, bbcb,   0,     torch301, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 301",                    MACHINE_NOT_WORKING)
-COMP ( 1984, torch725, bbcb,   0,     torch725, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 725",                    MACHINE_NOT_WORKING)
-COMP ( 1985, bbcbp,    0,      bbcb,  bbcbp,    bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, bbcbp128, bbcbp,  0,     bbcbp128, bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 128K",            MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, abc110,   bbcbp,  0,     abc110,   abc,    bbcbp_state, init_bbc,  "Acorn Computers", "ABC 110",                            MACHINE_NOT_WORKING)
-COMP ( 1985, acw443,   bbcbp,  0,     acw443,   abc,    bbcbp_state, init_bbc,  "Acorn Computers", "ABC 210/Cambridge Workstation",      MACHINE_NOT_WORKING)
-COMP ( 1985, abc310,   bbcbp,  0,     abc310,   abc,    bbcbp_state, init_bbc,  "Acorn Computers", "ABC 310",                            MACHINE_NOT_WORKING)
-COMP ( 1985, ltmpbp,   bbcbp,  0,     bbcbp,    ltmpbp, bbcbp_state, init_ltmp, "Lawrie T&M Ltd.", "LTM Portable (B+)",                  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, reutapm,  bbcbp,  0,     reutapm,  bbcb,   bbcbp_state, init_bbc,  "Acorn Computers", "Reuters APM",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP ( 1986, econx25,  bbcbp,  0,     econx25,  bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "Econet X25 Gateway",                 MACHINE_NOT_WORKING)
-COMP ( 1986, bbcm,     0,      bbcb,  bbcm,     bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master 128",                     MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcmt,    bbcm,   0,     bbcmt,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Turbo",                   MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcmaiv,  bbcm,   0,     bbcmaiv,  bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master AIV",                     MACHINE_NOT_WORKING)
-COMP ( 1986, bbcmet,   bbcm,   0,     bbcmet,   bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master ET",                      MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcm512,  bbcm,   0,     bbcm512,  bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master 512",                     MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcmarm,  bbcm,   0,     bbcmarm,  bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master (ARM Evaluation)",        MACHINE_NOT_WORKING)
-COMP ( 1986, ltmpm,    bbcm,   0,     bbcm,     ltmpm,  bbcm_state,  init_ltmp, "Lawrie T&M Ltd.", "LTM Portable (Master)",              MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1987, daisy,    bbcm,   0,     daisy,    bbcm,   bbcm_state,  init_bbc,  "Comus Instruments Ltd.", "Comus Daisy",                 MACHINE_NOT_WORKING)
-COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbcm_state,  init_bbc,  "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500 Teleprompter",          MACHINE_NOT_WORKING)
-COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
-COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
-//COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbcm_state,  init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)
-COMP ( 1987, mpc800,   bbcm,   0,     mpc800,   bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 800 Series",             MACHINE_NOT_WORKING)
-COMP ( 1988, mpc900,   bbcm,   0,     mpc900,   bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 900 Series",             MACHINE_NOT_WORKING)
-COMP ( 1990, mpc900gx, bbcm,   0,     mpc900gx, bbcm,   bbcm_state,  init_bbc,  "G2 Systems",      "MasterPieCe 900GX Series",           MACHINE_NOT_WORKING)
-COMP ( 1989, cfa3000,  bbcm,   0,     cfa3000,  bbcm,   bbcm_state,  init_cfa,  "Tinsley Medical Instruments",  "Henson CFA 3000",       MACHINE_NOT_WORKING)
+/*    YEAR  NAME        PARENT  COMPAT MACHINE     INPUT   CLASS         INIT       COMPANY                        FULLNAME                              FLAGS */
+
+/* Acorn Computers */
+COMP( 1981, bbcb,       0,      bbca,  bbcb,       bbcb,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1981, bbca,       bbcb,   0,     bbca,       bbca,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1982, bbcb_de,    bbcb,   0,     bbcb_de,    bbcb,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, bbcb_us,    bbcb,   0,     bbcb_us,    bbcb,   bbc_state,    init_bbc,  "Acorn Computers",             "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, bbcbp,      0,      bbcb,  bbcbp,      bbcbp,  bbcbp_state,  init_bbc,  "Acorn Computers",             "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, bbcbp128,   bbcbp,  0,     bbcbp128,   bbcbp,  bbcbp_state,  init_bbc,  "Acorn Computers",             "BBC Micro Model B+ 128K",            MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, abc110,     bbcbp,  0,     abc110,     abc,    bbcbp_state,  init_bbc,  "Acorn Computers",             "ABC 110",                            MACHINE_NOT_WORKING )
+COMP( 1985, acw443,     bbcbp,  0,     acw443,     abc,    bbcbp_state,  init_bbc,  "Acorn Computers",             "ABC 210/Cambridge Workstation",      MACHINE_NOT_WORKING )
+COMP( 1985, abc310,     bbcbp,  0,     abc310,     abc,    bbcbp_state,  init_bbc,  "Acorn Computers",             "ABC 310",                            MACHINE_NOT_WORKING )
+COMP( 1985, reutapm,    bbcbp,  0,     reutapm,    bbcb,   bbcbp_state,  init_bbc,  "Acorn Computers",             "Reuters APM",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1986, econx25,    bbcbp,  0,     econx25,    bbcbp,  bbcbp_state,  init_bbc,  "Acorn Computers",             "Econet X25 Gateway",                 MACHINE_NOT_WORKING )
+COMP( 1986, bbcm,       0,      bbcb,  bbcm,       bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master 128",                     MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, bbcmt,      bbcm,   0,     bbcmt,      bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master Turbo",                   MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, bbcmaiv,    bbcm,   0,     bbcmaiv,    bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master AIV",                     MACHINE_NOT_WORKING )
+COMP( 1986, bbcmet,     bbcm,   0,     bbcmet,     bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master ET",                      MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, bbcm512,    bbcm,   0,     bbcm512,    bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master 512",                     MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, bbcmarm,    bbcm,   0,     bbcmarm,    bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master (ARM Evaluation)",        MACHINE_NOT_WORKING )
+COMP( 1986, bbcmc,      0,      bbcm,  bbcmc,      bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, bbcmc_ar,   bbcmc,  0,     bbcmc,      bbcm,   bbcm_state,   init_bbc,  "Acorn Computers",             "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, pro128s,    bbcmc,  0,     pro128s,    bbcm,   bbcm_state,   init_bbc,  "Olivetti",                    "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS )
+
+/* Torch Computers */
+COMP( 1982, torchf,     bbcb,   0,     torchf,     torchb, torch_state,  init_bbc,  "Torch Computers",             "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, torchh,     bbcb,   0,     torchh,     torchb, torch_state,  init_bbc,  "Torch Computers",             "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, torch301,   bbcb,   0,     torch301,   torchi, torch_state,  init_bbc,  "Torch Computers",             "Torch Model 301",                    MACHINE_NOT_WORKING )
+COMP( 1984, torch725,   bbcb,   0,     torch725,   torchi, torch_state,  init_bbc,  "Torch Computers",             "Torch Model 725",                    MACHINE_NOT_WORKING )
+
+/* TV Production */
+COMP( 1988, autoc15,    bbcmc,  0,     autoc15,    autoc,  bbcm_state,   init_bbc,  "Autocue Ltd.",                "Autocue 1500 Teleprompter",          MACHINE_NOT_WORKING )
+COMP( 1987, mpc800,     bbcm,   0,     mpc800,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 800 Series",             MACHINE_NOT_WORKING )
+COMP( 1988, mpc900,     bbcm,   0,     mpc900,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900 Series",             MACHINE_NOT_WORKING )
+COMP( 1990, mpc900gx,   bbcm,   0,     mpc900gx,   bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900GX Series",           MACHINE_NOT_WORKING )
+
+/* Jukeboxes */
+COMP( 1988, discmon,    bbcm,   0,     discmon,    bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING )
+COMP( 1988, discmate,   bbcm,   0,     discmate,   bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmate A-02",              MACHINE_NOT_WORKING )
+//COMP( 1988, discmast,   bbcm,   0,     discmast,   bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING )
+
+/* Industrial */
+COMP( 1985, ltmpbp,     bbcbp,  0,     bbcbp,      ltmpbp, bbcbp_state,  init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (B+)",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, ltmpm,      bbcm,   0,     bbcm,       ltmpm,  bbcm_state,   init_ltmp, "Lawrie T&M Ltd.",             "LTM Portable (Master)",              MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, daisy,      bbcm,   0,     daisy,      bbcm,   bbcm_state,   init_bbc,  "Comus Instruments Ltd.",      "Comus Daisy",                        MACHINE_NOT_WORKING )
+COMP( 198?, cfa3000bp,  bbcbp,  0,     cfa3000bp,  bbcbp,  bbcbp_state,  init_cfa,  "Tinsley Medical Instruments", "Henson CFA 3000 (B+)",               MACHINE_NOT_WORKING )
+COMP( 1989, cfa3000,    bbcm,   0,     cfa3000,    bbcm,   bbcm_state,   init_cfa,  "Tinsley Medical Instruments", "Henson CFA 3000 (Master)",           MACHINE_NOT_WORKING )

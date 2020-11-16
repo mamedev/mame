@@ -860,8 +860,8 @@ public:
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_backbuffer->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_backbuffer->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	float z = extent.param[POLY_Z].start;
 	float dz = extent.param[POLY_Z].dpdx;
@@ -961,8 +961,8 @@ void cobra_renderer::render_texture_scan(int32_t scanline, const extent_t &exten
 	float ga = extent.param[POLY_A].start;
 	float dga = extent.param[POLY_A].dpdx;
 
-	uint32_t *fb = &m_backbuffer->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_backbuffer->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	uint32_t texture_width  = 1 << ((extradata.tex_format >> 28) & 0xf);
 	uint32_t texture_height = 1 << ((extradata.tex_format >> 24) & 0xf);
@@ -1066,7 +1066,7 @@ void cobra_renderer::draw_point(const rectangle &visarea, vertex_t &v, uint32_t 
 	if (x >= visarea.min_x && x <= visarea.max_x &&
 		y >= visarea.min_y && y <= visarea.max_y)
 	{
-		uint32_t *fb = &m_backbuffer->pix32(y);
+		uint32_t *const fb = &m_backbuffer->pix(y);
 		fb[x] = color;
 	}
 }
@@ -1094,7 +1094,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
-			uint32_t *fb = &m_backbuffer->pix32(y);
+			uint32_t *const fb = &m_backbuffer->pix(y);
 			fb[x] = color;
 
 			x++;
@@ -1107,7 +1107,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
 
-			uint32_t *fb = &m_backbuffer->pix32(y);
+			uint32_t *const fb = &m_backbuffer->pix(y);
 			fb[x] = color;
 
 			y++;
@@ -2610,11 +2610,11 @@ void cobra_renderer::gfx_fifo_exec()
 					uint32_t *buffer;
 					switch (m_gfx_gram[0x80104/4])
 					{
-						case 0x800000:      buffer = &m_framebuffer->pix32(y); break;
-						case 0x200000:      buffer = &m_backbuffer->pix32(y); break;
-						case 0x0e0000:      buffer = &m_overlay->pix32(y); break;
-						case 0x000800:      buffer = &m_zbuffer->pix32(y); break;
-						case 0x000200:      buffer = &m_stencil->pix32(y); break;
+						case 0x800000:      buffer = &m_framebuffer->pix(y); break;
+						case 0x200000:      buffer = &m_backbuffer->pix(y); break;
+						case 0x0e0000:      buffer = &m_overlay->pix(y); break;
+						case 0x000800:      buffer = &m_zbuffer->pix(y); break;
+						case 0x000200:      buffer = &m_stencil->pix(y); break;
 
 						default:
 						{
@@ -2666,11 +2666,11 @@ void cobra_renderer::gfx_fifo_exec()
 					uint32_t *buffer;
 					switch (m_gfx_gram[0x80104/4])
 					{
-						case 0x800000:      buffer = &m_framebuffer->pix32(y+i); break;
-						case 0x200000:      buffer = &m_backbuffer->pix32(y+i); break;
-						case 0x0e0000:      buffer = &m_overlay->pix32(y+i); break;
-						case 0x000800:      buffer = &m_zbuffer->pix32(y+i); break;
-						case 0x000200:      buffer = &m_stencil->pix32(y+i); break;
+						case 0x800000:      buffer = &m_framebuffer->pix(y+i); break;
+						case 0x200000:      buffer = &m_backbuffer->pix(y+i); break;
+						case 0x0e0000:      buffer = &m_overlay->pix(y+i); break;
+						case 0x000800:      buffer = &m_zbuffer->pix(y+i); break;
+						case 0x000200:      buffer = &m_stencil->pix(y+i); break;
 
 						default:
 						{

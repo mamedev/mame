@@ -218,36 +218,31 @@ void kron180_state::kron180_iomap(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 /* Video TODO: find and understand the char table within main rom */
 uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	int vramad;
-	uint8_t *chardata;
-	uint8_t charcode;
-
 	LOGSCREEN("%s()\n", FUNCNAME);
-	vramad = 0;
+	int vramad = 0;
 	for (int row = 0; row < 25 * 8; row += 8)
 	{
+		uint8_t charcode;
 		for (int col = 0; col < 80 * 8; col += 8)
 		{
 			/* look up the character data */
 			charcode = m_vram[vramad];
 			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_chargen[(charcode * 8) + 8];
+			uint8_t const *chardata = &m_chargen[(charcode * 8) + 8];
 			/* plot the character */
-			for (y = 0; y < 8; y++)
+			for (int y = 0; y < 8; y++)
 			{
 				chardata--;
 				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
-				for (x = 0; x < 8; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 			}
 			vramad += 2;

@@ -135,9 +135,37 @@ public:
 		m_node_id(*this, APOLLO_NI_TAG),
 		m_isa(*this, APOLLO_ISA_TAG),
 		m_graphics(*this, APOLLO_SCREEN_TAG),
-		m_keyboard(*this, APOLLO_KBD_TAG)
+		m_keyboard(*this, APOLLO_KBD_TAG),
+		m_internal_leds(*this, "internal_led_%u", 1U),
+		m_external_leds(*this, "external_led_%c", unsigned('a'))
 	{ }
 
+	void dn3500(machine_config &config);
+	void dn5500_19i(machine_config &config);
+	void dn3000(machine_config &config);
+	void dn3000_15i(machine_config &config);
+	void dn3000_19i(machine_config &config);
+	void dn3500_15i(machine_config &config);
+	void dsp3000(machine_config &config);
+	void dsp3500(machine_config &config);
+	void dsp5500(machine_config &config);
+	void dn5500(machine_config &config);
+	void dn5500_15i(machine_config &config);
+	void dn3500_19i(machine_config &config);
+
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
@@ -154,6 +182,8 @@ public:
 	required_device<isa16_device> m_isa;
 	optional_device<apollo_graphics_15i> m_graphics;
 	optional_device<apollo_kbd_device> m_keyboard;
+	output_finder<4> m_internal_leds;
+	output_finder<4> m_external_leds;
 
 	void apollo_csr_status_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t apollo_csr_status_register_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -202,16 +232,7 @@ public:
 	uint8_t dn5500_11500_r(offs_t offset);
 	void dn5500_io_protection_map_w(offs_t offset, uint8_t data);
 	uint8_t dn5500_io_protection_map_r(offs_t offset);
-	void init_dsp3000();
-	void init_dsp5500();
-	void init_dn3500();
-	void init_dn3000();
-	void init_dsp3500();
-	void init_dn5500();
-	void init_apollo();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
@@ -264,25 +285,14 @@ public:
 	void common(machine_config &config);
 	void apollo(machine_config &config);
 	void apollo_terminal(machine_config &config);
-	void dn3500(machine_config &config);
-	void dn5500_19i(machine_config &config);
-	void dn3000(machine_config &config);
-	void dn3000_15i(machine_config &config);
-	void dn3000_19i(machine_config &config);
-	void dn3500_15i(machine_config &config);
-	void dsp3000(machine_config &config);
-	void dsp3500(machine_config &config);
-	void dsp5500(machine_config &config);
-	void dn5500(machine_config &config);
-	void dn5500_15i(machine_config &config);
-	void dn3500_19i(machine_config &config);
+
 	void dn3000_map(address_map &map);
 	void dn3500_map(address_map &map);
 	void dn5500_map(address_map &map);
 	void dsp3000_map(address_map &map);
 	void dsp3500_map(address_map &map);
 	void dsp5500_map(address_map &map);
-private:
+
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
 	int m_dma_channel;
@@ -438,7 +448,7 @@ public:
 protected:
 	required_device<screen_device> m_screen;
 
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -544,8 +554,8 @@ protected:
 
 	uint32_t m_color_lookup_table[16];
 
-	lut_fifo *m_lut_fifo;
-	bt458 *m_bt458;
+	std::unique_ptr<lut_fifo> m_lut_fifo;
+	std::unique_ptr<bt458> m_bt458;
 };
 
 

@@ -37,30 +37,30 @@ public:
 	virtual ~device_o2_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read_rom04(offs_t offset) { return 0xff; }
-	virtual uint8_t read_rom0c(offs_t offset) { return 0xff; }
-	virtual void write_p1(uint8_t data) { }
-	virtual void write_p2(uint8_t data) { }
+	virtual u8 read_rom04(offs_t offset) { return 0xff; }
+	virtual u8 read_rom0c(offs_t offset) { return 0xff; }
+	virtual void write_p1(u8 data) { }
+	virtual void write_p2(u8 data) { }
 
-	virtual void io_write(offs_t offset, uint8_t data) { }
-	virtual uint8_t io_read(offs_t offset) { return 0xff; }
+	virtual void io_write(offs_t offset, u8 data) { }
+	virtual u8 io_read(offs_t offset) { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 	virtual int b_read() { return -1; }
 
 	virtual void cart_init() { } // called after loading ROM
 
-	uint8_t* get_rom_base() { return m_rom ? &m_rom[0] : nullptr; }
-	uint32_t get_rom_size() { return m_rom ? m_rom.bytes() : 0; }
+	u8* get_rom_base() { return m_rom ? &m_rom[0] : nullptr; }
+	u32 get_rom_size() { return m_rom ? m_rom.bytes() : 0; }
 
-	uint8_t* get_voice_base() { return m_voice ? &m_voice[0] : nullptr; }
-	uint32_t get_voice_size() { return m_voice ? m_voice.bytes() : 0; }
+	u8* get_voice_base() { return m_voice ? &m_voice[0] : nullptr; }
+	u32 get_voice_size() { return m_voice ? m_voice.bytes() : 0; }
 
 protected:
 	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<uint8_t> m_rom;
-	optional_shared_ptr<uint8_t> m_exrom;
-	optional_shared_ptr<uint8_t> m_voice;
+	optional_shared_ptr<u8> m_rom;
+	optional_shared_ptr<u8> m_exrom;
+	optional_shared_ptr<u8> m_voice;
 };
 
 
@@ -82,7 +82,7 @@ public:
 		set_fixed(false);
 	}
 
-	o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~o2_cart_slot_device();
 
 	// image-level overrides
@@ -105,15 +105,15 @@ public:
 	device_o2_cart_interface* cart() { return m_cart; }
 
 	// reading and writing
-	uint8_t read_rom04(offs_t offset);
-	uint8_t read_rom0c(offs_t offset);
-	void io_write(offs_t offset, uint8_t data);
-	uint8_t io_read(offs_t offset);
+	u8 read_rom04(offs_t offset);
+	u8 read_rom0c(offs_t offset);
+	void io_write(offs_t offset, u8 data);
+	u8 io_read(offs_t offset);
 	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
 	int b_read();
 
-	void write_p1(uint8_t data) { if (m_cart) m_cart->write_p1(data); }
-	void write_p2(uint8_t data) { if (m_cart) m_cart->write_p2(data); }
+	void write_p1(u8 data) { if (m_cart) m_cart->write_p1(data); }
+	void write_p2(u8 data) { if (m_cart) m_cart->write_p2(data); }
 
 protected:
 	// device-level overrides

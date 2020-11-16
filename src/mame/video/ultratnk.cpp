@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(ultratnk_state::screen_vblank)
 
 			for (int y = rect.top(); y <= rect.bottom(); y++)
 				for (int x = rect.left(); x <= rect.right(); x++)
-					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != BG)
+					if (m_palette->pen_indirect(m_helper.pix(y, x)) != BG)
 						m_collision[i] = 1;
 		}
 

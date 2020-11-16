@@ -101,25 +101,21 @@ public:
 	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sb2m600_state(mconfig, type, tag)
 		, m_beeper(*this, "beeper")
+		, m_beep_timer(*this, "beep_timer")
 	{ }
 
 	void init_c1p();
 	void c1p(machine_config &config);
 
 protected:
-	enum
-	{
-		TIMER_SETUP_BEEP
-	};
-
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	void osi630_ctrl_w(uint8_t data);
 	void osi630_sound_w(uint8_t data);
 	void c1p_mem(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 };
 
 class c1pmf_state : public c1p_state

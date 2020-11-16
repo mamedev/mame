@@ -92,10 +92,7 @@ private:
 
 uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int xi,yi;
-	#if 0
-	uint32_t count;
+#if 0
 	static int test_x;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
@@ -106,49 +103,48 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 
 	popmessage("%d",test_x);
 
-	count = 0;
+	uint32_t count = 0;
 
-	for(y=0;y<475;y++)
+	for(int y=0;y<475;y++)
 	{
 		count &= 0xffff;
 
-		for(x=0;x<test_x/16;x++)
+		for(int x=0;x<test_x/16;x++)
 		{
-			for(xi=0;xi<16;xi++)
+			for(int xi=0;xi<16;xi++)
 			{
 				int pen = (m_p_gvram[count] >> xi) & 1;
 
 				if(y < 475 && x*16+xi < 640) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = m_palette->pen(pen);
+					bitmap.pix(y, x*16+xi) = m_palette->pen(pen);
 			}
 
 			count++;
 		}
 	}
-	#endif
+#endif
 
 //  popmessage("%d %d %d",mc6845_h_display,mc6845_v_display,mc6845_tile_height);
 
-	for(y=0;y<mc6845_v_display;y++)
+	for(int y=0;y<mc6845_v_display;y++)
 	{
-		for(x=0;x<mc6845_h_display;x++)
+		for(int x=0;x<mc6845_h_display;x++)
 		{
 			int tile = m_p_vram[x+y*mc6845_h_display] & 0xff;
 			int color = (m_p_vram[x+y*mc6845_h_display] & 0x700) >> 8;
-			int pen;
 
-			for(yi=0;yi<19;yi++)
+			for(int yi=0;yi<19;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					pen = (m_p_chargen[tile*8+(yi >> 1)] >> (7-xi) & 1) ? color : -1;
+					int pen = (m_p_chargen[tile*8+(yi >> 1)] >> (7-xi) & 1) ? color : -1;
 
 					if(yi & 0x10)
 						pen = -1;
 
 					if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
-							bitmap.pix16(y*19+yi, x*8+xi) = m_palette->pen(pen);
+							bitmap.pix(y*19+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -156,15 +152,15 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 
 	/* quick and dirty way to do the cursor */
 	if(0)
-	for(yi=0;yi<mc6845_tile_height;yi++)
+	for(int yi=0;yi<mc6845_tile_height;yi++)
 	{
-		for(xi=0;xi<8;xi++)
+		for(int xi=0;xi<8;xi++)
 		{
 			if((mc6845_cursor_y_start & 0x60) != 0x20 && mc6845_h_display)
 			{
-				x = mc6845_cursor_addr % mc6845_h_display;
-				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
+				int x = mc6845_cursor_addr % mc6845_h_display;
+				int y = mc6845_cursor_addr / mc6845_h_display;
+				bitmap.pix(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
 			}
 		}
 	}

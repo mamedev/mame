@@ -121,6 +121,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/inifile.h",
 	MAME_DIR .. "src/frontend/mame/ui/inputmap.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/inputmap.h",
+	MAME_DIR .. "src/frontend/mame/ui/keyboard.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/keyboard.h",
 	MAME_DIR .. "src/frontend/mame/ui/mainmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/mainmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/menu.cpp",

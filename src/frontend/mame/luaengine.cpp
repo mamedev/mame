@@ -1570,7 +1570,7 @@ void lua_engine::initialize()
  * debugger.execution_state - accessor for active cpu run state
  */
 
-	struct wrap_textbuf { wrap_textbuf(text_buffer *buf) { textbuf = buf; }; text_buffer *textbuf; };
+	struct wrap_textbuf { wrap_textbuf(const text_buffer &buf) : textbuf(buf) { } std::reference_wrapper<const text_buffer> textbuf; };
 
 	auto debugger_type = sol().registry().create_simple_usertype<debugger_manager>("new", sol::no_constructor);
 	debugger_type.set("command", [](debugger_manager &debug, const std::string &cmd) { debug.console().execute_command(cmd, false); });

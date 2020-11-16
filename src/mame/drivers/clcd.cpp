@@ -105,43 +105,43 @@ public:
 
 				for (int x = 0; x < 60; x++)
 				{
-					uint8_t bit = m_ram->pointer()[offset++];
+					uint8_t const bit = m_ram->pointer()[offset++];
 
-					bitmap.pix16(y, (x * 8) + 0) = (bit >> 7) & 1;
-					bitmap.pix16(y, (x * 8) + 1) = (bit >> 6) & 1;
-					bitmap.pix16(y, (x * 8) + 2) = (bit >> 5) & 1;
-					bitmap.pix16(y, (x * 8) + 3) = (bit >> 4) & 1;
-					bitmap.pix16(y, (x * 8) + 4) = (bit >> 3) & 1;
-					bitmap.pix16(y, (x * 8) + 5) = (bit >> 2) & 1;
-					bitmap.pix16(y, (x * 8) + 6) = (bit >> 1) & 1;
-					bitmap.pix16(y, (x * 8) + 7) = (bit >> 0) & 1;
+					bitmap.pix(y, (x * 8) + 0) = BIT(bit, 7);
+					bitmap.pix(y, (x * 8) + 1) = BIT(bit, 6);
+					bitmap.pix(y, (x * 8) + 2) = BIT(bit, 5);
+					bitmap.pix(y, (x * 8) + 3) = BIT(bit, 4);
+					bitmap.pix(y, (x * 8) + 4) = BIT(bit, 3);
+					bitmap.pix(y, (x * 8) + 5) = BIT(bit, 2);
+					bitmap.pix(y, (x * 8) + 6) = BIT(bit, 1);
+					bitmap.pix(y, (x * 8) + 7) = BIT(bit, 0);
 				}
 			}
 		}
 		else
 		{
-			uint8_t *font = m_lcd_char_rom->base();
+			uint8_t const *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
 				font += 1024;
 			}
 
-			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
+			int const chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
 
 			for (int y = 0; y < 128; y++)
 			{
-				int offset = (m_lcd_scrolly * 128) + (m_lcd_scrollx & 0x7f) + ((y / 8) * 128);
+				int const offset = (m_lcd_scrolly * 128) + (m_lcd_scrollx & 0x7f) + ((y / 8) * 128);
 
 				for (int x = 0; x < 480; x++)
 				{
-					uint8_t ch = m_ram->pointer()[offset + (x / chrw)];
+					uint8_t const ch = m_ram->pointer()[offset + (x / chrw)];
 					uint8_t bit = font[((ch & 0x7f) * 8) + (y % 8)];
 					if (ch & 0x80)
 					{
 						bit = ~bit;
 					}
 
-					bitmap.pix16(y, x) = (bit >> (7 - (x % chrw))) & 1;
+					bitmap.pix(y, x) = (bit >> (7 - (x % chrw))) & 1;
 				}
 			}
 		}

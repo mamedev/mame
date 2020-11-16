@@ -917,8 +917,8 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		if (y >= fbi.yoffs)
 		{
-			uint16_t *src = (uint16_t *)(fbi.ram + fbi.rgboffs[drawbuf]) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
-			uint32_t *dst = &bitmap.pix32(y);
+			uint16_t const *const src = (uint16_t *)(fbi.ram + fbi.rgboffs[drawbuf]) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
+			uint32_t *const dst = &bitmap.pix(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = fbi.pen[src[x]];
 		}
@@ -944,8 +944,8 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		{
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				uint16_t* src = (uint16_t*)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
-				uint32_t* dst = &bitmap.pix32(y);
+				uint16_t const *const src = (uint16_t*)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
+				uint32_t *const dst = &bitmap.pix(y);
 				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
 			}

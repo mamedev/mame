@@ -346,7 +346,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						data = m_display_ram->read_byte(m_cgram_offset + c * 8 + cy);
 
 					for(int cx=0; cx<m_font_size; cx++)
-						bitmap.pix16(y * 8 + cy, x * m_font_size + cx) = BIT(data, m_font_size - 1 - cx);
+						bitmap.pix(y * 8 + cy, x * m_font_size + cx) = BIT(data, m_font_size - 1 - cx);
 				}
 			}
 
@@ -362,13 +362,13 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					switch(m_mode & 7)
 					{
 					case 0: // OR
-						bitmap.pix16(y, x * m_font_size + i) |= pix;
+						bitmap.pix(y, x * m_font_size + i) |= pix;
 						break;
 					case 1: // EXOR
-						bitmap.pix16(y, x * m_font_size + i) ^= pix;
+						bitmap.pix(y, x * m_font_size + i) ^= pix;
 						break;
 					case 3: // AND
-						bitmap.pix16(y, x * m_font_size + i) &= pix;
+						bitmap.pix(y, x * m_font_size + i) &= pix;
 						break;
 					case 4: // Text attribute
 						logerror("%s: Unimplemented Text attribute\n", machine().describe_context());

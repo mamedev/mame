@@ -21,22 +21,24 @@ DEFINE_DEVICE_TYPE(VSMILE_PAD, vsmile_pad_device, "vsmile_pad", "V.Smile Joystic
 //    V.Smile control pad
 //**************************************************************************
 
-DECLARE_ENUM_BITWISE_OPERATORS(vsmile_pad_device::stale_inputs)
-ALLOW_SAVE_TYPE(vsmile_pad_device::stale_inputs);
-
 vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: vsmile_ctrl_device_base(mconfig, VSMILE_PAD, tag, owner, clock)
+	: vsmile_pad_device(mconfig, VSMILE_PAD, tag, owner, clock)
+{
+}
+
+vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+	: vsmile_ctrl_device_base(mconfig, type, tag, owner, clock)
 	, m_io_joy(*this, "JOY")
 	, m_io_colors(*this, "COLORS")
 	, m_io_buttons(*this, "BUTTONS")
-	, m_idle_timer(nullptr)
-	, m_sent_joy(0x00U)
-	, m_sent_colors(0x00U)
-	, m_sent_buttons(0x00U)
-	, m_stale(STALE_ALL)
+	, m_sent_joy(0x0000U)
+	, m_sent_colors(0x0000U)
+	, m_sent_buttons(0x0000U)
 	, m_active(false)
+	, m_idle_timer(nullptr)
 {
 	std::fill(std::begin(m_ctrl_probe_history), std::end(m_ctrl_probe_history), 0U);
+	m_stale = stale_all();
 }
 
 vsmile_pad_device::~vsmile_pad_device()
@@ -51,10 +53,10 @@ void vsmile_pad_device::device_start()
 			timer_expired_delegate(FUNC(vsmile_pad_device::handle_idle), this));
 	m_idle_timer->adjust(attotime::from_seconds(1));
 
-	m_sent_joy = 0x00U;
-	m_sent_colors = 0x00U;
-	m_sent_buttons = 0x00U;
-	m_stale = STALE_ALL;
+	m_sent_joy = 0x0000U;
+	m_sent_colors = 0x0000U;
+	m_sent_buttons = 0x0000U;
+	m_stale = stale_all();
 	m_active = false;
 
 	save_item(NAME(m_sent_joy));
@@ -128,7 +130,7 @@ void vsmile_pad_device::tx_timeout()
 	{
 		m_idle_timer->reset();
 		m_active = false;
-		m_stale = STALE_ALL;
+		m_stale = stale_all();
 		std::fill(std::begin(m_ctrl_probe_history), std::end(m_ctrl_probe_history), 0U);
 		LOG("left active state\n");
 	}
@@ -174,7 +176,7 @@ INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_joy_changed)
 		if (!is_tx_empty())
 		{
 			LOG("joy changed while transmission in progress, marking stale\n");
-			m_stale |= stale_inputs(param);
+			m_stale |= stale_pad_inputs(param);
 		}
 		else
 		{
@@ -226,7 +228,7 @@ INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_button_changed)
 		if (!is_tx_empty())
 		{
 			LOG("buttons changed while transmission in progress, marking stale\n");
-			m_stale |= stale_inputs(param);
+			m_stale |= stale_pad_inputs(param);
 		}
 		else
 		{

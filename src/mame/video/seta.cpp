@@ -655,24 +655,24 @@ void seta_state::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectang
 	const bitmap_ind16 &src_bitmap = tilemap->pixmap();
 	const int opaque_mask = gfx_tilemap->granularity() - 1;
 	const int pixel_effect_mask = gfx_tilemap->colorbase() + (gfx_tilemap->colors() - 1) * gfx_tilemap->granularity();
-	int p;
 
 	const int width_mask = src_bitmap.width() - 1;
 	const int height_mask = src_bitmap.height() - 1;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *dest = &bitmap.pix16(y);
+		u16 *const dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
+			int p;
 			if (!flipscreen)
 			{
-				p = src_bitmap.pix16((y + scrolly) & height_mask, (x + scrollx) & width_mask);
+				p = src_bitmap.pix((y + scrolly) & height_mask, (x + scrollx) & width_mask);
 			}
 			else
 			{
-				p = src_bitmap.pix16((y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
+				p = src_bitmap.pix((y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
 			}
 
 			// draw not transparent pixels

@@ -234,16 +234,14 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 x,gfx;
-	u16 mem;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 	ma &= 0x7ff;
 
-	for (x = 0; x < x_count; x++)
+	for (u8 x = 0; x < x_count; x++)
 	{
-		mem = (x+ma)*8 + ra;
-		gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0);
+		u16 mem = (x+ma)*8 + ra;
+		u8 gfx = m_p_videoram[mem] ^ ((cursor_x == x) ? 0xff : 0);
 
 		*p++ = palette[BIT(gfx, 7) ? 7 : 0];
 		*p++ = palette[BIT(gfx, 6) ? 7 : 0];

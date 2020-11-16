@@ -157,10 +157,7 @@ void tandy2k_state::enable_w(uint8_t data)
 	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
-	if (!BIT(data, 5))
-	{
-		m_fdc->soft_reset();
-	}
+	m_fdc->reset_w(!BIT(data, 5));
 
 	// timer 0 enable
 	m_maincpu->tmrin0_w(BIT(data, 6));
@@ -406,6 +403,20 @@ void tandy2k_state::vpac_mem(address_map &map)
 
 static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
+	PORT_START("MOUSEBTN")
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tandy2kb_hle )
 	PORT_INCLUDE(pc_keyboard)
 
 	PORT_MODIFY("pc_keyboard_2")
@@ -440,19 +451,29 @@ static INPUT_PORTS_START( tandy2k )
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )  /* this would be button three but AFAIK no tandy mouse ever had one */
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, tandy2k_state, input_changed, 0)
 INPUT_PORTS_END
+
+class tandy2kb_hle_device : public pc_keyboard_device
+{
+public:
+	tandy2kb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(TANDY2K_HLE_KEYB, tandy2kb_hle_device, "tandy2kb_hle", "Tandy 2000 Keyboard HLE")
+
+tandy2kb_hle_device::tandy2kb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, TANDY2K_HLE_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor tandy2kb_hle_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tandy2kb_hle);
+}
 
 INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
 {
@@ -502,7 +523,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
-					bitmap.pix32(y, (sx * 8) + (7 - x)) = cpen[color];
+					bitmap.pix(y, (sx * 8) + (7 - x)) = cpen[color];
 				}
 			}
 			else
@@ -517,7 +538,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (int x = 0; x < 8; x++)
 				{
 					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
-					bitmap.pix32(y, (sx * 8) + x) = cpen[color];
+					bitmap.pix(y, (sx * 8) + x) = cpen[color];
 					data <<= 1;
 				}
 			}
@@ -624,7 +645,7 @@ CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 	{
 		int color = BIT(video, 7 - i);
 
-		bitmap.pix32(y, x++) = pen[color];
+		bitmap.pix(y, x++) = pen[color];
 	}
 }
 
@@ -1079,7 +1100,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	PC_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
+	TANDY2K_HLE_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");

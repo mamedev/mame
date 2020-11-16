@@ -5,7 +5,7 @@
     The MESS TI-99/8 emulation driver
 
     The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
-    its prototype state. Only a few dozens of consoles were built. The ROMs
+    its prototype state. Only a few dozen consoles were built. The ROMs
     were not even finalized, so the few available consoles have different
     operating system versions and capabilities.
 
@@ -15,7 +15,7 @@
 
     Name: "Texas Instruments Computer TI-99/8" (no "Home")
 
-    Inofficial nickname: "Armadillo"
+    Unofficial nickname: "Armadillo"
 
     CPU: Single-CPU system using a TMS9995, but as a variant named MP9537. This
          variant does not offer on-chip RAM or decrementer.
@@ -81,7 +81,7 @@
     Modes:
          - Compatibility mode (TI-99/4A mode): Memory-mapped devices are
            placed at the same location as found in the TI-99/4A, thereby
-           providing a good downward compatibility.
+           providing good downward compatibility.
            The console starts up in compatibility mode.
          - Native mode (Armadillo mode): Devices are located at positions above
            0xF000 that allow for a contiguous usage of memory.
@@ -94,7 +94,7 @@
     From the 32 bits, 24 bits define the physical address, so this allows for
     a maximum of 16 MiB of mapped-addressable memory.
 
-    See more about the mapper in the file mapper8.c.
+    See more about the mapper in the file 998board.cpp
 
 
     Availability of ROMs and documentation

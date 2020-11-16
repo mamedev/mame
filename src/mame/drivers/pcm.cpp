@@ -241,20 +241,19 @@ void pcm_state::machine_reset()
 
 u32 pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0x400,x;
+	u16 sy=0,ma=0x400;
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				chr = m_vram[x];
+				u8 const chr = m_vram[x];
 
-				gfx = m_p_chargen[(chr<<3) | ra];
+				u8 const gfx = m_p_chargen[(chr<<3) | ra];
 
 				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);

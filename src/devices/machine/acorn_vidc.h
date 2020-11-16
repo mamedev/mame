@@ -13,7 +13,6 @@
 
 #include "speaker.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

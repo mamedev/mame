@@ -94,11 +94,10 @@ GFXDECODE_END
 
 I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 {
-	unsigned i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	uint8_t pixels;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
+	uint8_t pixels;
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
@@ -111,8 +110,8 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 		pixels = ~pixels;
 	}
 
-	for (i = 0; i < 7; i++) {
-		bitmap.pix32(y, x + i) = palette[ (pixels & (1U << (7 - i))) != 0 ];
+	for (unsigned i = 0; i < 7; i++) {
+		bitmap.pix(y, x + i) = palette[ BIT(pixels, 7 - i) ];
 	}
 }
 

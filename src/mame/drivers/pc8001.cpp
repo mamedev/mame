@@ -373,18 +373,17 @@ static const rgb_t PALETTE_PC8001[] =
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 {
 	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
-	int i;
 
 	if (lc >= 8) return;
 	if (csr) data = 0xff;
 
 	if (m_width80)
 	{
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix32(y, (sx * 8) + i) = PALETTE_PC8001[color ? 7 : 0];
+			bitmap.pix(y, (sx * 8) + i) = PALETTE_PC8001[color ? 7 : 0];
 
 			data <<= 1;
 		}
@@ -393,12 +392,12 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 	{
 		if (sx % 2) return;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix32(y, (sx/2 * 16) + (i * 2)) = PALETTE_PC8001[color ? 7 : 0];
-			bitmap.pix32(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE_PC8001[color ? 7 : 0];
+			bitmap.pix(y, (sx/2 * 16) + (i * 2)) = PALETTE_PC8001[color ? 7 : 0];
+			bitmap.pix(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE_PC8001[color ? 7 : 0];
 
 			data <<= 1;
 		}

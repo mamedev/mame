@@ -15,8 +15,7 @@
 renderer_retro::~renderer_retro()
 {
 	// free the bitmap memory
-	if (m_bmdata != nullptr)
-		global_free_array(m_bmdata);
+	delete m_bmdata;
 }
 
 //============================================================

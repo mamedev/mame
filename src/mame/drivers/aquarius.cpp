@@ -10,7 +10,6 @@
     - slot interface for cartridges
     - hand controllers
     - scramble RAM also
-    - CAQ tape support
     - memory mapper
     - proper video timings
     - PAL mode
@@ -43,7 +42,7 @@ X-6026 : Roll of paper for the printer
 ***************************************************************************/
 
 #define XTAL1   8866000
-#define XTAL2   XTAL(7'159'090)
+#define XTAL2   7.15909_MHz_XTAL
 
 
 /***************************************************************************
@@ -362,7 +361,7 @@ GFXDECODE_END
 void aquarius_state::aquarius(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(3'579'545)); // ???
+	Z80(config, m_maincpu, XTAL2 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
 	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
@@ -384,6 +383,7 @@ void aquarius_state::aquarius(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
+	/* mini expander */
 	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
 	ay8910.port_a_read_callback().set_ioport("RIGHT");
 	ay8910.port_b_read_callback().set_ioport("LEFT");
@@ -393,15 +393,18 @@ void aquarius_state::aquarius(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_formats(aquarius_cassette_formats);
+	m_cassette->set_interface("aquarius_cass");
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "aquarius_cart");
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
+	RAM(config, RAM_TAG).set_default_size("20K").set_extra_options("4K,8K,36K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("aquarius");
+	SOFTWARE_LIST(config, "cart_list").set_original("aquarius_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("aquarius_cass");
 }
 
 
@@ -414,10 +417,10 @@ ROM_START( aquarius )
 
 	/* basic rom */
 	ROM_DEFAULT_BIOS("rev2")
-	ROM_SYSTEM_BIOS(0, "rev1", "Revision 1")
-	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "rev2", "Revision 2")
-	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "rev2", "Revision 2")
+	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rev1", "Revision 1")
+	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)

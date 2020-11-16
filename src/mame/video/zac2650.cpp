@@ -51,7 +51,6 @@ uint8_t zac2650_state::tinvader_port_0_r()
 int zac2650_state::SpriteCollision(int first,int second)
 {
 	int Checksum=0;
-	int x,y;
 	const rectangle &visarea = m_screen->visible_area();
 
 	if((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
@@ -70,12 +69,12 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Get fingerprint */
 
-		for (x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
 		{
-			for (y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
 			{
 				if (visarea.contains(x, y))
-					Checksum += m_spritebitmap.pix16(y, x);
+					Checksum += m_spritebitmap.pix(y, x);
 			}
 		}
 
@@ -89,12 +88,12 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Remove fingerprint */
 
-		for (x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
 		{
-			for (y = fy; y < fy +m_gfxdecode->gfx(expand)->height(); y++)
+			for (int y = fy; y < fy +m_gfxdecode->gfx(expand)->height(); y++)
 			{
 				if (visarea.contains(x, y))
-					Checksum -= m_spritebitmap.pix16(y, x);
+					Checksum -= m_spritebitmap.pix(y, x);
 			}
 		}
 
@@ -137,7 +136,6 @@ void zac2650_state::video_start()
 
 void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
 	const rectangle &visarea = m_screen->visible_area();
 
 	/* -------------------------------------------------------------- */
@@ -156,7 +154,7 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	// for collision detection checking
 	copybitmap(m_bitmap,bitmap,0,0,0,0,visarea);
 
-	for(offs=0;offs<0x50;offs+=0x10)
+	for(int offs=0;offs<0x50;offs+=0x10)
 	{
 		if((m_s2636_0_ram[offs+10]<0xF0) && (offs!=0x30))
 		{
@@ -164,7 +162,6 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int expand   = ((m_s2636_0_ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
 			int bx       = (m_s2636_0_ram[offs+10] * 4) - 22;
 			int by       = (m_s2636_0_ram[offs+12] * 3) + 3;
-			int x,y;
 
 			/* Sprite->Background collision detection */
 			m_gfxdecode->gfx(expand)->transpen(bitmap,cliprect,
@@ -173,12 +170,12 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					0,0,
 					bx,by, 0);
 
-			for (x = bx; x < bx + m_gfxdecode->gfx(expand)->width(); x++)
+			for (int x = bx; x < bx + m_gfxdecode->gfx(expand)->width(); x++)
 			{
-				for (y = by; y < by +m_gfxdecode->gfx(expand)->height(); y++)
+				for (int y = by; y < by +m_gfxdecode->gfx(expand)->height(); y++)
 				{
 					if (visarea.contains(x, y))
-						if (bitmap.pix16(y, x) != m_bitmap.pix16(y, x))
+						if (bitmap.pix(y, x) != m_bitmap.pix(y, x))
 						{
 							m_CollisionBackground = 0x80;
 							break;

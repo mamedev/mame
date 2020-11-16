@@ -341,18 +341,15 @@ uint8_t spaceg_state::colorram_r(offs_t offset)
 
 uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int i;
 		uint8_t data = m_videoram[offs];
 		int y = offs & 0xff;
 		int x = (offs >> 8) << 3;
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			bitmap.pix16(y, x) = (data & 0x80) ? m_colorram[offs] : 0;
+			bitmap.pix(y, x) = (data & 0x80) ? m_colorram[offs] : 0;
 
 			x++;
 			data <<= 1;

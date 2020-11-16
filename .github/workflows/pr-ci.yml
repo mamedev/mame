@@ -22,14 +22,20 @@ jobs:
   Windows:
     name: Build for Windows
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
-    - uses: numworks/setup-msys2@v1
+    - uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
-    - run: msys2do pacman -S --noconfirm --disable-download-timeout --needed wget git make mingw-w64-x86_64-binutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-pkg-config mingw-w64-x86_64-python2 zip p7zip
+        update: true
+        install: wget git make mingw-w64-x86_64-binutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-pkg-config mingw-w64-x86_64-python2 zip p7zip
     - uses: actions/checkout@v2
-    - run: msys2do make -f Makefile.libretro -j8
+    - name: Build libretro mame core
+      env:
+        MINGW64: "/mingw64"
+      run: make -f Makefile.libretro -j8
 
   macOS:
     name: Build for macOS

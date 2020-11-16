@@ -65,8 +65,8 @@ void kaypro_state::kayproii_pio_system_w(u8 data)
 		m_floppy->ss_w(!BIT(data, 2)); // signal exists even though drives are single sided
 	}
 
-	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output().set_value("ledB", BIT(data, 1));
+	m_leds[0] = BIT(data, 0);     // LEDs in artwork
+	m_leds[1] = BIT(data, 1);
 
 	m_centronics->write_strobe(BIT(data, 4));
 
@@ -78,7 +78,8 @@ void kaypro_state::kayproiv_pio_system_w(u8 data)
 	kayproii_pio_system_w(data);
 
 	/* side select */
-	m_floppy->ss_w(BIT(data, 2));
+	if (m_floppy)
+		m_floppy->ss_w(BIT(data, 2));
 }
 
 /***********************************************************
@@ -127,8 +128,8 @@ void kaypro_state::kaypro484_system_port_w(u8 data)
 		m_floppy->ss_w(!BIT(data, 2));
 	}
 
-	output().set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
-	output().set_value("ledB", BIT(data, 1));
+	m_leds[0] = BIT(data, 0);     // LEDs in artwork
+	m_leds[1] = BIT(data, 1);
 
 	m_centronics->write_strobe(BIT(data, 3));
 
@@ -176,36 +177,30 @@ void kaypro_state::kaypro484_system_port_w(u8 data)
 
 *************************************************************************************/
 
-void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(kaypro_state::floppy_timer)
 {
 	bool halt;
-	switch (id)
+	halt = (bool)m_maincpu->state_int(Z80_HALT);
+	if (m_is_motor_off)
 	{
-	case TIMER_FLOPPY:
-		halt = (bool)m_maincpu->state_int(Z80_HALT);
-		if (m_is_motor_off)
-		{
-			timer_set(attotime::from_hz(10), TIMER_FLOPPY);
-			break;
-		}
-		if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
-		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			m_fdc_rq |= 0x80;
-		}
-		else
-		if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
-		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-			m_fdc_rq &= 0x7f;
-		}
-		timer_set(attotime::from_hz(1e5), TIMER_FLOPPY);
-
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in kaypro_state::device_timer");
+		m_floppy_timer->adjust(attotime::from_hz(10));
+		return;
 	}
+
+	if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_fdc_rq |= 0x80;
+	}
+	else
+	if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_fdc_rq &= 0x7f;
+	}
+	m_floppy_timer->adjust(attotime::from_hz(1e5));
 }
+
 
 WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
 {
@@ -228,6 +223,8 @@ void kaypro_state::machine_start()
 	if (m_pio_s)
 		m_pio_s->strobe_a(0);
 
+	m_leds.resolve();
+
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_ram),  0x4000);
 
@@ -249,7 +246,7 @@ void kaypro_state::machine_reset()
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
 	m_maincpu->reset();
-	timer_set(attotime::from_hz(1), TIMER_FLOPPY);   /* kick-start the nmi timer */
+	m_floppy_timer->adjust(attotime::from_hz(1));   /* kick-start the nmi timer */
 }
 
 

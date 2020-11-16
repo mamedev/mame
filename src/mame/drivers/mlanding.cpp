@@ -243,12 +243,12 @@ void mlanding_state::machine_reset()
 
 u32 mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = m_palette->pens();
+	pen_t const *const pens = m_palette->pens();
 
 	for (u32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		u16 *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
-		u16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		u16 const *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
+		u16 *dst = &bitmap.pix(y, cliprect.min_x);
 
 		for (u32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{

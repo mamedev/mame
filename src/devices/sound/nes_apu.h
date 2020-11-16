@@ -56,6 +56,8 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
+	nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 

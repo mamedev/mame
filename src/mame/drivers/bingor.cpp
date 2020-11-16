@@ -564,37 +564,32 @@ void bingor_state::video_start()
 
 uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (0x2000 / 2);
-
-	for(y = 0; y < 256; y++)
+	int count = (0x2000 / 2);
+	for(int y = 0; y < 256; y++)
 	{
-		for(x = 0; x < 286; x += 4)
+		for(int x = 0; x < 286; x += 4)
 		{
-			uint32_t color;
-
-			color = (m_blit_ram[count] & 0xf000) >> 12;
+			uint32_t color = (m_blit_ram[count] & 0xf000) >> 12;
 
 			if(cliprect.contains(x + 3, y))
-				bitmap.pix32(y, x + 3) = m_palette->pen(color);
+				bitmap.pix(y, x + 3) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x0f00) >> 8;
 
 			if(cliprect.contains(x + 2, y))
-				bitmap.pix32(y, x + 2) = m_palette->pen(color);
+				bitmap.pix(y, x + 2) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x00f0) >> 4;
 
 			if(cliprect.contains(x + 1, y))
-				bitmap.pix32(y, x + 1) = m_palette->pen(color);
+				bitmap.pix(y, x + 1) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x000f) >> 0;
 
 			if(cliprect.contains(x + 0, y))
-				bitmap.pix32(y, x + 0) = m_palette->pen(color);
+				bitmap.pix(y, x + 0) = m_palette->pen(color);
 
 			count++;
 		}

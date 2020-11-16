@@ -42,7 +42,7 @@ void geebee_sound_device::device_start()
 		m_decay[0x7fff - i] = (int16_t) (0x7fff/exp(1.0*i/4096));
 
 	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-	m_channel = stream_alloc_legacy(0, 1, clock() / 3 / 2 / 384);
+	m_channel = stream_alloc(0, 1, clock() / 3 / 2 / 384);
 	m_vcount = 0;
 
 	m_volume_timer = timer_alloc(TIMER_VOLUME_DECAY);
@@ -103,16 +103,16 @@ void geebee_sound_device::sound_w(u8 data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void geebee_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-	{
-	stream_sample_t *buffer = outputs[0];
+void geebee_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	auto &buffer = outputs[0];
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer++ = m_sound_signal;
+		buffer.put_int(sampindex, m_sound_signal, 32768);
 		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
 		{
 			m_vcount++;

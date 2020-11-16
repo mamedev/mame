@@ -303,14 +303,10 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	offs_t offs;
 	pen_t pen = 0x3f;
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int bit;
-		uint8_t data;
-		uint8_t x;
 		uint8_t y = offs >> 5;
 
 		if (flip_screen_y())
@@ -319,23 +315,23 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if ((y < cliprect.min_y) || (y > cliprect.max_y))
 			continue;
 
-		x = (offs & 0x1f) << 3;
-		data = m_bitmap_ram[offs];
+		uint8_t x = (offs & 0x1f) << 3;
+		uint8_t data = m_bitmap_ram[offs];
 
 		if (flip_screen_x())
 			x = ~x;
 
-		for (bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 8; bit++)
 		{
 			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
-				bitmap.pix16(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 
 			if (flip_screen_x())
-				x = x - 1;
+				x--;
 			else
-				x = x + 1;
+				x++;
 
-			data = data << 1;
+			data <<= 1;
 		}
 	}
 }

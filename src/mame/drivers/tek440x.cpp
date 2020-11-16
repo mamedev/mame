@@ -131,22 +131,17 @@ void tek440x_state::machine_reset()
 
 u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u16 *video_ram;
-	u16 word;
-	u16 *line;
-	int y, x, b;
-
-	for (y = 0; y < 480; y++)
+	for (int y = 0; y < 480; y++)
 	{
-		line = &bitmap.pix16(y);
-		video_ram = &m_vram[y * 64];
+		u16 *const line = &bitmap.pix(y);
+		u16 const *video_ram = &m_vram[y * 64];
 
-		for (x = 0; x < 640; x += 16)
+		for (int x = 0; x < 640; x += 16)
 		{
-			word = *(video_ram++);
-			for (b = 0; b < 16; b++)
+			u16 const word = *(video_ram++);
+			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
+				line[x + b] = BIT(word, 15 - b);
 			}
 		}
 	}

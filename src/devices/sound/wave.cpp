@@ -62,7 +62,7 @@ void wave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 		for (int ch = 0; ch < 2; ch++)
 		{
-			cassette_get_samples(cassette, ch, time_index, duration, outputs[ch].samples(), 2, &m_sample_buf[0], CASSETTE_WAVEFORM_16BIT);
+			cassette->get_samples(ch, time_index, duration, outputs[ch].samples(), 2, &m_sample_buf[0], cassette_image::WAVEFORM_16BIT);
 			for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 				outputs[ch].put_int(sampindex, m_sample_buf[sampindex], 32768);
 		}

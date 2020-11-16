@@ -86,14 +86,14 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_t::netlist_t(netlist_state_t &state, const pstring &aname)
-		: m_state(state)
-		, m_solver(nullptr)
-		, m_time(netlist_time_ext::zero())
-		, m_mainclock(nullptr)
-		, m_queue(config::MAX_QUEUE_SIZE::value,
-			detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
-			detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
-		, m_use_stats(false)
+	: m_state(state)
+	, m_solver(nullptr)
+	, m_time(netlist_time_ext::zero())
+	, m_mainclock(nullptr)
+	, m_use_stats(false)
+	, m_queue(config::MAX_QUEUE_SIZE::value,
+		detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
+		detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
 	{
 		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), aname, "m_queue");
 		state.save(*this, m_time, aname, "m_time");
@@ -106,7 +106,6 @@ namespace netlist
 	netlist_state_t::netlist_state_t(const pstring &name,
 		plib::plog_delegate logger)
 	: m_log(logger)
-	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
@@ -141,9 +140,9 @@ namespace netlist
 		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp");
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp", true);
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
@@ -246,6 +245,7 @@ namespace netlist
 
 		ENTRY_EX(sizeof(base_device_t))
 		ENTRY_EX(sizeof(device_t))
+		ENTRY_EX(sizeof(logic_t))
 		ENTRY_EX(sizeof(logic_input_t))
 		ENTRY_EX(sizeof(logic_output_t))
 		ENTRY_EX(sizeof(param_model_t))
@@ -253,6 +253,7 @@ namespace netlist
 		ENTRY_EX(sizeof(state_var<int>))
 		ENTRY_EX(sizeof(pstring))
 		ENTRY_EX(sizeof(core_device_t::stats_t))
+		ENTRY_EX(sizeof(std::vector<detail::core_terminal_t *>))
 		ENTRY_EX(sizeof(plib::plog_level))
 
 		ENTRY_EX(sizeof(nldelegate))
@@ -338,7 +339,7 @@ namespace netlist
 				for (auto &n : m_nets)
 				{
 					n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
-					for (auto & term : n->core_terms())
+					for (auto & term : core_terms(*n))
 					{
 						if (!plib::container::contains(t, &term->delegate()))
 						{
@@ -432,7 +433,6 @@ namespace netlist
 			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
 			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
 			log().verbose("Queue Removes  {1:15}", si.m_queue.m_prof_remove());
-			log().verbose("Queue Retimes  {1:15}", si.m_queue.m_prof_retime());
 			log().verbose("");
 
 			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
@@ -619,7 +619,7 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : core_terms())
+		for (auto & term : exec().nlstate().core_terms(*this))
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
@@ -644,7 +644,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : core_terms())
+		for (core_terminal_t *ct : exec().nlstate().core_terms(*this))
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
@@ -704,13 +704,21 @@ namespace netlist
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
 
-	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate)
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, nldelegate delegate)
+	: terminal_t(dev, aname, otherterm, { nullptr, nullptr }, delegate)
+	{
+	}
+
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, const std::array<terminal_t *, 2> &splitterterms,
+		nldelegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, *otherterm);
+		state().setup().register_term(*this, otherterm, splitterterms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)

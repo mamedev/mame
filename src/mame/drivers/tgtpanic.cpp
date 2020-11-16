@@ -59,33 +59,31 @@ void tgtpanic_state::machine_start()
 uint32_t tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t colors[4];
-	uint32_t offs;
-	uint32_t x, y;
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
 	colors[2] = rgb_t(pal1bit(m_color >> 2), pal1bit(m_color >> 1), pal1bit(m_color >> 0));
 	colors[3] = rgb_t(pal1bit(m_color >> 6), pal1bit(m_color >> 5), pal1bit(m_color >> 4));
 
-	for (offs = 0; offs < 0x2000; ++offs)
+	for (uint32_t offs = 0; offs < 0x2000; ++offs)
 	{
 		uint8_t val = m_ram[offs];
 
-		y = (offs & 0x7f) << 1;
-		x = (offs >> 7) << 2;
+		uint32_t const y = (offs & 0x7f) << 1;
+		uint32_t const x = (offs >> 7) << 2;
 
 		/* I'm guessing the hardware doubles lines */
-		bitmap.pix32(y + 0, x + 0) = colors[val & 3];
-		bitmap.pix32(y + 1, x + 0) = colors[val & 3];
+		bitmap.pix(y + 0, x + 0) = colors[val & 3];
+		bitmap.pix(y + 1, x + 0) = colors[val & 3];
 		val >>= 2;
-		bitmap.pix32(y + 0, x + 1) = colors[val & 3];
-		bitmap.pix32(y + 1, x + 1) = colors[val & 3];
+		bitmap.pix(y + 0, x + 1) = colors[val & 3];
+		bitmap.pix(y + 1, x + 1) = colors[val & 3];
 		val >>= 2;
-		bitmap.pix32(y + 0, x + 2) = colors[val & 3];
-		bitmap.pix32(y + 1, x + 2) = colors[val & 3];
+		bitmap.pix(y + 0, x + 2) = colors[val & 3];
+		bitmap.pix(y + 1, x + 2) = colors[val & 3];
 		val >>= 2;
-		bitmap.pix32(y + 0, x + 3) = colors[val & 3];
-		bitmap.pix32(y + 1, x + 3) = colors[val & 3];
+		bitmap.pix(y + 0, x + 3) = colors[val & 3];
+		bitmap.pix(y + 1, x + 3) = colors[val & 3];
 	}
 
 	return 0;

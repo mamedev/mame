@@ -123,25 +123,24 @@ INPUT_CHANGED_MEMBER(ondra_state::nmi_button)
 
 u32 ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *r = m_ram->pointer();
+	u8 const *const r = m_ram->pointer();
 
 	u8 code1=0,code2=0;
-	int y, x, b;
 	int Vaddr = 0x2800;
 
-	for (x = 0; x < 40; x++)
+	for (int x = 0; x < 40; x++)
 	{
-		for (y = 127; y >=0; y--)
+		for (int y = 127; y >=0; y--)
 		{
 			if (m_video_enable)
 			{
 				code1 = r[0xd700 + Vaddr + 0x80];
 				code2 = r[0xd700 + Vaddr + 0x00];
 			}
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix16(2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
-				bitmap.pix16(2*y+1, x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
+				bitmap.pix(2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
+				bitmap.pix(2*y+1, x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
 			}
 			Vaddr++;
 		}

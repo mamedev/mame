@@ -171,12 +171,12 @@ void sbus_cgsix_device::device_reset()
 
 uint32_t sbus_cgsix_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = m_ramdac->pens();
-	uint8_t *vram = (uint8_t *)&m_vram[0];
+	pen_t const *const pens = m_ramdac->pens();
+	uint8_t const *const vram = (uint8_t *)&m_vram[0];
 
 	for (int16_t y = 0; y < 900; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 		const bool cursor_row_hit = (y >= m_cursor_y && y < (m_cursor_y + 32));
 		for (int16_t x = 0; x < 1152; x++)
 		{

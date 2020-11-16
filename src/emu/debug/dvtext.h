@@ -31,7 +31,12 @@ public:
 
 protected:
 	// construction/destruction
-	debug_view_textbuf(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate, text_buffer &textbuf);
+	debug_view_textbuf(
+			running_machine &machine,
+			debug_view_type type,
+			debug_view_osd_update_func osdupdate,
+			void *osdprivate,
+			text_buffer &textbuf);
 	virtual ~debug_view_textbuf();
 
 protected:
@@ -41,9 +46,9 @@ protected:
 
 private:
 	// internal state
-	text_buffer &       m_textbuf;              /* pointer to the text buffer */
-	bool                m_at_bottom;            /* are we tracking new stuff being added? */
-	u32                 m_topseq;               /* sequence number of the top line */
+	text_buffer &       m_textbuf;              // pointer to the text buffer
+	bool                m_at_bottom;            // are we tracking new stuff being added?
+	u32                 m_topseq;               // sequence number of the top line
 };
 
 

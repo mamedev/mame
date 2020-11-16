@@ -584,7 +584,7 @@ void arcadia_state::draw_sprites()
 				for (j=0,m=0x80; j<8; j++, m>>=1)
 				{
 					if (b & m)
-						m_bitmap->pix16(y, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
 				}
 			}
 			else
@@ -594,8 +594,8 @@ void arcadia_state::draw_sprites()
 				{
 					if (b & m)
 					{
-						m_bitmap->pix16(y, x + j) = color;
-						m_bitmap->pix16(y+1, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
+						m_bitmap->pix(y+1, x + j) = color;
 					}
 				}
 			}

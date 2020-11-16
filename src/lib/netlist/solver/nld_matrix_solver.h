@@ -10,10 +10,10 @@
 
 #include "nl_base.h"
 #include "nl_errstr.h"
-#include "plib/pmatrix_cr.h"
 #include "plib/palloc.h"
 #include "plib/penum.h"
 #include "plib/pmatrix2d.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
 #include "plib/vector_ops.h"

@@ -119,8 +119,6 @@ private:
 };
 
 static INPUT_PORTS_START( ibmpcjr )
-	PORT_INCLUDE(pc_keyboard)
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
@@ -404,8 +402,7 @@ void pcjr_state::pcjr_fdc_dor_w(uint8_t data)
 	else
 		m_fdc->set_floppy(nullptr);
 
-	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(m_pcjr_dor, 7));
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))

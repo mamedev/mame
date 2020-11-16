@@ -8572,30 +8572,29 @@ license:CC0
 	</software>
 
 <!-- Game Disks -->
-
-	<software name="1830rail" supported="no">
+	<software name="1830rail">
 		<description>1830 - Railroads &amp; Robber Barons</description>
 		<year>1995</year>
 		<publisher>Avalon Hill</publisher>
 		<info name="developer" value="Simtex" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 1).img" size="1474560" crc="c91a1322" sha1="91120df39f996d8713840dccf0ee322aa07a07e2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="38edb2bc" sha1="cda6c8de61645496cea395e2344a987783e3bd46"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 2).img" size="1474560" crc="f00758ba" sha1="0588634cee114f697d9e97254e188f4223627993"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="d8bad151" sha1="c6a2a27bf5d3c929b90da1cba59ef6755c0b5054"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 3).img" size="1474560" crc="d6d9a334" sha1="4d644adc76af7e04213237a3047fe6de761cbd5b"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="8b9cfa8d" sha1="0842b9d404bfb3edc8aa0cffb8a46bf9bf32144a"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 4).img" size="1474560" crc="2d61f1b1" sha1="728b2d863c985a250fbd41024ed289704836cc9f"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="1830 Railroads &amp; Robber Barons [Avalon Hill] [1995] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="01d9a5b5" sha1="7d03243a41e098e9c682637599024c4818186a8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10366,14 +10365,14 @@ license:CC0
 			<feature name="part_number" value="0863-1"/>
 			<feature name="part_id" value="Disk 1 of 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Doom_BBS_1.img" size="1474560" crc="e9b64e07" sha1="2f2a7ddc19b1c68696deaa06296684a6b0f4c538"/>
+				<rom name="Doom_BBS_1.img" size="1474560" crc="e9b64e07" sha1="2f2a7ddc19b1c68696deaa06296684a6b0f4c538" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_number" value="0863-2"/>
 			<feature name="part_id" value="Disk 2 of 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Doom_BBS_2.img" size="1474560" crc="154abef0" sha1="d34df477cd0e8f403a250a4c98ec1c7d06fb4042"/>
+				<rom name="Doom_BBS_2.img" size="1474560" crc="154abef0" sha1="d34df477cd0e8f403a250a4c98ec1c7d06fb4042" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -10959,50 +10958,98 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hofde">
-		<description>Fables &amp; Fiends - Book Two: The Hand of Fate (Germany)</description>
+	<software name="hof">
+		<description>Fables &amp; Fiends - Book Two: The Hand of Fate</description>
 		<year>1993</year>
+		<publisher>Virgin Interactive Entertainment</publisher>
+		<info name="version" value="v1.00c" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="c747690b" sha1="659353b54a015a8916a84091bcddfde30265dbf3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="4cd3a049" sha1="93b12ba7d7d026267f4b0cd63e88016648d38b0d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="a7c0c898" sha1="67256b49079329e255decccda8f40597be432c72"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="f3a249be" sha1="8dd62c8c0d923faa0374d786b2a1f91c5a69275e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="1b6b8aa9" sha1="bb483aee0dba9a12b6b4101a144f9f30d9591cbb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="702a1193" sha1="30ee3e66c79d01aff6574074fe2a8f55a2f21f1a"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="c11eec74" sha1="c0fd65c72359fed7f6b453926de494084fab7d22"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="0fd00a3d" sha1="5197ef4c02ca39ad259425a3d755b498c593c7bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hofde" cloneof="hof">
+		<description>Fables &amp; Fiends - Book Two: The Hand of Fate (Germany)</description>
+		<year>1994</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<info name="version" value="1.41" />
 		<info name="developer" value="Westwood Studios" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="f109ad49" sha1="c11eebac377d87990374f802a47f3574e92310fa"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="f109ad49" sha1="c11eebac377d87990374f802a47f3574e92310fa" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="9bcefa29" sha1="c71360c47f26cc50f024259747499a024355c86b"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="9bcefa29" sha1="c71360c47f26cc50f024259747499a024355c86b" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="4bd2ef7b" sha1="e39f0df11f5e042d5c2e08d80c2a8a76a2f61aa8"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="4bd2ef7b" sha1="e39f0df11f5e042d5c2e08d80c2a8a76a2f61aa8" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="ca427f9b" sha1="6edf8d1696645b37ef58f1444c8d68a637d7c6d7"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="ca427f9b" sha1="6edf8d1696645b37ef58f1444c8d68a637d7c6d7" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="f12b7d73" sha1="f8cc1cfeb466f464f8c4dd3df5e33f1055ca25a9"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="f12b7d73" sha1="f8cc1cfeb466f464f8c4dd3df5e33f1055ca25a9" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="2c3743dd" sha1="5bb7ffcaf7159658adf11c701fd875e89f93c466"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="2c3743dd" sha1="5bb7ffcaf7159658adf11c701fd875e89f93c466" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="34f16970" sha1="71f3fc2e66ec11105fd33d1bc55fa6e8c5e7aa71"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="34f16970" sha1="71f3fc2e66ec11105fd33d1bc55fa6e8c5e7aa71" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3"/>
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -11079,17 +11126,17 @@ license:CC0
 		<info name="version" value="1.03" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="b6b492b4" sha1="72f8342d0f5c8088be1d26026834d2d08d3c430d"/>
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="b6b492b4" sha1="72f8342d0f5c8088be1d26026834d2d08d3c430d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="730ac7ca" sha1="3f2e0bc149ec259fd7f8d5481005743975891b99"/>
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="730ac7ca" sha1="3f2e0bc149ec259fd7f8d5481005743975891b99" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="746eb33e" sha1="74cad4aed7f95cf4fb987844495f85b646801cde"/>
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="746eb33e" sha1="74cad4aed7f95cf4fb987844495f85b646801cde" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -12802,6 +12849,92 @@ license:CC0
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Day of the Tentacle (France) [LucasArts] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="4e21650b" sha1="8be9b2ffb1d7dd012ea51349ca5171fb1975f5eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmagic">
+		<description>Master of Magic (v1.1)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="SimTex" />
+		<info name="version" value="v1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="5a5f656d" sha1="0244a0ee5e3695aa0a4acff771939928d4cc1169" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="ec6b43bd" sha1="0ca1e773de672d619af3dd592935c713f373fe67" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="aec3a1a7" sha1="75cf93521d9a2a6b349e2ca4ce1894acb923a6d3" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="042ea60d" sha1="8d64348242da472b07ea8ffb555c491586be32ad" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="2a0215d6" sha1="b8c3eca13679a081ac507e835e65ec01ce9e1db4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="dc9888fe" sha1="3ea5a5febea4356d393dabe4b21c776fddfba167" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic (v1.1) [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="83a626b5" sha1="62c1d7717be4f5ac536fb9c8586283e92f7ea81b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmagica" cloneof="mmagic">
+		<description>Master of Magic (v1.0)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="SimTex" />
+		<info name="version" value="v1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="183161bf" sha1="7c8ff4474a0f4714a2b597b61ab11238d6e19526" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="a0295102" sha1="fe3a01c31065b31d5ed21706431979354934378b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="4c44bd1f" sha1="e3c00c246cb9377c6237bdebc86a638bfe9dd35b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="4b9be538" sha1="5b6dd84e9b22aebec0cadd23d7f67d27621b6096" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="9736e01c" sha1="2c68324ee278026f5103f98ebb82ab7ba186bd29" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="00e54856" sha1="cd384739f59ae99aa859c00d64d6470596e80988" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Magic [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="783b8434" sha1="a5722583bb690dd23983886b594ee63abf1a75e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -14717,6 +14850,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Euro)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- mpscopy.exe file version: MicroProse Software Unpacker - by Brian Reynolds - Version 1.07 - Lib 4.02 -->
 			<dataarea name="flop" size = "1474560">
@@ -14739,6 +14873,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Euro) (alt)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- mpscopy.exe file version: MicroProse Software Unpacker - F-15 Strike Eagle 3 - Version 1.08 - Lib 4.02 -->
 			<dataarea name="flop" size = "1474560">
@@ -14761,6 +14896,7 @@ license:CC0
 		<description>UFO - Enemy Unknown (Italy)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e6cac594" sha1="ff9e23147c99fa8bf101c556a6727a6261542893"/>
@@ -14782,6 +14918,7 @@ license:CC0
 		<description>X-COM - UFO Defense (USA)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
+		<info name="version" value="v1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Xcom Ufo Defense (USA) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="286b3afa" sha1="937264378c4766dcb8c6fc0ccbc607a8fe334f39"/>

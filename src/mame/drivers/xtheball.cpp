@@ -15,7 +15,6 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/tlc34076.h"
 #include "screen.h"
 #include "speaker.h"
@@ -77,19 +76,18 @@ void xtheball_state::machine_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 {
-	uint16_t *srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *const srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
-	int x;
 
 	/* bit stored at 3040130 controls which foreground mode to use */
 	if (!m_foreground_mode)
 	{
 		/* mode 0: foreground is the same as background */
-		uint16_t *srcfg = &m_vram_fg[(params->rowaddr << 8) & 0xff00];
+		uint16_t const *const srcfg = &m_vram_fg[(params->rowaddr << 8) & 0xff00];
 
-		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
 			uint16_t fgpix = srcfg[coladdr & 0xff];
 			uint16_t bgpix = srcbg[coladdr & 0xff];
@@ -102,9 +100,9 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 	{
 		/* mode 1: foreground is half background resolution in */
 		/* X and supports two pages */
-		uint16_t *srcfg = &m_vram_fg[(params->rowaddr << 7) & 0xff00];
+		uint16_t const *const srcfg = &m_vram_fg[(params->rowaddr << 7) & 0xff00];
 
-		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
 			uint16_t fgpix = srcfg[(coladdr >> 1) & 0xff] >> (8 * (coladdr & 1));
 			uint16_t bgpix = srcbg[coladdr & 0xff];
@@ -332,9 +330,6 @@ void xtheball_state::xtheball(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ZN428E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

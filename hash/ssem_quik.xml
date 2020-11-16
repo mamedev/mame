@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Software for the SSEM (Baby).
+
+-->
+<softwarelist name="ssem_quik" description="SSEM quickload">
+
+	<software name="diffeqt">
+		<description>DIFFEQT</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x191">
+				<rom name="diffeqt.asm" size="0x191" crc="f579c2de" sha1="f7c1dc1b680eb13dc3e4e6d0d9ebf8f760f80a70" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flash">
+		<description>FLASH</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x19b">
+				<rom name="flash.asm" size="0x19b" crc="fb1c34ac" sha1="471fd3a2cfb834dee4199030aa630e4439780366" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hcf">
+		<description>HCF</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x11d">
+				<rom name="hcf.asm" size="0x11d" crc="33fbdf7b" sha1="9b3f102c8c6678729a8ba8302df386029d535bfd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfr989">
+		<description>HFR989</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x142">
+				<rom name="hfr989.asm" size="0x142" crc="c65a7d51" sha1="0f56a7ccd8742fb6bdf4cefc474f304cc14fe226" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intdiv">
+		<description>INTDIV</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4e2">
+				<rom name="intdiv.snp" size="0x4e2" crc="20ff215a" sha1="798e5af3e6a39bee984340e20c3a6dd851509647" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="longdiv2">
+		<description>LONGDIV2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4e5">
+				<rom name="longdiv2.snp" size="0x4e5" crc="3ebd4f40" sha1="d8f35d02640f4fa3abe6a4fdff27567c01bf141d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medclock">
+		<description>MEDCLOCK</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4bb">
+				<rom name="medclock.snp" size="0x4bb" crc="da11b93c" sha1="9e15426b74d756c9d660a2a277b71fd91dce461b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmare">
+		<description>NIGHTMARE</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4e2">
+				<rom name="nightmare.snp" size="0x4e2" crc="facceafd" sha1="fbaa33b3e3ca892c95065ce5313947f46b48c1da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noodletimer">
+		<description>Noodle Timer</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4bb">
+				<rom name="noodletimer.snp" size="0x4bb" crc="62c0d92f" sha1="1de8b163745f64c26e3143eb78b71a4243e8a16b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="primegen">
+		<description>PRIMEGEN</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x17b">
+				<rom name="primegen.asm" size="0x17b" crc="df4c75e6" sha1="60a0f7cbbe5d5f7a3cfcec9f5ce62518a6d0fd27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slide9">
+		<description>Slide Show</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x4bf">
+				<rom name="slide9.snp" size="0x4bf" crc="084e5659" sha1="7e170748e2b00e54515ebdbfd1efbb9d6c0c6332" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virpet">
+		<description>Virtual Pet</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Achut Reddy"/>
+		<info name="usage" value="Press down-arrow to put cursor on line 22, then press E to feed your virtual pet."/>
+		<part name="quik" interface="ssemquik">
+			<dataarea name="quik" size="0x1ba">
+				<rom name="virpet.asm" size="0x1ba" crc="8547e875" sha1="b5de4c496073542675a63625860813eb98ac1590" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

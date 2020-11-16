@@ -164,19 +164,17 @@ void ec65_state::machine_reset()
 
 MC6845_UPDATE_ROW( ec65_common::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,inv;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
-		mem = (ma + x) & 0x7ff;
-		chr = m_vram[mem];
+		u8 const inv = (x == cursor_x) ? 0xff : 0;
+		u16 const mem = (ma + x) & 0x7ff;
+		u8 const chr = m_vram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = m_p_chargen[(chr<<4) | (ra & 0x0f)] ^ inv;
+		u8 const gfx = m_p_chargen[(chr<<4) | (ra & 0x0f)] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7)];

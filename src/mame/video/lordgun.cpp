@@ -309,12 +309,10 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// Scrolling
 
-	int x, y;
-
 	m_tilemap[0]->set_scrollx(0, *m_scroll_x[0] );
 	m_tilemap[0]->set_scrolly(0, *m_scroll_y[0] );
 
-	for (y = 0; y < 0x200; y++)
+	for (int y = 0; y < 0x200; y++)
 		m_tilemap[1]->set_scrollx(y, (*m_scroll_x[1]) + m_scrollram[y * 4/2 + 2/2]);
 	m_tilemap[1]->set_scrolly(0, *m_scroll_y[1] );
 
@@ -331,8 +329,7 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	pen_t trans_pen = 0 * 0x800 + 0x3f; // pri = 0, pen = 3f (transparent)
 
-	int l;
-	for (l = 0; l < 5; l++)
+	for (int l = 0; l < 5; l++)
 		m_bitmaps[l]->fill(trans_pen, cliprect);
 
 	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, *m_bitmaps[0], cliprect, 0, 0);
@@ -348,18 +345,18 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// layer index (0-3, 4 for sprites) -> priority address bit
 	const int layer2bit[5] = {0,1,2,4,3};
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t pens[5];
 
 			int pri_addr = 0;
 
 			// bits 0-4: layer transparency
-			for (l = 0; l < 5; l++)
+			for (int l = 0; l < 5; l++)
 			{
-				pens[l] = m_bitmaps[l]->pix16(y, x);
+				pens[l] = m_bitmaps[l]->pix(y, x);
 				if (pens[l] == trans_pen)
 					pri_addr |= 1 << layer2bit[l];
 			}
@@ -375,9 +372,9 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			pri_addr &= 0x7fff;
 
-			l   =   pri2layer[m_priority_ram[pri_addr] & 7];
+			int l = pri2layer[m_priority_ram[pri_addr] & 7];
 
-			bitmap.pix16(y, x) = pens[l] & 0x7ff;
+			bitmap.pix(y, x) = pens[l] & 0x7ff;
 		}
 	}
 

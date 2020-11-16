@@ -54,7 +54,7 @@ void elan_eu3a05_sound_device::map(address_map &map)
 void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
-	m_stream = stream_alloc_legacy(0, 1, 8000);
+	m_stream = stream_alloc(0, 1, 8000);
 
 	m_sound_end_cb.resolve_all_safe();
 
@@ -92,18 +92,19 @@ void elan_eu3a05_sound_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void elan_eu3a05_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	outputs[0].fill(0);
 
 	int volume = m_volumes[0] | (m_volumes[1] << 8);
 
 	int outpos = 0;
 	// loop while we still have samples to generate
+	int samples = outputs[0].samples();
 	while (samples-- != 0)
 	{
 		int total = 0;
@@ -142,7 +143,7 @@ void elan_eu3a05_sound_device::sound_stream_update_legacy(sound_stream &stream, 
 				//LOGMASKED( LOG_AUDIO, "m_isstopped %02x channel %d is NOT active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
 			}
 		}
-		outputs[0][outpos] = total / 6;
+		outputs[0].put_int(outpos, total, 32768 * 6);
 		outpos++;
 	}
 }

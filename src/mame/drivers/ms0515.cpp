@@ -68,19 +68,23 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "vg93")
-		, m_floppy0(*this, "vg93:0:525qd")
-		, m_floppy1(*this, "vg93:1:525qd")
+		, m_floppies(*this, "vg93:%u", 0U)
 		, m_i8251line(*this, "i8251line")
 		, m_rs232(*this, "rs232")
 		, m_i8251kbd(*this, "i8251kbd")
 		, m_ms7004(*this, "ms7004")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")
+		, m_bank(*this, "bank%u", 0U)
+		, m_led9(*this, "led9")
+		, m_led16(*this, "led16")
+		, m_led17(*this, "led17")
 	{ }
 
 	void ms0515(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -116,14 +120,17 @@ private:
 	required_device<t11_device> m_maincpu; // actual CPU is T11 clone, KR1807VM1
 	required_device<ram_device> m_ram;
 	required_device<kr1818vg93_device> m_fdc;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppies;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
 	required_device<i8251_device> m_i8251kbd;
 	required_device<ms7004_device> m_ms7004;
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_bank_array<7> m_bank;
+	output_finder<> m_led9;
+	output_finder<> m_led16;
+	output_finder<> m_led17;
 
 	uint8_t *m_video_ram;
 	uint8_t m_sysrega, m_sysregc;
@@ -199,30 +206,30 @@ void ms0515_state::ms0515_bank_w(uint16_t data)
 
 	m_bankreg = data;
 
-	membank("bank0")->set_base(ram + 0000000 + BIT(data, 0) * 0160000);
-	membank("bank1")->set_base(ram + 0020000 + BIT(data, 1) * 0160000);
-	membank("bank2")->set_base(ram + 0040000 + BIT(data, 2) * 0160000);
-	membank("bank3")->set_base(ram + 0060000 + BIT(data, 3) * 0160000);
-	membank("bank4")->set_base(ram + 0100000 + BIT(data, 4) * 0160000);
-	membank("bank5")->set_base(ram + 0120000 + BIT(data, 5) * 0160000);
-	membank("bank6")->set_base(ram + 0140000 + BIT(data, 6) * 0160000);
+	m_bank[0]->set_base(ram + 0000000 + BIT(data, 0) * 0160000);
+	m_bank[1]->set_base(ram + 0020000 + BIT(data, 1) * 0160000);
+	m_bank[2]->set_base(ram + 0040000 + BIT(data, 2) * 0160000);
+	m_bank[3]->set_base(ram + 0060000 + BIT(data, 3) * 0160000);
+	m_bank[4]->set_base(ram + 0100000 + BIT(data, 4) * 0160000);
+	m_bank[5]->set_base(ram + 0120000 + BIT(data, 5) * 0160000);
+	m_bank[6]->set_base(ram + 0140000 + BIT(data, 6) * 0160000);
 
 	if (BIT(data, 7))
 	{
 		switch ((data >> 10) & 3)
 		{
 		case 0: // 000000 - 037777
-			membank("bank0")->set_base(ram + 0000000 + 0340000);
-			membank("bank1")->set_base(ram + 0020000 + 0340000);
+			m_bank[0]->set_base(ram + 0000000 + 0340000);
+			m_bank[1]->set_base(ram + 0020000 + 0340000);
 			break;
 		case 1: // 040000 - 077777
-			membank("bank2")->set_base(ram + 0000000 + 0340000);
-			membank("bank3")->set_base(ram + 0020000 + 0340000);
+			m_bank[2]->set_base(ram + 0000000 + 0340000);
+			m_bank[3]->set_base(ram + 0020000 + 0340000);
 			break;
 		case 2:
 		case 3: // 100000 - 137777
-			membank("bank4")->set_base(ram + 0000000 + 0340000);
-			membank("bank5")->set_base(ram + 0020000 + 0340000);
+			m_bank[4]->set_base(ram + 0000000 + 0340000);
+			m_bank[5]->set_base(ram + 0020000 + 0340000);
 			break;
 		}
 	}
@@ -258,17 +265,17 @@ void ms0515_state::ms0515_porta_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg A <- %02x\n", data);
 
-	output().set_value("led16", BIT(data, 5));
-	output().set_value("led9", BIT(data, 4));
+	m_led16 = BIT(data, 5);
+	m_led9 = BIT(data, 4);
 
 	switch (data & 3)
 	{
 	case 0:
-		m_floppy = m_floppy0;
+		m_floppy = m_floppies[0]->get_device();
 		break;
 
 	case 1:
-		m_floppy = m_floppy1;
+		m_floppy = m_floppies[1]->get_device();
 		break;
 
 	default:
@@ -284,8 +291,9 @@ void ms0515_state::ms0515_porta_w(uint8_t data)
 	}
 	else
 	{
-		m_floppy0->mon_w(1);
-		m_floppy1->mon_w(1);
+		for (auto &floppy : m_floppies)
+			if (floppy->get_device() != nullptr)
+				floppy->get_device()->mon_w(1);
 	}
 
 	m_sysrega = data;
@@ -330,7 +338,7 @@ void ms0515_state::ms0515_portc_w(uint8_t data)
 	LOGSYSREG("Sysreg C <- %02x\n", data);
 
 	m_pit8253->write_gate2(BIT(data, 7));
-	output().set_value("led17", BIT(data, 4));
+	m_led17 = BIT(data, 4);
 
 	m_sysregc = data;
 }
@@ -350,6 +358,13 @@ WRITE_LINE_MEMBER(ms0515_state::write_line_clock)
 WRITE_LINE_MEMBER(ms0515_state::pit8253_out2_changed)
 {
 	m_speaker->level_w(state);
+}
+
+void ms0515_state::machine_start()
+{
+	m_led9.resolve();
+	m_led16.resolve();
+	m_led17.resolve();
 }
 
 void ms0515_state::machine_reset()
@@ -384,34 +399,33 @@ static void ms0515_floppies(device_slot_interface &device)
 
 uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b;
 	int addr = 0;
 
 	if (BIT(m_sysregc, 3))
 	{
 		uint8_t fg = m_sysregc & 7;
 		uint8_t bg = fg ^ 7;
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint16_t code = (m_video_ram[addr++] << 8);
-				code += m_video_ram[addr++];
-				for (b = 0; b < 16; b++)
+				code |= m_video_ram[addr++];
+				for (int b = 0; b < 16; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
+					bitmap.pix(y, horpos++) = ((code >> (15 - b)) & 0x01) ? bg : fg;
 				}
 			}
 		}
 	}
 	else
 	{
-		for (y = 0; y < 200; y++)
+		for (int y = 0; y < 200; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
 				uint8_t code = m_video_ram[addr++];
 				uint8_t attr = m_video_ram[addr++];
@@ -424,11 +438,11 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 					bg = tmp;
 					m_blink = -1;
 				}
-				for (b = 0; b < 8; b++)
+				for (int b = 0; b < 8; b++)
 				{
 					// In lower res mode we will just double pixels
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
-					bitmap.pix16(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
+					bitmap.pix(y, horpos++) = ((code >> (7 - b)) & 0x01) ? fg : bg;
 				}
 			}
 		}

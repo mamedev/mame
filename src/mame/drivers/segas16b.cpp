@@ -4274,9 +4274,6 @@ void dfjail_state::dfjail(machine_config &config)
 	config.device_remove("upd");
 
 	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -7578,7 +7575,8 @@ ROM_END
 //*************************************************************************************************************************
 //  Passing Shot (World, 4 Players), Sega System 16B
 //  CPU: FD1094 No. 317-0074
-//  ROM Board No. 171-5358
+//    ROM Board No. 171-5358
+//       I/O Board: 834-6523 (for Players 3 & 4)
 //
 ROM_START( passshta )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
@@ -7638,7 +7636,10 @@ ROM_END
 //*************************************************************************************************************************
 //  Passing Shot (Japan, 4 Players), Sega System 16B
 //  CPU: FD1094 No. 317-0070
-//  ROM Board No. 171-5358
+//    ROM Board No. 171-5358
+//       I/O Board: 834-6523 (for Players 3 & 4)
+//     Game Number: 833-6714 PASSING SHOT
+//
 //
 //  J1 - -
 //  J2 ---

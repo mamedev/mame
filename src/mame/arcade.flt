@@ -258,6 +258,7 @@ cops.cpp
 copsnrob.cpp
 corona.cpp
 cosmic.cpp
+cowtipping.cpp
 cps1.cpp
 cps1bl_5205.cpp
 cps1bl_pic.cpp
@@ -643,6 +644,7 @@ konmedal.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
+kpython.cpp
 ksayakyu.cpp
 ksys573.cpp
 kungfur.cpp
@@ -939,6 +941,7 @@ phoenix.cpp
 photon.cpp
 photon2.cpp
 photoply.cpp
+photoplysx.cpp
 piggypas.cpp
 pinball2k.cpp
 pingpong.cpp
@@ -988,7 +991,6 @@ pturn.cpp
 pubtimed.cpp
 puckpkmn.cpp
 punchout.cpp
-pyson.cpp
 pzletime.cpp
 qdrmfgp.cpp
 qix.cpp
@@ -1025,6 +1027,7 @@ relief.cpp
 renegade.cpp
 retofinv.cpp
 rfslots8085.cpp
+rfslotspcpent.cpp
 rgum.cpp
 rltennis.cpp
 rmhaihai.cpp

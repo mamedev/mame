@@ -257,8 +257,8 @@ uint32_t beezer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			bitmap.pix16(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
-			bitmap.pix16(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
+			bitmap.pix(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
+			bitmap.pix(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
 		}
 	}
 

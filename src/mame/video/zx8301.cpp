@@ -261,7 +261,7 @@ void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, uint16_t da)
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
 
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[ZX8301_COLOR_MODE4[color]];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[ZX8301_COLOR_MODE4[color]];
 
 			byte_high <<= 1;
 			byte_low <<= 1;
@@ -306,8 +306,8 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 				flash_color = color;
 			}
 
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
-			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[color];
+			bitmap.pix(y, x++) = PALETTE_ZX8301[color];
 
 			byte_high <<= 2;
 			byte_low <<= 2;

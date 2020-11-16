@@ -277,7 +277,7 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 				int py = 8 + y*8 + yi;
 
 				if (cliprect.contains(px, py))
-					bitmap.pix16(py, px) = (vram[addr % 0x140] >> yi) & 1;
+					bitmap.pix(py, px) = (vram[addr % 0x140] >> yi) & 1;
 			}
 
 			row_pos++;
@@ -336,7 +336,7 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 				else if (x < 74 && yi < 7)
 				{
 					int cx = x - 59;
-					bitmap.pix16(yi, (y ? 0 : 89) + (16 - (cx + cx / 5))) = state;
+					bitmap.pix(yi, (y ? 0 : 89) + (16 - (cx + cx / 5))) = state;
 				}
 			}
 		}
@@ -413,7 +413,7 @@ HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 	for (int i=0; i<20; i++)
 		if (pos == layout[i])
 		{
-			bitmap.pix16((line * 9) + y, (i * 6) + x) = state;
+			bitmap.pix((line * 9) + y, (i * 6) + x) = state;
 			break;
 		}
 }
@@ -962,7 +962,7 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 		};
 
 		uint8_t char_pos = gl4000_display_layout[line*40 + pos];
-		bitmap.pix16((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
+		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
 	}
 }
 

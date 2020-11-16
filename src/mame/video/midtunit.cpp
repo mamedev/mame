@@ -849,8 +849,8 @@ skipdma:
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_video_device::scanline_update)
 {
-	uint16_t *src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr << 1;
 
 	/* copy the non-blanked portions of this scanline */
@@ -861,8 +861,8 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_video_device::scanline_update)
 TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_video_device::scanline_update)
 {
 	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
-	uint16_t *src = &m_local_videoram[fulladdr & 0x3fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_local_videoram[fulladdr & 0x3fe00];
+	uint16_t *const dest = &bitmap.pix(scanline);
 
 	/* copy the non-blanked portions of this scanline */
 	for (int x = params->heblnk; x < params->hsblnk; x++)
@@ -1018,7 +1018,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		}
 	}
 
-	png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
+	util::png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
 
 	if (m_log_json)
 	{

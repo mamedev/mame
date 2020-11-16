@@ -300,16 +300,16 @@ inline void scv_state::plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_
 		x -= 4;
 
 		if (pat & 0x08)
-			bitmap.pix16(y + 2, x) = col;
+			bitmap.pix(y + 2, x) = col;
 
 		if (pat & 0x04 && x < 255 )
-			bitmap.pix16(y + 2, x + 1) = col;
+			bitmap.pix(y + 2, x + 1) = col;
 
 		if (pat & 0x02 && x < 254)
-			bitmap.pix16(y + 2, x + 2) = col;
+			bitmap.pix(y + 2, x + 2) = col;
 
 		if (pat & 0x01 && x < 253)
-			bitmap.pix16(y + 2, x + 3) = col;
+			bitmap.pix(y + 2, x + 3) = col;
 	}
 }
 
@@ -354,32 +354,30 @@ inline void scv_state::draw_sprite( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, 
 
 inline void scv_state::draw_text( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t *char_data, uint8_t fg, uint8_t bg )
 {
-	int i;
-
-	for ( i = 0; i < 8; i++ )
+	for ( int i = 0; i < 8; i++ )
 	{
-		uint8_t d = char_data[i];
+		uint8_t const d = char_data[i];
 
-		bitmap.pix16(y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 2 ) = ( d & 0x20 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 3 ) = ( d & 0x10 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 4 ) = ( d & 0x08 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 5 ) = ( d & 0x04 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 6 ) = ( d & 0x02 ) ? fg : bg;
-		bitmap.pix16(y + i, x + 7 ) = ( d & 0x01 ) ? fg : bg;
+		bitmap.pix(y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
+		bitmap.pix(y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
+		bitmap.pix(y + i, x + 2 ) = ( d & 0x20 ) ? fg : bg;
+		bitmap.pix(y + i, x + 3 ) = ( d & 0x10 ) ? fg : bg;
+		bitmap.pix(y + i, x + 4 ) = ( d & 0x08 ) ? fg : bg;
+		bitmap.pix(y + i, x + 5 ) = ( d & 0x04 ) ? fg : bg;
+		bitmap.pix(y + i, x + 6 ) = ( d & 0x02 ) ? fg : bg;
+		bitmap.pix(y + i, x + 7 ) = ( d & 0x01 ) ? fg : bg;
 	}
 
-	for ( i = 8; i < 16; i++ )
+	for ( int i = 8; i < 16; i++ )
 	{
-		bitmap.pix16(y + i, x + 0 ) = bg;
-		bitmap.pix16(y + i, x + 1 ) = bg;
-		bitmap.pix16(y + i, x + 2 ) = bg;
-		bitmap.pix16(y + i, x + 3 ) = bg;
-		bitmap.pix16(y + i, x + 4 ) = bg;
-		bitmap.pix16(y + i, x + 5 ) = bg;
-		bitmap.pix16(y + i, x + 6 ) = bg;
-		bitmap.pix16(y + i, x + 7 ) = bg;
+		bitmap.pix(y + i, x + 0 ) = bg;
+		bitmap.pix(y + i, x + 1 ) = bg;
+		bitmap.pix(y + i, x + 2 ) = bg;
+		bitmap.pix(y + i, x + 3 ) = bg;
+		bitmap.pix(y + i, x + 4 ) = bg;
+		bitmap.pix(y + i, x + 5 ) = bg;
+		bitmap.pix(y + i, x + 6 ) = bg;
+		bitmap.pix(y + i, x + 7 ) = bg;
 	}
 
 }
@@ -387,35 +385,31 @@ inline void scv_state::draw_text( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, ui
 
 inline void scv_state::draw_semi_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg )
 {
-	int i;
-
 	if ( ! data )
 		return;
 
-	for ( i = 0; i < 4; i++ )
+	for ( int i = 0; i < 4; i++ )
 	{
-		bitmap.pix16(y + i, x + 0) = fg;
-		bitmap.pix16(y + i, x + 1) = fg;
-		bitmap.pix16(y + i, x + 2) = fg;
-		bitmap.pix16(y + i, x + 3) = fg;
+		bitmap.pix(y + i, x + 0) = fg;
+		bitmap.pix(y + i, x + 1) = fg;
+		bitmap.pix(y + i, x + 2) = fg;
+		bitmap.pix(y + i, x + 3) = fg;
 	}
 }
 
 
 inline void scv_state::draw_block_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col )
 {
-	int i;
-
-	for ( i = 0; i < 8; i++ )
+	for ( int i = 0; i < 8; i++ )
 	{
-		bitmap.pix16(y + i, x + 0) = col;
-		bitmap.pix16(y + i, x + 1) = col;
-		bitmap.pix16(y + i, x + 2) = col;
-		bitmap.pix16(y + i, x + 3) = col;
-		bitmap.pix16(y + i, x + 4) = col;
-		bitmap.pix16(y + i, x + 5) = col;
-		bitmap.pix16(y + i, x + 6) = col;
-		bitmap.pix16(y + i, x + 7) = col;
+		bitmap.pix(y + i, x + 0) = col;
+		bitmap.pix(y + i, x + 1) = col;
+		bitmap.pix(y + i, x + 2) = col;
+		bitmap.pix(y + i, x + 3) = col;
+		bitmap.pix(y + i, x + 4) = col;
+		bitmap.pix(y + i, x + 5) = col;
+		bitmap.pix(y + i, x + 6) = col;
+		bitmap.pix(y + i, x + 7) = col;
 	}
 }
 

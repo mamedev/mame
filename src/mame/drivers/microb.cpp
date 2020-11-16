@@ -285,9 +285,9 @@ I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 		dots ^= 0xff;
 
 	// HLGT is active on status line
-	rgb_t fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	rgb_t const fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 
-	u32 *pix = &bitmap.pix32(y, x);
+	u32 *pix = &bitmap.pix(y, x);
 	for (int i = 0; i < 8; i++)
 	{
 		*pix++ = BIT(dots, 7) ? fg : rgb_t::black();

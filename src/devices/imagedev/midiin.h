@@ -60,7 +60,7 @@ private:
 
 	void xmit_char(uint8_t data);
 
-	osd_midi_device *m_midi;
+	std::unique_ptr<osd_midi_device> m_midi;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
 	uint8_t m_xmitring[XMIT_RING_SIZE];

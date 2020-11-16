@@ -96,7 +96,7 @@ NETLIST_START(astrob)
 	PARAM(Solver.Solver_54.DYNAMIC_MIN_TIMESTEP, 4e-6)  // gets rid of NR loops failure
 #else
 #if !(ENABLE_SONAR_ALT)
-	PARAM(Solver.Solver_42.DYNAMIC_MIN_TIMESTEP, 6e-6)  // gets rid of NR loops failure
+	PARAM(Solver.Solver_41.DYNAMIC_MIN_TIMESTEP, 6e-6)  // gets rid of NR loops failure
 #endif
 #endif
 #else
@@ -479,7 +479,7 @@ NETLIST_START(astrob)
 	Q_2N4403(Q1)
 	Q_2N4403(Q2)
 	Q_2N4403(Q3)
-	Q_2N4093(Q4)
+	//Q_2N4093(Q4)  // avoid singular matrix being created
 	Q_2N4093(Q5)
 	Q_2N4093(Q6)
 	Q_2N4403(Q7)
@@ -488,6 +488,13 @@ NETLIST_START(astrob)
 	Q_2N4403(Q10)
 
 	TL084_DIP(U1)           // Op. Amp.
+	NET_C(U1.4, I_V12)
+	NET_C(U1.11, I_VM12)
+
+	TL084_DIP(U2)           // Op. Amp.
+	NET_C(U2.4, I_V12)
+	NET_C(U2.11, I_VM12)
+
 #if (ENABLE_SONAR_ALT)
 	// Oscillators are of order 1kHz. No need to to have UGF in MHz range
 	PARAM(U1.A.MODEL, "TL084(TYPE=3 UGF=10k)")
@@ -499,12 +506,6 @@ NETLIST_START(astrob)
 	PARAM(U2.C.MODEL, "TL084(TYPE=3 UGF=10k)")
 	PARAM(U2.D.MODEL, "TL084(TYPE=3 UGF=10k)")
 #endif
-	NET_C(U1.4, I_V12)
-	NET_C(U1.11, I_VM12)
-
-	TL084_DIP(U2)           // Op. Amp.
-	NET_C(U2.4, I_V12)
-	NET_C(U2.11, I_VM12)
 
 	CD4017_DIP(U3)          // Decade Counter/Divider
 	NET_C(U3.8, GND)
@@ -675,7 +676,7 @@ NETLIST_START(astrob)
 
 	NET_C(U2.3, GND)
 	NET_C(U2.2, D6.A, R65.1)
-	NET_C(U2.14, D6.K, R62.1)
+	NET_C(U2.1, D6.K, R62.1)
 	NET_C(R62.2, R63.2, C24.1, C25.1)
 	NET_C(R63.1, GND)
 	NET_C(R65.2, R64.2, U2.7, C25.2, R66.2)
@@ -691,13 +692,30 @@ NETLIST_START(astrob)
 	NET_C(C40.2, R93.1, U2.9)
 	NET_C(U2.10, GND)
 
+	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
+
 #if (ENABLE_SONAR_ALT)
+	// The oscillators need a small offset voltage to start oscillating.
+	// Without frontiers I assume the offset voltage is created due to the
+	// slight differences in resistor values in the four (now connected)
+	// oscillators.
+
+	ANALOG_INPUT(I_VOFF, 0.1)
+	RES(RDUM1, RES_M(1))
+	RES(RDUM2, RES_M(1))
+	RES(RDUM3, RES_M(1))
+	RES(RDUM4, RES_M(1))
+	NET_C(R5.2, RDUM1.1)
+	NET_C(R40.2, RDUM2.1)
+	NET_C(R95.2, RDUM3.1)
+	NET_C(R66.2, RDUM4.1)
+	NET_C(I_VOFF, RDUM1.2, RDUM2.2, RDUM3.2, RDUM4.2)
+
 	OPTIMIZE_FRONTIER(R5.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R40.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R95.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R66.2, RES_K(68), 192)
 #endif
-	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
 #endif
 
 	NET_C(R114.2, GND)

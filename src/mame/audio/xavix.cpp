@@ -27,7 +27,7 @@ void xavix_sound_device::device_start()
 	m_readregs_cb.resolve_safe(0xff);
 	m_readsamples_cb.resolve_safe(0x80);
 
-	m_stream = stream_alloc_legacy(0, 2, 163840);
+	m_stream = stream_alloc(0, 2, 163840);
 }
 
 void xavix_sound_device::device_reset()
@@ -43,14 +43,15 @@ void xavix_sound_device::device_reset()
 }
 
 
-void xavix_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	int outpos = 0;
 	// loop while we still have samples to generate
+	int samples = outputs[0].samples();
 	while (samples-- != 0)
 	{
 		for (int channel = 0; channel < 2; channel++)
@@ -83,7 +84,7 @@ void xavix_sound_device::sound_stream_update_legacy(sound_stream &stream, stream
 							*/
 						}
 
-						outputs[channel][outpos] += sample * (m_voice[v].vol + 1);
+						outputs[channel].add_int(outpos, sample * (m_voice[v].vol + 1), 32768);
 						m_voice[v].position[channel] += m_voice[v].rate;
 					}
 					else

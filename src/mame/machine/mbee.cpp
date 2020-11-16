@@ -16,19 +16,6 @@
 #include "machine/z80bin.h"
 
 
-void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_MBEE_NEWKB:
-		timer_newkb(ptr, param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mbee_state::device_timer");
-	}
-}
-
-
 /***********************************************************
 
     PIO
@@ -144,7 +131,7 @@ void mbee_state::fdc_motor_w(uint8_t data)
 ************************************************************/
 
 
-TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
+TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 {
 	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
 	pin 2 (XTL2) and is therefore 2MHz. If a key change is detected (up or down), the /strobe
@@ -156,6 +143,9 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	The 3870 (MK3870) 8-bit microcontroller is a single chip implementation of Fairchild F8 (Mostek 3850).
 	It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
 	of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
+
+	if (!BIT(m_features, 2))
+		return;
 
 	uint8_t i, j, pressed;
 
@@ -186,8 +176,6 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 
 	if (m_b2)
 		m_pio->port_b_write(pio_port_b_r());
-
-	timer_set(attotime::from_hz(50), TIMER_MBEE_NEWKB);
 }
 
 uint8_t mbee_state::port18_r()
@@ -488,10 +476,6 @@ void mbee_state::machine_start()
 		m_size = 0xE000;
 	else
 		m_size = 0x8000;
-
-	// new keyboard
-	if (BIT(m_features, 2))
-		timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
 
 	// premium
 	if (BIT(m_features, 3))

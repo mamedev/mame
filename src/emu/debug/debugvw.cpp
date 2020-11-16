@@ -326,7 +326,7 @@ debug_view_manager::~debug_view_manager()
 	{
 		debug_view *oldhead = m_viewlist;
 		m_viewlist = oldhead->m_next;
-		global_free(oldhead);
+		delete oldhead;
 	}
 }
 
@@ -340,25 +340,25 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 	switch (type)
 	{
 		case DVT_CONSOLE:
-			return append(global_alloc(debug_view_console(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_console(machine(), osdupdate, osdprivate));
 
 		case DVT_STATE:
-			return append(global_alloc(debug_view_state(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_state(machine(), osdupdate, osdprivate));
 
 		case DVT_DISASSEMBLY:
-			return append(global_alloc(debug_view_disasm(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_disasm(machine(), osdupdate, osdprivate));
 
 		case DVT_MEMORY:
-			return append(global_alloc(debug_view_memory(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_memory(machine(), osdupdate, osdprivate));
 
 		case DVT_LOG:
-			return append(global_alloc(debug_view_log(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_log(machine(), osdupdate, osdprivate));
 
 		case DVT_BREAK_POINTS:
-			return append(global_alloc(debug_view_breakpoints(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_breakpoints(machine(), osdupdate, osdprivate));
 
 		case DVT_WATCH_POINTS:
-			return append(global_alloc(debug_view_watchpoints(machine(), osdupdate, osdprivate)));
+			return append(new debug_view_watchpoints(machine(), osdupdate, osdprivate));
 
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
@@ -378,7 +378,7 @@ void debug_view_manager::free_view(debug_view &view)
 		if (*viewptr == &view)
 		{
 			*viewptr = view.m_next;
-			global_free(&view);
+			delete &view;
 			break;
 		}
 }

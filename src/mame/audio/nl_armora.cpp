@@ -224,7 +224,7 @@ NETLIST_START(armora)
 	D_1N914(D8)
 
 
-	Q_2N3904(Q1)            // NPN
+//  Q_2N3904(Q1)            // NPN -- not used
 	Q_2N3906(Q2)            // PNP
 	Q_2N3906(Q3)            // PNP
 	Q_2N3906(Q4)            // PNP

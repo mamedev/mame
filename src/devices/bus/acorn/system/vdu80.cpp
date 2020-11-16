@@ -172,7 +172,7 @@ void acorn_vdu80_device::device_reset()
 MC6845_UPDATE_ROW(acorn_vdu80_device::crtc_update_row)
 {
 	uint8_t invert = BIT(m_links->read(), 1);
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	for (int column = 0; column < x_count; column++)
 	{

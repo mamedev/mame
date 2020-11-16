@@ -123,7 +123,6 @@ NOTE: Trivia Question ROM names are the internal names used. IE: read from the f
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -235,7 +234,7 @@ void gei_state::gei_bitmap_w(offs_t offset, uint8_t data)
 	sy = (sy + m_yadd) & 0xff;
 
 	for (int i = 0; i < 8; i++)
-		m_bitmap.pix16(sy, sx + i) = m_color[8 - i - 1];
+		m_bitmap.pix(sy, sx + i) = m_color[8 - i - 1];
 }
 
 void gei_state::video_start()
@@ -1058,8 +1057,6 @@ void gei_state::getrivia(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void gei_state::findout(machine_config &config)

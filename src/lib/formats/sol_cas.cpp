@@ -33,10 +33,10 @@ SVT - The full explanation may be found on the Solace web site,
       escaped characters
 
 ********************************************************************/
+#include "sol_cas.h"
 
 #include <cassert>
 
-#include "sol_cas.h"
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -44,7 +44,7 @@ SVT - The full explanation may be found on the Solace web site,
 #define SOL20_WAV_FREQUENCY   4800
 
 // image size
-static uint32_t sol20_image_size;
+static uint32_t sol20_image_size; // FIXME: global variable prevent multiple instances
 static bool level;
 static uint8_t sol20_cksm_byte;
 static uint32_t sol20_byte_num;
@@ -356,7 +356,7 @@ static int sol20_cassette_calculate_size_in_samples(const uint8_t *bytes, int le
 	return sol20_handle_cassette(nullptr, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller sol20_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller sol20_legacy_fill_wave =
 {
 	sol20_cassette_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -367,17 +367,17 @@ static const struct CassetteLegacyWaveFiller sol20_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error sol20_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error sol20_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &sol20_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &sol20_legacy_fill_wave);
 }
 
 static cassette_image::error sol20_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &sol20_legacy_fill_wave);
+	return cassette->legacy_construct(&sol20_legacy_fill_wave);
 }
 
-static const struct CassetteFormat sol20_cassette_image_format =
+static const cassette_image::Format sol20_cassette_image_format =
 {
 	"svt",
 	sol20_cassette_identify,

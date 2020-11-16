@@ -36,7 +36,6 @@
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "sound/volt_reg.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -143,21 +142,20 @@ uint32_t gp32_state::s3c240x_lcd_dma_read( )
 void gp32_state::s3c240x_lcd_render_01( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
-	int i, j;
-	for (i = 0; i < 4; i++)
+	uint32_t *scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c240x_lcd_dma_read();
-		for (j = 0; j < 32; j++)
+		for (int j = 0; j < 32; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 31) & 0x01);
-			data = data << 1;
+			data <<= 1;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 4))
 			{
 				m_s3c240x_lcd.vpos = (m_s3c240x_lcd.vpos + 1) % (m_s3c240x_lcd.lineval + 1);
 				m_s3c240x_lcd.hpos = 0;
-				scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+				scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -166,21 +164,20 @@ void gp32_state::s3c240x_lcd_render_01( )
 void gp32_state::s3c240x_lcd_render_02( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
-	int i, j;
-	for (i = 0; i < 4; i++)
+	uint32_t *scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c240x_lcd_dma_read();
-		for (j = 0; j < 16; j++)
+		for (int j = 0; j < 16; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 30) & 0x03);
-			data = data << 2;
+			data <<= 2;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 3))
 			{
 				m_s3c240x_lcd.vpos = (m_s3c240x_lcd.vpos + 1) % (m_s3c240x_lcd.lineval + 1);
 				m_s3c240x_lcd.hpos = 0;
-				scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+				scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -189,21 +186,20 @@ void gp32_state::s3c240x_lcd_render_02( )
 void gp32_state::s3c240x_lcd_render_04( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
-	int i, j;
-	for (i = 0; i < 4; i++)
+	uint32_t *scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c240x_lcd_dma_read( );
-		for (j = 0; j < 8; j++)
+		for (int j = 0; j < 8; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 28) & 0x0F);
-			data = data << 4;
+			data <<= 4;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 2))
 			{
 				m_s3c240x_lcd.vpos = (m_s3c240x_lcd.vpos + 1) % (m_s3c240x_lcd.lineval + 1);
 				m_s3c240x_lcd.hpos = 0;
-				scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+				scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -212,21 +208,20 @@ void gp32_state::s3c240x_lcd_render_04( )
 void gp32_state::s3c240x_lcd_render_08( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
-	int i, j;
-	for (i = 0; i < 4; i++)
+	uint32_t *scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c240x_lcd_dma_read();
-		for (j = 0; j < 4; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 24) & 0xFF);
-			data = data << 8;
+			data <<= 8;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 1))
 			{
 				m_s3c240x_lcd.vpos = (m_s3c240x_lcd.vpos + 1) % (m_s3c240x_lcd.lineval + 1);
 				m_s3c240x_lcd.hpos = 0;
-				scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+				scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -235,21 +230,20 @@ void gp32_state::s3c240x_lcd_render_08( )
 void gp32_state::s3c240x_lcd_render_16( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
-	int i, j;
-	for (i = 0; i < 4; i++)
+	uint32_t *scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	for (int i = 0; i < 4; i++)
 	{
 		uint32_t data = s3c240x_lcd_dma_read();
-		for (j = 0; j < 2; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			*scanline++ = s3c240x_get_color_5551( (data >> 16) & 0xFFFF);
-			data = data << 16;
+			data <<= 16;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 0))
 			{
 				m_s3c240x_lcd.vpos = (m_s3c240x_lcd.vpos + 1) % (m_s3c240x_lcd.lineval + 1);
 				m_s3c240x_lcd.hpos = 0;
-				scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+				scanline = &bitmap.pix(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -1708,9 +1702,6 @@ void gp32_state::gp32(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

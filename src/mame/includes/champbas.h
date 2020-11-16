@@ -112,6 +112,7 @@ public:
 
 	void exctsccr(machine_config &config);
 	void exctsccrb(machine_config &config);
+	void exctscc2(machine_config &config);
 
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
@@ -129,6 +130,7 @@ protected:
 	void exctsccrb_map(address_map &map);
 	void exctsccr_sound_map(address_map &map);
 	void exctsccr_sound_io_map(address_map &map);
+	void exctscc2_sound_io_map(address_map &map);
 
 private:
 	required_device<cpu_device> m_audiocpu;

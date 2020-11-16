@@ -42,9 +42,10 @@
  **************************************************************************** */
 
 #include "emu.h"
-#include "emuopts.h"
-#include "rendutil.h"
 #include "vector.h"
+
+#include "emuopts.h"
+#include "render.h"
 
 
 #define VECTOR_WIDTH_DENOM 512
@@ -85,7 +86,7 @@ void vector_device::device_start()
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
-	m_vector_list = make_unique_clear<point[]>(MAX_POINTS);
+	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 }
 
 /*

@@ -174,7 +174,7 @@ uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	for (int i = 0; i < 256; i++)
 	{
 		if (i & 4)
-			bitmap.pix16(m_cursor ^ 0xff, i) = 7;
+			bitmap.pix(m_cursor ^ 0xff, i) = 7;
 	}
 	return 0;
 }

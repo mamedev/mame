@@ -25,15 +25,18 @@
 #ifndef NANOSVGRAST_H
 #define NANOSVGRAST_H
 
+#ifndef NANOSVGRAST_CPLUSPLUS
 #ifdef __cplusplus
 extern "C" {
+#endif
 #endif
 
 typedef struct NSVGrasterizer NSVGrasterizer;
 
 /* Example Usage:
 	// Load SVG
-	struct SNVGImage* image = nsvgParseFromFile("test.svg.");
+	NSVGimage* image;
+	image = nsvgParseFromFile("test.svg", "px", 96);
 
 	// Create rasterizer (can be used to render multiple images).
 	struct NSVGrasterizer* rast = nsvgCreateRasterizer();
@@ -63,8 +66,10 @@ void nsvgRasterize(NSVGrasterizer* r,
 void nsvgDeleteRasterizer(NSVGrasterizer*);
 
 
+#ifndef NANOSVGRAST_CPLUSPLUS
 #ifdef __cplusplus
-};
+}
+#endif
 #endif
 
 #endif // NANOSVGRAST_H
@@ -239,7 +244,7 @@ static void nsvg__addPathPoint(NSVGrasterizer* r, float x, float y, int flags)
 	if (r->npoints > 0) {
 		pt = &r->points[r->npoints-1];
 		if (nsvg__ptEquals(pt->x,pt->y, x,y, r->distTol)) {
-			pt->flags |= flags;
+			pt->flags = (unsigned char)(pt->flags | flags);
 			return;
 		}
 	}
@@ -388,7 +393,7 @@ enum NSVGpointFlags
 {
 	NSVG_PT_CORNER = 0x01,
 	NSVG_PT_BEVEL = 0x02,
-	NSVG_PT_LEFT = 0x04,
+	NSVG_PT_LEFT = 0x04
 };
 
 static void nsvg__initClosed(NSVGpoint* left, NSVGpoint* right, NSVGpoint* p0, NSVGpoint* p1, float lineWidth)
@@ -454,7 +459,7 @@ static void nsvg__roundCap(NSVGrasterizer* r, NSVGpoint* left, NSVGpoint* right,
 	float lx = 0, ly = 0, rx = 0, ry = 0, prevx = 0, prevy = 0;
 
 	for (i = 0; i < ncap; i++) {
-		float a = i/(float)(ncap-1)*NSVG_PI;
+		float a = (float)i/(float)(ncap-1)*NSVG_PI;
 		float ax = cosf(a) * w, ay = sinf(a) * w;
 		float x = px - dlx*ax - dx*ay;
 		float y = py - dly*ax - dy*ay;
@@ -551,7 +556,7 @@ static void nsvg__roundJoin(NSVGrasterizer* r, NSVGpoint* left, NSVGpoint* right
 	if (da < NSVG_PI) da += NSVG_PI*2;
 	if (da > NSVG_PI) da -= NSVG_PI*2;
 
-	n = (int)ceilf((nsvg__absf(da) / NSVG_PI) * ncap);
+	n = (int)ceilf((nsvg__absf(da) / NSVG_PI) * (float)ncap);
 	if (n < 2) n = 2;
 	if (n > ncap) n = ncap;
 
@@ -561,7 +566,7 @@ static void nsvg__roundJoin(NSVGrasterizer* r, NSVGpoint* left, NSVGpoint* right
 	ry = right->y;
 
 	for (i = 0; i < n; i++) {
-		float u = i/(float)(n-1);
+		float u = (float)i/(float)(n-1);
 		float a = a0 + u*da;
 		float ax = cosf(a) * w, ay = sinf(a) * w;
 		float lx1 = p1->x - ax, ly1 = p1->y - ay;
@@ -732,7 +737,7 @@ static void nsvg__flattenShapeStroke(NSVGrasterizer* r, NSVGshape* shape, float 
 	int i, j, closed;
 	NSVGpath* path;
 	NSVGpoint* p0, *p1;
-	float miterLimit = 4;
+	float miterLimit = shape->miterLimit;
 	int lineJoin = shape->strokeLineJoin;
 	int lineCap = shape->strokeLineCap;
 	float lineWidth = shape->strokeWidth * scale;
@@ -838,8 +843,8 @@ static void nsvg__flattenShapeStroke(NSVGrasterizer* r, NSVGshape* shape, float 
 
 static int nsvg__cmpEdge(const void *p, const void *q)
 {
-	NSVGedge* a = (NSVGedge*)p;
-	NSVGedge* b = (NSVGedge*)q;
+	const NSVGedge* a = (const NSVGedge*)p;
+	const NSVGedge* b = (const NSVGedge*)q;
 
 	if (a->y0 < b->y0) return -1;
 	if (a->y0 > b->y0) return  1;
@@ -892,20 +897,20 @@ static void nsvg__fillScanline(unsigned char* scanline, int len, int x0, int x1,
 	if (i < len && j >= 0) {
 		if (i == j) {
 			// x0,x1 are the same pixel, so compute combined coverage
-			scanline[i] += (unsigned char)((x1 - x0) * maxWeight >> NSVG__FIXSHIFT);
+			scanline[i] = (unsigned char)(scanline[i] + ((x1 - x0) * maxWeight >> NSVG__FIXSHIFT));
 		} else {
 			if (i >= 0) // add antialiasing for x0
-				scanline[i] += (unsigned char)(((NSVG__FIX - (x0 & NSVG__FIXMASK)) * maxWeight) >> NSVG__FIXSHIFT);
+				scanline[i] = (unsigned char)(scanline[i] + (((NSVG__FIX - (x0 & NSVG__FIXMASK)) * maxWeight) >> NSVG__FIXSHIFT));
 			else
 				i = -1; // clip
 
 			if (j < len) // add antialiasing for x1
-				scanline[j] += (unsigned char)(((x1 & NSVG__FIXMASK) * maxWeight) >> NSVG__FIXSHIFT);
+				scanline[j] = (unsigned char)(scanline[j] + (((x1 & NSVG__FIXMASK) * maxWeight) >> NSVG__FIXSHIFT));
 			else
 				j = len; // clip
 
 			for (++i; i < j; ++i) // fill pixels between x0 and x1
-				scanline[i] += (unsigned char)maxWeight;
+				scanline[i] = (unsigned char)(scanline[i] + maxWeight);
 		}
 	}
 }
@@ -1021,8 +1026,8 @@ static void nsvg__scanlineSolid(unsigned char* dst, int count, unsigned char* co
 		int i, cr, cg, cb, ca;
 		unsigned int c;
 
-		fx = (x - tx) / scale;
-		fy = (y - ty) / scale;
+		fx = ((float)x - tx) / scale;
+		fy = ((float)y - ty) / scale;
 		dx = 1.0f / scale;
 
 		for (i = 0; i < count; i++) {
@@ -1066,8 +1071,8 @@ static void nsvg__scanlineSolid(unsigned char* dst, int count, unsigned char* co
 		int i, cr, cg, cb, ca;
 		unsigned int c;
 
-		fx = (x - tx) / scale;
-		fy = (y - ty) / scale;
+		fx = ((float)x - tx) / scale;
+		fy = ((float)y - ty) / scale;
 		dx = 1.0f / scale;
 
 		for (i = 0; i < count; i++) {
@@ -1121,7 +1126,7 @@ static void nsvg__rasterizeSortedEdges(NSVGrasterizer *r, float tx, float ty, fl
 		xmax = 0;
 		for (s = 0; s < NSVG__SUBSAMPLES; ++s) {
 			// find center of pixel for this scanline
-			float scany = y*NSVG__SUBSAMPLES + s + 0.5f;
+			float scany = (float)(y*NSVG__SUBSAMPLES + s) + 0.5f;
 			NSVGactiveEdge **step = &active;
 
 			// update all active edges;

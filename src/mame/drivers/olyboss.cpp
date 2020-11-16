@@ -262,18 +262,15 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 		data = m_vchrram[(data << 4) | lc];
 	else
 		data = m_char_rom->base()[(data << 4) | lc];
-	int i;
 
 	//if (lc >= 8) return;
 	if (csr)
-	{
 		data = 0xff;
-	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		int color = BIT(data, 7) ^ rvv;
-		bitmap.pix32(y, (sx * 8) + i) = color?0xffffff:0;
+		bitmap.pix(y, (sx * 8) + i) = color?0xffffff:0;
 		data <<= 1;
 	}
 }

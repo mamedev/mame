@@ -171,16 +171,16 @@ INPUT_CHANGED_MEMBER(d6800_state::reset_button)
 /* Video */
 uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,gfx=0;
+	uint8_t gfx=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		uint16_t *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		for (x = 0; x < 8; x++)
+		for (uint8_t x = 0; x < 8; x++)
 		{
 			if (m_cb2)
-				gfx = m_videoram[ x | (y<<3)];
+				gfx = m_videoram[x | (y<<3)];
 
 			*p++ = BIT(gfx, 7);
 			*p++ = BIT(gfx, 6);

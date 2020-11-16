@@ -174,7 +174,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		// copy the rendered character image into it
 		for (int y = 0; y < bitmap.height(); y++)
 		{
-			std::uint32_t *const dstrow = &bitmap.pix32(y);
+			std::uint32_t *const dstrow = &bitmap.pix(y);
 			std::uint8_t const *const srcrow = reinterpret_cast<std::uint8_t const *>(drawsurf->pixels) + (y * drawsurf->pitch);
 
 			for (int x = 0; x < drawsurf->w; x++)

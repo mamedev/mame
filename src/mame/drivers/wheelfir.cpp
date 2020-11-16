@@ -173,7 +173,6 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -276,9 +275,6 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
 	{
-		int x,y;
-
-
 		int direct_width=m_direct_write_x1-m_direct_write_x0+1;
 		int direct_height=m_direct_write_y1-m_direct_write_y0+1;
 
@@ -286,203 +282,197 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		if(direct_width>0 && direct_height>0)
 		{
-			x= m_direct_write_idx % direct_width;
-			y = (m_direct_write_idx / direct_width) %direct_height;
+			int x = m_direct_write_idx % direct_width;
+			int y = (m_direct_write_idx / direct_width) % direct_height;
 
 			x+=m_direct_write_x0;
 			y+=m_direct_write_y0;
 
 			if(x<512 && y <512)
 			{
-				m_tmp_bitmap[LAYER_BG]->pix16(y, x) = sixdat;
+				m_tmp_bitmap[LAYER_BG]->pix(y, x) = sixdat;
 			}
 		}
 
 		++m_direct_write_idx;
 
 		return;
-
 	}
 
 	if(offset==0xf && data==0xffff)
 	{
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
+		uint8_t const *const rom = memregion("gfx1")->base();
+
+		int width = m_screen->width();
+		int height = m_screen->height();
+
+		int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
+		int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
+
+		int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
+		int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
+
+		int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
+		int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
+
+		int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
+		int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
+
+		int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
+		int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
+
+		int page=((m_blitter_data[6])>>10)*0x40000;
+
+
+		if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
 		{
-			uint8_t *rom = memregion("gfx1")->base();
+			m_direct_write_x0=dst_x0;
+			m_direct_write_x1=dst_x1;
+			m_direct_write_y0=dst_y0;
+			m_direct_write_y1=dst_y1;
+			m_direct_write_idx=0;
+		}
 
-			int width = m_screen->width();
-			int height = m_screen->height();
-
-			int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
-			int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
-
-			int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
-			int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
-
-			int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
-			int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
-
-			int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
-			int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
-
-			int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
-			int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
-
-			int page=((m_blitter_data[6])>>10)*0x40000;
-
-
-			if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
+		if(x_dst_step<0)
+		{
+			if(dst_x0<=dst_x1)
 			{
-					m_direct_write_x0=dst_x0;
-					m_direct_write_x1=dst_x1;
-					m_direct_write_y0=dst_y0;
-					m_direct_write_y1=dst_y1;
-					m_direct_write_idx=0;
-
+				return;
 			}
 
-			if(x_dst_step<0)
+		}
+		else
+		{
+			if(dst_x0>=dst_x1)
 			{
-				if(dst_x0<=dst_x1)
-				{
-					return;
-				}
-
-			}
-			else
-			{
-				if(dst_x0>=dst_x1)
-				{
-					return;
-				}
-
+				return;
 			}
 
-			if(y_dst_step<0)
+		}
+
+		if(y_dst_step<0)
+		{
+			if(dst_y0<=dst_y1)
 			{
-				if(dst_y0<=dst_y1)
-				{
-					return;
-				}
+				return;
 			}
-			else
+		}
+		else
+		{
+			if(dst_y0>=dst_y1)
 			{
-				if(dst_y0>=dst_y1)
-				{
-					return;
-				}
-
+				return;
 			}
 
-
-			//additional checks
-
-			int d1, d2, hflag, dflag, index;
-
-			d1=((m_blitter_data[0x0a]&0x1f00)>>8);
-
-			d2=((m_blitter_data[0x0b]&0x1f00)>>8);
+		}
 
 
-			d1|=((m_blitter_data[0x8]&0x100)>>3);
-			d2|=((m_blitter_data[0x8]&0x400)>>5);
-			hflag=(m_blitter_data[0x9]&0x1)?1:0;
-			dflag=(m_blitter_data[0x8]&0x1000)?1:0;
-			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
+		//additional checks
+
+		int d1, d2, hflag, dflag, index;
+
+		d1=((m_blitter_data[0x0a]&0x1f00)>>8);
+
+		d2=((m_blitter_data[0x0b]&0x1f00)>>8);
 
 
-			float scale_x=get_scale(index);
+		d1|=((m_blitter_data[0x8]&0x100)>>3);
+		d2|=((m_blitter_data[0x8]&0x400)>>5);
+		hflag=(m_blitter_data[0x9]&0x1)?1:0;
+		dflag=(m_blitter_data[0x8]&0x1000)?1:0;
+		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
 
-			d1=((m_blitter_data[0x0b]&0xc000)>>14) |
-				((m_blitter_data[0x0c]&0xc000)>>12) |
-				((m_blitter_data[0x0a]&0x4000)>>10);
-
-			d2=((m_blitter_data[0x0c]&0x1f00)>>8);
-
-
-			d1|=((m_blitter_data[0x8]&0x200)>>4);
-			d2|=((m_blitter_data[0x8]&0x800)>>6);
-
-			hflag=(m_blitter_data[0x9]&0x2)?1:0;
-			dflag=(m_blitter_data[0x8]&0x2000)?1:0;
-			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
+		const float scale_x=get_scale(index);
 
 
-			float scale_y=get_scale(index);
+		d1=((m_blitter_data[0x0b]&0xc000)>>14) |
+			((m_blitter_data[0x0c]&0xc000)>>12) |
+			((m_blitter_data[0x0a]&0x4000)>>10);
+
+		d2=((m_blitter_data[0x0c]&0x1f00)>>8);
 
 
-			if(scale_x==0 || scale_y==0) return;
+		d1|=((m_blitter_data[0x8]&0x200)>>4);
+		d2|=((m_blitter_data[0x8]&0x800)>>6);
+
+		hflag=(m_blitter_data[0x9]&0x2)?1:0;
+		dflag=(m_blitter_data[0x8]&0x2000)?1:0;
+		index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
+
+		const float scale_y=get_scale(index);
 
 
-			float scale_x_step=100.f/scale_x;
-			float scale_y_step=100.f/scale_y;
+		if(scale_x==0 || scale_y==0) return;
+
+
+		const float scale_x_step=100.f/scale_x;
+		const float scale_y_step=100.f/scale_y;
 
 
 
-			int x,y;
-			float idx_x,idx_y;
-
-			int vpage=LAYER_FG;
-			if(m_blitter_data[0x7]&0x10)
-			{
-				vpage=LAYER_BG;
+		int vpage=LAYER_FG;
+		if(m_blitter_data[0x7]&0x10)
+		{
+			vpage=LAYER_BG;
 /*
-                printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
+            printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
-                for(int i=0;i<16;++i)
-                {
-                    printf("%x = %.4x\n",i,m_blitter_data[i]);
-                }
+            for(int i=0;i<16;++i)
+            {
+                printf("%x = %.4x\n",i,m_blitter_data[i]);
+            }
 
-                printf("\n");
+            printf("\n");
 */
-			}
+		}
 
-			bool endx=false;
-			bool endy=false;
+		bool endx=false;
+		bool endy=false;
 
-			if(m_blitter_data[0x7]&0x0c)
+		if(m_blitter_data[0x7]&0x0c)
+		{
+			//???
+		}
+
+		float idx_x = 0;
+		for(int x=dst_x0; !endx; x+=x_dst_step, idx_x+=scale_x_step)
+		{
+			endy=false;
+			float idx_y = 0;
+			for(int y=dst_y0; !endy; y+=y_dst_step, idx_y+=scale_y_step)
 			{
-				//???
-			}
+				endx=(x==dst_x1);
+				endy=(y==dst_y1);
 
-			for( x=dst_x0, idx_x=0 ; !endx;x+=x_dst_step, idx_x+=scale_x_step )
-			{
-				endy=false;
-				for( y=dst_y0, idx_y=0 ; !endy;y+=y_dst_step, idx_y+=scale_y_step)
+
+				int xx=src_x0+x_src_step*idx_x;
+				int yy=src_y0+y_src_step*idx_y;
+
+				int address=page+yy*512+xx;
+
+				int pix = rom[address&(0x1000000-1)];
+
+				int screen_x=x;
+				int screen_y=y;
+
+
+				if(page>=0x400000)
 				{
-						endx=(x==dst_x1);
-						endy=(y==dst_y1);
-
-
-					int xx=src_x0+x_src_step*idx_x;
-					int yy=src_y0+y_src_step*idx_y;
-
-					int address=page+yy*512+xx;
-
-					int pix = rom[address&(0x1000000-1)];
-
-					int screen_x=x;
-					int screen_y=y;
-
-
-					if(page>=0x400000)
+					//hack for clear
+					if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 					{
-						//hack for clear
-						if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-						{
-					//      m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) =0;
-						}
+				//      m_tmp_bitmap[vpage]->pix(screen_y , screen_x ) =0;
 					}
-					else
-					{
-						if (vpage == LAYER_FG) screen_y&=0xff;
+				}
+				else
+				{
+					if (vpage == LAYER_FG) screen_y&=0xff;
 
-						if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
-						{
-							m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) = pix;
-						}
+					if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
+					{
+						m_tmp_bitmap[vpage]->pix(screen_y, screen_x) = pix;
 					}
 				}
 			}
@@ -502,22 +492,19 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 
 	for(int y=cliprect.min_y; y < cliprect.max_y; y++)
 	{
-		uint16_t *source = &m_tmp_bitmap[LAYER_BG]->pix16(( (m_scanlines[y].y)&511));
-		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(( (m_scanlines[y].y)&511));
+		uint16_t *const dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
-			dest[x] = source[ (x+(m_scanlines[y].x)) &511];
+			dest[x] = source[(x + m_scanlines[y].x) & 511];
 		}
 	}
 
 	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 /*
-    {
-        m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
-
-    }
+    m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
 */
 
 	return 0;
@@ -769,9 +756,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+;
 }
 
 

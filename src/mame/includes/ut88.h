@@ -14,6 +14,7 @@
 #include "sound/dac.h"
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "emupal.h"
 
 class ut88_common : public driver_device
@@ -108,15 +109,10 @@ public:
 private:
 	void machine_start() override;
 	void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	TIMER_DEVICE_CALLBACK_MEMBER(display_timer);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
-	enum
-	{
-		TIMER_UPDATE_DISPLAY
-	};
 
 	uint8_t keyboard_r();
 	void led_w(offs_t offset, uint8_t data);

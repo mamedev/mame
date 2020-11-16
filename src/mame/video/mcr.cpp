@@ -272,9 +272,9 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				uint16_t *dst = &bitmap.pix16(sy);
-				uint8_t *pri = &screen.priority().pix8(sy);
+				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *const dst = &bitmap.pix(sy);
+				uint8_t *const pri = &screen.priority().pix(sy);
 
 				/* loop over columns */
 				for (int x = 0; x < 32; x++)
@@ -339,9 +339,9 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= 2 && sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				uint16_t *dst = &bitmap.pix16(sy);
-				uint8_t *pri = &screen.priority().pix8(sy);
+				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *const dst = &bitmap.pix(sy);
+				uint8_t *const pri = &screen.priority().pix(sy);
 
 				/* loop over columns */
 				for (int x = 0; x < 32; x++)

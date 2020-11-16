@@ -11,8 +11,8 @@
 ///
 ///
 #include "pconfig.h"
-#include "pmath.h"
 #include "pgsl.h"
+#include "pmath.h"
 
 #include <algorithm>
 #include <array>

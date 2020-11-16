@@ -300,8 +300,8 @@ uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_in
 		for(int x = 0; x < 384; x += 2)
 		{
 			uint16_t word = m_videoram[index];
-			bitmap.pix16(y, x) = word >> 8;
-			bitmap.pix16(y, x+1) = word & 0xff;
+			bitmap.pix(y, x) = word >> 8;
+			bitmap.pix(y, x+1) = word & 0xff;
 			++index;
 		}
 	}

@@ -250,7 +250,7 @@ netdev_pcap::~netdev_pcap()
 
 static CREATE_NETDEV(create_pcap)
 {
-	auto *dev = global_alloc(netdev_pcap(ifname, ifdev, rate));
+	auto *dev = new netdev_pcap(ifname, ifdev, rate);
 	return dynamic_cast<osd_netdev *>(dev);
 }
 

@@ -324,8 +324,8 @@ void darius_state::update_psg1(int port)
 
 void darius_state::update_da()
 {
-	const int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
-	const int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int left  = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
 		m_msm5205_l->flt_volume_set_volume(left / 100.0);

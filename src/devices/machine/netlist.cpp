@@ -987,7 +987,6 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 		auto lnetlist = std::make_unique<netlist::netlist_state_t>("netlist",
 			plib::plog_delegate(&validity_logger::log, &logger));
 		// enable validation mode
-		lnetlist->set_extended_validation(true);
 
 		lnetlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nullptr));
 

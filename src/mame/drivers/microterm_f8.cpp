@@ -162,7 +162,7 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			bool dot = (!BIT(ch, 8) && allow_underline) || ((BIT(ch, 10) || blink_on) && BIT(chdata, 8 - (x % 9)));
 			if ((BIT(ch, 7) && cursor_on) == BIT(ch, 9))
 				dot = !dot;
-			bitmap.pix32(y, x) = dot ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x) = dot ? rgb_t::white() : rgb_t::black();
 		}
 
 		y++;

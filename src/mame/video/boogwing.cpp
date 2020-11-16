@@ -37,8 +37,7 @@ constexpr u32 sub_blend_r32(u32 d, u32 s, u8 level)
 */
 void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y, x;
-	const pen_t *paldata = &m_deco_ace->pen(0);
+	pen_t const *const paldata = &m_deco_ace->pen(0);
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2, *alpha_tmap_bitmap;
 	bitmap_ind8* priority_bitmap;
 
@@ -49,21 +48,17 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	alpha_tmap_bitmap = &m_alpha_tmap_bitmap;
 	priority_bitmap = &screen.priority();
 
-	uint32_t* dstline;
-	uint16_t *srcline1, *srcline2, *srcline3, *tmapline;
-	uint8_t *srcpriline;
-
-	for (y=cliprect.top();y<=cliprect.bottom();y++)
+	for (int y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		srcline1=&sprite_bitmap1->pix16(y,0);
-		srcline2=&sprite_bitmap2->pix16(y,0);
-		srcline3=&alpha_tmap_bitmap->pix16(y,0);
-		tmapline=&m_temp_bitmap.pix16(y,0);
-		srcpriline=&priority_bitmap->pix8(y,0);
+		uint16_t *srcline1=&sprite_bitmap1->pix(y,0);
+		uint16_t *srcline2=&sprite_bitmap2->pix(y,0);
+		uint16_t *srcline3=&alpha_tmap_bitmap->pix(y,0);
+		uint16_t *tmapline=&m_temp_bitmap.pix(y,0);
+		uint8_t *srcpriline=&priority_bitmap->pix(y,0);
 
-		dstline=&bitmap.pix32(y,0);
+		uint32_t *dstline=&bitmap.pix(y,0);
 
-		for (x=cliprect.left();x<=cliprect.right();x++)
+		for (int x=cliprect.left();x<=cliprect.right();x++)
 		{
 			uint16_t pix1 = srcline1[x];
 			uint16_t pix2 = srcline2[x];

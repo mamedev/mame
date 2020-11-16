@@ -339,7 +339,7 @@ static int cbm_tap_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 
 
 
-static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller cbm_legacy_fill_wave = {
 	cbm_tap_fill_wave,      /* fill_wave */
 	-1,                     /* chunk_size */
 	0,                      /* chunk_samples */
@@ -350,19 +350,19 @@ static const struct CassetteLegacyWaveFiller cbm_legacy_fill_wave = {
 };
 
 
-static cassette_image::error cbm_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+static cassette_image::error cbm_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )
 {
-	return cassette_legacy_identify( cassette, opts, &cbm_legacy_fill_wave );
+	return cassette->legacy_identify( opts, &cbm_legacy_fill_wave );
 }
 
 
 static cassette_image::error cbm_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct( cassette, &cbm_legacy_fill_wave );
+	return cassette->legacy_construct( &cbm_legacy_fill_wave );
 }
 
 
-static const struct CassetteFormat cbm_tap_cassette_format = {
+static const cassette_image::Format cbm_tap_cassette_format = {
 	"tap",
 	cbm_cassette_identify,
 	cbm_cassette_load,

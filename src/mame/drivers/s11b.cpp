@@ -27,7 +27,7 @@
     - Bad Cats: "H" "Enter"
     - Banzai Run: "S" "D" "F" (won't start due to calibration? needs more investigation, try hitting E and / and lots of keys until calibration finishes); - starts music
     - Big Guns: "D" "F" "U"
-    - Black Knight 2000: "D" "F" "Y"; 'x' starts music
+    - Black Knight 2000: "D" "F" "Y"; 'x' starts music; 'enter' 'left' and 'right' lock the 3 balls in the upper playfield to start the multiball. hold keypad '.' to activate the lightning wheel. '=' is the after-drawbridge target to score jackpots etc
     - Cyclone: Nothing, game does not have switches to check for balls in the trough.
     - Earthshaker: "D" "F" "W"
     - Elvira and the Party Monsters: "D" "F" "U"
@@ -45,7 +45,6 @@
 #include "includes/s11b.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "s11b.lh"
@@ -300,13 +299,22 @@ void s11b_state::s11b_base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
-	SPEAKER(config, "speaker").front_center();
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+	MC1408(config, m_dac, 0);
 
-	SPEAKER(config, "speech").front_center();
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.50);
+	// this CVSD filter differs from the one on system 11 and 11a, possibly simplified so it uses more of the same components, or so it has a different
+	// shape/cutoff than the filter on the bg music/speech board, on purpose.
+	// The CVSD filter has a large gain, about 4.6x
+	// The filter is boosting the ~5vpp audio signal from the CVSD chip to a ~23vpp (really ~17vpp) theoretical audio signal that the s11
+	// mainboard outputs on its volume control-repurposed-as-audio-out connector.
+	// In reality, the S11 mainboard outputs audio at a virtual ground level between +5v and -12v (so, 17VPP balanced around -7VDC), but since
+	// the CVSD chip's internal DAC can only output between a bit over +0x180/-0x180 out of 0x200, the most voltage it can ever output is
+	// between (assuming 0x1ff is 5VDC and 0x300 is 0VDC) a max of 4.375VDC and a min of 0.625VDC, i.e. 3.75VPP centered on 2.5VDC.
+	// In reality, the range is likely less than that.
+	// This means multiplying a 3.75VPP signal by 4.6 is 17.25VPP, which is almost exactly the expected 17V (12v+5v) VPP the output should have.
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(12), RES_K(12), RES_K(56), CAP_P(4700), CAP_P(470));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(180), RES_K(180), RES_K(180), CAP_P(470), CAP_P(100));
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
@@ -324,11 +332,13 @@ void s11b_state::s11b(machine_config &config)
 	s11b_base(config);
 	/* Add the background music card */
 	S11_BG(config, m_bg);
+	m_dac->add_route(ALL_OUTPUTS, m_bg, 0.4484/2.0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_bg, (0.4484*4.0)/2.0);
 	m_pia34->ca2_handler().set(m_bg, FUNC(s11_bg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	SPEAKER(config, "bgspk").front_center();
-	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void s11b_state::s11b_jokerz(machine_config &config)
@@ -336,6 +346,12 @@ void s11b_state::s11b_jokerz(machine_config &config)
 	s11b_base(config);
 	/* Add the pin sound 88 music card */
 	PINSND88(config, m_ps88);
+	// the dac and cvsd volumes should be equally mixed on the s11 board send to the audio board, whatever type it is
+	// the 4 gain values in the add_route statements are actually irrelevant, the ps88 device will override them
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.29, AUTO_ALLOC_INPUT, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.29*4.0), AUTO_ALLOC_INPUT, 0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), AUTO_ALLOC_INPUT, 1);
 	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
 	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::ca1_w)); // the sync connection comes from sound connector pin 16 to MCA1, not the usual pin 12 to MCB1
 	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself

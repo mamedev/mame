@@ -9,22 +9,26 @@ jobs:
   Windows:
     name: Build for Windows
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
     - name: Setup MINGW64
-      uses: numworks/setup-msys2@v1
+      uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
-    - name: Install needed packages
-      run: msys2do pacman -S --noconfirm --disable-download-timeout --needed wget git make mingw-w64-x86_64-binutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-pkg-config mingw-w64-x86_64-python2 zip p7zip
+        update: true
+        install: wget git make mingw-w64-x86_64-binutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-pkg-config mingw-w64-x86_64-python2 zip p7zip
     - name: Checkout source
       uses: actions/checkout@v2
     - name: Build libretro mame core
+      env:
+        MINGW64: "/mingw64"
       run: |
-        msys2do make -f Makefile.libretro -j8
-        strip.exe -s mame_libretro.dll
-        msys2do zip -9 mame_libretro.dll.zip mame_libretro.dll
-        msys2do sha256sum mame_libretro.dll.zip > mame_libretro.dll.zip.sha256
+        make -f Makefile.libretro -j8
+        strip -s mame_libretro.dll
+        zip -9 mame_libretro.dll.zip mame_libretro.dll
+        sha256sum mame_libretro.dll.zip > mame_libretro.dll.zip.sha256
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:

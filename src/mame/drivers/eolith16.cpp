@@ -129,7 +129,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 	{
 		for (int x = 0; x < 320; x++)
 		{
-			bitmap.pix16(y, x) = m_vram[(y * 320) + x] & 0xff;
+			bitmap.pix(y, x) = m_vram[(y * 320) + x] & 0xff;
 		}
 	}
 	return 0;
