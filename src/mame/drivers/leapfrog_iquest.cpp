@@ -78,6 +78,12 @@ private:
 	uint8_t unk_ff80_r();
 	void unk_ff80_w(uint8_t data);
 	uint8_t m_ff80;
+
+	uint8_t unk_fc00_r();
+	uint8_t unk_fc2f_r();
+	uint8_t unk_fc3f_r();
+	void unk_fc3f_w(uint8_t data);
+
 };
 
 
@@ -183,7 +189,24 @@ void leapfrog_iquest_state::unk_ff80_w(uint8_t data)
 	m_ff80 = data;
 }
 
+uint8_t leapfrog_iquest_state::unk_fc00_r()
+{
+	return 0x00;// machine().rand();
+}
 
+uint8_t leapfrog_iquest_state::unk_fc2f_r()
+{
+	return 0x00;// machine().rand();
+}
+
+uint8_t leapfrog_iquest_state::unk_fc3f_r()
+{
+	return 0x00;// machine().rand();
+}
+
+void leapfrog_iquest_state::unk_fc3f_w(uint8_t data)
+{
+}
 
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
@@ -197,6 +220,10 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w));
 
+
+	map(0xfc00, 0xfc00).r(FUNC(leapfrog_iquest_state::unk_fc00_r));
+	map(0xfc2f, 0xfc2f).r(FUNC(leapfrog_iquest_state::unk_fc2f_r));
+	map(0xfc3f, 0xfc3f).rw(FUNC(leapfrog_iquest_state::unk_fc3f_r), FUNC(leapfrog_iquest_state::unk_fc3f_w));
 
 	map(0xff80, 0xff80).rw(FUNC(leapfrog_iquest_state::unk_ff80_r), FUNC(leapfrog_iquest_state::unk_ff80_w));
 }
