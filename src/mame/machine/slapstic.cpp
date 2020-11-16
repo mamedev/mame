@@ -175,7 +175,7 @@
     the current bank. After 5 or 6 seconds without a clock, the chip
     reverts to the default bank, with the chip reset (bank select
     addresses are enabled). Typically, the slapstic region is accessed
-    often enough to cause a problem.
+    often enough to avoid the problem.
 
     For full details, see the MAME source code.
 
