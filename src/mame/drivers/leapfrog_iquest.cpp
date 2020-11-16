@@ -347,7 +347,7 @@ void leapfrog_iquest_state::unk_fce5_w(uint8_t data)
 ':maincpu' (A204): write to ff91 to ff93 region ff b4 48 (current banks are 00010000 00020000 00010000)
 
 in all cases ff91-ff93 writes appear to be an address in the current main space
-which is 0x10000-0x17fff ,0x10000-0x17fff in ROM at the time of writing
+which is 0x10000-0x17fff, 0x10000-0x17fff in ROM at the time of writing
 or for the later writes  0x10000-0x17fff, 0x20000-0x27fff  (the b448 is from 0x23448 for example)
 
 each of the blocks pointed to is preceded by a 0x00 byte? (maybe 0x00 is a terminator for previous block?)
