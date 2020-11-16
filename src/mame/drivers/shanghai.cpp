@@ -31,6 +31,8 @@ displayed.
 #include "speaker.h"
 
 
+namespace {
+
 class shanghai_state : public driver_device
 {
 public:
@@ -43,6 +45,8 @@ public:
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
 	void kothello(machine_config &config);
+
+	void init_blktch2();
 
 private:
 	void shanghai_coin_w(uint8_t data);
@@ -94,13 +98,13 @@ INTERRUPT_GEN_MEMBER(shanghai_state::half_vblank_irq)
 {
 	// definitely running at vblank / 2 (hd63484 irq mask not used)
 	if(m_screen->frame_number() & 1)
-		device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80); // V30
+		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80); // V30
 }
 
 void shanghai_state::shanghai_coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0,data & 1);
-	machine().bookkeeping().coin_counter_w(1,data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 void shanghai_state::shanghai_map(address_map &map)
@@ -173,7 +177,7 @@ void shanghai_state::kothello_sound_map(address_map &map)
 }
 
 static INPUT_PORTS_START( kothello )
-	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
 
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -397,13 +401,13 @@ void shanghai_state::hd63484_map(address_map &map)
 
 void shanghai_state::shanghai(machine_config &config)
 {
-	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(16'000'000)/2); /* NEC D70116C-8 */
+	// basic machine hardware
+	V30(config, m_maincpu, XTAL(16'000'000)/2); // NEC D70116C-8
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shanghai_map);
 	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shanghai_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -416,7 +420,7 @@ void shanghai_state::shanghai(machine_config &config)
 
 	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
@@ -431,13 +435,13 @@ void shanghai_state::shanghai(machine_config &config)
 
 void shanghai_state::shangha2(machine_config &config)
 {
-	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(16'000'000)/2); /* ? */
+	// basic machine hardware
+	V30(config, m_maincpu, XTAL(16'000'000)/2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shangha2_map);
 	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shangha2_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -450,7 +454,7 @@ void shanghai_state::shangha2(machine_config &config)
 
 	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
@@ -465,7 +469,7 @@ void shanghai_state::shangha2(machine_config &config)
 
 void shanghai_state::kothello(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	V30(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::kothello_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
@@ -476,7 +480,7 @@ void shanghai_state::kothello(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -491,10 +495,10 @@ void shanghai_state::kothello(machine_config &config)
 	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
 	hd63484.set_external_skew(2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	/* same as standard seibu ym2203, but also reads "DSW" */
+	// same as standard seibu ym2203, but also reads "DSW"
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.port_a_read_callback().set_ioport("DSW1");
@@ -564,7 +568,7 @@ ROM_START( shanghai )
 	ROM_LOAD16_BYTE( "shg-21a.ic21", 0xa0000, 0x10000, CRC(4ab06d32) SHA1(02667d1270b101386b947d5b9bfe64052e498041) )
 	ROM_LOAD16_BYTE( "shg-28a.ic28", 0xc0001, 0x10000, CRC(983ec112) SHA1(110e120e35815d055d6108a7603e83d2d990c666) )
 	ROM_LOAD16_BYTE( "shg-27a.ic27", 0xc0000, 0x10000, CRC(41af0945) SHA1(dfc4638a17f716ccc8e59f275571d6dc1093a745) )
-	ROM_LOAD16_BYTE( "shg-37b.ic37", 0xe0001, 0x10000, BAD_DUMP CRC(ead3d66c) SHA1(f9be9a4773ea6c9ba931f7aa8c79121caacc231c) ) /* Single byte difference from IC37 below  0xD58C == 0x01 */
+	ROM_LOAD16_BYTE( "shg-37b.ic37", 0xe0001, 0x10000, BAD_DUMP CRC(ead3d66c) SHA1(f9be9a4773ea6c9ba931f7aa8c79121caacc231c) ) // Single byte difference from IC37 below  0xD58C == 0x01
 	ROM_LOAD16_BYTE( "shg-36b.ic36", 0xe0000, 0x10000, CRC(a1d6af96) SHA1(01c4c22bf03b3d260fffcbc6dfc5f2dd2bcba14a) )
 ROM_END
 
@@ -574,7 +578,7 @@ ROM_START( shanghaij )
 	ROM_LOAD16_BYTE( "shg-21a.ic21", 0xa0000, 0x10000, CRC(4ab06d32) SHA1(02667d1270b101386b947d5b9bfe64052e498041) )
 	ROM_LOAD16_BYTE( "shg-28a.ic28", 0xc0001, 0x10000, CRC(983ec112) SHA1(110e120e35815d055d6108a7603e83d2d990c666) )
 	ROM_LOAD16_BYTE( "shg-27a.ic27", 0xc0000, 0x10000, CRC(41af0945) SHA1(dfc4638a17f716ccc8e59f275571d6dc1093a745) )
-	ROM_LOAD16_BYTE( "shg-37b.ic37", 0xe0001, 0x10000, CRC(3f192da0) SHA1(e70d5da5d702e9bf9ac6b77df62bcf51894aadcf) ) /*  0xD58C == 0x00 */
+	ROM_LOAD16_BYTE( "shg-37b.ic37", 0xe0001, 0x10000, CRC(3f192da0) SHA1(e70d5da5d702e9bf9ac6b77df62bcf51894aadcf) ) // 0xD58C == 0x00
 	ROM_LOAD16_BYTE( "shg-36b.ic36", 0xe0000, 0x10000, CRC(a1d6af96) SHA1(01c4c22bf03b3d260fffcbc6dfc5f2dd2bcba14a) )
 ROM_END
 
@@ -599,6 +603,35 @@ ROM_START( shangha2a ) // content is the same, just different ROM sizes
 	ROM_LOAD16_BYTE( "6.bin", 0xf0000, 0x08000, CRC(14250057) SHA1(15af554099c977e3c753d758080805581a9e4c50) )
 ROM_END
 
+
+/*
+Black Touch II by unknown manufacturer
+
+The not working PCB has the following main components:
+
+1 chip covered by the 'Sea Hunter' sticker (HD63484)
+1 scratched off chip (near 2203) (V30?)
+1 YM2203C
+2 8-dip banks (near 2203)
+1 18 MHz OSC (near the chip covered by the sticker)
+1 16 MHz OSC (near 2203 and scratched off chip)
+4 ROMs (mix of 27C010A and 27C1001)
+2 PALs
+2 HM6264 SRAMs
+*/
+
+
+ROM_START( blktch2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1-c25.e7", 0x80001, 0x20000, CRC(ff4dd98d) SHA1(69c9229537a25aaaa82cd6b80eea85a91b6243d1) )
+	ROM_LOAD16_BYTE( "3-c35.f7", 0x80000, 0x20000, CRC(94297664) SHA1(2b8f979db92e4979e35ff22747a7076aa687e5da) )
+	ROM_LOAD16_BYTE( "2-c26.e8", 0xc0001, 0x20000, CRC(eb4f06c7) SHA1(3ef68edc48d33011d0f9eb78f3ad0cc58136e69c) )
+	ROM_LOAD16_BYTE( "4-c36.f8", 0xc0000, 0x20000, CRC(dcbf1619) SHA1(8333b661021bbe5de371bfcea121a69c2727df12) )
+
+	ROM_REGION( 0x208, "plds", 0 )
+	ROM_LOAD( "pal16l8.c13", 0x000, 0x104, NO_DUMP)
+	ROM_LOAD( "pal16l8.c14", 0x104, 0x104, NO_DUMP)
+ROM_END
 
 /*
 
@@ -667,10 +700,23 @@ ROM_START( kothello )
 	ROM_LOAD( "rom6.7m",   0x00000, 0x10000, CRC(4ab1335d) SHA1(3a803e8a7e9b0c2a26ee23e7ac9c89c70cf2504b))
 ROM_END
 
+void shanghai_state::init_blktch2()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x100000 / 2; i++)
+	{
+		rom[i] = bitswap<16>(rom[i], 15, 14, 13, 11, 12, 10, 9, 8, 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = ((rom[i] & 0x00ff) << 8) | ((rom[i] & 0xff00) >> 8);
+	}
+}
+
+} // Anonymous namespace
 
 
-GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, empty_init, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, empty_init, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, empty_init,   ROT0, "Sunsoft",   "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, empty_init,   ROT0, "Sunsoft",   "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, empty_init,   ROT0, "Sunsoft",   "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, empty_init,   ROT0, "Sunsoft",   "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, blktch2,   0,        shangha2, shangha2, shanghai_state, init_blktch2, ROT0, "<unknown>", "Black Touch II (Korea)",     MACHINE_SUPPORTS_SAVE ) // hacked from Shanghai II
+GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, empty_init,   ROT0, "Success",   "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

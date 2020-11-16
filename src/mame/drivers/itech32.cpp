@@ -872,7 +872,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 /*------ Time Killers memory layout ------*/
 void itech32_state::timekill_map(address_map &map)
 {
-	map(0x000000, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x003fff).ram().share("nvram16");
 	map(0x040000, 0x040001).portr("P1");
 	map(0x048000, 0x048001).portr("P2");
 	map(0x050000, 0x050001).portr("SYSTEM");
@@ -892,7 +892,7 @@ void itech32_state::timekill_map(address_map &map)
 /*------ BloodStorm and later games memory layout ------*/
 void itech32_state::bloodstm_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram().share("nvram");
+	map(0x000000, 0x00ffff).ram().share("nvram16");
 	map(0x080000, 0x080001).portr("P1").w(FUNC(itech32_state::int1_ack_w));
 	map(0x100000, 0x100001).portr("P2");
 	map(0x180000, 0x180001).portr("P3");
@@ -953,7 +953,7 @@ void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
 
 void drivedge_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram");
+	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram32");
 #if LOG_DRIVEDGE_UNINIT_RAM
 map(0x000100, 0x0003ff).mirror(0x40000).rw(FUNC(itech32_state::test1_r), FUNC(itech32_state::test1_w));
 map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(itech32_state::test2_w));
@@ -1011,7 +1011,7 @@ void itech32_state::itech020_map(address_map &map)
 	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w));
 	map(0x578000, 0x57ffff).nopr();             /* touched by protection */
 	map(0x580000, 0x59ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x600000, 0x603fff).ram().share("nvram");
+	map(0x600000, 0x603fff).ram().share("nvram32");
 /* ? */ map(0x61ff00, 0x61ffff).nopw();            /* Unknown Writes */
 	map(0x680002, 0x680002).r(FUNC(itech32_state::itech020_prot_result_r));
 	map(0x680000, 0x680003).nopw();
@@ -1722,9 +1722,6 @@ void itech32_state::base_devices(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
-	nvram_device &nvram(NVRAM(config, "nvram"));
-	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
-
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -1765,6 +1762,10 @@ void itech32_state::timekill(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::timekill_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram16"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
+
 	via(config);
 }
 
@@ -1774,6 +1775,9 @@ void itech32_state::bloodstm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::bloodstm_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram16"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
 	m_palette->set_format(palette_device::xBGR_888, 32768);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
@@ -1786,6 +1790,9 @@ void drivedge_state::drivedge(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drivedge_state::main_map);
+
+	nvram_device &nvram(NVRAM(config, "nvram32"));
+	nvram.set_custom_handler(FUNC(drivedge_state::nvram_init));
 
 	TMS32031(config, m_dsp[0], TMS_CLOCK);
 	m_dsp[0]->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
@@ -1828,6 +1835,9 @@ void itech32_state::sftm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::itech020_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram32"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
 	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));

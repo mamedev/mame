@@ -141,7 +141,7 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
           A179B - TI SN75179B Differential Driver and Receiver Pair (DIP8)
          ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
         PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
-            JP1 - set to 2-3. Alt setting is 1-2
+            JP1 - AICA clock Source; Default From Motherboard set to 2-3. Alt setting is 1-2 from Cart Bus (G2 Expansion BD; Multiboard Clock; other Cart Slot Peripherals that provide Aica Clock)
             JP4 - set to 2-3. Alt setting is 1-2
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board
@@ -403,9 +403,9 @@ Crazy Taxi                                      840-0002C    21684   13 (64Mb)* 
 Dead Or Alive 2 (Rev A)                         841-0003C    22121A  21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
 Dead Or Alive 2                                 841-0003C-01 22207   21 (64Mb)   present     315-6213  317-5048-COM   have unlocked Tag and Survival game modes, possible USA or international release
 Dead Or Alive 2 Millennium                      841-0003C DOA2 Ver.M 21 (64Mb)   present     315-6213  317-5048-COM   joystick + 3 buttons
-Death Crimson OX (Japan)                        841-0016C    23524   10 (64Mb)   present     315-6213  317-5066-COM
-Death Crimson OX (Japan, Rev A)                 841-0016C    23524A  10 (64Mb)   present     315-6213  317-5066-COM   cart case had no revision label
-Death Crimson OX (USA)                          841-0016B* DCOX US** 10 (64Mb)   present     315-6213  317-5066-COM   *no cart case **flash ROM module
+Death Crimson OX (Japan)                        841-0016B*   23524   10 (64Mb)   present     315-6213  317-5066-COM   *metal cage NAOMI, no cart case
+Death Crimson OX (Japan, Rev A)                 841-0016C*   23524A  10 (64Mb)   present     315-6213  317-5066-COM   *dumped cart had plastic case from some other game with self made / fake sticker
+Death Crimson OX (USA)                          841-0016B* DCOX US** 10 (64Mb)   present     315-6213  317-5066-COM   *metal cage NAOMI, no cart case **flash ROM module
 Dengen Tenshi Taisen Janshi Shangri-La          841-0004C    22060   12 (64Mb)   ?           315-6213  317-5050-JPN
 Derby Owners Club (Japan, Rev B)                840-0016C    22099B  14 (64Mb)   ?           315-6213  317-0262-JPN   touch panel + 2 buttons + card reader
 Derby Owners Club 2000 (Japan)                  *            22222   16 (64Mb)   present     315-6213  not present    * no cart, master unit stickers: 833-13937-01, DOC 4050-01, DOC S. not dumped.
@@ -630,7 +630,7 @@ Club Kart: European Session (Rev A)             840-0062C      *   11 (128Mb)  3
 Club Kart: European Session (Rev C)             ?          23704C  11 (128Mb)  ?          ?         ?             ?
 Club Kart: European Session (Rev D)             840-0062C  23704D  11 (128Mb)  315-6319A  315-6213  317-0313-COM  present
 Crackin' DJ                                     840-0043C  23450   10 (128Mb)  315-6319   315-6213  317-0288-COM  ?            requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
-Derby Owners Club II Ver.2.1 (Japan, Rev B)     840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  317-0327-JPN  present
+Derby Owners Club II Ver.2.1 (Japan, Rev B)     840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  317-0327-JPN* present      * may be not populated on satellite unit's cartridges
 Derby Owners Club World Edition (Rev A)         840-0088C  22336A   7 (128Mb)  315-6319A  315-6213  not present   present
 Derby Owners Club World Edition (Rev B)         840-0088C  22336B   7 (128Mb)  315-6319A  315-6213  not present   present
 Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not present   not present
@@ -4283,7 +4283,7 @@ ROM_START( derbyoc2 )
 	ROM_LOAD( "mpr-22305.ic11", 0xa800000, 0x1000000, CRC(027d0e7b) SHA1(e3c874e60cabb6f9ce686696d9055a0c0d5289ae) )
 
 	// 840-0083-01    2001     317-0327-JPN   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2a436bb7")
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2a436bb7") // not populated on some of satellite's units cartridges, this game does protection checks only when running in "main/master unit" mode.
 ROM_END
 
 /*
