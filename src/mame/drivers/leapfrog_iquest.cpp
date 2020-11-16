@@ -105,6 +105,10 @@ private:
 	uint8_t m_ffa8;
 
 	void unk_ffa9_w(uint8_t data);
+
+	void tx(uint8_t data);
+	uint8_t rx();
+
 };
 
 
@@ -461,6 +465,22 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xff00, 0xff01).r(FUNC(leapfrog_iquest_state::unk_ff00_01_r));
 
+	// it seems more likely that this is just RAM, as that after setting pointers in RAM, they're used to construct
+	// strings to transmit over the serial.
+	// however, mapping this area as RAM instead results in the program stalling much earlier, waiting for $24.3 to
+	// be cleared.
+	// 017658: 20 23 fd  jb    $24.3,$17658 
+	//
+	//The only realistic place for this to be cleared is deep in the interrupt handler for
+	// Serial Receive/Transmit
+	// 010023: 02 76 9e  ljmp  $769E
+	// (which eventually can reach)
+	// 016991: c2 23     clr   $24.3
+	// however I'm uncertain how to get the driver to trigger this at all.
+#if 0
+	map(0xff80, 0xffff).ram();
+#else
+	
 	map(0xff80, 0xff80).rw(FUNC(leapfrog_iquest_state::unk_ff80_r), FUNC(leapfrog_iquest_state::unk_ff80_w));
 
 	map(0xff81, 0xff84).w(FUNC(leapfrog_iquest_state::unk_ff81_84_w));
@@ -469,6 +489,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xffa8, 0xffa8).rw(FUNC(leapfrog_iquest_state::unk_ffa8_r), FUNC(leapfrog_iquest_state::unk_ffa8_w));
 	map(0xffa9, 0xffa9).w(FUNC(leapfrog_iquest_state::unk_ffa9_w));
+#endif
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_iquest_state::cart_load)
@@ -489,12 +510,31 @@ uint32_t leapfrog_iquest_state::screen_update(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+// never triggered?
+void leapfrog_iquest_state::tx(uint8_t data)
+{
+	logerror("%s: transmitting %02x\n", machine().describe_context().c_str(), data);
+}
+
+// never triggered?
+uint8_t leapfrog_iquest_state::rx()
+{
+	logerror("%s: receiving\n", machine().describe_context().c_str());
+	return machine().rand();
+}
+
+
 
 void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 {
+	// seems to have an IRQ vector at 002b, which would suggest it's an 8052 or similar, rather than plain 8031?
+	//I8052(config, m_maincpu, 96000000/10); // unknown clock
 	I8032(config, m_maincpu, 96000000/10); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_iquest_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
+	m_maincpu->set_vblank_int("screen", FUNC(leapfrog_iquest_state::irq0_line_hold));
+	m_maincpu->serial_tx_cb().set(FUNC(leapfrog_iquest_state::tx));
+	m_maincpu->serial_rx_cb().set(FUNC(leapfrog_iquest_state::rx));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
