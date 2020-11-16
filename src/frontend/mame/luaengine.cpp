@@ -1934,7 +1934,7 @@ void lua_engine::initialize()
 			return port_table;
 		}));
 	ioport_manager_type.set("type_seq", [](ioport_manager &m, ioport_type type, int player, input_seq_type seqtype) {
-			return sol::make_user(input_seq(m.type_seq(type, player, seqtype)));
+			return m.type_seq(type, player, seqtype);
 		});
 
 
@@ -2054,7 +2054,7 @@ void lua_engine::initialize()
 		});
 	ioport_field_type.set("input_seq", [](ioport_field &f, const std::string &seq_type_string) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-			return sol::make_user(input_seq(f.seq(seq_type)));
+			return f.seq(seq_type);
 		});
 	ioport_field_type.set("set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, const input_seq &seq) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
@@ -2062,7 +2062,7 @@ void lua_engine::initialize()
 		});
 	ioport_field_type.set("default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-			return sol::make_user(input_seq(f.defseq(seq_type)));
+			return f.defseq(seq_type);
 		});
 	ioport_field_type.set("keyboard_codes", [this](ioport_field &f, int which) {
 			sol::table result = sol().create_table();
@@ -2277,15 +2277,15 @@ void lua_engine::initialize()
  */
 
 	auto input_type = sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor);
-	input_type.set("code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); });
+	input_type.set("code_from_token", [](input_manager &input, const char *token) { return input.code_from_token(token); });
 	input_type.set("code_pressed", [](input_manager &input, const input_code &code) { return input.code_pressed(code); });
 	input_type.set("code_to_token", [](input_manager &input, const input_code &code) { return input.code_to_token(code); });
 	input_type.set("code_name", [](input_manager &input, const input_code &code) { return input.code_name(code); });
-	input_type.set("seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(std::move(seq)); });
+	input_type.set("seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return seq; });
 	input_type.set("seq_pressed", [](input_manager &input, const input_seq &seq) { return input.seq_pressed(seq); });
 	input_type.set("seq_to_tokens", [](input_manager &input, const input_seq &seq) { return input.seq_to_tokens(seq); });
 	input_type.set("seq_name", [](input_manager &input, const input_seq &seq) { return input.seq_name(seq); });
-	input_type.set("seq_clean", [](input_manager &input, const input_seq &seq) { return sol::make_user(input.seq_clean(seq)); });
+	input_type.set("seq_clean", [](input_manager &input, const input_seq &seq) { return input.seq_clean(seq); });
 	input_type.set("seq_poll_start", [this](input_manager &input, const char *cls_string, sol::object seq) {
 			if (!m_seq_poll)
 				m_seq_poll.reset(new input_sequence_poller(input));
@@ -2315,7 +2315,7 @@ void lua_engine::initialize()
 	input_type.set("seq_poll_final", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
 				return sol::make_object(sol(), sol::lua_nil);
-			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? input_seq(m_seq_poll->sequence()) : input_seq()));
+			return sol::make_object(sol(), m_seq_poll->valid() ? m_seq_poll->sequence() : input_seq());
 		});
 	input_type.set("seq_poll_modified", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
@@ -2330,7 +2330,7 @@ void lua_engine::initialize()
 	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
 			if (!m_seq_poll)
 				return sol::make_object(sol(), sol::lua_nil);
-			return sol::make_object(sol(), sol::make_user(input_seq(m_seq_poll->sequence())));
+			return sol::make_object(sol(), m_seq_poll->sequence());
 	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
 			sol::table result = sol().create_table();
@@ -2407,8 +2407,7 @@ void lua_engine::initialize()
 	input_device_item_type.set("name", sol::property(&input_device_item::name));
 	input_device_item_type.set("token", sol::property(&input_device_item::token));
 	input_device_item_type.set("code", [](input_device_item &item) {
-			input_code code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
-			return sol::make_user(std::move(code));
+			return input_code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
 		});
 
 
