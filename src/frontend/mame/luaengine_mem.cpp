@@ -12,11 +12,6 @@
 #include "luaengine.ipp"
 
 
-#ifdef __clang__
-#pragma clang diagnostic ignored "-Wshift-count-overflow"
-#endif
-
-
 namespace {
 
 //-------------------------------------------------
@@ -28,13 +23,14 @@ template <typename T>
 T region_read(memory_region &region, offs_t address)
 {
 	T mem_content = 0;
-	offs_t lowmask = region.bytewidth() - 1;
+	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = region.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
 		if (addr < region.bytes())
 		{
-			mem_content <<= 8;
+			if constexpr (sizeof(T) > 1)
+				mem_content <<= 8;
 			if (region.endianness() == ENDIANNESS_BIG)
 				mem_content |= region.as_u8((BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask));
 			else
@@ -53,7 +49,7 @@ T region_read(memory_region &region, offs_t address)
 template <typename T>
 void region_write(memory_region &region, offs_t address, T val)
 {
-	offs_t lowmask = region.bytewidth() - 1;
+	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = region.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
@@ -63,7 +59,8 @@ void region_write(memory_region &region, offs_t address, T val)
 				region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 			else
 				region.base()[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
-			val >>= 8;
+			if constexpr (sizeof(T) > 1)
+				val >>= 8;
 		}
 	}
 }
@@ -77,14 +74,15 @@ template <typename T>
 T share_read(memory_share &share, offs_t address)
 {
 	T mem_content = 0;
-	offs_t lowmask = share.bytewidth() - 1;
+	const offs_t lowmask = share.bytewidth() - 1;
 	uint8_t *ptr = (uint8_t *)share.ptr();
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = share.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
 		if (addr < share.bytes())
 		{
-			mem_content <<= 8;
+			if constexpr (sizeof(T) > 1)
+				mem_content <<= 8;
 			if (share.endianness() == ENDIANNESS_BIG)
 				mem_content |= ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)];
 			else
@@ -103,7 +101,7 @@ T share_read(memory_share &share, offs_t address)
 template <typename T>
 void share_write(memory_share &share, offs_t address, T val)
 {
-	offs_t lowmask = share.bytewidth() - 1;
+	const offs_t lowmask = share.bytewidth() - 1;
 	uint8_t *ptr = (uint8_t *)share.ptr();
 	for (int i = 0; i < sizeof(T); i++)
 	{
@@ -114,7 +112,8 @@ void share_write(memory_share &share, offs_t address, T val)
 				ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 			else
 				ptr[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
-			val >>= 8;
+			if constexpr (sizeof(T) > 1)
+				val >>= 8;
 		}
 	}
 }
@@ -288,15 +287,16 @@ template <typename T>
 T lua_engine::addr_space::direct_mem_read(offs_t address)
 {
 	T mem_content = 0;
-	offs_t lowmask = space.data_width() / 8 - 1;
+	const offs_t lowmask = space.data_width() / 8 - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
 		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if (base)
 		{
-			mem_content <<= 8;
-			if(space.endianness() == ENDIANNESS_BIG)
+			if constexpr (sizeof(T) > 1)
+				mem_content <<= 8;
+			if (space.endianness() == ENDIANNESS_BIG)
 				mem_content |= base[BYTE8_XOR_BE(addr) & lowmask];
 			else
 				mem_content |= base[BYTE8_XOR_LE(addr) & lowmask];
@@ -314,7 +314,7 @@ T lua_engine::addr_space::direct_mem_read(offs_t address)
 template <typename T>
 void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 {
-	offs_t lowmask = space.data_width() / 8 - 1;
+	const offs_t lowmask = space.data_width() / 8 - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
@@ -325,7 +325,8 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 				base[BYTE8_XOR_BE(addr) & lowmask] = val & 0xff;
 			else
 				base[BYTE8_XOR_LE(addr) & lowmask] = val & 0xff;
-			val >>= 8;
+			if constexpr (sizeof(T) > 1)
+				val >>= 8;
 		}
 	}
 }
