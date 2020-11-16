@@ -94,14 +94,17 @@ private:
 	uint8_t unk_ff00_01_r(offs_t offset);
 
 	void unk_ff81_84_w(offs_t offset, uint8_t data);
-
 	uint8_t m_ff81_84[4];
-
 
 	uint8_t unk_ff91_93_r(offs_t offset);
 	void unk_ff91_93_w(offs_t offset, uint8_t data);
-
 	uint8_t m_ff91_93[3];
+
+	uint8_t unk_ffa8_r();
+	void unk_ffa8_w(uint8_t data);
+	uint8_t m_ffa8;
+
+	void unk_ffa9_w(uint8_t data);
 };
 
 
@@ -257,8 +260,6 @@ uint8_t leapfrog_iquest_state::unk_ff91_93_r(offs_t offset)
 	return 0x00;// m_ff91_93[offset];
 }
 
-
-
 void leapfrog_iquest_state::unk_ff91_93_w(offs_t offset, uint8_t data)
 {
 	// these 3 values are written together
@@ -281,6 +282,25 @@ void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
 		logerror("%s: write to ff81 to ff84 region %02x %02x %02x %02x\n", machine().describe_context(), m_ff81_84[0], m_ff81_84[1], m_ff81_84[2], m_ff81_84[3]);
 }
 
+uint8_t leapfrog_iquest_state::unk_ffa8_r()
+{
+	logerror("%s: read from ffa8 ----------- POSSIBLE END OF SCREEN OPERATION?\n", machine().describe_context());
+	return 0x00;
+}
+
+void leapfrog_iquest_state::unk_ffa8_w(uint8_t data)
+{
+	logerror("%s: write to ffa8 %02x ----------- POSSIBLE START OF SCREEN OPERATION?\n", machine().describe_context(), data);
+	m_ffa8 = data;
+}
+
+void leapfrog_iquest_state::unk_ffa9_w(uint8_t data)
+{
+	logerror("%s: write to ffa9 %02x ----------- POSSIBLE TRIGGER SCREEN OPERATION??\n", machine().describe_context(), data);
+}
+
+
+
 
 void leapfrog_iquest_state::ext_map(address_map &map)
 {
@@ -288,6 +308,9 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
+	
+	map(0xf001, 0xf056).ram(); // written as a block
+	map(0xf400, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
 
 	map(0xfc00, 0xfc00).r(FUNC(leapfrog_iquest_state::unk_fc00_r));
 
@@ -309,6 +332,9 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xff81, 0xff84).w(FUNC(leapfrog_iquest_state::unk_ff81_84_w));
 
 	map(0xff91, 0xff93).rw(FUNC(leapfrog_iquest_state::unk_ff91_93_r), FUNC(leapfrog_iquest_state::unk_ff91_93_w));
+
+	map(0xffa8, 0xffa8).rw(FUNC(leapfrog_iquest_state::unk_ffa8_r), FUNC(leapfrog_iquest_state::unk_ffa8_w));
+	map(0xffa9, 0xffa9).w(FUNC(leapfrog_iquest_state::unk_ffa9_w));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(leapfrog_iquest_state::cart_load)
