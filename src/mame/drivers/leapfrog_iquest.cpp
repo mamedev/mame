@@ -255,6 +255,107 @@ void leapfrog_iquest_state::unk_fce5_w(uint8_t data)
 	m_fce5 = data;
 }
 
+/*
+* 
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5a ef (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 05 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 20
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 25 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 3d (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 03
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 4f (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 15
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 5c (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 7f be
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 61 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 7f ca
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 6e (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 7f d3
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 77 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 17
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 85 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 7f dd
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b 97 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 7f 77
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b a5 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b b3 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b bd (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b cf (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b fa (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5b f2 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 5c 1d (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 55 e0 (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 55 fe (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 0d (current banks are 00010000 00018000 00000000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 80 b9 (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 80 cb (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 80 e5 (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 80 fe (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 26 (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 77 8f (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 77 9d (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 3c (current banks are 00010000 00018000 00400000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 48 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 78 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 8c (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 9e (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 a7 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 b3 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 c0 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 cb (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 d8 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 56 e6 (current banks are 00010000 00018000 01410000)
+':maincpu' (6FE7): write to ff81 to ff84 region 00 02 00 00
+':maincpu' (6FF2): write to ff91 to ff93 region ff 62 d2 (current banks are 00010000 00018000 00010000)
+':maincpu' (A1F9): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (A204): write to ff91 to ff93 region ff 9e e5 (current banks are 00010000 00020000 00010000)
+':maincpu' (A1F9): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (A204): write to ff91 to ff93 region ff 9b fa (current banks are 00010000 00020000 00010000)
+':maincpu' (A1F9): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (A204): write to ff91 to ff93 region ff 9c 1f (current banks are 00010000 00020000 00010000)
+':maincpu' (A1F9): write to ff81 to ff84 region 00 00 00 00
+':maincpu' (A204): write to ff91 to ff93 region ff b4 48 (current banks are 00010000 00020000 00010000)
+
+in all cases ff91-ff93 writes appear to be an address in the current main space
+which is 0x10000-0x17fff ,0x10000-0x17fff in ROM at the time of writing
+or for the later writes  0x10000-0x17fff, 0x20000-0x27fff  (the b448 is from 0x23448 for example)
+
+each of the blocks pointed to is preceded by a 0x00 byte? (maybe 0x00 is a terminator for previous block?)
+
+what are these blocks? sound data? video data?
+
+*/
+
 uint8_t leapfrog_iquest_state::unk_ff91_93_r(offs_t offset)
 {
 	return 0x00;// m_ff91_93[offset];
@@ -265,10 +366,10 @@ void leapfrog_iquest_state::unk_ff91_93_w(offs_t offset, uint8_t data)
 	// these 3 values are written together
 	m_ff91_93[offset] = data;
 
-	// form is ff then 2 other values, maybe an address? blitter pointer?
+	// form is ff then 2 other values, these are pointers into the main space it seems
 
 	if (offset == 2)
-		logerror("%s: write to ff91 to ff93 region %02x %02x %02x\n", machine().describe_context(), m_ff91_93[0], m_ff91_93[1], m_ff91_93[2]);
+		logerror("%s: write to ff91 to ff93 region %02x %02x %02x (current banks are %08x %08x %08x)\n", machine().describe_context(), m_ff91_93[0], m_ff91_93[1], m_ff91_93[2], ((m_lowerbank[0] << 8) | (m_lowerbank[1])) * 0x8000, ((m_upperbank[0] << 8) | (m_upperbank[1])) * 0x8000, ((m_iobank[0] << 8) | (m_iobank[1])) * 0x8000);
 }
 
 void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
@@ -296,7 +397,8 @@ void leapfrog_iquest_state::unk_ffa8_w(uint8_t data)
 
 void leapfrog_iquest_state::unk_ffa9_w(uint8_t data)
 {
-	logerror("%s: write to ffa9 %02x ----------- POSSIBLE TRIGGER SCREEN OPERATION??\n", machine().describe_context(), data);
+
+	logerror("%s: write to ffa9 %02x ----------- POSSIBLE TRIGGER SCREEN OPERATION?? (current banks are %08x %08x %08x)\n", machine().describe_context(), data, ((m_lowerbank[0] << 8) | (m_lowerbank[1])) * 0x8000, ((m_upperbank[0] << 8) | (m_upperbank[1])) * 0x8000, ((m_iobank[0] << 8) | (m_iobank[1])) * 0x8000);
 }
 
 
