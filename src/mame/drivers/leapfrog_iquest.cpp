@@ -80,6 +80,8 @@ private:
 	uint8_t m_ff80;
 
 	uint8_t unk_fc00_r();
+	uint8_t unk_fc01_r(offs_t offset);
+
 	uint8_t unk_fc2f_r();
 	uint8_t unk_fc3f_r();
 	void unk_fc3f_w(uint8_t data);
@@ -110,6 +112,15 @@ private:
 	uint8_t rx();
 
 	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
+
+	uint8_t port0_r();
+	void port0_w(u8 data);
+	uint8_t port1_r();
+	void port1_w(u8 data);
+	uint8_t port2_r();
+	void port2_w(u8 data);
+	uint8_t port3_r();
+	void port3_w(u8 data);
 };
 
 
@@ -226,6 +237,12 @@ uint8_t leapfrog_iquest_state::unk_fc00_r()
 {
 	logerror("%s: unk_fc00_r\n", machine().describe_context());
 	return 0x00;// machine().rand();
+}
+
+uint8_t leapfrog_iquest_state::unk_fc01_r(offs_t offset)
+{
+	logerror("%s: unk_fc01_r %d\n", machine().describe_context(), offset);
+	return 0xff;// machine().rand();
 }
 
 uint8_t leapfrog_iquest_state::unk_fc2f_r()
@@ -382,6 +399,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xf400, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
 
 	map(0xfc00, 0xfc00).r(FUNC(leapfrog_iquest_state::unk_fc00_r));
+	map(0xfc01, 0xfc04).r(FUNC(leapfrog_iquest_state::unk_fc01_r));
 
 	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w)); // ROM / RAM window in main space at 0000-7fff
 	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff 
@@ -475,6 +493,51 @@ WRITE_LINE_MEMBER(leapfrog_iquest_state::rx_line_hack)
 	}
 }
 
+uint8_t leapfrog_iquest_state::port0_r()
+{
+	logerror("%s: port0_r\n", machine().describe_context());
+	return 0x00;
+}
+
+uint8_t leapfrog_iquest_state::port1_r()
+{
+	logerror("%s: port1_r\n", machine().describe_context());
+	return 0x00;
+}
+
+uint8_t leapfrog_iquest_state::port2_r()
+{
+	logerror("%s: port2_r\n", machine().describe_context());
+	return 0x00;
+}
+
+uint8_t leapfrog_iquest_state::port3_r()
+{
+	logerror("%s: port3_r\n", machine().describe_context());
+	return 0x00;
+}
+
+void leapfrog_iquest_state::port0_w(u8 data)
+{
+	logerror("%s: port0_w %02x\n", machine().describe_context(), data);
+}
+
+void leapfrog_iquest_state::port1_w(u8 data)
+{
+	logerror("%s: port1_w %02x\n", machine().describe_context(), data);
+}
+
+void leapfrog_iquest_state::port2_w(u8 data)
+{
+	logerror("%s: port2_w %02x\n", machine().describe_context(), data);
+}
+
+void leapfrog_iquest_state::port3_w(u8 data)
+{
+	logerror("%s: port3_w %02x\n", machine().describe_context(), data);
+}
+
+
 
 void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 {
@@ -485,6 +548,14 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
 	m_maincpu->serial_tx_cb().set(FUNC(leapfrog_iquest_state::tx));
 	m_maincpu->serial_rx_cb().set(FUNC(leapfrog_iquest_state::rx));
+	m_maincpu->port_in_cb<0>().set(FUNC(leapfrog_iquest_state::port0_r));
+	m_maincpu->port_out_cb<0>().set(FUNC(leapfrog_iquest_state::port0_w));
+	m_maincpu->port_in_cb<1>().set(FUNC(leapfrog_iquest_state::port1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(leapfrog_iquest_state::port1_w));
+	m_maincpu->port_in_cb<2>().set(FUNC(leapfrog_iquest_state::port2_r));
+	m_maincpu->port_out_cb<2>().set(FUNC(leapfrog_iquest_state::port2_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(leapfrog_iquest_state::port3_r));
+	m_maincpu->port_out_cb<3>().set(FUNC(leapfrog_iquest_state::port3_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
