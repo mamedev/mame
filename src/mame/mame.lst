@@ -1025,6 +1025,9 @@ typhoon                         // GX770 (c) 1987
 @source:akaiax80.cpp
 ax80
 
+@source:akaivx600.cpp
+vx600
+
 @source:akkaarrh.cpp
 akkaarrh                        // (c) 1982 Atari (prototype)
 
