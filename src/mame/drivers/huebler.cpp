@@ -286,6 +286,7 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 				break;
 			case 6:
 				m_sio->rxa_w((m_cassette->input() > 0.04) ? 1 : 0);
+				break;
 			default:
 				break;
 		}

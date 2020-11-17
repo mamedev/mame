@@ -710,18 +710,25 @@ LVS-DG2
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define VERBOSE 1
+#define LOG_GENERAL         (1U << 0)
+#define LOG_COMRW           (1U << 1)
+#define LOG_SNDCOM_UNKNWN   (1U << 2)
+#define LOG_DMA             (1U << 3)
+#define LOG_VREGS           (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-uint32_t hng64_state::hng64_com_r(offs_t offset)
+
+uint32_t hng64_state::hng64_com_r(offs_t offset, uint32_t mem_mask)
 {
-	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
 	return m_idt7133_dpram[offset];
 }
 
 void hng64_state::hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
+	LOGMASKED(LOG_COMRW, "com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
@@ -776,7 +783,7 @@ void hng64_state::do_dma(address_space &space)
 {
 	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
 
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	LOGMASKED(LOG_DMA, "Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
 		uint32_t dat;
@@ -1049,7 +1056,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
@@ -1062,7 +1069,7 @@ uint16_t hng64_state::main_sound_comms_r(offs_t offset)
 		case 0x06:
 			return sound_latch[1];
 		default:
-			//printf("%08x R\n",offset*2);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%08x R\n",offset*2);
 			break;
 	}
 	return 0;
@@ -1081,10 +1088,10 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 		case 0x08:
 			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 			if(data & 0xfe)
-				//printf("IRQ send %02x?\n",data);
+				LOGMASKED(LOG_SNDCOM_UNKNWN, "IRQ send %02x?\n",data);
 			break;
 		default:
-			//printf("%02x %04x\n",offset*2,data);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%02x %04x\n",offset*2,data);
 			break;
 	}
 }

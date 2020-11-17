@@ -989,11 +989,11 @@ end
 	buildoptions {
 		"-Wall",
 		"-Wcast-align",
-		"-Wundef",
 		"-Wformat-security",
+		"-Wundef",
 		"-Wwrite-strings",
-		"-Wno-sign-compare",
 		"-Wno-conversion",
+		"-Wno-sign-compare",
 		"-Wno-error=deprecated-declarations",
 	}
 -- warnings only applicable to C compiles
@@ -1060,20 +1060,20 @@ end
 				os.exit(-1)
 			end
 			buildoptions {
-				"-Wno-cast-align",
-				"-Wno-tautological-compare",
-				"-Wno-unused-value",
-				"-Wno-constant-logical-operand",
 				"-fdiagnostics-show-note-include-stack",
-				"-Wno-unknown-warning-option",
+				"-Wno-cast-align",
+				"-Wno-constant-logical-operand",
 				"-Wno-extern-c-compat",
-				"-Wno-unknown-attributes",
 				"-Wno-ignored-qualifiers",
-				"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				"-Wno-tautological-compare",
+				"-Wno-unknown-attributes",
+				"-Wno-unknown-warning-option",
+				"-Wno-unused-value",
 			}
 			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
 				buildoptions {
-					"-Wno-xor-used-as-pow " -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
+					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 				}
 			end
 		else

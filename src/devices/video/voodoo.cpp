@@ -3228,7 +3228,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case fbiInit6:
 			if (vd->vd_type < TYPE_VOODOO_2)
 				break;
-			/* else fall through... */
+			[[fallthrough]];
 
 		/* fbiInitX can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		/* most of these affect memory layout, so always recompute that when done */
@@ -5522,7 +5522,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 				fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				fbi.height = (data >> 12) & 0xfff;
-			/* fall through */
+			[[fallthrough]];
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{

@@ -373,10 +373,10 @@ void update_sr(const int type, const u32 tbl_entry, const int fc)
 		{
 			m_mmu_tmp_sr |= M68K_MMU_SR_MODIFIED;
 		}
-		// fall through
+		[[fallthrough]];
 
 	case M68K_MMU_DF_DT_TABLE_4BYTE:
-		// fall through
+		[[fallthrough]];
 
 	case M68K_MMU_DF_DT_TABLE_8BYTE:
 
@@ -1045,6 +1045,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 		}
 		break;
 
+		// FIXME: unreachable
 		if (!(modes & 0x100))
 		{
 			pmmu_atc_flush();

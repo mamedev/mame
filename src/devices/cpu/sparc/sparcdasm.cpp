@@ -721,6 +721,7 @@ sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis
 			m_vis_op_desc.find(0x07c)->second.mnemonic = "ford";
 			m_vis_op_desc.find(0x07e)->second.mnemonic = "foned";
 		}
+		[[fallthrough]];
 	case vis_none:
 		break;
 	}

@@ -66,6 +66,7 @@
 #include "coco_rs232.h"
 #include "coco_ssc.h"
 #include "coco_stecomp.h"
+#include "coco_sym12.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -171,6 +172,7 @@ static void coco_cart_slot1_3(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
+	device.option_add("sym12", COCO_SYM12);
 }
 static void coco_cart_slot4(device_slot_interface &device)
 {
@@ -186,6 +188,7 @@ static void coco_cart_slot4(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
+	device.option_add("sym12", COCO_SYM12);
 }
 
 

@@ -144,6 +144,7 @@
 				s2 = s2 + mem_readbyte( ( r1 >> 3 ) & 0x07 ); \
 			}  \
 			s2 = mem_readword( s2 ); \
+			break; \
 		case 0x80: \
 		case 0xC0: \
 			break; \

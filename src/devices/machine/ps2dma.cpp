@@ -327,7 +327,7 @@ void ps2_dmac_device::follow_source_tag(uint32_t chan)
 			break;
 		case ID_REFE:
 			channel.set_end_tag(true);
-			// Intentional fall-through
+			[[fallthrough]];
 		case ID_REF:
 			channel.set_addr(addr);
 			channel.set_tag_addr(channel.tag_addr() + 0x10);

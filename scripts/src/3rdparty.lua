@@ -1176,15 +1176,6 @@ project "bx"
 
 	configuration { }
 
-	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
-		if version < 60000 then
-			buildoptions {
-				"-Wno-strict-overflow",
-			}
-		end
-	end
-
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bx/3rdparty",
@@ -1483,6 +1474,7 @@ end
 		}
 		buildoptions {
 			"-x objective-c++",
+			"-D BGFX_CONFIG_MULTITHREADED=0",
 		}
 	end
 

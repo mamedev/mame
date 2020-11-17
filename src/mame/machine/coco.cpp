@@ -676,7 +676,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 	/* determine the JOYIN value */
 	const analog_input_t *analog;
 	bool joyin_value;
-	uint8_t joyval;
+	uint32_t joyval;
 	int dclg_vpos;
 	switch(joystick_type(joystick))
 	{
@@ -694,7 +694,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			{
 				/* conventional joystick */
 				joyval = analog->input(joystick, joystick_axis);
-				joyin_value = (dac_output() <= (joyval >> 2));
+				joyin_value = (dac_output() <= (joyval / 10));
 			}
 			break;
 
@@ -971,8 +971,8 @@ void coco_state::poll_hires_joystick(void)
 		if (m_hiresjoy_ca && !newvalue)
 		{
 			/* hi to lo */
-			double value = m_joystick.input(joystick_index, axis) / 255.0;
-			value *= is_cocomax3 ? 2500.0 : 4160.0;
+			double value = m_joystick.input(joystick_index, axis) / 640.0;
+			value *= is_cocomax3 ? 2500.0 : 4250.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
 			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);

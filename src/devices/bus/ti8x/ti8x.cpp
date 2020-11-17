@@ -432,6 +432,7 @@ TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
 	// send timeout:
 	case WAIT_IDLE:
 		assert(EMPTY != m_tx_bit_buffer);
+		[[fallthrough]];
 	case WAIT_ACK_0:
 	case WAIT_ACK_1:
 	case WAIT_REL_0:
