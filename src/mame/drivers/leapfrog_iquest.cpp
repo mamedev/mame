@@ -395,8 +395,8 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	
-	map(0xf001, 0xf056).ram(); // written as a block
-	map(0xf400, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
+	//map(0xf001, 0xf056).ram(); // written as a block
+	map(0xf000, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
 
 	map(0xfc00, 0xfc00).r(FUNC(leapfrog_iquest_state::unk_fc00_r));
 	map(0xfc01, 0xfc04).r(FUNC(leapfrog_iquest_state::unk_fc01_r));
