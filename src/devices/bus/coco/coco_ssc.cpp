@@ -576,7 +576,7 @@ bool cocossc_sac_device::sound_activity_circuit_output()
 
 	average /= 16.0;
 
-	if( average > 0.317 )
+	if( average > 0.3175 )
 		return true;
 
 	return false;
