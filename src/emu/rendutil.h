@@ -58,7 +58,7 @@ ru_imgformat render_detect_image(util::core_file &file);
     round-to-nearest
 -------------------------------------------------*/
 
-static inline float render_round_nearest(float f)
+constexpr float render_round_nearest(float f)
 {
 	return floorf(f + 0.5f);
 }
@@ -69,7 +69,7 @@ static inline float render_round_nearest(float f)
     flip flags
 -------------------------------------------------*/
 
-static inline int orientation_swap_flips(int orientation)
+constexpr int orientation_swap_flips(int orientation)
 {
 	return (orientation & ORIENTATION_SWAP_XY) |
 			((orientation & ORIENTATION_FLIP_X) ? ORIENTATION_FLIP_Y : 0) |
@@ -82,7 +82,7 @@ static inline int orientation_swap_flips(int orientation)
     that will undo another orientation
 -------------------------------------------------*/
 
-static inline int orientation_reverse(int orientation)
+constexpr int orientation_reverse(int orientation)
 {
 	/* if not swapping X/Y, then just apply the same transform to reverse */
 	if (!(orientation & ORIENTATION_SWAP_XY))
@@ -99,7 +99,7 @@ static inline int orientation_reverse(int orientation)
     after applying two subsequent orientations
 -------------------------------------------------*/
 
-static inline int orientation_add(int orientation1, int orientation2)
+constexpr int orientation_add(int orientation1, int orientation2)
 {
 	/* if the 2nd transform doesn't swap, just XOR together */
 	if (!(orientation2 & ORIENTATION_SWAP_XY))
@@ -117,7 +117,7 @@ static inline int orientation_add(int orientation1, int orientation2)
     a single RGB component
 -------------------------------------------------*/
 
-static inline float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
+constexpr float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
 {
 	/* first apply gamma */
 	srcval = pow(srcval, 1.0f / gamma);
@@ -140,7 +140,7 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
     a single RGB component
 -------------------------------------------------*/
 
-static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
+constexpr u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
 {
 	float srcval = (float)src * (1.0f / 255.0f);
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);
