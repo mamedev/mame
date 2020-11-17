@@ -37,10 +37,7 @@
 
 // FIXME: optimize
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
 	static constexpr const std::array<netlist_time, 2> delay_clear = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
@@ -115,5 +112,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

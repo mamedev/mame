@@ -1364,7 +1364,7 @@ render_primitive_list &render_target::get_primitives()
 			if (curitem.screen())
 				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
 			else
-				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
+				add_element_primitives(list, item_xform, *curitem.element(), curitem.element_state(), curitem.blend_mode());
 		}
 	}
 	else

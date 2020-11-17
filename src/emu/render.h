@@ -748,6 +748,8 @@ public:
 		// getters
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
+		bool bounds_animated() const { return m_bounds.size() > 1U; }
+		bool color_animated() const { return m_color.size() > 1U; }
 		render_bounds bounds() const { return m_get_bounds(); }
 		render_color color() const { return m_get_color(); }
 		int blend_mode() const { return m_blend_mode; }
@@ -761,7 +763,8 @@ public:
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
-		int state() const { return m_get_elem_state(); }
+		int element_state() const { return m_get_elem_state(); }
+		int animation_state() const { return m_get_anim_state(); }
 
 		// resolve tags, if any
 		void resolve_tags();

@@ -38,10 +38,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 
 	NETLIB_OBJECT(CD4042)
@@ -116,5 +113,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(CD4042,     "CD4042",        "+D1,+D2,+D3,+D4,+POL,+CLK,@VCC,@GND")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

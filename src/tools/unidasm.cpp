@@ -191,11 +191,19 @@ using util::BIT;
 #include "eminline.h"
 
 #include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 
-#include <cctype>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#include <stdio.h>
+#endif
+
 
 using u8 = util::u8;
 using u16 = util::u16;
@@ -1057,7 +1065,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		char *curarg = argv[arg];
 
 		// is it a switch?
-		if(curarg[0] == '-') {
+		if(curarg[0] == '-' && curarg[1] != '\0') {
 			if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
 				goto usage;
 
@@ -1083,11 +1091,9 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->xchbytes = true;
 			else
 				goto usage;
-		}
 
+		} else if(pending_base) {
 		// base PC
-		else if(pending_base)
-		{
 			int result;
 			if(curarg[0] == '0' && curarg[1] == 'x')
 				result = sscanf(&curarg[2], "%x", &opts->basepc);
@@ -1098,30 +1104,26 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if(result != 1)
 				goto usage;
 			pending_base = false;
-		}
 
-		// mode
-		else if(pending_mode)
-		{
+		} else if(pending_mode) {
+			// mode
 			if(sscanf(curarg, "%d", &opts->mode) != 1)
 				goto usage;
 			pending_mode = false;
-		}
 
-		// architecture
-		else if(pending_arch) {
-			int curarch;
-			for(curarch = 0; curarch < ARRAY_LENGTH(dasm_table); curarch++)
-				if(core_stricmp(curarg, dasm_table[curarch].name) == 0)
-					break;
-			if(curarch == ARRAY_LENGTH(dasm_table))
+		} else if(pending_arch) {
+			// architecture
+			auto const arch = std::find_if(
+					std::begin(dasm_table),
+					std::end(dasm_table),
+					[&curarg] (dasm_table_entry const &e) { return !core_stricmp(curarg, e.name); });
+			if (std::end(dasm_table) == arch)
 				goto usage;
-			opts->dasm = &dasm_table[curarch];
+			opts->dasm = &*arch;
 			pending_arch = false;
-		}
 
-		// skip bytes
-		else if(pending_skip) {
+		} else if(pending_skip) {
+			// skip bytes
 			int result;
 			if(curarg[0] == '0' && curarg[1] == 'x')
 				result = sscanf(&curarg[2], "%x", &opts->skip);
@@ -1130,22 +1132,21 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if(result != 1)
 				goto usage;
 			pending_skip = false;
-		}
 
-		// size
-		else if(pending_count) {
+		} else if(pending_count) {
+			// size
 			if(sscanf(curarg, "%d", &opts->count) != 1)
 				goto usage;
 			pending_count = false;
-		}
 
-		// filename
-		else if(opts->filename == nullptr)
+		} else if(opts->filename == nullptr) {
+			// filename
 			opts->filename = curarg;
 
-		// fail
-		else
+		} else {
+			// fail
 			goto usage;
+		}
 	}
 
 	// if we have a dangling option, error
@@ -1155,6 +1156,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 	// if no file or no architecture, fail
 	if(opts->filename == nullptr || opts->dasm == nullptr)
 		goto usage;
+
 	return 0;
 
 usage:
@@ -1166,8 +1168,7 @@ usage:
 	const int colwidth = 1 + std::strlen(std::max_element(std::begin(dasm_table), std::end(dasm_table), [](const dasm_table_entry &a, const dasm_table_entry &b) { return std::strlen(a.name) < std::strlen(b.name); })->name);
 	const int columns = std::max(1, 80 / colwidth);
 	const int numrows = (ARRAY_LENGTH(dasm_table) + columns - 1) / columns;
-	for(unsigned curarch = 0; curarch < numrows * columns; curarch++)
-	{
+	for(unsigned curarch = 0; curarch < numrows * columns; curarch++) {
 		const int row = curarch / columns;
 		const int col = curarch % columns;
 		const int index = col * numrows + row;
@@ -1188,13 +1189,43 @@ int main(int argc, char *argv[])
 		return 1;
 
 	// Load the file
-	void *data;
-	uint32_t length;
-	osd_file::error filerr = util::core_file::load(opts.filename, &data, length);
-	if(filerr != osd_file::error::NONE)
+	void *data = nullptr;
+	u32 length = 0;
+	if(std::strcmp(opts.filename, "-") != 0) {
+		osd_file::error filerr = util::core_file::load(opts.filename, &data, length);
+		if(filerr != osd_file::error::NONE) {
+			std::fprintf(stderr, "Error opening file '%s'\n", opts.filename);
+			return 1;
+		}
+	}
+	else
 	{
-		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
-		return 1;
+#ifdef _WIN32
+		if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
+#else
+		if (!std::freopen(nullptr, "rb", stdin)) {
+#endif
+			std::fprintf(stderr, "Error reopening stin in binary mode\n");
+			return 1;
+		}
+		std::size_t allocated = 0x1000;
+		data = std::malloc(allocated);
+		while(!std::ferror(stdin) && !std::feof(stdin)) {
+			if(length == allocated) {
+				allocated <<= 1;
+				data = std::realloc(data, allocated);
+			}
+			if(!data) {
+				std::fprintf(stderr, "Error allocating buffer\n");
+				return 1;
+			}
+
+			length += std::fread((u8 *)data + length, 1, allocated - length, stdin);
+		}
+		if(!length || (std::ferror(stdin) && !std::feof(stdin))) {
+			std::fprintf(stderr, "Error reading from stdin\n");
+			return 1;
+		}
 	}
 
 	// Build the disasm object
