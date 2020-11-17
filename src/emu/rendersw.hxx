@@ -31,8 +31,8 @@ private:
 	// internal helpers
 	static constexpr bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
 	static constexpr bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
-	static constexpr rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
-	static constexpr float round_nearest(float f) { return floor(f + 0.5f); }
+	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
+	static inline float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
 	static constexpr _PixelType dest_assemble_rgb(u32 r, u32 g, u32 b) { return (r << _DstShiftR) | (g << _DstShiftG) | (b << _DstShiftB); }
@@ -128,7 +128,7 @@ private:
 	//  palettized 16bpp source
 	//-------------------------------------------------
 
-	static constexpr u32 get_texel_palette16(const render_texinfo &texture, s32 curu, s32 curv)
+	static inline u32 get_texel_palette16(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		const rgb_t *palbase = texture.palette;
 		if constexpr (_BilinearFilter)
@@ -164,7 +164,7 @@ private:
 	//  palettized 16bpp source with alpha
 	//-------------------------------------------------
 
-	static constexpr u32 get_texel_palette16a(const render_texinfo &texture, s32 curu, s32 curv)
+	static inline u32 get_texel_palette16a(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		const rgb_t *palbase = texture.palette;
 		if constexpr (_BilinearFilter)
@@ -196,7 +196,7 @@ private:
 	//  YCbCr source (pixel is returned as Cr-Cb-Y)
 	//-------------------------------------------------
 
-	static constexpr u32 get_texel_yuy16(const render_texinfo &texture, s32 curu, s32 curv)
+	static inline u32 get_texel_yuy16(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		if constexpr (_BilinearFilter)
 		{
@@ -258,7 +258,7 @@ private:
 	//  RGB source
 	//-------------------------------------------------
 
-	static constexpr u32 get_texel_rgb32(const render_texinfo &texture, s32 curu, s32 curv)
+	static inline u32 get_texel_rgb32(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		if constexpr (_BilinearFilter)
 		{
@@ -289,7 +289,7 @@ private:
 	//  ARGB source
 	//-------------------------------------------------
 
-	static constexpr u32 get_texel_argb32(const render_texinfo &texture, s32 curu, s32 curv)
+	static inline u32 get_texel_argb32(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		if constexpr (_BilinearFilter)
 		{
@@ -319,7 +319,7 @@ private:
 	//  draw_aa_pixel - draw an antialiased pixel
 	//-------------------------------------------------
 
-	static constexpr void draw_aa_pixel(_PixelType *dstdata, u32 pitch, int x, int y, u32 col)
+	static inline void draw_aa_pixel(_PixelType *dstdata, u32 pitch, int x, int y, u32 col)
 	{
 		_PixelType *dest = dstdata + y * pitch + x;
 		u32 dpix = _NoDestRead ? 0 : *dest;

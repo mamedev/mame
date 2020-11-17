@@ -58,7 +58,7 @@ ru_imgformat render_detect_image(util::core_file &file);
     round-to-nearest
 -------------------------------------------------*/
 
-constexpr float render_round_nearest(float f)
+static inline float render_round_nearest(float f)
 {
 	return floorf(f + 0.5f);
 }
@@ -117,7 +117,7 @@ constexpr int orientation_add(int orientation1, int orientation2)
     a single RGB component
 -------------------------------------------------*/
 
-constexpr float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
+static inline float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
 {
 	/* first apply gamma */
 	srcval = pow(srcval, 1.0f / gamma);
@@ -140,7 +140,7 @@ constexpr float apply_brightness_contrast_gamma_fp(float srcval, float brightnes
     a single RGB component
 -------------------------------------------------*/
 
-constexpr u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
+static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
 {
 	float srcval = (float)src * (1.0f / 255.0f);
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);
