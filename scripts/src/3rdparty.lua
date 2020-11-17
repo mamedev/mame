@@ -1474,6 +1474,7 @@ end
 		}
 		buildoptions {
 			"-x objective-c++",
+			"-D BGFX_CONFIG_MULTITHREADED=0",
 		}
 	end
 
