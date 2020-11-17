@@ -315,8 +315,8 @@ void leapfrog_iquest_state::unk_ff91_93_w(offs_t offset, uint8_t data)
 			readdat = spc.read_byte(pointer++);
 			textout.append(1, readdat);
 		} while (readdat != 0x00);
-
-		logerror("%s: DEBUG MESSAGE ( %s ) \n\n", machine().describe_context(), textout);
+		logerror("%s: DEBUG MESSAGE: %s", machine().describe_context(), textout);
+		logerror("\n");
 	}
 }
 
@@ -345,8 +345,8 @@ void leapfrog_iquest_state::unk_ff81_84_w(offs_t offset, uint8_t data)
 				textout.append(1, readdat);
 			} while (readdat != 0x00);
 
-			//logerror("%s: %s\n", machine().describe_context(), textout);
-
+			//logerror("%s: %s", machine().describe_context(), textout);
+			//logerror("\n");
 		}
 	}
 }
