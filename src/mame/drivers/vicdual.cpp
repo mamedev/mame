@@ -1284,11 +1284,11 @@ uint8_t carnivalh_state::carnivalh_prot_r(offs_t offset)
 
 	uint8_t retdat = 0;
 
-	if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76b)) && */(m_previousvalue == 0x24))
+	if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76b))*/ true && (m_previousvalue == 0x24))
 		retdat = 0x02;
-	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76d)) && */(m_previousvalue == 0x66))
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76d))*/ true && (m_previousvalue == 0x66))
 		retdat = 0x07;
-	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76f)) && */(m_previousvalue == 0x48))
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76f))*/ true && (m_previousvalue == 0x48))
 		retdat = 0x03;
 	else
 		popmessage("%s: carnivalh_prot_r %04x %04x %02x\n", machine().describe_context(), offset, m_previousaddress, m_previousvalue);

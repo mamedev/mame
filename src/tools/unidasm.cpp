@@ -1205,7 +1205,7 @@ int main(int argc, char *argv[])
 #else
 		if (!std::freopen(nullptr, "rb", stdin)) {
 #endif
-			std::fprintf(stderr, "Error reopening stin in binary mode\n");
+			std::fprintf(stderr, "Error reopening stdin in binary mode\n");
 			return 1;
 		}
 		std::size_t allocated = 0x1000;
