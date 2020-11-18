@@ -258,8 +258,8 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 //  map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::input_r));                                        // Depends on board
 //  map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w));                                    // MCU on sh404
@@ -293,8 +293,8 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
