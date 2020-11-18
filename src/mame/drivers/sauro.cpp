@@ -545,8 +545,8 @@ void sauro_state::saurob(machine_config &config)
 
 ROM_START( sauro )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(2e356e2d) SHA1(2f893e9184f0227de4de17b7011c1bd7ea2c11b1) )
-	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(95d03e5e) SHA1(ae584ea9cecdadac46aa3565765ae0027010f8ca) )
+	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(2e356e2d) SHA1(2f893e9184f0227de4de17b7011c1bd7ea2c11b1) ) // Same label as 'sauroa', but different content
+	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(95d03e5e) SHA1(ae584ea9cecdadac46aa3565765ae0027010f8ca) ) // Same label as 'sauroa', but different content
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
@@ -577,8 +577,8 @@ ROM_END
 
 ROM_START( sauroa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sauro-2a.bin",     0x00000, 0x8000, CRC(19f8de25) SHA1(52eea7c0416ab0a8dbb3d1664b2f57ab7a405a67) )
-	ROM_LOAD( "sauro-1a.bin",     0x08000, 0x8000, CRC(0f8b876f) SHA1(6e61a8934a2cc3c80c1f47dd59aa43aaeec12f75) )
+	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(19f8de25) SHA1(52eea7c0416ab0a8dbb3d1664b2f57ab7a405a67) ) // Same label as 'sauro', but different content
+	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(0f8b876f) SHA1(6e61a8934a2cc3c80c1f47dd59aa43aaeec12f75) ) // Same label as 'sauro', but different content
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
