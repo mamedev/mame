@@ -681,7 +681,7 @@ void prmrsocr_state::prmrsocr_main_map(address_map &map)
 inline uint32_t tmnt_state::tmnt2_get_word( uint32_t addr )
 {
 	if (addr <= 0x07ffff / 2)
-		return(m_tmnt2_rom[addr]);
+		return(m_tmnt2_rom->as_u32(addr));
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
 		return(m_sunset_104000[addr - 0x104000 / 2]);
 	else if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -915,7 +915,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 
 void tmnt_state::tmnt2_main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom().share("tmnt2_rom");
+	map(0x000000, 0x0fffff).rom();
 	map(0x104000, 0x107fff).ram().share("sunset_104000");   /* main RAM */
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram().w(FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
