@@ -768,7 +768,7 @@ void mlanding_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x050000, 0x0503ff).ram().share("dsp_prog");
+	map(0x050000, 0x0507ff).ram().share("dsp_prog");
 	map(0x060000, 0x060001).w(FUNC(mlanding_state::dsp_control_w));
 	map(0x1c0000, 0x1c3fff).bankrw(m_dma_bank);
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
