@@ -36,6 +36,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
 
 	void ms32_snd_bank_w(u8 data);
@@ -45,7 +46,7 @@ protected:
 	void to_main_w(u8 data);
 	u32 sound_result_r();
 	void sound_command_w(u32 data);
-	void irq_raise(int level);
+	void irq_raise(int level, bool state);
 	void irq_init();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

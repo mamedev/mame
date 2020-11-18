@@ -116,6 +116,16 @@ VIDEO_START_MEMBER(ms32_state,f1superb)
 // see https://youtu.be/PQsefFtqAwA
 void ms32_state::update_color(int color)
 {
+	// anything above text layer is unaffected (maybe a priority setting?)
+	// that means this must happen at mixing time rather than here ...
+	// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
+	// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
+	// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
+	//			gameplay:0x0000 0x0000 0x2020 0x0020
+	//          continue:0x5050 0x0050 0x2020 0x0020
+	// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
+	// p47aces: bomb on stage clear fade out (untested, tbd)
+
 	int r,g,b;
 
 	/* I'm not sure how the brightness should be applied, currently I'm only
@@ -143,6 +153,7 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 	int oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
+	
 	if (m_brt[offset] != oldword)
 	{
 		// TODO: bank "1" is for sprite colors
@@ -159,8 +170,6 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 		//      update_color(machine(), i);
 		}
 	}
-
-//popmessage("%04x %04x %04x %04x",m_brt[0],m_brt[1],m_brt[2],m_brt[3]);
 }
 
 

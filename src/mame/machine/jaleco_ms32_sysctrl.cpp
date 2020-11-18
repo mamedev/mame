@@ -63,6 +63,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 	, m_vblank_cb(*this)
 	, m_field_cb(*this)
 	, m_prg_timer_cb(*this)
+	, m_sound_ack_cb(*this)
 	, m_sound_reset_cb(*this)
 {
 }
@@ -84,6 +85,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
 	map(0x1e, 0x1f).w(FUNC(jaleco_ms32_sysctrl_device::irq_ack_w));
 //	map(0x24, 0x27).w // sound comms bidirectional acks?
+	map(0x26, 0x27).w(FUNC(jaleco_ms32_sysctrl_device::sound_ack_w));
 	map(0x28, 0x29).nopw(); // watchdog on MS32
 	map(0x2c, 0x2d).w(FUNC(jaleco_ms32_sysctrl_device::field_ack_w));
 	map(0x2e, 0x2f).w(FUNC(jaleco_ms32_sysctrl_device::vblank_ack_w));
@@ -113,6 +115,7 @@ void jaleco_ms32_sysctrl_device::device_resolve_objects()
 	m_field_cb.resolve();
 	m_prg_timer_cb.resolve();
 	m_sound_reset_cb.resolve();
+	m_sound_ack_cb.resolve();
 }
 
 void jaleco_ms32_sysctrl_device::device_start()
@@ -316,6 +319,11 @@ void jaleco_ms32_sysctrl_device::field_ack_w(u16 data)
 	m_field_cb(0);
 }
 
+void jaleco_ms32_sysctrl_device::sound_ack_w(u16 data)
+{
+	m_sound_ack_cb(1);
+}
+
 void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
 {
 	// guess: 68k games calls this in vblank routine instead of 
@@ -333,6 +341,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::scanline_cb)
 
 	// 30 Hz irq
 	// TODO: unknown vertical position where this happens
+	// TODO: causes slowdowns in tetris plus 2 (ms32) and world pk soccer 2 if we don't run this at 60 Hz
+	// If we invert the irq lines (so that 9 is vblank and 10 is field) then p47aces (at least) slows down.
+	// bnstars instead pukes at the idea about this running at 60 ...
+	// Looking at the various irq routines seems like that actual vblank/field lines are configurable somehow (a pin)!?
 	if (scanline == 0 && m_screen->frame_number() & 1)
 		m_field_cb(1);	
 }

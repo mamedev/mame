@@ -4,7 +4,8 @@
     Jaleco Megasystem 32 sprite hardware
 
     TODO:
-        verify hardware configuration
+    - verify hardware configuration;
+	- suchie2: on attract gals background display is cut off on the right side;
 
     used by:
     ms32.cpp

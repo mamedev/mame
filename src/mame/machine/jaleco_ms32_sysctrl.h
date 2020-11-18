@@ -39,6 +39,7 @@ public:
 	auto vblank_cb() { return m_vblank_cb.bind(); }
 	auto field_cb() { return m_field_cb.bind(); }
 	auto prg_timer_cb() { return m_prg_timer_cb.bind(); }
+	auto sound_ack_cb() { return m_sound_ack_cb.bind(); }
 	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
 //	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
 
@@ -69,12 +70,14 @@ private:
 	void vblank_ack_w(u16 data);
 	void field_ack_w(u16 data);
 	void timer_ack_w(u16 data);
+	void sound_ack_w(u16 data);
 	void irq_ack_w(u16 data);
 
 	devcb_write_line m_flip_screen_cb;
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_field_cb;
 	devcb_write_line m_prg_timer_cb;
+	devcb_write_line m_sound_ack_cb;
 	devcb_write_line m_sound_reset_cb;
 	u8 m_dotclock_setting;
 	inline u32 get_dotclock_frequency();

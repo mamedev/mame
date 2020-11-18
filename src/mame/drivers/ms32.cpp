@@ -531,6 +531,8 @@ void ms32_base_state::sound_command_w(u32 data)
 
 u32 ms32_base_state::sound_result_r()
 {
+	// tp2m32 never pings the sound ack, so irq ack is most likely done here
+	irq_raise(1, false);
 	return m_to_main^0xff;
 }
 
@@ -728,12 +730,12 @@ u16 ms32_state::ms32_extra_r16(offs_t offset)
 
 void ms32_state::ms32_irq2_guess_w(u32 data)
 {
-	irq_raise(2);
+	irq_raise(2, true);
 }
 
 void ms32_state::ms32_irq5_guess_w(u32 data)
 {
-	irq_raise(5);
+	irq_raise(5, true);
 }
 
 void ms32_state::f1superb_map(address_map &map)
@@ -747,8 +749,8 @@ void ms32_state::f1superb_map(address_map &map)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
-	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
+//	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
+//	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
 
 	// COPRO 1
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
@@ -1625,9 +1627,6 @@ IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
 	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
-	m_irqreq &= ~(1<<i);
-	if(!m_irqreq)
-		device.execute().set_input_line(0, CLEAR_LINE);
 	return i;
 }
 
@@ -1637,28 +1636,32 @@ void ms32_base_state::irq_init()
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void ms32_base_state::irq_raise(int level)
-{
-	m_irqreq |= (1<<level);
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+void ms32_base_state::irq_raise(int level, bool state)
+{	
+	if (state == true)
+		m_irqreq |= (1<<level);
+	else
+		m_irqreq &= ~(1<<level);
+
+	if (m_irqreq)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(ms32_base_state::timer_irq_w)
 {
-	if (state)
-		irq_raise(0);
+	irq_raise(0, state);
 }
 
 WRITE_LINE_MEMBER(ms32_base_state::vblank_irq_w)
 {
-	if (state)
-		irq_raise(10);
+	irq_raise(10, state);
 }
 
 WRITE_LINE_MEMBER(ms32_base_state::field_irq_w)
 {
-	if (state)
-		irq_raise(9);
+	irq_raise(9, state);
 }
 
 WRITE_LINE_MEMBER(ms32_base_state::sound_reset_line_w)
@@ -1698,14 +1701,22 @@ u8 ms32_base_state::latch_r()
 
 void ms32_base_state::ms32_snd_bank_w(u8 data)
 {
-	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
-	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
+	m_z80bank[0]->set_entry((data >> 0) & 0x0f);
+	m_z80bank[1]->set_entry((data >> 4) & 0x0f);
 }
 
 void ms32_base_state::to_main_w(u8 data)
 {
-	m_to_main=data;
-	irq_raise(1);
+	m_to_main = data;
+	irq_raise(1, true);
+}
+
+
+WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
+{
+	// used by f1superb, is it the reason for sound dying?
+	if (state)
+		m_to_main = 0xff;
 }
 
 void ms32_state::ms32_sound_map(address_map &map)
@@ -1758,6 +1769,7 @@ void ms32_state::ms32(machine_config &config)
 	m_sysctrl->vblank_cb().set(FUNC(ms32_state::vblank_irq_w));
 	m_sysctrl->field_cb().set(FUNC(ms32_state::field_irq_w));
 	m_sysctrl->prg_timer_cb().set(FUNC(ms32_state::timer_irq_w));
+	m_sysctrl->sound_ack_cb().set(FUNC(ms32_state::sound_ack_w));
 	m_sysctrl->sound_reset_cb().set(FUNC(ms32_state::sound_reset_line_w));
 
 	/* video hardware */

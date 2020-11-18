@@ -705,6 +705,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_sysctrl->vblank_cb().set(FUNC(ms32_bnstars_state::vblank_irq_w));
 	m_sysctrl->field_cb().set(FUNC(ms32_bnstars_state::field_irq_w));
 	m_sysctrl->prg_timer_cb().set(FUNC(ms32_bnstars_state::timer_irq_w));
+	m_sysctrl->sound_ack_cb().set(FUNC(ms32_bnstars_state::sound_ack_w));
 	m_sysctrl->sound_reset_cb().set(FUNC(ms32_bnstars_state::sound_reset_line_w));
 
 	/* sound hardware */
