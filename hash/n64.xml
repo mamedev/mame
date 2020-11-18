@@ -6872,7 +6872,16 @@ This cart features a RTC, currently unemulated
 	</software>
 
 <!--
-This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated
+This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated.
+Known SmartMedia cards:
+Dumped Title                                                         Japanese title
+  YES  llustrations - Postal cards 1                                 イラムト集 - ポストカード 1
+  YES  Illustrations - Funny accessories 1                           イラムト集 - おもしろアクセサリー 1
+  YES  Characters collection - Yoshi's Story                         キャラクター集 - ヨッシーストーリー
+  YES  Characters collection - Sylvanian Families                    キャラクター集 - シルバニアファミリー
+  YES  Characters collection - Bomberman                             キャラクター集 - ボンバーマン
+   NO  Characters collection - The Legend Of Zelda - Ocarina of Time キャラクター集 - ゼルダの伝説 - 時のオカリナ
+   NO  Characters collection - Himitsu no Akko-chan                  キャラクター集 - ひみつのアッコちゃん
 -->
 	<software name="mariopho">
 		<description>Mario no Photopie (Japan)</description>
