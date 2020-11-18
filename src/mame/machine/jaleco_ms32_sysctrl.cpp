@@ -65,6 +65,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 	, m_prg_timer_cb(*this)
 	, m_sound_ack_cb(*this)
 	, m_sound_reset_cb(*this)
+	, m_invert_vblank_lines(false)
 {
 }
 
@@ -217,7 +218,7 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 {
 	/* 
 	 * ---- x--- programmable irq timer enable
-	 * ---- -x-- used by f1superb, stepstag
+	 * ---- -x-- used by f1superb, stepstag, bnstars
 	 * ---- --x- flip screen
 	 * ---- ---x dotclock select (1) 8 MHz (0) 6 MHz
 	 */
@@ -335,16 +336,18 @@ void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::scanline_cb)
 {
+	// in typical Jaleco fashion (cfr. mega system 1), both irqs are somehow configurable (a pin?).
+	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs at half chip, 
+	// but this config can't possibly work with p47aces (i.e. wants 10 and 9 respectively), 
+	// plus bnstars that locks up off the bat if the wrong irq runs at 60 Hz.
+	// We currently hardwire via an init time setter here, making the irq acks to trigger properly as well.
+
 	int scanline = param;
 	if (scanline == m_crtc.vert_display)
-		m_vblank_cb(1);
+		m_invert_vblank_lines ? m_field_cb(1) : m_vblank_cb(1);
 
 	// 30 Hz irq
 	// TODO: unknown vertical position where this happens
-	// TODO: causes slowdowns in tetris plus 2 (ms32) and world pk soccer 2 if we don't run this at 60 Hz
-	// If we invert the irq lines (so that 9 is vblank and 10 is field) then p47aces (at least) slows down.
-	// bnstars instead pukes at the idea about this running at 60 ...
-	// Looking at the various irq routines seems like that actual vblank/field lines are configurable somehow (a pin)!?
 	if (scanline == 0 && m_screen->frame_number() & 1)
-		m_field_cb(1);	
+		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
 }

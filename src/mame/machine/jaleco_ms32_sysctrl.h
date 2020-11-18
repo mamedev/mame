@@ -41,6 +41,7 @@ public:
 	auto prg_timer_cb() { return m_prg_timer_cb.bind(); }
 	auto sound_ack_cb() { return m_sound_ack_cb.bind(); }
 	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
+	void set_invert_vblank_lines(bool enable) { m_invert_vblank_lines = enable; }
 //	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
 
 protected:
@@ -98,6 +99,8 @@ private:
 	};
 
 	inline void flush_prg_timer();
+	
+	bool m_invert_vblank_lines;
 };
 
 // device type definition

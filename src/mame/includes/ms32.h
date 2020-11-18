@@ -81,6 +81,7 @@ public:
 	{ }
 
 	void ms32(machine_config &config);
+	void ms32_invert_lines(machine_config &config);
 	void f1superb(machine_config &config);
 
 	void init_ss92047_01();

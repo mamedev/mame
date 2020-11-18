@@ -1626,6 +1626,7 @@ GFXDECODE_END
 IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
+	// TODO: confirm irq priority
 	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
 	return i;
 }
@@ -1799,6 +1800,12 @@ void ms32_state::ms32(machine_config &config)
 	ymf.add_route(1, "rspeaker", 1.0);
 //  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
 //  ymf.add_route(3, "rspeaker", 1.0);
+}
+
+void ms32_state::ms32_invert_lines(machine_config &config)
+{
+	ms32(config);
+	m_sysctrl->set_invert_vblank_lines(true);
 }
 
 void ms32_state::f1superb(machine_config &config)
@@ -2730,9 +2737,9 @@ GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   RO
 GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
 GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
