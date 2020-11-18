@@ -332,6 +332,7 @@ void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
 	// or maybe this is right
 	m_vblank_cb(0);
 	m_field_cb(0);
+	// TODO: f1superb clears comms irq here
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::scanline_cb)

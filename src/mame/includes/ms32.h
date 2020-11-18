@@ -26,7 +26,6 @@ public:
 	{ }
 	
 protected:
-	
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -77,12 +76,10 @@ public:
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
 		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
-		, m_f1superb_extraram(*this, "f1sb_extraram", 0x10000, ENDIANNESS_LITTLE)
 	{ }
 
 	void ms32(machine_config &config);
 	void ms32_invert_lines(machine_config &config);
-	void f1superb(machine_config &config);
 
 	void init_ss92047_01();
 	void init_ss91022_10();
@@ -90,7 +87,6 @@ public:
 	void init_suchie2();
 	void init_ss92048_01();
 	void init_bnstars();
-	void init_f1superb();
 	void init_ss92046_01();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
@@ -105,6 +101,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	virtual void video_start() override;
 
+	void ms32_map(address_map &map);
+	void ms32_sound_map(address_map &map);
 private:
 	required_shared_ptr<u32> m_roz_ctrl;
 	required_shared_ptr<u32> m_tx_scroll;
@@ -117,7 +115,6 @@ private:
 	memory_share_creator<u16> m_sprram;
 	memory_share_creator<u16> m_txram;
 	memory_share_creator<u16> m_bgram;
-	memory_share_creator<u16> m_f1superb_extraram;
 
 	std::unique_ptr<u8[]> m_nvram_8;
 
@@ -129,7 +126,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
-	tilemap_t* m_extra_tilemap;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind8 m_temp_bitmap_sprites_pri;
@@ -137,7 +133,6 @@ private:
 	int m_brt_r;
 	int m_brt_g;
 	int m_brt_b;
-	u32 ms32_read_inputs3();
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
 	u8 ms32_priram_r8(offs_t offset);
@@ -155,10 +150,7 @@ private:
 	u16 ms32_bgram_r16(offs_t offset);
 	void ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bgmode_w(u32 data);
-	void ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 ms32_extra_r16(offs_t offset);
-	void ms32_irq2_guess_w(u32 data);
-	void ms32_irq5_guess_w(u32 data);
+
 	void ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void coin_counter_w(u32 data);
 	void init_ms32_common();
@@ -166,17 +158,44 @@ private:
 	TILE_GET_INFO_MEMBER(get_ms32_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
-	DECLARE_VIDEO_START(f1superb);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
+};
+
+class ms32_f1superbattle_state : public ms32_state
+{
+public:
+	ms32_f1superbattle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ms32_state(mconfig, type, tag)
+		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
+		// TODO: COPROs
+	{}
+	
+	void f1superb(machine_config &config);
+	void init_f1superb();
+
+protected:
+	virtual void video_start() override;
+private:
+	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
+
+	void ms32_irq2_guess_w(u32 data);
+	void ms32_irq5_guess_w(u32 data);
+	
+	memory_share_creator<u16> m_road_vram;
+
 	void f1superb_map(address_map &map);
-	void ms32_map(address_map &map);
-	void ms32_sound_map(address_map &map);
+
+	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 road_vram_r16(offs_t offset);
+	
+	u32 analog_r();
+	
+	tilemap_t* m_extra_tilemap;
 };
 
 #endif // MAME_INCLUDES_MS32_H

@@ -477,6 +477,8 @@ Notes from Charles MacDonald
 #include "sound/ymf271.h"
 #include "speaker.h"
 
+#include "f1superb.lh"
+
 
 /********** READ INPUTS **********/
 
@@ -509,18 +511,6 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 	return  mj_input & 0xff;
 }
 
-
-u32 ms32_state::ms32_read_inputs3()
-{
-	int a,b,c,d;
-	a = ioport("AN2")->read(); // unused?
-	b = ioport("AN2")->read(); // unused?
-	c = ioport("AN1")->read();
-	d = (ioport("AN0")->read() - 0xb0) & 0xff;
-	return a << 24 | b << 16 | c << 8 | d << 0;
-}
-
-
 void ms32_base_state::sound_command_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
@@ -535,11 +525,6 @@ u32 ms32_base_state::sound_result_r()
 	irq_raise(1, false);
 	return m_to_main^0xff;
 }
-
-
-
-/********** MEMORY MAP **********/
-
 
 u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
@@ -717,41 +702,63 @@ void ms32_state::ms32_map(address_map &map)
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use its own memory map */
 
-void ms32_state::ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask)
+void ms32_f1superbattle_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_f1superb_extraram[offset]);
+	COMBINE_DATA(&m_road_vram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 
-u16 ms32_state::ms32_extra_r16(offs_t offset)
+u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
 {
-	return m_f1superb_extraram[offset];
+	return m_road_vram[offset];
 }
 
-void ms32_state::ms32_irq2_guess_w(u32 data)
+void ms32_f1superbattle_state::ms32_irq2_guess_w(u32 data)
 {
 	irq_raise(2, true);
 }
 
-void ms32_state::ms32_irq5_guess_w(u32 data)
+void ms32_f1superbattle_state::ms32_irq5_guess_w(u32 data)
 {
 	irq_raise(5, true);
 }
 
-void ms32_state::f1superb_map(address_map &map)
+u32 ms32_f1superbattle_state::analog_r()
+{
+	int a,b,c,d;
+	a = ioport("AN2")->read(); // unused?
+	b = ioport("AN2")->read(); // unused?
+	c = ioport("AN1")->read();
+	d = (ioport("AN0")->read() - 0xb0) & 0xff;
+	return a << 24 | b << 16 | c << 8 | d << 0;
+}
+
+void ms32_f1superbattle_state::f1superb_map(address_map &map)
 {
 	ms32_map(map);
 
+	// comms RAM, 8-bit resolution?
+	// unsurprisingly it seems to use similar mechanics to other Jaleco games
+	// Throws "FLAM ERROR" in test mode if irq 11 is enabled
+	// irq 11 is cleared to port $1e (irq_ack_w) in sysctrl.
+	map(0xfd0c0000, 0xfd0c0fff).ram();
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
-	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
+	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_f1superbattle_state::analog_r)).nopw(); // writes 7-led seg at very least
 
 	map(0xfce00800, 0xfce0085f).ram(); // ROZ0 control register (mirrored from 0x400?)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-//	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
-//	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
+//	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
+	// bit 1: steering shock
+	// bit 0: seat motor
+//	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
 
+	// Note: it is unknown how COPRO irqs actually acks,
+	// most likely candidate is a 0x06 ping at both $fd1024c8 / $fd1424c8
+	// irq_2: 0xffe00878 (really unused)
+	// irq_5: 0xffe008ac 
+	// irq_7: 0xffe008ea (basically identical to irq_5)
 	// COPRO 1
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
 	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
@@ -759,9 +766,11 @@ void ms32_state::f1superb_map(address_map &map)
 	// COPRO 2
 	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
 	map(0xfd144000, 0xfd145fff).ram(); // same data here
+//  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff); // definitely line ram
+	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
 	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
+//	map(0xfe202000, 0xfe2fffff).ram(); // vram?
 }
 
 /* F1 Super Battle speculation from nuapete
@@ -864,14 +873,7 @@ what the operations might be, my maths isn't up to much though...
 
 */
 
-//  map(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
-///**/map(0xfd104000, 0xfd105fff).ram(); /* f1superb */
-///**/map(0xfd144000, 0xfd145fff).ram(); /* f1superb */
-///**/map(0xfd440000, 0xfd47ffff).ram(); /* f1superb color */
-///**/map(0xfdc00000, 0xfdc006ff).ram(); /* f1superb */
-///**/map(0xfde00000, 0xfde01fff).ram(); /* f1superb lineram #2? */
-///**/map(0xfe202000, 0xfe2fffff).ram(); /* f1superb vram */
-//  map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)); /* analog controls in f1superb? */
+
 
 /*************************************
  *
@@ -1511,7 +1513,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift") PORT_TOGGLE
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Brake")
 	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1609,7 +1611,7 @@ static GFXDECODE_START( gfx_f1superb )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x100 ) // not tilemap data?
+	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x80 ) // not tilemap data?
 GFXDECODE_END
 
 
@@ -1808,14 +1810,14 @@ void ms32_state::ms32_invert_lines(machine_config &config)
 	m_sysctrl->set_invert_vblank_lines(true);
 }
 
-void ms32_state::f1superb(machine_config &config)
+void ms32_f1superbattle_state::f1superb(machine_config &config)
 {
 	ms32(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::f1superb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
 
 	m_gfxdecode->set_info(gfx_f1superb);
 
-	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
+//	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 }
 
 
@@ -2702,7 +2704,7 @@ void ms32_state::init_suchie2()
 	init_ss92048_01();
 }
 
-void ms32_state::init_f1superb()
+void ms32_f1superbattle_state::init_f1superb()
 {
 #if 0
 	// hack for ?, game needs FPUs emulated anyway, eventually remove me
@@ -2742,4 +2744,4 @@ GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    RO
 GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1994, f1superb, 0,        f1superb, f1superb, ms32_f1superbattle_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

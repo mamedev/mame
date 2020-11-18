@@ -50,12 +50,12 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
+TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 {
 	int tileno,colour;
 
-	tileno = m_f1superb_extraram[tile_index *2]   & 0xffff;
-	colour = m_f1superb_extraram[tile_index *2+1] & 0x000f;
+	tileno = m_road_vram[tile_index *2]   & 0xffff;
+	colour = m_road_vram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(3,tileno,colour+0x50,0);
 }
@@ -66,7 +66,8 @@ void ms32_state::video_start()
 {
 	m_tx_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64, 64);
 	m_bg_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16,  64, 64);
-	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16); // alt layout, controller by register?
+	// alt layout, controller by register
+	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16);
 	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
 	m_objectram_size = m_sprram.length();
@@ -101,11 +102,11 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_b));
 }
 
-VIDEO_START_MEMBER(ms32_state,f1superb)
+void ms32_f1superbattle_state::video_start()
 {
 	ms32_state::video_start();
 
-	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 }
 
 /********** PALETTE WRITES **********/
