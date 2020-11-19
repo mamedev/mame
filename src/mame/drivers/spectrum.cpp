@@ -722,11 +722,9 @@ void spectrum_state::init_spectrum()
 	{
 		case 48*1024:
 			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x4000);
-			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, m_ram->pointer() + 0x1b00);
-			break;
+			[[fallthrough]];
 		case 16*1024:
 			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, m_ram->pointer() + 0x1b00);
-			break;
 	}
 }
 

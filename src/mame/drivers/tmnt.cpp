@@ -681,7 +681,7 @@ void prmrsocr_state::prmrsocr_main_map(address_map &map)
 inline uint32_t tmnt_state::tmnt2_get_word( uint32_t addr )
 {
 	if (addr <= 0x07ffff / 2)
-		return(m_tmnt2_rom->as_u32(addr));
+		return(m_tmnt2_rom[addr]);
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
 		return(m_sunset_104000[addr - 0x104000 / 2]);
 	else if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)

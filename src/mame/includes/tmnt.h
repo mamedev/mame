@@ -71,7 +71,7 @@ protected:
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
-	required_memory_region m_tmnt2_rom;
+	required_region_ptr<uint16_t> m_tmnt2_rom;
 	optional_shared_ptr<uint16_t> m_sunset_104000;
 	optional_shared_ptr<uint16_t> m_tmnt2_1c0800;
 
