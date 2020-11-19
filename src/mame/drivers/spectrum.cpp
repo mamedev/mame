@@ -718,14 +718,7 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	switch (m_ram->size())
-	{
-		case 48*1024:
-			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x4000);
-			[[fallthrough]];
-		case 16*1024:
-			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, m_ram->pointer() + 0x1b00);
-	}
+	m_specmem->space(AS_PROGRAM).install_ram(0x5b00, ram->size() + 0x3fff, m_ram->pointer() + 0x1b00);
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
