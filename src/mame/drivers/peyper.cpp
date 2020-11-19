@@ -17,9 +17,6 @@
   Hang-On (Sonic)
   Ator (Video Dens)
 
-  Others not emulated (need roms):
-  Storm (Sonic)
-
   Sir Lancelot (Peyper, 1994)
   - CPU is a B409 (could be a higher-speed Z80)
   - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
