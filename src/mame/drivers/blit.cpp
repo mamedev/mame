@@ -71,12 +71,8 @@ public:
 		, m_sysrom(*this, M68K_TAG)
 	{ }
 
-	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
-
 	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
 
-	uint16_t bootvect_r(offs_t offset);
-	void bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void start_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vblank_ack(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -233,8 +229,6 @@ void blit_state::machine_reset()
 	});
 
 	*m_misccr = 0;
-
-	m_maincpu->reset();
 }
 
 void blit_state::blit(machine_config &config)
