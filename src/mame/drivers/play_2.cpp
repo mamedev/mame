@@ -303,7 +303,7 @@ READ_LINE_MEMBER( play_2_state::ef4_r )
 void play_2_state::clockcnt_w(uint16_t data)
 {
 	if ((data & 0x3ff) == 0)
-		m_4013b->preset_w(BIT(data, 10)); // Q10 output
+		m_4013b->preset_w(!BIT(data, 10)); // Q10 output
 }
 
 WRITE_LINE_MEMBER( play_2_state::clock2_w )
@@ -364,7 +364,7 @@ void play_2_state::play_2(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(play_2_state::clear_r));
 	m_maincpu->ef1_cb().set(FUNC(play_2_state::ef1_r));
 	m_maincpu->ef4_cb().set(FUNC(play_2_state::ef4_r));
-	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w));
+	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w)).invert(); // actually active high on 4013
 	m_maincpu->tpb_cb().set(m_4013a, FUNC(ttl7474_device::clock_w));
 	m_maincpu->tpb_cb().append(m_4020, FUNC(ripple_counter_device::clock_w));
 
