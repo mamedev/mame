@@ -1124,8 +1124,8 @@ void mcr3_state::mono_tcs(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
 }
 
 void maxrpm_state::maxrpm(machine_config &config)
@@ -1147,8 +1147,8 @@ void mcr3_state::mono_sg(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good);
-	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 }
 
 
@@ -1186,8 +1186,8 @@ void mcrsc_csd_state::mcrsc_csd(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
 
 	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
 	m_lamplatch->q_out_cb<0>().set_output("lamp0");
