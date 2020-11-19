@@ -28,6 +28,9 @@
         * – Active low
     Port D is the 8-bit data bus.
 
+	Note: Status flags are forced to certain values after a reset to get
+	      Pegasus and the Phantom Riders working with speech.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -42,8 +45,8 @@
 
 #define LOG_INTERFACE   (1U <<  0)
 #define LOG_INTERNAL    (1U <<  1)
-// #define VERBOSE (0)
-#define VERBOSE (LOG_INTERFACE)
+#define VERBOSE (0)
+// #define VERBOSE (LOG_INTERFACE)
 // #define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
 
 #include "logmacro.h"
@@ -243,7 +246,7 @@ void coco_ssc_device::device_start()
 void coco_ssc_device::device_reset()
 {
 	m_reset_state = 0;
-	m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(19*13));
+	m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
 	m_reset_line = 0;
 	m_tms7000_busy = false;
 }
@@ -258,17 +261,15 @@ void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch(id)
 	{
 		case RESET_STATE_ID:
-			if( m_reset_state == 0 ) {
-				m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(750*13));
+			if( m_reset_state == 0 )
+			{
+				m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
 				m_reset_state = 1;
 			}
-			else if( m_reset_state == 1 ) {
-				m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(250*13));
-				m_reset_state = 2;
-			}
-			else if( m_reset_state == 2 ) {
+			else if( m_reset_state == 1 )
+			{
 				m_ssc_reset_state->adjust(attotime::never);
-				m_reset_state = 3;
+				m_reset_state = 2;
 			}
 		default:
 			break;
@@ -320,16 +321,8 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 			break;
 
 		case 0x01:
-
-			if( m_reset_state == 0 ) {
-				data = 0xff;
-				LOGINTERFACE( "[%s] ff7e read (reset state 0): 0xff\n" );
-			}
-			else if( m_reset_state == 1 ) {
-				data = 0xbf;
-				LOGINTERFACE( "[%s] ff7e read (reset state 1): 0xbf\n" );
-			}
-			else {
+			if( m_reset_state == 2 )
+			{
 				data = 0x1f;
 
 				if( m_tms7000_busy == false )
@@ -337,7 +330,7 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 					data |= 0x80;
 				}
 
-				if( (m_reset_state != 2 ) && m_spo->sby_r() )
+				if( m_spo->sby_r() )
 				{
 					data |= 0x40;
 				}
@@ -358,6 +351,35 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 						data & 0x02 ? '1' : '0',
 						data & 0x01 ? '1' : '0',
 						data );
+			}
+			else if( m_reset_state == 0 )
+			{
+				data = 0xbf;
+				LOGINTERFACE( "[%s] ff7e read (reset state 0): 0xff\n" );
+			}
+			else if( m_reset_state == 1 )
+			{
+				data = 0x7f;
+
+				if( m_tms7000_busy == false )
+				{
+					data |= 0x80;
+				}
+
+				LOGINTERFACE( "[%s] ff7e read: (reset state 1) %c%c%c%c %c%c%c%c (%02x)\n",
+						machine().describe_context(),
+						data & 0x80 ? 'b' : 'B',
+						data & 0x40 ? 's' : 'S',
+						data & 0x20 ? 'p' : 'P',
+						data & 0x10 ? '1' : '0',
+						data & 0x08 ? '1' : '0',
+						data & 0x04 ? '1' : '0',
+						data & 0x02 ? '1' : '0',
+						data & 0x01 ? '1' : '0',
+						data );
+			}
+			else
+			{
 				break;
 			}
 	}
@@ -381,7 +403,7 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 				if( (data & 1) == 0 )
 				{
 					m_reset_state = 0;
-					m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(19*13));
+					m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
 					m_tms7040->reset();
 					m_ay->reset();
 					m_spo->reset();
@@ -523,7 +545,8 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 		m_stream(nullptr),
 		m_index(0)
 {
-	for( int i=0; i<16; i++ ) {
+	for( int i=0; i<16; i++ )
+	{
 		m_rms[i] = 0.0;
 	}
 }
