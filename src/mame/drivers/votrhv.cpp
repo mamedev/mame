@@ -2,10 +2,10 @@
 // copyright-holders:Jonathan Gevaryahu
 // thanks-to:Kevin Horton
 /******************************************************************************
-*
-*  Votrax/Phonic Mirror HandiVolce models HC-110 and HC-120
-*
-******************************************************************************/
+ *
+ *  Votrax/Phonic Mirror HandiVoice models HC-110 and HC-120
+ *
+ *****************************************************************************/
 /*
     The HC-110 and HC-120 both consist of 3 boards:
     1. An 'embedded system' 6800 board with two output latches, one input

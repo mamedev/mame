@@ -114,7 +114,7 @@ void fungames_state::fungames(machine_config &config)
 ROM_START( biplane4 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 ) /* 82s115 PROMS */
 	ROM_LOAD( "biplane.p",     0x0000, 0x0200, CRC(0b3af146) SHA1(de7e4bffd4ca3baf3fe6017609d1b11fa9fc356a) )
 	ROM_LOAD( "biplane.r",     0x0000, 0x0200, CRC(121eee0c) SHA1(fbdbc4da94dd9dba5903a6df321a9c2319f86dbd) )
 	ROM_LOAD( "biplane.s",     0x0000, 0x0200, CRC(a57a1c43) SHA1(64d8e609415bc0fe51581bfea2e777106505c761) )
