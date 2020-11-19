@@ -355,6 +355,7 @@ uint32_t starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_in
 		draw_circle(bitmap);
 
 	rectangle tilemaprect(0, m_bg_tilemap->width(), 0, m_bg_tilemap->height());
+	tilemaprect &= cliprect;
 	m_bg_tilemap->draw(screen, bitmap, tilemaprect, 0, 0);
 
 	if (m_phasor != 0)
