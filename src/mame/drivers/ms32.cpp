@@ -474,7 +474,6 @@ Notes from Charles MacDonald
 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "sound/ymf271.h"
 #include "speaker.h"
 
 #include "f1superb.lh"
@@ -1722,10 +1721,10 @@ WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
 		m_to_main = 0xff;
 }
 
-void ms32_state::ms32_sound_map(address_map &map)
+void ms32_base_state::base_sound_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom();
-	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+//	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 	map(0x3f10, 0x3f10).rw(FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
 	map(0x3f20, 0x3f20).nopr(); /* 2nd latch ? */
 	map(0x3f20, 0x3f20).nopw(); /* to_main2_w  ? */
@@ -1735,6 +1734,13 @@ void ms32_state::ms32_sound_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("z80bank1");
 	map(0xc000, 0xffff).bankr("z80bank2");
+}
+
+void ms32_state::ms32_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x3f00, 0x3f0f).rw(m_ymf, FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+
 }
 
 
@@ -1797,11 +1803,12 @@ void ms32_state::ms32(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf(YMF271(config, "ymf", XTAL(16'934'400))); // 16.9344MHz
-	ymf.add_route(0, "lspeaker", 1.0);
-	ymf.add_route(1, "rspeaker", 1.0);
-//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
-//  ymf.add_route(3, "rspeaker", 1.0);
+	YMF271(config, m_ymf, XTAL(16'934'400)); // 16.9344MHz
+	m_ymf->add_route(0, "lspeaker", 1.0);
+	m_ymf->add_route(1, "rspeaker", 1.0);
+// Output 2/3 not used?
+//  m_ymf->add_route(2, "lspeaker", 1.0);
+//  m_ymf->add_route(3, "rspeaker", 1.0);
 }
 
 void ms32_state::ms32_invert_lines(machine_config &config)

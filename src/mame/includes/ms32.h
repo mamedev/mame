@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "machine/jaleco_ms32_sysctrl.h"
 #include "video/ms32_sprite.h"
+#include "sound/ymf271.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -50,6 +51,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void base_sound_map(address_map &map);
+
 private:
 	u32 m_to_main;
 	u16 m_irqreq;
@@ -65,6 +68,7 @@ public:
 		, m_sprite(*this, "sprite")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_ymf(*this, "ymf")
 		, m_roz_ctrl(*this, "roz_ctrl")
 		, m_tx_scroll(*this, "tx_scroll")
 		, m_bg_scroll(*this, "bg_scroll")
@@ -97,12 +101,14 @@ protected:
 	required_device<ms32_sprite_device> m_sprite;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ymf271_device> m_ymf;
 
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	virtual void video_start() override;
 
 	void ms32_map(address_map &map);
 	void ms32_sound_map(address_map &map);
+
 private:
 	required_shared_ptr<u32> m_roz_ctrl;
 	required_shared_ptr<u32> m_tx_scroll;

@@ -92,7 +92,6 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "sound/ymf271.h"
 #include "machine/jalcrpt.h"
 
 #include "rendlay.h"
@@ -120,6 +119,7 @@ public:
 		, m_object_vram(*this, "objram_%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 		, m_p1_keys(*this, "P1KEY.%u", 0)
 		, m_p2_keys(*this, "P2KEY.%u", 0)
+		, m_ymf(*this, "ymf.%u", 1U)
 	{ }
 
 	void bnstars(machine_config &config);
@@ -179,6 +179,8 @@ private:
 	void bnstars_sound_map(address_map &map);
 	
 	void bnstars1_mahjong_select_w(u32 data);
+	
+	required_device_array<ymf271_device, 2> m_ymf;
 };
 
 
@@ -495,16 +497,9 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 
 void ms32_bnstars_state::bnstars_sound_map(address_map &map)
 {
-	map(0x0000, 0x3eff).rom();
-	map(0x3f00, 0x3f0f).rw("ymf2", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f10, 0x3f10).rw(FUNC(ms32_bnstars_state::latch_r), FUNC(ms32_bnstars_state::to_main_w));
-	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	map(0x3f70, 0x3f70).nopw();   // watchdog?
-	map(0x3f80, 0x3f80).w(FUNC(ms32_bnstars_state::ms32_snd_bank_w));
-	map(0x4000, 0x7fff).ram();
-	map(0x8000, 0xbfff).bankr("z80bank1");
-	map(0xc000, 0xffff).bankr("z80bank2");
+	base_sound_map(map);
+	map(0x3f00, 0x3f0f).rw(m_ymf[1], FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f20, 0x3f2f).rw(m_ymf[0], FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 }
 
 
@@ -715,17 +710,19 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf1(YMF271(config, "ymf1", XTAL(16'934'400))); // 16.9344MHz
-	ymf1.add_route(0, "lspeaker", 1.0);
-	ymf1.add_route(1, "rspeaker", 1.0);
-//  ymf1.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
-//  ymf1.add_route(3, "rspeaker", 1.0);
+	YMF271(config, m_ymf[0], XTAL(16'934'400)); // 16.9344MHz
+	m_ymf[0]->add_route(0, "lspeaker", 1.0);
+	m_ymf[0]->add_route(1, "rspeaker", 1.0);
+// Output 2/3 not used?
+//  m_ymf[0]->add_route(2, "lspeaker", 1.0); 
+//  m_ymf[0]->add_route(3, "rspeaker", 1.0);
 
-	ymf271_device &ymf2(YMF271(config, "ymf2", XTAL(16'934'400))); // 16.9344MHz
-	ymf2.add_route(0, "lspeaker", 1.0);
-	ymf2.add_route(1, "rspeaker", 1.0);
-//  ymf2.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
-//  ymf2.add_route(3, "rspeaker", 1.0);
+	YMF271(config, m_ymf[1], XTAL(16'934'400)); // 16.9344MHz
+	m_ymf[1]->add_route(0, "lspeaker", 1.0);
+	m_ymf[1]->add_route(1, "rspeaker", 1.0);
+// Output 2/3 not used?
+//  m_ymf[1]->add_route(2, "lspeaker", 1.0);
+//  m_ymf[1]->add_route(3, "rspeaker", 1.0);
 }
 
 
@@ -779,11 +776,11 @@ ROM_START( bnstars1 )
 	ROM_LOAD( "sb93145.5",  0x000000, 0x040000, CRC(0424e899) SHA1(fbcdebfa3d5f52b10cf30f7e416f5f53994e4d55) )
 
 	/* Samples #1 (Screen 1?) */
-	ROM_REGION( 0x400000, "ymf1", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf.1", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 
 	/* Samples #2 (Screen 2?) */
-	ROM_REGION( 0x400000, "ymf2", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf.2", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 ROM_END
 
