@@ -105,21 +105,17 @@ namespace
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		u8 ff7d_read(offs_t offset);
 		void ff7d_write(offs_t offset, u8 data);
 		virtual void set_sound_enable(bool sound_enable) override;
-		static constexpr device_timer_id RESET_STATE_ID  = 0;
 
 	private:
-		u8										m_reset_state;
 		u8                                      m_reset_line;
 		bool                                    m_tms7000_busy;
 		u8                                      m_tms7000_porta;
 		u8                                      m_tms7000_portb;
 		u8                                      m_tms7000_portc;
 		u8                                      m_tms7000_portd;
-		emu_timer                               *m_ssc_reset_state;
 		required_device<tms7040_device>         m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
@@ -227,15 +223,12 @@ void coco_ssc_device::device_start()
 			read8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
 			write8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
 
-	save_item(NAME(m_reset_state));
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_tms7000_busy));
 	save_item(NAME(m_tms7000_porta));
 	save_item(NAME(m_tms7000_portb));
 	save_item(NAME(m_tms7000_portc));
 	save_item(NAME(m_tms7000_portd));
-
-	m_ssc_reset_state = timer_alloc(RESET_STATE_ID);
 }
 
 
@@ -245,35 +238,8 @@ void coco_ssc_device::device_start()
 
 void coco_ssc_device::device_reset()
 {
-	m_reset_state = 0;
-	m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
 	m_reset_line = 0;
 	m_tms7000_busy = false;
-}
-
-
-//-------------------------------------------------
-//  device_timer - handle timer callbacks
-//-------------------------------------------------
-
-void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case RESET_STATE_ID:
-			if( m_reset_state == 0 )
-			{
-				m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
-				m_reset_state = 1;
-			}
-			else if( m_reset_state == 1 )
-			{
-				m_ssc_reset_state->adjust(attotime::never);
-				m_reset_state = 2;
-			}
-		default:
-			break;
-	}
 }
 
 
@@ -321,67 +287,36 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 			break;
 
 		case 0x01:
-			if( m_reset_state == 2 )
+			data = 0x1f;
+
+			if( m_tms7000_busy == false )
 			{
-				data = 0x1f;
-
-				if( m_tms7000_busy == false )
-				{
-					data |= 0x80;
-				}
-
-				if( m_spo->sby_r() )
-				{
-					data |= 0x40;
-				}
-
-				if(  m_sac->sound_activity_circuit_output() )
-				{
-					data |= 0x20;
-				}
-
-				LOGINTERFACE( "[%s] ff7e read: %c%c%c%c %c%c%c%c (%02x)\n",
-						machine().describe_context(),
-						data & 0x80 ? 'b' : 'B',
-						data & 0x40 ? 's' : 'S',
-						data & 0x20 ? 'p' : 'P',
-						data & 0x10 ? '1' : '0',
-						data & 0x08 ? '1' : '0',
-						data & 0x04 ? '1' : '0',
-						data & 0x02 ? '1' : '0',
-						data & 0x01 ? '1' : '0',
-						data );
+				data |= 0x80;
 			}
-			else if( m_reset_state == 0 )
+
+			if( m_spo->sby_r() )
 			{
-				data = 0xbf;
-				LOGINTERFACE( "[%s] ff7e read (reset state 0): 0xff\n" );
+				data |= 0x40;
 			}
-			else if( m_reset_state == 1 )
-			{
-				data = 0x7f;
 
-				if( m_tms7000_busy == false )
-				{
-					data |= 0x80;
-				}
-
-				LOGINTERFACE( "[%s] ff7e read: (reset state 1) %c%c%c%c %c%c%c%c (%02x)\n",
-						machine().describe_context(),
-						data & 0x80 ? 'b' : 'B',
-						data & 0x40 ? 's' : 'S',
-						data & 0x20 ? 'p' : 'P',
-						data & 0x10 ? '1' : '0',
-						data & 0x08 ? '1' : '0',
-						data & 0x04 ? '1' : '0',
-						data & 0x02 ? '1' : '0',
-						data & 0x01 ? '1' : '0',
-						data );
-			}
-			else
+			if(  m_sac->sound_activity_circuit_output() )
 			{
-				break;
+				data |= 0x20;
 			}
+
+			LOGINTERFACE( "[%s] ff7e read: %c%c%c%c %c%c%c%c (%02x)\n",
+					machine().describe_context(),
+					data & 0x80 ? 'b' : 'B',
+					data & 0x40 ? 's' : 'S',
+					data & 0x20 ? 'p' : 'P',
+					data & 0x10 ? '1' : '0',
+					data & 0x08 ? '1' : '0',
+					data & 0x04 ? '1' : '0',
+					data & 0x02 ? '1' : '0',
+					data & 0x01 ? '1' : '0',
+					data );
+
+			break;
 	}
 
 	return data;
@@ -398,15 +333,18 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 	{
 		case 0x00:
 			LOGINTERFACE( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
+
+			if( (data & 1) == 1 )
+			{
+				m_spo->reset();
+			}
+
 			if( (m_reset_line & 1) == 1 )
 			{
 				if( (data & 1) == 0 )
 				{
-					m_reset_state = 0;
-					m_ssc_reset_state->adjust(m_tms7040->cycles_to_attotime(865*13));
 					m_tms7040->reset();
 					m_ay->reset();
-					m_spo->reset();
 					m_tms7000_busy = false;
 				}
 			}
