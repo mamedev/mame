@@ -280,27 +280,54 @@ It's possible to get MAME working from 10.6, but a bit more complicated:
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 1.37.29 or later by following the instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
+First, download and install Emscripten 1.37.29 or later by following the
+instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_.
 
-Once Emscripten has been installed, it should be possible to compile MAME out-of-the-box using Emscripten's '**emmake**' tool. Because a full MAME compile is too large to load into a web browser at once, you will want to use the SOURCES parameter to compile only a subset of the project, e.g. (in the mame directory):
+Once Emscripten has been installed, it should be possible to compile MAME
+out-of-the-box using Emscripten's '**emmake**' tool. Because a full MAME
+compile is too large to load into a web browser at once, you will want to use
+the SOURCES parameter to compile only a subset of the project, e.g. (in the
+MAME directory):
 
 **emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp**
 
-The SOURCES parameter should have the path to at least one driver .cpp file. The make process will attempt to locate and include all dependencies necessary to produce a complete build including the specified driver(s). However, sometimes it is necessary to manually specify additional files (using commas) if this process misses something. E.g.:
+The SOURCES parameter should have the path to at least one driver .cpp file. The
+make process will attempt to locate and include all dependencies necessary to
+produce a complete build including the specified driver(s). However, sometimes
+it is necessary to manually specify additional files (using commas) if this
+process misses something. E.g.:
 
 **emmake make SUBTARGET=apple2e SOURCES=src/mame/drivers/apple2e.cpp,src/mame/machine/applefdc.cpp**
 
-The value of the SUBTARGET parameter serves only to differentiate multiple builds and need not be set to any specific value.
+The value of the SUBTARGET parameter serves only to differentiate multiple
+builds and need not be set to any specific value.
 
-Emscripten supports compiling to WebAssembly with a JavaScript loader instead of all-JavaScript, and in later versions this is actually the default. To force WebAssembly on or off, add WEBASSEMBLY=1 or WEBASSEMBLY=0 to the make command line.
+Emscripten supports compiling to WebAssembly with a JavaScript loader instead
+of all-JavaScript, and in later versions this is actually the default. To force
+WebAssembly on or off, add WEBASSEMBLY=1 or WEBASSEMBLY=0 to the make command
+line.
 
-Other make parameters can also be used, e.g. *-j* for multithreaded compilation as described earlier.
+Other make parameters can also be used, e.g. *-j* for multithreaded compilation
+as described earlier.
 
-When the compilation reaches the emcc phase, you may see a number of *"unresolved symbol"* warnings. At the moment, this is expected for OpenGL-related functions such as glPointSize. Any others may indicate that an additional dependency file needs to be specified in the SOURCES list. Unfortunately this process is not automated and you will need to search the source tree to locate the files supplying the missing symbols. You may also be able to get away with ignoring the warnings if the code path referencing them is not used at run-time.
+When the compilation reaches the emcc phase, you may see a number of
+*"unresolved symbol"* warnings. At the moment, this is expected for
+OpenGL-related functions such as glPointSize. Any others may indicate that an
+additional dependency file needs to be specified in the SOURCES list.
+Unfortunately this process is not automated and you will need to search the
+source tree to locate the files supplying the missing symbols. You may also be
+able to get away with ignoring the warnings if the code path referencing them
+is not used at run-time.
 
-If all goes well, a .js file will be output to the current directory. This file cannot be run by itself, but requires an HTML loader to provide it with a canvas to output to and pass in command-line parameters. The `Emularity project <https://github.com/db48x/emularity>`_ provides such a loader.
+If all goes well, a .js file will be output to the current directory. This file
+cannot be run by itself, but requires an HTML loader to provide it with a canvas
+to output to and pass in command-line parameters. The
+`Emularity project <https://github.com/db48x/emularity>`_ provides such a
+loader.
 
-There are example .html files in that repository which can be edited to point to your newly compiled MAME js filename and pass in whatever parameters you desire. You will then need to place all of the following on a web server:
+There are example .html files in that repository which can be edited to point
+to your newly compiled MAME js filename and pass in whatever parameters you
+desire. You will then need to place all of the following on a web server:
 
 * The compiled MAME .js file
 * The compiled MAME .wasm file if using WebAssembly
@@ -309,30 +336,63 @@ There are example .html files in that repository which can be edited to point to
 * Any software files you would like to run with the MAME driver
 * An Emularity loader .html modified to point to all of the above
 
-You need to use a web server instead of opening the local files directly due to security restrictions in modern web browsers.
+You need to use a web server instead of opening the local files directly due to
+security restrictions in modern web browsers.
 
-If the result fails to run, you can open the Web Console in your browser to see any error output which may have been produced (e.g. missing or incorrect ROM files). A "ReferenceError: foo is not defined" error most likely indicates that a needed source file was omitted from the SOURCES list.
+If the result fails to run, you can open the Web Console in your browser to see
+any error output which may have been produced (e.g. missing or incorrect ROM
+files). A "ReferenceError: foo is not defined" error most likely indicates that
+a needed source file was omitted from the SOURCES list.
 
 .. _compiling-docs:
 
 Compiling the Documentation
 ---------------------------
 
-Compiling the documentation will require you to install several packages depending on your operating system.
+Compiling the documentation will require you to install several packages
+depending on your operating system.
 
-On Debian/Ubuntu flavors of Linux, you'll need python3-sphinx/python-sphinx and the python3-pip/python-pip packages.
+.. _compiling-docs-windows:
 
-**sudo apt-get install python3-sphinx python3-pip** or **sudo apt-get install python-sphinx python-pip** depending on whether you're using Python 3 or Python 2.
+Compiling the Documentation on Microsoft Windows
+------------------------------------------------
+
+On Windows, you'll need a couple of packages from the MSYS2 environment. You
+can install these packages with
+
+**pacman -S mingw-w64-x86_64-librsvg mingw-w64-x86_64-python-sphinx mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter**
+
+Note that no LaTeX packages currently exist for MSYS2 so you will not be able to
+generate a PDF file without using external tools.
+
+.. _compiling-docs-debian:
+
+Compiling the Documentation on Debian and Ubuntu
+------------------------------------------------
+
+On Debian/Ubuntu flavors of Linux, you'll need **python3-sphinx/python-sphinx**
+and the **python3-pip/python-pip** packages.
+
+**sudo apt-get install python3-sphinx python3-pip** or
+**sudo apt-get install python-sphinx python-pip** depending on whether you're
+using Python 3 or Python 2.
 
 You'll then need to install the SVG handler.
 
-**pip3 install sphinxcontrib-svg2pdfconverter** or **pip install sphinxcontrib-svg2pdfconverter** depending on whether you're using Python 3 or Python 2.
+**pip3 install sphinxcontrib-svg2pdfconverter** or
+**pip install sphinxcontrib-svg2pdfconverter** depending on whether you're
+using Python 3 or Python 2.
 
-If you intend on making a PDF via LaTeX, you'll need to install a LaTeX distribution such as TeX Live.
+If you intend on making a PDF via LaTeX, you'll need to install a LaTeX
+distribution such as TeX Live.
 
 **sudo apt-get install latexmk texlive texlive-science texlive-formats-extra**
 
-From this point you can do **make html** or **make latexpdf** from the docs folder to generate the output of your choice. Typing **make** by itself will tell you all available formats. The output will be in the docs/build folder in a subfolder based on the type chosen (e.g. **make html** will create *docs/build/html* with the output.)
+From this point you can do **make html** or **make latexpdf** from the docs
+folder to generate the output of your choice. Typing **make** by itself will
+tell you all available formats. The output will be in the docs/build folder in
+a subfolder based on the type chosen
+(e.g. **make html** will create *docs/build/html* with the output.)
 
 
 .. _compiling-options:
