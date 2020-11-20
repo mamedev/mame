@@ -28,9 +28,6 @@
         * – Active low
     Port D is the 8-bit data bus.
 
-	Note: Status flags are forced to certain values after a reset to get
-	      Pegasus and the Phantom Riders working with speech.
-
 ***************************************************************************/
 
 #include "emu.h"
