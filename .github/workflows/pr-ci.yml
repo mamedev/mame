@@ -60,7 +60,7 @@ jobs:
     - name: Install Android NDK
       run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${ANDROID_NDK_VERSION}"
     - uses: actions/checkout@v2
-    - run: make -f Makefile.libretro platform=android -j8
+    - run: make -f Makefile.libretro platform=android-arm -j8
 
   AndroidARM64:
     name: Build for Android ARM64

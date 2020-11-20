@@ -67,23 +67,6 @@ ifeq (,$(findstring x86,$(LIBRETRO_CPU)))
 	FORCE_DRC_C_BACKEND = 1
 endif
 
-ifeq ($(platform), android)
-	#PTR64 = 0
-	# FIXME: Pass these to GENie and test...
-#	CROSS_BUILD = 1
-#	FORCE_DRC_C_BACKEND = 1
-else ifeq ($(platform), osx)
-	PYTHON_EXECUTABLE = python
-else ifneq (,$(findstring ios,$(platform)))
-#	PTR64 = 0
-	LIBRETRO_CPU=arm
-	PYTHON_EXECUTABLE = python
-	# FIXME: Pass these to GENie and test...
-#	CROSS_BUILD = 1
-#	FORCE_DRC_C_BACKEND = 1
-endif
-
-
 ###########################################################################
 #
 #   BUILD FLAGS
@@ -119,7 +102,7 @@ ifeq ($(platform),win)
 		PLATFLAGS += MINGW32="$(MINGW32)"
 	endif
 endif
-ifeq ($(platform),android)
+ifeq ($(platform),android-arm)
 	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
 	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
 	ANDROID_NDK_ROOT ?= /opt/ndk
