@@ -10,6 +10,7 @@ Libretro MAME core build status:
 | Windows x86_64 | [![MAME-libretro Windows x86_64](https://github.com/libretro/mame/workflows/MAME-libretro%20Windows%20x86_64/badge.svg)](https://github.com/libretro/mame/releases/download/Windows_64-bit/mame_libretro.dll.zip) |
 | macOS x86_64 | [![MAME-libretro macOS x86_64](https://github.com/libretro/mame/workflows/MAME-libretro%20macOS%20x86_64/badge.svg)](https://github.com/libretro/mame/releases/download/macOS-x86_64/mame_libretro.dylib.zip) |
 | Android ARMv7 | [![MAME-libretro Android ARMv7](https://github.com/libretro/mame/workflows/MAME-libretro%20Android%20ARMv7/badge.svg)](https://github.com/libretro/mame/releases/download/Android_ARMv7/mame_libretro_android.so.zip) |
+| Android ARM64 | [![MAME-libretro Android ARM64](https://github.com/libretro/mame/workflows/MAME-libretro%20Android%20ARM64/badge.svg)](https://github.com/libretro/mame/releases/download/Android_ARM64/mame_libretro_android.so.zip) |
 
 To build libretro MAME core from source you need to use `Makefile.libretro` make file:
 
@@ -22,18 +23,6 @@ make -f Makefile.libretro
 # **MAME** #
 
 [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Build status:
-
-| OS/Compiler   | Status        | 
-| ------------- |:-------------:| 
-| Linux/GCC and Clang | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
-| Windows/GCC and MSVC | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
-| macOS/Clang | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
-
-Static analysis status for entire build (except for third-party parts of project):
-
-[![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
 
 What is MAME?
 =============

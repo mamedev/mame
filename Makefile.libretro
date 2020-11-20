@@ -67,23 +67,6 @@ ifeq (,$(findstring x86,$(LIBRETRO_CPU)))
 	FORCE_DRC_C_BACKEND = 1
 endif
 
-ifeq ($(platform), android)
-	#PTR64 = 0
-	# FIXME: Pass these to GENie and test...
-#	CROSS_BUILD = 1
-#	FORCE_DRC_C_BACKEND = 1
-else ifeq ($(platform), osx)
-	PYTHON_EXECUTABLE = python
-else ifneq (,$(findstring ios,$(platform)))
-#	PTR64 = 0
-        LIBRETRO_CPU=arm
-	PYTHON_EXECUTABLE = python
-	# FIXME: Pass these to GENie and test...
-#	CROSS_BUILD = 1
-#	FORCE_DRC_C_BACKEND = 1
-endif
-
-
 ###########################################################################
 #
 #   BUILD FLAGS
@@ -110,14 +93,6 @@ endif
 
 PLATFLAGS =
 
-ifneq ($(platform),android)
-	ifneq ($(PTR64),)
-		PLATFLAGS += PTR64=$(PTR64)
-	endif
-	ifneq ($(platform),)
-		PLATFLAGS += LIBRETRO_OS="$(platform)"
-	endif
-endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
 		MINGW64 ?= /mingw64
@@ -127,9 +102,9 @@ ifeq ($(platform),win)
 		PLATFLAGS += MINGW32="$(MINGW32)"
 	endif
 endif
-ifeq ($(platform),android)
-	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm-3.5/prebuilt/linux-x86_64
-	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64
+ifeq ($(platform),android-arm)
+	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
+	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
 	ANDROID_NDK_ROOT ?= /opt/ndk
 	PLATFLAGS += TARGETOS="android-arm" gcc="android-arm"
 	PLATFLAGS +=  ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
@@ -138,6 +113,20 @@ ifeq ($(platform),android)
 	LIBRETRO_CPU :=
 	ARCH :=
 	LIBRETRO_OS :=
+	PTR64 := 
+endif
+ifeq ($(platform),android-arm64)
+	ANDROID_NDK_LLVM  ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
+	ANDROID_NDK_ARM64 ?= /opt/ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64
+	ANDROID_NDK_ROOT  ?= /opt/ndk
+	PLATFLAGS += TARGETOS="android-arm64" gcc="android-arm64"
+	PLATFLAGS += ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
+	PLATFLAGS += ANDROID_NDK_ARM64="$(ANDROID_NDK_ARM64)"
+	PLATFLAGS += ANDROID_NDK_ROOT="$(ANDROID_NDK_ROOT)"
+	LIBRETRO_CPU :=
+	ARCH :=
+	LIBRETRO_OS :=
+	PTR64 := 
 endif
 ifeq ($(platform),osx)
   PLATFLAGS += DONT_USE_NETWORK=1
@@ -147,6 +136,12 @@ ifneq ($(LIBRETRO_CPU),)
 endif
 ifneq ($(FORCE_DRC_C_BACKEND),)
 	PLATFLAGS += FORCE_DRC_C_BACKEND="$(FORCE_DRC_C_BACKEND)"
+endif
+ifneq ($(LIBRETRO_OS),)
+	PLATFLAGS += LIBRETRO_OS="$(platform)"
+endif
+ifneq ($(PTR64),)
+	PLATFLAGS += PTR64=$(PTR64)
 endif
 
 ###########################################################################
