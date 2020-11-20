@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
-#ifndef MAME_CPU_PDP1_TX0_H
-#define MAME_CPU_PDP1_TX0_H
+#ifndef MAME_CPU_TX0_TX0_H
+#define MAME_CPU_TX0_TX0_H
 
 #pragma once
 
@@ -159,4 +159,4 @@ private:
 DECLARE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device)
 DECLARE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device)
 
-#endif // MAME_CPU_PDP1_TX0_H
+#endif // MAME_CPU_TX0_TX0_H
