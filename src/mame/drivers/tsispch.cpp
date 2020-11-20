@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
+// thanks-to:Kevin Horton
 /******************************************************************************
 *
 *  Telesensory Systems Inc./Speech Plus
 *  1500 and 2000 series
 *  Prose 2020
-*  Copyright (C) 2011-2013 Jonathan Gevaryahu AKA Lord Nightmare and Kevin 'kevtris' Horton
 *
 *  The Prose 2000 card is an IEEE 796 Multibus card, with additional connectors to facilitate power and serial input other than via multibus.
 *  There are two hardware versions of the card:
@@ -124,9 +124,18 @@
 namespace {
 
 // defines
-#define DEBUG_PARAM 1
-#undef DEBUG_DSP
-#undef DEBUG_DSP_W
+
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_PARAM     (1U <<  1)
+#define LOG_DSP       (1U <<  2)
+
+#define VERBOSE (LOG_GENERAL | LOG_PARAM)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGPRM(...) LOGMASKED(LOG_PARAM, __VA_ARGS__)
+#define LOGDSP(...) LOGMASKED(LOG_DSP, __VA_ARGS__)
 
 // class definition
 class tsispch_state : public driver_device
@@ -199,10 +208,8 @@ void tsispch_state::peripheral_w(uint8_t data)
 	*/
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
-#ifdef DEBUG_PARAM
-	//logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-#endif
+	//LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,1), 1-BIT(data,2), 1-BIT(data,3), 1-BIT(data,4));
 }
 
@@ -211,49 +218,39 @@ void tsispch_state::peripheral_w(uint8_t data)
 *****************************************************************************/
 uint16_t tsispch_state::dsp_data_r()
 {
-#ifdef DEBUG_DSP
-	uint8_t temp = m_dsp->snesdsp_read(true);
-	logerror("dsp data read: %02x\n", temp);
-	return temp;
-#else
-	return m_dsp->snesdsp_read(true);
-#endif
+	uint8_t r = m_dsp->snesdsp_read(true);
+	LOGDSP("dsp data read: %02x\n", r);
+	return r;
 }
 
 void tsispch_state::dsp_data_w(uint16_t data)
 {
-#ifdef DEBUG_DSP_W
-	logerror("dsp data write: %02x\n", data);
-#endif
+	LOGDSP("dsp data write: %02x\n", data);
 	m_dsp->snesdsp_write(true, data);
 }
 
 uint16_t tsispch_state::dsp_status_r()
 {
-#ifdef DEBUG_DSP
-	uint8_t temp = m_dsp->snesdsp_read(false);
-	logerror("dsp status read: %02x\n", temp);
-	return temp;
-#else
-	return m_dsp->snesdsp_read(false);
-#endif
+	uint8_t r = m_dsp->snesdsp_read(false);
+	LOGDSP("dsp status read: %02x\n", r);
+	return r;
 }
 
 void tsispch_state::dsp_status_w(uint16_t data)
 {
-	logerror("warning: upd772x status register should never be written to!\n");
+	LOGGEN("warning: upd772x status register should never be written to!\n");
 	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
 {
-	logerror("upd772x changed p0 state to %d!\n",state);
+	LOGGEN("upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 {
-	logerror("upd772x changed p1 state to %d!\n",state);
+	LOGGEN("upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
@@ -262,7 +259,7 @@ WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
-	logerror("machine reset\n");
+	LOGGEN("machine reset\n");
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
@@ -270,7 +267,7 @@ void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
-	logerror("driver init\n");
+	LOGGEN("driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
 	// source upd7720                  dest upd7725
@@ -553,7 +550,7 @@ ROM_START( prose2ko )
 	ROMX_LOAD( "v1.1__15__speech__plus__=c=1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
 
 	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
-	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is mask ROM and doesn't dump easily
+	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is mask ROM and an electronic dump method is not yet known
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, NO_DUMP)
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786)) // temp placeholder
