@@ -894,7 +894,6 @@ function toolchain(_buildDir, _subDir)
 			"-funwind-tables",
 			"-fstack-protector-strong",
 			"-no-canonical-prefixes",
-			"-fno-integrated-as",
 			"-Wunused-value",
 			"-Wundef",
 			"-Wno-cast-align",
@@ -955,7 +954,7 @@ function toolchain(_buildDir, _subDir)
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
 				"-target aarch64-none-linux-android",
-				"-march=armv8.2-a",
+				"-march=armv8-a",
 			}
 			links {
 				"gcc",
@@ -966,7 +965,7 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
 				"-target aarch64-none-linux-android",
-				"-march=armv8.2-a",
+				"-march=armv8-a",
 			}
 
 	configuration { "android-x86" }
