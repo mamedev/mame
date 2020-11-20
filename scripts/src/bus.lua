@@ -2466,6 +2466,8 @@ end
 
 if (BUSES["NSCSI"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/nscsi/applecd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/applecd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdd2000.cpp",
