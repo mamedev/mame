@@ -1,4 +1,4 @@
-name: MAME-libretro Android ARMv8a
+name: MAME-libretro Android ARM64
 
 on:
   push:
@@ -36,3 +36,9 @@ jobs:
         title: Android ARM64
         files: |
           mame_libretro_android.so.zip
+          mame_libretro_android.so.zip.sha256
+    - name: Save artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: mame_libretro_android.so.zip
+        path: mame_libretro_android.so.zip
