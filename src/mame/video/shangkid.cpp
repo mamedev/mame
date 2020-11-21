@@ -285,13 +285,13 @@ void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	int color;
 	for( i=0x7e; i>=0x00; i-=2 )
 	{
-		bank = m_videoram[0x1b80+i];
-		attr = m_videoram[0x1b81+i];
+		bank = m_spriteram[0xb80+i];
+		attr = m_spriteram[0xb81+i];
 		tile = m_videoram[0xb80+i];
 		color = m_videoram[0xb81+i];
-		sy = 240-m_videoram[0x1380+i];
+		sy = 240-m_spriteram[0x380+i];
 
-		sx = m_videoram[0x1381+i]-64+8+16;
+		sx = m_spriteram[0x381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
 

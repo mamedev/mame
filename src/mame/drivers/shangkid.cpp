@@ -458,7 +458,8 @@ void shangkid_state::shangkid(machine_config &config)
 void shangkid_state::dynamski_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xdbff).ram().share("videoram"); /* tilemap */
+	map(0xc000, 0xcbff).ram().share("videoram"); /* tilemap */
+	map(0xd000, 0xdbff).ram().share("spriteram"); /* tilemap */
 	map(0xe000, 0xe007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("SYSTEM");
 	map(0xe801, 0xe801).portr("P1");
