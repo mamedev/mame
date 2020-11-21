@@ -133,10 +133,7 @@ protected:
 	void set_scrolls();
 	void register_common();
 	void log_vram();
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int priority);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void reset_sound();
 	DECLARE_WRITE_LINE_MEMBER(reset_callback);
 	required_device<m68000_device> m_maincpu;
