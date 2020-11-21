@@ -40,8 +40,8 @@
 
 #include "speaker.h"
 
-#define LOG_INTERFACE   (1U <<  0)
-#define LOG_INTERNAL    (1U <<  1)
+#define LOG_INTERFACE   (1U <<  1)
+#define LOG_INTERNAL    (1U <<  2)
 #define VERBOSE (0)
 // #define VERBOSE (LOG_INTERFACE)
 // #define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
@@ -137,9 +137,11 @@ namespace
 		// sound stream update overrides
 		virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
+		// Power of 2
+		static constexpr int BUFFER_SIZE = 4;
 	private:
 		sound_stream*  m_stream;
-		float m_rms[16];
+		double m_rms[BUFFER_SIZE];
 		int m_index;
 	};
 };
@@ -367,7 +369,10 @@ u8 coco_ssc_device::ssc_port_a_r()
 {
 	LOGINTERNAL( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 
-	m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	}
 
 	return m_tms7000_porta;
 }
@@ -480,10 +485,7 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 		m_stream(nullptr),
 		m_index(0)
 {
-	for( int i=0; i<16; i++ )
-	{
-		m_rms[i] = 0.0;
-	}
+ 	std::fill(std::begin(m_rms), std::end(m_rms), 0);
 }
 
 
@@ -506,21 +508,25 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 	auto &src = inputs[0];
 	auto &dst = outputs[0];
 
-	double n = dst.samples();
+	int count = dst.samples();
+	m_rms[m_index] = 0;
 
-	if( n > 0 ) {
-		for (int sampindex = 0; sampindex < n; sampindex++)
+	if( count > 0 )
+	{
+		for (int sampindex = 0; sampindex < count; sampindex++)
 		{
+			// sum the squares
 			m_rms[m_index] += src.get(sampindex) * src.get(sampindex);
+			// copy from source to destination
 			dst.put(sampindex, src.get(sampindex));
 		}
 
-		m_rms[m_index] = m_rms[m_index] / n;
+		m_rms[m_index] = m_rms[m_index] / count;
 		m_rms[m_index] = sqrt(m_rms[m_index]);
-
-		m_index++;
-		m_index &= 0x0f;
 	}
+
+	m_index++;
+	m_index &= BUFFER_SIZE;
 }
 
 
@@ -530,9 +536,8 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-  float average = m_rms[0] + m_rms[1] + m_rms[2] + m_rms[3] + m_rms[4] +
-	m_rms[5] + m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] +
-	m_rms[11] + m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
+	double sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0);
+	double average = (sum / BUFFER_SIZE);
 
-	return (average / 16.0) < 0.3175 ;
+	return average < 0.08;
 }
