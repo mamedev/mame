@@ -750,10 +750,10 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	// then draw the higher priority layers in order
 	for (int priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, 0);
+		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
 
 		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
 		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
@@ -777,10 +777,10 @@ u32 toaplan1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	// then draw the higher priority layers in order
 	for (int priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
 	}
 
 	draw_sprites(screen, bitmap, cliprect);
