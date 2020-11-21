@@ -10322,6 +10322,33 @@ ROM_START( mooncptc )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( mouncrst )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w.7f", 0x0000, 0x0800, CRC(b8ef3a6b) SHA1(60fb7aa6c82741c75739adc2b9a56506f077fb8a) )
+	ROM_CONTINUE(     0x2000, 0x0800 )
+	ROM_LOAD( "x.7h", 0x0800, 0x0800, CRC(b878f354) SHA1(cfdf3e46b9b970bb781c628daefbe7e2609df45d) )
+	ROM_CONTINUE(     0x2800, 0x0800 )
+	ROM_LOAD( "y.7j", 0x1000, 0x0800, CRC(021762f4) SHA1(5b1a44ddee138775b6e85401e70d31ca26910379) )
+	ROM_CONTINUE(     0x3000, 0x0800 )
+	ROM_LOAD( "z.7k", 0x1800, 0x0800, CRC(f249ae30) SHA1(2c6e608369cf5c307e7faf2d197a80e234ad8130) )
+	ROM_CONTINUE(     0x3800, 0x0800 )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "k.1h", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
+	ROM_LOAD( "m.1h", 0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(     0x0c00, 0x0200 ) // this version of the gfx ROMs has two groups of 16 sprites swapped
+	ROM_CONTINUE(     0x0a00, 0x0200 )
+	ROM_CONTINUE(     0x0e00, 0x0200 )
+	ROM_LOAD( "l.1k", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "n.1k", 0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(     0x1c00, 0x0200 )
+	ROM_CONTINUE(     0x1a00, 0x0200 )
+	ROM_CONTINUE(     0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( sirio2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sirio2_1.bin",      0x0000, 0x0800, CRC(1e6a4b49) SHA1(6f71f10e73b7a385cd455e74129544cd58932781) )
@@ -13326,6 +13353,7 @@ GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)",            "Super Moon Cresta (Gremlin, bootleg)",                       MACHINE_SUPPORTS_SAVE ) // Probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
 GAME( 1980, mooncrstso,  mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Sonic)",              "Moon Cresta (SegaSA / Sonic)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Petaco S.A.)",        "Moon Cresta (Petaco S.A. Spanish bootleg)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,mouncrst,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)",             "Moune Creste (Jeutel French Moon Cresta bootleg)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,ataqandr,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (FAR S.A.)",           "Ataque Androide - Moon Cresta (FAR S.A. Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 // There may be an alternate version called "Star Crest" according to flyers; is it the same?
