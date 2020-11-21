@@ -225,4 +225,6 @@ private:
 	device_cococart_host_interface * m_host;
 };
 
+void coco_cart_add_devices(device_slot_interface &device, bool include_fdcs, bool include_multi_pak);
+
 #endif // MAME_BUS_COCO_COCOCART_H
