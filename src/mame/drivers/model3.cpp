@@ -1364,7 +1364,7 @@ void model3_state::model3_init(int step)
 	m_dma_busy = 0;
 	m_real3d_dma_timer->adjust(attotime::never);
 
-	membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
+	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
 	membank("bank4")->set_base(memregion("samples")->base() + 0x200000);
 	membank("bank5")->set_base(memregion("samples")->base() + 0x600000);
@@ -1568,7 +1568,7 @@ void model3_state::model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				data >>= 56;
 				data = (~data) & 0xf;
 
-				membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1691,7 +1691,7 @@ void model3_state::daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 		m_bank2->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
@@ -6157,7 +6157,7 @@ void model3_state::init_model3_10()
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
@@ -6168,7 +6168,7 @@ void model3_state::init_model3_10()
 void model3_state::init_model3_15()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1"));
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
@@ -6179,7 +6179,7 @@ void model3_state::init_model3_15()
 void model3_state::init_model3_20()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64s_delegate(*this, FUNC(model3_state::real3d_dma_r)), write64s_delegate(*this, FUNC(model3_state::real3d_dma_w)));
 
@@ -6248,7 +6248,7 @@ void model3_state::init_vs215()
 	m_step15_with_mpc106 = true;
 
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
@@ -6269,7 +6269,7 @@ void model3_state::init_vs29815()
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
@@ -6285,7 +6285,7 @@ void model3_state::init_bass()
 	m_step15_with_mpc106 = true;
 
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
@@ -6299,7 +6299,7 @@ void model3_state::init_bass()
 void model3_state::init_getbass()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, membank("bank1") );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 

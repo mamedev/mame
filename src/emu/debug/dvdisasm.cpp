@@ -35,9 +35,6 @@ debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t 
 //  DEBUG VIEW DISASM
 //**************************************************************************
 
-const int debug_view_disasm::DEFAULT_DASM_LINES, debug_view_disasm::DEFAULT_DASM_WIDTH, debug_view_disasm::DASM_MAX_BYTES;
-
-
 //-------------------------------------------------
 //  debug_view_disasm - constructor
 //-------------------------------------------------

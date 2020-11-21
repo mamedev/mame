@@ -273,6 +273,18 @@ void carnival_state::machine_start()
 	save_item(NAME(m_musicBus));
 }
 
+void carnivalh_state::machine_start()
+{
+	carnival_state::machine_start();
+
+	m_previousaddress = 0;
+	m_previousvalue = 0;
+
+	save_item(NAME(m_previousaddress));
+	save_item(NAME(m_previousvalue));
+}
+
+
 void tranqgun_state::machine_start()
 {
 	vicdual_state::machine_start();
@@ -764,7 +776,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( carnivalh )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // IPT_START2, but not implemented in game? - it goes game-over after player 1's turn
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -1262,6 +1274,47 @@ void tranqgun_state::tranqgun_dualgame_map(address_map &map)
 {
 	vicdual_dualgame_map(map);
 	map(0x4000, 0x7fff).rw(FUNC(tranqgun_state::tranqgun_prot_r), FUNC(tranqgun_state::tranqgun_prot_w));
+}
+
+uint8_t carnivalh_state::carnivalh_prot_r(offs_t offset)
+{
+	// There appear to be 2 protection functions in the code
+	// The first one is called if a duck gets to the bottom of the screen, or if Player 1 Game Over condition is reached and Player 2 needs to start
+	// The second one is called when you complete a bonus round
+
+	uint8_t retdat = 0;
+
+	if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76b))*/ true && (m_previousvalue == 0x24))
+		retdat = 0x02;
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76d))*/ true && (m_previousvalue == 0x66))
+		retdat = 0x07;
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76f))*/ true && (m_previousvalue == 0x48))
+		retdat = 0x03;
+	else
+		popmessage("%s: carnivalh_prot_r %04x %04x %02x\n", machine().describe_context(), offset, m_previousaddress, m_previousvalue);
+
+	return retdat;
+}
+
+void carnivalh_state::carnivalh_prot_w(offs_t offset, uint8_t data)
+{
+	// the protection writes appear to overlay regular RAM areas?
+	// protection writes are to 0xe76b, 0xe76d, 0xe76f for one function and 0xe3d4 for the other (see code at 0x26AF & 0x2892)
+
+	m_previousaddress = offset+0xe000;
+	m_previousvalue = data;
+
+	// fall through to usual accesses (write to the non-mirror address so we're not recursive)
+	address_space& spc = m_maincpu->space(AS_PROGRAM);
+	spc.write_byte(0x8000+offset, data);
+}
+
+
+void carnivalh_state::carnivalh_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x4000, 0x7fff).r(FUNC(carnivalh_state::carnivalh_prot_r));
+	map(0xe000, 0xefff).w(FUNC(carnivalh_state::carnivalh_prot_w));
 }
 
 void vicdual_state::carhntds_dualgame_map(address_map &map)
@@ -2285,12 +2338,13 @@ void carnival_state::carnivalb(machine_config &config)
 	carnivalb_audio(config);
 }
 
-void carnival_state::carnivalh(machine_config &config)
+void carnivalh_state::carnivalh(machine_config &config)
 {
 	carnival(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &carnival_state::headon_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &carnivalh_state::carnivalh_dualgame_map);
+	m_maincpu->set_addrmap(AS_IO, &carnivalh_state::headon_io_map);
 }
 
 
@@ -4067,8 +4121,8 @@ GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,  empty_in
 GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state, empty_init, ROT270, "Sega", "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state, empty_init, ROT270, "Sega", "Carnival (upright, PIT8253 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state, empty_init, ROT270, "Sega", "Carnival (cocktail)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnival_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnival_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state, empty_init, ROT270, "bootleg (Cocamatic)", "Verbena (bootleg of Carnival)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "Sega", "Borderline", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,  empty_init, ROT270, "Sega", "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

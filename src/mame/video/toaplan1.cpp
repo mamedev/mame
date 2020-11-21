@@ -669,102 +669,6 @@ void toaplan1_state::log_vram()
     Sprite Handlers
 ***************************************************************************/
 
-// custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-void toaplan1_state::draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int priority)
-{
-	const u32 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
-	bitmap_ind8 &priority_bitmap = screen.priority();
-	const int sprite_screen_height = ((1 << 16) * gfx->height() + 0x8000) >> 16;
-	const int sprite_screen_width = ((1 << 16) * gfx->width() + 0x8000) >> 16;
-	const pen_t *pens = &m_palette->pen(pal_base);
-
-	if (sprite_screen_width && sprite_screen_height)
-	{
-		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width() << 16) / sprite_screen_width;
-		int dy = (gfx->height() << 16) / sprite_screen_height;
-
-		int ex = sx + sprite_screen_width;
-		int ey = sy + sprite_screen_height;
-
-		int x_index_base;
-		int y_index;
-
-		if (flipx)
-		{
-			x_index_base = (sprite_screen_width - 1) * dx;
-			dx = -dx;
-		}
-		else
-		{
-			x_index_base = 0;
-		}
-
-		if (flipy)
-		{
-			y_index = (sprite_screen_height - 1) * dy;
-			dy = -dy;
-		}
-		else
-		{
-			y_index = 0;
-		}
-
-		if (sx < clip.min_x)
-		{ /* clip left */
-			int pixels = clip.min_x - sx;
-			sx += pixels;
-			x_index_base += pixels * dx;
-		}
-		if (sy < clip.min_y)
-		{ /* clip top */
-			int pixels = clip.min_y - sy;
-			sy += pixels;
-			y_index += pixels * dy;
-		}
-		/* NS 980211 - fixed incorrect clipping */
-		if (ex > clip.max_x + 1)
-		{ /* clip right */
-			int pixels = ex-clip.max_x - 1;
-			ex -= pixels;
-		}
-		if (ey > clip.max_y + 1)
-		{ /* clip bottom */
-			int pixels = ey-clip.max_y - 1;
-			ey -= pixels;
-		}
-
-		if (ex > sx)
-		{ /* skip if inner loop doesn't draw anything */
-			for (int y = sy; y < ey; y++)
-			{
-				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u32 *const dest = &dest_bmp.pix(y);
-				u8 *const pri = &priority_bitmap.pix(y);
-
-				int x_index = x_index_base;
-				for (int x = sx; x < ex; x++)
-				{
-					const u8 c = source[x_index >> 16];
-					if (c != 0)
-					{
-						if (pri[x] < priority)
-							dest[x] = pens[c];
-						pri[x] = 0xff; // mark it "already drawn"
-					}
-					x_index += dx;
-				}
-
-				y_index += dy;
-			}
-		}
-	}
-}
-
-
 void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = (u16 *)m_buffered_spriteram.get();
@@ -815,12 +719,11 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					draw_sprite_custom(screen,bitmap,cliprect,m_gfxdecode->gfx(1),
-												sprite,color,
-												fcu_flipscreen,fcu_flipscreen,
-												sx,sy,
-												priority);
-
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect,
+												sprite, color,
+												fcu_flipscreen, fcu_flipscreen,
+												sx, sy,
+												screen.priority(), u32(~0) << priority, 0); // ~0 for behind tilemap in same priority
 					sprite++;
 				}
 			}
@@ -847,10 +750,10 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	// then draw the higher priority layers in order
 	for (int priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, 0);
+		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
 
 		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
 		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
@@ -874,10 +777,10 @@ u32 toaplan1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	// then draw the higher priority layers in order
 	for (int priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, priority, priority, 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
 	}
 
 	draw_sprites(screen, bitmap, cliprect);

@@ -1171,7 +1171,7 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 ROM_START( dimm )
 	ROM_REGION( 0x200000, "segadimm", 0)
 	// Altera FLEX EPF10K30 firmwares (implements PCI IDE controller)
-	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff01, NO_DUMP ) // GD-only DIMM
+	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff5b, CRC(cc7735c7) SHA1(1afb442b5918c0d60f98688ed0a7117b0d068722) ) // GD-only DIMM
 	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
 
 	// unused and/or unknown security PICs

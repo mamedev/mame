@@ -22,13 +22,13 @@
     operation by disassembling the Nimbus bios and by writing experemental
     code on the real machine.
 */
-
-#include <functional>
-
 #include "emu.h"
+#include "includes/rmnimbus.h"
+
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "includes/rmnimbus.h"
+
+#include <functional>
 
 
 #define WIDTH_MASK      0x07

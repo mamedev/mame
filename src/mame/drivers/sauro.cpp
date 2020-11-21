@@ -82,11 +82,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
     This setting (as well as others) must be defined before resetting the games.
-  - "Test mode" crashes when trying to display "Difficult" ("Hard") because the full string
-    is 15 bytes long while other string are 14, so the 15th "char" is NOT 0x00 :
+  - On 'sauroa', "Test mode" crashes when trying to display "Difficult" ("Hard") 
+    because the full string is 15 bytes long while other string are 14, so the 15th
+	"char" is NOT 0x00 :
       * 0xd49f : mask (0x30)
       * 0xd4a0-0xd4a7 : offset of settings to display (4 x 2 bytes, LSB first) :
         0xd58e, 0xd5a5, 0xd5bc, 0xd5d4
+	On 'sauro' (the parent set), the "Test mode" works fine and displays the
+	"Difficult" string.
   - Player 2 uses player 2 inputs only when "Cabinet" Dip Switch is set to "Cocktail"
     (code at 0x2e40 : start reading inputs).
 
@@ -542,8 +545,8 @@ void sauro_state::saurob(machine_config &config)
 
 ROM_START( sauro )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(19f8de25) SHA1(52eea7c0416ab0a8dbb3d1664b2f57ab7a405a67) )
-	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(0f8b876f) SHA1(6e61a8934a2cc3c80c1f47dd59aa43aaeec12f75) )
+	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(2e356e2d) SHA1(2f893e9184f0227de4de17b7011c1bd7ea2c11b1) ) // Same label as 'sauroa', but different content
+	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(95d03e5e) SHA1(ae584ea9cecdadac46aa3565765ae0027010f8ca) ) // Same label as 'sauroa', but different content
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
@@ -574,8 +577,8 @@ ROM_END
 
 ROM_START( sauroa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sauro-2a.bin",     0x00000, 0x8000, CRC(2e356e2d) SHA1(2f893e9184f0227de4de17b7011c1bd7ea2c11b1) )
-	ROM_LOAD( "sauro-1a.bin",     0x08000, 0x8000, CRC(95d03e5e) SHA1(ae584ea9cecdadac46aa3565765ae0027010f8ca) )
+	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(19f8de25) SHA1(52eea7c0416ab0a8dbb3d1664b2f57ab7a405a67) ) // Same label as 'sauro', but different content
+	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(0f8b876f) SHA1(6e61a8934a2cc3c80c1f47dd59aa43aaeec12f75) ) // Same label as 'sauro', but different content
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )

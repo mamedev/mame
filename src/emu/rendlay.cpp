@@ -4167,7 +4167,8 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// normalize all the item bounds
 	for (item &curitem : items())
 	{
-		curitem.m_bounds = curitem.m_rawbounds;
+		assert(curitem.m_rawbounds.size() == curitem.m_bounds.size());
+		std::copy(curitem.m_rawbounds.begin(), curitem.m_rawbounds.end(), curitem.m_bounds.begin());
 		normalize_bounds(curitem.m_bounds, target_bounds.x0, target_bounds.y0, xoffs, yoffs, xscale, yscale);
 	}
 
@@ -4478,7 +4479,7 @@ layout_view::item::item(
 
 	// this can be called before resolving tags, make it return something valid
 	m_bounds = m_rawbounds;
-	m_get_bounds = bounds_delegate(&emu::render::detail::bounds_step::get, &const_cast<emu::render::detail::bounds_step &>(m_bounds.front()));
+	m_get_bounds = bounds_delegate(&emu::render::detail::bounds_step::get, &m_bounds.front());
 }
 
 
@@ -4558,7 +4559,7 @@ void layout_view::item::resolve_tags()
 
 	// choose optional bounds and colour functions
 	m_get_bounds = (m_bounds.size() == 1U)
-			? bounds_delegate(&emu::render::detail::bounds_step::get, &const_cast<emu::render::detail::bounds_step &>(m_bounds.front()))
+			? bounds_delegate(&emu::render::detail::bounds_step::get, &m_bounds.front())
 			: bounds_delegate(&item::get_interpolated_bounds, this);
 	m_get_color = (m_color.size() == 1U)
 			? color_delegate(&emu::render::detail::color_step::get, &const_cast<emu::render::detail::color_step &>(m_color.front()))

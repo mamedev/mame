@@ -251,6 +251,11 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_OPCODES, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 
+	m_console.register_command("strdump",   CMDFLAG_NONE, AS_PROGRAM, 3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpd",  CMDFLAG_NONE, AS_DATA, 3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpi",  CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+	m_console.register_command("strdumpo",  CMDFLAG_NONE, AS_OPCODES, 3, 5, std::bind(&debugger_commands::execute_strdump, this, _1, _2));
+
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2));
 
@@ -2386,6 +2391,181 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	}
 
 	/* close the file */
+	fclose(f);
+	m_console.printf("Data dumped successfully\n");
+}
+
+
+//-------------------------------------------------
+//  execute_strdump - execute the strdump command
+//-------------------------------------------------
+
+void debugger_commands::execute_strdump(int ref, const std::vector<std::string> &params)
+{
+	// validate parameters
+	u64 offset;
+	if (!validate_number_parameter(params[1], offset))
+		return;
+
+	u64 length;
+	if (!validate_number_parameter(params[2], length))
+		return;
+
+	u64 term = 0;
+	if (params.size() > 3 && !validate_number_parameter(params[3], term))
+		return;
+
+	address_space *space;
+	if (!validate_cpu_space_parameter((params.size() > 4) ? params[4].c_str() : nullptr, ref, space))
+		return;
+
+	// further validation
+	if (term >= 0x100 && term != u64(-0x80))
+	{
+		m_console.printf("Invalid termination character\n");
+		return;
+	}
+
+	// open the file
+	FILE *f = fopen(params[0].c_str(), "w");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		return;
+	}
+
+	const int shift = space->addr_shift();
+	const unsigned delta = (shift >= 0) ? (1 << shift) : 1;
+	const unsigned width = (shift >= 0) ? 1 : (1 << -shift);
+	const bool be = space->endianness() == ENDIANNESS_BIG;
+
+	offset = offset & space->addrmask();
+	if (shift > 0)
+		length >>= shift;
+
+	// now write the data out
+	util::ovectorstream output;
+	output.reserve(200);
+
+	auto dis = space->device().machine().disable_side_effects();
+
+	bool terminated = true;
+	while (length-- != 0)
+	{
+		if (terminated)
+		{
+			terminated = false;
+			output.clear();
+			output.rdbuf()->clear();
+
+			// print the address
+			util::stream_format(output, "%0*X: \"", space->logaddrchars(), offset);
+		}
+
+		// get the character data
+		u64 data = 0;
+		offs_t curaddr = offset;
+		if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
+		{
+			switch (width)
+			{
+			case 1:
+				data = space->read_byte(curaddr);
+				break;
+
+			case 2:
+				data = space->read_word(curaddr);
+				if (be)
+					data = swapendian_int16(data);
+				break;
+
+			case 4:
+				data = space->read_dword(curaddr);
+				if (be)
+					data = swapendian_int32(data);
+				break;
+
+			case 8:
+				data = space->read_qword(curaddr);
+				if (be)
+					data = swapendian_int64(data);
+				break;
+			}
+		}
+
+		// print the characters
+		for (int n = 0; n < width; n++)
+		{
+			// check for termination within word
+			if (terminated)
+			{
+				terminated = false;
+
+				// output the result
+				auto const &text = output.vec();
+				fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+				output.clear();
+				output.rdbuf()->clear();
+
+				// print the address
+				util::stream_format(output, "%0*X.%d: \"", space->logaddrchars(), offset, n);
+			}
+
+			u8 ch = data & 0xff;
+			data >>= 8;
+
+			// check for termination
+			if (term == u64(-0x80))
+			{
+				if (BIT(ch, 7))
+				{
+					terminated = true;
+					ch &= 0x7f;
+				}
+			}
+			else if (ch == term)
+			{
+				terminated = true;
+				continue;
+			}
+
+			// check for non-ASCII characters
+			if (ch < 0x20 || ch >= 0x7f)
+			{
+				// use special or octal escape
+				if (ch >= 0x07 && ch <= 0x0d)
+					util::stream_format(output, "\\%c", "abtnvfr"[ch - 0x07]);
+				else
+					util::stream_format(output, "\\%03o", ch);
+			}
+			else
+			{
+				if (ch == '"' || ch == '\\')
+					output << '\\';
+				output << char(ch);
+			}
+		}
+
+		if (terminated)
+		{
+			// output the result
+			auto const &text = output.vec();
+			fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+			output.clear();
+			output.rdbuf()->clear();
+		}
+
+		offset += delta;
+	}
+
+	if (!terminated)
+	{
+		// output the result
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\"\\\n", int(unsigned(text.size())), &text[0]);
+	}
+
+	// close the file
 	fclose(f);
 	m_console.printf("Data dumped successfully\n");
 }

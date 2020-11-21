@@ -985,6 +985,7 @@ void hle_device_base::received_byte(uint8_t byte)
 
 	default:
 		assert(m_rx_state == RX_IDLE);
+		[[fallthrough]];
 	case RX_IDLE:
 		switch (byte)
 		{

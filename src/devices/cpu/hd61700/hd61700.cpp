@@ -2578,7 +2578,7 @@ void hd61700_cpu_device::execute_run()
 
 						m_icount -= 5;
 					}
-					//fall through
+					[[fallthrough]];
 
 				case 0xfc:  //cani
 					{

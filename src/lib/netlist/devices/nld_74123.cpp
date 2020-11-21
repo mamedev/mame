@@ -49,10 +49,7 @@
 #include "analog/nlid_twoterm.h"
 #include "nlid_system.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	/// \brief Base monostable device
 	///
@@ -290,5 +287,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(4538,  "CD4538",    "")
 	NETLIB_DEVICE_IMPL(9602,  "TTL_9602",  "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

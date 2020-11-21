@@ -146,6 +146,7 @@ const double XTAL::known_xtals[] = {
 	  8'467'200, /* 8.4672_MHz_XTAL        Subsino's Ying Hua Lian */
 	  8'664'000, /* 8.664_MHz_XTAL         Touchmaster */
 	  8'700'000, /* 8.7_MHz_XTAL           Tandberg TDV 2324 */
+	  8'860'000, /* 8.86_MHz_XTAL          AlphaTantel */
 	  8'867'000, /* 8.867_MHz_XTAL         Philips G7400 (~2x PAL subcarrier) */
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
@@ -153,6 +154,7 @@ const double XTAL::known_xtals[] = {
 	  8'960'000, /* 8.96_MHz_XTAL          Casio CZ-101 (divided by 2 for Music LSI) */
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
+	  9'400'000, /* 9.4_MHz_XTAL           Yamaha MU-5 and TG-100 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'732'000, /* 9.732_MHz_XTAL         CTA Invader */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */

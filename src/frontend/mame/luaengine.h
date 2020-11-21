@@ -15,8 +15,11 @@
 #include "iptseqpoll.h"
 
 #include <condition_variable>
+#include <functional>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 #if defined(__GNUC__) && (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wnoexcept-type"
@@ -110,6 +113,8 @@ public:
 	sol::state_view &sol() const { return *m_sol_state; }
 
 private:
+	template<typename T, size_t SIZE> class enum_parser;
+
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
@@ -133,24 +138,7 @@ private:
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
-	struct addr_space {
-		addr_space(address_space &space, device_memory_interface &dev) :
-			space(space), dev(dev) {}
-		template<typename T> T mem_read(offs_t address);
-		template<typename T> void mem_write(offs_t address, T val);
-		template<typename T> T log_mem_read(offs_t address);
-		template<typename T> void log_mem_write(offs_t address, T val);
-		template<typename T> T direct_mem_read(offs_t address);
-		template<typename T> void direct_mem_write(offs_t address, T val);
-
-		address_space &space;
-		device_memory_interface &dev;
-	};
-
-	template<typename T> static T share_read(memory_share &share, offs_t address);
-	template<typename T> static void share_write(memory_share &share, offs_t address, T val);
-	template<typename T> static T region_read(memory_region &region, offs_t address);
-	template<typename T> static void region_write(memory_region &region, offs_t address, T val);
+	struct addr_space;
 
 	struct save_item {
 		void *base;
@@ -176,6 +164,10 @@ private:
 
 	template<typename TFunc, typename... TArgs>
 	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
+
+	void initialize_input();
+	void initialize_memory();
+	void initialize_render();
 };
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_H

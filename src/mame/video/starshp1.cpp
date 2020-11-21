@@ -56,7 +56,7 @@ void starshp1_state::video_start()
 
 	int i;
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(starshp1_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(starshp1_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 8);
 
 	m_bg_tilemap->set_transparent_pen(0);
 
@@ -354,7 +354,9 @@ uint32_t starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_in
 	if (m_circle_kill == 0 && m_circle_mod == 0)
 		draw_circle(bitmap);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	rectangle tilemaprect(0, m_bg_tilemap->width(), 0, m_bg_tilemap->height());
+	tilemaprect &= cliprect;
+	m_bg_tilemap->draw(screen, bitmap, tilemaprect, 0, 0);
 
 	if (m_phasor != 0)
 		draw_phasor(bitmap);

@@ -1027,8 +1027,7 @@ ADDRESS MAP - SLOT GAMES
 
 void aristmk4_state::slots_mem(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
-	map(0x0800, 0x17ff).ram();
+	map(0x0000, 0x17ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));
@@ -1072,8 +1071,7 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 
 void aristmk4_state::poker_mem(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
-	map(0x0800, 0x17ff).ram();
+	map(0x0000, 0x17ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));

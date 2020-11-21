@@ -31,7 +31,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_mob(*this, "mob")
-		, m_slapstic_base(*this, "slapstic_base")
+		, m_slapstic_region(*this, "maincpu")
 		, m_vrambank(*this, "vrambank")
 		, m_playfield_tilemap(*this, "playfield")
 		, m_alpha_tilemap(*this, "alpha")
@@ -74,7 +74,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<atari_motion_objects_device> m_mob;
-	required_shared_ptr<uint16_t> m_slapstic_base;
+	required_region_ptr<uint16_t> m_slapstic_region;
 	required_device<address_map_bank_device> m_vrambank;
 
 	uint8_t           m_interrupt_enable;

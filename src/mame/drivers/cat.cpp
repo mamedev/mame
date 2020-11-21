@@ -206,6 +206,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -267,6 +269,17 @@ public:
 		m_dipsw(*this, "DIPSW1")
 	{ }
 
+	void cat(machine_config &config);
+
+	void init_cat();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
 	required_device<mc68681_device> m_duart;
@@ -286,11 +299,6 @@ public:
 	required_ioport m_dipsw;
 	emu_timer *m_keyboard_timer;
 	emu_timer *m_6ms_timer;
-
-	DECLARE_MACHINE_START(cat);
-	DECLARE_MACHINE_RESET(cat);
-	DECLARE_VIDEO_START(cat);
-	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -356,12 +364,8 @@ public:
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 
-	void cat(machine_config &config);
 	void cat_mem(address_map &map);
 	void cpu_space_map(address_map &map);
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // TODO: this init doesn't actually work yet! please fix me!
@@ -922,7 +926,7 @@ void cat_state::cpu_space_map(address_map &map)
 	map(0xfffff3, 0xfffff3).lr8(NAME([this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); }));
 }
 
-MACHINE_START_MEMBER(cat_state,cat)
+void cat_state::machine_start()
 {
 	m_duart_ktobf_ff = 0; // reset doesn't touch this
 	m_duart_prn_ack_prev_state = 1; // technically uninitialized
@@ -935,7 +939,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(cat_state,cat)
+void cat_state::machine_reset()
 {
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
@@ -943,7 +947,7 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(19'968'000)/2)/65536));
 }
 
-VIDEO_START_MEMBER(cat_state,cat)
+void cat_state::video_start()
 {
 }
 
@@ -1060,9 +1064,6 @@ void cat_state::cat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cat_state::cat_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cat_state::cpu_space_map);
 
-	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
-	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -1070,8 +1071,6 @@ void cat_state::cat(machine_config &config)
 	screen.set_size(672, 344);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(cat_state::screen_update_cat));
-
-	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
 	MC68681(config, m_duart, (XTAL(19'968'000)*2)/11); // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	m_duart->irq_cb().set(FUNC(cat_state::cat_duart_irq_handler));
@@ -1172,6 +1171,7 @@ ROM_START( cat )
 	 */
 ROM_END
 
+} // Anonymous namespace
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */

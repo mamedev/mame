@@ -2466,6 +2466,8 @@ end
 
 if (BUSES["NSCSI"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/nscsi/applecd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/applecd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdd2000.cpp",
@@ -3417,6 +3419,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_ssc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_stecomp.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_stecomp.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_sym12.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_sym12.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.h",
 		MAME_DIR .. "src/devices/bus/coco/cococart.cpp",

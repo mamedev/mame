@@ -442,7 +442,7 @@ ROM_START( circus )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END

@@ -189,7 +189,7 @@ rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset)
 {
-	int result = m_slapstic_base[offset];
+	int result = m_slapstic_region[offset + 0100000/2];
 	m_slapstic->slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */

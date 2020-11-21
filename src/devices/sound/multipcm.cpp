@@ -13,7 +13,7 @@
  * 3: MSB of pitch (ooooppppppppppxx) (o=octave (4 bit signed), p=pitch (10 bits), x=unused?
  * 4: voice control: top bit = 1 for key on, 0 for key off
  * 5: bit 0: 0: interpolate volume changes, 1: direct set volume,
-      bits 1-7 = volume attenuate (0=max, 7f=min)
+ *    bits 1-7 = volume attenuate (0=max, 7f=min)
  * 6: LFO frequency + Phase LFO depth
  * 7: Amplitude LFO size
  *
@@ -22,8 +22,8 @@
  * This sample format might be derived from the one used by the older YM7138 'GEW6' chip.
  *
  * The first 3 bytes are the offset into the file (big endian). (0, 1, 2).
-   Bit 23 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
-   Bits 21 and 22 are used by the MU5 on some samples for as-yet unknown purposes.
+ * Bit 23 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
+ * Bits 21 and 22 are used by the MU5 on some samples for as-yet unknown purposes.
  * The next 2 are the loop start point, in samples (big endian) (3, 4)
  * The next 2 are the 2's complement negation of of the total number of samples (big endian) (5, 6)
  * The next byte is LFO freq + depth (copied to reg 6 ?) (7, 8)
@@ -31,8 +31,7 @@
  * The next byte is Amplitude LFO size (copied to reg 7 ?)
  *
  * TODO
- * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM and 12-bit sample support,
- *   which we don't have yet.
+ * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM support, which we don't have yet.
  */
 
 #include "emu.h"
@@ -481,7 +480,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 
 void multipcm_device::device_start()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 
 	m_stream = stream_alloc(0, 2, m_rate);
@@ -622,7 +621,7 @@ void multipcm_device::device_start()
 
 void multipcm_device::device_clock_changed()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 	m_stream->set_sample_rate(m_rate);
 

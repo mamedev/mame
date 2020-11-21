@@ -59,8 +59,8 @@ public:
 		, m_rtc_r(*this, "RTCR")
 		, m_rtc_w(*this, "RTCW")
 		, m_dipsw_r(*this, "DSW")
-		, m_vram(*this, "vram")
-		, m_gpuregs(*this, "gpu_regs")
+		, m_vram(*this, "vram", 0x800000, ENDIANNESS_LITTLE)
+		, m_gpuregs(*this, "gpu_regs", 0x800, ENDIANNESS_LITTLE)
 		, m_ymzram(*this, "ymz_ram")
 		, m_screen(*this, "screen")
 		, m_hopper(*this, "hopper")
@@ -77,8 +77,8 @@ protected:
 	required_ioport m_rtc_r;
 	required_ioport m_rtc_w;
 	required_ioport m_dipsw_r;
-	required_shared_ptr<u16> m_vram;
-	required_shared_ptr<u16> m_gpuregs;
+	memory_share_creator<u16> m_vram;
+	memory_share_creator<u16> m_gpuregs;
 	required_shared_ptr<u8> m_ymzram;
 	required_device<screen_device> m_screen;
 	optional_device<hopper_device> m_hopper;
@@ -760,7 +760,7 @@ void gsan_state::main_map_common(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
 	map(0x0c000000, 0x0c3fffff).ram().share("main_ram");
-	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w)).share("gpu_regs");
+	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w));
 	// misc I/O
 	map(0x14000800, 0x14000807).rw(FUNC(gsan_state::cf_regs_r), FUNC(gsan_state::cf_regs_w));
 	map(0x14000c00, 0x14000c03).rw(FUNC(gsan_state::cf_data_r), FUNC(gsan_state::cf_data_w));
@@ -776,8 +776,8 @@ void gsan_state::main_map_common(address_map &map)
 void gsan_state::main_map(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port(address_map &map)
@@ -797,8 +797,8 @@ void gsan_state::ymz280b_map(address_map &map)
 void gsan_state::main_map_medal(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port_medal(address_map &map)

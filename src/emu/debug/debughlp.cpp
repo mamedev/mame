@@ -112,10 +112,17 @@ static const help_item static_help_list[] =
 		"  f[ind] <address>,<length>[,<data>[,...]] -- search program memory for data\n"
 		"  f[ind]d <address>,<length>[,<data>[,...]] -- search data memory for data\n"
 		"  f[ind]i <address>,<length>[,<data>[,...]] -- search I/O memory for data\n"
+		"  fill <address>,<length>[,<data>[,...]] -- fill program memory with data\n"
+		"  filld <address>,<length>[,<data>[,...]] -- fill data memory with data\n"
+		"  filli <address>,<length>[,<data>[,...][ -- fill I/O memory with data\n"
 		"  dump <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump program memory as text\n"
 		"  dumpd <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump data memory as text\n"
 		"  dumpi <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump I/O memory as text\n"
 		"  dumpo <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump opcodes memory as text\n"
+		"  strdump <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from program memory\n"
+		"  strdumpd <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from data memory\n"
+		"  strdumpi <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from I/O memory\n"
+		"  strdumpo <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from opcodes memory\n"
 		"  save <filename>,<address>,<length>[,<CPU>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<CPU>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<CPU>] -- save binary I/O memory to the given file\n"
@@ -644,6 +651,21 @@ static const help_item static_help_list[] =
 		"dumpd harddriv.dmp,3000,1000,4,0,3\n"
 		"  Dumps data memory addresses 3000-3fff from CPU #3 in 4-byte chunks, with no ASCII data, "
 		"to the file 'harddriv.dmp'.\n"
+	},
+	{
+		"strdump",
+		"\n"
+		"  strdump[{d|i}] <filename>,<address>,<length>[,<term>[,<CPU>]]\n"
+		"\n"
+		"The strdump/strdumpd/strdumpi/strdumpo commands dump memory to the text file specified in the "
+		"<filename> parameter. 'strdump' will dump program space memory, while 'strdumpd' will dump data "
+		"space memory, 'strdumpi' will dump I/O space memory and 'strdumpo' will dump opcodes memory. "
+		"<address> indicates the address of the start of dumping, and <length> indicates how much memory "
+		"to dump. The range <address> through <address>+<length>-1 inclusive will be output to the file. "
+		"By default, the data will be interpreted as a series of null-terminated strings, and the dump "
+		"will have one string on each line and C-style escapes for non-ASCII characters. The optional "
+		"<term> parameter can be used to specify a different character as the string terminator. Finally, "
+		"you can dump memory from another CPU by specifying the <CPU> parameter.\n"
 	},
 	{
 		"save",

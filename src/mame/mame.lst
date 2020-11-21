@@ -1025,6 +1025,9 @@ typhoon                         // GX770 (c) 1987
 @source:akaiax80.cpp
 ax80
 
+@source:akaivx600.cpp
+vx600
+
 @source:akkaarrh.cpp
 akkaarrh                        // (c) 1982 Atari (prototype)
 
@@ -11803,50 +11806,51 @@ torp_e21                        //
 aar_101                         //
 btmn_101                        //
 btmn_103                        //
+btmn_103f                       //
+btmn_103g                       //
 btmn_106                        //
-btmn_f13                        //
-btmn_g13                        //
 ckpt_a17                        //
+gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
 gnr_300f                        //
-gnr_200                         //
 hook_401                        //
-hook_401p                       //
+hook_401_p                      //
 hook_404                        //
 hook_408                        //
+jupk_305                        // (c) 1993 Data East
 jupk_501                        //
+jupk_501g                       //
 jupk_513                        //
-jupk_g51                        //
+lah_104f                        //
+lah_104s                        //
 lah_106c                        //
 lah_107                         //
+lah_108s                        //
 lah_110                         //
 lah_112                         //
-lah_f104                        //
-lah_l104                        //
-lah_l108                        //
 lw3_200                         //
 lw3_203                         //
-lw3_204                         // (c) 1992 Data East
+lw3_204e                        // (c) 1992 Data East
 lw3_205                         //
 lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
 mj_130                          //
-rab_103                         //
+rab_103s                        //
 rab_130                         //
 rab_320                         //
 stwr_101                        //
+stwr_101g                       //
 stwr_102                        //
+stwr_102e                       //
 stwr_103                        //
+stwr_103_a104                   //
 stwr_104                        //
 stwr_106                        //
-stwr_106s                       //
-stwr_a046                       //
-stwr_a14                        //
-stwr_e12                        //
-stwr_g11                        //
-tftc_104                        //
+stwr_106_a046                   //
+stwr_106_s105                   //
+tftc_104s                       //
 tftc_200                        //
 tftc_300                        //
 tftc_302                        //
@@ -11855,10 +11859,10 @@ tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
 tomy_102                        //
+tomy_300h                       //
 tomy_400                        //
-tomy_h30                        //
 trek_110                        //
-trek_11a                        //
+trek_110_a027                   //
 trek_117                        //
 trek_120                        //
 trek_200                        //
@@ -13896,6 +13900,7 @@ fts2in1
 @source:funworld.cpp
 bigdeal                         // (c) 1986 Fun World
 bigdealb                        // (c) 1986 Fun World
+biliard                         // 1998 bootleg.
 bonuscrd                        // (c) 1986 Fun World
 bonuscrda                       // (c) 1986 Fun World
 bottl10b                        // (c) 1996 C.M.C.
@@ -13965,7 +13970,7 @@ pool10g                         // (c) 1996 C.M.C.
 pool10h                         // (c) 1996 C.M.C.
 pool10i                         // (c) 1997 C.M.C.
 pool10j                         // (c) 1996 bootleg
-biliard                         // 1998 bootleg.
+pool10k                         // (c) 1997 C.M.C.
 potgame                         // (c) 1996 C.M.C.
 powercrd                        // (c) 1993 Fun World
 rcdino4                         // 1998 unknown
@@ -14271,6 +14276,7 @@ mooncrstuku                     // (c) 1980 Nichibutsu UK
 moonqsr                         // (c) 1980 Nichibutsu
 moonwar                         // (c) 1981 Stern
 moonwara                        // (c) 1981 Stern
+mouncrst                        // bootleg
 mshuttle                        // (c) 1981 Nichibutsu
 mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlea                       // (c) 1981 Nichibutsu
@@ -22473,7 +22479,9 @@ mephisto2
 mephisto2a
 mephisto2e
 mephisto3
+mephisto3a
 mephisto3b
+mephisto3c
 mephistoj
 
 @source:mephisto_glasgow.cpp
@@ -32346,6 +32354,7 @@ dgun2573
 dgun2573a
 rminitv
 fcpocket
+dgunl3202
 
 @source:nes_vt369_vtunknown.cpp
 bittboy
@@ -33065,6 +33074,7 @@ superabc                        // hack
 superabco                       // hack
 theglobme                       // (c) 1983 Magic Electronics
 theglobp                        // (c) 1983 Epos Corporation
+theglobpb                       // bootleg
 titanpac                        // hack
 vanvan                          // (c) 1983 Sanritsu
 vanvanb                         // (c) 1983 Karateco (bootleg?)
@@ -34034,6 +34044,7 @@ superpet                        //
 
 @source:peyper.cpp
 ator                            //
+ator3bmp                        //
 gamatros                        //
 hangonp                         //
 lancelot                        //
@@ -34401,6 +34412,7 @@ blkfever                        //
 cerberup                        //
 evlfight                        //
 madrace                         //
+storm                           //
 zira                            //
 
 @source:play_3.cpp
@@ -37593,6 +37605,7 @@ shangha3u                       // (c) 1993 Sunsoft
 shangha3up                      // (c) 1993 Sunsoft (US prototype from 'PCB001')
 
 @source:shanghai.cpp
+blktch2                         // bootleg
 kothello                        // (c) 1990 Success.
 shangha2                        // (c) 1989 Sunsoft (Sun Electronics)
 shangha2a                       // (c) 1989 Sunsoft (Sun Electronics)

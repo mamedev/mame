@@ -805,7 +805,7 @@ void atarisy2_state::main_map(address_map &map)
 	map(0040000, 0057777).bankr("rombank1");
 	map(0060000, 0077777).bankr("rombank2");
 	map(0100000, 0177777).rom();
-	map(0100000, 0100777).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
+	map(0100000, 0100777).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w));
 }
 
 

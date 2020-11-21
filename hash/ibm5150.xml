@@ -7670,6 +7670,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="aliensyn">
+		<description>Alien Syndrome</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Alien Syndrome [SEGA] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="1bc8c113" sha1="ee65c2ddb8864db97fca9950511fc4c680b90cc7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alpntram">
 		<!-- Dumped via Kryoflux, four tracks show as modified -->
 		<description>Alpine Tram Ride</description>
@@ -8382,6 +8394,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="calgame2">
+		<description>California Games 2</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Epyx" />
+		<info name="version" value="Version 1.2.1 4/3/91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="California Games 2 [U.S. Gold] [1991] [3.5DD] [Disk 1 of 2] [Beach Disk].img" size="737280" crc="58eaef7e" sha1="036e6c4e87be7e85343eccc2e82c47b34ffa19c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="California Games 2 [U.S. Gold] [1991] [3.5DD] [Disk 2 of 2] [Bodyboarding Disk].img" size="737280" crc="e16e5bd6" sha1="a3fbc3dd8295fa2281c5a28dcdb8fb500cda861c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- dumped from an Olivetti Prodest PC1 branded release -->
 	<software name="capblood" supported="no">
 		<description>Captain Blood</description>
@@ -9042,7 +9072,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="ddragon3">
-		<description>Double Dragon 3 - The Rosetta Stone</description>
+		<description>Double Dragon 3 - The Rosetta Stone (5.25")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="usage" value="VGA required" />
@@ -9054,6 +9084,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Double Dragon 3 - The Rosetta Stone (World) (5.25'') (Disk 2).img" size="368640" crc="fb5a97a4" sha1="a46b44548145024479a5889482e88446d4b25f9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon3_35" cloneof="ddragon3">
+		<description>Double Dragon 3 - The Rosetta Stone (3.5")</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="usage" value="VGA required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Double Dragon 3 [Virgin] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="8cf34d6b" sha1="8187da9a675aa5f1bd5e3dc4747953f7f9a0cc00"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11544,6 +11586,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="omega">
+		<description>Omega</description>
+		<year>1989</year>
+		<publisher>Origin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Omega [Origin] [1989] [5.25DD] [Disk 1 of 2] [Program Disk].img" size="368640" crc="7cb2eb39" sha1="d97dd85bfb75ec0516d518560852ead8c10f4e46"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Omega [Origin] [1989] [5.25DD] [Disk 2 of 2] [Operations Disk].img" size="368640" crc="46035359" sha1="c43dc397c72eeb5d6647ae4aaf651a1abe1a339d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="opwolf">
 		<description>Operation Wolf (5.25")</description>
 		<year>1989</year>
@@ -11987,7 +12045,7 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Prince of Persia v1.0 [Broderbund] [1990] [3.5DD].img" size="737280" crc="d5e966bf" sha1="d45c2299a2d48de0897e9e5a7a366090192eb5f7"/>
+				<rom name="Prince of Persia v1.0 [Broderbund] [1990] [3.5DD].img" size="737280" crc="75495ad2" sha1="ea2756fc1e4f708d0a96c010983458422081aba0"/>
 			</dataarea>
 		</part>
 	</software>

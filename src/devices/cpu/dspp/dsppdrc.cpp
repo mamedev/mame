@@ -501,10 +501,10 @@ void dspp_device::generate_set_rbase(drcuml_block &block, compiler_state *compil
 		case 0:
 			UML_MOV(block, mem(&m_core->m_rbase[0]), addr);
 			UML_MOV(block, mem(&m_core->m_rbase[1]), addr + 4 - base);
-		// Intentional fall-through
+			[[fallthrough]];
 		case 8:
 			UML_MOV(block, mem(&m_core->m_rbase[2]), addr + 8 - base);
-		// Intentional fall-through
+			[[fallthrough]];
 		case 12:
 			UML_MOV(block, mem(&m_core->m_rbase[3]), addr + 12 - base);
 			break;

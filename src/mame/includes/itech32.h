@@ -42,9 +42,12 @@ public:
 		m_timekeeper(*this, "m48t02"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_nvram(*this, "nvram"),
-		m_video(*this, "video"),
-		m_main_rom(*this, "maincpu"),
+		m_nvram16(*this, "nvram16"),
+		m_nvram32(*this, "nvram32"),
+		m_main_ram32(*this, "main_ram"),
+		m_video(*this, "video", 0x200, ENDIANNESS_BIG),
+		m_main_rom16(*this, "user1"),
+		m_main_rom32(*this, "user1"),
 		m_grom(*this, "gfx1"),
 		m_soundbank(*this, "soundbank")
 	{ }
@@ -88,9 +91,12 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	optional_shared_ptr<u16> m_nvram;
-	optional_shared_ptr<u16> m_video;
-	optional_region_ptr<u16> m_main_rom;
+	optional_shared_ptr<u16> m_nvram16;
+	optional_shared_ptr<u32> m_nvram32;
+	optional_shared_ptr<u32> m_main_ram32;
+	memory_share_creator<u16> m_video;
+	optional_region_ptr<u16> m_main_rom16;
+	optional_region_ptr<u32> m_main_rom32;
 
 	required_region_ptr<u8> m_grom;
 	required_memory_bank m_soundbank;

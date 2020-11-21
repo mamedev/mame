@@ -209,10 +209,10 @@ protected:
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	memory_share_creator<uint16_t> m_videoram;
+	memory_share_creator<uint16_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_soundram;
-	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
+	memory_share_array_creator<uint16_t, 2> m_paletteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

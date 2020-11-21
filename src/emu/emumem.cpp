@@ -523,6 +523,11 @@ public:
 		m_dispatch_write = m_root_write->get_dispatch();
 	}
 
+	~address_space_specific() {
+		m_root_read->unref();
+		m_root_write->unref();
+	}
+
 	std::pair<void *, void *> get_cache_info() override {
 		std::pair<void *, void *> rw;
 		rw.first  = m_root_read;
@@ -712,176 +717,113 @@ private:
 		install_readwrite_handler_helper<handler_width<READ>::value>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, handler_r, handler_w);
 	}
 
-	template<int AccessWidth, typename READ> std::enable_if_t<(Width == AccessWidth)>
-	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, const READ &handler_r)
+
+	template<int AccessWidth, typename READ>
+	void install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, const READ &handler_r)
 	{
-		VPRINTF("address_space::install_read_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_r.name(), data_width() / 4, unitmask);
+		if constexpr (Width < AccessWidth) {
+			fatalerror("install_read_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
+		} else {
+			VPRINTF("address_space::install_read_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+					m_addrchars, addrstart, m_addrchars, addrend,
+					m_addrchars, addrmask, m_addrchars, addrmirror,
+					8 << Width, 8 << AccessWidth,
+					handler_r.name(), data_width() / 4, unitmask);
 
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+			offs_t nstart, nend, nmask, nmirror;
+			u64 nunitmask;
+			int ncswidth;
+			check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian, READ>(this, handler_r);
-		hand_r->set_address_info(nstart, nmask);
-		m_root_read->populate(nstart, nend, nmirror, hand_r);
-		invalidate_caches(read_or_write::READ);
+			if constexpr (Width == AccessWidth) {
+				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian, READ>(this, handler_r);
+				hand_r->set_address_info(nstart, nmask);
+				m_root_read->populate(nstart, nend, nmirror, hand_r);
+			} else {
+				auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
+				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
+				m_root_read->populate_mismatched(nstart, nend, nmirror, descriptor);
+				hand_r->unref();
+			}
+			invalidate_caches(read_or_write::READ);
+		}
 	}
 
-	template<int AccessWidth, typename READ> std::enable_if_t<(Width > AccessWidth)>
-	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								const READ &handler_r)
+	template<int AccessWidth, typename WRITE>
+	void install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, const WRITE &handler_w)
 	{
-		VPRINTF("address_space::install_read_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_r.name(), data_width() / 4, unitmask);
+		if constexpr (Width < AccessWidth) {
+			fatalerror("install_write_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
+		} else {
+			VPRINTF("address_space::install_write_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
+					m_addrchars, addrstart, m_addrchars, addrend,
+					m_addrchars, addrmask, m_addrchars, addrmirror,
+					8 << Width, 8 << AccessWidth,
+					handler_w.name(), data_width() / 4, unitmask);
 
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+			offs_t nstart, nend, nmask, nmirror;
+			u64 nunitmask;
+			int ncswidth;
+			check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
-		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
-		hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
-		m_root_read->populate_mismatched(nstart, nend, nmirror, descriptor);
-		hand_r->unref();
-		invalidate_caches(read_or_write::READ);
+			if constexpr (Width == AccessWidth) {
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
+				hand_w->set_address_info(nstart, nmask);
+				m_root_write->populate(nstart, nend, nmirror, hand_w);
+			} else {
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
+				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
+				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
+				m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
+				hand_w->unref();
+			}
+			invalidate_caches(read_or_write::WRITE);
+		}
 	}
 
-
-	template<int AccessWidth, typename READ> std::enable_if_t<(Width < AccessWidth)>
-	install_read_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								const READ &handler_r)
-	{
-		fatalerror("install_read_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
-	}
-
-	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width == AccessWidth)>
-	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 const WRITE &handler_w)
-	{
-		VPRINTF("address_space::install_write_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_w.name(), data_width() / 4, unitmask);
-
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
-
-		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
-		hand_w->set_address_info(nstart, nmask);
-		m_root_write->populate(nstart, nend, nmirror, hand_w);
-		invalidate_caches(read_or_write::WRITE);
-	}
-
-	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width > AccessWidth)>
-	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 const WRITE &handler_w)
-	{
-		VPRINTF("address_space::install_write_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_w.name(), data_width() / 4, unitmask);
-
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
-
-		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
-		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
-		hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
-		m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
-		hand_w->unref();
-		invalidate_caches(read_or_write::WRITE);
-	}
-
-
-	template<int AccessWidth, typename WRITE> std::enable_if_t<(Width < AccessWidth)>
-	install_write_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-								 const WRITE &handler_w)
-	{
-		fatalerror("install_write_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
-	}
-
-
-
-	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width == AccessWidth)>
-	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
+	template<int AccessWidth, typename READ, typename WRITE>
+	void install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
 									 const READ  &handler_r,
 									 const WRITE &handler_w)
 	{
-		VPRINTF("address_space::install_readwrite_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
+		if constexpr (Width < AccessWidth) {
+			fatalerror("install_readwrite_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
+		} else {
+			VPRINTF("address_space::install_readwrite_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %s, %*x)\n",
+					m_addrchars, addrstart, m_addrchars, addrend,
+					m_addrchars, addrmask, m_addrchars, addrmirror,
+					8 << Width, 8 << AccessWidth,
+					handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
 
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+			offs_t nstart, nend, nmask, nmirror;
+			u64 nunitmask;
+			int ncswidth;
+			check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-		auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian, READ>(this, handler_r);
-		hand_r->set_address_info(nstart, nmask);
-		m_root_read ->populate(nstart, nend, nmirror, hand_r);
+			if constexpr (Width == AccessWidth) {
+				auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian, READ>(this, handler_r);
+				hand_r->set_address_info(nstart, nmask);
+				m_root_read ->populate(nstart, nend, nmirror, hand_r);
 
-		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
-		hand_w->set_address_info(nstart, nmask);
-		m_root_write->populate(nstart, nend, nmirror, hand_w);
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(this, handler_w);
+				hand_w->set_address_info(nstart, nmask);
+				m_root_write->populate(nstart, nend, nmirror, hand_w);
+			} else {
+				auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
+				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
+				m_root_read ->populate_mismatched(nstart, nend, nmirror, descriptor);
+				hand_r->unref();
 
-		invalidate_caches(read_or_write::READWRITE);
-	}
-
-	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width > AccessWidth)>
-	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-									 const READ  &handler_r,
-									 const WRITE &handler_w)
-	{
-		VPRINTF("address_space::install_readwrite_handler(%*x-%*x mask=%*x mirror=%*x, space width=%d, handler width=%d, %s, %s, %*x)\n",
-				m_addrchars, addrstart, m_addrchars, addrend,
-				m_addrchars, addrmask, m_addrchars, addrmirror,
-				8 << Width, 8 << AccessWidth,
-				handler_r.name(), handler_w.name(), data_width() / 4, unitmask);
-
-		offs_t nstart, nend, nmask, nmirror;
-		u64 nunitmask;
-		int ncswidth;
-		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
-
-		auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian, READ>(this, handler_r);
-		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
-		hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
-		m_root_read ->populate_mismatched(nstart, nend, nmirror, descriptor);
-		hand_r->unref();
-
-		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
-		descriptor.set_subunit_handler(hand_w);
-		hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
-		m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
-		hand_w->unref();
-
-		invalidate_caches(read_or_write::READWRITE);
-	}
-
-
-	template<int AccessWidth, typename READ, typename WRITE> std::enable_if_t<(Width < AccessWidth)>
-	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
-									 const READ  &handler_r,
-									 const WRITE &handler_w)
-	{
-		fatalerror("install_readwrite_handler: cannot install a %d-wide handler in a %d-wide bus", 8 << AccessWidth, 8 << Width);
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(this, handler_w);
+				descriptor.set_subunit_handler(hand_w);
+				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
+				m_root_write->populate_mismatched(nstart, nend, nmirror, descriptor);
+				hand_w->unref();
+			}
+			invalidate_caches(read_or_write::READWRITE);
+		}
 	}
 };
 
@@ -2121,6 +2063,9 @@ void memory_bank::set_base(void *base)
 
 void memory_bank::set_entry(int entrynum)
 {
+	if(entrynum == -1 && m_entries.empty())
+		return;
+
 	// validate
 	if (entrynum < 0 || entrynum >= int(m_entries.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);

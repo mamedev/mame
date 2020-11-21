@@ -218,14 +218,14 @@ INPUT_PORTS_END
 void mu5_state::mu5(machine_config &config)
 {
 	/* basic machine hardware */
-	H83002(config, m_maincpu, 10_MHz_XTAL);
+	H83002(config, m_maincpu, 10_MHz_XTAL);	// clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
 	m_maincpu->set_addrmap(AS_IO, &mu5_state::mu5_io_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MULTIPCM(config, m_ymw258, 7500000);
+	MULTIPCM(config, m_ymw258, 9.4_MHz_XTAL); // clock verified by schematics
 	m_ymw258->set_addrmap(0, &mu5_state::ymw258_map);
 	m_ymw258->add_route(0, "lspeaker", 1.0);
 	m_ymw258->add_route(1, "rspeaker", 1.0);

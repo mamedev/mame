@@ -28,10 +28,8 @@
 #include <thread>
 #include <vector>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(log)
 	{
 		NETLIB_CONSTRUCTOR(log)
@@ -187,5 +185,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(log,  "LOG",  "+I")
 	NETLIB_DEVICE_IMPL(logD, "LOGD", "+I,+I2")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

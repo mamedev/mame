@@ -14,10 +14,14 @@
 --------------------------------------------------
 
 CPUS["Z80"] = true
+--CPUS["KC80"] = true
 CPUS["Z180"] = true
 CPUS["I8085"] = true
 CPUS["I8089"] = true
 CPUS["M6502"] = true
+CPUS["ST2XXX"] = true
+CPUS["XAVIX"] = true
+CPUS["XAVIX2000"] = true
 CPUS["H6280"] = true
 CPUS["I86"] = true
 CPUS["I386"] = true
@@ -95,6 +99,7 @@ CPUS["F8"] = true
 CPUS["LH5801"] = true
 CPUS["PATINHOFEIO"] = true
 CPUS["PDP1"] = true
+CPUS["TX0"] = true
 CPUS["SATURN"] = true
 CPUS["SC61860"] = true
 CPUS["LR35902"] = true
@@ -1655,6 +1660,8 @@ files {
 
 createMESSProjects(_target, _subtarget, "akai")
 files {
+	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
+	MAME_DIR .. "src/mame/drivers/akaivx600.cpp",
 	MAME_DIR .. "src/mame/drivers/mpc3000.cpp",
 }
 
@@ -4325,7 +4332,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/adacp150.cpp",
 	MAME_DIR .. "src/mame/drivers/aid80f.cpp",
-	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",
@@ -4553,7 +4559,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/tr175.cpp",
 	MAME_DIR .. "src/mame/drivers/trs80dt1.cpp",
 	MAME_DIR .. "src/mame/drivers/tsispch.cpp",
-	MAME_DIR .. "src/mame/includes/tsispch.h",
 	MAME_DIR .. "src/mame/drivers/tulip1.cpp",
 	MAME_DIR .. "src/mame/drivers/unistar.cpp",
 	MAME_DIR .. "src/mame/drivers/v6809.cpp",

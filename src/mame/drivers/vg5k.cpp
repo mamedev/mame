@@ -92,13 +92,16 @@ private:
 	required_device<ram_device> m_ram;
 
 	offs_t m_ef9345_offset;
+	uint8_t m_printer_latch;
+	uint8_t m_printer_signal;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void z80_m1_w(uint8_t data);
-	uint8_t printer_r();
-	void printer_w(uint8_t data);
+	uint8_t printer_state_r();
+	void printer_state_w(uint8_t data);
+	void printer_data_w(uint8_t data);
 	void ef9345_offset_w(uint8_t data);
 	uint8_t ef9345_io_r();
 	void ef9345_io_w(uint8_t data);
@@ -121,15 +124,24 @@ void vg5k_state::z80_m1_w(uint8_t data)
 	m_maincpu->adjust_icount(-1);
 }
 
-uint8_t vg5k_state::printer_r()
+uint8_t vg5k_state::printer_state_r()
 {
 	return (m_printer->is_ready() ? 0x00 : 0xff);
 }
 
-
-void vg5k_state::printer_w(uint8_t data)
+void vg5k_state::printer_state_w(uint8_t data)
 {
-	m_printer->output(data);
+	// Character is emitted on a rising edge.
+	if (!BIT(m_printer_signal, 0) && BIT(data, 0)) {
+		m_printer->output(m_printer_latch);
+	}
+	m_printer_signal = data;
+}
+
+
+void vg5k_state::printer_data_w(uint8_t data)
+{
+	m_printer_latch = data;
 }
 
 
@@ -194,8 +206,8 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	map(0x10, 0x10).r(FUNC(vg5k_state::printer_r));
-	map(0x11, 0x11).w(FUNC(vg5k_state::printer_w));
+	map(0x10, 0x10).rw(FUNC(vg5k_state::printer_state_r), FUNC(vg5k_state::printer_state_w));
+	map(0x11, 0x11).w(FUNC(vg5k_state::printer_data_w));
 
 	/* keyboard */
 	map(0x80, 0x80).portr("ROW1");
@@ -342,11 +354,15 @@ INPUT_CHANGED_MEMBER(vg5k_state::delta_button)
 void vg5k_state::machine_start()
 {
 	save_item(NAME(m_ef9345_offset));
+    save_item(NAME(m_printer_latch));
+    save_item(NAME(m_printer_signal));
 }
 
 void vg5k_state::machine_reset()
 {
-	m_ef9345_offset = 0;
+    m_ef9345_offset = 0;
+    m_printer_latch = 0;
+    m_printer_signal = 0;
 }
 
 
