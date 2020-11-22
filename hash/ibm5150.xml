@@ -12079,6 +12079,28 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="punisher">
+		<description>The Punisher</description>
+		<year>1990</year>
+		<publisher>Paragon Software</publisher>
+		<info name="developer" value="Paragon Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Punisher [Paragon] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="ea38e5bd" sha1="e5e2c16f5e6d41f60022d0378e582bc2f0aa273c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Punisher [Paragon] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="76dac916" sha1="5525003970a1a5b95f027284a2bb17eca698a420"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Punisher [Paragon] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="2120e577" sha1="37787bcad420dc2243f553f0b7b74b07b18b2445"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rambo3">
 		<description>Rambo III</description>
 		<year>1989</year>
