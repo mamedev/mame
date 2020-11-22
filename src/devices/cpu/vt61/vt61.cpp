@@ -127,7 +127,7 @@ u8 vt61_cpu_device::get_db(u16 i)
 		// SEL SPM
 		u8 addr = bitswap<4>(i, 5, 4, 3, 7);
 		if (BIT(i, 6))
-			addr = (addr & 014) | m_ir;
+			addr = (addr & 011) | (m_ir << 1);
 		return m_sp[addr];
 	}
 	else switch (BIT(i, 7, 4))
