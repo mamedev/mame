@@ -236,6 +236,15 @@ ROM_START( msi_sf2 )
 	ROM_CONTINUE(0x00000,0x338000) 
 ROM_END
 
+ROM_START( dgunl3227 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// populated in init function
+
+	ROM_REGION( 0x400000, "rom", 0 )
+	// 1ST AND 2ND HALF IDENTICAL, contains the games (and many more pirate versions of other ones, but possibly missing the correct menu code)
+	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, BAD_DUMP CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
+ROM_END
+
 
 void megadriv_radica_6button_state::init_megadriv_radica_6button_pal()
 {
@@ -251,6 +260,34 @@ void megadriv_radica_6button_state::init_megadriv_radica_6button_ntsc()
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+}
+
+void megadriv_radica_3button_state::init_dgunl3227()
+{
+	uint8_t* rom = memregion("rom")->base();
+	uint8_t* dst = memregion("maincpu")->base();
+
+	// this part of the ROM contains a pirate versions of Genesis games etc.
+	//int baseaddr = 0x200000, size = 0x40000; // unknown data (possible 2nd half of another game if the 1st half of this ROM should contain different data)
+	//int baseaddr = 0x240000, size = 0x20000; // 'sample' program with UWOL header later too (just plays music? possibly related to a multigame menu with music as the menu on this should be silent?)
+	//int baseaddr = 0x260000, size = 0x20000; // pirate version of Columns with Sega text removed
+	//int baseaddr = 0x280000, size = 0x20000; // Fatal Labyrinth
+	//int baseaddr = 0x2a0000, size = 0x20000; // pirate version of Block Out with EA logo and text removed
+	//int baseaddr = 0x2c0000, size = 0x20000; // Flicky
+	//int baseaddr = 0x2e0000, size = 0x20000; // Shove It
+	//int baseaddr = 0x300000, size = 0x40000; // pirate version of Space Invaders 90 with Taito logos and copyright removed, also has extra header + bits of code for '202 in 1' menu?
+
+	// the following 3 games are available to select from the menu on this system
+	//int baseaddr = 0x340000, size = 0x40000; // Pac-Attack / Pac-Panic (used by this unit)
+	//int baseaddr = 0x380000, size = 0x40000; // Pac-Mania (used by this unit)
+	int baseaddr = 0x3c0000, size = 0x40000; // Pac-Man (used by this unit) (2nd copy of header about halfway through?)
+
+	for (int i = 0; i < size; i++)
+	{
+		dst[i ^ 3] = rom[baseaddr + i];
+	}
+
+	init_megadriv();
 }
 
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
@@ -285,3 +322,6 @@ CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radic
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
 CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+
+// this seems to have been hacked down from a larger multi-game unit, there are a bunch of pirate versions of MegaDrive / Genesis games in the ROM, although can't located the correct menu code, possibly a bad dump with the correct first half missing.
+CONS( 2018, dgunl3227, 0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player,         megadriv_radica_3button_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", MACHINE_NOT_WORKING )

@@ -36,6 +36,8 @@ public:
 	void megadriv_radica_3button_ntsc(machine_config &config);
 	void megadriv_radica_3button_pal(machine_config &config);
 
+	void init_dgunl3227();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
