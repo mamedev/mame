@@ -421,4 +421,5 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6
 
 // this seems to have been hacked down from a larger multi-game unit, there are also a bunch of (unused?) pirate versions of MegaDrive / Genesis games in the ROM
 // this is the only 'Pocket Player' unit to use Genesis on a Chip tech, the others are NES on a chip.
+// some versions of this unit have an additional "Add Credits with 'A' or 'B'" screen after you select Pac-Man, this version does not.
 CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, megadriv_dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
