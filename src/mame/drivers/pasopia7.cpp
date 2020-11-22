@@ -46,6 +46,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class pasopia7_state : public driver_device
 {
 public:
@@ -80,6 +82,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	uint8_t vram_r(offs_t offset);
@@ -106,7 +110,6 @@ private:
 	uint8_t nmi_portb_r();
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	DECLARE_VIDEO_START(pasopia7);
 	void p7_lcd_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
@@ -137,7 +140,6 @@ private:
 	u8 m_porta_2;
 	bool m_spr_sw;
 	emu_timer *m_pio_timer;
-	virtual void machine_reset() override;
 	void fdc_irq(bool state);
 	void draw_cg4_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count);
 	void draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x);
@@ -180,7 +182,7 @@ TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 	m_pio->port_b_write(keyb_r());
 }
 
-VIDEO_START_MEMBER(pasopia7_state,pasopia7)
+void pasopia7_state::video_start()
 {
 	m_p7_pal = std::make_unique<uint8_t[]>(0x10);
 }
@@ -407,7 +409,7 @@ void pasopia7_state::pasopia_nmi_trap()
 	}
 }
 
-uint8_t pasopia7_state::fdc_r(offs_t offset)
+[[maybe_unused]] uint8_t pasopia7_state::fdc_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -770,7 +772,7 @@ void pasopia7_state::p7_lcd_palette(palette_device &palette) const
 		palette.set_pen_color(i, 0x30, 0x38, 0x10);
 }
 
-void pasopia7_state::fdc_irq(bool state)
+[[maybe_unused]] void pasopia7_state::fdc_irq(bool state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -848,8 +850,6 @@ void pasopia7_state::p7_raster(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 32-1);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
-	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
-
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
@@ -870,8 +870,6 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 200-1);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
-
-	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 
 	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
@@ -921,6 +919,8 @@ void pasopia7_state::init_p7_lcd()
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
 	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
+
+} // Anonymous namespace
 
 
 /* Driver */
