@@ -763,9 +763,9 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 address_map::address_map(device_t &device, int spacenum)
 	: m_spacenum(spacenum),
 		m_device(&device),
-	    m_view(nullptr),
+		m_view(nullptr),
 		m_unmapval(0),
-	    m_globalmask(0)
+		m_globalmask(0)
 {
 	// get our memory interface
 	const device_memory_interface *memintf;
@@ -799,7 +799,7 @@ address_map::address_map(device_t &device, int spacenum)
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
 		m_device(&device),
-	    m_view(nullptr),
+		m_view(nullptr),
 		m_unmapval(0),
 		m_globalmask(0)
 {
@@ -817,7 +817,7 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 address_map::address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate)
 	: m_spacenum(space.spacenum()),
 		m_device(&device),
-	    m_view(nullptr),
+		m_view(nullptr),
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {

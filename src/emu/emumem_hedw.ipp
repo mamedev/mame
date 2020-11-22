@@ -556,7 +556,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		fatalerror("init_handlers called on non-view handler_entry_write_dispatch.");
 	if(!m_dispatch_array.empty())
 		fatalerror("init_handlers called twice on handler_entry_write_dispatch.");
-			
+
 	m_ranges_array.resize(1);
 	m_dispatch_array.resize(1);
 	m_a_ranges = m_ranges_array[0].data();
@@ -597,7 +597,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		fatalerror("out-of-range view selection.");
 
 	m_a_ranges = m_ranges_array[i].data();
-	m_a_dispatch = m_dispatch_array[i].data();	
+	m_a_dispatch = m_dispatch_array[i].data();
 }
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::select_u(int id)
@@ -606,7 +606,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(i > m_dispatch_array.size())
 		fatalerror("out-of-range view update selection.");
 	else if(i == m_dispatch_array.size()) {
-		u32 aid = (std::array<handler_entry_write<Width, AddrShift, Endian> *, COUNT> *)(m_a_dispatch) - m_dispatch_array.data();
+		u32 aid = (handler_array *)(m_a_dispatch) - m_dispatch_array.data();
 
 		m_dispatch_array.resize(i+1);
 		m_ranges_array.resize(i+1);

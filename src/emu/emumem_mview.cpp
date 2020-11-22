@@ -460,7 +460,7 @@ namespace {
 
 	memory_view::memory_view_entry *mve_make(int Level, int Width, int AddrShift, endianness_t Endian, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
 		switch (Width | (AddrShift + 4)) {
-		case  8|(4+1): return mve_make_3<0,  1>(Level, Endian, config, manager, view, id); 
+		case  8|(4+1): return mve_make_3<0,  1>(Level, Endian, config, manager, view, id);
 		case  8|(4-0): return mve_make_3<0,  0>(Level, Endian, config, manager, view, id);
 		case 16|(4+3): return mve_make_3<1,  3>(Level, Endian, config, manager, view, id);
 		case 16|(4-0): return mve_make_3<1,  0>(Level, Endian, config, manager, view, id);
@@ -721,7 +721,7 @@ namespace {
 		case 64|(4-3): h_make_3<3, -3>(HighBits, Endian, space, view, r, w, sa, su); break;
 		default: abort();
 		}
-	}	
+	}
 }
 
 std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_space &space, offs_t addrstart, offs_t addrend)
@@ -752,7 +752,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write, m_select_a, m_select_u);
 	}
 
-	return std::make_pair(m_handler_read, m_handler_write);	
+	return std::make_pair(m_handler_read, m_handler_write);
 }
 
 void memory_view::make_subdispatch(std::string context)

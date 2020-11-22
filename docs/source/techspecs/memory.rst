@@ -264,10 +264,10 @@ before.  It is created as an object of the device.
 
     [device constructor] m_view(*this, "name"),
 
-It is then setup through the address map API or dynamically.  The, at
-runtime, a variant, which is numbered, can be selected through the
-``select`` method or the view can be disabled through the ``disabled``
-method.  A disabled view can be reenabled at any time.
+It is then setup through the address map API or dynamically.  At
+runtime, a numbered variant can be selected using the ``select`` method,
+or the view can be disabled using the ``disable`` method.  A disabled
+view can be re-enabled at any time.
 
 
 4. Address maps API
@@ -617,9 +617,9 @@ second method to setup a view is perfectly reasonable.  A view is of
 type **memory_view** and an indexed entry (e.g. a variant to setup) is
 of type **memory_view::memory_view_entry &**.
 
-A view can be installed in another view, but don't forget that a view
-can be installed only once.  A view can also being part of "what was
-there before".
+A view can be installed in another view, but don’t forget that a view
+can be installed only once.  A view can also be part of “what was there
+before”.
 
 
 5. Address space dynamic mapping API

@@ -1012,7 +1012,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 
 memory_region::memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian)
 	: m_machine(machine),
-	    m_name(std::move(name)),
+		m_name(std::move(name)),
 		m_buffer(length),
 		m_endianness(endian),
 		m_bitwidth(width * 8),

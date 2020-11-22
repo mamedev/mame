@@ -54,10 +54,30 @@ private:
 	static constexpr offs_t HIGHMASK = make_bitmask<offs_t>(HighBits) ^ LOWMASK;
 	static constexpr offs_t UPMASK   = ~make_bitmask<offs_t>(HighBits);
 
+	class handler_array : public std::array<handler_entry_read<Width, AddrShift, Endian> *, COUNT>
+	{
+	public:
+		using std::array<handler_entry_read<Width, AddrShift, Endian> *, COUNT>::array;
+		handler_array()
+		{
+			std::fill(this->begin(), this->end(), nullptr);
+		}
+	};
+
+	class range_array : public std::array<handler_entry::range, COUNT>
+	{
+	public:
+		using std::array<handler_entry::range, COUNT>::array;
+		range_array()
+		{
+			std::fill(this->begin(), this->end(), handler_entry::range{ 0, 0 });
+		}
+	};
+
 	memory_view *m_view;
 
-	std::vector<std::array<handler_entry_read<Width, AddrShift, Endian> *, COUNT>> m_dispatch_array;
-	std::vector<std::array<handler_entry::range, COUNT>> m_ranges_array;
+	std::vector<handler_array> m_dispatch_array;
+	std::vector<range_array> m_ranges_array;
 
 	handler_entry_read<Width, AddrShift, Endian> **m_a_dispatch;
 	handler_entry::range *m_a_ranges;
