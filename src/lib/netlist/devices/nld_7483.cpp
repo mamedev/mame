@@ -26,10 +26,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(7483)
 	{
 		NETLIB_CONSTRUCTOR(7483)
@@ -111,5 +109,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

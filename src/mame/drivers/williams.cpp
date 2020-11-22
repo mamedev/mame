@@ -423,8 +423,9 @@
     three ROMs, and a smaller board with lots of ROMs,
     the CPU, the 6821 PIAs, and the two "Special Chip 2"
     custom BIT/BLT chips.
-    Joust 2 has an additional music/speech board that has a
-    68B09E CPU, 68B21 PIA, Harris 55564-5 CVSD, and a YM2151.
+    Joust 2 has an additional D-11298 Williams System 11 background
+    music/speech board (the older board version from PIN*BOT)
+    that has a 68B09E CPU, 68B21 PIA, Harris 55564-5 CVSD, and a YM2151.
 
     Contact Michael Soderstrom (ichael@geocities.com) if you
     have any additional information or corrections.

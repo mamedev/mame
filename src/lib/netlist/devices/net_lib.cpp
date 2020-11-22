@@ -16,10 +16,7 @@
 #define LIB_DECL(decl) factory.add( decl () );
 #define LIB_ENTRY(nic) { NETLIB_DEVICE_DECL(nic); LIB_DECL(decl_ ## nic) }
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	void initialize_factory(factory::list_t &factory)
 	{
@@ -32,6 +29,5 @@ namespace devices
 
 	}
 
-} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 

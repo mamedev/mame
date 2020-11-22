@@ -81,7 +81,7 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 
 ROM_START( msx_sfg01 )
 	ROM_REGION(0x4000, "sfg", 0)
-	ROM_LOAD("sfg01.rom", 0x0, 0x4000, CRC(0995fb36) SHA1(434651305f92aa770a89e40b81125fb22d91603d))
+	ROM_LOAD("sfg01.rom", 0x0, 0x4000, CRC(0995fb36) SHA1(434651305f92aa770a89e40b81125fb22d91603d)) // correct label is almost certainly "yamaha__ym2211-22702__48_18_89_b.ic104" though the datecode portion may vary between late 1983 and mid 1984
 ROM_END
 
 
@@ -94,9 +94,9 @@ const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 ROM_START( msx_sfg05 )
 	ROM_REGION(0x8000, "sfg", 0)
 	ROM_SYSTEM_BIOS( 0, "sfg05", "SFG05 (original)" )
-	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) )
+	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) ) // correct label MIGHT be "yamaha__ym2301-23959.ic104" but this needs redump/verification
 	ROM_SYSTEM_BIOS( 1, "sfg05a", "SFG05 (SFG01 upgrade)" ) // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
-	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) )
+	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) ) // this came on a single eprom on a daughterboard on an SFG01 board which had been factory upgraded to SFG05
 ROM_END
 
 

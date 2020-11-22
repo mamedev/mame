@@ -2063,6 +2063,9 @@ void memory_bank::set_base(void *base)
 
 void memory_bank::set_entry(int entrynum)
 {
+	if(entrynum == -1 && m_entries.empty())
+		return;
+
 	// validate
 	if (entrynum < 0 || entrynum >= int(m_entries.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);

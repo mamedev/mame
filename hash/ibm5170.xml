@@ -11731,7 +11731,65 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="incait">
+	<software name="inca">
+		<description>Inca</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="version" value="1.000 02/17/93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="a84ab0cf" sha1="4728593066d8a527ab18cf4e50fba9c1c4ce03cf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="c0f43489" sha1="f4dd59439727e90fccb74a8c7b56ca87425441d2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="1d29fa54" sha1="5a5667b5c5551fb3e6d9e429f659c6d26072546f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="47c888b7" sha1="59cea909ac56cab80d0833a5c52204b9e0435425"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="6682014e" sha1="44afb6c38c64ad65009b1dbd3f9edaf5f4e1291b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="dcb3bd43" sha1="3cff37a4269037886a9ff414b450eb4ad8462dd2"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="d4a523c2" sha1="d35bc8bc0b25900def5f456d9048f7cd67ace1b3"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="2a5c9d33" sha1="230849edbc439189c3daec7dc9a1f77a3682f088"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1993] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="65c578a1" sha1="d5b37cc1c51af3c23adb94a8c5cb33f57941defa"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="7e1bce29" sha1="dbacbd4655c6fc9309a3b285793db07a78e84f9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incait" cloneof="inca">
 		<description>Inca (Italy)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
@@ -15240,6 +15298,37 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="veil of darkness disk 3.img" size="1474560" crc="848ccdbf" sha1="731ef4102cbd302a0442a8d40c095c56e9c10b8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wackywh">
+		<description>Wacky Wheels (v1.1)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Beavis Soft" />
+		<info name="version" value="v1.1 - Registered Version" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Wacky Wheels (v1.1) [Apogee] [1994] [3.5DD] [Disk 1 of 2].img" size="737280" crc="fffb8704" sha1="5a3ab45a9e793ed3f7adc2111f94322e89092893"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wacky Wheels (v1.1) [Apogee] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6da6788b" sha1="61266dc72d32d708b59abdd472c294603fdb6755"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wackywhu">
+		<description>Wacky Wheels (v1.1 registered &amp; upgraded patch)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Beavis Soft" />
+		<info name="version" value="v1.1 - Registered &amp; Upgraded Patch" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Wacky Wheels (Upgrade Disk) [Apogee] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="15ed5285" sha1="f5db12f9354fb7e3e2c4af6a8fbea152d73201dd"/>
 			</dataarea>
 		</part>
 	</software>

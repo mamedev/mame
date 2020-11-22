@@ -105,7 +105,7 @@
             Capable of running all romsets.
 
        * The following Romsets are known, ROUGHLY from oldest to newest:
-         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first Japanese release of space invaders (Andy W may call this 'SV0'?)
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped, this has never been seen in the wild and may never have existed.
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)

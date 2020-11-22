@@ -26,7 +26,7 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_bgram(*this, "bgram"),
 		m_soundbank(*this, "soundbank"),
-		m_spritebank(*this, "spritebank")
+		m_spritebank(*this, "spritebank", 0x08, ENDIANNESS_BIG)
 	{ }
 
 	void taotaido(machine_config &config);
@@ -50,7 +50,7 @@ private:
 
 	required_memory_bank m_soundbank;
 
-	required_shared_ptr<uint8_t> m_spritebank;
+	memory_share_creator<uint8_t> m_spritebank;
 
 	uint8_t m_bgbank[8];
 	tilemap_t *m_bg_tilemap;

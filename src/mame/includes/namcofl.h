@@ -58,7 +58,7 @@ private:
 	emu_timer *m_vblank_interrupt_timer;
 	emu_timer *m_network_interrupt_timer;
 	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<uint32_t> m_shareram;
 	uint8_t m_mcu_port6;
 	uint32_t m_sprbank;
 
@@ -74,7 +74,8 @@ private:
 	uint32_t sysreg_r();
 	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void c116_w(offs_t offset, uint8_t data);
-	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t port6_r();
 	void port6_w(uint8_t data);
 	uint8_t port7_r();

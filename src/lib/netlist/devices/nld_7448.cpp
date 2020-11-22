@@ -26,10 +26,8 @@
 
 #include <array>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
@@ -136,5 +134,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

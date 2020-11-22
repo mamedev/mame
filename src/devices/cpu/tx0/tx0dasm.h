@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
 
-#ifndef MAME_CPU_PDP1_TX0DASM_H
-#define MAME_CPU_PDP1_TX0DASM_H
+#ifndef MAME_CPU_TX0_TX0DASM_H
+#define MAME_CPU_TX0_TX0DASM_H
 
 #pragma once
 

@@ -1025,6 +1025,9 @@ typhoon                         // GX770 (c) 1987
 @source:akaiax80.cpp
 ax80
 
+@source:akaivx600.cpp
+vx600
+
 @source:akkaarrh.cpp
 akkaarrh                        // (c) 1982 Atari (prototype)
 
@@ -14273,6 +14276,7 @@ mooncrstuku                     // (c) 1980 Nichibutsu UK
 moonqsr                         // (c) 1980 Nichibutsu
 moonwar                         // (c) 1981 Stern
 moonwara                        // (c) 1981 Stern
+mouncrst                        // bootleg
 mshuttle                        // (c) 1981 Nichibutsu
 mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlea                       // (c) 1981 Nichibutsu
@@ -32350,6 +32354,7 @@ dgun2573
 dgun2573a
 rminitv
 fcpocket
+dgunl3202
 
 @source:nes_vt369_vtunknown.cpp
 bittboy
@@ -33069,6 +33074,7 @@ superabc                        // hack
 superabco                       // hack
 theglobme                       // (c) 1983 Magic Electronics
 theglobp                        // (c) 1983 Epos Corporation
+theglobpb                       // bootleg
 titanpac                        // hack
 vanvan                          // (c) 1983 Sanritsu
 vanvanb                         // (c) 1983 Karateco (bootleg?)
@@ -34038,6 +34044,7 @@ superpet                        //
 
 @source:peyper.cpp
 ator                            //
+ator3bmp                        //
 gamatros                        //
 hangonp                         //
 lancelot                        //
@@ -34405,6 +34412,7 @@ blkfever                        //
 cerberup                        //
 evlfight                        //
 madrace                         //
+storm                           //
 zira                            //
 
 @source:play_3.cpp

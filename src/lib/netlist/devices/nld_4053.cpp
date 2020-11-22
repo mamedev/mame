@@ -26,10 +26,8 @@
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(CD4053_GATE)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4053_GATE, "CD4XXX")
@@ -140,5 +138,5 @@ namespace netlist
 	};
 
 	NETLIB_DEVICE_IMPL(CD4053_GATE,         "CD4053_GATE",            "")
-	} //namespace devices
-} // namespace netlist
+
+} // namespace netlist::devices

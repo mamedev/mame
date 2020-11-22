@@ -254,7 +254,10 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 #endif
 
-	COMBINE_DATA(&m_shareram[offset]);
+	if (offset & 1)
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(uint32_t(mem_mask) << 16)) | ((data & mem_mask) << 16);
+	else
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~uint32_t(mem_mask)) | (data & mem_mask);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
@@ -263,6 +266,13 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
+uint16_t namcofl_state::mcu_shared_r(offs_t offset)
+{
+	if(offset & 1)
+		return m_shareram[offset >> 1] >> 16;
+	else
+		return m_shareram[offset >> 1];
+}
 
 uint8_t namcofl_state::port6_r()
 {
@@ -321,7 +331,7 @@ uint8_t namcofl_state::dac0_r(){ return 0xff; }
 void namcofl_state::namcoc75_am(address_map &map)
 {
 	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
-	map(0x004000, 0x00bfff).ram().w(FUNC(namcofl_state::mcu_shared_w)).share("shareram");
+	map(0x004000, 0x00bfff).ram().rw(FUNC(namcofl_state::mcu_shared_r), FUNC(namcofl_state::mcu_shared_w));
 	map(0x200000, 0x27ffff).rom().region("c75data", 0);
 }
 

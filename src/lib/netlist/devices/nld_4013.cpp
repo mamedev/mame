@@ -42,10 +42,7 @@
 #include "nl_base.h"
 #include "nl_factory.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	NETLIB_OBJECT(CD4013)
 	{
@@ -122,5 +119,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLOCK,+DATA,+RESET,+SET,@VDD,@VSS")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

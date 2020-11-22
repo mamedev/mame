@@ -44,10 +44,7 @@
 
 #include <array>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	NETLIB_OBJECT(7474)
 	{
@@ -117,5 +114,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

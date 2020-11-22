@@ -308,7 +308,7 @@ bool cqm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			if (heads == 1)
 				return false; // single side ED ?
 			image->set_variant(floppy_image::DSED);
-			[[fallthrough]]; // FIXME: really?
+			break;
 		default:
 			return false;
 	}

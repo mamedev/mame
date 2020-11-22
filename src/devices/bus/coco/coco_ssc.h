@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:tim lindner
 #ifndef MAME_BUS_COCO_COCO_SSC_H
 #define MAME_BUS_COCO_COCO_SSC_H
 

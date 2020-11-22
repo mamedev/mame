@@ -10,10 +10,8 @@
 #define R_OFF (1E20)
 #define R_ON  (1)
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(NE555)
 	{
 		NETLIB_CONSTRUCTOR(NE555)
@@ -161,5 +159,5 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(NE555,     "NE555", "")
 
 	NETLIB_DEVICE_IMPL_ALIAS(MC1455P, NE555,     "MC1455P", "")
-	} //namespace devices
-} // namespace netlist
+
+} // namespace netlist::devices

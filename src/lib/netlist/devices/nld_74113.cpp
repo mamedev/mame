@@ -62,10 +62,8 @@
 // FIXME: this can probably be merged with nld_7473.cpp
 // FIXME: timing, see 74107 for example, use template
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(74113)
 	{
 		NETLIB_CONSTRUCTOR(74113)
@@ -145,5 +143,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(74113, "TTL_74113", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74113A, "TTL_74113A", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices
