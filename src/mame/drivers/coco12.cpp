@@ -395,7 +395,9 @@ INPUT_PORTS_END
 
 void coco_cart(device_slot_interface &device)
 {
-	coco_cart_add_devices(device, true, true);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
+	coco_cart_add_multi_pak(device);
 }
 
 

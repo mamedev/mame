@@ -153,12 +153,13 @@ namespace
 
 static void coco_cart_slot1_3(device_slot_interface &device)
 {
-	coco_cart_add_devices(device, false, false);
+	coco_cart_add_basic_devices(device);
 }
 
 static void coco_cart_slot4(device_slot_interface &device)
 {
-	coco_cart_add_devices(device, true, false);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
 }
 
 
