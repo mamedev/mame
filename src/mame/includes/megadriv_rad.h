@@ -17,6 +17,7 @@ public:
 	uint16_t read(offs_t offset);
 	uint16_t read_a13(offs_t offset);
 
+	void megadriv_base_map(address_map &map);
 	void megadriv_radica_map(address_map &map);
 
 protected:
@@ -35,8 +36,6 @@ public:
 public:
 	void megadriv_radica_3button_ntsc(machine_config &config);
 	void megadriv_radica_3button_pal(machine_config &config);
-
-	void init_dgunl3227();
 
 protected:
 	virtual void machine_start() override;
@@ -58,6 +57,30 @@ public:
 	{}
 	virtual void machine_start() override;
 };
+
+class megadriv_dgunl_state : public megadriv_radica_3button_state
+{
+public:
+	megadriv_dgunl_state(const machine_config& mconfig, device_type type, const char* tag)
+		: megadriv_radica_3button_state(mconfig, type, tag)
+	{}
+public:
+	void megadriv_dgunl_ntsc(machine_config &config);
+
+	void init_dgunl3227();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);
+	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
+	void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	void megadriv_dgunl_map(address_map &map);
+	uint16_t m_a1630a;
+};
+
 
 
 #endif // MAME_INCLUDES_MEGADRIV_RAD_H
