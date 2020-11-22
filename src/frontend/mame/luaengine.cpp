@@ -1743,6 +1743,7 @@ void lua_engine::initialize()
  * image.is_creatable
  * image.is_reset_on_load
  * image.must_be_loaded
+ * image.formatlist
  */
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
@@ -1771,6 +1772,35 @@ void lua_engine::initialize()
 	image_type.set("is_creatable", sol::property(&device_image_interface::is_creatable));
 	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
+	image_type.set("formatlist", sol::property([this](const device_image_interface &image) {
+			sol::table format_table = sol().create_table();
+			for (const std::unique_ptr<image_device_format> &format : image.formatlist())
+				format_table[format->name()] = &*format;
+			return format_table;
+		}));
+
+/*	image_device_format library
+ *
+ * manager:machine().images[image_type].formatlist[x]
+ * 
+ * format.name
+ * format.description
+ * format.extensions
+ * format.optspec
+ * 
+ */
+	auto format_type = sol().registry().new_usertype<image_device_format>("format", "new", sol::no_constructor);
+	format_type.set("name", sol::property(&image_device_format::name));
+	format_type.set("description", sol::property(&image_device_format::description));
+	format_type.set("optspec", sol::property(&image_device_format::optspec));
+	format_type.set("extensions", sol::property([this](const image_device_format &format) {
+			int index = 1;
+			sol::table option_table = sol().create_table();
+			for (const std::string &ext : format.extensions())
+				option_table[index++] = ext;
+			return option_table;
+		}));
+	sol().registry().set("format", format_type);
 
 
 /*  mame_machine_manager library
