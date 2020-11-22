@@ -33,7 +33,7 @@ All Platforms
   An excessive number of concurrent jobs may increase compilation time.
   The optimal number depends on many factors, including number of CPU
   cores, available RAM, disk and filesystem performance, and memory
-  bandwidh.* For instance, **make -j5** is a good starting point on a
+  bandwidth.* For instance, **make -j5** is a good starting point on a
   system with a quad-core CPU.
 
 * Debugging information can be added to a compile using *SYMBOLS=1*
@@ -244,10 +244,11 @@ Compilation is exactly as described above in All Platforms.
 
 .. _compiling-macos:
 
-Apple Mac OS X
---------------
+Apple MacOS
+-----------
 
-You'll need a few prerequisites to get started. Make sure you're on OS X 10.9 Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
+You'll need a few prerequisites to get started. Make sure you're on MacOS 10.14
+Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
 
 * Install **Xcode** from the Mac App Store
 * Launch **Xcode**. It will download a few additional prerequisites. Let this run through before proceeding.
@@ -256,11 +257,13 @@ You'll need a few prerequisites to get started. Make sure you're on OS X 10.9 Ma
 
 Next you'll need to get SDL2 installed.
 
-* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *Mac OS X* .dmg file
+* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *MacOS* .dmg file
 * If the .dmg doesn't auto-open, open it
 * Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder
 
-Lastly to begin compiling, use Terminal to navigate to where you have the MAME source tree (*cd* command) and follow the normal compilation instructions from above in All Platforms.
+Lastly to begin compiling, use Terminal to navigate to where you have the MAME
+source tree (*cd* command) and follow the normal compilation instructions from
+above in All Platforms.
 
 It's possible to get MAME working from 10.6, but a bit more complicated:
 
@@ -383,10 +386,13 @@ You'll then need to install the SVG handler.
 **pip install sphinxcontrib-svg2pdfconverter** depending on whether you're
 using Python 3 or Python 2.
 
+On Debian, you'll need to install the **librsvg2-bin** package by typing **sudo
+apt-get install librsvg2-bin**.
+
 If you intend on making a PDF via LaTeX, you'll need to install a LaTeX
 distribution such as TeX Live.
 
-**sudo apt-get install latexmk texlive texlive-science texlive-formats-extra**
+**sudo apt-get install librsvg2-bin latexmk texlive texlive-science texlive-formats-extra**
 
 From this point you can do **make html** or **make latexpdf** from the docs
 folder to generate the output of your choice. Typing **make** by itself will
