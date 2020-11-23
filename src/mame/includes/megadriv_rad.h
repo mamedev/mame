@@ -17,10 +17,10 @@ public:
 	uint16_t read(offs_t offset);
 	uint16_t read_a13(offs_t offset);
 
-	void megadriv_base_map(address_map &map);
 	void megadriv_radica_map(address_map &map);
 
 protected:
+	void megadriv_base_map(address_map &map);
 	int m_bank;
 
 private:
