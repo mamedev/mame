@@ -257,8 +257,11 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
 			strcpy((char*)filectx.curdir, (char*)filectx.filename);
 		} else {
-			strcat((char*)filectx.curdir, "/");
-			strcat((char*)filectx.curdir, (char*)filectx.filename);
+		    if (strlen((char*)filectx.curdir) + strlen((char*)filectx.filename) + 1 < 1024)
+            {
+                strcat((char*)filectx.curdir, "/");
+                strcat((char*)filectx.curdir, (char*)filectx.filename);
+            }
 		}
 		break;
 	case kFileCmdGetFirstListing:
