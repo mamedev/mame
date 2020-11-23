@@ -65,7 +65,7 @@ nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const m
 
 
 /*-------------------------------------------------
-    device start callback
+	device start callback
 -------------------------------------------------*/
 
 void nubus_image_device::messimg_disk_image_device::device_start()
@@ -106,7 +106,7 @@ void nubus_image_device::messimg_disk_image_device::call_unload()
 }
 
 /*-------------------------------------------------
-    device reset callback
+	device reset callback
 -------------------------------------------------*/
 
 void nubus_image_device::messimg_disk_image_device::device_reset()
@@ -189,6 +189,8 @@ void nubus_image_device::device_start()
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
+	filectx.filename.reserve(128);
+	filectx.curdir.reserve(1024);
 	filectx.curdir[0] = '.';
 	filectx.curdir[1] = '\0';
 	filectx.dirp = nullptr;
@@ -249,41 +251,45 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 {
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
+
+	std::string & filename = filectx.filename;
+	std::string & current_dir = filectx.curdir;
+
 	switch(data) {
 	case kFileCmdGetDir:
-		strcpy((char*)filectx.filename, (char*)filectx.curdir);
+		filename = current_dir;
 		break;
 	case kFileCmdSetDir:
-		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
-			strcpy((char*)filectx.curdir, (char*)filectx.filename);
+		if (!filename.empty() && (filename[0] == '/' || filename[0] == '$')) {
+			current_dir = filename;
 		} else {
-			strcat((char*)filectx.curdir, "/");
-			strcat((char*)filectx.curdir, (char*)filectx.filename);
+			current_dir += "/";
+			current_dir += filename;
 		}
 		break;
 	case kFileCmdGetFirstListing:
-		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
+		filectx.dirp = osd::directory::open(current_dir.c_str());
 		[[fallthrough]];
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();
 			if(dp) {
-				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+				filename.assign((const char *)dp->name);
 			} else {
-				memset(filectx.filename, 0, sizeof(filectx.filename));
+				filename.clear();
 			}
 		}
 		else {
-			memset(filectx.filename, 0, sizeof(filectx.filename));
+			filename.clear();
 		}
 		break;
 	case kFileCmdGetFile:
 		{
 			std::string fullpath;
 			fullpath.reserve(1024);
-			fullpath.assign((const char *)filectx.curdir);
-			fullpath.append(PATH_SEPARATOR);
-			fullpath.append((const char*)filectx.filename);
+			fullpath = current_dir;
+			fullpath += PATH_SEPARATOR;
+			fullpath += filename;
 			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
 				osd_printf_error("Error opening %s\n", fullpath);
 			filectx.bytecount = 0;
@@ -293,9 +299,9 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		{
 			std::string fullpath;
 			fullpath.reserve(1024);
-			fullpath.assign((const char *)filectx.curdir);
-			fullpath.append(PATH_SEPARATOR);
-			fullpath.append((const char*)filectx.filename);
+			fullpath = current_dir;
+			fullpath += PATH_SEPARATOR;
+			fullpath += filename;
 			uint64_t filesize; // unused, but it's an output from the open call
 			if(osd_file::open(fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
 				osd_printf_error("Error opening %s\n", fullpath);
@@ -356,12 +362,14 @@ uint32_t nubus_image_device::file_len_r()
 
 void nubus_image_device::file_name_w(offs_t offset, uint32_t data)
 {
-	((uint32_t*)(filectx.filename))[offset] = big_endianize_int32(data);
+	assert(offset < (filectx.filename.size() - size_of(uint32_t)));
+	((uint32_t*)(filectx.filename.data()))[offset] = big_endianize_int32(data);
 }
 
 uint32_t nubus_image_device::file_name_r(offs_t offset)
 {
+	assert(offset < (filectx.filename.size() - size_of(uint32_t)));
 	uint32_t ret;
-	ret = big_endianize_int32(((uint32_t*)(filectx.filename))[offset]);
+	ret = big_endianize_int32(((uint32_t*)(filectx.filename.data()))[offset]);
 	return ret;
 }

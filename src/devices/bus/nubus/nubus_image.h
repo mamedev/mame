@@ -38,8 +38,8 @@ protected:
 	struct nbfilectx
 	{
 		uint32_t curcmd;
-		uint8_t filename[128];
-		uint8_t curdir[1024];
+		std::string filename;
+		std::string curdir;
 		osd::directory::ptr dirp;
 		osd_file::ptr fd;
 		uint64_t filelen;
