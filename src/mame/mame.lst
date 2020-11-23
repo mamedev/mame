@@ -9309,6 +9309,9 @@ bladestl                        // GX797 (c) 1987
 bladestle                       // GX797 (c) 1987
 bladestll                       // GX797 (c) 1987
 
+@source:blit.cpp
+blit
+
 @source:blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
 bankroba                        // (c) 1993 Entertainment Technology Corp.
