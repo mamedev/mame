@@ -282,8 +282,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		break;
 	case kFileCmdGetFile:
 		{
-			std::string fullpath;
-			fullpath = current_dir;
+            std::string fullpath(current_dir);
 			fullpath += PATH_SEPARATOR;
 			fullpath += filename;
 			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
@@ -293,8 +292,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		break;
 	case kFileCmdPutFile:
 		{
-			std::string fullpath;
-			fullpath = current_dir;
+			std::string fullpath(current_dir);
 			fullpath += PATH_SEPARATOR;
 			fullpath += filename;
 			uint64_t filesize; // unused, but it's an output from the open call
