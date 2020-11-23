@@ -189,10 +189,7 @@ void nubus_image_device::device_start()
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
-	filectx.filename.reserve(128);
-	filectx.curdir.reserve(1024);
-	filectx.curdir[0] = '.';
-	filectx.curdir[1] = '\0';
+	filectx.curdir = ".";
 	filectx.dirp = nullptr;
 	filectx.fd = nullptr;
 }
@@ -286,7 +283,6 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 	case kFileCmdGetFile:
 		{
 			std::string fullpath;
-			fullpath.reserve(1024);
 			fullpath = current_dir;
 			fullpath += PATH_SEPARATOR;
 			fullpath += filename;
@@ -298,7 +294,6 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 	case kFileCmdPutFile:
 		{
 			std::string fullpath;
-			fullpath.reserve(1024);
 			fullpath = current_dir;
 			fullpath += PATH_SEPARATOR;
 			fullpath += filename;
