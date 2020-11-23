@@ -52,7 +52,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 private:
 	required_device<screen_device> m_screen;
@@ -86,6 +85,7 @@ private:
 	struct {
 		u16 horz_blank, horz_display, vert_blank, vert_display;
 	}m_crtc;
+	inline u16 crtc_vtotal();
 	inline void crtc_refresh_screen_params();
 	struct {
 		bool irq_enable;
@@ -93,12 +93,15 @@ private:
 		emu_timer *prg_irq;
 	}m_timer;
 	
+	emu_timer *m_timer_scanline;
 	enum timer_id
 	{
+		SCANLINE_TIMER = 1,
 		PRG_TIMER
 	};
 
 	inline void flush_prg_timer();
+	inline void flush_scanline_timer(int current_scanline);
 	
 	bool m_invert_vblank_lines;
 };

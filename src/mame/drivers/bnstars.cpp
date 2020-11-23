@@ -461,6 +461,8 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 
 	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
+//	map(0xfce00280, 0xfce0028f) // left screen brightness control
+//	map(0xfce00300, 0xfce0030f) // right screen brightness control
 	map(0xfce00400, 0xfce0045f).writeonly().share("rotate_ctrl.0");
 	map(0xfce00700, 0xfce0075f).writeonly().share("rotate_ctrl.1"); // guess
 	map(0xfce00a00, 0xfce00a17).writeonly().share("ascii_ctrl.0");

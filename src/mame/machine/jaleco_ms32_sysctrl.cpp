@@ -99,7 +99,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
-	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1); 
+//	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1); 
 
 	// TODO: watchdog
 }
@@ -130,6 +130,7 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_timer.irq_enable));
 	
 	m_timer.prg_irq = timer_alloc(PRG_TIMER);
+	m_timer_scanline = timer_alloc(SCANLINE_TIMER);
 }
 
 
@@ -147,6 +148,8 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	m_timer.irq_enable = false;
 	m_timer.interval = 1;
 	flush_prg_timer();
+//	flush_scanline_timer(m_crtc.vert_display);
+	m_timer_scanline->adjust(attotime::never);
 	// put flipping in a default state
 	m_flip_screen_state = false;
 	m_flip_screen_cb(0);
@@ -170,10 +173,33 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 	m_timer.prg_irq->adjust(step);
 }
 
+void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
+{
+	// in typical Jaleco fashion (cfr. mega system 1), both irqs are somehow configurable (a pin?).
+	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs 
+	// at half speed, but then their config can't possibly work with p47aces (i.e. wants 10 and 9 respectively), 
+	// plus bnstars that locks up off the bat if the wrong irq runs at 60 Hz.
+	// We currently hardwire via an init time setter here, making the irq acks to trigger properly as well.
+
+	if (current_scanline == m_crtc.vert_display)
+		m_invert_vblank_lines ? m_field_cb(1) : m_vblank_cb(1);
+
+	// 30 Hz irq
+	// TODO: unknown mechanics where this happens, is it even tied to scanline?
+	if (current_scanline == 0 && m_screen->frame_number() & 1)
+		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
+	
+	uint32_t next_scanline = (current_scanline + 1) % crtc_vtotal();
+	m_timer_scanline->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
+}
+
 void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
+		case SCANLINE_TIMER:
+			flush_scanline_timer(param);
+			break;
 		case PRG_TIMER:
 			m_prg_timer_cb(1);
 			flush_prg_timer();
@@ -188,7 +214,7 @@ void jaleco_ms32_sysctrl_device::device_timer(emu_timer &timer, device_timer_id 
 static constexpr u16 clamp_to_12bits_neg(u16 raw_data)
 {
 	// each write has a 12 bit resolution, for both CRTC and timer interval
-	// TODO: nndmseal: on POST it sets up a 0x1000 for vblank_blank, possibly for screen disable?
+	// TODO: nndmseal: on POST it sets up a 0x1000 for vblank, possibly for screen disable?
 	// TODO: rockn2: on POST it sets up a vertical size of 487, is it trying to setup an interlace setting?
 	return 0x1000 - (raw_data & 0xfff);
 }
@@ -203,15 +229,21 @@ inline u32 jaleco_ms32_sysctrl_device::get_dotclock_frequency()
 	return clock() / dot_divider;
 }
 
+inline u16 jaleco_ms32_sysctrl_device::crtc_vtotal()
+{
+	return m_crtc.vert_blank + m_crtc.vert_display;
+}
+
 inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 {
 	rectangle visarea;
 	const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
-	const u16 vtotal = m_crtc.vert_blank + m_crtc.vert_display;
+	const u16 vtotal = crtc_vtotal();
 	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency()) * htotal * vtotal;
 	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
 	logerror("%s: CRTC setup total: %d x %d display: %d x %d\n", this->tag(), htotal, vtotal, m_crtc.horz_display, m_crtc.vert_display);
 	m_screen->configure(htotal, vtotal, visarea, refresh);
+	m_timer_scanline->adjust(m_screen->time_until_pos(vtotal), vtotal);
 }
 
 void jaleco_ms32_sysctrl_device::control_w(u16 data)
@@ -332,23 +364,5 @@ void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
 	// or maybe this is right
 	m_vblank_cb(0);
 	m_field_cb(0);
-	// TODO: f1superb clears comms irq here
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(jaleco_ms32_sysctrl_device::scanline_cb)
-{
-	// in typical Jaleco fashion (cfr. mega system 1), both irqs are somehow configurable (a pin?).
-	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs at half chip, 
-	// but this config can't possibly work with p47aces (i.e. wants 10 and 9 respectively), 
-	// plus bnstars that locks up off the bat if the wrong irq runs at 60 Hz.
-	// We currently hardwire via an init time setter here, making the irq acks to trigger properly as well.
-
-	int scanline = param;
-	if (scanline == m_crtc.vert_display)
-		m_invert_vblank_lines ? m_field_cb(1) : m_vblank_cb(1);
-
-	// 30 Hz irq
-	// TODO: unknown vertical position where this happens
-	if (scanline == 0 && m_screen->frame_number() & 1)
-		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
+	// TODO: f1superb definitely clears comms irq with this
 }
