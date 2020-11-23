@@ -242,7 +242,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 // CA2 will be forced high when the VIA is reset, causing the ROM to be switched in
-// When the bios clears POR, FF80-FFFF becomes a mirror of A67F-A6FF
+// When the bios clears POR, FF80-FFFF becomes a mirror of A600-A67F
 WRITE_LINE_MEMBER( sym1_state::via1_ca2_w )
 {
 	m_banks[8]->set_entry(state);
