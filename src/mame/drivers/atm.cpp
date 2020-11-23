@@ -35,7 +35,7 @@ public:
 	void atmtb2(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	DECLARE_MACHINE_RESET(atm);
 
 private:
 	void atm_port_7ffd_w(uint8_t data);
@@ -145,7 +145,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
 }
 
-void atm_state::machine_reset()
+MACHINE_RESET_MEMBER(atm_state, atm)
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -198,6 +198,8 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
+
+	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm)
 
 	BETA_DISK(config, m_beta, 0);
 
