@@ -223,6 +223,7 @@ debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+design.cpp
 dfs500.cpp
 dg680.cpp
 dgn_beta.cpp

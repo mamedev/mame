@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+
+Azkoyen "Design 6" layout
+-->
+
+<mamelayout version="2">
+
+	<element name="bg_rect">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.20" green="0.20" blue="0.20" />
+		</rect>
+	</element>
+
+	<element name="lightgrey_disk">
+		<disk>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.80" green="0.80" blue="0.80" />
+		</disk>
+	</element>
+
+	<element name="red_disk">
+		<disk>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.80" green="0.10" blue="0.10" />
+		</disk>
+	</element>
+
+	<element name="text_REMOTE"><text string="REMOTE"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+
+	<element name="text_R1"><text string="A"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_R2"><text string="B"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_R3"><text string="C"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_R4"><text string="D"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+
+	<element name="text_CANAL"><text string="CANAL"><color red="0.80" green="0.80" blue="0.80" /></text></element>
+
+	<element name="text_1"><text string="1"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.00" green="0.00" blue="0.00" /></text></element>
+
+	<element name="text_RECUP"><text string="RECUP."><color red="0.80" green="0.80" blue="0.80" /></text></element>
+
+	<element name="vfd0">
+		<led16segsc>
+			<color red="0" green="0.6" blue="1.0" />
+		</led16segsc>
+	</element>
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="280" height="90"/>
+
+		<!-- Remote -->
+		<element ref="bg_rect">
+			<bounds left="5" top="5" right="100" bottom="25" />
+		</element>
+		<element ref="text_REMOTE">
+			<bounds left="10" top="10" right="35" bottom="20" />
+		</element>
+		<repeat count="4">
+			<param name="mask" start="0x10" lshift="1" />
+			<param name="x1" start="40" increment="15" />
+			<param name="x2" start="41" increment="15" />
+			<param name="label" start="1" increment="1" />
+			<element ref="lightgrey_disk" inputtag="in2_4" inputmask="~mask~">
+				<bounds x="~x1~" y="10" width="10" height="10" />
+			</element>
+			<element ref="text_R~label~">
+				<bounds x="~x2~" y="11" width="8" height="8" />
+			</element>
+		</repeat>
+
+		<!-- Canal -->
+		<element ref="bg_rect">
+			<bounds left="5" top="55" right="130" bottom="75" />
+		</element>
+		<element ref="text_CANAL">
+			<bounds left="10" top="60" right="35" bottom="70" />
+		</element>
+		<repeat count="6">
+			<param name="mask" start="0x02" lshift="1" />
+			<param name="x1" start="40" increment="15" />
+			<param name="x2" start="41" increment="15" />
+			<param name="label" start="1" increment="1" />
+			<element ref="lightgrey_disk" inputtag="in2_1" inputmask="~mask~">
+				<bounds x="~x1~" y="60" width="10" height="10" />
+			</element>
+			<element ref="text_~label~">
+				<bounds x="~x2~" y="61" width="8" height="8" />
+			</element>
+		</repeat>
+
+		<!-- Coin Recover -->
+		<element ref="bg_rect">
+			<bounds left="140" top="55" right="190" bottom="75" />
+		</element>
+		<element ref="text_RECUP">
+			<bounds left="145" top="60" right="170" bottom="70" />
+		</element>
+		<element ref="red_disk" inputtag="in2_1" inputmask="0x01">
+			<bounds left="175" top="60" right="185" bottom="70" />
+		</element>
+
+		<!-- VFD -->
+		<repeat count="16">
+			<param name="n" start="15" increment="-1" />
+			<param name="x" start="120" increment="9" />
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<bounds x="~x~" y="20" width="9" height="17"/>
+			</element>
+		</repeat>
+	</view>
+
+</mamelayout>
