@@ -228,7 +228,7 @@ bool vt61_cpu_device::branch_mux(u8 cond)
 
 	case 12:
 		// KEY DOWN (TODO)
-		return true;
+		return (m_ac != 050); // HACK: this forces what should be the C key down, which is somehow necessary at power-up
 
 	case 13:
 		// PWR UP
