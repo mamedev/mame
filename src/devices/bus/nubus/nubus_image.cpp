@@ -189,7 +189,8 @@ void nubus_image_device::device_start()
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
-	filectx.curdir = ".";
+	filectx.curdir[0] = '.';
+	filectx.curdir[1] = '\0';
 	filectx.dirp = nullptr;
 	filectx.fd = nullptr;
 }
@@ -248,43 +249,41 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 {
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
-
-	std::string & filename = filectx.filename;
-	std::string & current_dir = filectx.curdir;
-
 	switch(data) {
 	case kFileCmdGetDir:
-		filename = current_dir;
+		strcpy((char*)filectx.filename, (char*)filectx.curdir);
 		break;
 	case kFileCmdSetDir:
-		if (!filename.empty() && (filename[0] == '/' || filename[0] == '$')) {
-			current_dir = filename;
+		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
+			strcpy((char*)filectx.curdir, (char*)filectx.filename);
 		} else {
-			current_dir += "/";
-			current_dir += filename;
+			strcat((char*)filectx.curdir, "/");
+			strcat((char*)filectx.curdir, (char*)filectx.filename);
 		}
 		break;
 	case kFileCmdGetFirstListing:
-		filectx.dirp = osd::directory::open(current_dir.c_str());
+		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
 		[[fallthrough]];
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();
 			if(dp) {
-				filename.assign((const char *)dp->name);
+				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
 			} else {
-				filename.clear();
+				memset(filectx.filename, 0, sizeof(filectx.filename));
 			}
 		}
 		else {
-			filename.clear();
+			memset(filectx.filename, 0, sizeof(filectx.filename));
 		}
 		break;
 	case kFileCmdGetFile:
 		{
-            std::string fullpath(current_dir);
-			fullpath += PATH_SEPARATOR;
-			fullpath += filename;
+			std::string fullpath;
+			fullpath.reserve(1024);
+			fullpath.assign((const char *)filectx.curdir);
+			fullpath.append(PATH_SEPARATOR);
+			fullpath.append((const char*)filectx.filename);
 			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
 				osd_printf_error("Error opening %s\n", fullpath);
 			filectx.bytecount = 0;
@@ -292,9 +291,11 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		break;
 	case kFileCmdPutFile:
 		{
-			std::string fullpath(current_dir);
-			fullpath += PATH_SEPARATOR;
-			fullpath += filename;
+			std::string fullpath;
+			fullpath.reserve(1024);
+			fullpath.assign((const char *)filectx.curdir);
+			fullpath.append(PATH_SEPARATOR);
+			fullpath.append((const char*)filectx.filename);
 			uint64_t filesize; // unused, but it's an output from the open call
 			if(osd_file::open(fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
 				osd_printf_error("Error opening %s\n", fullpath);
@@ -355,14 +356,12 @@ uint32_t nubus_image_device::file_len_r()
 
 void nubus_image_device::file_name_w(offs_t offset, uint32_t data)
 {
-	assert(offset < (filectx.filename.size() - size_of(uint32_t)));
-	((uint32_t*)(filectx.filename.data()))[offset] = big_endianize_int32(data);
+	((uint32_t*)(filectx.filename))[offset] = big_endianize_int32(data);
 }
 
 uint32_t nubus_image_device::file_name_r(offs_t offset)
 {
-	assert(offset < (filectx.filename.size() - size_of(uint32_t)));
 	uint32_t ret;
-	ret = big_endianize_int32(((uint32_t*)(filectx.filename.data()))[offset]);
+	ret = big_endianize_int32(((uint32_t*)(filectx.filename))[offset]);
 	return ret;
 }
