@@ -88,7 +88,8 @@ Unidesa Cirsa Multi Points
 
 P4, P8, P13, P15, P16 and P19 are unused.
 
-Some service manuals contains the complete PCB schematics (e.g., see the "Manual Técnico Cirsa Vulcano" PDF).
+The service manual contains the complete PCB schematics:
+https://media.recreativas.org/manuales/201909/cirsa-unidesa-carta-control-960606-5-manual.pdf
 
 */
 
@@ -250,6 +251,11 @@ ROM_START( mexlindo )
 	ROM_LOAD( "24c16_it7_0,05.u10",  0x000, 0x800, CRC(d84a3fae) SHA1(56e743a74d1934a6c6d99dc3dbbf6172c30e58a9) )
 ROM_END
 
+
+/***************************************************************************
+Games on Cirsa "960606-5" PCB
+***************************************************************************/
+
 ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical, no GFX but a Samsung VFD.
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u2",   0x000000, 0x100000, NO_DUMP )
@@ -289,5 +295,7 @@ ROM_END
 
 GAME( 2003,  neptunp2,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Neptune's Pearls 2",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
 GAME( 2004,  mexlindo,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Mexico Lindo",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
+
+// Games on Cirsa "960606-5" PCB
 GAME( 1999,  rockroll,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from parts' manual and sticker on PCB
-GAME( 2001?, unk960606, 0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Unknown 960606-5 based machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from sticker on PCB
+GAME( 2001?, unk960606, 0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "unknown 960606-5 based machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from sticker on PCB
