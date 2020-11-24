@@ -38100,16 +38100,16 @@ sorcererb                       // Sorcerer with Digitrio fdc
 sorcererd                       // Sorcerer with Micropolis fdc
 
 @source:storio.cpp
-vreader                         // (c) 2011 V.Tech
-vreadercaen                     // (c) 2011 V.Tech
-vreadercafr                     // (c) 2011 V.Tech
+innotab2                        // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
 storiode                        // (c) 2011 V.Tech
 storioes                        // (c) 2011 V.Tech
 storioesa                       // (c) 2011 V.Tech
 storiofr                        // (c) 2011 V.Tech
 storionl                        // (c) 2011 V.Tech
-innotab2
+vreader                         // (c) 2011 V.Tech
+vreadercaen                     // (c) 2011 V.Tech
+vreadercafr                     // (c) 2011 V.Tech
 
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
@@ -38386,6 +38386,16 @@ sentx6p                         //
 sentx6puk
 sentx6pd
 
+@source:spg2xx_senca.cpp
+cdlyoko
+dnv200fs
+m505neo
+m521neo
+mywicodx                        
+mywicogt
+oplayer
+zon32bit
+
 @source:spg2xx_shredmjr.cpp
 taikeegr                        //
 rockstar
@@ -38424,16 +38434,7 @@ zone100                         //
 lx_jg7415                       //
 lx_jg7410
 zonemini
-react
-
-@source:spg2xx_zone_32bit.cpp
-mywicodx                        //
-mywicogt
-zon32bit                        // Zone 32-bit
-oplayer
-dnv200fs
-m505neo
-m521neo
+react                
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
