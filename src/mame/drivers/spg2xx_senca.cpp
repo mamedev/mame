@@ -91,8 +91,6 @@ protected:
 	virtual uint16_t portc_r() override;
 };
 
-
-
 class denver_200in1_state : public mywicodx_state
 {
 public:
