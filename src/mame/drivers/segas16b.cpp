@@ -1291,6 +1291,9 @@ void segas16b_state::machine_reset()
 		for (int banknum = 0; banknum < 16; banknum++)
 			m_sprites->set_bank(banknum, banklist[banknum]);
 	}
+
+	// ensure the sound bank points somewhere sane
+	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000);
 }
 
 
