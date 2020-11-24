@@ -1053,7 +1053,7 @@ CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_o
 
 CONS( 2012, m505neo,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH / Senca", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2011, cdlyoko,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_cdlyoko, "<unknown> / Senca", "Code Lyoko (25-in-1 handheld)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, cdlyoko,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_cdlyoko, "Ingo Devices SL / Senca", "Code Lyoko (25-in-1 handheld)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // a version of this exists with the 'newer' style title screen seen in m505neo
 CONS( 2012, m521neo,   0, 0, zon32bit_bat, oplayer, denver_200in1_state,  init_m521neo, "Millennium 2000 GmbH / Senca", "Millennium M521 Arcade Neo 2.0 (Family Sport 220-in-1) ", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -288,7 +288,7 @@ ROM_START( msi_sf2 )
 	// and is probably leftover from one of the multigame systems, hacked to only launch one game. We should emulate it...
 	// .. but the game ROM starts at 0xc8000 so we can cheat for now
 	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0xc8000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
-	ROM_CONTINUE(0x00000,0x338000) 
+	ROM_CONTINUE(0x00000,0x338000)
 ROM_END
 
 ROM_START( dgunl3227 )
