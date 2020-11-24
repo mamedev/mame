@@ -19,11 +19,11 @@ Not working because of banking issues.
 
 namespace {
 
-class atm_state : public spectrum_state
+class atm_state : public spectrum_128_state
 {
 public:
 	atm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
+		: spectrum_128_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
@@ -35,7 +35,7 @@ public:
 	void atmtb2(machine_config &config);
 
 protected:
-	DECLARE_MACHINE_RESET(atm);
+	virtual void machine_reset() override;
 
 private:
 	void atm_port_7ffd_w(uint8_t data);
@@ -145,7 +145,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(atm_state, atm)
+void atm_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -198,8 +198,6 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
-
-	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm)
 
 	BETA_DISK(config, m_beta, 0);
 
