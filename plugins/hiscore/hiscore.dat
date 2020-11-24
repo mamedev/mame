@@ -8861,7 +8861,7 @@ rodlanda:
 ;(saint dragon)
 stdragon:
 stdragona:
-@:maincpu,program,f8d00,7c,00,d3
+@:maincpu,:ram/share,8d00,7c,00,d3
 
 
 ;(iga ninjyutsuden (japan))
