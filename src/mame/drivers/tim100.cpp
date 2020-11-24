@@ -97,6 +97,7 @@ void tim100_state::machine_start()
 {
 	m_palette->set_pen_colors(0, tim100_palette);
 	save_item(NAME(m_dma_adr));
+	m_dma_adr = 0;
 }
 
 const gfx_layout charlayout =
@@ -143,7 +144,10 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 WRITE_LINE_MEMBER( tim100_state::drq_w )
 {
 	if (state)
+	{
 		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
+		m_dma_adr &= 0x7ff;
+	}
 }
 
 WRITE_LINE_MEMBER( tim100_state::irq_w )
