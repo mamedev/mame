@@ -54,6 +54,7 @@ public:
 	pasopia7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_banks(*this, "bank%u", 0U)
 		, m_screen(*this, "screen")
 		, m_ppi0(*this, "ppi0")
 		, m_ppi1(*this, "ppi1")
@@ -146,6 +147,7 @@ private:
 	void draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x);
 
 	required_device<z80_device> m_maincpu;
+	required_memory_bank_array<2> m_banks;
 	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -174,6 +176,21 @@ void pasopia7_state::machine_start()
 	std::fill(&m_work_ram[0], &m_work_ram[0x10000], 0xff);
 
 	m_vram = make_unique_clear<uint8_t[]>(0x10000);
+
+	uint8_t *work_ram = m_work_ram.get();
+	uint8_t *basic = memregion("basic")->base();
+	uint8_t *bios = memregion("bios")->base();
+	// 0000-3FFF
+	m_banks[0]->configure_entry(0, bios);
+	m_banks[0]->configure_entry(1, basic);
+	m_banks[0]->configure_entry(2, work_ram);
+	// 4000-7FFF
+	m_banks[1]->configure_entry(0, bios);
+	m_banks[1]->configure_entry(1, basic+0x4000);
+	m_banks[1]->configure_entry(2, work_ram+0x4000);
+
+	m_banks[0]->set_entry(0);
+	m_banks[1]->set_entry(0);
 }
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
@@ -344,24 +361,20 @@ void pasopia7_state::vram_w(offs_t offset, uint8_t data)
 
 void pasopia7_state::memory_ctrl_w(uint8_t data)
 {
-	uint8_t *work_ram = m_work_ram.get();
-	uint8_t *basic = memregion("basic")->base();
-	uint8_t *bios = memregion("bios")->base();
-
 	switch(data & 3)
 	{
 		case 0:
 		case 3: //select Basic ROM
-			membank("bank1")->set_base(basic    + 0x00000);
-			membank("bank2")->set_base(basic    + 0x04000);
+			m_banks[0]->set_entry(1);
+			m_banks[1]->set_entry(1);
 			break;
 		case 1: //select Basic ROM + BIOS ROM
-			membank("bank1")->set_base(basic    + 0x00000);
-			membank("bank2")->set_base(bios     + 0x00000);
+			m_banks[0]->set_entry(1);
+			m_banks[1]->set_entry(0);
 			break;
 		case 2: //select Work RAM
-			membank("bank1")->set_base(work_ram + 0x00000);
-			membank("bank2")->set_base(work_ram + 0x04000);
+			m_banks[0]->set_entry(2);
+			m_banks[1]->set_entry(2);
 			break;
 	}
 
@@ -548,10 +561,10 @@ void pasopia7_state::pasopia7_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).w(FUNC(pasopia7_state::ram_bank_w));
-	map(0x0000, 0x3fff).bankr("bank1");
-	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x0000, 0x3fff).bankr("bank0");
+	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xbfff).rw(FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0xc000, 0xffff).ram();
 }
 
 void pasopia7_state::pasopia7_io(address_map &map)
@@ -751,12 +764,8 @@ WRITE_LINE_MEMBER( pasopia7_state::speaker_w )
 
 void pasopia7_state::machine_reset()
 {
-	uint8_t *bios = memregion("bios")->base();
-
-	membank("bank1")->set_base(bios);
-	membank("bank2")->set_base(bios);
-//  membank("bank3")->set_base(bios);
-//  membank("bank4")->set_base(bios);
+	m_banks[0]->set_entry(0);
+	m_banks[1]->set_entry(0);
 
 	m_nmi_reset |= 4;
 	m_porta_2 = 0xFF;
