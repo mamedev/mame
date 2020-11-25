@@ -81,7 +81,7 @@ bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
 
 
-template <typename T, typename C, typename I = typename C::iterator>
+template <typename T, typename C, typename I>
 struct lua_engine::immutable_container_helper
 {
 protected:
