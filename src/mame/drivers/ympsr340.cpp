@@ -22,7 +22,9 @@
 
 #include "cpu/h8/h8s2655.h"
 #include "sound/swp00.h"
+#include "video/hd44780.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,7 +34,8 @@ public:
 	psr340_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_swp00(*this, "swp00")
+		m_swp00(*this, "swp00"),
+		m_lcdc(*this, "ks0066")
 	{ }
 
 	void psr340(machine_config &config);
@@ -44,21 +47,28 @@ protected:
 private:
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp00_device> m_swp00;
+	required_device<hd44780_device> m_lcdc;
+
+	void psr340_palette(palette_device &palette) const;
 
 	void psr340_map(address_map &map);
 	void psr340_io_map(address_map &map);
 
 	void lcd_ctrl_w(u8 data);
-	void lcd_data_w(u8 data);
 };
+
+void psr340_state::psr340_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
+}
+
 
 void psr340_state::lcd_ctrl_w(u8 data)
 {
 	// bit 3 = E, bit 4 = RS, R/W is connected to GND so write-only
-}
-
-void psr340_state::lcd_data_w(u8 data)
-{
+	m_lcdc->rs_w(BIT(4, data));
+	m_lcdc->e_w(BIT(3, data));
 }
 
 void psr340_state::psr340_map(address_map &map)
@@ -69,7 +79,7 @@ void psr340_state::psr340_map(address_map &map)
 	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC?
 
 	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
-	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
+	map(0xffe02b, 0xffe02b).w(m_lcdc, FUNC(hd44780_device::db_w));
 }
 
 void psr340_state::psr340_io_map(address_map &map)
@@ -93,6 +103,20 @@ void psr340_state::psr340(machine_config &config)
 	H8S2655(config, m_maincpu, 8467200);    // actual type unknown, clock from schematic
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr340_state::psr340_map);
 	m_maincpu->set_addrmap(AS_IO, &psr340_state::psr340_io_map);
+
+	KS0066_F05(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 40);
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
+	screen.set_size(6 * 40, 9 * 4);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(psr340_state::psr340_palette), 2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
