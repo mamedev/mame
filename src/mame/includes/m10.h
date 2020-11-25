@@ -44,7 +44,6 @@ public:
 	m10_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
-		m_rom(*this, "rom"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_chargen(*this, "chargen"),
@@ -75,7 +74,6 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_memory;
-	required_shared_ptr<uint8_t> m_rom;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_chargen;

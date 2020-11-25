@@ -520,7 +520,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 void m10_state::m10_main(address_map &map)
 {
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x1000, 0x2fff).rom();
 	map(0x4000, 0x43ff).ram().share("videoram");
 	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
 	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
@@ -535,7 +535,7 @@ void m10_state::m10_main(address_map &map)
 void m10_state::m11_main(address_map &map)
 {
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x1000, 0x2fff).rom();
 	map(0x4000, 0x43ff).ram().share("videoram");
 	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
 	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
@@ -550,7 +550,7 @@ void m10_state::m11_main(address_map &map)
 void m10_state::m15_main(address_map &map)
 {
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x33ff).rom().share("rom");
+	map(0x1000, 0x33ff).rom();
 	map(0x4000, 0x43ff).ram().share("videoram");
 	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
 	map(0x5000, 0x57ff).ram().w(FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
@@ -936,27 +936,6 @@ void m10_state::headoni(machine_config &config)
 	m_maincpu->set_clock(11730000/16);
 }
 
-/*************************************
- *
- *  Driver Initialization
- *
- *************************************/
-
-/*
- * Hacks to work around missing roms to get at least some
- * video output
- */
-void m10_state::init_andromed()
-{
-	for (int i = 0x1c00; i < 0x2000; i++)
-		m_rom[i] = 0x60;
-}
-
-void m10_state::init_ipminva1()
-{
-	for (int i = 0x1400; i < 0x17ff; i++)
-		m_rom[i] = 0x60;
-}
 
 /***************************************************************************
 
@@ -989,6 +968,7 @@ ROM_START( ipminvad1 )
 	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
 	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
+	ROM_FILL(         0x2400, 0x0400, 0x60)
 	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
@@ -1007,6 +987,7 @@ ROM_START( andromed ) // Jumps to an unmapped sub-routine at $2fc9
 	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
 	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
 	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
+	ROM_FILL(         0x2c00, 0x0400, 0x60)
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
@@ -1067,8 +1048,8 @@ ROM_START( greenber )
 ROM_END
 
 GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
-GAME( 1980, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump, export version known as simply "Andromeda"
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1980, andromed,  0,        m11,     skychut,  m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump, export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
