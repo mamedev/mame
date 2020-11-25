@@ -186,14 +186,11 @@ void tim100_state::tim100(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(600, 352);
-	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
+	screen.set_raw(9'600'000, 600, 0, 480, 320, 0, 272);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_tim100);
 
-	I8276(config, m_crtc, XTAL(4'915'200) / 12);
+	I8276(config, m_crtc, 800'000);
 	m_crtc->set_character_width(12);
 	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
