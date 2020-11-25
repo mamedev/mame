@@ -1796,6 +1796,29 @@ void galaxian_state::explorer_map(address_map &map)
 	map(0x9000, 0x9000).mirror(0x0fff).w(FUNC(galaxian_state::explorer_sound_control_w));
 }
 
+
+// map not derived from schematics
+void galaxian_state::astroamb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000, 0x6000).portr("IN0");
+	map(0x6004, 0x6007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800, 0x6800).portr("IN1");
+	map(0x6800, 0x6807).w("cust", FUNC(galaxian_sound_device::sound_w));
+	map(0x7000, 0x7000).portr("IN2");
+	map(0x7001, 0x7001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x7002, 0x7002).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x7003, 0x7003).w(FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x7004, 0x7004).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
+}
+
 /* map derived from schematics */
 void galaxian_state::scobra_map(address_map &map)
 {
@@ -4969,6 +4992,46 @@ static INPUT_PORTS_START( jungsub ) // TODO: are there more dip-switches?
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( astroamb )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "3")
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x00, "255 (Cheat)" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME(    0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(       0x01, DEF_STR( Upright ) )
+	PORT_DIPNAME(    0x06, 0x06, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(       0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(       0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( 1C_4C ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // PCB has 1 8-dip bank so one between 0x10 and 0x80 can't be. Arbitrarily choosing 0x80
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( strfbomb )
 	PORT_INCLUDE(scramble)
 
@@ -6606,6 +6669,15 @@ void galaxian_state::takeoff(machine_config &config) // Sidam 10900, with 1 x AY
 	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
 	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
 	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void galaxian_state::astroamb(machine_config &config)
+{
+	galaxian(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::astroamb_map);
+
+	// PCB only has discrete sound hardware, Galaxian-like
 }
 
 void galaxian_state::amigo2(machine_config &config) // marked "AMI", but similar to above
@@ -12325,6 +12397,23 @@ ROM_START( bomber )
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // q.9c on pcb
 ROM_END
 
+ROM_START( astroamb ) // ROMs verified on two different PCBs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.sub", 0x0000, 0x1000, CRC(99533fcd) SHA1(859414e70dcde452b1ddfc68e7bc3298c1a410ba) )
+	ROM_LOAD( "2.7h",  0x1000, 0x1000, CRC(45fd250d) SHA1(097c5ed58ebe58eb01fc337b401c10ce2cef7cef) )
+	ROM_LOAD( "3.7k",  0x2000, 0x1000, CRC(d67eedde) SHA1(7fc637664566034aff8d6800980434a3ff71bc72) )
+	ROM_LOAD( "4.7l",  0x3000, 0x1000, CRC(e4b038fd) SHA1(2a1ce890f7231c2f06b6ee1a8d4e97190b6265ed) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "a.1h", 0x0000, 0x0800, CRC(72e5ca44) SHA1(263b05f8607c325ac9d07e6d86b26de9a6907295) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(               0x0800 )
+	ROM_LOAD( "b.1l", 0x0800, 0x0800, CRC(d3846f2b) SHA1(57de9a2917bc92707408164c8e23cc2d3181bb0d) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(               0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6l", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
 ROM_START( scorpion )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.2d",         0x0000, 0x1000, CRC(ba1219b4) SHA1(33c7843dba44152a8bc3223ea0c30b13609b80ba) )
@@ -13480,6 +13569,7 @@ GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_
 GAME( 1981, scramblebun, scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Scramble (unknown bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
 GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)",    MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, astroamb,    scramble, astroamb,   astroamb,   galaxian_state, init_scramble,   ROT90,  "bootleg (U.C.E.)",                   "Astro Ambush (Scramble bootleg on Galaxian hardware)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // uses the same sound implementation as Galaxian, might differ
 
 GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )

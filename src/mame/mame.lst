@@ -14176,6 +14176,7 @@ armorcar                        // (c) 1981 Stern
 armorcar2                       // (c) 1981 Stern
 asideral                        // bootleg
 astrians                        //
+astroamb                        // bootleg
 ataqandr                        // bootleg (FAR S.A.)
 atlantis                        // (c) 1981 Comsoft
 atlantis2                       // (c) 1981 Comsoft
@@ -38401,7 +38402,7 @@ cdlyoko
 dnv200fs
 m505neo
 m521neo
-mywicodx                        
+mywicodx
 mywicogt
 oplayer
 zon32bit
@@ -38444,7 +38445,7 @@ zone100                         //
 lx_jg7415                       //
 lx_jg7410
 zonemini
-react                
+react
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
@@ -42765,7 +42766,7 @@ mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
 
 @source:ympsr340.cpp
-psr340							// 1999 PSR-340
+psr340                          // 1999 PSR-340
 
 @source:ymtx81z.cpp
 tx81z                           //

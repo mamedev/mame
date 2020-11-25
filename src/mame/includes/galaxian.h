@@ -353,12 +353,14 @@ public:
 	void scorpnmc(machine_config &config);
 	void fourplay(machine_config &config);
 	void videight(machine_config &config);
+	void astroamb(machine_config &config);
 
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
+	void astroamb_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
 	void checkman_sound_portmap(address_map &map);
