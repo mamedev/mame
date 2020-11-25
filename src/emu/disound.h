@@ -113,7 +113,7 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_sound_interface> sound_interface_iterator;
+typedef device_interface_enumerator<device_sound_interface> sound_interface_enumerator;
 
 
 
@@ -142,7 +142,7 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
+typedef device_interface_enumerator<device_mixer_interface> mixer_interface_enumerator;
 
 
 #endif // MAME_EMU_DISOUND_H

@@ -363,7 +363,7 @@ std::vector<std::reference_wrapper<const std::string>> mame_machine_manager::mis
 	assert(m_machine);
 
 	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(m_machine->root_device()))
+	for (device_image_interface &image : image_interface_enumerator(m_machine->root_device()))
 	{
 		if (image.must_be_loaded())
 		{
@@ -424,14 +424,20 @@ void emulator_info::sound_hook()
 	return mame_machine_manager::instance()->lua()->on_sound_update();
 }
 
-void emulator_info::layout_file_cb(util::xml::data_node const &layout)
+void emulator_info::layout_script_cb(layout_file &file, const char *script)
 {
-	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");
-	if (mamelayout)
+	// TODO: come up with a better way to pass multiple arguments to plugin
+	//mame_machine_manager::instance()->lua()->call_plugin_set("layout", std::make_tuple(&file, script->get_value()));
+	auto &lua(mame_machine_manager::instance()->lua()->sol());
+	sol::object obj = lua.registry()["cb_layout"];
+	if (obj.is<sol::protected_function>())
 	{
-		util::xml::data_node const *const script = mamelayout->get_child("script");
-		if (script)
-			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
+		auto res = obj.as<sol::protected_function>()(sol::make_reference(lua, &file), sol::make_reference(lua, script));
+		if (!res.valid())
+		{
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
+		}
 	}
 }
 

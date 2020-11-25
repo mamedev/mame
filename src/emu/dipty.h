@@ -37,6 +37,6 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_pty_interface> pty_interface_iterator;
+typedef device_interface_enumerator<device_pty_interface> pty_interface_enumerator;
 
 #endif // MAME_EMU_DIPTY_H

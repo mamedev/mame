@@ -145,7 +145,7 @@ void debug_view_memory::enumerate_sources()
 	m_source_list.reserve(machine().save().registration_count());
 
 	// first add all the devices' address spaces
-	for (device_memory_interface &memintf : memory_interface_iterator(machine().root_device()))
+	for (device_memory_interface &memintf : memory_interface_enumerator(machine().root_device()))
 	{
 		for (int spacenum = 0; spacenum < memintf.max_space_count(); ++spacenum)
 		{

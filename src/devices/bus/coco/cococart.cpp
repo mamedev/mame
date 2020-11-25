@@ -40,6 +40,19 @@
 #include "emu.h"
 #include "cococart.h"
 
+#include "coco_dcmodem.h"
+#include "coco_fdc.h"
+#include "coco_gmc.h"
+#include "coco_multi.h"
+#include "coco_orch90.h"
+#include "coco_pak.h"
+#include "coco_psg.h"
+#include "coco_ram.h"
+#include "coco_rs232.h"
+#include "coco_ssc.h"
+#include "coco_stecomp.h"
+#include "coco_sym12.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -648,4 +661,53 @@ address_space &device_cococart_interface::cartridge_space()
 void device_cococart_interface::set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value)
 {
 	owning_slot().set_line_value(line, value);
+}
+
+
+//-------------------------------------------------
+//  coco_cart_add_basic_devices
+//-------------------------------------------------
+
+void coco_cart_add_basic_devices(device_slot_interface &device)
+{
+	// basic devices, on both the main slot and the Multi-Pak interface
+	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
+	device.option_add("ccpsg", COCO_PSG);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add_internal("pak", COCO_PAK);
+	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("ssc", COCO_SSC);
+	device.option_add("stecomp", COCO_STEREO_COMPOSER);
+	device.option_add("sym12", COCO_SYM12);
+}
+
+
+//-------------------------------------------------
+//  coco_cart_add_fdcs
+//-------------------------------------------------
+
+void coco_cart_add_fdcs(device_slot_interface &device)
+{
+	// FDCs are optional because if they are on a Multi-Pak interface, they must
+	// be on Slot 4
+	device.option_add("cc2hdb1", COCO2_HDB1);
+	device.option_add("cc3hdb1", COCO3_HDB1);
+	device.option_add("cd6809_fdc", CD6809_FDC);
+	device.option_add("cp450_fdc", CP450_FDC);
+	device.option_add("fdc", COCO_FDC);
+	device.option_add("fdcv11", COCO_FDC_V11);
+}
+
+
+//-------------------------------------------------
+//  coco_cart_add_multi_pak
+//-------------------------------------------------
+
+void coco_cart_add_multi_pak(device_slot_interface &device)
+{
+	// and the Multi-Pak itself is optional because they cannot be daisy chained
+	device.option_add("multi", COCO_MULTIPAK);
 }

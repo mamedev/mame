@@ -1163,7 +1163,7 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 		return next_index;
 
 	auto win = d3d->assert_window();
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 	float xscale = 1.0f / screen_container.xscale();
@@ -1244,7 +1244,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	auto win = d3d->assert_window();
 
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 
@@ -1794,7 +1794,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int 
 //============================================================
 void shaders::enumerate_screens()
 {
-	screen_device_iterator iter(machine->root_device());
+	screen_device_enumerator iter(machine->root_device());
 	num_screens = iter.count();
 }
 
@@ -2336,7 +2336,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	const screen_device *first_screen = screen_device_iterator(machine->root_device()).first();;
+	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();;
 	if (first_screen == nullptr)
 	{
 		return;
@@ -2427,7 +2427,7 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
-	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
 
 	bool vector_screen =
 		first_screen != nullptr &&

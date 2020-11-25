@@ -422,7 +422,7 @@ u64 debugger_commands::execute_s32(int params, const u64 *param)
 
 u64 debugger_commands::get_cpunum()
 {
-	execute_interface_iterator iter(m_machine.root_device());
+	execute_interface_enumerator iter(m_machine.root_device());
 	return iter.indexof(m_console.get_visible_cpu()->execute());
 }
 
@@ -558,7 +558,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 
 	// attempt to find by numerical index
 	int index = 0;
-	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 	{
 		// real CPUs should have pcbase
 		const device_state_interface *state;
@@ -1074,7 +1074,7 @@ void debugger_commands::execute_focus(int ref, const std::vector<std::string> &p
 	cpu->debug()->ignore(false);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 		if (&exec.device() != cpu)
 			exec.device().debug()->ignore(true);
 	m_console.printf("Now focused on CPU '%s'\n", cpu->tag());
@@ -1093,7 +1093,7 @@ void debugger_commands::execute_ignore(int ref, const std::vector<std::string> &
 		std::string buffer;
 
 		/* loop over all executable devices */
-		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 
 			/* build up a comma-separated list */
 			if (!exec.device().debug()->observing())
@@ -1125,7 +1125,7 @@ void debugger_commands::execute_ignore(int ref, const std::vector<std::string> &
 		{
 			/* make sure this isn't the last live CPU */
 			bool gotone = false;
-			for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+			for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 				if (&exec.device() != devicelist[paramnum] && exec.device().debug()->observing())
 				{
 					gotone = true;
@@ -1156,7 +1156,7 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
 		std::string buffer;
 
 		/* loop over all executable devices */
-		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 
 			/* build up a comma-separated list */
 			if (exec.device().debug()->observing())
@@ -1204,7 +1204,7 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
 		std::string buffer;
 
 		/* loop over all executable devices */
-		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 
 			/* build up a comma-separated list */
 			if (exec.device().debug()->suspended())
@@ -1233,7 +1233,7 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
 		{
 			/* make sure this isn't the last live CPU */
 			bool gotone = false;
-			for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+			for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 				if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
 				{
 					gotone = true;
@@ -1263,7 +1263,7 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 		std::string buffer;
 
 		/* loop over all executable devices */
-		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 
 			/* build up a comma-separated list */
 			if (exec.device().debug()->suspended())
@@ -1303,7 +1303,7 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> &params)
 {
 	int index = 0;
-	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 	{
 		device_state_interface *state;
 		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
@@ -1462,7 +1462,7 @@ void debugger_commands::execute_bpclear(int ref, const std::vector<std::string> 
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->breakpoint_clear_all();
 		m_console.printf("Cleared all breakpoints\n");
 	}
@@ -1473,7 +1473,7 @@ void debugger_commands::execute_bpclear(int ref, const std::vector<std::string> 
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->breakpoint_clear(bpindex))
 				found = true;
 		if (found)
@@ -1496,7 +1496,7 @@ void debugger_commands::execute_bpdisenable(int ref, const std::vector<std::stri
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->breakpoint_enable_all(ref);
 		if (ref == 0)
 			m_console.printf("Disabled all breakpoints\n");
@@ -1510,7 +1510,7 @@ void debugger_commands::execute_bpdisenable(int ref, const std::vector<std::stri
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->breakpoint_enable(bpindex, ref))
 				found = true;
 		if (found)
@@ -1532,7 +1532,7 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 	std::string buffer;
 
 	/* loop over all CPUs */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 		if (!device.debug()->breakpoint_list().empty())
 		{
 			m_console.printf("Device '%s' breakpoints:\n", device.tag());
@@ -1621,7 +1621,7 @@ void debugger_commands::execute_wpclear(int ref, const std::vector<std::string> 
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->watchpoint_clear_all();
 		m_console.printf("Cleared all watchpoints\n");
 	}
@@ -1632,7 +1632,7 @@ void debugger_commands::execute_wpclear(int ref, const std::vector<std::string> 
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->watchpoint_clear(wpindex))
 				found = true;
 		if (found)
@@ -1655,7 +1655,7 @@ void debugger_commands::execute_wpdisenable(int ref, const std::vector<std::stri
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->watchpoint_enable_all(ref);
 		if (ref == 0)
 			m_console.printf("Disabled all watchpoints\n");
@@ -1669,7 +1669,7 @@ void debugger_commands::execute_wpdisenable(int ref, const std::vector<std::stri
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->watchpoint_enable(wpindex, ref))
 				found = true;
 		if (found)
@@ -1691,7 +1691,7 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 	std::string buffer;
 
 	/* loop over all CPUs */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
 			if (!device.debug()->watchpoint_vector(spacenum).empty())
 			{
@@ -1763,7 +1763,7 @@ void debugger_commands::execute_rpclear(int ref, const std::vector<std::string> 
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->registerpoint_clear_all();
 		m_console.printf("Cleared all registerpoints\n");
 	}
@@ -1774,7 +1774,7 @@ void debugger_commands::execute_rpclear(int ref, const std::vector<std::string> 
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->registerpoint_clear(rpindex))
 				found = true;
 		if (found)
@@ -1797,7 +1797,7 @@ void debugger_commands::execute_rpdisenable(int ref, const std::vector<std::stri
 	/* if 0 parameters, clear all */
 	if (params.empty())
 	{
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->registerpoint_enable_all(ref);
 		if (ref == 0)
 			m_console.printf("Disabled all registerpoints\n");
@@ -1811,7 +1811,7 @@ void debugger_commands::execute_rpdisenable(int ref, const std::vector<std::stri
 	else
 	{
 		bool found = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->registerpoint_enable(rpindex, ref))
 				found = true;
 		if (found)
@@ -1833,7 +1833,7 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 	std::string buffer;
 
 	/* loop over all CPUs */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 		if (!device.debug()->registerpoint_list().empty())
 		{
 			m_console.printf("Device '%s' registerpoints:\n", device.tag());
@@ -1867,7 +1867,7 @@ void debugger_commands::execute_hotspot(int ref, const std::vector<std::string> 
 		bool cleared = false;
 
 		/* loop over CPUs and find live spots */
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug()->hotspot_tracking_enabled())
 			{
 				device.debug()->hotspot_track(0, 0);
@@ -1919,7 +1919,7 @@ void debugger_commands::execute_stateload(int ref, const std::vector<std::string
 	m_machine.immediate_load(filename.c_str());
 
 	// clear all PC & memory tracks
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 	{
 		device.debug()->track_pc_data_clear();
 		device.debug()->track_mem_data_clear();
@@ -1937,7 +1937,7 @@ void debugger_commands::execute_rewind(int ref, const std::vector<std::string> &
 	bool success = m_machine.rewind_step();
 	if (success)
 		// clear all PC & memory tracks
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 		{
 			device.debug()->track_pc_data_clear();
 			device.debug()->track_mem_data_clear();
@@ -3657,7 +3657,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 		const char *filename = params[0].c_str();
 		int scrnum = (params.size() > 1) ? atoi(params[1].c_str()) : 0;
 
-		screen_device_iterator iter(m_machine.root_device());
+		screen_device_enumerator iter(m_machine.root_device());
 		screen_device *screen = iter.byindex(scrnum);
 
 		if ((screen == nullptr) || !m_machine.render().is_live(*screen))
@@ -3750,7 +3750,7 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	file = fopen(filename, "w");
 	if (file)
 	{
-		memory_interface_iterator iter(m_machine.root_device());
+		memory_interface_enumerator iter(m_machine.root_device());
 		for (device_memory_interface &memory : iter) {
 			for (int space = 0; space != memory.max_space_count(); space++)
 				if (memory.has_space(space))
@@ -3767,10 +3767,15 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 						for (memory_entry &entry : entries[mode])
 						{
 							if (octal)
-								fprintf(file, "%0*o - %0*o", nc, entry.start, nc, entry.end);
+								fprintf(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
 							else
-								fprintf(file, "%0*x - %0*x", nc, entry.start, nc, entry.end);
-							fprintf(file, ": %s\n", entry.entry->name().c_str());
+								fprintf(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
+							for(const auto &c : entry.context)
+								if(c.disabled)
+									fprintf(file, " %s[off]", c.view->name().c_str());
+								else
+									fprintf(file, " %s[%d]", c.view->name().c_str(), c.slot);
+							fprintf(file, " %s\n", entry.entry->name().c_str());
 						}
 						fprintf(file, "\n");
 					}
@@ -3866,7 +3871,7 @@ void debugger_commands::execute_hardreset(int ref, const std::vector<std::string
 
 void debugger_commands::execute_images(int ref, const std::vector<std::string> &params)
 {
-	image_interface_iterator iter(m_machine.root_device());
+	image_interface_enumerator iter(m_machine.root_device());
 	for (device_image_interface &img : iter)
 		m_console.printf("%s: %s\n", img.brief_instance_name(), img.exists() ? img.filename() : "[empty slot]");
 	if (iter.first() == nullptr)
@@ -3880,7 +3885,7 @@ void debugger_commands::execute_images(int ref, const std::vector<std::string> &
 void debugger_commands::execute_mount(int ref, const std::vector<std::string> &params)
 {
 	bool done = false;
-	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
+	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
 		if (img.brief_instance_name() == params[0])
 		{
@@ -3903,7 +3908,7 @@ void debugger_commands::execute_mount(int ref, const std::vector<std::string> &p
 void debugger_commands::execute_unmount(int ref, const std::vector<std::string> &params)
 {
 	bool done = false;
-	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
+	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
 		if (img.brief_instance_name() == params[0])
 		{

@@ -24,7 +24,7 @@
 #include "includes/megadriv_rad.h"
 
 // todo, use actual MD map, easier once maps are part of base class.
-void megadriv_radica_state::megadriv_radica_map(address_map &map)
+void megadriv_radica_state::megadriv_base_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).r(FUNC(megadriv_radica_state::read)); /* Cartridge Program Rom */
 	map(0xa00000, 0xa01fff).rw(FUNC(megadriv_radica_state::megadriv_68k_read_z80_ram), FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
@@ -34,9 +34,40 @@ void megadriv_radica_state::megadriv_radica_map(address_map &map)
 	map(0xa10000, 0xa1001f).rw(FUNC(megadriv_radica_state::megadriv_68k_io_read), FUNC(megadriv_radica_state::megadriv_68k_io_write));
 	map(0xa11100, 0xa11101).rw(FUNC(megadriv_radica_state::megadriv_68k_check_z80_bus), FUNC(megadriv_radica_state::megadriv_68k_req_z80_bus));
 	map(0xa11200, 0xa11201).w(FUNC(megadriv_radica_state::megadriv_68k_req_z80_reset));
-	map(0xa13000, 0xa130ff).r(FUNC(megadriv_radica_state::read_a13));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
+}
+
+void megadriv_radica_state::megadriv_radica_map(address_map &map)
+{
+	megadriv_base_map(map);
+	map(0xa13000, 0xa130ff).r(FUNC(megadriv_radica_state::read_a13));
+}
+
+uint16_t megadriv_dgunl_state::read_a16300(offs_t offset, uint16_t mem_mask)
+{
+	return 0x5a5a;
+}
+
+uint16_t megadriv_dgunl_state::read_a16302(offs_t offset, uint16_t mem_mask)
+{
+	return m_a1630a;
+}
+
+void megadriv_dgunl_state::write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_a1630a = data;
+	m_bank = (data & 0x07) * 8;
+}
+
+void megadriv_dgunl_state::megadriv_dgunl_map(address_map &map)
+{
+	megadriv_base_map(map);
+
+	map(0xa16300, 0xa16301).r(FUNC(megadriv_dgunl_state::read_a16300));
+	map(0xa16302, 0xa16303).r(FUNC(megadriv_dgunl_state::read_a16302));
+
+	map(0xa1630a, 0xa1630b).w(FUNC(megadriv_dgunl_state::write_a1630a));
 }
 
 uint16_t megadriv_radica_state::read(offs_t offset)
@@ -120,6 +151,17 @@ static INPUT_PORTS_START( megadriv_msi_6button )
 	PORT_START("UNK")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megadriv_dgunl_1player )
+	PORT_INCLUDE( megadriv_radica_3button )
+
+	PORT_MODIFY("PAD1") // the unit only has 2 buttons, A and C, strings are changed to remove references to C, even if behavior in Pac-Mania still exists and differs between them
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) // disable 'C'
+	//PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // disable 'A'
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 void megadriv_radica_6button_state::machine_start()
 {
 	md_base_state::machine_start();
@@ -142,6 +184,14 @@ void megadriv_radica_3button_state::machine_start()
 	md_base_state::machine_start();
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
+}
+
+
+void megadriv_dgunl_state::machine_start()
+{
+	megadriv_radica_3button_state::machine_start();
+	m_a1630a = 0;
+	save_item(NAME(m_a1630a));
 }
 
 void megadriv_radica_3button_state::machine_reset()
@@ -174,6 +224,11 @@ void megadriv_radica_6button_state::megadriv_radica_6button_ntsc(machine_config 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 }
 
+void megadriv_dgunl_state::megadriv_dgunl_ntsc(machine_config &config)
+{
+	md_ntsc(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_dgunl_state::megadriv_dgunl_map);
+}
 
 ROM_START( rad_sf2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -233,7 +288,15 @@ ROM_START( msi_sf2 )
 	// and is probably leftover from one of the multigame systems, hacked to only launch one game. We should emulate it...
 	// .. but the game ROM starts at 0xc8000 so we can cheat for now
 	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0xc8000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
-	ROM_CONTINUE(0x00000,0x338000) 
+	ROM_CONTINUE(0x00000,0x338000)
+ROM_END
+
+ROM_START( dgunl3227 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// populated in init function
+
+	ROM_REGION( 0x400000, "rom", 0 )
+	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
 ROM_END
 
 
@@ -251,6 +314,76 @@ void megadriv_radica_6button_state::init_megadriv_radica_6button_ntsc()
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+}
+
+void megadriv_dgunl_state::init_dgunl3227()
+{
+	uint8_t* rom = memregion("rom")->base();
+	uint8_t* dst = memregion("maincpu")->base();
+
+	int baseaddr, size, dstaddr;
+	//baseaddr = 0x200000; size = 0x40000; // unknown data (unused menu data maybe?)
+	//baseaddr = 0x240000; size = 0x20000; // 'sample' program with UWOL header later too (lower part of menu program)
+	//baseaddr = 0x260000; size = 0x20000; // pirate version of Columns with Sega text removed
+	//baseaddr = 0x280000; size = 0x20000; // Fatal Labyrinth
+	//baseaddr = 0x2a0000; size = 0x20000; // pirate version of Block Out with EA logo and text removed
+	//baseaddr = 0x2c0000; size = 0x20000; // Flicky
+	//baseaddr = 0x2e0000; size = 0x20000; // Shove It
+	//baseaddr = 0x300000; size = 0x40000; // pirate version of Space Invaders 90 with Taito logos and copyright removed (also upper part of menu program - has extra header + bits of code for '202 in 1' menu which has been hacked to run the 3-in-1 menu)
+
+	// the following 3 games are available to select from the menu on this system
+	//baseaddr = 0x340000; size = 0x40000; // Pac-Attack / Pac-Panic (used by this unit)
+	//baseaddr = 0x380000; size = 0x40000; // Pac-Mania (used by this unit)
+	//baseaddr = 0x3c0000; size = 0x40000; // Pac-Man (used by this unit) (2nd copy of header about halfway through?)
+
+	// copy 1st part of menu code
+	baseaddr = 0x240000;
+	size     = 0x020000;
+	dstaddr  = 0x000000;
+	for (int i = 0; i < size; i++)
+	{
+		dst[(i ^ 3) + dstaddr] = rom[baseaddr + i];
+	}
+
+	// copy 2nd part of menu code
+	baseaddr = 0x300000;
+	size =     0x040000;
+	dstaddr =  0x0c0000;
+	for (int i = 0; i < size; i++)
+	{
+		dst[(i ^ 3) + dstaddr] = rom[baseaddr + i];
+	}
+
+	// copy pac-panic to first bank
+	baseaddr = 0x340000;
+	size =     0x040000;
+	dstaddr =  0x100000;
+	for (int i = 0; i < size; i++)
+	{
+		dst[(i ^ 3) + dstaddr] = rom[baseaddr + i];
+	}
+
+	// copy pac-mania to 2nd bank
+	baseaddr = 0x380000;
+	size =     0x040000;
+	dstaddr =  0x180000;
+	for (int i = 0; i < size; i++)
+	{
+		dst[(i ^ 3) + dstaddr] = rom[baseaddr + i];
+	}
+
+	// copy pac-man to 3nd bank
+	baseaddr = 0x3c0000;
+	size =     0x040000;
+	dstaddr =  0x200000;
+	for (int i = 0; i < size; i++)
+	{
+		dst[(i ^ 3) + dstaddr] = rom[baseaddr + i];
+	}
+
+	// other data isn't copied because it's never referenced, therefore we don't know how it gets accessed
+
+	init_megadriv();
 }
 
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
@@ -285,3 +418,8 @@ CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radic
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
 CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+
+// this seems to have been hacked down from a larger multi-game unit, there are also a bunch of (unused?) pirate versions of MegaDrive / Genesis games in the ROM
+// this is the only 'Pocket Player' unit to use Genesis on a Chip tech, the others are NES on a chip.
+// some versions of this unit have an additional "Add Credits with 'A' or 'B'" screen after you select Pac-Man, this version does not.
+CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, megadriv_dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )

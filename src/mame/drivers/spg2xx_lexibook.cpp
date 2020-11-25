@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+// JungleTac developed systems sold by Performance Designed Products, Lexibook etc.
+// these are mostly handhelds with built in screens, and seem to be newer(?) revisions of the software
+// of note, the way the audio is stored for Tiger Rescue has been updated and the core does not handle it properly at the moment
+
 #include "emu.h"
 #include "includes/spg2xx.h"
 

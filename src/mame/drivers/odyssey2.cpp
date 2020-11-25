@@ -122,10 +122,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_cart(*this, "cartslot"),
 		m_keyboard(*this, "KEY.%u", 0),
 		m_joysticks(*this, "JOY.%u", 0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(palette_changed) { adjust_palette(); }
 
 	// Reset button is tied to 8048 RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
@@ -140,21 +143,15 @@ protected:
 	required_device<i8048_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<o2_cart_slot_device> m_cart;
-
-	u8 m_ram[0x80];
-	u8 m_p1 = 0xff;
-	u8 m_p2 = 0xff;
-
-	DECLARE_READ_LINE_MEMBER(t1_read);
-
-	void odyssey2_io(address_map &map);
-	void odyssey2_mem(address_map &map);
-
-	virtual void machine_start() override;
-
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void adjust_palette();
 
 	virtual u8 io_read(offs_t offset);
 	virtual void io_write(offs_t offset, u8 data);
@@ -162,6 +159,14 @@ protected:
 	void p1_write(u8 data);
 	u8 p2_read();
 	void p2_write(u8 data);
+	DECLARE_READ_LINE_MEMBER(t1_read);
+
+	void odyssey2_io(address_map &map);
+	void odyssey2_mem(address_map &map);
+
+	u8 m_ram[0x80];
+	u8 m_p1 = 0xff;
+	u8 m_p2 = 0xff;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -214,6 +219,11 @@ void odyssey2_state::machine_start()
 	save_item(NAME(m_p2));
 }
 
+void odyssey2_state::machine_reset()
+{
+	adjust_palette();
+}
+
 void vpp_state::machine_start()
 {
 	odyssey2_state::machine_start();
@@ -258,6 +268,13 @@ void odyssey2_state::odyssey2_palette(palette_device &palette) const
 	palette.set_pen_colors(0, odyssey2_colors);
 }
 
+void odyssey2_state::adjust_palette()
+{
+	if (ioport("CONF")->read() & 1)
+		m_i8244->i8244_palette(*m_palette);
+	else
+		odyssey2_palette(*m_palette);
+}
 
 u32 odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -321,6 +338,8 @@ u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
     I/O
 ******************************************************************************/
 
+// 8048 ports
+
 u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
@@ -345,9 +364,6 @@ void odyssey2_state::io_write(offs_t offset, u8 data)
 	if (!(m_p1 & 0x08))
 		m_i8244->write(offset, data);
 }
-
-
-// 8048 ports
 
 void odyssey2_state::p1_write(u8 data)
 {
@@ -587,6 +603,11 @@ static INPUT_PORTS_START( o2 )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, reset_button, 0)
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x00, "Color Output" ) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, palette_changed, 0)
+	PORT_CONFSETTING(    0x00, "Composite" )
+	PORT_CONFSETTING(    0x01, "RGB" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vpp )
@@ -786,7 +807,7 @@ void vpp_state::g7400(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", m_i8244, FUNC(i8244_device::i8244_palette), 16);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(vpp_state::i8243_port_w<0>));
@@ -836,9 +857,6 @@ void vpp_state::odyssey3(machine_config &config)
 	m_ef934x->set_offsets(15, 15);
 
 	m_maincpu->set_clock((7.15909_MHz_XTAL * 3) / 4);
-
-	// same color encoder as O2 (no RGB port)
-	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	subdevice<software_list_device>("cart_list")->set_filter("O3");
 }

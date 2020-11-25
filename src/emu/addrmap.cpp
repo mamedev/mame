@@ -19,39 +19,6 @@
 
 #define DETECT_OVERLAPPING_MEMORY   (0)
 
-/*-------------------------------------------------
-    core_i64_hex_format - i64 format printf helper
-    why isn't fatalerror going through the same
-    channels as logerror exactly?
--------------------------------------------------*/
-
-static char *core_i64_hex_format(u64 value, u8 mindigits)
-{
-	static char buffer[16][64];
-	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
-	static int index;
-	char *bufbase = &buffer[index++ % 16][0];
-	char *bufptr = bufbase;
-	s8 curdigit;
-
-	for (curdigit = 15; curdigit >= 0; curdigit--)
-	{
-		int nibble = (value >> (curdigit * 4)) & 0xf;
-		if (nibble != 0 || curdigit < mindigits)
-		{
-			mindigits = curdigit;
-			*bufptr++ = "0123456789ABCDEF"[nibble];
-		}
-	}
-	if (bufptr == bufbase)
-		*bufptr++ = '0';
-	*bufptr = 0;
-
-	return bufbase;
-}
-
-
-
 //**************************************************************************
 //  ADDRESS MAP ENTRY
 //**************************************************************************
@@ -201,6 +168,15 @@ address_map_entry &address_map_entry::m(device_t *device, address_map_constructo
 	return *this;
 }
 
+void address_map_entry::view(memory_view &mv)
+{
+	m_read.m_type = AMH_VIEW;
+	m_read.m_tag = nullptr;
+	m_write.m_type = AMH_VIEW;
+	m_write.m_tag = nullptr;
+	m_view = &mv;
+	mv.initialize_from_address_map(m_addrstart, m_addrend, m_map.get_config());
+}
 
 //-------------------------------------------------
 //  r/w/rw - handler setters for
@@ -787,6 +763,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 address_map::address_map(device_t &device, int spacenum)
 	: m_spacenum(spacenum),
 		m_device(&device),
+		m_view(nullptr),
 		m_unmapval(0),
 		m_globalmask(0)
 {
@@ -796,8 +773,8 @@ address_map::address_map(device_t &device, int spacenum)
 		throw emu_fatalerror("No memory interface defined for device '%s'\n", m_device->tag());
 
 	// and then the configuration for the current address space
-	const address_space_config *spaceconfig = memintf->space_config(spacenum);
-	if (spaceconfig == nullptr)
+	m_config = memintf->space_config(spacenum);
+	if (m_config == nullptr)
 		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", m_device->tag(), spacenum);
 
 	// append the map provided by the owner
@@ -809,8 +786,8 @@ address_map::address_map(device_t &device, int spacenum)
 	}
 
 	// construct the internal device map (last so it takes priority)
-	if (!spaceconfig->m_internal_map.isnull())
-		spaceconfig->m_internal_map(*this);
+	if (!m_config->m_internal_map.isnull())
+		m_config->m_internal_map(*this);
 }
 
 
@@ -822,6 +799,7 @@ address_map::address_map(device_t &device, int spacenum)
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
 		m_device(&device),
+		m_view(nullptr),
 		m_unmapval(0),
 		m_globalmask(0)
 {
@@ -839,10 +817,26 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 address_map::address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate)
 	: m_spacenum(space.spacenum()),
 		m_device(&device),
+		m_view(nullptr),
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {
 	(*this)(start, end).m(DEVICE_SELF, submap_delegate).umask64(unitmask).cswidth(cswidth);
+}
+
+
+//----------------------------------------------------------
+//  address_map - constructor memory view mapping case
+//----------------------------------------------------------
+
+address_map::address_map(memory_view &view)
+	: m_spacenum(-1),
+	  m_device(&view.m_device),
+	  m_view(&view),
+	  m_config(view.m_config),
+	  m_unmapval(0),
+	  m_globalmask(0)
+{
 }
 
 
@@ -981,7 +975,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 								subentry_ratio ++;
 						subentry_ratio = data_width / subentry_ratio;
 						if (ratio * subentry_ratio > data_width / 8)
-							fatalerror("import_submap: In range %x-%x mask %x mirror %x select %x of device %s, the import unitmask of %s combined with an entry unitmask of %s does not fit in %d bits.\n", subentry->m_addrstart, subentry->m_addrend, subentry->m_addrmask, subentry->m_addrmirror, subentry->m_addrselect, entry->m_read.m_tag, core_i64_hex_format(entry->m_mask, data_width/4), core_i64_hex_format(subentry->m_mask, data_width/4), data_width);
+							fatalerror("import_submap: In range %x-%x mask %x mirror %x select %x of device %s, the import unitmask of %0*x combined with an entry unitmask of %0*x does not fit in %d bits.\n", subentry->m_addrstart, subentry->m_addrend, subentry->m_addrmask, subentry->m_addrmirror, subentry->m_addrselect, entry->m_read.m_tag, data_width/4, entry->m_mask, data_width/4, subentry->m_mask, data_width);
 
 						// Regenerate the unitmask
 						u64 newmask = 0;
@@ -1181,7 +1175,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
-			for (device_t &dev : device_iterator(m_device->mconfig().root_device()))
+			for (device_t &dev : device_enumerator(m_device->mconfig().root_device()))
 			{
 				for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 				{
@@ -1393,4 +1387,9 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		if (entry.m_share != nullptr)
 			valid.validate_tag(entry.m_share);
 	}
+}
+
+const address_space_config &address_map::get_config() const
+{
+	return *m_config;
 }

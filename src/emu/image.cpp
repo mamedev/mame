@@ -30,7 +30,7 @@ image_manager::image_manager(running_machine &machine)
 	: m_machine(machine)
 {
 	// make sure that any required devices have been allocated
-	for (device_image_interface &image : image_interface_iterator(machine.root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine.root_device()))
 	{
 		// ignore things not user loadable
 		if (!image.user_loadable())
@@ -93,7 +93,7 @@ void image_manager::unload_all()
 	// extract the options
 	options_extract();
 
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		// unload this image
 		image.unload();
@@ -110,7 +110,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 
 			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
 			{
-				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
 					if (!strcmp(dev_instance, image.instance_name().c_str()))
 					{
@@ -134,7 +134,7 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	/* only care about game-specific data */
 	if (cfg_type == config_type::GAME)
 	{
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		{
 			const char *const dev_instance = image.instance_name().c_str();
 
@@ -182,7 +182,7 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 
 void image_manager::options_extract()
 {
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		// There are two scenarios where we want to extract the option:
 		//
@@ -230,7 +230,7 @@ void image_manager::options_extract()
 void image_manager::postdevice_init()
 {
 	/* make sure that any required devices have been allocated */
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		image_init_result result = image.finish_load();
 

@@ -79,7 +79,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (ui().found_machine_warnings())
 		item_append(_("Warning Information"), "", 0, (void *)WARN_INFO);
 
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		if (image.user_loadable())
 		{
@@ -91,22 +91,22 @@ void menu_main::populate(float &customtop, float &custombottom)
 		}
 	}
 
-	if (cassette_device_iterator(machine().root_device()).first() != nullptr)
+	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Tape Control"), "", 0, (void *)TAPE_CONTROL);
 
-	if (pty_interface_iterator(machine().root_device()).first() != nullptr)
+	if (pty_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Pseudo terminals"), "", 0, (void *)PTY_INFO);
 
 	if (ui().machine_info().has_bioses())
 		item_append(_("BIOS Selection"), "", 0, (void *)BIOS_SELECTION);
 
-	if (slot_interface_iterator(machine().root_device()).first() != nullptr)
+	if (slot_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Slot Devices"), "", 0, (void *)SLOT_DEVICES);
 
-	if (barcode_reader_device_iterator(machine().root_device()).first() != nullptr)
+	if (barcode_reader_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Barcode Reader"), "", 0, (void *)BARCODE_READ);
 
-	if (network_interface_iterator(machine().root_device()).first() != nullptr)
+	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
 	if (machine().ioport().natkeyboard().keyboard_count())

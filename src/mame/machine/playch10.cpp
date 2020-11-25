@@ -343,7 +343,11 @@ void playch10_state::pc10_set_videorom_bank( int first, int count, int bank, int
 	/* yeah, this is probably a horrible assumption to make.*/
 	/* but the driver is 100% consistant */
 
-	len = memregion("gfx2")->bytes();
+	if (memregion("gfx2"))   // playch10 bios doesn't have gfx2
+		len = memregion("gfx2")->bytes();
+	else
+		len = memregion("gfx1")->bytes();
+
 	len /= 0x400;   // convert to KB
 	len /= size;    // convert to bank resolution
 	len--;          // convert to mask

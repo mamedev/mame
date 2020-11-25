@@ -1762,7 +1762,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
@@ -2085,9 +2085,11 @@ ROM_END
 
 
 ROM_START( argusg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
 	ROM_LOAD( "arg_ram2_2732.c7",         0x1000, 0x1000, CRC(5d35b83e) SHA1(5a1c3b2ae138d5509b8daaf03036f000bd09d0fc) )
 	ROM_LOAD( "arg_ram4_2732.c9c10",      0x2000, 0x1000, CRC(7180e823) SHA1(47124925d863b9b3784c0c990d4a4344e8d09372) )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "arg_rom4_2764.c16",        0x6000, 0x2000, CRC(2f48bd78) SHA1(b625a03b5a4989b67d5180fca7e9f6b7a24e6d2c) )
 	ROM_LOAD( "arg_rom3_2764.c14c15",     0x8000, 0x2000, CRC(4dc2914c) SHA1(8ca0fd2ce1fc9f00afd30a638ff2f8787ef7e3d4) )
 	ROM_LOAD( "arg_rom2_2764.c13c14",     0xa000, 0x2000, CRC(b5e9ee77) SHA1(dbdc176e3ca6be17b78eb98c07d5a9b5eaa28ba1) )

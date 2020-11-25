@@ -212,7 +212,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 	// iterate over devices and regions
 	std::vector<std::string> searchpath;
-	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
+	for (device_t &device : device_enumerator(m_enumerator.config()->root_device()))
 	{
 		searchpath.clear();
 
@@ -400,7 +400,7 @@ media_auditor::summary media_auditor::audit_samples()
 	std::size_t found = 0;
 
 	// iterate over sample entries
-	for (samples_device &device : samples_device_iterator(m_enumerator.config()->root_device()))
+	for (samples_device &device : samples_device_enumerator(m_enumerator.config()->root_device()))
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);

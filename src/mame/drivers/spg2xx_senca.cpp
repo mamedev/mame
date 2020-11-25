@@ -83,6 +83,7 @@ public:
 
 	void init_oplayer();
 	void init_m505neo();
+	void init_cdlyoko();
 
 protected:
 	virtual uint16_t porta_r() override;
@@ -884,6 +885,14 @@ ROM_START( oplayer )
 	ROM_LOAD16_WORD_SWAP( "oplayer.bin", 0x0000000, 0x4000000, CRC(aa09c358) SHA1(df2855cdfdf2b693636cace8768e579b9d5bc657) )
 ROM_END
 
+ROM_START( cdlyoko ) // P1-25IN1-MAIN-V11 2011.05.09 on PCB
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "clg001z.u2", 0x0000000, 0x1000000, CRC(1e73b910) SHA1(6f6cece054fcf91ff78962358804471794c58615) )
+	ROM_RELOAD(0x1000000,0x1000000)
+	ROM_RELOAD(0x2000000,0x1000000)
+	ROM_RELOAD(0x3000000,0x1000000)
+ROM_END
+
 ROM_START( dnv200fs )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "famsport200in1.u2", 0x0000000, 0x8000000, CRC(f59221e2) SHA1(d532cf5a80ffe9d527efcccbf380a7a860f0fbd9) )
@@ -984,6 +993,25 @@ void oplayer_100in1_state::init_m505neo()
 	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank
 }
 
+void oplayer_100in1_state::init_cdlyoko()
+{
+	uint16_t* rom16 = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	std::vector<u16> buffer(size / 2);
+
+	for (int i = 0; i < size / 2; i++)
+	{
+		buffer[bitswap<25>(i, 0x18, 0x17, 0x16, 0x15, 0x13, 0x8, 0x12, 0x11, 0x14, 0x10, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0)] = rom16[i];
+	}
+
+	std::copy(buffer.begin(), buffer.end(), &rom16[0]);
+
+	// patch a startup check, like oplayer
+	for (int i = 0; i < 4; i++)
+		rom16[0x493ed + ((0x1000000 * i) / 2)] = 0xf165;
+}
+
 
 void denver_200in1_state::init_denver()
 {
@@ -1019,10 +1047,11 @@ CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,   
 // Shows Mi Guitar 2 in the menu, it seems likely that there was an earlier version on VT1682 hardware as there is a very similar Guitar game (with the same song selection) in those multigames
 CONS( 200?, mywicogt,  0, 0, zon32bit, mywicogt, mywicogt_state,  empty_init,      "<unknown> / Senca",                                   "My Wico Guitar", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// issues with 'low battery' always showing, but otherwise functional
 CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer / Senca", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2012, m505neo,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH / Senca", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2011, cdlyoko,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_cdlyoko, "Ingo Devices SL / Senca", "Code Lyoko (25-in-1 handheld)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // a version of this exists with the 'newer' style title screen seen in m505neo
 CONS( 2012, m521neo,   0, 0, zon32bit_bat, oplayer, denver_200in1_state,  init_m521neo, "Millennium 2000 GmbH / Senca", "Millennium M521 Arcade Neo 2.0 (Family Sport 220-in-1) ", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

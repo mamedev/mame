@@ -566,7 +566,7 @@ void output_footer(std::ostream &out)
 void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes)
 {
 	machine_config config(driver, drivlist.options());
-	device_iterator iter(config.root_device());
+	device_enumerator iter(config.root_device());
 
 	// allocate input ports and build overall emulation status
 	ioport_list portlist;
@@ -685,7 +685,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 {
 	bool has_speaker = false, has_input = false;
 	// check if the device adds speakers to the system
-	sound_interface_iterator snditer(device);
+	sound_interface_enumerator snditer(device);
 	if (snditer.first() != nullptr)
 		has_speaker = true;
 
@@ -694,7 +694,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	std::string errors;
 	device_t::feature_type overall_unemulated(device.type().unemulated_features());
 	device_t::feature_type overall_imperfect(device.type().imperfect_features());
-	for (device_t &dev : device_iterator(device))
+	for (device_t &dev : device_enumerator(device))
 	{
 		portlist.append(dev, errors);
 		overall_unemulated |= dev.type().unemulated_features();
@@ -762,7 +762,7 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 				}
 
 				// notify this device and all its subdevices that they are now configured
-				for (device_t &device : device_iterator(*dev))
+				for (device_t &device : device_enumerator(*dev))
 					if (!device.configured())
 						device.config_complete();
 
@@ -791,7 +791,7 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 
 void output_device_refs(std::ostream &out, device_t &root)
 {
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
 			out << util::string_format("\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
 }
@@ -805,7 +805,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 void output_sampleof(std::ostream &out, device_t &device)
 {
 	// iterate over sample devices
-	for (samples_device &samples : samples_device_iterator(device))
+	for (samples_device &samples : samples_device_enumerator(device))
 	{
 		samples_iterator sampiter(samples);
 		if (sampiter.altbasename() != nullptr)
@@ -990,7 +990,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 void output_sample(std::ostream &out, device_t &device)
 {
 	// iterate over sample devices
-	for (samples_device &samples : samples_device_iterator(device))
+	for (samples_device &samples : samples_device_enumerator(device))
 	{
 		samples_iterator iter(samples);
 		std::unordered_set<std::string> already_printed;
@@ -1015,7 +1015,7 @@ void output_sample(std::ostream &out, device_t &device)
 void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 {
 	// iterate over executable devices
-	for (device_execute_interface &exec : execute_interface_iterator(device))
+	for (device_execute_interface &exec : execute_interface_enumerator(device))
 	{
 		if (strcmp(exec.device().tag(), device.tag()))
 		{
@@ -1032,7 +1032,7 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 	}
 
 	// iterate over sound devices
-	for (device_sound_interface &sound : sound_interface_iterator(device))
+	for (device_sound_interface &sound : sound_interface_enumerator(device))
 	{
 		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
 		{
@@ -1059,7 +1059,7 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
-	for (const screen_device &screendev : screen_device_iterator(device))
+	for (const screen_device &screendev : screen_device_enumerator(device))
 	{
 		if (strcmp(screendev.tag(), device.tag()))
 		{
@@ -1144,11 +1144,11 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 
 void output_sound(std::ostream &out, device_t &device)
 {
-	speaker_device_iterator spkiter(device);
+	speaker_device_enumerator spkiter(device);
 	int speakers = spkiter.count();
 
 	// if we have no sound, zero m_output the speaker count
-	sound_interface_iterator snditer(device);
+	sound_interface_enumerator snditer(device);
 	if (snditer.first() == nullptr)
 		speakers = 0;
 
@@ -1851,7 +1851,7 @@ void output_features(std::ostream &out, device_type type, device_t::feature_type
 
 void output_images(std::ostream &out, device_t &device, const char *root_tag)
 {
-	for (const device_image_interface &imagedev : image_interface_iterator(device))
+	for (const device_image_interface &imagedev : image_interface_enumerator(device))
 	{
 		if (strcmp(imagedev.device().tag(), device.tag()))
 		{
@@ -1912,7 +1912,7 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
-	for (device_slot_interface &slot : slot_interface_iterator(device))
+	for (device_slot_interface &slot : slot_interface_enumerator(device))
 	{
 		// shall we list fixed slots as non-configurable?
 		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
@@ -1936,7 +1936,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 						dev->config_complete();
 
 					if (devtypes)
-						for (device_t &subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
+						for (device_t &subdevice : device_enumerator(*dev)) devtypes->insert(&subdevice.type());
 
 					if (listed && option.second->selectable())
 					{
@@ -1965,7 +1965,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 void output_software_lists(std::ostream &out, device_t &root, const char *root_tag)
 {
-	for (const software_list_device &swlist : software_list_device_iterator(root))
+	for (const software_list_device &swlist : software_list_device_enumerator(root))
 	{
 		if (&static_cast<const device_t &>(swlist) == &root)
 		{
@@ -1992,7 +1992,7 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 
 void output_ramoptions(std::ostream &out, device_t &root)
 {
-	for (const ram_device &ram : ram_device_iterator(root, 1))
+	for (const ram_device &ram : ram_device_enumerator(root, 1))
 	{
 		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
 		{

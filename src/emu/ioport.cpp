@@ -1675,7 +1675,7 @@ time_t ioport_manager::initialize()
 	init_port_types();
 
 	// if we have a token list, proceed
-	device_iterator iter(machine().root_device());
+	device_enumerator iter(machine().root_device());
 	for (device_t &device : iter)
 	{
 		std::string errors;

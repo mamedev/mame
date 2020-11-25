@@ -59,7 +59,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
   - Inputs notes :
 
-      * COINx don't work correcly : see "cshooter_coin_r" read handler.
+      * COINx don't work correctly : see "cshooter_coin_r" read handler.
     * In game, bits 3 and 4 of 0xc202 ("START") are tested,
         while bits 4 and 5 are tested in the "test mode".
       * Pressing STARTx while in game adds lives (depending on the
@@ -159,6 +159,8 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "speaker.h"
 
 
+namespace {
+
 class airraid_state : public driver_device
 {
 public:
@@ -190,7 +192,6 @@ private:
 	void cshooter_c500_w(uint8_t data);
 	void cshooter_c700_w(uint8_t data);
 	void bank_w(uint8_t data);
-	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 
 	void airraid_map(address_map &map);
@@ -212,11 +213,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
 
 	if(scanline == 250) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
-}
-
-
-MACHINE_RESET_MEMBER(airraid_state,cshooter)
-{
 }
 
 void airraid_state::cshooter_c500_w(uint8_t data)
@@ -627,6 +623,9 @@ void airraid_state::init_cshootere()
 	init_cshooter();
 
 }
+
+} // Anonymous namespace
+
 
 // There's also an undumped International Games version
 GAME( 1987, cshooter, airraid, airraid_crypt, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

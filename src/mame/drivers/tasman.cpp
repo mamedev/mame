@@ -33,6 +33,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define CUSTOM_DRAW 1
 
 class kongambl_state : public driver_device
@@ -57,6 +59,10 @@ public:
 
 	void init_kingtut();
 
+protected:
+	virtual void machine_reset() override { m_irq_mask = 0; };
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
@@ -76,10 +82,8 @@ private:
 	uint32_t test_r();
 	// uint32_t rng_r();
 
-	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
-	virtual void machine_reset() override { m_irq_mask = 0; };
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	WRITE_LINE_MEMBER(hblank_irq_ack_w);
@@ -92,7 +96,7 @@ private:
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start()
 {
 	#if CUSTOM_DRAW
 
@@ -669,8 +673,6 @@ void kongambl_state::kongambl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
-
 	K055555(config, m_k055555, 0);
 
 	K055673(config, m_k055673, 0);
@@ -827,6 +829,9 @@ void kongambl_state::init_kingtut()
 	//rom[0x2acd0/4] = (rom[0x2acd0/4] & 0xffff) | 0x6612<<16; // patch OBJ ROM checks
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
+
+} // Anonymous namespace
+
 
 GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

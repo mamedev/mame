@@ -350,7 +350,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 	// validate the interrupts
 	if (!m_vblank_interrupt.isnull())
 	{
-		screen_device_iterator iter(device().mconfig().root_device());
+		screen_device_enumerator iter(device().mconfig().root_device());
 		if (iter.first() == nullptr)
 			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
 		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
@@ -379,7 +379,7 @@ void device_execute_interface::interface_pre_start()
 	m_driver_irq.resolve();
 
 	// fill in the initial states
-	int const index = device_iterator(device().machine().root_device()).indexof(*this);
+	int const index = device_enumerator(device().machine().root_device()).indexof(*this);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;

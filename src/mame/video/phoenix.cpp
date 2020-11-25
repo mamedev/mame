@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(phoenix_state,phoenix)
+void phoenix_state::video_start()
 {
 	m_videoram_pg[0] = std::make_unique<uint8_t[]>(0x1000);
 	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(uint8_t));

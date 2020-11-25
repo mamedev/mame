@@ -40,7 +40,8 @@ enum map_handler_type
 	AMH_DEVICE_DELEGATE_SMO,
 	AMH_PORT,
 	AMH_BANK,
-	AMH_DEVICE_SUBMAP
+	AMH_DEVICE_SUBMAP,
+	AMH_VIEW
 };
 
 
@@ -184,6 +185,8 @@ public:
 	address_map_entry &m(const char *tag, address_map_constructor func);
 	address_map_entry &m(device_t *device, address_map_constructor func);
 
+	// view initialization
+	void view(memory_view &mv);
 
 	// implicit base -> delegate converter
 	template <typename T, typename Ret, typename... Params>
@@ -404,6 +407,7 @@ public:
 
 	device_t               *m_submap_device;
 	address_map_constructor m_submap_delegate;
+	memory_view            *m_view;
 
 	// information used during processing
 	void *                  m_memory;               // pointer to memory backing this entry
@@ -477,6 +481,7 @@ class address_map
 public:
 	// construction/destruction
 	address_map(device_t &device, int spacenum);
+	address_map(memory_view &view);
 	address_map(device_t &device, address_map_entry *entry);
 	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate);
 	~address_map();
@@ -492,12 +497,15 @@ public:
 	// public data
 	int                             m_spacenum;     // space number of the map
 	device_t *                      m_device;       // associated device
+	memory_view *                   m_view;         // view, when in one
+	const address_space_config *    m_config;       // space configuration
 	u8                              m_unmapval;     // unmapped memory value
 	offs_t                          m_globalmask;   // global mask
 	simple_list<address_map_entry>  m_entrylist;    // list of entries
 
 	void import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian, int addr_shift);
 	void map_validity_check(validity_checker &valid, int spacenum) const;
+	const address_space_config &get_config() const;
 };
 
 #endif // MAME_EMU_ADDRMAP_H

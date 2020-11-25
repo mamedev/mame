@@ -186,13 +186,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 }
 
 
-MACHINE_START_MEMBER(badlands_state,badlands)
+void badlands_state::machine_start()
 {
 	save_item(NAME(m_pedal_value));
 }
 
 
-MACHINE_RESET_MEMBER(badlands_state,badlands)
+void badlands_state::machine_reset()
 {
 	m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
@@ -432,9 +432,6 @@ void badlands_state::badlands(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &badlands_state::audio_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(badlands_state::sound_scanline), "screen", 0, 1);
 
-	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
-	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
-
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -457,8 +454,6 @@ void badlands_state::badlands(machine_config &config)
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(badlands_state::screen_update_badlands));
 	m_screen->set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
 	GENERIC_LATCH_8(config, m_soundlatch);

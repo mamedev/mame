@@ -550,7 +550,7 @@ private:
 DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 
 // iterator helper
-typedef device_type_iterator<screen_device> screen_device_iterator;
+typedef device_type_enumerator<screen_device> screen_device_enumerator;
 
 /*!
  @defgroup Screen device configuration functions

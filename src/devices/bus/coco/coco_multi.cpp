@@ -57,16 +57,6 @@
 #include "coco_multi.h"
 
 #include "cococart.h"
-#include "coco_dcmodem.h"
-#include "coco_fdc.h"
-#include "coco_gmc.h"
-#include "coco_orch90.h"
-#include "coco_pak.h"
-#include "coco_ram.h"
-#include "coco_rs232.h"
-#include "coco_ssc.h"
-#include "coco_stecomp.h"
-#include "coco_sym12.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -163,32 +153,13 @@ namespace
 
 static void coco_cart_slot1_3(device_slot_interface &device)
 {
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("stecomp", COCO_STEREO_COMPOSER);
-	device.option_add("sym12", COCO_SYM12);
+	coco_cart_add_basic_devices(device);
 }
+
 static void coco_cart_slot4(device_slot_interface &device)
 {
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("cc2hdb1", COCO2_HDB1);
-	device.option_add("cc3hdb1", COCO3_HDB1);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("fdcv11", COCO_FDC_V11);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("stecomp", COCO_STEREO_COMPOSER);
-	device.option_add("sym12", COCO_SYM12);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
 }
 
 
