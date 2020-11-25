@@ -1932,7 +1932,6 @@ void lua_engine::initialize()
 				option_table[index++] = ext;
 			return option_table;
 		}));
-	sol().registry().set("format", format_type);
 
 
 /*  mame_machine_manager library
