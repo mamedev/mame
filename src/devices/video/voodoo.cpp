@@ -5724,7 +5724,7 @@ void voodoo_device::device_start()
 
 	/* set the type, and initialize the chip mask */
 	index = 0;
-	for (device_t &scan : device_iterator(machine().root_device()))
+	for (device_t &scan : device_enumerator(machine().root_device()))
 		if (scan.type() == this->type())
 		{
 			if (&scan == this)

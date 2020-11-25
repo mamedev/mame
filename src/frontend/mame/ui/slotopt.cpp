@@ -115,7 +115,7 @@ void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char 
 
 void menu_slot_devices::record_current_options()
 {
-	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
+	for (device_slot_interface &slot : slot_interface_enumerator(m_config->root_device()))
 	{
 		// we're doing this out of a desire to honor user-selectable options; therefore it only
 		// makes sense to record values for selectable options
@@ -177,7 +177,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 	m_config = std::make_unique<machine_config>(machine().system(), machine().options());
 
 	// cycle through all devices for this system
-	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
+	for (device_slot_interface &slot : slot_interface_enumerator(m_config->root_device()))
 	{
 		// does this slot have any selectable options?
 		bool has_selectable_options = slot.has_selectable_options();

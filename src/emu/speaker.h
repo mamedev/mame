@@ -90,7 +90,7 @@ protected:
 
 
 // speaker device iterator
-using speaker_device_iterator = device_type_iterator<speaker_device>;
+using speaker_device_enumerator = device_type_enumerator<speaker_device>;
 
 
 #endif // MAME_EMU_SPEAKER_H

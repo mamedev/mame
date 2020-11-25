@@ -331,6 +331,6 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_image_interface> image_interface_iterator;
+typedef device_interface_enumerator<device_image_interface> image_interface_enumerator;
 
 #endif  /* MAME_EMU_DIIMAGE_H */

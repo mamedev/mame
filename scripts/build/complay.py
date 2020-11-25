@@ -299,6 +299,16 @@ class LayoutChecker(Minifyer):
         self.have_color.append({ })
 
     def checkViewItem(self, name, attrs):
+        if 'id' in attrs:
+            if not attrs['id']:
+                self.handleError('Element %s attribute id is empty' % (name, ))
+            elif not self.VARPATTERN.match(attrs['id']):
+                if attrs['id'] in self.item_ids:
+                    self.handleError('Element %s has duplicate id "%s" (previous %s)' % (name, attrs['id'], self.item_ids[attrs['id']]))
+                else:
+                    self.item_ids[attrs['id']] = self.formatLocation()
+                if self.repeat_depth[-1]:
+                    self.handleError('Element %s attribute id "%s" in repeat contains no parameter references' % (name, attrs['id']))
         if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
             self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
         if 'inputtag' in attrs:
@@ -340,6 +350,7 @@ class LayoutChecker(Minifyer):
                     long(attrs['version'])
                 except:
                     self.handleError('Element mamelayout attribute version "%s" is not an integer' % (attrs['version'], ))
+            self.have_script = None
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
             self.handlers.append((self.layoutStartHandler, self.layoutEndHandler))
@@ -379,6 +390,7 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
             self.have_bounds.append(None)
         elif ('view' == name) and (not self.repeat_depth[-1]):
@@ -389,9 +401,10 @@ class LayoutChecker(Minifyer):
                 if attrs['name'] not in self.views:
                     self.views[attrs['name']] = self.formatLocation()
                 elif not self.VARPATTERN.match(attrs['name']):
-                    self.handleError('Element view has duplicate name (previous %s)' % (self.views[attrs['name']], ))
+                    self.handleError('Element view has duplicate name "%s" (previous %s)' % (attrs['name'], self.views[attrs['name']]))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
             self.have_bounds.append(None)
         elif 'repeat' == name:
@@ -407,6 +420,10 @@ class LayoutChecker(Minifyer):
             self.checkParameter(attrs)
             self.ignored_depth = 1
         elif ('script' == name) and (not self.repeat_depth[-1]):
+            if self.have_script is None:
+                self.have_script = self.formatLocation()
+            else:
+                self.handleError('Duplicate script element (previous %s)' % (self.have_script, ))
             self.ignored_depth = 1
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
@@ -427,6 +444,7 @@ class LayoutChecker(Minifyer):
                         self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             if not self.views:
                 self.handleError('No view elements found')
+            del self.have_script
             self.handlers.pop()
 
     def elementStartHandler(self, name, attrs):
@@ -602,6 +620,7 @@ class LayoutChecker(Minifyer):
         elif self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
+            del self.item_ids
             self.current_collections = None
             self.repeat_depth.pop()
             self.have_bounds.pop()

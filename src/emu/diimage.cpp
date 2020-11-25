@@ -1260,7 +1260,7 @@ void device_image_interface::update_names()
 	// count instances of the general image type, or device type if custom
 	int count = 0;
 	int index = -1;
-	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
+	for (const device_image_interface &image : image_interface_enumerator(device().mconfig().root_device()))
 	{
 		if (this == &image)
 			index = count;
@@ -1302,7 +1302,7 @@ const software_part *device_image_interface::find_software_item(const std::strin
 		: nullptr;
 
 	// find the software list if explicitly specified
-	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
+	for (software_list_device &swlistdev : software_list_device_enumerator(device().mconfig().root_device()))
 	{
 		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{

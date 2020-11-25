@@ -82,7 +82,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 {
 	ioport_list local_ports;
 	std::string sink;
-	for (device_t &device : device_iterator(config.root_device()))
+	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// the "no sound hardware" warning doesn't make sense when you plug in a sound card
 		if (dynamic_cast<device_sound_interface *>(&device))
@@ -343,7 +343,7 @@ std::string machine_info::game_info_string() const
 			core_filename_extract_base(m_machine.system().type.source()));
 
 	// loop over all CPUs
-	execute_interface_iterator execiter(m_machine.root_device());
+	execute_interface_enumerator execiter(m_machine.root_device());
 	std::unordered_set<std::string> exectags;
 	for (device_execute_interface &exec : execiter)
 	{
@@ -382,7 +382,7 @@ std::string machine_info::game_info_string() const
 	}
 
 	// loop over all sound chips
-	sound_interface_iterator snditer(m_machine.root_device());
+	sound_interface_enumerator snditer(m_machine.root_device());
 	std::unordered_set<std::string> soundtags;
 	bool found_sound = false;
 	for (device_sound_interface &sound : snditer)
@@ -426,7 +426,7 @@ std::string machine_info::game_info_string() const
 
 	// display screen information
 	buf << _("\nVideo:\n");
-	screen_device_iterator scriter(m_machine.root_device());
+	screen_device_enumerator scriter(m_machine.root_device());
 	int scrcount = scriter.count();
 	if (scrcount == 0)
 		buf << _("None\n");
@@ -468,7 +468,7 @@ std::string machine_info::game_info_string() const
 
 std::string machine_info::get_screen_desc(screen_device &screen) const
 {
-	if (screen_device_iterator(m_machine.root_device()).count() > 1)
+	if (screen_device_enumerator(m_machine.root_device()).count() > 1)
 		return string_format(_("Screen '%1$s'"), screen.tag());
 	else
 		return _("Screen");
@@ -543,7 +543,7 @@ void menu_image_info::populate(float &customtop, float &custombottom)
 	item_append(machine().system().type.fullname(), "", FLAG_DISABLE, nullptr);
 	item_append("", "", FLAG_DISABLE, nullptr);
 
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
 }
 

@@ -607,7 +607,7 @@ void sdl_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_iterator(machine().root_device()).byindex(m_index);
+				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(m_index);
 				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else

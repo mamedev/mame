@@ -787,7 +787,7 @@ void device_scheduler::rebuild_execute_list()
 	device_execute_interface **suspend_tailptr = &suspend_list;
 
 	// iterate over all devices
-	for (device_execute_interface &exec : execute_interface_iterator(machine().root_device()))
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
 	{
 		// append to the appropriate list
 		exec.m_nextexec = nullptr;

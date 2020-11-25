@@ -197,6 +197,7 @@ class output_manager;
 // declared in render.h
 class layout_element;
 class layout_view;
+class layout_file;
 class render_container;
 class render_manager;
 class render_target;

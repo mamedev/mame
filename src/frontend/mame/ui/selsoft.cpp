@@ -254,7 +254,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 	// FIXME: why does it do this relatively expensive operation every time?
 	machine_config config(m_driver, machine().options());
-	for (device_image_interface &image : image_interface_iterator(config.root_device()))
+	for (device_image_interface &image : image_interface_enumerator(config.root_device()))
 	{
 		if (!image.filename() && image.must_be_loaded())
 		{
@@ -351,7 +351,7 @@ void menu_select_software::build_software_list()
 		bool operator()(std::size_t a, std::size_t b) const { return swinfo[a].parentname < swinfo[b].parentname; };
 	};
 	orphan_less const orphan_cmp{ m_swinfo };
-	for (software_list_device &swlist : software_list_device_iterator(config.root_device()))
+	for (software_list_device &swlist : software_list_device_enumerator(config.root_device()))
 	{
 		m_filter_data.add_list(swlist.list_name(), swlist.description());
 		check_for_icons(swlist.list_name().c_str());
@@ -381,7 +381,7 @@ void menu_select_software::build_software_list()
 			{
 				char const *instance_name(nullptr);
 				char const *type_name(nullptr);
-				for (device_image_interface &image : image_interface_iterator(config.root_device()))
+				for (device_image_interface &image : image_interface_enumerator(config.root_device()))
 				{
 					char const *const interface = image.image_interface();
 					if (interface && part.matches_interface(interface))

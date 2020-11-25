@@ -95,7 +95,7 @@ bool finder_base::validate_memregion(bool required) const
 	std::string const region_fulltag(m_base.get().subtag(m_tag));
 
 	// look for the region
-	for (device_t const &dev : device_iterator(m_base.get().mconfig().root_device()))
+	for (device_t const &dev : device_enumerator(m_base.get().mconfig().root_device()))
 	{
 		for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 		{

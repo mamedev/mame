@@ -302,9 +302,8 @@ memory_manager::~memory_manager()
 void memory_manager::initialize()
 {
 	// loop over devices and spaces within each device
-	memory_interface_iterator iter(machine().root_device());
 	std::vector<device_memory_interface *> memories;
-	for (device_memory_interface &memory : iter)
+	for (device_memory_interface &memory : memory_interface_enumerator(machine().root_device()))
 	{
 		memories.push_back(&memory);
 		allocate(memory);

@@ -198,7 +198,7 @@ void ui_gfx_init(running_machine &machine)
 static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
 	// count the palette devices
-	state.palette.devcount = palette_interface_iterator(machine.root_device()).count();
+	state.palette.devcount = palette_interface_enumerator(machine.root_device()).count();
 
 	// set the pointer to the first palette
 	if (state.palette.devcount > 0)
@@ -206,7 +206,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 
 	// count the gfx devices
 	state.gfxset.devcount = 0;
-	for (device_gfx_interface &interface : gfx_interface_iterator(machine.root_device()))
+	for (device_gfx_interface &interface : gfx_interface_enumerator(machine.root_device()))
 	{
 		// count the gfx sets in each device, skipping devices with none
 		uint8_t count = 0;
@@ -371,7 +371,7 @@ cancel:
 
 static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 {
-	palette_interface_iterator pal_iter(machine.root_device());
+	palette_interface_enumerator pal_iter(machine.root_device());
 	state.palette.interface = pal_iter.byindex(state.palette.devindex);
 }
 
@@ -1337,7 +1337,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 	{
 		state.bitmap.fill(0);
 		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-		screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
+		screen_device *first_screen = screen_device_enumerator(machine.root_device()).first();
 		if (first_screen)
 		{
 			tilemap->draw_debug(*first_screen, state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);

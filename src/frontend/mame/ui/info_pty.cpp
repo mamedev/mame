@@ -30,7 +30,7 @@ void menu_pty_info::populate(float &customtop, float &custombottom)
 	item_append(_("Pseudo terminals"), "", FLAG_DISABLE, nullptr);
 	item_append("", "", FLAG_DISABLE, nullptr);
 
-	for (device_pty_interface &pty : pty_interface_iterator(machine().root_device()))
+	for (device_pty_interface &pty : pty_interface_enumerator(machine().root_device()))
 	{
 		const char *port_name = pty.device().owner()->tag() + 1;
 		if (pty.is_open())

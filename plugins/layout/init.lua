@@ -13,17 +13,24 @@ local layout = exports
 
 function layout.startplugin()
 	local scripts = {}
-	local function prepare_layout(script)
-		local env = { machine = manager:machine(), pairs = pairs, ipairs = ipairs,
-				  table = { insert = table.insert, remove = table.remove } }
+	local function prepare_layout(file, script)
+		local env = {
+			machine = manager:machine(),
+			file = file,
+			print = print,
+			pairs = pairs,
+			ipairs = ipairs,
+			string = { format = string.format },
+			table = { insert = table.insert, remove = table.remove } }
 		local script, err = load(script, script, "t", env)
 		if not script then
 			emu.print_verbose("error loading layout script " .. err)
 			return
 		end
-		local name
-		script, name = script()
-		scripts[name] = script
+		local hooks = script()
+		if hooks ~= nil then
+			table.insert(scripts, hooks)
+		end
 	end
 
 	emu.register_callback(prepare_layout, "layout")

@@ -1175,7 +1175,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
-			for (device_t &dev : device_iterator(m_device->mconfig().root_device()))
+			for (device_t &dev : device_enumerator(m_device->mconfig().root_device()))
 			{
 				for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 				{

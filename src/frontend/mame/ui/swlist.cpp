@@ -18,6 +18,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -355,7 +356,7 @@ void menu_software::populate(float &customtop, float &custombottom)
 	bool have_compatible = false;
 
 	// Add original software lists for this system
-	software_list_device_iterator iter(machine().config().root_device());
+	software_list_device_enumerator iter(machine().config().root_device());
 	for (software_list_device &swlistdev : iter)
 		if (swlistdev.is_original())
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)

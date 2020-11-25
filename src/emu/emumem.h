@@ -1658,7 +1658,7 @@ public:
 	handler_entry *unmap_w() const { return m_unmap_w; }
 	handler_entry *nop_r() const { return m_nop_r; }
 	handler_entry *nop_w() const { return m_nop_w; }
-	
+
 protected:
 	// internal helpers
 	virtual std::pair<void *, void *> get_cache_info() = 0;

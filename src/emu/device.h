@@ -1008,13 +1008,13 @@ private:
 };
 
 
-// ======================> device_iterator
+// ======================> device_enumerator
 
 // helper class to iterate over the hierarchy of devices depth-first
-class device_iterator
+class device_enumerator
 {
 public:
-	class auto_iterator
+	class iterator
 	{
 	public:
 		typedef std::ptrdiff_t difference_type;
@@ -1024,7 +1024,7 @@ public:
 		typedef std::forward_iterator_tag iterator_category;
 
 		// construction
-		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
+		iterator(device_t *devptr, int curdepth, int maxdepth)
 			: m_curdevice(devptr)
 			, m_curdepth(curdepth)
 			, m_maxdepth(maxdepth)
@@ -1036,12 +1036,12 @@ public:
 		int depth() const { return m_curdepth; }
 
 		// required operator overrides
-		bool operator==(auto_iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
-		bool operator!=(auto_iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
+		bool operator==(iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
+		bool operator!=(iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
 		device_t &operator*() const { assert(m_curdevice); return *m_curdevice; }
 		device_t *operator->() const { return m_curdevice; }
-		auto_iterator &operator++() { advance(); return *this; }
-		auto_iterator operator++(int) { auto_iterator const result(*this); ++*this; return result; }
+		iterator &operator++() { advance(); return *this; }
+		iterator operator++(int) { iterator const result(*this); ++*this; return result; }
 
 	protected:
 		// search depth-first for the next device
@@ -1082,18 +1082,17 @@ public:
 		}
 
 		// protected state
-		device_t *      m_curdevice;
-		int             m_curdepth;
-		const int       m_maxdepth;
+		device_t *  m_curdevice;
+		int         m_curdepth;
+		int         m_maxdepth;
 	};
 
 	// construction
-	device_iterator(device_t &root, int maxdepth = 255)
-		: m_root(root), m_maxdepth(maxdepth) { }
+	device_enumerator(device_t &root, int maxdepth = 255) : m_root(root), m_maxdepth(maxdepth) { }
 
 	// standard iterators
-	auto_iterator begin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
-	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
+	iterator begin() const { return iterator(&m_root, 0, m_maxdepth); }
+	iterator end() const { return iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
 	device_t *first() const { return begin().current(); }
@@ -1135,32 +1134,31 @@ public:
 
 private:
 	// internal state
-	device_t &      m_root;
-	int             m_maxdepth;
+	device_t &  m_root;
+	int         m_maxdepth;
 };
 
 
-// ======================> device_type_iterator
+// ======================> device_type_enumerator
 
 // helper class to find devices of a given type in the device hierarchy
 template <class DeviceType, class DeviceClass = DeviceType>
-class device_type_iterator
+class device_type_enumerator
 {
 public:
-	class auto_iterator : protected device_iterator::auto_iterator
+	class iterator : protected device_enumerator::iterator
 	{
 	public:
-		using device_iterator::auto_iterator::difference_type;
-		using device_iterator::auto_iterator::iterator_category;
-		using device_iterator::auto_iterator::depth;
+		using device_enumerator::iterator::difference_type;
+		using device_enumerator::iterator::iterator_category;
+		using device_enumerator::iterator::depth;
 
 		typedef DeviceClass value_type;
 		typedef DeviceClass *pointer;
 		typedef DeviceClass &reference;
 
 		// construction
-		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
-			: device_iterator::auto_iterator(devptr, curdepth, maxdepth)
+		iterator(device_t *devptr, int curdepth, int maxdepth) : device_enumerator::iterator(devptr, curdepth, maxdepth)
 		{
 			// make sure the first device is of the specified type
 			while (m_curdevice && (m_curdevice->type().type() != typeid(DeviceType)))
@@ -1168,8 +1166,8 @@ public:
 		}
 
 		// required operator overrides
-		bool operator==(auto_iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
-		bool operator!=(auto_iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
+		bool operator==(iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
+		bool operator!=(iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
 
 		// getters returning specified device type
 		DeviceClass *current() const { return downcast<DeviceClass *>(m_curdevice); }
@@ -1177,25 +1175,23 @@ public:
 		DeviceClass *operator->() const { return downcast<DeviceClass *>(m_curdevice); }
 
 		// search for devices of the specified type
-		auto_iterator &operator++()
+		iterator &operator++()
 		{
-			advance();
-			while (m_curdevice && (m_curdevice->type().type() != typeid(DeviceType)))
-				advance();
+			do { advance(); } while (m_curdevice && (m_curdevice->type().type() != typeid(DeviceType)));
 			return *this;
 		}
 
-		auto_iterator operator++(int) { auto_iterator const result(*this); ++*this; return result; }
+		iterator operator++(int) { iterator const result(*this); ++*this; return result; }
 	};
 
 	// construction
-	device_type_iterator(device_t &root, int maxdepth = 255) : m_root(root), m_maxdepth(maxdepth) { }
+	device_type_enumerator(device_t &root, int maxdepth = 255) : m_root(root), m_maxdepth(maxdepth) { }
 
 	// standard iterators
-	auto_iterator begin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
-	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
-	auto_iterator cbegin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
-	auto_iterator cend() const { return auto_iterator(nullptr, 0, m_maxdepth); }
+	iterator begin() const { return iterator(&m_root, 0, m_maxdepth); }
+	iterator end() const { return iterator(nullptr, 0, m_maxdepth); }
+	iterator cbegin() const { return iterator(&m_root, 0, m_maxdepth); }
+	iterator cend() const { return iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
 	DeviceClass *first() const { return begin().current(); }
@@ -1233,20 +1229,19 @@ private:
 };
 
 
-// ======================> device_interface_iterator
+// ======================> device_interface_enumerator
 
 // helper class to find devices with a given interface in the device hierarchy
 // also works for finding devices derived from a given subclass
-template<class InterfaceClass>
-class device_interface_iterator
+template <class InterfaceClass>
+class device_interface_enumerator
 {
 public:
-	class auto_iterator : public device_iterator::auto_iterator
+	class iterator : public device_enumerator::iterator
 	{
-public:
+	public:
 		// construction
-		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
-			: device_iterator::auto_iterator(devptr, curdepth, maxdepth)
+		iterator(device_t *devptr, int curdepth, int maxdepth) : device_enumerator::iterator(devptr, curdepth, maxdepth)
 		{
 			// set the iterator for the first device with the interface
 			find_interface();
@@ -1257,14 +1252,15 @@ public:
 		InterfaceClass &operator*() const { assert(m_interface != nullptr); return *m_interface; }
 
 		// search for devices with the specified interface
-		const auto_iterator &operator++() { advance(); find_interface(); return *this; }
+		const iterator &operator++() { advance(); find_interface(); return *this; }
+		iterator operator++(int) { iterator const result(*this); ++*this; return result; }
 
-private:
+	private:
 		// private helper
 		void find_interface()
 		{
 			// advance until finding a device with the interface
-			for ( ; m_curdevice != nullptr; advance())
+			for ( ; m_curdevice; advance())
 				if (m_curdevice->interface(m_interface))
 					return;
 
@@ -1276,14 +1272,12 @@ private:
 		InterfaceClass *m_interface;
 	};
 
-public:
 	// construction
-	device_interface_iterator(device_t &root, int maxdepth = 255)
-		: m_root(root), m_maxdepth(maxdepth) { }
+	device_interface_enumerator(device_t &root, int maxdepth = 255) : m_root(root), m_maxdepth(maxdepth) { }
 
 	// standard iterators
-	auto_iterator begin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
-	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
+	iterator begin() const { return iterator(&m_root, 0, m_maxdepth); }
+	iterator end() const { return iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
 	InterfaceClass *first() const { return begin().current(); }
@@ -1390,4 +1384,4 @@ inline device_t::interface_list::auto_iterator device_t::interface_list::auto_it
 }
 
 
-#endif  /* MAME_EMU_DEVICE_H */
+#endif // MAME_EMU_DEVICE_H
