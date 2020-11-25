@@ -470,7 +470,7 @@ void favorite_manager::apply_running_machine(running_machine &machine, T &&actio
 	else
 	{
 		bool have_software(false);
-		for (device_image_interface &image_dev : image_interface_iterator(machine.root_device()))
+		for (device_image_interface &image_dev : image_interface_enumerator(machine.root_device()))
 		{
 			software_info const *const sw(image_dev.software_entry());
 			if (image_dev.exists() && image_dev.loaded_through_softlist() && sw)

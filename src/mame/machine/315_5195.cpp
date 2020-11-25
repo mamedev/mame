@@ -286,6 +286,31 @@ void sega_315_5195_mapper_device::map_as_ram(u32 offset, u32 length, offs_t mirr
 
 
 //-------------------------------------------------
+//  map_as_region - map a region as ROM, with an
+//  optional write handler
+//-------------------------------------------------
+
+void sega_315_5195_mapper_device::map_as_region(u32 offset, u32 length, offs_t mirror, const char *region_name, write16_delegate whandler)
+{
+	// determine parameters
+	region_info info;
+	compute_region(info, m_curregion, length, mirror, offset);
+	LOG("Map %06X-%06X (%06X) as REGION(%s) with handler=%s\n", info.start, info.end, info.mirror, region_name,
+		whandler.isnull() ? "none" : whandler.name());
+
+	// map now
+	m_space->install_rom(info.start, info.end, info.mirror, owner()->memregion(region_name)->base());
+
+	// either install a write handler or a write bank, as appropriate
+	if (!whandler.isnull())
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
+
+	// clear this rom bank reference
+	m_banks[m_curregion].clear();
+}
+
+
+//-------------------------------------------------
 //  map_as_handler - map a region as a pair of
 //  read write handlers
 //-------------------------------------------------

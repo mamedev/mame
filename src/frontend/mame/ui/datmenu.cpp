@@ -24,6 +24,7 @@
 
 
 namespace ui {
+
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
@@ -36,7 +37,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	, m_issoft(false)
 
 {
-	for (device_image_interface& image : image_interface_iterator(mui.machine().root_device()))
+	for (device_image_interface& image : image_interface_enumerator(mui.machine().root_device()))
 	{
 		if (image.filename())
 		{

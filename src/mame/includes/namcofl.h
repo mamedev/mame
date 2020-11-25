@@ -38,6 +38,10 @@ public:
 
 	void driver_init() override;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 2> m_mainbank;
@@ -88,9 +92,6 @@ private:
 	uint8_t dac1_r();
 	uint8_t dac0_r();
 	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_MACHINE_START(namcofl);
-	DECLARE_MACHINE_RESET(namcofl);
-	DECLARE_VIDEO_START(namcofl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);

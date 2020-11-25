@@ -153,15 +153,15 @@ void s11c_state::s11c(machine_config &config)
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
-	m_pia28->writepb_handler().set(FUNC(s11b_state::dig1_w));
+	m_pia28->writepb_handler().set(FUNC(s11c_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
 	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
 	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
 	PIA6821(config, m_pia2c, 0);
-	m_pia2c->writepa_handler().set(FUNC(s11b_state::pia2c_pa_w));
-	m_pia2c->writepb_handler().set(FUNC(s11b_state::pia2c_pb_w));
+	m_pia2c->writepa_handler().set(FUNC(s11c_state::pia2c_pa_w));
+	m_pia2c->writepb_handler().set(FUNC(s11c_state::pia2c_pb_w));
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
@@ -174,7 +174,7 @@ void s11c_state::s11c(machine_config &config)
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
 	PIA6821(config, m_pia34, 0);
-	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
+	m_pia34->writepa_handler().set(FUNC(s11c_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
 	m_pia34->cb2_handler().set(FUNC(s11b_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));

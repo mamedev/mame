@@ -355,12 +355,12 @@ void specpls3_state::plus3_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-MACHINE_RESET_MEMBER(specpls3_state,spectrum_plus3)
+void specpls3_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	spectrum_state::machine_reset();
 
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
@@ -411,8 +411,6 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 	m_screen->set_refresh_hz(50.01);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
-
-	MCFG_MACHINE_RESET_OVERRIDE(specpls3_state, spectrum_plus3 )
 
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

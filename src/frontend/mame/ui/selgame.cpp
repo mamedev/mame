@@ -790,7 +790,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		enumerator.next();
 
 		// if there are software entries, show a software selection menu
-		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
 		{
 			if (!swlistdev.get_info().empty())
 			{
@@ -863,7 +863,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		enumerator.next();
 
 		// if there are software entries, show a software selection menu
-		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
 		{
 			if (!swlistdev.get_info().empty())
 			{

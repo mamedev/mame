@@ -340,6 +340,6 @@ public:
 };
 
 // iterator
-typedef device_interface_iterator<device_execute_interface> execute_interface_iterator;
+typedef device_interface_enumerator<device_execute_interface> execute_interface_enumerator;
 
 #endif // MAME_EMU_DIEXEC_H

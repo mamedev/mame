@@ -200,13 +200,15 @@ void ceres1_state::wfc_command(u8 command)
 	case 2:
 		LOG("read sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
+		if (hdf)
+			hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 3:
 		LOG("write sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
+		if (hdf)
+			hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 4:

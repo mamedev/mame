@@ -117,6 +117,8 @@ files {
 	MAME_DIR .. "src/emu/emucore.h",
 	MAME_DIR .. "src/emu/emumem.cpp",
 	MAME_DIR .. "src/emu/emumem.h",
+	MAME_DIR .. "src/emu/emumem_aspace.cpp",
+	MAME_DIR .. "src/emu/emumem_mview.cpp",
 	MAME_DIR .. "src/emu/emumem_mud.cpp",
 	MAME_DIR .. "src/emu/emumem_mud.h",
 	MAME_DIR .. "src/emu/emumem_hea.h",

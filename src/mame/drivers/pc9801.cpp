@@ -632,7 +632,7 @@ uint8_t pc9801_state::f0_r(offs_t offset)
 	if(offset == 0)
 	{
 		// iterate thru all devices to check if an AMD98 is present
-		for (pc9801_amd98_device &amd98 : device_type_iterator<pc9801_amd98_device>(machine().root_device()))
+		for (pc9801_amd98_device &amd98 : device_type_enumerator<pc9801_amd98_device>(machine().root_device()))
 		{
 			logerror("Read AMD98 ID %s\n",amd98.tag());
 			return 0x18; // return the right ID

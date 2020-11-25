@@ -17,15 +17,15 @@
     submenu listing available devices of the same kind.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_DEVCTRL_H
 #define MAME_FRONTEND_UI_DEVCTRL_H
+
+#pragma once
 
 #include "ui/menu.h"
 
 namespace ui {
+
 template<class DeviceType>
 class menu_device_control : public menu
 {
@@ -43,8 +43,8 @@ protected:
 	uint32_t current_display_flags();
 
 private:
-	// device iterator
-	typedef device_type_iterator<DeviceType> iterator;
+	// device enumerator
+	typedef device_type_enumerator<DeviceType> enumerator;
 
 	DeviceType *    m_device;
 	int             m_count;
@@ -59,7 +59,7 @@ template<class DeviceType>
 menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, render_container &container, DeviceType *device)
 	: menu(mui, container)
 {
-	iterator iter(mui.machine().root_device());
+	enumerator iter(mui.machine().root_device());
 	m_count = iter.count();
 	m_device = device ? device : iter.first();
 }
@@ -72,7 +72,7 @@ menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, rende
 template<class DeviceType>
 int menu_device_control<DeviceType>::current_index()
 {
-	iterator iter(machine().root_device());
+	enumerator iter(machine().root_device());
 	return iter.indexof(*m_device);
 }
 
@@ -87,7 +87,7 @@ void menu_device_control<DeviceType>::previous()
 	// left arrow - rotate left through cassette devices
 	if (m_device != nullptr)
 	{
-		iterator iter(machine().root_device());
+		enumerator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
 		if (index > 0)
 			index--;
@@ -108,7 +108,7 @@ void menu_device_control<DeviceType>::next()
 	// right arrow - rotate right through cassette devices
 	if (m_device != nullptr)
 	{
-		iterator iter(machine().root_device());
+		enumerator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
 		if (index < m_count - 1)
 			index++;
@@ -154,4 +154,4 @@ uint32_t menu_device_control<DeviceType>::current_display_flags()
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_DEVCTRL_H */
+#endif // MAME_FRONTEND_UI_DEVCTRL_H

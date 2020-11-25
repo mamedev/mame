@@ -5146,7 +5146,7 @@ ROM_END
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 (ISA/VL to PCI bridge) + VT82C496G (system chipset) + VT82C406MV (keyboard controller, RTC, CMOS), NS311/312 or NS332 I/O
 ROM_START( ficpio2 )
-	ROM_REGION32_LE(0x40000, "isa", 0)
+	ROM_REGION32_LE(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("ficpio2c1")
 	// 0
 	ROM_SYSTEM_BIOS(0, "ficpio2c7", "FIC 486-PIO-2 1.15C701") /* pnp, i/o core: NS 332, doesn't boot, requires cache emulation? */

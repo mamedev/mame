@@ -121,6 +121,7 @@ binbug.cpp
 bitel.cpp
 bitgraph.cpp
 bk.cpp
+blit.cpp
 blw700i.cpp
 bmjr.cpp
 bml3.cpp
@@ -222,6 +223,7 @@ debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+design.cpp
 dfs500.cpp
 dg680.cpp
 dgn_beta.cpp
@@ -932,6 +934,7 @@ spg2xx_pdc.cpp
 spg2xx_playvision.cpp
 spg2xx_senario.cpp
 spg2xx_senario_poker.cpp
+spg2xx_senca.cpp
 spg2xx_shredmjr.cpp
 spg2xx_skannerztv.cpp
 spg2xx_smarttv.cpp
@@ -940,7 +943,6 @@ spg2xx_tvgogo.cpp
 spg2xx_vii.cpp
 spg2xx_wiwi.cpp
 spg2xx_zone.cpp
-spg2xx_zone_32bit.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
@@ -1140,6 +1142,7 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp
 z100.cpp

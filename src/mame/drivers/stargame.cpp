@@ -19,6 +19,8 @@
 #include "machine/watchdog.h"
 
 
+namespace {
+
 class stargame_state : public genpin_class
 {
 public:
@@ -31,9 +33,11 @@ public:
 
 	void stargame(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	void rint_w(uint8_t data);
-	DECLARE_MACHINE_RESET(stargame);
 
 	void audiocpu_io(address_map &map);
 	void audiocpu_map(address_map &map);
@@ -91,7 +95,7 @@ void stargame_state::rint_w(uint8_t data)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-MACHINE_RESET_MEMBER( stargame_state, stargame )
+void stargame_state::machine_reset()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // doesn't do anything? cpu should be stuck in reset until allowed to start by SRESET line
 }
@@ -114,8 +118,6 @@ void stargame_state::stargame(machine_config &config)
 	Z80(config, m_audiocpu, 15000000 / 3); // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stargame_state::audiocpu_map);
 	m_audiocpu->set_addrmap(AS_IO, &stargame_state::audiocpu_io);
-
-	MCFG_MACHINE_RESET_OVERRIDE(stargame_state, stargame)
 
 	/* video hardware */
 	//config.set_default_layout();
@@ -160,6 +162,8 @@ ROM_START(whtforce)
 	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("sound.bin", 0x0000, 0x4000, CRC(4b2a1580) SHA1(62133fd186b1aab4f5aecfbff8151ba416328021))
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1986, spcship,  0, stargame, stargame, stargame_state, empty_init, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )

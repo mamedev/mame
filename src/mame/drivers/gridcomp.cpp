@@ -83,7 +83,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
@@ -95,6 +94,8 @@
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 #define I80130_TAG      "osp"
 
@@ -122,7 +123,9 @@ public:
 	void grid1109(machine_config &config);
 	void grid1101(machine_config &config);
 
-	void init_gridcomp();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -133,9 +136,6 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
-
-	DECLARE_MACHINE_START(gridcomp);
-	DECLARE_MACHINE_RESET(gridcomp);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -165,7 +165,7 @@ private:
 };
 
 
-uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
+[[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -276,12 +276,7 @@ uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 
 	return screen_update_generic(screen, bitmap, cliprect, 512);
 }
 
-
-void gridcomp_state::init_gridcomp()
-{
-}
-
-MACHINE_START_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -290,7 +285,7 @@ MACHINE_START_MEMBER(gridcomp_state, gridcomp)
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
 }
 
-MACHINE_RESET_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_reset()
 {
 	m_kbd_ready = false;
 }
@@ -357,9 +352,6 @@ void gridcomp_state::grid1101(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1101_map);
 	m_maincpu->set_addrmap(AS_IO, &gridcomp_state::grid1101_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(gridcomp_state::irq_callback));
-
-	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
-	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
@@ -609,6 +601,8 @@ ROM_START( grid1139 )
 	ROMX_LOAD("1139even.bin", 0x0000, 0x2000, CRC(67071849) SHA1(782239c155fa5821f8dbd2607cee9152d175e90e), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
+
+} // Anonymous namespace
 
 
 /***************************************************************************

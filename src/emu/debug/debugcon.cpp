@@ -68,10 +68,10 @@ debugger_console::debugger_console(running_machine &machine)
 	register_command("condump", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_console::execute_condump, this, _1, _2));
 
 	/* first CPU is visible by default */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 	{
 		auto *cpu = dynamic_cast<cpu_device *>(&device);
-		if (cpu != nullptr)
+		if (cpu)
 		{
 			m_visiblecpu = cpu;
 			break;

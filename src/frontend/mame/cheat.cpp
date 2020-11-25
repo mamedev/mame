@@ -1146,7 +1146,7 @@ void cheat_manager::reload()
 
 	// load the cheat file, if it's a system that has a software list then try softlist_name/shortname.xml first,
 	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml )
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		if (image.exists())
 		{
