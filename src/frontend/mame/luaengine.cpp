@@ -1011,7 +1011,7 @@ void lua_engine::initialize()
  */
 
 	auto emu_options_type = sol().registry().new_usertype<emu_options>("new", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
-	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return &opts.slot_option(name); });
+	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return opts.find_slot_option(name); });
 	sol().registry().set("emu_options", emu_options_type);
 
 /*  slot_option library
@@ -1173,7 +1173,7 @@ void lua_engine::initialize()
 	machine_type["ioport"] = &running_machine::ioport;
 	machine_type["parameters"] = &running_machine::parameters;
 	machine_type["memory"] = &running_machine::memory;
-	machine_type["options"] = [] (running_machine &m) { return static_cast<core_options *>(&m.options()); };
+	machine_type["options"] = &running_machine::options;
 	machine_type["outputs"] = &running_machine::output;
 	machine_type["input"] = &running_machine::input;
 	machine_type["uiinput"] = &running_machine::ui_input;
