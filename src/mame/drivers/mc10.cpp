@@ -37,17 +37,27 @@ namespace
 class mc10_state : public driver_device
 {
 public:
-	mc10_state(const machine_config &mconfig, device_type type, const char *tag);
+	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_mc6847(*this, "mc6847")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_cassette(*this, "cassette")
+		, m_rs232(*this, "rs232")
+		, m_pb(*this, "pb%u", 0U)
+		{ }
 
 	void alice90(machine_config &config);
 	void alice32(machine_config &config);
 	void mc10(machine_config &config);
 
+protected:
 	uint8_t mc10_bfff_r();
 	void mc10_bfff_w(uint8_t data);
-
-protected:
-	required_device<m6803_cpu_device> m_maincpu;
 
 	uint8_t mc10_port1_r();
 	void mc10_port1_w(uint8_t data);
@@ -63,6 +73,7 @@ protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
 
+	required_device<m6803_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -90,7 +101,20 @@ private:
 class mcx128_state : public mc10_state
 {
 public:
-	mcx128_state(const machine_config &mconfig, device_type type, const char *tag);
+	mcx128_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mc10_state(mconfig, type, tag)
+		, m_mcx_ram(*this, "mcx_ram")
+		, m_mcx_cart_rom_base(*this, "cart")
+		, m_mcx_int_rom_base(*this, "maincpu")
+		, m_bank3(*this, "bank3")
+		, m_bank4r(*this, "bank4r")
+		, m_bank4w(*this, "bank4w")
+		, m_bank5r(*this, "bank5r")
+		, m_bank5w(*this, "bank5w")
+		, m_bank6r(*this, "bank6r")
+		, m_bank6w(*this, "bank6w")
+		{ }
+
 	void mcx128(machine_config &config);
 
 private:
@@ -105,6 +129,8 @@ private:
 	virtual void driver_reset() override;
 
 	required_device<ram_device> m_mcx_ram;
+	required_region_ptr<u8> m_mcx_cart_rom_base;
+	required_region_ptr<u8> m_mcx_int_rom_base;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4r;
 	required_memory_bank m_bank4w;
@@ -113,8 +139,6 @@ private:
 	required_memory_bank m_bank6r;
 	required_memory_bank m_bank6w;
 
-	uint8_t *m_mcx_cart_rom_base;
-	uint8_t *m_mcx_int_rom_base;
 	uint8_t *m_mcx_ram_base;
 
 	uint8_t m_bank_control;
@@ -219,25 +243,25 @@ void mcx128_state::update_mcx128_banking()
 		case 0:
 			m_bank4r->set_base(m_mcx_cart_rom_base);
 			m_bank5r->set_base(m_mcx_cart_rom_base + 0x2000);
-			m_bank6r->set_base(m_mcx_cart_rom_base + 0x3f00);
+			m_bank6r->set_entry(0);
 			break;
 
 		case 1:
 			m_bank4r->set_base(m_mcx_ram_base + bank_offset_page_0 + 0x4000);
-			m_bank5r->set_base(m_mcx_cart_rom_base + 0x2000 + 0x2000);
-			m_bank6r->set_base(m_mcx_cart_rom_base + 0x3f00 + 0x2000);
+			m_bank5r->set_base(m_mcx_cart_rom_base + 0x2000 + 0x2000);  // invalid address, what should it be?
+			m_bank6r->set_entry(1);
 			break;
 
 		case 2:
 			m_bank4r->set_base(m_mcx_ram_base + bank_offset_page_0 + 0x4000);
 			m_bank5r->set_base(m_mcx_int_rom_base);
-			m_bank6r->set_base(m_mcx_int_rom_base + 0x1f00);
+			m_bank6r->set_entry(2);
 			break;
 
 		case 3:
 			m_bank4r->set_base(m_mcx_ram_base + bank_offset_page_0 + 0x4000);
 			m_bank5r->set_base(m_mcx_ram_base + bank_offset_page_0 + 0x6000);
-			m_bank6r->set_base(m_mcx_ram_base + 0 + 0x7f00); /* always bank 0 */
+			m_bank6r->set_entry(3); /* always bank 0 */
 			break;
 
 		default:
@@ -334,33 +358,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
     DRIVER INIT
 ***************************************************************************/
 
-mc10_state::mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag)
-	, m_maincpu(*this, "maincpu")
-	, m_ram(*this, RAM_TAG)
-	, m_bank1(*this, "bank1")
-	, m_bank2(*this, "bank2")
-	, m_mc6847(*this, "mc6847")
-	, m_ef9345(*this, "ef9345")
-	, m_dac(*this, "dac")
-	, m_cassette(*this, "cassette")
-	, m_rs232(*this, "rs232")
-	, m_pb(*this, "pb%u", 0)
-{
-}
-
-mcx128_state::mcx128_state(const machine_config &mconfig, device_type type, const char *tag)
-	: mc10_state(mconfig, type, tag)
-	, m_mcx_ram(*this, "mcx_ram")
-	, m_bank3(*this, "bank3")
-	, m_bank4r(*this, "bank4r")
-	, m_bank4w(*this, "bank4w")
-	, m_bank5r(*this, "bank5r")
-	, m_bank5w(*this, "bank5w")
-	, m_bank6r(*this, "bank6r")
-	, m_bank6w(*this, "bank6w")
-{
-}
 
 void mc10_state::driver_reset()
 {
@@ -409,11 +406,14 @@ void mcx128_state::driver_start()
 	m_ram_size = m_ram->size();
 
 	m_mcx_ram_base = m_mcx_ram->pointer();
-	m_mcx_cart_rom_base = memregion("cart")->base();
-	m_mcx_int_rom_base = memregion("maincpu")->base();
 
 	save_item(NAME(m_bank_control));
 	save_item(NAME(m_map_control));
+
+	m_bank6r->configure_entry(0, m_mcx_cart_rom_base + 0x3f00);
+	m_bank6r->configure_entry(1, m_mcx_cart_rom_base + 0x5f00); // invalid address, what should it be?
+	m_bank6r->configure_entry(2, m_mcx_int_rom_base + 0x1f00);
+	m_bank6r->configure_entry(3, m_mcx_ram_base + 0x7f00);
 }
 
 void mcx128_state::driver_reset()
@@ -469,13 +469,10 @@ void mcx128_state::mcx128_mem(address_map &map)
 	map(0xbf00, 0xbf01).rw(FUNC(mcx128_state::mcx128_bf00_r), FUNC(mcx128_state::mcx128_bf00_w));
 	map(0xbf02, 0xbf7f).noprw(); /* unused */
 	map(0xbf80, 0xbffe).noprw(); /* unused */
-	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
-	map(0xc000, 0xdfff).bankr("bank4r");
-	map(0xc000, 0xdfff).bankw("bank4w");
-	map(0xe000, 0xfeff).bankr("bank5r");
-	map(0xe000, 0xfeff).bankw("bank5w");
-	map(0xff00, 0xffff).bankr("bank6r");
-	map(0xff00, 0xffff).bankw("bank6w");
+	map(0xbfff, 0xbfff).rw(FUNC(mcx128_state::mc10_bfff_r), FUNC(mcx128_state::mc10_bfff_w));
+	map(0xc000, 0xdfff).bankr("bank4r").bankw("bank4w");
+	map(0xe000, 0xfeff).bankr("bank5r").bankw("bank5w");
+	map(0xff00, 0xffff).bankr("bank6r").bankw("bank6w");
 }
 
 /***************************************************************************
