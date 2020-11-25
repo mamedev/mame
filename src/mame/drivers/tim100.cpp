@@ -9,6 +9,7 @@ Mihajlo Pupin Institute
 2016/07/14 Fixed display etc [Robbbert]
 
 Notes:
+- CRTC is configured to display 17 rows of 40 characters, but code always blanks the last 3 rows.
 - Serial keyboard appears to need 8 bits, 2 stop bits, odd parity
 - Unable to type anything as it seems uarts want BRKDET activated all the time, which we cannot do.
 - Unable to find any technical info at all, so it's all guesswork.
