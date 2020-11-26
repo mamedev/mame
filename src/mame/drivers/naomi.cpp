@@ -141,7 +141,7 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
           A179B - TI SN75179B Differential Driver and Receiver Pair (DIP8)
          ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
         PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
-            JP1 - AICA clock Source; Default From Motherboard set to 2-3. Alt setting is 1-2 from Cart Bus (G2 Expansion BD; Multiboard Clock; other Cart Slot Peripherals that provide Aica Clock)
+            JP1 - AICA sound block Master Clock source: 2-3 - onboard OSC1 33.8688MHz (default), 1-2 - cart/DIMM connector CN2 pin A48 (alt setting, not used at practice, there is no known devices which provide external AICA clock).
             JP4 - set to 2-3. Alt setting is 1-2
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board
@@ -10866,6 +10866,59 @@ void atomiswave_state::init_atomiswave()
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
 }
+
+/*
+ ALL.Net board
+ -------------
+ Block diagram:
+                       GPIO Port A - Jumpers, LEDs
+             PIC16     GPIO Port B - I2C EEPROM
+              |        |
+  G2 Bus <-> FPGA <-> SH-3 <-> Ethernet PHY <-> Ethernet
+                       |
+                       |--- boot flash ROM 4MB
+                       |--- SDRAM 8MB
+                       |--- data buffer flash ROM 16MB
+
+ SH-3 external address space
+  00000000 - 003fffff boot flash ROM (IC2)
+  0c000000 - 0c7fffff SDRAM
+  10000000 - 10ffffff data buffer flash ROM (IC4)
+  16000000 rw FPGA_INT_OUT  interrupt to host, bit 0 active low
+  16000004 rw FPGA_INT_IN   interrupt from host (SH-3 IRQ0 line), bit 0 active low
+  16000008 rw FPGA_INT_MASK enable interrupt from host, bit 0 active low
+  1600000c rw FPGA_READY    bit 0 active high
+  16000010 r  FPGA_REVISION 8bit value
+  16002000 - 16007fff shared RAM (FPGA internal)
+
+ SH-3 GPIO PortA bits
+  2-3 - jumpers x2 (inputs, active low)
+  4-7 - LEDs x4 (outputs, active low)
+
+ SH-3 GPIO PortB bits (24LC024 I2C EEPROM)
+  0 - I2C SCL
+  6 - unknown, set to output 1
+  7 - I2C SDA
+
+ SH-4 address space
+  01000000 r  ID "G2IFSOJ AM"
+  01000020  w interrupt to net board, bit 0 active low
+  01000024  w interrupt from net board (HOLLY EXT IRQ line), bit 0 active low
+  01000028  w enable interrupt from net board, bit 0 active low
+  0100002c  w net board reset?, bit 0 active high
+  01000030 r  FPGA_READY?
+  01000100 - 01000114 protection registers, probably mirror of 010000xx
+  01010000 - 01016000 shared RAM (FPGA internal)
+
+  protection registers (16bit):
+  00-09 r  ID mirror? (unused)
+  0a    r  some ID? value (unused)
+  0c     w RNG seed?, game write here random value during init
+  0e     w data offset/index (0-3 in xtrmhnt2)
+  10    r  data read, xtrmhnt2 expecting: 1f9f, 1f03, 1f1c, 1f57
+  12    rw control reg?, write 0001 after offset set, wait for bit1=1 before data read
+  14    rw PIC detect/init reg, game check if bit0=1 (probably means if PIC present), then write RNG register, then write 0003, then wait for bit2=1 (probably means PIC initialised OK)
+*/
 
 uint64_t atomiswave_state::xtrmhnt2_hack_r()
 {
