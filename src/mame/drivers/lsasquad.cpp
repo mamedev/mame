@@ -543,15 +543,11 @@ void lsasquad_state::unk(uint8_t data)
 {
 }
 
-MACHINE_START_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
-}
-
-MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
-{
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -571,9 +567,6 @@ void lsasquad_state::lsasquad(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(30000)); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
-
-	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
-	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
@@ -636,9 +629,6 @@ void lsasquad_state::daikaiju(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(30000)); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
-
-	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
-	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));

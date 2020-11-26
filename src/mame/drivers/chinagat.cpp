@@ -179,7 +179,7 @@ ROMs
     23J8-0    - gfx2 mask ROM
     23J9-0    - gfx2 mask ROM
     23JA-0    - gfx2 mask ROM
-    TJR-100   - gfx3 custom ROM (undump)
+    TJR-100   - gfx3 custom ROM (undumped)
 
 SRAMs (2KBx8bits) Motorola MCM2016HN55, SANYO LC3517?
     IC7       - ?
@@ -257,6 +257,8 @@ M2H   -  /%    \_____/  duty 1:1, 1.5MHz
 #include "speaker.h"
 
 
+namespace {
+
 #define MAIN_CLOCK      XTAL(12'000'000)
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
@@ -280,6 +282,17 @@ protected:
 	virtual void video_start() override;
 
 private:
+	// for Sai Yu Gou Ma Roku
+	int            m_adpcm_addr;
+	int            m_i8748_P1;
+	int            m_i8748_P2;
+	int            m_pcm_shift;
+	int            m_pcm_nibble;
+	int            m_mcu_command;
+#if 0
+	int            m_m5205_clk;
+#endif
+
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
 	void interrupt_w(offs_t offset, uint8_t data);
 	void video_ctrl_w(uint8_t data);
@@ -307,8 +320,6 @@ private:
 
 void chinagat_state::video_start()
 {
-	ddragon_state::video_start();
-
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(chinagat_state::background_scan)), 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_fg_16color_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -484,7 +495,7 @@ void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 	m_i8748_P2 = data;
 }
 
-void chinagat_state::saiyugoub1_m5205_clk_w(uint8_t data)
+[[maybe_unused]] void chinagat_state::saiyugoub1_m5205_clk_w(uint8_t data)
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */
@@ -705,8 +716,6 @@ GFXDECODE_END
 
 void chinagat_state::machine_start()
 {
-	ddragon_state::machine_start();
-
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -728,8 +737,6 @@ void chinagat_state::machine_start()
 
 void chinagat_state::machine_reset()
 {
-	ddragon_state::machine_reset();
-
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
 	m_adpcm_sound_irq = 0;
@@ -1099,6 +1106,8 @@ void chinagat_state::init_chinagat()
 	membank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
 	membank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
 }
+
+} // Anonymous namespace
 
 
 //  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT           MONITOR COMPANY    FULLNAME     FLAGS ) */
