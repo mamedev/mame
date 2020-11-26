@@ -195,20 +195,19 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 		}
 		else if (_options.strip)
 		{
-			if (outputDepth   == 1
-			&&  outputWidth/6 == outputHeight)
+			if (outputDepth == 1
+			&& ( (outputWidth == outputHeight*6) || (outputWidth*6 == outputHeight) ) )
 			{
-				if (outputWidth/6 > _options.maxSize)
-				{
-					outputWidth  = _options.maxSize*6;
-					outputHeight = _options.maxSize;
-				}
+				const bool horizontal = outputWidth == outputHeight*6;
+
+				outputWidth  = bx::min(outputWidth,  horizontal ? _options.maxSize*6 : _options.maxSize);
+				outputHeight = bx::min(outputHeight, horizontal ? _options.maxSize   : _options.maxSize*6);
 			}
 			else
 			{
 				bimg::imageFree(input);
 
-				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal strip.");
+				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal or vertical strip.");
 				return NULL;
 			}
 		}
@@ -325,7 +324,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 			bimg::ImageContainer* dst;
 
-			if (outputWidth/2 == outputHeight)
+			if (outputWidth == outputHeight*2)
 			{
 				dst = bimg::imageCubemapFromLatLongRgba32F(_allocator, *src, true, _err);
 				bimg::imageFree(src);
@@ -933,7 +932,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		  "      --mipskip <N>        Skip <N> number of mips.\n"
 		  "  -n, --normalmap          Input texture is normal map. (Implies --linear)\n"
 		  "      --equirect           Input texture is equirectangular projection of cubemap.\n"
-		  "      --strip              Input texture is horizontal strip of cubemap.\n"
+		  "      --strip              Input texture is horizontal or vertical strip of cubemap.\n"
 		  "      --sdf                Compute SDF texture.\n"
 		  "      --ref <alpha>        Alpha reference value.\n"
 		  "      --iqa                Image Quality Assessment\n"
