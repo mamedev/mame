@@ -571,8 +571,8 @@ namespace bimg
 
 		for (uint16_t side = 0; side < numSides; ++side)
 		{
-			bimg::ImageMip mip;
-			bimg::imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
+			ImageMip mip;
+			imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
 
 			const uint32_t pitch = _imageContainer->m_width*16;
 			const uint32_t slice = _imageContainer->m_height*pitch;
@@ -617,8 +617,8 @@ namespace bimg
 
 		for (uint16_t side = 0; side < numSides; ++side)
 		{
-			bimg::ImageMip mip;
-			bimg::imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
+			ImageMip mip;
+			imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
 
 			const uint32_t pitch = _imageContainer->m_width*16;
 			const uint32_t slice = _imageContainer->m_height*pitch;
