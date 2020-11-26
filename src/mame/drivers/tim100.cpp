@@ -80,16 +80,10 @@ void tim100_state::mem_map(address_map &map)
 
 void tim100_state::mem_xfer_map(address_map &map)
 {
-	// FIXME: this should be a single-entry view layered over mem_map
 	map.unmap_value_high();
+	mem_map(map);
 	map(0x0000, 0xffff).view(m_dma_view);
 	m_dma_view[0](0x0000, 0xffff).r(FUNC(tim100_state::dma_r));
-	m_dma_view[1](0x0000, 0x1fff).rom().region("maincpu", 0); // 2764 at U16
-	m_dma_view[1](0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
-	m_dma_view[1](0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	m_dma_view[1](0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	m_dma_view[1](0xa000, 0xa000).nopw();   // continuously writes 00 here
-	m_dma_view[1](0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
 
@@ -172,7 +166,7 @@ WRITE_LINE_MEMBER( tim100_state::sod_w )
 	if (state)
 		m_dma_view.select(0);
 	else
-		m_dma_view.select(1);
+		m_dma_view.disable();
 }
 
 

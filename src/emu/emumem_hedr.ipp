@@ -46,7 +46,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 	m_u_dispatch = m_dispatch_array[0].data();
 
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_u_dispatch[i] = src->m_u_dispatch[i];
+		m_u_dispatch[i] = src->m_u_dispatch[i]->dup();
 		m_u_ranges[i] = src->m_u_ranges[i];
 	}
 }
