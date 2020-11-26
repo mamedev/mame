@@ -42,7 +42,7 @@ template <typename Format, typename... Params> static void VPRINTF(Format &&fmt,
 template <typename Format, typename... Params> static void VPRINTF(Format &&, Params &&...) {}
 #endif
 
-#define VALIDATE_REFCOUNTS 1
+#define VALIDATE_REFCOUNTS 0
 
 //**************************************************************************
 //  CONSTANTS
