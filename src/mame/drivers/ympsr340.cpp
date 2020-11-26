@@ -35,7 +35,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_swp00(*this, "swp00"),
-		m_lcdc(*this, "ks0066")
+		m_lcdc(*this, "ks0066"),
+		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U)
 	{ }
 
 	void psr340(machine_config &config);
@@ -48,27 +49,21 @@ private:
 	required_device<h8s2655_device> m_maincpu;
 	required_device<swp00_device> m_swp00;
 	required_device<hd44780_device> m_lcdc;
-
-	void psr340_palette(palette_device &palette) const;
+	output_finder<80, 8, 5> m_outputs;
 
 	void psr340_map(address_map &map);
 	void psr340_io_map(address_map &map);
 
 	void lcd_ctrl_w(u8 data);
+
+	DECLARE_WRITE_LINE_MEMBER(render_w);
 };
-
-void psr340_state::psr340_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
-}
-
 
 void psr340_state::lcd_ctrl_w(u8 data)
 {
 	// bit 3 = E, bit 4 = RS, R/W is connected to GND so write-only
-	m_lcdc->rs_w(BIT(4, data));
-	m_lcdc->e_w(BIT(3, data));
+	m_lcdc->rs_w(BIT(data, 4));
+	m_lcdc->e_w(BIT(data, 3));
 }
 
 void psr340_state::psr340_map(address_map &map)
@@ -88,11 +83,48 @@ void psr340_state::psr340_io_map(address_map &map)
 
 void psr340_state::machine_start()
 {
+	m_outputs.resolve();
 }
 
 void psr340_state::machine_reset()
 {
 }
+
+WRITE_LINE_MEMBER(psr340_state::render_w)
+{
+	if(!state)
+		return;
+
+	const u8 *render = m_lcdc->render();
+
+	if(0) {
+		logerror("XX -\n");
+		for(int i=0; i != 4; i++) {
+			for(int y=0; y != 8; y++) {
+				std::string r = "XX";
+				for(int x=0; x != 20; x++) {
+					uint8_t v = render[16*(x+20*i) + y];
+					r += util::string_format(" %c%c%c%c%c",
+											 v & 0x01 ? '#' : '.',
+											 v & 0x02 ? '#' : '.',
+											 v & 0x04 ? '#' : '.',
+											 v & 0x08 ? '#' : '.',
+											 v & 0x10 ? '#' : '.');
+				}
+				logerror("%s\n", r);
+			}
+			logerror("XX\n");
+		}
+	}
+
+	for(int yy=0; yy != 8; yy++)
+		for(int x=0; x != 80; x++) {
+			uint8_t v = render[16*x + yy];
+			for(int xx=0; xx != 5; xx++)
+				m_outputs[x][yy][xx] = (v >> xx) & 1;
+		}
+}
+
 
 static INPUT_PORTS_START(psr340)
 INPUT_PORTS_END
@@ -108,15 +140,11 @@ void psr340_state::psr340(machine_config &config)
 	m_lcdc->set_lcd_size(2, 40);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
-	screen.set_size(6 * 40, 9 * 4);
+	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	screen.set_refresh_hz(60);
+	screen.set_size(800, 384);
 	screen.set_visarea_full();
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(psr340_state::psr340_palette), 2);
+	screen.screen_vblank().set(FUNC(psr340_state::render_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -132,6 +160,9 @@ ROM_START( psr340 )
 
 	ROM_REGION(0x200000, "swp00", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
+
+	ROM_REGION(0x52fb4, "screen", 0)
+	ROM_LOAD("psr340-lcd.svg", 0, 0x52fb4, CRC(21b87261) SHA1(8b3331e7b31511fbf694eebe003296c219c65772))
 ROM_END
 
 CONS(1994, psr340, 0, 0, psr340, psr340, psr340_state, empty_init, "Yamaha", "PSR-340 PortaSound", MACHINE_NOT_WORKING)
