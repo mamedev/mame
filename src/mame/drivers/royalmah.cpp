@@ -221,7 +221,6 @@ private:
 	void mjifb_coin_counter_w(uint8_t data);
 	uint8_t mjifb_rom_io_r(offs_t offset);
 	void mjifb_rom_io_w(offs_t offset, uint8_t data);
-	void mjifb_videoram_w(offs_t offset, uint8_t data);
 	uint8_t mjifb_p3_r();
 	uint8_t mjifb_p5_r();
 	uint8_t mjifb_p6_r();
@@ -1128,18 +1127,13 @@ void royalmah_state::mjifb_rom_io_w(offs_t offset, uint8_t data)
 	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
-void royalmah_state::mjifb_videoram_w(offs_t offset, uint8_t data)
-{
-	m_videoram[offset + 0x4000] = data;
-}
-
 void royalmah_state::mjifb_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
-	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
-//  map(0xc000, 0xffff).rom().writeonly();  This should, but doesn't work
+	map(0x8000, 0xffff).writeonly().share("videoram");
+	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w));
+	map(0xc000, 0xffff).rom();
 }
 
 uint8_t royalmah_state::mjifb_p3_r()
@@ -1228,8 +1222,9 @@ void royalmah_state::mjdejavu_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w)).share("videoram");
-	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
+	map(0x8000, 0xffff).writeonly().share("videoram");
+	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w));
+	map(0xc000, 0xffff).rom();
 }
 
 
