@@ -1189,7 +1189,7 @@ ROM_START( rmpgwt )
 	ROM_LOAD16_BYTE( "1.3_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(403ae41e) SHA1(c08d9352efe63849f5d10c1bd1efe2b9dd7382e0) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "465 rampage wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
+	ROM_LOAD( "465_rampage_wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
@@ -1226,7 +1226,7 @@ ROM_START( rmpgwt11 )
 	ROM_LOAD16_BYTE( "1.1_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(031c908f) SHA1(531669b13c33921ff199be1e841dd337c86fec50) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "465 rampage wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
+	ROM_LOAD( "465_rampage_wt.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
