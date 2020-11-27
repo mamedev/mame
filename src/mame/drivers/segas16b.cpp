@@ -1293,7 +1293,8 @@ void segas16b_state::machine_reset()
 	}
 
 	// ensure the sound bank points somewhere sane
-	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000);
+	if (membank("soundbank"))
+		membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000);
 }
 
 
