@@ -14,7 +14,8 @@
 	- Rockwell 10937P-50 A8201-17 display controller
 
     TODO:
-	- The coin mech isn't emulated
+	- The coin mech isn't emulated. It's an Azkoyen L66S coin selector,
+	  which uses a PIC16C76/PIC16F76 (undumped).
 
 ***************************************************************************/
 
@@ -285,11 +286,17 @@ void design6_state::design6(machine_config &config)
 ROM_START( design6 )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x8000, CRC(1155999c) SHA1(2896af89011c496f905ed0e57d7035a3b612c718))
+
+	ROM_REGION(0x4000, "coinsel", 0)
+	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4000, NO_DUMP)
 ROM_END
 
 ROM_START( designe )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("designe.bin", 0x0000, 0x8000, CRC(693d40bd) SHA1(9596bbf9c367bc919393923460da15563d9447ca))
+
+	ROM_REGION(0x4000, "coinsel", 0)
+	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4000, NO_DUMP)
 ROM_END
 
 
