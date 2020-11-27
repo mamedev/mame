@@ -44,6 +44,28 @@ void tunhunt_state::video_start()
 	m_fg_tilemap->set_scrollx(0, 64);
 
 	save_item(NAME(m_control));
+	save_item(NAME(m_mobsc0));
+	save_item(NAME(m_mobsc1));
+	save_item(NAME(m_lineh));
+	save_item(NAME(m_shl0st));
+	save_item(NAME(m_shl1st));
+	save_item(NAME(m_vstrlo));
+	save_item(NAME(m_linesh));
+	save_item(NAME(m_shl0pc));
+	save_item(NAME(m_shl1pc));
+	save_item(NAME(m_linec));
+	save_item(NAME(m_shl0v));
+	save_item(NAME(m_shl1v));
+	save_item(NAME(m_mobjh));
+	save_item(NAME(m_linev));
+	save_item(NAME(m_shl0vs));
+	save_item(NAME(m_shl1vs));
+	save_item(NAME(m_mobvs));
+	save_item(NAME(m_linevs));
+	save_item(NAME(m_shel0h));
+	save_item(NAME(m_mobst));
+	save_item(NAME(m_shel1h));
+	save_item(NAME(m_mobjv));
 }
 
 void tunhunt_state::tunhunt_palette(palette_device &palette) const
