@@ -2578,9 +2578,8 @@ void galaxold_state::drivfrcg(machine_config &config)
 	s2650_device &maincpu(S2650(config, m_maincpu, MASTER_CLOCK/6));
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::drivfrcg_program);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::drivfrcg_io);
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)); // ???
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2590,6 +2589,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 64);
 
@@ -2668,9 +2668,7 @@ void galaxold_state::racknrol(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::racknrol_map);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::racknrol_io);
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
-	// FIXME: kill the following line - convert to a screen vblank callback
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
@@ -2680,6 +2678,7 @@ void galaxold_state::racknrol(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
@@ -2697,9 +2696,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &galaxold_state::hexpoola_io);
 	maincpu.set_addrmap(AS_DATA, &galaxold_state::hexpoola_data);
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
-	// FIXME: kill the following line - convert to a screen vblank callback
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 32);
@@ -2708,6 +2705,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 

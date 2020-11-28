@@ -218,7 +218,6 @@ public:
 	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);

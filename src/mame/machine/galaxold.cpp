@@ -161,11 +161,6 @@ void galaxold_state::init_4in1()
 	save_item(NAME(m__4in1_bank));
 }
 
-INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
-{
-	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
-}
-
 void galaxold_state::init_bullsdrtg()
 {
 	// patch char supposed to be space

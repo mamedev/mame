@@ -1538,10 +1538,10 @@ void scramble_state::hunchbks(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
-	maincpu.intack_handler().set_constant(0x03);
-	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
