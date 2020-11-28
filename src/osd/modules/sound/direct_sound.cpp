@@ -35,6 +35,8 @@
 #endif
 #include <utility>
 
+#include "mmreg.h"
+
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -419,24 +421,32 @@ HRESULT sound_direct_sound::dsound_init()
 
 	{
 		// make a format description for what we want
-		WAVEFORMATEX stream_format;
-		stream_format.wBitsPerSample    = 16;
-		stream_format.wFormatTag        = WAVE_FORMAT_PCM;
-		stream_format.nChannels         = 2;
-		stream_format.nSamplesPerSec    = sample_rate();
-		stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
-		stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
+		WAVEFORMATEXTENSIBLE stream_format;
+		stream_format.Format.wBitsPerSample    = 16;
+		stream_format.Format.wFormatTag        = WAVE_FORMAT_PCM;
+		//stream_format.Format.wFormatTag        = WAVE_FORMAT_EXTENSIBLE; // needed for more than 2 channels
+		stream_format.Format.nChannels         = 2;
+		stream_format.Format.nSamplesPerSec    = sample_rate();
+		stream_format.Format.nBlockAlign       = stream_format.Format.wBitsPerSample * stream_format.Format.nChannels / 8;
+		stream_format.Format.nAvgBytesPerSec   = stream_format.Format.nSamplesPerSec * stream_format.Format.nBlockAlign;
+
+		// extra for WAVE_FORMAT_EXTENSIBLE
+		//stream_format.Samples.wValidBitsPerSample = 16;
+		//stream_format.Samples.wSamplesPerBlock = 0;
+		//stream_format.Samples.wReserved = 0;
+		//stream_format.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
+		//stream_format.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
 
 		// compute the buffer size based on the output sample rate
-		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * m_audio_latency / 10;
+		DWORD stream_buffer_size = stream_format.Format.nSamplesPerSec * stream_format.Format.nBlockAlign * m_audio_latency / 10;
 		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
 		LOG(("stream_buffer_size = %u\n", (unsigned)stream_buffer_size));
 
 		// create the buffers
-		m_bytes_per_sample = stream_format.nBlockAlign;
+		m_bytes_per_sample = stream_format.Format.nBlockAlign;
 		m_stream_buffer_in = 0;
-		result = create_buffers(stream_buffer_size, stream_format);
+		result = create_buffers(stream_buffer_size, (WAVEFORMATEX&)stream_format);
 		if (result != DS_OK)
 			goto error;
 	}

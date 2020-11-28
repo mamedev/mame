@@ -824,8 +824,7 @@ private:
 	u32 m_finalmix_leftover;              // leftover samples in the final mix
 	u32 m_samples_this_update;            // number of samples this update
 	std::vector<s16> m_finalmix;          // final mix, in 16-bit signed format
-	std::vector<stream_buffer::sample_t> m_leftmix; // left speaker mix, in native format
-	std::vector<stream_buffer::sample_t> m_rightmix; // right speaker mix, in native format
+	std::vector<std::vector<stream_buffer::sample_t>> m_mixes; // per speaker mix, in native format
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
@@ -840,6 +839,7 @@ private:
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list; // list of streams
 	std::map<sound_stream *, u8> m_orphan_stream_list; // list of orphaned streams
 	bool m_first_reset;                   // is this our first reset?
+	int m_numstreams;
 };
 
 

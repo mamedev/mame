@@ -56,7 +56,7 @@ speaker_device::~speaker_device()
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 
-void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, attotime start, attotime end, int expected_samples, bool suppress)
+void speaker_device::mix(std::vector<std::vector<stream_buffer::sample_t>> &mixes, attotime start, attotime end, int expected_samples, bool suppress)
 {
 	// skip if no stream
 	if (m_mixer_stream == nullptr)
@@ -89,24 +89,49 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 	// mix if sound is enabled
 	if (!suppress)
 	{
-		// if the speaker is centered, send to both left and right
-		if (m_x == 0)
-			for (int sample = 0; sample < expected_samples; sample++)
-			{
-				stream_buffer::sample_t cursample = view.get(sample);
-				leftmix[sample] += cursample;
-				rightmix[sample] += cursample;
-			}
+		/*
+			Thoughts:
 
-		// if the speaker is to the left, send only to the left
-		else if (m_x < 0)
-			for (int sample = 0; sample < expected_samples; sample++)
-				leftmix[sample] += view.get(sample);
+			This only handles 2 phsyical speakers, assumed to be stereo, with a kludge to send mono audio to both.
 
-		// if the speaker is to the right, send only to the right
+			While drivers can specify an x/y/z space position for each speaker, using this to determine speaker
+			output levels in a 3+ multi-speaker setup would also assume the host machine on which has a standard 2.1,
+			5.1 or 7.1 setup, this is not realistic when trying to replicate arcade speaker setups in many cases.
+
+			A system whereby the x/y/z co-ordinates are used as a hint to set initial levels for each speaker would
+			need to be complemented with an option giving the user absolute control over the mixing of any virtual
+			speaker to any physical speaker in order to replicate more complex arcade setups (for example, 4 virtual
+			mono speakers facing away from each other that need to be mapped to 4 physical speakers also facing away
+			from each other)
+
+			Currently the platform specific code in MAME does not handle more than 2 channels.
+		*/
+
+		if (mixes.size() == 2)
+		{
+			// if the speaker is centered, send to both left and right
+			if (m_x == 0)
+				for (int sample = 0; sample < expected_samples; sample++)
+				{
+					stream_buffer::sample_t cursample = view.get(sample);
+					mixes[0][sample] += cursample;
+					mixes[1][sample] += cursample;
+				}
+
+			// if the speaker is to the left, send only to the left
+			else if (m_x < 0)
+				for (int sample = 0; sample < expected_samples; sample++)
+					mixes[0][sample] += view.get(sample);
+
+			// if the speaker is to the right, send only to the right
+			else
+				for (int sample = 0; sample < expected_samples; sample++)
+					mixes[1][sample] += view.get(sample);
+		}
 		else
-			for (int sample = 0; sample < expected_samples; sample++)
-				rightmix[sample] += view.get(sample);
+		{
+			fatalerror("speaker.cpp: unsupported number of streams (%d) provided\n", mixes.size());
+		}
 	}
 }
 
