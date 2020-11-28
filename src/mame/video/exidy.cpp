@@ -128,6 +128,7 @@ void exidy_state::set_colors()
 
 void exidy_state::draw_background()
 {
+	const u8 *cram = m_characterram ? (u8 *)m_characterram : memregion("maincpu")->base() + 0x4800;
 	offs_t offs;
 
 	pen_t off_pen = 0;
@@ -155,8 +156,8 @@ void exidy_state::draw_background()
 
 			if (m_is_2bpp)
 			{
-				uint8_t data1 = m_characterram[0x000 | (code << 3) | cy];
-				uint8_t data2 = m_characterram[0x800 | (code << 3) | cy];
+				uint8_t data1 = cram[0x000 | (code << 3) | cy];
+				uint8_t data2 = cram[0x800 | (code << 3) | cy];
 
 				for (int i = 0; i < 8; i++)
 				{
@@ -173,7 +174,7 @@ void exidy_state::draw_background()
 			/* 1bpp */
 			else
 			{
-				uint8_t data = m_characterram[(code << 3) | cy];
+				uint8_t data = cram[(code << 3) | cy];
 
 				for (int i = 0; i < 8; i++)
 				{
