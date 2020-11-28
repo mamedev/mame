@@ -133,6 +133,7 @@ public:
 	void mjsenka(machine_config &config);
 	void mjyarou(machine_config &config);
 	void janoh(machine_config &config);
+	void janoha(machine_config &config);
 	void mjtensin(machine_config &config);
 	void mjvegasa(machine_config &config);
 	void jansou(machine_config &config);
@@ -3581,6 +3582,13 @@ void royalmah_state::janoh(machine_config &config)
 	royalmah(config);
 	m_maincpu->set_clock(8000000/2);   /* 4 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::janoh_map);
+}
+
+void royalmah_state::janoha(machine_config &config)
+{
+	royalmah(config);
+	m_maincpu->set_clock(8000000/2);   /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::janoh_map);
 
 	z80_device &sub(Z80(config, "sub", 4000000));        /* 4 MHz ? */
 	sub.set_addrmap(AS_PROGRAM, &royalmah_state::janoh_sub_map);
@@ -5409,8 +5417,8 @@ GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, empty_init,
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
 GAME( 1984,  rkjanoh2, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_NOT_WORKING )
-GAME( 1984,  janoh,    0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
-GAME( 1984,  janoha,   janoh,    janoh,    royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
+GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
+GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state, empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   royalmah_state, init_jansou,   ROT0,   "Dyna Computer",              "Jansou (set 1)",                        MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 GAME( 1985,  jansoua,  jansou,   jansou,   jansou,   royalmah_state, init_jansou,   ROT0,   "Dyna Computer",              "Jansou (V 1.1)",                        0 )
 GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state, init_jansou,   ROT0,   "Dyna Computer",              "Jang Taku (V 1.3)",                     0 )
