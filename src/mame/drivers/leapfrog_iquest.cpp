@@ -26,14 +26,26 @@ class leapfrog_iquest_state : public driver_device
 public:
 	leapfrog_iquest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_screen(*this, "screen")
+		, m_maincpu(*this, "maincpu")
 		, m_rombank(*this, "rombank")
 		, m_cart_region(nullptr)
 	{ }
 
 	void leapfrog_iquest(machine_config &config);
+
+protected:
+	void leapfrog_base(machine_config &config);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<generic_slot_device> m_cart;
+	required_device<screen_device> m_screen;
+
+	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 private:
 	virtual void machine_start() override;
@@ -42,13 +54,7 @@ private:
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_device<screen_device> m_screen;
 
 	void rom_map(address_map &map);
 
@@ -111,7 +117,6 @@ private:
 	void tx(uint8_t data);
 	uint8_t rx();
 
-	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
 
 	uint8_t port0_r();
 	void port0_w(u8 data);
@@ -123,6 +128,16 @@ private:
 	void port3_w(u8 data);
 };
 
+
+class leapfrog_turboextreme_state : public leapfrog_iquest_state
+{
+public:
+	leapfrog_turboextreme_state(const machine_config &mconfig, device_type type, const char *tag)
+		: leapfrog_iquest_state(mconfig, type, tag)
+	{ }
+
+	void leapfrog_turboex(machine_config &config);
+};
 
 
 void leapfrog_iquest_state::machine_start()
@@ -539,7 +554,7 @@ void leapfrog_iquest_state::port3_w(u8 data)
 
 
 
-void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
+void leapfrog_iquest_state::leapfrog_base(machine_config &config)
 {
 	// seems to have an IRQ vector at 002b, which would suggest it's an 8052 or similar, rather than plain 8031?
 	//I8052(config, m_maincpu, 96000000/10); // unknown clock
@@ -557,6 +572,13 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(leapfrog_iquest_state::port3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(leapfrog_iquest_state::port3_w));
 
+	ADDRESS_MAP_BANK(config, "rombank").set_map(&leapfrog_iquest_state::rom_map).set_options(ENDIANNESS_LITTLE, 8, 31, 0x80000000);
+}
+
+void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
+{
+	leapfrog_iquest_state::leapfrog_base(config);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
@@ -569,9 +591,26 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_iquest_state::cart_load));
 
-	ADDRESS_MAP_BANK(config, "rombank").set_map(&leapfrog_iquest_state::rom_map).set_options(ENDIANNESS_LITTLE, 8, 31, 0x80000000);
-
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_iquest_cart");
+}
+
+void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
+{
+	leapfrog_iquest_state::leapfrog_base(config);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_size(64, 32); // unknown resolution
+	m_screen->set_visarea(0, 64-1, 0, 32-1);
+	m_screen->set_screen_update(FUNC(leapfrog_turboextreme_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(leapfrog_turboextreme_state::rx_line_hack));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_turboextreme_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(leapfrog_turboextreme_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turboextreme_cart");
 }
 
 ROM_START( iquest )
@@ -579,6 +618,17 @@ ROM_START( iquest )
 	ROM_LOAD( "iquest.bin", 0x000000, 0x400000, CRC(f785dc4e) SHA1(ec002c18df536737334fe6b7db0e7342bad7b66b))
 ROM_END
 
+ROM_START( turboex )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "turbotwistextreme.bin", 0x000000, 0x400000, CRC(d7cabcff) SHA1(7813811c0518aba017f7a79fd477be5ed9fa7529))
+ROM_END
+
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 // it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
 CONS( 2004, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )
+
+CONS( 2004, turboex,     0,         0,      leapfrog_turboex,   leapfrog_iquest,  leapfrog_turboextreme_state,  empty_init, "LeapFrog", "Turbo Extreme (US)",           MACHINE_IS_SKELETON )
+
+// Turbo Twist Math
+// Turbo Twist Spelling
+// more?
