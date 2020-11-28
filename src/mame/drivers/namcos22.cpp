@@ -4722,7 +4722,6 @@ ROM_START( propcycl )
 	ROM_LOAD( "pr1waveb.1l", 0x800000, 0x400000, CRC(d91acb26) SHA1(c2161e2d70e08aed15cbc875ffee685190611daf) )
 ROM_END
 
-
 ROM_START( propcyclj )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "pr1ver-a.1", 0x00003, 0x100000, CRC(dfea7ff7) SHA1(9c81b145d0b6fbe14e1c5ce93ea67dacb2567220) )
@@ -5417,6 +5416,7 @@ ROM_START( dirtdashj )
 	ROM_LOAD( "dt1waveb.1l",  0x800000, 0x400000, CRC(6b736f94) SHA1(ac3715480aa9a9c2dec099607f89859bb3b73a6a) )
 ROM_END
 
+
 ROM_START( aquajet )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "aj2ver-b.1",   0x000003, 0x100000, CRC(3a67b9f4) SHA1(8cd51f319e082297fdb99634486fe297a0ace654) )
@@ -5709,23 +5709,13 @@ void namcos22s_state::init_propcycl()
 
 void namcos22s_state::init_propcyclj()
 {
+	// see init_propcycl for notes
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
-	// patch out strange routine (uninitialized-eeprom related?)
-	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1990a/4] = 0x4e754e75;
 
-	/**
-	 * The dipswitch reading routine in Prop Cycle polls the
-	 * dipswitch value, but promptly overwrites with zero, discarding
-	 * it.
-	 *
-	 * By patching out this behavior, we expose an additional "secret" test.
-	 *
-	 * DIP5: real time display of "INST_CUNT, MODE_NUM, MODE_CUNT"
-	 */
-	//ROM[0x22296/4] &= 0xffff0000; //<-- NOT correct for Japanese set!!!
-	//ROM[0x22296/4] |= 0x00004e75; //<-- NOT correct for Japanese set!!!
+	//ROM[0x22272/4] &= 0xffff0000;
+	//ROM[0x22272/4] |= 0x00004e75;
 
 	m_gametype = NAMCOS22_PROP_CYCLE;
 	install_141_speedup();
@@ -5771,7 +5761,7 @@ void namcos22s_state::init_dirtdash()
 
 /*********************************************************************************************/
 
-/*     YEAR, NAME,     PARENT,   MACHINE,   INPUT,     CLASS,           INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
+/*     YEAR, NAME,     PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
 GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, RR3 means USA?
 GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
