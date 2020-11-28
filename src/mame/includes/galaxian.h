@@ -312,6 +312,7 @@ public:
 	void moonqsr(machine_config &config);
 	void frogger(machine_config &config);
 	void anteatergg(machine_config &config);
+	void ozon1(machine_config &config);
 	void theend(machine_config &config);
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
@@ -406,6 +407,8 @@ protected:
 	void mshuttle_decrypted_opcodes_map(address_map &map);
 	void mshuttle_map(address_map &map);
 	void mshuttle_portmap(address_map &map);
+	void ozon1_map(address_map &map);
+	void ozon1_io_map(address_map &map);
 	void scobra_map(address_map &map);
 	void scorpion_map(address_map &map);
 	void scorpion_sound_map(address_map &map);

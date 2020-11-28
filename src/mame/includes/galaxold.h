@@ -200,7 +200,6 @@ public:
 	DECLARE_VIDEO_START(dkongjrmc);
 	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
-	DECLARE_VIDEO_START(ozon1);
 	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
 	DECLARE_VIDEO_START(rescue);
@@ -291,7 +290,6 @@ public:
 	void porter(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
-	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
 	void ckongmc(machine_config &config);
@@ -314,8 +312,6 @@ public:
 	void hunchbkg_data(address_map &map);
 	void hustlerb3_map(address_map &map);
 	void mooncrst_map(address_map &map);
-	void ozon1_io_map(address_map &map);
-	void ozon1_map(address_map &map);
 	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);

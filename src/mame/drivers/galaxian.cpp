@@ -645,6 +645,24 @@ q) 'bongo'
   - IN2 is read via code at 0x2426, but its contents is directly overwritten
     with value read from DSW (AY port A) via code at 0x3647.
 
+r) 'ozon1'
+
+  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
+    (check code at 0x03c6 which changes player and routines that handle players inputs :
+    0x0dc3 and 0x1e31 LEFT and RIGHT - 0x0e76 BUTTON1).
+  - Credits are coded on 1 byte (range 0x00-0xff) and stored at 0x4002.
+    To display them, they are converted to BCD on 1 byte via routine at 0x1421.
+    As a result, it will always display 0 to 99 (eg: 0xf0 = 240 will display 40).
+    When you get 256 credits, 0x4002 = 0x00, so the game thinks you have no credit
+    at all and enters "attract mode" again (but the game does NOT reset).
+  - There's an ingame bug when you get 101 or 201 credits : due to code at 0x0239,
+    the game checks the BCD value (0x01) instead of the correct one at 0x4002,
+    so you can't start a 2 players game !
+  - There is another ingame bug when "Coinage" settings are "A 1C/2C  B 1C/1C"
+    and you press COIN2 : due to code at 0x0473, contents of 0x4004 is NEVER reset
+    to 0x00, so routine at 0x042a ALWAYS thinks that you've pressed COIN2,
+    and as a consequence, it ALWAYS adds 1 credit (even when you are playing) !
+
 
 
 TODO:
@@ -1772,6 +1790,26 @@ void galaxian_state::zigzag_map(address_map &map)
 	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
 	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
+
+// not derived from schematics
+void galaxian_state::ozon1_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6801, 0x6801).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6806, 0x6806).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x8100, 0x8103).rw(m_ppi8255[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+void galaxian_state::ozon1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_ay8910[0], FUNC(ay8910_device::data_address_w));
 }
 
 
@@ -4991,6 +5029,45 @@ static INPUT_PORTS_START( olmandingo )
 INPUT_PORTS_END
 
 
+/* verified from Z80 code */
+static INPUT_PORTS_START( ozon1 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A 1C/1C  B 2C/1C" )
+	PORT_DIPSETTING(    0x02, "A 1C/2C  B 1C/1C" )          /* see notes */
+	PORT_DIPSETTING(    0x04, "A 1C/3C  B 3C/1C" )
+	PORT_DIPSETTING(    0x06, "A 1C/4C  B 4C/1C" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( theend )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -6323,7 +6400,6 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
-
 }
 
 
@@ -6782,6 +6858,25 @@ void galaxian_state::theend(machine_config &config)
 
 	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
+}
+
+
+void galaxian_state::ozon1(machine_config &config)
+{
+	konami_base(config);
+
+	// alternate memory map
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::ozon1_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxian_state::ozon1_io_map);
+
+	// no watchdog?
+	config.device_remove("watchdog");
+
+	// only one PPI, used in input mode only
+	m_ppi8255[0]->out_pc_callback().set_nop();
+	config.device_remove("ppi8255_1");
+
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -12173,6 +12268,20 @@ ROM_START( theendss ) // The End (SegaSA / Sonic)
 	ROM_LOAD( "6331-1j.86",       0x0000, 0x0020, BAD_DUMP CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) // Not dumped on this set
 ROM_END
 
+ROM_START( ozon1 )
+	ROM_REGION( 0x3000, "maincpu", 0 )
+	ROM_LOAD( "rom1.bin",     0x0000, 0x1000, CRC(54899e8b) SHA1(270af76ae4396ebda767f160535fa77c0b49726a) )
+	ROM_LOAD( "rom2.bin",     0x1000, 0x1000, CRC(3c90fbfc) SHA1(92da614dba3a644eac144bb0ed434d78a31fcb1a) )
+	ROM_LOAD( "rom3.bin",     0x2000, 0x1000, CRC(79fe313b) SHA1(ef8fd70f5669b7e7d7184eca2baaddcecb55c22d) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "rom7.bin",     0x0000, 0x0800, CRC(464285e8) SHA1(fff36b034b95050219c70cdfe05ff3bbc452b73e) )
+	ROM_LOAD( "rom8.bin",     0x0800, 0x0800, CRC(92056dcc) SHA1(b162da8701bfee465205e8f274ee494063c52c7b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ozon1.clr", 0x0000, 0x0020, CRC(605ea6e9) SHA1(d3471e6ef756059c2f7feb32fb8e41181cc1718e) )
+ROM_END
+
 ROM_START( takeoff )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0p.t.o.10l",   0x0000, 0x1000, CRC(46712d43) SHA1(e1b84494b530dd96d8a51a3f8bd7d7d3ba7560a9) )
@@ -13937,6 +14046,8 @@ GAME( 1981, astroamb,    scramble, astroamb,   astroamb,   galaxian_state, init_
 
 GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, ozon1,       0,        ozon1,      ozon1,      galaxian_state, init_galaxian,   ROT90,  "Proma", "Ozon I", MACHINE_SUPPORTS_SAVE )
 
 // Konami L-1200-2 base board with custom Subelectro 113 rom board
 GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, init_jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
