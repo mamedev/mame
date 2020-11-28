@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 		// is the timer already running/non-zero? if not, start it.
 		if (!m_resume_timer->enabled())
 		{
-			m_resume_timer->adjust(attotime::from_hz((XTAL(2'000'000)/2)/0x20));
+			m_resume_timer->adjust(attotime::from_hz(2'000'000/2/0x20));
 		}
 	}
 	else // state == ASSERT_LINE
@@ -659,7 +659,9 @@ uint8_t hc120_state::input_r()
 void votrhv_state::votrhv(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(2'000'000) / 2 );  // ~1'000'000 done using two 74L123 multivibrators with cap 100pf res 11k, which each oscillate at 1.8-2.5mhz, but since you need two clock phases for the 6800, each multivibrator does one phase and the falling edge of one triggers the other, so the actual clock rate is half the rate of each.
+	// ~1MHz done using two 74L123 multivibrators with cap 100pf res 11k, which each oscillate at 1.8-2.5mhz
+	// since you need two clock phases for the 6800, each multivibrator does one phase and the falling edge of one triggers the other, so the actual clock rate is half the rate of each
+	M6800(config, m_maincpu, 2'000'000 / 2 );
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrhv_state::mem_map);
 
 	INPUT_MERGER_ALL_LOW(config, m_reset).output_handler().set(FUNC(votrhv_state::reset_counter));

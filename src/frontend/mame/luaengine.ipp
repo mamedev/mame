@@ -92,9 +92,9 @@ protected:
 		auto p(sol::stack::unqualified_check_get<T *>(L, 1));
 		if (!p)
 			luaL_error(L, "sol: 'self' is not of type '%s' (pass 'self' as first argument with ':' or call on proper type)", sol::detail::demangle<T>().c_str());
-		if (!p.value())
+		if (*p)
 			luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument with ':' or call on a '%s' type", sol::detail::demangle<T>().c_str());
-		return *p.value();
+		return **p;
 	}
 
 	struct indexed_iterator

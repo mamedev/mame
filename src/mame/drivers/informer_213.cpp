@@ -167,7 +167,7 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 			uint8_t code = m_program.read_byte(addr);
 			uint8_t attr = m_program.read_byte(addr+0x1000);
 
-			logerror("%02d.%02d %04x %02x %02x\n", x, y, addr, code, attr);
+			//logerror("%02d.%02d %04x %02x %02x\n", x, y, addr, code, attr);
 
 			if (code == 0xc0 || code == 0xe8)
 				line_attr = attr;

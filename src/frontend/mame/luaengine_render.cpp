@@ -429,7 +429,7 @@ void lua_engine::initialize_render()
 								auto result(invoke(cbfunc).get<sol::optional<int> >());
 								if (result)
 								{
-									return result.value();
+									return *result;
 								}
 								else
 								{
@@ -458,7 +458,7 @@ void lua_engine::initialize_render()
 								auto result(invoke(cbfunc).get<sol::optional<int> >());
 								if (result)
 								{
-									return result.value();
+									return *result;
 								}
 								else
 								{
@@ -487,7 +487,7 @@ void lua_engine::initialize_render()
 								auto result(invoke(cbfunc).get<sol::optional<render_bounds> >());
 								if (result)
 								{
-									b = result.value();
+									b = *result;
 								}
 								else
 								{
@@ -516,7 +516,7 @@ void lua_engine::initialize_render()
 								auto result(invoke(cbfunc).get<sol::optional<render_color> >());
 								if (result)
 								{
-									c = result.value();
+									c = *result;
 								}
 								else
 								{

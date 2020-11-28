@@ -82,7 +82,7 @@ static void sd725_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  device_add_mconfigfloppy_image
+//  device_add_mconfig
 //-------------------------------------------------
 
 void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
