@@ -164,6 +164,7 @@ public:
 	void init_tontonb();
 	void init_janptr96();
 	void init_mjsenka();
+	void init_mjsiyoub();
 
 protected:
 	virtual void machine_start() override;
@@ -5407,6 +5408,12 @@ void royalmah_state::init_mjsenka()
 	}
 }
 
+void royalmah_state::init_mjsiyoub()
+{
+	m_mainbank->set_base(memregion("maincpu")->base() + 0x8000);
+}
+
+
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
@@ -5426,7 +5433,7 @@ GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_jongshin, ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
-GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
+GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, init_mjsiyoub, ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        mjsenka,  mjyarou,  royalmah_state, init_mjsenka,  ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING ) // heavy GFX glitches, wrong palette decode, code flow doesn't seem totally correct
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
 GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
