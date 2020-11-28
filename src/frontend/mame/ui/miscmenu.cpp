@@ -51,7 +51,7 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 void menu_bios_selection::populate(float &customtop, float &custombottom)
 {
 	// cycle through all devices for this system
-	for (device_t &device : device_iterator(machine().root_device()))
+	for (device_t &device : device_enumerator(machine().root_device()))
 	{
 		device_t const *const parent(device.owner());
 		device_slot_interface const *const slot(dynamic_cast<device_slot_interface const *>(parent));
@@ -132,7 +132,7 @@ menu_network_devices::~menu_network_devices()
 void menu_network_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
-	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
+	for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 	{
 		int curr = network.get_interface();
 		const char *title = nullptr;

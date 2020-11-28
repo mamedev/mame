@@ -29,6 +29,9 @@ sound system appears to be the same as 'spartanxtec.cpp'
 
 #include "spyhunttec.lh"
 
+
+namespace {
+
 class spyhuntertec_state : public driver_device
 {
 public:
@@ -53,6 +56,11 @@ public:
 
 	void init_spyhuntertec();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -68,9 +76,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -85,7 +90,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	void spyhuntertec_paletteram_w(offs_t offset, uint8_t data);
 
-	//  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spyhuntertec_port04_w(uint8_t data);
 	void spyhuntertec_portf0_w(uint8_t data);
@@ -916,6 +920,9 @@ void spyhuntertec_state::init_spyhuntertec()
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
+
+} // Anonymous namespace
+
 
 /***************************************************************************
 *                              Game Drivers                                *

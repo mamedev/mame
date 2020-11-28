@@ -1690,7 +1690,7 @@ msgstr "Cab. Mag.\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr "Cab. Mag.\Imperfeito\n"
+msgstr "Cab. Mag.\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
@@ -3020,15 +3020,15 @@ msgstr "Testar/Escrever o Valor do Poke"
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
-msgstr "Use isto se quiser fazer um poke o Slot 1 (Quando você
-começa com algo mas o perde)"
+msgstr "Use isto se quiser fazer um poke o Slot 1 (Quando você "
+"começa com algo mas o perde)"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
-msgstr "Use isto se quiser fazer um poke com o valor do Último Slot (Quando você começa
-sem um item e depois você o consegue por exemplo)"
+msgstr "Use isto se quiser fazer um poke com o valor do Último Slot (Quando você começa "
+"sem um item e depois você o consegue por exemplo)"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"

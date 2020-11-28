@@ -43,6 +43,11 @@ public:
 
 	void divebomb(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_spritecpu;
 	required_device<cpu_device> m_fgcpu;
@@ -62,9 +67,6 @@ private:
 	uint8_t m_roz_pal;
 	bool m_roz_enable[2];
 
-	DECLARE_MACHINE_RESET(divebomb);
-	DECLARE_MACHINE_START(divebomb);
-	DECLARE_VIDEO_START(divebomb);
 	void divebomb_palette(palette_device &palette) const;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

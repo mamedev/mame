@@ -3,7 +3,8 @@
 
 // handler_entry_read_dispatch
 
-// dispatches an access among multiple handlers indexed on part of the address
+// dispatches an access among multiple handlers indexed on part of the
+// address and when appropriate a selected view
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> class handler_entry_read_dispatch : public handler_entry_read<Width, AddrShift, Endian>
 {
@@ -13,6 +14,8 @@ public:
 	using mapping = typename inh::mapping;
 
 	handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift, Endian> *handler);
+	handler_entry_read_dispatch(address_space *space, memory_view &view);
+	handler_entry_read_dispatch(handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian> *src);
 	~handler_entry_read_dispatch();
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -35,9 +38,13 @@ public:
 
 	void enumerate_references(handler_entry::reflist &refs) const override;
 
-	virtual const handler_entry_read<Width, AddrShift, Endian> *const *get_dispatch() const override;
+	const handler_entry_read<Width, AddrShift, Endian> *const *get_dispatch() const override;
+	void select_a(int slot) override;
+	void select_u(int slot) override;
+	void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges) override;
+	handler_entry_read<Width, AddrShift, Endian> *dup() override;
 
-protected:
+private:
 	static constexpr int    Level    = emu::detail::handler_entry_dispatch_level(HighBits);
 	static constexpr u32    LowBits  = emu::detail::handler_entry_dispatch_lowbits(HighBits, Width, AddrShift);
 	static constexpr u32    BITCOUNT = HighBits > LowBits ? HighBits - LowBits : 0;
@@ -47,10 +54,37 @@ protected:
 	static constexpr offs_t HIGHMASK = make_bitmask<offs_t>(HighBits) ^ LOWMASK;
 	static constexpr offs_t UPMASK   = ~make_bitmask<offs_t>(HighBits);
 
-	handler_entry_read<Width, AddrShift, Endian> *m_dispatch[COUNT];
-	handler_entry::range m_ranges[COUNT];
+	class handler_array : public std::array<handler_entry_read<Width, AddrShift, Endian> *, COUNT>
+	{
+	public:
+		using std::array<handler_entry_read<Width, AddrShift, Endian> *, COUNT>::array;
+		handler_array()
+		{
+			std::fill(this->begin(), this->end(), nullptr);
+		}
+	};
 
-private:
+	class range_array : public std::array<handler_entry::range, COUNT>
+	{
+	public:
+		using std::array<handler_entry::range, COUNT>::array;
+		range_array()
+		{
+			std::fill(this->begin(), this->end(), handler_entry::range{ 0, 0 });
+		}
+	};
+
+	memory_view *m_view;
+
+	std::vector<handler_array> m_dispatch_array;
+	std::vector<range_array> m_ranges_array;
+
+	handler_entry_read<Width, AddrShift, Endian> **m_a_dispatch;
+	handler_entry::range *m_a_ranges;
+
+	handler_entry_read<Width, AddrShift, Endian> **m_u_dispatch;
+	handler_entry::range *m_u_ranges;
+
 	void populate_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler);
 	void populate_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler);
 

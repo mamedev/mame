@@ -126,11 +126,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
 
 /*************************************
  *
- *  System setup and intialization
+ *  System setup and initialization
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start()
 {
 	/* configure banks */
 	if (m_mainbank)
@@ -147,7 +147,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -969,9 +969,6 @@ void ddragon_state::ddragon(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -980,8 +977,6 @@ void ddragon_state::ddragon(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1051,9 +1046,6 @@ void ddragon_state::ddragon6809(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -1062,8 +1054,6 @@ void ddragon_state::ddragon6809(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1103,9 +1093,6 @@ void ddragon_state::ddragon2(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -1114,8 +1101,6 @@ void ddragon_state::ddragon2(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

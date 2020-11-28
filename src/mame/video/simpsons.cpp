@@ -77,8 +77,11 @@ void simpsons_state::simpsons_k053247_w(offs_t offset, uint8_t data)
 
 void simpsons_state::simpsons_video_banking( int bank )
 {
-	m_bank0000->set_bank(bank & 1);
-	m_bank2000->set_bank((bank >> 1) & 1);
+	if(bank & 1)
+		m_palette_view.select(0);
+	else
+		m_palette_view.disable();	
+	m_video_view.select((bank >> 1) & 1);
 }
 
 

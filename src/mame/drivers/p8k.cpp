@@ -327,14 +327,14 @@ void p8k_state::init_p8k()
 
 void p8k_state::p8k_16_memmap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x00000, 0x03fff).rom().region("maincpu",0);
 	map(0x04000, 0x07fff).ram().share("share1");
 	map(0x08000, 0xfffff).ram().share("share2");
 }
 
 void p8k_state::p8k_16_datamap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x00000, 0x03fff).rom().region("maincpu",0);
 	map(0x04000, 0x07fff).ram().share("share1");
 	map(0x08000, 0xfffff).ram().share("share2");
 }

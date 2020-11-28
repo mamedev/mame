@@ -116,14 +116,14 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 
 	// cycle through all devices for this system
 	std::unordered_set<std::string> devtags;
-	for (device_t &dev : device_iterator(machine().root_device()))
+	for (device_t &dev : device_enumerator(machine().root_device()))
 	{
 		bool tag_appended = false;
 		if (!devtags.insert(dev.tag()).second)
 			continue;
 
 		// check whether it owns an image interface
-		image_interface_iterator subiter(dev);
+		image_interface_enumerator subiter(dev);
 		if (subiter.first() != nullptr)
 		{
 			// if so, cycle through all its image interfaces

@@ -122,12 +122,6 @@ static INPUT_PORTS_START( s11a )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-
-MACHINE_RESET_MEMBER( s11a_state, s11a )
-{
-	MACHINE_RESET_CALL_MEMBER(s11);
-}
-
 void s11a_state::dig0_w(uint8_t data)
 {
 	data &= 0x7f;
@@ -150,7 +144,6 @@ void s11a_state::s11a_base(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 

@@ -93,7 +93,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	//
 	// Images menu
 	//
-	image_interface_iterator imageIterTest(m_machine->root_device());
+	image_interface_enumerator imageIterTest(m_machine->root_device());
 	if (imageIterTest.first() != nullptr)
 	{
 		createImagesMenu();
@@ -332,7 +332,7 @@ void MainWindow::mountImage(bool changedTo)
 {
 	// The image interface index was assigned to the QAction's data memeber
 	const int imageIndex = dynamic_cast<QAction*>(sender())->data().toInt();
-	image_interface_iterator iter(m_machine->root_device());
+	image_interface_enumerator iter(m_machine->root_device());
 	device_image_interface *img = iter.byindex(imageIndex);
 	if (img == nullptr)
 	{
@@ -374,7 +374,7 @@ void MainWindow::unmountImage(bool changedTo)
 {
 	// The image interface index was assigned to the QAction's data memeber
 	const int imageIndex = dynamic_cast<QAction*>(sender())->data().toInt();
-	image_interface_iterator iter(m_machine->root_device());
+	image_interface_enumerator iter(m_machine->root_device());
 	device_image_interface *img = iter.byindex(imageIndex);
 
 	img->unload();
@@ -455,7 +455,7 @@ void MainWindow::createImagesMenu()
 	QMenu* imagesMenu = menuBar()->addMenu("&Images");
 
 	int interfaceIndex = 0;
-	for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
+	for (device_image_interface &img : image_interface_enumerator(m_machine->root_device()))
 	{
 		std::string menuName = string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[empty slot]");
 

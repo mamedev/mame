@@ -388,8 +388,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_gsp_vram(*this, "gsp_vram"),
 			m_gsp_control_lo(*this, "gsp_control_lo"),
 			m_gsp_control_hi(*this, "gsp_control_hi"),
-			m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
-			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
+			m_gsp_paletteram_lo(*this, "gsp_palram_lo", 1024*2, ENDIANNESS_LITTLE),
+			m_gsp_paletteram_hi(*this, "gsp_palram_hi", 1024*2, ENDIANNESS_LITTLE),
 			m_in0(*this, "IN0"),
 			m_sw1(*this, "SW1"),
 			m_a80000(*this, "a80000"),
@@ -565,8 +565,8 @@ void harddriv_state::driver_gsp_map(address_map &map)
 	map(0x02000000, 0x0207ffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w));
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w));
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }
 
@@ -614,8 +614,8 @@ void harddriv_state::multisync_gsp_map(address_map &map)
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w));
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w));
 	map(0xff800000, 0xffbfffff).mirror(0x0400000).ram().share("gsp_vram");
 }
 
@@ -655,8 +655,8 @@ void harddriv_state::multisync2_gsp_map(address_map &map)
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w));
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w));
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }
 
@@ -4993,8 +4993,8 @@ void harddriv_state::init_harddriv()
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16s_delegate(*this, FUNC(harddriv_state::hdgsp_speedup2_w)));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16sm_delegate(*this, FUNC(harddriv_state::hdgsp_speedup_r)));
 	m_gsp_speedup_pc = 0xffc00f10;
-	m_gsp_speedup_addr[0] = (uint16_t *)&m_gsp_vram[(0xfff9fc00 - 0xff800000) >> 3]; // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (uint16_t *)&m_gsp_vram[(0xfffcfc00 - 0xff800000) >> 3];
+	m_gsp_speedup_addr[0] = &m_gsp_vram[(0xfff9fc00 - 0xff800000) >> 4]; // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = &m_gsp_vram[(0xfffcfc00 - 0xff800000) >> 4];
 
 	/* set up msp speedup handler */
 	m_msp->space(AS_PROGRAM).install_write_handler(0x00751b00, 0x00751b0f, write16s_delegate(*this, FUNC(harddriv_state::hdmsp_speedup_w)));
@@ -5019,8 +5019,8 @@ void harddriv_state::init_harddrivc()
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16s_delegate(*this, FUNC(harddriv_state::hdgsp_speedup2_w)));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16sm_delegate(*this, FUNC(harddriv_state::hdgsp_speedup_r)));
 	m_gsp_speedup_pc = 0xfff40ff0;
-	m_gsp_speedup_addr[0] = (uint16_t *)&m_gsp_vram[(0xfff9fc00 - 0xffc00000) >> 3]; // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (uint16_t *)&m_gsp_vram[(0xfffcfc00 - 0xffc00000) >> 3];
+	m_gsp_speedup_addr[0] = &m_gsp_vram[(0xfff9fc00 - 0xffc00000) >> 4]; // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = &m_gsp_vram[(0xfffcfc00 - 0xffc00000) >> 4];
 
 	/* set up msp speedup handler */
 	m_msp->space(AS_PROGRAM).install_write_handler(0x00751b00, 0x00751b0f, write16s_delegate(*this, FUNC(harddriv_state::hdmsp_speedup_w)));
@@ -5044,8 +5044,8 @@ void harddriv_state::init_stunrun()
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfffcfc00, 0xfffcfc0f, write16s_delegate(*this, FUNC(harddriv_state::hdgsp_speedup2_w)));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff9fc00, 0xfff9fc0f, read16sm_delegate(*this, FUNC(harddriv_state::hdgsp_speedup_r)));
 	m_gsp_speedup_pc = 0xfff41070;
-	m_gsp_speedup_addr[0] = (uint16_t *)&m_gsp_vram[(0xfff9fc00 - 0xffc00000) >> 3]; // Addresses are in bits. Really.
-	m_gsp_speedup_addr[1] = (uint16_t *)&m_gsp_vram[(0xfffcfc00 - 0xffc00000) >> 3];
+	m_gsp_speedup_addr[0] = &m_gsp_vram[(0xfff9fc00 - 0xffc00000) >> 4]; // Addresses are in bits. Really.
+	m_gsp_speedup_addr[1] = &m_gsp_vram[(0xfffcfc00 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5098,13 +5098,13 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(gsp_protection - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(gsp_protection - 0xffc00000) >> 4];
 
 	/* set up gsp speedup handler */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16s_delegate(*this, FUNC(harddriv_state::rdgsp_speedup1_w)));
 	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16sm_delegate(*this, FUNC(harddriv_state::rdgsp_speedup1_r)));
 	m_gsp_speedup_pc = 0xfff43a00;
-	m_gsp_speedup_addr[0] = (uint16_t *)&m_gsp_vram[(0xfff76f60 - 0xffc00000) >> 3];
+	m_gsp_speedup_addr[0] = &m_gsp_vram[(0xfff76f60 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5127,13 +5127,13 @@ void harddriv_state::init_racedrivc_panorama_side()
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(gsp_protection - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(gsp_protection - 0xffc00000) >> 4];
 
 	/* set up gsp speedup handler (todo, work these out) */
 //  m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16s_delegate(*this, FUNC(harddriv_state::rdgsp_speedup1_w)));
 //  m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16s_delegate(*this, FUNC(harddriv_state::rdgsp_speedup1_r)));
 //  m_gsp_speedup_pc = 0xfff43a00;
-//  m_gsp_speedup_addr[0] = (uint16_t *)&m_gsp_vram[(0xfff76f60 - 0xffc00000) >> 3)];
+//  m_gsp_speedup_addr[0] = &m_gsp_vram[(0xfff76f60 - 0xffc00000) >> 4)];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5185,7 +5185,7 @@ void harddriv_state::steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloo
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff965d0, 0xfff965df, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff965d0 - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(0xfff965d0 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5235,7 +5235,7 @@ void harddriv_state::init_strtdriv()
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5263,7 +5263,7 @@ void harddriv_state::init_hdrivair()
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff960a0, 0xfff960af, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(0xfff960a0 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));
@@ -5291,7 +5291,7 @@ void harddriv_state::init_hdrivairp()
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(0xfff916c0, 0xfff916cf, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
-	m_gsp_protection = (uint16_t *)&m_gsp_vram[(0xfff916c0 - 0xffc00000) >> 3];
+	m_gsp_protection = &m_gsp_vram[(0xfff916c0 - 0xffc00000) >> 4];
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16smo_delegate(*this, FUNC(harddriv_state::hdadsp_speedup_r)));

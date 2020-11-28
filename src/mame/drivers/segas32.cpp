@@ -5205,6 +5205,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851 J. LEAGUE 1994
+ROM board: 834-10852 J.LEAGUE
 
 */
 ROM_START( jleague )

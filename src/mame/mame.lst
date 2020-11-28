@@ -2457,6 +2457,7 @@ cadashjo                        // C21 (c) 1989 Taito Corporation
 cadashp                         // prototype
 cadashs                         // C21 (c) 1989 Taito Corporation
 cadashu                         // C21 (c) 1989 Taito America Corporation
+cadashu1                        // C21 (c) 1989 Taito America Corporation
 earthjkr                        // (c) 1993 Visco (Japan)
 earthjkra                       //
 earthjkrp                       //
@@ -9309,6 +9310,9 @@ bladestl                        // GX797 (c) 1987
 bladestle                       // GX797 (c) 1987
 bladestll                       // GX797 (c) 1987
 
+@source:blit.cpp
+blit
+
 @source:blitz68k.cpp
 bankrob                         // (c) 1993 Entertainment Technology Corp.
 bankroba                        // (c) 1993 Entertainment Technology Corp.
@@ -12120,6 +12124,10 @@ karianx                         // (c) 1996 Deniam
 logicpr2                        // (c) 1997 Deniam (Japan)
 logicpro                        // (c) 1996 Deniam
 
+@source:design.cpp
+design6                         // (c) Azkoyen
+designe                         // (c) Azkoyen
+
 @source:deshoros.cpp
 destiny                         // (c) 1983
 
@@ -14168,6 +14176,7 @@ armorcar                        // (c) 1981 Stern
 armorcar2                       // (c) 1981 Stern
 asideral                        // bootleg
 astrians                        //
+astroamb                        // bootleg
 ataqandr                        // bootleg (FAR S.A.)
 atlantis                        // (c) 1981 Comsoft
 atlantis2                       // (c) 1981 Comsoft
@@ -14250,6 +14259,10 @@ mandinga                        // bootleg (Artemi)
 mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
+mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
+mimonsco                        // (c) 1982 bootleg
+mimonscr                        // (c) 1982 bootleg
+mimonscra                       // (c) 1982 bootleg
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -14847,6 +14860,7 @@ rp200
 @source:generalplus_gpl_unknown.cpp
 mapacman
 taspinv
+parcade
 
 @source:generalplus_gpl162xx_lcdtype.cpp
 pcp8718
@@ -22303,6 +22317,7 @@ rad_sonic
 rad_sonicp
 rad_orun
 msi_sf2
+dgunl3227
 
 @source:megadriv_sunplus_hybrid.cpp
 reactmd
@@ -31310,6 +31325,7 @@ cybrcycc                        // (c) 1995
 dirtdash                        // (c) 1995
 dirtdashj                       // (c) 1995
 propcycl                        // (c) 1996
+propcyclj                       // (c) 1996
 raveracj                        // (c) 1995
 raveracja                       // (c) 1995
 raveracw                        // (c) 1995
@@ -32220,9 +32236,10 @@ npssr2                          //
 npusagif                        //
 
 @source:neptunp2.cpp
-mexlindo                        //
-neptunp2                        //
-rockroll                        //
+mexlindo                        // (c) 2004 Cirsa / Unidesa
+neptunp2                        // (c) 2003 Cirsa / Unidesa
+rockroll                        // (c) 1999 Cirsa / Unidesa
+unk960606                       // (c) 2001? Cirsa / Unidesa
 
 @source:nes.cpp
 iq501                           // Micro Genius IQ-501
@@ -36377,9 +36394,7 @@ hustlerb4                       // bootleg
 hustlerb5                       // bootleg
 hustlerb6                       // bootleg
 hustlerd                        // GX343 (c) 1981 Konami + Dynamo Games license
-mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonkeyug                      // (c) 1983 bootleg
-mimonsco                        // (c) 1982 bootleg
 minefld                         // (c) 1983 Stern
 minefldfe                       // bootleg
 rescue                          // (c) 1982 Stern
@@ -36424,8 +36439,6 @@ knockoutb                       // bootleg
 knockoutc                       //
 mariner                         // (c) 1981 Amenip
 mars                            // (c) 1981 Artic
-mimonscr                        // (c) 1982 bootleg
-mimonscra                       // (c) 1982 bootleg
 mrkougar                        // (c) 1984 ATW
 mrkougar2                       // (c) 1984 ATW
 mrkougb                         // bootleg
@@ -38099,15 +38112,16 @@ sorcererb                       // Sorcerer with Digitrio fdc
 sorcererd                       // Sorcerer with Micropolis fdc
 
 @source:storio.cpp
-vreader                         // (c) 2011 V.Tech
-vreadercaen                     // (c) 2011 V.Tech
-vreadercafr                     // (c) 2011 V.Tech
+innotab2                        // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
 storiode                        // (c) 2011 V.Tech
 storioes                        // (c) 2011 V.Tech
 storioesa                       // (c) 2011 V.Tech
 storiofr                        // (c) 2011 V.Tech
 storionl                        // (c) 2011 V.Tech
+vreader                         // (c) 2011 V.Tech
+vreadercaen                     // (c) 2011 V.Tech
+vreadercafr                     // (c) 2011 V.Tech
 
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
@@ -38384,6 +38398,16 @@ sentx6p                         //
 sentx6puk
 sentx6pd
 
+@source:spg2xx_senca.cpp
+cdlyoko
+dnv200fs
+m505neo
+m521neo
+mywicodx
+mywicogt
+oplayer
+zon32bit
+
 @source:spg2xx_shredmjr.cpp
 taikeegr                        //
 rockstar
@@ -38423,15 +38447,6 @@ lx_jg7415                       //
 lx_jg7410
 zonemini
 react
-
-@source:spg2xx_zone_32bit.cpp
-mywicodx                        //
-mywicogt
-zon32bit                        // Zone 32-bit
-oplayer
-dnv200fs
-m505neo
-m521neo
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
@@ -39937,6 +39952,7 @@ fstarfrcj                       // (c) 1992 Tecmo
 fstarfrcw                       // (c) 1992 Tecmo
 ginkun                          // (c) 1995 Tecmo
 riot                            // (c) 1992 NMK
+riotw                           // (c) 1992 Woong Bi
 
 @source:tecmosys.cpp
 deroon                          // (c) 1996 Tecmo
@@ -42749,6 +42765,9 @@ mu80                            // 1994 MU-80
 mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
+
+@source:ympsr340.cpp
+psr340                          // 1999 PSR-340
 
 @source:ymtx81z.cpp
 tx81z                           //

@@ -1762,7 +1762,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
@@ -1912,6 +1912,9 @@ ROM_END
 
 
 ROM_START( qbert )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(fe434526) SHA1(4cfc5d52dd6c82163e035af82d6112c0c93a3797) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
@@ -1934,6 +1937,9 @@ ROM_START( qbert )
 ROM_END
 
 ROM_START( qberta )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qrom_2.bin",  0xa000, 0x2000, CRC(b54a8ffc) SHA1(5e19690f141d3db8f3bfa6c7de75026256758c1f) )
 	ROM_LOAD( "qrom_1.bin",  0xc000, 0x2000, CRC(19d924e3) SHA1(af55ecb5b650e7b069d8be67eb9a9d0f3e69e3f1) )
@@ -1955,6 +1961,9 @@ ROM_START( qberta )
 ROM_END
 
 ROM_START( qbertj )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbj-rom2.bin", 0xa000, 0x2000, CRC(67bb1cb2) SHA1(23a7f8c86d6db9220a98b3f630c5d000e80f2d53) )
 	ROM_LOAD( "qbj-rom1.bin", 0xc000, 0x2000, CRC(c61216e7) SHA1(e727b85dddc2963e33af6c02b675243f6fbe2710) )
@@ -1976,6 +1985,9 @@ ROM_START( qbertj )
 ROM_END
 
 ROM_START( myqbert )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mqb-rom2.bin",  0xa000, 0x2000, CRC(6860f957) SHA1(ebd68aeb6d54868295bd20cf64ee0187a52df0e3) )
 	ROM_LOAD( "mqb-rom1.bin",  0xc000, 0x2000, CRC(11f0a4e4) SHA1(a805e51c40042fae209ace277abd9b35a990905b) )
@@ -1997,6 +2009,9 @@ ROM_START( myqbert )
 ROM_END
 
 ROM_START( qberttst )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbtst2.bin",   0xa000, 0x2000, CRC(55307b02) SHA1(8a41820211093779d9010b4c9e7d667ad3a31f23) )
 	ROM_LOAD( "qbtst1.bin",   0xc000, 0x2000, CRC(e97fdd78) SHA1(98dd07043a72273240c593650aa9947199347870) )
@@ -2019,6 +2034,9 @@ ROM_END
 
 /* test rom, not a game */
 ROM_START( qbtrktst )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(fe434526) SHA1(4cfc5d52dd6c82163e035af82d6112c0c93a3797) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
@@ -2041,6 +2059,9 @@ ROM_END
 
 
 ROM_START( insector )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom3",         0x8000, 0x2000, CRC(640881fd) SHA1(2832183e41ae7e631b61e4845fa68ce1c49edf29) )
 	ROM_LOAD( "rom2",         0xa000, 0x2000, CRC(456bc3f4) SHA1(b61a56a65639f97399a8a3a4293ac2292edfd159) )
@@ -2063,6 +2084,9 @@ ROM_END
 
 
 ROM_START( tylz )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tylz.s4t",        0x8000, 0x2000, CRC(28ed146d) SHA1(52d72503b456b1411cd91724c6d524b78ca6fe03) )
 	ROM_LOAD( "tylz.s4b",        0xa000, 0x2000, CRC(18ee09f9) SHA1(632896bfe7e14f93665671dbcc17b7cabc754a98) )
@@ -2085,9 +2109,11 @@ ROM_END
 
 
 ROM_START( argusg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
 	ROM_LOAD( "arg_ram2_2732.c7",         0x1000, 0x1000, CRC(5d35b83e) SHA1(5a1c3b2ae138d5509b8daaf03036f000bd09d0fc) )
 	ROM_LOAD( "arg_ram4_2732.c9c10",      0x2000, 0x1000, CRC(7180e823) SHA1(47124925d863b9b3784c0c990d4a4344e8d09372) )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "arg_rom4_2764.c16",        0x6000, 0x2000, CRC(2f48bd78) SHA1(b625a03b5a4989b67d5180fca7e9f6b7a24e6d2c) )
 	ROM_LOAD( "arg_rom3_2764.c14c15",     0x8000, 0x2000, CRC(4dc2914c) SHA1(8ca0fd2ce1fc9f00afd30a638ff2f8787ef7e3d4) )
 	ROM_LOAD( "arg_rom2_2764.c13c14",     0xa000, 0x2000, CRC(b5e9ee77) SHA1(dbdc176e3ca6be17b78eb98c07d5a9b5eaa28ba1) )
@@ -2110,6 +2136,9 @@ ROM_END
 
 
 ROM_START( mplanets )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom4.c16",     0x6000, 0x2000, CRC(5402077f) SHA1(f4e8699ab3c6dfc0f86b6df86d2a5b35caf2ca73) )
 	ROM_LOAD( "rom3.c14-15",  0x8000, 0x2000, CRC(5d18d740) SHA1(30307d98704c49dec5aecd0a1ec2f06f1869a5d2) )
@@ -2135,6 +2164,9 @@ ROM_START( mplanets )
 ROM_END
 
 ROM_START( mplanetsuk )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpt_rom4.bin", 0x6000, 0x2000, CRC(cd88e23c) SHA1(03222e2600f7fb1c6844340d4a56eedfcdeaa3c8) )
 	ROM_LOAD( "mpt_rom3.bin", 0x8000, 0x2000, CRC(dc355b2d) SHA1(ae3e376afc7a8cb049d0dd28bf3959cb76780999) )
@@ -2186,6 +2218,9 @@ ROM_END
 
 
 ROM_START( kngtmare )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gv112_rom3_2764.c14c15", 0x8000, 0x2000, CRC(47351270) SHA1(e6ca0b27b8f703cf73aad5f82d3b986823fbda88) )
 	ROM_LOAD( "gv112_rom2_2764.c13c14", 0xa000, 0x2000, CRC(53e01f97) SHA1(0fbb92789609ba1df6e4ae56b2fc77a004e3a4ea) )
@@ -2208,6 +2243,9 @@ ROM_END
 
 
 ROM_START( sqbert )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(1e3d4038) SHA1(d4402c5d16c0aa55efbceb83f0b30082b8434df7) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(eaf3076c) SHA1(749a87b3c40ba0a2ecd2ca962786e066daf63e30) )
@@ -2230,6 +2268,9 @@ ROM_END
 
 
 ROM_START( qbertqub )
+	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_FILL( 0x1000, 0x2000, 0x00)
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qq-rom3.bin",  0x8000, 0x2000, CRC(c4dbdcd7) SHA1(34aaa4762073680e2b4d024ce7106315ffc6bcf3) )
 	ROM_LOAD( "qq-rom2.bin",  0xa000, 0x2000, CRC(21a6c6cc) SHA1(6d4d81d9ad85be3792584e39dbeaf0dfeeda1503) )

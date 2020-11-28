@@ -340,7 +340,7 @@ void driver_enumerator::release_current() const
 		if (cached != m_config.end())
 		{
 			// iterate over software lists in this entry and reset
-			for (software_list_device &swlistdev : software_list_device_iterator(cached->second->root_device()))
+			for (software_list_device &swlistdev : software_list_device_enumerator(cached->second->root_device()))
 				swlistdev.release();
 		}
 	}

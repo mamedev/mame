@@ -18,8 +18,6 @@ priority should be given to
 #include "includes/ms32.h"
 
 
-// kirarast, tp2m32, and suchie2 require the sprites in a different order
-
 /********** Tilemaps **********/
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
@@ -52,12 +50,12 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
+TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 {
 	int tileno,colour;
 
-	tileno = m_f1superb_extraram[tile_index *2]   & 0xffff;
-	colour = m_f1superb_extraram[tile_index *2+1] & 0x000f;
+	tileno = m_road_vram[tile_index *2]   & 0xffff;
+	colour = m_road_vram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(3,tileno,colour+0x50,0);
 }
@@ -68,11 +66,12 @@ void ms32_state::video_start()
 {
 	m_tx_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64, 64);
 	m_bg_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16,  64, 64);
-	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16); // alt layout, controller by register?
+	// alt layout, controller by register
+	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16);
 	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
-	size_t size = m_sprram.bytes() / 4;
-	m_sprram_buffer = make_unique_clear<u16[]>(size);
+	m_objectram_size = m_sprram.length();
+	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
 
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
@@ -88,64 +87,63 @@ void ms32_state::video_start()
 	m_bg_tilemap_alt->set_transparent_pen(0);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_reverse_sprite_order = 1;
-
-	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine().system().name,"kirarast"))    m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"tp2m32"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"suchie2"))  m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"suchie2o")) m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"hayaosi3"))    m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"bnstars")) m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"wpksocv2"))    m_reverse_sprite_order = 0;
-
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
+	m_sprite_ctrl[0x10/4] = 0x8000;
 
-	save_pointer(NAME(m_sprram_buffer), size);
-	save_item(NAME(m_irqreq));
+	save_pointer(NAME(m_sprram_buffer), m_objectram_size);
 	save_item(NAME(m_temp_bitmap_tilemaps));
 	save_item(NAME(m_temp_bitmap_sprites));
 	save_item(NAME(m_temp_bitmap_sprites_pri));
 	save_item(NAME(m_tilemaplayoutcontrol));
-	save_item(NAME(m_reverse_sprite_order));
-	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_brt));
 	save_item(NAME(m_brt_r));
 	save_item(NAME(m_brt_g));
 	save_item(NAME(m_brt_b));
 }
 
-VIDEO_START_MEMBER(ms32_state,f1superb)
+void ms32_f1superbattle_state::video_start()
 {
 	ms32_state::video_start();
 
-	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 }
 
 /********** PALETTE WRITES **********/
 
 
+// TODO: fix p47aces brightness
+// intro text should actually appear one line at a time instead of fading-in altogether,
+// see https://youtu.be/PQsefFtqAwA
 void ms32_state::update_color(int color)
 {
+	// anything above text layer is unaffected (maybe a priority setting?)
+	// that means this must happen at mixing time rather than here ...
+	// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
+	// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
+	// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
+	//			gameplay:0x0000 0x0000 0x2020 0x0020
+	//          continue:0x5050 0x0050 0x2020 0x0020
+	// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
+	// p47aces: bomb on stage clear fade out (untested, tbd)
+
 	int r,g,b;
 
 	/* I'm not sure how the brightness should be applied, currently I'm only
 	   affecting bg & sprites, not fg.
 	   The second brightness control might apply to shadows, see gametngk.
 	 */
-	// TODO : p47aces : brightness are disabled sometimes, see https://youtu.be/PQsefFtqAwA
 	if (~color & 0x4000)
 	{
-		r = ((m_palram[color*2] & 0xff00) >>8 ) * m_brt_r / 0x100;
-		g = ((m_palram[color*2] & 0x00ff) >>0 ) * m_brt_g / 0x100;
-		b = ((m_palram[color*2+1] & 0x00ff) >>0 ) * m_brt_b / 0x100;
+		r = ((m_palram[color*2] & 0xff00) >> 8 ) * m_brt_r / 0x100;
+		g = ((m_palram[color*2] & 0x00ff) >> 0 ) * m_brt_g / 0x100;
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0 ) * m_brt_b / 0x100;
 	}
 	else
 	{
-		r = ((m_palram[color*2] & 0xff00) >>8 );
-		g = ((m_palram[color*2] & 0x00ff) >>0 );
-		b = ((m_palram[color*2+1] & 0x00ff) >>0 );
+		r = ((m_palram[color*2] & 0xff00) >> 8 );
+		g = ((m_palram[color*2] & 0x00ff) >> 0 );
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0 );
 	}
 
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
@@ -156,8 +154,10 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 	int oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
+	
 	if (m_brt[offset] != oldword)
 	{
+		// TODO: bank "1" is for sprite colors
 		int bank = ((offset & 2) >> 1) * 0x4000;
 		//int i;
 
@@ -171,45 +171,23 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 		//      update_color(machine(), i);
 		}
 	}
-
-//popmessage("%04x %04x %04x %04x",m_brt[0],m_brt[1],m_brt[2],m_brt[3]);
 }
-
-
-
-
-
-
-void ms32_state::ms32_gfxctrl_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 1 = flip screen */
-		m_flipscreen = data & 0x02;
-		m_tx_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		m_bg_tilemap_alt->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-		/* bit 2 used by f1superb, unknown */
-
-		/* bit 3 used by several games, unknown */
-
-//popmessage("%08x",data);
-	}
-}
-
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size, int reverseorder)
+void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top)
 {
-	u16  *source =   sprram_top;
-	u16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
+	const size_t sprite_tail = m_objectram_size - 8; //(0x20000 - 0x10) / 2;
+	u16 *source = sprram_top;
+	u16 *finish = sprram_top + sprite_tail;
+	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
+	// akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
+	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 
-	if (reverseorder == 1)
+	if (reverseorder == true)
 	{
-		source  = sprram_top + (sprram_size - 0x10) / 2;
-		finish  = sprram_top;
+		source = sprram_top + sprite_tail;
+		finish = sprram_top;
 	}
 
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
@@ -222,8 +200,8 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 		u16 xsize, ysize;
 		s32 sx, sy;
 		u16 xzoom, yzoom;
-
-		m_sprite->extract_parameters(true, false, source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		
+		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
 			continue;
@@ -244,20 +222,21 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
 	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
-	// Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
-	// nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
-	//             0x4*   0x5*  ROZ should wrap?
-	// bbbxing:  0xffff 0x0000  0 (match presentation)
-	// gratia:   0x0000 0x0000  1 (sky in stage 2)
-	// p47aces:  0xffff 0x0651  0 (title screen)
-	// desertwr: 0xffff 0x0651  1 (any stage)
-	// f1superb: 0xffff 0x0000  ?
-	// suchie2:  0x0000 0x0000  0?
-	// bnstars:  0x0000 0x0000  ?
-	// hayaosi3: 0x0000 0x0000  ?
-	// Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
-	// Are we missing a ROZ plane size as well?
-
+    // Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
+    // nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
+    //             0x4*   0x5*  ROZ should wrap?
+    // bbbxing:  0xffff 0x0000  0 (match presentation)
+    // gratia:   0x0000 0x0000  1 (sky in stage 2)
+    // p47aces:  0xffff 0x0651  0 (title screen)
+    // desertwr: 0xffff 0x0651  1 (any stage)
+    // f1superb: 0xffff 0x0000  ?
+    // suchie2:  0x0000 0x0000  0?
+    // bnstars:  0x0000 0x0000  ?
+    // hayaosi3: 0x0000 0x0000  ?
+    // akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
+    // Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
+    // Are we missing a ROZ plane size as well?
+    
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
@@ -336,13 +315,36 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 
 
-u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrollx,scrolly;
 	int asc_pri;
 	int scr_pri;
 	int rot_pri;
 
+	/*
+		sprite control regs
+			    0x1c 0x20 0x40 <prihack>
+		akiss      0    0    0     0  
+		bbbxing    0    0    0     0  
+		bnstars    1    0    0     1
+		bnstars1   ?    ?    ?     1
+		desertwr   1    0    0     0
+		f1superb   0    0    0     0
+		gametngk   0 0140    0     0
+		gratia     0    0    0     0
+		hayaosi2   0    0    0     0
+		hayaosi3   0 0140    0     1
+		kirarast   0    0    0     1
+		p47aces    1    0    0     0
+		suchie2    0    0    0     1
+		tetrisp    0    0    0     0
+		tp2m32     0 0140    0     1
+		wpksocv2   0 0140    0     1
+	*/
+//	popmessage("%04x %04x %04x",m_sprite_ctrl[0x1c/4], m_sprite_ctrl[0x20/4], m_sprite_ctrl[0x40/4]);
+//	popmessage("%04x %04x %04x %04x|%04x %04x %04x",m_sprite_ctrl[0x00/4],m_sprite_ctrl[0x04/4],m_sprite_ctrl[0x08/4],m_sprite_ctrl[0x0c/4]
+//					 ,m_sprite_ctrl[0x10/4],m_sprite_ctrl[0x14/4],m_sprite_ctrl[0x18/4]);
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
 	   is gametngk, where they are *usually*, but not always, copies of 0x00/4
 	   and 0x0c/4 (used for scrolling).
@@ -351,9 +353,9 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	   The two registers might be somewhat related to the width and height of the
 	   tilemaps, but there's something that just doesn't fit.
 	 */
-	int i;
 
-	for (i = 0;i < 0x10000;i++) // colors 0x3000-0x3fff are not used
+	// TODO: move to a cache system
+	for (int i = 0; i < m_palette->entries(); i++) // colors 0x3000-0x3fff are not used
 		update_color(i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
@@ -368,10 +370,7 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_bg_tilemap_alt->set_scrollx(0, scrollx);
 	m_bg_tilemap_alt->set_scrolly(0, scrolly);
 
-
 	screen.priority().fill(0, cliprect);
-
-
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
 	   top and bottom of the screen becomes black on black) */
@@ -381,8 +380,7 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get(), 0x20000, m_reverse_sprite_order);
-
+	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
 
 	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
 	asc_pri = scr_pri = rot_pri = 0;
@@ -431,31 +429,32 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 
 	// tile-sprite mixing
-	/* this mixing isn't 100% accurate, it should be using ALL the data in
-	   the priority ram, probably for per-pixel / pen mixing, or more levels
-	   than are supported here..  I don't know, it will need hw tests I think */
+	// TODO: spaghetti code
+	// TODO: complete guesswork and missing many spots
+	// TODO: move to a reusable function
+	/* it should be using ALL the data in the priority ram, probably for 
+	   per-pixel / pen mixing, or more levels than are supported here..  
+	   I don't know, it will need hw tests I think */
 	{
-		int width = screen.width();
-		int height = screen.height();
 		pen_t const *const paldata = m_palette->pens();
-
 		bitmap.fill(0, cliprect);
-
-		for (int yy=0;yy<height;yy++)
+		
+		for (int yy = cliprect.min_y; yy <= cliprect.max_y; yy++)
 		{
 			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
 			u8 const *const  srcptr_tilepri =  &screen.priority().pix(yy);
 			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
 			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
 			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
-			for (int xx=0;xx<width;xx++)
+			
+			for (int xx = cliprect.min_x; xx <= cliprect.max_x; xx++)
 			{
 				u16 src_tile  = srcptr_tile[xx];
 				u8 src_tilepri = srcptr_tilepri[xx];
 				u16 src_spri = srcptr_spri[xx];
 				//u8 src_spripri;// = srcptr_spripri[xx];
-				u16 spridat = ((src_spri&0x0fff));
-				u8  spritepri =     ((src_spri&0xf000) >> 8);
+				u16 spridat = (src_spri & 0x0fff);
+				u8  spritepri = ((src_spri & 0xf000) >> 8);
 				int primask = 0;
 
 				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)
@@ -468,7 +467,6 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 				if (m_priram[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
 				if (m_priram[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
-				// TODO: spaghetti code ...
 				if (primask == 0x00)
 				{
 					if (src_tilepri==0x00)
@@ -691,22 +689,26 @@ u32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, 
 					dstptr_bitmap[xx] = 0;
 					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
 				}
-
-
-
 			}
-
 		}
-
 	}
 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ms32_state::screen_vblank_ms32)
+WRITE_LINE_MEMBER(ms32_state::screen_vblank)
 {
 	if (state)
 	{
-		std::copy_n(&m_sprram[0], m_sprram.bytes() / 4, &m_sprram_buffer[0]);
+		std::copy_n(&m_sprram[0], m_objectram_size, &m_sprram_buffer[0]);
 	}
+}
+
+WRITE_LINE_MEMBER(ms32_state::flipscreen_w)
+{
+	m_tx_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap_alt->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_roz_tilemap->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	// TODO: sprite device
 }

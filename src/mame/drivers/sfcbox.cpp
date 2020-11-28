@@ -104,7 +104,7 @@ Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Tetris 2 + Bombliss (BPS), SHVC-T2-1, 8Mibit
 
 PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart
-GameData ROM: GROM4-1, undumped
+GameData ROM: GROM4-1, 256Kibit
 Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Bomberman 2 (Hudson Soft), SHVC-M4-0, 8Mibit
 
@@ -562,8 +562,8 @@ ROM_END
 ROM_START( pss64 )
 	SFCBOX_BIOS
 
-	ROM_REGION( 0x8000, "grom1", ROMREGION_ERASEFF )
-	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x8000, "grom1", 0 )
+	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, CRC(fcdbcb7d) SHA1(f27e8a264a427c3b74c8a370c380a79b9363affa) )
 
 	ROM_REGION( 0x8000, "grom2", ROMREGION_ERASEFF )
 

@@ -583,8 +583,6 @@ void elwro800_state::elwro800(machine_config &config)
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
 
-	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
-
 	UPD765A(config, "upd765", 8_MHz_XTAL / 2, true, true);
 
 	I8255A(config, m_i8255, 0);

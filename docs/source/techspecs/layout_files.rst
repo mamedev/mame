@@ -602,8 +602,8 @@ the state of an active-high output:
 .. code-block:: XML
 
     <element name="led" defstate="0">
-        <rect state="0"><color red="0.43" green="0.35" blue="0.39" /></rect>
-        <rect state="1"><color red="1.0" green="0.18" blue="0.20" /></rect>
+        <disk state="0"><color red="0.43" green="0.35" blue="0.39" /></disk>
+        <disk state="1"><color red="1.0" green="0.18" blue="0.20" /></disk>
     </element>
 
 An example element for a button that gives visual feedback when clicked:
@@ -773,7 +773,7 @@ The ``orientation`` element supports the following attributes, all of which are
 optional:
 
 rotate
-    If present, applies clockwise rotation in ninety degree implements.  Must be
+    If present, applies clockwise rotation in ninety degree increments.  Must be
     an integer equal to 0, 90, 180 or 270.
 swapxy
     Allows the screen, element or group to be mirrored along a line at
@@ -1419,7 +1419,7 @@ in case of an I/O error.  If an output file name is specified, the file will be
 created/overwritten on success or removed on failure.
 
 To check a layout file for common errors, run the script with the path to the
-file no check and no output file name or base variable name.  For example:
+file to check and no output file name or base variable name.  For example:
 
     **python scripts/build/complay.py artwork/dino/default.lay**
 

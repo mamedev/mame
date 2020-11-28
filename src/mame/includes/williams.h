@@ -266,8 +266,6 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
-		m_palette_0(*this, "blaster_pal0"),
-		m_scanline_control(*this, "blaster_scan"),
 		m_bankb(*this, "blaster_bankb"),
 		m_muxa(*this, "mux_a"),
 		m_muxb(*this, "mux_b")
@@ -282,8 +280,6 @@ private:
 	virtual void driver_init() override;
 
 	optional_device<cpu_device> m_soundcpu_b;
-	required_shared_ptr<uint8_t> m_palette_0;
-	required_shared_ptr<uint8_t> m_scanline_control;
 	optional_memory_bank m_bankb;
 	required_device<ls157_x2_device> m_muxa;
 	optional_device<ls157_device> m_muxb;

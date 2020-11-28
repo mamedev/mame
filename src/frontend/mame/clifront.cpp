@@ -514,7 +514,7 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 			args,
 			[] (device_t &root, char const *type, bool first)
 			{
-				for (device_t const &device : device_iterator(root))
+				for (device_t const &device : device_enumerator(root))
 				{
 					for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
 					{
@@ -548,7 +548,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 
 				// iterate through ROMs
 				bool hasroms = false;
-				for (device_t const &device : device_iterator(root))
+				for (device_t const &device : device_enumerator(root))
 				{
 					for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 					{
@@ -618,7 +618,7 @@ void cli_frontend::listsamples(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		// see if we have samples
-		samples_device_iterator iter(drivlist.config()->root_device());
+		samples_device_enumerator iter(drivlist.config()->root_device());
 		if (iter.count() == 0)
 			continue;
 
@@ -665,7 +665,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 		// build a list of devices
 		std::vector<device_t *> device_list;
-		for (device_t &device : device_iterator(drivlist.config()->root_device()))
+		for (device_t &device : device_enumerator(drivlist.config()->root_device()))
 			device_list.push_back(&device);
 
 		// sort them by tag
@@ -747,7 +747,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 	{
 		// iterate
 		bool first = true;
-		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
+		for (const device_slot_interface &slot : slot_interface_enumerator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
 
@@ -815,7 +815,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 	{
 		// iterate
 		bool first = true;
-		for (const device_image_interface &imagedev : image_interface_iterator(drivlist.config()->root_device()))
+		for (const device_image_interface &imagedev : image_interface_enumerator(drivlist.config()->root_device()))
 		{
 			if (!imagedev.user_loadable())
 				continue;
@@ -1215,7 +1215,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 			args,
 			[this, &list_map, &firstlist] (device_t &root, char const *type, bool first)
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(root))
+				for (software_list_device &swlistdev : software_list_device_enumerator(root))
 				{
 					if (list_map.insert(swlistdev.list_name()).second)
 					{
@@ -1268,7 +1268,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	{
 		matched++;
 
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.is_original())
 			{
@@ -1330,7 +1330,7 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 			std::vector<std::string>(),
 			[this, gamename, &list_map, &firstlist] (device_t &root, char const *type, bool first)
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(root))
+				for (software_list_device &swlistdev : software_list_device_enumerator(root))
 				{
 					if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 					{
@@ -1375,7 +1375,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 
 	while (drivlist.next())
 	{
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{

@@ -353,7 +353,7 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 				}
 
 				// next iterate over softlists
-				for (software_list_device &swlistdev : software_list_device_iterator(device))
+				for (software_list_device &swlistdev : software_list_device_enumerator(device))
 				{
 					if (!listnames.insert(swlistdev.list_name()).second)
 						continue;

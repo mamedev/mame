@@ -33,6 +33,10 @@ struct lua_State;
 class lua_engine
 {
 public:
+	// helper structures
+	template <typename T> struct devenum;
+	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
+
 	// construction/destruction
 	lua_engine();
 	~lua_engine();
@@ -55,12 +59,12 @@ public:
 	bool on_missing_mandatory_image(const std::string &instance_name);
 	void on_machine_before_load_settings();
 
-	template<typename T, typename U>
-	bool call_plugin(const std::string &name, const T in, U &out)
+	template <typename T, typename U>
+	bool call_plugin(const std::string &name, T &&in, U &out)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<U>())
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
+		if (outobj.is<U>())
 		{
 			out = outobj.as<U>();
 			ret = true;
@@ -68,16 +72,16 @@ public:
 		return ret;
 	}
 
-	template<typename T, typename U>
-	bool call_plugin(const std::string &name, const T in, std::vector<U> &out)
+	template <typename T, typename U>
+	bool call_plugin(const std::string &name, T &&in, std::vector<U> &out)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<sol::table>())
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
+		if (outobj.is<sol::table>())
 		{
-			for(auto &entry : outobj.as<sol::table>())
+			for (auto &entry : outobj.as<sol::table>())
 			{
-				if(entry.second.template is<U>())
+				if (entry.second.template is<U>())
 				{
 					out.push_back(entry.second.template as<U>());
 					ret = true;
@@ -88,26 +92,26 @@ public:
 	}
 
 	// this can also check if a returned table contains type T
-	template<typename T, typename U>
-	bool call_plugin_check(const std::string &name, const U in, bool table = false)
+	template <typename T, typename U>
+	bool call_plugin_check(const std::string &name, U &&in, bool table = false)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<T>() && !table)
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<U>(in)));
+		if (outobj.is<T>() && !table)
 			ret = true;
-		else if(outobj.is<sol::table>() && table)
+		else if (outobj.is<sol::table>() && table)
 		{
 			// check just one entry, checking the whole thing shouldn't be necessary as this only supports homogeneous tables
-			if(outobj.as<sol::table>().begin().operator*().second.template is<T>())
+			if (outobj.as<sol::table>().begin().operator*().second.template is<T>())
 				ret = true;
 		}
 		return ret;
 	}
 
-	template<typename T>
-	void call_plugin_set(const std::string &name, const T in)
+	template <typename T>
+	void call_plugin_set(const std::string &name, T &&in)
 	{
-		call_plugin(name, sol::make_object(sol(), in));
+		call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
 	}
 
 	sol::state_view &sol() const { return *m_sol_state; }

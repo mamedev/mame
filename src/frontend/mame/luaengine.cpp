@@ -37,24 +37,144 @@
 //**************************************************************************
 
 extern "C" {
-	int luaopen_zlib(lua_State *L);
-	int luaopen_lfs(lua_State *L);
-	int luaopen_linenoise(lua_State *L);
-	int luaopen_lsqlite3(lua_State *L);
-}
+
+int luaopen_zlib(lua_State *L);
+int luaopen_lfs(lua_State *L);
+int luaopen_linenoise(lua_State *L);
+int luaopen_lsqlite3(lua_State *L);
+
+} // extern "C"
+
+
+template <typename T>
+struct lua_engine::devenum
+{
+	devenum(device_t &d) : device(d), iter(d) { }
+
+	device_t &device;
+	T iter;
+	int count = -1;
+};
+
 
 namespace sol
 {
-	sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
-	{
-		return new sol::buffer(stack::get<int>(L, index), L);
-	}
-	int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
-	{
-		delete value;
-		return 1;
-	}
+
+sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
+{
+	return new sol::buffer(stack::get<int>(L, index), L);
 }
+
+int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
+{
+	delete value;
+	return 1;
+}
+
+template <typename T>
+struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_container_helper<lua_engine::devenum<T>, T>
+{
+private:
+	using enumerator = lua_engine::devenum<T>;
+
+	template <bool Indexed>
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return stack::push(L, lua_nil);
+		int result;
+		if constexpr (Indexed)
+			result = stack::push(L, i.ix + 1);
+		else
+			result = stack::push(L, i.it->tag());
+		result += stack::push_reference(L, *i.it);
+		++i;
+		return result;
+	}
+
+	template <bool Indexed>
+	static int start_pairs(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs<Indexed>);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.iter, self.iter.begin());
+		stack::push(L, lua_nil);
+		return 3;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		auto const dev(self.iter.byindex(index - 1));
+		if (dev)
+			return stack::push_reference(L, *dev);
+		else
+			return stack::push(L, lua_nil);
+	}
+
+	static int get(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		char const *const tag(stack::unqualified_get<char const *>(L));
+		device_t *const dev(self.device.subdevice(tag));
+		if (dev)
+		{
+			auto *const check(T(*dev, 0).first());
+			bool match;
+			if constexpr (std::is_base_of_v<device_t, decltype(*check)>)
+				match = check && (static_cast<device_t *>(check) == dev);
+			else if constexpr (std::is_base_of_v<device_interface, decltype(*check)>)
+				match = check && (&check->device() == dev);
+			else
+				match = check && (dynamic_cast<device_t *>(check) == dev);
+			if (match)
+				return stack::push_reference(L, *check);
+		}
+		return stack::push(L, lua_nil);
+	}
+
+	static int index_get(lua_State *L)
+	{
+		return get(L);
+	}
+
+	static int index_of(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		auto &dev(stack::unqualified_get<decltype(*self.iter.first())>(L, 2));
+		std::ptrdiff_t found(self.iter.indexof(dev));
+		if (0 > found)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push(L, found + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		if (0 > self.count)
+			self.count = self.iter.count();
+		return stack::push(L, self.count);
+	}
+
+	static int empty(lua_State *L)
+	{
+		enumerator &self(usertype_container::get_self(L));
+		if (0 > self.count)
+			self.count = self.iter.count();
+		return stack::push(L, !self.count);
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
+	static int pairs(lua_State *L) { return start_pairs<false>(L); }
+	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
+
+} // namespace sol
+
 
 int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
 {
@@ -461,17 +581,23 @@ void lua_engine::initialize()
  * emu.print_error(str) - output to stderr at error level
  * emu.print_info(str) - output to stderr at info level
  * emu.print_debug(str) - output to stderr at debug level
+ *
+ * emu.device_enumerator(dev) - get device enumerator starting at arbitrary point in tree
+ * emu.screen_enumerator(dev) - get screen device enumerator starting at arbitrary point in tree
+ * emu.image_enumerator(dev) - get image interface enumerator starting at arbitrary point in tree
  */
 
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
-	emu["gamename"] = [this](){ return machine().system().type.fullname(); };
-	emu["romname"] = [this](){ return machine().basename(); };
-	emu["softname"] = [this]() { return machine().options().software_name(); };
-	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
-	emu["time"] = [this](){ return machine().time().as_double(); };
-	emu["start"] = [this](const char *driver) {
+	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
+	emu["romname"] = [this] () { return machine().basename(); };
+	emu["softname"] = [this] () { return machine().options().software_name(); };
+	emu["keypost"] = [this] (const char *keys) { machine().ioport().natkeyboard().post_utf8(keys); };
+	emu["time"] = [this] () { return machine().time().as_double(); };
+	emu["start"] =
+		[this](const char *driver)
+		{
 			int i = driver_list::find(driver);
 			if (i != -1)
 			{
@@ -480,69 +606,86 @@ void lua_engine::initialize()
 			}
 			return 1;
 		};
-	emu["pause"] = [this](){ return machine().pause(); };
-	emu["unpause"] = [this](){ return machine().resume(); };
-	emu["step"] = [this]() {
+	emu["pause"] = [this] () { return machine().pause(); };
+	emu["unpause"] = [this] () { return machine().resume(); };
+	emu["step"] =
+		[this] ()
+		{
 			mame_machine_manager::instance()->ui().set_single_step(true);
 			machine().resume();
 		};
-	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
-	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
-	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
-	emu["register_pause"] = [this](sol::function func){ register_function(func, "LUA_ON_PAUSE"); };
-	emu["register_resume"] = [this](sol::function func){ register_function(func, "LUA_ON_RESUME"); };
-	emu["register_frame"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME"); };
-	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
-	emu["register_sound_update"] = [this](sol::function func){ register_function(func, "LUA_ON_SOUND_UPDATE"); };
-	emu["register_periodic"] = [this](sol::function func){ register_function(func, "LUA_ON_PERIODIC"); };
-	emu["register_mandatory_file_manager_override"] = [this](sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
+	emu["register_prestart"] = [this] (sol::function func) { register_function(func, "LUA_ON_PRESTART"); };
+	emu["register_start"] = [this] (sol::function func) { register_function(func, "LUA_ON_START"); };
+	emu["register_stop"] = [this] (sol::function func) { register_function(func, "LUA_ON_STOP"); };
+	emu["register_pause"] = [this] (sol::function func) { register_function(func, "LUA_ON_PAUSE"); };
+	emu["register_resume"] = [this] (sol::function func) { register_function(func, "LUA_ON_RESUME"); };
+	emu["register_frame"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME"); };
+	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
+	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };
+	emu["register_periodic"] = [this] (sol::function func) { register_function(func, "LUA_ON_PERIODIC"); };
+	emu["register_mandatory_file_manager_override"] = [this] (sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
 	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
-	emu["register_menu"] = [this](sol::function cb, sol::function pop, const std::string &name) {
+	emu["register_menu"] =
+		[this] (sol::function cb, sol::function pop, const std::string &name)
+		{
 			std::string cbfield = "menu_cb_" + name;
 			std::string popfield = "menu_pop_" + name;
 			sol().registry()[cbfield] = cb;
 			sol().registry()[popfield] = pop;
 			m_menu.push_back(name);
 		};
-	emu["show_menu"] = [this](const char *name) {
+	emu["show_menu"] =
+		[this](const char *name)
+		{
 			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 			render_container &container = machine().render().ui_container();
 			ui::menu_plugin::show_menu(mui, container, (char *)name);
 		};
-	emu["register_callback"] = [this](sol::function cb, const std::string &name) {
+	emu["register_callback"] =
+		[this] (sol::function cb, const std::string &name)
+		{
 			std::string field = "cb_" + name;
 			sol().registry()[field] = cb;
 		};
-	emu["print_verbose"] = [](const char *str) { osd_printf_verbose("%s\n", str); };
-	emu["print_error"] = [](const char *str) { osd_printf_error("%s\n", str); };
-	emu["print_info"] = [](const char *str) { osd_printf_info("%s\n", str); };
-	emu["print_debug"] = [](const char *str) { osd_printf_debug("%s\n", str); };
-	emu["driver_find"] = [this](const char *driver) -> sol::object {
-			int i = driver_list::find(driver);
-			if(i == -1)
+	emu["print_verbose"] = [] (const char *str) { osd_printf_verbose("%s\n", str); };
+	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
+	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
+	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
+	emu["driver_find"] =
+		[this] (const char *driver) -> sol::object
+		{
+			const int i = driver_list::find(driver);
+			if (i < 0)
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
-	emu["wait"] = lua_CFunction([](lua_State *L) {
-			lua_engine *engine = mame_machine_manager::instance()->lua();
-			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-			int ret = lua_pushthread(L);
-			if(ret == 1)
-				return luaL_error(L, "cannot wait from outside coroutine");
-			int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
-			return lua_yield(L, 0);
-		});
+	emu["wait"] = lua_CFunction(
+			[](lua_State *L)
+			{
+				lua_engine *engine = mame_machine_manager::instance()->lua();
+				luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
+				int ret = lua_pushthread(L);
+				if (ret == 1)
+					return luaL_error(L, "cannot wait from outside coroutine");
+				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
+				return lua_yield(L, 0);
+			});
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] = [](const std::string &str) {
+	emu["subst_env"] =
+		[] (const std::string &str)
+		{
 			std::string result;
 			osd_subst_env(result, str);
 			return result;
 		};
+	emu["device_enumerator"] = [] (device_t &d) { return devenum<device_enumerator>(d); };
+	emu["screen_enumerator"] = [] (device_t &d) { return devenum<screen_device_enumerator>(d); };
+	emu["image_enumerator"] = [] (device_t &d) { return devenum<image_interface_enumerator>(d); };
 
 
-/*  emu_file library
+/* emu_file library
  *
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style
  *                                     with 'rwc' with addtional c for create *and truncate*
@@ -820,7 +963,7 @@ void lua_engine::initialize()
 		});
 
 
-/*  core_options library
+/* core_options library
  *
  * manager:options()
  * manager:machine():options()
@@ -957,12 +1100,14 @@ void lua_engine::initialize()
  */
 
 	auto machine_type = sol().registry().new_usertype<running_machine>("machine", "new", sol::no_constructor);
-	machine_type.set("exit", &running_machine::schedule_exit);
-	machine_type.set("hard_reset", &running_machine::schedule_hard_reset);
-	machine_type.set("soft_reset", &running_machine::schedule_soft_reset);
-	machine_type.set("save", &running_machine::schedule_save);
-	machine_type.set("load", &running_machine::schedule_load);
-	machine_type.set("buffer_save", [](running_machine &m, sol::this_state s) {
+	machine_type["exit"] = &running_machine::schedule_exit;
+	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
+	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
+	machine_type["save"] = &running_machine::schedule_save;
+	machine_type["load"] = &running_machine::schedule_load;
+	machine_type["buffer_save"] =
+		[] (running_machine &m, sol::this_state s)
+		{
 			lua_State *L = s;
 			luaL_Buffer buff;
 			int size = ram_state::get_size(m.save());
@@ -975,8 +1120,10 @@ void lua_engine::initialize()
 			}
 			luaL_error(L, "State save error.");
 			return sol::make_reference(L, nullptr);
-		});
-	machine_type.set("buffer_load", [](running_machine &m, sol::this_state s, std::string str) {
+		};
+	machine_type["buffer_load"] =
+		[] (running_machine &m, sol::this_state s, std::string str)
+		{
 			lua_State *L = s;
 			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
 			if (error == STATERR_NONE)
@@ -986,65 +1133,36 @@ void lua_engine::initialize()
 				luaL_error(L,"State load error.");
 				return false;
 			}
-		});
-	machine_type.set("system", &running_machine::system);
-	machine_type.set("video", &running_machine::video);
-	machine_type.set("sound", &running_machine::sound);
-	machine_type.set("render", &running_machine::render);
-	machine_type.set("ioport", &running_machine::ioport);
-	machine_type.set("parameters", &running_machine::parameters);
-	machine_type.set("memory", &running_machine::memory);
-	machine_type.set("options", [](running_machine &m) { return static_cast<core_options *>(&m.options()); });
-	machine_type.set("outputs", &running_machine::output);
-	machine_type.set("input", &running_machine::input);
-	machine_type.set("uiinput", &running_machine::ui_input);
-	machine_type.set("debugger", [this](running_machine &m) -> sol::object {
+		};
+	machine_type["system"] = &running_machine::system;
+	machine_type["video"] = &running_machine::video;
+	machine_type["sound"] = &running_machine::sound;
+	machine_type["render"] = &running_machine::render;
+	machine_type["ioport"] = &running_machine::ioport;
+	machine_type["parameters"] = &running_machine::parameters;
+	machine_type["memory"] = &running_machine::memory;
+	machine_type["options"] = [] (running_machine &m) { return static_cast<core_options *>(&m.options()); };
+	machine_type["outputs"] = &running_machine::output;
+	machine_type["input"] = &running_machine::input;
+	machine_type["uiinput"] = &running_machine::ui_input;
+	machine_type["debugger"] =
+		[this] (running_machine &m) -> sol::object
+		{
 			if(!(m.debug_flags & DEBUG_FLAG_ENABLED))
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), &m.debugger());
-		});
-	machine_type.set("paused", sol::property(&running_machine::paused));
-	machine_type.set("samplerate", sol::property(&running_machine::sample_rate));
-	machine_type.set("exit_pending", sol::property(&running_machine::exit_pending));
-	machine_type.set("hard_reset_pending", sol::property(&running_machine::hard_reset_pending));
-	machine_type.set("devices", sol::property([this](running_machine &m) {
-			std::function<void(device_t &, sol::table)> tree;
-			sol::table table = sol().create_table();
-			tree = [&tree](device_t &root, sol::table table) {
-				for(device_t &dev : root.subdevices())
-				{
-					if(dev.configured() && dev.started())
-					{
-						table[dev.tag()] = &dev;
-						tree(dev, table);
-					}
-				}
-			};
-			tree(m.root_device(), table);
-			return table;
-		}));
-	machine_type.set("screens", sol::property([this](running_machine &r) {
-			sol::table table = sol().create_table();
-			for (screen_device &sc : screen_device_iterator(r.root_device()))
-			{
-				if (sc.configured() && sc.started() && sc.type())
-					table[sc.tag()] = &sc;
-			}
-			return table;
-		}));
-	machine_type.set("images", sol::property([this](running_machine &r) {
-			sol::table image_table = sol().create_table();
-			for(device_image_interface &image : image_interface_iterator(r.root_device()))
-			{
-				image_table[image.brief_instance_name()] = &image;
-				image_table[image.instance_name()] = &image;
-			}
-			return image_table;
-		}));
-	machine_type.set("popmessage", sol::overload(
+		};
+	machine_type["paused"] = sol::property(&running_machine::paused);
+	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
+	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
+	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
+	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
+	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
+	machine_type["popmessage"] = sol::overload(
 			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
-			[](running_machine &m) { m.popmessage(); }));
-	machine_type.set("logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
+			[](running_machine &m) { m.popmessage(); });
+	machine_type["logerror"]  = [] (running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); };
 
 
 /*  game_driver library
@@ -1270,6 +1388,8 @@ void lua_engine::initialize()
  * device:owner() - device parent tag
  * device:debug() - debug interface, cpus only
  *
+ * device.configured - whether configuration is complete
+ * device.started - whether the device has been started
  * device.spaces[] - device address spaces table (k=name, v=addr_space)
  * device.state[] - device state entries table (k=name, v=device_state_entry)
  * device.items[] - device save state items table (k=name, v=index)
@@ -1277,65 +1397,77 @@ void lua_engine::initialize()
  */
 
 	auto device_type = sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor);
-	device_type.set("name", &device_t::name);
-	device_type.set("shortname", &device_t::shortname);
-	device_type.set("tag", &device_t::tag);
-	device_type.set("owner", &device_t::owner);
-	device_type.set("debug", [this](device_t &dev) -> sol::object {
-			if(!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
+	device_type["name"] = &device_t::name;
+	device_type["shortname"] = &device_t::shortname;
+	device_type["tag"] = &device_t::tag;
+	device_type["owner"] = &device_t::owner;
+	device_type["debug"] =
+		[this] (device_t &dev) -> sol::object
+		{
+			if (!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), dev.debug());
-		});
-	device_type.set("spaces", sol::property([this](device_t &dev) {
-			device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(&dev);
-			sol::table sp_table = sol().create_table();
-			if(!memdev)
-				return sp_table;
-			for(int sp = 0; sp < memdev->max_space_count(); ++sp)
+		};
+	device_type["configured"] = sol::property(&device_t::configured);
+	device_type["started"] = sol::property(&device_t::started);
+	device_type["spaces"] = sol::property(
+			[this] (device_t &dev)
 			{
-				if(memdev->has_space(sp))
-					sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
-			}
-			return sp_table;
-		}));
-	device_type.set("state", sol::property([this](device_t &dev) {
-			sol::table st_table = sol().create_table();
-			if(!dynamic_cast<device_state_interface *>(&dev))
-				return st_table;
-			// XXX: refrain from exporting non-visible entries?
-			for(auto &s : dev.state().state_entries())
-				st_table[s->symbol()] = s.get();
-			return st_table;
-		}));
-	device_type.set("items", sol::property([this](device_t &dev) {
-			sol::table table = sol().create_table();
-			std::string tag = dev.tag();
-			// 10000 is enough?
-			for(int i = 0; i < 10000; i++)
-			{
-				std::string name;
-				const char *item;
-				void *base;
-				uint32_t size, valcount, blockcount, stride;
-				item = dev.machine().save().indexed_item(i, base, size, valcount, blockcount, stride);
-				if(!item)
-					break;
-				name = &(strchr(item, '/')[1]);
-				if(name.substr(0, name.find('/')) == tag)
+				device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(&dev);
+				sol::table sp_table = sol().create_table();
+				if(!memdev)
+					return sp_table;
+				for(int sp = 0; sp < memdev->max_space_count(); ++sp)
 				{
-					name = name.substr(name.find('/') + 1, std::string::npos);
-					table[name] = i;
+					if(memdev->has_space(sp))
+						sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
 				}
-			}
-			return table;
-		}));
-	device_type.set("roms", sol::property([this](device_t &dev) {
-			sol::table table = sol().create_table();
-			for(auto rom : dev.rom_region_vector())
-				if(!rom.name().empty())
-					table[rom.name()] = rom;
-			return table;
-		}));
+				return sp_table;
+			});
+	device_type["state"] = sol::property(
+			[this] (device_t &dev)
+			{
+				sol::table st_table = sol().create_table();
+				if(!dynamic_cast<device_state_interface *>(&dev))
+					return st_table;
+				// XXX: refrain from exporting non-visible entries?
+				for(auto &s : dev.state().state_entries())
+					st_table[s->symbol()] = s.get();
+				return st_table;
+			});
+	device_type["items"] = sol::property(
+			[this] (device_t &dev)
+			{
+				sol::table table = sol().create_table();
+				std::string tag = dev.tag();
+				// 10000 is enough?
+				for(int i = 0; i < 10000; i++)
+				{
+					std::string name;
+					const char *item;
+					void *base;
+					uint32_t size, valcount, blockcount, stride;
+					item = dev.machine().save().indexed_item(i, base, size, valcount, blockcount, stride);
+					if(!item)
+						break;
+					name = &(strchr(item, '/')[1]);
+					if(name.substr(0, name.find('/')) == tag)
+					{
+						name = name.substr(name.find('/') + 1, std::string::npos);
+						table[name] = i;
+					}
+				}
+				return table;
+			});
+	device_type["roms"] = sol::property(
+			[this] (device_t &dev)
+			{
+				sol::table table = sol().create_table();
+				for(auto rom : dev.rom_region_vector())
+					if(!rom.name().empty())
+						table[rom.name()] = rom;
+				return table;
+			});
 
 
 /*  parameters_manager library
@@ -1346,9 +1478,9 @@ void lua_engine::initialize()
  * parameters:lookup(tag) - get val for tag
  */
 
-	sol().registry().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
-			"add", &parameters_manager::add,
-			"lookup", &parameters_manager::lookup);
+	auto parameters_type = sol().registry().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor);
+	parameters_type["add"] = &parameters_manager::add;
+	parameters_type["lookup"] = &parameters_manager::lookup;
 
 
 /*  video_manager library
@@ -1880,17 +2012,4 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	run(sol().load(value));
-}
-
-//-------------------------------------------------
-//  invoke - invokes a function, wrapping profiler
-//-------------------------------------------------
-
-template<typename TFunc, typename... TArgs>
-sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs&&... args)
-{
-	g_profiler.start(PROFILER_LUA);
-	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
-	g_profiler.stop();
-	return result;
 }

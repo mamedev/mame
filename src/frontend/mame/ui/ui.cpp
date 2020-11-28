@@ -446,7 +446,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				{
 					// non-critical warnings - map current unemulated/imperfect features
 					device_feature_set unemulated_features, imperfect_features;
-					for (device_t &device : device_iterator(machine().root_device()))
+					for (device_t &device : device_enumerator(machine().root_device()))
 					{
 						device_t::feature_type unemulated = device.type().unemulated_features();
 						for (std::underlying_type_t<device_t::feature_type> feature = 1U; unemulated; feature <<= 1)
@@ -1167,7 +1167,7 @@ void mame_ui_manager::image_handler_ingame()
 		auto layout = create_layout(machine().render().ui_container());
 
 		// loop through all devices, build their text into the layout
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		{
 			std::string str = image.call_display();
 			if (!str.empty())
@@ -1315,7 +1315,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// handle a tape control key
 	if (machine().ui_input().pressed(IPT_UI_TAPE_START))
 	{
-		for (cassette_image_device &cass : cassette_device_iterator(machine().root_device()))
+		for (cassette_image_device &cass : cassette_device_enumerator(machine().root_device()))
 		{
 			cass.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 			return 0;
@@ -1323,7 +1323,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 	if (machine().ui_input().pressed(IPT_UI_TAPE_STOP))
 	{
-		for (cassette_image_device &cass : cassette_device_iterator(machine().root_device()))
+		for (cassette_image_device &cass : cassette_device_enumerator(machine().root_device()))
 		{
 			cass.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 			return 0;
@@ -1541,13 +1541,13 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	slider_index = 0;
 	if (machine.options().cheat())
 	{
-		for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
+		for (device_execute_interface &exec : execute_interface_enumerator(machine.root_device()))
 		{
 			void *param = (void *)&exec.device();
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
 			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 100, 1000, 4000, 10, param));
 		}
-		for (device_sound_interface &snd : sound_interface_iterator(machine.root_device()))
+		for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
 		{
 			device_execute_interface *exec;
 			if (!snd.device().interface(exec) && snd.device().unscaled_clock() != 0)
@@ -1560,7 +1560,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	}
 
 	// add screen parameters
-	screen_device_iterator scriter(machine.root_device());
+	screen_device_enumerator scriter(machine.root_device());
 	slider_index = 0;
 	for (screen_device &screen : scriter)
 	{
@@ -1599,7 +1599,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	}
 
 	slider_index = 0;
-	for (laserdisc_device &laserdisc : laserdisc_device_iterator(machine.root_device()))
+	for (laserdisc_device &laserdisc : laserdisc_device_enumerator(machine.root_device()))
 	{
 		if (laserdisc.overlay_configured())
 		{

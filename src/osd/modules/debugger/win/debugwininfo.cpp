@@ -333,7 +333,7 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			machine().rewind_step();
 
 			// clear all PC & memory tracks
-			for (device_t &device : device_iterator(machine().root_device()))
+			for (device_t &device : device_enumerator(machine().root_device()))
 			{
 				device.debug()->track_pc_data_clear();
 				device.debug()->track_mem_data_clear();

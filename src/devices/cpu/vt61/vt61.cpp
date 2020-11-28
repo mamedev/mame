@@ -127,7 +127,7 @@ u8 vt61_cpu_device::get_db(u16 i)
 		// SEL SPM
 		u8 addr = bitswap<4>(i, 5, 4, 3, 7);
 		if (BIT(i, 6))
-			addr = (addr & 014) | m_ir;
+			addr = (addr & 011) | (m_ir << 1);
 		return m_sp[addr];
 	}
 	else switch (BIT(i, 7, 4))
@@ -228,7 +228,7 @@ bool vt61_cpu_device::branch_mux(u8 cond)
 
 	case 12:
 		// KEY DOWN (TODO)
-		return true;
+		return (m_ac != 050); // HACK: this forces what should be the C key down, which is somehow necessary at power-up
 
 	case 13:
 		// PWR UP

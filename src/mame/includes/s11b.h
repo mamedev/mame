@@ -25,17 +25,16 @@ public:
 	void init_s11b();
 	void init_s11b_invert();
 
+protected:
+	virtual void machine_reset() override;
+	void set_invert(bool inv) { m_invert = inv; }
+
 	void dig1_w(uint8_t data);
 	void pia2c_pa_w(uint8_t data);
 	void pia2c_pb_w(uint8_t data);
 	void pia34_pa_w(uint8_t data);
 
-protected:
-	void set_invert(bool inv) { m_invert = inv; }
-
 private:
-	DECLARE_MACHINE_RESET(s11b);
-
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
 };
 

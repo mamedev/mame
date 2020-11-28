@@ -141,7 +141,7 @@ static INPUT_PORTS_START( s11b )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s11b_state, s11b )
+void s11b_state::machine_reset()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -232,7 +232,6 @@ void s11b_state::s11b_base(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 

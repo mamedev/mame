@@ -52,17 +52,19 @@ void spc1000_fdd_exp_device::control_w(uint8_t data)
 	logerror("%s: control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
-	if (m_fd0)
-		m_fd0->mon_w(!BIT(data, 0));
-	if (m_fd1)
-		m_fd1->mon_w(!BIT(data, 0));
+	for (auto &fd : m_fd)
+	{
+		floppy_image_device *img = fd->get_device();
+		if (img)
+			img->mon_w(!BIT(data, 0));
+	}
 }
 
 void spc1000_fdd_exp_device::sd725_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xffff).ram();
+	map(0x0000, 0x0fff).rom().region("fdccpu", 0);
+	map(0x4000, 0x7fff).ram(); // 16K dynamic RAM (2x TMS4416-15NL)
 }
 
 void spc1000_fdd_exp_device::sd725_io(address_map &map)
@@ -85,10 +87,11 @@ static void sd725_floppies(device_slot_interface &device)
 
 void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 {
-	// sub CPU (5 inch floppy drive)
-	Z80(config, m_cpu, XTAL(4'000'000));
+	// Z80A sub CPU (5 inch floppy drive)
+	Z80(config, m_cpu, 8_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &spc1000_fdd_exp_device::sd725_mem);
 	m_cpu->set_addrmap(AS_IO, &spc1000_fdd_exp_device::sd725_io);
+	m_cpu->set_irq_acknowledge_callback(NAME([](device_t &, int) { return 0xcf; })); // vector to 0008 in IM 0
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(m_ppi, FUNC(i8255_device::pb_r));
@@ -98,7 +101,7 @@ void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(spc1000_fdd_exp_device::i8255_c_w));
 
 	// floppy disk controller
-	UPD765A(config, m_fdc, 4'000'000, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL / 2, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives
@@ -107,7 +110,7 @@ void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START( spc1000_fdd )
-	ROM_REGION(0x10000, "fdccpu", 0)
+	ROM_REGION(0x1000, "fdccpu", 0)
 	ROM_LOAD("sd725a.bin", 0x0000, 0x1000, CRC(96ac2eb8) SHA1(8e9d8f63a7fb87af417e95603e71cf537a6e83f1))
 ROM_END
 
@@ -141,7 +144,8 @@ spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, co
 	m_cpu(*this, "fdccpu"),
 	m_fdc(*this, "upd765"),
 	m_ppi(*this, "d8255_master"),
-	m_fd0(nullptr), m_fd1(nullptr), m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
+	m_fd(*this, "upd765:%u", 0U),
+	m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
 {
 }
 
@@ -152,11 +156,7 @@ spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, co
 
 void spc1000_fdd_exp_device::device_start()
 {
-	m_timer_tc = timer_alloc(TIMER_TC);
-	m_timer_tc->adjust(attotime::never);
-
-	m_fd0 = subdevice<floppy_connector>("upd765:0")->get_device();
-	m_fd1 = subdevice<floppy_connector>("upd765:1")->get_device();
+	m_timer_tc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spc1000_fdd_exp_device::tc_off), this));
 }
 
 //-------------------------------------------------
@@ -165,20 +165,11 @@ void spc1000_fdd_exp_device::device_start()
 
 void spc1000_fdd_exp_device::device_reset()
 {
-	m_cpu->set_input_line_vector(0, 0); // Z80
-
-	// enable rom (is this really needed? it does not seem necessary for FDD to work)
-	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0x2000, memregion("fdccpu")->base());
 }
 
-void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(spc1000_fdd_exp_device::tc_off)
 {
-	switch (id)
-	{
-		case TIMER_TC:
-			m_fdc->tc_w(false);
-			break;
-	}
+	m_fdc->tc_w(false);
 }
 
 /*-------------------------------------------------

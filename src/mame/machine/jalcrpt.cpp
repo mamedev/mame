@@ -125,7 +125,7 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 	uint8_t *source_data;
 	int source_size;
 
-	source_data = machine.root_device().memregion       ( region )->base();
+	source_data = machine.root_device().memregion( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
 	std::vector<uint8_t> result_data(source_size);
@@ -176,7 +176,7 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 	uint8_t *source_data;
 	int source_size;
 
-	source_data = machine.root_device().memregion       ( region )->base();
+	source_data = machine.root_device().memregion( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
 	std::vector<uint8_t> result_data(source_size);
