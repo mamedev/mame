@@ -630,6 +630,21 @@ p) 'mooncrgx'
     as a consequence, square around letters is wrong when entering player name
     for hi-score table when screen not is flipped
 
+q) 'bongo'
+
+  - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
+    there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
+    (unmapped memory) if it pressed (HIGH).
+  - IN0 bit 7 is tested on startup (code at 0x0048) in combination with bits 0 and 1
+    (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
+    the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
+  - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
+    but their status is discarded with 3 'NOP' instructions at 0x06ca.
+  - IN0 bit 7 and IN0 bit 6 should have been IPT_BUTTON1 (Upright and Cocktail)
+    but their status is discarded with 3 'NOP' instructions at 0x06d1.
+  - IN2 is read via code at 0x2426, but its contents is directly overwritten
+    with value read from DSW (AY port A) via code at 0x3647.
+
 
 
 TODO:
@@ -1631,17 +1646,12 @@ void galaxian_state::mooncrst_map_base(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x9800, 0x98ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
-	map(0xa000, 0xa002).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w));
-	map(0xa003, 0xa003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-//  map(0xa004, 0xa007).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
 	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
-//  map(0xa800, 0xa807).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::sound_w));
 	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
 	map(0xb000, 0xb000).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
 	map(0xb004, 0xb004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0xb006, 0xb006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
 	map(0xb007, 0xb007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-//  map(0xb800, 0xb800).mirror(0x07ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
 	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -1654,12 +1664,15 @@ void galaxian_state::mooncrst_map(address_map &map)
 {
 	mooncrst_map_base(map);
 	mooncrst_map_discrete(map);
+	map(0xa000, 0xa002).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w));
+	map(0xa003, 0xa003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
 }
 
 void galaxian_state::froggermc_map(address_map &map)
 {
 	mooncrst_map_base(map); // no discrete sound
 	map(0x8400, 0x87ff).ram(); // actually needs 2k of RAM
+	map(0xa003, 0xa003).mirror(0x7f8).w(FUNC(galaxian_state::coin_count_0_w));
 	map(0xa800, 0xa800).mirror(0x7ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::froggermc_sound_control_w));
 }
@@ -1696,6 +1709,22 @@ void galaxian_state::scorpnmc_map(address_map &map)
 	map(0x8400, 0x87ff).unmaprw(); // doesn't appear to use original RAM
 	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
+}
+
+void galaxian_state::bongo_map(address_map &map)
+{
+	mooncrst_map_base(map); // no discrete sound
+	map(0x0000, 0x5fff).rom().region("maincpu", 0); // extend ROM
+	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
+	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xb800, 0xb800).mirror(0x7ff).nopw(); // written once at start
+}
+
+void galaxian_state::bongo_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_ay8910[0], FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r(m_ay8910[0], FUNC(ay8910_device::data_r));
 }
 
 
@@ -4055,6 +4084,52 @@ static INPUT_PORTS_START( kong )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( bongo )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* see notes */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
+
+	PORT_START("DSW")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPNAME( 0x08, 0x00, "Infinite Lives (Cheat)" )    /* always gives 3 lives */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )            /* also 1C_3C for Coin B if it existed */
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )            /* also 1C_6C for Coin B if it existed */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 
@@ -6498,6 +6573,21 @@ void galaxian_state::scorpnmc(machine_config &config)
 {
 	mooncrst(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::scorpnmc_map);
+}
+
+
+void galaxian_state::bongo(machine_config &config)
+{
+	galaxian_base(config);
+
+	// alternate memory map
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongo_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxian_state::bongo_io_map);
+	
+	// sound hardware
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/4);
+	m_ay8910[0]->port_a_read_callback().set_ioport("DSW");
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -10723,6 +10813,24 @@ ROM_START( kong )
 	ROM_LOAD( "prom", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
+ROM_START( bongo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
+	ROM_LOAD( "bg2.bin",    0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
+	ROM_LOAD( "bg3.bin",    0x2000, 0x1000, CRC(9f6f2150) SHA1(26a1f872686ddddcdb690d7b826ba26c20cdec35) )
+	ROM_LOAD( "bg4.bin",    0x3000, 0x1000, CRC(f80372d2) SHA1(078e2c8b947103c168c0c85430f8ebc9d09f8ba7) )
+	ROM_LOAD( "bg5.bin",    0x4000, 0x1000, CRC(fc92eade) SHA1(f4012a1c4631388a3e8109a8381bc4084ddc8757) )
+	ROM_LOAD( "bg6.bin",    0x5000, 0x1000, CRC(561d9e5d) SHA1(68d7fab3cfb5b3360fe8064c70bf21bb1341032f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "b-h.bin",    0x0000, 0x1000, CRC(fc79d103) SHA1(dac1152221ebdc4cd9bf353b4cc5d45021ca5d9e) )
+	ROM_LOAD( "b-k.bin",    0x1000, 0x1000, CRC(94d17bf3) SHA1(2a70968249946de52c5a4cfabafbbf4ecda844a8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "b-clr.bin",  0x0000, 0x0020, CRC(c4761ada) SHA1(067d12b2d3635ffa6337ed234ba42717447bea00) )
+ROM_END
+
+
 ROM_START( mooncmw )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "60.1x",      0x0000, 0x0800, CRC(322859e6) SHA1(292dccb66c38c8de837ec3ac10928d092494958e) )
@@ -13720,6 +13828,7 @@ GAME( 1980, moonal2b,    moonal2,  mooncrst,   moonal2,    galaxian_state, init_
 
 // Larger romspace, interrupt enable moved
 GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+GAME( 1983, bongo,       0,        bongo,      bongo,      galaxian_state, init_kong,       ROT90,  "Jetsoft",       "Bongo", MACHINE_SUPPORTS_SAVE )
 
 // Other games on basic mooncrst hardware
 GAME( 1982, skybase,     0,        skybase,    skybase,    galaxian_state, init_skybase,    ROT90,  "Omori Electric Co., Ltd.", "Sky Base",                                           MACHINE_SUPPORTS_SAVE )

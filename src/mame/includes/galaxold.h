@@ -201,7 +201,6 @@ public:
 	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
 	DECLARE_VIDEO_START(ozon1);
-	DECLARE_VIDEO_START(bongo);
 	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
 	DECLARE_VIDEO_START(rescue);
@@ -274,7 +273,6 @@ public:
 	void galaxold_base(machine_config &config);
 	void ckongg(machine_config &config);
 	void _4in1(machine_config &config);
-	void bongo(machine_config &config);
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
@@ -301,8 +299,6 @@ public:
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
 	void bagmanmc_map(address_map &map);
-	void bongo_map(address_map &map);
-	void bongo_io(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
 	void ckongg_map(address_map &map);
 	void ckongmc_map(address_map &map);
