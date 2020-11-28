@@ -135,11 +135,11 @@ private:
 	required_device<dac_word_interface> m_dac;
 	optional_device<mc6845_device> m_crtc;
 	required_shared_ptr<uint64_t> m_vid_0_ram;
-	required_shared_ptr<uint64_t> m_vid_1_ram;
+	optional_shared_ptr<uint64_t> m_vid_1_ram;
 	required_shared_ptr<uint64_t> m_m0_p0_c1;
 	required_shared_ptr<uint64_t> m_m0_p0_c2;
-	required_shared_ptr<uint64_t> m_m0_p1_c1;
-	required_shared_ptr<uint64_t> m_m0_p1_c2;
+	optional_shared_ptr<uint64_t> m_m0_p1_c1;
+	optional_shared_ptr<uint64_t> m_m0_p1_c2;
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
@@ -164,7 +164,8 @@ private:
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void single_i860_map(address_map &map);
+	void dual_i860_map(address_map &map);
 	void sound_map(address_map &map);
 	void vid_0_map(address_map &map);
 	void vid_1_map(address_map &map);
@@ -485,7 +486,7 @@ void vcombat_state::vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	vram_w(offset, data, mem_mask, m_vid_1_ram);
 }
 
-void vcombat_state::main_map(address_map &map)
+void vcombat_state::single_i860_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
@@ -495,11 +496,6 @@ void vcombat_state::main_map(address_map &map)
 	map(0x440000, 0x440003).rw(FUNC(vcombat_state::m0_p0_c1_r), FUNC(vcombat_state::m0_p0_c1_w));      /* M0->P0 i860 #1 com 1 */
 	map(0x480000, 0x480003).rw(FUNC(vcombat_state::m0_p0_c2_r), FUNC(vcombat_state::m0_p0_c2_w));      /* M0<-P0 i860 #1 com 2 */
 	map(0x4c0000, 0x4c0003).w(FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
-
-	map(0x500000, 0x53ffff).rw(FUNC(vcombat_state::vram_1_r), FUNC(vcombat_state::vram_1_w));   /* Second i860 shared RAM */
-	map(0x540000, 0x540003).rw(FUNC(vcombat_state::m0_p1_c1_r), FUNC(vcombat_state::m0_p1_c1_w));      /* M0->P1 i860 #2 com 1 */
-	map(0x580000, 0x580003).rw(FUNC(vcombat_state::m0_p1_c2_r), FUNC(vcombat_state::m0_p1_c2_w));      /* M0<-P1 i860 #2 com 2 */
-	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 
 	map(0x600000, 0x600001).r(FUNC(vcombat_state::control_1_r));   /* IN0 port */
 	map(0x600004, 0x600005).ram().share("share5");      /* M0<-M1 */
@@ -517,6 +513,17 @@ void vcombat_state::main_map(address_map &map)
 	//map(0x704000, 0x704001)      /* Headset rotation axis? */
 
 	map(0x706000, 0x70601f).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+}
+
+
+void vcombat_state::dual_i860_map(address_map &map)
+{
+	single_i860_map(map);
+
+	map(0x500000, 0x53ffff).rw(FUNC(vcombat_state::vram_1_r), FUNC(vcombat_state::vram_1_w));   /* Second i860 shared RAM */
+	map(0x540000, 0x540003).rw(FUNC(vcombat_state::m0_p1_c1_r), FUNC(vcombat_state::m0_p1_c1_w));      /* M0->P1 i860 #2 com 1 */
+	map(0x580000, 0x580003).rw(FUNC(vcombat_state::m0_p1_c2_r), FUNC(vcombat_state::m0_p1_c2_w));      /* M0<-P1 i860 #2 com 2 */
+	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 }
 
 
@@ -680,7 +687,7 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 void vcombat_state::vcombat(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::dual_i860_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
@@ -727,7 +734,7 @@ void vcombat_state::vcombat(machine_config &config)
 void vcombat_state::shadfgtr(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::single_i860_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
