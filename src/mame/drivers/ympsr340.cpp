@@ -69,7 +69,7 @@ u8 psr340_state::matrix_r()
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (!BIT(m_matrixsel, i))
+		if (BIT(m_matrixsel, i))
 		{
 			data |= m_key[i]->read();
 		}
