@@ -10,9 +10,7 @@
     RAM: 256KiB, 2x uPD431000 or equivalent
 
     TODO:
-    - Figure out correct CPU model.  H8S/2655 seems to be the only H8 model in MAME where this actually boots, so it at
-      least has similar or a superset of the 2655 peripheral layout.
-      CPU is at least H8S/2xxx, and may be H8S/26xx like MU-100.
+    - Customized CPU.  Interrupt controller is H8S/2655 style, but there are customizations too.
     - LCD (it's similar to the MU-5's)
     - Front panel / keyboard scanner (6305 with internal ROM manages this on hardware)
     - Sound generation
@@ -36,7 +34,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_swp00(*this, "swp00"),
 		m_lcdc(*this, "ks0066"),
-		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U)
+		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
+		m_key(*this, "S%c", 'A')
 	{ }
 
 	void psr340(machine_config &config);
@@ -50,20 +49,47 @@ private:
 	required_device<swp00_device> m_swp00;
 	required_device<hd44780_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
+	required_ioport_array<8> m_key;
 
 	void psr340_map(address_map &map);
 	void psr340_io_map(address_map &map);
 
 	void lcd_ctrl_w(u8 data);
+	void lcd_data_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(render_w);
+
+	u8 m_matrixsel;
+	u8 matrix_r();
 };
+
+u8 psr340_state::matrix_r()
+{
+	u8 data = 0x3f;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (!BIT(m_matrixsel, i))
+		{
+			data &= m_key[i]->read();
+		}
+	}
+
+	return data;
+}
 
 void psr340_state::lcd_ctrl_w(u8 data)
 {
 	// bit 3 = E, bit 4 = RS, R/W is connected to GND so write-only
+	// all bits are also matrix select for reading the controls
 	m_lcdc->rs_w(BIT(data, 4));
 	m_lcdc->e_w(BIT(data, 3));
+}
+
+void psr340_state::lcd_data_w(u8 data)
+{
+	m_lcdc->db_w(data);
+	m_matrixsel = data;
 }
 
 void psr340_state::psr340_map(address_map &map)
@@ -71,10 +97,12 @@ void psr340_state::psr340_map(address_map &map)
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x400000, 0x43ffff).ram();  // Work RAM?  Or SWP / MEG?
 
-	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC?
+	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
+
+	map(0xffe026, 0xffe026).r(FUNC(psr340_state::matrix_r));
 
 	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
-	map(0xffe02b, 0xffe02b).w(m_lcdc, FUNC(hd44780_device::db_w));
+	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
 }
 
 void psr340_state::psr340_io_map(address_map &map)
@@ -127,12 +155,75 @@ WRITE_LINE_MEMBER(psr340_state::render_w)
 
 
 static INPUT_PORTS_START(psr340)
+	PORT_START("SA")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Song") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Record") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main A") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("-") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Execute") PORT_CODE(KEYCODE_ENTER)
+
+	PORT_START("SB")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Function") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dual") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Intro/End") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Metronome") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Tenkey +") PORT_CODE(KEYCODE_EQUALS)
+
+	PORT_START("SC")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S. 6") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Touch") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Start/Stop") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Porta Grand") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Tenkey -") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+
+	PORT_START("SD")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S 5") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Harmony") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Sync Start") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Utility") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+
+	PORT_START("SE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S. 4") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reverb") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Accomp On") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Save") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+
+	PORT_START("SF")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S. 3") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Demo") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Load") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("+") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+
+	PORT_START("SG")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S. 2") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Chord Guide") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Voice") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+
+	PORT_START("SH")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("O.T.S. 1") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main B") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Style") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Down") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 INPUT_PORTS_END
 
 void psr340_state::psr340(machine_config &config)
 {
 	/* basic machine hardware */
-	H8S2655(config, m_maincpu, 8467200);    // actual type unknown, clock from schematic
+	H8S2655(config, m_maincpu, 16_MHz_XTAL);    // gives correct MIDI serial rate and matches MU100, but doesn't line up exactly with schematic value
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr340_state::psr340_map);
 	m_maincpu->set_addrmap(AS_IO, &psr340_state::psr340_io_map);
 
@@ -157,6 +248,10 @@ void psr340_state::psr340(machine_config &config)
 ROM_START( psr340 )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP("xv89710.bin", 0x000000, 0x200000, CRC(271ccb8a) SHA1(ec6abbdb82a5e851b77338c79ecabfd8040f023d))
+
+	// patch out battery check for now (SWX00B customized H8S reads ADC *value* at FFFF90)
+	ROM_FILL(0x20e6, 1, 0x54)
+	ROM_FILL(0x20e7, 1, 0x70)
 
 	ROM_REGION(0x200000, "swp00", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
