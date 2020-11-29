@@ -99,7 +99,7 @@ void psr340_state::psr340_map(address_map &map)
 
 	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
 
-	map(0xffe026, 0xffe026).r(FUNC(psr340_state::matrix_r));
+	map(0xffe027, 0xffe027).r(FUNC(psr340_state::matrix_r));
 
 	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
 	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
@@ -223,6 +223,9 @@ void psr340_state::psr340(machine_config &config)
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);    // gives correct MIDI serial rate and matches MU100, but doesn't line up exactly with schematic value
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr340_state::psr340_map);
 	m_maincpu->set_addrmap(AS_IO, &psr340_state::psr340_io_map);
+
+	// SCI0 is externally clocked at the 31250 Hz MIDI rate
+	m_maincpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(31250 * 16));
 
 	KS0066_F05(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 40);
