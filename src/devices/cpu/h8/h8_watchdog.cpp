@@ -68,10 +68,7 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 uint16_t h8_watchdog_device::wd_r()
 {
 	if (!machine().side_effects_disabled())
-	{
 		tcnt_update();
-		logerror("read\n");
-	}
 	return (tcsr << 8) | tcnt;
 }
 
