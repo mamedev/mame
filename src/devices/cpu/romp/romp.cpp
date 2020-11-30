@@ -9,8 +9,7 @@
  *
  * TODO:
  *   - mmu/iocc exceptions
- *   - unimplemented instructions (multiply, divide, wait)
- *   - timer/counter
+ *   - unimplemented instructions (wait)
  */
 
 #include "emu.h"
@@ -327,19 +326,27 @@ void romp_device::execute_run()
 					break;
 
 				case 0xd0: // lps: load program status
-					if (m_branch_state != BRANCH)
+					if (!(m_scr[ICS] & ICS_US))
 					{
-						m_branch_target = m_mem.read_dword(r3 + s16(i) + 0);
-						m_branch_state = BRANCH;
-						m_scr[ICS] = m_mem.read_word(r3 + s16(i) + 4);
-						m_scr[CS] = m_mem.read_word(r3 + s16(i) + 6);
-						m_scr[MPCS] &= ~0xffff;
-						// TODO: defer interrupt enable
+						if (m_branch_state != BRANCH)
+						{
+							m_branch_target = m_mem.read_dword(r3 + s16(i) + 0);
+							m_branch_state = BRANCH;
+							m_scr[ICS] = m_mem.read_word(r3 + s16(i) + 4);
+							m_scr[CS] = m_mem.read_word(r3 + s16(i) + 6);
+							if (m_scr[MPCS] & MCS_ALL)
+								m_scr[MPCS] &= ~MCS_ALL;
+							else
+								m_scr[MPCS] &= ~PCS_ALL;
+							// TODO: defer interrupt enable
 
-						m_icount -= 15;
+							m_icount -= 15;
+						}
+						else
+							program_check(PCS_PCK | PCS_IOC);
 					}
 					else
-						program_check(PCS_PCK | PCS_IOC);
+						program_check(PCS_PCK | PCS_PIE);
 					break;
 				case 0xd1: // aei: add extended immediate
 					flags_add(m_gpr[R3], s32(s16(i)) + bool(m_scr[CS] & CS_C));
@@ -456,10 +463,15 @@ void romp_device::execute_run()
 				m_icount -= 3;
 				break;
 			case 0x96: // mfs: move from scr
-				if (R2 == IAR)
-					m_gpr[R3] = updated_iar;
+				if (!(m_scr[ICS] & ICS_US) || R2 == MQ || R2 == CS)
+				{
+					if (R2 == IAR)
+						m_gpr[R3] = updated_iar;
+					else
+						m_gpr[R3] = m_scr[R2];
+				}
 				else
-					m_gpr[R3] = m_scr[R2];
+					program_check(PCS_PCK | PCS_PIE);
 				m_icount--;
 				break;
 			case 0x97: // setsb: set scr bit
@@ -588,8 +600,30 @@ void romp_device::execute_run()
 				m_icount -= 2;
 				break;
 			case 0xb6: // d: divide step
-				// m_icount -= 2;
-				fatalerror("divide step (%s)\n", machine().describe_context());
+				{
+					s64 sum = (s64(s32(m_gpr[R2])) << 1) | (m_scr[MQ] >> 31);
+
+					if (BIT(m_gpr[R2], 31) == BIT(m_gpr[R3], 31))
+						sum -= s32(m_gpr[R3]);
+					else
+						sum += s32(m_gpr[R3]);
+
+					// update remainder
+					m_gpr[R2] = sum;
+
+					// update quotient
+					m_scr[MQ] <<= 1;
+					if (BIT(sum, 32) == BIT(m_gpr[R3], 31))
+					{
+						m_scr[MQ] |= 1;
+						m_scr[CS] |= CS_C;
+					}
+
+					// overflow test
+					if (BIT(sum, 32) == BIT(m_gpr[R2], 31))
+						m_scr[CS] |= CS_O;
+				}
+				m_icount -= 2;
 				break;
 			case 0xb8: // sr: shift right
 				m_gpr[R2] >>= (m_gpr[R3] & 63);
@@ -670,8 +704,40 @@ void romp_device::execute_run()
 				flags_log(m_gpr[R2]);
 				break;
 			case 0xe6: // m: multiply step
-				// m_icount -= 3;
-				fatalerror("multiply step (%s)\n", machine().describe_context());
+				{
+					s64 sum = s32(m_gpr[R2]);
+
+					if (m_scr[CS] & CS_C)
+					{
+						// no carry
+						switch (m_scr[MQ] & 3)
+						{
+						case 1: sum += s32(m_gpr[R3]); break;
+						case 2: sum -= s64(s32(m_gpr[R3])) * 2; break;
+						case 3: sum -= s32(m_gpr[R3]); break;
+						}
+					}
+					else
+					{
+						// carry
+						switch (m_scr[MQ] & 3)
+						{
+						case 0: sum += s32(m_gpr[R3]); break;
+						case 1: sum += s64(s32(m_gpr[R3])) * 2; break;
+						case 2: sum -= s32(m_gpr[R3]); break;
+						}
+					}
+
+					// update carry flag
+					if (m_scr[MQ] & 2)
+						m_scr[CS] &= ~CS_C;
+					else
+						m_scr[CS] |= CS_C;
+
+					m_scr[MQ] = (sum << 30) | (m_scr[MQ] >> 2);
+					m_gpr[R2] = sum >> 2;
+				}
+				m_icount -= 3;
 				break;
 			case 0xe7: // x: exclusive or
 				m_gpr[R2] ^= m_gpr[R3];
@@ -744,17 +810,23 @@ void romp_device::execute_run()
 				break;
 
 			case 0xf0: // wait: wait
-				// if (m_branch_state == BRANCH)
-				// program_check(PCS_PCK | PCS_IOC);
-				fatalerror("wait (%s)\n", machine().describe_context());
+				if (!(m_scr[ICS] & ICS_US))
+				{
+					if (m_branch_state != BRANCH)
+						fatalerror("wait (%s)\n", machine().describe_context());
+					else
+						program_check(PCS_PCK | PCS_IOC);
+				}
+				else
+					program_check(PCS_PCK | PCS_PIE);
 				break;
 			case 0xf1: // ae: add extended
 				flags_add(m_gpr[R2], m_gpr[R3] + bool(m_scr[CS] & CS_C));
 				m_gpr[R2] += m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf2: // se: subtract extended
-				flags_sub(m_gpr[R2], m_gpr[R3] + bool(m_scr[CS] & CS_C));
-				m_gpr[R2] -= m_gpr[R3] + bool(m_scr[CS] & CS_C);
+				flags_add(m_gpr[R2], ~m_gpr[R3] + bool(m_scr[CS] & CS_C));
+				m_gpr[R2] += ~m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf3: // ca16: compute address 16-bit
 				m_gpr[R2] = (m_gpr[R3] & 0xffff'0000U) | (u16(m_gpr[R2]) + u16(m_gpr[R3]));
@@ -830,17 +902,22 @@ void romp_device::set_scr(unsigned scr, u32 data)
 
 	LOG("set_scr %s data 0x%08x (%s)\n", scr_names[scr], data, machine().describe_context());
 
-	switch (scr)
+	if (!(m_scr[ICS] & ICS_US) || scr == MQ || scr == CS)
 	{
-	case ICS:
-		space(bool(data & ICS_TM)).cache(m_mem);
-		break;
+		switch (scr)
+		{
+		case ICS:
+			space(bool(data & ICS_TM)).cache(m_mem);
+			break;
 
-	default:
-		break;
+		default:
+			break;
+		}
+
+		m_scr[scr] = data;
 	}
-
-	m_scr[scr] = data;
+	else
+		program_check(PCS_PCK | PCS_PIE);
 }
 
 void romp_device::execute_set_input(int irqline, int state)
@@ -925,7 +1002,7 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 {
 	u32 const result = op1 - op2;
 
-	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_C | CS_O);
+	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_O);
 
 	if (result == 0)
 		m_scr[CS] |= CS_E;
@@ -935,8 +1012,10 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 		else
 			m_scr[CS] |= CS_G;
 
-	// carry
+	// borrow
 	if ((!BIT(op2, 31) && BIT(op1, 31)) || (BIT(result, 31) && (!BIT(op2, 31) || BIT(op1, 31))))
+		m_scr[CS] &= ~CS_C;
+	else
 		m_scr[CS] |= CS_C;
 
 	// overflow
