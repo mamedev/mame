@@ -178,6 +178,8 @@ WRITE_LINE_MEMBER(psr340_state::render_w)
 						known = known || (idx == 47 && y == 3 && b == 2);
 						known = known || (idx == 47 && y == 1 && b == 1);
 						known = known || (idx == 47 && y == 1 && b == 0);
+						known = known || (idx == 47 && y == 2 && b == 4);
+						known = known || (idx == 41 && y == 4 && b == 0);
 						bool is = v & (0x01 << b);
 						r += known ? '_' : is ? '#' : '.';
 					}
