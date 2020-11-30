@@ -23,6 +23,9 @@ void swp20_device::device_reset()
 {
 	m_p3c_port = 0x00;
 	m_p3c_address = true;
+	m_voice = 0x00;
+	m_keyon = 0;
+	m_keyoff = 0;
 }
 
 void swp20_device::rom_bank_updated()
@@ -66,7 +69,27 @@ u8 swp20_device::snd_r(offs_t offset)
 
 void swp20_device::snd_w(offs_t offset, u8 data)
 {
-	logerror("w %02x, %02x %s\n", offset, data, machine().describe_context());
+	switch(offset) {
+	case 0x01:
+		m_voice = data & 0x1f;
+		break;
+	case 0x04: case 0x05: case 0x06: case 0x07: {
+		int off = 8*(offset & 3);
+		u32 mask = 0xff << off;
+		m_keyon = (m_keyon & ~mask) | (data << off);
+		logerror("keyon %08x\n", m_keyon);
+		break;
+	}
+	case 0x08: case 0x09: case 0x0a: case 0x0b: {
+		int off = 8*(offset & 3);
+		u32 mask = 0xff << off;
+		m_keyoff = (m_keyoff & ~mask) | (data << off);
+		logerror("keyoff %08x\n", m_keyoff);
+		break;
+	}
+	default:
+		logerror("w %02x.%02x, %02x %s\n", m_voice, offset, data, machine().describe_context());
+	}
 }
 
 void swp20_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
