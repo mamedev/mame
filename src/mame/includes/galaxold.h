@@ -200,8 +200,6 @@ public:
 	DECLARE_VIDEO_START(dkongjrmc);
 	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
-	DECLARE_VIDEO_START(ozon1);
-	DECLARE_VIDEO_START(bongo);
 	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
 	DECLARE_VIDEO_START(rescue);
@@ -218,7 +216,6 @@ public:
 	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
@@ -275,7 +272,6 @@ public:
 	void galaxold_base(machine_config &config);
 	void ckongg(machine_config &config);
 	void _4in1(machine_config &config);
-	void bongo(machine_config &config);
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
@@ -294,7 +290,6 @@ public:
 	void porter(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
-	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
 	void ckongmc(machine_config &config);
@@ -302,8 +297,6 @@ public:
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
 	void bagmanmc_map(address_map &map);
-	void bongo_map(address_map &map);
-	void bongo_io(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
 	void ckongg_map(address_map &map);
 	void ckongmc_map(address_map &map);
@@ -319,8 +312,6 @@ public:
 	void hunchbkg_data(address_map &map);
 	void hustlerb3_map(address_map &map);
 	void mooncrst_map(address_map &map);
-	void ozon1_io_map(address_map &map);
-	void ozon1_map(address_map &map);
 	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);

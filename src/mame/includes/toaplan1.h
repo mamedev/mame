@@ -20,14 +20,14 @@
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag, bool large = false) :
 		driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
 		m_dswb_io(*this, "DSWB"),
 		m_tjump_io(*this, "TJUMP"),
-		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG),
+		m_spriteram(*this, "spriteram", large ? 0x1000 : 0x800, ENDIANNESS_BIG),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ymsnd(*this, "ymsnd"),
@@ -162,7 +162,7 @@ class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
 	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag) :
-		toaplan1_state(mconfig, type, tag),
+		toaplan1_state(mconfig, type, tag, true),
 		m_spritegen(*this, "scu")
 	{
 	}

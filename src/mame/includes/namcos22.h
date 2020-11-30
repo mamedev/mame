@@ -524,6 +524,7 @@ public:
 	void init_timecris();
 	void init_tokyowar();
 	void init_propcycl();
+	void init_propcyclj();
 	void init_alpiner2();
 	void init_dirtdash();
 	void init_airco22();

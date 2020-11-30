@@ -61,15 +61,15 @@ void unico_state::burglarx_map(address_map &map)
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
 	map(0x800030, 0x800031).nopw();                                                // ? 0
-	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w)).share("scroll");               // Scroll
+	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w));               // Scroll
 	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x80018e, 0x80018e).w(FUNC(unico_state::burglarx_okibank_w));                    //
 	map(0x8001e0, 0x8001e1).nopw();                                                // IRQ Ack
-	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w)).share("vram");         // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w));         // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                                     // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(unico_state::spriteram_r), FUNC(unico_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(unico_state::spriteram_r), FUNC(unico_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 }
 
@@ -140,7 +140,7 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x800018, 0x800019).portr("INPUTS");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x80010c, 0x800121).rw(FUNC(zeropnt_state::scroll_r), FUNC(zeropnt_state::scroll_w)).share("scroll");   // Scroll
+	map(0x80010c, 0x800121).rw(FUNC(zeropnt_state::scroll_r), FUNC(zeropnt_state::scroll_w));   // Scroll
 	map(0x800170, 0x800171).r(FUNC(zeropnt_state::guny_0_msb_r));   // Light Guns
 	map(0x800174, 0x800175).r(FUNC(zeropnt_state::gunx_0_msb_r));   //
 	map(0x800178, 0x800179).r(FUNC(zeropnt_state::guny_1_msb_r));   //
@@ -150,9 +150,9 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x80018e, 0x80018e).w(FUNC(zeropnt_state::zeropnt_okibank_leds_w));   //
 	map(0x8001e0, 0x8001e1).nopw();   // ? IRQ Ack
-	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w)).share("vram");     // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w));     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram(); // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 }
 
@@ -211,7 +211,7 @@ void zeropnt2_state::zeropnt2_map(address_map &map)
 	map(0x800031, 0x800031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
 	map(0x800034, 0x800034).w(FUNC(zeropnt2_state::zeropnt2_okibank));   //
 	map(0x800039, 0x800039).w(FUNC(zeropnt2_state::leds_w));   // ?
-	map(0x80010c, 0x800123).rw(FUNC(zeropnt2_state::scroll_r), FUNC(zeropnt2_state::scroll_w)).share("scroll");   // Scroll
+	map(0x80010c, 0x800123).rw(FUNC(zeropnt2_state::scroll_r), FUNC(zeropnt2_state::scroll_w));   // Scroll
 	map(0x800140, 0x800143).r(FUNC(zeropnt2_state::zeropnt2_guny_0_msb_r));   // Light Guns
 	map(0x800144, 0x800147).r(FUNC(zeropnt2_state::zeropnt2_gunx_0_msb_r));   //
 	map(0x800148, 0x80014b).r(FUNC(zeropnt2_state::zeropnt2_guny_1_msb_r));   //
@@ -221,9 +221,9 @@ void zeropnt2_state::zeropnt2_map(address_map &map)
 	map(0x80015c, 0x80015f).portr("BUTTONS");
 	map(0x8001e0, 0x8001e3).nopw();                                    // ? IRQ Ack
 	map(0x8001f0, 0x8001f3).w(FUNC(zeropnt2_state::eeprom_w));                    // EEPROM
-	map(0x904000, 0x90ffff).rw(FUNC(zeropnt2_state::vram_r), FUNC(zeropnt2_state::vram_w)).share("vram");     // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt2_state::vram_r), FUNC(zeropnt2_state::vram_w));     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                         // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(zeropnt2_state::spriteram_r), FUNC(zeropnt2_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt2_state::spriteram_r), FUNC(zeropnt2_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");   // Palette
 	map(0xfe0000, 0xffffff).ram();                                         // RAM
 }

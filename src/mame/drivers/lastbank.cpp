@@ -30,6 +30,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK XTAL(14'318'181)
 
 class lastbank_state : public driver_device
@@ -47,13 +49,15 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
-	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_mux_data;
@@ -405,9 +409,6 @@ void lastbank_state::lastbank(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
-	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -420,8 +421,6 @@ void lastbank_state::lastbank(machine_config &config)
 
 	TC0091LVC(config, m_vdp, 0);
 	m_vdp->set_tilemap_xoffs(0,192); // TODO: correct?
-
-//  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -469,4 +468,7 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+} // Anonymous namespace
+
+
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)", MACHINE_SUPPORTS_SAVE )

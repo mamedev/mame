@@ -426,10 +426,10 @@ void lua_engine::initialize_render()
 				i.set_element_state_callback(layout_view::item::state_delegate(
 							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
 							{
-								sol::optional<int> result(invoke(cbfunc));
+								auto result(invoke(cbfunc).get<sol::optional<int> >());
 								if (result)
 								{
-									return result.value();
+									return *result;
 								}
 								else
 								{
@@ -455,10 +455,10 @@ void lua_engine::initialize_render()
 				i.set_animation_state_callback(layout_view::item::state_delegate(
 							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
 							{
-								sol::optional<int> result(invoke(cbfunc));
+								auto result(invoke(cbfunc).get<sol::optional<int> >());
 								if (result)
 								{
-									return result.value();
+									return *result;
 								}
 								else
 								{
@@ -484,10 +484,10 @@ void lua_engine::initialize_render()
 				i.set_bounds_callback(layout_view::item::bounds_delegate(
 							[this, cbfunc = cb.as<sol::protected_function>()] (render_bounds &b)
 							{
-								sol::optional<render_bounds> result(invoke(cbfunc));
+								auto result(invoke(cbfunc).get<sol::optional<render_bounds> >());
 								if (result)
 								{
-									b = result.value();
+									b = *result;
 								}
 								else
 								{
@@ -513,10 +513,10 @@ void lua_engine::initialize_render()
 				i.set_color_callback(layout_view::item::color_delegate(
 							[this, cbfunc = cb.as<sol::protected_function>()] (render_color &c)
 							{
-								sol::optional<render_color> result(invoke(cbfunc));
+								auto result(invoke(cbfunc).get<sol::optional<render_color> >());
 								if (result)
 								{
-									c = result.value();
+									c = *result;
 								}
 								else
 								{

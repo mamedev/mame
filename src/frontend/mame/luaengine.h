@@ -169,6 +169,7 @@ private:
 	template<typename TFunc, typename... TArgs>
 	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 
+	void initialize_debug();
 	void initialize_input();
 	void initialize_memory();
 	void initialize_render();

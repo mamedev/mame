@@ -660,7 +660,7 @@ void cb3_state::chryangla_map(address_map &map) // most to be verified when the 
 
 void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -876,7 +876,7 @@ void cmaster_state::ss2001_portmap(address_map &map) // TODO: everything but ay
 
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -996,7 +996,7 @@ void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 
 void goldstar_state::super972_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xefff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 }
 
 void goldstar_state::flaming7_map(address_map &map)

@@ -53,14 +53,22 @@ public:
 	void init_spyhunt2();
 	void init_archrivlb();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
 	optional_device<s11c_bg_device> m_bg;
 	optional_device<adc0844_device> m_adc;
-
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<ptm6840_device> m_ptm;
+
 	uint16_t m_control_word;
 	uint8_t m_protection_data[5];
 	attotime m_timing_factor;
@@ -85,26 +93,18 @@ private:
 
 	uint16_t archrivlb_port_1_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(mcr68);
-	DECLARE_MACHINE_RESET(mcr68);
-	DECLARE_VIDEO_START(mcr68);
 	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);
 	TIMER_CALLBACK_MEMBER(mcr68_493_callback);
 	void mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void mcr68_common_init(int clip, int xoffset);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
 
 	void mcr68_map(address_map &map);
 	void pigskin_map(address_map &map);
 	void trisport_map(address_map &map);
-
-	required_device<ptm6840_device> m_ptm;
 };
 
 #endif // MAME_INCLUDES_MCR68_H

@@ -70,7 +70,7 @@
 #include <vector>
 
 #define AS_IO16LE           1
-#define AS_IO16BE           2
+#define AS_IO16BE           4
 
 class vgmplay_disassembler : public util::disasm_interface
 {

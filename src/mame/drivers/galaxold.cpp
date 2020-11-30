@@ -64,39 +64,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     settings (code at 0x5805 for player 1 and player 2 in "Upright" cabinet, or
     0x5563 for player 2 in "Cocktail" cabinet).
 
-5) 'bongo'
-
-  - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
-    there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
-    (unmapped memory) if it pressed (HIGH).
-  - IN0 bit 7 is tested on startup (code at 0x0048) in combination with bits 0 and 1
-    (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
-    the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
-  - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
-    but their status is discarded with 3 'NOP' instructions at 0x06ca.
-  - IN0 bit 7 and IN0 bit 6 should have been IPT_BUTTON1 (Upright and Cocktail)
-    but their status is discarded with 3 'NOP' instructions at 0x06d1.
-  - DSW0 is read via code at 0x2426, but its contents is directly overwritten
-    with value read from DSW1 (AY port A) via code at 0x3647.
-
-4) 'ozon1'
-
-  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch
-    (check code at 0x03c6 which changes player and routines that handle players inputs :
-    0x0dc3 and 0x1e31 LEFT and RIGHT - 0x0e76 BUTTON1).
-  - Credits are coded on 1 byte (range 0x00-0xff) and stored at 0x4002.
-    To display them, they are converted to BCD on 1 byte via routine at 0x1421.
-    As a result, it will always display 0 to 99 (eg: 0xf0 = 240 will display 40).
-    When you get 256 credits, 0x4002 = 0x00, so the game thinks you have no credit
-    at all and enters "attract mode" again (but the game does NOT reset).
-  - There's an ingame bug when you get 101 or 201 credits : due to code at 0x0239,
-    the game checks the BCD value (0x01) instead of the correct one at 0x4002,
-    so you can't start a 2 players game !
-  - There is another ingame bug when "Coinage" settings are "A 1C/2C  B 1C/1C"
-    and you press COIN2 : due to code at 0x0473, contents of 0x4004 is NEVER reset
-    to 0x00, so routine at 0x042a ALWAYS thinks that you've pressed COIN2,
-    and as a consequence, it ALWAYS adds 1 credit (even when you are playing) !
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -106,7 +73,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/watchdog.h"
-#include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
 
@@ -610,60 +576,6 @@ void galaxold_state::tazzmang_map(address_map &map)
 	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
-}
-
-
-void galaxold_state::bongo_map(address_map &map)
-{
-	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x83ff).ram();
-	map(0x8400, 0x87ff).nopw(); // not used
-	map(0x9000, 0x93ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).nopw(); // not used
-	map(0x9800, 0x983f).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x9840, 0x985f).ram().share("spriteram");
-	map(0x9860, 0x987f).ram().share("bulletsram");
-	map(0xa000, 0xa000).portr("IN0");
-	map(0xa800, 0xa800).portr("IN1");
-	map(0xb000, 0xb000).portr("DSW0");
-	map(0xb001, 0xb001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0xb004, 0xb004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
-	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
-	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
-	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).nopw();
-}
-
-void galaxold_state::bongo_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
-}
-
-
-void galaxold_state::ozon1_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom();
-	map(0x4000, 0x4200).ram();
-	map(0x4300, 0x43ff).ram();
-	map(0x4800, 0x4bff).rw(FUNC(galaxold_state::galaxold_videoram_r), FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
-	map(0x4c00, 0x4fff).w(FUNC(galaxold_state::galaxold_videoram_w));
-	map(0x5000, 0x503f).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x5040, 0x505f).ram().share("spriteram");
-	map(0x6801, 0x6801).nopw(); //continuosly 0 and 1
-	map(0x6802, 0x6802).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	map(0x6806, 0x6806).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
-	map(0x6807, 0x6807).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
-	map(0x8100, 0x8100).portr("IN0");
-	map(0x8101, 0x8101).portr("IN1");
-	map(0x8102, 0x8102).portr("IN2");
-	map(0x8103, 0x8103).nopw(); //only one 9b at reset
-}
-
-void galaxold_state::ozon1_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
 
@@ -1837,90 +1749,6 @@ static INPUT_PORTS_START( tazzmang )
 INPUT_PORTS_END
 
 
-/* verified from Z80 code */
-static INPUT_PORTS_START( bongo )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* see notes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DSW0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )            /* see notes */
-
-	PORT_START("DSW1")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x06, "5" )
-	PORT_DIPNAME( 0x08, 0x00, "Infinite Lives (Cheat)" )    /* always gives 3 lives */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )            /* also 1C_3C for Coin B if it existed */
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )            /* also 1C_6C for Coin B if it existed */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-INPUT_PORTS_END
-
-
-/* verified from Z80 code */
-static INPUT_PORTS_START( ozon1 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 1C/1C  B 2C/1C" )
-	PORT_DIPSETTING(    0x02, "A 1C/2C  B 1C/1C" )          /* see notes */
-	PORT_DIPSETTING(    0x04, "A 1C/3C  B 3C/1C" )
-	PORT_DIPSETTING(    0x06, "A 1C/4C  B 4C/1C" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( hunchbkg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -2552,35 +2380,14 @@ void galaxold_state::rockclim(machine_config &config)
 }
 
 
-void galaxold_state::ozon1(machine_config &config)
-{
-	galaxold_base(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::ozon1_map);
-	m_maincpu->set_addrmap(AS_IO, &galaxold_state::ozon1_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxold_state::nmi_line_pulse));
-
-	MCFG_MACHINE_RESET_REMOVE()
-
-	/* video hardware */
-	m_palette->set_entries(32);
-	m_palette->set_init(FUNC(galaxold_state::rockclim_palette));
-
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
-	AY8910(config, "aysnd", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
-}
-
-
 void galaxold_state::drivfrcg(machine_config &config)
 {
 	/* basic machine hardware */
 	s2650_device &maincpu(S2650(config, m_maincpu, MASTER_CLOCK/6));
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::drivfrcg_program);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::drivfrcg_io);
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)); // ???
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2590,6 +2397,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 64);
 
@@ -2601,26 +2409,6 @@ void galaxold_state::drivfrcg(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
-}
-
-
-void galaxold_state::bongo(machine_config &config)
-{
-	galaxold_base(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::bongo_map);
-	m_maincpu->set_addrmap(AS_IO, &galaxold_state::bongo_io);
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
-
-	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
-
-	/* sound hardware */
-	ay8910_device &aysnd(AY8910(config, "aysnd", PIXEL_CLOCK/4));
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -2668,9 +2456,7 @@ void galaxold_state::racknrol(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::racknrol_map);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::racknrol_io);
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
-	// FIXME: kill the following line - convert to a screen vblank callback
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
@@ -2680,6 +2466,7 @@ void galaxold_state::racknrol(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
@@ -2697,9 +2484,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &galaxold_state::hexpoola_io);
 	maincpu.set_addrmap(AS_DATA, &galaxold_state::hexpoola_data);
 	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
-	// FIXME: kill the following line - convert to a screen vblank callback
-	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.intack_handler().set_constant(0x03);
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 32);
@@ -2708,6 +2493,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
@@ -3394,37 +3180,6 @@ ROM_START( tazzmang2 )  // Original Sparcade set
 ROM_END
 
 
-ROM_START( bongo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
-	ROM_LOAD( "bg2.bin",    0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
-	ROM_LOAD( "bg3.bin",    0x2000, 0x1000, CRC(9f6f2150) SHA1(26a1f872686ddddcdb690d7b826ba26c20cdec35) )
-	ROM_LOAD( "bg4.bin",    0x3000, 0x1000, CRC(f80372d2) SHA1(078e2c8b947103c168c0c85430f8ebc9d09f8ba7) )
-	ROM_LOAD( "bg5.bin",    0x4000, 0x1000, CRC(fc92eade) SHA1(f4012a1c4631388a3e8109a8381bc4084ddc8757) )
-	ROM_LOAD( "bg6.bin",    0x5000, 0x1000, CRC(561d9e5d) SHA1(68d7fab3cfb5b3360fe8064c70bf21bb1341032f) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "b-h.bin",    0x0000, 0x1000, CRC(fc79d103) SHA1(dac1152221ebdc4cd9bf353b4cc5d45021ca5d9e) )
-	ROM_LOAD( "b-k.bin",    0x1000, 0x1000, CRC(94d17bf3) SHA1(2a70968249946de52c5a4cfabafbbf4ecda844a8) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "b-clr.bin",  0x0000, 0x0020, CRC(c4761ada) SHA1(067d12b2d3635ffa6337ed234ba42717447bea00) )
-ROM_END
-
-ROM_START( ozon1 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom1.bin",     0x0000, 0x1000, CRC(54899e8b) SHA1(270af76ae4396ebda767f160535fa77c0b49726a) )
-	ROM_LOAD( "rom2.bin",     0x1000, 0x1000, CRC(3c90fbfc) SHA1(92da614dba3a644eac144bb0ed434d78a31fcb1a) )
-	ROM_LOAD( "rom3.bin",     0x2000, 0x1000, CRC(79fe313b) SHA1(ef8fd70f5669b7e7d7184eca2baaddcecb55c22d) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "rom7.bin",     0x0000, 0x0800, CRC(464285e8) SHA1(fff36b034b95050219c70cdfe05ff3bbc452b73e) )
-	ROM_LOAD( "rom8.bin",     0x0800, 0x0800, CRC(92056dcc) SHA1(b162da8701bfee465205e8f274ee494063c52c7b) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "ozon1.clr", 0x0000, 0x0020, CRC(605ea6e9) SHA1(d3471e6ef756059c2f7feb32fb8e41181cc1718e) )
-ROM_END
-
 ROM_START( hunchbkg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "gal_hb_1",     0x0000, 0x0800, CRC(46590e9b) SHA1(5d26578c91adec20d8d8a17d5dade9ef2febcbe5) )
@@ -3807,8 +3562,6 @@ GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, empty_ini
 GAME( 1982, portera,   dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bongo,     0,        bongo,     bongo,     galaxold_state, empty_init,     ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ozon1,     0,        ozon1,     ozon1,     galaxold_state, empty_init,     ROT90,  "Proma", "Ozon I", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, init_guttangt,  ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 // Videotron cartridge system

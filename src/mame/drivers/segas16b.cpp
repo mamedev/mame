@@ -1293,7 +1293,8 @@ void segas16b_state::machine_reset()
 	}
 
 	// ensure the sound bank points somewhere sane
-	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000);
+	if (membank("soundbank"))
+		membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000);
 }
 
 
@@ -3454,6 +3455,8 @@ static INPUT_PORTS_START( tturf )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	// note: neither Starting nor Bonus Energy dips really works for both tturf and tturfu,
+	// former does on tturfbl, is it based on a later rev we don't have?
 	PORT_DIPNAME( 0x30, 0x20, "Starting Energy" ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -6070,6 +6073,10 @@ ROM_END
 //  Dunk Shot, Sega System 16B
 //  CPU: FD1089A (317-0022)
 //  ROM Board type: 171-5358
+//       I/O board: 834-6180
+//      Main board: 837-6237
+//    Sega game ID: 833-6235-05 DUNK SHOT
+//       ROM board: 834-6236-04
 //
 ROM_START( dunkshot )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -8982,7 +8989,8 @@ ROM_START( tturf )
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12328.a10", 0x00000, 0x08000, CRC(13a346de) SHA1(4e8cb12b7936c4c5d8ebc9ba563099ac2056ee60) )
 	ROM_LOAD( "opr-12329.a11", 0x10000, 0x10000, CRC(ed9a686d) SHA1(da433033d501ee871429ee676b3972b14179df9f) )     // speech
-	ROM_LOAD( "opr-12330.a12", 0x20000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
+	// note: it needs this hole otherwise voice samples won't playback
+    ROM_LOAD( "opr-12330.a12", 0x30000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "317-0104.c2", 0x00000, 0x1000, NO_DUMP )

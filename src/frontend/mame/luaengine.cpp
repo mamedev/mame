@@ -16,10 +16,6 @@
 #include "ui/pluginopt.h"
 #include "ui/ui.h"
 
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-#include "debug/points.h"
-#include "debug/textbuf.h"
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -522,15 +518,6 @@ void lua_engine::initialize()
 	{
 		{ "avi", movie_recording::format::AVI },
 		{ "mng", movie_recording::format::MNG }
-	};
-
-
-	static const enum_parser<read_or_write, 4> s_read_or_write_parser =
-	{
-		{ "r", read_or_write::READ },
-		{ "w", read_or_write::WRITE },
-		{ "rw", read_or_write::READWRITE },
-		{ "wr", read_or_write::READWRITE }
 	};
 
 
@@ -1198,7 +1185,7 @@ void lua_engine::initialize()
 	machine_type["logerror"]  = [] (running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); };
 
 
-/*  game_driver library
+/* game_driver library
  *
  * emu.driver_find(driver_name)
  *
@@ -1224,203 +1211,90 @@ void lua_engine::initialize()
  * driver.is_incomplete - official system with blatantly incomplete hardware/software
  */
 
-	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor);
-	game_driver_type.set("source_file", sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; }));
-	game_driver_type.set("parent", sol::readonly(&game_driver::parent));
-	game_driver_type.set("name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }));
-	game_driver_type.set("description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }));
-	game_driver_type.set("year", sol::readonly(&game_driver::year));
-	game_driver_type.set("manufacturer", sol::readonly(&game_driver::manufacturer));
-	game_driver_type.set("compatible_with", sol::readonly(&game_driver::compatible_with));
-	game_driver_type.set("default_layout", sol::readonly(&game_driver::default_layout));
-	game_driver_type.set("orientation", sol::property([](game_driver const &driver) {
-			std::string rot;
-			switch (driver.flags & machine_flags::MASK_ORIENTATION)
+	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
+	game_driver_type["name"] = sol::property([] (game_driver const &driver) { return &driver.name[0]; });
+	game_driver_type["description"] = sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; });
+	game_driver_type["year"] = sol::readonly(&game_driver::year);
+	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
+	game_driver_type["compatible_with"] = sol::readonly(&game_driver::compatible_with);
+	game_driver_type["default_layout"] = sol::readonly(&game_driver::default_layout);
+	game_driver_type["orientation"] = sol::property(
+			[] (game_driver const &driver)
 			{
-			case machine_flags::ROT0:
-				rot = "rot0";
-				break;
-			case machine_flags::ROT90:
-				rot = "rot90";
-				break;
-			case machine_flags::ROT180:
-				rot = "rot180";
-				break;
-			case machine_flags::ROT270:
-				rot = "rot270";
-				break;
-			default:
-				rot = "undefined";
-				break;
-			}
-			return rot;
-		}));
-	game_driver_type.set("type", sol::property([](game_driver const &driver) {
-			std::string type;
-			switch (driver.flags & machine_flags::MASK_TYPE)
-			{
-			case machine_flags::TYPE_ARCADE:
-				type = "arcade";
-				break;
-			case machine_flags::TYPE_CONSOLE:
-				type = "console";
-				break;
-			case machine_flags::TYPE_COMPUTER:
-				type = "computer";
-				break;
-			default:
-				type = "other";
-				break;
-			}
-			return type;
-		}));
-	game_driver_type.set("not_working", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) > 0; }));
-	game_driver_type.set("supports_save", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) > 0; }));
-	game_driver_type.set("no_cocktail", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) > 0; }));
-	game_driver_type.set("is_bios_root", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) > 0; }));
-	game_driver_type.set("requires_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) > 0; }));
-	game_driver_type.set("clickable_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) > 0; }));
-	game_driver_type.set("unofficial", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) > 0; }));
-	game_driver_type.set("no_sound_hw", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) > 0; }));
-	game_driver_type.set("mechanical", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) > 0; }));
-	game_driver_type.set("is_incomplete", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) > 0; } ));
-
-
-/*  debugger_manager library (requires debugger to be active)
- *
- * manager:machine():debugger()
- *
- * debugger:command(command_string) - run command_string in debugger console
- *
- * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
- * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
- * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
- * debugger.execution_state - accessor for active cpu run state
- */
-
-	struct wrap_textbuf { wrap_textbuf(const text_buffer &buf) : textbuf(buf) { } std::reference_wrapper<const text_buffer> textbuf; };
-
-	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", "new", sol::no_constructor);
-	debugger_type.set("command", [](debugger_manager &debug, const std::string &cmd) { debug.console().execute_command(cmd, false); });
-	debugger_type.set("consolelog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); }));
-	debugger_type.set("errorlog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); }));
-	debugger_type.set("visible_cpu", sol::property(
-		[](debugger_manager &debug) { debug.console().get_visible_cpu(); },
-		[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); }));
-	debugger_type.set("execution_state", sol::property(
-		[](debugger_manager &debug) {
-			return debug.cpu().is_stopped() ? "stop" : "run";
-		},
-		[](debugger_manager &debug, const std::string &state) {
-			if(state == "stop")
-				debug.cpu().set_execution_stopped();
-			else
-				debug.cpu().set_execution_running();
-		}));
-
-
-/*  wrap_textbuf library (requires debugger to be active)
- *
- * manager:machine():debugger().consolelog
- * manager:machine():debugger().errorlog
- *
- * log[index] - get log entry
- * #log - entry count
- */
-
-	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
-			"__metatable", [](){},
-			"__newindex", [](){},
-			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
-			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
-
-/*  device_debug library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug()
- *
- * debug:step([opt] steps) - run cpu steps, default 1
- * debug:go() - run cpu
- * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
- *                                            expressions. returns breakpoint index
- * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints (k=index, v=debug_breakpoint)
- * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
- *                                                              are debugger expressions.
- *                                                              returns watchpoint index
- * debug:wpclr(idx) - clear watch
- * debug:wplist(space)[] - table of watchpoints (k=index, v=watchpoint)
- */
-
-	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor);
-	device_debug_type.set("step", [](device_debug &dev, sol::object num) {
-			int steps = 1;
-			if(num.is<int>())
-				steps = num.as<int>();
-			dev.single_step(steps);
-		});
-	device_debug_type.set("go", &device_debug::go);
-	device_debug_type.set("bpset", [](device_debug &dev, offs_t addr, const char *cond, const char *act) { return dev.breakpoint_set(addr, cond, act); });
-	device_debug_type.set("bpclr", &device_debug::breakpoint_clear);
-	device_debug_type.set("bplist", [this](device_debug &dev) {
-			sol::table table = sol().create_table();
-			for(const auto &bpp : dev.breakpoint_list())
-			{
-				const debug_breakpoint &bpt = *bpp.second;
-				sol::table bp = sol().create_table();
-				bp["enabled"] = bpt.enabled();
-				bp["address"] = bpt.address();
-				bp["condition"] = bpt.condition();
-				bp["action"] = bpt.action();
-				table[bpt.index()] = bp;
-			}
-			return table;
-		});
-	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-			read_or_write wptype = s_read_or_write_parser(type);
-			return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
-		});
-	device_debug_type.set("wpclr", &device_debug::watchpoint_clear);
-	device_debug_type.set("wplist", [this](device_debug &dev, addr_space &sp) {
-			sol::table table = sol().create_table();
-			for(auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
-			{
-				sol::table wp = sol().create_table();
-				wp["enabled"] = wpp->enabled();
-				wp["address"] = wpp->address();
-				wp["length"] = wpp->length();
-				switch(wpp->type())
+				std::string rot;
+				switch (driver.flags & machine_flags::MASK_ORIENTATION)
 				{
-					case read_or_write::READ:
-						wp["type"] = "r";
-						break;
-					case read_or_write::WRITE:
-						wp["type"] = "w";
-						break;
-					case read_or_write::READWRITE:
-						wp["type"] = "rw";
-						break;
-					default: // huh?
-						wp["type"] = "";
-						break;
+				case machine_flags::ROT0:
+					rot = "rot0";
+					break;
+				case machine_flags::ROT90:
+					rot = "rot90";
+					break;
+				case machine_flags::ROT180:
+					rot = "rot180";
+					break;
+				case machine_flags::ROT270:
+					rot = "rot270";
+					break;
+				default:
+					rot = "undefined";
+					break;
 				}
-				wp["condition"] = wpp->condition();
-				wp["action"] = wpp->action();
-				table[wpp->index()] = wp;
-			}
-			return table;
-		});
+				return rot;
+			});
+	game_driver_type["type"] = sol::property(
+			[](game_driver const &driver)
+			{
+				std::string type;
+				switch (driver.flags & machine_flags::MASK_TYPE)
+				{
+				case machine_flags::TYPE_ARCADE:
+					type = "arcade";
+					break;
+				case machine_flags::TYPE_CONSOLE:
+					type = "console";
+					break;
+				case machine_flags::TYPE_COMPUTER:
+					type = "computer";
+					break;
+				default:
+					type = "other";
+					break;
+				}
+				return type;
+			});
+	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
+	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
+	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
+	game_driver_type["is_bios_root"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) != 0; });
+	game_driver_type["requires_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) != 0; });
+	game_driver_type["clickable_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) != 0; });
+	game_driver_type["unofficial"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) != 0; });
+	game_driver_type["no_sound_hw"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) != 0; });
+	game_driver_type["mechanical"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) != 0; });
+	game_driver_type["is_incomplete"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) != 0; });
 
 
-/*  device_t library
+/* device_t library
  *
  * manager:machine().devices[device_tag]
  *
- * device:name() - device long name
- * device:shortname() - device short name
- * device:tag() - device tree tag
- * device:owner() - device parent tag
- * device:debug() - debug interface, cpus only
+ * device:subtag(tag) - get absolute tag relative to this device
+ * device:siblingtag(tag) - get absolute tag relative to this device
+ * device:memregion(tag) - get memory region
+ * device:memshare(tag) - get memory share
+ * device:membank(tag) - get memory bank
+ * device:subdevice(tag) - get subdevice
+ * device:siblingdevice(tag) - get sibling device
+ * device:debug() - debug interface, CPUs only
  *
+ * device.tag - device tree tag
+ * device.basetag - last component of tag ("root" for root device)
+ * device.name - device type full name
+ * device.shortname - device type short name
+ * device.owner - parent device (nil for root device)
  * device.configured - whether configuration is complete
  * device.started - whether the device has been started
  * device.spaces[] - device address spaces table (k=name, v=addr_space)
@@ -1429,11 +1303,14 @@ void lua_engine::initialize()
  * device.roms[] - device rom entry table (k=name, v=rom_entry)
  */
 
-	auto device_type = sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor);
-	device_type["name"] = &device_t::name;
-	device_type["shortname"] = &device_t::shortname;
-	device_type["tag"] = &device_t::tag;
-	device_type["owner"] = &device_t::owner;
+	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
+	device_type["subtag"] = &device_t::subtag;
+	device_type["siblingtag"] = &device_t::siblingtag;
+	device_type["memregion"] = &device_t::memregion;
+	device_type["memshare"] = &device_t::memshare;
+	device_type["membank"] = &device_t::membank;
+	device_type["subdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::subdevice);
+	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::siblingdevice);
 	device_type["debug"] =
 		[this] (device_t &dev) -> sol::object
 		{
@@ -1441,6 +1318,11 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), dev.debug());
 		};
+	device_type["tag"] = sol::property(&device_t::tag);
+	device_type["basetag"] = sol::property(&device_t::basetag);
+	device_type["name"] = sol::property(&device_t::name);
+	device_type["shortname"] = sol::property(&device_t::shortname);
+	device_type["owner"] = sol::property(&device_t::owner);
 	device_type["configured"] = sol::property(&device_t::configured);
 	device_type["started"] = sol::property(&device_t::started);
 	device_type["spaces"] = sol::property(
@@ -2004,6 +1886,7 @@ void lua_engine::initialize()
 
 
 	// set up other user types
+	initialize_debug();
 	initialize_input();
 	initialize_memory();
 	initialize_render();
