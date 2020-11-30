@@ -609,6 +609,10 @@ void h8_sci_device::tx_dropped_edge()
 		ssr |= SSR_TEND;
 		if(scr & SCR_TEIE)
 			intc->internal_interrupt(tei_int);
+
+		// if there's more to send, start the transmitter
+		if ((scr & SCR_TE) && !(ssr & SSR_TDRE))
+			tx_start();
 		break;
 
 	default:
