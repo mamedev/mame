@@ -129,17 +129,58 @@ WRITE_LINE_MEMBER(psr340_state::render_w)
 
 	if(0) {
 		logerror("XX -\n");
-		for(int i=0; i != 4; i++) {
+		for(int i=2; i != 3; i++) {
 			for(int y=0; y != 8; y++) {
 				std::string r = "XX";
-				for(int x=0; x != 20; x++) {
+				for(int x=0; x != 10; x++) {
+					int idx = x+20*i;
 					uint8_t v = render[16*(x+20*i) + y];
-					r += util::string_format(" %c%c%c%c%c",
-											 v & 0x01 ? '#' : '.',
-											 v & 0x02 ? '#' : '.',
-											 v & 0x04 ? '#' : '.',
-											 v & 0x08 ? '#' : '.',
-											 v & 0x10 ? '#' : '.');
+					r += ' ';
+					for(int b=4; b >= 0; b--) {
+						bool known = (idx == 43 && b <= 3) || (idx == 44) || (idx == 45) || (idx == 46 && b >= 3);
+						known = known || (idx == 46 && b == 2 && y >= 5);
+						known = known || (idx == 46 && b == 1 && y >= 4);
+						known = known || (idx == 46 && b == 0 && y >= 5);
+						known = known || (idx == 47 && b == 4 && y >= 4);
+						known = known || (idx == 47 && b == 3 && y >= 5);
+						known = known || (idx == 47 && b == 2 && y >= 4);
+						known = known || (idx == 43 && b == 4 && y >= 4);
+						known = known || (idx == 42 && b == 0 && y >= 4 && y <= 6);
+						known = known || (idx == 42 && b == 1 && y >= 4);
+						known = known || (idx == 42 && b == 2 && y >= 4 && y <= 6);
+						known = known || (idx == 42 && b == 3 && y >= 4);
+						known = known || (idx == 42 && b == 4 && y >= 4 && y <= 6);
+						known = known || (idx == 41 && b == 1 && y >= 4);
+						known = known || (idx == 41 && b == 2 && y >= 4 && y <= 6);
+						known = known || (idx == 41 && b == 3 && y >= 4);
+						known = known || (idx == 41 && b == 4 && y >= 4 && y <= 6);
+						known = known || (idx == 40 && b == 0 && y >= 4);
+						known = known || (idx == 40 && b == 1 && y >= 4 && y <= 6);
+
+						known = known || (idx == 40 && b == 4 && y >= 1 && y <= 6);
+
+						known = known || (idx == 46 && y == 3 && b == 2);
+						known = known || (idx == 46 && y == 2 && b == 1);
+						known = known || (idx == 46 && y == 3 && b == 1);
+						known = known || (idx == 46 && y == 2 && b == 0);
+						known = known || (idx == 46 && y == 3 && b == 0);
+						known = known || (idx == 47 && y == 3 && b == 4);
+						known = known || (idx == 47 && y == 4 && b == 3);
+
+						known = known || (idx == 40 && y == 7 && b == 2);
+						known = known || (idx == 40 && y == 7 && b == 1);
+						known = known || (idx == 41 && y == 7 && b == 4);
+						known = known || (idx == 41 && y == 7 && b == 2);
+						known = known || (idx == 42 && y == 7 && b == 4);
+						known = known || (idx == 42 && y == 7 && b == 2);
+						known = known || (idx == 42 && y == 7 && b == 0);
+						known = known || (idx == 47 && y == 3 && b == 3);
+						known = known || (idx == 47 && y == 3 && b == 2);
+						known = known || (idx == 47 && y == 1 && b == 1);
+						known = known || (idx == 47 && y == 1 && b == 0);
+						bool is = v & (0x01 << b);
+						r += known ? '_' : is ? '#' : '.';
+					}
 				}
 				logerror("%s\n", r);
 			}
@@ -261,8 +302,8 @@ ROM_START( psr340 )
 	ROM_REGION(0x200000, "swp00", 0)
 	ROM_LOAD("xv89810.bin", 0x000000, 0x200000, CRC(10e68363) SHA1(5edee814bf07c49088da44474fdd5c817e7c5af0))
 
-	ROM_REGION(0x52fb4, "screen", 0)
-	ROM_LOAD("psr340-lcd.svg", 0, 0x52fb4, CRC(21b87261) SHA1(8b3331e7b31511fbf694eebe003296c219c65772))
+	ROM_REGION(0x5704b, "screen", 0)
+	ROM_LOAD("psr340-lcd.svg", 0, 0x5704b, CRC(d93af0a9) SHA1(76156443025e0b4089259417bb266888c547b2d7))
 ROM_END
 
 CONS(1994, psr340, 0, 0, psr340, psr340, psr340_state, empty_init, "Yamaha", "PSR-340 PortaSound", MACHINE_NOT_WORKING)
