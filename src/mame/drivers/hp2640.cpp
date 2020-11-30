@@ -163,27 +163,26 @@ constexpr unsigned BEEP_DURATION_MS = 100;
 // ************
 class hp2640_base_state : public driver_device
 {
-public:
+protected:
 	hp2640_base_state(const machine_config &mconfig, device_type type, const char *tag , uint8_t m_cg_0 , uint8_t m_cg_1 , uint8_t m_cg_2 , uint8_t m_cg_3);
 
 	void hp2640_base(machine_config &config);
 
-protected:
 	// Character generator settings
 	enum : uint8_t {
-					// OR-ENABLE (0) or AND-ENABLE (1)
-					// *Ignored*
-					CHARGEN_A = 0x01,
-					// Alphanumeric (0) or Microvector (1)
-					CHARGEN_B = 0x02,
-					// 128 characters (0) or 64 characters (1)
-					CHARGEN_C = 0x04,
-					// D0 copy disabled (0) or enabled (1)
-					// *Ignored as D0 copy is always enabled*
-					CHARGEN_D = 0x08,
-					// D0 copy on UC/LC (0) or LC only (1)
-					// *Ignored, see CHARGEN_D*
-					CHARGEN_E = 0x10
+		// OR-ENABLE (0) or AND-ENABLE (1)
+		// *Ignored*
+		CHARGEN_A = 0x01,
+		// Alphanumeric (0) or Microvector (1)
+		CHARGEN_B = 0x02,
+		// 128 characters (0) or 64 characters (1)
+		CHARGEN_C = 0x04,
+		// D0 copy disabled (0) or enabled (1)
+		// *Ignored as D0 copy is always enabled*
+		CHARGEN_D = 0x08,
+		// D0 copy on UC/LC (0) or LC only (1)
+		// *Ignored, see CHARGEN_D*
+		CHARGEN_E = 0x10
 	};
 
 	virtual void machine_start() override;
