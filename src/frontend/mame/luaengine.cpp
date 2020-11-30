@@ -23,6 +23,7 @@
 #include "natkeyboard.h"
 #include "softlist.h"
 #include "uiinput.h"
+#include "imagedev/cassette.h"
 
 #include <cstring>
 #include <thread>
@@ -1350,6 +1351,7 @@ void lua_engine::initialize()
 						table[rom.name()] = rom;
 				return table;
 			});
+	device_type["cassette"] = sol::property([] (device_t &dev) { return dynamic_cast<cassette_image_device *>(&dev); });
 
 
 /*  parameters_manager library
@@ -1786,6 +1788,39 @@ void lua_engine::initialize()
 	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
 
+/*  cassette_image_device
+ *
+ * device.cassette
+ *
+ * cass:play()
+ * cass:stop()
+ * cass:record()
+ * cass:forward() - forward play direction
+ * cass:reverse() - reverse play direction
+ *
+ * cass.is_stopped
+ * cass.is_playing
+ * cass.is_recording
+ * cass.motor_state
+ * cass.speaker_state
+ * cass.position
+ * cass.length
+ */
+
+	auto cass_type = sol().registry().new_usertype<cassette_image_device>("cassette", sol::no_constructor);
+	cass_type["stop"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE); };
+	cass_type["play"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE); };
+	cass_type["record"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE); };
+	cass_type["is_stopped"] = sol::property(&cassette_image_device::is_stopped);
+	cass_type["is_playing"] = sol::property(&cassette_image_device::is_playing);
+	cass_type["is_recording"] = sol::property(&cassette_image_device::is_recording);
+	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
+	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
+	cass_type["position"] = sol::property(&cassette_image_device::get_position);
+	cass_type["length"] = sol::property(&cassette_image_device::get_length);
+	cass_type["forward"] = &cassette_image_device::go_forward;
+	cass_type["reverse"] = &cassette_image_device::go_reverse;
+	cass_type["seek"] = &cassette_image_device::seek;
 
 /*  mame_machine_manager library
  *
