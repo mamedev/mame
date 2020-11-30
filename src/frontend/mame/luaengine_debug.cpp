@@ -171,7 +171,7 @@ void lua_engine::initialize_debug()
 		};
 	device_debug_type["go"] = &device_debug::go;
 	device_debug_type["bpset"] =
-		[this] (device_debug &dev, offs_t address, char const *cond, char const *act)
+		[] (device_debug &dev, offs_t address, char const *cond, char const *act)
 		{
 			int result(dev.breakpoint_set(address, cond, act));
 			dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
