@@ -10,7 +10,7 @@
  Race! (1976)
  Take 5 (1975)
  Take 7 (1975)
- Tankers (1975) - there is bootleg of this released by Alca called "Battleground"
+ Tankers (1975) - there is a bootleg of this released by Alca called "Battleground"
 
 ***************************************************************************/
 
@@ -20,6 +20,9 @@
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
+
+
+namespace {
 
 // copied by Pong, not accurate for this driver!
 // start
@@ -48,16 +51,16 @@ public:
 
 	void fungames(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 };
 
 
@@ -111,14 +114,25 @@ void fungames_state::fungames(machine_config &config)
  ***************************************************************************/
 
 
+ROM_START( biplane )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 ) // 82s115 PROMs
+	ROM_LOAD( "12355.h6",     0x0000, 0x0200, CRC(15e9067a) SHA1(d9a5eb558bcf9c1846b2090247bd7940aa6e2d5a) )
+	ROM_LOAD( "12356.h7",     0x0000, 0x0200, CRC(c02c66cb) SHA1(8f7f7b8e5f48e49cb1fd01b456a2bf659ba68047) )
+	ROM_LOAD( "12357.h8",     0x0000, 0x0200, CRC(a57a1c43) SHA1(64d8e609415bc0fe51581bfea2e777106505c761) )
+	ROM_LOAD( "12358.h9",     0x0000, 0x0200, CRC(40415f2a) SHA1(8a5d4cfb7713fc42ab12e3af61230255c5dffbf2) )
+ROM_END
+
+
 ROM_START( biplane4 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 ) /* 82s115 PROMS */
-	ROM_LOAD( "biplane.p",     0x0000, 0x0200, CRC(0b3af146) SHA1(de7e4bffd4ca3baf3fe6017609d1b11fa9fc356a) )
-	ROM_LOAD( "biplane.r",     0x0000, 0x0200, CRC(121eee0c) SHA1(fbdbc4da94dd9dba5903a6df321a9c2319f86dbd) )
-	ROM_LOAD( "biplane.s",     0x0000, 0x0200, CRC(a57a1c43) SHA1(64d8e609415bc0fe51581bfea2e777106505c761) )
-	ROM_LOAD( "biplane.t",     0x0000, 0x0200, CRC(40415f2a) SHA1(8a5d4cfb7713fc42ab12e3af61230255c5dffbf2) )
+	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 ) // 82s115 PROMs
+	ROM_LOAD( "12365.p12",     0x0000, 0x0200, CRC(0b3af146) SHA1(de7e4bffd4ca3baf3fe6017609d1b11fa9fc356a) )
+	ROM_LOAD( "12366.r12",     0x0000, 0x0200, CRC(121eee0c) SHA1(fbdbc4da94dd9dba5903a6df321a9c2319f86dbd) )
+	ROM_LOAD( "12357.s12",     0x0000, 0x0200, CRC(a57a1c43) SHA1(64d8e609415bc0fe51581bfea2e777106505c761) )
+	ROM_LOAD( "12358.t12",     0x0000, 0x0200, CRC(40415f2a) SHA1(8a5d4cfb7713fc42ab12e3af61230255c5dffbf2) )
 ROM_END
 
 
@@ -131,6 +145,8 @@ ROM_START( take5 )
 	ROM_LOAD( "take5.i2",     0x0000, 0x0200, CRC(25ff4f82) SHA1(6b3b9071591ca5126cce556007c12e4bf2cb3d51) )
 ROM_END
 
+} // Anonymous namespace
 
+GAME( 1975, biplane,  0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane [TTL]",   MACHINE_IS_SKELETON )
 GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
 GAME( 1975, take5,    0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )
