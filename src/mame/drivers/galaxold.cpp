@@ -46,15 +46,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
   - DSW bit 6 was previously used for "Bonus Lives" settings, but it has no effect
     in this set because of 'NOP' instructions from 0x3501 to 0x3507.
 
-3) 'porter'
-
-  - It's difficult to map correctly players buttons because of what they do :
-    on one side, both buttons do the same thing (code at 0x0940 for player 1 and
-    player 2 in "Upright" cabinet, or 0x1cc0 for player 2 in "Cocktail" cabinet),
-    but on the other side, due to code at 0x0910, player 1 BUTTON1 acts as a
-    START1 button while player 1 BUTTON2 acts as a START2 button. Any help is welcome !
-
-4) 'tazzmang'
+3) 'tazzmang'
 
   - If you press COIN2 during the boot-up sequence, you enter sort of "test mode"
     where you can access to all inputs, but this doesn't give a clue about what
@@ -1670,46 +1662,6 @@ INPUT_PORTS_END
 
 
 /* verified from Z80 code */
-static INPUT_PORTS_START( porter )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL       /* see notes */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )                     /* also START1 - see notes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )                     /* also START2 - see notes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL       /* see notes */
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "10000 only" )
-	PORT_DIPSETTING(    0x40, "30000 only" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 2C/1C  B 1C/3C" )
-	PORT_DIPSETTING(    0x01, "A 1C/1C  B 1C/6C" )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                             /* stored to 0x8021 bit 1 but not tested */
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-/* verified from Z80 code */
 static INPUT_PORTS_START( tazzmang )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -2228,15 +2180,6 @@ void galaxold_state::videotron(machine_config &config)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
-}
-
-
-void galaxold_state::porter(machine_config &config)
-{
-	mooncrst(config);
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 }
 
 
@@ -3100,47 +3043,6 @@ ROM_START( dkongjrmc ) // "CENTROMATIC - G/G" main board
 	ROM_LOAD( "tbp28l22n-a8240a.bin", 0x0100, 0x0100, CRC(9575df2b) SHA1(9360730fc230d17f6be5fc7f8d46d79566839cfa) )
 ROM_END
 
-ROM_START( porter )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "port1.bin",          0x0000, 0x0800, CRC(babaf7fe) SHA1(2138abf57990df9b6f9953efd3be9b2bede49520) )
-	ROM_CONTINUE(                   0x2000, 0x0800)
-	ROM_LOAD( "port2.bin",          0x0800, 0x0800, CRC(8f7eb0e3) SHA1(7ac5bfc0bb8b6a7a3e9acab5ce9a53f7cba1fca5) )
-	ROM_CONTINUE(                   0x2800, 0x0800)
-	ROM_LOAD( "port3.bin",          0x1000, 0x0800, CRC(683939b5) SHA1(caf69b03794cb5cf63b1aa52cf8ef355a3aeef87) )
-	ROM_CONTINUE(                   0x3000, 0x0800)
-	ROM_LOAD( "port4.bin",          0x1800, 0x0800, CRC(6a65d58d) SHA1(05824a41b2912f12bff7887e7483cb3f4367d339) )
-	ROM_CONTINUE(                   0x3800,0x0800)
-	ROM_LOAD( "port5.bin",          0x4000, 0x0800, CRC(2978a9aa) SHA1(99ec75c7f83f4858b26e083b50fde41fbcfe449a) )
-	ROM_LOAD( "port6.bin",          0x4800, 0x0800, CRC(7ecdffb5) SHA1(18ce71b670503bef039c6bfb0aed5e8c10e9eb2d) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "port7.bin",          0x0000, 0x1000, CRC(603294f9) SHA1(168b90fdf38cd2e2c7f54cde16b4d83dc5bb3046) )
-	ROM_LOAD( "port8.bin",          0x1000, 0x1000, CRC(b66a763d) SHA1(995b473b1942ff666b0989993587e41e89542172) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // not in the set
-	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
-ROM_END
-
-ROM_START( portera )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "port_man_sub_1.a1",  0x0000, 0x0800, CRC(09b80d10) SHA1(d2de4023fd71434fa9f53b5a900fc962729882e0) )
-	ROM_LOAD( "port_man_sub_2.a2",  0x0800, 0x0800, CRC(c86973fb) SHA1(f635da2662da18f81f2da2df0a44d6684bab0505) )
-	ROM_LOAD( "port_man_sub_3.b2",  0x1000, 0x0800, CRC(610b2da8) SHA1(8c4030fefa67a1841cdef2b26546fcafad95631d) )
-	ROM_LOAD( "port_man_sub_4.c1",  0x1800, 0x0800, CRC(5a3b3584) SHA1(f17e7429f9ace6e0c53b957e078969ca2565d366) )
-	ROM_LOAD( "port_man_sub_5.d1",  0x2000, 0x0800, CRC(2a34cfba) SHA1(74b19a0de47a02f2125bc8790196ad8f675f3c8d) )
-	ROM_LOAD( "port_man_sub_6.e2",  0x2800, 0x0800, CRC(58c01681) SHA1(ef1c7035960073299348092226f69927ebbc8e69) )
-	ROM_LOAD( "port_man_sub_7.f2",  0x3000, 0x0800, CRC(72a38ad0) SHA1(df07d5514d987eecd43e9a24113add8be9a67129) )
-	ROM_LOAD( "port_man_sub_8.f1",  0x3800, 0x0800, CRC(d7017450) SHA1(8e901c40ceab4ddbeaaafe0384729a431e0aedd0) )
-	ROM_LOAD( "port_man_sub_9.1d",  0x4000, 0x1000, CRC(2459fe44) SHA1(55d70eca43aa4497eaaedbddf639a87973d439b4) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "port_man_4k.kl",     0x0000, 0x1000, CRC(71e3debd) SHA1(c0f4caa7f6f64016c6c339085925e5f831948d3d) )
-	ROM_LOAD( "port_man_4k.hj",     0x1000, 0x1000, CRC(b66a763d) SHA1(995b473b1942ff666b0989993587e41e89542172) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "port_man_82s123.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
 ROM_START( tazzmang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tazzm1.4k",    0x0000, 0x1000, CRC(a14480a1) SHA1(60dac6b57e8331cc4daedaf87faf3e3acc68f378) )
@@ -3558,8 +3460,6 @@ GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_ini
 GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
-GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1982, portera,   dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, init_guttangt,  ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?

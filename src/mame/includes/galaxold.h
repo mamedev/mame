@@ -287,7 +287,6 @@ public:
 	void drivfrcg(machine_config &config);
 	void rockclim(machine_config &config);
 	void scramblb(machine_config &config);
-	void porter(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
 	void mooncrst(machine_config &config);

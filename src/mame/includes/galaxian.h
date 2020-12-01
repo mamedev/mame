@@ -198,14 +198,12 @@ public:
 	void init_checkmaj();
 	void init_dingo();
 	void init_dingoe();
-	void init_skybase();
 	void init_kong();
 	void init_mshuttle();
 	void init_mshuttlj();
 	void init_fantastc();
 	void init_timefgtr();
 	void init_kingball();
-	void init_scorpnmc();
 	void init_theend();
 	void init_scramble();
 	void init_sidam();
@@ -321,6 +319,7 @@ public:
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
+	void pisces(machine_config &config);
 	void highroll(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
@@ -353,6 +352,7 @@ public:
 	void frogg(machine_config &config);
 	void mandingarf(machine_config &config);
 	void thepitm(machine_config &config);
+	void porter(machine_config &config);
 	void skybase(machine_config &config);
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
@@ -409,6 +409,8 @@ protected:
 	void mshuttle_portmap(address_map &map);
 	void ozon1_map(address_map &map);
 	void ozon1_io_map(address_map &map);
+	void pisces_map(address_map &map);
+	void porter_map(address_map &map);
 	void scobra_map(address_map &map);
 	void scorpion_map(address_map &map);
 	void scorpion_sound_map(address_map &map);
