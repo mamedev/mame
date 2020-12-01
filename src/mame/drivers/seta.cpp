@@ -8936,7 +8936,7 @@ void seta_state::orbs(machine_config &config)
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-void seta_state::keroppij(machine_config &config)
+void seta_state::keroppi(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
@@ -8968,11 +8968,6 @@ void seta_state::keroppij(machine_config &config)
 	X1_010(config, m_x1, 14318180);   /* 14.318180 MHz */
 	m_x1->add_route(0, "lspeaker", 1.0);
 	m_x1->add_route(1, "rspeaker", 1.0);
-}
-
-void seta_state::keroppi(machine_config &config)
-{
-	keroppij(config);
 }
 
 
@@ -12176,7 +12171,7 @@ GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     empty_ini
 GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     empty_init,     ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
 
 GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
-GAME( 1993, keroppij,  keroppi,  keroppij,  keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     empty_init,     ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 

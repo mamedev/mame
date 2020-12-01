@@ -68,7 +68,6 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void keroppij(machine_config &config);
 	void madshark(machine_config &config);
 	void jjsquawb(machine_config &config);
 	void oisipuzl(machine_config &config);
