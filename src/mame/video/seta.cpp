@@ -299,7 +299,7 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-void seta_state::twineagl_tilebank_w(offs_t offset, u8 data)
+void downtown_state::twineagl_tilebank_w(offs_t offset, u8 data)
 {
 	if (m_twineagl_tilebank[offset] != data)
 	{
@@ -308,7 +308,7 @@ void seta_state::twineagl_tilebank_w(offs_t offset, u8 data)
 	}
 }
 
-u16 seta_state::twineagl_tile_offset(u16 code)
+u16 downtown_state::twineagl_tile_offset(u16 code)
 {
 	if ((code & 0x3e00) == 0x3e00)
 		return (code & 0x007f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);

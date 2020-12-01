@@ -1584,12 +1584,12 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 
 */
 
-u8 seta_state::sharedram_68000_r(offs_t offset)
+u8 downtown_state::sharedram_68000_r(offs_t offset)
 {
 	return m_sharedram[offset];
 }
 
-void seta_state::sharedram_68000_w(offs_t offset, u8 data)
+void downtown_state::sharedram_68000_w(offs_t offset, u8 data)
 {
 	m_sharedram[offset] = data & 0xff;
 }
@@ -1601,7 +1601,7 @@ void seta_state::sharedram_68000_w(offs_t offset, u8 data)
 
 */
 
-void seta_state::sub_ctrl_w(offs_t offset, u8 data)
+void downtown_state::sub_ctrl_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1615,11 +1615,11 @@ void seta_state::sub_ctrl_w(offs_t offset, u8 data)
 			break;
 
 		case 4/2:   // not sure
-			if (m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data);
+			if (m_soundlatch[0].found()) m_soundlatch[0]->write(data);
 			break;
 
 		case 6/2:   // not sure
-			if (m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data);
+			if (m_soundlatch[1].found()) m_soundlatch[1]->write(data);
 			break;
 	}
 
@@ -1637,12 +1637,12 @@ u16 seta_state::seta_dsw_r(offs_t offset)
 
 /* DSW reading for 8 bit CPUs */
 
-u8 seta_state::dsw1_r()
+u8 downtown_state::dsw1_r()
 {
 	return (m_dsw->read() >> 8) & 0xff;
 }
 
-u8 seta_state::dsw2_r()
+u8 downtown_state::dsw2_r()
 {
 	return (m_dsw->read() >> 0) & 0xff;
 }
@@ -1726,10 +1726,10 @@ void seta_state::ipl2_ack_w(u16 data)
    writing to sharedram! */
 
 
-void seta_state::tndrcade_map(address_map &map)
+void downtown_state::tndrcade_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
-	map(0x200000, 0x200001).w(FUNC(seta_state::ipl1_ack_w));
+	map(0x200000, 0x200001).w(FUNC(downtown_state::ipl1_ack_w));
 	map(0x280000, 0x280001).nopw();                        // ? 0 / 1 (sub cpu related?)
 	map(0x300000, 0x300001).nopw();                        // ? 0 / 1
 	map(0x380000, 0x3803ff).ram().share("paletteram1"); // Palette
@@ -1737,8 +1737,8 @@ void seta_state::tndrcade_map(address_map &map)
 	map(0x600000, 0x6005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0x600600, 0x600607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 
-	map(0x800000, 0x800007).w(FUNC(seta_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
-	map(0xa00000, 0xa00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
+	map(0x800000, 0x800007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
+	map(0xa00000, 0xa00fff).rw(FUNC(downtown_state::sharedram_68000_r), FUNC(downtown_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xe00000, 0xe03fff).ram().share("share1");                  // RAM (Mirrored?)
 	map(0xffc000, 0xffffff).ram().share("share1");                  // RAM (Mirrored?)
@@ -1750,7 +1750,7 @@ void seta_state::tndrcade_map(address_map &map)
         (with slight variations, and Meta Fox protection hooked in)
 ***************************************************************************/
 
-void seta_state::twineagl_ctrl_w(u8 data)
+void downtown_state::twineagl_ctrl_w(u8 data)
 {
 	if ((data & 0x30) == 0)
 	{
@@ -1759,20 +1759,20 @@ void seta_state::twineagl_ctrl_w(u8 data)
 	}
 }
 
-void seta_state::downtown_map(address_map &map)
+void downtown_state::downtown_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x200000, 0x200001).noprw();                             // watchdog? (twineagl)
-	map(0x300000, 0x300001).w(FUNC(seta_state::ipl1_ack_w));
-	map(0x400000, 0x400007).w(FUNC(seta_state::twineagl_tilebank_w)).umask16(0x00ff);      // special tile banking to animate water in twineagl
-	map(0x500001, 0x500001).w(FUNC(seta_state::twineagl_ctrl_w));
-	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x300000, 0x300001).w(FUNC(downtown_state::ipl1_ack_w));
+	map(0x400000, 0x400007).w(FUNC(downtown_state::twineagl_tilebank_w)).umask16(0x00ff);      // special tile banking to animate water in twineagl
+	map(0x500001, 0x500001).w(FUNC(downtown_state::twineagl_ctrl_w));
+	map(0x600000, 0x600003).r(FUNC(downtown_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x800005).w(m_layers[0], FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM
-	map(0xa00000, 0xa00007).w(FUNC(seta_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
-	map(0xb00000, 0xb00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
+	map(0xa00000, 0xa00007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
+	map(0xb00000, 0xb00fff).rw(FUNC(downtown_state::sharedram_68000_r), FUNC(downtown_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
 	map(0xc00000, 0xc00001).nopw();                        // ? $4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -1785,15 +1785,15 @@ void seta_state::downtown_map(address_map &map)
                                 Caliber 50
 ***************************************************************************/
 
-void seta_state::calibr50_map(address_map &map)
+void downtown_state::calibr50_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
-	map(0x100000, 0x100001).r(FUNC(seta_state::ipl2_ack_r));
+	map(0x100000, 0x100001).r(FUNC(downtown_state::ipl2_ack_r));
 	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
-	map(0x300000, 0x300001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
+	map(0x300000, 0x300001).rw(FUNC(downtown_state::ipl1_ack_r), FUNC(downtown_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x500000, 0x500001).nopw();                        // ?
-	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x600000, 0x600003).r(FUNC(downtown_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x800005).w(m_layers[0], FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM
@@ -3008,7 +3008,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
-	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -3037,7 +3037,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));     // Protection (not in wits)
 	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
-	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -3051,7 +3051,7 @@ void seta_state::wiggie_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 
@@ -3102,7 +3102,7 @@ void seta_state::utoukond_map(address_map &map)
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00001, 0xc00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xc00001, 0xc00001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe00000, 0xe00001).nopw();                        // ? ack
 }
 
@@ -3459,12 +3459,12 @@ void jockeyc_state::inttoote_map(address_map &map)
 
 ***************************************************************************/
 
-void seta_state::sub_bankswitch_w(u8 data)
+void downtown_state::sub_bankswitch_w(u8 data)
 {
 	m_subbank->set_entry(data >> 4);
 }
 
-void seta_state::sub_bankswitch_lockout_w(u8 data)
+void downtown_state::sub_bankswitch_lockout_w(u8 data)
 {
 	sub_bankswitch_w(data);
 	seta_coin_lockout_w(data);
@@ -3475,16 +3475,16 @@ void seta_state::sub_bankswitch_lockout_w(u8 data)
                                 Thundercade
 ***************************************************************************/
 
-u8 seta_state::ff_r(){return 0xff;}
+u8 downtown_state::ff_r(){return 0xff;}
 
-void seta_state::tndrcade_sub_map(address_map &map)
+void downtown_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
-	map(0x0800, 0x0800).r(FUNC(seta_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
+	map(0x0800, 0x0800).r(FUNC(downtown_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
 	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             //
 	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
-	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
 	map(0x1002, 0x1002).portr("COINS");              // Coins
 	map(0x2000, 0x2001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
@@ -3500,13 +3500,13 @@ void seta_state::tndrcade_sub_map(address_map &map)
                                 Twin Eagle
 ***************************************************************************/
 
-void seta_state::twineagl_sub_map(address_map &map)
+void downtown_state::twineagl_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
 	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
 	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");             // P1
-	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");             // P2
 	map(0x1002, 0x1002).portr("COINS");          // Coins
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
@@ -3520,7 +3520,7 @@ void seta_state::twineagl_sub_map(address_map &map)
                                 DownTown
 ***************************************************************************/
 
-u8 seta_state::downtown_ip_r(offs_t offset)
+u8 downtown_state::downtown_ip_r(offs_t offset)
 {
 	int dir1 = m_rot[0]->read();  // analog port
 	int dir2 = m_rot[1]->read();  // analog port
@@ -3543,13 +3543,13 @@ u8 seta_state::downtown_ip_r(offs_t offset)
 	return 0;
 }
 
-void seta_state::downtown_sub_map(address_map &map)
+void downtown_state::downtown_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
 	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
 	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
-	map(0x1000, 0x1007).r(FUNC(seta_state::downtown_ip_r));         // Input Ports
-	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
+	map(0x1000, 0x1007).r(FUNC(downtown_state::downtown_ip_r));         // Input Ports
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
 	map(0x8000, 0xbfff).bankr("subbank");                    // Banked ROM
@@ -3561,12 +3561,12 @@ void seta_state::downtown_sub_map(address_map &map)
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(seta_state,calibr50)
+MACHINE_RESET_MEMBER(downtown_state,calibr50)
 {
 	calibr50_sub_bankswitch_w(0);
 }
 
-void seta_state::calibr50_sub_bankswitch_w(u8 data)
+void downtown_state::calibr50_sub_bankswitch_w(u8 data)
 {
 	// Bits 7-4: BK3-BK0
 	sub_bankswitch_w(data);
@@ -3583,22 +3583,22 @@ void seta_state::calibr50_sub_bankswitch_w(u8 data)
 	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
 }
 
-void seta_state::calibr50_soundlatch2_w(u8 data)
+void downtown_state::calibr50_soundlatch2_w(u8 data)
 {
 	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
-void seta_state::calibr50_sub_map(address_map &map)
+void downtown_state::calibr50_sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lrw8(
 								 NAME([this](offs_t offset) { return m_x1->read(offset ^ 0x1000); }),
 								 NAME([this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); })); // Sound
 	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
-	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
+	map(0x4000, 0x4000).w(FUNC(downtown_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
-	map(0xc000, 0xc000).w(FUNC(seta_state::calibr50_soundlatch2_w));   // To Main CPU
+	map(0xc000, 0xc000).w(FUNC(downtown_state::calibr50_soundlatch2_w));   // To Main CPU
 }
 
 
@@ -3606,13 +3606,13 @@ void seta_state::calibr50_sub_map(address_map &map)
                                 Meta Fox
 ***************************************************************************/
 
-void seta_state::metafox_sub_map(address_map &map)
+void downtown_state::metafox_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
 	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
 	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("COINS");          // Coins
-	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1002, 0x1002).portr("P1");             // P1
 	//map(0x1004, 0x1004).nopr();                // ?
 	map(0x1006, 0x1006).portr("P2");             // P2
@@ -3630,7 +3630,7 @@ void seta_state::metafox_sub_map(address_map &map)
 void seta_state::utoukond_sound_control_w(u8 data)
 {
 	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w();
+		m_soundlatch->acknowledge_w();
 
 	// other bits used for banking? (low nibble seems to always be 2)
 }
@@ -3647,7 +3647,7 @@ void seta_state::utoukond_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x80, 0x80).w(FUNC(seta_state::utoukond_sound_control_w));
-	map(0xc0, 0xc0).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 
@@ -7894,7 +7894,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::seta_sub_interrupt)
 {
 	int scanline = param;
 
@@ -7910,7 +7910,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
                                 Thundercade
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::tndrcade_sub_interrupt)
 {
 	int scanline = param;
 
@@ -7921,19 +7921,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
-void seta_state::tndrcade(machine_config &config)
+void downtown_state::tndrcade(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::tndrcade_map);
+	m_maincpu->set_vblank_int("screen", FUNC(downtown_state::irq2_line_assert));
 
 	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_sub_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::tndrcade_sub_interrupt), "screen", 0, 1);
+	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::tndrcade_sub_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(downtown_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -7941,19 +7941,19 @@ void seta_state::tndrcade(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
+	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ym1(YM2203(config, "ym1", 16000000/4));   /* 4 MHz */
-	ym1.port_a_read_callback().set(FUNC(seta_state::dsw1_r));     /* input A: DSW 1 */
-	ym1.port_b_read_callback().set(FUNC(seta_state::dsw2_r));     /* input B: DSW 2 */
+	ym1.port_a_read_callback().set(FUNC(downtown_state::dsw1_r));     /* input A: DSW 1 */
+	ym1.port_b_read_callback().set(FUNC(downtown_state::dsw2_r));     /* input B: DSW 2 */
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	ym3812_device &ym2(YM3812(config, "ym2", 16000000/4));   /* 4 MHz */
@@ -7971,19 +7971,19 @@ void seta_state::tndrcade(machine_config &config)
 
 /* twineagl lev 3 = lev 2 + lev 1 ! */
 
-void seta_state::twineagl(machine_config &config)
+void downtown_state::twineagl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(downtown_state::irq3_line_assert));
 
 	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::twineagl_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
+	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::twineagl_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -7991,13 +7991,13 @@ void seta_state::twineagl(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(seta_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
+	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8016,19 +8016,19 @@ void seta_state::twineagl(machine_config &config)
 
 /* downtown lev 3 = lev 2 + lev 1 ! */
 
-void seta_state::downtown(machine_config &config)
+void downtown_state::downtown(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(downtown_state::irq2_line_assert));
 
 	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
+	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8036,13 +8036,13 @@ void seta_state::downtown(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(seta_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
+	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8065,7 +8065,7 @@ void seta_state::downtown(machine_config &config)
     5 ints per frame
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::calibr50_interrupt)
 {
 	int scanline = param;
 
@@ -8148,29 +8148,29 @@ void usclssic_state::usclssic(machine_config &config)
     Test mode shows a 16ms and 4ms counters. I wonder if every game has
     5 ints per frame */
 
-void seta_state::calibr50(machine_config &config)
+void downtown_state::calibr50(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::calibr50_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::calibr50_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(downtown_state::calibr50_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_sub_map);
-	m_subcpu->set_periodic_int(FUNC(seta_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
+	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::calibr50_sub_map);
+	m_subcpu->set_periodic_int(FUNC(downtown_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
 
 	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
 	upd4701.set_portx_tag("ROT1");
 	upd4701.set_porty_tag("ROT2");
 
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	MCFG_MACHINE_RESET_OVERRIDE(downtown_state,calibr50)
 
 	SETA001_SPRITE(config, m_seta001, XTAL(16'000'000), m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8178,13 +8178,13 @@ void seta_state::calibr50(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
+	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8206,19 +8206,19 @@ void seta_state::calibr50(machine_config &config)
 
 /* metafox lev 3 = lev 2 + lev 1 ! */
 
-void seta_state::metafox(machine_config &config)
+void downtown_state::metafox(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(downtown_state::irq3_line_assert));
 
 	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::metafox_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
+	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::metafox_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8226,13 +8226,13 @@ void seta_state::metafox(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(seta_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
+	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8409,7 +8409,7 @@ void seta_state::blockcarb_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 //  map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-//  map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+//  map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void seta_state::blockcarb(machine_config &config)
@@ -9373,7 +9373,7 @@ void seta_state::thunderlbl_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void seta_state::thunderlbl(machine_config &config)
@@ -9393,8 +9393,8 @@ void seta_state::thunderlbl(machine_config &config)
 
 	YM2151(config, "ymsnd", 16_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // XTAL verified, divider unknown
 
-	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 }
 
 
@@ -9429,8 +9429,8 @@ void seta_state::wiggie(machine_config &config)
 
 	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 }
 
 void seta_state::superbar(machine_config &config)
@@ -9542,9 +9542,9 @@ void seta_state::utoukond(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
-	m_soundlatch[0]->set_separate_acknowledge(true);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1, 16000000);
 	m_x1->add_route(0, "lspeaker", 1.0);
@@ -11826,7 +11826,7 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf0-018.u51", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
-u16 seta_state::twineagl_debug_r()
+u16 downtown_state::twineagl_debug_r()
 {
 	/*  At several points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11856,7 +11856,7 @@ u16 seta_state::twineagl_debug_r()
 	return 0;
 }
 
-void seta_state::init_bank6502()
+void downtown_state::init_bank6502()
 {
 	u8 *rom = memregion("sub")->base();
 	const u32 max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
@@ -11873,13 +11873,13 @@ void seta_state::init_bank6502()
 
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
-u16 seta_state::twineagl_200100_r(offs_t offset)
+u16 downtown_state::twineagl_200100_r(offs_t offset)
 {
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(), offset);
 	return m_twineagl_xram[offset];
 }
-void seta_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
+void downtown_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(), offset,data);
 
@@ -11889,20 +11889,20 @@ void seta_state::twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void seta_state::init_twineagl()
+void downtown_state::init_twineagl()
 {
 	init_bank6502();
 	/* debug? */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16smo_delegate(*this, FUNC(seta_state::twineagl_debug_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16smo_delegate(*this, FUNC(downtown_state::twineagl_debug_r)));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200100, 0x20010f, read16sm_delegate(*this, FUNC(seta_state::twineagl_200100_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200100, 0x20010f, write16s_delegate(*this, FUNC(seta_state::twineagl_200100_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200100, 0x20010f, read16sm_delegate(*this, FUNC(downtown_state::twineagl_200100_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200100, 0x20010f, write16s_delegate(*this, FUNC(downtown_state::twineagl_200100_w)));
 }
 
 
 /* Protection? NVRAM is handled writing commands here */
-u16 seta_state::downtown_protection_r(offs_t offset)
+u16 downtown_state::downtown_protection_r(offs_t offset)
 {
 	const int job = m_downtown_protection[0xf8/2] & 0xff;
 
@@ -11919,24 +11919,24 @@ u16 seta_state::downtown_protection_r(offs_t offset)
 	}
 }
 
-void seta_state::downtown_protection_w(offs_t offset, u16 data, u16 mem_mask)
+void downtown_state::downtown_protection_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-void seta_state::init_downtown()
+void downtown_state::init_downtown()
 {
 	init_bank6502();
 
 	m_downtown_protection = make_unique_clear<u16[]>(0x200/2);
 	save_pointer(NAME(m_downtown_protection),0x200/2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2001ff, read16sm_delegate(*this, FUNC(seta_state::downtown_protection_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x2001ff, write16s_delegate(*this, FUNC(seta_state::downtown_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2001ff, read16sm_delegate(*this, FUNC(downtown_state::downtown_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x2001ff, write16s_delegate(*this, FUNC(downtown_state::downtown_protection_w)));
 }
 
 
-u16 seta_state::arbalest_debug_r()
+u16 downtown_state::arbalest_debug_r()
 {
 	/*  At some points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11950,14 +11950,14 @@ u16 seta_state::arbalest_debug_r()
 	return 0;
 }
 
-void seta_state::init_arbalest()
+void downtown_state::init_arbalest()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16smo_delegate(*this, FUNC(seta_state::arbalest_debug_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16smo_delegate(*this, FUNC(downtown_state::arbalest_debug_r)));
 }
 
 
-u16 seta_state::metafox_protection_r(offs_t offset)
+u16 downtown_state::metafox_protection_r(offs_t offset)
 {
 	// very simplified protection simulation
 	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
@@ -11979,10 +11979,10 @@ u16 seta_state::metafox_protection_r(offs_t offset)
 	return offset * 0x1f;
 }
 
-void seta_state::init_metafox()
+void downtown_state::init_metafox()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16sm_delegate(*this, FUNC(seta_state::metafox_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16sm_delegate(*this, FUNC(downtown_state::metafox_protection_r)));
 }
 
 
@@ -12070,23 +12070,23 @@ void jockeyc_state::init_inttoote()
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     init_bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     init_bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  downtown_state, init_bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  downtown_state, init_bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 
-GAME( 1988, twineagl,  0,        twineagl,  twineagl,  seta_state,     init_twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
+GAME( 1988, twineagl,  0,        twineagl,  twineagl,  downtown_state, init_twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 
-GAME( 1989, downtown,  0,        downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
-GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
-GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
-GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
+GAME( 1989, downtown,  0,        downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
+GAME( 1989, downtown2, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
+GAME( 1989, downtownj, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
+GAME( 1989, downtownp, downtown, downtown,  downtown,  downtown_state, init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
 GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
+GAME( 1989, arbalest,  0,        metafox,   arbalest,  downtown_state, init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
-GAME( 1989, metafox,   0,        metafox,   metafox,   seta_state,     init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
+GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
 
