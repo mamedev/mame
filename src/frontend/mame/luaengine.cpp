@@ -1813,7 +1813,7 @@ void lua_engine::initialize()
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { if (c.exists()) return c.get_length(); return 0.0; });
 	cass_type["forward"] = &cassette_image_device::go_forward;
 	cass_type["reverse"] = &cassette_image_device::go_reverse;
-	cass_type["seek"] = [this] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
+	cass_type["seek"] = [] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
 	cass_type["image"] = sol::property([] (cassette_image_device &c) { return dynamic_cast<device_image_interface *>(&c); });
 
 
