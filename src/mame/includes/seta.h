@@ -394,11 +394,11 @@ private:
 	u16 m_kiwame_row_select;
 };
 
-class zombraid_state : public blandia_state
+class zombraid_state : public seta_state
 {
 public:
 	zombraid_state(const machine_config &mconfig, device_type type, const char *tag) :
-		blandia_state(mconfig, type, tag),
+		seta_state(mconfig, type, tag),
 		m_adc(*this, "adc"),
 		m_gun_inputs(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
