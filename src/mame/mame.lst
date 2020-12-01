@@ -13884,7 +13884,6 @@ fs3216                          //
 ft68m                           //
 
 @source:fungames.cpp
-biplane                         // (c) 1975 Fun Games
 biplane4                        // (c) 1976 Fun Games
 take5                           // (c) 1975 Fun Games
 
@@ -14192,6 +14191,13 @@ catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
 checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
 chewing                         // ?? unknown
+ckongcv                         // 19?? Competitive Video?
+ckongg                          // 1981 bootleg
+ckonggx                         //
+ckongis                         //
+ckongmc                         // 1981 bootleg
+ckongmc2                        // 1981 bootleg
+ckongs                          // bootleg
 devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
@@ -14405,12 +14411,6 @@ zigzagb2                        // (c) 1982 LAX (bootleg)
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
 bullsdrtg                       // 1985 Senko
-ckongcv                         // 19?? Competitive Video?
-ckongg                          // 1981 bootleg
-ckonggx                         //
-ckongis                         //
-ckongmc                         // 1981 bootleg
-ckongmc2                        // 1981 bootleg
 dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
@@ -36427,7 +36427,6 @@ scotrsht                        // GX545 (c) 1985
 800fatha                        // (c) 1981 Amenip + U.S. Billiards license
 ad2083                          // (c) 1983 Midcoin
 cavelon                         // (c) 1983 Jetsoft
-ckongs                          // bootleg
 conquer                         // (c) 1982 ????
 devilfsh                        // (c) 1982 Artic
 harem                           // [1983] I.G.R.

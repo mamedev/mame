@@ -76,6 +76,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_netlist(*this, "konami")
 		, m_filter_ctl(*this, "konami:ctl%u", 0)
+		, m_ckong_coinage(*this, "COINAGE")
 		, m_fake_select(*this, "FAKE_SELECT")
 		, m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"})
 		, m_spriteram(*this, "spriteram")
@@ -222,6 +223,8 @@ public:
 	void init_quaak();
 	void init_turtles();
 	void init_scorpion();
+	void init_ckongs();
+	void init_ckonggx();
 	void init_anteater();
 	void init_anteateruk();
 	void init_superbon();
@@ -343,6 +346,7 @@ public:
 	void mooncrst(machine_config &config);
 	void eagle(machine_config &config);
 	void scorpion(machine_config &config);
+	void ckongs(machine_config &config);
 	void frogf(machine_config &config);
 	void amigo2(machine_config &config);
 	void zigzag(machine_config &config);
@@ -357,11 +361,16 @@ public:
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
 	void scorpnmc(machine_config &config);
+	void ckongg(machine_config &config);
+	void ckongmc(machine_config &config);
 	void fourplay(machine_config &config);
 	void videight(machine_config &config);
 	void astroamb(machine_config &config);
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
+
+	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 
 protected:
 	void amigo2_map(address_map &map);
@@ -374,6 +383,10 @@ protected:
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
 	void checkman_sound_portmap(address_map &map);
+	void ckongg_map(address_map &map);
+	void ckongg_map_base(address_map &map);
+	void ckongmc_map(address_map &map);
+	void ckongs_map(address_map &map);
 	void explorer_map(address_map &map);
 	void fantastc_map(address_map &map);
 	void frogf_map(address_map &map);
@@ -400,6 +413,7 @@ protected:
 	void mimonkey_map(address_map &map);
 	void mimonscr_map(address_map &map);
 	void monsterz_map(address_map &map);
+	void monsterz_sound_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void mooncrst_map_base(address_map &map);
 	void mooncrst_map_discrete(address_map &map);
@@ -449,6 +463,7 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<netlist_mame_sound_device> m_netlist;
 	optional_device_array<netlist_mame_logic_input_device, 12> m_filter_ctl;
+	optional_ioport m_ckong_coinage;
 	optional_ioport m_fake_select;
 	optional_ioport_array<10> m_tenspot_game_dsw;
 
