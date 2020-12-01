@@ -594,7 +594,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (m_layers[layer].found())
 			m_layers[layer]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-	int x[2]{ 0, 0 }, y[2]{ 0, 0 };
+//	int x[2]{ 0, 0 }, y[2]{ 0, 0 };
 	for (int layer = 0; layer < 2; layer++)
 	{
 		if (m_layers[layer].found())
@@ -609,11 +609,11 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			m_layers[layer]->update_scroll(m_global_offsets->tilemap_offs[flip ? 1 : 0], vis_dimy, flip);
 		}
-		else
-		{
-			x[layer] = 0;
-			y[layer] = 0;
-		}
+//		else
+//		{
+//			x[layer] = 0;
+//			y[layer] = 0;
+//		}
 	}
 
 	unsigned layers_ctrl = ~0U;
