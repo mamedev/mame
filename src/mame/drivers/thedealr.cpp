@@ -555,8 +555,7 @@ void thedealr_state::thedealr(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_thedealr);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -569,7 +568,6 @@ void thedealr_state::thedealr(machine_config &config)
 	screen.screen_vblank().append_inputline(m_subcpu, INPUT_LINE_NMI);
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_thedealr);
 	PALETTE(config, m_palette, FUNC(thedealr_state::thedealr_palette), 512);
 
 	// sound hardware

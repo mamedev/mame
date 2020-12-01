@@ -47,8 +47,8 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 		//      logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, tcnt, next_tcnt, shift);
 
 		if(next_tcnt >= 0x100) {
-			logerror("watchdog triggered\n");
 			if(tcsr & TCSR_WT) {
+				logerror("%s watchdog triggered\n", machine().time().as_string());
 				if(type == B && !(tcsr & TCSR_NMI))
 					intc->internal_interrupt(3);
 				else
@@ -68,11 +68,8 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 uint16_t h8_watchdog_device::wd_r()
 {
 	if (!machine().side_effects_disabled())
-	{
 		tcnt_update();
-		logerror("read\n");
-	}
-	return 0;
+	return (tcsr << 8) | tcnt;
 }
 
 void h8_watchdog_device::wd_w(offs_t offset, uint16_t data, uint16_t mem_mask)

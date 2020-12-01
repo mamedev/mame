@@ -501,8 +501,7 @@ void champbwl_state::champbwl(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
 	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_champbwl);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -514,7 +513,6 @@ void champbwl_state::champbwl(machine_config &config)
 	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_champbwl));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */
@@ -562,8 +560,7 @@ void champbwl_state::doraemon(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 14'318'181, m_palette, gfx_champbwl);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
@@ -579,7 +576,6 @@ void champbwl_state::doraemon(machine_config &config)
 	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_doraemon));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */

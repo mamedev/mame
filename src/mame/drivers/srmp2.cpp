@@ -1148,8 +1148,7 @@ void srmp2_state::srmp2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp2);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1160,7 +1159,6 @@ void srmp2_state::srmp2(machine_config &config)
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp2));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp2);
 	PALETTE(config, "palette", FUNC(srmp2_state::srmp2_palette)).set_format(palette_device::xRGB_555, 1024); // sprites only
 
 	/* sound hardware */
@@ -1188,8 +1186,7 @@ void srmp2_state::srmp3(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
 	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
 
 	/* video hardware */
@@ -1201,7 +1198,6 @@ void srmp2_state::srmp3(machine_config &config)
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp3));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp3);
 	PALETTE(config, "palette", FUNC(srmp2_state::srmp3_palette)).set_format(palette_device::xRGB_555, 512); // sprites only
 
 	/* sound hardware */
@@ -1240,8 +1236,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
 	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
 
 	/* video hardware */
@@ -1253,7 +1248,6 @@ void srmp2_state::mjyuugi(machine_config &config)
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_mjyuugi));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp3);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512); // sprites only
 
 	/* sound hardware */
