@@ -12,44 +12,6 @@
 
 /****************************************************************************************/
 
-/* Video Hardware Addresses */
-
-/* Square Generator (13 bytes each) */
-#define LINEV   0x1403  // LINES VERTICAL START
-#define LINEVS  0x1483  // LINES VERT STOP
-#define LINEH   0x1083  // LINES HORIZ START
-#define LINEC   0x1283  // LINE COLOR, 4 BITS D0-D3
-#define LINESH  0x1203  // LINES SLOPE 4 BITS D0-D3 (signed)
-/* LINESH was used for rotation effects in an older version of the game */
-
-/* Shell Object0 */
-#define SHEL0H  0x1800  // SHELL H POSITON (NORMAL SCREEN)
-#define SHL0V   0x1400  // SHELL V START(NORMAL SCREEN)
-#define SHL0VS  0x1480  // SHELL V STOP (NORMAL SCREEN)
-#define SHL0ST  0x1200  // SHELL VSTRETCH (LIKE MST OBJ STRECTH)
-#define SHL0PC  0x1280  // SHELL PICTURE CODE (D3-D0)
-
-/* Shell Object1 (see above) */
-#define SHEL1H  0x1A00
-#define SHL1V   0x1401
-#define SHL1VS  0x1481
-#define SHL1ST  0x1201
-#define SHL1PC  0x1281
-
-/* Motion Object RAM */
-#define MOBJV   0x1C00  // V POSITION (SCREEN ON SIDE)
-#define MOBVS   0x1482  // V STOP OF MOTION OBJECT (NORMAL SCREEN)
-#define MOBJH   0x1402  // H POSITON (SCREEN ON SIDE) (VSTART - NORMAL SCREEN)
-#define MOBST   0x1082  // STARTING LINE FOR RAM SCAN ON MOBJ
-#define VSTRLO  0x1202  // VERT (SCREEN ON SIDE) STRETCH MOJ OBJ
-#define MOTT    0x2C00  // MOTION OBJECT RAM (00-0F NOT USED, BYT CLEARED)
-#define MOBSC0  0x1080  // SCAN ROM START FOR MOBJ (unused?)
-#define MOBSC1  0x1081  // (unused?)
-
-
-
-/****************************************************************************************/
-
 void tunhunt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -76,12 +38,34 @@ void tunhunt_state::video_start()
 
 	m_tmpbitmap.allocate(256, 64, m_screen->format());
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tunhunt_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tunhunt_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 8, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);
 
 	save_item(NAME(m_control));
+	save_item(NAME(m_mobsc0));
+	save_item(NAME(m_mobsc1));
+	save_item(NAME(m_lineh));
+	save_item(NAME(m_shl0st));
+	save_item(NAME(m_shl1st));
+	save_item(NAME(m_vstrlo));
+	save_item(NAME(m_linesh));
+	save_item(NAME(m_shl0pc));
+	save_item(NAME(m_shl1pc));
+	save_item(NAME(m_linec));
+	save_item(NAME(m_shl0v));
+	save_item(NAME(m_shl1v));
+	save_item(NAME(m_mobjh));
+	save_item(NAME(m_linev));
+	save_item(NAME(m_shl0vs));
+	save_item(NAME(m_shl1vs));
+	save_item(NAME(m_mobvs));
+	save_item(NAME(m_linevs));
+	save_item(NAME(m_shel0h));
+	save_item(NAME(m_mobst));
+	save_item(NAME(m_shel1h));
+	save_item(NAME(m_mobjv));
 }
 
 void tunhunt_state::tunhunt_palette(palette_device &palette) const
@@ -208,9 +192,9 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
  */
 
 	bitmap_ind16 &tmpbitmap = m_tmpbitmap;
-	//int skip = m_workram[MOBST];
-	const int x0 = 255 - m_workram[MOBJV];
-	const int y0 = 255 - m_workram[MOBJH];
+	//int skip = m_mobst;
+	const int x0 = 255 - m_mobjv;
+	const int y0 = 255 - m_mobjh;
 
 	for (int line = 0; line < 64; line++)
 	{
@@ -230,7 +214,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 
 	int scaley;
-	switch (m_workram[VSTRLO])
+	switch (m_vstrlo)
 	{
 	case 0x01:
 		scaley = (1 << 16) * 0.33; // seems correct
@@ -241,7 +225,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 		break;
 
 	default:
-		scaley = (1 << 16) * m_workram[VSTRLO] / 4; // ???
+		scaley = (1 << 16) * m_vstrlo / 4; // ???
 		break;
 	}
 	const int scalex = 1 << 16;
@@ -290,15 +274,15 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				color = 0;
 				z = 0;
-				for( span=3; span<16; span++ )
+				for( span=0; span<13; span++ )
 				{
-					x0 = m_workram[span+0x1080];
-					y0 = m_workram[span+0x1480];
-					y1 = m_workram[span+0x1400];
+					x0 = m_lineh[span];
+					y0 = m_linevs[span];
+					y1 = m_linev[span];
 
 					if( y>=y0 && y<=y1 && x>=x0 && x0>=z )
 					{
-						color = m_workram[span+0x1280]&0xf;
+						color = m_linec[span]&0xf;
 						z = x0; /* give priority to rightmost spans */
 					}
 				}
@@ -366,21 +350,25 @@ uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	draw_motion_object(bitmap, cliprect);
 
 	draw_shell(bitmap, cliprect,
-		m_workram[SHL0PC],  /* picture code */
-		m_workram[SHEL0H],  /* hposition */
-		m_workram[SHL0V],   /* vstart */
-		m_workram[SHL0VS],  /* vstop */
-		m_workram[SHL0ST],  /* vstretch */
+		m_shl0pc,  /* picture code */
+		m_shel0h,  /* hposition */
+		m_shl0v,   /* vstart */
+		m_shl0vs,  /* vstop */
+		m_shl0st,  /* vstretch */
 		m_control&0x08 ); /* hstretch */
 
 	draw_shell(bitmap, cliprect,
-		m_workram[SHL1PC],  /* picture code */
-		m_workram[SHEL1H],  /* hposition */
-		m_workram[SHL1V],   /* vstart */
-		m_workram[SHL1VS],  /* vstop */
-		m_workram[SHL1ST],  /* vstretch */
+		m_shl1pc,  /* picture code */
+		m_shel1h,  /* hposition */
+		m_shl1v,   /* vstart */
+		m_shl1vs,  /* vstop */
+		m_shl1st,  /* vstretch */
 		m_control&0x10 ); /* hstretch */
 
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	rectangle cr = cliprect;	
+	if( cr.min_x < 192 )
+		cr.min_x = 192;
+
+	m_fg_tilemap->draw(screen, bitmap, cr, 0, 0);
 	return 0;
 }

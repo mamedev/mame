@@ -48,7 +48,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 	m_u_dispatch = m_dispatch_array[0].data();
 
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_u_dispatch[i] = src->m_u_dispatch[i];
+		m_u_dispatch[i] = src->m_u_dispatch[i]->dup();
 		m_u_ranges[i] = src->m_u_ranges[i];
 	}
 }
@@ -120,14 +120,14 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void *hand
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::name() const
 {
-	return  m_view ? "view" :"dispatch";
+	return m_view ? "view" :"dispatch";
 }
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const
 {
 	offs_t slot = (address >> LowBits) & BITMASK;
 	auto h = m_a_dispatch[slot];
-	if(h->is_dispatch())
+	if(h->is_dispatch() || h->is_view())
 		h->lookup(address, start, end, handler);
 	else {
 		start = m_a_ranges[slot].start;

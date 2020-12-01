@@ -14176,6 +14176,7 @@ armorcar                        // (c) 1981 Stern
 armorcar2                       // (c) 1981 Stern
 asideral                        // bootleg
 astrians                        //
+astroamb                        // bootleg
 ataqandr                        // bootleg (FAR S.A.)
 atlantis                        // (c) 1981 Comsoft
 atlantis2                       // (c) 1981 Comsoft
@@ -14184,6 +14185,7 @@ azurian                         // (c) 1982 Rait Electronics Ltd
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bomber                          //
+bongo                           // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
 catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
@@ -14258,6 +14260,10 @@ mandinga                        // bootleg (Artemi)
 mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
+mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
+mimonsco                        // (c) 1982 bootleg
+mimonscr                        // (c) 1982 bootleg
+mimonscra                       // (c) 1982 bootleg
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -14297,6 +14303,7 @@ olmandingc                      // bootleg (Calfesa)
 omegab                          // bootleg
 omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
+ozon1                           // (c) 1983 Proma
 pacmanbl                        // bootleg
 pacmanbla                       // bootleg
 pacmanblb                       // bootleg
@@ -14394,7 +14401,6 @@ zigzagb2                        // (c) 1982 LAX (bootleg)
 4in1                            // (c) 1981 Armenia / Food and Fun
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
-bongo                           // (c) 1983 Jetsoft
 bullsdrtg                       // 1985 Senko
 ckongcv                         // 19?? Competitive Video?
 ckongg                          // 1981 bootleg
@@ -14415,7 +14421,6 @@ hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
-ozon1                           // (c) 1983 Proma
 porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
 portera                         // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
@@ -16460,6 +16465,7 @@ hp2100                          // HP 2100 and HP 1000
 hp2622a                         //
 
 @source:hp2640.cpp
+hp2641                          //
 hp2645                          //
 
 @source:hp3478a.cpp
@@ -19407,6 +19413,7 @@ lcmate2                         //
 
 @source:leapfrog_iquest.cpp
 iquest
+turboex
 
 @source:leapfrog_leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
@@ -31320,6 +31327,7 @@ cybrcycc                        // (c) 1995
 dirtdash                        // (c) 1995
 dirtdashj                       // (c) 1995
 propcycl                        // (c) 1996
+propcyclj                       // (c) 1996
 raveracj                        // (c) 1995
 raveracja                       // (c) 1995
 raveracw                        // (c) 1995
@@ -32230,7 +32238,6 @@ npssr2                          //
 npusagif                        //
 
 @source:neptunp2.cpp
-mexlindo                        // (c) 2004 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
 rockroll                        // (c) 1999 Cirsa / Unidesa
 unk960606                       // (c) 2001? Cirsa / Unidesa
@@ -36388,9 +36395,7 @@ hustlerb4                       // bootleg
 hustlerb5                       // bootleg
 hustlerb6                       // bootleg
 hustlerd                        // GX343 (c) 1981 Konami + Dynamo Games license
-mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonkeyug                      // (c) 1983 bootleg
-mimonsco                        // (c) 1982 bootleg
 minefld                         // (c) 1983 Stern
 minefldfe                       // bootleg
 rescue                          // (c) 1982 Stern
@@ -36435,8 +36440,6 @@ knockoutb                       // bootleg
 knockoutc                       //
 mariner                         // (c) 1981 Amenip
 mars                            // (c) 1981 Artic
-mimonscr                        // (c) 1982 bootleg
-mimonscra                       // (c) 1982 bootleg
 mrkougar                        // (c) 1984 ATW
 mrkougar2                       // (c) 1984 ATW
 mrkougb                         // bootleg
@@ -38401,7 +38404,7 @@ cdlyoko
 dnv200fs
 m505neo
 m521neo
-mywicodx                        
+mywicodx
 mywicogt
 oplayer
 zon32bit
@@ -38444,7 +38447,7 @@ zone100                         //
 lx_jg7415                       //
 lx_jg7410
 zonemini
-react                
+react
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
@@ -42765,7 +42768,7 @@ mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
 
 @source:ympsr340.cpp
-psr340							// 1999 PSR-340
+psr340                          // 1999 PSR-340
 
 @source:ymtx81z.cpp
 tx81z                           //

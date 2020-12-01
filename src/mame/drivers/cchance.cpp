@@ -223,10 +223,7 @@ void cchance_state::cchance(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_cchance);
-
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_cchance);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

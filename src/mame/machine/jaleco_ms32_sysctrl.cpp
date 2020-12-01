@@ -148,8 +148,11 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	m_timer.irq_enable = false;
 	m_timer.interval = 1;
 	flush_prg_timer();
-//	flush_scanline_timer(m_crtc.vert_display);
-	m_timer_scanline->adjust(attotime::never);
+	// bnstars1 never ever set up the CRTC at boot, causing no irq.
+	// we currently compensate by basically giving one frame of time,
+	// ofc on the real thing the first vblank is really when screen sync occurs.
+	flush_scanline_timer(m_crtc.vert_display-1);
+//	m_timer_scanline->adjust(attotime::never);
 	// put flipping in a default state
 	m_flip_screen_state = false;
 	m_flip_screen_cb(0);

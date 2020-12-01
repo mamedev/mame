@@ -71,7 +71,7 @@ Views are a way to multiplex different submaps over a memory range
 with fast switching.  It is to be used when multiple devices map at
 the same addresses and are switched in externally.  They must be
 created as an object of the device and then setup either statically in
-a memory map or dynamically through install_* calls.
+a memory map or dynamically through ``install_*`` calls.
 
 Switchable submaps, aka variants, are named through an integer.  An
 internal indirection through a map ensures that any integer value can
@@ -593,29 +593,29 @@ parameter is that trigger width (would be 16 in the 68000 case).
 
 .. code-block:: C++
 
-   map(start, end).view(m_view);
-   m_view[0](start1, end1).[...];
+    map(start, end).view(m_view);
+    m_view[0](start1, end1).[...];
 
 A view is setup in a address map with the view method.  The only
-qualifier accepted is mirror.  The "disabled" version of the view will
+qualifier accepted is mirror.  The “disabled” version of the view will
 include what was in the range prior to the view setup.
 
 The different variants are setup by indexing the view with the variant
 number and setting up an entry in the usual way.  The entries within a
 variant must of course stay within the range.  There are no other
 additional constraints.  The contents of a variant, by default, are
-what was there before, e.g. the contents of the disabled view, and
-then setting it up allows to override part or all of it.
+what was there before, i.e. the contents of the disabled view, and
+setting it up allows part or all of it to be overridden.
 
 Variants can only be setup once the view itself has been setup with
 the ``view`` method.
 
 A view can only be put in one address map and in only one position.
-If multiple views have identical or similar contents remember that
+If multiple views have identical or similar contents, remember that
 setting up a map is nothing more than a method call, and creating a
 second method to setup a view is perfectly reasonable.  A view is of
-type **memory_view** and an indexed entry (e.g. a variant to setup) is
-of type **memory_view::memory_view_entry &**.
+type ``memory_view`` and an indexed entry (e.g. a variant to setup) is
+of type ``memory_view::memory_view_entry &``.
 
 A view can be installed in another view, but don’t forget that a view
 can be installed only once.  A view can also be part of “what was there
@@ -787,8 +787,8 @@ Install a device address with an address map in a space.  The
 
 Installs a view in a space.  This can be only done once and in only
 one space, and the view must not have been setup through the address
-map API before.  Once the view is installed variants can be selected
-through indexation to call a dynamic mapping method on it.
+map API before.  Once the view is installed, variants can be selected
+by indexing to call a dynamic mapping method on it.
 
-A view can be installed into a variant of another view without issues
-with the only usual constraint of single installation.
+A view can be installed into a variant of another view without issues,
+with only the usual constraint of single installation.

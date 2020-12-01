@@ -233,6 +233,8 @@ public:
 	void init_froggrs();
 	void init_warofbugg();
 	void init_jungsub();
+	void init_mimonkey();
+	void init_mimonkeyb();
 	void init_victoryc();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
@@ -284,6 +286,8 @@ public:
 	void calipso_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void jumpbug_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
 	void jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void monsterz_set_latch();
 	void decode_mooncrst(int length, uint8_t *dest);
 	void decode_checkman();
@@ -308,6 +312,7 @@ public:
 	void moonqsr(machine_config &config);
 	void frogger(machine_config &config);
 	void anteatergg(machine_config &config);
+	void ozon1(machine_config &config);
 	void theend(machine_config &config);
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
@@ -350,15 +355,22 @@ public:
 	void thepitm(machine_config &config);
 	void skybase(machine_config &config);
 	void kong(machine_config &config);
+	void bongo(machine_config &config);
 	void scorpnmc(machine_config &config);
 	void fourplay(machine_config &config);
 	void videight(machine_config &config);
+	void astroamb(machine_config &config);
+	void mimonkey(machine_config &config);
+	void mimonscr(machine_config &config);
 
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
+	void astroamb_map(address_map &map);
+	void bongo_map(address_map &map);
+	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
 	void checkman_sound_portmap(address_map &map);
@@ -385,6 +397,8 @@ protected:
 	void konami_sound_portmap(address_map &map);
 	void kong_map(address_map &map);
 	void mandingarf_map(address_map &map);
+	void mimonkey_map(address_map &map);
+	void mimonscr_map(address_map &map);
 	void monsterz_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void mooncrst_map_base(address_map &map);
@@ -393,6 +407,8 @@ protected:
 	void mshuttle_decrypted_opcodes_map(address_map &map);
 	void mshuttle_map(address_map &map);
 	void mshuttle_portmap(address_map &map);
+	void ozon1_map(address_map &map);
+	void ozon1_io_map(address_map &map);
 	void scobra_map(address_map &map);
 	void scorpion_map(address_map &map);
 	void scorpion_sound_map(address_map &map);

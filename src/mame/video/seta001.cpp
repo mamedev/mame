@@ -30,6 +30,8 @@
 	appear to have 0x800 bytes of RAM that isn't connected to the sprite chip
 	between the banks.
 
+    This should implement device_video_interface, since it generates the vertical
+    and horizontal blanking and sync signals from a master clock.
 	*/
 
 #include "emu.h"
@@ -41,7 +43,7 @@ DEFINE_DEVICE_TYPE(SETA001_SPRITE, seta001_device, "seta001", "Seta SETA001 Spri
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SETA001_SPRITE, tag, owner, clock)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this)
 	, m_gfxbank_cb(*this)
 {
 }
@@ -251,7 +253,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int offs, col;
 	int xoffs, yoffs;
 
-	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   gfx(0)->colors();
 
 	int const ctrl    =   m_spritectrl[0];
 	int const ctrl2   =   m_spritectrl[1];
@@ -322,28 +324,28 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff)-512,((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff)-256,
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -362,7 +364,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	int const ctrl2 = m_spritectrl[1];
 	int xoffs, yoffs;
 
-	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   gfx(0)->colors();
 
 	uint8_t *char_pointer = &m_spritecodelow[0x0000];
 	uint8_t *x_pointer = &m_spritecodelow[0x0200];
@@ -409,7 +411,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -417,7 +419,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -425,7 +427,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -433,7 +435,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

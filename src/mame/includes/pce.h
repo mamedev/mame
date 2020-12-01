@@ -47,10 +47,24 @@ public:
 		m_a_card(*this, "A_CARD")
 	{ }
 
+	void init_sgx();
+	void init_tg16();
+	void init_mess_pce();
+
+	void pce_common(machine_config &config);
+	void pce(machine_config &config);
+	void tg16(machine_config &config);
+	void sgx(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<h6280_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_cd_ram;
 	required_shared_ptr<uint8_t> m_user_ram;
-	optional_device<huc6260_device> m_huc6260;
+	required_device<huc6260_device> m_huc6260;
 	required_device<pce_cart_slot_device> m_cartslot;
 	optional_device<pce_cd_device> m_cd;
 	required_ioport_array<5> m_joy;
@@ -70,16 +84,7 @@ public:
 	uint8_t pce_cd_intf_r(offs_t offset);
 	uint8_t pce_cd_acard_wram_r(offs_t offset);
 	void pce_cd_acard_wram_w(offs_t offset, uint8_t data);
-	void init_sgx();
-	void init_tg16();
-	void init_mess_pce();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_MACHINE_START(pce);
-	DECLARE_MACHINE_RESET(mess_pce);
-	void pce_common(machine_config &config);
-	void pce(machine_config &config);
-	void tg16(machine_config &config);
-	void sgx(machine_config &config);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void sgx_io(address_map &map);

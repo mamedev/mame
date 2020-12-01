@@ -26,6 +26,8 @@ Magic Sticks:
 #include "tilemap.h"
 
 
+namespace {
+
 class powerbal_state : public playmark_state
 {
 public:
@@ -40,14 +42,15 @@ public:
 	void powerbal(machine_config &config);
 	void atombjt(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	int         m_tilebank;
 	int         m_bg_yoffset;
 
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
-	DECLARE_MACHINE_START(powerbal);
-	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
 	DECLARE_VIDEO_START(atombjt);
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -616,12 +619,12 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_start()
 {
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_reset()
 {
 	m_tilebank = 0;
 	configure_oki_banks();
@@ -633,9 +636,6 @@ void powerbal_state::powerbal(machine_config &config)
 	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::powerbal_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
-
-	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
-	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -667,9 +667,6 @@ void powerbal_state::magicstk(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
-
-	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
-	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -867,6 +864,9 @@ void powerbal_state::init_magicstk()
 	m_yoffset = -5;
 }
 
+} // Anonymous namespace
+
+
 /*************************
 *      Game Drivers      *
 *************************/
@@ -875,4 +875,4 @@ void powerbal_state::init_magicstk()
 GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original, does this really support flip screen?
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original, does this really support flip screen?

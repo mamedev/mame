@@ -26,6 +26,9 @@ To distinguish between versions, press the Set Level button.
 Note that the H8 option doesn't appear to work with sexperta2, but when doing a
 hex compare with sexperta, the program differences are minor.
 
+To identify C program version, start MAME with -rs232 terminal, and afterwards,
+input I followed by Enter.
+
 TODO:
 - use W65C802 device for version B/C? it works ok but this cpu core emulation is
   not as accurate, and the program doesn't enable extended mode (in other words,

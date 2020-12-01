@@ -46,6 +46,9 @@ public:
 	void init_pic_decode();
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_bgvideoram;
 	required_shared_ptr<uint16_t> m_videoram1;
@@ -115,8 +118,6 @@ protected:
 	TILE_GET_INFO_MEMBER(bigtwinb_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_bg_tile_info);
-	DECLARE_MACHINE_START(playmark);
-	DECLARE_MACHINE_RESET(playmark);
 	DECLARE_VIDEO_START(bigtwin);
 	DECLARE_VIDEO_START(bigtwinb);
 	DECLARE_VIDEO_START(wbeachvl);
