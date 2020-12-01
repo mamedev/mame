@@ -997,28 +997,29 @@ void lua_engine::initialize()
  * options.entries[] - get table of option entries (k=name, v=core_options::entry)
  */
 
-	auto emu_options_type = sol().registry().new_usertype<emu_options>("new", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
+	auto emu_options_type = sol().registry().new_usertype<emu_options>("emu_options", sol::no_constructor);
 	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return opts.find_slot_option(name); });
-	sol().registry().set("emu_options", emu_options_type);
+
 
 /*  slot_option library
  *
  * manager:options():slot_option("name")
  * manager:machine():options():slot_option("name")
  *
- * slot_option:value()
- * slot_option:specified_value()
- * slot_option:bios()
- * slot_option:default_card_software()
+ * slot_option.value - the actual value of the option, after being interpreted
+ * slot_option.specified_value - the value of the option, as specified from outside
+ * slot_option.bios - the bios, if any, associated with the slot
+ * slot_option.default_card_software - the software list item that is associated with this option, by default
+ * slot_option:specify() - specifies the value of the slot, potentially causing a recalculation
  */
 
-	auto slot_option_type = sol().registry().new_usertype<slot_option>("new", sol::no_constructor);
-	slot_option_type.set("value", &slot_option::value);
-	slot_option_type.set("specified_value", &slot_option::specified_value);
-	slot_option_type.set("bios", &slot_option::bios);
-	slot_option_type.set("default_card_software", &slot_option::default_card_software);
+	auto slot_option_type = sol().registry().new_usertype<slot_option>("slot_option", sol::no_constructor);
+	slot_option_type["value"] = sol::property(&slot_option::value);
+	slot_option_type["specified_value"] = sol::property(&slot_option::specified_value);
+	slot_option_type["bios"] = sol::property(&slot_option::bios);
+	slot_option_type["default_card_software"] = sol::property(&slot_option::default_card_software);
 	slot_option_type.set("specify", [](slot_option &opt, std::string &&text) { opt.specify(std::move(text)); });
-	sol().registry().set("slot_option", slot_option_type);
+
 
 /*  core_options::entry library
  *
@@ -1823,15 +1824,15 @@ void lua_engine::initialize()
  *
  * manager:machine().slots[slot_name]
  *
- * slot:fixed()
- * slot:has_selectable_options()
- *
+ * slot.fixed - whether this slot is fixed, and hence not selectable by the user
+ * slot.has_selectable_options - does this slot have any selectable options at all?
+ * slot.default_option - returns the default option if one exists
  * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
  */
 
 	auto slot_type = sol().registry().new_usertype<device_slot_interface>("new", sol::no_constructor);
-	slot_type.set("fixed", &device_slot_interface::fixed);
-	slot_type.set("has_selectable_options", &device_slot_interface::has_selectable_options);
+	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
+	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
 	slot_type.set("default_option", &device_slot_interface::default_option);
 	slot_type.set("options", sol::property([this](device_slot_interface &slot) {
 			sol::table option_table = sol().create_table();
@@ -1840,6 +1841,7 @@ void lua_engine::initialize()
 			return option_table;
 		}));
 	sol().registry().set("slot", slot_type);
+
 
 /*  device_slot_interface::slot_option library
  *
@@ -1851,6 +1853,7 @@ void lua_engine::initialize()
 	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("new", sol::no_constructor);
 	dislot_option_type.set("selectable", &device_slot_interface::slot_option::selectable);
 	sol().registry().set("dislot_option", dislot_option_type);
+
 
 /*  mame_machine_manager library
  *
