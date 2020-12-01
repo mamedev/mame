@@ -3813,6 +3813,8 @@ files {
 	MAME_DIR .. "src/mame/includes/simple_st0016.h",
 	MAME_DIR .. "src/mame/video/seta001.cpp",
 	MAME_DIR .. "src/mame/video/seta001.h",
+	MAME_DIR .. "src/mame/video/x1_012.cpp",
+	MAME_DIR .. "src/mame/video/x1_012.h",
 	MAME_DIR .. "src/mame/drivers/thedealr.cpp",
 }
 

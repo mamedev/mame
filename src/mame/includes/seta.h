@@ -21,6 +21,7 @@
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "video/x1_012.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -50,6 +51,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
+		m_layers(*this, "layer%u", 1U),
 		m_x1(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_dsw(*this, "DSW"),
@@ -59,13 +61,10 @@ public:
 		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
 		m_sharedram(*this,"sharedram"),
-		m_vram(*this,"vram_%u", 0U),
-		m_vctrl(*this,"vctrl_%u", 0U),
 		m_paletteram(*this,"paletteram%u", 1U),
 		m_subbank(*this,"subbank"),
 		m_x1_bank(*this,"x1_bank"),
 		m_leds(*this, "led%u", 0U),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -136,6 +135,7 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
+	optional_device_array<x1_012_device, 2> m_layers;
 	optional_device<x1_010_device> m_x1;
 	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
 
@@ -147,8 +147,6 @@ protected:
 	optional_ioport m_extra_port;
 
 	optional_shared_ptr<u8> m_sharedram;
-	optional_shared_ptr_array<u16, 2> m_vram;
-	optional_shared_ptr_array<u16, 2> m_vctrl;
 	optional_shared_ptr_array<u16, 2> m_paletteram;
 
 	optional_memory_bank m_subbank;
@@ -156,18 +154,12 @@ protected:
 
 	output_finder<48> m_leds;
 
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	u8 m_vregs;
 
-	int m_tiles_offset;
-	tilemap_t *m_tilemap[2]; // Max 2 Layers
-	int m_rambank[2]; // 2 Tilemap banks for each layers
 	int m_tilemaps_flip;
 	int m_samples_bank;
-	int m_color_mode_shift;
-	int m_current_tilemap_mode[2];
 
 	uPD71054_state m_uPD71054;
 	const game_offset *m_global_offsets;
@@ -191,7 +183,6 @@ protected:
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
-	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void twineagl_tilebank_w(offs_t offset, u8 data);
 	void timer_regs_w(offs_t offset, u16 data);
 	u8 sharedram_68000_r(offs_t offset);
@@ -227,15 +218,11 @@ protected:
 	u8 dsw2_r();
 	u16 extra_r();
 
-	TILE_GET_INFO_MEMBER(twineagl_get_tile_info);
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_VIDEO_START(seta_no_layers);
-	DECLARE_VIDEO_START(kyustrkr_no_layers);
-	DECLARE_VIDEO_START(twineagl_1_layer);
-	DECLARE_VIDEO_START(seta_1_layer);
+	DECLARE_VIDEO_START(seta);
+	DECLARE_VIDEO_START(kyustrkr);
 	DECLARE_MACHINE_RESET(calibr50);
+	u16 twineagl_tile_offset(u16 code);
 
-	DECLARE_VIDEO_START(seta_2_layers);
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(wrofaero);
@@ -243,7 +230,7 @@ protected:
 	void jjsquawk_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(keroppi);
 	DECLARE_MACHINE_START(magspeed);
-	DECLARE_VIDEO_START(oisipuzl_2_layers);
+	DECLARE_VIDEO_START(oisipuzl);
 	u32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -266,7 +253,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 
 	void set_pens();
-	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
 	void uPD71054_timer_init();
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
@@ -327,7 +313,9 @@ public:
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
 		m_track_x(*this, "TRACK%u_X", 1U),
-		m_track_y(*this, "TRACK%u_Y", 1U)
+		m_track_y(*this, "TRACK%u_Y", 1U),
+		m_port_select(0),
+		m_tiles_offset(0)
 	{ }
 
 	void usclssic(machine_config &config);
@@ -344,6 +332,7 @@ private:
 
 	void usclssic_palette(palette_device &palette) const;
 
+	u16 tile_offset(u16 code);
 	u32 screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void usclssic_set_pens();
@@ -356,6 +345,7 @@ private:
 	required_ioport_array<2> m_track_y;
 
 	u8 m_port_select;
+	u16 m_tiles_offset;
 };
 
 class kiwame_state : public seta_state
@@ -453,7 +443,7 @@ private:
 	DECLARE_MACHINE_START(setaroul);
 	DECLARE_MACHINE_RESET(setaroul);
 
-	DECLARE_VIDEO_START(setaroul_1_layer);
+	DECLARE_VIDEO_START(setaroul);
 	void setaroul_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -518,7 +508,7 @@ private:
 
 	DECLARE_MACHINE_START(jockeyc);
 	DECLARE_MACHINE_START(inttoote);
-	DECLARE_VIDEO_START(jockeyc_1_layer);
+	DECLARE_VIDEO_START(jockeyc);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
