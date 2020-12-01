@@ -16,6 +16,8 @@
 #include "ui/pluginopt.h"
 #include "ui/ui.h"
 
+#include "imagedev/cassette.h"
+
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -23,7 +25,6 @@
 #include "natkeyboard.h"
 #include "softlist.h"
 #include "uiinput.h"
-#include "imagedev/cassette.h"
 
 #include <cstring>
 #include <thread>
@@ -530,6 +531,13 @@ void lua_engine::initialize()
 	};
 
 
+	static const enum_parser<int, 3> s_seek_parser =
+	{
+		{ "set", SEEK_SET },
+		{ "cur", SEEK_CUR },
+		{ "end", SEEK_END }
+	};
+
 /*  emu library
  *
  * emu.app_name() - return application name
@@ -745,16 +753,7 @@ void lua_engine::initialize()
 					return sol::make_object(sol(), file.tell());
 			},
 			[this](emu_file &file, const char* whence) -> sol::object {
-				int wval = -1;
-				const char *seekdirs[] = {"set", "cur", "end"};
-				for(int i = 0; i < 3; i++)
-				{
-					if(!strncmp(whence, seekdirs[i], 3))
-					{
-						wval = i;
-						break;
-					}
-				}
+				int wval = s_seek_parser(whence);
 				if(wval < 0 || wval >= 3)
 					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(0, wval))
@@ -762,16 +761,7 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), file.tell());
 			},
 			[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
-				int wval = -1;
-				const char *seekdirs[] = {"set", "cur", "end"};
-				for(int i = 0; i < 3; i++)
-				{
-					if(!strncmp(whence, seekdirs[i], 3))
-					{
-						wval = i;
-						break;
-					}
-				}
+				int wval = s_seek_parser(whence);
 				if(wval < 0 || wval >= 3)
 					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(offset, wval))
@@ -1146,6 +1136,7 @@ void lua_engine::initialize()
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
+	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["popmessage"] = sol::overload(
 			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
@@ -1351,7 +1342,6 @@ void lua_engine::initialize()
 						table[rom.name()] = rom;
 				return table;
 			});
-	device_type["cassette"] = sol::property([] (device_t &dev) { return dynamic_cast<cassette_image_device *>(&dev); });
 
 
 /*  parameters_manager library
@@ -1788,6 +1778,7 @@ void lua_engine::initialize()
 	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
 
+
 /*  cassette_image_device
  *
  * device.cassette
@@ -1797,6 +1788,7 @@ void lua_engine::initialize()
  * cass:record()
  * cass:forward() - forward play direction
  * cass:reverse() - reverse play direction
+ * cass:seek(time, origin) - seek time sec from origin: "set", "cur", "end"
  *
  * cass.is_stopped
  * cass.is_playing
@@ -1805,6 +1797,7 @@ void lua_engine::initialize()
  * cass.speaker_state
  * cass.position
  * cass.length
+ * cass.image - get the device_image_interface for this cassette device
  */
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>("cassette", sol::no_constructor);
@@ -1817,10 +1810,12 @@ void lua_engine::initialize()
 	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
 	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
-	cass_type["length"] = sol::property(&cassette_image_device::get_length);
+	cass_type["length"] = sol::property([] (cassette_image_device &c) { if (c.exists()) return c.get_length(); return 0.0; });
 	cass_type["forward"] = &cassette_image_device::go_forward;
 	cass_type["reverse"] = &cassette_image_device::go_reverse;
-	cass_type["seek"] = &cassette_image_device::seek;
+	cass_type["seek"] = [this] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
+	cass_type["image"] = sol::property([] (cassette_image_device &c) { return dynamic_cast<device_image_interface *>(&c); });
+
 
 /*  mame_machine_manager library
  *
