@@ -4873,7 +4873,7 @@ ROM_END
     MANEGEMENT = It's the general statistic. It shows in and out credits.
 
     To cancel statistics press CANCEL for 5 seconds.
-    To change max and min value for play connect to GND the mangement pin,
+    To change max and min value for play connect to GND the manegement pin,
     at the same time press together HOLD 2 + HOLD 4 for some seconds.
 
     The following menu will show up:
