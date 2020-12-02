@@ -50,6 +50,8 @@ private:
 	required_device<input_buffer_device> m_cent_status_in;
 	required_device<m68000_base_device> m_oscpu;
 	required_shared_ptr<uint32_t> m_mailbox;
+	required_shared_ptr<uint32_t> m_p_ram;
+	required_region_ptr<uint32_t> m_sysrom;
 
 	DECLARE_WRITE_LINE_MEMBER(dusirq_callback);
 	DECLARE_WRITE_LINE_MEMBER(scsiirq_callback);
@@ -58,8 +60,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_callback);
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t    *m_sysrom;
-	uint32_t    m_sysram[2];
+	memory_passthrough_handler *m_rom_shadow_tap;
 	uint16_t    m_irq_state;
 	uint16_t    m_irq_mask;
 	uint8_t     m_rtc_reg[16];
@@ -68,8 +69,6 @@ private:
 	bool        m_bus_error;
 	emu_timer  *m_bus_error_timer;
 
-	uint32_t bootvect_r(offs_t offset);
-	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t irq_state_r(offs_t offset);
 	void irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t rtc_r(offs_t offset);

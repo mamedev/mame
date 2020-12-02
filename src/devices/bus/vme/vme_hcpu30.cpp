@@ -24,8 +24,8 @@
  * - pass functional test
  * - boot to multiuser (SysV and Linux)
  * - add LAN and Centronics
- * - floppy: how is TC signal generated? (m_fdcdrq_hack); ready signal; dp8493 hacks
- * - remove other hacks
+ * - floppy: how is TC signal generated? (m_fdcdrq_hack); ready signal routing; dp8493 hacks
+ * - dump PALs (should help with irq routing)
  *
  */
 
@@ -65,9 +65,7 @@ DEFINE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device, "hcpu30", "Besta HCPU30 C
 void vme_hcpu30_card_device::hcpu30_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x00000007).w(FUNC(vme_hcpu30_card_device::bootvect_w));   /* After first write we act as RAM */
-	map(0x00000000, 0x00000007).r(FUNC(vme_hcpu30_card_device::bootvect_r));   /* ROM mirror just during reset */
-	map(0x00000008, 0x003fffff).ram().share("dram"); // local bus DRAM, 4 MB
+	map(0x00000000, 0x003fffff).ram().share("dram"); // local bus DRAM, 4 MB
 	map(0x00400000, 0x00ffffff).ram().share("hldram"); // optional HLDRAM
 	map(0xff000000, 0xff007fff).rom().region("user1", 0).mirror(0x8000);
 	map(0xfff1f400, 0xfff1f4ff).unmaprw(); // LAN DMA
@@ -89,16 +87,14 @@ void vme_hcpu30_card_device::hcpu30_os_mem(address_map &map)
 // bus error handler
 	map(0x00000000, 0xffffffff).rw(FUNC(vme_hcpu30_card_device::trap_r), FUNC(vme_hcpu30_card_device::trap_w));
 // shared memory with iocpu
-	map(0x00000000, 0x00000007).w(FUNC(vme_hcpu30_card_device::bootvect_w));
-	map(0x00000000, 0x00000007).r(FUNC(vme_hcpu30_card_device::bootvect_r));
-	map(0x00000008, 0x003fffff).ram().share("dram");
+	map(0x00000000, 0x003fffff).ram().share("dram");
 	map(0x00400000, 0x00ffffff).ram().share("hldram");
 	map(0xffff8000, 0xffff9fff).ram().share("mailbox");
 }
 
 void vme_hcpu30_card_device::cpu_space_map(address_map &map)
 {
-	map(0xfffffff0, 0xffffffff).lr16(NAME([this](offs_t offset) -> u16 { return 0x18 + offset; }));
+	map(0xfffffff0, 0xffffffff).lr16(NAME([](offs_t offset) -> u16 { return 0x18 + offset; }));
 }
 
 void vme_hcpu30_card_device::oscpu_space_map(address_map &map)
@@ -106,7 +102,7 @@ void vme_hcpu30_card_device::oscpu_space_map(address_map &map)
 	map(0xfffffff0, 0xffffffff).lr16(NAME([this](offs_t offset) -> u16 {
 		u16 vec = (offset & 1) ? (m_mailbox[offset >> 1] >> 8) : (m_mailbox[offset >> 1] >> 24);
 		logerror("68030 iack %d = %02x\n", offset, vec);
-		if (1 || BIT(m_irq_state, 6)) // XXX
+		if (1 || BIT(m_irq_state, 6)) // FIXME: irq routing is not fully understood
 		{
 			m_irq_state &= ~(1 << 6); // raise IRQ30*
 			update_030_irq(offset, CLEAR_LINE);
@@ -187,7 +183,7 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_hcpu30_card_device::cpu_space_map);
 	m_maincpu->disable_interrupt_mixer();
 
-	// functional test expects dtr->dcd, rts->cts connections on both ports and tx->rx connection on port B
+	// FIXME: functional test expects dtr->dcd, rts->cts connections on both ports and tx->rx connection on port B
 	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
 	m_dusccterm->configure_channels(0, 0, 0, 0);
 	m_dusccterm->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
@@ -220,59 +216,35 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 		{
 			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
-			wd33c93.set_clock(16670000/4); // XXX default internal divisor is 2
+			wd33c93.set_clock(16670000/4); // default internal divisor is 2
 			wd33c93.irq_cb().set(*this, FUNC(vme_hcpu30_card_device::scsiirq_callback)).invert();
 			wd33c93.drq_cb().set(*this, FUNC(vme_hcpu30_card_device::scsidrq_callback));
 		});
 
-	// XXX schematics connect INT to IPL1, not DRQ
+	// schematics connect INT to IPL1, not DRQ; could be outdated
 	DP8473(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 	m_fdc->intrq_wr_callback().set(*this, FUNC(vme_hcpu30_card_device::fdcirq_callback)).invert();
 
-	// XXX drive select signals are swapped
+	// FIXME: drive select signals are swapped, handle this
 	FLOPPY_CONNECTOR(config, "floppy:0", hcpu_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "floppy:1", hcpu_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
-	// functional test expects A26-C24 A27-C28 A28-C26 A29-C30 A30-C32
+	// FIXME: functional test expects A26-C24 A27-C28 A28-C26 A29-C30 A30-C32
 	// i.e. ACKNOWL-CENTDS BUSY-CENTD3 PE-CENTD1 SLCT-CENTD5 ERROR-CENTD7
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-#if 0
-	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit0));
-	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit1));
-	m_centronics->select_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit2));
-	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit3));
-//	m_centronics->ack_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit3));
-//	m_centronics->strobe_handler().set(m_centronics, FUNC(centronics_device::write_ack));
-#endif
 
 	INPUT_BUFFER(config, m_cent_status_in);
 
 	OUTPUT_LATCH(config, m_cent_data_out);
-//	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// OS CPU
 	M68030(config, m_oscpu, 2*16670000);
 	m_oscpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_os_mem);
 	m_oscpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_hcpu30_card_device::oscpu_space_map);
 	m_oscpu->set_disable();
-}
-
-/* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff000000 to 0x0 at reset */
-uint32_t vme_hcpu30_card_device::bootvect_r(offs_t offset)
-{
-	LOG("%s\n", FUNCNAME);
-	return m_sysrom[offset];
-}
-
-void vme_hcpu30_card_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 uint32_t vme_hcpu30_card_device::rtc_r(offs_t offset)
@@ -314,13 +286,6 @@ void vme_hcpu30_card_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		if (offset == 7)
 		{
 			m_cent_data_out->write(data >> 8);
-#if 0
-			// ACKNOWL-CENTDS BUSY-CENTD3 PE-CENTD1 SLCT-CENTD5 ERROR-CENTD7
-			m_centronics->write_perror(BIT(data, 8+1));
-			m_centronics->write_busy(BIT(data, 8+3));
-			m_centronics->write_select(BIT(data, 8+5));
-			m_centronics->write_fault(BIT(data, 8+7));
-#endif
 		}
 	}
 	else
@@ -559,7 +524,7 @@ void vme_hcpu30_card_device::set_bus_error(uint32_t address, bool rw, uint32_t m
 		return;
 	}
 	LOG("bus error at %08x & %08x (%s)\n", address, mem_mask, rw ? "read" : "write");
-	if (!ACCESSING_BITS_16_31) // XXX
+	if (!ACCESSING_BITS_16_31)
 	{
 		address++;
 	}
@@ -584,6 +549,8 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, de
 	, m_cent_status_in(*this, "cent_status_in")
 	, m_oscpu(*this, "oscpu")
 	, m_mailbox(*this, "mailbox")
+	, m_p_ram(*this, "dram")
+	, m_sysrom(*this, "user1")
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 	m_slot = 1;
@@ -602,23 +569,35 @@ void vme_hcpu30_card_device::device_start()
 
 	set_vme_device();
 
-	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
-	save_pointer (NAME (m_sysram), sizeof(m_sysram));
-
-	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (uint32_t*)(memregion ("user1")->base());
-
 	m_bus_error_timer = timer_alloc(0);
 }
 
 void vme_hcpu30_card_device::device_reset()
 {
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
 	LOG("%s %s\n", tag(), FUNCNAME);
 	m_irq_state = (1 << 10) | (1 << 6); // fdcirq | irq30*
 	m_irq_mask = 0;
 	m_rtc_hack = false;
 	m_fdcdrq_hack = 0;
-	m_fdc->ready_w(false); // XXX
+	m_fdc->ready_w(false);
+
+	program.install_rom(0x00000000, 0x00000007, m_sysrom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xff000000, 0xff007fff, "rom_shadow_r", [this](offs_t offset, u32 &data, u32 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, 0x00000007, m_p_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
 void vme_hcpu30_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
