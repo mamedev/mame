@@ -11833,6 +11833,7 @@ lah_107                         //
 lah_108s                        //
 lah_110                         //
 lah_112                         //
+lah_xxx_s105                    //
 lw3_200                         //
 lw3_203                         //
 lw3_204e                        // (c) 1992 Data East
@@ -14191,6 +14192,13 @@ catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
 checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
 chewing                         // ?? unknown
+ckongcv                         // 19?? Competitive Video?
+ckongg                          // 1981 bootleg
+ckonggx                         //
+ckongis                         //
+ckongmc                         // 1981 bootleg
+ckongmc2                        // 1981 bootleg
+ckongs                          // bootleg
 devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
@@ -14313,6 +14321,8 @@ pajaroes                        // bootleg
 phoenxp2                        // bootleg
 pisces                          // Subelectro
 piscesb                         // bootleg
+porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
+portera                         // bootleg
 quaak                           // bootleg
 redufo                          // (c) Artic
 redufob                         // bootleg
@@ -14402,12 +14412,6 @@ zigzagb2                        // (c) 1982 LAX (bootleg)
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
 bullsdrtg                       // 1985 Senko
-ckongcv                         // 19?? Competitive Video?
-ckongg                          // 1981 bootleg
-ckonggx                         //
-ckongis                         //
-ckongmc                         // 1981 bootleg
-ckongmc2                        // 1981 bootleg
 dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
@@ -14421,8 +14425,6 @@ hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
-porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
-portera                         // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
 rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
@@ -36426,7 +36428,6 @@ scotrsht                        // GX545 (c) 1985
 800fatha                        // (c) 1981 Amenip + U.S. Billiards license
 ad2083                          // (c) 1983 Midcoin
 cavelon                         // (c) 1983 Jetsoft
-ckongs                          // bootleg
 conquer                         // (c) 1982 ????
 devilfsh                        // (c) 1982 Artic
 harem                           // [1983] I.G.R.

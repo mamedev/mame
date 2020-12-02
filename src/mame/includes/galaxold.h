@@ -158,14 +158,12 @@ public:
 	uint8_t rescueb_a002_r() { return 0xfc; }
 	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
 	void init_bullsdrtg();
 	void init_ladybugg();
 	void init_4in1();
 	void init_guttangt();
-	void init_ckonggx();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -270,7 +268,6 @@ public:
 	void machine_reset_common(int line);
 	void galaxian(machine_config &config);
 	void galaxold_base(machine_config &config);
-	void ckongg(machine_config &config);
 	void _4in1(machine_config &config);
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
@@ -287,19 +284,15 @@ public:
 	void drivfrcg(machine_config &config);
 	void rockclim(machine_config &config);
 	void scramblb(machine_config &config);
-	void porter(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
-	void ckongmc(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
 	void bagmanmc_map(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
-	void ckongg_map(address_map &map);
-	void ckongmc_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);
 	void drivfrcg_program(address_map &map);

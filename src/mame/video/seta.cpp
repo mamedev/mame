@@ -299,7 +299,7 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-void seta_state::twineagl_tilebank_w(offs_t offset, u8 data)
+void downtown_state::twineagl_tilebank_w(offs_t offset, u8 data)
 {
 	if (m_twineagl_tilebank[offset] != data)
 	{
@@ -308,7 +308,7 @@ void seta_state::twineagl_tilebank_w(offs_t offset, u8 data)
 	}
 }
 
-u16 seta_state::twineagl_tile_offset(u16 code)
+u16 downtown_state::twineagl_tile_offset(u16 code)
 {
 	if ((code & 0x3e00) == 0x3e00)
 		return (code & 0x007f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
@@ -591,14 +591,11 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	const int flip = m_seta001->is_flipped() ^ m_tilemaps_flip;
 	for (int layer = 0; layer < 2; layer++)
-		if (m_layers[layer].found())
-			m_layers[layer]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-
-//	int x[2]{ 0, 0 }, y[2]{ 0, 0 };
-	for (int layer = 0; layer < 2; layer++)
 	{
 		if (m_layers[layer].found())
 		{
+			m_layers[layer]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+
 			/* the hardware wants different scroll values when flipped */
 
 			/*  bg x scroll      flip
@@ -609,11 +606,6 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			m_layers[layer]->update_scroll(m_global_offsets->tilemap_offs[flip ? 1 : 0], vis_dimy, flip);
 		}
-//		else
-//		{
-//			x[layer] = 0;
-//			y[layer] = 0;
-//		}
 	}
 
 	unsigned layers_ctrl = ~0U;
