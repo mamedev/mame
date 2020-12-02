@@ -1789,23 +1789,23 @@ void lua_engine::initialize()
  *
  * manager:machine().images[image_type].formatlist[x]
  * 
- * format.name
- * format.description
- * format.extensions
- * format.optspec
+ * format.name - name of the format (e.g. - "dsk")
+ * format.description - the description of the format
+ * format.extensions - all of the extensions, as an array
+ * format.optspec - the option spec associated with the format
  * 
  */
 	auto format_type = sol().registry().new_usertype<image_device_format>("format", "new", sol::no_constructor);
-	format_type.set("name", sol::property(&image_device_format::name));
-	format_type.set("description", sol::property(&image_device_format::description));
-	format_type.set("optspec", sol::property(&image_device_format::optspec));
-	format_type.set("extensions", sol::property([this](const image_device_format &format) {
+	format_type["name"] = sol::property(&image_device_format::name);
+	format_type["description"] = sol::property(&image_device_format::description);
+	format_type["optspec"] = sol::property(&image_device_format::optspec);
+	format_type["extensions"] = sol::property([this](const image_device_format &format) {
 			int index = 1;
 			sol::table option_table = sol().create_table();
 			for (const std::string &ext : format.extensions())
 				option_table[index++] = ext;
 			return option_table;
-		}));
+		});
 
 
 /*  cassette_image_device
