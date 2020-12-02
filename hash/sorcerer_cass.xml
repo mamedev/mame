@@ -1459,4 +1459,16 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<software name="killerg">
+		<description>Killer Gorilla (ported from TRS-80)</description>
+		<year>19??</year>
+		<publisher>Displayed Video</publisher>
+		<info name="developer" value="Dubios and McNamara"/>
+		<info name="usage" value="Boot to Monitor, LOG. Numpad 5 to climb ladder. Numpad 8 to jump." />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xba942c">
+				<rom name="killerg.wav" size="0xba942c" crc="38b7e929" sha1="cf22f87b9f494daa19e4175ddbfb25879d75b1e4" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
