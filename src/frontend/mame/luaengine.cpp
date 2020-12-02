@@ -984,11 +984,9 @@ void lua_engine::initialize()
  * manager:machine():options()
  *
  * options:slot_option() - retrieves a specific slot option
- *
- * options.entries[] - get table of option entries (k=name, v=core_options::entry)
  */
 
-	auto emu_options_type = sol().registry().new_usertype<emu_options>("emu_options", sol::no_constructor);
+	auto emu_options_type = sol().registry().new_usertype<emu_options>("emu_options", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
 	emu_options_type.set("slot_option", [](emu_options &opts, const std::string &name) { return opts.find_slot_option(name); });
 
 
@@ -1009,7 +1007,11 @@ void lua_engine::initialize()
 	slot_option_type["specified_value"] = sol::property(&slot_option::specified_value);
 	slot_option_type["bios"] = sol::property(&slot_option::bios);
 	slot_option_type["default_card_software"] = sol::property(&slot_option::default_card_software);
-	slot_option_type.set("specify", [](slot_option &opt, std::string &&text) { opt.specify(std::move(text)); });
+	slot_option_type.set("specify", [](slot_option &opt, std::string &&text, const char *bios) {
+			opt.specify(std::move(text));
+			if (bios)
+				opt.set_bios(bios);
+		});
 
 
 /*  core_options::entry library
@@ -1822,29 +1824,31 @@ void lua_engine::initialize()
  * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
  */
 
-	auto slot_type = sol().registry().new_usertype<device_slot_interface>("new", sol::no_constructor);
+	auto slot_type = sol().registry().new_usertype<device_slot_interface>("slot", "new", sol::no_constructor);
 	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
 	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
-	slot_type.set("default_option", &device_slot_interface::default_option);
-	slot_type.set("options", sol::property([this](device_slot_interface &slot) {
+	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
+	slot_type["options"] = sol::property([this](const device_slot_interface &slot) {
 			sol::table option_table = sol().create_table();
 			for (auto &x : slot.option_list())
 				option_table[x.first] = &*x.second;
 			return option_table;
-		}));
-	sol().registry().set("slot", slot_type);
+		});
 
 
 /*  device_slot_interface::slot_option library
  *
  * manager:machine().slots[slot_name].options[option_name]
  *
- * slot_option:selectable()
+ * slot_option.selectable - is this item selectable by the user?
+ * slot_option.default_bios - the default bios for this option
+ * slot_option.default_bios - the clock speed associated with this option
  */
 
-	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("new", sol::no_constructor);
-	dislot_option_type.set("selectable", &device_slot_interface::slot_option::selectable);
-	sol().registry().set("dislot_option", dislot_option_type);
+	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("dislot_option", "new", sol::no_constructor);
+	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
+	dislot_option_type["default_bios"] = sol::property([](const device_slot_interface::slot_option &opt) { return opt.default_bios(); });
+	dislot_option_type["clock"] = sol::property([](const device_slot_interface::slot_option &opt) { return opt.clock(); });
 
 
 /*  cassette_image_device
