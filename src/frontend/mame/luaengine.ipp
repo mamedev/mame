@@ -17,6 +17,16 @@
 #include <lua.hpp>
 
 
+
+template <typename T>
+struct lua_engine::tag_object_ptr_map
+{
+	tag_object_ptr_map(T const &m) : map(m) { }
+
+	T const &map;
+};
+
+
 namespace sol {
 
 class buffer
@@ -68,6 +78,106 @@ int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
 // lua_engine::devenum  customisation
 template <typename T> struct is_container<lua_engine::devenum<T> > : std::true_type { };
 template <typename T> struct usertype_container<lua_engine::devenum<T> >;
+
+
+// tag_object_ptr_map is_container
+template <typename T> struct is_container<lua_engine::tag_object_ptr_map<T> > : std::true_type { };
+
+// tag_object_ptr_map usertype_container
+template <typename T>
+struct usertype_container<lua_engine::tag_object_ptr_map<T> > : lua_engine::immutable_container_helper<lua_engine::tag_object_ptr_map<T>, T const, typename T::const_iterator>
+{
+private:
+	template <bool Indexed>
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return stack::push(L, lua_nil);
+		int result;
+		if constexpr (Indexed)
+			result = stack::push(L, i.ix + 1);
+		else
+			result = stack::push(L, i.it->first);
+		result += stack::push_reference(L, *i.it->second);
+		++i;
+		return result;
+	}
+
+	template <bool Indexed>
+	static int start_pairs(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs<Indexed>);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.map, self.map.begin());
+		stack::push(L, lua_nil);
+		return 3;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((0 >= index) || (self.map.size() < index))
+			return stack::push(L, lua_nil);
+		auto const found(std::next(self.map.begin(), index - 1));
+		if (!found->second)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push_reference(L, *found->second);
+	}
+
+	static int get(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		char const *const tag(stack::unqualified_get<char const *>(L));
+		auto const found(self.map.find(tag));
+		if ((self.map.end() == found) || !found->second)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push_reference(L, *found->second);
+	}
+
+	static int index_get(lua_State *L)
+	{
+		return get(L);
+	}
+
+	static int index_of(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		auto &obj(stack::unqualified_get<decltype(*self.map.begin()->second)>(L, 2));
+		auto it(self.map.begin());
+		std::ptrdiff_t ix(0);
+		while ((self.map.end() != it) && (it->second.get() != &obj))
+		{
+			++it;
+			++ix;
+		}
+		if (self.map.end() == it)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push(L, ix + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.map.size());
+	}
+
+	static int empty(lua_State *L)
+	{
+		lua_engine::tag_object_ptr_map<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.map.empty());
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
+	static int pairs(lua_State *L) { return start_pairs<false>(L); }
+	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
+
 
 } // namespace sol
 

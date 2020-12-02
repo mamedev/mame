@@ -37,6 +37,9 @@ public:
 	template <typename T> struct devenum;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
 
+	template <typename T> struct tag_object_ptr_map;
+	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
+
 	// construction/destruction
 	lua_engine();
 	~lua_engine();
