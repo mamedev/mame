@@ -47,28 +47,21 @@ public:
 
 	seta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
 		m_layers(*this, "layer%u", 1U),
 		m_x1(*this, "x1snd"),
-		m_soundlatch(*this, "soundlatch%u", 1U),
+		m_soundlatch(*this, "soundlatch"),
 		m_dsw(*this, "DSW"),
-		m_rot(*this, "ROT%u", 1),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
 		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
-		m_sharedram(*this,"sharedram"),
-		m_paletteram(*this,"paletteram%u", 1U),
-		m_subbank(*this,"subbank"),
-		m_x1_bank(*this,"x1_bank"),
+		m_paletteram(*this, "paletteram%u", 1U),
+		m_x1_bank(*this, "x1_bank"),
 		m_leds(*this, "led%u", 0U),
 		m_palette(*this, "palette")
 	{ }
 
-	void keroppij(machine_config &config);
 	void madshark(machine_config &config);
 	void jjsquawb(machine_config &config);
 	void oisipuzl(machine_config &config);
@@ -76,7 +69,6 @@ public:
 	void eightfrc(machine_config &config);
 	void gundhara(machine_config &config);
 	void triplfun(machine_config &config);
-	void calibr50(machine_config &config);
 	void blandiap(machine_config &config);
 	void wits(machine_config &config);
 	void msgundam(machine_config &config);
@@ -86,13 +78,11 @@ public:
 	void zingzip(machine_config &config);
 	void wiggie(machine_config &config);
 	void umanclub(machine_config &config);
-	void tndrcade(machine_config &config);
 	void daioh(machine_config &config);
 	void atehate(machine_config &config);
 	void thunderlbl(machine_config &config);
 	void blockcarb(machine_config &config);
 	void wrofaero(machine_config &config);
-	void downtown(machine_config &config);
 	void blockcar(machine_config &config);
 	void crazyfgt(machine_config &config);
 	void keroppi(machine_config &config);
@@ -105,20 +95,13 @@ public:
 	void kamenrid(machine_config &config);
 	void superbar(machine_config &config);
 	void jjsquawk(machine_config &config);
-	void twineagl(machine_config &config);
 	void blandia(machine_config &config);
 	void thunderl(machine_config &config);
-	void metafox(machine_config &config);
 	void utoukond(machine_config &config);
 	void rezon(machine_config &config);
 
-	void init_bank6502();
-	void init_downtown();
 	void init_rezon();
-	void init_twineagl();
 	void init_crazyfgt();
-	void init_metafox();
-	void init_arbalest();
 	void init_wiggie();
 	void init_bankx1();
 	void init_eightfrc();
@@ -133,23 +116,17 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	optional_device_array<x1_012_device, 2> m_layers;
 	optional_device<x1_010_device> m_x1;
-	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dsw;
-	optional_ioport_array<2> m_rot;
-	optional_ioport m_p1;
-	optional_ioport m_p2;
 	optional_ioport m_coins;
 	optional_ioport m_extra_port;
 
-	optional_shared_ptr<u8> m_sharedram;
 	optional_shared_ptr_array<u16, 2> m_paletteram;
 
-	optional_memory_bank m_subbank;
 	optional_memory_bank m_x1_bank;
 
 	output_finder<48> m_leds;
@@ -164,30 +141,19 @@ protected:
 	uPD71054_state m_uPD71054;
 	const game_offset *m_global_offsets;
 
-	int m_sub_ctrl_data;
-
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
 	emu_timer *m_keroppi_prize_hop_timer;
-
-	u8 m_twineagl_xram[8];
-	int m_twineagl_tilebank[4];
 
 	u16 m_magspeed_lights[3];
 
 	std::unique_ptr<u16[]> m_pairslove_protram;
 	std::unique_ptr<u16[]> m_pairslove_protram_old;
-	std::unique_ptr<u16[]> m_downtown_protection;
 
-	u16 metafox_protection_r(offs_t offset);
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
-	void twineagl_tilebank_w(offs_t offset, u8 data);
 	void timer_regs_w(offs_t offset, u16 data);
-	u8 sharedram_68000_r(offs_t offset);
-	void sharedram_68000_w(offs_t offset, u8 data);
-	void sub_ctrl_w(offs_t offset, u8 data);
 	u16 seta_dsw_r(offs_t offset);
 
 	u16 zingzipbl_unknown_r();
@@ -200,28 +166,11 @@ protected:
 	void utoukond_sound_control_w(u8 data);
 	u16 pairlove_prot_r(offs_t offset);
 	void pairlove_prot_w(offs_t offset, u16 data);
-	void sub_bankswitch_w(u8 data);
-	void sub_bankswitch_lockout_w(u8 data);
-	u8 ff_r();
-	u8 downtown_ip_r(offs_t offset);
-	void calibr50_sub_bankswitch_w(u8 data);
-	void calibr50_soundlatch2_w(u8 data);
-	void twineagl_ctrl_w(u8 data);
-	u16 twineagl_debug_r();
-	u16 twineagl_200100_r(offs_t offset);
-	void twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 downtown_protection_r(offs_t offset);
-	void downtown_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 arbalest_debug_r();
 	void magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u8 dsw1_r();
-	u8 dsw2_r();
 	u16 extra_r();
 
 	DECLARE_VIDEO_START(seta);
 	DECLARE_VIDEO_START(kyustrkr);
-	DECLARE_MACHINE_RESET(calibr50);
-	u16 twineagl_tile_offset(u16 code);
 
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
@@ -247,9 +196,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
-	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 
 	void set_pens();
@@ -266,13 +212,9 @@ protected:
 	void blockcarb_map(address_map &map);
 	void blockcarb_sound_map(address_map &map);
 	void blockcarb_sound_portmap(address_map &map);
-	void calibr50_map(address_map &map);
-	void calibr50_sub_map(address_map &map);
 	void crazyfgt_map(address_map &map);
 	void daioh_map(address_map &map);
 	void daiohp_map(address_map &map);
-	void downtown_map(address_map &map);
-	void downtown_sub_map(address_map &map);
 	void drgnunit_map(address_map &map);
 	void extdwnhl_map(address_map &map);
 	void jjsquawb_map(address_map &map);
@@ -281,7 +223,6 @@ protected:
 	void krzybowl_map(address_map &map);
 	void madshark_map(address_map &map);
 	void magspeed_map(address_map &map);
-	void metafox_sub_map(address_map &map);
 	void msgundam_map(address_map &map);
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
@@ -291,10 +232,7 @@ protected:
 	void thunderlbl_map(address_map &map);
 	void thunderlbl_sound_map(address_map &map);
 	void thunderlbl_sound_portmap(address_map &map);
-	void tndrcade_map(address_map &map);
-	void tndrcade_sub_map(address_map &map);
 	void triplfun_map(address_map &map);
-	void twineagl_sub_map(address_map &map);
 	void umanclub_map(address_map &map);
 	void utoukond_map(address_map &map);
 	void utoukond_sound_io_map(address_map &map);
@@ -305,11 +243,95 @@ protected:
 	void zingzipbl_map(address_map &map);
 };
 
-class usclssic_state : public seta_state
+class downtown_state : public seta_state
+{
+public:
+	downtown_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag),
+		m_subcpu(*this, "sub"),
+		m_soundlatch(*this, "soundlatch%u", 1U),
+		m_rot(*this, "ROT%u", 1),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_sharedram(*this, "sharedram"),
+		m_subbank(*this, "subbank"),
+		m_sub_ctrl_data(0)
+	{ }
+
+	void calibr50(machine_config &config);
+	void downtown(machine_config &config);
+	void metafox(machine_config &config);
+	void tndrcade(machine_config &config);
+	void twineagl(machine_config &config);
+
+	void init_bank6502();
+	void init_downtown();
+	void init_twineagl();
+	void init_metafox();
+	void init_arbalest();
+
+protected:
+	required_device<cpu_device> m_subcpu;
+	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
+
+	optional_ioport_array<2> m_rot;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
+
+	required_shared_ptr<u8> m_sharedram;
+
+	required_memory_bank m_subbank;
+
+	u8 m_sub_ctrl_data;
+
+	u8 m_twineagl_xram[8];
+	u8 m_twineagl_tilebank[4];
+
+	std::unique_ptr<u16[]> m_downtown_protection;
+
+	u16 metafox_protection_r(offs_t offset);
+	void twineagl_tilebank_w(offs_t offset, u8 data);
+	u8 sharedram_68000_r(offs_t offset);
+	void sharedram_68000_w(offs_t offset, u8 data);
+	void sub_ctrl_w(offs_t offset, u8 data);
+	void sub_bankswitch_w(u8 data);
+	void sub_bankswitch_lockout_w(u8 data);
+	u8 ff_r();
+	u8 downtown_ip_r(offs_t offset);
+	void calibr50_sub_bankswitch_w(u8 data);
+	void calibr50_soundlatch2_w(u8 data);
+	void twineagl_ctrl_w(u8 data);
+	u16 twineagl_debug_r();
+	u16 twineagl_200100_r(offs_t offset);
+	void twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 downtown_protection_r(offs_t offset);
+	void downtown_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 arbalest_debug_r();
+	u8 dsw1_r();
+	u8 dsw2_r();
+
+	DECLARE_MACHINE_RESET(calibr50);
+	u16 twineagl_tile_offset(u16 code);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
+
+	void calibr50_map(address_map &map);
+	void calibr50_sub_map(address_map &map);
+	void downtown_map(address_map &map);
+	void downtown_sub_map(address_map &map);
+	void metafox_sub_map(address_map &map);
+	void tndrcade_map(address_map &map);
+	void tndrcade_sub_map(address_map &map);
+	void twineagl_sub_map(address_map &map);
+};
+
+class usclssic_state : public downtown_state
 {
 public:
 	usclssic_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag),
+		downtown_state(mconfig, type, tag),
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
 		m_track_x(*this, "TRACK%u_X", 1U),

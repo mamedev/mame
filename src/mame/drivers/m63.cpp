@@ -824,6 +824,9 @@ void m63_state::fghtbskt(machine_config &config)
 	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
 	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->p1_out_cb().set(FUNC(m63_state::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(m63_state::p2_w));
+	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
 
 	/* video hardware */
