@@ -131,7 +131,7 @@ Notes:
       VR2       - 2k-Ohm volume pot
       LA4460    - Sanyo LA4460 12W Audio Power Amplifier
       YM3012    - Yamaha YM3012 DAC. Clock 1.7897725MHz [14.31818/8]
-      M5205     - Oki M5205 ADPCM Speech Synthesis Chip. Clock 375kHz [12/32]
+      M5205     - Oki M5205 ADPCM Speech Synthesis Chip. Clock 375kHz [12/32]. Pins 1,2=H,L so sample rate is 375/48=7.8125kHz
       LM324     - Texas Instruments LM324 Quad Operational Amplifier
       YM2151    - Yamaha YM2151 8-Channel 4-Operator (OPM; FM Operator Type-M) Sound Chip. Clock 3.579545MHz [14.31818/4]
       HB-41     - Ceramic module (Audio Mixer). Contains caps, resistors and 2 op-amps.
@@ -647,8 +647,8 @@ void cabal_state::cabal(machine_config &config)
 	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	SEIBU_ADPCM(config, m_adpcm[0], 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
-	SEIBU_ADPCM(config, m_adpcm[1], 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+	SEIBU_ADPCM(config, m_adpcm[0], XTAL(12'000'000)/32/48).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+	SEIBU_ADPCM(config, m_adpcm[1], XTAL(12'000'000)/32/48).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
 }
 
 void cabal_state::cabalt(machine_config &config)
@@ -772,6 +772,10 @@ ROM_START( cabal )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabala )
@@ -801,6 +805,10 @@ ROM_START( cabala )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "epr-a-1.1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 
@@ -831,6 +839,10 @@ ROM_START( cabaluk )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabalukj )
@@ -874,6 +886,10 @@ ROM_START( cabalukj )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabalus )
