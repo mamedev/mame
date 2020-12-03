@@ -1206,7 +1206,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 	<software name="gokickj" supported="no">
 		<description>Jissen Igo Taikyoku - Gokichi-kun - Chuukyuu (Jou)</description>
 		<year>1989</year>
-		<publisher>タケル (Takeru)</publisher>
+		<publisher>ジーエーエム (GAM)</publisher>
 		<info name="alt_title" value="実戦囲碁対局　碁キチくん 中級（上）" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
