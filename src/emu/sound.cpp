@@ -1080,9 +1080,6 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_last_update(attotime::zero),
 	m_finalmix_leftover(0),
 	m_samples_this_update(0),
-	m_finalmix(machine.sample_rate()),
-	m_leftmix(machine.sample_rate()),
-	m_rightmix(machine.sample_rate()),
 	m_compressor_scale(1.0),
 	m_compressor_counter(0),
 	m_muted(0),
@@ -1090,8 +1087,17 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_attenuation(0),
 	m_unique_id(0),
 	m_wavfile(nullptr),
-	m_first_reset(true)
+	m_first_reset(true),
+	m_numstreams(2) // TODO: get from OSD
 {
+	m_finalmix.resize(machine.sample_rate());
+
+	m_mixes.resize(m_numstreams);
+
+	for (auto i=0;i<m_numstreams;i++)
+		m_mixes[i].resize(machine.sample_rate());
+
+
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();
 	const char *avifile = machine.options().avi_write();
@@ -1225,7 +1231,7 @@ bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 
 void sound_manager::samples(s16 *buffer)
 {
-	for (int sample = 0; sample < m_samples_this_update * 2; sample++)
+	for (int sample = 0; sample < m_samples_this_update * m_numstreams; sample++)
 		*buffer++ = m_finalmix[sample];
 }
 
@@ -1483,33 +1489,32 @@ void sound_manager::update(void *ptr, int param)
 	attotime endtime = m_last_update + attotime(0, m_samples_this_update * sample_rate_attos);
 
 	// clear out the mix bufers
-	std::fill_n(&m_leftmix[0], m_samples_this_update, 0);
-	std::fill_n(&m_rightmix[0], m_samples_this_update, 0);
+	for (auto i = 0; i < m_numstreams; i++)
+		std::fill_n(&m_mixes[i][0], m_samples_this_update, 0);
 
 	// force all the speaker streams to generate the proper number of samples
 	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
-		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.mix(m_mixes, m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// determine the maximum in this section
 	stream_buffer::sample_t curmax = 0;
 	for (int sampindex = 0; sampindex < m_samples_this_update; sampindex++)
 	{
-		auto sample = m_leftmix[sampindex];
-		if (sample < 0)
-			sample = -sample;
-		if (sample > curmax)
-			curmax = sample;
-
-		sample = m_rightmix[sampindex];
-		if (sample < 0)
-			sample = -sample;
-		if (sample > curmax)
-			curmax = sample;
+		for (auto i = 0; i < m_numstreams; i++)
+		{
+			auto sample = m_mixes[i][sampindex];
+			if (sample < 0)
+				sample = -sample;
+			if (sample > curmax)
+				curmax = sample;
+		}
 	}
 
 	// pull in current compressor scale factor before modifying
-	stream_buffer::sample_t lscale = m_compressor_scale;
-	stream_buffer::sample_t rscale = m_compressor_scale;
+	stream_buffer::sample_t scales[m_numstreams];
+
+	for (auto i=0;i<m_numstreams;i++)
+		scales[i] = m_compressor_scale;
 
 	// if we're above what the compressor will handle, adjust the compression
 	if (curmax * m_compressor_scale > 1.0)
@@ -1531,12 +1536,15 @@ void sound_manager::update(void *ptr, int param)
 	}
 
 #if (SOUND_DEBUG)
-	if (lscale != m_compressor_scale)
+	if (scales[0] != m_compressor_scale)
 	printf("scale=%.5f\n", m_compressor_scale);
 #endif
 
 	// track whether there are pending scale changes in left/right
-	stream_buffer::sample_t lprev = 0, rprev = 0;
+	stream_buffer::sample_t prevs[m_numstreams];
+
+	for (auto i=0;i<m_numstreams;i++)
+		prevs[i] = 0;
 
 	// now downmix the final result
 	u32 finalmix_step = machine().video().speed_factor();
@@ -1547,31 +1555,24 @@ void sound_manager::update(void *ptr, int param)
 	{
 		int sampindex = sample / 1000;
 
-		// ensure that changing the compression won't reverse direction to reduce "pops"
-		stream_buffer::sample_t lsamp = m_leftmix[sampindex];
-		if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
-			lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
+		stream_buffer::sample_t samps[m_numstreams];
 
-		// clamp the left side
-		lprev = lsamp *= lscale;
-		if (lsamp > 1.0)
-			lsamp = 1.0;
-		else if (lsamp < -1.0)
-			lsamp = -1.0;
-		finalmix[finalmix_offset++] = s16(lsamp * 32767.0);
+		for (auto i = 0; i < m_numstreams; i++)
+		{
+			// ensure that changing the compression won't reverse direction to reduce "pops"
+			samps[i] = m_mixes[i][sampindex];
 
-		// ensure that changing the compression won't reverse direction to reduce "pops"
-		stream_buffer::sample_t rsamp = m_rightmix[sampindex];
-		if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
-			rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
+			if (scales[i] != m_compressor_scale && sample != m_finalmix_leftover)
+				scales[i] = adjust_toward_compressor_scale(scales[i], prevs[i], samps[i]);
 
-		// clamp the left side
-		rprev = rsamp *= rscale;
-		if (rsamp > 1.0)
-			rsamp = 1.0;
-		else if (rsamp < -1.0)
-			rsamp = -1.0;
-		finalmix[finalmix_offset++] = s16(rsamp * 32767.0);
+			// clamp the this stream
+			prevs[i] = samps[i] *= scales[i];
+			if (samps[i] > 1.0)
+				samps[i] = 1.0;
+			else if (samps[i] < -1.0)
+				samps[i] = -1.0;
+			finalmix[finalmix_offset++] = s16(samps[i] * 32767.0);
+		}
 	}
 	m_finalmix_leftover = sample - m_samples_this_update * 1000;
 
@@ -1579,9 +1580,9 @@ void sound_manager::update(void *ptr, int param)
 	if (finalmix_offset > 0)
 	{
 		if (!m_nosound_mode)
-			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
-		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
-		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
+			machine().osd().update_audio_stream(finalmix, finalmix_offset / m_numstreams);
+		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / m_numstreams);
+		machine().video().add_sound_to_recording(finalmix, finalmix_offset / m_numstreams);
 		if (m_wavfile != nullptr)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
 	}
