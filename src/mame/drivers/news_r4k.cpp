@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brice Onken
+// copyright-holders:Brice Onken, based on Patrick Mackinlay's NEWS 68k and r3k emulators
 // thanks-to:Patrick Mackinlay
 
 /*
@@ -12,6 +12,7 @@
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
  *   - https://github.com/briceonk/news-os
  *
+ *  Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
  */
 
 #include "emu.h"
@@ -39,7 +40,7 @@
 // MAME infra imports
 #include "debugger.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 class news_r4k_state : public driver_device
@@ -148,6 +149,14 @@ protected:
     u16 m_intst;
     u8 m_debug;
 
+	uint8_t log_mem_access_r(offs_t offset);
+	void log_mem_access_w(offs_t offset, uint8_t data);
+
+	uint8_t debug_mem_r(offs_t offset);
+	void debug_mem_w(offs_t offset, uint8_t data);
+
+	uint8_t led_state_r(offs_t offset);
+	void led_state_w(offs_t offset, uint8_t data);
     bool m_int_state[4];
 };
 
@@ -174,7 +183,7 @@ void news_r4k_state::machine_start()
 	save_item(NAME(m_lcd_dim));
 
 	m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::itimer), this));
-
+data
 	for (bool &int_state : m_int_state)
 		int_state = false;
 	m_lcd_enable = false;
@@ -205,6 +214,30 @@ void news_r4k_state::init_nws5000x()
     init_common();
 }
 
+uint8_t news_r4k_state::log_mem_access_r(offs_t offset) {
+	LOG("Read from 0x%x\n", offset);
+	return 0;
+}
+
+void news_r4k_state::log_mem_access_w(offs_t offset, uint8_t data) {
+	LOG("Write 0x%x to 0x%x\n", data, offset);
+}
+
+uint8_t news_r4k_state::debug_mem_r(offs_t offset) {
+	return 0;
+}
+
+void news_r4k_state::debug_mem_w(offs_t offset, uint8_t data) {
+
+}
+
+uint8_t news_r4k_state::led_state_r(offs_t offset) {
+	return 0; // who cares
+}
+void news_r4k_state::led_state_w(offs_t offset, uint8_t data) {
+	// LOG("Setting LED at offset 0x%x to 0x%x\n", offset, data);
+}
+
 /*
  * cpu_map
  * 
@@ -221,101 +254,110 @@ void news_r4k_state::cpu_map(address_map &map)
     // Monitor ROM (NEWS firmware)
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
 
-    map(0x1f3d0000, 0x1f3d0000); // DIP_SWITCH
+    // map(0x1f3d0000, 0x1f3d0000); // DIP_SWITCH
     map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
-    map(0x1f800000, 0x1f800000); // TIMER0
-    map(0x1f840000, 0x1f840000); // FREERUN
-    map(0x1f880000, 0x1f882000); // NVRAM  TODO: Confirm size with datasheet? this doesn't cover the mrom NVRAM region
-    map(0x1f881fe0, 0x1f881fe0); // RTC_PORT
+    // map(0x1f800000, 0x1f800000); // TIMER0
+    // map(0x1f840000, 0x1f840000); // FREERUN
+    map(0x1f880000, 0x1f880FFF).ram(); // Probably some kind of AP-Bus RAM or NVRAM
+    
+	// ST TIMEKEEPER RAM+RTC
+	// 2Kb SRAM (0x800 bytes)
+	// RTC ports are remapped to 1fe0
+	map(0x1f881000, 0x1f8817ff).ram();  // monitor NVRAM
+	map(0x1f881fe0, 0x1f881fff); // RTC registers (TODO)
 
-    // Interrupt clear ports
-    map(0x1f4e0000, 0x1f4e0000); // INTCLR0
-    map(0x1f4e0004, 0x1f4e0004); // INTCLR1
-    map(0x1f4e0008, 0x1f4e0008); // INTCLR2
-    map(0x1f4e000c, 0x1f4e000c); // INTCLR3
-    map(0x1f4e0010, 0x1f4e0010); // INTCLR4
-    map(0x1f4e0014, 0x1f4e0014); // INTCLR5
+    // // Interrupt clear ports; // INTCLR0
+    // map(0x1f4e0004, 0x1f4e0004); // INTCLR1
+    // map(0x1f4e0008, 0x1f4e0008); // INTCLR2
+    // map(0x1f4e000c, 0x1f4e000c); // INTCLR3
+    // map(0x1f4e0010, 0x1f4e0010); // INTCLR4
+    // map(0x1f4e0014, 0x1f4e0014); // INTCLR5
 
-    // Interrupt enable ports
-    map(0x1fa00000, 0x1fa00000); // INTEN0
-    map(0x1fa00004, 0x1fa00004); // INTEN1
-    map(0x1fa00008, 0x1fa00008); // INTEN2
-    map(0x1fa0000c, 0x1fa0000c); // INTEN3
-    map(0x1fa00010, 0x1fa00010); // INTEN4
-    map(0x1fa00014, 0x1fa00014); // INTEN5
+    // // Interrupt enable ports
+    // map(0x1fa00000, 0x1fa00000); // INTEN0
+    // map(0x1fa00004, 0x1fa00004); // INTEN1
+    // map(0x1fa00008, 0x1fa00008); // INTEN2
+    // map(0x1fa0000c, 0x1fa0000c); // INTEN3
+    // map(0x1fa00010, 0x1fa00010); // INTEN4
+    // map(0x1fa00014, 0x1fa00014); // INTEN5
 
-    // Interrupt status ports
-    map(0x1fa00020, 0x1fa00020); // INTST0
-    map(0x1fa00024, 0x1fa00024); // INTST1
-    map(0x1fa00028, 0x1fa00028); // INTST2
-    map(0x1fa0002c, 0x1fa0002c); // INTST3
-    map(0x1fa00030, 0x1fa00030); // INTST4
-    map(0x1fa00034, 0x1fa00034); // INTST5
+    // // Interrupt status ports
+    // map(0x1fa00020, 0x1fa00020); // INTST0
+    // map(0x1fa00024, 0x1fa00024); // INTST1
+    // map(0x1fa00028, 0x1fa00028); // INTST2
+    // map(0x1fa0002c, 0x1fa0002c); // INTST3
+    // map(0x1fa00030, 0x1fa00030); // INTST4
+    // map(0x1fa00034, 0x1fa00034); // INTST5
 
     // LEDs
-    map(0x1f3f0000, 0x1f3f0000); // LED_POWER
-    map(0x1f3f0004, 0x1f3f0004); // LED_DISK
-    map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
-    map(0x1f3f000c, 0x1f3f000c); // LED_SEC
-    map(0x1f3f0010, 0x1f3f0010); // LED_NET
-    map(0x1f3f0014, 0x1f3f0014); // LED_CD
+    // map(0x1f3f0000, 0x1f3f0000); // LED_POWER
+    // map(0x1f3f0004, 0x1f3f0004); // LED_DISK
+    // map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
+    // map(0x1f3f000c, 0x1f3f000c); // LED_SEC
+    // map(0x1f3f0010, 0x1f3f0010); // LED_NET
+    // map(0x1f3f0014, 0x1f3f0014); // LED_CD
+	map(0x1f3f0000, 0x1f3f0014).rw(FUNC(news_r4k_state::led_state_r), FUNC(news_r4k_state::led_state_w));
 
     // APBus region
-    map(0x1f520004, 0x1f520004); // WBFLUSH
-    map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
-    map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
-    map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
-    map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
-    map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
-    map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
-    map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
-    map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
+    // map(0x1f520004, 0x1f520004); // WBFLUSH
+    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
+    // map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
+    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
+    // map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
+    // map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
+    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
+    // map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
+    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
     // Serial port (TODO: other serial ports)
-    //map(0x1e950000, 0x1e950000); // SCCPORT0A
-	map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+    map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
+	//map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
-	// TESTING
+	// TESTING - needed for mrom to boot
 	//map(0x1e980000, 0x1e9fffff).ram();
+	//map(0x1f3f0000, 0x1f3f0017);
+	map(0x1ff03000, 0x1ff04003).ram();
+
+	// Unknown regions that mrom accesses
+	//map(0x1f4c0000, 0x1f4c0003).ram();
+	//map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, ???
+	//map(0x1f520008, 0x1f52000B).ram(); 
+	//map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
 
 	// TODO: ESCCF?
 	// TODO: map(0x1e900000, 0x1e900000);
 
     // Sonic network controller (https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD)
-    map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
+    // map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
 
 	// DMA Controller 0
 	//map(0x1e200000, 0x1e20000f).m(m_dma, FUNC(dmac_0448_device::map)); // End addr meeds confirmation
 	// TODO: DMA Controller 1
 	// TODO: map(0x1e300000, 0x1e30000f).m(m_dma, FUNC(dmac_0448_device::map)); // End addr meeds confirmation
 
-	// No clue what this is, the monitor ROM reads and writes to these areas. Maybe poking at shared RAM regions?
-	//map(0x1f3f0000, 0x1f3f0017).ram();
-	map(0x1ff03000, 0x1ff04003).ram();
-
 	// xb (Sony DSC-39 video card)
-	// TODO: map(0x14900000, 0x14900000);
+	// map(0x14900000, 0x14900000);
 
 	// sb (???)
-	// TODO: map(0x1ed00000, 0x1ed00000);
+	// map(0x1ed00000, 0x1ed00000);
 
 	// spifi controller 1 (????, related to DMAC DMA)
-	// TODO: map(0x1e280000, 0x1e280000);
+	// map(0x1e280000, 0x1e280000);
 
 	// spifi controller 2 (????, related ot DMAC DMA)
-	// TODO: map(0x1e380000, 0x1e380000);
+	//map(0x1e380000, 0x1e380000);
 
 	// ms (mouse)
-	// TODO: map(0x1f900014, 0x1f900014);
+	//map(0x1f900014, 0x1f900014);
 
 	// lp (printer port??)
-	// TODO: map(0x1ed30000, 0x1ed30000);
+	//map(0x1ed30000, 0x1ed30000);
 
 	// kb (keyboard)
-	// TODO: map(0x1f900000, 0x1f900000);
+	//map(0x1f900000, 0x1f900000);
 
 	// fd (???)
-	// TODO: map(0x1ed20000, 0x1ed20000);
+	//map(0x1ed20000, 0x1ed20000);
 
 
     /*
@@ -357,6 +399,8 @@ void news_r4k_state::cpu_map(address_map &map)
 		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
 */
 }
+
+
 
 static INPUT_PORTS_START(nws5000)
     /*
