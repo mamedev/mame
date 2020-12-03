@@ -16,10 +16,10 @@ two games dumped so far have the same label on the security dongle (KN00002) but
 identical. So far all the Konami game software resides on a 128M CF card. However there are probably
 HDD/CDROM/DVDROM-based games too since the Konami interface board has connectors for IDE drives.
 
-Games known to run on this system include....                      DIN5
-                                                       CF Card     Dongle                 PS2 Cart
-Game Title                                             Label       Label                  Label (bottom)
----------------------------------------------------------------------------------------------------------
+Games known to run on this system include....                 DIN5                 PS2 Cart
+                                                    CF Card   Dongle               Label
+Game Title                                          Label     Label                (bottom)  Notes
+-----------------------------------------------------------------------------------------------------------------
 *Baseball Heroes 2005
 *Battle Climaxx!
 *Battle Climaxx! 2
@@ -33,12 +33,14 @@ Game Title                                             Label       Label        
 *Perfect Pool
 *Pool Pocket Fortunes
 Pop'n Music 9
+*Pro Evolution Soccer The Arcade                    C18EAA03  not used             KN00002   Labels from partial dump (just the CF)
 *R.P.M. Red
-World Soccer Winning Eleven Arcade Game Style          C18JAA03    DIN5 dongle GCC27JA    KN00002
-World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used               KN00002
----------------------------------------------------------------------------------------------------------
+World Soccer Winning Eleven Arcade Game Style       C18JAA03  DIN5 dongle GCC27JA  KN00002
+World Soccer Winning Eleven Arcade Game Style 2003  C27JAA03  not used             KN00002
+-----------------------------------------------------------------------------------------------------------------
 
-* denotes not dumped.
+* denotes not fully dumped (including dongle and PS2 cart).
+
 
 Konami PCB Layout
 -----------------
@@ -221,7 +223,7 @@ void kpython_state::kpython(machine_config &config)
 	//DS2430(config, m_ds2430);
 	M48T58(config, m_m48t58);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(kpython_state::screen_update));
@@ -232,10 +234,10 @@ void kpython_state::kpython(machine_config &config)
 }
 
 #define KPYTHON_BIOS  \
-		ROM_REGION32_LE(0x200000, "bios", 0) \
-		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
-		ROM_REGION(0x8000, "io_mcu", 0) \
-		ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
+	ROM_REGION32_LE(0x200000, "bios", 0) \
+	ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
+	ROM_REGION(0x8000, "io_mcu", 0) \
+	ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
 
 ROM_START( kpython )
 	KPYTHON_BIOS
@@ -259,7 +261,7 @@ ROM_START( dogstdx )
 	// Not dumped
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) //No picture of media available; used romset name
+	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) // No picture of media available; used romset name
 ROM_END
 
 ROM_START( wswe )
@@ -296,6 +298,26 @@ ROM_START( wswe2k3 )
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )
 ROM_END
 
+// GXC18 EAA PRO EVOLUTION SOCCER THE ARCADE
+ROM_START( pesta )
+	KPYTHON_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	// Not dumped. PS2 memory card MagicGate COH-H10020 labeled "KN00002"
+	ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, NO_DUMP )
+	ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105)) // Not dumped on this set
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
+	ROM_LOAD( "m48t58y.u48", 0x0000, 0x2000, NO_DUMP )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	// Konami 128MB Compact Flash PN.0000124371
+	DISK_IMAGE_READONLY( "pes_c18_ea_a03", 0, SHA1(4fe2f0f8e11ac709881e754755d44de5dd8d9fa8) )
+ROM_END
+
 ROM_START( popn9 )
 	KPYTHON_BIOS
 
@@ -305,7 +327,7 @@ ROM_START( popn9 )
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105)) // Placeholder, Not dumped or needs verification from this hardware
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -313,10 +335,11 @@ ROM_START( popn9 )
 ROM_END
 
 
-GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, dogstdx,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "dogstation Deluxe", MACHINE_IS_SKELETON)
+GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS",                            MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, dogstdx,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "dogstation Deluxe",                             MACHINE_IS_SKELETON)
+GAME(2002, pesta,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pro Evolution Soccer The Arcade (ver EAA)",     MACHINE_IS_SKELETON)
 GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
-GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003",  MACHINE_IS_SKELETON)
+GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)",                       MACHINE_IS_SKELETON)
 
 // Konami Python 2 (Customized? PS2 SCPH-50000)
