@@ -259,7 +259,7 @@ ROM_START( dogstdx )
 	// Not dumped
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE_READONLY( "dogstdx", 0, BAD_DUMP SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) //No picture of media available; used romset name
+	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) //No picture of media available; used romset name
 ROM_END
 
 ROM_START( wswe )
