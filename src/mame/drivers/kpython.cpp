@@ -246,6 +246,22 @@ ROM_START( kpython )
 	DISK_REGION( "ide:0:hdd:image" )
 ROM_END
 
+ROM_START( dogstdx )
+	KPYTHON_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	// Not dumped
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
+	// Not dumped
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)    
+	// Not dumped
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) //No picture of media available; used romset name
+ROM_END
+
 ROM_START( wswe )
 	KPYTHON_BIOS
 
@@ -298,6 +314,7 @@ ROM_END
 
 
 GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, dogstdx,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "dogstation Deluxe", MACHINE_IS_SKELETON)
 GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
 GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
 GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_IS_SKELETON)
