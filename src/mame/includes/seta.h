@@ -277,7 +277,7 @@ protected:
 	optional_ioport m_p1;
 	optional_ioport m_p2;
 
-	required_shared_ptr<u8> m_sharedram;
+	optional_shared_ptr<u8> m_sharedram;
 
 	required_memory_bank m_subbank;
 
