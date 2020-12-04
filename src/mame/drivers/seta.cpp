@@ -1544,19 +1544,6 @@ void seta_state::timer_regs_w(offs_t offset, u16 data)
 /***************************************************************************
 
 
-                                    Sound
-
-
-***************************************************************************/
-
-WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-/***************************************************************************
-
-
                                 Common Routines
 
 
@@ -3468,6 +3455,9 @@ void downtown_state::sub_bankswitch_lockout_w(u8 data)
 {
 	sub_bankswitch_w(data);
 	seta_coin_lockout_w(data);
+
+	// 65C02 code doesn't seem to do anything to explicitly acknowledge IRQ; implicitly acknowledging it here seems most likely
+	m_subcpu->set_input_line(m65c02_device::IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -3577,7 +3567,7 @@ void downtown_state::calibr50_sub_bankswitch_w(u8 data)
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
-		m_subcpu->set_input_line(0, CLEAR_LINE);
+		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, CLEAR_LINE);
 
 	// Bit 1: PCMMUTE
 	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
@@ -7899,10 +7889,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::seta_sub_interrupt)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(m65c02_device::NMI_LINE, attotime::zero);
 
 	if (scanline == 112)
-		m_subcpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -7915,10 +7905,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::tndrcade_sub_interrupt)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(m65c02_device::NMI_LINE, attotime::zero);
 
 	if ((scanline % 16) == 0)
-		m_subcpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, ASSERT_LINE);
 }
 
 void downtown_state::tndrcade(machine_config &config)
@@ -8131,7 +8121,7 @@ void usclssic_state::usclssic(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, m65c02_device::NMI_LINE);
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
@@ -8190,7 +8180,7 @@ void downtown_state::calibr50(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, m65c02_device::NMI_LINE);
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
@@ -9551,7 +9541,7 @@ void seta_state::utoukond(machine_config &config)
 	m_x1->add_route(1, "rspeaker", 1.0);
 
 	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/4)); /* 4 MHz */
-	ymsnd.irq_handler().set(FUNC(seta_state::utoukond_ym3438_interrupt));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(0, "lspeaker", 0.30);
 	ymsnd.add_route(1, "rspeaker", 0.30);
 }

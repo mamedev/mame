@@ -22,7 +22,7 @@ in the other.
 Rally X uses a single Z80 and Namco sound hardware, while the others use the
 standard Konami sound hardware of that era (slave Z80 + 2xAY-3-8910).
 Also, the Konami design includes an optional starfield generator, only used
-by Tactician.
+by Tactician. This is identical to the starfield circuit from Scramble.
 
 Rally X has two Namco customs. They are nothing more than simple logic and can
 be replaced by daughter boards with TTL parts.

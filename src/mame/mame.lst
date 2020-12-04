@@ -13885,6 +13885,7 @@ fs3216                          //
 ft68m                           //
 
 @source:fungames.cpp
+biplane                         // (c) 1975 Fun Games
 biplane4                        // (c) 1976 Fun Games
 take5                           // (c) 1975 Fun Games
 
@@ -13919,6 +13920,8 @@ crystal                         // (c) 1998 J.C.D. srl
 cuoreuno                        // (c) 1996 C.M.C.
 cuoreunoa                       // (c) 1996 C.M.C.
 cuoreunob                       // (c) 1996 C.M.C.
+cuoreunoc                       // (c) 1996 C.M.C.
+cuoreunod                       // (c) 1996 C.M.C.
 elephfam                        // (c) 1997 C.M.C.
 elephfmb                        // (c) 1996 C.M.C.
 funquiz                         // (c) 198? Fun World
@@ -19135,6 +19138,7 @@ korgz3                          //
 
 @source:kpython.cpp
 kpython                         // Konami Python Bios
+dogstdx                         // dogstation Deluxe
 wswe                            // World Soccer Winning Eleven
 wswe2k3                         // World Soccer Winning Eleven 2003
 popn9                           // 2003

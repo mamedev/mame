@@ -12,7 +12,7 @@ PCB Information (needs tidying:)
 
 TOP Board
 .20u    27c4001 stickered   U20
-                #1537 V1.0  a 1 was hadwritten over the 0
+                #1537 V1.0  a 1 was handwritten over the 0
 
 .u7     stamped     (c) 1997
                 ACCLAIM COINOP
