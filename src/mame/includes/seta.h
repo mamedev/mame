@@ -37,14 +37,6 @@ public:
 		u8   reg[4];             //
 	};
 
-	struct game_offset
-	{
-		/* 2 values, for normal and flipped */
-		const char *gamename;
-		int sprite_offs[2];
-		int tilemap_offs[2];
-	};
-
 	seta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -87,6 +79,8 @@ public:
 	void crazyfgt(machine_config &config);
 	void keroppi(machine_config &config);
 	void drgnunit(machine_config &config);
+	void stg(machine_config &config);
+	void qzkklogy(machine_config &config);
 	void orbs(machine_config &config);
 	void daiohp(machine_config &config);
 	void magspeed(machine_config &config);
@@ -139,7 +133,6 @@ protected:
 	int m_samples_bank;
 
 	uPD71054_state m_uPD71054;
-	const game_offset *m_global_offsets;
 
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
@@ -170,7 +163,6 @@ protected:
 	u16 extra_r();
 
 	DECLARE_VIDEO_START(seta);
-	DECLARE_VIDEO_START(kyustrkr);
 
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
@@ -260,6 +252,7 @@ public:
 	void calibr50(machine_config &config);
 	void downtown(machine_config &config);
 	void metafox(machine_config &config);
+	void arbalest(machine_config &config);
 	void tndrcade(machine_config &config);
 	void twineagl(machine_config &config);
 
@@ -464,7 +457,6 @@ private:
 	DECLARE_MACHINE_START(setaroul);
 	DECLARE_MACHINE_RESET(setaroul);
 
-	DECLARE_VIDEO_START(setaroul);
 	void setaroul_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -529,7 +521,6 @@ private:
 
 	DECLARE_MACHINE_START(jockeyc);
 	DECLARE_MACHINE_START(inttoote);
-	DECLARE_VIDEO_START(jockeyc);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 

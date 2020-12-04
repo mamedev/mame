@@ -7924,6 +7924,10 @@ void downtown_state::tndrcade(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (start grid, wall at beginning of game)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -7974,6 +7978,10 @@ void downtown_state::twineagl(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -7984,7 +7992,10 @@ void downtown_state::twineagl(machine_config &config)
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	m_layers[0]->set_xoffsets(-3, 0);
+
 	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
@@ -8019,6 +8030,10 @@ void downtown_state::downtown(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 1); // sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8029,7 +8044,10 @@ void downtown_state::downtown(machine_config &config)
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	m_layers[0]->set_xoffsets(0, -1);
+
 	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
@@ -8102,6 +8120,10 @@ void usclssic_state::usclssic(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(usclssic_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(2, 1); // correct (test grid and bg)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8112,7 +8134,10 @@ void usclssic_state::usclssic(machine_config &config)
 	screen.set_screen_update(FUNC(usclssic_state::screen_update_usclssic));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_usclssic).set_tile_offset_callback(FUNC(usclssic_state::tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_usclssic);
+	m_layers[0]->set_tile_offset_callback(FUNC(usclssic_state::tile_offset));
+	m_layers[0]->set_xoffsets(-1, 0);
+
 	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta)
@@ -8161,6 +8186,10 @@ void downtown_state::calibr50(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, XTAL(16'000'000), m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(2, -1); // correct (test grid and roof in animation at beginning of game)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8172,6 +8201,8 @@ void downtown_state::calibr50(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_xoffsets(-2, -3);
+
 	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
@@ -8209,6 +8240,10 @@ void downtown_state::metafox(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // sprites unknown, tilemap correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8219,7 +8254,10 @@ void downtown_state::metafox(machine_config &config)
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
+	m_layers[0]->set_xoffsets(-19, 16);
+
 	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
@@ -8232,6 +8270,14 @@ void downtown_state::metafox(machine_config &config)
 
 	X1_010(config, m_x1, 16000000);   /* 16 MHz */
 	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void downtown_state::arbalest(machine_config &config)
+{
+	metafox(config);
+
+	m_seta001->set_fg_xoffsets(1, 0); // correct (test grid and landing pad at beginning of game)
+	m_layers[0]->set_xoffsets(-1, -2);
 }
 
 
@@ -8248,6 +8294,10 @@ void seta_state::atehate(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8289,6 +8339,10 @@ void seta_state::blandia(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(8, 0); // correct (test grid, startup bg)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8301,8 +8355,8 @@ void seta_state::blandia(machine_config &config)
 	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8324,6 +8378,10 @@ void seta_state::blandiap(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(8, 0); // correct (test grid, startup bg)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8336,8 +8394,8 @@ void seta_state::blandiap(machine_config &config)
 	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8364,6 +8422,10 @@ void seta_state::blockcar(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8436,6 +8498,10 @@ void seta_state::daioh(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid, planet)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8446,8 +8512,8 @@ void seta_state::daioh(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8491,6 +8557,10 @@ void seta_state::drgnunit(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(2, 2); // correct (test grid and I/O test)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8502,7 +8572,7 @@ void seta_state::drgnunit(machine_config &config)
 	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8514,6 +8584,19 @@ void seta_state::drgnunit(machine_config &config)
 	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void seta_state::stg(machine_config &config)
+{
+	drgnunit(config);
+	m_seta001->set_fg_xoffsets(0, 0); // sprites correct? (panel), tilemap correct (test grid)
+}
+
+void seta_state::qzkklogy(machine_config &config)
+{
+	drgnunit(config);
+	m_seta001->set_fg_xoffsets(1, 1); // correct (timer, test grid)
+	m_layers[0]->set_xoffsets(-1, -1);
+}
+
 /*  Same as qzkklogy, but with a 16MHz CPU    */
 
 void seta_state::qzkklgy2(machine_config &config)
@@ -8521,6 +8604,9 @@ void seta_state::qzkklgy2(machine_config &config)
 	drgnunit(config);
 	/* basic machine hardware */
 	m_maincpu->set_clock(16000000);   /* 16 MHz */
+
+	m_seta001->set_fg_xoffsets(0, 0); // sprites unknown, tilemaps correct (test grid)
+	m_layers[0]->set_xoffsets(-3, -1);
 }
 
 
@@ -8555,6 +8641,11 @@ void setaroul_state::setaroul(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_setaroul_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 7); // unknown (flipped offsets are unused: game handles flipping manually without setting the flip bit)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0, -0x1);
+	m_seta001->set_bg_xoffsets(0, 0x2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
@@ -8573,10 +8664,10 @@ void setaroul_state::setaroul(machine_config &config)
 	screen.screen_vblank().set(FUNC(setaroul_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_setaroul);
+	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
-	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul)
+	MCFG_VIDEO_START_OVERRIDE(setaroul_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8605,6 +8696,10 @@ void seta_state::eightfrc(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(4, 3); // correct (test mode)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8649,6 +8744,10 @@ void seta_state::extdwnhl(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid, background images)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8659,8 +8758,8 @@ void seta_state::extdwnhl(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8714,6 +8813,10 @@ void seta_state::gundhara(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test mode)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8762,6 +8865,9 @@ void zombraid_state::zombraid(machine_config &config)
 	adc0834_device &adc(ADC0834(config, "adc"));
 	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
 
+	m_layers[0]->set_xoffsets(-2, -2); // correct for normal, flip screen not working yet
+	m_layers[1]->set_xoffsets(-2, -2);
+
 	m_x1->set_addrmap(0, &zombraid_state::zombraid_x1_map);
 }
 
@@ -8783,6 +8889,10 @@ void seta_state::jjsquawk(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(1, 1); // correct (test mode)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8793,8 +8903,8 @@ void seta_state::jjsquawk(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1).set_xoffsets(-1, -1);
+	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8815,6 +8925,10 @@ void seta_state::jjsquawb(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(1, 1); // correct (test mode)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8825,8 +8939,8 @@ void seta_state::jjsquawb(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
+	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8859,6 +8973,10 @@ void seta_state::kamenrid(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (map, banpresto logo)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8869,8 +8987,8 @@ void seta_state::kamenrid(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -8898,6 +9016,10 @@ void seta_state::orbs(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 14318180, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8937,6 +9059,10 @@ void seta_state::keroppi(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 14318180, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8982,6 +9108,10 @@ void seta_state::krzybowl(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9022,6 +9152,10 @@ void seta_state::madshark(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown (wrong when flipped, but along y)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -9072,6 +9206,10 @@ void seta_state::magspeed(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // floating tilemap maybe 1px off in test grid
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9082,8 +9220,8 @@ void seta_state::magspeed(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9115,6 +9253,10 @@ void seta_state::msgundam(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid, banpresto logo)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9126,8 +9268,8 @@ void seta_state::msgundam(machine_config &config)
 	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9159,6 +9301,10 @@ void seta_state::oisipuzl(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(1, 1); // correct (test mode) flip screen not supported?
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9169,8 +9315,8 @@ void seta_state::oisipuzl(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl) // flip is inverted for the tilemaps
@@ -9200,6 +9346,10 @@ void seta_state::triplfun(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(1, 1); // correct (test mode) flip screen not supported?
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9210,8 +9360,8 @@ void seta_state::triplfun(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl) // flip is inverted for the tilemaps
@@ -9247,6 +9397,10 @@ void kiwame_state::kiwame(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(-16, 0); // correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9289,6 +9443,10 @@ void seta_state::rezon(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9299,8 +9457,8 @@ void seta_state::rezon(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9328,6 +9486,10 @@ void seta_state::thunderl(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9400,6 +9562,10 @@ void seta_state::wiggie(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_wiggie);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // some problems but they seem y co-ordinate related?
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9438,6 +9604,10 @@ void seta_state::wits(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9473,6 +9643,10 @@ void seta_state::umanclub(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9512,6 +9686,10 @@ void seta_state::utoukond(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown (wrong when flipped, but along y)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9522,8 +9700,8 @@ void seta_state::utoukond(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9570,6 +9748,10 @@ void seta_state::wrofaero(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // correct (test mode)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9612,6 +9794,10 @@ void seta_state::zingzip(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // sprites unknown, tilemaps correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -9624,8 +9810,8 @@ void seta_state::zingzip(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
+	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9668,6 +9854,10 @@ void seta_state::pairlove(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_pairlove);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // unknown
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9714,6 +9904,10 @@ void seta_state::crazyfgt(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // wrong (empty background column in title screen, but aligned sprites in screen select)
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9724,8 +9918,8 @@ void seta_state::crazyfgt(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1);
-	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2);
+	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
+	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
@@ -9783,6 +9977,10 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	// position kludges
+	m_seta001->set_fg_xoffsets(0, 0); // sprites correct? (bets), tilemap correct (test grid)
+	m_seta001->set_fg_yoffsets(-0x12+8, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
@@ -9802,10 +10000,10 @@ void jockeyc_state::jockeyc(machine_config &config)
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta_layers));
 	screen.set_palette(m_palette);
 
-	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
-	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc)
+	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9838,6 +10036,8 @@ void jockeyc_state::inttoote(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::inttoote_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
+
+	m_layers[0]->set_xoffsets(0, -2);
 
 	// I/O board (not hooked up yet)
 	PIA6821(config, "pia0", 0);
@@ -12074,7 +12274,7 @@ GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        metafox,   arbalest,  downtown_state, init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
+GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
 GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
 
@@ -12100,7 +12300,7 @@ GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_intt
 GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
 GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
 
-GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
+GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
 GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
 
@@ -12110,7 +12310,7 @@ GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bank
 GAME( 1992, blockcar,  0,        blockcar,  blockcar,  seta_state,     empty_init,     ROT90,  "Visco",                     "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
 GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     empty_init,     ROT90,  "bootleg",                   "Block Carnival / Thunder & Lightning 2 (bootleg)", MACHINE_IMPERFECT_SOUND)
 
-GAME( 1992, qzkklogy,  0,        drgnunit,  qzkklogy,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
+GAME( 1992, qzkklogy,  0,        qzkklogy,  qzkklogy,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
 
 GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
 

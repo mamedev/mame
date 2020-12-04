@@ -1149,6 +1149,11 @@ void srmp2_state::srmp2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp2);
+	m_seta001->set_transpen(15);
+	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
+	m_seta001->set_fg_yoffsets( 0x05, 0x07 );
+	m_seta001->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
+	m_seta001->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1188,6 +1193,10 @@ void srmp2_state::srmp3(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
 	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
+	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
+	m_seta001->set_fg_yoffsets( 0x06, 0x06 );
+	m_seta001->set_bg_xoffsets( -0x01, 0x10 );
+	m_seta001->set_bg_yoffsets( -0x06, 0x06 );
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1238,6 +1247,10 @@ void srmp2_state::mjyuugi(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, "palette", gfx_srmp3);
 	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
+	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
+	m_seta001->set_fg_yoffsets( 0x06, 0x06 );
+	m_seta001->set_bg_yoffsets( 0x09, 0x07 );
+	m_seta001->set_spritelimit( 0x1ff-6 );
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1245,7 +1258,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 256-16);
 	screen.set_visarea(16, 400-1, 0, 256-1-16);
-	screen.set_screen_update(FUNC(srmp2_state::screen_update_mjyuugi));
+	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp3));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512); // sprites only

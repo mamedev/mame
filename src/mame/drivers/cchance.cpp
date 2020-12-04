@@ -224,6 +224,8 @@ void cchance_state::cchance(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_cchance);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

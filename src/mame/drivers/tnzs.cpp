@@ -1545,6 +1545,8 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 
 	/* video hardware */
 	SETA001_SPRITE(config, m_seta001, 12'000'000, m_palette, gfx_tnzs);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
