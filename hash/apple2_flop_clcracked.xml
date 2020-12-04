@@ -36203,7 +36203,6 @@ license:CC0
 		<description>Geometry: Rectilinear Regions (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Encyclopaedia Britannica</publisher>
-
 		<info name="release" value="2020-07-16"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -37361,8 +37360,8 @@ license:CC0
 		<description>Fathoms 40 (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Datasoft</publisher>
-
 		<info name="release" value="2020-10-17"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="fathoms 40 (4am crack).dsk" size="143360" crc="5f23866e" sha1="a4ea1b01fc84c822dc82b6e84ccccfec8da7aa2c"/>
@@ -37534,6 +37533,63 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="kukulcan (4am crack) side b.dsk" size="143360" crc="12414c30" sha1="3a5850edff0d9f549d80404c1287f1af2f81d623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dondrar2">
+		<description>Dondra: A New Beginning (Revision 2) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2020-12-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 1a.dsk" size="143360" crc="8bc20698" sha1="be42d27bf4466d78da98188cf2fc1ee73dbd5fea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 1b.dsk" size="143360" crc="01a43225" sha1="899304bd0ebe95472901768d0fb321484ddbba3d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 2a.dsk" size="143360" crc="8d1b21ff" sha1="45c7edd4f4afc90c6cc3a96057c8496e9cabe14e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 2b.dsk" size="143360" crc="f8117f5b" sha1="118c9a8ac340a9c6ee70c9bf5b73d1649ca7f7b4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 3a.dsk" size="143360" crc="b9d36f8f" sha1="4d4b3108e4cf809b58695853d7609a5b9d57d8d7"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 3b.dsk" size="143360" crc="6f67c489" sha1="c9cb59f9b170c8d8b372dea69922eb8dcc81b48f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcwrace">
+		<description>Space Waste Race: Storybooks Of The Future (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-12-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space waste race- storybooks of the future (4am crack).dsk" size="143360" crc="45acb2d7" sha1="989f333bb3196547749134460010fec5b2551f59"/>
 			</dataarea>
 		</part>
 	</software>
