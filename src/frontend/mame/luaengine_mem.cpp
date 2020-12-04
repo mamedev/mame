@@ -538,9 +538,9 @@ void lua_engine::initialize_memory()
  */
 
 	auto memory_type = sol().registry().new_usertype<memory_manager>("memory", sol::no_constructor);
-	memory_type["banks"] = sol::property([] (memory_manager &mm) { return lua_engine::standard_tag_object_ptr_map<memory_bank>(mm.banks()); });
-	memory_type["regions"] = sol::property([] (memory_manager &mm) { return lua_engine::standard_tag_object_ptr_map<memory_region>(mm.regions()); });
-	memory_type["shares"] = sol::property([] (memory_manager &mm) { return lua_engine::standard_tag_object_ptr_map<memory_share>(mm.shares()); });
+	memory_type["banks"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_bank>(mm.banks()); });
+	memory_type["regions"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_region>(mm.regions()); });
+	memory_type["shares"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_share>(mm.shares()); });
 
 
 /* memory_bank library

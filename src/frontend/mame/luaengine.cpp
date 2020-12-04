@@ -1828,7 +1828,7 @@ void lua_engine::initialize()
 	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
 	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
 	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
-	slot_type["options"] = sol::property([](const device_slot_interface &slot) { return lua_engine::standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
+	slot_type["options"] = sol::property([](const device_slot_interface &slot) { return standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
 
 
 /*  device_slot_interface::slot_option library
@@ -1837,13 +1837,13 @@ void lua_engine::initialize()
  *
  * slot_option.selectable - is this item selectable by the user?
  * slot_option.default_bios - the default bios for this option
- * slot_option.default_bios - the clock speed associated with this option
+ * slot_option.clock - the clock speed associated with this option
  */
 
 	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("dislot_option", "new", sol::no_constructor);
 	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
-	dislot_option_type["default_bios"] = sol::property([](const device_slot_interface::slot_option &opt) { return opt.default_bios(); });
-	dislot_option_type["clock"] = sol::property([](const device_slot_interface::slot_option &opt) { return opt.clock(); });
+	dislot_option_type["default_bios"] = sol::property(static_cast<const char *(device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::default_bios));
+	dislot_option_type["clock"] = sol::property(static_cast<u32 (device_slot_interface::slot_option:: *)() const>(&device_slot_interface::slot_option::clock));
 
 
 /*  cassette_image_device
