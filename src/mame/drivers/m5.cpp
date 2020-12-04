@@ -1405,21 +1405,21 @@ void brno_state::machine_reset()
 void m5_state::m5(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	Z80(config, m_maincpu, 10.738635_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
 	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
 	m_maincpu->set_daisy_config(m5_daisy_chain);
 
-	Z80(config, m_fd5cpu, 14.318181_MHz_XTAL / 4);
+	Z80(config, m_fd5cpu, 16_MHz_XTAL / 4);
 	m_fd5cpu->set_addrmap(AS_PROGRAM, &m5_state::fd5_mem);
 	m_fd5cpu->set_addrmap(AS_IO, &m5_state::fd5_io);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, SN76489AN_TAG, 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, SN76489AN_TAG, 10.738635_MHz_XTAL / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
+	Z80CTC(config, m_ctc, 10.738635_MHz_XTAL / 3);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
@@ -1443,7 +1443,7 @@ void m5_state::m5(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true); // clocked by SED9420C
 	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats);
 
@@ -1520,7 +1520,7 @@ void brno_state::brno(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// floppy
-	WD2797(config, m_fdc, 1_MHz_XTAL);
+	WD2797(config, m_fdc, 4_MHz_XTAL / 4);
 	FLOPPY_CONNECTOR(config, WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	// only one floppy drive
