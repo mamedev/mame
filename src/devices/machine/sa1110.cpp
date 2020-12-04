@@ -1,18 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************************************************************
- *
- * Intel XScale SA1110 peripheral emulation
- *
- **************************************************************************/
+/***************************************************************************
+
+	Intel XScale SA1110 peripheral emulation
+
+***************************************************************************/
 
 #include "emu.h"
 #include "sa1110.h"
 
 #define LOG_UNKNOWN     (1 << 1)
-#define LOG_INTC        (1 << 2)
-#define LOG_POWER       (1 << 3)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_INTC | LOG_POWER)
+#define LOG_UART        (1 << 2)
+#define LOG_UART_HF		(1 << 3)
+#define LOG_OSTIMER		(1 << 4)
+#define LOG_RTC			(1 << 5)
+#define LOG_POWER       (1 << 6)
+#define LOG_RESET       (1 << 7)
+#define LOG_GPIO		(1 << 8)
+#define LOG_INTC        (1 << 9)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
@@ -21,90 +27,571 @@ DEFINE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device, "sa1110_periphs", 
 
 sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SA1110_PERIPHERALS, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_uart3_irqs(*this, "uart3irq")
+	, m_gpio_out(*this)
 {
 }
 
 /*
 
-  Intel SA-1110 Interrupt Controller
+  Intel SA-1110 Serial Port 3 - UART
 
-  pg. 81 to 88 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+  pg. 289 to 306 Intel StrongARM SA-1110 Microprocessor Developer's Manual
 
 */
 
-void sa1110_periphs_device::update_interrupts()
+WRITE_LINE_MEMBER(sa1110_periphs_device::uart3_irq_callback)
 {
-	m_intc_regs.icfp = (m_intc_regs.icpr & m_intc_regs.icmr) & m_intc_regs.iclr;
-	m_intc_regs.icip = (m_intc_regs.icpr & m_intc_regs.icmr) & (~m_intc_regs.iclr);
-	m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_intc_regs.icfp ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE,  m_intc_regs.icip ? ASSERT_LINE : CLEAR_LINE);
+	set_irq_line(INT_UART3, state);
 }
 
-void sa1110_periphs_device::set_irq_line(uint32_t line, int irq_state)
+// Rx completed receiving byte
+void sa1110_periphs_device::rcv_complete()
 {
-	m_intc_regs.icpr &= ~line;
-	m_intc_regs.icpr |= irq_state ? line : 0;
-	update_interrupts();
 }
 
-uint32_t sa1110_periphs_device::intc_r(offs_t offset, uint32_t mem_mask)
+// Tx completed sending byte
+void sa1110_periphs_device::tra_complete()
 {
-	switch (offset)
+	m_uart_regs.tx_fifo_count--;
+	m_uart_regs.tx_fifo_read_idx = (m_uart_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_uart_regs.tx_fifo);
+	m_uart_regs.utsr1 |= (1 << UTSR1_TNF_BIT);
+
+	if (m_uart_regs.tx_fifo_count)
+		transmit_register_setup(m_uart_regs.tx_fifo[m_uart_regs.tx_fifo_read_idx]);
+	else
+		m_uart_regs.utsr1 &= ~(1 << UTSR1_TBY_BIT);
+
+	uart_check_tx_fifo_service();
+}
+
+// Tx send bit
+void sa1110_periphs_device::tra_callback()
+{
+	transmit_register_get_data_bit();
+}
+
+void sa1110_periphs_device::uart_recalculate_divisor()
+{
+	// TODO: Handle external UART clocking
+	const int multiplier = (((m_uart_regs.utcr[1] & 0x0f) << 8) | (m_uart_regs.utcr[2] & 0xff)) + 1;
+	set_rcv_rate(INTERNAL_OSC, multiplier * 16);
+	set_tra_rate(INTERNAL_OSC, multiplier * 16);
+
+	receive_register_reset();
+	transmit_register_reset();
+}
+
+void sa1110_periphs_device::uart_update_eif_status()
+{
+	bool has_error = false;
+	for (int i = 0; i < 4 && i < m_uart_regs.rx_fifo_count; i++)
 	{
-		case REG_ICIP:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", m_intc_regs.icip, mem_mask);
-			return m_intc_regs.icip;
-		case REG_ICMR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller Mask Register: %08x & %08x\n", m_intc_regs.icmr, mem_mask);
-			return m_intc_regs.icmr;
-		case REG_ICLR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller Level Register: %08x & %08x\n", m_intc_regs.iclr, mem_mask);
-			return m_intc_regs.iclr;
-		case REG_ICFP:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", m_intc_regs.icfp, mem_mask);
-			return m_intc_regs.icfp;
-		case REG_ICPR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller Pending Register: %08x & %08x\n", m_intc_regs.icpr, mem_mask);
-			return m_intc_regs.icpr;
-		case REG_ICCR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_r: Interrupt Controller Control Register: %08x & %08x\n", m_intc_regs.iccr, mem_mask);
-			return m_intc_regs.iccr;
-		default:
-			LOGMASKED(LOG_INTC | LOG_UNKNOWN, "sa1110 intc_r: Unknown address: %08x\n", INTC_BASE_ADDR | (offset << 2));
+		const int read_idx = (m_uart_regs.rx_fifo_read_idx + i) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+		if (m_uart_regs.rx_fifo[read_idx] & 0x700)
+		{
+			has_error = true;
 			break;
+		}
 	}
-	return 0;
+
+	if (has_error)
+	{
+		m_uart_regs.utsr0 |= (1 << UTSR0_EIF_BIT);
+		m_uart3_irqs->in_w<UART3_EIF>(1);
+	}
+	else
+	{
+		m_uart_regs.utsr0 &= ~(1 << UTSR0_EIF_BIT);
+		m_uart3_irqs->in_w<UART3_EIF>(0);
+	}
 }
 
-void sa1110_periphs_device::intc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+uint8_t sa1110_periphs_device::uart_read_receive_fifo()
+{
+	const uint8_t data = m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_read_idx];
+	if (m_uart_regs.rx_fifo_count)
+	{
+		m_uart_regs.rx_fifo_read_idx = (m_uart_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+		m_uart_regs.rx_fifo_count--;
+		if (m_uart_regs.rx_fifo_count)
+		{
+			const uint16_t fifo_bottom_flags = ((m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_read_idx]) >> 8) & 7;
+			m_uart_regs.utsr1 &= ~((1 << UTSR1_PRE_BIT) | (1 << UTSR1_FRE_BIT) | (1 << UTSR1_ROR_BIT));
+			m_uart_regs.utsr1 |= fifo_bottom_flags << UTSR1_PRE_BIT;
+		}
+	}
+	return data;
+}
+
+void sa1110_periphs_device::uart_write_transmit_fifo(uint8_t data)
+{
+	if (m_uart_regs.tx_fifo_count >= ARRAY_LENGTH(m_uart_regs.tx_fifo))
+		return;
+	if (!BIT(m_uart_regs.utcr[3], UTCR3_TXE_BIT))
+		return;
+
+	// immediately start transmitting if FIFO is empty
+	if (m_uart_regs.tx_fifo_count == 0)
+	{
+		m_uart_regs.utsr1 |= (1 << UTSR1_TBY_BIT);
+		transmit_register_setup(data);
+	}
+
+	// fill FIFO entry
+	m_uart_regs.tx_fifo[m_uart_regs.tx_fifo_write_idx] = data;
+	m_uart_regs.tx_fifo_count++;
+	m_uart_regs.tx_fifo_write_idx = (m_uart_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_uart_regs.tx_fifo);
+
+	// update transmitter-not-full flag
+	if (m_uart_regs.tx_fifo_count == ARRAY_LENGTH(m_uart_regs.tx_fifo))
+		m_uart_regs.utsr1 &= ~(1 << UTSR1_TNF_BIT);
+	else
+		m_uart_regs.utsr1 |= (1 << UTSR1_TNF_BIT);
+
+	// update FIFO-service interrupt
+	uart_check_tx_fifo_service();
+}
+
+void sa1110_periphs_device::uart_check_tx_fifo_service()
+{
+	if (m_uart_regs.tx_fifo_count <= 4 && BIT(m_uart_regs.utcr[3], UTCR3_TXE_BIT))
+	{
+		m_uart_regs.utsr0 |= (1 << UTSR0_TFS_BIT);
+		if (BIT(m_uart_regs.utcr[3], UTCR3_TIE_BIT))
+		{
+			m_uart3_irqs->in_w<UART3_TFS>(1);
+		}
+	}
+	else
+	{
+		m_uart_regs.utsr0 &= ~(1 << UTSR0_TFS_BIT);
+		m_uart3_irqs->in_w<UART3_TFS>(0);
+	}
+}
+
+void sa1110_periphs_device::uart_set_receiver_idle()
+{
+}
+
+void sa1110_periphs_device::uart_begin_of_break()
+{
+}
+
+void sa1110_periphs_device::uart_end_of_break()
+{
+}
+
+void sa1110_periphs_device::uart_set_receiver_enabled(bool enabled)
+{
+}
+
+void sa1110_periphs_device::uart_set_transmitter_enabled(bool enabled)
+{
+	if (enabled)
+	{
+		m_uart_regs.utsr0 |= (1 << UTSR0_TFS_BIT);
+		m_uart3_irqs->in_w<UART3_TFS>(1);
+
+		m_uart_regs.utsr1 |= (1 << UTSR1_TNF_BIT);
+	}
+	else
+	{
+		m_uart_regs.utsr0 &= ~(1 << UTSR0_TFS_BIT);
+		m_uart3_irqs->in_w<UART3_TFS>(0);
+
+		m_uart_regs.utsr1 &= ~(1 << UTSR1_TBY_BIT);
+		m_uart_regs.utsr1 &= ~(1 << UTSR1_TNF_BIT);
+
+		m_uart_regs.tx_fifo_count = 0;
+		m_uart_regs.tx_fifo_read_idx = 0;
+		m_uart_regs.tx_fifo_write_idx = 0;
+
+		transmit_register_reset();
+	}
+}
+
+void sa1110_periphs_device::uart_set_receive_irq_enabled(bool enabled)
+{
+}
+
+void sa1110_periphs_device::uart_set_transmit_irq_enabled(bool enabled)
+{
+}
+
+uint32_t sa1110_periphs_device::uart3_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
-		case REG_ICIP:
-			LOGMASKED(LOG_INTC, "sa1110 intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask);
-			break;
-		case REG_ICMR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_intc_regs.icmr);
-			break;
-		case REG_ICLR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_intc_regs.iclr);
-			break;
-		case REG_ICFP:
-			LOGMASKED(LOG_INTC, "sa1110 intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask);
-			break;
-		case REG_ICPR:
-			LOGMASKED(LOG_INTC, "sa1110_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask);
-			break;
-		case REG_ICCR:
-			LOGMASKED(LOG_INTC, "sa1110 intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask);
-			m_intc_regs.iccr = BIT(data, 0);
-			break;
-		default:
-			LOGMASKED(LOG_INTC | LOG_UNKNOWN, "sa1110 intc_w: Unknown address: %08x = %08x & %08x\n", INTC_BASE_ADDR | (offset << 2), data, mem_mask);
-			break;
+	case REG_UTCR0:
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Control Register 0: %08x & %08x\n", machine().describe_context(), m_uart_regs.utcr[0], mem_mask);
+		return m_uart_regs.utcr[0];
+	case REG_UTCR1:
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Control Register 1: %08x & %08x\n", machine().describe_context(), m_uart_regs.utcr[1], mem_mask);
+		return m_uart_regs.utcr[1];
+	case REG_UTCR2:
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Control Register 2: %08x & %08x\n", machine().describe_context(), m_uart_regs.utcr[2], mem_mask);
+		return m_uart_regs.utcr[2];
+	case REG_UTCR3:
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Control Register 3: %08x & %08x\n", machine().describe_context(), m_uart_regs.utcr[3], mem_mask);
+		return m_uart_regs.utcr[3];
+	case REG_UTDR:
+	{
+		const uint8_t data = uart_read_receive_fifo();
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Data Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		return data;
+	}
+	case REG_UTSR0:
+		LOGMASKED(LOG_UART_HF, "%s: uart3_r: UART Status Register 0: %08x & %08x\n", machine().describe_context(), m_uart_regs.utsr0, mem_mask);
+		return m_uart_regs.utsr0;
+	case REG_UTSR1:
+		LOGMASKED(LOG_UART, "%s: uart3_r: UART Status Register 1: %08x & %08x\n", machine().describe_context(), m_uart_regs.utsr1, mem_mask);
+		return m_uart_regs.utsr1;
+	default:
+		LOGMASKED(LOG_UART | LOG_UNKNOWN, "%s: uart3_r: Unknown address: %08x & %08x\n", machine().describe_context(), UART_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_UTCR0:
+	{
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Control Register 0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_UART, "%s:          Parity Enable: %d\n", machine().describe_context(), BIT(data, 0));
+		LOGMASKED(LOG_UART, "%s:          Parity Mode: %s\n", machine().describe_context(), BIT(data, 1) ? "Even" : "Odd");
+		LOGMASKED(LOG_UART, "%s:          Stop Bits: %d\n", machine().describe_context(), BIT(data, 2) + 1);
+		LOGMASKED(LOG_UART, "%s:          Data Size: %d\n", machine().describe_context(), BIT(data, 3) ? 8 : 7);
+		LOGMASKED(LOG_UART, "%s:          Sample Clock: %s\n", machine().describe_context(), BIT(data, 4) ? "External" : "Internal");
+		LOGMASKED(LOG_UART, "%s:          Receive Edge: %s\n", machine().describe_context(), BIT(data, 5) ? "Falling" : "Rising");
+		LOGMASKED(LOG_UART, "%s:          Transmit Edge: %s\n", machine().describe_context(), BIT(data, 6) ? "Falling" : "Rising");
+
+		stop_bits_t stop_bits = (BIT(data, 2) ? STOP_BITS_2 : STOP_BITS_1);
+
+		parity_t parity = PARITY_NONE;
+		if (BIT(data, 0))
+		{
+			parity = (BIT(data, 1) ? PARITY_EVEN : PARITY_ODD);
+		}
+
+		set_data_frame(1, BIT(data, 3) ? 8 : 7, parity, stop_bits);
+		receive_register_reset();
+		transmit_register_reset();
+
+		COMBINE_DATA(&m_uart_regs.utcr[0]);
+		break;
+	}
+	case REG_UTCR1:
+	{
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Control Register 1: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_UART, "%s:          Baud Rate Divisor MSB: %02x\n", machine().describe_context(), data & 0x0f);
+		const uint8_t old = m_uart_regs.utcr[1] & 0x0f;
+		COMBINE_DATA(&m_uart_regs.utcr[1]);
+		if ((m_uart_regs.utcr[1] & 0x0f) != old)
+			uart_recalculate_divisor();
+		break;
+	}
+	case REG_UTCR2:
+	{
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Control Register 2: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_UART, "%s:          Baud Rate Divisor LSB: %02x\n", machine().describe_context(), (uint8_t)data);
+		const uint8_t old = m_uart_regs.utcr[2] & 0xff;
+		COMBINE_DATA(&m_uart_regs.utcr[2]);
+		if ((m_uart_regs.utcr[2] & 0xff) != old)
+			uart_recalculate_divisor();
+		break;
+	}
+	case REG_UTCR3:
+	{
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Control Register 3: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_UART, "%s:          Receive Enable: %d\n", machine().describe_context(), BIT(data, 0));
+		LOGMASKED(LOG_UART, "%s:          Transmit Enable: %d\n", machine().describe_context(), BIT(data, 1));
+		LOGMASKED(LOG_UART, "%s:          Send Break: %d\n", machine().describe_context(), BIT(data, 2));
+		LOGMASKED(LOG_UART, "%s:          Receive FIFO IRQ Enable: %d\n", machine().describe_context(), BIT(data, 3));
+		LOGMASKED(LOG_UART, "%s:          Transmit FIFO IRQ Enable: %d\n", machine().describe_context(), BIT(data, 4));
+		LOGMASKED(LOG_UART, "%s:          Loopback Enable: %d\n", machine().describe_context(), BIT(data, 5));
+		const uint32_t old = m_uart_regs.utcr[3];
+		COMBINE_DATA(&m_uart_regs.utcr[3]);
+		const uint32_t changed = old ^ m_uart_regs.utcr[3];
+		if (BIT(changed, 0))
+			uart_set_receiver_enabled(BIT(data, 0));
+		if (BIT(changed, 1))
+			uart_set_transmitter_enabled(BIT(data, 1));
+		if (BIT(changed, 3))
+			uart_set_receive_irq_enabled(BIT(data, 3));
+		if (BIT(changed, 4))
+			uart_set_transmit_irq_enabled(BIT(data, 4));
+		break;
+	}
+	case REG_UTDR:
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Data Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (data == 0x0d || data == 0x0a || (data >= 0x20 && data < 0x7f))
+		{
+			printf("%c", (char)data);
+		}
+		uart_write_transmit_fifo((uint8_t)data);
+		break;
+	case REG_UTSR0:
+		LOGMASKED(LOG_UART, "%s: uart3_w: UART Status Register 0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_UART, "%s:          Receiver Idle Status: %d\n", machine().describe_context(), BIT(data, 2));
+		LOGMASKED(LOG_UART, "%s:          Receiver Begin of Break Status: %d\n", machine().describe_context(), BIT(data, 3));
+		LOGMASKED(LOG_UART, "%s:          Receiver End of Break Status: %d\n", machine().describe_context(), BIT(data, 4));
+		if (BIT(data, 2))
+			uart_set_receiver_idle();
+		if (BIT(data, 3))
+			uart_begin_of_break();
+		if (BIT(data, 4))
+			uart_end_of_break();
+		break;
+	default:
+		LOGMASKED(LOG_UART | LOG_UNKNOWN, "%s: uart3_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), UART_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 Operating System Timer
+
+  pg. 92 to 96 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::ostimer_tick_cb)
+{
+	const int channel = param;
+	if (BIT(m_ostmr_regs.oier, channel))
+	{
+		m_ostmr_regs.ossr |= (1 << channel);
+		set_irq_line(INT_OSTIMER0 + channel, 1);
+		// TODO: Handle Channel 3, watchdog timer mode
+	}
+}
+
+void sa1110_periphs_device::ostimer_update_count()
+{
+	const attotime time_delta = machine().time() - m_ostmr_regs.last_count_sync;
+	const uint64_t ticks_elapsed = time_delta.as_ticks(INTERNAL_OSC);
+	const uint32_t wrapped_ticks = (uint32_t)ticks_elapsed;
+	m_ostmr_regs.oscr += wrapped_ticks;
+	m_ostmr_regs.last_count_sync = machine().time();
+}
+
+void sa1110_periphs_device::ostimer_update_match_timer(int channel)
+{
+	uint64_t ticks_remaining = m_ostmr_regs.osmr[channel] - m_ostmr_regs.oscr;
+	if (m_ostmr_regs.oscr >= m_ostmr_regs.osmr[channel])
+		ticks_remaining += 0x100000000ULL;
+	m_ostmr_regs.timer[channel]->adjust(attotime::from_ticks(ticks_remaining, INTERNAL_OSC), channel);
+}
+
+uint32_t sa1110_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
+{
+	ostimer_update_count();
+
+	switch (offset)
+	{
+	case REG_OSMR0:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 0: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[0], mem_mask);
+		return m_ostmr_regs.osmr[0];
+	case REG_OSMR1:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 1: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[1], mem_mask);
+		return m_ostmr_regs.osmr[1];
+	case REG_OSMR2:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 2: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[2], mem_mask);
+		return m_ostmr_regs.osmr[2];
+	case REG_OSMR3:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 3: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[3], mem_mask);
+		return m_ostmr_regs.osmr[3];
+	case REG_OSCR:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Counter Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.oscr, mem_mask);
+		return m_ostmr_regs.oscr;
+	case REG_OSSR:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Status Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.ossr, mem_mask);
+		return m_ostmr_regs.ossr;
+	case REG_OWER:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Watchdog Enable Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.ower, mem_mask);
+		return m_ostmr_regs.ower;
+	case REG_OIER:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.oier, mem_mask);
+		return m_ostmr_regs.oier;
+	default:
+		LOGMASKED(LOG_OSTIMER | LOG_UNKNOWN, "%s: ostimer_r: Unknown address: %08x & %08x\n", machine().describe_context(), OSTMR_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	ostimer_update_count();
+
+	switch (offset)
+	{
+	case REG_OSMR0:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Match Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.osmr[0]);
+		ostimer_update_match_timer(0);
+		break;
+	case REG_OSMR1:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Match Register 1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.osmr[1]);
+		ostimer_update_match_timer(1);
+		break;
+	case REG_OSMR2:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Match Register 2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.osmr[2]);
+		ostimer_update_match_timer(2);
+		break;
+	case REG_OSMR3:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Match Register 3 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.osmr[3]);
+		ostimer_update_match_timer(3);
+		break;
+	case REG_OSCR:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Counter Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.oscr);
+		m_ostmr_regs.last_count_sync = machine().time();
+		for (int channel = 0; channel < 4; channel++)
+		{
+			if (m_ostmr_regs.oscr == m_ostmr_regs.osmr[channel] && BIT(m_ostmr_regs.oier, channel))
+			{
+				if (!BIT(m_ostmr_regs.ossr, channel))
+				{
+					m_ostmr_regs.ossr |= (1 << channel);
+					set_irq_line(INT_OSTIMER0 + channel, 1);
+				}
+			}
+			else
+			{
+				ostimer_update_match_timer(channel);
+			}
+		}
+		break;
+	case REG_OSSR:
+	{
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_ostmr_regs.ossr;
+		m_ostmr_regs.ossr &= ~(data & mem_mask);
+		if (old != m_ostmr_regs.ossr)
+		{
+			for (int channel = 0; channel < 4; channel++)
+			{
+				if (BIT(old, channel))
+					set_irq_line(INT_OSTIMER0 + channel, 0);
+			}
+		}
+		break;
+	}
+	case REG_OWER:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Watchdog Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (!m_ostmr_regs.ower)
+		{
+			m_ostmr_regs.ower = data & mem_mask & 1;
+		}
+		break;
+	case REG_OIER:
+		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Interrupt Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ostmr_regs.oier);
+		break;
+	default:
+		LOGMASKED(LOG_OSTIMER | LOG_UNKNOWN, "%s: ostimer_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), OSTMR_BASE_ADDR | (offset << 2),
+			data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 Real-Time Clock
+
+  pg. 88 to 92 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::rtc_tick_cb)
+{
+	m_rtc_regs.rcnr++;
+	m_rtc_regs.rtsr |= (1 << RTSR_HZ_BIT);
+
+	if (m_rtc_regs.rcnr == m_rtc_regs.rtar)
+	{
+		m_rtc_regs.rtsr |= (1 << RTSR_AL_BIT);
+		if (BIT(m_rtc_regs.rtsr, RTSR_ALE_BIT))
+			set_irq_line(INT_RTC_ALARM, 1);
+	}
+
+	if (BIT(m_rtc_regs.rtsr, RTSR_HZE_BIT))
+		set_irq_line(INT_RTC_TICK, 1);
+}
+
+uint32_t sa1110_periphs_device::rtc_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_RTAR:
+		LOGMASKED(LOG_RTC, "%s: rtc_r: RTC Alarm Register: %08x & %08x\n", machine().describe_context(), m_rtc_regs.rtar, mem_mask);
+		return m_rtc_regs.rtar;
+	case REG_RCNR:
+		LOGMASKED(LOG_RTC, "%s: rtc_r: RTC Count Register: %08x & %08x\n", machine().describe_context(), m_rtc_regs.rcnr, mem_mask);
+		return m_rtc_regs.rcnr;
+	case REG_RTTR:
+		LOGMASKED(LOG_RTC, "%s: rtc_r: RTC Timer Trim Register: %08x & %08x\n", machine().describe_context(), m_rtc_regs.rttr, mem_mask);
+		return m_rtc_regs.rttr;
+	case REG_RTSR:
+		LOGMASKED(LOG_RTC, "%s: rtc_r: RTC Status Register: %08x & %08x\n", machine().describe_context(), m_rtc_regs.rtsr, mem_mask);
+		return m_rtc_regs.rtsr;
+	default:
+		LOGMASKED(LOG_RTC | LOG_UNKNOWN, "%s: reset_r: Unknown address: %08x & %08x\n", machine().describe_context(), RTC_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_RTAR:
+		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Alarm Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_rtc_regs.rtar);
+		break;
+	case REG_RCNR:
+		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_rtc_regs.rcnr);
+		break;
+	case REG_RTTR:
+		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Timer Trim Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_rtc_regs.rttr);
+		// TODO: Implement timer trimming
+		break;
+	case REG_RTSR:
+	{
+		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+
+		const uint32_t old = m_rtc_regs.rtsr;
+		const bool old_alarm_int = BIT(old, RTSR_AL_MASK) && BIT(m_rtc_regs.rtsr, RTSR_ALE_MASK);
+		const bool old_tick_int = BIT(old, RTSR_HZ_MASK) && BIT(m_rtc_regs.rtsr, RTSR_HZE_MASK);
+
+		m_rtc_regs.rtsr &= ~(data & (RTSR_AL_MASK | RTSR_HZ_MASK) & mem_mask);
+		m_rtc_regs.rtsr &= ~(RTSR_ALE_MASK | RTSR_HZE_MASK);
+		m_rtc_regs.rtsr |= (data & (RTSR_ALE_MASK | RTSR_HZE_MASK) & mem_mask);
+
+		const bool new_alarm_int = BIT(m_rtc_regs.rtsr, RTSR_AL_MASK) && BIT(m_rtc_regs.rtsr, RTSR_ALE_MASK);
+		const bool new_tick_int = BIT(m_rtc_regs.rtsr, RTSR_HZ_MASK) && BIT(m_rtc_regs.rtsr, RTSR_HZE_MASK);
+
+		if (old_alarm_int != new_alarm_int)
+			set_irq_line(INT_RTC_ALARM, (int)new_alarm_int);
+		if (old_tick_int != new_tick_int)
+			set_irq_line(INT_RTC_TICK, (int)new_tick_int);
+		break;
+	}
+	default:
+		LOGMASKED(LOG_RTC | LOG_UNKNOWN, "%s: reset_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), RTC_BASE_ADDR | (offset << 2),
+			data, mem_mask);
+		break;
 	}
 }
 
@@ -120,108 +607,531 @@ uint32_t sa1110_periphs_device::power_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
-		case REG_PMCR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Control Register: %08x\n", machine().describe_context(), m_power_regs.pmcr);
-			return m_power_regs.pmcr;
-		case REG_PSSR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Sleep Status Register: %08x\n", machine().describe_context(), m_power_regs.pssr);
-			return m_power_regs.pssr;
-		case REG_PSPR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Scratch Pad Register: %08x\n", machine().describe_context(), m_power_regs.pspr);
-			return m_power_regs.pspr;
-		case REG_PWER:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Wake-up Enable Register: %08x\n", machine().describe_context(), m_power_regs.pwer);
-			return m_power_regs.pwer;
-		case REG_PCFR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager General Configuration Register: %08x\n", machine().describe_context(), m_power_regs.pcfr);
-			return m_power_regs.pcfr;
-		case REG_PPCR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager PLL Configuration Register: %08x\n", machine().describe_context(), m_power_regs.ppcr);
-			return m_power_regs.ppcr;
-		case REG_PGSR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Sleep State Register: %08x\n", machine().describe_context(), m_power_regs.pgsr);
-			return m_power_regs.pgsr;
-		case REG_POSR:
-			LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Oscillator Status Register: %08x\n", machine().describe_context(), m_power_regs.posr);
-			return m_power_regs.posr;
-		default:
-			LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_r: Unknown address: %08x\n", machine().describe_context(), POWER_BASE_ADDR | (offset << 2));
-			break;
+	case REG_PMCR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Control Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pmcr, mem_mask);
+		return m_power_regs.pmcr;
+	case REG_PSSR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Sleep Status Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pssr, mem_mask);
+		return m_power_regs.pssr;
+	case REG_PSPR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Scratch Pad Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pspr, mem_mask);
+		return m_power_regs.pspr;
+	case REG_PWER:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Wake-up Enable Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pwer, mem_mask);
+		return m_power_regs.pwer;
+	case REG_PCFR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager General Configuration Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pcfr, mem_mask);
+		return m_power_regs.pcfr;
+	case REG_PPCR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager PLL Configuration Register: %08x & %08x\n", machine().describe_context(), m_power_regs.ppcr, mem_mask);
+		return m_power_regs.ppcr;
+	case REG_PGSR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager GPIO Sleep State Register: %08x & %08x\n", machine().describe_context(), m_power_regs.pgsr, mem_mask);
+		return m_power_regs.pgsr;
+	case REG_POSR:
+		LOGMASKED(LOG_POWER, "%s: power_r: Power Manager Oscillator Status Register: %08x & %08x\n", machine().describe_context(), m_power_regs.posr, mem_mask);
+		return m_power_regs.posr;
+	default:
+		LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_r: Unknown address: %08x & %08x\n", machine().describe_context(), POWER_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
 	}
-	return 0;
 }
 
 void sa1110_periphs_device::power_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
-		case REG_PMCR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.pmcr);
-			break;
-		case REG_PSSR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Sleep Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_power_regs.pssr &= ~(data & 0x0000001f);
-			break;
-		case REG_PSPR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Scratch Pad Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.pspr);
-			break;
-		case REG_PWER:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Wake-Up Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.pwer);
-			break;
-		case REG_PCFR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager General Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.pcfr);
-			break;
-		case REG_PPCR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager PLL Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.ppcr);
-			break;
-		case REG_PGSR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Sleep State Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			COMBINE_DATA(&m_power_regs.pgsr);
-			break;
-		case REG_POSR:
-			LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Oscillator Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		default:
-			LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), POWER_BASE_ADDR | (offset << 2),
-				data, mem_mask);
-			break;
+	case REG_PMCR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.pmcr);
+		break;
+	case REG_PSSR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Sleep Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_power_regs.pssr &= ~(data & 0x0000001f);
+		break;
+	case REG_PSPR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Scratch Pad Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.pspr);
+		break;
+	case REG_PWER:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Wake-Up Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.pwer);
+		break;
+	case REG_PCFR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager General Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.pcfr);
+		break;
+	case REG_PPCR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager PLL Configuration Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.ppcr);
+		break;
+	case REG_PGSR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager GPIO Sleep State Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_power_regs.pgsr);
+		break;
+	case REG_POSR:
+		LOGMASKED(LOG_POWER, "%s: power_w: Power Manager Oscillator Status Register (ignored) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_POWER | LOG_UNKNOWN, "%s: power_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), POWER_BASE_ADDR | (offset << 2),
+			data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 Reset Controller
+
+  pg. 112 to 114 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+uint32_t sa1110_periphs_device::reset_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_RSRR:
+		LOGMASKED(LOG_RESET, "%s: reset_r: Reset Controller Software Reset Register: %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case REG_RCSR:
+		LOGMASKED(LOG_RESET, "%s: reset_r: Reset Controller Status Register: %08x & %08x\n", machine().describe_context(), m_rcsr, mem_mask);
+		return m_rcsr;
+	default:
+		LOGMASKED(LOG_RESET | LOG_UNKNOWN, "%s: reset_r: Unknown address: %08x & %08x\n", machine().describe_context(), RESET_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::reset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_RSRR:
+		LOGMASKED(LOG_RESET, "%s: reset_w: Reset Controller Software Reset Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_RCSR:
+		LOGMASKED(LOG_RESET, "%s: reset_w: Reset Controller Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_rcsr &= ~(data & mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_RESET | LOG_UNKNOWN, "%s: reset_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), RESET_BASE_ADDR | (offset << 2),
+			data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 GPIO Controller
+
+  pg. 71 to 80 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+void sa1110_periphs_device::gpio_in(const uint32_t line, const int state)
+{
+	const uint32_t mask = (1 << line);
+	const uint32_t old_latch = m_gpio_regs.input_latch;
+	m_gpio_regs.input_latch &= ~mask;
+	m_gpio_regs.input_latch |= (state << line);
+
+	if (old_latch != m_gpio_regs.input_latch && !BIT(m_gpio_regs.gafr, line))
+	{
+		// TODO: The manual is unclear if edge detection functions on both inputs and outputs.
+		//       If it can also function on outputs, remove the GPDR check below.
+		if (!BIT(m_gpio_regs.gpdr, line) && BIT(m_gpio_regs.any_edge_mask, line))
+		{
+			const uint32_t old_edge = m_gpio_regs.gedr;
+			if (state && BIT(m_gpio_regs.grer, line))
+				m_gpio_regs.gedr |= mask;
+			if (!state && BIT(m_gpio_regs.gfer, line))
+				m_gpio_regs.gedr |= mask;
+			if (old_edge != m_gpio_regs.gedr)
+				gpio_update_interrupts(mask);
+		}
+
+		m_gpio_regs.gplr = (m_gpio_regs.input_latch & ~m_gpio_regs.gafr) | (m_gpio_regs.alt_input_latch & m_gpio_regs.gafr);
+	}
+}
+
+void sa1110_periphs_device::gpio_update_interrupts(const uint32_t changed_mask)
+{
+	uint32_t remaining_mask = changed_mask;
+	for (uint32_t line = 0; line < 11; line++)
+	{
+		if (!BIT(remaining_mask, line))
+			continue;
+
+		set_irq_line(INT_GPIO0 + line, BIT(m_gpio_regs.gedr, line));
+		remaining_mask &= ~(1 << line);
+	}
+
+	if (!remaining_mask)
+		return;
+
+	set_irq_line(INT_GPIOHI, (m_gpio_regs.gedr & 0x0ffff800) ? 1 : 0);
+}
+
+void sa1110_periphs_device::gpio_update_direction(const uint32_t old_gpdr)
+{
+	const uint32_t new_outputs = ~old_gpdr & m_gpio_regs.gpdr & ~m_gpio_regs.gafr;
+	if (new_outputs)
+	{
+		for (uint32_t line = 0; line < 28; line++)
+		{
+			if (BIT(new_outputs, line))
+			{
+				m_gpio_out[line](BIT(m_gpio_regs.gplr, line));
+			}
+		}
+	}
+
+	// TODO: Do we need to check rising/falling edges based on the transition from output to input?
+}
+
+void sa1110_periphs_device::gpio_update_outputs(const uint32_t old_latch, const uint32_t changed)
+{
+	uint32_t remaining_changed = changed;
+
+	for (uint32_t line = 0; line < 28 && remaining_changed != 0; line++)
+	{
+		if (BIT(remaining_changed, line))
+		{
+			m_gpio_out[line](BIT(m_gpio_regs.output_latch, line));
+			remaining_changed &= ~(1 << line);
+		}
+	}
+}
+
+void sa1110_periphs_device::gpio_update_alternate_pins(const uint32_t changed_mask)
+{
+	// TODO
+}
+
+uint32_t sa1110_periphs_device::gpio_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_GPLR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Pin-Level Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.gplr, mem_mask);
+		return m_gpio_regs.gplr;
+	case REG_GPDR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Pin Direction Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.gpdr, mem_mask);
+		return m_gpio_regs.gpdr;
+	case REG_GPSR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Pin Output Set Register: %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case REG_GPCR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Pin Output Clear Register (ignored): %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case REG_GRER:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Rising-Edge Detect Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.grer, mem_mask);
+		return m_gpio_regs.grer;
+	case REG_GFER:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Falling-Edge Detect Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.gfer, mem_mask);
+		return m_gpio_regs.gfer;
+	case REG_GEDR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Edge Detect Status Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.gedr, mem_mask);
+		return m_gpio_regs.gedr;
+	case REG_GAFR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_r: GPIO Alternate Function Register: %08x & %08x\n", machine().describe_context(), m_gpio_regs.gafr, mem_mask);
+		return m_gpio_regs.gafr;
+	default:
+		LOGMASKED(LOG_GPIO | LOG_UNKNOWN, "%s: gpio_r: Unknown address: %08x & %08x\n", machine().describe_context(), GPIO_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_GPLR:
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin-Level Register (ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_GPDR:
+	{
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin Direction Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_gpio_regs.gpdr;
+		COMBINE_DATA(&m_gpio_regs.gpdr);
+		if (old != m_gpio_regs.gpdr)
+			gpio_update_direction(old);
+		break;
+	}
+	case REG_GPSR:
+	{
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin Output Set Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_gpio_regs.output_latch;
+		m_gpio_regs.output_latch |= (data & mem_mask);
+		const uint32_t changed = ((old ^ m_gpio_regs.output_latch) & m_gpio_regs.gpdr) & ~m_gpio_regs.gafr;
+		if (changed)
+			gpio_update_outputs(old, changed);
+		break;
+	}
+	case REG_GPCR:
+	{
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin Output Clear Register (ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_gpio_regs.output_latch;
+		m_gpio_regs.output_latch &= ~(data & mem_mask);
+		const uint32_t changed = ((old ^ m_gpio_regs.output_latch) & m_gpio_regs.gpdr) & ~m_gpio_regs.gafr;
+		if (changed)
+			gpio_update_outputs(old, changed);
+		break;
+	}
+	case REG_GRER:
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Rising-Edge Detect Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_gpio_regs.grer);
+		m_gpio_regs.any_edge_mask = m_gpio_regs.grer | m_gpio_regs.gfer;
+		break;
+	case REG_GFER:
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Falling-Edge Detect Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_gpio_regs.gfer);
+		m_gpio_regs.any_edge_mask = m_gpio_regs.grer | m_gpio_regs.gfer;
+		break;
+	case REG_GEDR:
+	{
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Edge Detect Status Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_gpio_regs.gedr;
+		m_gpio_regs.gedr &= ~(data & mem_mask);
+		if (old != m_gpio_regs.gedr)
+			gpio_update_interrupts(old);
+		break;
+	}
+	case REG_GAFR:
+	{
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Alternate Function Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_gpio_regs.gafr;
+		COMBINE_DATA(&m_gpio_regs.gafr);
+		if (old != m_gpio_regs.gafr)
+			gpio_update_alternate_pins(old);
+		break;
+	}
+	default:
+		LOGMASKED(LOG_GPIO | LOG_UNKNOWN, "%s: gpio_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), GPIO_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 Interrupt Controller
+
+  pg. 81 to 88 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+void sa1110_periphs_device::set_irq_line(uint32_t line, int irq_state)
+{
+	const uint32_t line_mask = (1 << line);
+	const uint32_t old_status = m_intc_regs.icpr;
+	m_intc_regs.icpr &= ~line_mask;
+	m_intc_regs.icpr |= irq_state ? line_mask : 0;
+
+	if (m_intc_regs.icpr == old_status)
+		return;
+
+	update_interrupts();
+}
+
+void sa1110_periphs_device::update_interrupts()
+{
+	const uint32_t old_fiq = m_intc_regs.icfp;
+	m_intc_regs.icfp = (m_intc_regs.icpr & m_intc_regs.icmr) & m_intc_regs.iclr;
+	if (old_fiq != m_intc_regs.icfp)
+	{
+		m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_intc_regs.icfp ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	const uint32_t old_irq = m_intc_regs.icip;
+	m_intc_regs.icip = (m_intc_regs.icpr & m_intc_regs.icmr) & (~m_intc_regs.iclr);
+	if (old_irq != m_intc_regs.icip)
+	{
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, m_intc_regs.icip ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+uint32_t sa1110_periphs_device::intc_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_ICIP:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icip, mem_mask);
+		return m_intc_regs.icip;
+	case REG_ICMR:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Mask Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icmr, mem_mask);
+		return m_intc_regs.icmr;
+	case REG_ICLR:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Level Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.iclr, mem_mask);
+		return m_intc_regs.iclr;
+	case REG_ICFP:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icfp, mem_mask);
+		return m_intc_regs.icfp;
+	case REG_ICPR:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icpr, mem_mask);
+		return m_intc_regs.icpr;
+	case REG_ICCR:
+		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Control Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.iccr, mem_mask);
+		return m_intc_regs.iccr;
+	default:
+		LOGMASKED(LOG_INTC | LOG_UNKNOWN, "%s: intc_r: Unknown address: %08x & %08x\n", machine().describe_context(), INTC_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::intc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_ICIP:
+		LOGMASKED(LOG_INTC, "%s: intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_ICMR:
+	{
+		LOGMASKED(LOG_INTC, "%s: intc_w: Interrupt Controller Mask Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_intc_regs.icmr;
+		COMBINE_DATA(&m_intc_regs.icmr);
+		if (old != m_intc_regs.icmr)
+			update_interrupts();
+		break;
+	}
+	case REG_ICLR:
+	{
+		LOGMASKED(LOG_INTC, "%s: intc_w: Interrupt Controller Level Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_intc_regs.iclr;
+		COMBINE_DATA(&m_intc_regs.iclr);
+		if (old != m_intc_regs.iclr)
+			update_interrupts();
+		break;
+	}
+	case REG_ICFP:
+		LOGMASKED(LOG_INTC, "%s: intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_ICPR:
+		LOGMASKED(LOG_INTC, "%s: intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_ICCR:
+		LOGMASKED(LOG_INTC, "%s: intc_w: Interrupt Controller Control Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_intc_regs.iccr = BIT(data, 0);
+		break;
+	default:
+		LOGMASKED(LOG_INTC | LOG_UNKNOWN, "%s: intc_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), INTC_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 void sa1110_periphs_device::device_start()
 {
-	save_item(NAME(m_intc_regs.icip), m_intc_regs.icip);
-	save_item(NAME(m_intc_regs.icmr), m_intc_regs.icmr);
-	save_item(NAME(m_intc_regs.iclr), m_intc_regs.iclr);
-	save_item(NAME(m_intc_regs.iccr), m_intc_regs.iccr);
-	save_item(NAME(m_intc_regs.icfp), m_intc_regs.icfp);
-	save_item(NAME(m_intc_regs.icpr), m_intc_regs.icpr);
+	save_item(NAME(m_uart_regs.utcr));
+	save_item(NAME(m_uart_regs.utsr0));
+	save_item(NAME(m_uart_regs.utsr1));
+	save_item(NAME(m_uart_regs.rx_fifo));
+	save_item(NAME(m_uart_regs.rx_fifo_read_idx));
+	save_item(NAME(m_uart_regs.rx_fifo_write_idx));
+	save_item(NAME(m_uart_regs.rx_fifo_count));
+	save_item(NAME(m_uart_regs.tx_fifo));
+	save_item(NAME(m_uart_regs.tx_fifo_read_idx));
+	save_item(NAME(m_uart_regs.tx_fifo_write_idx));
+	save_item(NAME(m_uart_regs.tx_fifo_count));
+	save_item(NAME(m_uart_regs.rx_break_interlock));
 
-	save_item(NAME(m_power_regs.pmcr), m_power_regs.pmcr);
-	save_item(NAME(m_power_regs.pssr), m_power_regs.pssr);
-	save_item(NAME(m_power_regs.pspr), m_power_regs.pspr);
-	save_item(NAME(m_power_regs.pwer), m_power_regs.pwer);
-	save_item(NAME(m_power_regs.pcfr), m_power_regs.pcfr);
-	save_item(NAME(m_power_regs.ppcr), m_power_regs.ppcr);
-	save_item(NAME(m_power_regs.pgsr), m_power_regs.pgsr);
-	save_item(NAME(m_power_regs.posr), m_power_regs.posr);
+	save_item(NAME(m_ostmr_regs.osmr));
+	save_item(NAME(m_ostmr_regs.oscr));
+	save_item(NAME(m_ostmr_regs.ossr));
+	save_item(NAME(m_ostmr_regs.ower));
+	save_item(NAME(m_ostmr_regs.oier));
+	for (int i = 0; i < 4; i++)
+	{
+		m_ostmr_regs.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ostimer_tick_cb), this));
+	}
+
+	save_item(NAME(m_rtc_regs.rtar));
+	save_item(NAME(m_rtc_regs.rcnr));
+	save_item(NAME(m_rtc_regs.rttr));
+	save_item(NAME(m_rtc_regs.rtsr));
+	m_rtc_regs.tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::rtc_tick_cb), this));
+
+	save_item(NAME(m_power_regs.pmcr));
+	save_item(NAME(m_power_regs.pssr));
+	save_item(NAME(m_power_regs.pspr));
+	save_item(NAME(m_power_regs.pwer));
+	save_item(NAME(m_power_regs.pcfr));
+	save_item(NAME(m_power_regs.ppcr));
+	save_item(NAME(m_power_regs.pgsr));
+	save_item(NAME(m_power_regs.posr));
+
+	save_item(NAME(m_rcsr));
+
+	save_item(NAME(m_gpio_regs.gplr));
+	save_item(NAME(m_gpio_regs.gpdr));
+	save_item(NAME(m_gpio_regs.grer));
+	save_item(NAME(m_gpio_regs.gfer));
+	save_item(NAME(m_gpio_regs.gedr));
+	save_item(NAME(m_gpio_regs.gafr));
+	save_item(NAME(m_gpio_regs.any_edge_mask));
+	save_item(NAME(m_gpio_regs.output_latch));
+	save_item(NAME(m_gpio_regs.input_latch));
+	save_item(NAME(m_gpio_regs.alt_output_latch));
+	save_item(NAME(m_gpio_regs.alt_input_latch));
+
+	save_item(NAME(m_intc_regs.icip));
+	save_item(NAME(m_intc_regs.icmr));
+	save_item(NAME(m_intc_regs.iclr));
+	save_item(NAME(m_intc_regs.iccr));
+	save_item(NAME(m_intc_regs.icfp));
+	save_item(NAME(m_intc_regs.icpr));
+
+	m_gpio_out.resolve_all_safe();
 }
 
 void sa1110_periphs_device::device_reset()
 {
-	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
-	memset(&m_power_regs, 0, sizeof(m_power_regs));
-}
+	// init UART3
+	memset(m_uart_regs.utcr, 0, sizeof(uint32_t) * 4);
+	m_uart_regs.utsr0 = 0;
+	m_uart_regs.utsr1 = 0;
+	memset(m_uart_regs.rx_fifo, 0, sizeof(uint16_t) * 12);
+	m_uart_regs.rx_fifo_read_idx = 0;
+	m_uart_regs.rx_fifo_write_idx = 0;
+	m_uart_regs.rx_fifo_count = 0;
+	memset(m_uart_regs.tx_fifo, 0, 8);
+	m_uart_regs.tx_fifo_read_idx = 0;
+	m_uart_regs.tx_fifo_write_idx = 0;
+	m_uart_regs.tx_fifo_count = 0;
+	m_uart_regs.rx_break_interlock = false;
 
-void sa1110_periphs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
+	transmit_register_reset();
+	receive_register_reset();
+
+	// init OS timers
+	memset(m_ostmr_regs.osmr, 0, sizeof(uint32_t) * 4);
+	m_ostmr_regs.ower = 0;
+	m_ostmr_regs.ossr = 0;
+	m_ostmr_regs.oier = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_ostmr_regs.timer[i]->adjust(attotime::never);
+	}
+	m_ostmr_regs.last_count_sync = attotime::zero;
+
+	// init RTC
+	m_rtc_regs.rtar = 0;
+	m_rtc_regs.rcnr = 0;
+	m_rtc_regs.rttr = 0;
+	m_rtc_regs.rtsr = 0;
+	m_rtc_regs.tick_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+
+	// init power regs
+	memset(&m_power_regs, 0, sizeof(m_power_regs));
+	m_power_regs.posr = 1; // flag oscillator OK
+
+	// bulk-init other registers
+	m_rcsr = 0x00000001; // indicate hardware reset
+	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
+	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
 }
 
 void sa1110_periphs_device::device_add_mconfig(machine_config &config)
 {
+	INPUT_MERGER_ANY_HIGH(config, m_uart3_irqs).output_handler().set(FUNC(sa1110_periphs_device::uart3_irq_callback));
 }

@@ -1857,6 +1857,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
+---------------------------------------------------
+
+if (MACHINES["LOCOMO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/locomo.cpp",
+		MAME_DIR .. "src/devices/machine/locomo.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/m3002.h,MACHINES["M3002"] = true
 ---------------------------------------------------
 
