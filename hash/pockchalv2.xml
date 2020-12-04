@@ -106,7 +106,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="churika" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (2PL)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1-bun'ya) (2-bun'ya) (2PL)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BF400" />
@@ -122,7 +122,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="churika6" cloneof="churika" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (6PL)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1-bun'ya) (2-bun'ya) (6PL)</description>
 		<year>2006</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="6FF400" />
@@ -176,7 +176,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="chukoku" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Kokugo-Hyakunin Isshu (2JA)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuuichi Kokugo-Hyakunin Isshu (2JA)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BK401" />
@@ -192,7 +192,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="chu1suga" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Suugaku (2M1)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuu 1 Suugaku (2M1)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BM110" />
