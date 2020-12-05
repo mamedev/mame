@@ -724,6 +724,9 @@ public:
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
 	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device> >;
+	using prepare_items_delegate = delegate<void ()>;
+	using preload_delegate = delegate<void ()>;
+	using recomputed_delegate = delegate<void ()>;
 
 	/// \brief A single item in a view
 	///
@@ -930,7 +933,13 @@ public:
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
 
+	// set handlers
+	void set_prepare_items_callback(prepare_items_delegate &&handler);
+	void set_preload_callback(preload_delegate &&handler);
+	void set_recomputed_callback(recomputed_delegate &&handler);
+
 	// operations
+	void prepare_items() { if (!m_prepare_items.isnull()) m_prepare_items(); }
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
 	void preload();
 
@@ -972,6 +981,11 @@ private:
 	edge_vector                 m_interactive_edges_x;
 	edge_vector                 m_interactive_edges_y;
 	screen_ref_vector           m_screens;          // list screens visible in current configuration
+
+	// handlers
+	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
+	preload_delegate            m_preload;          // additional actions when visible items change
+	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
 
 	// cold items
 	std::string                 m_name;             // display name for the view

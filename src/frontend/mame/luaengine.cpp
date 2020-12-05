@@ -985,7 +985,7 @@ void lua_engine::initialize()
  * manager:options()
  * manager:machine():options()
  *
- * options:slot_option() - retrieves a specific slot option
+ * options:slot_option(tag) - retrieves a specific slot option
  */
 
 	auto emu_options_type = sol().registry().new_usertype<emu_options>("emu_options", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
@@ -1286,6 +1286,7 @@ void lua_engine::initialize()
  * device:memregion(tag) - get memory region
  * device:memshare(tag) - get memory share
  * device:membank(tag) - get memory bank
+ * device:ioport(tag) - get I/O port
  * device:subdevice(tag) - get subdevice
  * device:siblingdevice(tag) - get sibling device
  * device:debug() - debug interface, CPUs only
@@ -1309,6 +1310,7 @@ void lua_engine::initialize()
 	device_type["memregion"] = &device_t::memregion;
 	device_type["memshare"] = &device_t::memshare;
 	device_type["membank"] = &device_t::membank;
+	device_type["ioport"] = &device_t::ioport;
 	device_type["subdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::subdevice);
 	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::siblingdevice);
 	device_type["debug"] =
@@ -1873,7 +1875,7 @@ void lua_engine::initialize()
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
 			"cassette",
 			sol::no_constructor,
-			sol::base_classes, sol::bases<device_t>());
+			sol::base_classes, sol::bases<device_t, device_image_interface>());
 	cass_type["stop"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE); };
 	cass_type["play"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE); };
 	cass_type["record"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE); };
@@ -1886,11 +1888,10 @@ void lua_engine::initialize()
 	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
 	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
-	cass_type["length"] = sol::property([] (cassette_image_device &c) { if (c.exists()) return c.get_length(); return 0.0; });
-	cass_type["image"] = sol::property([] (cassette_image_device &c) { return dynamic_cast<device_image_interface *>(&c); });
+	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
 
-/*  mame_machine_manager library
+/* mame_machine_manager library
  *
  * manager
  * mame_manager - alias of manager
@@ -1924,10 +1925,10 @@ void lua_engine::initialize()
 
 
 	// set up other user types
-	initialize_debug();
-	initialize_input();
-	initialize_memory();
-	initialize_render();
+	initialize_debug(emu);
+	initialize_input(emu);
+	initialize_memory(emu);
+	initialize_render(emu);
 }
 
 //-------------------------------------------------

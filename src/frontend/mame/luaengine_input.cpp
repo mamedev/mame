@@ -21,7 +21,7 @@
 //  initialize_input - register input user types
 //-------------------------------------------------
 
-void lua_engine::initialize_input()
+void lua_engine::initialize_input(sol::table &emu)
 {
 
 	static const enum_parser<input_seq_type, 3> s_seq_type_parser =

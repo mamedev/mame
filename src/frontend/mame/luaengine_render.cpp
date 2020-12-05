@@ -316,7 +316,7 @@ public:
 //  initialize_render - register render user types
 //-------------------------------------------------
 
-void lua_engine::initialize_render()
+void lua_engine::initialize_render(sol::table &emu)
 {
 
 /* render_bounds library
@@ -333,12 +333,14 @@ void lua_engine::initialize_render()
  * bounds.height - get/set height
  * bounds.aspect - read-only aspect ratio width:height
  */
-	auto bounds_type = sol().registry().new_usertype<render_bounds>("bounds", sol::call_constructor, sol::initializers(
+	auto bounds_type = emu.new_usertype<render_bounds>(
+			"render_bounds",
+			sol::call_constructor, sol::initializers(
 				[] (render_bounds &b) { new (&b) render_bounds{ 0.0F, 0.0F, 1.0F, 1.0F }; },
 				[] (render_bounds &b, float x0, float y0, float x1, float y1) { new (&b) render_bounds{ x0, y0, x1, y1 }; }));
 	bounds_type["includes"] = &render_bounds::includes;
-	bounds_type["set_xy"] = &render_bounds::includes;
-	bounds_type["set_wh"] = &render_bounds::includes;
+	bounds_type["set_xy"] = &render_bounds::set_xy;
+	bounds_type["set_wh"] = &render_bounds::set_wh;
 	bounds_type["x0"] = &render_bounds::x0;
 	bounds_type["y0"] = &render_bounds::y0;
 	bounds_type["x1"] = &render_bounds::x1;
@@ -357,7 +359,9 @@ void lua_engine::initialize_render()
  * color.g - green channel
  * color.b - blue channel
  */
-	auto color_type = sol().registry().new_usertype<render_color>("color", sol::call_constructor, sol::initializers(
+	auto color_type = emu.new_usertype<render_color>(
+			"render_color",
+			sol::call_constructor, sol::initializers(
 				[] (render_color &c) { new (&c) render_color{ 1.0F, 1.0F, 1.0F, 1.0F }; },
 				[] (render_color &c, float a, float r, float g, float b) { new (&c) render_color{ a, r, g, b }; }));
 	color_type["set"] = &render_color::set;
@@ -372,6 +376,9 @@ void lua_engine::initialize_render()
  * manager:machine():render().targets[target_index]:current_view()
  *
  * view:has_screen(screen) - returns whether a given screen is present in the view (including hidden screens)
+ * view:set_prepare_items_callback(cb) - set additional tasks before adding items to render target
+ * view:set_preload_callback(cb) - set additional tasks after preloading visible items
+ * view:set_recomputed_callback(cb) - set additional tasks after recomputing for resize or visibility change
  *
  * view.items - get the items in the view (including hidden items)
  * view.name - display name for the view
@@ -384,6 +391,24 @@ void lua_engine::initialize_render()
 
 	auto layout_view_type = sol().registry().new_usertype<layout_view>("layout_view", sol::no_constructor);
 	layout_view_type["has_screen"] = &layout_view::has_screen;
+	layout_view_type["set_prepare_items_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_prepare_items_callback,
+				nullptr,
+				"set_prepare_items_callback",
+				nullptr);
+	layout_view_type["set_preload_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_preload_callback,
+				nullptr,
+				"set_preload_callback",
+				nullptr);
+	layout_view_type["set_recomputed_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_recomputed_callback,
+				nullptr,
+				"set_recomputed_callback",
+				nullptr);
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);
@@ -415,63 +440,17 @@ void lua_engine::initialize_render()
 	auto layout_view_item_type = sol().registry().new_usertype<layout_view::item>("layout_item", sol::no_constructor);
 	layout_view_item_type["set_state"] = &layout_view::item::set_state;
 	layout_view_item_type["set_element_state_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_element_state_callback(layout_view::item::state_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_element_state_callback(layout_view::item::state_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
-							{
-								auto result(invoke(cbfunc).get<sol::optional<int> >());
-								if (result)
-								{
-									return *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from element state callback\n");
-									return 0;
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_element_state_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<int>(
+				&layout_view::item::set_element_state_callback,
+				[] () { return 0; },
+				"set_element_state_callback",
+				"element state");
 	layout_view_item_type["set_animation_state_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_animation_state_callback(layout_view::item::state_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_animation_state_callback(layout_view::item::state_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
-							{
-								auto result(invoke(cbfunc).get<sol::optional<int> >());
-								if (result)
-								{
-									return *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from animation state callback\n");
-									return 0;
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_animation_state_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<int>(
+				&layout_view::item::set_animation_state_callback,
+				[] () { return 0; },
+				"set_animation_state_callback",
+				"animation state");
 	layout_view_item_type["set_bounds_callback"] =
 		[this] (layout_view::item &i, sol::object cb)
 		{
@@ -550,7 +529,7 @@ void lua_engine::initialize_render()
 
 /* layout_file library
  *
- * file.set_resolve_tags_callback - set additional tasks after resolving tags
+ * file:set_resolve_tags_callback(cb) - set additional tasks after resolving tags
  *
  * file.device - get device that caused the file to be loaded
  * file.views[] - get view table (k=name, v=layout_view)
@@ -558,22 +537,11 @@ void lua_engine::initialize_render()
 
 	auto layout_file_type = sol().registry().new_usertype<layout_file>("layout_file", sol::no_constructor);
 	layout_file_type["set_resolve_tags_callback"] =
-		[this] (layout_file &f, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				f.set_resolve_tags_callback(layout_file::resolve_tags_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				f.set_resolve_tags_callback(layout_file::resolve_tags_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); }));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_resolve_tags_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<void>(
+				&layout_file::set_resolve_tags_callback,
+				nullptr,
+				"set_resolve_tags_callback",
+				nullptr);
 	layout_file_type["device"] = sol::property(&layout_file::device);
 	layout_file_type["views"] = sol::property([] (layout_file &f) { return layout_file_views(f); });
 
