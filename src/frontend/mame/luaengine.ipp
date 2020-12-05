@@ -331,6 +331,8 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 							{
 								if constexpr (std::is_same_v<R, void>)
 								{
+									(void)dflt;
+									(void)desc;
 									invoke(cbfunc);
 								}
 								else
