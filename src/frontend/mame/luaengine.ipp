@@ -327,7 +327,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[this, dflt, name, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[this, dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
 							{
 								if constexpr (std::is_same_v<R, void>)
 								{
