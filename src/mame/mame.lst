@@ -10659,6 +10659,7 @@ sf2cems6c                       // bootleg
 sfach                           // CPS Changer (Street Fighter Alpha)
 sfzbch                          // CPS Changer (Street Fighter ZERO Brazil)
 sfzch                           // CPS Changer (Street Fighter ZERO)
+sfzch_cps15                     // CPS 1.5 (Street Fighter ZERO)
 slammast                        // 13/07/1993 (c) 1993 (World) (CPS1 + QSound)
 slammastu                       // 13/07/1993 (c) 1993 (USA) (CPS1 + QSound)
 strider                         // 3/1989 (c) 1989 (not explicitly stated but should be USA)

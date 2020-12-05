@@ -1652,6 +1652,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"sfzch",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
 	{"wofch",       CPS_B_21_DEF, mapper_TK263B },
 
+	{"sfzch_cps15", CPS_B_21_DEF, mapper_sfzch }, 
+
 	/* CPS2 games */
 
 	{"cps2",        CPS_B_21_DEF, mapper_cps2 },

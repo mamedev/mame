@@ -190,6 +190,14 @@ static void cps1_decode(uint8_t *src, uint8_t *dst,int swap_key1,int swap_key2,i
 	kabuki_decode(src,dst,src,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 }
 
+static void cps1_no_decode(uint8_t *src, uint8_t *dst)
+{
+	for (int x = 0; x < 0x8000; x ++) {
+		dst[x] = src[x];
+	}
+}
+
+void sfzch_decode(uint8_t *src, uint8_t *dst)    { cps1_no_decode(src,dst); }
 void wof_decode(uint8_t *src, uint8_t *dst)      { cps1_decode(src,dst,0x01234567,0x54163072,0x5151,0x51); }
 void dino_decode(uint8_t *src, uint8_t *dst)     { cps1_decode(src,dst,0x76543210,0x24601357,0x4343,0x43); }
 void punisher_decode(uint8_t *src, uint8_t *dst) { cps1_decode(src,dst,0x67452103,0x75316024,0x2222,0x22); }

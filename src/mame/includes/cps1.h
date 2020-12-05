@@ -149,6 +149,7 @@ public:
 	void init_wof();
 	void init_dino();
 	void init_punisher();
+	void init_sfzch_cps15();
 	void init_slammast();
 	void init_pang3();
 	void init_ganbare();

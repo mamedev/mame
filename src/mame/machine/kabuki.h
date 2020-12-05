@@ -16,3 +16,4 @@ void wof_decode(uint8_t *src, uint8_t *dst);
 void dino_decode(uint8_t *src, uint8_t *dst);
 void punisher_decode(uint8_t *src, uint8_t *dst);
 void slammast_decode(uint8_t *src, uint8_t *dst);
+void sfzch_decode(uint8_t *src, uint8_t *dst);
