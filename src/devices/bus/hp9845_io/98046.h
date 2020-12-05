@@ -85,6 +85,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_rxc_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_txc_w);
 	bool rx_fifo_flag() const;
 	bool tx_fifo_flag() const;
 	void update_flg();
@@ -95,6 +97,9 @@ private:
 	void set_r6_r7_pending(bool state);
 	uint8_t get_hs_input() const;
 	void set_brgs(uint8_t sel);
+	void rxc_w(bool state);
+	void txc_w(bool state);
+	static bool is_ext_clock(uint8_t sel);
 };
 
 // device type definitions

@@ -195,6 +195,8 @@ void hp98046_io_card_device::device_add_mconfig(machine_config &config)
 	m_rs232->dcd_handler().set(FUNC(hp98046_io_card_device::rs232_dcd_w));
 	m_rs232->dsr_handler().set(FUNC(hp98046_io_card_device::rs232_dsr_w));
 	m_rs232->cts_handler().set(FUNC(hp98046_io_card_device::rs232_cts_w));
+	m_rs232->rxc_handler().set(FUNC(hp98046_io_card_device::rs232_rxc_w));
+	m_rs232->txc_handler().set(FUNC(hp98046_io_card_device::rs232_txc_w));
 	config.set_maximum_quantum(attotime::from_hz(5000));
 }
 
@@ -259,22 +261,12 @@ void hp98046_io_card_device::device_timer(emu_timer &timer, device_timer_id id, 
 	switch (id) {
 	case TMR_ID_RXC:
 		m_rxc = !m_rxc;
-		m_sio->rxca_w(m_rxc);
-		if (m_loopback && (m_txc_sel == 0 || m_txc_sel == 1)) {
-			m_sio->txca_w(m_rxc);
-			m_sio->txcb_w(m_rxc);
-			m_sio->rxcb_w(m_rxc);
-		}
+		rxc_w(m_rxc);
 		break;
 
 	case TMR_ID_TXC:
 		m_txc = !m_txc;
-		m_sio->txca_w(m_txc);
-		m_sio->txcb_w(m_txc);
-		m_sio->rxcb_w(m_txc);
-		if (m_loopback && (m_rxc_sel == 0 || m_rxc_sel == 1)) {
-			m_sio->rxca_w(m_txc);
-		}
+		txc_w(m_txc);
 		break;
 	}
 }
@@ -519,6 +511,22 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_cts_w)
 	}
 }
 
+WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_rxc_w)
+{
+	if (!m_loopback && is_ext_clock(m_rxc_sel)) {
+		LOG("RxC %d %s\n" , state , machine().time().to_string());
+		rxc_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_txc_w)
+{
+	if (!m_loopback && is_ext_clock(m_txc_sel)) {
+		LOG("TxC %d %s\n" , state , machine().time().to_string());
+		txc_w(state);
+	}
+}
+
 bool hp98046_io_card_device::rx_fifo_flag() const
 {
 	return m_rx_fifo.queue_length() >= 16;
@@ -674,12 +682,45 @@ void hp98046_io_card_device::set_brgs(uint8_t sel)
 
 	if (new_rxc_sel != m_rxc_sel) {
 		m_rxc_sel = new_rxc_sel;
-		auto period = attotime::from_hz(brg_freq[ m_rxc_sel ]);
-		m_rxc_timer->adjust(period , 0 , period);
+		if (is_ext_clock(m_rxc_sel)) {
+			m_rxc_timer->reset();
+		} else {
+			auto period = attotime::from_hz(brg_freq[ m_rxc_sel ]);
+			m_rxc_timer->adjust(period , 0 , period);
+		}
 	}
 	if (new_txc_sel != m_txc_sel) {
 		m_txc_sel = new_txc_sel;
-		auto period = attotime::from_hz(brg_freq[ m_txc_sel ]);
-		m_txc_timer->adjust(period , 0 , period);
+		if (is_ext_clock(m_txc_sel)) {
+			m_txc_timer->reset();
+		} else {
+			auto period = attotime::from_hz(brg_freq[ m_txc_sel ]);
+			m_txc_timer->adjust(period , 0 , period);
+		}
 	}
+}
+
+void hp98046_io_card_device::rxc_w(bool state)
+{
+	m_sio->rxca_w(state);
+	if (m_loopback && is_ext_clock(m_txc_sel)) {
+		m_sio->txca_w(state);
+		m_sio->txcb_w(state);
+		m_sio->rxcb_w(state);
+	}
+}
+
+void hp98046_io_card_device::txc_w(bool state)
+{
+	m_sio->txca_w(state);
+	m_sio->txcb_w(state);
+	m_sio->rxcb_w(state);
+	if (m_loopback && is_ext_clock(m_rxc_sel)) {
+		m_sio->rxca_w(state);
+	}
+}
+
+bool hp98046_io_card_device::is_ext_clock(uint8_t sel)
+{
+	return sel == 0 || sel == 1;
 }
