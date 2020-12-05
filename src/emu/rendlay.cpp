@@ -4214,7 +4214,45 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 		for (edge const &e : m_interactive_edges_y)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
+
+	// additional actions typically supplied by script
+	if (!m_recomputed.isnull())
+		m_recomputed();
 }
+
+
+//-------------------------------------------------
+//  set_prepare_items_callback - set handler called
+//  before adding items to render target
+//-------------------------------------------------
+
+void layout_view::set_prepare_items_callback(prepare_items_delegate &&handler)
+{
+	m_prepare_items = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_preload_callback - set handler called
+//  after preloading elements
+//-------------------------------------------------
+
+void layout_view::set_preload_callback(preload_delegate &&handler)
+{
+	m_preload = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_recomputed_callback - set handler called
+//  after recomputing item bounds
+//-------------------------------------------------
+
+void layout_view::set_recomputed_callback(recomputed_delegate &&handler)
+{
+	m_recomputed = std::move(handler);
+}
+
 
 //-------------------------------------------------
 //  preload - perform expensive loading upfront
@@ -4228,6 +4266,9 @@ void layout_view::preload()
 		if (curitem.element())
 			curitem.element()->preload();
 	}
+
+	if (!m_preload.isnull())
+		m_preload();
 }
 
 

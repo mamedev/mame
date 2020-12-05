@@ -49,6 +49,8 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 #include "speaker.h"
 
 
+namespace {
+
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223
@@ -71,6 +73,10 @@ public:
 	void init_magerror();
 	void init_hyprduel();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t irq_cause_r();
 	void irq_cause_w(uint8_t data);
@@ -79,8 +85,6 @@ private:
 	void hyprduel_cpusync_trigger1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hyprduel_cpusync_trigger2_r(offs_t offset);
 	void hyprduel_cpusync_trigger2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_MACHINE_START(hyprduel);
-	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -91,8 +95,6 @@ private:
 	void hyprduel_map2(address_map &map);
 	void magerror_map(address_map &map);
 	void magerror_map2(address_map &map);
-
-	virtual void machine_reset() override;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_irq_enable;
@@ -424,7 +426,7 @@ void hyprduel_state::machine_reset()
 	*m_irq_enable = 0xff;
 }
 
-MACHINE_START_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::machine_start()
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
@@ -461,8 +463,6 @@ void hyprduel_state::hyprduel(machine_config &config)
 	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::hyprduel_map2);
 
-	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
-
 	/* video hardware */
 	i4220_config(config);
 
@@ -488,8 +488,6 @@ void hyprduel_state::magerror(machine_config &config)
 	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::magerror_map2);
 	m_subcpu->set_periodic_int(FUNC(hyprduel_state::irq1_line_hold), attotime::from_hz(968));        /* tempo? */
-
-	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);
@@ -567,6 +565,8 @@ void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 }
+
+} // Anonymous namespace
 
 
 GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

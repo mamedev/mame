@@ -16,10 +16,8 @@
 #include "ui/pluginopt.h"
 #include "ui/ui.h"
 
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-#include "debug/points.h"
-#include "debug/textbuf.h"
+#include "imagedev/cassette.h"
+
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -525,20 +523,19 @@ void lua_engine::initialize()
 	};
 
 
-	static const enum_parser<read_or_write, 4> s_read_or_write_parser =
-	{
-		{ "r", read_or_write::READ },
-		{ "w", read_or_write::WRITE },
-		{ "rw", read_or_write::READWRITE },
-		{ "wr", read_or_write::READWRITE }
-	};
-
-
 	static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser =
 	{
 		{ "left", ui::text_layout::LEFT },
 		{ "right", ui::text_layout::RIGHT },
 		{ "center", ui::text_layout::CENTER },
+	};
+
+
+	static const enum_parser<int, 3> s_seek_parser =
+	{
+		{ "set", SEEK_SET },
+		{ "cur", SEEK_CUR },
+		{ "end", SEEK_END }
 	};
 
 
@@ -757,16 +754,7 @@ void lua_engine::initialize()
 					return sol::make_object(sol(), file.tell());
 			},
 			[this](emu_file &file, const char* whence) -> sol::object {
-				int wval = -1;
-				const char *seekdirs[] = {"set", "cur", "end"};
-				for(int i = 0; i < 3; i++)
-				{
-					if(!strncmp(whence, seekdirs[i], 3))
-					{
-						wval = i;
-						break;
-					}
-				}
+				int wval = s_seek_parser(whence);
 				if(wval < 0 || wval >= 3)
 					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(0, wval))
@@ -774,16 +762,7 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), file.tell());
 			},
 			[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
-				int wval = -1;
-				const char *seekdirs[] = {"set", "cur", "end"};
-				for(int i = 0; i < 3; i++)
-				{
-					if(!strncmp(whence, seekdirs[i], 3))
-					{
-						wval = i;
-						break;
-					}
-				}
+				int wval = s_seek_parser(whence);
 				if(wval < 0 || wval >= 3)
 					return sol::make_object(sol(), sol::lua_nil);
 				if(file.seek(offset, wval))
@@ -1001,7 +980,46 @@ void lua_engine::initialize()
 		}));
 
 
-/*  core_options::entry library
+/* emu_options library
+ *
+ * manager:options()
+ * manager:machine():options()
+ *
+ * options:slot_option(tag) - retrieves a specific slot option
+ */
+
+	auto emu_options_type = sol().registry().new_usertype<emu_options>("emu_options", sol::no_constructor, sol::base_classes, sol::bases<core_options>());
+	emu_options_type["slot_option"] = [] (emu_options &opts, std::string const &name) { return opts.find_slot_option(name); };
+
+
+/* slot_option library
+ *
+ * manager:options():slot_option("name")
+ * manager:machine():options():slot_option("name")
+ *
+ * slot_option:specify(card, bios) - specifies the value of the slot, potentially causing a recalculation
+ *
+ * slot_option.value - the actual value of the option, after being interpreted
+ * slot_option.specified_value - the value of the option, as specified from outside
+ * slot_option.bios - the bios, if any, associated with the slot
+ * slot_option.default_card_software - the software list item that is associated with this option, by default
+ */
+
+	auto slot_option_type = sol().registry().new_usertype<slot_option>("slot_option", sol::no_constructor);
+	slot_option_type["specify"] =
+		[] (slot_option &opt, std::string &&text, char const *bios)
+		{
+			opt.specify(std::move(text));
+			if (bios)
+				opt.set_bios(bios);
+		};
+	slot_option_type["value"] = sol::property(&slot_option::value);
+	slot_option_type["specified_value"] = sol::property(&slot_option::specified_value);
+	slot_option_type["bios"] = sol::property(&slot_option::bios);
+	slot_option_type["default_card_software"] = sol::property(&slot_option::default_card_software);
+
+
+/* core_options::entry library
  *
  * options.entries[entry_name]
  *
@@ -1062,7 +1080,7 @@ void lua_engine::initialize()
 	core_options_entry_type.set("has_range", &core_options::entry::has_range);
 
 
-/*  running_machine library
+/* running_machine library
  *
  * manager:machine()
  *
@@ -1083,7 +1101,7 @@ void lua_engine::initialize()
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
  * machine:memory() - get memory_manager
- * machine:options() - get machine core_options
+ * machine:options() - get machine emu_options
  * machine:outputs() - get output_manager
  * machine:input() - get input_manager
  * machine:uiinput() - get ui_input_manager
@@ -1141,7 +1159,7 @@ void lua_engine::initialize()
 	machine_type["ioport"] = &running_machine::ioport;
 	machine_type["parameters"] = &running_machine::parameters;
 	machine_type["memory"] = &running_machine::memory;
-	machine_type["options"] = [] (running_machine &m) { return static_cast<core_options *>(&m.options()); };
+	machine_type["options"] = &running_machine::options;
 	machine_type["outputs"] = &running_machine::output;
 	machine_type["input"] = &running_machine::input;
 	machine_type["uiinput"] = &running_machine::ui_input;
@@ -1158,14 +1176,16 @@ void lua_engine::initialize()
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
+	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
+	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
 	machine_type["popmessage"] = sol::overload(
 			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
 			[](running_machine &m) { m.popmessage(); });
 	machine_type["logerror"]  = [] (running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); };
 
 
-/*  game_driver library
+/* game_driver library
  *
  * emu.driver_find(driver_name)
  *
@@ -1191,203 +1211,91 @@ void lua_engine::initialize()
  * driver.is_incomplete - official system with blatantly incomplete hardware/software
  */
 
-	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor);
-	game_driver_type.set("source_file", sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; }));
-	game_driver_type.set("parent", sol::readonly(&game_driver::parent));
-	game_driver_type.set("name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }));
-	game_driver_type.set("description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }));
-	game_driver_type.set("year", sol::readonly(&game_driver::year));
-	game_driver_type.set("manufacturer", sol::readonly(&game_driver::manufacturer));
-	game_driver_type.set("compatible_with", sol::readonly(&game_driver::compatible_with));
-	game_driver_type.set("default_layout", sol::readonly(&game_driver::default_layout));
-	game_driver_type.set("orientation", sol::property([](game_driver const &driver) {
-			std::string rot;
-			switch (driver.flags & machine_flags::MASK_ORIENTATION)
+	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
+	game_driver_type["name"] = sol::property([] (game_driver const &driver) { return &driver.name[0]; });
+	game_driver_type["description"] = sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; });
+	game_driver_type["year"] = sol::readonly(&game_driver::year);
+	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
+	game_driver_type["compatible_with"] = sol::readonly(&game_driver::compatible_with);
+	game_driver_type["default_layout"] = sol::readonly(&game_driver::default_layout);
+	game_driver_type["orientation"] = sol::property(
+			[] (game_driver const &driver)
 			{
-			case machine_flags::ROT0:
-				rot = "rot0";
-				break;
-			case machine_flags::ROT90:
-				rot = "rot90";
-				break;
-			case machine_flags::ROT180:
-				rot = "rot180";
-				break;
-			case machine_flags::ROT270:
-				rot = "rot270";
-				break;
-			default:
-				rot = "undefined";
-				break;
-			}
-			return rot;
-		}));
-	game_driver_type.set("type", sol::property([](game_driver const &driver) {
-			std::string type;
-			switch (driver.flags & machine_flags::MASK_TYPE)
-			{
-			case machine_flags::TYPE_ARCADE:
-				type = "arcade";
-				break;
-			case machine_flags::TYPE_CONSOLE:
-				type = "console";
-				break;
-			case machine_flags::TYPE_COMPUTER:
-				type = "computer";
-				break;
-			default:
-				type = "other";
-				break;
-			}
-			return type;
-		}));
-	game_driver_type.set("not_working", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) > 0; }));
-	game_driver_type.set("supports_save", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) > 0; }));
-	game_driver_type.set("no_cocktail", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) > 0; }));
-	game_driver_type.set("is_bios_root", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) > 0; }));
-	game_driver_type.set("requires_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) > 0; }));
-	game_driver_type.set("clickable_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) > 0; }));
-	game_driver_type.set("unofficial", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) > 0; }));
-	game_driver_type.set("no_sound_hw", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) > 0; }));
-	game_driver_type.set("mechanical", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) > 0; }));
-	game_driver_type.set("is_incomplete", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) > 0; } ));
-
-
-/*  debugger_manager library (requires debugger to be active)
- *
- * manager:machine():debugger()
- *
- * debugger:command(command_string) - run command_string in debugger console
- *
- * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
- * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
- * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
- * debugger.execution_state - accessor for active cpu run state
- */
-
-	struct wrap_textbuf { wrap_textbuf(const text_buffer &buf) : textbuf(buf) { } std::reference_wrapper<const text_buffer> textbuf; };
-
-	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", "new", sol::no_constructor);
-	debugger_type.set("command", [](debugger_manager &debug, const std::string &cmd) { debug.console().execute_command(cmd, false); });
-	debugger_type.set("consolelog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); }));
-	debugger_type.set("errorlog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); }));
-	debugger_type.set("visible_cpu", sol::property(
-		[](debugger_manager &debug) { debug.console().get_visible_cpu(); },
-		[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); }));
-	debugger_type.set("execution_state", sol::property(
-		[](debugger_manager &debug) {
-			return debug.cpu().is_stopped() ? "stop" : "run";
-		},
-		[](debugger_manager &debug, const std::string &state) {
-			if(state == "stop")
-				debug.cpu().set_execution_stopped();
-			else
-				debug.cpu().set_execution_running();
-		}));
-
-
-/*  wrap_textbuf library (requires debugger to be active)
- *
- * manager:machine():debugger().consolelog
- * manager:machine():debugger().errorlog
- *
- * log[index] - get log entry
- * #log - entry count
- */
-
-	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
-			"__metatable", [](){},
-			"__newindex", [](){},
-			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
-			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
-
-/*  device_debug library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug()
- *
- * debug:step([opt] steps) - run cpu steps, default 1
- * debug:go() - run cpu
- * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
- *                                            expressions. returns breakpoint index
- * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints (k=index, v=debug_breakpoint)
- * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
- *                                                              are debugger expressions.
- *                                                              returns watchpoint index
- * debug:wpclr(idx) - clear watch
- * debug:wplist(space)[] - table of watchpoints (k=index, v=watchpoint)
- */
-
-	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor);
-	device_debug_type.set("step", [](device_debug &dev, sol::object num) {
-			int steps = 1;
-			if(num.is<int>())
-				steps = num.as<int>();
-			dev.single_step(steps);
-		});
-	device_debug_type.set("go", &device_debug::go);
-	device_debug_type.set("bpset", [](device_debug &dev, offs_t addr, const char *cond, const char *act) { return dev.breakpoint_set(addr, cond, act); });
-	device_debug_type.set("bpclr", &device_debug::breakpoint_clear);
-	device_debug_type.set("bplist", [this](device_debug &dev) {
-			sol::table table = sol().create_table();
-			for(const auto &bpp : dev.breakpoint_list())
-			{
-				const debug_breakpoint &bpt = *bpp.second;
-				sol::table bp = sol().create_table();
-				bp["enabled"] = bpt.enabled();
-				bp["address"] = bpt.address();
-				bp["condition"] = bpt.condition();
-				bp["action"] = bpt.action();
-				table[bpt.index()] = bp;
-			}
-			return table;
-		});
-	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-			read_or_write wptype = s_read_or_write_parser(type);
-			return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
-		});
-	device_debug_type.set("wpclr", &device_debug::watchpoint_clear);
-	device_debug_type.set("wplist", [this](device_debug &dev, addr_space &sp) {
-			sol::table table = sol().create_table();
-			for(auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
-			{
-				sol::table wp = sol().create_table();
-				wp["enabled"] = wpp->enabled();
-				wp["address"] = wpp->address();
-				wp["length"] = wpp->length();
-				switch(wpp->type())
+				std::string rot;
+				switch (driver.flags & machine_flags::MASK_ORIENTATION)
 				{
-					case read_or_write::READ:
-						wp["type"] = "r";
-						break;
-					case read_or_write::WRITE:
-						wp["type"] = "w";
-						break;
-					case read_or_write::READWRITE:
-						wp["type"] = "rw";
-						break;
-					default: // huh?
-						wp["type"] = "";
-						break;
+				case machine_flags::ROT0:
+					rot = "rot0";
+					break;
+				case machine_flags::ROT90:
+					rot = "rot90";
+					break;
+				case machine_flags::ROT180:
+					rot = "rot180";
+					break;
+				case machine_flags::ROT270:
+					rot = "rot270";
+					break;
+				default:
+					rot = "undefined";
+					break;
 				}
-				wp["condition"] = wpp->condition();
-				wp["action"] = wpp->action();
-				table[wpp->index()] = wp;
-			}
-			return table;
-		});
+				return rot;
+			});
+	game_driver_type["type"] = sol::property(
+			[](game_driver const &driver)
+			{
+				std::string type;
+				switch (driver.flags & machine_flags::MASK_TYPE)
+				{
+				case machine_flags::TYPE_ARCADE:
+					type = "arcade";
+					break;
+				case machine_flags::TYPE_CONSOLE:
+					type = "console";
+					break;
+				case machine_flags::TYPE_COMPUTER:
+					type = "computer";
+					break;
+				default:
+					type = "other";
+					break;
+				}
+				return type;
+			});
+	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
+	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
+	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
+	game_driver_type["is_bios_root"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) != 0; });
+	game_driver_type["requires_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) != 0; });
+	game_driver_type["clickable_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) != 0; });
+	game_driver_type["unofficial"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) != 0; });
+	game_driver_type["no_sound_hw"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) != 0; });
+	game_driver_type["mechanical"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) != 0; });
+	game_driver_type["is_incomplete"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) != 0; });
 
 
-/*  device_t library
+/* device_t library
  *
  * manager:machine().devices[device_tag]
  *
- * device:name() - device long name
- * device:shortname() - device short name
- * device:tag() - device tree tag
- * device:owner() - device parent tag
- * device:debug() - debug interface, cpus only
+ * device:subtag(tag) - get absolute tag relative to this device
+ * device:siblingtag(tag) - get absolute tag relative to this device
+ * device:memregion(tag) - get memory region
+ * device:memshare(tag) - get memory share
+ * device:membank(tag) - get memory bank
+ * device:ioport(tag) - get I/O port
+ * device:subdevice(tag) - get subdevice
+ * device:siblingdevice(tag) - get sibling device
+ * device:debug() - debug interface, CPUs only
  *
+ * device.tag - device tree tag
+ * device.basetag - last component of tag ("root" for root device)
+ * device.name - device type full name
+ * device.shortname - device type short name
+ * device.owner - parent device (nil for root device)
  * device.configured - whether configuration is complete
  * device.started - whether the device has been started
  * device.spaces[] - device address spaces table (k=name, v=addr_space)
@@ -1396,11 +1304,15 @@ void lua_engine::initialize()
  * device.roms[] - device rom entry table (k=name, v=rom_entry)
  */
 
-	auto device_type = sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor);
-	device_type["name"] = &device_t::name;
-	device_type["shortname"] = &device_t::shortname;
-	device_type["tag"] = &device_t::tag;
-	device_type["owner"] = &device_t::owner;
+	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
+	device_type["subtag"] = &device_t::subtag;
+	device_type["siblingtag"] = &device_t::siblingtag;
+	device_type["memregion"] = &device_t::memregion;
+	device_type["memshare"] = &device_t::memshare;
+	device_type["membank"] = &device_t::membank;
+	device_type["ioport"] = &device_t::ioport;
+	device_type["subdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::subdevice);
+	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::siblingdevice);
 	device_type["debug"] =
 		[this] (device_t &dev) -> sol::object
 		{
@@ -1408,6 +1320,11 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), dev.debug());
 		};
+	device_type["tag"] = sol::property(&device_t::tag);
+	device_type["basetag"] = sol::property(&device_t::basetag);
+	device_type["name"] = sol::property(&device_t::name);
+	device_type["shortname"] = sol::property(&device_t::shortname);
+	device_type["owner"] = sol::property(&device_t::owner);
 	device_type["configured"] = sol::property(&device_t::configured);
 	device_type["started"] = sol::property(&device_t::started);
 	device_type["spaces"] = sol::property(
@@ -1601,9 +1518,6 @@ void lua_engine::initialize()
  * screen:snapshot([opt] filename) - save snap shot
  * screen:type() - screen drawing type
  * screen:frame_number() - screen frame count
- * screen:name() - screen device full name
- * screen:shortname() - screen device short name
- * screen:tag() - screen device tag
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
@@ -1611,7 +1525,10 @@ void lua_engine::initialize()
  * screen:time_until_pos(vpos, hpos) - get the time until this screen pos is reached
  */
 
-	auto screen_dev_type = sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor);
+	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
+			"screen_dev",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t>());
 	screen_dev_type.set("draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
 			int sc_width = sdev.visible_area().width();
 			int sc_height = sdev.visible_area().height();
@@ -1721,9 +1638,6 @@ void lua_engine::initialize()
 			return "unknown";
 		});
 	screen_dev_type.set("frame_number", &screen_device::frame_number);
-	screen_dev_type.set("name", &screen_device::name);
-	screen_dev_type.set("shortname", &screen_device::shortname);
-	screen_dev_type.set("tag", &screen_device::tag);
 	screen_dev_type.set("xscale", &screen_device::xscale);
 	screen_dev_type.set("yscale", &screen_device::yscale);
 	screen_dev_type.set("pixel", [](screen_device &sdev, float x, float y) { return sdev.pixel((s32)x, (s32)y); });
@@ -1804,7 +1718,7 @@ void lua_engine::initialize()
 	dev_state_type.set("is_divider", &device_state_entry::divider);
 
 
-/*  rom_entry library
+/* rom_entry library
  *
  * manager:machine().devices[device_tag].roms[rom]
  *
@@ -1823,7 +1737,7 @@ void lua_engine::initialize()
 	rom_entry_type.set("flags", &rom_entry::get_flags);
 
 
-/*  output_manager library
+/* output_manager library
  *
  * manager:machine():outputs()
  *
@@ -1848,7 +1762,7 @@ void lua_engine::initialize()
 	output_type.set("id_to_name", &output_manager::id_to_name);
 
 
-/*  device_image_interface library
+/* device_image_interface library
  *
  * manager:machine().images[image_type]
  *
@@ -1905,20 +1819,92 @@ void lua_engine::initialize()
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
 
 
-/*  mame_machine_manager library
+/* device_slot_interface library
+ *
+ * manager:machine().slots[slot_name]
+ *
+ * slot.fixed - whether this slot is fixed, and hence not selectable by the user
+ * slot.has_selectable_options - does this slot have any selectable options at all?
+ * slot.default_option - returns the default option if one exists
+ * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
+ */
+
+	auto slot_type = sol().registry().new_usertype<device_slot_interface>("slot", sol::no_constructor);
+	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
+	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
+	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
+	slot_type["options"] = sol::property([] (device_slot_interface const &slot) { return standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
+
+
+/* device_slot_interface::slot_option library
+ *
+ * manager:machine().slots[slot_name].options[option_name]
+ *
+ * slot_option.selectable - is this item selectable by the user?
+ * slot_option.default_bios - the default bios for this option
+ * slot_option.clock - the clock speed associated with this option
+ */
+
+	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("dislot_option", sol::no_constructor);
+	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
+	dislot_option_type["default_bios"] = sol::property(static_cast<char const * (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::default_bios));
+	dislot_option_type["clock"] = sol::property(static_cast<u32 (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::clock));
+
+
+/* cassette_image_device library
+ *
+ * manager:machine().cassettes[cass_name]
+ *
+ * cass:play()
+ * cass:stop()
+ * cass:record()
+ * cass:forward() - forward play direction
+ * cass:reverse() - reverse play direction
+ * cass:seek(time, origin) - seek time sec from origin: "set", "cur", "end"
+ *
+ * cass.is_stopped
+ * cass.is_playing
+ * cass.is_recording
+ * cass.motor_state
+ * cass.speaker_state
+ * cass.position
+ * cass.length
+ * cass.image - get the device_image_interface for this cassette device
+ */
+
+	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
+			"cassette",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t, device_image_interface>());
+	cass_type["stop"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE); };
+	cass_type["play"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE); };
+	cass_type["record"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE); };
+	cass_type["forward"] = &cassette_image_device::go_forward;
+	cass_type["reverse"] = &cassette_image_device::go_reverse;
+	cass_type["seek"] = [] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
+	cass_type["is_stopped"] = sol::property(&cassette_image_device::is_stopped);
+	cass_type["is_playing"] = sol::property(&cassette_image_device::is_playing);
+	cass_type["is_recording"] = sol::property(&cassette_image_device::is_recording);
+	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
+	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
+	cass_type["position"] = sol::property(&cassette_image_device::get_position);
+	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
+
+
+/* mame_machine_manager library
  *
  * manager
  * mame_manager - alias of manager
  *
  * manager:machine() - running machine
- * manager:options() - core options
+ * manager:options() - emu options
  * manager:plugins() - plugin options
  * manager:ui() - mame ui manager
  */
 
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
-			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
+			"options", &machine_manager::options,
 			"plugins", [this](mame_machine_manager &m) {
 				sol::table table = sol().create_table();
 				for (auto &curentry : m.plugins().plugins())
@@ -1939,9 +1925,10 @@ void lua_engine::initialize()
 
 
 	// set up other user types
-	initialize_input();
-	initialize_memory();
-	initialize_render();
+	initialize_debug(emu);
+	initialize_input(emu);
+	initialize_memory(emu);
+	initialize_render(emu);
 }
 
 //-------------------------------------------------

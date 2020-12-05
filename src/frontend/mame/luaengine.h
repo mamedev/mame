@@ -37,6 +37,9 @@ public:
 	template <typename T> struct devenum;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
 
+	template <typename T> struct tag_object_ptr_map;
+	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
+
 	// construction/destruction
 	lua_engine();
 	~lua_engine();
@@ -119,6 +122,26 @@ public:
 private:
 	template<typename T, size_t SIZE> class enum_parser;
 
+	struct addr_space;
+
+	struct save_item {
+		void *base;
+		unsigned int size;
+		unsigned int count;
+		unsigned int valcount;
+		unsigned int blockcount;
+		unsigned int stride;
+	};
+
+	struct context
+	{
+		context() { busy = false; yield = false; }
+		std::string result;
+		std::condition_variable sync;
+		bool busy;
+		bool yield;
+	};
+
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
@@ -126,6 +149,9 @@ private:
 	std::unique_ptr<input_sequence_poller> m_seq_poll;
 
 	std::vector<std::string> m_menu;
+
+	template <typename R, typename T, typename D>
+	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
@@ -142,36 +168,17 @@ private:
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
-	struct addr_space;
-
-	struct save_item {
-		void *base;
-		unsigned int size;
-		unsigned int count;
-		unsigned int valcount;
-		unsigned int blockcount;
-		unsigned int stride;
-	};
-
 	void close();
 
 	void run(sol::load_result res);
 
-	struct context
-	{
-		context() { busy = false; yield = false; }
-		std::string result;
-		std::condition_variable sync;
-		bool busy;
-		bool yield;
-	};
-
-	template<typename TFunc, typename... TArgs>
+	template <typename TFunc, typename... TArgs>
 	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 
-	void initialize_input();
-	void initialize_memory();
-	void initialize_render();
+	void initialize_debug(sol::table &emu);
+	void initialize_input(sol::table &emu);
+	void initialize_memory(sol::table &emu);
+	void initialize_render(sol::table &emu);
 };
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_H

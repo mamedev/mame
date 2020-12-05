@@ -103,19 +103,6 @@ VIDEO_START_MEMBER(fromance_state,nekkyoku)
 	init_common();
 }
 
-VIDEO_START_MEMBER(fromance_state,pipedrm)
-{
-	VIDEO_START_CALL_MEMBER(fromance);
-	m_scrolly_ofs = 0x00;
-}
-
-VIDEO_START_MEMBER(fromance_state,hatris)
-{
-	VIDEO_START_CALL_MEMBER(fromance);
-	m_scrollx_ofs = 0xB9;
-	m_scrolly_ofs = 0x00;
-}
-
 /*************************************
  *
  *  Graphics control register
@@ -312,22 +299,5 @@ uint32_t fromance_state::screen_update_fromance(screen_device &screen, bitmap_in
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-
-uint32_t fromance_state::screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t* sram = m_spriteram;
-
-	/* there seems to be no logical mapping for the X scroll register -- maybe it's gone */
-	m_bg_tilemap->set_scrolly(0, m_scrolly[1]);
-	m_fg_tilemap->set_scrolly(0, m_scrolly[0]);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 1);
 	return 0;
 }

@@ -11833,6 +11833,7 @@ lah_107                         //
 lah_108s                        //
 lah_110                         //
 lah_112                         //
+lah_xxx_s105                    //
 lw3_200                         //
 lw3_203                         //
 lw3_204e                        // (c) 1992 Data East
@@ -13884,6 +13885,7 @@ fs3216                          //
 ft68m                           //
 
 @source:fungames.cpp
+biplane                         // (c) 1975 Fun Games
 biplane4                        // (c) 1976 Fun Games
 take5                           // (c) 1975 Fun Games
 
@@ -13918,6 +13920,8 @@ crystal                         // (c) 1998 J.C.D. srl
 cuoreuno                        // (c) 1996 C.M.C.
 cuoreunoa                       // (c) 1996 C.M.C.
 cuoreunob                       // (c) 1996 C.M.C.
+cuoreunoc                       // (c) 1996 C.M.C.
+cuoreunod                       // (c) 1996 C.M.C.
 elephfam                        // (c) 1997 C.M.C.
 elephfmb                        // (c) 1996 C.M.C.
 funquiz                         // (c) 198? Fun World
@@ -14185,11 +14189,19 @@ azurian                         // (c) 1982 Rait Electronics Ltd
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bomber                          //
+bongo                           // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
 catacomb                        // 1982 MTM Games
 checkman                        // (c) 1982 Zilec-Zenitone
 checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
 chewing                         // ?? unknown
+ckongcv                         // 19?? Competitive Video?
+ckongg                          // 1981 bootleg
+ckonggx                         //
+ckongis                         //
+ckongmc                         // 1981 bootleg
+ckongmc2                        // 1981 bootleg
+ckongs                          // bootleg
 devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
 dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
 dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
@@ -14302,6 +14314,7 @@ olmandingc                      // bootleg (Calfesa)
 omegab                          // bootleg
 omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
+ozon1                           // (c) 1983 Proma
 pacmanbl                        // bootleg
 pacmanbla                       // bootleg
 pacmanblb                       // bootleg
@@ -14311,6 +14324,8 @@ pajaroes                        // bootleg
 phoenxp2                        // bootleg
 pisces                          // Subelectro
 piscesb                         // bootleg
+porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
+portera                         // bootleg
 quaak                           // bootleg
 redufo                          // (c) Artic
 redufob                         // bootleg
@@ -14399,14 +14414,7 @@ zigzagb2                        // (c) 1982 LAX (bootleg)
 4in1                            // (c) 1981 Armenia / Food and Fun
 bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
-bongo                           // (c) 1983 Jetsoft
 bullsdrtg                       // 1985 Senko
-ckongcv                         // 19?? Competitive Video?
-ckongg                          // 1981 bootleg
-ckonggx                         //
-ckongis                         //
-ckongmc                         // 1981 bootleg
-ckongmc2                        // 1981 bootleg
 dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
@@ -14420,9 +14428,6 @@ hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
-ozon1                           // (c) 1983 Proma
-porter                          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
-portera                         // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
 rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
@@ -16465,6 +16470,7 @@ hp2100                          // HP 2100 and HP 1000
 hp2622a                         //
 
 @source:hp2640.cpp
+hp2641                          //
 hp2645                          //
 
 @source:hp3478a.cpp
@@ -19088,6 +19094,7 @@ koropens
 kzaurus
 pwrchanc
 ymcapsul
+spcpokan
 
 @source:quickpick5.cpp
 quickp5
@@ -19132,6 +19139,7 @@ korgz3                          //
 
 @source:kpython.cpp
 kpython                         // Konami Python Bios
+dogstdx                         // dogstation Deluxe
 wswe                            // World Soccer Winning Eleven
 wswe2k3                         // World Soccer Winning Eleven 2003
 popn9                           // 2003
@@ -19412,6 +19420,7 @@ lcmate2                         //
 
 @source:leapfrog_iquest.cpp
 iquest
+turboex
 
 @source:leapfrog_leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
@@ -32236,7 +32245,6 @@ npssr2                          //
 npusagif                        //
 
 @source:neptunp2.cpp
-mexlindo                        // (c) 2004 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
 rockroll                        // (c) 1999 Cirsa / Unidesa
 unk960606                       // (c) 2001? Cirsa / Unidesa
@@ -36425,7 +36433,6 @@ scotrsht                        // GX545 (c) 1985
 800fatha                        // (c) 1981 Amenip + U.S. Billiards license
 ad2083                          // (c) 1983 Midcoin
 cavelon                         // (c) 1983 Jetsoft
-ckongs                          // bootleg
 conquer                         // (c) 1982 ????
 devilfsh                        // (c) 1982 Artic
 harem                           // [1983] I.G.R.

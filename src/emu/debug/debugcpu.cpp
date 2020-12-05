@@ -1669,7 +1669,7 @@ void device_debug::breakpoint_update_flags()
 			break;
 		}
 
-	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
+	if (!(m_flags & DEBUG_FLAG_LIVE_BP))
 	{
 		// see if there are any enabled registerpoints
 		for (debug_registerpoint &rp : *m_rplist)
@@ -1677,6 +1677,7 @@ void device_debug::breakpoint_update_flags()
 			if (rp.m_enabled)
 			{
 				m_flags |= DEBUG_FLAG_LIVE_BP;
+				break;
 			}
 		}
 	}

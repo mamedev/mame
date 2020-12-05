@@ -73,6 +73,7 @@ files {
 	MAME_DIR .. "src/frontend/mame/luaengine.cpp",
 	MAME_DIR .. "src/frontend/mame/luaengine.h",
 	MAME_DIR .. "src/frontend/mame/luaengine.ipp",
+	MAME_DIR .. "src/frontend/mame/luaengine_debug.cpp",
 	MAME_DIR .. "src/frontend/mame/luaengine_input.cpp",
 	MAME_DIR .. "src/frontend/mame/luaengine_mem.cpp",
 	MAME_DIR .. "src/frontend/mame/luaengine_render.cpp",

@@ -199,7 +199,6 @@ public:
 	DECLARE_MACHINE_START(doraemon);
 	void champbwl_palette(palette_device &palette) const;
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
 	void champbwl(machine_config &config);
@@ -474,9 +473,6 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
-	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
-
 	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
@@ -501,8 +497,9 @@ void champbwl_state::champbwl(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
 	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_champbwl);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -514,7 +511,6 @@ void champbwl_state::champbwl(machine_config &config)
 	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_champbwl));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */
@@ -528,17 +524,6 @@ void champbwl_state::champbwl(machine_config &config)
 
 
 
-
-uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0x1f0, cliprect);
-
-	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
-	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
-
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
-	return 0;
-}
 
 WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 {
@@ -562,8 +547,9 @@ void champbwl_state::doraemon(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 14'318'181, m_palette, gfx_champbwl);
+	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
+	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
@@ -575,11 +561,10 @@ void champbwl_state::doraemon(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 256);
 	screen.set_visarea(0, 320-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(champbwl_state::screen_update_doraemon));
+	screen.set_screen_update(FUNC(champbwl_state::screen_update_champbwl));
 	screen.screen_vblank().set(FUNC(champbwl_state::screen_vblank_doraemon));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
 	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */

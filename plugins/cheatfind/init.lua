@@ -31,7 +31,7 @@ function cheatfind.startplugin()
 	function cheat.getram()
 		local ram = {}
 		for tag, device in pairs(manager:machine().devices) do
-			if device:shortname() == "ram" then
+			if device.shortname == "ram" then
 				ram[tag] = {}
 				ram[tag].dev = device
 				ram[tag].size = emu.item(device.items["0/m_size"]):read(0)
@@ -56,7 +56,7 @@ function cheatfind.startplugin()
 			data.shift = space.shift
 		end
 		if getmetatable(space).__name:match("device_t") then
-			if space:shortname() == "ram" then
+			if space.shortname == "ram" then
 				data.block = emu.item(space.items["0/m_pointer"]):read_block(start, size)
 				if not data.block then
 					return nil

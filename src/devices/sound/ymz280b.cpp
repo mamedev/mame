@@ -452,8 +452,8 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
 			int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-			lacc.add_int(sampindex, interp_sample * lvol, 32768 * 256);
-			racc.add_int(sampindex, interp_sample * rvol, 32768 * 256);
+			lacc.add_int(sampindex, interp_sample * lvol / 2, 32768 * 256);
+			racc.add_int(sampindex, interp_sample * rvol / 2, 32768 * 256);
 			sampindex++;
 			voice->output_pos += voice->output_step;
 			remaining--;
@@ -517,8 +517,8 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
 				int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-				lacc.add_int(sampindex, interp_sample * lvol, 32768 * 256);
-				racc.add_int(sampindex, interp_sample * rvol, 32768 * 256);
+				lacc.add_int(sampindex, interp_sample * lvol / 2, 32768 * 256);
+				racc.add_int(sampindex, interp_sample * rvol / 2, 32768 * 256);
 				sampindex++;
 				voice->output_pos += voice->output_step;
 				remaining--;

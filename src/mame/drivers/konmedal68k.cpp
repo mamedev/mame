@@ -50,6 +50,7 @@ public:
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
 	void slot(machine_config &config);
+	void spcpokan(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -89,6 +90,19 @@ private:
 		return m_k056832->piratesh_rom_r(offset);
 	}
 
+	uint16_t vrom_spcpokan_r(offs_t offset)
+	{
+		if (m_control2 & 0x10)
+		{
+			offset |= 0x1000;
+		}
+
+		if (offset & 1)
+			offset |= 0x100000;
+
+		return m_k056832->piratesh_rom_r(offset);
+	}
+
 	uint16_t vrom_koropens_r(offs_t offset)
 	{
 		if (m_control2 & 0x10)
@@ -103,6 +117,7 @@ private:
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
 	void slot_main(address_map &map);
+	void spcpokan_main(address_map &map);
 
 	static constexpr int NUM_LAYERS = 4;
 
@@ -231,6 +246,13 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 	common_main(map);
 	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
+}
+
+void konmedal68k_state::spcpokan_main(address_map &map)
+{
+	common_main(map);
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_spcpokan_r));
 }
 
 void konmedal68k_state::koropens_main(address_map &map)
@@ -383,6 +405,14 @@ void konmedal68k_state::koropens(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
 }
 
+void konmedal68k_state::spcpokan(machine_config &config)
+{
+	kzaurus(config);
+
+	M68000(config.replace(), m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::spcpokan_main);
+}
+
 void konmedal68k_state::slot(machine_config &config)
 {
 	kzaurus(config);
@@ -472,6 +502,21 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
+ROM_START(spcpokan)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP("642-a05-2n.bin", 0x000000, 0x080000, CRC(ec8047d0) SHA1(4c9c3a7db3b56109b384df2031a396a8d4dc19f6))
+
+	ROM_REGION(0x200000, "k056832", 0)
+	ROM_LOAD("642-a06-14n.bin", 0x000000, 0x080000, CRC(ebcc67cf) SHA1(b2efd41438fa562e8545695b09d124c730a9c8d3))
+	ROM_LOAD("642-a07-17n.bin", 0x080000, 0x080000, CRC(80da3c5e) SHA1(843db853958ed994185e9d3a156014466e080863))
+	ROM_LOAD("642-a08-19n.bin", 0x100000, 0x080000, CRC(cfaeba54) SHA1(83a8a7b6a4cfa26d2c804a26d7ab17ed376625f4))
+	ROM_LOAD("642-a09-22n.bin", 0x180000, 0x080000, BAD_DUMP CRC(8b01e2cb) SHA1(8a15c2462f0a35136386eeba0d926349fb9f5cf9)) // byte sum should be f9c7, is f9c8 so POST fails
+
+	ROM_REGION(0x200000, "ymz", 0)
+	ROM_LOAD("642-a01-2f.bin", 0x000000, 0x080000, CRC(2096c185) SHA1(948ec4bc3896fae5d1f7c478ee7fafd25ef30b74))
+	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
+ROM_END
+
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
 // at 1st boot press Service1 to initialise NVRAM
 ROM_START( konslot )
@@ -506,3 +551,4 @@ GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0,
 GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, spcpokan, 0, spcpokan, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

@@ -6073,6 +6073,10 @@ ROM_END
 //  Dunk Shot, Sega System 16B
 //  CPU: FD1089A (317-0022)
 //  ROM Board type: 171-5358
+//       I/O board: 834-6180
+//      Main board: 837-6237
+//    Sega game ID: 833-6235-05 DUNK SHOT
+//       ROM board: 834-6236-04
 //
 ROM_START( dunkshot )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code

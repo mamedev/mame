@@ -82,15 +82,24 @@
 
 **************************************************************************/
 
-#include <cstddef>
 #include "emu.h"
+#include "drcbex86.h"
+
 #include "debugger.h"
 #include "emuopts.h"
 #include "drcuml.h"
-#include "drcbex86.h"
+
+#include <cstddef>
+
 
 namespace drc {
+
 using namespace uml;
+
+using namespace asmjit;
+using namespace asmjit::x86;
+
+
 
 //**************************************************************************
 //  DEBUGGING

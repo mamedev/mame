@@ -2508,8 +2508,12 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
 	/* TMP87PH40AN (I/O MCU) */ \
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
-
+	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) ) \
+	/* BR9020F (EEPROM) */ \
+	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
+	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
+	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
 
 ROM_START( hng64 )
 	/* BIOS */
