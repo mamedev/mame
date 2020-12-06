@@ -15,6 +15,7 @@
 #include "cpu/arm7/arm7core.h"
 
 #include "machine/input_merger.h"
+#include "machine/ucb1200.h"
 
 #include "diserial.h"
 
@@ -30,16 +31,20 @@ public:
 
 	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_codec_tag(T &&tag) { m_codec.set_tag(std::forward<T>(tag)); }
+
 	// device_serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
 
-	void gpio_in(const uint32_t line, const int state);
+	template <unsigned Line> void gpio_in(int state) { gpio_in(Line, state); }
 	template <unsigned Line> auto gpio_out() { return m_gpio_out[Line].bind(); }
 
 	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
 	void uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t mcp_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mcp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ostimer_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -73,12 +78,27 @@ protected:
 	void uart_set_receive_irq_enabled(bool enabled);
 	void uart_set_transmit_irq_enabled(bool enabled);
 
+	DECLARE_WRITE_LINE_MEMBER(mcp_irq_callback);
+	TIMER_CALLBACK_MEMBER(mcp_audio_tx_callback);
+	TIMER_CALLBACK_MEMBER(mcp_telecom_tx_callback);
+	void mcp_update_sample_rate();
+	void mcp_set_enabled(bool enabled);
+	uint16_t mcp_read_audio_fifo();
+	uint16_t mcp_read_telecom_fifo();
+	attotime mcp_get_audio_frame_rate();
+	attotime mcp_get_telecom_frame_rate();
+	void mcp_audio_tx_fifo_push(const uint16_t value);
+	void mcp_telecom_tx_fifo_push(const uint16_t value);
+	void mcp_codec_read(offs_t offset);
+	void mcp_codec_write(offs_t offset, uint16_t data);
+
 	TIMER_CALLBACK_MEMBER(ostimer_tick_cb);
 	void ostimer_update_count();
 	void ostimer_update_match_timer(int channel);
 
 	TIMER_CALLBACK_MEMBER(rtc_tick_cb);
 
+	void gpio_in(const uint32_t line, const int state);
 	void gpio_update_interrupts(const uint32_t changed_mask);
 	void gpio_update_direction(const uint32_t old_gpdr);
 	void gpio_update_outputs(const uint32_t old_latch, const uint32_t changed);
@@ -98,6 +118,13 @@ protected:
 		REG_UTDR        = (0x00000014 >> 2),
 		REG_UTSR0       = (0x0000001c >> 2),
 		REG_UTSR1       = (0x00000020 >> 2),
+
+		MCP_BASE_ADDR	= 0x80060000,
+		REG_MCCR0       = (0x00000000 >> 2),
+		REG_MCDR0       = (0x00000008 >> 2),
+		REG_MCDR1       = (0x0000000c >> 2),
+		REG_MCDR2       = (0x00000010 >> 2),
+		REG_MCSR        = (0x00000018 >> 2),
 
 		OSTMR_BASE_ADDR	= 0x90000000,
 		REG_OSMR0       = (0x00000000 >> 2),
@@ -176,6 +203,44 @@ protected:
 		UTSR1_FRE_BIT	= 4,
 		UTSR1_ROR_BIT	= 5,
 
+		MCCR0_ASD_BIT	= 0,
+		MCCR0_ASD_MASK	= 0x0000007f,
+		MCCR0_TSD_BIT	= 8,
+		MCCR0_TSD_MASK	= 0x00007f00,
+		MCCR0_MCE_BIT	= 16,
+		MCCR0_ECS_BIT	= 17,
+		MCCR0_ADM_BIT	= 18,
+		MCCR0_TTE_BIT	= 19,
+		MCCR0_TRE_BIT	= 20,
+		MCCR0_ATE_BIT	= 21,
+		MCCR0_ARE_BIT	= 22,
+		MCCR0_LBM_BIT	= 23,
+		MCCR0_ECP_BIT	= 24,
+		MCCR0_ECP_MASK	= 0x03000000,
+
+		MCCR1_CFS_BIT	= 20,
+
+		MCDR2_RW_BIT	= 16,
+		MCDR2_ADDR_BIT	= 17,
+		MCDR2_ADDR_MASK	= 0x001e0000,
+
+		MCSR_ATS_BIT	= 0,
+		MCSR_ARS_BIT	= 1,
+		MCSR_TTS_BIT	= 2,
+		MCSR_TRS_BIT	= 3,
+		MCSR_ATU_BIT	= 4,
+		MCSR_ARO_BIT	= 5,
+		MCSR_TTU_BIT	= 6,
+		MCSR_TRO_BIT	= 7,
+		MCSR_ANF_BIT	= 8,
+		MCSR_ANE_BIT	= 9,
+		MCSR_TNF_BIT	= 10,
+		MCSR_TNE_BIT	= 11,
+		MCSR_CWC_BIT	= 12,
+		MCSR_CRC_BIT	= 13,
+		MCSR_ACE_BIT	= 14,
+		MCSR_TCE_BIT	= 15,
+
 		RTSR_AL_BIT		= 0,
 		RTSR_AL_MASK	= (1 << RTSR_AL_BIT),
 		RTSR_HZ_BIT		= 1,
@@ -233,6 +298,19 @@ protected:
 		UART3_EIF		= 5,
 	};
 
+	// MCP interrupt sources
+	enum : unsigned
+	{
+		MCP_AUDIO_TX			= 0,
+		MCP_AUDIO_RX			= 1,
+		MCP_TELECOM_TX			= 2,
+		MCP_TELECOM_RX			= 3,
+		MCP_AUDIO_UNDERRUN		= 4,
+		MCP_AUDIO_OVERRUN		= 5,
+		MCP_TELECOM_UNDERRUN	= 6,
+		MCP_TELECOM_OVERRUN		= 7
+	};
+
 	struct uart_regs
 	{
 		uint32_t utcr[4];
@@ -250,6 +328,36 @@ protected:
 		int     tx_fifo_count;
 
 		bool	rx_break_interlock;
+	};
+
+	struct mcp_regs
+	{
+		uint32_t mccr0;
+		uint32_t mccr1;
+		uint32_t mcdr2;
+		uint32_t mcsr;
+
+		uint16_t audio_rx_fifo[8];
+		int      audio_rx_fifo_read_idx;
+		int      audio_rx_fifo_write_idx;
+		int      audio_rx_fifo_count;
+
+		uint16_t audio_tx_fifo[8];
+		int      audio_tx_fifo_read_idx;
+		int      audio_tx_fifo_write_idx;
+		int      audio_tx_fifo_count;
+		emu_timer *audio_tx_timer;
+
+		uint16_t telecom_rx_fifo[8];
+		int      telecom_rx_fifo_read_idx;
+		int      telecom_rx_fifo_write_idx;
+		int      telecom_rx_fifo_count;
+
+		uint16_t telecom_tx_fifo[8];
+		int      telecom_tx_fifo_read_idx;
+		int      telecom_tx_fifo_write_idx;
+		int      telecom_tx_fifo_count;
+		emu_timer *telecom_tx_timer;
 	};
 
 	struct ostimer_regs
@@ -314,6 +422,7 @@ protected:
 	};
 
 	uart_regs		m_uart_regs;
+	mcp_regs		m_mcp_regs;
 	ostimer_regs	m_ostmr_regs;
 	rtc_regs		m_rtc_regs;
 	power_regs		m_power_regs;
@@ -323,6 +432,8 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;
+	required_device<input_merger_device> m_mcp_irqs;
+	optional_device<ucb1200_device> m_codec;
 
 	devcb_write_line::array<28> m_gpio_out;
 };

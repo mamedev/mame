@@ -5,7 +5,6 @@
     Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)
 
     TODO:
-    - ARM TLB look-up errors?
     - Dumps are questionable
 
 =========================================================================================================================================
@@ -1406,7 +1405,9 @@ Note:
 #include "machine/locomo.h"
 #include "machine/pxa255.h"
 #include "machine/sa1110.h"
+#include "machine/scoop.h"
 #include "machine/timer.h"
+#include "machine/ucb1200.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1445,6 +1446,8 @@ public:
 		: zaurus_state(mconfig, type, tag)
 		, m_sa_periphs(*this, "sa_periphs")
 		, m_locomo(*this, "locomo")
+		, m_scoop(*this, "scoop")
+		, m_codec(*this, "codec")
 	{ }
 
 	void zaurus_sa1110(machine_config &config);
@@ -1456,6 +1459,8 @@ private:
 
 	required_device<sa1110_periphs_device> m_sa_periphs;
 	required_device<locomo_device> m_locomo;
+	required_device<scoop_device> m_scoop;
+	required_device<ucb1200_device> m_codec;
 };
 
 class zaurus_pxa_state : public zaurus_state
@@ -1485,7 +1490,9 @@ void zaurus_sa_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom().region("firmware", 0);
 	map(0x40000000, 0x40001fff).rw(m_locomo, FUNC(locomo_device::read), FUNC(locomo_device::write));
+	map(0x40800000, 0x4080002b).rw(m_scoop, FUNC(scoop_device::read), FUNC(scoop_device::write));
 	map(0x80050000, 0x80050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::uart3_r), FUNC(sa1110_periphs_device::uart3_w));
+	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
 	map(0x90000000, 0x9000001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ostimer_r), FUNC(sa1110_periphs_device::ostimer_w));
 	map(0x90010000, 0x9001000f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
 	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
@@ -1512,7 +1519,10 @@ void zaurus_pxa_state::main_map(address_map &map)
 
 void zaurus_sa_state::device_reset_after_children()
 {
-	m_sa_periphs->gpio_in(1, 1);
+	m_sa_periphs->gpio_in<1>(1);
+	m_sa_periphs->gpio_in<24>(1);
+	//m_scoop->gpio_in<2>(1); // DIAG_BOOT1
+	//m_scoop->gpio_in<3>(1); // DIAG_BOOT2
 }
 
 INPUT_CHANGED_MEMBER( zaurus_pxa_state::system_start )
@@ -1542,8 +1552,15 @@ void zaurus_sa_state::zaurus_sa1110(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_sa_state::main_map);
 
 	SA1110_PERIPHERALS(config, m_sa_periphs, SA1110_CLOCK, m_maincpu);
+	m_sa_periphs->set_codec_tag(m_codec);
 
 	LOCOMO(config, m_locomo);
+	SCOOP(config, m_scoop);
+
+	UCB1200(config, m_codec);
+	m_codec->adc_in<0>().set_constant(460); // Battery temperature monitor. HACK: Value is arbitrary, taken from Linux
+	m_codec->adc_in<1>().set_constant(255); // Battery voltage monitor. HACK: Value is arbitrary, taken from Linux
+	m_codec->irq_out().set(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_in<23>));
 }
 
 void zaurus_pxa_state::zaurus_pxa250(machine_config &config)

@@ -12,13 +12,14 @@
 #define LOG_UNKNOWN     (1 << 1)
 #define LOG_UART        (1 << 2)
 #define LOG_UART_HF		(1 << 3)
-#define LOG_OSTIMER		(1 << 4)
-#define LOG_RTC			(1 << 5)
-#define LOG_POWER       (1 << 6)
-#define LOG_RESET       (1 << 7)
-#define LOG_GPIO		(1 << 8)
-#define LOG_INTC        (1 << 9)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
+#define LOG_MCP			(1 << 4)
+#define LOG_OSTIMER		(1 << 5)
+#define LOG_RTC			(1 << 6)
+#define LOG_POWER       (1 << 7)
+#define LOG_RESET       (1 << 8)
+#define LOG_GPIO		(1 << 9)
+#define LOG_INTC        (1 << 10)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
@@ -30,6 +31,8 @@ sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, cons
 	, device_serial_interface(mconfig, *this)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_uart3_irqs(*this, "uart3irq")
+	, m_mcp_irqs(*this, "mcpirq")
+	, m_codec(*this, finder_base::DUMMY_TAG)
 	, m_gpio_out(*this)
 {
 }
@@ -349,6 +352,357 @@ void sa1110_periphs_device::uart3_w(offs_t offset, uint32_t data, uint32_t mem_m
 		break;
 	default:
 		LOGMASKED(LOG_UART | LOG_UNKNOWN, "%s: uart3_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), UART_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
+	}
+}
+
+/*
+
+  Intel SA-1110 MCP - Serial Port 4
+
+  pg. 306 to 346 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+WRITE_LINE_MEMBER(sa1110_periphs_device::mcp_irq_callback)
+{
+	set_irq_line(INT_MCP, state);
+}
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::mcp_audio_tx_callback)
+{
+	if (!m_codec)
+		return;
+
+	const uint16_t sample = m_mcp_regs.audio_tx_fifo[m_mcp_regs.audio_tx_fifo_read_idx];
+	m_codec->audio_sample_in(sample);
+
+	if (m_mcp_regs.audio_tx_fifo_count)
+	{
+		m_mcp_regs.audio_tx_fifo_count--;
+		m_mcp_regs.audio_tx_fifo_read_idx = (m_mcp_regs.audio_tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo);
+
+		m_mcp_regs.mcsr &= ~(1 << MCSR_ATU_BIT);
+		m_mcp_irqs->in_w<MCP_AUDIO_UNDERRUN>(0);
+	}
+	else
+	{
+		m_mcp_regs.mcsr |= (1 << MCSR_ATU_BIT);
+		m_mcp_irqs->in_w<MCP_AUDIO_UNDERRUN>(1);
+	}
+
+	m_mcp_regs.mcsr |= (1 << MCSR_ANF_BIT);
+}
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::mcp_telecom_tx_callback)
+{
+	if (!m_codec)
+		return;
+
+	const uint16_t sample = m_mcp_regs.telecom_tx_fifo[m_mcp_regs.telecom_tx_fifo_read_idx];
+	m_codec->telecom_sample_in(sample);
+
+	if (m_mcp_regs.telecom_tx_fifo_count)
+	{
+		m_mcp_regs.telecom_tx_fifo_count--;
+		m_mcp_regs.telecom_tx_fifo_read_idx = (m_mcp_regs.telecom_tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo);
+
+		m_mcp_regs.mcsr &= ~(1 << MCSR_TTU_BIT);
+		m_mcp_irqs->in_w<MCP_TELECOM_UNDERRUN>(0);
+	}
+	else
+	{
+		m_mcp_regs.mcsr |= (1 << MCSR_TTU_BIT);
+		m_mcp_irqs->in_w<MCP_TELECOM_UNDERRUN>(1);
+	}
+
+	m_mcp_regs.mcsr |= (1 << MCSR_TNF_BIT);
+}
+
+uint16_t sa1110_periphs_device::mcp_read_audio_fifo()
+{
+	const uint16_t data = m_mcp_regs.audio_rx_fifo[m_mcp_regs.audio_rx_fifo_read_idx];
+	if (m_mcp_regs.audio_rx_fifo_count)
+	{
+		m_mcp_regs.audio_rx_fifo_count--;
+		m_mcp_regs.audio_rx_fifo_read_idx = (m_mcp_regs.audio_rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_rx_fifo);
+
+		const bool half_full = m_mcp_regs.audio_rx_fifo_count >= 4;
+		m_mcp_regs.mcsr &= ~(1 << MCSR_ARS_BIT);
+		if (half_full)
+		{
+			m_mcp_regs.mcsr |= (1 << MCSR_ARS_BIT);
+		}
+		bool fifo_interrupt = BIT(m_mcp_regs.mccr0, MCCR0_ARE_BIT) && half_full;
+		m_mcp_irqs->in_w<MCP_AUDIO_RX>((int)fifo_interrupt);
+
+		if (m_mcp_regs.audio_rx_fifo_count)
+			m_mcp_regs.mcsr &= ~(1 << MCSR_ANE_BIT);
+		else
+			m_mcp_regs.mcsr |= (1 << MCSR_ANE_BIT);
+	}
+	return data;
+}
+
+uint16_t sa1110_periphs_device::mcp_read_telecom_fifo()
+{
+	const uint16_t data = m_mcp_regs.telecom_rx_fifo[m_mcp_regs.telecom_rx_fifo_read_idx];
+	if (m_mcp_regs.telecom_rx_fifo_count)
+	{
+		m_mcp_regs.telecom_rx_fifo_count--;
+		m_mcp_regs.telecom_rx_fifo_read_idx = (m_mcp_regs.telecom_rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_rx_fifo);
+
+		const bool half_full = m_mcp_regs.telecom_rx_fifo_count >= 4;
+		m_mcp_regs.mcsr &= ~(1 << MCSR_TRS_BIT);
+		if (half_full)
+		{
+			m_mcp_regs.mcsr |= (1 << MCSR_TRS_BIT);
+		}
+		bool fifo_interrupt = BIT(m_mcp_regs.mccr0, MCCR0_TRE_BIT) && half_full;
+		m_mcp_irqs->in_w<MCP_TELECOM_RX>((int)fifo_interrupt);
+
+		if (m_mcp_regs.telecom_rx_fifo_count)
+			m_mcp_regs.mcsr &= ~(1 << MCSR_TNE_BIT);
+		else
+			m_mcp_regs.mcsr |= (1 << MCSR_TNE_BIT);
+	}
+	return data;
+}
+
+attotime sa1110_periphs_device::mcp_get_audio_frame_rate()
+{
+	const uint32_t bit_rate = BIT(m_mcp_regs.mccr1, MCCR1_CFS_BIT) ? 9585000 : 11981000;
+	const uint64_t ticks = 32 * ((m_mcp_regs.mccr0 & MCCR0_ASD_MASK) >> MCCR0_ASD_BIT);
+	return attotime::from_ticks(ticks, bit_rate);
+}
+
+attotime sa1110_periphs_device::mcp_get_telecom_frame_rate()
+{
+	const uint32_t bit_rate = BIT(m_mcp_regs.mccr1, MCCR1_CFS_BIT) ? 9585000 : 11981000;
+	const uint64_t ticks = 32 * ((m_mcp_regs.mccr0 & MCCR0_TSD_MASK) >> MCCR0_TSD_BIT);
+	return attotime::from_ticks(ticks, bit_rate);
+}
+
+void sa1110_periphs_device::mcp_update_sample_rate()
+{
+	const attotime audio_rate = mcp_get_audio_frame_rate();
+	m_mcp_regs.audio_tx_timer->adjust(audio_rate, 0, audio_rate);
+
+	const attotime telecom_rate = mcp_get_telecom_frame_rate();
+	m_mcp_regs.telecom_tx_timer->adjust(telecom_rate, 0, telecom_rate);
+}
+
+void sa1110_periphs_device::mcp_set_enabled(bool enabled)
+{
+	if (enabled)
+	{
+		mcp_update_sample_rate();
+	}
+	else
+	{
+		m_mcp_regs.audio_tx_timer->adjust(attotime::never);
+		m_mcp_regs.telecom_tx_timer->adjust(attotime::never);
+	}
+}
+
+void sa1110_periphs_device::mcp_audio_tx_fifo_push(const uint16_t value)
+{
+	if (m_mcp_regs.audio_rx_fifo_count == ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo))
+		return;
+
+	m_mcp_regs.audio_tx_fifo[m_mcp_regs.audio_tx_fifo_write_idx] = value;
+	m_mcp_regs.audio_rx_fifo_write_idx = (m_mcp_regs.audio_tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo);
+	m_mcp_regs.audio_rx_fifo_count++;
+
+	if (m_mcp_regs.audio_tx_fifo_count == ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo))
+		m_mcp_regs.mcsr &= ~(1 << MCSR_ANF_BIT);
+
+	if (m_mcp_regs.audio_tx_fifo_count >= 4)
+	{
+		m_mcp_regs.mcsr &= ~(1 << MCSR_ATS_BIT);
+		if (BIT(m_mcp_regs.mccr0, MCCR0_ATE_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_TX>(0);
+	}
+	else
+	{
+		m_mcp_regs.mcsr |= (1 << MCSR_ATS_BIT);
+		if (BIT(m_mcp_regs.mccr0, MCCR0_ATE_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_TX>(1);
+	}
+}
+
+void sa1110_periphs_device::mcp_telecom_tx_fifo_push(const uint16_t value)
+{
+	if (m_mcp_regs.telecom_rx_fifo_count == ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo))
+		return;
+
+	m_mcp_regs.telecom_tx_fifo[m_mcp_regs.telecom_tx_fifo_write_idx] = value;
+	m_mcp_regs.telecom_rx_fifo_write_idx = (m_mcp_regs.telecom_tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo);
+	m_mcp_regs.telecom_rx_fifo_count++;
+
+	if (m_mcp_regs.telecom_tx_fifo_count == ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo))
+		m_mcp_regs.mcsr &= ~(1 << MCSR_TNF_BIT);
+
+	if (m_mcp_regs.audio_tx_fifo_count >= 4)
+	{
+		m_mcp_regs.mcsr &= ~(1 << MCSR_TTS_BIT);
+		if (BIT(m_mcp_regs.mccr0, MCCR0_TTE_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_TX>(0);
+	}
+	else
+	{
+		m_mcp_regs.mcsr |= (1 << MCSR_TTS_BIT);
+		if (BIT(m_mcp_regs.mccr0, MCCR0_TTE_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_TX>(1);
+	}
+}
+
+void sa1110_periphs_device::mcp_codec_read(offs_t offset)
+{
+	if (!m_codec)
+		return;
+
+	const uint16_t data = m_codec->read(offset);
+	m_mcp_regs.mcdr2 &= 0xffff0000;
+	m_mcp_regs.mcdr2 |= data;
+
+	m_mcp_regs.mcsr |= (1 << MCSR_CRC_BIT);
+	m_mcp_regs.mcsr &= ~(1 << MCSR_CWC_BIT);
+}
+
+void sa1110_periphs_device::mcp_codec_write(offs_t offset, uint16_t data)
+{
+	if (!m_codec)
+		return;
+
+	m_codec->write(offset, data);
+	m_mcp_regs.mcsr |= (1 << MCSR_CWC_BIT);
+	m_mcp_regs.mcsr &= ~(1 << MCSR_CRC_BIT);
+}
+
+uint32_t sa1110_periphs_device::mcp_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_MCCR0:
+		LOGMASKED(LOG_MCP, "%s: mcp_r: MCP Control Register 0: %08x & %08x\n", machine().describe_context(), m_mcp_regs.mccr0, mem_mask);
+		return m_mcp_regs.mccr0;
+	case REG_MCDR0:
+	{
+		const uint16_t data = mcp_read_audio_fifo() << 4;
+		LOGMASKED(LOG_MCP, "%s: mcp_r: MCP Data Register 0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		return data;
+	}
+	case REG_MCDR1:
+	{
+		const uint16_t data = mcp_read_telecom_fifo() << 4;
+		LOGMASKED(LOG_MCP, "%s: mcp_r: MCP Data Register 1: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		return data;
+	}
+	case REG_MCDR2:
+		LOGMASKED(LOG_MCP, "%s: mcp_r: MCP Data Register 2: %08x & %08x\n", machine().describe_context(), m_mcp_regs.mcdr2, mem_mask);
+		LOGMASKED(LOG_MCP, "%s:        Value: %04x\n", machine().describe_context(), (uint16_t)m_mcp_regs.mcdr2);
+		LOGMASKED(LOG_MCP, "%s:        Read/Write: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcdr2, 16));
+		LOGMASKED(LOG_MCP, "%s:        Address: %01x\n", machine().describe_context(), (m_mcp_regs.mcdr2 >> 17) & 0xf);
+		return m_mcp_regs.mcdr2;
+	case REG_MCSR:
+		LOGMASKED(LOG_MCP, "%s: mcp_r: MCP Status Register: %08x & %08x\n", machine().describe_context(), m_mcp_regs.mcsr, mem_mask);
+		LOGMASKED(LOG_MCP, "%s:        Audio Xmit FIFO Service Request: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 0));
+		LOGMASKED(LOG_MCP, "%s:        Audio Recv FIFO Service Request: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 1));
+		LOGMASKED(LOG_MCP, "%s:        Telecom Xmit FIFO Service Request: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 2));
+		LOGMASKED(LOG_MCP, "%s:        Telecom Recv FIFO Service Request: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 3));
+		LOGMASKED(LOG_MCP, "%s:        Audio Xmit FIFO Underrun: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 4));
+		LOGMASKED(LOG_MCP, "%s:        Audio Recv FIFO Overrun: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 5));
+		LOGMASKED(LOG_MCP, "%s:        Telcom Xmit FIFO Underrun: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 6));
+		LOGMASKED(LOG_MCP, "%s:        Telcom Recv FIFO Overrun: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 7));
+		LOGMASKED(LOG_MCP, "%s:        Audio Xmit FIFO Not Full: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 8));
+		LOGMASKED(LOG_MCP, "%s:        Audio Recv FIFO Not Empty: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 9));
+		LOGMASKED(LOG_MCP, "%s:        Telcom Xmit FIFO Not Full: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 10));
+		LOGMASKED(LOG_MCP, "%s:        Telcom Recv FIFO Not Empty: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 11));
+		LOGMASKED(LOG_MCP, "%s:        Codec Write Complete: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 12));
+		LOGMASKED(LOG_MCP, "%s:        Codec Read Complete: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 13));
+		LOGMASKED(LOG_MCP, "%s:        Audio Codec Enabled: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 14));
+		LOGMASKED(LOG_MCP, "%s:        Telecom Codec Enabled: %d\n", machine().describe_context(), BIT(m_mcp_regs.mcsr, 15));
+		return m_mcp_regs.mcsr;
+	default:
+		LOGMASKED(LOG_MCP | LOG_UNKNOWN, "%s: ostimer_r: Unknown address: %08x & %08x\n", machine().describe_context(), MCP_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::mcp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_MCCR0:
+	{
+		LOGMASKED(LOG_MCP, "%s: mcp_w: MCP Control Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_MCP, "%s:        Audio Sample Rate Divisor: %02x\n", machine().describe_context(), data & MCCR0_ASD_MASK);
+		LOGMASKED(LOG_MCP, "%s:        Telecom Sample Rate Divisor: %02x\n", machine().describe_context(), (data & MCCR0_TSD_MASK) >> MCCR0_TSD_BIT);
+		LOGMASKED(LOG_MCP, "%s:        MCP Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_MCE_BIT));
+		LOGMASKED(LOG_MCP, "%s:        Clock Select: %s\n", machine().describe_context(), BIT(data, MCCR0_ECS_BIT) ? "External" : "Internal");
+		LOGMASKED(LOG_MCP, "%s:        A/D Data Sampling Mode: %s Valid\n", machine().describe_context(), BIT(data, MCCR0_ADM_BIT) ? "First" : "Each");
+		LOGMASKED(LOG_MCP, "%s:        Telecom Tx FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_TTE_BIT));
+		LOGMASKED(LOG_MCP, "%s:        Telecom Rx FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_TRE_BIT));
+		LOGMASKED(LOG_MCP, "%s:        Audio Tx FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_ATE_BIT));
+		LOGMASKED(LOG_MCP, "%s:        Audio Rx FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_ARE_BIT));
+		LOGMASKED(LOG_MCP, "%s:        Loopback Enable: %d\n", machine().describe_context(), BIT(data, MCCR0_LBM_BIT));
+		LOGMASKED(LOG_MCP, "%s:        External Clock Prescaler: %d\n", machine().describe_context(), ((data & MCCR0_ECP_MASK) >> MCCR0_ECP_BIT) + 1);
+		const uint32_t old = m_mcp_regs.mccr0;
+		COMBINE_DATA(&m_mcp_regs.mccr0);
+		const uint32_t changed = old ^ m_mcp_regs.mccr0;
+		if (BIT(m_mcp_regs.mcsr, MCSR_ATS_BIT) && BIT(changed, MCCR0_ATE_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_TX>(BIT(m_mcp_regs.mcsr, MCSR_ATS_BIT));
+		if (BIT(m_mcp_regs.mcsr, MCSR_ARS_BIT) && BIT(changed, MCCR0_ARE_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_RX>(BIT(m_mcp_regs.mcsr, MCSR_ARS_BIT));
+		if (BIT(m_mcp_regs.mcsr, MCSR_TTS_BIT) && BIT(changed, MCCR0_TTE_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_TX>(BIT(m_mcp_regs.mcsr, MCSR_TTS_BIT));
+		if (BIT(m_mcp_regs.mcsr, MCSR_TRS_BIT) && BIT(changed, MCCR0_TRE_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_RX>(BIT(m_mcp_regs.mcsr, MCSR_TRS_BIT));
+		if (BIT(old, MCCR0_MCE_BIT) != BIT(m_mcp_regs.mccr0, MCCR0_MCE_BIT))
+			mcp_set_enabled(BIT(m_mcp_regs.mccr0, MCCR0_MCE_BIT));
+		break;
+	}
+	case REG_MCDR0:
+		LOGMASKED(LOG_MCP, "%s: mcp_w: MCP Data Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		mcp_audio_tx_fifo_push((uint16_t)data);
+		break;
+	case REG_MCDR1:
+		LOGMASKED(LOG_MCP, "%s: mcp_w: MCP Data Register 1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		mcp_telecom_tx_fifo_push((uint16_t)data);
+		break;
+	case REG_MCDR2:
+	{
+		const offs_t addr = (data & MCDR2_ADDR_MASK) >> MCDR2_ADDR_BIT;
+		LOGMASKED(LOG_MCP, "%s: mcp_w: MCP Data Register 2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_mcp_regs.mcdr2);
+		m_mcp_regs.mcdr2 &= ~(1 << MCDR2_RW_BIT);
+
+		if (BIT(data, MCDR2_RW_BIT))
+			mcp_codec_write(addr, (uint16_t)data);
+		else
+			mcp_codec_read(addr);
+		break;
+	}
+	case REG_MCSR:
+	{
+		LOGMASKED(LOG_MCP, "%s: mcp_w: MCP Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint32_t old = m_mcp_regs.mcsr;
+		const uint32_t sticky_mask = (1 << MCSR_ATU_BIT) | (1 << MCSR_ARO_BIT) | (1 << MCSR_TTU_BIT) | (1 << MCSR_TRO_BIT);
+		m_mcp_regs.mcsr &= ~(data & mem_mask & sticky_mask);
+		if (BIT(old, MCSR_ATU_BIT) && !BIT(m_mcp_regs.mcsr, MCSR_ATU_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_UNDERRUN>(0);
+		if (BIT(old, MCSR_ARO_BIT) && !BIT(m_mcp_regs.mcsr, MCSR_ARO_BIT))
+			m_mcp_irqs->in_w<MCP_AUDIO_OVERRUN>(0);
+		if (BIT(old, MCSR_TTU_BIT) && !BIT(m_mcp_regs.mcsr, MCSR_TTU_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_UNDERRUN>(0);
+		if (BIT(old, MCSR_TRO_BIT) && !BIT(m_mcp_regs.mcsr, MCSR_TRO_BIT))
+			m_mcp_irqs->in_w<MCP_TELECOM_OVERRUN>(0);
+		break;
+	}
+	default:
+		LOGMASKED(LOG_MCP | LOG_UNKNOWN, "%s: mcp_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), MCP_BASE_ADDR | (offset << 2),
+			data, mem_mask);
 		break;
 	}
 }
@@ -1035,6 +1389,29 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_uart_regs.tx_fifo_count));
 	save_item(NAME(m_uart_regs.rx_break_interlock));
 
+	save_item(NAME(m_mcp_regs.mccr0));
+	save_item(NAME(m_mcp_regs.mccr1));
+	save_item(NAME(m_mcp_regs.mcdr2));
+	save_item(NAME(m_mcp_regs.mcsr));
+	save_item(NAME(m_mcp_regs.audio_rx_fifo));
+	save_item(NAME(m_mcp_regs.audio_rx_fifo_read_idx));
+	save_item(NAME(m_mcp_regs.audio_rx_fifo_write_idx));
+	save_item(NAME(m_mcp_regs.audio_rx_fifo_count));
+	save_item(NAME(m_mcp_regs.audio_tx_fifo));
+	save_item(NAME(m_mcp_regs.audio_tx_fifo_read_idx));
+	save_item(NAME(m_mcp_regs.audio_tx_fifo_write_idx));
+	save_item(NAME(m_mcp_regs.audio_tx_fifo_count));
+	m_mcp_regs.audio_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_audio_tx_callback), this));
+	save_item(NAME(m_mcp_regs.telecom_rx_fifo));
+	save_item(NAME(m_mcp_regs.telecom_rx_fifo_read_idx));
+	save_item(NAME(m_mcp_regs.telecom_rx_fifo_write_idx));
+	save_item(NAME(m_mcp_regs.telecom_rx_fifo_count));
+	save_item(NAME(m_mcp_regs.telecom_tx_fifo));
+	save_item(NAME(m_mcp_regs.telecom_tx_fifo_read_idx));
+	save_item(NAME(m_mcp_regs.telecom_tx_fifo_write_idx));
+	save_item(NAME(m_mcp_regs.telecom_tx_fifo_count));
+	m_mcp_regs.telecom_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_telecom_tx_callback), this));
+
 	save_item(NAME(m_ostmr_regs.osmr));
 	save_item(NAME(m_ostmr_regs.oscr));
 	save_item(NAME(m_ostmr_regs.ossr));
@@ -1103,6 +1480,30 @@ void sa1110_periphs_device::device_reset()
 	transmit_register_reset();
 	receive_register_reset();
 
+	// init MCP regs
+	m_mcp_regs.mccr0 = 0;
+	m_mcp_regs.mccr1 = 0;
+	m_mcp_regs.mcdr2 = 0;
+	m_mcp_regs.mcsr = (1 << MCSR_ANF_BIT) | (1 << MCSR_TNF_BIT);
+	memset(m_mcp_regs.audio_rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.audio_rx_fifo));
+	m_mcp_regs.audio_rx_fifo_read_idx = 0;
+	m_mcp_regs.audio_rx_fifo_write_idx = 0;
+	m_mcp_regs.audio_rx_fifo_count = 0;
+	memset(m_mcp_regs.audio_tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo));
+	m_mcp_regs.audio_tx_fifo_read_idx = 0;
+	m_mcp_regs.audio_tx_fifo_write_idx = 0;
+	m_mcp_regs.audio_tx_fifo_count = 0;
+	m_mcp_regs.audio_tx_timer->adjust(attotime::never);
+	memset(m_mcp_regs.telecom_rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.telecom_rx_fifo));
+	m_mcp_regs.telecom_rx_fifo_read_idx = 0;
+	m_mcp_regs.telecom_rx_fifo_write_idx = 0;
+	m_mcp_regs.telecom_rx_fifo_count = 0;
+	memset(m_mcp_regs.telecom_tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo));
+	m_mcp_regs.telecom_tx_fifo_read_idx = 0;
+	m_mcp_regs.telecom_tx_fifo_write_idx = 0;
+	m_mcp_regs.telecom_tx_fifo_count = 0;
+	m_mcp_regs.telecom_tx_timer->adjust(attotime::never);
+
 	// init OS timers
 	memset(m_ostmr_regs.osmr, 0, sizeof(uint32_t) * 4);
 	m_ostmr_regs.ower = 0;
@@ -1134,4 +1535,5 @@ void sa1110_periphs_device::device_reset()
 void sa1110_periphs_device::device_add_mconfig(machine_config &config)
 {
 	INPUT_MERGER_ANY_HIGH(config, m_uart3_irqs).output_handler().set(FUNC(sa1110_periphs_device::uart3_irq_callback));
+	INPUT_MERGER_ANY_HIGH(config, m_mcp_irqs).output_handler().set(FUNC(sa1110_periphs_device::mcp_irq_callback));
 }

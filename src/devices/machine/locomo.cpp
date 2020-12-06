@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Sharp LoCoMo peripheral chip emulation
+	Sharp LoCoMo peripheral chip emulation skeleton
 
 ***************************************************************************/
 
