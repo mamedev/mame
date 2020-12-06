@@ -48,7 +48,7 @@ private:
 
 	tilemap_t *m_tilemap;
 
-	u8 m_xoffsets[2];
+	int m_xoffsets[2];
 
 	u16 m_vctrl[3];
 	u8 m_rambank;
