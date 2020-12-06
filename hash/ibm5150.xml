@@ -12062,23 +12062,6 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
-	<software name="purplesa" supported="no">
-		<description>Purple Saturn Day</description>
-		<year>1989</year>
-		<publisher>Epyx</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "354497">
-				<rom name="Purple Saturn Day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "339570">
-				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="punisher">
 		<description>The Punisher</description>
 		<year>1990</year>
@@ -12097,6 +12080,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="The Punisher [Paragon] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="2120e577" sha1="37787bcad420dc2243f553f0b7b74b07b18b2445"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
+	<software name="purplesa" supported="no">
+		<description>Purple Saturn Day</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "354497">
+				<rom name="Purple Saturn Day [1989] [5.25] [1 of 2].td0" size="354497" crc="8832e9eb" sha1="84a4d1f85ad8f34f11686d3f8c5725a5f332b652"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "339570">
+				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825"/>
 			</dataarea>
 		</part>
 	</software>
