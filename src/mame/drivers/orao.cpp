@@ -14,12 +14,10 @@ Ctrl-V turns on keyclick
 Ctrl-S turns on reversed video
 
 BC starts BASIC. orao103: EXIT to quit. orao: unknown how to quit.
+To load use LMEM""
 
 Todo:
 - When pasting, shift key doesn't work
-- orao103: loads its own tapes, but can't load software items
-- orao: can't load anything
-
 
 ****************************************************************************/
 
