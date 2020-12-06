@@ -3520,7 +3520,7 @@ MACHINE_START_MEMBER(cps_state,cps1)
 MACHINE_START_MEMBER(cps_state,qsound)
 {
 	MACHINE_START_CALL_MEMBER(common);
-	membank("bank1")->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
+		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 void cps_state::cps1_10MHz(machine_config &config)
