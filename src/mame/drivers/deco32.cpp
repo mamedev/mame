@@ -40,7 +40,7 @@
     special blending effects.  It's exact effect is unclear.
 
     Video backgrounds(intel DVI) in Dragongun?
-	reference video: https://youtu.be/TVc0SsTVJ94
+    reference video(dragngunj): https://youtu.be/TVc0SsTVJ94
 
     Locked 'n Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
