@@ -40967,10 +40967,12 @@ vulcanb                         // GX785 (c) 1988
 @source:twincobr.cpp
 fnshark                         // bootleg
 fshark                          // B02 / TP-007 (c) 1987 Taito Corporation (World)
+fsharkb                         // bootleg
 fsharkbt                        // bootleg
 gulfwar2                        // (c) 1991 Comad
 gulfwar2a                       //
 hishouza                        // B02 / TP-007 (c) 1987 Taito Corporation (Japan)
+hishouzab                       // bootleg
 ktiger                          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 skyshark                        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharka                       // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
@@ -41690,6 +41692,7 @@ wangpc                          //
 @source:wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
+wardnerb                        // bootleg
 wardnerj                        // B25 / TP-009 (c) 1987 Taito Corporation (Japan)
 
 @source:warpsped.cpp
