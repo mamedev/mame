@@ -134,7 +134,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(emu.subst_env(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -160,7 +160,7 @@ function cheat.startplugin()
 		end
 		if #hotkeys > 0 then
 			local json = require("json")
-			local path = lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
+			local path = emu.subst_env(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
 				lfs.mkdir(path)

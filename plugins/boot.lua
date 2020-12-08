@@ -2,29 +2,10 @@
 -- copyright-holders:Miodrag Milanovic
 require('lfs')
 
--- add helper to lfs for plugins to use
-function lfs.env_replace(str)
-	local pathsep = package.config:sub(1,1)
-	local function dorep(val)
-		ret = os.getenv(val)
-		if ret then
-			return ret
-		end
-		return val
-	end
-
-	if pathsep == '\\' then
-		str = str:gsub("%%([%w_]+)%%", dorep)
-	else
-		str = str:gsub("%$([%w_]+)", dorep)
-	end
-	return str
-end
-
 _G._ = emu.lang_translate
 _G.emu.plugin = {} -- table to contain plugin interfaces
 -- substitute environment variables in the plugins path from options
-local dirs = lfs.env_replace(manager:options().entries.pluginspath:value())
+local dirs = emu.subst_env(manager:options().entries.pluginspath:value())
 
 -- and split the paths apart and make them suitable for package.path
 package.path = ""

@@ -23,7 +23,7 @@ function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
 	local hiscore_path = "hi";
-	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
+	local config_path = emu.subst_env(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 
 	local current_checksum = 0;
 	local default_checksum = 0;
@@ -51,7 +51,7 @@ function hiscore.startplugin()
 			_conf[token] = value;
 		  end
 		end
-		hiscore_path = lfs.env_replace(_conf["hi_path"] or hiscore_path);
+		hiscore_path = emu.subst_env(_conf["hi_path"] or hiscore_path);
 		timed_save = _conf["only_save_at_exit"] ~= "1"
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
 		return true
