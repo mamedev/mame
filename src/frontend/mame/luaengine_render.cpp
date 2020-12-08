@@ -33,21 +33,13 @@ struct layout_view_items
 	layout_view &view;
 };
 
-
-struct render_manager_targets
-{
-	render_manager_targets(render_manager &m) : targets(m.targets()) { }
-
-	simple_list<render_target> const &targets;
-};
-
 } // anonymous namespace
+
 
 namespace sol {
 
 template <> struct is_container<layout_file_views> : std::true_type { };
 template <> struct is_container<layout_view_items> : std::true_type { };
-template <> struct is_container<render_manager_targets> : std::true_type { };
 
 
 template <>
@@ -234,76 +226,6 @@ public:
 		layout_view_items &self(get_self(L));
 		stack::push(L, next_pairs);
 		stack::push<user<indexed_iterator> >(L, self.view.items(), self.view.items().begin());
-		stack::push(L, lua_nil);
-		return 3;
-	}
-};
-
-
-template <>
-struct usertype_container<render_manager_targets> : lua_engine::immutable_container_helper<render_manager_targets, simple_list<render_target> const, simple_list<render_target>::auto_iterator>
-{
-private:
-	using target_list = simple_list<render_target>;
-
-	static int next_pairs(lua_State *L)
-	{
-		indexed_iterator &i(stack::unqualified_get<user<indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
-			return stack::push(L, lua_nil);
-		int result;
-		result = stack::push(L, i.ix + 1);
-		result += stack::push_reference(L, *i.it);
-		++i.it;
-		++i.ix;
-		return result;
-	}
-
-public:
-	static int at(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.targets.count() < index))
-			return stack::push(L, lua_nil);
-		else
-			return stack::push_reference(L, *self.targets.find(index - 1));
-	}
-
-	static int get(lua_State *L) { return at(L); }
-	static int index_get(lua_State *L) { return at(L); }
-
-	static int index_of(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		render_target &target(stack::unqualified_get<render_target>(L, 2));
-		int const found(self.targets.indexof(target));
-		if (0 > found)
-			return stack::push(L, lua_nil);
-		else
-			return stack::push(L, found + 1);
-	}
-
-	static int size(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.count());
-	}
-
-	static int empty(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.empty());
-	}
-
-	static int next(lua_State *L) { return stack::push(L, next_pairs); }
-	static int pairs(lua_State *L) { return ipairs(L); }
-
-	static int ipairs(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		stack::push(L, next_pairs);
-		stack::push<user<indexed_iterator> >(L, self.targets, self.targets.begin());
 		stack::push(L, lua_nil);
 		return 3;
 	}
@@ -619,6 +541,6 @@ void lua_engine::initialize_render(sol::table &emu)
 	render_type["max_update_rate"] = &render_manager::max_update_rate;
 	render_type["ui_target"] = &render_manager::ui_target;
 	render_type["ui_container"] = &render_manager::ui_container;
-	render_type["targets"] = sol::property([] (render_manager &m) { return render_manager_targets(m); });
+	render_type["targets"] = sol::property([] (render_manager &m) { return simple_list_wrapper<render_target>(m.targets()); });
 
 }

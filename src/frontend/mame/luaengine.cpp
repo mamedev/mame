@@ -378,8 +378,6 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 
 void lua_engine::set_machine(running_machine *machine)
 {
-	if (!machine || (machine != m_machine))
-		m_seq_poll.reset();
 	m_machine = machine;
 }
 

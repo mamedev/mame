@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "iptseqpoll.h"
-
 #include <condition_variable>
 #include <functional>
 #include <map>
@@ -35,10 +33,10 @@ class lua_engine
 public:
 	// helper structures
 	template <typename T> struct devenum;
-	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
-
+	template <typename T> struct simple_list_wrapper;
 	template <typename T> struct tag_object_ptr_map;
 	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
+	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
 
 	// construction/destruction
 	lua_engine();
@@ -146,7 +144,6 @@ private:
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
 	running_machine *m_machine;
-	std::unique_ptr<input_sequence_poller> m_seq_poll;
 
 	std::vector<std::string> m_menu;
 
