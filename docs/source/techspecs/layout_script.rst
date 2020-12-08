@@ -14,11 +14,11 @@ Introduction
 MAME layout files can embed Lua script to provide enhanced functionality.
 Although there’s a lot you can do with conditionally drawn components and
 parameter animation, some things can only be done with scripting.  MAME uses an
-event-based model.  Scripts can supply function that will be called after
+event-based model.  Scripts can supply functions that will be called after
 certain events, or when certain data is required.
 
 Layout scripting requires the layout plugin to be enabled.  For example, to run
-BWB Touble Take with the Lua script in the layout enabled, you might use this
+BWB Double Take with the Lua script in the layout enabled, you might use this
 command::
 
     mame64 -plugins -plugin layout v4dbltak
@@ -33,7 +33,7 @@ Practical examples
 ------------------
 
 Before diving into the technical details of how it works, we’ll start with some
-complete examples using Lua script to enhance layouts.
+example layout files using Lua script for enhancement.
 
 Espial: joystick split across ports
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,9 +67,9 @@ first player on a cocktail cabinet, and one used for the second player on a
 cocktail cabinet.  Notice that the switches for the first joystick are split
 across the two I/O ports.
 
-There’s no layout file syntax to build element state using bits from multiple
-I/O ports.  It’s also inconvenient if each joystick needs to be defined as a
-separate element because the bits for the switches aren’t arranged the same
+There’s no layout file syntax to build the element state using bits from
+multiple I/O ports.  It’s also inconvenient if each joystick needs to be defined
+as a separate element because the bits for the switches aren’t arranged the same
 way.
 
 We can overcome these limitations using a script to read the player inputs and
@@ -181,11 +181,11 @@ as a function by the layout plugin when the layout file is loaded.  The layout
 views have been built at this point, but the emulated system has not finished
 starting.  In particular, it’s not safe to access inputs and outputs at this
 time.  The key variable in the script environment is ``file``, which gives the
-script access its layout file.
+script access to its layout file.
 
 We supply a function to be called after tags in the layout file have been
 resolved.  At this point, the emulated system will have completed starting.
-This function does the following tasks
+This function does the following tasks:
 
 * Looks up the two I/O ports used for player input.  I/O ports can be looked up
   by tag relative to the device that caused the layout file to be loaded.
@@ -199,5 +199,5 @@ This function does the following tasks
   the element state is 1).
 
 The function called before view items are added to the render target reads the
-player inputs, and shuffle the bits into the order needed by the joystick
+player inputs, and shuffles the bits into the order needed by the joystick
 element.
