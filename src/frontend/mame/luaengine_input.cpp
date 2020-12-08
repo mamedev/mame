@@ -515,7 +515,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto seqpoll_type = sol().registry().new_usertype<input_sequence_poller>("input_seq_poller", sol::no_constructor);
 	seqpoll_type["start"] =
-		[this] (input_sequence_poller &poller, char const *cls_string, sol::object seq)
+		[] (input_sequence_poller &poller, char const *cls_string, sol::object seq)
 		{
 			input_item_class cls;
 			if (!strcmp(cls_string, "switch"))
