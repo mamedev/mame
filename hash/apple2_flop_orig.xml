@@ -16180,4 +16180,95 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="vortex">
+		<description>Vortex</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-12-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="240901">
+				<rom name="vortex.woz" size="240901" crc="79f5cc2d" sha1="404fa8d43726567ac610bcf2cbbad244d44bbcc0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batsbelf">
+		<description>Bats in the Belfry</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2020-12-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121627">
+				<rom name="bats in the belfry.woz" size="121627" crc="b42681ec" sha1="84d8e3a1cc653faee017a319decdd87d353d7c36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnrain">
+		<description>Alien Rain</description>
+		<year>1980</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-12-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101653">
+				<rom name="alien rain.woz" size="101653" crc="3a2ecd02" sha1="3e5bce778cae684dd3dca0c195150b0152340d84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awawhale">
+		<description>Audubon Wildlife Adventures: Whales!</description>
+		<year>1990</year>
+		<publisher>The National Audubon Society</publisher>
+		<info name="release" value="2020-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 1.woz" size="235010" crc="3826388a" sha1="a382890a44668d318c6f387eec4c0720840fdd69"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 2.woz" size="235010" crc="bb8f4d4a" sha1="fdf44da707c68e8988be461eacf8e92cbd6914fc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 3.woz" size="235010" crc="37a32d28" sha1="ddcb1a55b0a668313953a18120f51963668effc3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 4.woz" size="235010" crc="4aaf4b8c" sha1="c9d5d06bb0b8b4849e10e349913984c1e5e8155f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 5.woz" size="235010" crc="d66ddb15" sha1="2ac14b32b993789cd27d01d1d822ade804fd2db8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side 6"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 6.woz" size="235010" crc="b6f153f3" sha1="0ad0c8ba6a3f9ff11ff2aa83cc84e486f7429346"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
