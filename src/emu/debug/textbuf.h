@@ -12,6 +12,7 @@
 #define MAME_EMU_DEBUG_TEXTBUF_H
 
 #include <memory>
+#include <string_view>
 
 #include "emucore.h"
 
@@ -21,12 +22,6 @@
 ***************************************************************************/
 
 struct text_buffer;
-
-struct text_buffer_line
-{
-	const char *text;
-	size_t length;
-};
 
 // helper class for iterating over the lines of a text_buffer
 class text_buffer_lines
@@ -49,7 +44,7 @@ public:
 		}
 
 		// technically this isn't a valid forward iterator, because operator * doesn't return a reference
-		text_buffer_line operator*() const;
+		std::string_view operator*() const;
 		text_buffer_line_iterator &operator++();
 
 		bool operator!=(const text_buffer_line_iterator& rhs)
