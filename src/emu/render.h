@@ -56,6 +56,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -591,7 +592,7 @@ private:
 		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, std::string_view str, int align, const render_color &color);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);

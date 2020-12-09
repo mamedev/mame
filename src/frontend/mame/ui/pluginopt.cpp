@@ -38,7 +38,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 void menu_plugin::populate(float &customtop, float &custombottom)
 {
 	for (auto &curplugin : m_plugins)
-		item_append(curplugin, "", 0, (void *)curplugin.c_str());
+		item_append(curplugin, 0, (void *)curplugin.c_str());
 	item_append(menu_item_type::SEPARATOR);
 }
 

@@ -58,11 +58,11 @@ menu_about::~menu_about()
 void menu_about::populate(float &customtop, float &custombottom)
 {
 	std::string title = string_format(_("%1$s %2$s"), emulator_info::get_appname(), bare_build_version);
-	item_append(title, "", 0, nullptr);
+	item_append(title, 0, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 
 	for (char const *const *line = copying_text; *line; ++line)
-		item_append(*line, "", 0, nullptr);
+		item_append(*line, 0, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 }

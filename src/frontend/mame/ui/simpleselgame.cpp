@@ -250,7 +250,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 				"the docs directory for information on configuring %2$s."),
 				emulator_info::get_configname(),
 				emulator_info::get_appname());
-		item_append(txt, "", FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
+		item_append(txt, FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
 		return;
 	}
 
@@ -275,7 +275,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	if (stack_has_special_main_menu())
 	{
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("Configure Options"), "", 0, (void *)1);
+		item_append(_("Configure Options"), 0, (void *)1);
 		m_skip_main_items = 1;
 	}
 

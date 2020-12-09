@@ -37,8 +37,8 @@ public:
 	// size queries
 	s32 pixel_height() const { return m_height; }
 	float char_width(float height, float aspect, char32_t ch);
-	float string_width(float height, float aspect, const char *string);
-	float utf8string_width(float height, float aspect, const char *utf8string);
+	float string_width(float height, float aspect, std::string_view string);
+	float utf8string_width(float height, float aspect, std::string_view utf8string);
 
 	// texture/bitmap queries
 	render_texture *get_char_texture_and_bounds(float height, float aspect, char32_t ch, render_bounds &bounds);

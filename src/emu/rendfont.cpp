@@ -856,21 +856,19 @@ float render_font::char_width(float height, float aspect, char32_t ch)
 //  at the given height
 //-------------------------------------------------
 
-float render_font::string_width(float height, float aspect, const char *string)
+float render_font::string_width(float height, float aspect, std::string_view string)
 {
 	// loop over the string and accumulate widths
 	int totwidth = 0;
 
-	const char *ends = string + strlen(string);
-	const char *s = string;
 	char32_t schar;
 
 	// loop over characters
-	while (*s != 0)
+	while (!string.empty())
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(&schar, &string[0], string.length());
 		totwidth += get_char(schar).width;
-		s += scharcount;
+		string.remove_prefix(scharcount);
 	}
 
 
@@ -884,21 +882,19 @@ float render_font::string_width(float height, float aspect, const char *string)
 //  UTF8-encoded string at the given height
 //-------------------------------------------------
 
-float render_font::utf8string_width(float height, float aspect, const char *utf8string)
+float render_font::utf8string_width(float height, float aspect, std::string_view utf8string)
 {
-	std::size_t const length = std::strlen(utf8string);
-
 	// loop over the string and accumulate widths
-	int count;
 	s32 totwidth = 0;
-	for (std::size_t offset = 0U; offset < length; offset += unsigned(count))
+	while (!utf8string.empty())
 	{
 		char32_t uchar;
-		count = uchar_from_utf8(&uchar, utf8string + offset, length - offset);
+		int count = uchar_from_utf8(&uchar, &utf8string[0], utf8string.length());
 		if (count < 0)
 			break;
 
 		totwidth += get_char(uchar).width;
+		utf8string.remove_prefix(count);
 	}
 
 	// scale the final result based on height
