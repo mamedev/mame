@@ -1194,6 +1194,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wavefront_4_5">
+		<description>Alias|Wavefront Composer 4.5</description>
+		<year>1997</year> <!-- 08/1997 -->
+		<publisher>Walias|Wavefront, Inc.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0506-004"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="wavefront_composer_4_5" sha1="ae5e0f16a4370ad83a26c2286be791fe81759ca1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="webforce_feb_98">
 		<description>WebFORCE February 1998</description>
 		<year>1998</year> <!-- 02/98 -->
@@ -1212,6 +1225,45 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="webforce_2_of_2_february_1998" sha1="42f14378b5e635228a4febd032a74a5b89402eef" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="webforce_aug_98">
+		<description>Media Value Pack WebFORCE August 1998 for IRIX 6.5</description>
+		<year>1998</year> <!-- 08/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="812-0533-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="webforce_august_1998" sha1="587208016f769555a06e70947879075b4ef40bfa" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pdfgenerator_1_2">
+		<description>PDF Generator 1.2 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year> <!-- 07/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="812-0528-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="pdf_generator_1_2" sha1="cdb0bb0abb41f31973231a4706a9acc496011e8f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="intranetjunction">
+		<description>Intranet Junction 1.0.2 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year> <!-- 07/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="812-0587-003"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="intranet_junction_1_0_2" sha1="1dfedcbd84a56adea8a0aa58a088256927780f49" />
 			</diskarea>
 		</part>
 	</software>

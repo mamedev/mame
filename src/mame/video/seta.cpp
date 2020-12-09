@@ -141,82 +141,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "includes/seta.h"
 #include "screen.h"
 
-/* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
-static const seta_state::game_offset game_offsets[] =
-{
-	// x offsets
-	// "game",    { spr, spr_flip}, {tmap, tmap_flip}
-
-	/* only sprites */
-	{ "tndrcade",   {  0,  0 } },             // correct (start grid, wall at beginning of game)
-	{ "tndrcadej",  {  0,  0 } },             // "
-	{ "wits",       {  0,  0 } },             // unknown
-	{ "thunderl",   {  0,  0 } },             // unknown
-	{ "wiggie",     {  0,  0 } },             // some problems but they seem y co-ordinate related?
-	{ "superbar",   {  0,  0 } },             // "
-	{ "pairlove",   {  0,  0 } },             // unknown
-	{ "blockcar",   {  0,  0 } },             // unknown
-	{ "neobattl",   {  0,  0 } },             // correct (test grid)
-	{ "umanclub",   {  0,  0 } },             // correct (test grid)
-	{ "atehate",    {  0,  0 } },             // correct (test grid)
-	{ "kiwame",     {  0,-16 } },             // correct (test grid)
-	{ "krzybowl",   {  0,  0 } },             // correct (test grid)
-	{ "orbs",       {  0,  0 } },             // unknown
-	{ "keroppi",    {  0,  0 } },             // unknown
-
-	/* 1 layer */
-	{ "twineagl",   {  0,  0 }, {  0,  -3 } }, // unknown
-	{ "downtown",   {  1,  0 }, { -1,   0 } }, // sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
-	{ "downtown2",  {  1,  0 }, { -1,   0 } }, // "
-	{ "downtownj",  {  1,  0 }, { -1,   0 } }, // "
-	{ "downtownp",  {  1,  0 }, { -1,   0 } }, // "
-	{ "usclssic",   {  1,  2 }, {  0,  -1 } }, // correct (test grid and bg)
-	{ "calibr50",   { -1,  2 }, { -3,  -2 } }, // correct (test grid and roof in animation at beginning of game)
-	{ "arbalest",   {  0,  1 }, { -2,  -1 } }, // correct (test grid and landing pad at beginning of game)
-	{ "metafox",    {  0,  0 }, { 16, -19 } }, // sprites unknown, tilemap correct (test grid)
-	{ "setaroul",   {  7,  0 }, {  5,   0 } }, // unknown (flipped offsets are unused: game handles flipping manually without setting the flip bit)
-	{ "drgnunit",   {  2,  2 }, { -2,  -2 } }, // correct (test grid and I/O test)
-	{ "jockeyc",    {  0,  0 }, { -2, 126 } }, // sprites correct? (bets), tilemap correct (test grid)
-	{ "inttoote2",  {  0,  0 }, { -2, 126 } }, // "
-	{ "inttoote",   {  0,  0 }, { -2,   0 } }, // "
-	{ "stg",        {  0,  0 }, { -2,  -2 } }, // sprites correct? (panel), tilemap correct (test grid)
-	{ "qzkklogy",   {  1,  1 }, { -1,  -1 } }, // correct (timer, test grid)
-	{ "qzkklgy2",   {  0,  0 }, { -1,  -3 } }, // sprites unknown, tilemaps correct (test grid)
-
-	/* 2 layers */
-	{ "rezon",      {  0,  0 }, { -2,  -2 } }, // correct (test grid)
-	{ "rezont",     {  0,  0 }, { -2,  -2 } }, // "
-	{ "blandia",    {  0,  8 }, { -2,   6 } }, // correct (test grid, startup bg)
-	{ "blandiap",   {  0,  8 }, { -2,   6 } }, // "
-	{ "zingzip",    {  0,  0 }, { -1,  -2 } }, // sprites unknown, tilemaps correct (test grid)
-	{ "eightfrc",   {  3,  4 }, {  0,   0 } }, // correct (test mode)
-	{ "daioh",      {  0,  0 }, { -1,  -1 } }, // correct (test grid, planet)
-	{ "daioha",     {  0,  0 }, { -1,  -1 } }, // "
-	{ "daiohc",     {  0,  0 }, { -1,  -1 } }, // "
-	{ "daiohp",     {  0,  0 }, { -1,  -1 } }, // "
-	{ "msgundam",   {  0,  0 }, { -2,  -2 } }, // correct (test grid, banpresto logo)
-	{ "msgundam1",  {  0,  0 }, { -2,  -2 } }, // "
-	{ "oisipuzl",   {  1,  1 }, { -1,  -1 } }, // correct (test mode) flip screen not supported?
-	{ "triplfun",   {  1,  1 }, { -1,  -1 } }, // "
-	{ "wrofaero",   {  0,  0 }, {  0,   0 } }, // correct (test mode)
-	{ "jjsquawk",   {  1,  1 }, { -1,  -1 } }, // correct (test mode)
-	{ "jjsquawkb",  {  1,  1 }, { -1,  -1 } }, // "
-	{ "kamenrid",   {  0,  0 }, { -2,  -2 } }, // correct (map, banpresto logo)
-	{ "extdwnhl",   {  0,  0 }, { -2,  -2 } }, // correct (test grid, background images)
-	{ "sokonuke",   {  0,  0 }, { -2,  -2 } }, // correct (game selection, test grid)
-	{ "gundhara",   {  0,  0 }, {  0,   0 } }, // correct (test mode)
-	{ "zombraid",   {  0,  0 }, { -2,  -2 } }, // correct for normal, flip screen not working yet
-	{ "zombraidp",  {  0,  0 }, { -2,  -2 } }, // correct for normal, flip screen not working yet
-	{ "zombraidpj", {  0,  0 }, { -2,  -2 } }, // correct for normal, flip screen not working yet
-	{ "madshark",   {  0,  0 }, {  0,   0 } }, // unknown (wrong when flipped, but along y)
-	{ "utoukond",   {  0,  0 }, { -2,   0 } }, // unknown (wrong when flipped, but along y)
-	{ "crazyfgt",   {  0,  0 }, { -2,   0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
-	{ "magspeed",   {  0,  0 }, { -2,   0 } }, // floating tilemap maybe 1px off in test grid
-
-	{ nullptr }
-};
-
-
 /*      76-- ----
         --5- ----     Sound Enable
         ---4 ----     toggled in IRQ1 by many games, irq acknowledge?
@@ -325,26 +249,6 @@ VIDEO_START_MEMBER(seta_state,oisipuzl)
 {
 	VIDEO_START_CALL_MEMBER(seta);
 	m_tilemaps_flip = 1;
-
-	// position kludges
-	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
-}
-
-VIDEO_START_MEMBER(setaroul_state,setaroul)
-{
-	VIDEO_START_CALL_MEMBER(seta);
-
-	// position kludges
-	m_seta001->set_bg_yoffsets(0, -0x1);
-	m_seta001->set_bg_xoffsets(0, 0x2);
-}
-
-VIDEO_START_MEMBER(jockeyc_state,jockeyc)
-{
-	VIDEO_START_CALL_MEMBER(seta);
-
-	// position kludges
-	m_seta001->set_fg_yoffsets(-0x12+8, 0x0e);
 }
 
 SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
@@ -359,29 +263,12 @@ VIDEO_START_MEMBER(seta_state,seta)
 {
 	m_tilemaps_flip = 0;
 
-	m_global_offsets = game_offsets;
-	while (m_global_offsets->gamename && strcmp(machine().system().name, m_global_offsets->gamename))
-		m_global_offsets++;
 	m_samples_bank = -1;    // set the samples bank to an out of range value at start-up
 	if (m_x1_bank != nullptr)
 		m_x1_bank->set_entry(0); // TODO : Unknown init
 
-	// position kludges
-	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
-	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
-
 	m_vregs = 0;
 	save_item(NAME(m_vregs));
-}
-
-VIDEO_START_MEMBER(seta_state,kyustrkr)
-{
-	VIDEO_START_CALL_MEMBER(seta);
-
-	// position kludges
-	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
 }
 
 
@@ -604,7 +491,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 			                fff0 0260 = -$10, $400-$190 -$10
 			                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
-			m_layers[layer]->update_scroll(m_global_offsets->tilemap_offs[flip ? 1 : 0], vis_dimy, flip);
+			m_layers[layer]->update_scroll(vis_dimy, flip);
 		}
 	}
 

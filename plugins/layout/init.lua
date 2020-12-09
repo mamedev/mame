@@ -16,6 +16,13 @@ function layout.startplugin()
 	local function prepare_layout(file, script)
 		local env = {
 			machine = manager:machine(),
+			emu = {
+				render_bounds = emu.render_bounds,
+				render_color = emu.render_color,
+				print_verbose = emu.print_verbose,
+				print_error = emu.print_error,
+				print_info = emu.print_info,
+				print_debug = emu.print_debug },
 			file = file,
 			print = print,
 			pairs = pairs,

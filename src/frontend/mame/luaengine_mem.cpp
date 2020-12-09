@@ -353,7 +353,7 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 //  initialize_memory - register memory user types
 //-------------------------------------------------
 
-void lua_engine::initialize_memory()
+void lua_engine::initialize_memory(sol::table &emu)
 {
 
 /* addr_space library

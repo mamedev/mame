@@ -1343,6 +1343,7 @@ render_primitive_list &render_target::get_primitives()
 	if (m_manager.machine().phase() >= machine_phase::RESET)
 	{
 		// we're running - iterate over items in the view
+		current_view().prepare_items();
 		for (layout_view::item &curitem : current_view().visible_items())
 		{
 			// first apply orientation to the bounds

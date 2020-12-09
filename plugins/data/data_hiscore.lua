@@ -9,7 +9,7 @@ local curset
 function env.open(file, size)
 	if file == ".hi" then
 		local path = "hi"
-		local ini = emu.file(lfs.env_replace(manager:options().entries.inipath:value()), 1)
+		local ini = emu.file(emu.subst_env(manager:options().entries.inipath:value()), 1)
 		local ret = ini:open("hiscore.ini")
 		if not ret then
 			local inifile = ini:read(ini:size())
@@ -23,7 +23,7 @@ function env.open(file, size)
 		end
 		file = path .. "/" .. curset .. ".hi"
 	else
-		file = lfs.env_replace(manager:options().entries.nvram_directory:value()) .. "/" .. curset .. "/" .. file
+		file = emu.subst_env(manager:options().entries.nvram_directory:value()) .. "/" .. curset .. "/" .. file
 	end
 	local f = io.open(file, "rb")
 	local content = f:read("*all")
@@ -789,12 +789,12 @@ function dat.check(set, softlist)
 	output = nil
 	curset = set
 
-	local scrfile = emu.file(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
+	local scrfile = emu.file(emu.subst_env(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
 	local ret = scrfile:open(set .. ".lua")
 	local script
 	if ret then
 		function get_xml_table(fileset)
-			local file = emu.file(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
+			local file = emu.file(emu.subst_env(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
 			local ret = file:open(fileset .. ".xml")
 			if ret then
 				return nil

@@ -158,9 +158,9 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 		return;
 	}
 
-	for (auto line_info : text_buffer_lines(*m_console_textbuf))
+	for (std::string_view line_info : text_buffer_lines(*m_console_textbuf))
 	{
-		fwrite(line_info.text, sizeof(char), line_info.length, f);
+		fwrite(line_info.data(), sizeof(char), line_info.length(), f);
 		fputc('\n', f);
 	}
 

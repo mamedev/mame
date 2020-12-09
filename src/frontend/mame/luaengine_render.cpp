@@ -33,21 +33,13 @@ struct layout_view_items
 	layout_view &view;
 };
 
-
-struct render_manager_targets
-{
-	render_manager_targets(render_manager &m) : targets(m.targets()) { }
-
-	simple_list<render_target> const &targets;
-};
-
 } // anonymous namespace
+
 
 namespace sol {
 
 template <> struct is_container<layout_file_views> : std::true_type { };
 template <> struct is_container<layout_view_items> : std::true_type { };
-template <> struct is_container<render_manager_targets> : std::true_type { };
 
 
 template <>
@@ -239,76 +231,6 @@ public:
 	}
 };
 
-
-template <>
-struct usertype_container<render_manager_targets> : lua_engine::immutable_container_helper<render_manager_targets, simple_list<render_target> const, simple_list<render_target>::auto_iterator>
-{
-private:
-	using target_list = simple_list<render_target>;
-
-	static int next_pairs(lua_State *L)
-	{
-		indexed_iterator &i(stack::unqualified_get<user<indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
-			return stack::push(L, lua_nil);
-		int result;
-		result = stack::push(L, i.ix + 1);
-		result += stack::push_reference(L, *i.it);
-		++i.it;
-		++i.ix;
-		return result;
-	}
-
-public:
-	static int at(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.targets.count() < index))
-			return stack::push(L, lua_nil);
-		else
-			return stack::push_reference(L, *self.targets.find(index - 1));
-	}
-
-	static int get(lua_State *L) { return at(L); }
-	static int index_get(lua_State *L) { return at(L); }
-
-	static int index_of(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		render_target &target(stack::unqualified_get<render_target>(L, 2));
-		int const found(self.targets.indexof(target));
-		if (0 > found)
-			return stack::push(L, lua_nil);
-		else
-			return stack::push(L, found + 1);
-	}
-
-	static int size(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.count());
-	}
-
-	static int empty(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.empty());
-	}
-
-	static int next(lua_State *L) { return stack::push(L, next_pairs); }
-	static int pairs(lua_State *L) { return ipairs(L); }
-
-	static int ipairs(lua_State *L)
-	{
-		render_manager_targets &self(get_self(L));
-		stack::push(L, next_pairs);
-		stack::push<user<indexed_iterator> >(L, self.targets, self.targets.begin());
-		stack::push(L, lua_nil);
-		return 3;
-	}
-};
-
 } // namespace sol
 
 
@@ -316,7 +238,7 @@ public:
 //  initialize_render - register render user types
 //-------------------------------------------------
 
-void lua_engine::initialize_render()
+void lua_engine::initialize_render(sol::table &emu)
 {
 
 /* render_bounds library
@@ -333,12 +255,14 @@ void lua_engine::initialize_render()
  * bounds.height - get/set height
  * bounds.aspect - read-only aspect ratio width:height
  */
-	auto bounds_type = sol().registry().new_usertype<render_bounds>("bounds", sol::call_constructor, sol::initializers(
+	auto bounds_type = emu.new_usertype<render_bounds>(
+			"render_bounds",
+			sol::call_constructor, sol::initializers(
 				[] (render_bounds &b) { new (&b) render_bounds{ 0.0F, 0.0F, 1.0F, 1.0F }; },
 				[] (render_bounds &b, float x0, float y0, float x1, float y1) { new (&b) render_bounds{ x0, y0, x1, y1 }; }));
 	bounds_type["includes"] = &render_bounds::includes;
-	bounds_type["set_xy"] = &render_bounds::includes;
-	bounds_type["set_wh"] = &render_bounds::includes;
+	bounds_type["set_xy"] = &render_bounds::set_xy;
+	bounds_type["set_wh"] = &render_bounds::set_wh;
 	bounds_type["x0"] = &render_bounds::x0;
 	bounds_type["y0"] = &render_bounds::y0;
 	bounds_type["x1"] = &render_bounds::x1;
@@ -357,7 +281,9 @@ void lua_engine::initialize_render()
  * color.g - green channel
  * color.b - blue channel
  */
-	auto color_type = sol().registry().new_usertype<render_color>("color", sol::call_constructor, sol::initializers(
+	auto color_type = emu.new_usertype<render_color>(
+			"render_color",
+			sol::call_constructor, sol::initializers(
 				[] (render_color &c) { new (&c) render_color{ 1.0F, 1.0F, 1.0F, 1.0F }; },
 				[] (render_color &c, float a, float r, float g, float b) { new (&c) render_color{ a, r, g, b }; }));
 	color_type["set"] = &render_color::set;
@@ -372,6 +298,9 @@ void lua_engine::initialize_render()
  * manager:machine():render().targets[target_index]:current_view()
  *
  * view:has_screen(screen) - returns whether a given screen is present in the view (including hidden screens)
+ * view:set_prepare_items_callback(cb) - set additional tasks before adding items to render target
+ * view:set_preload_callback(cb) - set additional tasks after preloading visible items
+ * view:set_recomputed_callback(cb) - set additional tasks after recomputing for resize or visibility change
  *
  * view.items - get the items in the view (including hidden items)
  * view.name - display name for the view
@@ -384,6 +313,24 @@ void lua_engine::initialize_render()
 
 	auto layout_view_type = sol().registry().new_usertype<layout_view>("layout_view", sol::no_constructor);
 	layout_view_type["has_screen"] = &layout_view::has_screen;
+	layout_view_type["set_prepare_items_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_prepare_items_callback,
+				nullptr,
+				"set_prepare_items_callback",
+				nullptr);
+	layout_view_type["set_preload_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_preload_callback,
+				nullptr,
+				"set_preload_callback",
+				nullptr);
+	layout_view_type["set_recomputed_callback"] =
+		make_simple_callback_setter<void>(
+				&layout_view::set_recomputed_callback,
+				nullptr,
+				"set_recomputed_callback",
+				nullptr);
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);
@@ -415,63 +362,17 @@ void lua_engine::initialize_render()
 	auto layout_view_item_type = sol().registry().new_usertype<layout_view::item>("layout_item", sol::no_constructor);
 	layout_view_item_type["set_state"] = &layout_view::item::set_state;
 	layout_view_item_type["set_element_state_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_element_state_callback(layout_view::item::state_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_element_state_callback(layout_view::item::state_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
-							{
-								auto result(invoke(cbfunc).get<sol::optional<int> >());
-								if (result)
-								{
-									return *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from element state callback\n");
-									return 0;
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_element_state_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<int>(
+				&layout_view::item::set_element_state_callback,
+				[] () { return 0; },
+				"set_element_state_callback",
+				"element state");
 	layout_view_item_type["set_animation_state_callback"] =
-		[this] (layout_view::item &i, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				i.set_animation_state_callback(layout_view::item::state_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				i.set_animation_state_callback(layout_view::item::state_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () -> int
-							{
-								auto result(invoke(cbfunc).get<sol::optional<int> >());
-								if (result)
-								{
-									return *result;
-								}
-								else
-								{
-									osd_printf_error("[LUA ERROR] invalid return from animation state callback\n");
-									return 0;
-								}
-							}));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_animation_state_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<int>(
+				&layout_view::item::set_animation_state_callback,
+				[] () { return 0; },
+				"set_animation_state_callback",
+				"animation state");
 	layout_view_item_type["set_bounds_callback"] =
 		[this] (layout_view::item &i, sol::object cb)
 		{
@@ -550,7 +451,7 @@ void lua_engine::initialize_render()
 
 /* layout_file library
  *
- * file.set_resolve_tags_callback - set additional tasks after resolving tags
+ * file:set_resolve_tags_callback(cb) - set additional tasks after resolving tags
  *
  * file.device - get device that caused the file to be loaded
  * file.views[] - get view table (k=name, v=layout_view)
@@ -558,22 +459,11 @@ void lua_engine::initialize_render()
 
 	auto layout_file_type = sol().registry().new_usertype<layout_file>("layout_file", sol::no_constructor);
 	layout_file_type["set_resolve_tags_callback"] =
-		[this] (layout_file &f, sol::object cb)
-		{
-			if (cb == sol::lua_nil)
-			{
-				f.set_resolve_tags_callback(layout_file::resolve_tags_delegate());
-			}
-			else if (cb.is<sol::protected_function>())
-			{
-				f.set_resolve_tags_callback(layout_file::resolve_tags_delegate(
-							[this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); }));
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call set_resolve_tags_callback with function or nil\n");
-			}
-		};
+		make_simple_callback_setter<void>(
+				&layout_file::set_resolve_tags_callback,
+				nullptr,
+				"set_resolve_tags_callback",
+				nullptr);
 	layout_file_type["device"] = sol::property(&layout_file::device);
 	layout_file_type["views"] = sol::property([] (layout_file &f) { return layout_file_views(f); });
 
@@ -651,6 +541,6 @@ void lua_engine::initialize_render()
 	render_type["max_update_rate"] = &render_manager::max_update_rate;
 	render_type["ui_target"] = &render_manager::ui_target;
 	render_type["ui_container"] = &render_manager::ui_container;
-	render_type["targets"] = sol::property([] (render_manager &m) { return render_manager_targets(m); });
+	render_type["targets"] = sol::property([] (render_manager &m) { return simple_list_wrapper<render_target>(m.targets()); });
 
 }

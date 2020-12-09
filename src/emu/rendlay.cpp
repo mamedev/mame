@@ -2295,7 +2295,7 @@ protected:
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
-		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
+		draw_text(*font, dest, bounds, m_string, m_textalign, color(state));
 	}
 
 private:
@@ -2985,7 +2985,7 @@ protected:
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
-		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
+		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state), m_textalign, color(state));
 	}
 
 private:
@@ -3137,18 +3137,13 @@ protected:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-					const char *origs = m_stopnames[fruit].c_str();
-					const char *ends = origs + strlen(origs);
-					const char *s = origs;
-					char32_t schar;
-
 					// get the width of the string
 					float aspect = 1.0f;
 					s32 width;
 
 					while (1)
 					{
-						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
+						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
 						aspect *= 0.9f;
@@ -3157,9 +3152,11 @@ protected:
 					s32 curx = bounds.left() + (bounds.width() - width) / 2;
 
 					// loop over characters
-					while (*s != 0)
+					std::string_view s = m_stopnames[fruit];
+					while (!s.empty())
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						char32_t schar;
+						int scharcount = uchar_from_utf8(&schar, &s[0], s.length());
 
 						if (scharcount == -1)
 							break;
@@ -3199,7 +3196,7 @@ protected:
 
 						// advance in the X direction
 						curx += font->char_width(ourheight/num_shown, aspect, schar);
-						s += scharcount;
+						s.remove_prefix(scharcount);
 					}
 				}
 			}
@@ -3294,7 +3291,7 @@ private:
 					s32 width;
 					while (1)
 					{
-						width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
+						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
 						aspect *= 0.9f;
@@ -3305,15 +3302,12 @@ private:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-					const char *origs = m_stopnames[fruit].c_str();
-					const char *ends = origs + strlen(origs);
-					const char *s = origs;
-					char32_t schar;
-
 					// loop over characters
-					while (*s != 0)
+					std::string_view s = m_stopnames[fruit];
+					while (!s.empty())
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						char32_t schar;
+						int scharcount = uchar_from_utf8(&schar, &s[0], s.length());
 
 						if (scharcount == -1)
 							break;
@@ -3353,7 +3347,7 @@ private:
 
 						// advance in the X direction
 						curx += font->char_width(dest.height(), aspect, schar);
-						s += scharcount;
+						s.remove_prefix(scharcount);
 					}
 				}
 			}
@@ -3650,7 +3644,7 @@ void layout_element::component::draw_text(
 		render_font &font,
 		bitmap_argb32 &dest,
 		const rectangle &bounds,
-		const char *str,
+		std::string_view str,
 		int align,
 		const render_color &color)
 {
@@ -3696,15 +3690,10 @@ void layout_element::component::draw_text(
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 	// loop over characters
-	const char *origs = str;
-	const char *ends = origs + strlen(origs);
-	const char *s = origs;
-	char32_t schar;
-
-	// loop over characters
-	while (*s != 0)
+	while (!str.empty())
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		char32_t schar;
+		int scharcount = uchar_from_utf8(&schar, &str[0], str.length());
 
 		if (scharcount == -1)
 			break;
@@ -3743,7 +3732,7 @@ void layout_element::component::draw_text(
 
 		// advance in the X direction
 		curx += font.char_width(bounds.height(), aspect, schar);
-		s += scharcount;
+		str.remove_prefix(scharcount);
 	}
 }
 
@@ -4214,7 +4203,45 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 		for (edge const &e : m_interactive_edges_y)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
+
+	// additional actions typically supplied by script
+	if (!m_recomputed.isnull())
+		m_recomputed();
 }
+
+
+//-------------------------------------------------
+//  set_prepare_items_callback - set handler called
+//  before adding items to render target
+//-------------------------------------------------
+
+void layout_view::set_prepare_items_callback(prepare_items_delegate &&handler)
+{
+	m_prepare_items = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_preload_callback - set handler called
+//  after preloading elements
+//-------------------------------------------------
+
+void layout_view::set_preload_callback(preload_delegate &&handler)
+{
+	m_preload = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_recomputed_callback - set handler called
+//  after recomputing item bounds
+//-------------------------------------------------
+
+void layout_view::set_recomputed_callback(recomputed_delegate &&handler)
+{
+	m_recomputed = std::move(handler);
+}
+
 
 //-------------------------------------------------
 //  preload - perform expensive loading upfront
@@ -4228,6 +4255,9 @@ void layout_view::preload()
 		if (curitem.element())
 			curitem.element()->preload();
 	}
+
+	if (!m_preload.isnull())
+		m_preload();
 }
 
 

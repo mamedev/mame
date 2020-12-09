@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <string_view>
 
 class render_font;
 class render_container;
@@ -63,7 +64,7 @@ public:
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
 	void emit(render_container &container, float x, float y);
-	void add_text(const char *text, rgb_t fgcolor = rgb_t::white(), rgb_t bgcolor = rgb_t::transparent(), float size = 1.0)
+	void add_text(std::string_view text, rgb_t fgcolor = rgb_t::white(), rgb_t bgcolor = rgb_t::transparent(), float size = 1.0)
 	{
 		// create the style
 		char_style style = { 0, };
@@ -147,7 +148,7 @@ private:
 	bool m_truncating;
 
 	// methods
-	void add_text(const char *text, const char_style &style);
+	void add_text(std::string_view text, const char_style &style);
 	void start_new_line(text_justify justify, float height);
 	float get_char_width(char32_t ch, float size);
 	void truncate_wrap();

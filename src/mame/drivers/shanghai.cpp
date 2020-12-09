@@ -26,6 +26,7 @@ displayed.
 #include "video/hd63484.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
+#include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -470,7 +471,7 @@ void shanghai_state::shangha2(machine_config &config)
 void shanghai_state::kothello(machine_config &config)
 {
 	// basic machine hardware
-	V30(config, m_maincpu, XTAL(16'000'000));
+	V30(config, m_maincpu, XTAL(16'000'000)/2); // CXQ70116
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::kothello_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
@@ -512,7 +513,12 @@ void shanghai_state::kothello(machine_config &config)
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
-	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
+	SEIBU_ADPCM(config, "adpcm", XTAL(16'000'000)/36/48, "msm");
+
+	msm5205_device &msm(MSM5205(config, "msm", XTAL(16'000'000)/36)); // unknown divider, value from docs
+	msm.vck_callback().set("adpcm", FUNC(seibu_adpcm_device::msm_int));
+	msm.set_prescaler_selector(msm5205_device::S48_4B); /* 9.3? kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 /***************************************************************************
@@ -665,7 +671,7 @@ SSS8906
 |------------------------------------------|
 Notes:
       Z80 clock     : 4.000MHz
-      CXQ70116 clock: 16.000MHz
+      CXQ70116 clock: 8.000MHz
       YM3931 clock  : 4.000MHz
       YM2203 clock  : 4.000MHz
       M5205 clock   : 444598Hz; sample rate = M5205 clock / 48

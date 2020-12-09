@@ -80,7 +80,6 @@ myherok     3x16k 1x8k  6x8k  4x16k  no  pio  bootleg?
 4dwarrio    3x16k 1x8k  6x8k  4x16k  no  pio  ????    ????
 
 shtngmst    3x32k 1x32k 3x32k 7x32k  yes      7102
-shtngmste   3x32k 1x32k 3x32k 7x32k  yes      7102(a) 7104
 
 choplift    3x32k 1x32k 3x32k 4x32k  yes      7126    7120
 chopliftu   3x32k 1x32k 3x32k 4x32k  yes      7154
@@ -3854,18 +3853,47 @@ ROM_END
 
     Main Board        834-5719
     Light Gun Board?  834-5720
+
+
+Offically licensed and manufactured in Italy, 100% identical code:
+
+    Shooting Master (EVG)
+    Year: 1985
+    Manufacturer: E.V.G. SRL Milano made in Italy (Sega license)
+
+    CPU
+    1x Z8400AB1-Z80ACPU-Y28548 (main board)
+    1x iC8751H-88-L5310039 (main board)
+    1x AMD P8255A-8526YP (main board)
+    1x SEGA 315-5012-8605P5 (main board)
+    1x SEGA 315-5011-8549X5 (main board)
+    1x SEGA 315-5049-8551PX (main board)
+    1x SEGA 315-5139-8537-CK2605-V-J (main board)
+    1x oscillator 20.000MHz (main board)
+    1x SYS Z8400AB1-Z80ACPU-Y28535 (upper board)
+    1x NEC D8255AC-2 (upper board)
+    1x oscillator 4.9152MHz (upper board)
+
+    ROMs
+    1x HN27256G-25 (7043)(main board close to Z80)
+    2x HN27256G-25 (7101-7102)(main board close to C8751)
+    3x HN27256G-25 (7040-7041-7042)(main board close to 315-5049)
+    2x PAL16R4A (315-5137 and 315-5138)
+    1x HN27256G-25 (7100)(upper board close to oscillator)
+    7x HN27256G-25 (7104 to 7110)(upper board close to Z80 and 8255)
+
 */
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr-7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) ) /* This rom is located on the daughter board. */
-	ROM_LOAD( "epr-7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) ) /* These 2 roms are located on the main board. */
-	ROM_LOAD( "epr-7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+	ROM_LOAD( "epr-7100.ic18", 0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) /* This rom is located on the daughter board. */
+	ROM_LOAD( "epr-7101.ic91", 0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) ) /* These 2 roms are located on the main board. */
+	ROM_LOAD( "epr-7102.ic92", 0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) ) /* This rom is located on the main board. */
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP ) /* This mcu is located on the main board. */
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) ) /* These roms are located on the main board. */
@@ -3898,71 +3926,6 @@ ROM_START( shtngmst )
 	ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7 */
 	ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13 */
 	ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19 */
-ROM_END
-
-/*
-    Shooting Master (EVG)
-    Year: 1985
-    Manufacturer: E.V.G. SRL Milano made in Italy (Sega license)
-
-    CPU
-    1x Z8400AB1-Z80ACPU-Y28548 (main board)
-    1x iC8751H-88-L5310039 (main board)
-    1x AMD P8255A-8526YP (main board)
-    1x SEGA 315-5012-8605P5 (main board)
-    1x SEGA 315-5011-8549X5 (main board)
-    1x SEGA 315-5049-8551PX (main board)
-    1x SEGA 315-5139-8537-CK2605-V-J (main board)
-    1x oscillator 20.000MHz (main board)
-    1x SYS Z8400AB1-Z80ACPU-Y28535 (upper board)
-    1x NEC D8255AC-2 (upper board)
-    1x oscillator 4.9152MHz (upper board)
-
-    ROMs
-    1x HN27256G-25 (7043)(main board close to Z80)
-    2x HN27256G-25 (7101-7102)(main board close to C8751)
-    3x HN27256G-25 (7040-7041-7042)(main board close to 315-5049)
-    2x PAL16R4A (315-5137 and 315-5138)
-    1x HN27256G-25 (7100)(upper board close to oscillator)
-    7x HN27256G-25 (7104 to 7110)(upper board close to Z80 and 8255)
-*/
-ROM_START( shtngmste )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr-7100.ic18", 0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) // sldh
-	ROM_LOAD( "epr-7101.ic91", 0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
-	ROM_LOAD( "epr-7102.ic92", 0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr-7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
-
-	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr-7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
-	ROM_LOAD( "epr-7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
-	ROM_LOAD( "epr-7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
-
-	ROM_REGION( 0x40000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
-	ROM_LOAD( "epr-7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
-	ROM_LOAD( "epr-7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
-	ROM_LOAD( "epr-7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
-	ROM_LOAD( "epr-7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
-	ROM_LOAD( "epr-7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
-	ROM_LOAD( "epr-7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
-
-	ROM_REGION( 0x0300, "color_proms", 0 )
-	ROM_LOAD( "epr-7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
-	ROM_LOAD( "epr-7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
-	ROM_LOAD( "epr-7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
-
-	ROM_REGION( 0x0100, "lookup_proms", 0 )
-	ROM_LOAD( "pr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
-
-	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
-	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
 ROM_END
 
 /*
@@ -5640,8 +5603,7 @@ GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, i
 GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )

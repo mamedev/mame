@@ -9877,6 +9877,7 @@ ghv101                          //
 kpv106                          //
 pmv112                          //
 pmv112r                         //
+pp100                           //
 
 @source:capr1.cpp
 cspin2                          //
@@ -12120,7 +12121,8 @@ dectalk                         // 1983 Digital Equipment Corporation
 la120                           // 1978 Digital Equipment Corporation
 
 @source:deniam.cpp
-croquis                         // (c) 1996 Deniam (Germany)
+croquis                         // (c) 1996 Deniam (Korea)
+croquisg                        // (c) 1996 Deniam (Germany)
 karianx                         // (c) 1996 Deniam
 logicpr2                        // (c) 1997 Deniam (Japan)
 logicpro                        // (c) 1996 Deniam
@@ -19094,6 +19096,7 @@ koropens
 kzaurus
 pwrchanc
 ymcapsul
+spcpokan
 
 @source:quickpick5.cpp
 quickp5
@@ -30972,8 +30975,9 @@ wales210                        // 199? Walther ES-210 (German)
 
 @source:namcofl.cpp
 finalapr                        // (c) 1995
+finalapr1                       // (c) 1995
 finalaprj                       // (c) 1995
-finalapro                       // (c) 1995
+finalaprj1                      // (c) 1995
 speedrcr                        // (c) 1995
 
 @source:namcona1.cpp
@@ -39270,7 +39274,6 @@ seganinj                        // 834-5677 (c) 1985 (S1)
 seganinju                       // 834-5677 (c) 1985 (S1)
 seganinja                       //
 shtngmst                        // 834-5719/5720 (c) 1985 (S2)
-shtngmste                       // 834-5719/5720 (c) 1985 (S2)
 spatter                         // 834-5583 (c) 1984 (S1)
 spattera                        // 834-5583 (c) 1984 (S1)
 ssanchan                        // 834-5583 (c) 1984 (S1)
@@ -40965,10 +40968,12 @@ vulcanb                         // GX785 (c) 1988
 @source:twincobr.cpp
 fnshark                         // bootleg
 fshark                          // B02 / TP-007 (c) 1987 Taito Corporation (World)
+fsharkb                         // bootleg
 fsharkbt                        // bootleg
 gulfwar2                        // (c) 1991 Comad
 gulfwar2a                       //
 hishouza                        // B02 / TP-007 (c) 1987 Taito Corporation (Japan)
+hishouzab                       // bootleg
 ktiger                          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 skyshark                        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharka                       // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
@@ -41688,6 +41693,7 @@ wangpc                          //
 @source:wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
+wardnerb                        // bootleg
 wardnerj                        // B25 / TP-009 (c) 1987 Taito Corporation (Japan)
 
 @source:warpsped.cpp

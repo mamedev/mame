@@ -50,15 +50,15 @@ uint8_t vic10_standard_cartridge_device::vic10_cd_r(offs_t offset, uint8_t data,
 {
 	if (!lorom && m_lorom)
 	{
-		data = m_lorom[offset];
+		data = m_lorom[offset & 0x1fff];
 	}
 	else if (!exram && m_exram)
 	{
-		data = m_exram[offset];
+		data = m_exram[offset & 0x7ff];
 	}
 	else if (!uprom && m_uprom)
 	{
-		data = m_uprom[offset];
+		data = m_uprom[offset & 0x1fff];
 	}
 
 	return data;
@@ -73,6 +73,6 @@ void vic10_standard_cartridge_device::vic10_cd_w(offs_t offset, uint8_t data, in
 {
 	if (!exram && m_exram)
 	{
-		m_exram[offset] = data;
+		m_exram[offset & 0x7ff] = data;
 	}
 }

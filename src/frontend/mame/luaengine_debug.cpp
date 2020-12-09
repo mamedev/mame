@@ -81,7 +81,7 @@ sol::object do_watchpoint_enable(lua_State *L, device_debug &dev, sol::object &i
 } // anonymous namespace
 
 
-void lua_engine::initialize_debug()
+void lua_engine::initialize_debug(sol::table &emu)
 {
 
 	static const enum_parser<read_or_write, 4> s_read_or_write_parser =

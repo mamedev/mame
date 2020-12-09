@@ -8,7 +8,7 @@
     Electron ULA emulation by Wilbert Pol
 
     Main CPU: 65C816
-    Other chips: 6850 UART, 6522 VIA, SAA5240(video?), AM7910 modem, PCF0335(?), PCF8573P
+    Other chips: 6850 UART, 6522 VIA, SAA5240(teletext), AM7910(modem), PCF0335(dialler?), PCF8573P(RTC)
 
 ****************************************************************************/
 
@@ -17,9 +17,11 @@
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/pcf8573.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
 #include "bus/econet/econet.h"
@@ -47,8 +49,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_maincpu_region(*this, "maincpu"),
+		m_irqs(*this, "irqs"),
+		m_screen(*this, "screen"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
+		m_rtc(*this, "rtc"),
 		m_via(*this, "via6522"),
 		m_acia(*this, "acia"),
 		m_acia_clock(*this, "acia_clock"),
@@ -71,6 +76,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -83,15 +90,17 @@ private:
 	void sheila_w(offs_t offset, uint8_t data);
 
 	void accomm_palette(palette_device &palette) const;
-	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	void main_map(address_map &map);
 
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_memory_region m_maincpu_region;
+	required_device<input_merger_device> m_irqs;
+	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beeper;
 	required_device<ram_device> m_ram;
+	required_device<pcf8573_device> m_rtc;
 	required_device<via6522_device> m_via;
 	required_device<acia6850_device> m_acia;
 	required_device<clock_device> m_acia_clock;
@@ -107,6 +116,11 @@ private:
 
 	bool m_ch00rom_enabled;
 
+	enum
+	{
+		TIMER_SCANLINE_INTERRUPT
+	};
+
 	/* ULA context */
 
 	struct ULA
@@ -116,15 +130,14 @@ private:
 		uint8_t rompage;
 		uint16_t screen_start;
 		uint16_t screen_base;
-		int screen_size;
+		uint16_t screen_size;
 		uint16_t screen_addr;
-		uint8_t *vram;
+		int screen_dispend;
 		int current_pal[16];
 		int communication_mode;
 		int screen_mode;
 		int shiftlock_mode;
 		int capslock_mode;
-		//  int scanline;
 		/* tape reading related */
 		uint32_t tape_value;
 		int tape_steps;
@@ -136,27 +149,18 @@ private:
 		uint8_t tape_byte;
 	};
 
-
 	ULA m_ula;
 	int m_map4[256];
 	int m_map16[256];
-};
-
-static const rgb_t electron_palette[8]=
-{
-	rgb_t(0x0ff,0x0ff,0x0ff),
-	rgb_t(0x000,0x0ff,0x0ff),
-	rgb_t(0x0ff,0x000,0x0ff),
-	rgb_t(0x000,0x000,0x0ff),
-	rgb_t(0x0ff,0x0ff,0x000),
-	rgb_t(0x000,0x0ff,0x000),
-	rgb_t(0x0ff,0x000,0x000),
-	rgb_t(0x000,0x000,0x000)
+	emu_timer *m_scanline_timer;
 };
 
 void accomm_state::accomm_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette);
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		palette.set_pen_color(i ^ 7, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
+	}
 }
 
 uint8_t accomm_state::read_keyboard1(offs_t offset)
@@ -187,11 +191,6 @@ uint8_t accomm_state::read_keyboard2(offs_t offset)
 	return data;
 }
 
-INTERRUPT_GEN_MEMBER(accomm_state::vbl_int)
-{
-	interrupt_handler( INT_SET, INT_DISPLAY_END );
-}
-
 void accomm_state::machine_reset()
 {
 	m_ula.communication_mode = 0x04;
@@ -201,11 +200,10 @@ void accomm_state::machine_reset()
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
-	m_ula.screen_addr = 0;
+	m_ula.screen_addr = 0x3000;
 	m_ula.tape_running = 0;
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0;
-	m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
 
 	m_ch00rom_enabled = true;
 }
@@ -217,6 +215,21 @@ void accomm_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
+
+	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
+	save_item(STRUCT_MEMBER(m_ula, interrupt_control));
+	save_item(STRUCT_MEMBER(m_ula, rompage));
+	save_item(STRUCT_MEMBER(m_ula, screen_start));
+	save_item(STRUCT_MEMBER(m_ula, screen_base));
+	save_item(STRUCT_MEMBER(m_ula, screen_size));
+	save_item(STRUCT_MEMBER(m_ula, screen_addr));
+	save_item(STRUCT_MEMBER(m_ula, screen_dispend));
+	save_item(STRUCT_MEMBER(m_ula, current_pal));
+	save_item(STRUCT_MEMBER(m_ula, communication_mode));
+	save_item(STRUCT_MEMBER(m_ula, screen_mode));
+	save_item(STRUCT_MEMBER(m_ula, shiftlock_mode));
+	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
+	save_item(NAME(m_ch00rom_enabled));
 }
 
 void accomm_state::video_start()
@@ -226,6 +239,8 @@ void accomm_state::video_start()
 		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE_INTERRUPT);
+	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 
 void accomm_state::ch00switch_w(offs_t offset, uint8_t data)
@@ -237,7 +252,8 @@ void accomm_state::ch00switch_w(offs_t offset, uint8_t data)
 
 inline uint8_t accomm_state::read_vram(uint16_t addr)
 {
-	return m_ula.vram[ addr % m_ula.screen_size ];
+	if ( addr & 0x8000 ) addr -= m_ula.screen_size;
+	return m_vram[ addr ];
 }
 
 inline void accomm_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
@@ -252,9 +268,6 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
 	r.sety(scanline, scanline);
-
-	if (scanline == 0)
-		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
 
 	/* set up palette */
 	int pal[16];
@@ -439,8 +452,32 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 		break;
 	}
+	if ( m_ula.screen_addr & 0x8000 )
+		m_ula.screen_addr -= m_ula.screen_size;
 
 	return 0;
+}
+
+
+void accomm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_SCANLINE_INTERRUPT)
+	{
+		switch (m_screen->vpos())
+		{
+		case 99:
+			interrupt_handler( INT_SET, INT_RTC );
+			break;
+		case 249:
+		case 255:
+			if ( m_screen->vpos() == m_ula.screen_dispend )
+				interrupt_handler( INT_SET, INT_DISPLAY_END );
+			break;
+		case 311:
+			m_ula.screen_addr = m_ula.screen_start;
+			break;
+		}
+	}
 }
 
 
@@ -499,17 +536,17 @@ uint8_t accomm_state::sheila_r(offs_t offset)
 		data = m_ula.tape_byte;
 		break;
 	}
-	logerror( "ULA: read offset %02x: %02x\n", offset, data );
 	return data;
 }
 
 static const int palette_offset[4] = { 0, 4, 5, 1 };
-static const uint16_t screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
+static const int mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
 void accomm_state::sheila_w(offs_t offset, uint8_t data)
 {
 	int i = palette_offset[(( offset >> 1 ) & 0x03)];
-	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
+
 	switch( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt control */
@@ -519,11 +556,9 @@ void accomm_state::sheila_w(offs_t offset, uint8_t data)
 		break;
 	case 0x02:  /* Screen start address #1 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
-		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x03:  /* Screen start address #2 */
-		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
-		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
+		m_ula.screen_start = ( m_ula.screen_start & 0x1ff ) | ( ( data & 0x3f ) << 9 );
 		break;
 	case 0x04:  /* Cassette data shift register */
 		break;
@@ -585,23 +620,22 @@ void accomm_state::sheila_w(offs_t offset, uint8_t data)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
-		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
+		m_ula.screen_dispend = mode_end[ m_ula.screen_mode ];
 		m_ula.shiftlock_mode = !BIT(data, 6);
 		m_shiftlock_led = m_ula.shiftlock_mode;
 		m_ula.capslock_mode = BIT(data, 7);
 		m_capslock_led = m_ula.capslock_mode;
 		break;
-	case 0x08: case 0x0A: case 0x0C: case 0x0E:
-		// video_update
-		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+	case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		/* colour palette */
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 2));
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
 		m_ula.current_pal[i] = (m_ula.current_pal[
 		i] & 0x03) | ((data & 0x10) >> 2);
 		break;
-	case 0x09: case 0x0B: case 0x0D: case 0x0F:
-		// video_update
+	case 0x09: case 0x0b: case 0x0d: case 0x0f:
+		/* colour palette */
 		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
@@ -840,15 +874,14 @@ void accomm_state::accomm(machine_config &config)
 {
 	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(accomm_state::vbl_int));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50.08);
-	screen.set_size(640, 312);
-	screen.set_visarea(0, 640 - 1, 0, 256 - 1);
-	screen.set_screen_update(FUNC(accomm_state::screen_update));
-	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_palette("palette");
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
+	m_screen->set_screen_update(FUNC(accomm_state::screen_update));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(accomm_state::accomm_palette), 16);
 
@@ -863,18 +896,27 @@ void accomm_state::accomm(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* rtc pcf8573 */
+	/* rtc */
+	PCF8573(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->comp_cb().set(m_via, FUNC(via6522_device::write_cb1));
+
+	/* teletext */
+	//SAA5240(config, m_cct);
 
 	/* via */
 	VIA6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);
+	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
+	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
+	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* acia */
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
-	m_acia->irq_handler().set_inputline("maincpu", G65816_LINE_IRQ);
+	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
 	serial.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));

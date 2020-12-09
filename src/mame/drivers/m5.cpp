@@ -331,9 +331,6 @@ public:
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 
-	void init_pal();
-	void init_ntsc();
-
 protected:
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -1167,7 +1164,7 @@ void brno_state::m5_mem_brno(address_map &map)
 	map(0x0000, 0xffff).view(m_ram_view);
 	m_ram_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r), FUNC(brno_state::ramdisk_w));
 	map(0x0000, 0x7fff).view(m_rom_view);
-	m_rom_view[0](0x0000, 0x3fff).rom().region("maincpu", 0);
+	m_rom_view[0](0x0000, 0x3fff).rom().region("maincpu", 0).unmapw();
 	m_rom_view[0](0x7000, 0x7fff).ram();
 }
 
@@ -1194,7 +1191,7 @@ void brno_state::brno_io(address_map &map)
 	map(0x64, 0x64).select(0xf000).mirror(0x0f03).w(FUNC(brno_state::mmu_w));         //  MMU - page select (ramdisk memory paging)
 	map(0x68, 0x68).mirror(0xff03).w(FUNC(brno_state::ramsel_w));                     //  CASEN
 	map(0x6c, 0x6c).mirror(0xff03).w(FUNC(brno_state::romsel_w));                     //  RAMEN
-//  map(0x70, 0x73).mirror(0xff04).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
+	map(0x70, 0x73).mirror(0xff00).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
 	map(0x78, 0x7b).mirror(0xff00).rw(m_wdfdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));   //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
 	map(0x7c, 0x7c).mirror(0xff03).w(FUNC(brno_state::fd_w));                         //  drive select
 }
@@ -1228,6 +1225,7 @@ void brno_state::mmu_w(offs_t offset, u8 data)
 void brno_state::ramsel_w(u8 data) //out 6b
 {
 	// 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
+	// Note that RAM disk is not banked in 0000-3FFF or 7000-7FFF unless ROM is disabled
 	if (!BIT(data, 0))
 		m_ram_view.select(0);
 	else
@@ -1626,6 +1624,8 @@ void brno_state::brno(machine_config &config)
 
 	m_ctc->zc_callback<2>().set("sio", FUNC(i8251_device::write_txc));
 	m_ctc->zc_callback<2>().append("sio", FUNC(i8251_device::write_rxc));
+
+	I8255(config, "pio");
 
 	// floppy
 	WD2797(config, m_wdfdc, 4_MHz_XTAL / 4);

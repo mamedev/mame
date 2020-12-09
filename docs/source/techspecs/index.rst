@@ -9,6 +9,7 @@ MAME’s source or working on scripts that run within the MAME framework.
 
         naming
         layout_files
+        layout_script
         object_finders
         device_memory_interface
         device_rom_interface

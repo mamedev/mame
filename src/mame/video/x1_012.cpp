@@ -21,6 +21,7 @@ x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, dev
 	, m_tile_offset_callback(*this)
 	, m_vram(*this, DEVICE_SELF)
 	, m_tilemap(nullptr)
+	, m_xoffsets{0, 0}
 	, m_rambank(0)
 {
 	std::fill(std::begin(m_vctrl), std::end(m_vctrl), 0);
@@ -94,7 +95,7 @@ void x1_012_device::vctrl_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void x1_012_device::update_scroll(int xoffset, int vis_dimy, bool flip)
+void x1_012_device::update_scroll(int vis_dimy, bool flip)
 {
 	int x = m_vctrl[0];
 	int y = m_vctrl[1];
@@ -107,7 +108,7 @@ void x1_012_device::update_scroll(int xoffset, int vis_dimy, bool flip)
 	                fff0 0260 = -$10, $400-$190 -$10
 	                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
-	x += 0x10 - xoffset;
+	x += 0x10 - m_xoffsets[flip ? 1 : 0];
 	y -= (256 - vis_dimy)/2;
 	if (flip)
 	{

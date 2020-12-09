@@ -20,13 +20,14 @@ public:
 
 	// configuration
 	template <typename... T> void set_tile_offset_callback(T &&... args) { m_tile_offset_callback.set(std::forward<T>(args)...); }
+	void set_xoffsets(int flip, int noflip) { m_xoffsets[1] = flip; m_xoffsets[0] = noflip; }
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 	u16 vctrl_r(offs_t offset, u16 mem_mask = 0xffff);
 	void vctrl_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
 	u16 vctrl(int index) const { return m_vctrl[index]; }
-	void update_scroll(int xoffset, int vis_dimy, bool flip);
+	void update_scroll(int vis_dimy, bool flip);
 
 	void set_flip(u32 flip) { m_tilemap->set_flip(flip); }
 	void mark_all_dirty() { m_tilemap->mark_all_dirty(); }
@@ -46,6 +47,8 @@ private:
 	required_shared_ptr<u16> m_vram;
 
 	tilemap_t *m_tilemap;
+
+	int m_xoffsets[2];
 
 	u16 m_vctrl[3];
 	u8 m_rambank;

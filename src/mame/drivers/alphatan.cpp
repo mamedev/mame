@@ -196,7 +196,7 @@ void alphatan_state::alphatan(machine_config &config)
 	M6504(config, m_maincpu, 8.86_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphatan_state::alphatan_map);
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 625, 0, 480);

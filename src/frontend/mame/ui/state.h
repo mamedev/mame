@@ -30,7 +30,7 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 protected:
-	menu_load_save_state_base(mame_ui_manager &mui, render_container &container, const char *header, const char *footer, bool must_exist);
+	menu_load_save_state_base(mame_ui_manager &mui, render_container &container, std::string_view header, std::string_view footer, bool must_exist);
 	virtual void process_file(std::string &&file_name) = 0;
 
 private:
@@ -56,8 +56,8 @@ private:
 
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
-	char const *const                               m_header;
-	char const *const                               m_footer;
+	std::string_view const                          m_header;
+	std::string_view const                          m_footer;
 	bool const                                      m_must_exist;
 	bool                                            m_was_paused;
 	bool                                            m_keys_released;

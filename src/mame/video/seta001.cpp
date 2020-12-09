@@ -45,6 +45,17 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SETA001_SPRITE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxbank_cb(*this)
+	, m_fg_flipxoffs(0)
+	, m_fg_noflipxoffs(0)
+	, m_fg_flipyoffs(0)
+	, m_fg_noflipyoffs(0)
+	, m_bg_flipyoffs(0)
+	, m_bg_noflipyoffs(0)
+	, m_bg_flipxoffs(0)
+	, m_bg_noflipxoffs(0)
+	, m_colorbase(0)
+	, m_spritelimit(0x1ff)
+	, m_transpen(0)
 {
 }
 
@@ -80,22 +91,6 @@ void seta001_device::device_start()
 	memset(m_spriteylow.get(),0xff,0x300);
 	memset(m_spritecodelow.get(),0xff,0x2000);
 	memset(m_spritecodehigh.get(),0xff,0x2000);
-
-	m_fg_flipxoffs = 0;
-	m_fg_noflipxoffs = 0;
-
-	m_fg_flipyoffs = 0;
-	m_fg_noflipyoffs = 0;
-
-	m_bg_flipyoffs = 0;
-	m_bg_noflipyoffs = 0;
-
-	m_bg_flipxoffs = 0;
-	m_bg_noflipxoffs = 0;
-
-	m_transpen = 0;
-	m_colorbase = 0;
-	m_spritelimit = 0x1ff;
 
 	m_bgflag = 0x00;
 
@@ -258,7 +253,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int const ctrl    =   m_spritectrl[0];
 	int const ctrl2   =   m_spritectrl[1];
 
-	int const flip    =   ctrl & 0x40;
+	bool const flip   =   BIT(ctrl, 6);
 	int numcol  =   ctrl2 & 0x0f;
 
 	int scrollx, scrolly;
@@ -360,9 +355,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int const screenflip = (m_spritectrl[0] & 0x40) >> 6;
-	int i;
 	int const ctrl2 = m_spritectrl[1];
-	int xoffs, yoffs;
 
 	int const total_color_codes   =   gfx(0)->colors();
 
@@ -371,8 +364,9 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	uint8_t *ctrl_pointer = &m_spritecodehigh[0x0000];
 	uint8_t *color_pointer = &m_spritecodehigh[0x0200];
 
-	xoffs   =   screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
-	yoffs   =   screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
+	// note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment
+	int xoffs = screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
+	int yoffs = screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
 	{
@@ -385,7 +379,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	int const max_y = screen.height();
 
 	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. */
-	for (i = m_spritelimit; i >= 0; i--)
+	for (int i = m_spritelimit; i >= 0; i--)
 	{
 		int code, color, sx, sy, flipx, flipy;
 

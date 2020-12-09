@@ -519,9 +519,9 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 
 	// add remove/add handlers
 	if (1 < i)
-		item_append(_("Remove last filter"), "", 0, (void *)REMOVE_FILTER);
+		item_append(_("Remove last filter"), 0, (void *)REMOVE_FILTER);
 	if (MAX > i)
-		item_append(_("Add filter"), "", 0, (void *)ADD_FILTER);
+		item_append(_("Add filter"), 0, (void *)ADD_FILTER);
 	item_append(menu_item_type::SEPARATOR);
 
 	// leave space for heading
@@ -845,21 +845,18 @@ public:
 		inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 		if (value)
 		{
-			char const *const split(std::strchr(value, '/'));
-			std::string ini;
-			if (split)
-				ini.assign(value, split);
-			else
-				ini.assign(value);
+			std::string_view const s(value);
+			std::string_view::size_type const split(s.find('/'));
+			std::string_view const ini(s.substr(0, split));
 
 			for (unsigned i = 0; mgr.get_file_count() > i; ++i)
 			{
 				if (mgr.get_file_name(i) == ini)
 				{
 					m_ini = i;
-					if (split)
+					if (std::string_view::npos != split)
 					{
-						std::string const group(split + 1);
+						std::string_view const group(s.substr(split + 1));
 						for (unsigned j = 0; mgr.get_category_count(i) > j; ++j)
 						{
 							if (mgr.get_category_name(i, j) == group)
@@ -1036,7 +1033,7 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 	unsigned const filecnt(mgr.get_file_count());
 	if (!filecnt)
 	{
-		item_append(_("No category INI files found"), "", FLAG_DISABLE, nullptr);
+		item_append(_("No category INI files found"), FLAG_DISABLE, nullptr);
 	}
 	else
 	{
@@ -1045,7 +1042,7 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 		unsigned const groupcnt(mgr.get_category_count(m_ini));
 		if (!groupcnt)
 		{
-			item_append(_("No groups found in category file"), "", FLAG_DISABLE, nullptr);
+			item_append(_("No groups found in category file"), FLAG_DISABLE, nullptr);
 		}
 		else
 		{
@@ -1601,7 +1598,7 @@ std::string software_filter_data::extract_region(std::string const &longname)
 	if (found != std::string::npos)
 	{
 		std::string::size_type const ends(fullname.find_first_not_of("abcdefghijklmnopqrstuvwxyz", found + 1));
-		std::string const temp(fullname.substr(found + 1, ends - found - 1));
+		std::string_view const temp(std::string_view(fullname).substr(found + 1, ends - found - 1));
 		auto const match(std::find_if(
 				std::begin(SOFTWARE_REGIONS),
 				std::end(SOFTWARE_REGIONS),
@@ -1686,19 +1683,19 @@ machine_filter::ptr machine_filter::create(emu_file &file, machine_filter_data c
 		return nullptr;
 
 	// split it into a key/value or bail
-	std::string key(buffer);
-	for (std::string::size_type i = 0; (2 * indent) > i; ++i)
+	std::string_view key(buffer);
+	for (std::string_view::size_type i = 0; (2 * indent) > i; ++i)
 	{
 		if ((key.length() <= i) || (' ' != key[i]))
 			return nullptr;
 	}
 	key = key.substr(2 * indent);
-	std::string::size_type const split(key.find(" = "));
-	if (std::string::npos == split)
+	std::string_view::size_type const split(key.find(" = "));
+	if (std::string_view::npos == split)
 		return nullptr;
-	std::string::size_type const nl(key.find_first_of("\r\n", split));
-	std::string const value(key.substr(split + 3, (std::string::npos == nl) ? nl : (nl - split - 3)));
-	key.resize(split);
+	std::string_view::size_type const nl(key.find_first_of("\r\n", split));
+	std::string const value(key.substr(split + 3, (std::string_view::npos == nl) ? nl : (nl - split - 3)));
+	key = key.substr(0, split);
 
 	// look for a filter type that matches
 	for (type n = FIRST; COUNT > n; ++n)
@@ -1794,19 +1791,19 @@ software_filter::ptr software_filter::create(emu_file &file, software_filter_dat
 		return nullptr;
 
 	// split it into a key/value or bail
-	std::string key(buffer);
-	for (std::string::size_type i = 0; (2 * indent) > i; ++i)
+	std::string_view key(buffer);
+	for (std::string_view::size_type i = 0; (2 * indent) > i; ++i)
 	{
 		if ((key.length() <= i) || (' ' != key[i]))
 			return nullptr;
 	}
 	key = key.substr(2 * indent);
-	std::string::size_type const split(key.find(" = "));
-	if (std::string::npos == split)
+	std::string_view::size_type const split(key.find(" = "));
+	if (std::string_view::npos == split)
 		return nullptr;
-	std::string::size_type const nl(key.find_first_of("\r\n", split));
-	std::string const value(key.substr(split + 3, (std::string::npos == nl) ? nl : (nl - split - 3)));
-	key.resize(split);
+	std::string_view::size_type const nl(key.find_first_of("\r\n", split));
+	std::string const value(key.substr(split + 3, (std::string_view::npos == nl) ? nl : (nl - split - 3)));
+	key = key.substr(0, split);
 
 	// look for a filter type that matches
 	for (type n = FIRST; COUNT > n; ++n)
