@@ -1823,9 +1823,10 @@ void lua_engine::initialize()
 			return format_table;
 		}));
 
+
 /*	image_device_format library
  *
- * manager:machine().images[image_type].formatlist[x]
+ * manager:machine().images[tag].formatlist[name]
  * 
  * format.name - name of the format (e.g. - "dsk")
  * format.description - the description of the format
@@ -1833,7 +1834,7 @@ void lua_engine::initialize()
  * format.optspec - the option spec associated with the format
  * 
  */
-	auto format_type = sol().registry().new_usertype<image_device_format>("format", "new", sol::no_constructor);
+	auto format_type = sol().registry().new_usertype<image_device_format>("image_format", sol::no_constructor);
 	format_type["name"] = sol::property(&image_device_format::name);
 	format_type["description"] = sol::property(&image_device_format::description);
 	format_type["optspec"] = sol::property(&image_device_format::optspec);
