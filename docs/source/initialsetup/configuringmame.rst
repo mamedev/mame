@@ -1,10 +1,10 @@
 Configuring MAME
-================
+----------------
 
 .. contents:: :local:
 
 Getting Started: A Quick Preface
-================================
+--------------------------------
 
 Once you have MAME installed, the next step is to configure it. There are
 several ways to do this, and each will be covered in turn.
@@ -16,12 +16,12 @@ If you are on Linux or MacOS, the MAME executable will be called ``mame64`` or
 ``mame`` depending on if you have a 64-bit or 32-bit version of MAME.
 
 
-Initial Setup: Creating MAME.ini From Command Line on Windows
-=============================================================
+Initial Setup: Creating mame.ini From Command Line on Windows
+-------------------------------------------------------------
 
 First, you will need to *cd* to the directory where you installed MAME into.
-If, for instance, you have MAME installed in ``c:\emu\mame`` you will need to
-type ``cd \emu\mame`` into the command prompt.
+If, for instance, you have MAME installed in ``c:\users\public\mame`` you will
+need to type ``cd c:\users\public\mame`` into the command prompt.
 
 Then you have MAME create the config file by typing ``mame64 -createconfig``
 or ``mame -createconfig`` depending on if you are using the 64-bit version of
@@ -32,8 +32,8 @@ This file contains the default configuration settings for a new MAME
 installation.
 
 
-Initial Setup: Creating MAME.ini From Command Line on Linux or MacOS
-====================================================================
+Initial Setup: Creating mame.ini From Command Line on Linux or MacOS
+--------------------------------------------------------------------
 
 The steps for Linux and MacOS are similar to those of Windows. If you
 installed MAME using the package manager that came from a Linux distro, you will
@@ -56,7 +56,7 @@ from inside of MAME.
 
 
 Initial Setup: Graphical Setup
-==============================
+------------------------------
 
 This is the easiest way to get started. Start MAME by opening the MAME icon
 in the location where you installed it. This will be ``mame64.exe`` or
@@ -74,5 +74,5 @@ text editor.
 
 
 Configuring MAME
-================
+----------------
 
