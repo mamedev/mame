@@ -19,6 +19,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_msm(*this, "msm%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram")
@@ -31,6 +32,7 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<msm5205_device, 2> m_msm;
 
 	void flipscreen_w(uint8_t data);
 	void background_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -85,8 +87,7 @@ class cabalbl_state : public cabal_base_state
 {
 public:
 	cabalbl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		cabal_base_state(mconfig, type, tag),
-		m_msm(*this, "msm%u", 1U)
+		cabal_base_state(mconfig, type, tag)
 	{ }
 
 	void cabalbl(machine_config &config);
@@ -96,8 +97,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device_array<msm5205_device, 2> m_msm;
-
 	int m_sound_command[2];
 
 	void sndcmd_w(offs_t offset, uint16_t data);
