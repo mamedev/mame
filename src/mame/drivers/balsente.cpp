@@ -248,7 +248,7 @@ void balsente_state::cpu1_base_map(address_map &map)
 	map(0x9902, 0x9902).portr("IN0");
 	map(0x9903, 0x9903).portr("IN1").nopw();
 	map(0x9a00, 0x9a03).r(FUNC(balsente_state::random_num_r));
-	map(0x9a04, 0x9a05).r("acia", FUNC(acia6850_device::read)).w(FUNC(balsente_state::acia_w));
+	map(0x9a04, 0x9a05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xa000, 0xbfff).bankr("bankab");
 	map(0xc000, 0xdfff).bankr("bankcd");
 	map(0xe000, 0xffff).bankr("bankef");
