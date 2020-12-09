@@ -53,7 +53,7 @@ Supported OS
 
 The current source code can be directly compiled under all the main OSes:
 Microsoft Windows (both with DirectX/BGFX native support or with SDL support),
-Linux, FreeBSD, and Mac OS X. Also, both 32-bit and 64-bit are supported, but
+Linux, FreeBSD, and macOS. Also, both 32-bit and 64-bit are supported, but
 be aware 64-bit often shows a significant speed increase over 32-bit.
 
 System Requirements
@@ -65,7 +65,7 @@ evolved as well to take advantage of the greater processing power and hardware
 capabilities offered.
 
 The official MAME binaries are compiled and designed to run on a standard
-Windows-based system. The minimum requirements are:
+Windows-based system. The minimum requirements for Windows are:
 
 * Intel Core series CPU or equivalent, at least 2.0 GHz
 * 32-bit OS (Vista SP1 or later on Windows, 10.9 or later on Mac)
