@@ -244,10 +244,10 @@ Compilation is exactly as described above in All Platforms.
 
 .. _compiling-macos:
 
-Apple MacOS
+Apple macOS
 -----------
 
-You'll need a few prerequisites to get started. Make sure you're on MacOS 10.14
+You'll need a few prerequisites to get started. Make sure you're on macOS 10.14
 Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
 
 * Install **Xcode** from the Mac App Store
@@ -257,7 +257,7 @@ Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
 
 Next you'll need to get SDL2 installed.
 
-* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *MacOS* .dmg file
+* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *macOS* .dmg file
 * If the .dmg doesn't auto-open, open it
 * Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder
 
@@ -466,7 +466,7 @@ NO_USE_PORTAUDIO
    Set to **1** to disable building the PortAudio sound output module.
 USE_QTDEBUG
    Set to **1** to include the Qt debugger on platforms where it's not built by
-   default (e.g. Windows or MacOS), or to **0** to disable it.  You'll need to
+   default (e.g. Windows or macOS), or to **0** to disable it.  You'll need to
    install Qt development libraries and tools to build the Qt debugger.  The
    process depends on the platform.
 
