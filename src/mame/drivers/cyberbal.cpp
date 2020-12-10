@@ -1006,7 +1006,6 @@ void cyberbal_state::init_cyberbalt()
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); });
 
-	m_slapstic->legacy_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }
 
 
