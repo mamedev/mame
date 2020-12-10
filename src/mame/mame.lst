@@ -14924,6 +14924,10 @@ wrlshunt                        // Wireless: Hunting Video Game System
 @source:generalplus_gpl16250_spi.cpp
 bkrankp
 
+@source:generalplus_gpl16250_spi_direct.cpp
+fixitflx
+wiwcs
+
 @source:generalplus_gpl32612.cpp
 jak_swbstrik
 jak_tmnthp

@@ -4068,6 +4068,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250_nand.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250_mobigo.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250_spi.cpp",
+	MAME_DIR .. "src/mame/drivers/generalplus_gpl16250_spi_direct.cpp",
 	MAME_DIR .. "src/mame/includes/generalplus_gpl16250.h",
 	MAME_DIR .. "src/mame/includes/generalplus_gpl16250_romram.h",
 	MAME_DIR .. "src/mame/includes/generalplus_gpl16250_nand.h",

@@ -346,6 +346,7 @@ generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
 generalplus_gpl16250_romram.cpp
 generalplus_gpl16250_spi.cpp
+generalplus_gpl16250_spi_direct.cpp
 generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
