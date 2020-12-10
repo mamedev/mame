@@ -55,7 +55,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 }
 
 ROM_START( bbl338 )
-	// is there an internal ROM? the code in the external ROM contains a bank for 4000-6fff including vectors at least.
+	// is internal ROM used? the code in the external ROM contains a bank for 4000-6fff including vectors at least.
 	// it sets stack to 14f, but quickly jumps to 150 in RAM where there is no code? was something meant to have copied
 	// code there earlier?
 

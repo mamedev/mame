@@ -32277,12 +32277,15 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
-pjoypj001
 afbm7800
+dancmix3
 dnce2000
-vtvppong
-papsudok
+hs36blk
+hs36red
 nytsudo
+papsudok
+pjoypj001
+vtvppong
 vtvsocr
 
 @source:nes_sh6578.cpp

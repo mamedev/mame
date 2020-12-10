@@ -1074,6 +1074,21 @@ ROM_START( vtvsocr )
 	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
 ROM_END
 
+ROM_START( hs36red )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29lv160cb.u3", 0x00000, 0x200000, CRC(318a81bb) SHA1(8b207e6a5fca53cbf383b79ff570fcdb89639fa3) )
+ROM_END
+
+ROM_START( hs36blk )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
+ROM_END
+
+ROM_START( dancmix3 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
+ROM_END
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1097,3 +1112,12 @@ CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvpp
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
+
+// might be VT02 hardware, needs decrypting, possibly designed by wellminds (M350 etc.)
+CONS( 2010, hs36red, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
+
+// probably not a plain NES clone, uses extended opcodes found in later chips, but doesn't fit directly in either
+// ROM seems very small for a device with sampled music, but size matches chip type
+// does access NES-like addresses
+CONS( 201?, dancmix3, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Venom", "TV Dance Mat 4 Games in 1 (Mix Party 3 / Dance Mix 3)", MACHINE_NOT_WORKING )
