@@ -28,4 +28,5 @@ is required to use the "MAME" name, logo, or wordmark.
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Please see the `license information <https://github.com/mamedev/mame#license>`_ for further details.
+Please see the `license information <https://github.com/mamedev/mame/blob/master/COPYING>`_
+for further details.
