@@ -109,11 +109,10 @@ class atari_slapstic_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, int chipnum, bool m68k_mode)
+	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, int chipnum)
 		: atari_slapstic_device(mconfig, tag, owner, u32(0))
 	{
-		set_chipnum(chipnum);
-		set_access68k(m68k_mode ? 1 : 0);
+		m_chipnum = chipnum;
 	}
 
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -121,11 +120,7 @@ public:
 	template <typename T> void set_bank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 
 	int bank();
-	int tweak(address_space &space, offs_t offset);
-
-	int alt2_kludge(address_space &space, offs_t offset);
-
-	void set_access68k(int type) { access_68k = type; }
+	int tweak(offs_t offset);
 
 	void set_chipnum(int chipnum) { m_chipnum = chipnum; }
 

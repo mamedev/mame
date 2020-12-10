@@ -194,7 +194,7 @@
  *
  *************************************/
 
-#define LOG_SLAPSTIC    (0)
+#define LOG_SLAPSTIC    (1)
 
 
 
@@ -260,7 +260,7 @@ static const struct slapstic_data slapstic101 =
 	{ 0x0080,0x0090,0x00a0,0x00b0 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,UNKNOWN },             /* 1st mask/value in sequence */
+	{ 0x1fff,0x1dfe },              /* 1st mask/value in sequence */
 	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
 	{ 0x1ffc,0x1b5c },              /* 3rd mask/value in sequence */
 	{ 0x1fcf,0x0080 },              /* 4th mask/value in sequence */
@@ -799,58 +799,11 @@ int atari_slapstic_device::bank(void)
 
 /*************************************
  *
- *  Kludge to catch alt seqeuences
- *
- *************************************/
-
-int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
-{
-	/* Of the 3 alternate addresses, only the middle one needs to actually hit
-	   in the slapstic region; the first and third ones can be anywhere in the
-	   address space. For this reason, the read/write handlers usually only
-	   see the 2nd access. For the 68000-based games, we do the following
-	   kludge to examine the opcode that is executing and look for the 1st
-	   and 3rd accesses. */
-
-	if (access_68k)
-	{
-		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(space.device().state().pc() >> 1, slapstic.alt1))
-		{
-			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			u16 opcode = space.read_word(space.device().state().pcbase() & 0xffffff);
-			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
-			{
-				/* fetch the value of the register for the second operand, and see */
-				/* if it matches the third alternate */
-				u32 regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
-				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
-				{
-					alt_bank = (regval >> slapstic.altshift) & 3;
-					return ALTERNATE3;
-				}
-			}
-		}
-
-		/* if there's no second memory hit within this instruction, the next */
-		/* opcode fetch will botch the operation, so just fall back to */
-		/* the enabled state */
-		return ENABLED;
-	}
-
-	/* kludge for ESB */
-	return ALTERNATE2;
-}
-
-
-
-/*************************************
- *
  *  Call this *after* every access
  *
  *************************************/
 
-int atari_slapstic_device::tweak(address_space &space, offs_t offset)
+int atari_slapstic_device::tweak(offs_t offset)
 {
 	offset &= 0x3fff;
 
@@ -888,13 +841,6 @@ int atari_slapstic_device::tweak(address_space &space, offs_t offset)
 				else if (MATCHES_MASK_VALUE(offset, slapstic.alt1))
 				{
 					state = ALTERNATE1;
-				}
-
-				/* special kludge for catching the second alternate address if */
-				/* the first one was missed (since it's usually an opcode fetch) */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
-				{
-					state = alt2_kludge(space, offset);
 				}
 
 				/* check for standard bankswitches */

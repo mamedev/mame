@@ -91,9 +91,9 @@ void starwars_state::irq_ack_w(uint8_t data)
  *
  *************************************/
 
-void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
+void starwars_state::esb_slapstic_tweak(offs_t offset)
 {
-	int new_bank = m_slapstic_device->tweak(space, offset);
+	int new_bank = m_slapstic_device->tweak(offset);
 
 	/* update for the new bank */
 	if (new_bank != m_slapstic_current_bank)
@@ -104,17 +104,17 @@ void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
 }
 
 
-uint8_t starwars_state::esb_slapstic_r(address_space &space, offs_t offset)
+uint8_t starwars_state::esb_slapstic_r(offs_t offset)
 {
 	int result = m_slapstic_base[offset];
-	esb_slapstic_tweak(space, offset);
+	esb_slapstic_tweak(offset);
 	return result;
 }
 
 
-void starwars_state::esb_slapstic_w(address_space &space, offs_t offset, uint8_t data)
+void starwars_state::esb_slapstic_w(offs_t offset, uint8_t data)
 {
-	esb_slapstic_tweak(space, offset);
+	esb_slapstic_tweak(offset);
 }
 
 
@@ -370,7 +370,7 @@ void starwars_state::esb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 101, false);
+	SLAPSTIC(config, m_slapstic_device, 101);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
 }

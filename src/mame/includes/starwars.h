@@ -74,8 +74,8 @@ private:
 	int16_t m_C;
 	int32_t m_ACC;
 	void irq_ack_w(uint8_t data);
-	uint8_t esb_slapstic_r(address_space &space, offs_t offset);
-	void esb_slapstic_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t esb_slapstic_r(offs_t offset);
+	void esb_slapstic_w(offs_t offset, uint8_t data);
 	void starwars_nstore_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -98,7 +98,7 @@ private:
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
-	void esb_slapstic_tweak(address_space &space, offs_t offset);
+	void esb_slapstic_tweak(offs_t offset);
 
 	void esb_main_map(address_map &map);
 	void main_map(address_map &map);

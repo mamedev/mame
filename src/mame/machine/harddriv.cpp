@@ -1697,15 +1697,15 @@ void harddriv_state::hddspcom_control_w(offs_t offset, uint16_t data)
  *
  *************************************/
 
-void harddriv_state::rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data)
+void harddriv_state::rd68k_slapstic_w(offs_t offset, uint16_t data)
 {
-	m_slapstic_device->tweak(space, offset & 0x3fff);
+	m_slapstic_device->tweak(offset & 0x3fff);
 }
 
 
-uint16_t harddriv_state::rd68k_slapstic_r(address_space &space, offs_t offset)
+uint16_t harddriv_state::rd68k_slapstic_r(offs_t offset)
 {
-	int bank = m_slapstic_device->tweak(space, offset & 0x3fff) * 0x4000;
+	int bank = m_slapstic_device->tweak(offset & 0x3fff) * 0x4000;
 	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
 }
 

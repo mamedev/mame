@@ -181,7 +181,7 @@ void xybots_state::xybots(machine_config &config)
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
@@ -389,8 +389,8 @@ void xybots_state::machine_start()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xffff, 0x7c0000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); });
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
 	m_h256 = 0x0400;
 }

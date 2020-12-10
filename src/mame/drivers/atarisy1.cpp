@@ -788,7 +788,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 void atarisy1_state::marble(machine_config &config)
 {
 	atarisy1(config);
-	SLAPSTIC(config, m_slapstic, 103, true);
+	SLAPSTIC(config, m_slapstic, 103);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -796,7 +796,7 @@ void atarisy1_state::peterpak(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
-	SLAPSTIC(config, m_slapstic, 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
@@ -811,7 +811,7 @@ void atarisy1_state::indytemp(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 105, true);
+	SLAPSTIC(config, m_slapstic, 105);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
@@ -826,7 +826,7 @@ void atarisy1_state::roadrunn(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 108, true);
+	SLAPSTIC(config, m_slapstic, 108);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Hall-effect analog joystick
@@ -839,7 +839,7 @@ void atarisy1_state::roadb109(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 109, true);
+	SLAPSTIC(config, m_slapstic, 109);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
@@ -851,7 +851,7 @@ void atarisy1_state::roadb110(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 110, true);
+	SLAPSTIC(config, m_slapstic, 110);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
@@ -2489,8 +2489,8 @@ void atarisy1_state::init_slapstic()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x80000, 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x80000, 0x87fff, 0, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); });
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
 
 void atarisy1_state::init_marble()

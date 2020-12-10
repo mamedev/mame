@@ -235,8 +235,8 @@ protected:
 	/* DSPCOM board */
 	void hddspcom_control_w(offs_t offset, uint16_t data);
 
-	void rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t rd68k_slapstic_r(address_space &space, offs_t offset);
+	void rd68k_slapstic_w(offs_t offset, uint16_t data);
+	uint16_t rd68k_slapstic_r(offs_t offset);
 
 	/* Game-specific protection */
 	void st68k_sloop_w(offs_t offset, uint16_t data);

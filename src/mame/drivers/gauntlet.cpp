@@ -548,7 +548,7 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 void gauntlet_state::gauntlet(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 104, true);
+	SLAPSTIC(config, m_slapstic, 104);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -556,7 +556,7 @@ void gauntlet_state::gauntlet(machine_config & config)
 void gauntlet_state::gaunt2p(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -564,7 +564,7 @@ void gauntlet_state::gaunt2p(machine_config & config)
 void gauntlet_state::gauntlet2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 106, true);
+	SLAPSTIC(config, m_slapstic, 106);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -572,7 +572,7 @@ void gauntlet_state::gauntlet2(machine_config & config)
 void gauntlet_state::vindctr2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 118, true);
+	SLAPSTIC(config, m_slapstic, 118);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -1660,8 +1660,8 @@ void gauntlet_state::common_init(int vindctr2)
 	u8 *rom = memregion("maincpu")->base();
 	m_slapstic_bank->configure_entries(0, 4, rom + 0x38000, 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x38000, 0x3ffff, 0x280000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); });
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
 	// swap the top and bottom halves of the main CPU ROM images
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);
