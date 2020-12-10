@@ -43,7 +43,7 @@ u32 st22xx_bbl338_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 4000000); // likely higher clock
+	ST2302U(config, m_maincpu, 12000000); // likely higher clock
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_bbl338_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
