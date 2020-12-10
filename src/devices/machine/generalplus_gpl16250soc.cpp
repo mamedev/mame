@@ -68,7 +68,7 @@ void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map
 DEFINE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device, "gpac800spi_direct", "GeneralPlus GPL16250 (with direct SPI handling)")
 
 generalplus_gpspi_direct_device::generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspi_direct_device::gpspi_direct_internal_map), this))
+	sunplus_gcm394_base_device(mconfig, GP_SPI_DIRECT, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspi_direct_device::gpspi_direct_internal_map), this))
 {
 }
 
