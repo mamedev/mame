@@ -249,7 +249,7 @@ Apple macOS
 -----------
 
 You'll need a few prerequisites to get started. Make sure you're on macOS 10.14
-Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
+Mavericks or later. You will need SDL2 2.0.4 or later for macOS.
 
 * Install **Xcode** from the Mac App Store
 * Launch **Xcode**. It will download a few additional prerequisites. Let this run through before proceeding.
