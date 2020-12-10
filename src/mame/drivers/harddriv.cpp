@@ -5061,7 +5061,6 @@ void harddriv_state::init_racedriv()
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
 	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
@@ -5086,7 +5085,6 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
 	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
@@ -5121,7 +5119,6 @@ void harddriv_state::init_racedrivc_panorama_side()
 	init_adsp();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
 	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 
@@ -5221,7 +5218,6 @@ void harddriv_state::init_strtdriv()
 	init_dsk();
 
 	/* set up the slapstic */
-	m_slapstic_device->slapstic_init();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16m_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
 	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 

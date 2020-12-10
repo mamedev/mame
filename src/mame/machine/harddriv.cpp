@@ -48,9 +48,6 @@ void harddriv_state::device_start()
 
 void  harddriv_state::device_reset()
 {
-	/* generic reset */
-	if (m_slapstic_device.found()) m_slapstic_device->slapstic_reset();
-
 	/* halt several of the DSPs to start */
 	m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

@@ -118,9 +118,6 @@ public:
 
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void slapstic_init();
-	void slapstic_reset();
-
 	int slapstic_bank();
 	int slapstic_tweak(address_space &space, offs_t offset);
 

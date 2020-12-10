@@ -236,8 +236,6 @@ void atarisy2_state::machine_start()
 
 void atarisy2_state::machine_reset()
 {
-	m_slapstic->slapstic_reset();
-
 	m_interrupt_enable = 0;
 
 	sound_reset_w(1);
@@ -3318,8 +3316,6 @@ void atarisy2_state::init_paperboy()
 {
 	uint8_t *cpu1 = memregion("maincpu")->base();
 
-	m_slapstic->slapstic_init();
-
 	// expand the 16k program ROMs into full 64k chunks
 	for (int i = 0x10000; i < 0x90000; i += 0x20000)
 	{
@@ -3335,8 +3331,6 @@ void atarisy2_state::init_paperboy()
 
 void atarisy2_state::init_720()
 {
-	m_slapstic->slapstic_init();
-
 	m_pedal_count = -1;
 	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }
@@ -3345,8 +3339,6 @@ void atarisy2_state::init_720()
 void atarisy2_state::init_ssprint()
 {
 	uint8_t *cpu1 = memregion("maincpu")->base();
-
-	m_slapstic->slapstic_init();
 
 	// expand the 32k program ROMs into full 64k chunks
 	for (int i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3360,8 +3352,6 @@ void atarisy2_state::init_csprint()
 {
 	uint8_t *cpu1 = memregion("maincpu")->base();
 
-	m_slapstic->slapstic_init();
-
 	// expand the 32k program ROMs into full 64k chunks
 	for (int i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
@@ -3372,8 +3362,6 @@ void atarisy2_state::init_csprint()
 
 void atarisy2_state::init_apb()
 {
-	m_slapstic->slapstic_init();
-
 	m_pedal_count = 2;
 	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }

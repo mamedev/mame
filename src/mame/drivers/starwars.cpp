@@ -62,7 +62,6 @@ void starwars_state::machine_reset()
 	if (m_slapstic_device.found())
 	{
 		/* reset the slapstic */
-		m_slapstic_device->slapstic_reset();
 		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
 		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
 	}
@@ -566,7 +565,6 @@ void starwars_state::init_esb()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
 

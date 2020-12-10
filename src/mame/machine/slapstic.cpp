@@ -249,22 +249,6 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	slapstic.add3.value = 0;
 }
 
-
-
-void atari_slapstic_device::device_start()
-{
-}
-
-void atari_slapstic_device::device_reset()
-{
-	// reset the slapstic
-	if (m_legacy_configured)
-	{
-		slapstic_reset();
-		legacy_update_bank(slapstic_bank());
-	}
-}
-
 void atari_slapstic_device::device_post_load()
 {
 	if (m_legacy_configured)
@@ -780,14 +764,10 @@ void atari_slapstic_device::device_validity_check(validity_checker &valid) const
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_init()
+void atari_slapstic_device::device_start()
 {
 	/* set up the parameters */
 	slapstic = *slapstic_table[m_chipnum - 101];
-
-	/* reset the chip */
-	slapstic_reset();
-
 
 	/* save state */
 	save_item(NAME(state));
@@ -799,13 +779,16 @@ void atari_slapstic_device::slapstic_init()
 }
 
 
-void atari_slapstic_device::slapstic_reset(void)
+void atari_slapstic_device::device_reset(void)
 {
 	/* reset the chip */
 	state = DISABLED;
 
 	/* the 111 and later chips seem to reset to bank 0 */
 	current_bank = slapstic.bankstart;
+
+	if (m_legacy_configured)
+		legacy_update_bank(slapstic_bank());
 }
 
 
@@ -1152,7 +1135,6 @@ void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, of
 {
 	// initialize the slapstic
 	m_legacy_configured = true;
-	slapstic_init();
 	save_item(NAME(m_legacy_bank));
 
 	// install the memory handlers

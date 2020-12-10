@@ -117,8 +117,6 @@ void atetris_state::machine_start()
 
 void atetris_state::machine_reset()
 {
-	/* reset the slapstic */
-	m_slapstic->slapstic_reset();
 	m_current_bank = m_slapstic->slapstic_bank() & 1;
 	reset_bank();
 
@@ -737,7 +735,6 @@ void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 
-	m_slapstic->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }

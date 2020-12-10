@@ -499,7 +499,6 @@ void rampart_state::slapstic_tweak(offs_t offset, u16 &, u16)
 
 void rampart_state::machine_start()
 {
-	m_slapstic->slapstic_init();
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x140000, 0x147fff, 0x438000, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { slapstic_tweak(offset, data, mem_mask); },
@@ -508,7 +507,6 @@ void rampart_state::machine_start()
 
 void rampart_state::machine_reset()
 {
-	m_slapstic->slapstic_reset();
 	m_slapstic_bank->set_entry(m_slapstic->slapstic_bank());
 }
 
