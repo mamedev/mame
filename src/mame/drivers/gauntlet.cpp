@@ -259,7 +259,7 @@ void gauntlet_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x037fff).mirror(0x280000).rom();
-	map(0x038000, 0x03ffff).mirror(0x280000).bankr(m_slapstic_bank); // slapstic maps here
+	map(0x038000, 0x039fff).mirror(0x286000).bankr(m_slapstic_bank); // slapstic maps here
 	map(0x040000, 0x07ffff).mirror(0x280000).rom();
 
 	// MBUS
