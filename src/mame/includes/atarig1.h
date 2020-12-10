@@ -21,6 +21,7 @@ public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_slapstic(*this, "slapstic"),
+			m_slapstic_bank(*this, "slapstic_bank"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -30,6 +31,7 @@ public:
 			m_mo_command(*this, "mo_command") { }
 
 	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -42,9 +44,6 @@ public:
 
 	required_shared_ptr<uint16_t> m_mo_command;
 
-	uint16_t *        m_bslapstic_base;
-	std::unique_ptr<uint8_t[]>          m_bslapstic_bank0;
-	uint8_t           m_bslapstic_bank;
 	bool            m_bslapstic_primed;
 
 	int             m_pfscroll_xoffset;
@@ -53,13 +52,12 @@ public:
 	uint16_t          m_playfield_xscroll;
 	uint16_t          m_playfield_yscroll;
 
-	virtual void device_post_load() override;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	void mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void a2d_select_w(offs_t offset, uint16_t data);
 	uint16_t a2d_data_r();
-	uint16_t pitfightb_cheap_slapstic_r(offs_t offset);
+	void pitfightb_cheap_slapstic_tweak(offs_t offset);
 	void update_bank(int bank);
 	void init_hydrap();
 	void init_hydra();
@@ -78,6 +76,6 @@ public:
 	void hydrap(machine_config &config);
 	void hydra(machine_config &config);
 	void main_map(address_map &map);
-private:
-	void pitfightb_cheap_slapstic_init();
+	void pitfight_map(address_map &map);
+	void hydra_map(address_map &map);
 };

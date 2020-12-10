@@ -146,7 +146,7 @@ void cyberbal_state::main_map(address_map &map)
 void cyberbal_state::tournament_map(address_map &map)
 {
 	main_map(map);
-	map(0x018000, 0x01ffff).bankr(m_slapstic_bank);
+	map(0x018000, 0x019fff).mirror(0x6000).bankr(m_slapstic_bank);
 }
 
 
