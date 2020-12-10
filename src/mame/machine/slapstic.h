@@ -144,8 +144,7 @@ public:
 	struct slapstic_data slapstic;
 
 
-	void slapstic_log(running_machine &machine, offs_t offset);
-	FILE *slapsticlog;
+	void slapstic_log(offs_t offset);
 
 	// legacy interface
 	void legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);

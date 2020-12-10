@@ -194,7 +194,7 @@
  *
  *************************************/
 
-#define LOG_SLAPSTIC    (0)
+#define LOG_SLAPSTIC    (1)
 
 
 
@@ -1086,7 +1086,7 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(machine(), offset);
+		slapstic_log(offset);
 
 	/* return the active bank */
 	return current_bank;
@@ -1100,59 +1100,25 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_log(running_machine &machine, offs_t offset)
+void atari_slapstic_device::slapstic_log(offs_t offset)
 {
-	static attotime last_time;
-
-	if (!slapsticlog)
-		slapsticlog = fopen("slapstic.log", "w");
-	if (slapsticlog)
+	const char *mode = "UNKNOWN";
+	switch (state)
 	{
-		attotime time = machine.time();
-
-		if ((time - last_time) > attotime::from_seconds(1))
-			fprintf(slapsticlog, "------------------------------------\n");
-		last_time = time;
-
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context().c_str(), offset, current_bank);
-		switch (state)
-		{
-			case DISABLED:
-				fprintf(slapsticlog, "DISABLED\n");
-				break;
-			case ENABLED:
-				fprintf(slapsticlog, "ENABLED\n");
-				break;
-			case ALTERNATE1:
-				fprintf(slapsticlog, "ALTERNATE1\n");
-				break;
-			case ALTERNATE2:
-				fprintf(slapsticlog, "ALTERNATE2\n");
-				break;
-			case ALTERNATE3:
-				fprintf(slapsticlog, "ALTERNATE3\n");
-				break;
-			case BITWISE1:
-				fprintf(slapsticlog, "BITWISE1\n");
-				break;
-			case BITWISE2:
-				fprintf(slapsticlog, "BITWISE2\n");
-				break;
-			case BITWISE3:
-				fprintf(slapsticlog, "BITWISE3\n");
-				break;
-			case ADDITIVE1:
-				fprintf(slapsticlog, "ADDITIVE1\n");
-				break;
-			case ADDITIVE2:
-				fprintf(slapsticlog, "ADDITIVE2\n");
-				break;
-			case ADDITIVE3:
-				fprintf(slapsticlog, "ADDITIVE3\n");
-				break;
-		}
-		fflush(slapsticlog);
+	case DISABLED:   mode = "DISABLED"; break;
+	case ENABLED:    mode = "ENABLED"; break;
+	case ALTERNATE1: mode = "ALTERNATE1"; break;
+	case ALTERNATE2: mode = "ALTERNATE2"; break;
+	case ALTERNATE3: mode = "ALTERNATE3"; break;
+	case BITWISE1:   mode = "BITWISE1"; break;
+	case BITWISE2:   mode = "BITWISE2"; break;
+	case BITWISE3:   mode = "BITWISE3"; break;
+	case ADDITIVE1:  mode = "ADDITIVE1"; break;
+	case ADDITIVE2:  mode = "ADDITIVE2"; break;
+	case ADDITIVE3:  mode = "ADDITIVE3"; break;
 	}
+
+	logerror("%s: %04x B=%d AB=%d %s %s\n", machine().time().as_string(), offset, current_bank, add_bank, mode, machine().describe_context());
 }
 
 
@@ -1213,7 +1179,7 @@ void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	assert(m_legacy_configured);
 
-	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
+	//	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
 }
 
 
