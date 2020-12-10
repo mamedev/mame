@@ -194,7 +194,7 @@
  *
  *************************************/
 
-#define LOG_SLAPSTIC    (1)
+#define LOG_SLAPSTIC    (0)
 
 
 
@@ -209,11 +209,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	bit_bank(0),
 	add_bank(0),
 	bit_xor(0),
-	m_bank(*this, finder_base::DUMMY_TAG),
-	m_legacy_configured(false),
-	m_legacy_space(nullptr),
-	m_legacy_memptr(nullptr),
-	m_legacy_bank(0)
+	m_bank(*this, finder_base::DUMMY_TAG)
 {
 	slapstic.bankstart = 0;
 	slapstic.bank[0] = slapstic.bank[1] = slapstic.bank[2] = slapstic.bank[3] = 0;
@@ -248,12 +244,6 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	slapstic.addplus2.value = 0;
 	slapstic.add3.mask = 0;
 	slapstic.add3.value = 0;
-}
-
-void atari_slapstic_device::device_post_load()
-{
-	if (m_legacy_configured)
-		legacy_update_bank(bank());
 }
 
 /*************************************
@@ -790,9 +780,6 @@ void atari_slapstic_device::device_reset(void)
 
 	if(m_bank)
 		m_bank->set_entry(current_bank);
-
-	if (m_legacy_configured)
-		legacy_update_bank(bank());
 }
 
 
@@ -1111,85 +1098,4 @@ void atari_slapstic_device::slapstic_log(offs_t offset)
 	}
 
 	logerror("%s: %04x B=%d AB=%d %s %s\n", machine().time().as_string(), offset, current_bank, add_bank, mode, machine().describe_context());
-}
-
-
-//**************************************************************************
-//  LEGACY HANDLING
-//**************************************************************************
-
-void atari_slapstic_device::legacy_update_bank(int bank)
-{
-	// if the bank has changed, copy the memory; Pit Fighter needs this
-	if (bank != m_legacy_bank)
-	{
-		// bank 0 comes from the copy we made earlier
-		if (bank == 0)
-			memcpy(m_legacy_memptr, &m_legacy_bank0[0], 0x2000);
-		else
-			memcpy(m_legacy_memptr, &m_legacy_memptr[bank * 0x1000], 0x2000);
-
-		// remember the current bank
-		m_legacy_bank = bank;
-	}
-}
-
-
-//-------------------------------------------------
-//  legacy_configure: Installs memory handlers for the
-//  slapstic
-//-------------------------------------------------
-
-void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem)
-{
-	// initialize the slapstic
-	m_legacy_configured = true;
-	save_item(NAME(m_legacy_bank));
-
-	// install the memory handlers
-	m_legacy_space = &device.space(AS_PROGRAM);
-	m_legacy_space->install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_r)), write16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_w)));
-	m_legacy_memptr = (u16 *)mem;
-
-	// allocate memory for a copy of bank 0
-	m_legacy_bank0.resize(0x2000);
-	memcpy(&m_legacy_bank0[0], m_legacy_memptr, 0x2000);
-
-	// ensure we recopy memory for the bank
-	m_legacy_bank = 0xff;
-}
-
-
-//-------------------------------------------------
-//  slapstic_w: Assuming that the slapstic sits in
-//  ROM memory space, we just simply tweak the slapstic at this
-//  address and do nothing more.
-//-------------------------------------------------
-
-void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	assert(m_legacy_configured);
-
-	legacy_update_bank(tweak(*m_legacy_space, offset));
-}
-
-
-//-------------------------------------------------
-//  slapstic_r: Tweaks the slapstic at the appropriate
-//  address and then reads a word from the underlying memory.
-//-------------------------------------------------
-
-u16 atari_slapstic_device::slapstic_r(offs_t offset, u16 mem_mask)
-{
-	assert(m_legacy_configured);
-
-	// fetch the result from the current bank first
-	u16 result = m_legacy_memptr[offset & 0xfff];
-
-	if (!machine().side_effects_disabled())
-	{
-		// then determine the new one
-		legacy_update_bank(tweak(*m_legacy_space, offset));
-	}
-	return result;
 }

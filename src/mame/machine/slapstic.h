@@ -142,31 +142,15 @@ public:
 
 	struct slapstic_data slapstic;
 
-
 	void slapstic_log(offs_t offset);
-
-	// legacy interface
-	void legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	// legacy helpers
-	void legacy_update_bank(int bank);
-	void slapstic_w(offs_t offset, u16 data, u16 mem_mask);
-	uint16_t slapstic_r(offs_t offset, u16 mem_mask);
-
 	optional_memory_bank m_bank;
-
-	bool             m_legacy_configured;
-	address_space *  m_legacy_space;
-	u16 *            m_legacy_memptr;
-	u8               m_legacy_bank;
-	std::vector<u8>  m_legacy_bank0;
 };
 
 #endif // MAME_INCLUDES_SLAPSTIC_H
