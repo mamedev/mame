@@ -19137,12 +19137,12 @@ korgwssr                        //
 korgz3                          //
 
 @source:kpython.cpp
-kpython                         // (c) 2002 Konami. Python Bios
 dogstdx                         // (c) 2002 Konami. dogstation Deluxe
-wswe                            // (c) 2002 Konami, World Soccer Winning Eleven
-wswe2k3                         // (c) 2002 Konami. World Soccer Winning Eleven 2003
+kpython                         // (c) 2002 Konami. Python Bios
 pesta                           // (c) 2002 Konami. Pro Evolution Soccer The Arcade
 popn9                           // (c) 2003 Konami. Pop'n Music 9
+wswe                            // (c) 2002 Konami, World Soccer Winning Eleven
+wswe2k3                         // (c) 2002 Konami. World Soccer Winning Eleven 2003
 
 @source:kramermc.cpp
 kramermc                        // 1987 Kramer MC
