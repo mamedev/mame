@@ -12,8 +12,8 @@ At one point there were actually two separate projects, MAME and MESS. MAME
 covered arcade machines, while MESS covered everything else. They are now
 merged into the one MAME.
 
-MAME is mostly programmed in C with some core components in C++. MAME can
-currently emulate over 32000 individual systems from the last 5 decades.
+MAME is programmed in C++ and can currently emulate over 32000 individual
+systems from the last 5 decades.
 
 
 Purpose of MAME
@@ -59,10 +59,9 @@ be aware 64-bit often shows a significant speed increase over 32-bit.
 System Requirements
 ===================
 
-MAME is written in fairly generic C/C++, and has been ported to numerous
-platforms. Over time, as computer hardware has evolved, the MAME code has
-evolved as well to take advantage of the greater processing power and hardware
-capabilities offered.
+MAME is written in C++, and has been ported to numerous platforms. Over time, as
+computer hardware has evolved, the MAME code has evolved as well to take
+advantage of the greater processing power and hardware capabilities offered.
 
 The official MAME binaries are compiled and designed to run on a standard
 Windows-based system. The minimum requirements for Windows are:
@@ -82,8 +81,8 @@ performance, at the cost of greatly lowered accuracy and fewer supported
 systems.
 
 MAME will take advantage of 3D hardware for compositing artwork and scaling the
-games to full screen. To make use of this, you should have a modern Direct3D
-8-capable video card with at least 16MB of video RAM.
+games to full screen. To make use of this, you should have a modern computer
+with modern 3D hardware.
 
 HLSL or GLSL special effects such as CRT simulation will put a very heavy load
 on your video card, especially at higher resolutions. You will need a fairly
