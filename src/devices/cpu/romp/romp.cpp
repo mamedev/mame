@@ -714,6 +714,8 @@ void romp_device::execute_run()
 				break;
 			case 0xb6: // d: divide step
 				{
+					m_scr[CS] &= ~(CS_C | CS_O);
+
 					s64 sum = (s64(s32(m_gpr[R2])) << 1) | (m_scr[MQ] >> 31);
 
 					if (BIT(m_gpr[R2], 31) == BIT(m_gpr[R3], 31))
