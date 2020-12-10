@@ -62,7 +62,7 @@ void starwars_state::machine_reset()
 	if (m_slapstic_device.found())
 	{
 		/* reset the slapstic */
-		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
+		m_slapstic_current_bank = m_slapstic_device->bank();
 		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
 	}
 
@@ -93,7 +93,7 @@ void starwars_state::irq_ack_w(uint8_t data)
 
 void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
 {
-	int new_bank = m_slapstic_device->slapstic_tweak(space, offset);
+	int new_bank = m_slapstic_device->tweak(space, offset);
 
 	/* update for the new bank */
 	if (new_bank != m_slapstic_current_bank)

@@ -118,8 +118,10 @@ public:
 
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	int slapstic_bank();
-	int slapstic_tweak(address_space &space, offs_t offset);
+	template <typename T> void set_bank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
+
+	int bank();
+	int tweak(address_space &space, offs_t offset);
 
 	int alt2_kludge(address_space &space, offs_t offset);
 
@@ -157,6 +159,8 @@ private:
 	void legacy_update_bank(int bank);
 	void slapstic_w(offs_t offset, u16 data, u16 mem_mask);
 	uint16_t slapstic_r(offs_t offset, u16 mem_mask);
+
+	optional_memory_bank m_bank;
 
 	bool             m_legacy_configured;
 	address_space *  m_legacy_space;

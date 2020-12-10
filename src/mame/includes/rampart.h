@@ -38,7 +38,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -62,8 +61,6 @@ private:
 	required_shared_ptr<u16> m_bitmap;
 
 	static const atari_motion_objects_config s_mob_config;
-
-	void slapstic_tweak(offs_t offset, u16 &, u16);
 };
 
 #endif // MAME_INCLUDES_RAMPART_H

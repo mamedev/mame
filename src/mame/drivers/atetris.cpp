@@ -117,7 +117,7 @@ void atetris_state::machine_start()
 
 void atetris_state::machine_reset()
 {
-	m_current_bank = m_slapstic->slapstic_bank() & 1;
+	m_current_bank = m_slapstic->bank() & 1;
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
@@ -135,7 +135,7 @@ void atetris_state::machine_reset()
 uint8_t atetris_state::slapstic_r(address_space &space, offs_t offset)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = m_slapstic->slapstic_tweak(space, offset) & 1;
+	int new_bank = m_slapstic->tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)

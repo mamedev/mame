@@ -329,6 +329,7 @@ void rampart_state::rampart(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
 	SLAPSTIC(config, m_slapstic, 118, true);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
 
@@ -491,23 +492,12 @@ ROM_END
  *
  *************************************/
 
-void rampart_state::slapstic_tweak(offs_t offset, u16 &, u16)
-{
-	m_slapstic->slapstic_tweak(m_maincpu->space(AS_PROGRAM), (offset >> 1) & 0x3fff);
-	m_slapstic_bank->set_entry(m_slapstic->slapstic_bank());
-}
-
 void rampart_state::machine_start()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x140000, 0x147fff, 0x438000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { slapstic_tweak(offset, data, mem_mask); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { slapstic_tweak(offset, data, mem_mask); });
-}
-
-void rampart_state::machine_reset()
-{
-	m_slapstic_bank->set_entry(m_slapstic->slapstic_bank());
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(m_maincpu->space(), offset >> 1); });
 }
 
 

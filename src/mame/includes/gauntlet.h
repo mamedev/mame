@@ -54,7 +54,6 @@ public:
 
 protected:
 	virtual void video_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void video_int_ack_w(uint16_t data = 0);

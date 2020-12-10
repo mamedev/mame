@@ -209,6 +209,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	bit_bank(0),
 	add_bank(0),
 	bit_xor(0),
+	m_bank(*this, finder_base::DUMMY_TAG),
 	m_legacy_configured(false),
 	m_legacy_space(nullptr),
 	m_legacy_memptr(nullptr),
@@ -252,7 +253,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 void atari_slapstic_device::device_post_load()
 {
 	if (m_legacy_configured)
-		legacy_update_bank(slapstic_bank());
+		legacy_update_bank(bank());
 }
 
 /*************************************
@@ -787,8 +788,11 @@ void atari_slapstic_device::device_reset(void)
 	/* the 111 and later chips seem to reset to bank 0 */
 	current_bank = slapstic.bankstart;
 
+	if(m_bank)
+		m_bank->set_entry(current_bank);
+
 	if (m_legacy_configured)
-		legacy_update_bank(slapstic_bank());
+		legacy_update_bank(bank());
 }
 
 
@@ -799,7 +803,7 @@ void atari_slapstic_device::device_reset(void)
  *
  *************************************/
 
-int atari_slapstic_device::slapstic_bank(void)
+int atari_slapstic_device::bank(void)
 {
 	return current_bank;
 }
@@ -859,8 +863,10 @@ int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
  *
  *************************************/
 
-int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
+int atari_slapstic_device::tweak(address_space &space, offs_t offset)
 {
+	offset &= 0x3fff;
+
 	/* reset is universal */
 	if (offset == 0x0000)
 	{
@@ -1071,6 +1077,9 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 	if (LOG_SLAPSTIC)
 		slapstic_log(offset);
 
+	if(m_bank)
+		m_bank->set_entry(current_bank);
+
 	/* return the active bank */
 	return current_bank;
 }
@@ -1161,7 +1170,7 @@ void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	assert(m_legacy_configured);
 
-	//	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
+	legacy_update_bank(tweak(*m_legacy_space, offset));
 }
 
 
@@ -1180,7 +1189,7 @@ u16 atari_slapstic_device::slapstic_r(offs_t offset, u16 mem_mask)
 	if (!machine().side_effects_disabled())
 	{
 		// then determine the new one
-		legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
+		legacy_update_bank(tweak(*m_legacy_space, offset));
 	}
 	return result;
 }
