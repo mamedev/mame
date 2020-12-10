@@ -265,7 +265,7 @@ ROM_START( unk960606 ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. Like '
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "s284_otp_m27c801.u14", 0x000000, 0x100000, CRC(87325ae4) SHA1(6d77f1933f0aab29371795e8fc7bef9bd05cafea) )
-	ROM_LOAD( "u15",                  0x080000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+	ROM_LOAD( "u15",                  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(5e2d52ac) SHA1(98bc7a668ee23de4184bdef23fbceda0c1987cd7) )
