@@ -92,10 +92,14 @@ private:
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 
-	uint32_t screen_update_storio(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint32_t a000004_r();
+
+	void arm_map(address_map &map);
 };
 
-uint32_t easy_karaoke_state::screen_update_storio(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t easy_karaoke_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -111,6 +115,7 @@ void easy_karaoke_state::machine_start()
 
 void easy_karaoke_state::machine_reset()
 {
+	m_maincpu->set_state_int(ARM7_R15, 0x04000000);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_state::cart_load)
@@ -126,16 +131,29 @@ DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_state::cart_load)
 static INPUT_PORTS_START( easy_karaoke )
 INPUT_PORTS_END
 
+uint32_t easy_karaoke_state::a000004_r()
+{
+	return machine().rand();
+}
+
+void easy_karaoke_state::arm_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram();
+	map(0x04000000, 0x043fffff).rom().region("maincpu", 0);
+	map(0x0a000004, 0x0a000007).r(FUNC(easy_karaoke_state::a000004_r));
+}
+
 
 void easy_karaoke_state::easy_karaoke_base(machine_config &config)
 {
 	ARM9(config, m_maincpu, 72000000); // ARM 720 core
+	m_maincpu->set_addrmap(AS_PROGRAM, &easy_karaoke_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(easy_karaoke_state::screen_update_storio));
+	m_screen->set_screen_update(FUNC(easy_karaoke_state::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -153,8 +171,8 @@ void easy_karaoke_state::easy_karaoke(machine_config &config)
 }
 
 ROM_START( easykara )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF ) // unknown size
-	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )	
 ROM_END
 
 CONS( 2004, easykara,      0,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies", "Easy Karaoke Groove Station", MACHINE_IS_SKELETON )
