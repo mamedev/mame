@@ -38121,6 +38121,9 @@ sorcerera                       // Sorcerer with Dreamdisk fdc
 sorcererb                       // Sorcerer with Digitrio fdc
 sorcererd                       // Sorcerer with Micropolis fdc
 
+@source:st22xx_bbl338.cpp
+bbl338
+
 @source:storio.cpp
 innotab2                        // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
@@ -41600,23 +41603,24 @@ wrecking                        // (c) 1984 Nintendo
 dgun2572
 
 @source:vt1682.cpp
+110dance
+dance555
+exsprt48
+gm235upc
 ii8in1
 ii32in1
-zone7in1
-zone7in1p
-dance555
-miwi2_16
-miwi2_7
 intact89
 intg5410
-exsprt48
 itvg48
-xing48
-wowwg
-110dance
 lxts3
-unk1682
+miwi2_16
+miwi2_7
 njp60in1
+unk1682
+wowwg
+xing48
+zone7in1
+zone7in1p
 
 @source:vt52.cpp
 vt52                            // 1975 Digital Equipment Corporation

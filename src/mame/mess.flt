@@ -946,6 +946,7 @@ spg2xx_zone.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
+st22xx_bbl338.cpp
 storio.cpp
 studio2.cpp
 sun1.cpp
