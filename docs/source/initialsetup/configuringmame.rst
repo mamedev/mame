@@ -20,8 +20,8 @@ Initial Setup: Creating mame.ini From Command Line on Windows
 -------------------------------------------------------------
 
 First, you will need to *cd* to the directory where you installed MAME into.
-If, for instance, you have MAME installed in ``c:\users\public\mame`` you will
-need to type ``cd c:\users\public\mame`` into the command prompt.
+If, for instance, you have MAME installed in ``C:\Users\Public\MAME`` you will
+need to type ``cd C:\Users\Public\MAME`` into the command prompt.
 
 Then you have MAME create the config file by typing ``mame64 -createconfig``
 or ``mame -createconfig`` depending on if you are using the 64-bit version of
