@@ -55,6 +55,15 @@ struct lua_engine::devenum
 };
 
 
+template <typename T>
+struct lua_engine::object_ptr_vector_wrapper
+{
+	object_ptr_vector_wrapper(std::vector<std::unique_ptr<T>> const &v) : vec(v) { }
+
+	std::vector<std::unique_ptr<T>> const &vec;
+};
+
+
 namespace sol
 {
 
@@ -169,6 +178,78 @@ public:
 	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
 	static int pairs(lua_State *L) { return start_pairs<false>(L); }
 	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
+
+
+template <typename T>
+struct usertype_container<lua_engine::object_ptr_vector_wrapper<T> > : lua_engine::immutable_container_helper<lua_engine::object_ptr_vector_wrapper<T>, std::vector<std::unique_ptr<T>> const, typename std::vector<std::unique_ptr<T>>::const_iterator>
+{
+private:
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return stack::push(L, lua_nil);
+		int result;
+		result = stack::push(L, i.ix + 1);
+		result += stack::push_reference(L, i.it->get());
+		++i;
+		return result;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((0 >= index) || (self.vec.size() < index))
+			return stack::push(L, lua_nil);
+		return stack::push_reference(L, self.vec[index - 1].get());
+	}
+
+	static int get(lua_State *L) { return at(L); }
+	static int index_get(lua_State *L) { return at(L); }
+
+	static int index_of(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		T &target(stack::unqualified_get<T>(L, 2));
+		auto it(self.vec.begin());
+		std::ptrdiff_t ix(0);
+		while ((self.vec.end() != it) && (it->get() != &target))
+		{
+			++it;
+			++ix;
+		}
+		if (self.vec.end() == it)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push(L, ix + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.vec.size());
+	}
+
+	static int empty(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.vec.empty());
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs); }
+	static int pairs(lua_State *L) { return ipairs(L); }
+
+	static int ipairs(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.vec, self.vec.begin());
+		stack::push(L, lua_nil);
+		return 3;
+	}
 };
 
 } // namespace sol
@@ -1816,17 +1897,12 @@ void lua_engine::initialize()
 	image_type.set("is_creatable", sol::property(&device_image_interface::is_creatable));
 	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
-	image_type.set("formatlist", sol::property([this](const device_image_interface &image) {
-			sol::table format_table = sol().create_table();
-			for (const std::unique_ptr<image_device_format> &format : image.formatlist())
-				format_table[format->name()] = &*format;
-			return format_table;
-		}));
+	image_type.set("formatlist", sol::property([](const device_image_interface &image) { return object_ptr_vector_wrapper<image_device_format>(image.formatlist()); }));
 
 
 /*	image_device_format library
  *
- * manager:machine().images[tag].formatlist[name]
+ * manager:machine().images[tag].formatlist[index]
  * 
  * format.name - name of the format (e.g. - "dsk")
  * format.description - the description of the format
