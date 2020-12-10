@@ -12558,6 +12558,9 @@ e9161                           //
 @source:eacc.cpp
 eacc                            //
 
+@source:easy_karaoke.cpp
+easykara
+
 @source:ec184x.cpp
 ec1840                          //
 ec1841                          //

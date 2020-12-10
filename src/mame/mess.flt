@@ -250,6 +250,7 @@ dvk_ksm.cpp
 e100.cpp
 e9161.cpp
 eacc.cpp
+easy_karaoke.cpp
 ec184x.cpp
 ec65.cpp
 ec7915.cpp
