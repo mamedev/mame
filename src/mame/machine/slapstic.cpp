@@ -194,7 +194,7 @@
  *
  *************************************/
 
-#define LOG_SLAPSTIC    (1)
+#define LOG_SLAPSTIC    (0)
 
 
 
