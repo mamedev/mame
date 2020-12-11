@@ -65,6 +65,15 @@
 
 #define SWITCH_CONFIG_TAG   "switch"
 
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+#define LOG_CART   (1U << 1) // shows cart line changes
+#define LOG_SWITCH (1U << 2) // shows switch changes
+//#define VERBOSE (LOG_CART|LOG_SWITCH)
+
+#include "logmacro.h"
+
+#define LOGCART(...)     LOGMASKED(LOG_CART,  __VA_ARGS__)
+#define LOGSWITCH(...)   LOGMASKED(LOG_SWITCH,  __VA_ARGS__)
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -333,6 +342,8 @@ cococart_slot_device &coco_multipak_device::active_cts_slot()
 
 void coco_multipak_device::set_select(u8 new_select)
 {
+	LOGSWITCH( "set_select: 0x%02X\n", new_select);
+
 	// identify old value for CART, in case this needs to change
 	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
@@ -382,6 +393,7 @@ void coco_multipak_device::update_line(int slot_number, line ln)
 	case line::CART:
 		// only propagate if this is coming from the slot specified
 		propagate = slot_number == active_cts_slot_number();
+		LOGCART( "update_line: slot: %d, line: CART, value: %s, propogate: %s\n", slot_number, owning_slot().line_value_string(slot(slot_number).get_line_value(ln)), propagate ? "yes" : "no" );
 		break;
 
 	case line::NMI:
