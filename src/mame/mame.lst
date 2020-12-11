@@ -32279,7 +32279,6 @@ nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
 afbm7800
-dancmix3
 dnce2000
 hs36blk
 hs36red
@@ -32293,6 +32292,7 @@ vtvsocr
 bandgpad
 bandggcn
 cpatrolm
+dancmix3
 ts_handy11
 ablwikid
 maxx5in1
