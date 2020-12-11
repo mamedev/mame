@@ -32280,7 +32280,6 @@ nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
 afbm7800
-dancmix3
 dnce2000
 hs36blk
 hs36red
@@ -32294,6 +32293,7 @@ vtvsocr
 bandgpad
 bandggcn
 cpatrolm
+dancmix3
 ts_handy11
 ablwikid
 maxx5in1
@@ -32393,9 +32393,10 @@ joypad65
 @source:nes_vt32.cpp
 dgun2573
 dgun2573a
-rminitv
-fcpocket
+dgunl3201
 dgunl3202
+fcpocket
+rminitv
 
 @source:nes_vt369_vtunknown.cpp
 bittboy
