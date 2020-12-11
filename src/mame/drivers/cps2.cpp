@@ -1363,7 +1363,7 @@ void cps2_state::gigaman2(machine_config &config)
 ROM_START( 1944 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "nffe.03", 0x000000, 0x80000, CRC(7544b926) SHA1(903d9ab45e05a2ab9d7efa074a7ee4ff2006d30a) )
-	ROM_LOAD16_WORD_SWAP( "nffe.04", 0x080000, 0x80000, CRC(dba1c66e) SHA1(4764e77d4da5d19d9acded27df1e1bcba06b0fcf) )
+	ROM_LOAD16_WORD_SWAP( "nff.04",  0x080000, 0x80000, CRC(dba1c66e) SHA1(4764e77d4da5d19d9acded27df1e1bcba06b0fcf) )
 	ROM_LOAD16_WORD_SWAP( "nffe.05", 0x100000, 0x80000, CRC(d78d31d3) SHA1(060c3defc87b0cce186df545427bd18687770815) )
 
 	ROM_REGION( 0x1400000, "gfx", 0 )
