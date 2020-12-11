@@ -109,7 +109,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device, "ti_hx5102", "TI Hexbus Floppy Drive")
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 void hx5102_device::memmap(address_map &map)
 {
@@ -744,5 +744,5 @@ ioport_constructor hx5102_device::device_input_ports() const
 	return INPUT_PORTS_NAME( hx5102 );
 }
 
-}   }  // end namespace bus::hexbus
+}  // end namespace bus::hexbus
 

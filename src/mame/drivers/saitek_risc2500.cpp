@@ -18,7 +18,6 @@ TODO:
   Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
   (pipeline has to refill). The delay loop between writing to the speaker is simply:
   SUBS R2, R2, #$1, BNE $2000cd8
-- use SED1520 device for the LCD
 
 ******************************************************************************/
 
@@ -28,6 +27,7 @@ TODO:
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
+#include "video/sed1520.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -45,6 +45,7 @@ public:
 		, m_ram(*this, "ram")
 		, m_nvram(*this, "nvram")
 		, m_dac(*this, "dac")
+		, m_lcdc(*this, "lcdc")
 		, m_board(*this, "board")
 		, m_inputs(*this, "P%u", 0)
 		, m_digits(*this, "digit%u", 0U)
@@ -64,7 +65,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	SED1520_UPDATE_CB(screen_update_cb);
 	void install_boot_rom();
 	void remove_boot_rom();
 	void lcd_palette(palette_device &palette) const;
@@ -76,6 +77,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<dac_byte_interface> m_dac;
+	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
 	required_ioport_array<8> m_inputs;
 	output_finder<12> m_digits;
@@ -83,8 +85,6 @@ private:
 	output_finder<16> m_leds;
 
 	uint32_t  m_p1000;
-	uint16_t  m_vram_addr;
-	uint8_t   m_vram[0x100];
 	emu_timer *m_boot_rom_disable_timer;
 };
 
@@ -106,32 +106,42 @@ void risc2500_state::lcd_palette(palette_device &palette) const
 	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
 }
 
-uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
 {
 	bitmap.fill(2, cliprect);
 
-	for(int c=0; c<12; c++)
+	for (int c=0; c<12; c++)
 	{
 		// 12 characters 5 x 7
-		for(int x=0; x<5; x++)
+		for (int x=0; x<5; x++)
 		{
-			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
+			uint8_t gfx = 0;
+			if (lcd_on)
+				gfx = bitswap<8>(dram[c * 5 + x], 6,5,0,1,2,3,4,7);
 
-			for(int y=0; y<7; y++)
-				bitmap.pix(y + 1, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
+			for (int y=1; y<8; y++)
+				bitmap.pix(y, 71 - (c * 6 + x)) = BIT(gfx, y);
 		}
 
 		// LCD digits and symbols
-		int data_addr = 0x40 + c * 5;
-		uint16_t data = ((m_vram[data_addr + 1] & 0x3) << 5) | ((m_vram[data_addr + 2] & 0x7) << 2) | (m_vram[data_addr + 4] & 0x3);
-		data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		if (lcd_on)
+		{
+			int data_addr = 80 + c * 5;
+			uint16_t data = ((dram[data_addr + 1] & 0x3) << 5) | ((dram[data_addr + 2] & 0x7) << 2) | (dram[data_addr + 4] & 0x3);
+			data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((dram[data_addr - 1] & 0x04) ? 0x80 : 0);
 
-		m_digits[c] = data;
-		m_syms[c] = BIT(m_vram[data_addr + 1], 2);
+			m_digits[c] = data;
+			m_syms[c] = BIT(dram[data_addr + 1], 2);
+		}
+		else
+		{
+			m_digits[c] = 0;
+			m_syms[c] = 0;
+		}
 	}
 
-	m_syms[12] = BIT(m_vram[0x63], 0);
-	m_syms[13] = BIT(m_vram[0x4a], 0);
+	m_syms[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
+	m_syms[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
 
 	return 0;
 }
@@ -187,7 +197,7 @@ uint32_t risc2500_state::p1000_r()
 {
 	uint32_t data = 0;
 
-	for(int i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 	{
 		if (m_p1000 & (1 << i))
 		{
@@ -196,36 +206,29 @@ uint32_t risc2500_state::p1000_r()
 		}
 	}
 
-	return data;
+	return data | ((uint32_t)m_lcdc->status_read() << 16);
 }
 
 void risc2500_state::p1000_w(uint32_t data)
 {
-	if ((data & 0xff000000) == 0x01000000)          // VRAM address
+	if (!BIT(data, 27))
 	{
-		if (data & 0x80)
-			m_vram_addr = (m_vram_addr & ~0x40) | (data & 0x01 ? 0x40 : 0);
+		if (BIT(data, 26))
+			m_lcdc->data_write(data);
 		else
-			m_vram_addr = (m_vram_addr & 0x40) | (data & 0xff);
+			m_lcdc->control_write(data);
 	}
-	else if (data & 0x04000000)                     // VRAM write
+
+	if (BIT(data, 31))                     // Vertical LED
 	{
-		if (!(data & 0x08000000))
-			m_vram[m_vram_addr++ & 0x7f] = data & 0xff;
-	}
-	else if (data & 0x80000000)                     // Vertical LED
-	{
-		for(int i=0; i<8; i++)
+		for (int i=0; i<8; i++)
 			m_leds[i] = BIT(data, i);
 	}
-	else if (data & 0x40000000)                     // Horizontal LED
+
+	if (BIT(data, 30))                     // Horizontal LED
 	{
-		for(int i=0; i<8; i++)
+		for (int i=0; i<8; i++)
 			m_leds[8 + i] = BIT(data, i);
-	}
-	else if ((data & 0xff000000) == 0x08000000)     // Power OFF
-	{
-		memset(m_vram, 0, sizeof(m_vram));
 	}
 
 	m_dac->write(data >> 28 & 3);                   // Speaker
@@ -255,8 +258,6 @@ void risc2500_state::machine_start()
 	m_boot_rom_disable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
 
 	save_item(NAME(m_p1000));
-	save_item(NAME(m_vram_addr));
-	save_item(NAME(m_vram));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(risc2500_state::remove_boot_rom), this));
 }
@@ -264,7 +265,6 @@ void risc2500_state::machine_start()
 void risc2500_state::machine_reset()
 {
 	m_p1000 = 0;
-	m_vram_addr = 0;
 
 	install_boot_rom();
 }
@@ -289,12 +289,15 @@ void risc2500_state::risc2500(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(12*6+1, 7+2);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(risc2500_state::screen_update));
+	screen.set_screen_update(m_lcdc, FUNC(sed1520_device::screen_update));
 	screen.set_palette("palette");
 
 	config.set_default_layout(layout_saitek_risc2500);
 
 	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
+
+	SED1520(config, m_lcdc);
+	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
 
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::BUTTONS);

@@ -98,6 +98,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_vhd_1(*this, VHD1_TAG),
 	m_beckerport(*this, DWSOCK_TAG),
 	m_beckerportconfig(*this, BECKERPORT_TAG),
+	m_irqs(*this, "irqs"),
+	m_firqs(*this, "firqs"),
 	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
 	m_joystick_hires_control(*this, HIRES_INTF_TAG),
@@ -374,29 +376,6 @@ WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 }
 
 
-
-//-------------------------------------------------
-//  pia0_irq_a
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
-{
-	recalculate_irq();
-}
-
-
-
-//-------------------------------------------------
-//  pia0_irq_b
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
-{
-	recalculate_irq();
-}
-
-
-
 /***************************************************************************
   PIA1 ($FF20-$FF3F) (Chip U4)
 
@@ -522,29 +501,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 }
 
 
-
-//-------------------------------------------------
-//  pia1_firq_a
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
-{
-	recalculate_firq();
-}
-
-
-
-//-------------------------------------------------
-//  pia1_firq_b
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
-{
-	recalculate_firq();
-}
-
-
-
 /***************************************************************************
   CPU INTERRUPTS
 
@@ -564,56 +520,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
   -----
 
 ***************************************************************************/
-
-//-------------------------------------------------
-//  irq_get_line - gets the value of the FIRQ line
-//  passed into the CPU
-//-------------------------------------------------
-
-bool coco_state::irq_get_line(void)
-{
-	return pia_0().irq_a_state() || pia_0().irq_b_state();
-}
-
-
-
-//-------------------------------------------------
-//  recalculate_irq
-//-------------------------------------------------
-
-void coco_state::recalculate_irq(void)
-{
-	bool line = irq_get_line();
-	if (LOG_INTERRUPTS)
-		logerror("recalculate_irq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-//-------------------------------------------------
-//  firq_get_line - gets the value of the FIRQ line
-//  passed into the CPU
-//-------------------------------------------------
-
-bool coco_state::firq_get_line(void)
-{
-	return pia_1().irq_a_state() || pia_1().irq_b_state();
-}
-
-
-
-//-------------------------------------------------
-//  recalculate_firq
-//-------------------------------------------------
-
-void coco_state::recalculate_firq(void)
-{
-	bool line = firq_get_line();
-	if (LOG_INTERRUPTS)
-		logerror("recalculate_firq():  line=%d\n", line ? 1 : 0);
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
-}
 
 
 
@@ -770,7 +676,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 	/* determine the JOYIN value */
 	const analog_input_t *analog;
 	bool joyin_value;
-	uint8_t joyval;
+	uint32_t joyval;
 	int dclg_vpos;
 	switch(joystick_type(joystick))
 	{
@@ -788,7 +694,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			{
 				/* conventional joystick */
 				joyval = analog->input(joystick, joystick_axis);
-				joyin_value = (dac_output() <= (joyval >> 2));
+				joyin_value = (dac_output() <= (joyval / 10));
 			}
 			break;
 
@@ -1065,8 +971,8 @@ void coco_state::poll_hires_joystick(void)
 		if (m_hiresjoy_ca && !newvalue)
 		{
 			/* hi to lo */
-			double value = m_joystick.input(joystick_index, axis) / 255.0;
-			value *= is_cocomax3 ? 2500.0 : 4160.0;
+			double value = m_joystick.input(joystick_index, axis) / 640.0;
+			value *= is_cocomax3 ? 2500.0 : 4250.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
 			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);

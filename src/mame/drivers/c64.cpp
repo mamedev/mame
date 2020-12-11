@@ -64,7 +64,7 @@ public:
 		m_user(*this, PET_USER_PORT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_loram(1),
@@ -93,7 +93,7 @@ public:
 	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	optional_ioport_array<8> m_row;
 	optional_ioport m_lock;
 
@@ -1408,9 +1408,6 @@ void c64_state::machine_start()
 		m_kernal = &m_basic[0x2000];
 	}
 	m_charom = memregion("charom")->base();
-
-	// allocate memory
-	m_color_ram.allocate(0x400);
 
 	// initialize memory
 	uint8_t data = 0xff;

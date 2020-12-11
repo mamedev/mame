@@ -114,7 +114,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_SYSKEYDOWN:
 		if (wparam != VK_F10)
 			return CallWindowProc(m_original_editproc, m_editwnd, message, wparam, lparam);
-		// (fall through)
+		[[fallthrough]];
 	case WM_KEYDOWN:
 		switch (wparam)
 		{

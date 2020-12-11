@@ -532,7 +532,7 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 		m_resampler_source->set_end_time(end);
 
 	// update the source, returning a view of the needed output over the start and end times
-	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * m_native_source->gain());
+	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * source.gain());
 }
 
 
@@ -1102,7 +1102,7 @@ sound_manager::sound_manager(running_machine &machine) :
 
 	// count the mixers
 #if VERBOSE
-	mixer_interface_iterator iter(machine.root_device());
+	mixer_interface_enumerator iter(machine.root_device());
 	VPRINTF(("total mixers = %d\n", iter.count()));
 #endif
 
@@ -1199,7 +1199,7 @@ void sound_manager::set_attenuation(float attenuation)
 bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 {
 	// scan through the mixers until we find the indexed input
-	for (device_mixer_interface &mixer : mixer_interface_iterator(machine().root_device()))
+	for (device_mixer_interface &mixer : mixer_interface_enumerator(machine().root_device()))
 	{
 		if (index < mixer.inputs())
 		{
@@ -1270,7 +1270,7 @@ void sound_manager::recursive_remove_stream_from_orphan_list(sound_stream *which
 void sound_manager::apply_sample_rate_changes()
 {
 	// update sample rates if they have changed
-	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 	{
 		int stream_out;
 		sound_stream *stream = speaker.output_to_stream_output(0, stream_out);
@@ -1292,7 +1292,7 @@ void sound_manager::apply_sample_rate_changes()
 void sound_manager::reset()
 {
 	// reset all the sound chips
-	for (device_sound_interface &sound : sound_interface_iterator(machine().root_device()))
+	for (device_sound_interface &sound : sound_interface_enumerator(machine().root_device()))
 		sound.device().reset();
 
 	// apply any sample rate changes now
@@ -1308,7 +1308,7 @@ void sound_manager::reset()
 			m_orphan_stream_list[stream.get()] = 0;
 
 		// then walk the graph like we do on update and remove any we touch
-		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		{
 			int dummy;
 			sound_stream *output = speaker.output_to_stream_output(0, dummy);
@@ -1318,7 +1318,7 @@ void sound_manager::reset()
 
 #if (SOUND_DEBUG)
 		// dump the sound graph when we start up
-		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		{
 			int index;
 			sound_stream *output = speaker.output_to_stream_output(0, index);
@@ -1487,7 +1487,7 @@ void sound_manager::update(void *ptr, int param)
 	std::fill_n(&m_rightmix[0], m_samples_this_update, 0);
 
 	// force all the speaker streams to generate the proper number of samples
-	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// determine the maximum in this section

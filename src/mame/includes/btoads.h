@@ -21,13 +21,13 @@ class btoads_state : public driver_device
 public:
 	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vram_fg0(*this, "vram_fg0", 32),
-		m_vram_fg1(*this, "vram_fg1", 32),
-		m_vram_fg_data(*this, "vram_fg_data", 32),
-		m_vram_bg0(*this, "vram_bg0", 32),
-		m_vram_bg1(*this, "vram_bg1", 32),
-		m_sprite_scale(*this, "sprite_scale", 32),
-		m_sprite_control(*this, "sprite_control", 32),
+		m_vram_fg0(*this, "vram_fg0", 0x200000, ENDIANNESS_LITTLE),
+		m_vram_fg1(*this, "vram_fg1", 0x200000, ENDIANNESS_LITTLE),
+		m_vram_fg_data(*this, "vram_fg_data"),
+		m_vram_bg0(*this, "vram_bg0", 0x400000, ENDIANNESS_LITTLE),
+		m_vram_bg1(*this, "vram_bg1", 0x400000, ENDIANNESS_LITTLE),
+		m_sprite_scale(*this, "sprite_scale"),
+		m_sprite_control(*this, "sprite_control"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bsmt(*this, "bsmt"),
@@ -56,13 +56,13 @@ private:
 	};
 
 	// shared pointers
-	required_shared_ptr<uint8_t> m_vram_fg0;
-	required_shared_ptr<uint8_t> m_vram_fg1;
-	required_shared_ptr<uint16_t> m_vram_fg_data;
-	required_shared_ptr<uint16_t> m_vram_bg0;
-	required_shared_ptr<uint16_t> m_vram_bg1;
-	required_shared_ptr<uint16_t> m_sprite_scale;
-	required_shared_ptr<uint16_t> m_sprite_control;
+	memory_share_creator<uint8_t> m_vram_fg0;
+	memory_share_creator<uint8_t> m_vram_fg1;
+	required_shared_ptr<uint32_t> m_vram_fg_data;
+	memory_share_creator<uint16_t> m_vram_bg0;
+	memory_share_creator<uint16_t> m_vram_bg1;
+	required_shared_ptr<uint32_t> m_sprite_scale;
+	required_shared_ptr<uint32_t> m_sprite_control;
 
 	// state
 	uint8_t m_main_to_sound_data;

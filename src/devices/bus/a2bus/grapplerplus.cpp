@@ -76,7 +76,7 @@ a2bus_grapplerplus_device::a2bus_grapplerplus_device(machine_config const &mconf
 INPUT_CHANGED_MEMBER(a2bus_grapplerplus_device::sw_msb)
 {
 	if (BIT(m_data_latch, 7))
-		m_printer_out->write(m_data_latch & ((BIT(m_s1->read(), 3) ? 0xffU : 0x7fU)));
+		m_printer_out->write(m_data_latch & (BIT(m_s1->read(), 3) ? 0xffU : 0x7fU));
 }
 
 
@@ -106,7 +106,7 @@ void a2bus_grapplerplus_device::write_c0nx(u8 offset, u8 data)
 		// latch output data - remember MSB can be forced low by DIP switch
 		LOG("Latch data %02X\n", data);
 		m_data_latch = data;
-		m_printer_out->write(data & ((BIT(m_s1->read(), 3) ? 0xffU : 0x7fU)));
+		m_printer_out->write(data & (BIT(m_s1->read(), 3) ? 0xffU : 0x7fU));
 
 		// clearing the ACK latch will acknowledge an interrupt
 		if (m_ack_in)
@@ -188,6 +188,16 @@ u8 a2bus_grapplerplus_device::read_cnxx(u8 offset)
 		m_rom_bank = 0x0000U;
 	}
 	return m_rom[(!m_ack_latch && BIT(offset, 7)) ? (offset & 0xbfU) : offset];
+}
+
+
+void a2bus_grapplerplus_device::write_cnxx(u8 offset, u8 data)
+{
+	LOG("Write Cn%02X=%02X (bus conflict)\n", offset, data);
+
+	if (m_rom_bank)
+		LOG("Select low ROM bank\n");
+	m_rom_bank = 0x0000U;
 }
 
 

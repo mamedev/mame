@@ -229,7 +229,7 @@ license:CC0
 
 <!-- sb ui -->
 
-	<element name="wmask1" defstate="1">
+	<element name="wmask1" defstate="0">
 		<rect state="0"><color red="0.84" green="0.75" blue="0.50" /></rect>
 	</element>
 	<element name="wmask2">

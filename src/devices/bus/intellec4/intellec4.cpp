@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device, "in
 DEFINE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device,  "intlc4univbus",  "INTELLEC 4 Universal Bus")
 
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 /***********************************************************************
     SLOT DEVICE
@@ -256,7 +256,7 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 	m_index = (m_bus = &bus)->add_card(*this);
 }
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4
 
 
 

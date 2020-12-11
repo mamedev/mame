@@ -203,7 +203,7 @@ void vsnes_state::vsnes_cpu1_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
 	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
-	map(0x6000, 0x7fff).bankrw("extra1");
+	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom();
 }
 
@@ -215,7 +215,6 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
 	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
-	map(0x6000, 0x7fff).bankrw("extra2");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -279,7 +278,7 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
 	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w));
-	map(0x6000, 0x7fff).bankrw("extra1");
+	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom();
 }
 

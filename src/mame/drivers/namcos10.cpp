@@ -415,6 +415,8 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 #include "speaker.h"
 
 
+namespace {
+
 class namcos10_state : public driver_device
 {
 public:
@@ -450,6 +452,10 @@ public:
 	void init_mrdrilrg();
 	void init_chocovdr();
 	void init_konotako();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// memm variant interface
@@ -508,12 +514,17 @@ private:
 
 	void i2c_update();
 
-	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<psxcpu_device> m_maincpu;
 	optional_device<tmp95c061_device> m_exio_mcu;
 	optional_device<tmp95c061_device> m_memp3_mcu;
 };
+
+
+void namcos10_state::machine_start()
+{
+	nand_address = 0;
+}
 
 
 void namcos10_state::namcos10_map(address_map &map)
@@ -932,7 +943,7 @@ void namcos10_state::init_konotako()
 }
 
 
-MACHINE_RESET_MEMBER(namcos10_state,namcos10)
+void namcos10_state::machine_reset()
 {
 	i2c_dev_clock = i2c_dev_data = 1;
 	i2c_host_clock = i2c_host_data = 1;
@@ -952,8 +963,6 @@ void namcos10_state::namcos10_base(machine_config &config)
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards
-
-	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10)
 
 	/* video hardware */
 	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
@@ -1338,6 +1347,9 @@ ROM_START( pacmball )
 	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(7b6f814d) SHA1(728167866d9350150b5fd9ebcf8fe7280efedb91) )
 	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2,      namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks

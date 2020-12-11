@@ -404,7 +404,6 @@ void pico_state::pico(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
-	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
@@ -425,7 +424,6 @@ void pico_state::picopal(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
-	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
@@ -624,7 +622,6 @@ void copera_state::copera(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
-	MCFG_MACHINE_RESET_OVERRIDE( copera_state, ms_megadriv )
 
 	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");

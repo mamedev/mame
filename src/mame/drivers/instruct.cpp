@@ -331,6 +331,7 @@ INPUT_PORTS_END
 
 void instruct_state::machine_reset()
 {
+	m_irqstate = 0;
 	m_cassin = 0;
 	port_w(0); // turn round leds off
 	m_maincpu->set_state_int(S2650_PC, 0x1800);

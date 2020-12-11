@@ -2444,6 +2444,7 @@ uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 			break;
 		case 0x08:
 			et4k.dac_state = 0;
+			[[fallthrough]];
 		default:
 			res = vga_device::port_03c0_r(offset);
 			break;
@@ -2481,6 +2482,7 @@ void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 				et4k.dac_ctrl = data;
 				break;
 			}
+			[[fallthrough]];
 		default:
 			vga_device::port_03c0_w(offset,data);
 			break;
@@ -4434,6 +4436,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 	case 0xf000:
 		ibm8514.multifunc_sel = data & 0x000f;
 		if(LOG_8514) logerror("S3: Multifunction select write %04x\n",data);
+		break;
 	default:
 		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}

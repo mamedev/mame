@@ -270,7 +270,7 @@ void play_2_state::port06_w(uint8_t data)
 
 void play_2_state::port07_w(uint8_t data)
 {
-	m_soundlatch = (data & 0x70) >> 4; // Zira (manual doesn't say where data comes from)
+	m_soundlatch = (data & 0x70) >> 4; // Zira, Cerberus
 	m_4013b->clear_w(0);
 	m_4013b->clear_w(1);
 	if (!BIT(data, 7))
@@ -303,7 +303,7 @@ READ_LINE_MEMBER( play_2_state::ef4_r )
 void play_2_state::clockcnt_w(uint16_t data)
 {
 	if ((data & 0x3ff) == 0)
-		m_4013b->preset_w(BIT(data, 10)); // Q10 output
+		m_4013b->preset_w(!BIT(data, 10)); // Q10 output
 }
 
 WRITE_LINE_MEMBER( play_2_state::clock2_w )
@@ -339,7 +339,7 @@ void play_2_state::sound_g_w(uint8_t data)
 
 uint8_t play_2_state::sound_in_r()
 {
-	return m_soundlatch;
+	return ~m_soundlatch & 7;
 }
 
 uint8_t play_2_state::psg_r()
@@ -364,7 +364,7 @@ void play_2_state::play_2(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(play_2_state::clear_r));
 	m_maincpu->ef1_cb().set(FUNC(play_2_state::ef1_r));
 	m_maincpu->ef4_cb().set(FUNC(play_2_state::ef4_r));
-	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w));
+	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w)).invert(); // actually active high on 4013
 	m_maincpu->tpb_cb().set(m_4013a, FUNC(ttl7474_device::clock_w));
 	m_maincpu->tpb_cb().append(m_4020, FUNC(ripple_counter_device::clock_w));
 
@@ -440,6 +440,16 @@ ROM_START(antar2)
 	ROM_LOAD("antar11a.bin", 0x0c00, 0x0400, CRC(17ad38bf) SHA1(e2c9472ed8fbe9d5965a5c79515a1b7ea9edaa79))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Storm (??/79)
+/-------------------------------------------------------------------*/
+ROM_START(storm)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("a-1.bin",  0x0000, 0x0400, CRC(12e37664) SHA1(d7095975cd9d4445fd1f4cd711992c7367deae89))
+	ROM_LOAD("b-1.bin",  0x0400, 0x0400, CRC(3ac3cea3) SHA1(c6197911d25661cb647ea606eee5f3f1bd9b4ba2))
+	ROM_LOAD("c-1.bin",  0x0800, 0x0400, CRC(8bedf1ea) SHA1(7633ebf8a65e3fc7afa21d50aaa441f87a86efd3))
+	ROM_LOAD("d-1.bin",  0x0c00, 0x0400, CRC(f717ef3e) SHA1(cd5126360471c06539e445fecbf2f0ddeb1b156c))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Evil Fight (03/80)
@@ -514,11 +524,12 @@ ROM_START(madrace)
 ROM_END
 
 
-GAME(1979,  antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1982,  cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1985,  madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980,  zira,      0,     zira,   play_2, play_2_state, init_zira,  ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980, zira,      0,     zira,   play_2, play_2_state, init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

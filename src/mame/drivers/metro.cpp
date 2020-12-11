@@ -5612,7 +5612,7 @@ void metro_state::init_lastfortg()
 
 // VG420 / VG460
 GAME( 1992, karatour,  0,        karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "The Karate Tournament", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "Chatan Yarakuu Shanku - The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, karatourj, karatour, karatour,  karatour,   metro_state, init_karatour, ROT0,   "Mitchell",                                        "Chatan Yara Kuushanku - The Karate Tournament (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpoms,  0,        pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro",                                           "Pang Pom's", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsm, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_state, init_metro,    ROT0,   "Nova",                                            "Pang Pom's (Nova)", MACHINE_SUPPORTS_SAVE )

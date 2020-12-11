@@ -1073,7 +1073,7 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 
 	// if we don't have a match, default to the nth view
 	std::vector<std::reference_wrapper<screen_device> > screens;
-	for (screen_device &screen : screen_device_iterator(m_manager.machine().root_device()))
+	for (screen_device &screen : screen_device_enumerator(m_manager.machine().root_device()))
 		screens.push_back(screen);
 	if (!view && !screens.empty())
 	{
@@ -1262,10 +1262,10 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 	// scan the current view for all screens
 	for (layout_view::item &curitem : current_view().items())
 	{
-		if (curitem.screen())
+		screen_device *const screen = curitem.screen();
+		if (screen)
 		{
 			// use a hard-coded default visible area for vector screens
-			screen_device *const screen = curitem.screen();
 			const rectangle vectorvis(0, 639, 0, 479);
 			const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
@@ -1343,6 +1343,7 @@ render_primitive_list &render_target::get_primitives()
 	if (m_manager.machine().phase() >= machine_phase::RESET)
 	{
 		// we're running - iterate over items in the view
+		current_view().prepare_items();
 		for (layout_view::item &curitem : current_view().visible_items())
 		{
 			// first apply orientation to the bounds
@@ -1364,7 +1365,7 @@ render_primitive_list &render_target::get_primitives()
 			if (curitem.screen())
 				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
 			else
-				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
+				add_element_primitives(list, item_xform, *curitem.element(), curitem.element_state(), curitem.blend_mode());
 		}
 	}
 	else
@@ -1615,17 +1616,10 @@ void render_target::debug_append(render_container &container)
 void render_target::resolve_tags()
 {
 	for (layout_file &file : m_filelist)
-	{
-		for (layout_view &view : file.views())
-		{
-			view.resolve_tags();
-			if (&current_view() == &view)
-			{
-				view.recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
-				view.preload();
-			}
-		}
-	}
+		file.resolve_tags();
+
+	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
+	current_view().preload();
 }
 
 
@@ -1779,7 +1773,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		bool m_rotated;
 		std::pair<unsigned, unsigned> m_physical, m_native;
 	};
-	screen_device_iterator iter(m_manager.machine().root_device());
+	screen_device_enumerator iter(m_manager.machine().root_device());
 	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
 
 	// need this because views aren't fully set up yet
@@ -2208,12 +2202,11 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	{
 		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
-	catch (emu_fatalerror &)
+	catch (emu_fatalerror &err)
 	{
+		osd_printf_warning("%s\n", err.what());
 		return false;
 	}
-
-	emulator_info::layout_file_cb(rootnode);
 
 	return true;
 }
@@ -3053,7 +3046,7 @@ render_manager::render_manager(running_machine &machine)
 	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
-	for (screen_device &screen : screen_device_iterator(machine.root_device()))
+	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
 		screen.set_container(*container_alloc(&screen));
 }
 

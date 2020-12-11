@@ -2555,13 +2555,24 @@ ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(f1b74978) SHA1(d1ac1bc212050d4f1a861045ab612115c73d3fd0) )
 ROM_END
 
+/*
+
+Cookie & Bibi 2
+SemiCom (c) 1996
+
+  CPU: MC68000P10, Z8400B Z80
+Sound: OKIM6295, YM2151+YM3012 (rebadged as AD-65, KA51+K-662)
+Video: Lattice pLSI 1032-60LJ (square 84 pin socketed)
+  OSC: 16MHz, 12MHz
+*/
+
 ROM_START( cookbib2 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "cookbib2.02",  0x00001, 0x40000, CRC(b2909460) SHA1(2438638af870cfc105631d2b5e5a27a64ab5394d) )
-	ROM_LOAD16_BYTE( "cookbib2.01",  0x00000, 0x40000, CRC(65aafde2) SHA1(01f9f261527c35182f0445d641d987aa86ad750f) )
+	ROM_LOAD16_BYTE( "unico_02.uh12",  0x00001, 0x40000, CRC(b2909460) SHA1(2438638af870cfc105631d2b5e5a27a64ab5394d) ) // 27C020
+	ROM_LOAD16_BYTE( "unico_01.ui12",  0x00000, 0x40000, CRC(65aafde2) SHA1(01f9f261527c35182f0445d641d987aa86ad750f) ) // 27C020
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "cookbib2.07", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) )
+	ROM_LOAD( "unico_07.u1", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) ) // 27C512
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
@@ -2572,15 +2583,42 @@ ROM_START( cookbib2 )
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x00000, 0x200 , CRC(ae6d8ed5) SHA1(410cdacb9b90ea345c0e4be85e60a138f45a51f1) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "cookbib2.06", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) )
+	ROM_LOAD( "unico_06.uj15", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) ) // 27C010
 
 	ROM_REGION( 0x140000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "cookbib2.05", 0x000000, 0x80000, CRC(89fb38ce) SHA1(1b39dd9c2743916b8d8af590bd92fe4819c2454b) )
-	ROM_LOAD( "cookbib2.04", 0x080000, 0x80000, CRC(f240111f) SHA1(b2c3b6e3d916fc68e1fd258b1279b6c39e1f0108) )
-	ROM_LOAD( "cookbib2.03", 0x100000, 0x40000, CRC(e1604821) SHA1(bede6bdd8331128b9f2b229d718133470bf407c9) )
+	ROM_LOAD( "unico_05.ua4", 0x000000, 0x80000, CRC(89fb38ce) SHA1(1b39dd9c2743916b8d8af590bd92fe4819c2454b) ) // 27C040
+	ROM_LOAD( "unico_04.ua5", 0x080000, 0x80000, CRC(f240111f) SHA1(b2c3b6e3d916fc68e1fd258b1279b6c39e1f0108) ) // 27C040
+	ROM_LOAD( "unico_03.ua6", 0x100000, 0x40000, CRC(e1604821) SHA1(bede6bdd8331128b9f2b229d718133470bf407c9) ) // 27C020
+	/* UA7 is unpopulated */
 ROM_END
 
 ROM_START( cookbib2a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "unico.uh12",  0x00001, 0x40000, CRC(19421631) SHA1(00dfc474cee7d21d4b6bdbae2eabcdfde3584307) ) // non descriptive UNICO label with no numbers
+	ROM_LOAD16_BYTE( "unico.ui12",  0x00000, 0x40000, CRC(0d09ecf5) SHA1(16f787638041d38ee2567ca958ca4405324cf5fa) ) // both program ROMs are 27C020
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "unico_07.u1", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) ) // 27C512
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x00000, 0x200 , CRC(ae6d8ed5) SHA1(410cdacb9b90ea345c0e4be85e60a138f45a51f1) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "unico_06.uj15", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) ) // 27C010
+
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "unico_05.ua4", 0x000000, 0x80000, CRC(89fb38ce) SHA1(1b39dd9c2743916b8d8af590bd92fe4819c2454b) ) // 27C040
+	ROM_LOAD( "unico_04.ua5", 0x080000, 0x80000, CRC(f240111f) SHA1(b2c3b6e3d916fc68e1fd258b1279b6c39e1f0108) ) // 27C040
+	ROM_LOAD( "unico_03.ua6", 0x100000, 0x40000, CRC(e1604821) SHA1(bede6bdd8331128b9f2b229d718133470bf407c9) ) // 27C020
+	/* UA7 is unpopulated */
+ROM_END
+
+ROM_START( cookbib2b )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "uh12.020",  0x00001, 0x40000, CRC(a44ec1f8) SHA1(0c741bf38f5cf667586cd1925417b6e17dbb8916) )
 	ROM_LOAD16_BYTE( "ui12.020",  0x00000, 0x40000, CRC(bdbcd0d1) SHA1(9a6a85a492c21f6dd5daef964071a8a1c62f73c8) )
@@ -2927,7 +2965,8 @@ GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, empty_i
 GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, init_hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, empty_init,    ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
+GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )

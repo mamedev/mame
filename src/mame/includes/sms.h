@@ -54,6 +54,7 @@ public:
 		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
+		m_BIOS(nullptr),
 		m_is_gamegear(false),
 		m_is_smsj(false),
 		m_is_mark_iii(false),

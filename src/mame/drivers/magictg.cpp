@@ -12,7 +12,7 @@ PCB Information (needs tidying:)
 
 TOP Board
 .20u    27c4001 stickered   U20
-                #1537 V1.0  a 1 was hadwritten over the 0
+                #1537 V1.0  a 1 was handwritten over the 0
 
 .u7     stamped     (c) 1997
                 ACCLAIM COINOP
@@ -75,7 +75,7 @@ U4 on daughter board        Zoran ZR36050PQC
                             85 GF7B9726E
 
 U11 on main board           Removed heatsink, Couldn't see anything...
-
+                            On a second PCB: IDT 79RV5000-200BS272 YA9802C
 
 U71 on main board           Galileo
                             GT-64010A-B-0
@@ -126,7 +126,7 @@ Xilinx  XC3120A
     DT72811
     DT71256 x2
     DT72271
-29.500000 osciallator by ZR36120PQC
+29.500000 oscillator by ZR36120PQC
 Medium size chip with heat sink on it
 
 ***************************************************************************/
@@ -140,6 +140,8 @@ Medium size chip with heat sink on it
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 /* TODO: Two 3Dfx Voodoo chipsets are used in SLI configuration */
 // #define USE_TWO_3DFX
@@ -157,6 +159,11 @@ public:
 	{ }
 
 	void magictg(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<mips3_device>       m_mips;
@@ -235,10 +242,6 @@ private:
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
 	void magictg_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	uint32_t pci_dev0_r(int function, int reg, uint32_t mem_mask);
 	void pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -250,7 +253,7 @@ protected:
 #endif
 	uint32_t zr36120_pci_r(int function, int reg, uint32_t mem_mask);
 	void zr36120_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-public:
+
 	uint32_t screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -912,7 +915,7 @@ INPUT_PORTS_END
 
 void magictg_state::magictg(machine_config &config)
 {
-	R5000BE(config, m_mips, 150000000); /* TODO: CPU type and clock are unknown */
+	R5000BE(config, m_mips, 200000000); // exact model 79RV5000-200BS272 rated for 200MHz, clock not measured
 	//m_mips->set_icache_size(16384); /* TODO: Unknown */
 	//m_mips->set_dcache_size(16384); /* TODO: Unknown */
 	m_mips->set_addrmap(AS_PROGRAM, &magictg_state::magictg_map);
@@ -1016,6 +1019,8 @@ ROM_START( magictga )
 	ROM_REGION( 0x400000, "key", 0 )
 	ROM_LOAD( "magic.k0.u20", 0x000000, 0x400000, BAD_DUMP CRC(63ab0e9e) SHA1(c4f0b009860ee499496ed7fc1f14ef1e221c1085) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /*************************************

@@ -17,14 +17,10 @@
 
 // FIXME: this file could be created programmatically
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
-		NETLIB_DEVICE_IMPL(74161,     "TTL_74161",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
-		// FIXME: This happens on copy/paste
-		NETLIB_DEVICE_IMPL(74161_fixme, "TTL_74161_FIXME", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENP,+ENT,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74161,     "TTL_74161",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
+	// FIXME: This happens on copy/paste
+	NETLIB_DEVICE_IMPL(74161_fixme, "TTL_74161_FIXME", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENP,+ENT,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

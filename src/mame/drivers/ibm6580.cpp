@@ -827,10 +827,7 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void ibm6580_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
-	membank("bank10")->set_base(m_ram->pointer());
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_fdc->set_rate(500000); // XXX workaround
 

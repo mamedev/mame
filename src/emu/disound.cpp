@@ -287,7 +287,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 void device_sound_interface::interface_pre_start()
 {
 	// scan all the sound devices
-	sound_interface_iterator iter(device().machine().root_device());
+	sound_interface_enumerator iter(device().machine().root_device());
 	for (device_sound_interface const &sound : iter)
 	{
 		// scan each route on the device
@@ -332,7 +332,7 @@ void device_sound_interface::interface_pre_start()
 void device_sound_interface::interface_post_start()
 {
 	// iterate over all the sound devices
-	for (device_sound_interface &sound : sound_interface_iterator(device().machine().root_device()))
+	for (device_sound_interface &sound : sound_interface_enumerator(device().machine().root_device()))
 	{
 		// scan each route on the device
 		for (sound_route const &route : sound.routes())
@@ -440,7 +440,7 @@ void device_mixer_interface::interface_pre_start()
 	m_outputmap.resize(m_auto_allocated_inputs);
 
 	// iterate through all routes that point to us and note their mixer output
-	for (device_sound_interface const &sound : sound_interface_iterator(device().machine().root_device()))
+	for (device_sound_interface const &sound : sound_interface_enumerator(device().machine().root_device()))
 	{
 		for (sound_route const &route : sound.routes())
 		{

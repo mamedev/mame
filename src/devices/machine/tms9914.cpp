@@ -178,7 +178,58 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 	  m_dio_write_func(*this),
 	  m_signal_wr_fns(*this),
 	  m_int_write_func(*this),
-	  m_accrq_write_func(*this)
+	  m_accrq_write_func(*this),
+	  m_int_line{false},
+	  m_accrq_line{false},
+	  m_dio{0},
+	  m_signals{false},
+	  m_ext_signals{false},
+	  m_no_reflection{false},
+	  m_ext_state_change{false},
+	  m_reg_int0_status{0},
+	  m_reg_int0_mask{0},
+	  m_reg_int1_status{0},
+	  m_reg_int1_mask{0},
+	  m_reg_address{0},
+	  m_reg_serial_p{0},
+	  m_reg_2nd_serial_p{0},
+	  m_reg_parallel_p{0},
+	  m_reg_2nd_parallel_p{0},
+	  m_reg_di{0},
+	  m_reg_do{0},
+	  m_reg_ulpa{false},
+	  m_swrst{false},
+	  m_hdfa{false},
+	  m_hdfe{false},
+	  m_rtl{false},
+	  m_gts{false},
+	  m_rpp{false},
+	  m_sic{false},
+	  m_sre{false},
+	  m_dai{false},
+	  m_pts{false},
+	  m_stdl{false},
+	  m_shdw{false},
+	  m_vstdl{false},
+	  m_rsvd2{false},
+	  m_ah_state{FSM_AH_AIDS},
+	  m_ah_adhs{false},
+	  m_ah_anhs{false},
+	  m_ah_aehs{false},
+	  m_sh_state{FSM_SH_SIDS},
+	  m_sh_shfs{false},
+	  m_sh_vsts{false},
+	  m_t_state{FSM_T_TIDS},
+	  m_t_tpas{false},
+	  m_t_spms{false},
+	  m_t_eoi_state{FSM_T_ENIS},
+	  m_l_state{FSM_L_LIDS},
+	  m_l_lpas{false},
+	  m_sr_state{FSM_SR_NPRS},
+	  m_rl_state{FSM_RL_LOCS},
+	  m_pp_ppas{false},
+	  m_c_state{FSM_C_CIDS},
+	  m_next_eoi{false}
 {
 	// Silence compiler complaints about unused variables
 	(void)REG_INT1_IFC_BIT;
@@ -500,15 +551,40 @@ void tms9914_device::device_reset()
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
+	m_int_line = false;
 	m_accrq_line = true;    // Ensure change is propagated
+	m_dio = 0;
 
+	m_reg_int0_status = 0;
+	m_reg_int0_mask = 0;
+	m_reg_int1_status = 0;
+	m_reg_int1_mask = 0;
+	m_reg_address = 0;
 	m_reg_serial_p = 0;
 	m_reg_2nd_serial_p = 0;
 	m_reg_parallel_p = 0;
 	m_reg_2nd_parallel_p = 0;
-
+	m_reg_di = 0;
+	m_reg_do = 0;
 	m_reg_ulpa = false;
+	m_swrst = false;
+	m_hdfa = false;
+	m_hdfe = false;
+	m_rtl = false;
+	m_gts = false;
+	m_rpp = false;
+	m_sic = false;
+	m_sre = false;
+	m_dai = false;
+	m_pts = false;
+	m_stdl = false;
+	m_shdw = false;
+	m_vstdl = false;
+	m_rsvd2 = false;
+
+
 	std::fill(std::begin(m_ext_signals), std::end(m_ext_signals), false);
+	std::fill(std::begin(m_signals), std::end(m_signals), false);
 
 	do_swrst();
 	update_fsm();

@@ -111,6 +111,8 @@ Notes:
 #include "cpu/mips/mips1.h"
 #include <algorithm>
 
+namespace {
+
 class speglsht_state : public driver_device
 {
 public:
@@ -128,6 +130,11 @@ public:
 	void speglsht(machine_config &config);
 
 	void init_speglsht();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<palette_device> m_palette;
@@ -150,9 +157,6 @@ private:
 	uint32_t cop_r(offs_t offset);
 	uint32_t irq_ack_clear();
 
-	DECLARE_MACHINE_RESET(speglsht);
-	virtual void machine_start() override;
-	DECLARE_VIDEO_START(speglsht);
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void st0016_rom_bank_w(uint8_t data);
@@ -361,15 +365,14 @@ static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(speglsht_state,speglsht)
+void speglsht_state::machine_reset()
 {
 	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
-VIDEO_START_MEMBER(speglsht_state,speglsht)
+void speglsht_state::video_start()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
-//  VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
@@ -425,7 +428,6 @@ void speglsht_state::speglsht(machine_config &config)
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
-	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -437,8 +439,6 @@ void speglsht_state::speglsht(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
 	PALETTE(config, m_palette).set_entries(16*16*4+1);
-
-	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
 }
 
 ROM_START( speglsht )
@@ -462,6 +462,8 @@ void speglsht_state::init_speglsht()
 {
 	m_maincpu->set_game_flag(3);
 }
+
+} // Anonymous namespace
 
 
 GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

@@ -27,7 +27,7 @@
 #include "machine/hdc92x4.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /*
     Implementation for modern floppy system.
@@ -187,7 +187,7 @@ private:
 	int  m_readyflags;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device)
 

@@ -305,7 +305,7 @@ const char *text_buffer_get_seqnum_line(text_buffer const &text, u32 seqnum)
     Gets the line that the iterator currently points to.
 -----------------------------------------------------------------------*/
 
-text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
+std::string_view text_buffer_lines::text_buffer_line_iterator::operator*() const
 {
 	char const *const line = &m_buffer.buffer[m_buffer.lineoffs[m_lineptr]];
 
@@ -321,7 +321,7 @@ text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
 	if (difference < 0)
 		difference += m_buffer.bufsize;
 
-	return text_buffer_line{ line, size_t(difference) };
+	return std::string_view{ line, size_t(difference) };
 }
 
 /*---------------------------------------------------------------------

@@ -198,6 +198,13 @@ void twin16_state::main_map(address_map &map)
 	map(0x140000, 0x143fff).ram().share("spriteram");
 }
 
+void cuebrickj_state::cuebrickj_main_map(address_map &map)
+{
+	main_map(map);
+	map(0x0b0000, 0x0b03ff).bankrw("nvrambank");
+	map(0x0b0400, 0x0b0400).w(FUNC(cuebrickj_state::nvram_bank_w));
+}
+
 void twin16_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -763,6 +770,7 @@ void twin16_state::miaj(machine_config &config)
 void cuebrickj_state::cuebrickj(machine_config &config)
 {
 	twin16(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cuebrickj_state::cuebrickj_main_map);
 	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -1251,11 +1259,6 @@ void cuebrickj_state::nvram_bank_w(uint8_t data)
 void cuebrickj_state::init_cuebrickj()
 {
 	init_twin16();
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
-	space.install_write_handler( 0x0b0400, 0x0b0401, write8smo_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 

@@ -15574,4 +15574,85 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="extk8508">
+		<description>Extra K (Version 1985-08-30)</description>
+		<year>1985</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - DOS 3.3"/>
+			<dataarea name="flop" size="234833">
+				<rom name="extra k side a - dos 3.3.woz" size="234833" crc="5303a52a" sha1="4fa2db1e130758a17d5969541135856a45aab1dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - ProDOS"/>
+			<dataarea name="flop" size="234832">
+				<rom name="extra k side b - prodos.woz" size="234832" crc="73e180d9" sha1="7a39338f3d089577f6ebe21cd7d38e0b0e8ab331"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minipx2">
+		<description>Mini-Pix #2 (Version 1986-11-01)</description>
+		<year>1986</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241518">
+				<rom name="mini-pix disk #2 side a.woz" size="241518" crc="e1570257" sha1="1b2b5a9d3e338c8b164e17ee6be25a1433bd40bc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234862">
+				<rom name="mini-pix disk #2 side b.woz" size="234862" crc="62f2a84c" sha1="1762c5d341aaa1f4de7e9200e920e4100aecefab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minipx3">
+		<description>Mini-Pix #3 (Version 1986-11-17)</description>
+		<year>1986</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234862">
+				<rom name="mini-pix disk #3 side a.woz" size="234862" crc="6a743a47" sha1="a5e2fe3a34c38bd86dbf6af4310d194fc8da5dba"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234862">
+				<rom name="mini-pix disk #3 side b.woz" size="234862" crc="aee26ad0" sha1="c07137e9bb47cf66df499551e6fa8788b7edface"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iosilver">
+		<description>I.O. Silver</description>
+		<year>1984</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2020-10-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="i.o. silver.woz" size="234790" crc="b6356107" sha1="b31b227a08ab2d7631cb9e411a8c6d99044f3d37"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

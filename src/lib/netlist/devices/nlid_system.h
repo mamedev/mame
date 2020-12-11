@@ -16,10 +16,8 @@
 
 #include <random>
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
+
 	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
@@ -579,7 +577,6 @@ namespace devices
 		state_var<distribution> m_dis;
 	};
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NLD_SYSTEM_H_

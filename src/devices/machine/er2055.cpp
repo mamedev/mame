@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM (64x8)")
 er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ER2055, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
-		m_default_data(*this, DEVICE_SELF, SIZE_DATA),
+		m_default_data(*this, DEVICE_SELF),
 		m_control_state(0),
 		m_address(0),
 		m_data(0)

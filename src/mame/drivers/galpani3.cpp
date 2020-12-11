@@ -306,24 +306,24 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 			/*
 			else if (pridat==0x2f) // area outside of the girl
 			{
-				//dst[drawx] = machine().rand()&0x3fff;
+			    //dst[drawx] = machine().rand()&0x3fff;
 			}
 
 			else if (pridat==0x00) // the initial line / box that gets drawn
 			{
-				//dst[drawx] = machine().rand()&0x3fff;
+			    //dst[drawx] = machine().rand()&0x3fff;
 			}
 			else if (pridat==0x30) // during the 'gals boxes' on the intro
 			{
-				//dst[drawx] = machine().rand()&0x3fff;
+			    //dst[drawx] = machine().rand()&0x3fff;
 			}
 			else if (pridat==0x0c) // 'nice' at end of level
 			{
-				//dst[drawx] = machine().rand()&0x3fff;
+			    //dst[drawx] = machine().rand()&0x3fff;
 			}
 			else
 			{
-				//printf("%02x, ",pridat);
+			    //printf("%02x, ",pridat);
 			}
 			*/
 		}

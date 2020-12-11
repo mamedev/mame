@@ -57,7 +57,7 @@ void dragon_state::pia1_pa_changed(uint8_t data)
 	/* if strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		uint8_t output = pia_1().b_output();
+		uint8_t output = pia_0().b_output();
 		m_printer->output(output);
 	}
 }
@@ -186,8 +186,8 @@ void d64plus_state::d64plus_bank_w(uint8_t data)
 	switch (data & 0x06)
 	{
 	case 0:  // Standard Dragon 32 Dynamic bank
-		space.install_write_bank(0x0000, 0x7fff, "bank0000_w");
-		space.install_read_bank(0x0000, 0x7fff, "bank0000_r");
+		space.install_write_bank(0x0000, 0x7fff, membank(":sam:bank0000_w"));
+		space.install_read_bank(0x0000, 0x7fff, membank(":sam:bank0000_r"));
 		break;
 	case 2:  // First extra 32K bank (A)
 		space.install_ram(0x0000, 0x7fff, m_plus_ram + 0x0000);
@@ -241,10 +241,6 @@ void d64plus_state::device_start()
 	space.install_readwrite_handler(0xffe0, 0xffe0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	space.install_readwrite_handler(0xffe1, 0xffe1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 	space.install_readwrite_handler(0xffe2, 0xffe2, read8smo_delegate(*this, FUNC(d64plus_state::d64plus_6845_disp_r)), write8smo_delegate(*this, FUNC(d64plus_state::d64plus_bank_w)));
-
-	// allocate memory
-	m_plus_ram.allocate(0x10000);
-	m_video_ram.allocate(0x800);
 }
 
 

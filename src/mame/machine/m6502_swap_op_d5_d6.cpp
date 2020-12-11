@@ -9,8 +9,8 @@
     Seen on die marked VH2009, used on polmega, silv35
     these are N2A03 derived CPUs used on VTxx systems
 
-	VT1682 systems with this scrambling currently derive from M6502 type
-	but this might be incorrect
+    VT1682 systems with this scrambling currently derive from M6502 type
+    but this might be incorrect
 
 ***************************************************************************/
 
@@ -33,12 +33,21 @@ void m6502_swap_op_d5_d6::device_start()
 
 void m6502_swap_op_d5_d6::device_reset()
 {
+	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = true;
 	m6502_device::device_reset();
+}
+
+void m6502_swap_op_d5_d6::set_encryption_state(bool state)
+{
+	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = state;
 }
 
 uint8_t m6502_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 {
-	return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0);
+	if (m_encryption_enabled)
+		return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0);
+	else
+		return op;
 }
 
 uint8_t m6502_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
@@ -86,12 +95,21 @@ void n2a03_core_swap_op_d5_d6::device_start()
 
 void n2a03_core_swap_op_d5_d6::device_reset()
 {
+	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = true;
 	n2a03_core_device::device_reset();
+}
+
+void n2a03_core_swap_op_d5_d6::set_encryption_state(bool state)
+{
+	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = state;
 }
 
 uint8_t n2a03_core_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 {
-	return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0);
+	if (m_encryption_enabled)
+		return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0);
+	else
+		return op;
 }
 
 uint8_t n2a03_core_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)

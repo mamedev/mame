@@ -49,18 +49,21 @@ public:
 
 	virtual void cart_init() { } // called after loading ROM
 
-	u8* get_rom_base() { return m_rom ? &m_rom[0] : nullptr; }
-	u32 get_rom_size() { return m_rom ? m_rom.bytes() : 0; }
+	u8* get_rom_base() { return m_rom ? m_rom.get() : nullptr; }
+	u32 get_rom_size() { return m_rom_size; }
 
-	u8* get_voice_base() { return m_voice ? &m_voice[0] : nullptr; }
-	u32 get_voice_size() { return m_voice ? m_voice.bytes() : 0; }
+	u8* get_voice_base() { return m_voice ? m_voice.get() : nullptr; }
+	u32 get_voice_size() { return m_voice_size; }
 
 protected:
 	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<u8> m_rom;
-	optional_shared_ptr<u8> m_exrom;
-	optional_shared_ptr<u8> m_voice;
+	std::unique_ptr<uint8_t[]> m_rom;
+	std::unique_ptr<uint8_t[]> m_exrom;
+	std::unique_ptr<uint8_t[]> m_voice;
+	u32 m_rom_size;
+	u32 m_exrom_size;
+	u32 m_voice_size;
 };
 
 

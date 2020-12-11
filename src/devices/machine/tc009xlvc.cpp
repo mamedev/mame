@@ -214,6 +214,9 @@ void tc0090lvc_device::device_post_load()
 
 void tc0090lvc_device::device_start()
 {
+	// rom_r assumes it can make a mask with (m_rom.length() - 1)
+	assert(!(m_rom.length() & (m_rom.length() - 1)));
+
 	m_tile_cb.resolve();
 
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
@@ -241,6 +244,7 @@ void tc0090lvc_device::device_start()
 	bg_tilemap[0]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
 	bg_tilemap[1]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
 
+	save_item(NAME(m_bg_scroll));
 	save_item(NAME(m_irq_vector));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_ram_bank));

@@ -117,9 +117,7 @@ void atetris_state::machine_start()
 
 void atetris_state::machine_reset()
 {
-	/* reset the slapstic */
-	m_slapstic->slapstic_reset();
-	m_current_bank = m_slapstic->slapstic_bank() & 1;
+	m_current_bank = m_slapstic->bank() & 1;
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
@@ -134,10 +132,10 @@ void atetris_state::machine_reset()
  *
  *************************************/
 
-uint8_t atetris_state::slapstic_r(address_space &space, offs_t offset)
+uint8_t atetris_state::slapstic_r(offs_t offset)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = m_slapstic->slapstic_tweak(space, offset) & 1;
+	int new_bank = m_slapstic->tweak(offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)
@@ -382,7 +380,7 @@ void atetris_state::atetris_base(machine_config &config)
 	M6502(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 101, false);
+	SLAPSTIC(config, m_slapstic, 101);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -737,7 +735,6 @@ void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 
-	m_slapstic->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }

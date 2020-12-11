@@ -3,37 +3,44 @@
 license:CC0
 -->
 <mamelayout version="2">
-<!-- luascript (demo for plugin -layout) -->
-<!-- this adds support for combining outputs to make an aggregated output--><script>
-	local layout = {}
+	<!-- Lua script (demo for -plugin layout) -->
+	<!-- this adds support for combining outputs to make an aggregated output -->
+	<script><![CDATA[
+		local ledlamps = {
+			{ 88, 89, 90, 91, 92, 93, 94     },
+			{ 80, 81, 82, 83, 84, 85, 86, 87 },
+			{ 72, 73, 74, 75, 76, 77, 78     },
+			{ 64, 65, 66, 67, 68, 69, 70     } }
 
-	local ledlamps = {  { 88, 89, 90, 91, 92, 93, 94, -1 },
-						{ 80, 81, 82, 83, 84, 85, 86, 87 },
-						{ 72, 73, 74, 75, 76, 77, 78, -1 },
-						{ 64, 65, 66, 67, 68, 69, 70, -1 } }
-
-	function layout.reset()
-		for led=0,3 do
-			machine:outputs():set_indexed_value("compoundled", led, 0)
-			return
+		function configure_view(view)
+			local led_items = {
+					view.items["compoundled0"],
+					view.items["compoundled1"],
+					view.items["compoundled2"],
+					view.items["compoundled3"] }
+			view:set_prepare_items_callback(
+					function ()
+						for ledno, lamps in pairs(ledlamps) do
+							local ledstate = 0
+							for bit, lampno in pairs(lamps) do
+								if machine:outputs():get_indexed_value("lamp", lampno) > 0 then
+									ledstate = ledstate | (1 << (bit - 1))
+								end
+							end
+							if led_items[ledno] ~= nil then
+								led_items[ledno]:set_state(ledstate)
+							end
+						end
+					end)
 		end
-	end
 
-	function layout.frame()
-		for num, led in pairs(ledlamps) do
-			local temp_state = 0
-			for lamp=0,7 do
-				local lampval = led[lamp+1]
-				local lampstate = machine:outputs():get_indexed_value("lamp", lampval)
-				if (lampstate > 0) then
-					temp_state = temp_state | (1 &lt;&lt; lamp)
-				end
-			end
-			machine:outputs():set_indexed_value("compoundled", num-1, temp_state)
-		end
-	end
-return layout, "v4dbltak"
-</script>
+		file:set_resolve_tags_callback(
+				function ()
+					for k, view in pairs(file.views) do
+						configure_view(view)
+					end
+				end)
+	]]></script>
 
 	<element name="£">
 		<text string="£">
@@ -169,16 +176,16 @@ return layout, "v4dbltak"
 		<element name="£" ref="£" state="0">
 			<bounds x="505" y="200" width="8" height="15"/>
 		</element>
-		<element name="compoundled0" ref="digit" state="0">
+		<element id="compoundled0" ref="digit" state="0">
 			<bounds x="515" y="200" width="8" height="15"/>
 		</element>
-		<element name="compoundled1" ref="digit" state="0">
+		<element id="compoundled1" ref="digit" state="0">
 			<bounds x="525" y="200" width="8" height="15"/>
 		</element>
-		<element name="compoundled2" ref="digit" state="0">
+		<element id="compoundled2" ref="digit" state="0">
 			<bounds x="535" y="200" width="8" height="15"/>
 		</element>
-		<element name="compoundled3" ref="digit" state="0">
+		<element id="compoundled3" ref="digit" state="0">
 			<bounds x="545" y="200" width="8" height="15"/>
 		</element>
 		<element name="lamp24" ref="COLLECT" state="0">

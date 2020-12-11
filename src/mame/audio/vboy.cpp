@@ -442,6 +442,7 @@ void vboysnd_device::write(offs_t offset, uint8_t data)
 					break;
 				}
 			}
+			[[fallthrough]]; // FIXME: really?
 		case SxINT:
 			if (channel < 5)
 			{

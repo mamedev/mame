@@ -25,7 +25,7 @@
 #include <memory>
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 class graph_link_hle_device
 		: public device_t
@@ -59,7 +59,7 @@ private:
 	bool                                m_empty, m_ready;
 };
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x
 
 
 DECLARE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device)

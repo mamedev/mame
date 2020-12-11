@@ -154,14 +154,11 @@ void galaxold_state::init_4in1()
 	/* games are banked at 0x0000 - 0x3fff */
 	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
+
 	_4in1_bank_w(0); /* set the initial CPU bank */
 
 	save_item(NAME(m__4in1_bank));
-}
-
-INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
-{
-	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
 
 void galaxold_state::init_bullsdrtg()

@@ -160,7 +160,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		util::xml::data_node::int_format const format(itemnode->get_attribute_int_format("value"));
 
 		// allocate and append a new item
-		item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode->get_value(), value, format));
+		item &curitem(m_itemlist.emplace_back(itemnode->get_value(), value, format));
 
 		// ensure the maximum expands to suit
 		m_maxval = std::max(m_maxval, curitem.value());
@@ -212,11 +212,11 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	{
 		// if no items, just output min/max/step
 		if (m_minval != 0)
-			cheatfile.printf(" min=\"%s\"", m_minval.format().c_str());
+			cheatfile.printf(" min=\"%s\"", m_minval.format());
 		if (m_maxval != 0)
-			cheatfile.printf(" max=\"%s\"", m_maxval.format().c_str());
+			cheatfile.printf(" max=\"%s\"", m_maxval.format());
 		if (m_stepval != 1)
-			cheatfile.printf(" step=\"%s\"", m_stepval.format().c_str());
+			cheatfile.printf(" step=\"%s\"", m_stepval.format());
 		cheatfile.printf("/>\n");
 	}
 	else
@@ -224,7 +224,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 		// iterate over items
 		cheatfile.printf(">\n");
 		for (item const &curitem : m_itemlist)
-			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format().c_str(), curitem.text());
+			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format(), curitem.text());
 		cheatfile.printf("\t\t</parameter>\n");
 	}
 }
@@ -533,15 +533,15 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 		// output an action
 		cheatfile.printf("\t\t\t<action");
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition).c_str());
-		cheatfile.printf(">%s</action>\n", cheat_manager::quote_expression(m_expression).c_str());
+			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition));
+		cheatfile.printf(">%s</action>\n", cheat_manager::quote_expression(m_expression));
 	}
 	else
 	{
 		// output an output
 		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format.c_str());
 		if (!m_condition.is_empty())
-			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition).c_str());
+			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition));
 
 		if (m_line != 0)
 			cheatfile.printf(" line=\"%d\"", m_line);
@@ -588,14 +588,14 @@ void cheat_script::script_entry::validate_format(std::string const &filename, in
 
 		// look for a valid type
 		if (!strchr("cdiouxX", *p))
-			throw emu_fatalerror("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, m_format.c_str());
+			throw emu_fatalerror("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, m_format);
 	}
 
 	// did we match?
 	if (argscounted < argsprovided)
-		throw emu_fatalerror("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.c_str());
+		throw emu_fatalerror("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format);
 	if (argscounted > argsprovided)
-		throw emu_fatalerror("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.c_str());
+		throw emu_fatalerror("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format);
 }
 
 
@@ -662,7 +662,7 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 	cheatfile.printf("\t\t\t\t<argument");
 	if (m_count != 1)
 		cheatfile.printf(" count=\"%d\"", int(m_count));
-	cheatfile.printf(">%s</argument>\n", cheat_manager::quote_expression(m_expression).c_str());
+	cheatfile.printf(">%s</argument>\n", cheat_manager::quote_expression(m_expression));
 }
 
 
@@ -763,7 +763,7 @@ void cheat_entry::save(emu_file &cheatfile) const
 	bool const has_scripts(m_off_script || m_on_script || m_run_script || m_change_script);
 
 	// output the cheat tag
-	cheatfile.printf("\t<cheat desc=\"%s\"", m_description.c_str());
+	cheatfile.printf("\t<cheat desc=\"%s\"", m_description);
 	if (m_numtemp != DEFAULT_TEMP_VARIABLES)
 		cheatfile.printf(" tempvariables=\"%d\"", m_numtemp);
 
@@ -777,7 +777,7 @@ void cheat_entry::save(emu_file &cheatfile) const
 
 		// save the comment
 		if (!m_comment.empty())
-			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment.c_str());
+			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment);
 
 		// output the parameter, if present
 		if (m_parameter) m_parameter->save(cheatfile);
@@ -1146,7 +1146,7 @@ void cheat_manager::reload()
 
 	// load the cheat file, if it's a system that has a software list then try softlist_name/shortname.xml first,
 	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml )
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
 		if (image.exists())
 		{
@@ -1235,7 +1235,7 @@ void cheat_manager::render_text(mame_ui_manager &mui, render_container &containe
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mui.draw_text_full(container, m_output[linenum].c_str(),
+			mui.draw_text_full(container, m_output[linenum],
 					0.0f, float(linenum) * mui.get_line_height(), 1.0f,
 					m_justify[linenum], ui::text_layout::NEVER, mame_ui_manager::OPAQUE_,
 					rgb_t::white(), rgb_t::black(), nullptr, nullptr);

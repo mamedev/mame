@@ -83,8 +83,6 @@ WRITE_LINE_MEMBER( comx35_state::prd_w )
 
 void comx35_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(COMX35_CHARRAM_SIZE);
 }
 
 /* Machine Drivers */

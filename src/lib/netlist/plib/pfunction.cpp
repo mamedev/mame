@@ -410,11 +410,11 @@ namespace plib {
 	case OP: \
 		if (ADJ == 2) {\
 			if (m_precompiled[ptr-3].cmd() == PUSH_CONST && m_precompiled[ptr-2].cmd() == PUSH_CONST && m_precompiled[ptr-1].cmd() == PUSH_CONST) \
-			{	ptr--; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 3; ptr++; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-2)); ptr-=2;} \
+			{   ptr--; m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 3; ptr++; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-2)); ptr-=2;} \
 			else { ptr++; } \
 		} else if (ADJ == 1) {\
 			if (m_precompiled[ptr-2].cmd() == PUSH_CONST && m_precompiled[ptr-1].cmd() == PUSH_CONST) \
-			{	m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 2; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-1)); ptr--;} \
+			{   m_precompiled[ptr-2] = rpn_inst(EXPR); n -= 2; std::copy(m_precompiled.begin()+(ptr+1), m_precompiled.end(), m_precompiled.begin()+(ptr-1)); ptr--;} \
 			else { ptr++; } \
 		} else if (ADJ == 0) {\
 			if (m_precompiled[ptr-1].cmd() == PUSH_CONST) \

@@ -23,10 +23,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	static constexpr const std::array<netlist_time, 2> times = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 
@@ -90,5 +87,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(7450,        "TTL_7450_ANDORINVERT", "+A,+B,+C,+D,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -18,18 +18,18 @@
 *   era, such as the 3468, 3457, 3488?, 4263?, 6623?, and probably others.
 *
 * TODO next level
-* * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
-* * better display render and layout (annunciators + show button subtext)
+* * do something for analog CPU serial link (not quite uart), or emulate CPU
+* * better display render and layout - actual photo ?
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
-* * dump + add analog CPU (8049)
+* * add analog CPU (8049)
 * * validate one single chipselect active when doing external access (movx)
 
 
 **** Hardware details (refer to service manual for schematics)
 Main CPU : i8039 , no internal ROM
-Analog (floating) CPU : i8049, internal ROM (never dumped ?)
+Analog (floating) CPU : i8049, internal ROM (, dump available at ko4bb.com)
 ROM : 2764 (64kbit, org 8kB)
 RAM : 5101 , 256 * 4bit (!), battery-backed calibration data
 GPIB:  i8291
@@ -153,10 +153,12 @@ protected:
 	/////////////// stuff for internal LCD emulation
 	// shoud be split to a separate driver
 	std::unique_ptr<output_finder<16> > m_outputs;
+	std::unique_ptr<output_finder<12> > m_annuns;
 
 	void lcd_interface(uint8_t p2new);
 	void lcd_update_hinib(uint64_t shiftreg);
 	void lcd_update_lonib(uint64_t shiftreg);
+	void lcd_update_annuns(uint64_t shiftreg);
 	void lcd_map_chars();
 	static uint32_t lcd_set_display(uint32_t segin);
 
@@ -179,6 +181,7 @@ protected:
 	uint8_t m_lcd_chrbuf[12];   //raw digits (not ASCII)
 	uint8_t m_lcd_text[13]; //mapped to ASCII, only for debug output
 	uint32_t m_lcd_segdata[12];
+	bool m_lcd_annuns[12];	//local copy of annunciators
 	///////////////////////////
 
 
@@ -374,6 +377,18 @@ void hp3478a_state::lcd_update_lonib(uint64_t shiftreg)
 	}
 }
 
+
+/** update annunciators : 12 bits */
+void hp3478a_state::lcd_update_annuns(uint64_t shiftreg)
+{
+	int i;
+	for (i=11; i >= 0; i--) {
+		m_lcd_annuns[i] = (shiftreg & 0x01);
+		shiftreg >>=1;
+	}
+	std::copy(std::begin(m_lcd_annuns), std::end(m_lcd_annuns), std::begin(*m_annuns));
+}
+
 /** map LCD char to ASCII and segment data + update
  *
  * discards extra bits
@@ -532,6 +547,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			LOGMASKED(DEBUG_LCD, "LCD : data 0x%X\n", m_lcd_bitbuf);
 			switch (m_lcdiwa) {
 			case lcd_iwatype::ANNUNS:
+				lcd_update_annuns(m_lcd_bitbuf);
 				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", m_lcd_bitbuf & 0xFF);
 				break;
 			case lcd_iwatype::REG_A:
@@ -567,6 +583,8 @@ void hp3478a_state::machine_start()
 
 	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", (unsigned) 0);
 	m_outputs->resolve();
+	m_annuns = std::make_unique<output_finder<12> >(*this, "ann%u", (unsigned) 0);
+	m_annuns->resolve();
 
 	m_watchdog->watchdog_enable();
 
@@ -594,7 +612,7 @@ void hp3478a_state::i8039_io(address_map &map)
 void hp3478a_state::io_bank(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram").w(FUNC(hp3478a_state::nvwrite));
+	map(0x000, 0x0ff).ram().share("nvram").w(FUNC(hp3478a_state::nvwrite));
 	map(0x100, 0x107).ram().share("gpibregs");  //XXX TODO : connect to i8291.cpp
 	map(0x200, 0x2ff).portr("DIP");
 }
@@ -713,9 +731,9 @@ void hp3478a_state::hp3478a(machine_config &config)
 ******************************************************************************/
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  //main CPU ROM, can match other datecodes too
+	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))  // main CPU ROM, can match other datecodes too
 
-	ROM_REGION( 0x100, "nvram", 0 ) /* Calibration RAM, battery-backed */
+	ROM_REGION( 0x100, "nvram", 0 ) // default data for battery-backed Calibration RAM
 	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
 

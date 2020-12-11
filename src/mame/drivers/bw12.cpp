@@ -45,22 +45,22 @@ void bw12_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	switch (m_bank)
+	switch (m_curbank)
 	{
 	case 0: /* ROM */
-		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.install_read_bank(0x0000, 0x7fff, m_bank);
 		program.unmap_write(0x0000, 0x7fff);
 		break;
 
 	case 1: /* BK0 */
-		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, m_bank);
 		break;
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
 		if (m_ram->size() > 64*1024)
 		{
-			program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
+			program.install_readwrite_bank(0x0000, 0x7fff, m_bank);
 		}
 		else
 		{
@@ -69,7 +69,7 @@ void bw12_state::bankswitch()
 		break;
 	}
 
-	membank("bank1")->set_entry(m_bank);
+	m_bank->set_entry(m_curbank);
 }
 
 void bw12_state::floppy_motor_on_off()
@@ -97,13 +97,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 
 WRITE_LINE_MEMBER(bw12_state::ls138_a0_w)
 {
-	m_bank = (m_bank & 0x02) | state;
+	m_curbank = (m_curbank & 0x02) | state;
 	bankswitch();
 }
 
 WRITE_LINE_MEMBER(bw12_state::ls138_a1_w)
 {
-	m_bank = (state << 1) | (m_bank & 0x01);
+	m_curbank = (state << 1) | (m_curbank & 0x01);
 	bankswitch();
 }
 
@@ -135,7 +135,7 @@ uint8_t bw12_state::ls259_r(offs_t offset)
 
 void bw12_state::bw12_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x0000, 0x7fff).bankrw("bank");
 	map(0x8000, 0xf7ff).ram();
 	map(0xf800, 0xffff).ram().share("video_ram");
 }
@@ -438,12 +438,12 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 void bw12_state::machine_start()
 {
 	/* setup memory banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_ram->pointer());
-	membank("bank1")->configure_entries(2, 2, m_ram->pointer() + 0x10000, 0x8000);
+	m_bank->configure_entry(0, m_rom->base());
+	m_bank->configure_entry(1, m_ram->pointer());
+	m_bank->configure_entries(2, 2, m_ram->pointer() + 0x10000, 0x8000);
 
 	/* register for state saving */
-	save_item(NAME(m_bank));
+	save_item(NAME(m_curbank));
 	save_item(NAME(m_pit_out2));
 	save_item(NAME(m_key_data));
 	save_item(NAME(m_key_sin));
@@ -460,6 +460,8 @@ void bw12_state::machine_start()
 
 void bw12_state::machine_reset()
 {
+	m_key_stb = 0;
+	m_key_shift = 0;
 }
 
 static void bw12_floppies(device_slot_interface &device)

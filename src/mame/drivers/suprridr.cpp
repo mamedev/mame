@@ -19,7 +19,7 @@
         * what are the writes to $08DB and $08E8 for?
           (guess: a discrete sound effect)
 
-    ** driver should probably be merged with timelimt.c
+    ** driver should probably be merged with timelimt.cpp
 
 ****************************************************************************
 
@@ -150,8 +150,8 @@ void suprridr_state::main_map(address_map &map)
 	map(0x8800, 0x8bff).ram().w(FUNC(suprridr_state::bgram_w)).share("bgram");
 	map(0x9000, 0x97ff).ram().w(FUNC(suprridr_state::fgram_w)).share("fgram");
 	map(0x9800, 0x983f).ram();
-	map(0x9840, 0x987f).ram().share("spriteram");
-	map(0x9880, 0x9bff).ram();
+	map(0x9840, 0x98ff).ram().share("spriteram");
+	map(0x9900, 0x9bff).ram();
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
 	map(0xb000, 0xb000).portr("DSW").w(FUNC(suprridr_state::nmi_enable_w));

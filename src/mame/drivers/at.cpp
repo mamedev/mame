@@ -442,9 +442,7 @@ void at_state::init_at_common(int xmsbase)
 	if (m_ram->size() > xmsbase)
 	{
 		offs_t ram_limit = 0x100000 + m_ram->size() - xmsbase;
-		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer() + xmsbase);
+		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + xmsbase);
 	}
 }
 
@@ -463,8 +461,7 @@ void at_vrom_fix_state::machine_start()
 	at_state::machine_start();
 
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");
-	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
+	space.install_rom(0xc0000, 0xcffff, machine().root_device().memregion("bios")->base());
 }
 
 void at_state::cfg_single_1200K(device_t *device)
@@ -5149,7 +5146,7 @@ ROM_END
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 (ISA/VL to PCI bridge) + VT82C496G (system chipset) + VT82C406MV (keyboard controller, RTC, CMOS), NS311/312 or NS332 I/O
 ROM_START( ficpio2 )
-	ROM_REGION32_LE(0x40000, "isa", 0)
+	ROM_REGION32_LE(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("ficpio2c1")
 	// 0
 	ROM_SYSTEM_BIOS(0, "ficpio2c7", "FIC 486-PIO-2 1.15C701") /* pnp, i/o core: NS 332, doesn't boot, requires cache emulation? */

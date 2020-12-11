@@ -57,6 +57,9 @@
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
+
+namespace {
+
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
@@ -75,9 +78,10 @@ public:
 
 	void init_tosh1000();
 
-private:
-	DECLARE_MACHINE_RESET(tosh1000);
+protected:
+	virtual void machine_reset() override;
 
+private:
 	void romdos_bank_w(uint8_t data);
 
 	void bram_w(offs_t offset, uint8_t data);
@@ -106,7 +110,7 @@ void tosh1000_state::init_tosh1000()
 {
 }
 
-MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
+void tosh1000_state::machine_reset()
 {
 	m_bram_latch = false;
 	m_bram_offset = 0;
@@ -261,8 +265,6 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
-
 	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
@@ -301,6 +303,8 @@ ROM_START( tosh1000 )
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
+
+} // Anonymous namespace
 
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS

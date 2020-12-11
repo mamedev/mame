@@ -405,7 +405,7 @@ void slapshot_state::machine_start()
 void slapshot_state::slapshot(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* overclocked MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::slapshot_map);
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 
@@ -464,7 +464,7 @@ void slapshot_state::slapshot(machine_config &config)
 void slapshot_state::opwolf3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* overclocked MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
+	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* MC68000P12F, 32MHz/2 or 26.6860MHz/2 ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
 

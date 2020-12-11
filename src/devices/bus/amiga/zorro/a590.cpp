@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE_NS(ZORRO_A590,  bus::amiga::zorro, a590_device,  "zorro_a590"
 DEFINE_DEVICE_TYPE_NS(ZORRO_A2091, bus::amiga::zorro, a2091_device, "zorro_a2091", "CBM A2091 HD Controller")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -377,4 +377,4 @@ WRITE_LINE_MEMBER( dmac_hdc_device_base::scsi_drq_w )
 	m_dmac->xdreq_w(state);
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

@@ -10,8 +10,7 @@
 #include "machine/keyboard.h"
 
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 class hle_hp_46060b_device
 		: public hle_device_base
@@ -45,7 +44,6 @@ public:
 };
 
 } // namespace bus::hp_hil
-} // namespace bus
 
 DECLARE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device);
 

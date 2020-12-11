@@ -200,6 +200,9 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 	m_digits.resolve();
 	m_leds.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+
+	m_digitsel = 0;
+	m_LED_state = 0;
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
@@ -212,6 +215,9 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+
+	m_digitsel = 0;
+	m_LED_state = 0;
 }
 
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)

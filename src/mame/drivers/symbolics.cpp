@@ -256,7 +256,7 @@ void symbolics_state::m68k_mem(address_map &map)
 	// 0x00c000-0x00ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	map(0x010000, 0x01bfff).rom();
 	// 0x01c000-0x01ffff is open bus but decoded/auto-DTACKed, does not cause bus error
-	map(0x020000, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	map(0x020000, 0x03ffff).ram().share("fepdram"); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	//map(0x020000, 0x03ffff).rw(FUNC(symbolics_state::ram_parity_hack_r), FUNC(symbolics_state::ram_parity_hack_w));
 	//map(0x020002, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
@@ -392,7 +392,6 @@ ROM_START( s3670 )
 	    LBARB.4           @I18 <- 4887235 page 625 has LBARB rev1, pal16l8
 	    SERCTL.4          @K6 <- 4887235 page 620 has SERCTL rev4, pal16l8
 	*/
-	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASE00 )
 
 ROM_END
 

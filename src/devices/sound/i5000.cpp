@@ -224,6 +224,7 @@ void i5000snd_device::write_reg16(uint8_t reg, uint16_t data)
 							default:
 								logerror("i5000snd: channel %d unknown sample param %04X!\n", ch, param);
 								// fall through (take settings from 0x0184)
+								[[fallthrough]];
 							// 4-bit ADPCM
 							case 0x0184:
 								m_channels[ch].freq_min = 0x100;

@@ -41,6 +41,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	IRQ_CALLBACK_MEMBER(mcram_vect_r);
+
 private:
 	/* memory pointers */
 	required_shared_ptr<u8> m_mainram;

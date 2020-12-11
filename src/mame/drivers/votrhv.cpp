@@ -2,10 +2,10 @@
 // copyright-holders:Jonathan Gevaryahu
 // thanks-to:Kevin Horton
 /******************************************************************************
-*
-*  Votrax/Phonic Mirror HandiVolce models HC-110 and HC-120
-*
-******************************************************************************/
+ *
+ *  Votrax/Phonic Mirror HandiVoice models HC-110 and HC-120
+ *
+ *****************************************************************************/
 /*
     The HC-110 and HC-120 both consist of 3 boards:
     1. An 'embedded system' 6800 board with two output latches, one input
@@ -52,9 +52,29 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/input_merger.h"
 #include "sound/votrax.h"
 #include "speaker.h"
 
+namespace {
+
+#include "hc110.lh"
+
+// defines
+
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_INPUT     (1U <<  1)
+#define LOG_LATCHX    (1U <<  2)
+#define LOG_LATCHY    (1U <<  3)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)
+#define LOGLTX(...) LOGMASKED(LOG_LATCHX, __VA_ARGS__)
+#define LOGLTY(...) LOGMASKED(LOG_LATCHY, __VA_ARGS__)
 
 class votrhv_state : public driver_device
 {
@@ -63,11 +83,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_votrax(*this, "votrax")
+		, m_reset(*this, "reset")
 		, m_swarray(*this, "SW.%u", 0U)
+		, m_leds(*this, "led_%u", 0U)
 		, m_latchx(0)
 		, m_latchy(0)
 		, m_latcha_flop(false)
 		, m_latchb_flop(false)
+		, m_latcha_in(false)
 		, m_latchb_in(false)
 		, m_scanflag(false)
 	{ }
@@ -76,6 +99,9 @@ public:
 	virtual void device_start() override;
 
 	void votrhv(machine_config &config);
+	void hc110(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(reset_counter);
 	DECLARE_WRITE_LINE_MEMBER(key_pressed);
 	DECLARE_WRITE_LINE_MEMBER(pho_done);
 
@@ -89,11 +115,16 @@ private:
 
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
+protected:
+	required_device<input_merger_device> m_reset;
+private:
 	optional_ioport_array<16> m_swarray;
+	output_finder<5> m_leds;
 
-	virtual uint8_t input_r();
+	virtual void key_check();
 	virtual void latchx_w(uint8_t data);
 	void latchy_w(uint8_t data);
+	virtual uint8_t input_r();
 	uint8_t latcha_rst_r();
 	uint8_t latchb_rst_r();
 
@@ -102,12 +133,12 @@ protected:
 	uint8_t m_latchy;
 	bool m_latcha_flop;
 	bool m_latchb_flop;
+	bool m_latcha_in;
 	bool m_latchb_in;
 	bool m_scanflag;
+	emu_timer* m_scan_timer;
 private:
 	emu_timer* m_resume_timer;
-	emu_timer* m_scan_timer;
-
 };
 
 class hc120_state : public votrhv_state
@@ -116,7 +147,9 @@ public:
 	hc120_state(const machine_config &mconfig, device_type type, const char *tag)
 		: votrhv_state(mconfig, type, tag)
 	{ }
-	private:
+private:
+	virtual void device_start() override;
+	virtual void key_check() override;
 	virtual uint8_t input_r() override;
 	virtual void latchx_w(uint8_t data) override;
 };
@@ -125,7 +158,8 @@ public:
  Address Maps
 ******************************************************************************/
 
-/*15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
+/* This memory map is for the CPU board which is shared between HC-110 and HC-120
+  15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
    x  0  0  0    0  x  x  x    *  *  *  *    *  *  *  *    RW RAM (2x 2114 1kx4 SRAM, wired in parallel)
    x  0  0  0    1  x  x  x    x  x  x  x    x  x  x  x    open bus
    x  0  0  1    0  x  x  x    x  x  x  x    x  x  x  x    R Input Latch
@@ -173,164 +207,164 @@ void votrhv_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START(hc110)
 	PORT_START("SW.0")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Talk
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Master Clear
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Clear
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Talk Repeat
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 1
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 4
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Talk
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Master Clear
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Clear
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Talk Repeat
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed) // Level 4
 
 	PORT_START("SW.1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.2")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.4")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.5")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.6")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.7")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.8")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.9")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.10")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.11")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.12")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.13")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.14")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 
 	PORT_START("SW.15")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, votrhv_state, key_pressed)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(hc120)
@@ -371,7 +405,7 @@ void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		case TIMER_SCAN:
 			// invert the scan state bit
 			m_scanflag = !m_scanflag;
-			m_scan_timer->adjust(attotime::from_seconds(1));
+			if (m_scan_timer) m_scan_timer->adjust(attotime::from_seconds(1));
 			break;
 	}
 }
@@ -381,51 +415,83 @@ void votrhv_state::device_start()
 	m_resume_timer = timer_alloc(TIMER_RESUME);
 	m_resume_timer->adjust(attotime::never);
 	m_resume_timer->enable(false);
-	m_scan_timer = timer_alloc(TIMER_SCAN);
-	m_scan_timer->adjust(attotime::from_seconds(1)); // hc-120 specific; adjustable, guessed .1hz to 2hz? needs measurement
+	m_leds.resolve();
+
 	save_item(NAME(m_latchx));
 	save_item(NAME(m_latchy));
 	save_item(NAME(m_latcha_flop));
 	save_item(NAME(m_latchb_flop));
+	save_item(NAME(m_latcha_in));
 	save_item(NAME(m_latchb_in));
 	save_item(NAME(m_scanflag));
+}
+
+// hc-120 variant for scan_timer
+void hc120_state::device_start()
+{
+	m_scan_timer = timer_alloc(TIMER_SCAN);
+	m_scan_timer->adjust(attotime::from_seconds(1)); // hc-120 specific; adjustable, guessed 1hz to 2hz? needs measurement
+	votrhv_state::device_start();
 }
 
 /******************************************************************************
  Driver specific functions
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( votrhv_state::key_pressed )
+WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 {
-	m_latchb_in = (state == ASSERT_LINE) ? true : false;
-	if (state == ASSERT_LINE)
+	if (state == CLEAR_LINE)
 	{
-		// clock the key flipflop which sets its state to 1
-		m_latchb_flop = true;
 		// is the timer already running/non-zero? if not, start it.
 		if (!m_resume_timer->enabled())
 		{
-			m_resume_timer->adjust(attotime::from_hz((2'000'000/2)/0x20));
+			m_resume_timer->adjust(attotime::from_hz(2'000'000/2/0x20));
 		}
 	}
+	else // state == ASSERT_LINE
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER( votrhv_state::key_pressed )
+{
+	// If we got called here, a key was pressed or released somewhere on the keyboard, and we don't know where.
+	// If, regardless of whether a key was pressed or released, our currently selected column has a non-zero
+	// number of keys closed in it, we need to assert m_latchb_in and if its edge was rising with that assertion, set m_latchb_flop.
+	LOGINP("key %s event\n", state?"down":"up");
+	key_check();
 }
 
 WRITE_LINE_MEMBER( votrhv_state::pho_done )
 {
-	if (state == ASSERT_LINE) // HACK: sc-01 is in /ready state now
+	bool rising_edge = (!m_latcha_in && (state == ASSERT_LINE));
+	m_latcha_in = (state == ASSERT_LINE);
+	if (rising_edge) // HACK: sc-01 is in /ready state now
 	{
 		// clock the pho_done flipflop which sets its state to 1
 		m_latcha_flop = true;
-		// is the timer already running/non-zero? if not, start it.
-		if (!m_resume_timer->enabled())
-		{
-			m_resume_timer->adjust(attotime::from_hz((2'000'000/2)/0x20));
-		}
 		// HACK: we manually clock the same old phoneme into the sc-01 here, this is a hack since the 1818c the pho_done signal is a free running counter and doesn't stop like the A/R latch on the sc-01 does
 		//m_votrax->inflection_w((m_latchy&0xc0)>>6);
 		m_votrax->write(m_latchy&0x3f);
+		m_reset->in_w<0>(1);
 	}
 }
+
+void votrhv_state::key_check()
+{
+	uint8_t keys = m_swarray[m_latchx&0xf]->read();
+	bool m_latchb_in_old = m_latchb_in;
+	m_latchb_in = (keys == 0); // If the currently selected column has a non-zero number of keys set in it, the latchb_in state is false (KPRESS is active LOW), otherwise true
+	if (!m_latchb_in_old && m_latchb_in) // on the rising edge of m_latchb_in, set the flipflop
+	{
+		// clock the key flipflop which sets its state to 1
+		m_latchb_flop = true;
+		m_reset->in_w<1>(1);
+	}
+	LOGINP("column %x keys read as %02x, latchb_in was %d now %d, latchb flop is %d\n", m_latchx&0xf, keys, m_latchb_in_old, m_latchb_in, m_latchb_flop);
+}
+
 
 void votrhv_state::latchx_w(uint8_t data)
 {
@@ -440,8 +506,14 @@ void votrhv_state::latchx_w(uint8_t data)
 	 *  |\------- Green status LED
 	 *  \-------- Phoneme silence (ties pitch input of 1818c high thru a diode)
 	 */
-	logerror("latchx written with value of %02x\n", m_latchx);
 	m_latchx = data;
+	LOGLTX("latchx written with value of %02x\n", m_latchx);
+	for (int i = 0; i < 4; i++)
+	{
+		m_leds[i] = (((data >> 4) & 0x03) == (3 - i)) ? 1 : 0;
+	}
+	m_leds[4] = !BIT(data, 6);
+	key_check();
 }
 
 void votrhv_state::latchy_w(uint8_t data)
@@ -458,7 +530,7 @@ void votrhv_state::latchy_w(uint8_t data)
 	 *  \-------- /
 	 */
 	m_latchy = data;
-	logerror("latchy written with value of %02x\n", m_latchy);
+	LOGLTY("latchy written with value of %02x\n", m_latchy);
 	m_votrax->inflection_w((m_latchy&0xc0)>>6);
 	m_votrax->write(m_latchy&0x3f);
 }
@@ -481,14 +553,14 @@ uint8_t votrhv_state::input_r()
 	uint8_t temp = m_swarray[m_latchx&0xf]->read();
 	for (int i = 7; i >= 0; i--)
 	{
-		if ((temp>>i)&1)
+		if (BIT(temp,i))
 		{
 			retval |= i;
 			break;
 		}
 	}
-	retval |= (m_latcha_flop?0x80:0x00) | (m_latchb_in?0x40:0x00) /*| 0x10*/;
-	logerror("input_r read, returning value of %02x\n", retval);
+	retval |= (m_latcha_flop?0x80:0x00) | (m_latchb_in?0x40:0x00) | 0x10;
+	LOGINP("input_r read with latchx column set to %01x, returning value of %02x\n", m_latchx&0xf, retval);
 	return retval;
 }
 
@@ -498,9 +570,7 @@ uint8_t votrhv_state::latcha_rst_r()
 	{
 		// reset the 0x80 flop
 		m_latcha_flop = false;
-		// if both flops are now clear, assert reset on the cpu
-		if ((!m_latcha_flop) && (!m_latchb_flop))
-			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_reset->in_w<0>(0);
 	}
 	return 0xff;
 }
@@ -511,15 +581,27 @@ uint8_t votrhv_state::latchb_rst_r()
 	{
 		// reset the 0x40 flop
 		m_latchb_flop = false;
-		// if both flops are now clear, assert reset on the cpu
-		if ((!m_latcha_flop) && (!m_latchb_flop))
-			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_reset->in_w<1>(0);
 	}
 	return 0xff;
 }
 
 
 // hc120 specific overrides
+void hc120_state::key_check()
+{
+	uint16_t keys = ioport("KEYPAD")->read();
+	bool m_latchb_in_old = m_latchb_in;
+	m_latchb_in = (keys != 0); // If the input has a non-zero number of keys set in it, the latchb_in state is TRUE, on the HC-120.
+	if (!m_latchb_in_old && m_latchb_in) // on the rising edge of m_latchb_in, set the flipflop
+	{
+		// clock the key flipflop which sets its state to 1
+		m_latchb_flop = true;
+		m_reset->in_w<1>(1);
+	}
+	LOGINP("keys read as %02x, latchb_in was %d now %d, latchb flop is %d\n", keys, m_latchb_in_old, m_latchb_in, m_latchb_flop);
+}
+
 void hc120_state::latchx_w(uint8_t data)
 {
 	/* latchx output:
@@ -534,7 +616,7 @@ void hc120_state::latchx_w(uint8_t data)
 	 *  \-------- LCD latch 4bit digitsel for extra io (colon and other segments on d2 d3)
 	 */
 	m_latchx = data;
-	logerror("latchx written with value of %02x\n", m_latchx);
+	LOGLTX("latchx written with value of %02x\n", m_latchx);
 }
 
 uint8_t hc120_state::input_r()
@@ -559,14 +641,14 @@ uint8_t hc120_state::input_r()
 	uint16_t temp = ioport("KEYPAD")->read();
 	for (int i = 0; i < 16; i++)
 	{
-		if ((temp>>i)&1)
+		if (BIT(temp,i))
 		{
 			retval &= (15-i);
 			break; // HACK: this is wrong for the HD-0165, which produces mangled data if more than one key is pressed simultaneously; later HC-120 units had a grid/collimator 'guard' on top of the keypad to reduce the chance of multiple keys being hit. Here we just give priority to the lowest bit active.
 		}
 	}
 	retval |= (m_latcha_flop?0x80:0x00) | (m_latchb_in?0x40:0x00) | (m_scanflag?0x20:0x00) | 0x10;
-	logerror("input_r read, returning value of %02x\n", retval);
+	LOGINP("input_r read, returning value of %02x\n", retval);
 	return retval;
 }
 
@@ -577,8 +659,12 @@ uint8_t hc120_state::input_r()
 void votrhv_state::votrhv(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 2'000'000 / 2 );  // ~1'000'000 done using two 74L123 multivibrators with cap 100pf res 11k, which each oscillate at 1.8-2.5mhz, but since you need two clock phases for the 6800, each multivibrator does one phase and the falling edge of one triggers the other, so the actual clock rate is half the rate of each.
+	// ~1MHz done using two 74L123 multivibrators with cap 100pf res 11k, which each oscillate at 1.8-2.5mhz
+	// since you need two clock phases for the 6800, each multivibrator does one phase and the falling edge of one triggers the other, so the actual clock rate is half the rate of each
+	M6800(config, m_maincpu, 2'000'000 / 2 );
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrhv_state::mem_map);
+
+	INPUT_MERGER_ALL_LOW(config, m_reset).output_handler().set(FUNC(votrhv_state::reset_counter));
 
 	/* video hardware */
 	//config.set_default_layout(layout_votrhv);
@@ -593,6 +679,12 @@ void votrhv_state::votrhv(machine_config &config)
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
+void votrhv_state::hc110(machine_config &config)
+{
+	votrhv(config);
+
+	config.set_default_layout(layout_hc110);
+}
 
 
 /******************************************************************************
@@ -632,10 +724,12 @@ ROM_START(hc120) // ic10 and ic11 are Rev B? is there an older revision undumped
 	ROMX_LOAD("scm46111pk.mcm14524.u20", 0x001, 0x100, CRC(4227f04e) SHA1(4393b0a9960cbae7768a27b32688f640e822f13e), ROM_SKIP(1) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
 ROM_END
 
+} // anonymous namespace
+
 /******************************************************************************
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT  CLASS         INIT        COMPANY   FULLNAME             FLAGS
-COMP( 1978, hc110,   0,      0,      votrhv, hc110, votrhv_state, empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-110", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT  CLASS         INIT        COMPANY                 FULLNAME             FLAGS
+COMP( 1978, hc110,   0,      0,      hc110,  hc110, votrhv_state, empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-110", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 COMP( 1978, hc120,   hc110,  0,      votrhv, hc120, hc120_state,  empty_init, "Votrax/Phonic Mirror", "HandiVoice HC-120", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -45,6 +45,35 @@ class parent_rom_vector : public std::vector<parent_rom>
 public:
 	using std::vector<parent_rom>::vector;
 
+	void remove_redundant_parents()
+	{
+		while (!empty())
+		{
+			// find where the next parent starts
+			auto const last(
+					std::find_if(
+						std::next(cbegin()),
+						cend(),
+						[this] (parent_rom const &r) { return &front().type.get() != &r.type.get(); }));
+
+			// examine dumped ROMs in this generation
+			for (auto i = cbegin(); last != i; ++i)
+			{
+				if (!i->hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				{
+					auto const match(
+							std::find_if(
+								last,
+								cend(),
+								[&i] (parent_rom const &r) { return (i->length == r.length) && (i->hashes == r.hashes); }));
+					if (cend() == match)
+						return;
+				}
+			}
+			erase(cbegin(), last);
+		}
+	}
+
 	std::add_pointer_t<device_type> find_shared_device(device_t &current, char const *name, util::hash_collection const &hashes, uint64_t length) const
 	{
 		// if we're examining a child device, it will always have a perfect match
@@ -172,6 +201,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 			}
 		}
 	}
+	parentroms.remove_redundant_parents();
 
 	// count ROMs required/found
 	std::size_t found(0);
@@ -182,7 +212,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 	// iterate over devices and regions
 	std::vector<std::string> searchpath;
-	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
+	for (device_t &device : device_enumerator(m_enumerator.config()->root_device()))
 	{
 		searchpath.clear();
 
@@ -370,7 +400,7 @@ media_auditor::summary media_auditor::audit_samples()
 	std::size_t found = 0;
 
 	// iterate over sample entries
-	for (samples_device &device : samples_device_iterator(m_enumerator.config()->root_device()))
+	for (samples_device &device : samples_device_enumerator(m_enumerator.config()->root_device()))
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);

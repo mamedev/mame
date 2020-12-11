@@ -32,7 +32,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 	machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
 	device_t *const dev = mconfig.device_add(m_option->name(), m_option->devtype(), 0);
-	for (device_t &d : device_iterator(*dev))
+	for (device_t &d : device_enumerator(*dev))
 		if (!d.configured())
 			d.config_complete();
 
@@ -46,7 +46,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			dev->name());
 
 	// loop over all CPUs
-	execute_interface_iterator execiter(*dev);
+	execute_interface_enumerator execiter(*dev);
 	if (execiter.count() > 0)
 	{
 		str << _("* CPU:\n");
@@ -90,7 +90,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	}
 
 	// display screen information
-	screen_device_iterator scriter(*dev);
+	screen_device_enumerator scriter(*dev);
 	if (scriter.count() > 0)
 	{
 		str << _("* Video:\n");
@@ -122,7 +122,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	}
 
 	// loop over all sound chips
-	sound_interface_iterator snditer(*dev);
+	sound_interface_enumerator snditer(*dev);
 	if (snditer.count() > 0)
 	{
 		str << _("* Sound:\n");
@@ -192,7 +192,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	std::string errors;
 	std::ostringstream dips_opt, confs_opt;
 	ioport_list portlist;
-	for (device_t &iptdev : device_iterator(*dev))
+	for (device_t &iptdev : device_enumerator(*dev))
 		portlist.append(iptdev, errors);
 
 	// check if the device adds inputs to the system
@@ -272,7 +272,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	if (input_keyboard)
 		util::stream_format(str, _("  Keyboard inputs    [%1$d inputs]\n"), input_keyboard);
 
-	image_interface_iterator imgiter(*dev);
+	image_interface_enumerator imgiter(*dev);
 	if (imgiter.count() > 0)
 	{
 		str << _("* Media Options:\n");
@@ -280,7 +280,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			util::stream_format(str, _("  %1$s    [tag: %2$s]\n"), imagedev.image_type_name(), imagedev.device().tag());
 	}
 
-	slot_interface_iterator slotiter(*dev);
+	slot_interface_enumerator slotiter(*dev);
 	if (slotiter.count() > 0)
 	{
 		str << _("* Slot Options:\n");
@@ -293,7 +293,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			str << _("[None]\n");
 
 	mconfig.device_remove(m_option->name());
-	item_append(str.str(), "", FLAG_MULTILINE, nullptr);
+	item_append(str.str(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_device_config::handle()

@@ -18,6 +18,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -82,18 +83,18 @@ void menu_software_parts::populate(float &customtop, float &custombottom)
 		software_part_menu_entry &entry1(*m_entries.emplace(m_entries.end()));
 		entry1.type = result::EMPTY;
 		entry1.part = nullptr;
-		item_append(_("[empty slot]"), "", 0, &entry1);
+		item_append(_("[empty slot]"), 0, &entry1);
 
 		software_part_menu_entry &entry2(*m_entries.emplace(m_entries.end()));
 		entry2.type = result::FMGR;
 		entry2.part = nullptr;
-		item_append(_("[file manager]"), "", 0, &entry2);
+		item_append(_("[file manager]"), 0, &entry2);
 
 
 		software_part_menu_entry &entry3(*m_entries.emplace(m_entries.end()));
 		entry3.type = result::SWLIST;
 		entry3.part = nullptr;
-		item_append(_("[software list]"), "", 0, &entry3);
+		item_append(_("[software list]"), 0, &entry3);
 	}
 
 	for (const software_part &swpart : m_info->parts())
@@ -227,7 +228,7 @@ void menu_software_list::populate(float &customtop, float &custombottom)
 		append_software_entry(swinfo);
 
 	// add an entry to change ordering
-	item_append(_("Switch Item Ordering"), "", 0, ITEMREF_SWITCH_ITEM_ORDERING);
+	item_append(_("Switch Item Ordering"), 0, ITEMREF_SWITCH_ITEM_ORDERING);
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
@@ -355,7 +356,7 @@ void menu_software::populate(float &customtop, float &custombottom)
 	bool have_compatible = false;
 
 	// Add original software lists for this system
-	software_list_device_iterator iter(machine().config().root_device());
+	software_list_device_enumerator iter(machine().config().root_device());
 	for (software_list_device &swlistdev : iter)
 		if (swlistdev.is_original())
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)
@@ -369,7 +370,7 @@ void menu_software::populate(float &customtop, float &custombottom)
 							break;
 						}
 				if (found)
-					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
+					item_append(swlistdev.description(), 0, (void *)&swlistdev);
 			}
 
 	// add compatible software lists for this system
@@ -388,8 +389,8 @@ void menu_software::populate(float &customtop, float &custombottom)
 				if (found)
 				{
 					if (!have_compatible)
-						item_append(_("[compatible lists]"), "", FLAG_DISABLE, nullptr);
-					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
+						item_append(_("[compatible lists]"), FLAG_DISABLE, nullptr);
+					item_append(swlistdev.description(), 0, (void *)&swlistdev);
 				}
 				have_compatible = true;
 			}

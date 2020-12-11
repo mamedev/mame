@@ -48,12 +48,12 @@
 typedef device_delegate<int ()> read_line_delegate;
 typedef device_delegate<void (int)> write_line_delegate;
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
 template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
 
-} } // namespace emu::detail
+} // namespace emu::detail
 
 
 //**************************************************************************
@@ -112,8 +112,13 @@ protected:
 	// Working with devices and interfaces
 	template <typename T> static std::enable_if_t<emu::detail::is_device_implementation<T>::value, const char *> get_tag(T &obj) { return obj.tag(); }
 	template <typename T> static std::enable_if_t<emu::detail::is_device_interface<T>::value, const char *> get_tag(T &obj) { return obj.device().tag(); }
-	template <typename T, typename U> static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T &> cast_reference(U &obj) { return downcast<T &>(obj); }
-	template <typename T, typename U> static std::enable_if_t<!std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T &> cast_reference(U &obj) { return dynamic_cast<T &>(obj); }
+	template <typename T, typename U> static T &cast_reference(U &obj)
+	{
+		if constexpr (std::is_convertible_v<std::add_pointer_t<U>, std::add_pointer_t<T> >)
+			return downcast<T &>(obj);
+		else
+			return dynamic_cast<T &>(obj);
+	}
 
 	/// \brief Base transform helper
 	///

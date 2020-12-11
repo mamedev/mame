@@ -59,11 +59,9 @@ menu_file_manager::~menu_file_manager()
 
 void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	const char *path;
-
 	// access the path
-	path = selected_device ? selected_device->filename() : nullptr;
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, nullptr, path);
+	std::string_view path = selected_device ? selected_device->filename() : std::string_view();
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 
 
@@ -110,20 +108,20 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 
 	if (!m_warnings.empty())
 	{
-		item_append(m_warnings, "", FLAG_DISABLE, nullptr);
-		item_append("", "", FLAG_DISABLE, nullptr);
+		item_append(m_warnings, FLAG_DISABLE, nullptr);
+		item_append(std::string(), FLAG_DISABLE, nullptr);
 	}
 
 	// cycle through all devices for this system
 	std::unordered_set<std::string> devtags;
-	for (device_t &dev : device_iterator(machine().root_device()))
+	for (device_t &dev : device_enumerator(machine().root_device()))
 	{
 		bool tag_appended = false;
 		if (!devtags.insert(dev.tag()).second)
 			continue;
 
 		// check whether it owns an image interface
-		image_interface_iterator subiter(dev);
+		image_interface_enumerator subiter(dev);
 		if (subiter.first() != nullptr)
 		{
 			// if so, cycle through all its image interfaces
@@ -143,7 +141,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 								first_entry = false;
 							else
 								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", dev.tag()), "", 0, nullptr);
+							item_append(string_format("[root%s]", dev.tag()), 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
@@ -156,7 +154,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	if (m_warnings.empty() || m_curr_selected)
-		item_append("Reset", "", 0, (void *)1);
+		item_append("Reset", 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }

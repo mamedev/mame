@@ -164,20 +164,13 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-		case M5074X_INT1_LINE:
-			if (state == ASSERT_LINE)
-			{
-				m_intctrl |= IRQ_INTREQ;
-			}
-			else
-			{
-				m_intctrl &= ~IRQ_INTREQ;
-			}
-			break;
-
-		case M5074X_SET_OVERFLOW:   // the base 740 class can handle this
-			m740_device::execute_set_input(M740_SET_OVERFLOW, state);
-			break;
+	case M5074X_INT1_LINE:
+		// FIXME: edge-triggered
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_INTREQ;
+		}
+		break;
 	}
 
 	recalc_irqs();
@@ -446,12 +439,13 @@ void m5074x_device::tmrirq_w(offs_t offset, uint8_t data)
 			break;
 
 		case 5:
-			m_intctrl = data;
+			// Interrupt request bits can only be reset
+			m_intctrl = data & (m_intctrl | ~(IRQ_CNTRREQ | IRQ_INTREQ));
 			recalc_irqs();
 			break;
 
 		case 6:
-			m_tmrctrl = data;
+			m_tmrctrl = data & (m_tmrctrl | ~TMRC_TMRXREQ);
 			recalc_irqs();
 			break;
 	}
@@ -500,13 +494,19 @@ void m50753_device::m50753_map(address_map &map)
 {
 	map(0x0000, 0x00bf).ram();
 	map(0x00e0, 0x00eb).rw(FUNC(m50753_device::ports_r), FUNC(m50753_device::ports_w));
+	map(0x00ee, 0x00ee).r(FUNC(m50753_device::in_r));
 	map(0x00ef, 0x00ef).r(FUNC(m50753_device::ad_r));
-	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_control_w));
+	map(0x00f2, 0x00f2).w(FUNC(m50753_device::ad_start_w));
 	map(0x00f3, 0x00f3).rw(FUNC(m50753_device::ad_control_r), FUNC(m50753_device::ad_control_w));
 	map(0x00f5, 0x00f5).rw(FUNC(m50753_device::pwm_control_r), FUNC(m50753_device::pwm_control_w));
 	map(0x00f9, 0x00ff).rw(FUNC(m50753_device::tmrirq_r), FUNC(m50753_device::tmrirq_w));
 	map(0xe800, 0xffff).rom().region(DEVICE_SELF, 0);
 }
+
+// interrupt bits on 50753 are slightly different from the 740/741.
+static constexpr u8 IRQ_50753_INT1REQ = 0x80;
+static constexpr u8 IRQ_50753_INTADC = 0x20;
+static constexpr u8 IRQ_50753_INT2REQ = 0x02;
 
 m50753_device::m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m50753_device(mconfig, M50753, tag, owner, clock)
@@ -516,6 +516,7 @@ m50753_device::m50753_device(const machine_config &mconfig, const char *tag, dev
 m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(m50753_device::m50753_map), this)),
 	m_ad_in(*this),
+	m_in_p(*this),
 	m_ad_control(0),
 	m_pwm_enabled(false)
 {
@@ -526,6 +527,7 @@ void m50753_device::device_start()
 	m5074x_device::device_start();
 
 	m_ad_in.resolve_all_safe(0);
+	m_in_p.resolve_safe(0);
 
 	save_item(NAME(m_ad_control));
 	save_item(NAME(m_pwm_enabled));
@@ -539,14 +541,25 @@ void m50753_device::device_reset()
 	m_pwm_enabled = false;
 }
 
+uint8_t m50753_device::in_r()
+{
+	return m_in_p();
+}
+
 uint8_t m50753_device::ad_r()
 {
+	m_intctrl &= ~IRQ_50753_INTADC;
+	recalc_irqs();
+
 	return m_ad_in[m_ad_control & 0x07]();
 }
 
 void m50753_device::ad_start_w(uint8_t data)
 {
 	logerror("%s: A-D start (IN%d)\n", machine().describe_context(), m_ad_control & 0x07);
+
+	// starting a conversion.  M50753 documentation says conversion time is 72 microseconds.
+	m_timers[TIMER_ADC]->adjust(attotime::from_usec(72));
 }
 
 uint8_t m50753_device::ad_control_r()
@@ -569,40 +582,47 @@ void m50753_device::pwm_control_w(uint8_t data)
 	m_pwm_enabled = BIT(data, 0);
 }
 
-// interrupt bits on 50753 are slightly different from the 740/741.
-static constexpr u8 IRQ_50753_INT1REQ = 0x80;
-static constexpr u8 IRQ_50753_INT2REQ = 0x02;
-
 void m50753_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
 	case M50753_INT1_LINE:
+		// FIXME: edge-triggered
 		if (state == ASSERT_LINE)
 		{
 			m_intctrl |= IRQ_50753_INT1REQ;
 		}
-		else
-		{
-			m_intctrl &= ~IRQ_50753_INT1REQ;
-		}
 		break;
 
 	case M50753_INT2_LINE:
+		// FIXME: edge-triggered
 		if (state == ASSERT_LINE)
 		{
 			m_intctrl |= IRQ_50753_INT2REQ;
 		}
-		else
-		{
-			m_intctrl &= ~IRQ_50753_INT2REQ;
-		}
-		break;
-
-	case M5074X_SET_OVERFLOW: // the base 740 class can handle this
-		m740_device::execute_set_input(M740_SET_OVERFLOW, state);
 		break;
 	}
 
 	recalc_irqs();
+}
+
+void m50753_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ADC:
+		m_timers[TIMER_ADC]->adjust(attotime::never);
+
+		// if interrupt source is the ADC, do it.
+		if (m_ad_control & 4)
+		{
+			m_intctrl |= IRQ_50753_INTADC;
+			recalc_irqs();
+		}
+		break;
+
+	default:
+		m5074x_device::device_timer(timer, id, param, ptr);
+		break;
+	}
 }

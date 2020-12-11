@@ -14,10 +14,14 @@
 ---------------------------------------------------
 
 CPUS["Z80"] = true
+CPUS["KC80"] = true
 CPUS["Z180"] = true
 CPUS["I8085"] = true
 CPUS["I8089"] = true
 CPUS["M6502"] = true
+--CPUS["ST2XXX"] = true
+--CPUS["XAVIX"] = true
+--CPUS["XAVIX2000"] = true
 CPUS["H6280"] = true
 CPUS["I86"] = true
 CPUS["I386"] = true
@@ -93,7 +97,8 @@ CPUS["APEXC"] = true
 CPUS["CP1610"] = true
 CPUS["F8"] = true
 CPUS["LH5801"] = true
-CPUS["PDP1"] = true
+--CPUS["PDP1"] = true
+--CPUS["TX0"] = true
 CPUS["SATURN"] = true
 CPUS["SC61860"] = true
 CPUS["LR35902"] = true
@@ -336,6 +341,7 @@ VIDEOS["I4100"] = true
 VIDEOS["I8275"] = true
 VIDEOS["JANGOU_BLITTER"] = true
 --VIDEOS["LC7582"] = true
+--VIDEOS["LC7985"] = true
 VIDEOS["M50458"] = true
 VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true
@@ -522,6 +528,7 @@ MACHINES["LDP1450"] = true
 MACHINES["LDVP931"] = true
 --MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
+--MACHINES["LOCOMO"] = true
 MACHINES["LPCI"] = true
 --MACHINES["LSI53C810"] = true
 --MACHINES["M3002"] = true
@@ -617,6 +624,7 @@ MACHINES["S3C24XX"] = true
 MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
 MACHINES["SCN_PCI"] = true
+--MACHINES["SCOOP"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
 MACHINES["SDA2006"] = true
@@ -649,6 +657,7 @@ MACHINES["TSB12LV01A"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL74181"] = true
 --MACHINES["TTL7474"] = true
+--MACHINES["UCB1200"] = true
 MACHINES["UPD1990A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
@@ -1939,7 +1948,6 @@ files {
 	MAME_DIR .. "src/mame/audio/exidy.cpp",
 	MAME_DIR .. "src/mame/audio/exidy.h",
 	MAME_DIR .. "src/mame/video/exidy.cpp",
-	MAME_DIR .. "src/mame/audio/targ.cpp",
 	MAME_DIR .. "src/mame/drivers/exidy440.cpp",
 	MAME_DIR .. "src/mame/includes/exidy440.h",
 	MAME_DIR .. "src/mame/audio/exidy440.cpp",
@@ -2308,6 +2316,8 @@ files {
 	MAME_DIR .. "src/mame/video/ms1_tmap.h",
 	MAME_DIR .. "src/mame/video/ms32_sprite.cpp",
 	MAME_DIR .. "src/mame/video/ms32_sprite.h",
+	MAME_DIR .. "src/mame/machine/jaleco_ms32_sysctrl.cpp",
+	MAME_DIR .. "src/mame/machine/jaleco_ms32_sysctrl.h",
 }
 
 createMAMEProjects(_target, _subtarget, "jpm")
@@ -2501,6 +2511,7 @@ files {
 	MAME_DIR .. "src/mame/video/3dom2_te.cpp",
 	MAME_DIR .. "src/mame/video/3dom2_te.h",
 	MAME_DIR .. "src/mame/drivers/konblands.cpp",
+	MAME_DIR .. "src/mame/drivers/kongs470.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",
 	MAME_DIR .. "src/mame/drivers/kontest.cpp",
@@ -3805,6 +3816,8 @@ files {
 	MAME_DIR .. "src/mame/includes/simple_st0016.h",
 	MAME_DIR .. "src/mame/video/seta001.cpp",
 	MAME_DIR .. "src/mame/video/seta001.h",
+	MAME_DIR .. "src/mame/video/x1_012.cpp",
+	MAME_DIR .. "src/mame/video/x1_012.h",
 	MAME_DIR .. "src/mame/drivers/thedealr.cpp",
 }
 
@@ -5124,6 +5137,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/vroulet.cpp",
 	MAME_DIR .. "src/mame/drivers/wildpkr.cpp",
+	MAME_DIR .. "src/mame/drivers/winbingo.cpp",
 	MAME_DIR .. "src/mame/drivers/wms.cpp",
 	MAME_DIR .. "src/mame/drivers/xtom3d.cpp",
 	MAME_DIR .. "src/mame/drivers/xyonix.cpp",

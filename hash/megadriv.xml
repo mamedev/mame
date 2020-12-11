@@ -30774,6 +30774,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- This was both sold as a cart and released as a Freeware ROM by the programmers -->
+	<!-- https://playonretro.itch.io/labbaye-des-morts-megadrivegenesis-por-002 -->
+	<software name="abbaye">
+		<description>L'Abbaye des Morts</description>
+		<year>2017</year>
+		<publisher>PlayOnRetro</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3932160">
+				<rom name="20170907 - AbbayeMD.bin" size="3932160" crc="8865ee24" sha1="c65b9c58a01973700ababccf1e4ae3064345c9d6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- This was both sold as a cart and released as a ROM by the programmers -->
 	<software name="ohmummy">
 		<description>Oh Mummy (Spa)</description>

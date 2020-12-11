@@ -134,7 +134,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(emu.subst_env(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -160,7 +160,7 @@ function cheat.startplugin()
 		end
 		if #hotkeys > 0 then
 			local json = require("json")
-			local path = lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
+			local path = emu.subst_env(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
 				lfs.mkdir(path)
@@ -610,24 +610,25 @@ function cheat.startplugin()
 
 			local function hkcbfunc(cheat)
 				local input = manager:machine():input()
+				local poller = input:sequence_poller()
 				manager:machine():popmessage(_("Press button for hotkey or wait to clear"))
 				manager:machine():video():frame_update(true)
-				input:seq_poll_start("switch")
+				poller:start("switch")
 				local time = os.clock()
 				local clearmsg = true
-				while (not input:seq_poll()) and (input.seq_poll_modified() or (os.clock() < time + 1)) do
-					if input:seq_poll_modified() then
-						if not input:seq_poll_valid() then
+				while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
+					if poller.modified then
+						if not poller.valid then
 							manager:machine():popmessage(_("Invalid sequence entered"))
 							clearmsg = false
 							break
 						end
-						manager:machine():popmessage(input:seq_name(input:seq_poll_sequence()))
+						manager:machine():popmessage(input:seq_name(poller.sequence))
 						manager:machine():video():frame_update(true)
 					end
 				end
-				if input:seq_poll_valid() then
-					cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
+				if poller.valid then
+					cheat.hotkeys = { pressed = false, keys = poller.sequence }
 				else
 					cheat.hotkeys = nil
 				end
@@ -748,7 +749,8 @@ function cheat.startplugin()
 				return chg
 			else
 				if not cheat.is_oneshot then
-					return cheat:set_enabled(false)
+					local state, chg = cheat:set_enabled(false)
+					return chg
 				end
 				return false
 			end

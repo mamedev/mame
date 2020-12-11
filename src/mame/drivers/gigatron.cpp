@@ -229,6 +229,10 @@ void gigatron_state::gigatron(machine_config &config)
 {
 	config.set_default_layout(layout_gigatron);
 
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
@@ -242,10 +246,6 @@ void gigatron_state::gigatron(machine_config &config)
 	m_screen.set_size(640, 480);
 	m_screen.set_visarea(0, 640-1, 0, 480-1);
 	m_screen.set_screen_update(FUNC(gigatron_state::screen_update));
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 ROM_START( gigatron )

@@ -87,6 +87,7 @@ public:
 		m_fdc_connector(*this, "upd765:%u", 0U),
 		m_dmac(*this, "i8237"),
 		m_pit(*this, "pit8253"),
+		m_aux_pcg(*this, "aux_pcg"),
 		m_speaker(*this, "mono"),
 		m_sound(*this, "upd1771c"),
 		m_video_ram_1(*this, "video_ram_1"),
@@ -115,8 +116,8 @@ private:
 	required_device_array<floppy_connector, 2> m_fdc_connector;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
+	required_shared_ptr<uint16_t> m_aux_pcg;
 	uint8_t *m_char_rom;
-	uint8_t *m_aux_pcg;
 
 	required_device<speaker_device> m_speaker;
 	required_device<upd1771c_device> m_sound;
@@ -185,7 +186,6 @@ private:
 void apc_state::video_start()
 {
 	m_char_rom = memregion("gfx")->base();
-	m_aux_pcg = memregion("aux_pcg")->base();
 }
 
 uint32_t apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -478,7 +478,7 @@ void apc_state::apc_map(address_map &map)
 	map(0xa0000, 0xa0fff).ram().share("cmos");
 //  map(0xa1000, 0xbffff) mirror CMOS
 //  map(0xc0000, 0xcffff) standard character ROM
-	map(0xd8000, 0xd9fff).ram().region("aux_pcg", 0); // AUX character RAM
+	map(0xd8000, 0xd9fff).ram().share("aux_pcg"); // AUX character RAM
 //  map(0xe0000, 0xeffff) Special Character RAM
 	map(0xfe000, 0xfffff).rom().region("ipl", 0);
 }
@@ -791,7 +791,6 @@ static GFXDECODE_START( gfx_apc )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1800, charset_8x16, 0, 128 )
-//  GFXDECODE_ENTRY( "aux_pcg", 0x0000, charset_pcg, 0, 128 )
 GFXDECODE_END
 
 
@@ -1000,8 +999,6 @@ ROM_START( apc )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
-
-	ROM_REGION16_LE( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
 void apc_state::init_apc()

@@ -29,7 +29,7 @@ public:
 		m_palette(*this, "palette"),
 		m_dials(*this, "DIAL.%u", 0),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x100, ENDIANNESS_LITTLE),
 		m_colorram(*this, "colorram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
@@ -64,7 +64,7 @@ private:
 	optional_ioport_array<2> m_dials;
 
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_colorram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 

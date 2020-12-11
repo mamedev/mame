@@ -420,6 +420,7 @@ void ws_rom_sram_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 			{
 				m_nvram_base = ((data >> 8) * 0x10000) & (m_nvram.size() -  1);
 			}
+			[[fallthrough]];
 		default:
 			ws_rom_device::write_io(offset, data, mem_mask);
 			break;

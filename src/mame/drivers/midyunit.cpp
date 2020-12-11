@@ -82,7 +82,7 @@ Notes:
      Other U* - 27C020 EPROMs
 
 
-Sound PCB
+Sound PCB (see /audio/s11c_bg.cpp)
 ---------
 
 5766-12702-00 REV. B
@@ -105,6 +105,7 @@ Notes:
       6809   - clock 2.000MHz [8/4]
       YM2151 - clock 3.579545MHz
       55536  - Harris HC-55536 Continuously Variable Slope Delta Modulator
+               (some early boards use an HC-55516, later boards use an HC-55536 or HC-55564)
       6116   - 2k x8 SRAM
       U*     - 27C010 EPROMs
       J4     - flat cable connector from main board J8
@@ -204,7 +205,7 @@ void midyunit_state::main_map(address_map &map)
 	map(0x01c00060, 0x01c0007f).rw(FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
 	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
 	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
-	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
+	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -287,7 +288,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( trog )
-	PORT_START("IN0")
+	PORT_START("IN0") // Input 0-15 on D0-D15
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
@@ -301,7 +302,7 @@ static INPUT_PORTS_START( trog )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Punch") PORT_PLAYER(2)
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_START("IN1") // coin1,coin2,start1,tilt,test,start2,service1,input23-31 on D0-D15
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -319,7 +320,7 @@ static INPUT_PORTS_START( trog )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P3 Punch") PORT_PLAYER(3)
 
-	PORT_START("IN2")
+	PORT_START("IN2") // input32-input39 on D0-D7; D8-D15 unused
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(4)
@@ -328,7 +329,7 @@ static INPUT_PORTS_START( trog )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
+	PORT_START("DSW") // DSW1 and DSW2 on D0-D15
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))

@@ -883,6 +883,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	case NREG_CPUSTAT + 0:    /* CPU status */
 		if (data & 0x1) logerror("cpu_reg_w: System Cold Reset\n");
 		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
+		[[fallthrough]];
 	case NREG_CPUSTAT + 1:    /* CPU status */
 		if (LOG_NILE) logerror("%s NILE WRITE: CPU status(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;

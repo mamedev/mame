@@ -157,13 +157,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco3_joystick )
 	PORT_START(JOYSTICK_RX_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_RY_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_LX_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_LY_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_BUTTONS_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
@@ -262,13 +262,16 @@ void coco3_state::coco3(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
-	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
+	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
@@ -277,8 +280,8 @@ void coco3_state::coco3(machine_config &config)
 	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
 	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
-	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
+	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	// Becker Port device
 	COCO_DWSOCK(config, DWSOCK_TAG, 0);
@@ -309,8 +312,8 @@ void coco3_state::coco3(machine_config &config)
 	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
-	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
-	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// composite monitor
@@ -351,8 +354,8 @@ void coco3_state::coco3p(machine_config &config)
 	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
-	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
-	m_gime->firq_wr_callback().set(FUNC(coco3_state::gime_firq_w));
+	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 }
 

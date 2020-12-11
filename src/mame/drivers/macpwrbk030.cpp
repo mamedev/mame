@@ -9,12 +9,96 @@
     These are basically late-period Mac IIs without NuBus and with
     Egret/Cuda replaced with the PMU.
 
+    VIA 1 connections: (PowerBook 140/170, 160/180/180C are similar)
+    Port A: 0: VIA_TEST
+            1: CPU_ID0
+            2: CPU_ID1
+            3: MODEM
+            4: CPU_ID2
+            5: HDSEL (floppy head select)
+            6: CPU_ID3
+            7: SCC REQ
+
+    Port B: 0: RTC DATA
+            1: RTC CLOCK
+            2: RTC
+            3: LINK SEL
+            4: N/C
+            5: N/C
+            6: N/C
+            7: N/C
+
+    CA1: 60 Hz clock
+    CA2: 1 second clock
+    CB1: PMU IRQ
+    CB2: MODEM SND EN
+
+    VIA 2 connections: (VIA2 is inside the "Peripheral Glue" ASIC)
+    Port A: bi-directional PMU data bus
+
+    Port B: 0: SV1
+            1: PMACK
+            2: PMREQ
+            3: SV0
+            4: SV2
+            5: HMMU
+            6: N/C
+            7: MODEM RESET
+
+    PMU (M50753) connections:
+    IN port: 0: BRITE SENSE
+             1: A/D BATT
+             2: SND CNTL
+             3: MODEM BUSY
+             4: PWR ON
+             5: TEMP A/D
+             6: NICAD SLA
+             7: TABLE SEL
+
+    Port 0: 0: SWIM CNTL
+            1: SCC CNTL
+            2: HD PWR
+            3: MODEM PWR
+            4: N/C
+            5: SOUND PWR
+            6: MODEM PWROUT
+            7: SYS_PWR
+
+    Port 1: 0: CCFL PWR CNTL
+            1: AKD
+            2: STOP CLK
+            3: CHRG ON
+            4: KBD RST (resets keyboard M50740)
+            5: HICHG
+            6: RING DETECT
+            7: CHG OFF
+
+    Port 2: bi-directional data bus, connected to VIA port A
+
+    Port 3: 0: PWR OFF
+            1: SYS RST
+            2: VIA TEST
+            3: SOUND OFF
+            4: 1 SEC
+            5: PMINT
+            6: PMACK
+            7: PMREQ
+
+    Port 4: 0: PMGR_ADB (ADB out)
+            1: ADB (ADB in)
+            2: DISP BLANK
+            3: MODEM_INS
+
+    INT1: 60 Hz clock
+    INT2: INT2 PULLUP (pulled up and otherwise N/C)
+
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "machine/macrtc.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/ram.h"
@@ -44,6 +128,7 @@ public:
 	macpb030_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
 		m_via2(*this, "via2"),
 		m_macadb(*this, "macadb"),
@@ -75,6 +160,7 @@ public:
 
 private:
 	required_device<m68030_device> m_maincpu;
+	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<macadb_device> m_macadb;
@@ -168,6 +254,21 @@ private:
 	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	u32 m_colors[3], m_count, m_clutoffs, m_wd_palette[256];
+
+	u8 m_pmu_via_bus, m_pmu_ack, m_pmu_req;
+	u8 pmu_data_r() { return m_pmu_via_bus; }
+	void pmu_data_w(u8 data) { m_pmu_via_bus = data; }
+	u8 pmu_comms_r() { return (m_pmu_req<<7); }
+	void pmu_comms_w(u8 data)
+	{
+		m_via1->write_cb1(BIT(data, 5));
+		m_pmu_ack = BIT(data, 6);
+	}
+	int m_adb_line;
+	void set_adb_line(int state) { m_adb_line = state; }
+	u8 pmu_adb_r() { return (m_adb_line<<1); }
+	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w(data & 1); }
+	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled on the PB100
 };
 
 // 4-level grayscale
@@ -246,8 +347,7 @@ void macpb030_state::machine_reset()
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_read_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-	membank("bank1")->set_base(m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
@@ -289,14 +389,19 @@ u32 macpb030_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &
 	{
 		u16 *line = &bitmap.pix(y);
 
-		for (int x = 0; x < 640 / 4; x++)
+		for (int x = 0; x < 640; x+=8)
 		{
-			uint8_t const pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
+			u8 const pixels = vram8[(y * 80) + (BYTE4_XOR_BE(x/8))];
+			static const u16 palette[2] = { 0, 3 };
 
-			*line++ = ((pixels >> 6) & 3);
-			*line++ = ((pixels >> 4) & 3);
-			*line++ = ((pixels >> 2) & 3);
-			*line++ = (pixels & 3);
+			*line++ = palette[(pixels >> 7)&1];
+			*line++ = palette[(pixels >> 6)&1];
+			*line++ = palette[(pixels >> 5)&1];
+			*line++ = palette[(pixels >> 4)&1];
+			*line++ = palette[(pixels >> 3)&1];
+			*line++ = palette[(pixels >> 2)&1];
+			*line++ = palette[(pixels >> 1)&1];
+			*line++ = palette[(pixels & 1)];
 		}
 	}
 	return 0;
@@ -306,15 +411,22 @@ u32 macpb030_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &b
 {
 	u8 const *vram8 = (uint8_t *)m_vram.target();
 
-	//    vram8 += 0x40000;
-
 	for (int y = 0; y < 480; y++)
 	{
-		u32 *scanline = &bitmap.pix(y);
-		for (int x = 0; x < 640; x++)
+		u32 *line = &bitmap.pix(y);
+		for (int x = 0; x < 640; x+=8)
 		{
-			uint8_t const pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-			*scanline++ = m_wd_palette[pixels];
+			uint8_t const pixels = vram8[(y * 80) + (BYTE4_XOR_BE(x/8))];
+			static const u32 palette[2] = { 0xffffffff, 0 };
+
+			*line++ = palette[(pixels >> 7) & 1];
+			*line++ = palette[(pixels >> 6) & 1];
+			*line++ = palette[(pixels >> 5) & 1];
+			*line++ = palette[(pixels >> 4) & 1];
+			*line++ = palette[(pixels >> 3) & 1];
+			*line++ = palette[(pixels >> 2) & 1];
+			*line++ = palette[(pixels >> 1) & 1];
+			*line++ = palette[(pixels & 1)];
 		}
 	}
 
@@ -392,8 +504,7 @@ u32 macpb030_state::rom_switch_r(offs_t offset)
 		void *memory_data = m_ram->pointer();
 		offs_t memory_mirror = memory_end & ~memory_end;
 
-		space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-		membank("bank1")->set_base(memory_data);
+		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
 
@@ -407,6 +518,8 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 	/* signal VBlank on CA1 input on the VIA */
 	m_ca1_data ^= 1;
 	m_via1->write_ca1(m_ca1_data);
+
+	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 
 	if (++m_irq_count == 60)
 	{
@@ -645,21 +758,12 @@ void macpb030_state::macpd210_map(address_map &map)
 
 u8 macpb030_state::mac_via_in_a()
 {
-	return 0x81 | 0x12;
+	return 0x81 | 0x12; // ID for 140/160
 }
 
 u8 macpb030_state::mac_via_in_b()
 {
-	int val = 0;
-	// TODO: is this valid for VIA2 PMU machines?
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-
-	if (m_screen->vpos() >= 480)
-		val |= 0x40;
-
-	//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
+	return 0x08;    // flag indicating no Target Disk Mode
 }
 
 void macpb030_state::mac_via_out_a(u8 data)
@@ -673,29 +777,22 @@ void macpb030_state::mac_via_out_b(u8 data)
 
 u8 macpb030_state::mac_via2_in_a()
 {
-	return m_macadb->get_pm_data_recv();
+	return m_pmu_via_bus;
 }
 
 u8 macpb030_state::mac_via2_in_b()
 {
-	if (m_macadb->get_pm_ack() == 2)
-	{
-		return 0xcf;
-	}
-	else
-	{
-		return 0xcd;
-	}
+	return 0xcd | ((m_pmu_ack & 1) << 1);
 }
 
 void macpb030_state::mac_via2_out_a(u8 data)
 {
-	m_macadb->set_pm_data_send(data);
+	m_pmu_via_bus = data;
 }
 
 void macpb030_state::mac_via2_out_b(u8 data)
 {
-	m_macadb->pmu_req_w((data >> 2) & 1);
+	m_pmu_req = BIT(data, 2);
 }
 
 /***************************************************************************
@@ -731,6 +828,17 @@ void macpb030_state::macpb140(machine_config &config)
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb140_map);
 
+	M50753(config, m_pmu, 3.93216_MHz_XTAL);
+	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
+	m_pmu->write_p<2>().set(FUNC(macpb030_state::pmu_data_w));
+	m_pmu->read_p<3>().set(FUNC(macpb030_state::pmu_comms_r));
+	m_pmu->write_p<3>().set(FUNC(macpb030_state::pmu_comms_w));
+	m_pmu->read_p<4>().set(FUNC(macpb030_state::pmu_adb_r));
+	m_pmu->write_p<4>().set(FUNC(macpb030_state::pmu_adb_w));
+	m_pmu->read_in_p().set(FUNC(macpb030_state::pmu_in_r));
+
+	config.set_perfect_quantum(m_maincpu);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
@@ -743,8 +851,8 @@ void macpb030_state::macpb140(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_pmu_mode(true);
-	m_macadb->set_pmu_is_via1(false);
+	m_macadb->set_mcu_mode(true);
+	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
 	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
@@ -814,6 +922,15 @@ void macpb030_state::macpb160(machine_config &config)
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
 
+	M50753(config, m_pmu, 3.93216_MHz_XTAL);
+	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
+	m_pmu->write_p<2>().set(FUNC(macpb030_state::pmu_data_w));
+	m_pmu->read_p<3>().set(FUNC(macpb030_state::pmu_comms_r));
+	m_pmu->write_p<3>().set(FUNC(macpb030_state::pmu_comms_w));
+	m_pmu->read_p<4>().set(FUNC(macpb030_state::pmu_adb_r));
+	m_pmu->write_p<4>().set(FUNC(macpb030_state::pmu_adb_w));
+	m_pmu->read_in_p().set(FUNC(macpb030_state::pmu_in_r));
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
@@ -826,8 +943,8 @@ void macpb030_state::macpb160(machine_config &config)
 	PALETTE(config, m_palette, FUNC(macpb030_state::macgsc_palette), 16);
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_pmu_mode(true);
-	m_macadb->set_pmu_is_via1(false);
+	m_macadb->set_mcu_mode(true);
+	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
 	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
@@ -895,6 +1012,8 @@ void macpb030_state::macpd210(machine_config &config)
 	macpb160(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpd210_map);
 
+	M50753(config.replace(), m_pmu, 3.93216_MHz_XTAL).set_disable();
+
 	m_ram->set_extra_options("8M,12M,16M,20M,24M");
 }
 
@@ -960,15 +1079,17 @@ ROM_END
 ROM_START(macpd210)
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD("ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a))
+
+	ROM_REGION(0x1800, "pmu", ROMREGION_ERASE00)
 ROM_END
 
-COMP(1991, macpb140, 0, 0,         macpb140, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING)
-COMP(1991, macpb170, macpb140, 0,  macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING)
-COMP(1992, macpb145, macpb140, 0,  macpb145, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING)
-COMP(1992, macpb145b, macpb140, 0, macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING)
-COMP(1992, macpb160, 0, 0,         macpb160, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING)
-COMP(1992, macpb180, macpb160, 0,  macpb180, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING)
-COMP(1992, macpb180c, macpb160, 0, macpb180c,macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING)
+	COMP(1991, macpb140, 0, 0, macpb140, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING)
+	COMP(1991, macpb170, macpb140, 0, macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING)
+	COMP(1992, macpb145, macpb140, 0, macpb145, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING)
+	COMP(1992, macpb145b, macpb140, 0, macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING)
+	COMP(1992, macpb160, 0, 0, macpb160, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING)
+	COMP(1992, macpb180, macpb160, 0, macpb180, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING)
+	COMP(1992, macpb180c, macpb160, 0, macpb180c, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING)
 
-// PowerBook Duos (may or may not belong in this driver ultimately)
-COMP( 1992, macpd210,  0,        0,      macpd210, macadb,  macpb030_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+	// PowerBook Duos (may or may not belong in this driver ultimately)
+	COMP(1992, macpd210, 0, 0, macpd210, macadb, macpb030_state, init_macpb160, "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING)

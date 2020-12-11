@@ -97,28 +97,28 @@ void pc8201_state::bankswitch(uint8_t data)
 	if (rom_bank > 1)
 	{
 		/* RAM */
-		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, m_bank1);
 	}
 	else
 	{
 		/* ROM */
-		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.install_read_bank(0x0000, 0x7fff, m_bank1);
 		program.unmap_write(0x0000, 0x7fff);
 	}
 
-	membank("bank1")->set_entry(rom_bank);
+	m_bank1->set_entry(rom_bank);
 
 	switch (ram_bank)
 	{
 	case 0:
 		if (m_ram->size() > 16 * 1024)
 		{
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		}
 		else
 		{
 			program.unmap_readwrite(0x8000, 0xbfff);
-			program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+			program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		}
 		break;
 
@@ -128,20 +128,20 @@ void pc8201_state::bankswitch(uint8_t data)
 
 	case 2:
 		if (m_ram->size() > 32 * 1024)
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		else
 			program.unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 3:
 		if (m_ram->size() > 64 * 1024)
-			program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		else
 			program.unmap_readwrite(0x8000, 0xffff);
 		break;
 	}
 
-	membank("bank2")->set_entry(ram_bank);
+	m_bank2->set_entry(ram_bank);
 }
 
 void pc8201_state::bank_w(uint8_t data)
@@ -429,7 +429,7 @@ void kc85_state::ctrl_w(uint8_t data)
 	*/
 
 	/* ROM bank selection */
-	membank("bank1")->set_entry(BIT(data, 0));
+	m_bank1->set_entry(BIT(data, 0));
 
 	/* printer strobe */
 	m_centronics->write_strobe(BIT(data, 1));
@@ -467,9 +467,9 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 	else
 	{
-		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.install_read_bank(0x0000, 0x7fff, m_bank1);
 		program.unmap_write(0x0000, 0x7fff);
-		membank("bank1")->set_entry(rom_bank);
+		m_bank1->set_entry(rom_bank);
 	}
 
 	if (m_ram->size() < ((ram_bank + 1) * 24 * 1024))
@@ -479,8 +479,8 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 	else
 	{
-		program.install_readwrite_bank(0xa000, 0xffff, "bank2");
-		membank("bank2")->set_entry(ram_bank);
+		program.install_readwrite_bank(0xa000, 0xffff, m_bank2);
+		m_bank2->set_entry(ram_bank);
 	}
 }
 
@@ -1158,27 +1158,27 @@ void kc85_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	program.install_read_bank(0x0000, 0x7fff, "bank1");
+	program.install_read_bank(0x0000, 0x7fff, m_bank1);
 	program.unmap_write(0x0000, 0x7fff);
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
 	{
 	case 16 * 1024:
 		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		break;
 
 	case 32 * 1024:
-		program.install_readwrite_bank(0x8000, 0xffff,"bank2");
+		program.install_readwrite_bank(0x8000, 0xffff,m_bank2);
 		break;
 	}
 
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, m_ram->pointer());
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1201,15 +1201,15 @@ void pc8201_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->configure_entries(2, 2, ram + 0x8000, 0x8000);
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
-	membank("bank2")->configure_entry(0, ram);
-	membank("bank2")->configure_entries(2, 2, ram + 0x8000, 0x8000);
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, ram);
+	m_bank2->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	m_bank2->set_entry(0);
 
 	bankswitch(0);
 
@@ -1237,37 +1237,37 @@ void trsm100_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	program.install_read_bank(0x0000, 0x7fff, "bank1");
+	program.install_read_bank(0x0000, 0x7fff, m_bank1);
 	program.unmap_write(0x0000, 0x7fff);
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
 	{
 	case 8 * 1024:
 		program.unmap_readwrite(0x8000, 0xcfff);
-		program.install_readwrite_bank(0xe000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xe000, 0xffff, m_bank2);
 		break;
 
 	case 16 * 1024:
 		program.unmap_readwrite(0x8000, 0xbfff);
-		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xc000, 0xffff, m_bank2);
 		break;
 
 	case 24 * 1024:
 		program.unmap_readwrite(0x8000, 0x9fff);
-		program.install_readwrite_bank(0xa000, 0xffff, "bank2");
+		program.install_readwrite_bank(0xa000, 0xffff, m_bank2);
 		break;
 
 	case 32 * 1024:
-		program.install_readwrite_bank(0x8000, 0xffff, "bank2");
+		program.install_readwrite_bank(0x8000, 0xffff, m_bank2);
 		break;
 	}
 
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entry(0, m_ram->pointer());
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1280,18 +1280,20 @@ void trsm100_state::machine_start()
 
 void tandy200_state::machine_start()
 {
-	std::string region_tag;
-	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_opt_region = memregion(std::string(m_opt_cart->tag()) + GENERIC_ROM_REGION_TAG);
+
+	m_bank = 0;
+	m_tp = 0;
 
 	/* configure ROM banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_rom->base() + 0x10000);
-	membank("bank1")->configure_entry(2, m_opt_region ? m_opt_region->base() : m_rom->base());
-	membank("bank1")->set_entry(0);
+	m_bank1->configure_entry(0, m_rom->base());
+	m_bank1->configure_entry(1, m_rom->base() + 0x10000);
+	m_bank1->configure_entry(2, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->set_entry(0);
 
 	/* configure RAM banking */
-	membank("bank2")->configure_entries(0, 3, m_ram->pointer(), 0x6000);
-	membank("bank2")->set_entry(0);
+	m_bank2->configure_entries(0, 3, m_ram->pointer(), 0x6000);
+	m_bank2->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));

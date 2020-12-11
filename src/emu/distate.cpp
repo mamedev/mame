@@ -331,7 +331,7 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 					width--;
 				}
 				// fall through to unsigned case
-
+				[[fallthrough]];
 			// u outputs as unsigned decimal
 			case 'u':
 				if (width == 0)

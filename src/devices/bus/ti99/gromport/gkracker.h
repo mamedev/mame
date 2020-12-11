@@ -10,7 +10,7 @@
 #pragma once
 #include "cartridges.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_gkracker_device : public cartridge_connector_device, public device_nvram_interface
 {
@@ -64,7 +64,7 @@ private:
 };
 
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device)
 

@@ -111,6 +111,7 @@ bool aim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					raw_w(raw_track_data, 16, 0x8924);
 					raw_w(raw_track_data, 16, 0x5555);
 					data_count = 0;
+					break;
 
 				// TELETEXT.AIM and others
 				case 0xff:

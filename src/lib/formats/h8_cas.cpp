@@ -117,13 +117,13 @@ static int h8_cassette_calculate_size_in_samples(const uint8_t *bytes, int lengt
 
 static const cassette_image::LegacyWaveFiller h8_legacy_fill_wave =
 {
-	h8_cassette_fill_wave,                 /* fill_wave */
-	-1,                                     /* chunk_size */
-	0,                                      /* chunk_samples */
-	h8_cassette_calculate_size_in_samples, /* chunk_sample_calc */
-	H8_WAV_FREQUENCY,                      /* sample_frequency */
-	0,                                      /* header_samples */
-	0                                       /* trailer_samples */
+	h8_cassette_fill_wave,                  // fill_wave
+	-1,                                     // chunk_size
+	0,                                      // chunk_samples
+	h8_cassette_calculate_size_in_samples,  // chunk_sample_calc
+	H8_WAV_FREQUENCY,                       // sample_frequency
+	0,                                      // header_samples
+	0                                       // trailer_samples
 };
 
 static cassette_image::error h8_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)

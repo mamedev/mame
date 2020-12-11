@@ -17,7 +17,7 @@
 #include "machine/autoconfig.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,7 +46,7 @@ private:
 	std::vector<uint16_t> m_ram;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2052, bus::amiga::zorro, a2052_device)

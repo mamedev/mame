@@ -1630,7 +1630,7 @@ void voodoo_device::recompute_video_memory()
 	{
 		case 3: /* reserved */
 			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
-
+			[[fallthrough]];
 		case 0: /* 2 color buffers, 1 aux buffer */
 			fbi.rgboffs[2] = ~0;
 			fbi.auxoffs = 2 * buffer_pages * 0x1000;
@@ -2751,36 +2751,42 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* Vertex data is 12.4 formatted fixed point */
 		case fvertexAx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexAx:
 			if (chips & 1) vd->fbi.ax = (int16_t)data;
 			break;
 
 		case fvertexAy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexAy:
 			if (chips & 1) vd->fbi.ay = (int16_t)data;
 			break;
 
 		case fvertexBx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexBx:
 			if (chips & 1) vd->fbi.bx = (int16_t)data;
 			break;
 
 		case fvertexBy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexBy:
 			if (chips & 1) vd->fbi.by = (int16_t)data;
 			break;
 
 		case fvertexCx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexCx:
 			if (chips & 1) vd->fbi.cx = (int16_t)data;
 			break;
 
 		case fvertexCy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexCy:
 			if (chips & 1) vd->fbi.cy = (int16_t)data;
 			break;
@@ -2788,72 +2794,84 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* RGB data is 12.12 formatted fixed point */
 		case fstartR:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startR:
 			if (chips & 1) vd->fbi.startr = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartG:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startG:
 			if (chips & 1) vd->fbi.startg = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartB:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startB:
 			if (chips & 1) vd->fbi.startb = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartA:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startA:
 			if (chips & 1) vd->fbi.starta = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdRdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dRdX:
 			if (chips & 1) vd->fbi.drdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdGdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dGdX:
 			if (chips & 1) vd->fbi.dgdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdBdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dBdX:
 			if (chips & 1) vd->fbi.dbdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdAdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dAdX:
 			if (chips & 1) vd->fbi.dadx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdRdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dRdY:
 			if (chips & 1) vd->fbi.drdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdGdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dGdY:
 			if (chips & 1) vd->fbi.dgdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdBdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dBdY:
 			if (chips & 1) vd->fbi.dbdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdAdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dAdY:
 			if (chips & 1) vd->fbi.dady = (int32_t)(data << 8) >> 8;
 			break;
@@ -2861,18 +2879,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* Z data is 20.12 formatted fixed point */
 		case fstartZ:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startZ:
 			if (chips & 1) vd->fbi.startz = (int32_t)data;
 			break;
 
 		case fdZdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dZdX:
 			if (chips & 1) vd->fbi.dzdx = (int32_t)data;
 			break;
 
 		case fdZdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dZdY:
 			if (chips & 1) vd->fbi.dzdy = (int32_t)data;
 			break;
@@ -3207,7 +3228,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case fbiInit6:
 			if (vd->vd_type < TYPE_VOODOO_2)
 				break;
-			/* else fall through... */
+			[[fallthrough]];
 
 		/* fbiInitX can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		/* most of these affect memory layout, so always recompute that when done */
@@ -3437,8 +3458,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case clipLowYHighY:
 		case clipLeftRight:
 			poly_wait(vd->poly, vd->regnames[regnum]);
-			/* fall through to default implementation */
-
+			[[fallthrough]];
 		/* by default, just feed the data to the chips */
 		default:
 default_case:
@@ -4571,6 +4591,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		case fbiAfuncFail:
 		case fbiPixelsOut:
 			vd->update_statistics(true);
+			[[fallthrough]];
 		case fbiTrianglesOut:
 			result = vd->reg[regnum].u & 0xffffff;
 			break;
@@ -5501,7 +5522,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 				fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				fbi.height = (data >> 12) & 0xfff;
-			/* fall through */
+			[[fallthrough]];
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{
@@ -5703,7 +5724,7 @@ void voodoo_device::device_start()
 
 	/* set the type, and initialize the chip mask */
 	index = 0;
-	for (device_t &scan : device_iterator(machine().root_device()))
+	for (device_t &scan : device_enumerator(machine().root_device()))
 		if (scan.type() == this->type())
 		{
 			if (&scan == this)

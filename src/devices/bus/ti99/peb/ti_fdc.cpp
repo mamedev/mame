@@ -34,7 +34,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 #define FDC_TAG "fd1771"
@@ -429,4 +429,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

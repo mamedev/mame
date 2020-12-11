@@ -378,6 +378,9 @@ void blaster_state::machine_start()
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_rom_bank));
+
+	m_vram_bank = 0;
+	m_rom_bank = 0;
 }
 
 

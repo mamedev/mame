@@ -39,6 +39,7 @@ $305.b invincibility
 
 TODO:
 - device-ify TC0610? (no other known users)
+- full screen rotation is incorrect in taito logo, end of stage, etc... (see https://youtu.be/lzPnO8Kej20)
 */
 
 

@@ -41,10 +41,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	// FIXME: optimize clock input
 
@@ -114,5 +111,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(CD4006, "CD4006", "+CLOCK,+D1,+D2,+D3,+D4,+D1P4,+D1P4S,+D2P4,+D2P5,+D3P4,+D4P4,+D4P5,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

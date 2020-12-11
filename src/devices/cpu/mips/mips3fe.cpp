@@ -155,6 +155,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x22:  // LWL
 		case 0x26:  // LWR
 			desc.regin[0] |= REGFLAG_R(RTREG);
+			[[fallthrough]];
 		case 0x20:  // LB
 		case 0x21:  // LH
 		case 0x23:  // LW
@@ -217,6 +218,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x33:  // PREF
 			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
+			[[fallthrough]];
 		case 0x2f:  // CACHE
 			// effective no-op
 			return true;
@@ -253,6 +255,7 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
 			desc.regin[0] |= REGFLAG_R(RDREG);
+			[[fallthrough]];
 		case 0x04:  // SLLV
 		case 0x06:  // SRLV
 		case 0x07:  // SRAV
@@ -596,6 +599,7 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x13:  // MOVN - MIPS IV
 					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
+					[[fallthrough]];
 				case 0x00:  // ADD
 				case 0x01:  // SUB
 				case 0x02:  // MUL
@@ -608,6 +612,7 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x16:  // RSQRT - MIPS IV
 					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
+					[[fallthrough]];
 				case 0x04:  // SQRT
 				case 0x05:  // ABS
 				case 0x06:  // MOV

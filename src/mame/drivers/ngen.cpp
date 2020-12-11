@@ -100,7 +100,7 @@ public:
 		m_hdc_timer(*this,"hdc_timer"),
 		m_disk_rom(*this,"disk"),
 		m_fd0(*this,"fdc:0"),
-		m_hd_buffer(*this,"hd_buffer_ram")
+		m_hd_buffer(*this,"hd_buffer_ram", 1024*8, ENDIANNESS_LITTLE)
 	{
 	}
 
@@ -186,7 +186,7 @@ private:
 	memory_array m_vram;
 	memory_array m_fontram;
 	optional_device<floppy_connector> m_fd0;
-	optional_shared_ptr<uint8_t> m_hd_buffer;
+	memory_share_creator<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
 
@@ -843,7 +843,6 @@ void ngen_state::machine_start()
 {
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
-	m_hd_buffer.allocate(1024*8);  // 8kB buffer RAM for HD controller
 	if(vidshare == nullptr || fontshare == nullptr)
 		fatalerror("VRAM not found\n");
 	m_vram.set(*vidshare,2);

@@ -111,7 +111,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 		LOG_FORMATS("Unsupported Major Version\n");
 		return cassette_image::error::INVALID_IMAGE;
 	}
-	
+
 	/* csw data */
 	switch (compression)
 	{
@@ -141,13 +141,13 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 		std::vector<uint8_t> gz_ptr;
 		z_stream    d_stream;
 		int         err;
-		
+
 		gz_ptr.resize(8);
 
 		d_stream.next_in = (unsigned char *) &image_data[csw_data];
 		d_stream.avail_in = image_size - 0x34 - header[0x23];
 		d_stream.total_in = 0;
-		
+
 		d_stream.next_out = &gz_ptr[0];
 		d_stream.avail_out = 1;
 		d_stream.total_out = 0;
@@ -186,7 +186,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 				}
 				bit ^= 0xff;
 			}
-		} 
+		}
 		while (err == Z_OK);
 
 		if (err != Z_STREAM_END)

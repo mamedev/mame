@@ -3,15 +3,27 @@
 license:CC0
 
 loosely based on tranz330.lay
-note, the led16seg renderer is hardcoded to have OFF segments darker than ON, which is good for LEDs but not LCDs.
-TODO : fix that
-TODO : add button subtext for shifted functions
 -->
 <mamelayout version="2">
-	<element name="vfd0"><led16segsc><color red="0.8" green="0.8" blue="0.8" /></led16segsc></element>
+	<element name="vfd"><led16segsc><color red="0.19" green="0.20" blue="0.22" /></led16segsc></element>
+
+	<!-- set text for 12 annunciators -->
+	<element name="ann0"><text string="SRQ" /></element>
+	<element name="ann1"><text string="LSTN" /></element>
+	<element name="ann2"><text string="TLK" /></element>
+	<element name="ann3"><text string="RMT" /></element>
+	<element name="ann4"><text string="MATH" /></element>
+	<element name="ann5"><text string="AZ OFF" /></element>
+	<element name="ann6"><text string="2Ω" /></element>
+	<element name="ann7"><text string="4Ω" /></element>
+	<element name="ann8"><text string="M RNG" /></element>
+	<element name="ann9"><text string="S TRG" /></element>
+	<element name="ann10"><text string="CAL" /></element>
+	<element name="ann11"><text string="SHIFT" /></element>
+
 
 	<element name="front"><rect><color red="0.6" green="0.63" blue="0.65" /></rect></element>
-	<element name="vfd_back"><rect><color red="0.29" green="0.33" blue="0.32" /></rect></element>
+	<element name="vfd_back"><rect><color red="0.46" green="0.44" blue="0.35" /></rect></element>
 	<element name="button_digit_back"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
 
 	<element name="hl" defstate="0">
@@ -20,116 +32,118 @@ TODO : add button subtext for shifted functions
 		</rect>
 	</element>
 
-	<element name="button_dcv_text">
+
+	<element name="btn00_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="DCV"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_acv_text">
+	<element name="btn01_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="ACV"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_2w_text">
+	<element name="btn02_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="2W"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_4w_text">
+	<element name="btn03_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="4W"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_dca_text">
+	<element name="btn04_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="DCA"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_aca_text">
+	<element name="btn05_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="ACA"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_shift_text">
+	<element name="btn06_text">
 		<rect><color red="0.3" green="0.35" blue="0.85" /></rect>
 		<text string=""><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_auto_text">
+	<element name="btn10_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="AUTO"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="AUTO/MAN"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_up_text">
+	<element name="btn11_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="UP"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_dn_text">
+	<element name="btn12_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="DN"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_int_text">
+	<element name="btn13_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="INT"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_sgl_text">
+	<element name="btn14_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="SGL"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_srq_text">
+	<element name="btn15_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="SRQ"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	<element name="button_local_text">
+	<element name="btn16_text">
 		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 		<text string="LCL"><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
+
+	<!-- a few extra labels -->
+	<element name="3dig"><text string="3"/></element>
+	<element name="4dig"><text string="4"/></element>
+	<element name="5dig"><text string="5"/></element>
+	<element name="az"><text string="Autozero"/></element>
+	<element name="trst"><text string="Test/Rst"/></element>
+	<element name="adrs"><text string="Adrs"/></element>
+	<element name="cal"><text string="Cal"/></element>
 
 
 	<view name="Internal Layout">
 		<element name="case_bg"      ref="front">            <bounds x=" 0" y=" 0" width="126" height="70"/></element>
 
-		<!-- 2 rows of 7 buttons , but electrical switch matrix is different -->
-		<element name="button_dcv"   ref="button_digit_back"><bounds x="5" y="35" width="10" height="10"/></element>
-		<element name="button_acv"   ref="button_digit_back"><bounds x="20" y="35" width="10" height="10"/></element>
-		<element name="button_2w"    ref="button_digit_back"><bounds x="35" y="35" width="10" height="10"/></element>
-		<element name="button_4w"    ref="button_digit_back"><bounds x="50" y="35" width="10" height="10"/></element>
-		<element name="button_dca"   ref="button_digit_back"><bounds x="65" y="35" width="10" height="10"/></element>
-		<element name="button_aca"   ref="button_digit_back"><bounds x="80" y="35" width="10" height="10"/></element>
-		<element name="button_shift" ref="button_digit_back"><bounds x="95" y="35" width="10" height="10"/></element>
-
-		<element name="button_auto"  ref="button_digit_back"><bounds x="5" y="50" width="10" height="10"/></element>
-		<element name="button_up"    ref="button_digit_back"><bounds x="20" y="50" width="10" height="10"/></element>
-		<element name="button_dn"    ref="button_digit_back"><bounds x="35" y="50" width="10" height="10"/></element>
-		<element name="button_int"   ref="button_digit_back"><bounds x="50" y="50" width="10" height="10"/></element>
-		<element name="button_sgl"   ref="button_digit_back"><bounds x="65" y="50" width="10" height="10"/></element>
-		<element name="button_srq"   ref="button_digit_back"><bounds x="80" y="50" width="10" height="10"/></element>
-		<element name="button_local" ref="button_digit_back"><bounds x="95" y="50" width="10" height="10"/></element>
-
 		<element name="vfd_backdrop" ref="vfd_back">         <bounds x="0" y="0" width="126" height="32"/></element>
 
-		<element name="vfd0"         ref="vfd0" state="0"><bounds x=" 9" y="9" width="9" height="14"/></element>
-		<element name="vfd1"         ref="vfd0" state="0"><bounds x="18" y="9" width="9" height="14"/></element>
-		<element name="vfd2"         ref="vfd0" state="0"><bounds x="27" y="9" width="9" height="14"/></element>
-		<element name="vfd3"         ref="vfd0" state="0"><bounds x="36" y="9" width="9" height="14"/></element>
-		<element name="vfd4"         ref="vfd0" state="0"><bounds x="45" y="9" width="9" height="14"/></element>
-		<element name="vfd5"         ref="vfd0" state="0"><bounds x="54" y="9" width="9" height="14"/></element>
-		<element name="vfd6"         ref="vfd0" state="0"><bounds x="63" y="9" width="9" height="14"/></element>
-		<element name="vfd7"         ref="vfd0" state="0"><bounds x="72" y="9" width="9" height="14"/></element>
-		<element name="vfd8"         ref="vfd0" state="0"><bounds x="81" y="9" width="9" height="14"/></element>
-		<element name="vfd9"         ref="vfd0" state="0"><bounds x="90" y="9" width="9" height="14"/></element>
-		<element name="vfd10"        ref="vfd0" state="0"><bounds x="99" y="9" width="9" height="14"/></element>
-		<element name="vfd11"        ref="vfd0" state="0"><bounds x="108" y="9" width="9" height="14"/></element>
+		<!-- pattern of 12 digits -->
+		<repeat count="12">
+			<param name="vfdnum" start="0" increment="1" />
+			<param name="vfd_xpos" start="9" increment="9" />
+			<element name="vfd~vfdnum~" ref="vfd" state="0">
+				<bounds x="~vfd_xpos~" y="9" width="9" height="14" />
+			</element>
+		</repeat>
 
-		<element name="button_dcv_text1"   ref="button_dcv_text">   <bounds x="5" y="37" width="10" height="8"/></element>
-		<element name="button_acv_text1"   ref="button_acv_text">   <bounds x="20" y="37" width="10" height="8"/></element>
-		<element name="button_2w_text1"    ref="button_2w_text">    <bounds x="35" y="37" width="10" height="8"/></element>
-		<element name="button_4w_text1"    ref="button_4w_text">    <bounds x="50" y="37" width="10" height="8"/></element>
-		<element name="button_dca_text1"   ref="button_dca_text">   <bounds x="65" y="37" width="10" height="8"/></element>
-		<element name="button_aca_text1"   ref="button_aca_text">   <bounds x="80" y="37" width="10" height="8"/></element>
-		<element name="button_shift_text1" ref="button_shift_text"> <bounds x="95" y="35" width="10" height="10"/></element>
+		<!-- pattern of 12 text annunciators -->
+		<repeat count="12">
+			<param name="ann_i" start="0" increment="1" />
+			<param name="ann_xpos" start="9" increment="9" />
+			<element name="ann~ann_i~" ref="ann~ann_i~">
+				<bounds x="~ann_xpos~" y="24" width="8" height="3" />
+				<color state="0" red="0.19" green="0.20" blue="0.22" alpha="0.13" />
+				<color state="1" red="0.19" green="0.20" blue="0.22" />
+			</element>
+		</repeat>
 
-		<element name="button_auto_text1"  ref="button_auto_text">  <bounds x="5" y="52" width="10" height="8"/></element>
-		<element name="button_up_text1"    ref="button_up_text">    <bounds x="20" y="52" width="10" height="8"/></element>
-		<element name="button_dn_text1"    ref="button_dn_text">    <bounds x="35" y="52" width="10" height="8"/></element>
-		<element name="button_int_text1"   ref="button_int_text">   <bounds x="50" y="52" width="10" height="8"/></element>
-		<element name="button_sgl_text1"   ref="button_sgl_text">   <bounds x="65" y="52" width="10" height="8"/></element>
-		<element name="button_srq_text1"   ref="button_srq_text">   <bounds x="80" y="52" width="10" height="8"/></element>
-		<element name="button_local_text1" ref="button_local_text"> <bounds x="95" y="52" width="10" height="8"/></element>
+		<!-- 2 rows of 7 button backgrounds and text elements, but electrical switch matrix is different -->
+		<repeat count="2">
+			<param name="brow" start="0" increment="1"/>
+			<param name="by" start="35" increment="15" />
+			<param name="ty" start="37" increment="15" />
+			<repeat count="7">
+				<param name="bcol" start="0" increment="1"/>
+				<param name="bx" start="5" increment="15" />
+				<element name="btn~brow~~bcol~_back" ref="button_digit_back">
+					<bounds x="~bx~" y="~by~" width="10" height="10"/>
+				</element>
+				<element name="btn~brow~~bcol~_text1" ref="btn~brow~~bcol~_text">
+					<bounds x="~bx~" y="~ty~" width="10" height="8"/>
+				</element>
+			</repeat>
+		</repeat>
 
 
+<!-- not sure how to parametrize this one : switch matrix doesn't match button layout. -->
 <!-- to match the schematics, we consider Col.0-3 to be driven by P14-17. The value in "inputmask" is the one read as "p1 & 0x0F", i.e. P13-P10. -->
 <!--    col.0 : (nc)|shift|ACA|DCA
         col.1 : 4W|2W|ACV|DCV
@@ -151,5 +165,38 @@ TODO : add button subtext for shifted functions
 		<element ref="hl" inputtag="COL.3" inputmask="0x02"><bounds x="80" y="50" width="10" height="10" /><color alpha="0.2" /></element>
 		<element ref="hl" inputtag="COL.3" inputmask="0x04"><bounds x="95" y="50" width="10" height="10" /><color alpha="0.2" /></element>
 		<!--element ref="hl" inputtag="COL.3" inputmask="0x08"><bounds x="" y="5" width="10" height="10" /><color alpha="0.2" /></element -->
+
+		<!-- misc text above buttons -->
+		<param name="bluetext_r" value="0.1"/>
+		<param name="bluetext_g" value="0.1"/>
+		<param name="bluetext_b" value="0.6"/>
+		<element name="3dig" ref="3dig">
+			<bounds x="5" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="4dig" ref="4dig">
+			<bounds x="20" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="5dig" ref="5dig">
+			<bounds x="35" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="az" ref="az">
+			<bounds x="50" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="trst" ref="trst">
+			<bounds x="65" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="adrs" ref="adrs">
+			<bounds x="80" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
+		<element name="cal" ref="cal">
+			<bounds x="95" y="47" width="10" height="3" />
+			<color red="~bluetext_r~" green="~bluetext_g~" blue="~bluetext_b~"/>
+		</element>
 	</view>
 </mamelayout>

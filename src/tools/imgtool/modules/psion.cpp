@@ -245,6 +245,7 @@ char *stream_getline(imgtool::stream &source, uint16_t max_len)
 				source.read(&data, 1);
 				if (data != '\n')
 					source.seek(-1, SEEK_CUR);
+				[[fallthrough]];
 			case '\n':
 				return line;
 			default:

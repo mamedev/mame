@@ -58,7 +58,6 @@ private:
 	// address maps
 	void main_map(address_map &map);
 	void data_map(address_map &map);
-	void io_map(address_map &map);
 
 	// I/O handlers
 	void update_display();
@@ -130,13 +129,6 @@ void avrmax_state::data_map(address_map &map)
 	map(0x0100, 0x04ff).ram();
 }
 
-void avrmax_state::io_map(address_map &map)
-{
-	map(AVR8_IO_PORTB, AVR8_IO_PORTB).r(FUNC(avrmax_state::input_r));
-	map(AVR8_IO_PORTC, AVR8_IO_PORTC).w(FUNC(avrmax_state::mux_w));
-	map(AVR8_IO_PORTD, AVR8_IO_PORTD).w(FUNC(avrmax_state::led_w));
-}
-
 
 
 /******************************************************************************
@@ -177,8 +169,10 @@ void avrmax_state::avrmax(machine_config &config)
 	ATMEGA88(config, m_maincpu, 8000000); // internal R/C clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &avrmax_state::main_map);
 	m_maincpu->set_addrmap(AS_DATA, &avrmax_state::data_map);
-	m_maincpu->set_addrmap(AS_IO, &avrmax_state::io_map);
 	m_maincpu->set_eeprom_tag("eeprom");
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(avrmax_state::input_r));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(avrmax_state::mux_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(avrmax_state::led_w));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);

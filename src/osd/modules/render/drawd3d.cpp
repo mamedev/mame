@@ -1280,7 +1280,7 @@ void renderer_d3d9::pick_best_mode()
 	auto win = assert_window();
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *primary_screen = screen_device_enumerator(win->machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -2621,7 +2621,7 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 	auto win = d3d->assert_window();
 
-	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
 	bool vector_screen =
 		first_screen != nullptr &&
 		first_screen->screen_type() == SCREEN_TYPE_VECTOR;

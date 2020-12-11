@@ -123,7 +123,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "gromport", "TI-99 Cartridge port")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
@@ -288,7 +288,7 @@ void cartridge_connector_device::device_config_complete()
 	m_gromport = static_cast<gromport_device*>(owner());
 }
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 void ti99_gromport_options(device_slot_interface &device)
 {

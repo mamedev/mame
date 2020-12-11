@@ -754,12 +754,14 @@ void i8271_device::start_command(int cmd)
 	switch(cmd) {
 	case C_READ_DATA_SINGLE:
 		command[3] = 1;
+		[[fallthrough]];
 	case C_READ_DATA_MULTI:
 		read_data_start(flopi[BIT(command[0], 7)]);
 		break;
 
 	case C_VERIFY_DATA_SINGLE:
 		command[3] = 1;
+		[[fallthrough]];
 	case C_VERIFY_DATA_MULTI:
 		verify_data_start(flopi[BIT(command[0], 7)]);
 		break;
@@ -817,6 +819,7 @@ void i8271_device::start_command(int cmd)
 
 	case C_WRITE_DATA_SINGLE:
 		command[3] = 1;
+		[[fallthrough]];
 	case C_WRITE_DATA_MULTI:
 		write_data_start(flopi[BIT(command[0], 7)]);
 		break;

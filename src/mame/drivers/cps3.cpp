@@ -62,6 +62,8 @@ Warzard                                              1996  WZD96a00F  CP300000G 
 Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       X      CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       x      CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
@@ -2139,7 +2141,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
 	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
-	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w));  // Colour RAM 0x20000 colours
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
 	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));

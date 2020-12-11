@@ -24,7 +24,7 @@
 #include "machine/bankdev.h"
 #include "sound/dac.h"
 #include "screen.h"
-
+#include "machine/input_merger.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -102,8 +102,6 @@ public:
 	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
 	// PIA1
 	uint8_t pia1_pa_r();
@@ -112,8 +110,6 @@ public:
 	void pia1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
 	uint8_t floating_bus_r()   { return floating_bus_read(); }
@@ -138,12 +134,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// interrupts
-	virtual bool firq_get_line(void);
-	virtual bool irq_get_line(void);
-	void recalculate_irq(void);
-	void recalculate_firq(void);
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -195,7 +185,7 @@ protected:
 		ioport_port *m_input[2][2];
 		ioport_port *m_buttons;
 
-		uint8_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		uint32_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
 		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
@@ -242,7 +232,9 @@ protected:
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
 	optional_device<beckerport_device> m_beckerport;
-	optional_ioport                    m_beckerportconfig;
+	optional_ioport m_beckerportconfig;
+	required_device<input_merger_device> m_irqs;
+	required_device<input_merger_device> m_firqs;
 
 	// input ports
 	required_ioport_array<7> m_keyboard;

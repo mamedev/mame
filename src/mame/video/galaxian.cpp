@@ -1293,6 +1293,18 @@ void galaxian_state::pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx,
 }
 
 
+/*** Mighty Monkey ***/
+void galaxian_state::mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+{
+	*code |= m_gfxbank[0] << 8 | m_gfxbank[2] << 9;
+}
+
+void galaxian_state::mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	*code |= m_gfxbank[0] << 6 | m_gfxbank[2] << 7;
+}
+
+
 /*** Batman Part 2 ***/
 void galaxian_state::batman2_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
 {

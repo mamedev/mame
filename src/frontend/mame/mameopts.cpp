@@ -68,7 +68,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 	}
 
 	machine_config config(*cursystem, options);
-	for (const screen_device &device : screen_device_iterator(config.root_device()))
+	for (const screen_device &device : screen_device_enumerator(config.root_device()))
 	{
 		// parse "raster.ini" for raster games
 		if (device.screen_type() == SCREEN_TYPE_RASTER)

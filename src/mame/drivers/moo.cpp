@@ -343,7 +343,7 @@ void moo_state::moobl_map(address_map &map)
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));       /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
-	map(0x0d0000, 0x0d001f).writeonly();                   /* CCU regs (ignored) */
+	map(0x0d0000, 0x0d001f).nopw();                   /* CCU regs (ignored) */
 	map(0x0d6ffc, 0x0d6ffd).w(FUNC(moo_state::moobl_oki_bank_w));
 	map(0x0d6fff, 0x0d6fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));     /* VSCCS regs */

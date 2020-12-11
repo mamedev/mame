@@ -186,7 +186,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_memory_region m_flash;
+	required_shared_ptr<uint32_t> m_flash;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ks0164_device> m_sound;
@@ -243,7 +243,7 @@ u32 dgpix_state::mpu401_status_r()
 
 u32 dgpix_state::flash_r(offs_t offset)
 {
-	u32 *ROM = (u32 *)m_flash->base();
+	u32 *ROM = m_flash;
 
 	if (offset >= (0x2000000 - m_flash_roms * 0x400000) / 4)
 	{
@@ -280,7 +280,7 @@ void dgpix_state::flash_w(offs_t offset, u32 data, u32 mem_mask)
 		if (data == 0xd0d00000)
 		{
 			// point to game settings
-			u8 *rom = (u8 *)m_flash->base() + offset*4;
+			u8 *rom = (u8 *)(u32 *)m_flash + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -298,7 +298,7 @@ void dgpix_state::flash_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 		else
 		{
-			u16 *rom = (u16 *)m_flash->base();
+			u16 *rom = (u16 *)(u32 *)m_flash;
 
 			// write game settings
 
@@ -359,7 +359,7 @@ void dgpix_state::mem_map(address_map &map)
 	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
 	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
+	map(0xfe000000, 0xffffffff).rom().share("flash");
 }
 
 void dgpix_state::io_map(address_map &map)
@@ -454,7 +454,7 @@ void dgpix_state::dgpix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, "flash", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -630,7 +630,7 @@ ROM_END
 
 void dgpix_state::init_elfin()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9e94)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9e95)] = 0;
@@ -644,7 +644,7 @@ void dgpix_state::init_elfin()
 
 void dgpix_state::init_jumpjump()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
@@ -658,7 +658,7 @@ void dgpix_state::init_jumpjump()
 
 void dgpix_state::init_xfiles()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9a2a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9a2b)] = 0;
@@ -672,7 +672,7 @@ void dgpix_state::init_xfiles()
 
 void dgpix_state::init_xfilesk()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -689,7 +689,7 @@ void dgpix_state::init_xfilesk()
 
 void dgpix_state::init_kdynastg()
 {
-	u8 *rom = (u8 *)m_flash->base() + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

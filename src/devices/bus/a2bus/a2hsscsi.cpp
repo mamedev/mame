@@ -156,7 +156,7 @@ uint8_t a2bus_hsscsi_device::read_c0nx(uint8_t offset)
 			return m_ncr5380->read(offset);
 
 		case 6:
-			if (m_dma_control & 1)	// pseudo-DMA?
+			if (m_dma_control & 1)  // pseudo-DMA?
 			{
 				return m_ncr5380->dma_r();
 			}
@@ -166,19 +166,19 @@ uint8_t a2bus_hsscsi_device::read_c0nx(uint8_t offset)
 				return m_ncr5380->read(offset);
 			}
 
-		case 8:	// DMA address low
+		case 8: // DMA address low
 			return m_dma_addr & 0xff;
 
-		case 9:	// DMA address high
+		case 9: // DMA address high
 			return (m_dma_addr >> 8) & 0xff;
 
-		case 0xa:	// DMA size low
+		case 0xa:   // DMA size low
 			return m_dma_size & 0xff;
 
-		case 0xb:	// DMA size high
+		case 0xb:   // DMA size high
 			return (m_dma_size >> 8) & 0xff;
 
-		case 0xc:	// DMA control
+		case 0xc:   // DMA control
 			return m_dma_control;
 
 		case 0xe:   // code at cf32 wants to RMW this without killing the ROM bank
@@ -204,7 +204,7 @@ void a2bus_hsscsi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0:	// data out register; in PDMA mode, it's assumed this goes to DMA as reads do
+		case 0: // data out register; in PDMA mode, it's assumed this goes to DMA as reads do
 			if (m_dma_control & 1)
 			{
 				m_ncr5380->dma_w(data);
@@ -252,7 +252,7 @@ void a2bus_hsscsi_device::write_c0nx(uint8_t offset, uint8_t data)
 
 		case 0xc:   // DMA control
 			//printf("%02x to DMA control\n", data);
-			m_dma_control &= ~0x2b;	// clear the read/write bits
+			m_dma_control &= ~0x2b; // clear the read/write bits
 			m_dma_control |= (data & 0x2b);
 			break;
 
@@ -332,5 +332,5 @@ void a2bus_hsscsi_device::write_c800(uint16_t offset, uint8_t data)
 WRITE_LINE_MEMBER( a2bus_hsscsi_device::drq_w )
 {
 	m_drq = (state ? 0x80 : 0x00);
-//	printf("DRQ to %d\n", state);
+//  printf("DRQ to %d\n", state);
 }

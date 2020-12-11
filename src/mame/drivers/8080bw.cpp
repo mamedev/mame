@@ -105,7 +105,7 @@
             Capable of running all romsets.
 
        * The following Romsets are known, ROUGHLY from oldest to newest:
-         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first Japanese release of space invaders (Andy W may call this 'SV0'?)
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped, this has never been seen in the wild and may never have existed.
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
@@ -954,13 +954,13 @@ void _8080bw_state::invrvnge(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// CPU E-pin connects to AY clock pin
-	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/2));
+	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/4));
 	psg.port_a_read_callback().set([this] () { return m_sound_data >> 1; });
 	psg.port_b_read_callback().set_constant(0xff);
 	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// CPU E-pin also connects to a 4040 divider. The Q8 output goes to the CPU's NMI pin.
-	TIMER(config, "nmi").configure_periodic(FUNC(_8080bw_state::nmi_timer), attotime::from_hz((XTAL(4'000'000)/2)/512));
+	TIMER(config, "nmi").configure_periodic(FUNC(_8080bw_state::nmi_timer), attotime::from_hz((XTAL(4'000'000)/4)/256));
 }
 
 void _8080bw_state::init_invrvnge()
@@ -2226,7 +2226,7 @@ void _8080bw_state::yosakdon_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
-	map(0x4000, 0x43ff).writeonly(); /* what's this? */
+	map(0x4000, 0x43ff).nopw(); /* what's this? */
 }
 
 void _8080bw_state::yosakdon_io_map(address_map &map)

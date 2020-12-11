@@ -203,7 +203,7 @@ void dec8_state::ghostb_bank_w(uint8_t data)
 	flip_screen_set(BIT(data, 3));
 }
 
-void dec8_state::csilver_control_w(uint8_t data)
+void csilver_state::csilver_control_w(uint8_t data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -222,7 +222,7 @@ void dec8_state::dec8_sound_w(uint8_t data)
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
+WRITE_LINE_MEMBER(csilver_state::csilver_adpcm_int)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -232,18 +232,18 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	m_msm5205next <<= 4;
 }
 
-uint8_t dec8_state::csilver_adpcm_reset_r()
+uint8_t csilver_state::csilver_adpcm_reset_r()
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-void dec8_state::csilver_adpcm_data_w(uint8_t data)
+void csilver_state::csilver_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-void dec8_state::csilver_sound_bank_w(uint8_t data)
+void csilver_state::csilver_sound_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
@@ -455,48 +455,48 @@ void dec8_state::meikyuh_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_map(address_map &map)
+void csilver_state::csilver_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN1").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN0").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
-	map(0x1807, 0x1807).w(FUNC(dec8_state::flip_screen_w));
-	map(0x1808, 0x180b).w(FUNC(dec8_state::dec8_scroll2_w));
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::csilver_control_w));
-	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
-	map(0x1c00, 0x1c00).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1e00, 0x1e00).r(FUNC(dec8_state::i8751_l_r));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
+	map(0x1800, 0x1800).portr("IN1").w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN0").w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
+	map(0x1807, 0x1807).w(FUNC(csilver_state::flip_screen_w));
+	map(0x1808, 0x180b).w(FUNC(csilver_state::dec8_scroll2_w));
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(FUNC(csilver_state::csilver_control_w));
+	map(0x180e, 0x180f).w(FUNC(csilver_state::dec8_i8751_w));
+	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_h_r));
+	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_l_r));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w)).share("bg_data");
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_sub_map(address_map &map)
+void csilver_state::csilver_sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x1800, 0x1800).w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -573,7 +573,7 @@ void dec8_state::cobra_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
-	map(0x3200, 0x37ff).writeonly(); /* Unused */
+	map(0x3200, 0x37ff).nopw(); /* Unused */
 	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
@@ -623,15 +623,15 @@ void dec8_state::ym3526_s_map(address_map &map)
 }
 
 /* Captain Silver - same sound system as Pocket Gal */
-void dec8_state::csilver_s_map(address_map &map)
+void csilver_state::csilver_s_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
-	map(0x1800, 0x1800).w(FUNC(dec8_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(FUNC(dec8_state::csilver_sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(csilver_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(csilver_state::csilver_sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(dec8_state::csilver_adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(csilver_state::csilver_adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -747,7 +747,7 @@ void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
 }
 
 
-void dec8_state::csilver_mcu_to_main_w(uint8_t data)
+void csilver_state::csilver_mcu_to_main_w(uint8_t data)
 {
 	if (~data & 0x10)
 		m_i8751_port0 = m_i8751_value >> 8;
@@ -815,46 +815,46 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)")         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )       /* tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno' */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno' */
 	PORT_DIPSETTING(    0x06, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x04, "40k 90k 90k+" )
 	PORT_DIPSETTING(    0x02, "40k and 80k" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -864,17 +864,17 @@ static INPUT_PORTS_START( lastmisnj )
 	PORT_INCLUDE(lastmisn)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )       /* tables at 0x82b7 (4 words) and 0xdd29 (3 words) */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82b7 (4 words) and 0xdd29 (3 words) */
 	PORT_DIPSETTING(    0x06, "30k 50k 50k+" )
 	PORT_DIPSETTING(    0x04, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x02, "50k 100k 100k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )             /* "difficult" */
 	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )        /* "very difficult" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          /* "top difficult" */
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -911,24 +911,24 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	/* tables in main CPU : 0x859b (Help), 0x85e9 (6-Help), 0x8fbe (Coin), 0x91b6 (Heart) */
-	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )    /* name from Dip Switches page */
+	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") /* name from Dip Switches page */
 	PORT_DIPSETTING( 0x00, "2/100/50/200" )
 	PORT_DIPSETTING( 0x01, "4/100/60/300" )
 	PORT_DIPSETTING( 0x02, "6/200/70/300" )
@@ -937,14 +937,14 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPSETTING( 0x06, "12/300/100/600" )
 	PORT_DIPSETTING( 0x05, "18/400/200/700" )
 	PORT_DIPSETTING( 0x04, "20/500/200/800" )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -954,7 +954,7 @@ static INPUT_PORTS_START( breywood )
 	PORT_INCLUDE(shackled)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                     /* table at 0x41be in sub CPU */
+	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                         PORT_DIPLOCATION("SW2:1,2,3,4") /* table at 0x41be in sub CPU */
 	PORT_DIPSETTING( 0x07, "200" )
 	PORT_DIPSETTING( 0x0b, "300" )
 	PORT_DIPSETTING( 0x03, "400" )
@@ -1019,44 +1019,44 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2") /* table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4") /* table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )              /* code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual */
+	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )                  PORT_DIPLOCATION("SW1:8") /* code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* gives 99 lives */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "99 (Cheat)")  // gives 99 lives
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -1084,41 +1084,41 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produces sound but gives 0 credits - coinage not initialised in the (fake) MCU */
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* not tested - no cocktail when simultaneous players anyway */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") /* not tested - no cocktail when simultaneous players anyway */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:5")
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                     PORT_DIPLOCATION("SW2:7")  /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -1157,41 +1157,44 @@ static INPUT_PORTS_START( ghostb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produce sound but gives 0 credits - "ANDA" instruction at 0x8a5a */
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )     // Tested on real hardware     PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )     // 1-2 should be coinage.      PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+																				// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+																				// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+																				// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")          // PORT_DIPLOCATION("SW1:3") // Manual says 'Must Be Off'. Note: Turning on 3+4+5+8 does nothing on real hardware.
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4") // Manual says 'Must Be Off'. See note
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5") // Manual says 'Must Be Off'. See note
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* not tested - no cocktail when simultaneous players anyway */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") // not tested - no cocktail when simultaneous players anyway. Manual says 'Must Be Off'. See note
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* lives are added when STARTn is pressed */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2") /* lives are added when STARTn is pressed */
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")    /* gives 1 life */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")  // gives 1 life and energy does not decrease
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )            /* 1:00 is added when STARTn is pressed until max scene time is reached */
+	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )                PORT_DIPLOCATION("SW2:5,6") /* 1:00 is added when STARTn is pressed until max scene time is reached */
 	PORT_DIPSETTING(    0x00, "4:00" )
 	PORT_DIPSETTING(    0x10, "4:30" )
 	PORT_DIPSETTING(    0x30, "5:00" )
 	PORT_DIPSETTING(    0x20, "6:00" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )              /* energy is set to value each new life */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )             /* 0x0100 */
-	PORT_DIPSETTING(    0x00, "+25%" )                      /* 0x0140 */
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is set to value each new life */
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0100 */
+	PORT_DIPSETTING(    0x00, "+25%" )                                                    /* 0x0140 */
 INPUT_PORTS_END
 
 /* verified from HD6309 code */
@@ -1212,13 +1215,19 @@ static INPUT_PORTS_START( ghostb2a )
 	/* NO start buttons - to start a game, press any button from any player */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+// 1 & 2 should be coinage
+// PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )                   PORT_DIPLOCATION("SW1:1,2")
+// PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 
 	PORT_MODIFY("DSW1")
 	/* lives are added when COINn is pressed */
 	/* 1:00 is added when COINn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )              /* energy is added when COINn is pressed */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )             /* 0x0040 */
-	PORT_DIPSETTING(    0x00, "+50%" )                      /* 0x0060 */
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is added when COINn is pressed */
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0040 */
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0060 */
 INPUT_PORTS_END
 
 /* verified from HD6309 code */
@@ -1257,11 +1266,11 @@ static INPUT_PORTS_START( meikyuh )
 	PORT_MODIFY("DSW1")
 	/* lives are added when STARTn is pressed - 1 extra life is awarded on 2nd credit and after for the same player who gets then 2, 4 or 6 additional lives */
 	/* max time scene is always 6:00 at start - 0:30 is subed every 8 levels - 1:00 is added when STARTn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )              /* energy is added when STARTn is pressed */
-	PORT_DIPSETTING(    0x10, DEF_STR( None ) )             /* 0x0020 */
-	PORT_DIPSETTING(    0x00, "+50%" )                      /* 0x0030 */
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:5") /* energy is added when STARTn is pressed */
+	PORT_DIPSETTING(    0x10, DEF_STR( None ) )                                           /* 0x0020 */
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0030 */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1294,46 +1303,46 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "255 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")    /* code at 0x9816 in sub CPU */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* code at 0x9816 in sub CPU */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 
 	PORT_START("I8751") /* hooked up on the i8751 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1348,12 +1357,12 @@ static INPUT_PORTS_START( csilverj )
 	PORT_INCLUDE(csilver)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1389,49 +1398,49 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0xf8eb (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8eb (4 * 2 bytes : coins then credits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze Mode" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze Mode" )                   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* tables at 0x82d8 (4 words) and 0xf3fe (3 words) */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5,6")  /* tables at 0x82d8 (4 words) and 0xf3fe (3 words) */
 	PORT_DIPSETTING(    0x30, "40k 100k 60k+" )
 	PORT_DIPSETTING(    0x20, "60k 160k 100k+" )
 	PORT_DIPSETTING(    0x10, "90k 240k 150k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")    /* not when falling into void or water - also gives infinite time */
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* not when falling into void or water - also gives infinite time */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1441,12 +1450,12 @@ static INPUT_PORTS_START( oscarj )
 	PORT_INCLUDE(oscar)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1486,46 +1495,46 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "28 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "Every 50k" )                 /* table at 0xab06 - last bonus life at 850k */
 	PORT_DIPSETTING(    0x00, "Every 100k" )                /* table at 0xab17 - last bonus life at 900k */
-	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )            /* code at 0xab94 */
+	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )                PORT_DIPLOCATION("SW2:6")  /* code at 0xab94 */
 	PORT_DIPSETTING(    0x20, "Back to Stage 1" )
 	PORT_DIPSETTING(    0x00, "Game Over" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1535,12 +1544,12 @@ static INPUT_PORTS_START( srdarwinj )
 	PORT_INCLUDE(srdarwin)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1575,48 +1584,48 @@ static INPUT_PORTS_START( cobracom )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )              PORT_DIPLOCATION("SW1:5")  // Manual says 'Off'
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "99 (Cheat)")                 /* lose a life before getting 2nd bonus life ! */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )       /* table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj' */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:6")  /* table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj' */
 	PORT_DIPSETTING(    0x20, "50k and 150k" )
 	PORT_DIPSETTING(    0x00, "100k and 200k" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj' */
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")  /* previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj' */
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -1784,9 +1793,15 @@ WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
 
 void dec8_state::machine_start()
 {
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
+
 	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
 	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+
 	m_i8751_p2 = 0xff;
+	m_latch = 0;
 
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_i8751_p2));
@@ -1805,8 +1820,6 @@ void dec8_state::machine_start()
 	save_item(NAME(m_cred2));
 	save_item(NAME(m_credits));
 	save_item(NAME(m_snd));
-	save_item(NAME(m_msm5205next));
-	save_item(NAME(m_toggle));
 
 	save_item(NAME(m_scroll2));
 	save_item(NAME(m_bg_control));
@@ -1815,18 +1828,14 @@ void dec8_state::machine_start()
 
 void dec8_state::machine_reset()
 {
-	int i;
-
 	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
 	m_coinage_id = 0;
 	m_coin1 = m_coin2 = m_credits = m_snd = 0;
 	m_need1 = m_need2 = m_cred1 = m_cred2 = 1;
-	m_msm5205next = 0;
-	m_toggle = 0;
 
 	m_scroll2[0] = m_scroll2[1] = m_scroll2[2] = m_scroll2[3] = 0;
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		m_bg_control[i] = 0;
 		m_pf1_control[i] = 0;
@@ -1835,6 +1844,26 @@ void dec8_state::machine_reset()
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
 		ghostb_bank_w(0);
+}
+
+
+void csilver_state::machine_start()
+{
+	dec8_state::machine_start();
+
+	uint8_t *RAM = memregion("audiocpu")->base();
+	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
+
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
+}
+
+void csilver_state::machine_reset()
+{
+	dec8_state::machine_reset();
+
+	m_msm5205next = 0;
+	m_toggle = 0;
 }
 
 
@@ -2143,26 +2172,26 @@ void dec8_state::meikyuh(machine_config &config)
 }
 
 
-void dec8_state::csilver(machine_config &config)
+void csilver_state::csilver(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_map);
 
 	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_sub_map);
 
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_s_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::csilver_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set(FUNC(csilver_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(csilver_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(csilver_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(csilver_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::csilver_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	config.set_perfect_quantum(m_maincpu);
@@ -2178,14 +2207,14 @@ void dec8_state::csilver(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_lastmisn));
+	m_screen->set_screen_update(FUNC(csilver_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(csilver_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2203,7 +2232,7 @@ void dec8_state::csilver(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(dec8_state::csilver_adpcm_int));  /* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(csilver_state::csilver_adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.88);
 }
@@ -3700,59 +3729,39 @@ ROM_START( cobracomjb )
 	ROM_LOAD( "pal16l8a-2cn.bin", 0x0000, 0x0104, CRC(3ef8cf68) SHA1(9410a139fb10628bc612d198f5c9f04b2b34f52f) )
 ROM_END
 
-/******************************************************************************/
-
-void dec8_state::init_dec8()
-{
-	if (m_mainbank.found())
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-		m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
-	}
-	m_latch = 0;
-}
-
-void dec8_state::init_csilver()
-{
-	uint8_t *RAM = memregion("audiocpu")->base();
-	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
-	init_dec8();
-}
-
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -82,6 +82,7 @@ def save_partial_one(f, t, name, source):
     for line in source:
         if has_memory(line):
             print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
+            print("\t[[fallthrough]];", file=f)
             print("case %d:;" % substate, file=f)
             print(line, file=f)
             substate += 1

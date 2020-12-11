@@ -65,31 +65,31 @@ const char *const vt61_disassembler::s_sources[12] = {
 };
 
 const char *const vt61_disassembler::s_conditions[32][2] = {
-	{ "NINTR1", "INTR1" }, // INTR 1 L
-	{ "NBXF",   "NBXT"  }, // NBX L
-	{ "NBRF",   "NBRT"  }, // NBR L
-	{ "NF1",    "F1"    }, // F1 L
-	{ "NF2",    "F2"    }, // F2 L
-	{ "NCF",    "CF"    }, // C L
-	{ "NURF",   "URF"   }, // UART R FLAG L
-	{ "NUTB",   "UTB"   }, // UART T BUFF L
-	{ "NXOFF",  "XOFF"  }, // DO X OFF L
-	{ "NGOSR",  "GOSR"  }, // GOUT SER RQ L
-	{ "NF3",    "F3"    }, // F3 L
-	{ "NINTR2", "INTR2" }, // INTR 2 L
-	{ "KEYUP",  "KEYDN" }, // KEY DOWN L
-	{ "NPWRUP", "PWRUP" }, // PWR UP L
-	{ "NSYNC",  "SYNC"  }, // SYNC ENA L
-	{ "PE",     "NPE"   }, // PARITY ERROR H
-	{ "BZY",    "NBZY"  }, // MEM BZY H
-	{ "EQ",     "NE"    }, // EQUAL H
-	{ "CC",     "CS"    }, // CARRY OUT L
-	{ "MDOFO",  "MDOFZ" }, // MDR O.F. OUT H
-	{ "NCSR",   "CSR"   }, // COPIER SER REQ L
-	{ "NCPCF",  "CPCF"  }, // C-PCF L
-	{ "T",      "F"     }, // TRUE H
-	{ "NVSR",   "VSR"   }, // VID SERV REQ L
-	{ "?H",     "?L"    },
+	{ "INTR1",  "NINTR1" }, // INTR 1 L (actually active high)
+	{ "NBXF",   "NBXT"   }, // NBX L
+	{ "NBRF",   "NBRT"   }, // NBR L
+	{ "NF1",    "F1"     }, // F1 L
+	{ "NF2",    "F2"     }, // F2 L
+	{ "NCF",    "CF"     }, // C L
+	{ "NURF",   "URF"    }, // UART R FLAG L
+	{ "NUTB",   "UTB"    }, // UART T BUFF L
+	{ "NXOFF",  "XOFF"   }, // DO X OFF L
+	{ "NGOSR",  "GOSR"   }, // GOUT SER RQ L
+	{ "NF3",    "F3"     }, // F3 L
+	{ "NINTR2", "INTR2"  }, // INTR 2 L
+	{ "KEYUP",  "KEYDN"  }, // KEY DOWN L
+	{ "NPWRUP", "PWRUP"  }, // PWR UP L
+	{ "NSYNC",  "SYNC"   }, // SYNC ENA L
+	{ "PE",     "NPE"    }, // PARITY ERROR H
+	{ "BZY",    "NBZY"   }, // MEM BZY H
+	{ "EQ",     "NE"     }, // EQUAL H
+	{ "CC",     "CS"     }, // CARRY OUT L
+	{ "MDOFO",  "MDOFZ"  }, // MDR O.F. OUT H
+	{ "NCSR",   "CSR"    }, // COPIER SER REQ L
+	{ "NCPCF",  "CPCF"   }, // C-PCF L
+	{ "T",      "F"      }, // TRUE H
+	{ "NVSR",   "VSR"    }, // VID SERV REQ L
+	{ "?H",     "?L"     },
 	{ "?H",     "?L"    },
 	{ "?H",     "?L"    },
 	{ "?H",     "?L"    },
@@ -167,7 +167,7 @@ offs_t vt61_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt6
 				break;
 
 			case 050000:
-				stream << "JMP ";
+				stream << "JUMP ";
 				break;
 
 			case 060000:
@@ -195,7 +195,7 @@ offs_t vt61_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt6
 	}
 	else if (BIT(inst, 14))
 	{
-		util::stream_format(stream, "BR %s,%03o", s_conditions[(inst & 017400) >> 8][BIT(inst, 13)], inst & 000377);
+		util::stream_format(stream, "JMP %s,%03o", s_conditions[(inst & 017400) >> 8][BIT(inst, 13)], inst & 000377);
 	}
 	else if (BIT(inst, 13))
 	{

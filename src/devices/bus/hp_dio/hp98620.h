@@ -9,8 +9,7 @@
 #include "hp_dio.h"
 
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98620_device :
 		public device_t,
@@ -104,28 +103,28 @@ private:
 	bool m_irq_state;
 
 	struct dma_regs {
-		uint32_t address;
-		uint32_t tc;
-		uint32_t control;
+		uint32_t address = 0;
+		uint32_t tc = 0;
+		uint32_t control = 0;
 		/* control register */
-		int irq_level;
-		int tsz;
-		int subcount;
+		int irq_level = 0;
+		int tsz = 0;
+		int subcount = 0;
 
-		bool irq;
-		bool ie;
-		bool armed;
+		bool irq = false;
+		bool ie = false;
+		bool armed = false;
 
-		bool dma_out;
-		bool dma_pri; // TODO
-		bool lword;
-		bool word;
+		bool dma_out = false;
+		bool dma_pri = false; // TODO
+		bool lword = false;
+		bool word = false;
 	} m_regs[2];
 
-	bool dmar[2];
+	bool m_dmar[2];
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device)
 

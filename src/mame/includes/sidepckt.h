@@ -53,7 +53,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
-	
+
 	uint8_t m_mcu_p1;
 	uint8_t m_mcu_p2;
 	uint8_t m_mcu_p3;

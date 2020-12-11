@@ -640,6 +640,7 @@ konamigx.cpp
 konamim2.cpp
 konblands.cpp
 konendev.cpp
+kongs470.cpp
 konmedal.cpp
 konmedal68k.cpp
 kontest.cpp
@@ -1419,6 +1420,7 @@ white_mod.cpp
 wico.cpp
 wildpkr.cpp
 williams.cpp
+winbingo.cpp
 wink.cpp
 wiping.cpp
 witch.cpp

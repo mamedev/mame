@@ -34,6 +34,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class elwro800_state : public spectrum_state
 {
 public:
@@ -54,6 +56,9 @@ public:
 
 	void elwro800(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	/* for elwro800 */
 	/* RAM mapped at 0 */
@@ -66,7 +71,6 @@ private:
 	void elwro800jr_fdc_control_w(uint8_t data);
 	uint8_t elwro800jr_io_r(offs_t offset);
 	void elwro800jr_io_w(offs_t offset, uint8_t data);
-	DECLARE_MACHINE_RESET(elwro800);
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 	uint8_t i8255_port_c_r();
 	void i8255_port_c_w(uint8_t data);
@@ -513,7 +517,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(elwro800_state,elwro800)
+void elwro800_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -568,8 +572,6 @@ void elwro800_state::elwro800(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &elwro800_state::elwro800_m1);
 	m_maincpu->set_vblank_int("screen", FUNC(elwro800_state::elwro800jr_interrupt));
 
-	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT);
@@ -580,8 +582,6 @@ void elwro800_state::elwro800(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
-
-	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
 
 	UPD765A(config, "upd765", 8_MHz_XTAL / 2, true, true);
 
@@ -639,6 +639,8 @@ ROM_START( elwro800 )
 	ROM_LOAD( "junior_mem_prom.bin", 0x0200, 0x0200, CRC(0f745f42) SHA1(360ec23887fb6d7e19ee85d2bb30d9fa57f4936e) )
 	ROM_LOAD( "tv_2716.e11",         0x0400, 0x0800, CRC(6093e80e) SHA1(a4972f336490d15222f4f24369f1f3253cfb9516) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

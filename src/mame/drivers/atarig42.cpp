@@ -49,6 +49,8 @@ void atarig42_state::machine_start()
 	save_item(NAME(m_sloop_next_bank));
 	save_item(NAME(m_sloop_offset));
 	save_item(NAME(m_sloop_state));
+
+	m_sloop_bank = 0;
 }
 
 

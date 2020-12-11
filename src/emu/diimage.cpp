@@ -479,15 +479,14 @@ const char *device_image_interface::get_feature(const char *feature_name) const
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<u8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, std::unique_ptr<u8[]> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
 	if (size)
 	{
-		ptr.allocate(size);
-
-		memcpy(ptr, get_software_region(tag), size);
+		ptr = std::make_unique<u8[]>(size);
+		memcpy(ptr.get(), get_software_region(tag), size);
 	}
 
 	return size > 0;
@@ -1261,7 +1260,7 @@ void device_image_interface::update_names()
 	// count instances of the general image type, or device type if custom
 	int count = 0;
 	int index = -1;
-	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
+	for (const device_image_interface &image : image_interface_enumerator(device().mconfig().root_device()))
 	{
 		if (this == &image)
 			index = count;
@@ -1303,7 +1302,7 @@ const software_part *device_image_interface::find_software_item(const std::strin
 		: nullptr;
 
 	// find the software list if explicitly specified
-	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
+	for (software_list_device &swlistdev : software_list_device_enumerator(device().mconfig().root_device()))
 	{
 		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{

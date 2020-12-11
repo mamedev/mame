@@ -421,13 +421,6 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void abc806_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(m_char_ram_size);
-	m_attr_ram.allocate(m_char_ram_size);
-
-	uint32_t videoram_size = m_ram->size() - 0x8000;
-	m_video_ram.allocate(videoram_size);
-
 	// register for state saving
 	save_item(NAME(m_txoff));
 	save_item(NAME(m_40));

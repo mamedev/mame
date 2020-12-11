@@ -81,6 +81,21 @@ template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &
 	, m_interrupt_config("interrupt", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_fpu(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
+	, m_pc(0)
+	, m_sb(0)
+	, m_fp(0)
+	, m_sp1(0)
+	, m_sp0(0)
+	, m_intbase(0)
+	, m_psr(0)
+	, m_mod(0)
+	, m_cfg(0)
+	, m_r{0}
+	, m_f{0}
+	, m_nmi_line(false)
+	, m_int_line(false)
+	, m_wait(false)
+	, m_sequential(false)
 {
 }
 

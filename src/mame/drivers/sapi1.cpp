@@ -285,8 +285,8 @@ void sapi_state::sapi3b_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().bankrw("bank1");
 	map(0x0800, 0xafff).ram();
-	map(0xb000, 0xb7ff).ram().share("videoram");
-	map(0xb800, 0xffff).ram();
+	map(0xb000, 0xbfff).ram().share("videoram");
+	map(0xc000, 0xffff).ram();
 }
 
 void sapi_state::sapi3_io(address_map &map)

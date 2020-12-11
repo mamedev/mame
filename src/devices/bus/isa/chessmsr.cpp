@@ -32,8 +32,7 @@ isa8_chessmsr_device::isa8_chessmsr_device(const machine_config &mconfig, const 
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_mainlatch(*this, "mainlatch"),
-	m_sublatch(*this, "sublatch"),
-	m_ram(*this, "ram")
+	m_sublatch(*this, "sublatch")
 { }
 
 
@@ -50,6 +49,11 @@ void isa8_chessmsr_device::device_start()
 	save_item(NAME(m_installed));
 	save_item(NAME(m_suspended));
 	save_item(NAME(m_ram_offset));
+
+	// allocate maximum RAM beforehand
+	const u32 maxram = 1 << 21;
+	m_ram = std::make_unique<u32[]>(maxram / 4);
+	save_pointer(NAME(m_ram), maxram / 4);
 }
 
 
@@ -70,8 +74,7 @@ void isa8_chessmsr_device::device_reset()
 
 		// install RAM
 		u32 ramsize = 1 << ioport("RAM")->read();
-		m_ram.allocate(ramsize / 4);
-		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram.get());
 
 		m_installed = true;
 	}

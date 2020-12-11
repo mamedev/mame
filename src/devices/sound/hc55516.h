@@ -75,10 +75,10 @@ class hc55516_device : public cvsd_device_base
 public:
 	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto fzq_cb() { return m_fzq_pull_cb.bind(); } 	// /FZ (partial reset) pull callback, ok to leave unconnected (we assume it is pulled high)
-	auto agc_cb() { return m_agc_push_cb.bind(); } 	// AGC callback function, called to push the state if the AGC pin changes, ok to leave unconnected
+	auto fzq_cb() { return m_fzq_pull_cb.bind(); }  // /FZ (partial reset) pull callback, ok to leave unconnected (we assume it is pulled high)
+	auto agc_cb() { return m_agc_push_cb.bind(); }  // AGC callback function, called to push the state if the AGC pin changes, ok to leave unconnected
 
-	WRITE_LINE_MEMBER( fzq_w );	// /FZ (partial reset) push
+	WRITE_LINE_MEMBER( fzq_w ); // /FZ (partial reset) push
 	READ_LINE_MEMBER( agc_r ); // AGC pull
 	/* TODO: These are only relevant for encode mode, which isn't done yet! */
 	//WRITE_LINE_MEMBER( aptq_w ); // /APT (silence encoder output) push

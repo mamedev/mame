@@ -322,7 +322,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 		// RTE
 		dc_set(HP_NANO_IE_DC);
 		// Intentional fall-through to RTI!
-
+		[[fallthrough]];
 	case 0xb0:
 		// RTI
 		m_reg_PA = m_reg_ISR;
@@ -342,7 +342,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 		// RSE
 		dc_set(HP_NANO_IE_DC);
 		// Intentional fall-through to RTS!
-
+		[[fallthrough]];
 	case 0xb8:
 		// RTS
 		{
@@ -424,7 +424,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 			// JAS
 			m_reg_SSR = pa_offset(1);
 			// Intentional fall-through to JAI!
-
+			[[fallthrough]];
 		case 0x90:
 			// JAI
 			// On HP doc there's a mysterious warning about JAI:

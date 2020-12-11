@@ -141,8 +141,6 @@ protected:
 	u8 m_driveio_comm_data;
 	int m_iop_write_num;
 	u32 m_iop_data;
-	int m_geo_iop_write_num;
-	u32 m_geo_iop_data;
 
 	u32 m_geo_read_start_address;
 	u32 m_geo_write_start_address;
@@ -441,12 +439,16 @@ public:
 		: model2o_state(mconfig, type, tag)
 	{}
 
-	u8 gtx_r(offs_t offset);
 	void daytona_gtx(machine_config &config);
-	void model2o_gtx_mem(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	int m_gtx_state;
+
+	u8 gtx_r(offs_t offset);
+	void model2o_gtx_mem(address_map &map);
 };
 
 /*****************************

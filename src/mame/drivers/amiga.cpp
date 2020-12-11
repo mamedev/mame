@@ -793,7 +793,7 @@ void a1000_state::machine_reset()
 
 	// bootrom visible, wom writable
 	m_bootrom->set_bank(0);
-	m_maincpu->space(AS_PROGRAM).install_write_bank(0xfc0000, 0xffffff, "wom");
+	m_maincpu->space(AS_PROGRAM).install_write_bank(0xfc0000, 0xffffff, m_wom);
 }
 
 // any write to this area will write protect the wom and disable the bootrom

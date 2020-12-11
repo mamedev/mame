@@ -84,7 +84,7 @@ void aeroboto_state::main_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("mainram"); // main  RAM
 	map(0x01a2, 0x01a2).w(FUNC(aeroboto_state::aeroboto_1a2_w));           // affects IRQ line (more protection?)
 	map(0x0800, 0x08ff).ram();                             // tile color buffer; copied to 0x2000
-	map(0x0900, 0x09ff).writeonly();                       // a backup of default tile colors
+	map(0x0900, 0x09ff).writeonly().share("colors2");      // a backup of default tile colors
 	map(0x1000, 0x17ff).ram().w(FUNC(aeroboto_state::aeroboto_videoram_w)).share("videoram");     // tile RAM
 	map(0x1800, 0x183f).ram().share("hscroll"); // horizontal scroll regs
 	map(0x1840, 0x27ff).nopw();                    // cleared during custom LSI test

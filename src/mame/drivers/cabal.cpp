@@ -2,13 +2,13 @@
 // copyright-holders:Carlos A. Lozano
 /******************************************************************
 
-Cabal  (c)1998 Tad
+Cabal  (c)1988/1989 Tad
 
 driver by Carlos A. Lozano Baides
 
 68000 + Z80
 
-The original uses 2xYM3931 for sound
+The original uses 2xYM3931 for ADPCM sound and a YM2151 for music
 The bootleg uses YM2151 + 2xZ80 used as ADPCM players
 
 
@@ -41,6 +41,125 @@ COLORRAM (Colors)
 2008-07
 Dip locations verified with Fabtek manual for the trackball version
 
+******************************************************************
+Cabal, TAD 1988 (Trackball version), 1989 (Joystick version)
+Hardware info by Guru
+
+Top PCB
+-------
+
+TAD-8710-SUB (I)                                      CN1
+|------------------------------------------------|-------------|--------|
+|                                                |-------------|        |
+|                                                                       |
+|                                                                       |
+|                                      PLD09.5T   LC3517                |
+|                                                    LC3517             |
+|                                                                       |
+|                                                                       |
+|                                                           TMM2018     |
+|                                                      TMM2018  TMM2018 |
+|                                                           TMM2018     |
+| LC3517   LC3517   LC3517   LC3517   LC3517                            |
+| LC3517   LC3517   LC3517   LC3517   LC3517                            |
+|                                                                       |
+|                                                                       |
+|  SEI0060BU       SEI0060BU                                            |
+|                                                                       |
+|                                                                       |
+|                                         TAD-1.5E                      |
+|  SEI0010BU       SEI0010BU                                            |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                     CN2               |
+|                                                |-------------|        |
+|------------------------------------------------|-------------|--------|
+Notes:
+      TMM2018   - Toshiba TMM2018 2kx8 SRAM
+      LC3517    - Sanyo LC3517BSL-15 2kx8 SRAM
+      SEI0060BU - Toshiba TC17G008AN-0024 Gate Array programmed as a custom chip
+      SEI0010BU - Toshiba TC17G005AN-0025 Gate Array programmed as a custom chip
+      PLD09.5T  - Signetics PLHS18P8AN Programmable Array Logic
+      TAF-1.5E  - 512kx8 (4Mbit) Mask ROM for Sprite Data
+      CN1/CN2   - Flat cable connector
+
+
+Bottom PCB
+----------
+
+TAD-8710-MAIN (I)                                                J426
+|-----------------------------------------------------------|-------------|--------|
+| EPR_A-1.1U   SEI0100BU          SEI0010BU                 |-------------|        |
+|                                                                                  |
+| EPR_A-2.1S   SEI0100BU                                                           |
+|                                          EPR_A-5.6S   TAD-2.7S                   |
+|     M5205  TMM2015   Z80A                                                        |
+|     M5205  EPR_A-3.3P                                                            |
+|            EPR_A-4.3N   SEI80BU                       TMM2015                    |
+|     LM324                                                                        |
+|                                                       TMM2015                    |
+|   VR1  VR2                                                              TMM2015  |
+|     LA4460  YM3012  YM2151  14.31818MHz                                          |
+|                                                 TMM2063    TMM2063      TMM2015  |
+|                                                                                  |
+|     HB-41                  PROM10.4J          EPR_A-6.6J  EPR_A-8.7J             |
+|J                                                                                 |
+|A    UEC-05   TMM2015                          EPR_A-7.6H  EPR_A-9.7H             |
+|M    HB-2     TMM2015                                                             |
+|M    HB-1                                                                         |
+|A    HB-1                        |-------------------|         PROM05.8E          |
+|     HB-1                        |    MC68000P8      |                  SEI0050BU |
+|  UPD4701                        |                   |                            |
+|     UPD4701                     |-------------------|  20MHz                     |
+|                                                                J425       12MHz  |
+|  SW1   SW2                                                |-------------|        |
+|-----------------------------------------------------------|-------------|--------|
+Notes:
+      SEI0100BU - SEI010BU YM3931 Custom Chip. Note this is not a Yamaha sound chip.
+                  It is some kind of gate array made to look like a sound chip and manipulates
+                  the sample data in ROMs A-1 and A-2. Clock input 3.579545MHz [14.31818/4]
+      TMM2015   - Toshiba TMM2015 2kx8 SRAM
+      TMM2063   - Toshiba tmm2063 8kx8 SRAM
+      SEI0050BU - Gate Array(?) programmed as a custom chip. Other markings "M ^ 71000"
+      SEI80BU   - Gate Array(?) programmed as a custom chip. Other markings "611 787"
+      SEI0010BU - Toshiba TC17G005AN-0025 Gate Array programmed as a custom chip
+      J425/J426 - Flat cable connector
+      68000     - Clock 10MHz [20/2]
+      Z80A      - Clock 3.579545MHz [14.31818/4]
+      VR1       - 500-Ohm volume pot
+      VR2       - 2k-Ohm volume pot
+      LA4460    - Sanyo LA4460 12W Audio Power Amplifier
+      YM3012    - Yamaha YM3012 DAC. Clock 1.7897725MHz [14.31818/8]
+      M5205     - Oki M5205 ADPCM Speech Synthesis Chip. Clock 375kHz [12/32]. Pins 1,2=H,L so sample rate is 375/48=7.8125kHz
+      LM324     - Texas Instruments LM324 Quad Operational Amplifier
+      YM2151    - Yamaha YM2151 8-Channel 4-Operator (OPM; FM Operator Type-M) Sound Chip. Clock 3.579545MHz [14.31818/4]
+      HB-41     - Ceramic module (Audio Mixer). Contains caps, resistors and 2 op-amps.
+                  JRC2060; compatible with LM324, and JRC4560; compatible with LM358.
+                  This module was reversed by aje_fr in 2016 (https://www.gamoover.net/Forums/index.php?topic=35345.0)
+      UEC-05    - Ceramic module (Video DAC; RGB comes from this module)
+      HB-1      - Ceramic module (I/O; controls/buttons)
+      HB-2      - Ceramic module (coin counter functions)
+      SW1/SW2   - 8-position DIP Switch
+      UPD4701   - NEC uPD4701 Incremental Encoder Counter used for trackball controls. On the joystick version, these chips
+                  are replaced with a small plug-in PCB containing a 74LS244 logic chip
+      HSync     - 15.2580kHz
+      VSync     - 60Hz
+
+      ROMs -
+             EPR_A-1.1U \ ADPCM Samples
+             EPR_A-2.1S /
+             EPR_A-3.3P \ Z80 Sound Program
+             EPR_A-4.3N /
+             EPR_A-5.6S - Characters
+             TAF-2.7S   - 512kx8 (4Mbit) Mask ROM for Tiles (Foreground/Background)
+             EPR_A-6.6J \
+             EPR_A-8.7J |
+             EPR_A-7.6H | 68000 Main Program
+             EPR_A-9.7H /
+             PROM10.4J  - Signetics 82S129 Bi-Polar PROM marked "PROM10"
+             PROM05.8E  - Signetics 82S135 Bi-Polar PROM marked "PROM05"
+
 ******************************************************************/
 
 #include "emu.h"
@@ -51,35 +170,33 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/ym2151.h"
-#include "sound/msm5205.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(cabal_state,cabalbl)
+void cabalbl_state::machine_start()
 {
-	save_item(NAME(m_sound_command1));
-	save_item(NAME(m_sound_command2));
+	save_item(NAME(m_sound_command));
 }
 
-MACHINE_RESET_MEMBER(cabal_state,cabalbl)
+void cabalbl_state::machine_reset()
 {
-	m_sound_command1 = m_sound_command2 = 0xff;
+	m_sound_command[0] = m_sound_command[1] = 0xff;
 }
 
 
 /******************************************************************************************/
 
-void cabal_state::cabalbl_sndcmd_w(offs_t offset, uint16_t data)
+void cabalbl_state::sndcmd_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
 		case 0x0:
-			m_sound_command1 = data;
+			m_sound_command[0] = data;
 			break;
 
 		case 0x1: /* ?? */
-			m_sound_command2 = data & 0xff;
+			m_sound_command[1] = data & 0xff;
 			break;
 	}
 }
@@ -95,7 +212,7 @@ void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 	m_maincpu->spin_until_time(attotime::from_usec(50));
 }
 
-void cabal_state::cabalbl_sound_irq_trigger_word_w(uint16_t data)
+void cabalbl_state::sound_irq_trigger_word_w(uint16_t data)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -115,7 +232,7 @@ void cabal_state::main_map(address_map &map)
 	map(0xa0008, 0xa0009).portr("IN2");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
+	map(0xc0081, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe8000, 0xe800d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xe8008, 0xe8009).w(FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
@@ -134,40 +251,35 @@ void cabal_state::trackball_main_map(address_map &map)
 
 
 
-void cabal_state::cabalbl_main_map(address_map &map)
+void cabalbl_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x437ff).ram();
 	map(0x43800, 0x43fff).ram().share("spriteram");
 	map(0x44000, 0x4ffff).ram();
-	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
-	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x60000, 0x607ff).ram().w(FUNC(cabalbl_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabalbl_state::background_videoram_w)).share("videoram");
 	map(0x80200, 0x803ff).ram();
 	map(0xa0000, 0xa0001).portr("DSW");
 	map(0xa0008, 0xa0009).portr("JOY");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
+	map(0xc0081, 0xc0081).w(FUNC(cabalbl_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xe8000, 0xe8003).w(FUNC(cabal_state::cabalbl_sndcmd_w));
+	map(0xe8000, 0xe8003).w(FUNC(cabalbl_state::sndcmd_w));
 	map(0xe8005, 0xe8005).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xe8008, 0xe8009).w(FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
+	map(0xe8008, 0xe8009).w(FUNC(cabalbl_state::sound_irq_trigger_word_w));
 }
 
 /*********************************************************************/
 
-
-uint8_t cabal_state::cabalbl_snd2_r()
+template<uint8_t Which>
+uint8_t cabalbl_state::snd_r()
 {
-	return bitswap<8>(m_sound_command2, 7,2,4,5,3,6,1,0);
+	return bitswap<8>(m_sound_command[Which], 7,2,4,5,3,6,1,0);
 }
 
-uint8_t cabal_state::cabalbl_snd1_r()
-{
-	return bitswap<8>(m_sound_command1, 7,2,4,5,3,6,1,0);
-}
-
-void cabal_state::cabalbl_coin_w(uint8_t data)
+void cabalbl_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -182,16 +294,16 @@ void cabal_state::sound_map(address_map &map)
 	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
 	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
 	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
-	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4005, 0x4006).w(m_adpcm[0], FUNC(seibu_adpcm_device::adr_w));
 	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
 	map(0x4013, 0x4013).portr("COIN");
 	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
-	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401a, 0x401a).w(m_adpcm[0], FUNC(seibu_adpcm_device::ctl_w));
 	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
-	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
-	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x6005, 0x6006).w(m_adpcm[1], FUNC(seibu_adpcm_device::adr_w));
+	map(0x601a, 0x601a).w(m_adpcm[1], FUNC(seibu_adpcm_device::ctl_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -201,16 +313,16 @@ void cabal_state::sound_decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("audiocpu", 0x8000);
 }
 
-void cabal_state::cabalbl_sound_map(address_map &map)
+void cabalbl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x2fff).ram();
 	map(0x4000, 0x4000).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x4002, 0x4002).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).w(FUNC(cabal_state::cabalbl_coin_w));
+	map(0x4004, 0x4004).w(FUNC(cabalbl_state::coin_w));
 	map(0x4006, 0x4006).portr("COIN");
-	map(0x4008, 0x4008).r(FUNC(cabal_state::cabalbl_snd2_r));
-	map(0x400a, 0x400a).r(FUNC(cabal_state::cabalbl_snd1_r));
+	map(0x4008, 0x4008).r(FUNC(cabalbl_state::snd_r<1>));
+	map(0x400a, 0x400a).r(FUNC(cabalbl_state::snd_r<0>));
 	map(0x400c, 0x400c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x400e, 0x400f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x6000, 0x6000).nopw();  /* ??? */
@@ -224,16 +336,16 @@ void cabal_state::cabalbl2_sound_map(address_map &map)
 	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
 	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
 	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
-	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4005, 0x4006).w(m_adpcm[0], FUNC(seibu_adpcm_device::adr_w));
 	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
 	map(0x4013, 0x4013).portr("COIN");
 	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
-	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401a, 0x401a).w(m_adpcm[0], FUNC(seibu_adpcm_device::ctl_w));
 	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
-	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
-	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x6005, 0x6006).w(m_adpcm[1], FUNC(seibu_adpcm_device::adr_w));
+	map(0x601a, 0x601a).w(m_adpcm[1], FUNC(seibu_adpcm_device::ctl_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -245,44 +357,38 @@ void cabal_state::cabalbl2_predecrypted_opcodes_map(address_map &map)
 
 /* the bootleg has 2x z80 sample players */
 
-void cabal_state::cabalbl_1_adpcm_w(uint8_t data)
+template<uint8_t Which>
+void cabalbl_state::adpcm_w(uint8_t data)
 {
-	m_msm1->reset_w(BIT(data, 7));
+	m_msm[Which]->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
-	m_msm1->vclk_w(1);
-	m_msm1->vclk_w(0);
+	m_msm[Which]->data_w(data);
+	m_msm[Which]->vclk_w(1);
+	m_msm[Which]->vclk_w(0);
 }
-void cabal_state::cabalbl_2_adpcm_w(uint8_t data)
-{
-	m_msm2->reset_w(BIT(data, 7));
-	/* ?? bit 6?? */
-	m_msm2->data_w(data);
-	m_msm2->vclk_w(1);
-	m_msm2->vclk_w(0);
-}
-void cabal_state::cabalbl_talk1_map(address_map &map)
+
+void cabalbl_state::talk1_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void cabal_state::cabalbl_talk1_portmap(address_map &map)
+void cabalbl_state::talk1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_1_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabalbl_state::adpcm_w<0>));
 }
 
-void cabal_state::cabalbl_talk2_map(address_map &map)
+void cabalbl_state::talk2_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void cabal_state::cabalbl_talk2_portmap(address_map &map)
+void cabalbl_state::talk2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_2_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabalbl_state::adpcm_w<1>));
 }
 
 /***************************************************************************/
@@ -540,8 +646,18 @@ void cabal_state::cabal(machine_config &config)
 	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	SEIBU_ADPCM(config, m_adpcm1, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
-	SEIBU_ADPCM(config, m_adpcm2, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+	SEIBU_ADPCM(config, m_adpcm[0], XTAL(12'000'000)/32/48, m_msm[0]);
+	SEIBU_ADPCM(config, m_adpcm[1], XTAL(12'000'000)/32/48, m_msm[1]);
+
+	MSM5205(config, m_msm[0], XTAL(12'000'000)/32); /* verified on pcb */
+	m_msm[0]->vck_callback().set(m_adpcm[0], FUNC(seibu_adpcm_device::msm_int));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	MSM5205(config, m_msm[1], XTAL(12'000'000)/32); /* verified on pcb */
+	m_msm[1]->vck_callback().set(m_adpcm[1], FUNC(seibu_adpcm_device::msm_int));
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void cabal_state::cabalt(machine_config &config)
@@ -569,31 +685,28 @@ void cabal_state::cabalbl2(machine_config &config)
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-void cabal_state::cabalbl(machine_config &config)
+void cabalbl_state::cabalbl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cabal_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cabalbl_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cabalbl_state::irq1_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cabalbl_state::sound_map);
 
 	/* there are 2x z80s for the ADPCM */
 	z80_device &adpcm_1(Z80(config, "adpcm_1", XTAL(3'579'545))); /* verified on pcb */
-	adpcm_1.set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_talk1_map);
-	adpcm_1.set_addrmap(AS_IO, &cabal_state::cabalbl_talk1_portmap);
-	adpcm_1.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
+	adpcm_1.set_addrmap(AS_PROGRAM, &cabalbl_state::talk1_map);
+	adpcm_1.set_addrmap(AS_IO, &cabalbl_state::talk1_portmap);
+	adpcm_1.set_periodic_int(FUNC(cabalbl_state::irq0_line_hold), attotime::from_hz(8000));
 
 	z80_device &adpcm_2(Z80(config, "adpcm_2", XTAL(3'579'545))); /* verified on pcb */
-	adpcm_2.set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_talk2_map);
-	adpcm_2.set_addrmap(AS_IO, &cabal_state::cabalbl_talk2_portmap);
-	adpcm_2.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
+	adpcm_2.set_addrmap(AS_PROGRAM, &cabalbl_state::talk2_map);
+	adpcm_2.set_addrmap(AS_IO, &cabalbl_state::talk2_portmap);
+	adpcm_2.set_periodic_int(FUNC(cabalbl_state::irq0_line_hold), attotime::from_hz(8000));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
-	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -601,7 +714,7 @@ void cabal_state::cabalbl(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cabal_state::screen_update));
+	screen.set_screen_update(FUNC(cabalbl_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabal);
@@ -618,13 +731,13 @@ void cabal_state::cabalbl(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MSM5205(config, m_msm1, XTAL(12'000'000)/32); /* verified on pcb (no resonator) */
-	m_msm1->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.60);
+	MSM5205(config, m_msm[0], XTAL(12'000'000)/32); /* verified on pcb (no resonator) */
+	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MSM5205(config, m_msm2, XTAL(12'000'000)/32); /* verified on pcb (no resonator)*/
-	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.60);
+	MSM5205(config, m_msm[1], XTAL(12'000'000)/32); /* verified on pcb (no resonator)*/
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 ROM_START( cabal )
@@ -668,6 +781,10 @@ ROM_START( cabal )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabala )
@@ -697,6 +814,10 @@ ROM_START( cabala )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "epr-a-1.1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 
@@ -727,6 +848,10 @@ ROM_START( cabaluk )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabalukj )
@@ -770,6 +895,10 @@ ROM_START( cabalukj )
 
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
+	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
+	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabalus )
@@ -965,17 +1094,17 @@ ROM_END
 
 void cabal_state::init_cabal()
 {
-	m_adpcm1->decrypt();
-	m_adpcm2->decrypt();
+	m_adpcm[0]->decrypt();
+	m_adpcm[1]->decrypt();
 }
 
 
-GAME( 1988, cabal,    0,     cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,   cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1989, cabalukj, cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl,  cabal, cabalbl,  cabalbl, cabal_state, empty_init, ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2, cabal, cabalbl2, cabalj,  cabal_state, init_cabal, ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabal,    0,     cabal,    cabalj,  cabal_state,   init_cabal, ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,   cabal, cabal,    cabalj,  cabal_state,   init_cabal, ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // Korea?
+GAME( 1989, cabalukj, cabal, cabal,    cabalj,  cabal_state,   init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl,  cabal, cabalbl,  cabalbl, cabalbl_state, empty_init, ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2, cabal, cabalbl2, cabalj,  cabal_state,   init_cabal, ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2, cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabaluk,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus,  cabal, cabalt,   cabalt,  cabal_state,   init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2, cabal, cabalt,   cabalt,  cabal_state,   init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk,  cabal, cabalt,   cabalt,  cabal_state,   init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

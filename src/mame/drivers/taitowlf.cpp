@@ -62,6 +62,9 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class taitowlf_state : public pcat_base_state
 {
 public:
@@ -328,6 +331,8 @@ void taitowlf_state::taitowlf_io(address_map &map)
 
 void taitowlf_state::machine_start()
 {
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void taitowlf_state::machine_reset()
@@ -427,6 +432,9 @@ ROM_START(pf2012)
 	ROM_REGION(0x20000, "bootscreen", 0) // bootscreen
 	ROM_LOAD("e58-04.u71", 0x000000, 0x20000, CRC(500e6113) SHA1(93226706517c02e336f96bdf9443785158e7becf) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*****************************************************************************/
 

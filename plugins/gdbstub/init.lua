@@ -45,8 +45,8 @@ function gdbstub.startplugin()
 		if not cpu then
 			print("gdbstub: maincpu not found")
 		end
-		if not regmaps[cpu:shortname()] then
-			print("gdbstub: no register map for cpu " .. cpu:shortname())
+		if not regmaps[cpu.shortname] then
+			print("gdbstub: no register map for cpu " .. cpu.shortname)
 			cpu = nil
 		end
 		consolelog = debugger.consolelog
@@ -98,7 +98,7 @@ function gdbstub.startplugin()
 		consolelast = #consolelog
 		if #consolelog > last and msg:find("Stopped at", 1, true) then
 			local point = tonumber(msg:match("Stopped at breakpoint ([0-9]+)"))
-			local map = regmaps[cpu:shortname()]
+			local map = regmaps[cpu.shortname]
 			running = false
 			if not point then
 				point = tonumber(msg:match("Stopped at watchpoint ([0-9]+"))
@@ -152,7 +152,7 @@ function gdbstub.startplugin()
 		if packet then
 			packet:gsub("}(.)", function(s) return string.char(string.byte(s) ~ 0x20) end)
 			local cmd = packet:sub(1, 1)
-			local map = regmaps[cpu:shortname()]
+			local map = regmaps[cpu.shortname]
 			if cmd == "g" then
 				local regs = {}
 				for reg, idx in pairs(map.togdb) do

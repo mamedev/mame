@@ -126,6 +126,7 @@ uint8_t electron_plus2_device::expbus_r(offs_t offset)
 		case 13:
 			data &= m_cart[0]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 			data &= m_cart[1]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			[[fallthrough]];
 		case 14:
 		case 15:
 			data &= m_rom[m_romsel - 13]->read_rom(offset & 0x3fff);

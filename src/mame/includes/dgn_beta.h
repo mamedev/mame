@@ -88,7 +88,6 @@ public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_mc6845(*this, "crtc"),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_dmacpu(*this, DMACPU_TAG),
 		m_ram(*this, RAM_TAG),
@@ -105,29 +104,10 @@ public:
 
 	void dgnbeta(machine_config &config);
 
-	void dgnbeta_ram_b0_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b1_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b2_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b3_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b4_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b5_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b6_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b7_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b8_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_b9_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bA_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bB_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bC_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bD_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bE_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bF_w(offs_t offset, uint8_t data);
-	void dgnbeta_ram_bG_w(offs_t offset, uint8_t data);
-
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
-	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dmacpu;
 	required_device<ram_device> m_ram;

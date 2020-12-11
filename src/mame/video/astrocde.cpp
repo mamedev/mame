@@ -26,6 +26,8 @@ void astrocde_state::machine_start()
 {
 	save_item(NAME(m_ram_write_enable));
 	save_item(NAME(m_input_select));
+
+	m_input_select = 0;
 }
 
 void seawolf2_state::machine_start()
@@ -211,6 +213,8 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	save_item(NAME(m_profpac_writemode));
 	save_item(NAME(m_profpac_writemask));
 	save_item(NAME(m_profpac_vw));
+
+	std::fill(std::begin(m_profpac_palette), std::end(m_profpac_palette), 0);
 }
 
 

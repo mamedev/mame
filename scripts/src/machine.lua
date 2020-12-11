@@ -1857,6 +1857,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
+---------------------------------------------------
+
+if (MACHINES["LOCOMO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/locomo.cpp",
+		MAME_DIR .. "src/devices/machine/locomo.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/m3002.h,MACHINES["M3002"] = true
 ---------------------------------------------------
 
@@ -2432,6 +2444,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcf8573.h,MACHINES["PCF8573"] = true
+---------------------------------------------------
+
+if (MACHINES["PCF8573"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcf8573.cpp",
+		MAME_DIR .. "src/devices/machine/pcf8573.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8583.h,MACHINES["PCF8583"] = true
 ---------------------------------------------------
 
@@ -2875,6 +2899,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/scoop.h,MACHINES["SCOOP"] = true
+---------------------------------------------------
+if (MACHINES["SCOOP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scoop.cpp",
+		MAME_DIR .. "src/devices/machine/scoop.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 
@@ -3242,6 +3277,18 @@ if (MACHINES["TUBE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tube.cpp",
 		MAME_DIR .. "src/devices/machine/tube.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ucb1200.h,MACHINES["UCB1200"] = true
+---------------------------------------------------
+
+if (MACHINES["UCB1200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ucb1200.cpp",
+		MAME_DIR .. "src/devices/machine/ucb1200.h",
 	}
 end
 
