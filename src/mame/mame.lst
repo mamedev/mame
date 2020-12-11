@@ -10951,9 +10951,10 @@ slampic2                        // bootleg
 wofpic                          // bootleg
 
 @source:cps2.cpp
-1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
+1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (Euro)
 1944d                           //
 1944j                           // 20/06/2000 (c) 2000 Eighting/Raizing (Japan)
+1944u                           // 20/06/2000 (c) 2000 Eighting/Raizing (Japan)
 19xx                            // 04/01/1996 (c) 1996 (Euro)
 19xxu                           // 07/12/1995 (c) 1996 (USA)
 19xxa                           // 04/01/1996 (c) 1996 (Asia)
@@ -19152,7 +19153,7 @@ dogstdx                         // (c) 2002 Konami. dogstation Deluxe
 kpython                         // (c) 2002 Konami. Python Bios
 pesta                           // (c) 2002 Konami. Pro Evolution Soccer The Arcade
 popn9                           // (c) 2003 Konami. Pop'n Music 9
-wswe                            // (c) 2002 Konami, World Soccer Winning Eleven
+wswe                            // (c) 2002 Konami. World Soccer Winning Eleven
 wswe2k3                         // (c) 2002 Konami. World Soccer Winning Eleven 2003
 
 @source:kramermc.cpp
