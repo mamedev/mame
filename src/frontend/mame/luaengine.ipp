@@ -89,6 +89,7 @@ int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
 template <typename T> struct is_container<lua_engine::devenum<T> > : std::true_type { };
 template <typename T> struct is_container<lua_engine::simple_list_wrapper<T> > : std::true_type { };
 template <typename T> struct is_container<lua_engine::tag_object_ptr_map<T> > : std::true_type { };
+template <typename T> struct is_container<lua_engine::object_ptr_vector_wrapper<T> > : std::true_type { };
 
 
 template <typename T> struct usertype_container<lua_engine::devenum<T> >;
