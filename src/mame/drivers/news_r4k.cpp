@@ -258,12 +258,11 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
     // map(0x1f800000, 0x1f800000); // TIMER0
     // map(0x1f840000, 0x1f840000); // FREERUN
-    map(0x1f880000, 0x1f880FFF).ram(); // Probably some kind of AP-Bus RAM or NVRAM
     
 	// ST TIMEKEEPER RAM+RTC
 	// 2Kb SRAM (0x800 bytes)
 	// RTC ports are remapped to 1fe0
-	map(0x1f881000, 0x1f8817ff).ram();  // monitor NVRAM
+	map(0x1f880000, 0x1f8817ff).ram();  // monitor NVRAM, mapped in an interesting way
 	map(0x1f881fe0, 0x1f881fff); // RTC registers (TODO)
 
     // // Interrupt clear ports; // INTCLR0
@@ -331,9 +330,9 @@ void news_r4k_state::cpu_map(address_map &map)
     // map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
 
 	// DMA Controller 0
-	//map(0x1e200000, 0x1e20000f).m(m_dma, FUNC(dmac_0448_device::map)); // End addr meeds confirmation
-	// TODO: DMA Controller 1
-	// TODO: map(0x1e300000, 0x1e30000f).m(m_dma, FUNC(dmac_0448_device::map)); // End addr meeds confirmation
+	//map(0x1e200000, 0x1e20000f); // End addr meeds confirmation
+	// DMA Controller 1
+	// map(0x1e300000, 0x1e30000f); // End addr meeds confirmation
 
 	// xb (Sony DSC-39 video card)
 	// map(0x14900000, 0x14900000);
