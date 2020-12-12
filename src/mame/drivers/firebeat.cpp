@@ -10,7 +10,7 @@
 
     GQ972 PWB(A2) 0000070609 Main board
     -----------------------------------
-        OSC 64.00MHz
+        OSC 66.0000MHz
         IBM PowerPC 403GCX at 66MHz
         (2x) Konami 0000057714 (2D object processor)
         Yamaha YMZ280B (ADPCM sound chip)
