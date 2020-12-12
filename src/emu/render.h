@@ -444,8 +444,8 @@ public:
 	float yscale() const { return m_user.m_yscale; }
 	float xoffset() const { return m_user.m_xoffset; }
 	float yoffset() const { return m_user.m_yoffset; }
-	bool is_empty() const { return (m_itemlist.count() == 0); }
-	void get_user_settings(user_settings &settings) const { settings = m_user; }
+	bool is_empty() const { return m_itemlist.empty(); }
+	const user_settings &get_user_settings() const { return m_user; }
 
 	// setters
 	void set_overlay(bitmap_argb32 *bitmap);

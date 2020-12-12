@@ -152,8 +152,7 @@ void menu_video_options::handle()
 				m_target.set_orientation(orientation_add(delta, m_target.orientation()));
 				if (m_target.is_ui_target())
 				{
-					render_container::user_settings settings;
-					container().get_user_settings(settings);
+					render_container::user_settings settings = container().get_user_settings();
 					settings.m_orientation = orientation_add(delta ^ ROT180, settings.m_orientation);
 					container().set_user_settings(settings);
 				}

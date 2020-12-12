@@ -79,7 +79,7 @@ int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
 }
 
 template <typename T>
-struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_container_helper<lua_engine::devenum<T>, T>
+struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_collection_helper<lua_engine::devenum<T>, T>
 {
 private:
 	using enumerator = lua_engine::devenum<T>;
@@ -182,7 +182,7 @@ public:
 
 
 template <typename T>
-struct usertype_container<lua_engine::object_ptr_vector_wrapper<T> > : lua_engine::immutable_container_helper<lua_engine::object_ptr_vector_wrapper<T>, std::vector<std::unique_ptr<T>> const, typename std::vector<std::unique_ptr<T>>::const_iterator>
+struct usertype_container<lua_engine::object_ptr_vector_wrapper<T> > : lua_engine::immutable_collection_helper<lua_engine::object_ptr_vector_wrapper<T>, std::vector<std::unique_ptr<T>> const, typename std::vector<std::unique_ptr<T>>::const_iterator>
 {
 private:
 	static int next_pairs(lua_State *L)
@@ -1173,6 +1173,7 @@ void lua_engine::initialize()
  * machine:popmessage(str) - print str as popup
  * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
+ *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
  * machine:sound() - get sound_manager
@@ -1196,7 +1197,7 @@ void lua_engine::initialize()
  * machine.images[] - get available image devices table (k=type, v=device_image_interface)
  */
 
-	auto machine_type = sol().registry().new_usertype<running_machine>("machine", "new", sol::no_constructor);
+	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
 	machine_type["exit"] = &running_machine::schedule_exit;
 	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
 	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
@@ -1231,6 +1232,9 @@ void lua_engine::initialize()
 				return false;
 			}
 		};
+	machine_type["popmessage"] = sol::overload(
+			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
+			[](running_machine &m) { m.popmessage(); });
 	machine_type["system"] = &running_machine::system;
 	machine_type["video"] = &running_machine::video;
 	machine_type["sound"] = &running_machine::sound;
@@ -1245,7 +1249,7 @@ void lua_engine::initialize()
 	machine_type["debugger"] =
 		[this] (running_machine &m) -> sol::object
 		{
-			if(!(m.debug_flags & DEBUG_FLAG_ENABLED))
+			if (!(m.debug_flags & DEBUG_FLAG_ENABLED))
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), &m.debugger());
 		};
@@ -1258,9 +1262,6 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
-	machine_type["popmessage"] = sol::overload(
-			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
-			[](running_machine &m) { m.popmessage(); });
 	machine_type["logerror"]  = [] (running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); };
 
 
@@ -1608,6 +1609,7 @@ void lua_engine::initialize()
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
+	screen_dev_type.set("container", sol::property(&screen_device::container));
 	screen_dev_type.set("draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
 			int sc_width = sdev.visible_area().width();
 			int sc_height = sdev.visible_area().height();

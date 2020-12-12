@@ -37,7 +37,8 @@ public:
 	template <typename T> struct object_ptr_vector_wrapper;
 	template <typename T> struct tag_object_ptr_map;
 	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
-	template <typename T, typename C, typename I = typename C::iterator> struct immutable_container_helper;
+	template <typename T> struct immutable_container_helper;
+	template <typename T, typename C, typename I = typename C::iterator> struct immutable_collection_helper;
 
 	// construction/destruction
 	lua_engine();

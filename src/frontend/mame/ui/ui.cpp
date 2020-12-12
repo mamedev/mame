@@ -1839,9 +1839,8 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_brightness = (float)newval * 0.001f;
@@ -1861,9 +1860,8 @@ int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, 
 int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_contrast = (float)newval * 0.001f;
@@ -1882,9 +1880,8 @@ int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, in
 int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_gamma = (float)newval * 0.001f;
@@ -1904,9 +1901,8 @@ int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int i
 int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xscale = (float)newval * 0.001f;
@@ -1926,9 +1922,8 @@ int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yscale = (float)newval * 0.001f;
@@ -1948,9 +1943,8 @@ int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xoffset = (float)newval * 0.001f;
@@ -1970,9 +1964,8 @@ int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yoffset = (float)newval * 0.001f;

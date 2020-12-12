@@ -5064,9 +5064,12 @@ layout_file::layout_file(
 		}
 
 		// load the content of the first script node
-		util::xml::data_node const *const scriptnode = mamelayoutnode->get_child("script");
-		if (scriptnode)
-			emulator_info::layout_script_cb(*this, scriptnode->get_value());
+		if (!m_viewlist.empty())
+		{
+			util::xml::data_node const *const scriptnode = mamelayoutnode->get_child("script");
+			if (scriptnode)
+				emulator_info::layout_script_cb(*this, scriptnode->get_value());
+		}
 	}
 	catch (layout_syntax_error const &err)
 	{

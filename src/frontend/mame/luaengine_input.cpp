@@ -48,19 +48,9 @@ template <> struct is_container<natkbd_kbd_list> : std::true_type { };
 
 
 template <>
-struct usertype_container<natkbd_kbd_list>
+struct usertype_container<natkbd_kbd_list> : lua_engine::immutable_container_helper<natkbd_kbd_list>
 {
 private:
-	static natkbd_kbd_list &get_self(lua_State *L)
-	{
-		auto p(sol::stack::unqualified_check_get<natkbd_kbd_list *>(L, 1));
-		if (!p)
-			luaL_error(L, "sol: 'self' is not of type 'natkbd_kbd_list' (pass 'self' as first argument with ':' or call on proper type)");
-		if (!*p)
-			luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument with ':' or call on a 'natkbd_kbd_list' type");
-		return **p;
-	}
-
 	template <bool Indexed>
 	static int next_pairs(lua_State *L)
 	{
@@ -127,17 +117,6 @@ public:
 		return stack::push(L, !self.manager.keyboard_count());
 	}
 
-	// produce errors for unsupported operations
-	static int set(lua_State *L) { return luaL_error(L, "sol: cannot call 'set(key, value)' on type 'natkbd_kbd_list': container is not modifiable"); }
-	static int index_set(lua_State *L) { return luaL_error(L, "sol: cannot call 'container[key] = value' on type 'natkbd_kbd_list': container is not modifiable"); }
-	static int add(lua_State *L) { return luaL_error(L, "sol: cannot call 'add' on type 'natkbd_kbd_list': container is not modifiable"); }
-	static int insert(lua_State *L) { return luaL_error(L, "sol: cannot call 'insert' on type 'natkbd_kbd_list': container is not modifiable"); }
-	static int find(lua_State *L) { return luaL_error(L, "sol: cannot call 'find' on type 'natkbd_kbd_list': no supported comparison operator for the value type"); }
-	static int index_of(lua_State *L) { return luaL_error(L, "sol: cannot call 'index_of' on type 'natkbd_kbd_list': no supported comparison operator for the value type"); }
-	static int clear(lua_State *L) { return luaL_error(L, "sol: cannot call 'clear' on type 'natkbd_kbd_list': container is not modifiable"); }
-	static int erase(lua_State *L) { return luaL_error(L, "sol: cannot call 'erase' on type 'natkbd_kbd_list': container is not modifiable"); }
-
-	// support for iteration with pairs and ipairs
 	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
 	static int pairs(lua_State *L) { return start_pairs<false>(L); }
 	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
