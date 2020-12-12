@@ -867,10 +867,15 @@ int atari_slapstic_device::tweak(offs_t offset)
 				break;
 
 			/* ALTERNATE1 state: look for alternate2 offset, or else fall back to ENABLED */
+			/* Can also go to ADDITIVE1.  Not a hack, it's real. */
 			case ALTERNATE1:
 				if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
 				{
 					state = ALTERNATE2;
+				}
+				else if (MATCHES_MASK_VALUE(offset, slapstic.add1))
+				{
+					state = ADDITIVE1;
 				}
 				else
 				{
@@ -994,10 +999,9 @@ int atari_slapstic_device::tweak(offs_t offset)
 				}
 				break;
 
-			/* ADDITIVE3 state: waiting for a bank to seal the deal */
+			/* ADDITIVE3 state: waiting for the commit, which is common with alt, but can be delayed */
 			case ADDITIVE3:
-				if (offset == slapstic.bank[0] || offset == slapstic.bank[1] ||
-					offset == slapstic.bank[2] || offset == slapstic.bank[3])
+				if (MATCHES_MASK_VALUE(offset, slapstic.alt4))
 				{
 					state = DISABLED;
 					current_bank = add_bank;
