@@ -77,10 +77,10 @@ text_buffer_ptr text_buffer_alloc(u32 bytes, u32 lines);
 void text_buffer_clear(text_buffer &text);
 
 // "print" data to a text buffer
-void text_buffer_print(text_buffer &text, const char *data);
+void text_buffer_print(text_buffer &text, std::string_view data);
 
 // "print" data to a text buffer with word wrapping to a given column
-void text_buffer_print_wrap(text_buffer &text, const char *data, int wrapcol);
+void text_buffer_print_wrap(text_buffer &text, std::string_view data, int wrapcol);
 
 // get the maximum width of lines seen so far
 u32 text_buffer_max_width(const text_buffer &text);
