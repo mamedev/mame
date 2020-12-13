@@ -10326,7 +10326,7 @@ GAME( 1996, ddsomu,     ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     RO
 GAME( 1996, ddsomur1,   ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960209)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomj,     ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960619)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomjr1,   ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960206)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ddsomjr2,   ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 96022)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ddsomjr2,   ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960223)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsoma,     ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960619)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomar1,   ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960208)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ddsomh,     ddsom,    cps2, cps2_4p4b, cps2_state, init_cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Hispanic 960223)",                     MACHINE_SUPPORTS_SAVE )
