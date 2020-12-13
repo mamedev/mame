@@ -137,9 +137,10 @@ private:
 	device_cococart_interface   *m_cart;
 
 	// methods
-	void set_line(const char *line_name, coco_cartridge_line &line, line_value value);
+	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+public:
 	static const char *line_value_string(line_value value);
 };
 
