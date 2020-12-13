@@ -194,12 +194,25 @@ void pasopia_state::machine_start()
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 
 	m_hblank = 0;
+	m_spr_sw = false;
+
+	save_item(NAME(m_hblank));
+	save_item(NAME(m_vram_addr));
+	save_item(NAME(m_vram_latch));
+	save_item(NAME(m_gfx_mode));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_porta_2));
+	save_item(NAME(m_video_wl));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_spr_sw));
+	save_pointer(NAME(m_p_vram), 0x4000);
 }
 
 void pasopia_state::machine_reset()
 {
 	m_porta_2 = 0xFF;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_ram_bank = false;
 }
 
 void pasopia_state::vram_addr_lo_w(u8 data)
@@ -274,7 +287,7 @@ WRITE_LINE_MEMBER( pasopia_state::speaker_w )
 
 void pasopia_state::vram_addr_hi_w(u8 data)
 {
-	m_vram_latch = u16(data & 0x80) << 1 | m_vram_latch;
+	m_vram_latch = u16(data & 0x80) << 1 | (m_vram_latch & 0xff);
 	if ( BIT(data, 6) && !m_video_wl )
 	{
 		m_p_vram[m_vram_addr] = m_vram_latch;
@@ -311,6 +324,7 @@ u8 pasopia_state::keyb_r()
 void pasopia_state::mux_w(u8 data)
 {
 	m_mux_data = data;
+	m_pio->port_b_write(keyb_r());
 }
 
 static const gfx_layout p7_chars_8x8 =
@@ -414,4 +428,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME   FLAGS
-COMP( 1982, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, empty_init, "Toshiba", "Personal Computer Pasopia PA7010", MACHINE_NOT_WORKING )
+COMP( 1982, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, empty_init, "Toshiba", "Personal Computer Pasopia PA7010", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
