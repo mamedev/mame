@@ -126,7 +126,7 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 	const rgb_t bclr = palette[m_gfx_mode & 0x07];
 	u32 *p = &bitmap.pix(y);
 	const bool text = (m_gfx_mode & 0xc0) == 0;
-	const u16 *const vram = &m_p_vram[text ? 0 : u16(BIT(m_gfx_mode, 7) ? ra : ra & 6) << 11];
+	const u16 *const vram = &m_p_vram[text ? 0 : u16(BIT(m_gfx_mode, 7) ? ra & 7 : ra & 6) << 11];
 
 	for (u16 x = 0; x < x_count; x++)
 	{
@@ -154,7 +154,7 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 			std::fill_n(p, 4, lclr);
 			p += 4;
 		}
-		else if (BIT(ra, 4) || (chr & 0x1f8) == 0x0f8)
+		else if (BIT(ra, 3) || (chr & 0x1f8) == 0x0f8)
 		{
 			std::fill_n(p, 8, bclr);
 			p += 8;
@@ -162,7 +162,7 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 		else
 		{
 			// DHR graphic characters, normal or inverted text
-			u8 gfx = BIT(chr, 8) && BIT(m_gfx_mode, 7) ? (chr & 0xff) : m_p_chargen[((chr & 0xff)<<3) | ra];
+			u8 gfx = BIT(chr, 8) && BIT(m_gfx_mode, 7) ? (chr & 0xff) : m_p_chargen[((chr & 0xff)<<3) | (ra & 7)];
 			if (BIT(chr, 8) && text)
 				gfx ^= 0xff;
 
