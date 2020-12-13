@@ -701,13 +701,13 @@ void menu::draw(uint32_t flags)
 					}
 
 					// customize subitem text color
-					if (!core_strnicmp(&subitem_text[0], _("On"), subitem_text.length()))
+					if (!core_stricmp(pitem.subtext.c_str(), _("On")))
 						fgcolor2 = rgb_t(0x00,0xff,0x00);
 
-					if (!core_strnicmp(&subitem_text[0], _("Off"), subitem_text.length()))
+					if (!core_stricmp(pitem.subtext.c_str(), _("Off")))
 						fgcolor2 = rgb_t(0xff,0x00,0x00);
 
-					if (!core_strnicmp(&subitem_text[0], _("Auto"), subitem_text.length()))
+					if (!core_stricmp(pitem.subtext.c_str(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
 					// draw the subitem right-justified
