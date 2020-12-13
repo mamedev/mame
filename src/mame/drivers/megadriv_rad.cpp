@@ -520,7 +520,7 @@ ROM_START( ra145 )
 	/*
 	Data for the following games is corrupt (ranges approximate, based on areas of inconsistent readout)
 
-	3c0000 - 43ffff - The Dual 007                (400171 - 41c600 is corrupt)
+	3c0000 - 43ffff - James Bond 007 - The Duel   (400171 - 41c600 is corrupt)
 	4c0000 - 53ffff - Robocop 3                   (507bd4 - 50ad43 is corrupt)
 	540000 - 5bffff - Hokuto no Ken               (540006 - 55fff2 is corrupt)
 	640000 - 6bffff - Batman                      (640042 - 65ffaf is corrupt)
