@@ -972,8 +972,7 @@ float menu_select_launch::draw_left_panel(
 	}
 
 	// calculate horizontal offset for unadorned names
-	std::string tmp("_# ");
-	convert_command_glyph(tmp);
+	std::string tmp(convert_command_glyph("_# "));
 	float const text_sign = ui().get_string_width(tmp, text_size);
 
 	// get the maximum width of a filter name
@@ -1005,10 +1004,7 @@ float menu_select_launch::draw_left_panel(
 		else
 		{
 			if (current == filter)
-			{
-				str = std::string("_> ");
-				convert_command_glyph(str);
-			}
+				str = convert_command_glyph("_> ");
 			str.append(Filter::display_name(filter));
 		}
 

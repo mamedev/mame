@@ -201,8 +201,7 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 	// add subitem if the filter wants it
 	if (active_filter.wants_adjuster())
 	{
-		std::string name("^!");
-		convert_command_glyph(name);
+		std::string name(convert_command_glyph("^!"));
 		item_append(name, active_filter.adjust_text(), active_filter.arrow_flags(), (void *)(FILTER_ADJUST));
 	}
 

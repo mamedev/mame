@@ -133,10 +133,7 @@ public:
 	{
 		std::string result;
 		if (Type == n)
-		{
-			result = "_> ";
-			convert_command_glyph(result);
-		}
+			result = convert_command_glyph("_> ");
 		result.append(Base::display_name(n));
 		return result;
 	}
@@ -259,18 +256,14 @@ public:
 	{
 		std::string result;
 		if (Type == n)
-		{
-			result = "_> ";
-			convert_command_glyph(result);
-		}
+			result = convert_command_glyph("_> ");
 		else
 		{
 			for (unsigned i = 0; (MAX > i) && m_filters[i]; ++i)
 			{
 				if (m_filters[i]->get_type() == n)
 				{
-					result = util::string_format("@custom%u ", i + 1);
-					convert_command_glyph(result);
+					result = convert_command_glyph(util::string_format("@custom%u ", i + 1));
 					break;
 				}
 			}
@@ -509,8 +502,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 			set_selected_index(item_count() - 2);
 		if (m_parent.m_filters[i]->wants_adjuster())
 		{
-			std::string name("^!");
-			convert_command_glyph(name);
+			std::string name(convert_command_glyph("^!"));
 			item_append(name, m_parent.m_filters[i]->adjust_text(), m_parent.m_filters[i]->arrow_flags(), (void *)(ADJUST_FIRST + i));
 		}
 		item_append(menu_item_type::SEPARATOR);

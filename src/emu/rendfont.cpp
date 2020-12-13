@@ -372,35 +372,30 @@ private:
 } // anonymous namespace
 
 
-void convert_command_glyph(std::string &str)
+std::string convert_command_glyph(std::string_view str)
 {
-	(void)str.c_str(); // force NUL-termination - we depend on it later
-	std::size_t const len(str.length());
-	std::vector<char> buf(2 * (len + 1));
+	std::vector<char> buf(2 * (str.length() + 1));
 	std::size_t j(0);
-	for (std::size_t i = 0; len > i; )
+	while (!str.empty())
 	{
 		// decode UTF-8
 		char32_t uchar;
-		int const codelen(uchar_from_utf8(&uchar, &str[i], len - i));
+		int const codelen(uchar_from_utf8(&uchar, &str[0], str.length()));
 		if (0 >= codelen)
 			break;
-		i += codelen;
+		str.remove_prefix(codelen);
 
 		// check for three metacharacters
 		fix_command_t const *fixcmd(nullptr);
 		switch (uchar)
 		{
 		case COMMAND_CONVERT_TEXT:
-			for (fix_strings_t *fixtext = convert_text; fixtext->glyph_code; ++fixtext)
+			for (fix_strings_t const *fixtext = convert_text; fixtext->glyph_code; ++fixtext)
 			{
-				if (!fixtext->glyph_str_len)
-					fixtext->glyph_str_len = std::strlen(fixtext->glyph_str);
-
-				if (!std::strncmp(fixtext->glyph_str, &str[i], fixtext->glyph_str_len))
+				if (str.substr(0, fixtext->glyph_str.length()) == fixtext->glyph_str)
 				{
 					uchar = fixtext->glyph_code + COMMAND_UNICODE;
-					i += strlen(fixtext->glyph_str);
+					str.remove_prefix(fixtext->glyph_str.length());
 					break;
 				}
 			}
@@ -416,20 +411,20 @@ void convert_command_glyph(std::string &str)
 		}
 
 		// this substitutes a single character
-		if (fixcmd)
+		if (fixcmd && !str.empty())
 		{
-			if (str[i] == uchar)
+			if (str[0] == uchar)
 			{
-				++i;
+				str.remove_prefix(1);
 			}
 			else
 			{
-				while (fixcmd->glyph_code && (fixcmd->glyph_char != str[i]))
+				while (fixcmd->glyph_code && !str.empty() && fixcmd->glyph_char != str[0])
 					++fixcmd;
-				if (fixcmd->glyph_code)
+				if (fixcmd->glyph_code && !str.empty())
 				{
 					uchar = COMMAND_UNICODE + fixcmd->glyph_code;
-					++i;
+					str.remove_prefix(1);
 				}
 			}
 		}
@@ -440,7 +435,7 @@ void convert_command_glyph(std::string &str)
 			break;
 		j += outlen;
 	}
-	str.assign(&buf[0], j);
+	return std::string(&buf[0], j);
 }
 
 

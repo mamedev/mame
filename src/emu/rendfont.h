@@ -110,6 +110,6 @@ private:
 	static const u64 CACHED_BDF_HASH_SIZE   = 1024;
 };
 
-void convert_command_glyph(std::string &s);
+std::string convert_command_glyph(std::string_view str);
 
 #endif  /* MAME_EMU_RENDFONT_H */
