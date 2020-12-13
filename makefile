@@ -166,6 +166,9 @@ endif
 ifneq ($(filter aarch64%,$(UNAME_M)),)
 PLATFORM := arm64
 endif
+ifneq ($(filter arm64%,$(UNAME_M)),)
+PLATFORM := arm64
+endif
 ifneq ($(filter aarch64%,$(UNAME_P)),)
 PLATFORM := arm64
 endif
@@ -394,6 +397,13 @@ endif
 
 # ppc has inline assembly support but no DRC
 ifeq ($(findstring ppc,$(UNAME)),ppc)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+# ARM / ARM64
+ifeq ($(findstring arm,$(UNAME)),arm)
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
@@ -1030,7 +1040,11 @@ ifneq ($(TARGETOS),asmjs)
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
 else
+ifneq ($(filter arm64%,$(UNAME_M)),)
+ARCHITECTURE := _arm64_clang
+else
 ARCHITECTURE := _x86_clang
+endif
 endif
 endif
 endif
@@ -1420,6 +1434,11 @@ $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
+	$(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
+
+.PHONY: macosx_arm64_clang
+macosx_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
 
