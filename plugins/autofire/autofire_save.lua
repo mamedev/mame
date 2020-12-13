@@ -1,7 +1,7 @@
 local lib = {}
 
 local function get_settings_path()
-	return lfs.env_replace(manager:machine():options().entries.homepath:value():match('([^;]+)')) .. '/autofire/'
+	return emu.subst_env(manager:machine():options().entries.homepath:value():match('([^;]+)')) .. '/autofire/'
 end
 
 local function get_settings_filename()

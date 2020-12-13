@@ -577,7 +577,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[10] = (frame>>8)&0xff;
 					data[11] = frame&0xff;
 
-					frame -= cdrom_get_track_start(m_cdrom, data[6] - 1);
+					frame = m_last_lba - cdrom_get_track_start(m_cdrom, data[6] - 1);
 
 					if (msf)
 					{

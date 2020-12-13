@@ -205,7 +205,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	}
 }
 
-void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, uint32_t dragngun_sprite_ctrl,  bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, uint32_t dragngun_sprite_ctrl,  bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
 {
 	const uint32_t *layout_ram;
 	const uint32_t *lookup_ram;
@@ -238,7 +238,7 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x0000001f - colour.
 	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
 	        0x00000040 - ?  priority?
-	        0x00000080 - Alpha blending enable
+	        0x00000080 - flicker
 	        0x40000000 - Additive/Subtractable blend? (dragngun)
 	    Word 7 :
 
@@ -264,7 +264,10 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
-		int sx,sy,colour,fx,fy,w,h,x,y,bx,by,alpha,scalex,scaley;
+		if ((spritedata[offs+6]&0x80) && (screen.frame_number() & 1)) // flicker
+			continue;
+
+		int sx,sy,colour,fx,fy,w,h,x,y,bx,by/*,alpha*/,scalex,scaley;
 		int zoomx,zoomy;
 		int xpos,ypos;
 
@@ -306,11 +309,6 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
 		else if (priority == 2) priority = 7;
 		else if (priority == 3) priority = 7;
-
-		if (spritedata[offs+6]&0x80)
-			alpha=0x80;
-		else
-			alpha=0xff;
 
 		fx = spritedata[offs+4]&0x8000;
 		fy = spritedata[offs+5]&0x8000;
@@ -378,7 +376,7 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 						fx,fy,
 						xpos>>16,ypos>>16,
 						15,zoomx,zoomy,nullptr,0,
-						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha,
+						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), 0xff/*alpha*/,
 						pri_bitmap, temp_bitmap,
 						priority
 						);

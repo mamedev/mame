@@ -85,38 +85,9 @@ uint16_t atarig1_state::a2d_data_r()
  *
  *************************************/
 
-void atarig1_state::update_bank(int bank)
+void atarig1_state::pitfightb_cheap_slapstic_tweak(offs_t offset)
 {
-	/* if the bank has changed, copy the memory; Pit Fighter needs this */
-	if (bank != m_bslapstic_bank)
-	{
-		/* bank 0 comes from the copy we made earlier */
-		if (bank == 0)
-			memcpy(m_bslapstic_base, m_bslapstic_bank0.get(), 0x2000);
-		else
-			memcpy(m_bslapstic_base, &m_bslapstic_base[bank * 0x1000], 0x2000);
-
-		/* remember the current bank */
-		m_bslapstic_bank = bank;
-	}
-}
-
-
-void atarig1_state::device_post_load()
-{
-	if (m_bslapstic_base != nullptr)
-	{
-		int bank = m_bslapstic_bank;
-		m_bslapstic_bank = -1;
-		update_bank(bank);
-	}
-}
-
-
-uint16_t atarig1_state::pitfightb_cheap_slapstic_r(offs_t offset)
-{
-	int result = m_bslapstic_base[offset & 0xfff];
-
+	offset = offset & 0x3fff;
 	/* the cheap replacement slapstic just triggers on the simple banking */
 	/* addresses; a software patch ensure that this is good enough */
 
@@ -127,34 +98,19 @@ uint16_t atarig1_state::pitfightb_cheap_slapstic_r(offs_t offset)
 	/* one of 4 bankswitchers produces the result */
 	else if (m_bslapstic_primed)
 	{
+		m_bslapstic_primed = false;
 		if (offset == 0x42)
-			update_bank(0), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(0);
 		else if (offset == 0x52)
-			update_bank(1), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(1);
 		else if (offset == 0x62)
-			update_bank(2), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(2);
 		else if (offset == 0x72)
-			update_bank(3), m_bslapstic_primed = false;
+			m_slapstic_bank->set_entry(3);
+		else
+			m_bslapstic_primed = true;
 	}
-	return result;
 }
-
-
-void atarig1_state::pitfightb_cheap_slapstic_init()
-{
-	/* install a read handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16sm_delegate(*this, FUNC(atarig1_state::pitfightb_cheap_slapstic_r)));
-	m_bslapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0x38000);
-
-	/* allocate memory for a copy of bank 0 */
-	m_bslapstic_bank0 = std::make_unique<uint8_t[]>(0x2000);
-	memcpy(m_bslapstic_bank0.get(), m_bslapstic_base, 0x2000);
-
-	/* not primed by default */
-	m_bslapstic_primed = false;
-}
-
-
 
 /*************************************
  *
@@ -164,10 +120,7 @@ void atarig1_state::pitfightb_cheap_slapstic_init()
 
 void atarig1_state::main_map(address_map &map)
 {
-	map(0x000000, 0x037fff).rom();
-	map(0x038000, 0x03ffff).rom(); /* pitfight slapstic goes here */
-	map(0x040000, 0x077fff).rom();
-	map(0x078000, 0x07ffff).rom(); /* hydra slapstic goes here */
+	map(0x000000, 0x07ffff).rom();
 	map(0xf80000, 0xf80001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xf88000, 0xf8ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xf90000, 0xf90000).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
@@ -189,6 +142,17 @@ void atarig1_state::main_map(address_map &map)
 	map(0xff7000, 0xffffff).ram();
 }
 
+void atarig1_state::pitfight_map(address_map &map)
+{
+	main_map(map);
+	map(0x038000, 0x039fff).mirror(0x6000).bankr(m_slapstic_bank); /* pitfight slapstic goes here */
+}
+
+void atarig1_state::hydra_map(address_map &map)
+{
+	main_map(map);
+	map(0x078000, 0x079fff).mirror(0x6000).bankr(m_slapstic_bank); /* hydra slapstic goes here */
+}
 
 
 /*************************************
@@ -389,7 +353,6 @@ void atarig1_state::atarig1(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -428,6 +391,7 @@ void atarig1_state::atarig1(machine_config &config)
 void atarig1_state::hydrap(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
 
 	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
@@ -441,45 +405,61 @@ void atarig1_state::hydrap(machine_config &config)
 void atarig1_state::hydra(machine_config &config)
 {
 	hydrap(config);
-	SLAPSTIC(config, "slapstic", 116, true);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::hydra_map);
+	SLAPSTIC(config, m_slapstic, 116);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap111(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 111, true);
+	SLAPSTIC(config, m_slapstic, 111);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap112(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 112, true);
+	SLAPSTIC(config, m_slapstic, 112);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap113(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 113, true);
+	SLAPSTIC(config, m_slapstic, 113);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pfslap114(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, "slapstic", 114, true);
+	SLAPSTIC(config, m_slapstic, 114);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void atarig1_state::pitfightb(machine_config &config)
 {
 	atarig1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
+
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
 }
 
@@ -1327,7 +1307,11 @@ ROM_END
 
 void atarig1_state::init_hydra()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x78000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x78000, 0x7ffff, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+
 	m_is_pitfight = false;
 }
 
@@ -1338,14 +1322,23 @@ void atarig1_state::init_hydrap()
 
 void atarig1_state::init_pitfight()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x38000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x38000, 0x3ffff, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 	m_is_pitfight = true;
 }
 
 void atarig1_state::init_pitfightb()
 {
-	pitfightb_cheap_slapstic_init();
-	save_item(NAME(m_bslapstic_bank));
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x38000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x38000, 0x3ffff, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { pitfightb_cheap_slapstic_tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { pitfightb_cheap_slapstic_tweak(offset >> 1); });
+	
+	/* not primed by default */
+	m_bslapstic_primed = false;
+
 	save_item(NAME(m_bslapstic_primed));
 	m_is_pitfight = true;
 }

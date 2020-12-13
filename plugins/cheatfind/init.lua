@@ -959,8 +959,7 @@ function cheatfind.startplugin()
 								end
 							end
 						end
-						-- lfs.env_replace is defined in boot.lua
-						cheat_save.path = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.path = emu.subst_env(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
 						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
 						cheat_save.name = cheat.desc
 						local json = require("json")
@@ -1044,7 +1043,7 @@ function cheatfind.startplugin()
 	end
 	emu.register_menu(menu_callback, menu_populate, _("Cheat Finder"))
 	emu.register_frame_done(function ()
-			local tag, screen = next(manager:machine().screens)
+			local screen = manager:machine().screens:at(1)
 			local height = mame_manager:ui():get_line_height()
 			for num, watch in ipairs(watches) do
 				screen:draw_text("left", num * height, string.format(watch.format, watch.addr, watch.func()))

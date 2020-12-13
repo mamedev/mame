@@ -82,7 +82,7 @@ menu_load_save_state_base::file_entry::file_entry(std::string &&file_name, std::
 //  ctor
 //-------------------------------------------------
 
-menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container &container, const char *header, const char *footer, bool must_exist)
+menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container &container, std::string_view header, std::string_view footer, bool must_exist)
 	: menu(mui, container)
 	, m_header(header)
 	, m_footer(footer)
@@ -200,7 +200,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 
 		// append the menu item
 		void *const itemref = itemref_from_file_entry(*entry);
-		item_append(std::move(text), std::string(), 0, itemref);
+		item_append(std::move(text), 0, itemref);
 
 		// is this item selected?
 		if (entry->file_name() == s_last_file_selected)
@@ -209,7 +209,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 
 	if (m_entries_vec.empty())
 	{
-		item_append(_("No save states found"), std::string(), 0, nullptr);
+		item_append(_("No save states found"), 0, nullptr);
 		set_selection(nullptr);
 	}
 	item_append(menu_item_type::SEPARATOR);
@@ -334,10 +334,10 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, nullptr);
-	if (m_footer)
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, std::string_view());
+	if (!m_footer.empty())
 	{
-		char const *const text[] = { m_footer };
+		std::string_view const text[] = { m_footer };
 		draw_text_box(
 				std::begin(text), std::end(text),
 				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,

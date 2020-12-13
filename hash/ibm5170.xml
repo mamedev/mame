@@ -8933,6 +8933,35 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lemming3">
+		<description>All New World of Lemmings</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design" />
+		<info name="version" value="v1.53" />
+		<info name="usage" value="Mouse and EMS Memory required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="23259f9a" sha1="1d1b5e21d0bd9089ba0ac41be7ca1b3ffecf15af"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="3826e140" sha1="b33476065013e26315bd66c33abaa301d7f6edea"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d9c345b4" sha1="b0645535d12920edb2b3c918d1fe19a0e7458366"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="All New World of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="96cf7c5d" sha1="a02d03b959b2c54ae1f1fbaf7e628b30812a56fb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitd">
 		<description>Alone in the Dark (USA)</description>
 		<year>1992</year>
@@ -10037,28 +10066,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cruisecr">
-		<description>Cruise for a Corpse</description>
-		<year>1991</year>
-		<publisher>U.S. Gold</publisher>
-		<info name="developer" value="Delphine Software" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="3783f600" sha1="874ed3004b6b867377107d019df780a4aa4dd556"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="8c2ff3c9" sha1="13bdf7b34d1321011c5be0c457455160c25f7dbe"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="f9ffe21a" sha1="5ccc25bda8b0a6cbadbaceb8f6c280f8c4bbec78"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="crystalc">
 		<description>Crystal Caves (1.0a)</description>
 		<year>1991</year>
@@ -10271,13 +10278,14 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Marked as bad dump (Modified OEM ID) -->
 	<software name="lionkingd" cloneof="lionking">
 		<description>Disney's The Lion King (Playable Demo)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="lion.img" size="1474560" crc="e4767eb0" sha1="752b4b6268d464a6b7a8700152ca746f1e81b74b"/>
+				<rom name="lion.img" size="1474560" crc="e4767eb0" sha1="752b4b6268d464a6b7a8700152ca746f1e81b74b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -12460,6 +12468,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="legvalor">
+		<description>Legends of Valour</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Synthetic Dimensions" />
+		<info name="version" value="v1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legends of Valour [US Gold] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="2ec07aea" sha1="0b267afeaa5a4f93f7d42a9e0e69a44f6de5959a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legends of Valour [US Gold] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="180a4cd1" sha1="a0751b6b58f7583efb619192d43a9f007286c023"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legends of Valour [US Gold] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="c437fecf" sha1="00b0f2a0ff3d637d96f58224c81eda3a56e7ffaf"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Legends of Valour [US Gold] [1992] [3.5DD] [Disk 4 of 4].img" size="737280" crc="84c270ca" sha1="9ec72c7d905c670a653ee71a6d7d0ae6892cba6c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lslvga">
 		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.1)</description>
 		<year>1991</year>
@@ -12557,6 +12593,102 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lsl5">
+		<description>Leisure Suit Larry 5: Passionate Patti Does a Little Undercover Work (3.5")</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="v1.000 09/11/91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 1 of 8] [Startup Disk].img" size="1474560" crc="a5865aa2" sha1="fe230a9b9493117ad50e81d6c48def872501b330"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 2 of 8] [Disk 1].img" size="1474560" crc="ad4fb960" sha1="c8720ebf627065e0d90dba66ac1938c1a79c2daf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 3 of 8] [Disk 2].img" size="1474560" crc="28583365" sha1="3e0aea18c558cf85ade6ce1b8eca7b2a6778261f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 4 of 8] [Disk 3].img" size="1474560" crc="04d86515" sha1="f3056862bdf97ecfc93ebf37c5107c6782357b97"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 5 of 8] [Disk 4].img" size="1474560" crc="303cbf47" sha1="b5a4994c89aac4a3bad6a3952704c61f9bc0fcf8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 6 of 8] [Disk 5].img" size="1474560" crc="8a45e42c" sha1="4a3cf00b8528b812f555343948cf5e36dc0eb23c"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 7 of 8] [Disk 6].img" size="1474560" crc="3a3bedc0" sha1="064502559da0a1336ecba942f2bd64dffefda45a"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [3.5HD] [Disk 8 of 8] [Disk 7].img" size="1474560" crc="d5ccde6d" sha1="58044ee8dd8b3ae61f4ef50d0b32e577c41e2b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl5_525" cloneof="lsl5">
+		<description>Leisure Suit Larry 5: Passionate Patti Does a Little Undercover Work (5.25")</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="v1.000 09/11/91" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 1 of 8] [Startup Disk].img" size="1228800" crc="71202c1e" sha1="eb8ae0d196138c83e953256ff6cbb188a5fa8914"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 2 of 8] [Disk 1].img" size="1228800" crc="115be48c" sha1="a8f000ac29473ea4e20752d06f34968c5a2ac954"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 3 of 8] [Disk 2].img" size="1228800" crc="5250a344" sha1="2e6674472a2853cc04ae77a7d0b6fc46b0025c14"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 4 of 8] [Disk 3].img" size="1228800" crc="64af0a8b" sha1="7dcd5161751b50b94aced98e2183e59ef28b060e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 5 of 8] [Disk 4].img" size="1228800" crc="88e17e5a" sha1="983e28e2c543b3a1de5bbb0018cfb9e0234f4279"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 6 of 8] [Disk 5].img" size="1228800" crc="475fa0c5" sha1="adab54b491ba592d618c954404eb4290dcbea2ce"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 7 of 8] [Disk 6].img" size="1228800" crc="3451cbb1" sha1="cf1e1a50e72aa6507ad24e92f05fe8e626ac3406"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 5 [Sierra] [1991] [5.25HD] [Disk 8 of 8] [Disk 7].img" size="1228800" crc="686a1ef6" sha1="bb294a24771ce09cabde6d2e7dc029bbe6139cc0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lemmings">
 		<!-- Dumped via Kryoflux -->
 		<description>Lemmings</description>
@@ -12567,35 +12699,6 @@ license:CC0
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2181136">
 				<rom name="Lemmings [Psygnosis] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2181136" crc="82b47a9b" sha1="7f0912d798c97a56ac8eea1f87caa20cc2044b94"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lemming3">
-		<description>All New World Of Lemmings</description>
-		<year>1994</year>
-		<publisher>Psygnosis</publisher>
-		<info name="developer" value="DMA Design" />
-		<info name="version" value="v1.53" />
-		<info name="usage" value="Mouse and EMS Memory required" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="23259f9a" sha1="1d1b5e21d0bd9089ba0ac41be7ca1b3ffecf15af"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="3826e140" sha1="b33476065013e26315bd66c33abaa301d7f6edea"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d9c345b4" sha1="b0645535d12920edb2b3c918d1fe19a0e7458366"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="All New World Of Lemmings [Psygnosis] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="96cf7c5d" sha1="a02d03b959b2c54ae1f1fbaf7e628b30812a56fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13228,39 +13331,6 @@ license:CC0
 
 	<software name="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
-		<year>1991</year>
-		<publisher>LucasArts</publisher>
-		<info name="version" value="1.0 (11/21/91)" />
-		<info name="developer" value="LucasArts" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [1 of 5].img" size="1474560" crc="351a3104" sha1="cce3e02f81cd9234fadf34a58930e1cfc4326d4b"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [2 of 5].img" size="1474560" crc="141b315e" sha1="4af90abedff5c660a64ebe48755e147883fdb911"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [3 of 5].img" size="1474560" crc="fdf75bc5" sha1="4296937f48bc5fc8e32afa95f0bbc1b8e2f6f4f6"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [4 of 5].img" size="1474560" crc="65fb2338" sha1="408c76c8957fda999f795d9fd1db18b4b6b0bbdc"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [5 of 5].img" size="1474560" crc="56984413" sha1="e9ca6b21c6384fcde7f2b358cf775487c1fc7791"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="monkey2a" cloneof="monkey2">
-		<description>Monkey Island 2: LeChuck's Revenge (3.5", Alt)</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
 		<info name="developer" value="LucasArts" />
@@ -14199,27 +14269,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sserv2">
-		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>Silent Service II (Version 457.01)</description>
-		<year>1990</year>
-		<publisher>MicroProse</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="disk_serial" value="4561 A" />
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="737280">
-				<rom name="diska.img" size="737280" crc="d21eeeb5" sha1="196d053414c08bff51936a669025cb933b4b9096"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="disk_serial" value="4561 B" />
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="737280">
-				<rom name="diskb.img" size="737280" crc="e3d92c3d" sha1="787b795422552c413bfe14465bc06b152943ce91"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="silverb2p">
 		<description>Silverball 2 Plus</description>
 		<year>1994</year>
@@ -14699,6 +14748,24 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Spear of Destiny Mission 3 - Ultimate Challenge (World) (Add-on).img" size="1474560" crc="6046a918" sha1="42f7969a494f82d20c42343f767239fcfe58417d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specfrce">
+		<description>Special Forces (5.25")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Sleepless Knights" />
+		<info name="version" value="Version 1.00  7th August 1992" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Special Forces [MicroProse] [1992] [5.25HD] [Disk 1 of 2].img" size="1228800" crc="43a32c7f" sha1="931d1effa5b73c32d41f86d226409628af6ccab8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Special Forces [MicroProse] [1992] [5.25HD] [Disk 2 of 2].img" size="1228800" crc="86823208" sha1="95ba58cab80477dc5db9df675a810a983b31073f"/>
 			</dataarea>
 		</part>
 	</software>

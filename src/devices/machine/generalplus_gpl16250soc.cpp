@@ -46,6 +46,35 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 }
 
 
+uint16_t generalplus_gpspi_direct_device::spi_direct_7b40_r()
+{
+	return machine().rand();
+}
+
+
+void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+
+	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+
+	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
+}
+
+
+DEFINE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device, "gpac800spi_direct", "GeneralPlus GPL16250 (with direct SPI handling)")
+
+generalplus_gpspi_direct_device::generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GP_SPI_DIRECT, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspi_direct_device::gpspi_direct_internal_map), this))
+{
+}
+
+
+
+
 void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
 	logerror("callback not hooked\n");

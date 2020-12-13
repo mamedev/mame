@@ -137,10 +137,10 @@ void menu_cheat::populate(float &customtop, float &custombottom)
 		item_append(menu_item_type::SEPARATOR);
 
 		/* add a reset all option */
-		item_append(_("Reset All"), "", 0, (void *)ITEMREF_CHEATS_RESET_ALL);
+		item_append(_("Reset All"), 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 
 		/* add a reload all cheats option */
-		item_append(_("Reload All"), "", 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
+		item_append(_("Reload All"), 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
 	}
 }
 

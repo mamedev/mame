@@ -272,7 +272,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	{
 		// if the device can be loaded empty, add an item
 		if (m_has_empty_start)
-			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
+			item_append("[Start empty]", flags_ui, (void *)&m_swinfo[0]);
 
 		if (m_filters.end() == flt)
 			std::copy(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));

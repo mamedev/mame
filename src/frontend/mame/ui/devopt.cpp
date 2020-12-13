@@ -293,7 +293,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			str << _("[None]\n");
 
 	mconfig.device_remove(m_option->name());
-	item_append(str.str(), "", FLAG_MULTILINE, nullptr);
+	item_append(str.str(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_device_config::handle()

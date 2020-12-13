@@ -19,6 +19,15 @@
 
 
 template <typename T>
+struct lua_engine::simple_list_wrapper
+{
+	simple_list_wrapper(simple_list<T> const &l) : list(l) { }
+
+	simple_list<T> const &list;
+};
+
+
+template <typename T>
 struct lua_engine::tag_object_ptr_map
 {
 	tag_object_ptr_map(T const &m) : map(m) { }
@@ -75,17 +84,86 @@ template <> struct is_container<core_options> : std::false_type { };
 sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking);
 int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
 
-// lua_engine::devenum  customisation
+
+// these things should be treated as containers
 template <typename T> struct is_container<lua_engine::devenum<T> > : std::true_type { };
+template <typename T> struct is_container<lua_engine::simple_list_wrapper<T> > : std::true_type { };
+template <typename T> struct is_container<lua_engine::tag_object_ptr_map<T> > : std::true_type { };
+template <typename T> struct is_container<lua_engine::object_ptr_vector_wrapper<T> > : std::true_type { };
+
+
 template <typename T> struct usertype_container<lua_engine::devenum<T> >;
 
 
-// tag_object_ptr_map is_container
-template <typename T> struct is_container<lua_engine::tag_object_ptr_map<T> > : std::true_type { };
-
-// tag_object_ptr_map usertype_container
 template <typename T>
-struct usertype_container<lua_engine::tag_object_ptr_map<T> > : lua_engine::immutable_container_helper<lua_engine::tag_object_ptr_map<T>, T const, typename T::const_iterator>
+struct usertype_container<lua_engine::simple_list_wrapper<T> > : lua_engine::immutable_collection_helper<lua_engine::simple_list_wrapper<T>, simple_list<T> const, typename simple_list<T>::auto_iterator>
+{
+private:
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return stack::push(L, lua_nil);
+		int result;
+		result = stack::push(L, i.ix + 1);
+		result += stack::push_reference(L, *i.it);
+		++i;
+		return result;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		lua_engine::simple_list_wrapper<T> &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((0 >= index) || (self.list.count() < index))
+			return stack::push(L, lua_nil);
+		else
+			return stack::push_reference(L, *self.list.find(index - 1));
+	}
+
+	static int get(lua_State *L) { return at(L); }
+	static int index_get(lua_State *L) { return at(L); }
+
+	static int index_of(lua_State *L)
+	{
+		lua_engine::simple_list_wrapper<T> &self(usertype_container::get_self(L));
+		T &target(stack::unqualified_get<T>(L, 2));
+		int const found(self.list.indexof(target));
+		if (0 > found)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push(L, found + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		lua_engine::simple_list_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.list.count());
+	}
+
+	static int empty(lua_State *L)
+	{
+		lua_engine::simple_list_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.list.empty());
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs); }
+	static int pairs(lua_State *L) { return ipairs(L); }
+
+	static int ipairs(lua_State *L)
+	{
+		lua_engine::simple_list_wrapper<T> &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.list, self.list.begin());
+		stack::push(L, lua_nil);
+		return 3;
+	}
+};
+
+
+template <typename T>
+struct usertype_container<lua_engine::tag_object_ptr_map<T> > : lua_engine::immutable_collection_helper<lua_engine::tag_object_ptr_map<T>, T const, typename T::const_iterator>
 {
 private:
 	template <bool Indexed>
@@ -191,12 +269,10 @@ bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
 
 
-template <typename T, typename C, typename I>
+template <typename T>
 struct lua_engine::immutable_container_helper
 {
 protected:
-	using iterator = I;
-
 	static T &get_self(lua_State *L)
 	{
 		auto p(sol::stack::unqualified_check_get<T *>(L, 1));
@@ -206,22 +282,6 @@ protected:
 			luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument with ':' or call on a '%s' type", sol::detail::demangle<T>().c_str());
 		return **p;
 	}
-
-	struct indexed_iterator
-	{
-		indexed_iterator(C &s, iterator i) : src(s), it(i), ix(0U) { }
-
-		C &src;
-		iterator it;
-		std::size_t ix;
-
-		indexed_iterator &operator++()
-		{
-			++it;
-			++ix;
-			return *this;
-		}
-	};
 
 public:
 	static int set(lua_State *L)
@@ -249,6 +309,11 @@ public:
 		return luaL_error(L, "sol: cannot call 'find' on type '%s': no supported comparison operator for the value type", sol::detail::demangle<T>().c_str());
 	}
 
+	static int index_of(lua_State *L)
+	{
+		return luaL_error(L, "sol: cannot call 'index_of' on type '%s': no supported comparison operator for the value type", sol::detail::demangle<T>().c_str());
+	}
+
 	static int clear(lua_State *L)
 	{
 		return luaL_error(L, "sol: cannot call 'clear' on type '%s': container is not modifiable", sol::detail::demangle<T>().c_str());
@@ -258,6 +323,30 @@ public:
 	{
 		return luaL_error(L, "sol: cannot call 'erase' on type '%s': container is not modifiable", sol::detail::demangle<T>().c_str());
 	}
+};
+
+
+template <typename T, typename C, typename I>
+struct lua_engine::immutable_collection_helper : immutable_container_helper<T>
+{
+protected:
+	using iterator = I;
+
+	struct indexed_iterator
+	{
+		indexed_iterator(C &s, iterator i) : src(s), it(i), ix(0U) { }
+
+		C &src;
+		iterator it;
+		std::size_t ix;
+
+		indexed_iterator &operator++()
+		{
+			++it;
+			++ix;
+			return *this;
+		}
+	};
 };
 
 

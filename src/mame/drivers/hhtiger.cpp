@@ -580,13 +580,17 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 ROM_START(hhtiger)
 	ROM_REGION(0x1000, "rom_z80", 0)
-	ROM_DEFAULT_BIOS("rel12")
+	ROM_DEFAULT_BIOS("rel13")
 	ROM_SYSTEM_BIOS(0, "rel12", "Rel1.2")
 	ROMX_LOAD("rel1.2-0ea0.ic79", 0x0000, 0x1000, CRC(2f81e48c) SHA1(a4a1d7fde9f92abd6d8f8a1c24e35d713a5cbcb2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rel13", "Rel1.3")
+	ROMX_LOAD("rel1.3-0ea0.ic79", 0x0000, 0x1000, CRC(2f81e48c) SHA1(a4a1d7fde9f92abd6d8f8a1c24e35d713a5cbcb2), ROM_BIOS(1))
 	/* Rel1.4 also known to exist */
 	ROM_REGION(0x4000, "rom_m6809", 0)
 	ROMX_LOAD("rel1.2-cfd3.ic16", 0x0000, 0x2000, CRC(1ae4d2e0) SHA1(c379c5f1be24835ae4b4bd7bed35800faa3a9af6), ROM_BIOS(0))
 	ROMX_LOAD("rel1.2-8fd2.ic15", 0x2000, 0x2000, CRC(0ef23968) SHA1(d46ce3b965ce51d0c90a10121661199b51e33d8b), ROM_BIOS(0))
+	ROMX_LOAD("rel1.3-789a.ic16", 0x0000, 0x2000, CRC(7fa6fd33) SHA1(0b2768c170ca7077ef5164bfa13d9bf033528115), ROM_BIOS(1))
+	ROMX_LOAD("rel1.3-77c1.ic15", 0x2000, 0x2000, CRC(dd2f15d5) SHA1(139a2b97cb8c27a50e3bfa3f42a9572203e453e0), ROM_BIOS(1))
 ROM_END
 
 

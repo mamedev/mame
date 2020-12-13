@@ -51,7 +51,7 @@ void menu_video_targets::populate(float &customtop, float &custombottom)
 			break;
 
 		// add a menu item
-		item_append(util::string_format(_("Screen #%d"), targetnum), "", 0, target);
+		item_append(util::string_format(_("Screen #%d"), targetnum), 0, target);
 	}
 }
 
@@ -89,7 +89,7 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 
 	// add items for each view
 	for (char const *name = m_target.view_name(ref = 0); name; name = m_target.view_name(++ref))
-		item_append(name, "", 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
+		item_append(name, 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
 	item_append(menu_item_type::SEPARATOR);
 
 	// add items for visibility toggles
@@ -105,8 +105,7 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 			bool eclipsed(false);
 			for (auto it = toggles.begin(); !eclipsed && (toggle != it); ++it)
 				eclipsed = ((current_mask & it->mask()) != it->mask()) && ((toggle_mask & it->mask()) == it->mask());
-			u32 const flags((enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW) | (eclipsed ? (FLAG_INVERT | FLAG_DISABLE) : 0U));
-			item_append(toggle->name(), enabled ? _("On") : _("Off"), flags, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
+			item_append_on_off(toggle->name(), enabled, eclipsed ? (FLAG_INVERT | FLAG_DISABLE) : 0U, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
 		}
 		item_append(menu_item_type::SEPARATOR);
 	}
@@ -126,7 +125,7 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 	// cropping
 	int enabled;
 	enabled = m_target.zoom_to_screen();
-	item_append(_("Zoom to Screen Area"), enabled ? _("On") : _("Off"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ZOOM));
+	item_append_on_off(_("Zoom to Screen Area"), enabled, 0, reinterpret_cast<void *>(ITEM_ZOOM));
 }
 
 
@@ -153,8 +152,7 @@ void menu_video_options::handle()
 				m_target.set_orientation(orientation_add(delta, m_target.orientation()));
 				if (m_target.is_ui_target())
 				{
-					render_container::user_settings settings;
-					container().get_user_settings(settings);
+					render_container::user_settings settings = container().get_user_settings();
 					settings.m_orientation = orientation_add(delta ^ ROT180, settings.m_orientation);
 					container().set_user_settings(settings);
 				}

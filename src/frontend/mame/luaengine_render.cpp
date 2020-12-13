@@ -34,24 +34,26 @@ struct layout_view_items
 };
 
 
-struct render_manager_targets
+struct render_target_view_names
 {
-	render_manager_targets(render_manager &m) : targets(m.targets()) { }
+	render_target_view_names(render_target &t) : target(t), count(-1) { }
 
-	simple_list<render_target> const &targets;
+	render_target &target;
+	int count;
 };
 
 } // anonymous namespace
+
 
 namespace sol {
 
 template <> struct is_container<layout_file_views> : std::true_type { };
 template <> struct is_container<layout_view_items> : std::true_type { };
-template <> struct is_container<render_manager_targets> : std::true_type { };
+template <> struct is_container<render_target_view_names> : std::true_type { };
 
 
 template <>
-struct usertype_container<layout_file_views> : lua_engine::immutable_container_helper<layout_file_views, layout_file::view_list>
+struct usertype_container<layout_file_views> : lua_engine::immutable_collection_helper<layout_file_views, layout_file::view_list>
 {
 private:
 	using view_list = layout_file::view_list;
@@ -148,7 +150,7 @@ public:
 
 
 template <>
-struct usertype_container<layout_view_items> : lua_engine::immutable_container_helper<layout_view_items, layout_view::item_list>
+struct usertype_container<layout_view_items> : lua_engine::immutable_collection_helper<layout_view_items, layout_view::item_list>
 {
 private:
 	using item_list = layout_view::item_list;
@@ -241,71 +243,97 @@ public:
 
 
 template <>
-struct usertype_container<render_manager_targets> : lua_engine::immutable_container_helper<render_manager_targets, simple_list<render_target> const, simple_list<render_target>::auto_iterator>
+struct usertype_container<render_target_view_names> : lua_engine::immutable_container_helper<render_target_view_names>
 {
 private:
-	using target_list = simple_list<render_target>;
+	struct iterator
+	{
+		iterator(render_target &t, unsigned i) : target(t), index(i) { }
+
+		render_target &target;
+		unsigned index;
+	};
 
 	static int next_pairs(lua_State *L)
 	{
-		indexed_iterator &i(stack::unqualified_get<user<indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
+		iterator &i(stack::unqualified_get<user<iterator> >(L, 1));
+		char const *name(i.target.view_name(i.index));
+		if (!name)
 			return stack::push(L, lua_nil);
-		int result;
-		result = stack::push(L, i.ix + 1);
-		result += stack::push_reference(L, *i.it);
-		++i.it;
-		++i.ix;
+		int result = stack::push(L, i.index + 1);
+		result += stack::push(L, name);
+		++i.index;
 		return result;
 	}
 
 public:
 	static int at(lua_State *L)
 	{
-		render_manager_targets &self(get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.targets.count() < index))
-			return stack::push(L, lua_nil);
-		else
-			return stack::push_reference(L, *self.targets.find(index - 1));
+		render_target_view_names &self(get_self(L));
+		unsigned const index(stack::unqualified_get<unsigned>(L, 2));
+		return stack::push(L, self.target.view_name(index - 1));
 	}
 
-	static int get(lua_State *L) { return at(L); }
-	static int index_get(lua_State *L) { return at(L); }
+	static int get(lua_State *L)
+	{
+		return at(L);
+	}
+
+	static int index_get(lua_State *L)
+	{
+		return at(L);
+	}
+
+	static int find(lua_State *L)
+	{
+		render_target_view_names &self(get_self(L));
+		char const *const key(stack::unqualified_get<char const *>(L, 2));
+		for (unsigned i = 0; ; ++i)
+		{
+			char const *const name(self.target.view_name(i));
+			if (!name)
+				return stack::push(L, lua_nil);
+			else if (!std::strcmp(key, name))
+				return stack::push(L, i + 1);
+		}
+	}
 
 	static int index_of(lua_State *L)
 	{
-		render_manager_targets &self(get_self(L));
-		render_target &target(stack::unqualified_get<render_target>(L, 2));
-		int const found(self.targets.indexof(target));
-		if (0 > found)
-			return stack::push(L, lua_nil);
-		else
-			return stack::push(L, found + 1);
+		return find(L);
 	}
 
 	static int size(lua_State *L)
 	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.count());
+		render_target_view_names &self(get_self(L));
+		if (0 > self.count)
+			for (self.count = 0; self.target.view_name(self.count); ++self.count) { }
+		return stack::push(L, self.count);
 	}
 
 	static int empty(lua_State *L)
 	{
-		render_manager_targets &self(get_self(L));
-		return stack::push(L, self.targets.empty());
+		render_target_view_names &self(get_self(L));
+		return stack::push(L, !self.target.view_name(0));
 	}
 
-	static int next(lua_State *L) { return stack::push(L, next_pairs); }
-	static int pairs(lua_State *L) { return ipairs(L); }
+	static int next(lua_State *L)
+	{
+		return stack::push(L, next_pairs);
+	}
+
+	static int pairs(lua_State *L)
+	{
+		render_target_view_names &self(get_self(L));
+		stack::push(L, next_pairs);
+		stack::push<user<iterator> >(L, self.target, 0);
+		stack::push(L, lua_nil);
+		return 3;
+	}
 
 	static int ipairs(lua_State *L)
 	{
-		render_manager_targets &self(get_self(L));
-		stack::push(L, next_pairs);
-		stack::push<user<indexed_iterator> >(L, self.targets, self.targets.begin());
-		stack::push(L, lua_nil);
-		return 3;
+		return pairs(L);
 	}
 };
 
@@ -319,20 +347,6 @@ public:
 void lua_engine::initialize_render(sol::table &emu)
 {
 
-/* render_bounds library
- *
- * bounds:includes(x, y) - returns true if point is within bounds
- * bounds:set_xy(left, top, right, bottom) - set bounds
- * bounds:set_wh(left, top, width, height) - set bounds
- *
- * bounds.x0 - leftmost X coordinate
- * bounds.y0 - topmost Y coordinate
- * bounds.x1 - rightmost X coordinate
- * bounds.y1 - bottommost Y coordinate
- * bounds.width - get/set width
- * bounds.height - get/set height
- * bounds.aspect - read-only aspect ratio width:height
- */
 	auto bounds_type = emu.new_usertype<render_bounds>(
 			"render_bounds",
 			sol::call_constructor, sol::initializers(
@@ -350,15 +364,6 @@ void lua_engine::initialize_render(sol::table &emu)
 	bounds_type["aspect"] = sol::property(&render_bounds::aspect);
 
 
-/* render_color library
- *
- * set(a, r, g, b) - set color
- *
- * color.a - alpha channel
- * color.r - red channel
- * color.g - green channel
- * color.b - blue channel
- */
 	auto color_type = emu.new_usertype<render_color>(
 			"render_color",
 			sol::call_constructor, sol::initializers(
@@ -370,24 +375,6 @@ void lua_engine::initialize_render(sol::table &emu)
 	color_type["g"] = &render_color::g;
 	color_type["b"] = &render_color::b;
 
-
-/* layout_view library
- *
- * manager:machine():render().targets[target_index]:current_view()
- *
- * view:has_screen(screen) - returns whether a given screen is present in the view (including hidden screens)
- * view:set_prepare_items_callback(cb) - set additional tasks before adding items to render target
- * view:set_preload_callback(cb) - set additional tasks after preloading visible items
- * view:set_recomputed_callback(cb) - set additional tasks after recomputing for resize or visibility change
- *
- * view.items - get the items in the view (including hidden items)
- * view.name - display name for the view
- * view.unqualified_name - name of the view as specified in the layout file
- * view.visible_screen_count - number of screens items currently enabled
- * view.effective_aspect - effective aspect ratio in current configuration
- * view.bounds - effective bounds in current configuration
- * view.has_art - true if the view has non-screen items
- */
 
 	auto layout_view_type = sol().registry().new_usertype<layout_view>("layout_view", sol::no_constructor);
 	layout_view_type["has_screen"] = &layout_view::has_screen;
@@ -417,25 +404,6 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_type["bounds"] = sol::property(&layout_view::bounds);
 	layout_view_type["has_art"] = sol::property(&layout_view::has_art);
 
-
-/* layout_view::item library
- *
- * item:set_state(state) - set state value used in absence of bindings
- * item.set_element_state_callback(cb) - set callback to obtain element state
- * item.set_animation_state_callback(cb) - set callback to obtain animation state
- * item.set_bounds_callback(cb) - set callback to obtain item bounds
- * item.set_color_callback(cb) - set callback to obtain item color
- *
- * item.id - get optional item identifier
- * item.bounds_animated - true if bounds depend on state
- * item.color_animated - true if color depends on state
- * item.bounds - get bounds for current state
- * item.color - get color for current state
- * item.blend_mode - get blend mode or -1
- * item.orientation - get item orientation
- * item.element_state - get effective element state
- * item.animation_state - get effective animation state
- */
 
 	auto layout_view_item_type = sol().registry().new_usertype<layout_view::item>("layout_item", sol::no_constructor);
 	layout_view_item_type["set_state"] = &layout_view::item::set_state;
@@ -527,14 +495,6 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_item_type["animation_state"] = sol::property(&layout_view::item::animation_state);
 
 
-/* layout_file library
- *
- * file:set_resolve_tags_callback(cb) - set additional tasks after resolving tags
- *
- * file.device - get device that caused the file to be loaded
- * file.views[] - get view table (k=name, v=layout_view)
- */
-
 	auto layout_file_type = sol().registry().new_usertype<layout_file>("layout_file", sol::no_constructor);
 	layout_file_type["set_resolve_tags_callback"] =
 		make_simple_callback_setter<void>(
@@ -546,79 +506,85 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_file_type["views"] = sol::property([] (layout_file &f) { return layout_file_views(f); });
 
 
-/* render_target library
- *
- * manager:machine():render().targets[target_index]
- * manager:machine():render():ui_target()
- *
- * target:current_view() - get current view for target
- * target:width() - get target width
- * target:height() - get target height
- * target:pixel_aspect() - get target aspect
- * target:hidden() - is target hidden
- * target:is_ui_target() - is ui render target
- * target:index() - target index
- * target:view_name([opt] index) - current target layout view name
- *
- * target.max_update_rate -
- * target.view - current target layout view
- * target.orientation - current target orientation
- * target.screen_overlay - enable overlays
- * target.zoom - enable zoom
- */
-
 	auto target_type = sol().registry().new_usertype<render_target>("target", sol::no_constructor);
-	target_type["current_view"] = &render_target::current_view;
-	target_type["width"] = &render_target::width;
-	target_type["height"] = &render_target::height;
-	target_type["pixel_aspect"] = &render_target::pixel_aspect;
-	target_type["hidden"] = &render_target::hidden;
-	target_type["is_ui_target"] = &render_target::is_ui_target;
-	target_type["index"] = &render_target::index;
-	target_type["view_name"] = &render_target::view_name;
+	target_type["index"] = sol::property([] (render_target const &t) { return t.index() + 1; });
+	target_type["width"] = sol::property(&render_target::width);
+	target_type["height"] = sol::property(&render_target::height);
+	target_type["pixel_aspect"] = sol::property(&render_target::pixel_aspect);
+	target_type["hidden"] = sol::property(&render_target::hidden);
+	target_type["is_ui_target"] = sol::property(&render_target::is_ui_target);
 	target_type["max_update_rate"] = sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate);
-	target_type["view"] = sol::property(&render_target::view, &render_target::set_view);
 	target_type["orientation"] = sol::property(&render_target::orientation, &render_target::set_orientation);
+	target_type["view_names"] = sol::property([] (render_target &t) { return render_target_view_names(t); });
+	target_type["current_view"] = sol::property(&render_target::current_view);
+	target_type["view_index"] = sol::property(
+			[] (render_target const &t) { return t.view() + 1; },
+			[] (render_target &t, unsigned v) { t.set_view(v - 1); });
+	target_type["visibility_mask"] = sol::property(&render_target::visibility_mask);
 	target_type["screen_overlay"] = sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled);
-	target_type["zoom"] = sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen);
+	target_type["zoom_to_screen"] = sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen);
 
-
-/* render_container library
- *
- * manager:machine():render():ui_container()
- *
- * container.orientation
- * container.xscale
- * container.yscale
- * container.xoffset
- * container.yoffset
- * container.is_empty
- */
 
 	auto render_container_type = sol().registry().new_usertype<render_container>("render_container", sol::no_constructor);
-	render_container_type["orientation"] = sol::property(&render_container::orientation);
-	render_container_type["xscale"] = sol::property(&render_container::xscale);
-	render_container_type["yscale"] = sol::property(&render_container::yscale);
-	render_container_type["xoffset"] = sol::property(&render_container::xoffset);
-	render_container_type["yoffset"] = sol::property(&render_container::yoffset);
+	render_container_type["user_settings"] = sol::property(&render_container::get_user_settings, &render_container::set_user_settings);
+	render_container_type["orientation"] = sol::property(
+			&render_container::orientation,
+			[] (render_container &c, int v)
+			{
+				render_container::user_settings s(c.get_user_settings());
+				s.m_orientation = v;
+				c.set_user_settings(s);
+			});
+	render_container_type["xscale"] = sol::property(
+			&render_container::xscale,
+			[] (render_container &c, float v)
+			{
+				render_container::user_settings s(c.get_user_settings());
+				s.m_xscale = v;
+				c.set_user_settings(s);
+			});
+	render_container_type["yscale"] = sol::property(
+			&render_container::yscale,
+			[] (render_container &c, float v)
+			{
+				render_container::user_settings s(c.get_user_settings());
+				s.m_yscale = v;
+				c.set_user_settings(s);
+			});
+	render_container_type["xoffset"] = sol::property(
+			&render_container::xoffset,
+			[] (render_container &c, float v)
+			{
+				render_container::user_settings s(c.get_user_settings());
+				s.m_xoffset = v;
+				c.set_user_settings(s);
+			});
+	render_container_type["yoffset"] = sol::property(
+			&render_container::yoffset,
+			[] (render_container &c, float v)
+			{
+				render_container::user_settings s(c.get_user_settings());
+				s.m_yoffset = v;
+				c.set_user_settings(s);
+			});
 	render_container_type["is_empty"] = sol::property(&render_container::is_empty);
 
 
-/* render_manager library
- *
- * manager:machine():render()
- *
- * render:max_update_rate() -
- * render:ui_target() - render_target for ui drawing
- * render:ui_container() - render_container for ui drawing
- *
- * render.targets[] - render_target table
- */
+	auto user_settings_type = sol().registry().new_usertype<render_container::user_settings>("render_container_settings", sol::no_constructor);
+	user_settings_type["orientation"] = &render_container::user_settings::m_orientation;
+	user_settings_type["brightness"] = &render_container::user_settings::m_brightness;
+	user_settings_type["contrast"] = &render_container::user_settings::m_contrast;
+	user_settings_type["gamma"] = &render_container::user_settings::m_gamma;
+	user_settings_type["xscale"] = &render_container::user_settings::m_xscale;
+	user_settings_type["yscale"] = &render_container::user_settings::m_yscale;
+	user_settings_type["xoffset"] = &render_container::user_settings::m_xoffset;
+	user_settings_type["yoffset"] = &render_container::user_settings::m_yoffset;
+
 
 	auto render_type = sol().registry().new_usertype<render_manager>("render", sol::no_constructor);
-	render_type["max_update_rate"] = &render_manager::max_update_rate;
-	render_type["ui_target"] = &render_manager::ui_target;
-	render_type["ui_container"] = &render_manager::ui_container;
-	render_type["targets"] = sol::property([] (render_manager &m) { return render_manager_targets(m); });
+	render_type["max_update_rate"] = sol::property(&render_manager::max_update_rate);
+	render_type["ui_target"] = sol::property(&render_manager::ui_target);
+	render_type["ui_container"] = sol::property(&render_manager::ui_container);
+	render_type["targets"] = sol::property([] (render_manager &m) { return simple_list_wrapper<render_target>(m.targets()); });
 
 }

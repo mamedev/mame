@@ -1054,27 +1054,39 @@ function toolchain(_buildDir, _subDir)
 	configuration { "pnacl", "Release" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
-	configuration { "osx*", "x32" }
+	configuration { "osx*", "x32", "not arm64" }
 		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
-	configuration { "osx*", "x32", "Release" }
+	configuration { "osx*", "x32", "not arm64", "Release" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x32/Release")
 
-	configuration { "osx*", "x32", "Debug" }
+	configuration { "osx*", "x32", "not arm64", "Debug" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x32/Debug")
 
-	configuration { "osx*", "x64" }
+	configuration { "osx*", "x64", "not arm64" }
 		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
 			"-m64", "-DHAVE_IMMINTRIN_H=1",
 		}
 
-	configuration { "osx*", "x64", "Release" }
+	configuration { "osx*", "x64", "not arm64", "Release" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Release")
 
-	configuration { "osx*", "x64", "Debug" }
+	configuration { "osx*", "x64", "not arm64", "Debug" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Debug")
+
+	configuration { "osx*", "arm64" }
+		objdir (_buildDir .. "osx_clang" .. "/obj")
+		buildoptions {
+			"-m64", "-DHAVE_IMMINTRIN_H=0", "-DSDL_DISABLE_IMMINTRIN_H=1", "-DHAVE_SSE=0"
+		}
+
+	configuration { "osx*", "arm64", "Release" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Release")
+
+	configuration { "osx*", "arm64", "Debug" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Debug")
 
 	configuration { "ios-arm" }

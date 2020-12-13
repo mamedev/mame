@@ -254,20 +254,6 @@ void balsente_state::novram_8bit_w(offs_t offset, uint8_t data)
 
 /*************************************
  *
- *  6850 UART communications
- *
- *************************************/
-
-void balsente_state::acia_w(offs_t offset, uint8_t data)
-{
-	// Ugly workaround: suppress soft reset command in order to avert race condition
-	m_acia->write(offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
-}
-
-
-
-/*************************************
- *
  *  ADC handlers
  *
  *************************************/

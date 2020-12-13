@@ -1,5 +1,12 @@
-Scripting MAME via LUA
+.. _luaengine:
+
+Scripting MAME via Lua
 ======================
+
+.. contents:: :local:
+
+
+.. _luaengine-intro:
 
 Introduction
 ------------
@@ -19,6 +26,9 @@ change without prior notice.  However, we expose methods to let you know at
 runtime which API version you are running against, and most of the objects
 support runtime you can introspection.
 
+
+.. _luaengine-features:
+
 Features
 --------
 
@@ -33,6 +43,9 @@ currently available to Lua scripts:
 -  screen HUD drawing (text, lines, boxes on multiple screens)
 -  memory read/write (8/16/32/64 bits, signed and unsigned)
 -  register and state control (state enumeration, get and set)
+
+
+.. _luaengine-usage:
 
 Usage
 -----
@@ -52,10 +65,13 @@ approach.  The former is not encouraged as it is resource-intensive and makes
 control flow unnecessarily complex.  Instead, we suggest to register custom
 hooks to be invoked on specific events (e.g. at each frame rendering).
 
+
+.. _luaengine-walkthrough:
+
 Walkthrough
 -----------
 
-Let's first run MAME in a terminal to reach the LUA console:
+Let's first run MAME in a terminal to reach the Lua console:
 
 ::
 

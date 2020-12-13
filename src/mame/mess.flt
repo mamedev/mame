@@ -250,6 +250,7 @@ dvk_ksm.cpp
 e100.cpp
 e9161.cpp
 eacc.cpp
+easy_karaoke.cpp
 ec184x.cpp
 ec65.cpp
 ec7915.cpp
@@ -346,6 +347,7 @@ generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
 generalplus_gpl16250_romram.cpp
 generalplus_gpl16250_spi.cpp
+generalplus_gpl16250_spi_direct.cpp
 generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
@@ -946,6 +948,7 @@ spg2xx_zone.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
+st22xx_bbl338.cpp
 storio.cpp
 studio2.cpp
 sun1.cpp

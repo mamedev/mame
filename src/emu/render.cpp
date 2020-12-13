@@ -2634,10 +2634,8 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		// apply the opposite orientation to the UI
 		if (is_ui_target())
 		{
-			render_container::user_settings settings;
 			render_container &ui_container = m_manager.ui_container();
-
-			ui_container.get_user_settings(settings);
+			render_container::user_settings settings = ui_container.get_user_settings();
 			settings.m_orientation = orientation_add(orientation_reverse(rotate), settings.m_orientation);
 			ui_container.set_user_settings(settings);
 		}
@@ -3326,10 +3324,9 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 	{
 		int const index = screennode->get_attribute_int("index", -1);
 		render_container *container = m_screen_container_list.find(index);
-		render_container::user_settings settings;
 
 		// fetch current settings
-		container->get_user_settings(settings);
+		render_container::user_settings settings = container->get_user_settings();
 
 		// fetch color controls
 		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
@@ -3395,8 +3392,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			// output the basics
 			screennode->set_attribute_int("index", scrnum);
 
-			render_container::user_settings settings;
-			container->get_user_settings(settings);
+			render_container::user_settings settings = container->get_user_settings();
 
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())

@@ -35,13 +35,13 @@ menu_input_groups::~menu_input_groups()
 void menu_input_groups::populate(float &customtop, float &custombottom)
 {
 	// build up the menu
-	item_append(_("User Interface"), "", 0, (void *)uintptr_t(IPG_UI + 1));
+	item_append(_("User Interface"), 0, (void *)uintptr_t(IPG_UI + 1));
 	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
 		auto s = string_format("Player %d Controls", player + 1);
-		item_append(s, "", 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
+		item_append(s, 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
 	}
-	item_append(_("Other Controls"), "", 0, (void *)uintptr_t(IPG_OTHER + 1));
+	item_append(_("Other Controls"), 0, (void *)uintptr_t(IPG_OTHER + 1));
 }
 
 void menu_input_groups::handle()
@@ -445,9 +445,9 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 			else
 				item_append(menu_item_type::SEPARATOR);
 			if (item.owner->owner())
-				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), "", 0, nullptr);
+				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), 0, nullptr);
 			else
-				item_append(string_format(_("[root%1$s]"), item.owner->tag()), "", 0, nullptr);
+				item_append(string_format(_("[root%1$s]"), item.owner->tag()), 0, nullptr);
 			prev_owner = item.owner;
 		}
 

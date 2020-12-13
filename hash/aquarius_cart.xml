@@ -27,11 +27,24 @@ X-6203 : Chess
 	<software name="addtot">
 		<description>Advanced Dungeons and Dragons: Treasure of Tarmin</description>
 		<year>1982</year>
-		<publisher>TRS Hobbies, Inc.</publisher>
+		<publisher>Mattel</publisher>
 		<info name="serial" value="4023" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="treasue of tarmin.bin" size="0x4000" crc="2fe95594" sha1="e3e494b9dd9623c92f54cc7d12af29b1103f000f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aqcart">
+		<description>Aquaricart</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Jay Snellen, III"/>
+		<part name="cart" interface="aquarius_cart">
+			<feature name="slot" value="sc1" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="aquaricart_v135.bin" size="0x100000" crc="a0844430" sha1="56f53ce63769720b58a74bafb45da35276b72330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,17 +57,6 @@ X-6203 : Chess
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="aworm.bin" size="0x4000" crc="0cbaa1cf" sha1="95bffb44e66d78c3caee834fd53a876d113e3d25"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="basic">
-		<description>Aquarius BASIC ROM</description>
-		<year>1982</year>
-		<publisher>Microsoft</publisher>
-		<part name="cart" interface="aquarius_cart">
-			<dataarea name="rom" size="0x2000">
-				<rom name="basic.bin" size="0x2000" crc="5cfa5b42" sha1="02c8ee11e911d1aa346812492d14284b6870cb3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +88,7 @@ X-6203 : Chess
 	<software name="btime">
 		<description>Burgertime</description>
 		<year>1982</year>
-		<publisher>Data East</publisher>
+		<publisher>Mattel</publisher>
 		<info name="serial" value="4653" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -108,9 +110,9 @@ X-6203 : Chess
 	</software>
 
 	<software name="ebasic">
-		<description>Extended BASIC</description>
+		<description>Extended Microsoft BASIC</description>
 		<year>1982</year>
-		<publisher>Microsoft</publisher>
+		<publisher>Radofin Electronics</publisher>
 		<info name="serial" value="4392" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -119,19 +121,8 @@ X-6203 : Chess
 		</part>
 	</software>
 
-	<software name="dosbasic">
-		<description>Dos BASIC</description>
-		<year>1982</year>
-		<publisher>Microsoft</publisher>
-		<part name="cart" interface="aquarius_cart">
-			<dataarea name="rom" size="0x4000">
-				<rom name="dos basic.bin" size="0x4000" crc="10fb3dca" sha1="ea38ce45628c9d9e4e633c7638e8d860a40c3ffa"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fileform">
-		<description>Fileform</description>
+		<description>FileForm</description>
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4177" />
@@ -143,7 +134,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="finform">
-		<description>Finform</description>
+		<description>FinForm</description>
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4178" />
@@ -155,7 +146,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="logo">
-		<description>Aquarius LOGO</description>
+		<description>LOGO</description>
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4391" />
@@ -167,7 +158,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="demo">
-		<description>Marquee Demo</description>
+		<description>Demonstration</description>
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -189,14 +180,13 @@ X-6203 : Chess
 		</part>
 	</software>
 
-	<software name="modem" supported="no">
-		<description>Modem Terminal Software</description>
+	<software name="minidiag">
+		<description>Mini Expander Diagnostics</description>
 		<year>1982</year>
-		<publisher>Mattel</publisher>
-		<info name="usage" value="Modem required" />
+		<publisher>Radofin Electronics</publisher>
 		<part name="cart" interface="aquarius_cart">
-			<dataarea name="rom" size="0x4000">
-				<rom name="modem terminal software.bin" size="0x4000" crc="052dd522" sha1="35230b695470d9df1c37233107c2b29a18124f7b"/>
+			<dataarea name="rom" size="0x1000">
+				<rom name="mini expander diagnostics.bin" size="0x1000" crc="a2417af2" sha1="e89c054f240f40db02209136b8d7e8a6d9dd5a62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -214,7 +204,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="shark">
-		<description>Shark!</description>
+		<description>Shark! (Prototype)</description>
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -249,9 +239,9 @@ X-6203 : Chess
 	</software>
 
 	<software name="tron">
-		<description>Tron Deadly Discs</description>
+		<description>TRON Deadly Discs</description>
 		<year>1982</year>
-		<publisher>Walt Disney</publisher>
+		<publisher>Mattel</publisher>
 		<info name="serial" value="4024" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -284,7 +274,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="zeroin">
-		<description>Zero-in</description>
+		<description>Zero-In</description>
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4895C" />
@@ -295,14 +285,40 @@ X-6203 : Chess
 		</part>
 	</software>
 
-	<software name="quikdisk">
-		<description>Quick Disk</description>
+	<!--Hardware -->
+
+	<software name="modem" supported="no">
+		<description>Modem Terminal Software</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="usage" value="Modem required" />
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="modem terminal software.bin" size="0x4000" crc="052dd522" sha1="35230b695470d9df1c37233107c2b29a18124f7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qdisk101" cloneof="qdisk" supported="no">
+		<description>Quick Disk V1.01</description>
 		<year>198?</year>
 		<publisher>Radofin Electronics</publisher>
 		<part name="cart" interface="aquarius_cart">
-			<dataarea name="rom" size="0x8000">
-				<rom name="qd1_01.bin" size="0x4000" crc="06dc0ef3" sha1="94b18c2f3f4baca8f5ab0feb2458c88b1682f8b2"/>
-				<rom name="qd1_02.bin" size="0x4000" crc="10fb3dca" sha1="ea38ce45628c9d9e4e633c7638e8d860a40c3ffa" offset="0x4000" />
+			<feature name="slot" value="qdisk" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="qd1_01.bin" size="0x2000" crc="acd84c35" sha1="94a0a0e947d44ffb1139e2776b4f7cf59a21b875"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qdisk" supported="no">
+		<description>Quick Disk V1.02</description>
+		<year>198?</year>
+		<publisher>Radofin Electronics</publisher>
+		<part name="cart" interface="aquarius_cart">
+			<feature name="slot" value="qdisk" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="qd1_02.bin" size="0x2000" crc="1875ac79" sha1="5520ed2aa36ae6ff2cd7d9b496590b877d388396"/>
 			</dataarea>
 		</part>
 	</software>

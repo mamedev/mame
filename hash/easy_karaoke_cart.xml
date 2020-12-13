@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="easy_karaoke_cart" description="IVL Technologies Easy Karaoke cartridges">
+
+	<software name="ekgg3" supported="no">
+		<description>Golden Greats Vol.3</description>
+		<year>2004</year>
+		<publisher>IVL Technologies</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="MX29LV040.U3" size="0x80000" crc="163e6f6d" sha1="baa95437161459d3874fe0576a813907d2ee7869" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>						
+		</part>
+	</software>
+
+	<software name="ekgg4" supported="no">
+		<description>Golden Greats Vol.4</description>
+		<year>2004</year>
+		<publisher>IVL Technologies</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="MX29LV040.U3" size="0x80000" crc="41587eea" sha1="efe29e7dfae91c1f5d0fd196197c3021e8907b58" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>						
+		</part>
+	</software>
+
+</softwarelist>

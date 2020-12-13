@@ -1843,7 +1843,7 @@ static INPUT_PORTS_START( birdiy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_4WAY
-	PORT_DIPNAME(0x10, 0x10, "Rack Test (Cheat)" )  PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x10, 0x10, "Test mode?" ) // Some kind of test/debug mode
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1855,10 +1855,10 @@ static INPUT_PORTS_START( birdiy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW:1,2")
@@ -1874,13 +1874,13 @@ static INPUT_PORTS_START( birdiy )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x20, "Skip Screen" )       PORT_DIPLOCATION("SW:7") /* Used to skip "Act" (AKA level)?? - How do you activate it? */
+	PORT_DIPNAME( 0x20, 0x20, "Skip Screen" )           PORT_DIPLOCATION("SW:7") // End level after the first worm fed to your baby
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Stop Screen" )       PORT_DIPLOCATION("SW:8") /* Seems to have no function? */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -6633,33 +6633,6 @@ ROM_START( theglobme )
 ROM_END
 
 
-ROM_START( theglobpb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8.bin", 0x0000, 0x0800, CRC(3fb1ab3d) SHA1(29b8600c86a5161c90e1797cfec86875c948cf5d) )
-	ROM_LOAD( "4.bin", 0x0800, 0x0800, CRC(554a0461) SHA1(149a0e317d91465c09fb3406073c331cc4e4aa95) )
-	ROM_LOAD( "7.bin", 0x1000, 0x0800, CRC(07a2faf7) SHA1(7f1e95ae94fc404b65ef4465e7f147dbd3093ffb) )
-	ROM_LOAD( "3.bin", 0x1800, 0x0800, CRC(b097cb29) SHA1(bfe750dffebcf6bc1b0acf5a4147fb445559b926) )
-	ROM_LOAD( "6.bin", 0x2000, 0x0800, CRC(b459ba66) SHA1(563259523a4e525eeb01c733fb3c192897725a45) )
-	ROM_LOAD( "2.bin", 0x2800, 0x0800, CRC(d8ef9f98) SHA1(caaefdda74d7415be28abacc192b57a87a72baf7) )
-	ROM_LOAD( "5.bin", 0x3000, 0x0800, CRC(7204e11d) SHA1(ca680a835edad78859b0b3bf54360b1963795850) )
-	ROM_LOAD( "1.bin", 0x3800, 0x0800, CRC(edac5b91) SHA1(8a6f29442370cca8114e7941a36747aa96e4f1bc) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "9.bin",  0x0000, 0x0800, CRC(36408c76) SHA1(f5bb18e38de57adc2aed6211048d9f0ee0e58df7) )
-	ROM_LOAD( "11.bin", 0x0800, 0x0800, CRC(b8ba069c) SHA1(f8d8e40afd8214a6d951af8de2761703b0651f79) )
-	ROM_LOAD( "10.bin", 0x1000, 0x0800, CRC(e0478b4e) SHA1(9697c7fd92752d052aea4c46292b1b7cae28f606) )
-	ROM_LOAD( "12.bin", 0x1800, 0x0800, CRC(7c4456a4) SHA1(74f55ae921cdf8f1f7a866d75a63244187426f17) )
-
-	ROM_REGION( 0x0120, "proms", 0 ) // Sound PROMs, not dumped for this set
-	ROM_LOAD( "n82s123an_a.7f", 0x0000, 0x0020, BAD_DUMP CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
-	ROM_LOAD( "n82s129n_b.4a",  0x0020, 0x0100, BAD_DUMP CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
-
-	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs, not dumped for this set
-	ROM_LOAD( "63s141_b.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "63s141_b.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
-ROM_END
-
-
 ROM_START( beastfp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "bf-u2.bin",    0x0000, 0x2000, CRC(3afc517b) SHA1(5b74bca9e9cd4d8bcf94a340f8f0e53fe1dcfc1d) )
@@ -7972,7 +7945,6 @@ GAME( 1983, bwcasino, 0,        acitya,   bwcasino, epospm_state,  empty_init,  
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,    ROT90,  "Epos Corporation", "Atlantic City Action", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglobpb,suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg",                  "The Glob (Pac-Man hardware, bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )

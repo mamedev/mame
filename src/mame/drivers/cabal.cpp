@@ -170,7 +170,6 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/ym2151.h"
-#include "sound/msm5205.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -647,8 +646,18 @@ void cabal_state::cabal(machine_config &config)
 	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	SEIBU_ADPCM(config, m_adpcm[0], XTAL(12'000'000)/32/48).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
-	SEIBU_ADPCM(config, m_adpcm[1], XTAL(12'000'000)/32/48).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+	SEIBU_ADPCM(config, m_adpcm[0], XTAL(12'000'000)/32/48, m_msm[0]);
+	SEIBU_ADPCM(config, m_adpcm[1], XTAL(12'000'000)/32/48, m_msm[1]);
+
+	MSM5205(config, m_msm[0], XTAL(12'000'000)/32); /* verified on pcb */
+	m_msm[0]->vck_callback().set(m_adpcm[0], FUNC(seibu_adpcm_device::msm_int));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	MSM5205(config, m_msm[1], XTAL(12'000'000)/32); /* verified on pcb */
+	m_msm[1]->vck_callback().set(m_adpcm[1], FUNC(seibu_adpcm_device::msm_int));
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void cabal_state::cabalt(machine_config &config)

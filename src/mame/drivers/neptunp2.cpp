@@ -188,13 +188,13 @@ GFXDECODE_END
 
 void neptunp2_state::neptunp2(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	I80188(config, m_maincpu, 36.864_MHz_XTAL); // N80C188-20 AMD
 	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_map);
 	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -206,7 +206,7 @@ void neptunp2_state::neptunp2(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_neptunp2);
 	PALETTE(config, "palette").set_entries(512);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// OKIM6376(config, "oki", xxx).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -240,32 +240,32 @@ Games on Cirsa "960606-5" PCB
 
 ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical, no GFX but a Samsung VFD.
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u2",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "prg_data", 0 )
-	ROM_LOAD( "u3",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "c.rock_n_roll_b-2103_6219_otp_b-82_m27c801.u14",  0x000000, 0x100000, CRC(963d184b) SHA1(8ad8b3215d3fc513dfae27bea2ed2ae9939c0f02) )
-	ROM_LOAD( "u15",  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+	ROM_LOAD( "c.rock_n_roll_b-2103_6219_otp_b-82_m27c801.u14", 0x000000, 0x100000, CRC(963d184b) SHA1(8ad8b3215d3fc513dfae27bea2ed2ae9939c0f02) )
+	ROM_LOAD( "u15",                                            0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP ) // Protected
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // Protected
 ROM_END
 
 ROM_START( unk960606 ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. Like 'rockroll', it was found with most sockets unpopulated. This is mechanical.
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u2",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "prg_data", 0 )
-	ROM_LOAD( "u3",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP )
 
-	ROM_REGION( 0x180000, "oki", 0 )
-	ROM_LOAD( "s284_otp.u14",   0x000000, 0x080000, CRC(8e385577) SHA1(c8d951b0743f6598a21e78f8c04325408c212554) )
-	ROM_LOAD( "u15",  0x080000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "s284_otp_m27c801.u14", 0x000000, 0x100000, CRC(87325ae4) SHA1(6d77f1933f0aab29371795e8fc7bef9bd05cafea) )
+	ROM_LOAD( "u15",                  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(5e2d52ac) SHA1(98bc7a668ee23de4184bdef23fbceda0c1987cd7) )

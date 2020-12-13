@@ -55,6 +55,15 @@ struct lua_engine::devenum
 };
 
 
+template <typename T>
+struct lua_engine::object_ptr_vector_wrapper
+{
+	object_ptr_vector_wrapper(std::vector<std::unique_ptr<T>> const &v) : vec(v) { }
+
+	std::vector<std::unique_ptr<T>> const &vec;
+};
+
+
 namespace sol
 {
 
@@ -70,7 +79,7 @@ int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
 }
 
 template <typename T>
-struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_container_helper<lua_engine::devenum<T>, T>
+struct usertype_container<lua_engine::devenum<T> > : lua_engine::immutable_collection_helper<lua_engine::devenum<T>, T>
 {
 private:
 	using enumerator = lua_engine::devenum<T>;
@@ -169,6 +178,78 @@ public:
 	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
 	static int pairs(lua_State *L) { return start_pairs<false>(L); }
 	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
+
+
+template <typename T>
+struct usertype_container<lua_engine::object_ptr_vector_wrapper<T> > : lua_engine::immutable_collection_helper<lua_engine::object_ptr_vector_wrapper<T>, std::vector<std::unique_ptr<T>> const, typename std::vector<std::unique_ptr<T>>::const_iterator>
+{
+private:
+	static int next_pairs(lua_State *L)
+	{
+		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return stack::push(L, lua_nil);
+		int result;
+		result = stack::push(L, i.ix + 1);
+		result += stack::push_reference(L, i.it->get());
+		++i;
+		return result;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((0 >= index) || (self.vec.size() < index))
+			return stack::push(L, lua_nil);
+		return stack::push_reference(L, self.vec[index - 1].get());
+	}
+
+	static int get(lua_State *L) { return at(L); }
+	static int index_get(lua_State *L) { return at(L); }
+
+	static int index_of(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		T &target(stack::unqualified_get<T>(L, 2));
+		auto it(self.vec.begin());
+		std::ptrdiff_t ix(0);
+		while ((self.vec.end() != it) && (it->get() != &target))
+		{
+			++it;
+			++ix;
+		}
+		if (self.vec.end() == it)
+			return stack::push(L, lua_nil);
+		else
+			return stack::push(L, ix + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.vec.size());
+	}
+
+	static int empty(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		return stack::push(L, self.vec.empty());
+	}
+
+	static int next(lua_State *L) { return stack::push(L, next_pairs); }
+	static int pairs(lua_State *L) { return ipairs(L); }
+
+	static int ipairs(lua_State *L)
+	{
+		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
+		stack::push(L, next_pairs);
+		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.vec, self.vec.begin());
+		stack::push(L, lua_nil);
+		return 3;
+	}
 };
 
 } // namespace sol
@@ -378,8 +459,6 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 
 void lua_engine::set_machine(running_machine *machine)
 {
-	if (!machine || (machine != m_machine))
-		m_seq_poll.reset();
 	m_machine = machine;
 }
 
@@ -557,7 +636,7 @@ void lua_engine::initialize()
  * emu.keypost(keys) - post keys to natural keyboard
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
- * emu.subst_env(str) - substitute environment variables with values for str
+ * emu.subst_env(str) - substitute environment variables with values for str (semantics are OS-specific)
  *
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_start(callback) - register callback after reset
@@ -1094,6 +1173,7 @@ void lua_engine::initialize()
  * machine:popmessage(str) - print str as popup
  * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
+ *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
  * machine:sound() - get sound_manager
@@ -1117,7 +1197,7 @@ void lua_engine::initialize()
  * machine.images[] - get available image devices table (k=type, v=device_image_interface)
  */
 
-	auto machine_type = sol().registry().new_usertype<running_machine>("machine", "new", sol::no_constructor);
+	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
 	machine_type["exit"] = &running_machine::schedule_exit;
 	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
 	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
@@ -1152,6 +1232,9 @@ void lua_engine::initialize()
 				return false;
 			}
 		};
+	machine_type["popmessage"] = sol::overload(
+			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
+			[](running_machine &m) { m.popmessage(); });
 	machine_type["system"] = &running_machine::system;
 	machine_type["video"] = &running_machine::video;
 	machine_type["sound"] = &running_machine::sound;
@@ -1166,7 +1249,7 @@ void lua_engine::initialize()
 	machine_type["debugger"] =
 		[this] (running_machine &m) -> sol::object
 		{
-			if(!(m.debug_flags & DEBUG_FLAG_ENABLED))
+			if (!(m.debug_flags & DEBUG_FLAG_ENABLED))
 				return sol::make_object(sol(), sol::lua_nil);
 			return sol::make_object(sol(), &m.debugger());
 		};
@@ -1179,9 +1262,6 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
-	machine_type["popmessage"] = sol::overload(
-			[](running_machine &m, const char *str) { m.popmessage("%s", str); },
-			[](running_machine &m) { m.popmessage(); });
 	machine_type["logerror"]  = [] (running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); };
 
 
@@ -1529,6 +1609,7 @@ void lua_engine::initialize()
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
+	screen_dev_type.set("container", sol::property(&screen_device::container));
 	screen_dev_type.set("draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
 			int sc_width = sdev.visible_area().width();
 			int sc_height = sdev.visible_area().height();
@@ -1789,6 +1870,7 @@ void lua_engine::initialize()
  * image.is_creatable
  * image.is_reset_on_load
  * image.must_be_loaded
+ * image.formatlist
  */
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
@@ -1817,6 +1899,30 @@ void lua_engine::initialize()
 	image_type.set("is_creatable", sol::property(&device_image_interface::is_creatable));
 	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
+	image_type.set("formatlist", sol::property([](const device_image_interface &image) { return object_ptr_vector_wrapper<image_device_format>(image.formatlist()); }));
+
+
+/*	image_device_format library
+ *
+ * manager:machine().images[tag].formatlist[index]
+ * 
+ * format.name - name of the format (e.g. - "dsk")
+ * format.description - the description of the format
+ * format.extensions - all of the extensions, as an array
+ * format.optspec - the option spec associated with the format
+ * 
+ */
+	auto format_type = sol().registry().new_usertype<image_device_format>("image_format", sol::no_constructor);
+	format_type["name"] = sol::property(&image_device_format::name);
+	format_type["description"] = sol::property(&image_device_format::description);
+	format_type["optspec"] = sol::property(&image_device_format::optspec);
+	format_type["extensions"] = sol::property([this](const image_device_format &format) {
+			int index = 1;
+			sol::table option_table = sol().create_table();
+			for (const std::string &ext : format.extensions())
+				option_table[index++] = ext;
+			return option_table;
+		});
 
 
 /* device_slot_interface library

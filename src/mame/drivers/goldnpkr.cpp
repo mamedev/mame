@@ -959,338 +959,6 @@
 ************************************************************************************
 
 
-  DRIVER UPDATES:
-
-
-  [2006-09-02]
-
-  - Initial release.
-
-
-  [2006-09-06]
-
-  - Understood the GFX banks:
-      - 1 bank (1bpp) for text layer and minor graphics.
-      - 1 bank (3bpp) for the undumped cards deck graphics.
-
-  - Partially added inputs through 6821 PIAs.
-      ("Bitte techniker rufen" error messages. Press 'W' to reset the machine)
-
-  - Confirmed the CPU as 6502. (was in doubt due to use of illegal opcodes)
-
-
-  [2006-09-15]
-
-  - Confirmed the GFX banks (a complete dump appeared!).
-  - Improved technical notes and added a PCB layout based on PCB picture.
-  - Found and fixed the 3rd bitplane of BigBoy gfx.
-  - Renamed Big-Boy to Golden Poker Double Up. (Big-Boy and Mini-Boy are names of cabinet models).
-  - Added 'Joker Poker' (Golden Poker version without the 'double-up' feature).
-  - Added 'Jack Potten's Poker' (same as Joker Poker, but with 'Aces or better' instead of jacks).
-  - Simulated colors for all sets till color PROMs appear.
-  - Fixed bit corruption in goldnpkr rom u40_4a.bin.
-  - Completed inputs in all sets (except DIP switches).
-  - Removed flags MACHINE_WRONG_COLORS and MACHINE_IMPERFECT_GRAPHICS in all sets.
-  - Removed flag MACHINE_NOT_WORKING. All sets are now playable. :)
-
-
-  [2006-10-09]
-
-  - Added service/settings mode to pmpoker.
-  - Added PORT_IMPULSE to manage correct timings for most inputs in all games.
-    (jokerpkr still trigger more than 1 credit for coin pulse).
-
-
-  [2007-02-01]
-
-  - Crystal documented via #define.
-  - CPU clock derived from #defined crystal value.
-  - Replaced simulated colors with proper color prom decode.
-  - Renamed "Golden Poker Double Up" to "Golden Poker Double Up (Big Boy)".
-  - Added set Golden Poker Double Up (Mini Boy).
-  - Cleaned up the driver a bit.
-  - Updated technical notes.
-
-
-  [2007-05-05]
-
-  - Removed all inputs hacks.
-  - Connected both PIAs properly.
-  - Demuxed all inputs for each game.
-  - Documented all outputs.
-  - Added lamps support.
-  - Created different layout files to cover each game.
-  - Add NVRAM support to all games.
-  - Corrected the color PROM status for each set.
-  - Figured out most of the DIP switches.
-  - Added diplocations to goldnpkb.
-  - Replaced the remaining IPT_SERVICE with IPT_BUTTON for regular buttons.
-  - Updated technical notes.
-  - Cleaned up the driver. Now is better organized and documented.
-
-
-  [2007-07-07]
-
-  - Added set goldnpkc (Golden Poker without the double up feature).
-  - Updated technical notes.
-
-
-  [2008-10-12] *** REWRITE ***
-
-  - Added discrete sound support to Golden Poker hardware games based on schematics.
-  - Added discrete sound support to Potten's Poker hardware games based on PCB analysis.
-  - Added discrete circuitry diagrams for both hardware types.
-  - Adjusted the CPU addressing to 15 bits for pmpoker/goldenpkr hardware.
-  - Adjusted the CPU addressing to 14 bits for pottnpkr hardware.
-  - Rewrote all the ROM loads based on these changes.
-  - Defined MASTER Xtal & CPU clock.
-  - Fixed the visible area based on M6845 registers.
-  - Improved the lamps layouts to be more realistic.
-  - Added Good Luck (potten's poker hybrid running in goldnpkr hardware).
-  - Added Buena Suerte (Spanish) x 2 sets.
-  - Added set Royale.
-  - Added Witch Card and Spanish variants.
-  - Added Super Loco 93 (Spanish) x 2 sets.
-  - Renamed set goldnpkc to pottnpkr (parent Jack Potten's Poker set).
-  - Renamed set jokerpkr to potnpkra, since is another Jack Potten's Poker set.
-  - Added other 2 clones of Jack Potten's Poker.
-  - Renamed/cleaned all sets based on code/hardware analysis.
-  - Added intensity bit to the color system.
-  - Implemented the blue killer bit for Witch Card hardware.
-  - Implemented the extended graphics addressing bit for Witch Card hardware.
-  - Added proper visible area to sloco93.
-  - Rewrote the graphics & color decode system based on schematics. No more patched codes.
-  - Changed the char gfx bank structure and rom load according to the new routines.
-  - Adjusted the amount of color codes and PROM region size accordingly.
-  - Updated all notes.
-
-
-  [2008-11-29] *** REWRITE (part II) ***
-
-  - Changed the driver name to goldnpkr.c (Golden Poker is the most representative hardware).
-  - Splitted the PIA interfases to cover witchcrd/pottenpkr connections.
-  - Fixed the witchcrd/pottnpkr/sloco93 double up mode.
-  - Replaced the pottenpkr layout with goldnpkr one in all Jack Potten's Poker sets.
-  - Updated game notes for Witch Card and Super Loco 93 sets.
-  - Fixed al inputs & lamps to allow double up mode to the above games.
-  - Added Witch Card (Video Klein) but still not working.
-  - Added several Buena Suerte! sets.
-  - Added new games: Maverik, Brasil 89 & Poker'91.
-  - Reworked the sets parent-clone relationship (still in progress).
-
-
-  [2008-12-26]
-
-  - Correctly setup the MC6845 device for all systems.
-  - Added common MC6845 device interface.
-  - Merged witchcrd and sloco93 machine drivers.
-  - Added/corrected the 50/60 Hz. DIP switches to all games.
-    The 50hz mode needs to be corrected. Some games as most bsuerte sets have
-    the 50/60 Hz. DIP switch connection patched.
-
-
-  [2009-09-05]
-
-  - Added 2 new Witch Card sets.
-  - Reworked inputs for Witch Card (German set 1).
-  - Created new inputs for Witch Card (English, witch game, lamps).
-  - Added and connected lamps for both sets.
-  - Added minimal bet and 50/60 Hz. switches to both sets.
-  - Added DIP switches info for Witch Card (German, set 2).
-
-  - Added Genius, running in a modified Golden Poker board.
-
-
-  [2010-09-28]
-
-  - Added 3 new Witch Card sets.
-  - Added 3 new Falcons Wild sets (from 3 different hardwares).
-  - Hooked the second CPU (still encrypted) to the Falcon hardware.
-  - Partially decrypted the second CPU program from Falcon hardware.
-  - Figured out the Falcons Wild (Video Klein) memory map and machine.
-  - Defeated the evil Video Klein's Witch Card hardware.
-  - Reworked inputs for some sets.
-  - Added lamps layouts/connections to the new sets.
-  - Figured out the multiplexed data/address from Falcon's boards sound.
-  - Added full sound support to Falcon hardware.
-  - Reorganized and partially cleaned-up the driver.
-  - Added more technical notes.
-
-
-  [2010-11-18]
-
-  - Added Karateco Super Double (French)
-  - Extended ROM space for goldnpkr game to include the 0x2000..0x3fff range
-
-
-  [2011-01-20]
-
-  - Lots of changes to get working the Video Klein games.
-  - Renamed witchcde to witchjol --> Jolly Witch (Export, 6T/12T ver 1.57D).
-  - Added Wild Witch (Export, 6T/12T ver 1.74A).
-  - New video hardware and machine driver for Video Klein's extended tiles games.
-  - Added Dallas DS1210 + battery backed RAM support to the Video Klein CPU boxed games.
-  - Improved inputs for Jolli Witch and Wild Witch. Added the game selector switch.
-  - Cleaned up some witch card sets.
-  - Added technical and game notes.
-
-
-  [2011-10-19]
-
-  - Mapped the Dallas DS1210 for Video Klein sets that have one.
-  - Mapped the 2800-2fff range as RAM for the non-Dallas Video Klein sets.
-  - Added Witch Card (Video Klein CPU box, set 2)
-  - Added Witch Game (Video Klein, set 2)
-  - Some minor fixes.
-
-
-  [2012-02-19]
-
-  - Added Casino Poker (Ver PM86LO-35-5, German).
-  - Inputs from the scratch.
-  - Switched manufacturer 'Playman' to PM / Beck Elektronik, since
-     it's PM and Beck Elektronik/Computer/etc...
-  - Added technical and game notes.
-
-
-  [2012-03-12]
-
-  - Emulated the Video Klein extended hardware, with Dallas Timekeeper,
-     and the insane 16 graphics banks scheme.
-  - Added Witch Up & Down (Export, 6T/12T ver 0.99).
-  - Added Witch Up & Down (Export, 6T/12T ver 1.02).
-  - Switched Wild Witch and Jolli Witch to the extended hardware.
-  - Accurate colors.
-  - Inputs and lamps from the scratch.
-  - Added technical notes.
-
-
-  [2012-03-14]
-
-  - Fixed and improved the Video Klein extended hardware banking.
-  - Added Witch Strike (Export, 6T/12T ver 1.01A).
-  - Added Witch Strike (Export, 6T/12T ver 1.01B).
-  - Added technical notes.
-
-
-  [2012-03-15]
-
-  - Found and patched the Witch Strike protection scheme.
-  - Proper inputs and lamps support for Witch Strike.
-  - Promoted both Witch Strike sets to working state.
-  - Added technical notes.
-
-
-  [2012-03-17]
-
-  - Added Wild Witch (Export, 6T/12T ver 1.57-SP).
-  - Added Wild Witch (Export, 6T/12T ver 1.57-TE).
-  - Added Wild Witch (Export, 6T/12T ver 1.62A).
-  - Added Wild Witch (Export, 6T/12T ver 1.62B).
-  - Added Wild Witch (Export, 6T/12T ver 1.62A-F).
-  - Added Wild Witch (Export, 6T/12T ver 1.62A alt).
-  - Added Wild Witch (Export, 6T/12T ver 1.62B alt).
-  - Added Wild Witch (Export, 6T/12T ver 1.65A).
-  - Added Wild Witch (Export, 6T/12T ver 1.65A-S).
-  - Added Wild Witch (Export, 6T/12T ver 1.65A-S alt).
-  - Added Wild Witch (Export, 6T/12T ver 1.65A-N).
-  - Added Wild Witch (Export, 6T/12T ver 1.70A beta).
-  - Added Wild Witch (Export, 6T/12T ver 1.70A).
-  - Added Wild Witch (Export, 6T/12T ver 1.70A alt).
-  - Added Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG).
-  - Added Wild Witch (Export, 6T/12T ver 1.74A).
-  - Added Wild Witch (Export, 6T/12T ver 1.74A alt).
-  - Added Wild Witch (Export, 6B/12B ver 1.75A-E English).
-  - Added Wild Witch (Export, 6T/12T ver 1.76A).
-  - Added Wild Witch (Export, 6T/12T ver 1.77A).
-  - Added Wild Witch (Export, 6T/12T ver 1.79A).
-  - Added Wild Witch (Export, 6T/12T ver 1.83A).
-  - Added Wild Witch (Export, 6T/12T ver 1.84A).
-  - Worked each game to temporarily bypass the protection,
-     laying in the Dallas Timekeeper RAM.
-  - Reworked the parent/clones relationship.
-  - Added technical notes.
-
-
-  [2012-03-18]
-
-  - Added Witch Jackpot (Export, 6T/12T ver 0.25).
-  - Added Witch Jack (Export, 6T/12T ver 0.40).
-  - Added Witch Jack (Export, 6T/12T ver 0.40T).
-  - Added Witch Jack (Export, 6T/12T ver 0.62).
-  - Added Witch Jack (Export, 6T/12T ver 0.64).
-  - Added Witch Jack (Export, 6T/12T ver 0.65).
-  - Added Witch Jack (Export, 6T/12T ver 0.70S).
-  - Added Witch Jack (Export, 6T/12T ver 0.70P).
-  - Added Witch Jack (Export, 6T/12T ver 0.87).
-  - Added Witch Jack (Export, 6T/12T ver 0.87-88).
-  - Added Witch Jack (Export, 6T/12T ver 0.87-89).
-  - Proper inputs and lamps.
-
-
-  [2012-03-19]
-
-  - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 2).
-  - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 3).
-  - Added Witch Up & Down (Export, 6T/12T ver 0.99T).
-  - Added Falcons Wild - World Wide Poker (Video Klein, set 2).
-  - Fixed a bug in the coinage input.
-
-
-  [2013-05-04]
-
-  - Added Bonne Chance! (Golden Poker prequel hardware).
-  - Inverted the bipolar PROM data to get the proper palette.
-  - Added technical notes.
-
-  - Added Mundial/Mondial (Italian/French).
-  - Implemented the program banking, but set the Italian lang
-     as default till we can get some evidence.
-  - Added technical notes.
-
-
-  [2013-05-18]
-
-  - Added 2 Videotron Poker sets...(cards selector and normal controls)
-  - Added another Potten's Poker set with Royale cards back graphics.
-  - Proper inputs for Videotron Poker selector.
-  - Figured out the Royale multiplexer system.
-  - Removed the unused Royale driver init.
-  - Both Royale sets promoted to working.
-  - Added technical notes.
-
-
-  [2014-02-23]
-
-  - Added a new Videotron set with cards selector.
-  - Mundial/Mondial (Italian/French): Implemented the program banking
-     properly. Now you can choose the program through a DIP switch.
-
-
-  [2015-11-04]
-
-  - Added new sets:
-     * Genie (ICP-1, set 2).
-     * Super 98 (ICP-1).
-     * Jack Potten's Poker (set 8, Australian).
-
-  - Derived a new machine with improved memory map for this new Genie set.
-  - Minor fixes and clean-ups.
-  - Added games & technical notes.
-
-
-  [2015-11-09]
-
-  - Renamed and rearranged the parent/clone relationship
-     of Witch Jack sets.
-  - Added partial decryption to the ICP1 daughterboard games.
-     (currently only pokerduc set). Since it's just partial,
-     commented out the code for now....
-  - Added port impulse to the Golden Poker's second coin slot.
-     This is needed for both royale sets.
-  - Some fixes and clean-ups.
-
-
   TODO:
 
   - Missing PIA connections.
@@ -6279,7 +5947,7 @@ ROM_END
 /*  Witch Card (Spanish, set 1)
     Unknown argentine manufacturer.
 */
-ROM_START( witchcda )
+ROM_START( witchcrda )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w_card.256", 0x0000, 0x8000, CRC(63a471f8) SHA1(96a2140e2da0050e7865a6662f707cf024130832) )
 
@@ -6299,7 +5967,7 @@ ROM_END
 /*  Witch Card (Spanish, set 2)
     Unknown argentine manufacturer.
 */
-ROM_START( witchcdb )
+ROM_START( witchcrdb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w_card.128", 0x4000, 0x4000, CRC(11ecac96) SHA1(717709b31f3dfa09be321c14fbf0e95d492ad2f2) )
 
@@ -6319,7 +5987,7 @@ ROM_END
 /*  Witch Card (English, no witch game)
     Hack?
 */
-ROM_START( witchcdc )
+ROM_START( witchcrdc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wc_sbruj.256",   0x0000, 0x8000, CRC(5689ae41) SHA1(c7a624ec881204137489b147ce66cc9a9900650a) )
 
@@ -6345,7 +6013,7 @@ ROM_END
    CASINOVERSION WC3050
 
 ***************************************/
-ROM_START( witchcdd )
+ROM_START( witchcrdd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12a.bin",    0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
 
@@ -6366,7 +6034,7 @@ ROM_END
     Video Klein original with epoxy block module.
     Alt set....
 */
-	ROM_START( witchcde )
+ROM_START( witchcrde )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27128_epoxy.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  // epoxy block program ROM
 
@@ -6396,7 +6064,7 @@ ROM_END
     Copyright 1983/84/85
     W.BECK ELEKTRONIK
 */
-ROM_START( witchcdf )
+ROM_START( witchcrdf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "@25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
 	ROM_LOAD( "@26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
@@ -6427,7 +6095,7 @@ ROM_END
   AY8910 is present.
 
 *******************************************/
-ROM_START( witchcdg )
+ROM_START( witchcrdg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.b9",   0x5000, 0x1000, CRC(70462a63) SHA1(9dfa18bf7d4e0803f2a68e64661ece392a7983cc) )
 	ROM_LOAD( "7.b11",  0x6000, 0x1000, CRC(227b3801) SHA1(aebabce01b1abdb42b3e49c38f4fe429e65c1a88) )
@@ -6458,7 +6126,7 @@ ROM_END
    CASINOVERSION WC3050
 
 ***************************************/
-ROM_START( witchcdh )
+ROM_START( witchcrdh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prog3000.a12",   0x0000, 0x8000, CRC(a5c1186a) SHA1(b6c662bf489fbcccc3063ce55c957e630ba96ccb) )
 
@@ -6507,7 +6175,7 @@ ROM_END
 03.a5        [3/4]      ce-3-tvg.bin [1/4]      88.378906%
 
 ***************************************/
-ROM_START( witchcdi )
+ROM_START( witchcrdi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "04.a12", 0x0000, 0x8000, CRC(0f662e02) SHA1(71d7344f63c11082beb4fb4eeb20b04780a9b14c) )
 
@@ -6558,7 +6226,7 @@ ROM_END
     Video Klein original with epoxy block module.
     Alt set....
 */
-	ROM_START( witchcdk )
+	ROM_START( witchgmea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wc_epoxy.bin",   0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  // epoxy block program ROM
 
@@ -11346,7 +11014,7 @@ ROM_END
   Char ROM is identical to the Witch Card one.
 
 *****************************************************/
-ROM_START( witchcdj )
+ROM_START( witchcrdj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c",  0x2000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
 	ROM_LOAD( "d",  0x3000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
@@ -12254,22 +11922,22 @@ GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init
 GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
 GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, init_flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
 
-GAME(  1987, super21p,   0,       super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                   MACHINE_IMPERFECT_COLORS )
+GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                   MACHINE_IMPERFECT_COLORS )
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
-GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
-GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
-GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
-GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
-GAMEL( 1991, witchcde,  witchcrd, witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
-GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
-GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
-GAME(  199?, witchcdj,  witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
+GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
+GAME(  1991, witchcrdb, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
+GAME(  1991, witchcrdc, witchcrd, witchcrd, witchcdc, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
+GAMEL( 1994, witchcrdd, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
+GAMEL( 1991, witchcrde, witchcrd, witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
+GAMEL( 1985, witchcrdf, witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
+GAMEL( 199?, witchcrdg, witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcrdh, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcrdi, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
+GAME(  199?, witchcrdj, witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
-GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1997, witchgmea, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
 
 GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
 

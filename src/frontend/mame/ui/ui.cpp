@@ -598,7 +598,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext.c_str(), ui::text_layout::CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_poptext, ui::text_layout::CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		m_popup_text_end = 0;
 
@@ -703,7 +703,7 @@ float mame_ui_manager::get_char_width(char32_t ch)
 //  character string
 //-------------------------------------------------
 
-float mame_ui_manager::get_string_width(const char *s, float text_size)
+float mame_ui_manager::get_string_width(std::string_view s, float text_size)
 {
 	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
 }
@@ -741,7 +741,7 @@ void mame_ui_manager::draw_outlined_box(render_container &container, float x0, f
 //  draw_text - simple text renderer
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text(render_container &container, const char *buf, float x, float y)
+void mame_ui_manager::draw_text(render_container &container, std::string_view buf, float x, float y)
 {
 	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
 }
@@ -753,7 +753,7 @@ void mame_ui_manager::draw_text(render_container &container, const char *buf, fl
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container &container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, justify, wrap);
@@ -782,7 +782,7 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
 	float maximum_width = 1.0f - box_lr_border() * 2;
@@ -829,7 +829,7 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_message_window(render_container &container, const char *text)
+void mame_ui_manager::draw_message_window(render_container &container, std::string_view text)
 {
 	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
 }
@@ -953,7 +953,7 @@ bool mame_ui_manager::is_menu_active(void)
 
 uint32_t mame_ui_manager::handler_messagebox(render_container &container)
 {
-	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -969,7 +969,7 @@ uint32_t mame_ui_manager::handler_messagebox_anykey(render_container &container)
 	uint32_t state = 0;
 
 	// draw a standard message window
-	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
 	if (machine().ui_input().pressed(IPT_UI_CANCEL))
@@ -1090,7 +1090,7 @@ bool mame_ui_manager::can_paste()
 
 void mame_ui_manager::draw_fps_counter(render_container &container)
 {
-	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().speed_text(), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1102,7 +1102,7 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 void mame_ui_manager::draw_timecode_counter(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().timecode_text(tempstring), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1114,7 +1114,7 @@ void mame_ui_manager::draw_timecode_counter(render_container &container)
 void mame_ui_manager::draw_timecode_total(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().timecode_total_text(tempstring), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1125,7 +1125,7 @@ void mame_ui_manager::draw_timecode_total(render_container &container)
 
 void mame_ui_manager::draw_profiler(render_container &container)
 {
-	const char *text = g_profiler.text(machine());
+	std::string_view text = g_profiler.text(machine());
 	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1172,7 +1172,7 @@ void mame_ui_manager::image_handler_ingame()
 			std::string str = image.call_display();
 			if (!str.empty())
 			{
-				layout.add_text(str.c_str());
+				layout.add_text(str);
 				layout.add_text("\n");
 			}
 		}
@@ -1445,7 +1445,7 @@ uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
 			ui_select_text,
 			ui_cancel_text);
 
-	draw_text_box(container, quit_message.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	draw_text_box(container, quit_message, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine().pause();
 
 	// if the user press ENTER, quit the game
@@ -1839,9 +1839,8 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_brightness = (float)newval * 0.001f;
@@ -1861,9 +1860,8 @@ int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, 
 int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_contrast = (float)newval * 0.001f;
@@ -1882,9 +1880,8 @@ int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, in
 int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_gamma = (float)newval * 0.001f;
@@ -1904,9 +1901,8 @@ int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int i
 int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xscale = (float)newval * 0.001f;
@@ -1926,9 +1922,8 @@ int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yscale = (float)newval * 0.001f;
@@ -1948,9 +1943,8 @@ int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xoffset = (float)newval * 0.001f;
@@ -1970,9 +1964,8 @@ int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yoffset = (float)newval * 0.001f;
@@ -2204,7 +2197,7 @@ ui::text_layout mame_ui_manager::create_layout(render_container &container, floa
 //  wrap_text
 //-------------------------------------------------
 
-int mame_ui_manager::wrap_text(render_container &container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+int mame_ui_manager::wrap_text(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);

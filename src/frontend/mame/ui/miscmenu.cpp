@@ -73,7 +73,7 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), "", 0, (void *)1);
+	item_append(_("Reset"), 0, (void *)1);
 }
 
 menu_bios_selection::~menu_bios_selection()
@@ -237,7 +237,7 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 	}
 
 	/* append the single item */
-	item_append(tempstring.str(), "", FLAG_MULTILINE, nullptr);
+	item_append(tempstring.str(), FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -668,9 +668,9 @@ void menu_export::handle()
 void menu_export::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(uintptr_t)1);
-	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(uintptr_t)3);
-	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(uintptr_t)2);
+	item_append(_("Export list in XML format (like -listxml)"), 0, (void *)(uintptr_t)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), 0, (void *)(uintptr_t)3);
+	item_append(_("Export list in TXT format (like -listfull)"), 0, (void *)(uintptr_t)2);
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -782,28 +782,28 @@ void menu_machine_configure::handle()
 void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("BIOS"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("BIOS"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
 		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
-		item_append(_("This machine has no BIOS."), "", FLAG_DISABLE, nullptr);
+		item_append(_("This machine has no BIOS."), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);
-	item_append(_(submenu::video_options[0].description), "", 0, (void *)(uintptr_t)VIDEO);
-	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
+	item_append(_(submenu::advanced_options[0].description), 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options[0].description), 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options[0].description), 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!m_want_favorite)
-		item_append(_("Add To Favorites"), "", 0, (void *)ADDFAV);
+		item_append(_("Add To Favorites"), 0, (void *)ADDFAV);
 	else
-		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
+		item_append(_("Remove From Favorites"), 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
+	item_append(_("Save machine configuration"), 0, (void *)(uintptr_t)SAVE);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
