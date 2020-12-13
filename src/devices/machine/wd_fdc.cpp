@@ -3003,9 +3003,7 @@ int wd1772_device::settle_time() const
 
 wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
 {
-	const static int wd1773_step_times[4] = { 6000, 12000, 20000, 30000 };
-
-	step_times = wd1773_step_times;
+	step_times = wd_digital_step_times;
 	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
