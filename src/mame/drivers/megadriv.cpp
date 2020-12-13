@@ -1178,11 +1178,11 @@ CONS( 1995, gen_nomd,     0,        0,      ms_megadriv2,    gen_nomd, md_cons_s
 // handheld without LCD
 CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )
 
-// LaserActive (Laserdisc Player(ex: CLD-A100) with Addon slot)
-// Mega Drive/Genesis PAC(PAC-S1) plugged into the LaserActive PAC slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs
-CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer","LaserActive with Genesis PAC (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer","LaserActive with Mega Drive PAC (Japan, NTSC)", MACHINE_NOT_WORKING )
-//TODO: it has also PC Engine/TG16 PAC(PAC-N1) for plays PC Engine/TG16 Cartridge, LD-ROM2 stuffs, but not emulated.
+// LaserActive (Laserdisc Player(ex: CLD-A100) with 'Control Pack' Addon slot)
+// Mega Drive Pack(PAC-S1)/Genesis Pack(PAC-S10) plugged into the Control Pack slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs
+CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer / Sega","LaserActive with Genesis Pack PAC-S10 (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
+//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, LD-ROM2 stuffs, but not emulated.
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
