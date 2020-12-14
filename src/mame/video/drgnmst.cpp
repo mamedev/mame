@@ -199,7 +199,6 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 	else
 	{
 		// mastfury scrolling
-		int unkvreg = m_vidregs[0x10]; // scroll upper bits or layer banks? lower bits seem to be a copy of a scroll reg?
 
 		int fgys = m_vidregs[0x7];
 		m_fg_tilemap->set_scrollx(0, m_vidregs[0x6] - 18); // verify (test mode colour test needs it)
@@ -212,14 +211,11 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
 
-		int bgys = m_vidregs[0xb]; // skyscraper lift stage confirms this reg?
+		// this reg seems to be more closely related to md_tilemap again? is it some kind of split pos?
+		//int bgys = m_vidregs[0xb] & 0x1ff; 
 
-		if (unkvreg & 0x100) // warning screen
-			m_bg_tilemap->set_scrolly(0, (bgys >> 1) - 0x380);
-		else // in game backgrounds
-			m_bg_tilemap->set_scrolly(0, (bgys >> 1) - 0x280);
-
-		//popmessage("bgys %04x", m_vidregs[0xb]);
+		int bgys = m_vidregs[0x10]; // skyscraper lift stage confirms this reg?
+		m_bg_tilemap->set_scrolly(0, bgys); 
 	}
 
 	//popmessage("m_vidregs2[0] %04x", m_vidregs2[0]);
