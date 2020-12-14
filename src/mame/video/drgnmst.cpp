@@ -249,7 +249,7 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
-		case 0x2d80: // all ok (although mastfury looks like it needs md to be raster split on biker/bridge stage?)
+		case 0x2d80: // all ok
 			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
