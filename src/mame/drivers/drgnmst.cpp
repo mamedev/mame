@@ -42,8 +42,6 @@ Notes:
 #include "includes/drgnmst.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -212,9 +210,8 @@ void drgnmst_pic_state::drgnmst_main_map_with_pic(address_map& map)
 void drgnmst_ym_state::drgnmst_main_map_with_ym(address_map& map)
 {
 	drgnmst_main_map(map);
-	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
-	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x800180, 0x800183).umask16(0x00ff).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
@@ -452,8 +449,9 @@ void drgnmst_ym_state::drgnmst_ym(machine_config& config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_ym_state::drgnmst_main_map_with_ym);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); // not verified
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+	ym2151_device &ym2151(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* verified on pcb */
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
