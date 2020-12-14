@@ -46,110 +46,111 @@
 class news_r4k_state : public driver_device
 {
 public:
-    news_r4k_state(machine_config const &mconfig, device_type type, char const *tag)
-        : driver_device(mconfig, type, tag),
-          m_cpu(*this, "cpu"),
-          m_ram(*this, "ram"),
-          //m_dma(*this, "dma"),
-          //m_rtc(*this, "rtc"),
-          m_scc(*this, "scc"),
-          //m_net(*this, "net"),
-          //m_fdc(*this, "fdc"),
-          //m_lcd(*this, "lcd"),
-          //m_hid(*this, "hid"),
-          //m_scsi(*this, "scsi:7:cxd1185"),
-          m_serial(*this, "serial%u", 0U)
-          //m_scsibus(*this, "scsi"),
-          //m_vram(*this, "vram"),
-          //m_led(*this, "led%u", 0U) 
-		  {}
+	news_r4k_state(machine_config const &mconfig, device_type type, char const *tag)
+		: driver_device(mconfig, type, tag),
+		  m_cpu(*this, "cpu"),
+		  m_ram(*this, "ram"),
+		  //m_dma(*this, "dma"),
+		  //m_rtc(*this, "rtc"),
+		  m_scc(*this, "scc"),
+		  //m_net(*this, "net"),
+		  //m_fdc(*this, "fdc"),
+		  //m_lcd(*this, "lcd"),
+		  //m_hid(*this, "hid"),
+		  //m_scsi(*this, "scsi:7:cxd1185"),
+		  m_serial(*this, "serial%u", 0U)
+	//m_scsibus(*this, "scsi"),
+	//m_vram(*this, "vram"),
+	//m_led(*this, "led%u", 0U)
+	{
+	}
 
 protected:
-    // driver_device overrides
-    virtual void machine_start() override;
-    virtual void machine_reset() override;
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-    // address maps
-    void cpu_map(address_map &map);
+	// address maps
+	void cpu_map(address_map &map);
 
-    // machine config
-    void common(machine_config &config);
+	// machine config
+	void common(machine_config &config);
 
 public:
-    // NWS-5000X
-    void nws5000x(machine_config &config);
-    void init_nws5000x();
+	// NWS-5000X
+	void nws5000x(machine_config &config);
+	void init_nws5000x();
 
 protected:
-    void init_common();
-    u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+	void init_common();
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-    void inten_w(offs_t offset, u16 data, u16 mem_mask);
-    u16 inten_r() { return m_inten; }
-    u16 intst_r() { return m_intst; }
-    void intclr_w(offs_t offset, u16 data, u16 mem_mask);
+	void inten_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 inten_r() { return m_inten; }
+	u16 intst_r() { return m_intst; }
+	void intclr_w(offs_t offset, u16 data, u16 mem_mask);
 
-    // See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
-    enum irq_number : unsigned
-    {
-        EXT3 = 0,
-        EXT1 = 1,
-        SLOT3 = 2,
-        SLOT1 = 3,
-        DMA = 4,
-        LANCE = 5,
-        SCC = 6,
-        BEEP = 7,
-        CBSY = 8,
-        CFLT = 9,
-        MOUSE = 10,
-        KBD = 11,
-        TIMER = 12,
-        BERR = 13,
-        ABORT = 14,
-        PERR = 15,
-    }; // TODO: Needs to be scrubbed
-    template <irq_number Number>
-    void irq_w(int state);
-    void int_check();
+	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
+	enum irq_number : unsigned
+	{
+		EXT3 = 0,
+		EXT1 = 1,
+		SLOT3 = 2,
+		SLOT1 = 3,
+		DMA = 4,
+		LANCE = 5,
+		SCC = 6,
+		BEEP = 7,
+		CBSY = 8,
+		CFLT = 9,
+		MOUSE = 10,
+		KBD = 11,
+		TIMER = 12,
+		BERR = 13,
+		ABORT = 14,
+		PERR = 15,
+	}; // TODO: Needs to be scrubbed
+	template <irq_number Number>
+	void irq_w(int state);
+	void int_check();
 
-    u32 bus_error();
-    void itimer_w(u8 data);
-    void itimer(void *ptr, s32 param);
-    u8 debug_r() { return m_debug; }
-    void debug_w(u8 data);
+	u32 bus_error();
+	void itimer_w(u8 data);
+	void itimer(void *ptr, s32 param);
+	u8 debug_r() { return m_debug; }
+	void debug_w(u8 data);
 
-    // DECLARE_FLOPPY_FORMATS(floppy_formats);
+	// DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-    // devices
-    // TODO: Scrub these - NWS-5000X has some differences to the NWS-3xxx series beyond just the AP-Bus
-    required_device<r4400be_32_device> m_cpu;
-    required_device<ram_device> m_ram;
-    //required_device<dmac_0448_device> m_dma;
-    //required_device<m48t02_device> m_rtc;
-    required_device<z80scc_device> m_scc;
-    //required_device<am7990_device> m_net;
-    // required_device<upd72067_device> m_fdc;
+	// devices
+	// TODO: Scrub these - NWS-5000X has some differences to the NWS-3xxx series beyond just the AP-Bus
+	required_device<r4400be_32_device> m_cpu;
+	required_device<ram_device> m_ram;
+	//required_device<dmac_0448_device> m_dma;
+	//required_device<m48t02_device> m_rtc;
+	required_device<z80scc_device> m_scc;
+	//required_device<am7990_device> m_net;
+	// required_device<upd72067_device> m_fdc;
 
-    //required_device<screen_device> m_lcd;
-    //required_device<news_hid_hle_device> m_hid;
-    //required_device<cxd1185_device> m_scsi;
+	//required_device<screen_device> m_lcd;
+	//required_device<news_hid_hle_device> m_hid;
+	//required_device<cxd1185_device> m_scsi;
 
-    required_device_array<rs232_port_device, 2> m_serial;
-    //required_device<nscsi_bus_device> m_scsibus;
+	required_device_array<rs232_port_device, 2> m_serial;
+	//required_device<nscsi_bus_device> m_scsibus;
 
-    //required_shared_ptr<u32> m_vram;
-    //output_finder<4> m_led;
+	//required_shared_ptr<u32> m_vram;
+	//output_finder<4> m_led;
 
-    std::unique_ptr<u16[]> m_net_ram;
+	std::unique_ptr<u16[]> m_net_ram;
 
-    // emu_timer *m_itimer;
+	// emu_timer *m_itimer;
 	emu_timer *m_freerun_timer;
 	u32 freerun_timer_val;
 
-    u16 m_inten;
-    u16 m_intst;
-    u8 m_debug;
+	u16 m_inten;
+	u16 m_intst;
+	u8 m_debug;
 
 	uint8_t log_mem_access_r(offs_t offset);
 	void log_mem_access_w(offs_t offset, uint8_t data);
@@ -159,10 +160,10 @@ protected:
 
 	uint8_t led_state_r(offs_t offset);
 	void led_state_w(offs_t offset, uint8_t data);
-    bool m_int_state[4];
+	bool m_int_state[4];
 
 	uint8_t apbus_cmd_r(offs_t offset);
-    void apbus_cmd_w(offs_t offset, uint8_t data);
+	void apbus_cmd_w(offs_t offset, uint8_t data);
 
 	//void freerun_clock(int context);
 
@@ -181,7 +182,7 @@ protected:
 
 void news_r4k_state::machine_start()
 {
-    /*
+	/*
 	m_led.resolve();
 	*/
 
@@ -204,8 +205,7 @@ data
 	m_lcd_enable = false;
 	m_lcd_dim = false;
     */
-   m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
-   
+	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
@@ -222,10 +222,10 @@ void news_r4k_state::machine_reset()
 
 void news_r4k_state::init_common()
 {
-    
+
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
-	
+
 	/*
 	// HACK: hardwire the rate until fdc is better understood
 	m_fdc->set_rate(500000);
@@ -237,94 +237,118 @@ void news_r4k_state::init_common()
 
 void news_r4k_state::init_nws5000x()
 {
-    init_common();
+	init_common();
 }
 
-uint8_t news_r4k_state::log_mem_access_r(offs_t offset) {
+uint8_t news_r4k_state::log_mem_access_r(offs_t offset)
+{
 	LOG("Read from 0x%x\n", offset);
 	return 0;
 }
 
-void news_r4k_state::log_mem_access_w(offs_t offset, uint8_t data) {
+void news_r4k_state::log_mem_access_w(offs_t offset, uint8_t data)
+{
 	LOG("Write 0x%x to 0x%x\n", data, offset);
 }
 
-uint8_t news_r4k_state::debug_mem_r(offs_t offset) {
+uint8_t news_r4k_state::debug_mem_r(offs_t offset)
+{
 	return 0;
 }
 
-void news_r4k_state::debug_mem_w(offs_t offset, uint8_t data) {
-
+void news_r4k_state::debug_mem_w(offs_t offset, uint8_t data)
+{
 }
 
-uint8_t news_r4k_state::led_state_r(offs_t offset) {
+uint8_t news_r4k_state::led_state_r(offs_t offset)
+{
 	return 0; // who cares
 }
-void news_r4k_state::led_state_w(offs_t offset, uint8_t data) {
+void news_r4k_state::led_state_w(offs_t offset, uint8_t data)
+{
 	// LOG("Setting LED at offset 0x%x to 0x%x\n", offset, data);
 }
 
-uint8_t news_r4k_state::apbus_cmd_r(offs_t offset) {
+uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
+{
 	// ugly hack, like everything else about this driver right now
 	// these values came from my NWS-5000X after it booted to the monitor
 	// so this is pretending to be fully initialized. Needless to say, that
 	// *might* cause problems with the monitor
 	uint8_t value = 0x0;
-	if(offset == 7) {
+	if (offset == 7)
+	{
 		value = 0x1;
-	} else if (offset == 11) {
-		value =  0x1;
-	} else if (offset == 15) {
-		value =  0xc8;
-	} else if (offset == 19) {
+	}
+	else if (offset == 11)
+	{
+		value = 0x1;
+	}
+	else if (offset == 15)
+	{
+		value = 0xc8;
+	}
+	else if (offset == 19)
+	{
 		value = 0x32;
 	}
 	LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
 	return value;
 }
 
-void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data) {
+void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data)
+{
 	LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
-uint8_t news_r4k_state::hack1(offs_t offset) {
-	if(offset % 4 == 0 || offset % 4 == 1) {
+uint8_t news_r4k_state::hack1(offs_t offset)
+{
+	if (offset % 4 == 0 || offset % 4 == 1)
+	{
 		return 0x0;
-	} else if (offset % 4 == 2) {
+	}
+	else if (offset % 4 == 2)
+	{
 		return 0x6f;
-	} else if (offset % 4 == 3) {
+	}
+	else if (offset % 4 == 3)
+	{
 		return 0xe0;
-	} else {
+	}
+	else
+	{
 		LOG("uh oh!\n");
 		return 0x0;
 	}
 }
 
-uint8_t news_r4k_state::hack2(offs_t offset) {
-	if(offset < 1) 
+uint8_t news_r4k_state::hack2(offs_t offset)
+{
+	if (offset < 1)
 	{
 		return 0x0;
 	}
-	else if (offset == 1) 
+	else if (offset == 1)
 	{
 		return 0x3;
 	}
-	else if (offset == 2) 
+	else if (offset == 2)
 	{
 		return 0xff;
-	} 
+	}
 	else if (offset == 3)
 	{
 		return 0x17;
-	} 
-	else 
+	}
+	else
 	{
 		return 0x0;
 	}
 }
 
-uint8_t news_r4k_state::hack3(offs_t offset) {
-	if(offset < 1) 
+uint8_t news_r4k_state::hack3(offs_t offset)
+{
+	if (offset < 1)
 	{
 		return 0x0;
 	}
@@ -332,21 +356,22 @@ uint8_t news_r4k_state::hack3(offs_t offset) {
 	{
 		return 0x0;
 	}
-	else if (offset == 2) 
+	else if (offset == 2)
 	{
 		return 0x03;
-	} 
-	else if (offset == 3) 
+	}
+	else if (offset == 3)
 	{
 		return 0x28;
-	} 
-	else 
+	}
+	else
 	{
 		return 0x0;
 	}
 }
 
-uint8_t news_r4k_state::freerun_r(offs_t offset) {
+uint8_t news_r4k_state::freerun_r(offs_t offset)
+{
 	return freerun_timer_val & 0x000F << (4 * offset);
 }
 
@@ -359,68 +384,68 @@ uint8_t news_r4k_state::freerun_r(offs_t offset) {
  */
 void news_r4k_state::cpu_map(address_map &map)
 {
-    map.unmap_value_high();
+	map.unmap_value_high();
 
-    // Monitor ROM (NEWS firmware)
-    map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
+	// Monitor ROM (NEWS firmware)
+	map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
 
-    map(0x1f3d0000, 0x1f3d0003).ram(); // DIP_SWITCH
-    map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
-    // map(0x1f800000, 0x1f800000); // TIMER0
-    map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
-    
+	map(0x1f3d0000, 0x1f3d0003).ram();					  // DIP_SWITCH
+	map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
+	// map(0x1f800000, 0x1f800000); // TIMER0
+	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
+
 	// ST TIMEKEEPER RAM+RTC
 	// 2Kb SRAM (0x800 bytes)
 	// RTC ports are remapped to 1fe0
-	map(0x1f880000, 0x1f8817ff).ram();  // AP-bus + monitor NVRAM, mapped in an interesting way
-	map(0x1f881fe0, 0x1f881fff); // RTC registers (TODO)
+	map(0x1f880000, 0x1f8817ff).ram(); // AP-bus + monitor NVRAM, mapped in an interesting way
+	map(0x1f881fe0, 0x1f881fff);	   // RTC registers (TODO)
 
-    // // Interrupt clear ports; // INTCLR0
-    // map(0x1f4e0004, 0x1f4e0004); // INTCLR1
-    // map(0x1f4e0008, 0x1f4e0008); // INTCLR2
-    // map(0x1f4e000c, 0x1f4e000c); // INTCLR3
-    // map(0x1f4e0010, 0x1f4e0010); // INTCLR4
-    // map(0x1f4e0014, 0x1f4e0014); // INTCLR5
+	// // Interrupt clear ports; // INTCLR0
+	// map(0x1f4e0004, 0x1f4e0004); // INTCLR1
+	// map(0x1f4e0008, 0x1f4e0008); // INTCLR2
+	// map(0x1f4e000c, 0x1f4e000c); // INTCLR3
+	// map(0x1f4e0010, 0x1f4e0010); // INTCLR4
+	// map(0x1f4e0014, 0x1f4e0014); // INTCLR5
 
-    // // Interrupt enable ports
-    // map(0x1fa00000, 0x1fa00000); // INTEN0
-    // map(0x1fa00004, 0x1fa00004); // INTEN1
-    // map(0x1fa00008, 0x1fa00008); // INTEN2
-    // map(0x1fa0000c, 0x1fa0000c); // INTEN3
-    // map(0x1fa00010, 0x1fa00010); // INTEN4
-    // map(0x1fa00014, 0x1fa00014); // INTEN5
+	// // Interrupt enable ports
+	// map(0x1fa00000, 0x1fa00000); // INTEN0
+	// map(0x1fa00004, 0x1fa00004); // INTEN1
+	// map(0x1fa00008, 0x1fa00008); // INTEN2
+	// map(0x1fa0000c, 0x1fa0000c); // INTEN3
+	// map(0x1fa00010, 0x1fa00010); // INTEN4
+	// map(0x1fa00014, 0x1fa00014); // INTEN5
 
-    // // Interrupt status ports
-    // map(0x1fa00020, 0x1fa00020); // INTST0
-    // map(0x1fa00024, 0x1fa00024); // INTST1
-    // map(0x1fa00028, 0x1fa00028); // INTST2
-    // map(0x1fa0002c, 0x1fa0002c); // INTST3
-    // map(0x1fa00030, 0x1fa00030); // INTST4
-    // map(0x1fa00034, 0x1fa00034); // INTST5
+	// // Interrupt status ports
+	// map(0x1fa00020, 0x1fa00020); // INTST0
+	// map(0x1fa00024, 0x1fa00024); // INTST1
+	// map(0x1fa00028, 0x1fa00028); // INTST2
+	// map(0x1fa0002c, 0x1fa0002c); // INTST3
+	// map(0x1fa00030, 0x1fa00030); // INTST4
+	// map(0x1fa00034, 0x1fa00034); // INTST5
 
-    // LEDs
-    // map(0x1f3f0000, 0x1f3f0000); // LED_POWER
-    // map(0x1f3f0004, 0x1f3f0004); // LED_DISK
-    // map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
-    // map(0x1f3f000c, 0x1f3f000c); // LED_SEC
-    // map(0x1f3f0010, 0x1f3f0010); // LED_NET
-    // map(0x1f3f0014, 0x1f3f0014); // LED_CD
+	// LEDs
+	// map(0x1f3f0000, 0x1f3f0000); // LED_POWER
+	// map(0x1f3f0004, 0x1f3f0004); // LED_DISK
+	// map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
+	// map(0x1f3f000c, 0x1f3f000c); // LED_SEC
+	// map(0x1f3f0010, 0x1f3f0010); // LED_NET
+	// map(0x1f3f0014, 0x1f3f0014); // LED_CD
 	map(0x1f3f0000, 0x1f3f0014).rw(FUNC(news_r4k_state::led_state_r), FUNC(news_r4k_state::led_state_w));
 
-    // APBus region
+	// APBus region
 	// map(0x1f520004, 0x1f520007); // WBFLUSH
 	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
-    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
-    // map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
-    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
-    // map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
-    // map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
-    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
-    // map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
-    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
+	// map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
+	// map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
+	// map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
+	// map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
+	// map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
+	// map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
+	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
+	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
-    // Serial port (TODO: other serial ports)
-    //map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
+	// Serial port (TODO: other serial ports)
+	//map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
 	map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
 	// TESTING - needed for mrom to boot - work RAM? or some unknown devices??
@@ -429,7 +454,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
 	//map(0x1f840000, 0x1f84ffff).ram(); // what is this
 	map(0x1f3e0000, 0x1f3efff0).r(FUNC(news_r4k_state::hack1)); // ditto ;__;
-	map(0x1f4c0000, 0x1f4c0007).ram(); // Register for something that is accessed very early in mrom flow (0xbfc0040C)
+	map(0x1f4c0000, 0x1f4c0007).ram();							// Register for something that is accessed very early in mrom flow (0xbfc0040C)
 
 	map(0x14400004, 0x14400007).r(FUNC(news_r4k_state::hack2));
 	map(0x14900004, 0x14900007).r(FUNC(news_r4k_state::hack3));
@@ -444,8 +469,8 @@ void news_r4k_state::cpu_map(address_map &map)
 	// TODO: ESCCF?
 	// TODO: map(0x1e900000, 0x1e900000);
 
-    // Sonic network controller (https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD)
-    // map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
+	// Sonic network controller (https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD)
+	// map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
 
 	// DMA Controller 0
 	//map(0x1e200000, 0x1e20000f); // End addr meeds confirmation
@@ -476,8 +501,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// fd (???)
 	//map(0x1ed20000, 0x1ed20000);
 
-
-    /*
+	/*
 
 	map(0x10000000, 0x101fffff).rom().region("krom", 0);
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
@@ -517,10 +541,8 @@ void news_r4k_state::cpu_map(address_map &map)
 */
 }
 
-
-
 static INPUT_PORTS_START(nws5000)
-    /*
+	/*
 	PORT_START("SW2")
 	// TODO: other combinations of switches 1-3 may be valid
 	PORT_DIPNAME(0x07000000, 0x02000000, "Display") PORT_DIPLOCATION("SW2:1,2,3")
@@ -549,11 +571,11 @@ static INPUT_PORTS_START(nws5000)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
     */
-    INPUT_PORTS_END
+	INPUT_PORTS_END
 
-    u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+	u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-    /*
+	/*
 	if (!m_lcd_enable)
 		return 0;
 
@@ -574,12 +596,11 @@ static INPUT_PORTS_START(nws5000)
 	}
 */
 	return 0;
-    
 }
 
 void news_r4k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
-    /*
+	/*
 	COMBINE_DATA(&m_inten);
 
 	int_check();
@@ -589,7 +610,7 @@ void news_r4k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 template <news_r4k_state::irq_number Number>
 void news_r4k_state::irq_w(int state)
 {
-    /*
+	/*
 	LOG("irq number %d state %d\n",  Number, state);
 
 	if (state)
@@ -603,7 +624,7 @@ void news_r4k_state::irq_w(int state)
 
 void news_r4k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
 {
-    /*
+	/*
 	m_intst &= ~(data & mem_mask);
 
 	int_check();
@@ -612,7 +633,7 @@ void news_r4k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
 
 void news_r4k_state::int_check()
 {
-    /*
+	/*
 	// TODO: assume 44422222 11100000
 	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
 	static u16 const int_mask[] = { 0x001f, 0x00e0, 0x1f00, 0xe000 };
@@ -632,17 +653,16 @@ void news_r4k_state::int_check()
 
 u32 news_r4k_state::bus_error()
 {
-    /*
+	/*
 	if (!machine().side_effects_disabled())
 		irq_w<BERR>(ASSERT_LINE);
 	*/
 	return 0;
-    
 }
 
 void news_r4k_state::itimer_w(u8 data)
 {
-    /*
+	/*
 	LOG("itimer_w 0x%02x (%s)\n", data, machine().describe_context());
 
 	// TODO: assume 0xff stops the timer
@@ -654,14 +674,14 @@ void news_r4k_state::itimer_w(u8 data)
 
 void news_r4k_state::itimer(void *ptr, s32 param)
 {
-    /*
+	/*
 	irq_w<TIMER>(ASSERT_LINE);
     */
 }
 
 void news_r4k_state::debug_w(u8 data)
 {
-    /*
+	/*
 	 * The low four bits of this register control the diagnostic LEDs labelled 1-4
 	 * with bit 0 correspondig to LED #1, and a 0 value enabling the LED. A non-
 	 * exhaustive list of diagnostic codes produced by the PROM follows:
@@ -679,7 +699,7 @@ void news_r4k_state::debug_w(u8 data)
 	 *  x.x.  inventory/boot
 	 *
 	 */
-    /*
+	/*
 	LOG("debug_w 0x%02x (%s)\n", data, machine().describe_context());
 
 	for (unsigned i = 0; i < 4; i++)
@@ -698,8 +718,8 @@ void news_r4k_state::debug_w(u8 data)
 
 void news_r4k_state::common(machine_config &config)
 {
-	R4400BE32(config, m_cpu, 25_MHz_XTAL); // TODO: Main crystal frequency
-	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);  // TODO: Split PROGRAM/IO?
+	R4400BE32(config, m_cpu, 25_MHz_XTAL);					  // TODO: Main crystal frequency
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map); // TODO: Split PROGRAM/IO?
 	//	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	//void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
 	m_cpu->set_icache_size(16384);
@@ -708,7 +728,7 @@ void news_r4k_state::common(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("64M");
 
-    /*
+	/*
 	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
@@ -751,7 +771,7 @@ void news_r4k_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-/*
+	/*
 	AM7990(config, m_net);
 	m_net->intr_out().set(FUNC(news_r4k_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
@@ -803,7 +823,7 @@ void news_r4k_state::common(machine_config &config)
 
 void news_r4k_state::nws5000x(machine_config &config)
 {
-    common(config);
+	common(config);
 }
 
 ROM_START(nws5000x)
