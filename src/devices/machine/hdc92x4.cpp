@@ -2825,10 +2825,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 				write_on_track(encode((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
 			else
+			{
 				// Write a filler byte so that the last CRC bit is saved correctly
 				// Without, the last bit of the CRC value may be flipped
-				write_on_track(encode(0xff), 1, WRITE_DONE);
-
+				// This is an effect of the PLL, not of MFM
+				// Compare with the header CRC, where during formatting, the
+				// CRC bytes are followed by the gap bytes.
+				write_on_track(encode(fm_mode()? 0xff : 0x4e), 1, WRITE_DONE);
+			}
 			break;
 
 		case WRITE_DONE:
@@ -3572,9 +3576,11 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				write_on_track(encode_hd((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
 			else
+			{
 				// Write a filler byte so that the last CRC bit is saved correctly
-				write_on_track(encode_hd(0xff), 1, WRITE_DONE);
-
+				// See above for an explanation
+				write_on_track(encode_hd(0x4e), 1, WRITE_DONE);
+			}
 			break;
 
 		case WRITE_DONE:
