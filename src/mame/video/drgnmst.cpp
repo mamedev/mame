@@ -98,7 +98,7 @@ void drgnmst_base_state::md_videoram_w(offs_t offset, uint16_t data, uint16_t me
 void drgnmst_base_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint16_t *source = m_spriteram;
+	uint16_t *source = m_spriteram->buffer();
 	uint16_t *finish = source + 0x800 / 2;
 
 	while (source < finish)
@@ -218,8 +218,6 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 		m_bg_tilemap->set_scrolly(0, bgys); 
 	}
 
-	//popmessage("m_vidregs2[0] %04x", m_vidregs2[0]);
-
 	// todo: figure out which bits relate to the order
 	switch (m_vidregs2[0])
 	{
@@ -245,6 +243,7 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x2780: // mastfury skyscraper lift stage
+		case 0x279a: // mastfury continue screen
 			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -258,8 +257,7 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			logerror ("unknown video priority regs %04x\n", m_vidregs2[0]);
-
+			//popmessage("unknown video priority regs %04x\n", m_vidregs2[0]);
 	}
 
 	draw_sprites(bitmap,cliprect);

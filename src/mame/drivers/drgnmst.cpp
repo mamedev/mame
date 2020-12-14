@@ -411,6 +411,9 @@ void drgnmst_base_state::drgnmst(machine_config &config)
 	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(drgnmst_base_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	PALETTE(config, m_palette).set_format(2, &drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
