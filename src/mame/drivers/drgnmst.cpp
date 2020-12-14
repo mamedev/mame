@@ -648,4 +648,4 @@ void drgnmst_pic_state::init_drgnmst()
 GAME( 1994, drgnmst,        0, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, drgnmst2, drgnmst, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, mastfury,       0, drgnmst_ym,  drgnmst, drgnmst_ym_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mastfury,       0, drgnmst_ym,  drgnmst, drgnmst_ym_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_IMPERFECT_GRAPHICS )
