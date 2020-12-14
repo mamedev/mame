@@ -14,7 +14,7 @@ public:
 		, m_screen(*this, "screen")
 	{
 	}
-
+	
 	void st22xx_bbl338(machine_config &config);
 
 private:
@@ -64,5 +64,16 @@ ROM_START( bbl338 )
 ROM_END
 
 
+ROM_START( dphh8213 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "mx29lv160cb.u1", 0x000000, 0x200000, CRC(c8e7e355) SHA1(726f28c2c9ab012a6842f9f30a0a71538741ba14) )
+ROM_END
+
+
+
+
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
 COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+
+// Chinese menus only, low resolution
+COMP( 201?, dphh8213, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213 (China)", MACHINE_IS_SKELETON )

@@ -22340,6 +22340,7 @@ rad_sonicp
 rad_orun
 msi_sf2
 dgunl3227
+ra145
 
 @source:megadriv_sunplus_hybrid.cpp
 reactmd
@@ -32373,6 +32374,10 @@ ppgc200g
 dgun2869
 
 @source:nes_vt09.cpp
+cybar120
+dturbogt
+jl2050
+joypad65
 msiwwe
 msiwwea
 msidd
@@ -32380,16 +32385,13 @@ msimpac
 msimm2
 msisinv
 msifrog
-cybar120
-vsmaxtx2
-senario25
 rcapnp
-dturbogt
+senario25
 ventur25
-vgpocket
-vgpmini
 vgtablet
-joypad65
+vgpmini
+vgpocket
+vsmaxtx2
 
 @source:nes_vt32.cpp
 dgun2573
@@ -38137,6 +38139,7 @@ sorcererd                       // Sorcerer with Micropolis fdc
 
 @source:st22xx_bbl338.cpp
 bbl338
+dphh8213
 
 @source:storio.cpp
 innotab2                        // (c) 2011 V.Tech

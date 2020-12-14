@@ -10,6 +10,7 @@ public:
 	megadriv_radica_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_base_state(mconfig, type, tag),
 		m_bank(0),
+		m_romsize(0x400000),
 		m_rom(*this, "maincpu")
 	{}
 
@@ -22,6 +23,7 @@ public:
 protected:
 	void megadriv_base_map(address_map &map);
 	int m_bank;
+	int m_romsize;
 
 private:
 	required_region_ptr<uint16_t> m_rom;
@@ -71,14 +73,33 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	uint16_t m_a1630a;
 
 private:
 	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);
 	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
-	void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void megadriv_dgunl_map(address_map &map);
-	uint16_t m_a1630a;
+};
+
+class megadriv_ra145_state : public megadriv_dgunl_state
+{
+public:
+	megadriv_ra145_state(const machine_config& mconfig, device_type type, const char* tag)
+		: megadriv_dgunl_state(mconfig, type, tag)
+	{}
+
+	void init_ra145();
+
+public:
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 };
 
 
