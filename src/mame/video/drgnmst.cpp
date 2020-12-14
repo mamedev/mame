@@ -199,15 +199,16 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 	else
 	{
 		// mastfury scrolling
+		// does layer order change scroll offsets?
 
 		int fgys = m_vidregs[0x7];
-		m_fg_tilemap->set_scrollx(0, m_vidregs[0x6] - 18); // verify (test mode colour test needs it)
+		m_fg_tilemap->set_scrollx(0, m_vidregs[0x6] - 14); // 14 = continue screen background
 		m_fg_tilemap->set_scrolly(0, fgys); // verify
 
 		int mgys = m_vidregs[0x8]; // skyscraper lift stage confirms this reg?
 		m_md_tilemap->set_scrolly(0, mgys); // verify
 		for (int y = 0; y < 1024; y++)
-			m_md_tilemap->set_scrollx(y, m_vidregs[0x9] - 16 + m_rowscrollram[y + 0x800 * rowscroll_bank]);
+			m_md_tilemap->set_scrollx(y, m_vidregs[0x9] - 14 + m_rowscrollram[y + 0x800 * rowscroll_bank]); // 14 = char select backround, but vs screen is 16?
 
 		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
 
