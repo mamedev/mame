@@ -185,9 +185,7 @@ void drgnmst_base_state::drgnmst_main_map(address_map &map)
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
 	map(0x800030, 0x800031).w(FUNC(drgnmst_base_state::coin_w));
-	map(0x800100, 0x80011f).writeonly().share("vidregs");
-	map(0x800120, 0x800121).nopw();
-	map(0x80014a, 0x80014b).nopw();
+	map(0x800100, 0x800121).writeonly().share("vidregs");
 	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
 	map(0x800176, 0x800177).portr("EXTRA");
 	map(0x8001e0, 0x8001e1).nopw();
