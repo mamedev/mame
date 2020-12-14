@@ -1044,6 +1044,8 @@ void next_state::next_base(machine_config &config)
 	NEXTMO(config, mo, 0);
 	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
 	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("next_hdd");
 }
 
 void next_state::next(machine_config &config)
