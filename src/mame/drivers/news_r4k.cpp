@@ -143,7 +143,9 @@ protected:
 
     std::unique_ptr<u16[]> m_net_ram;
 
-    emu_timer *m_itimer;
+    // emu_timer *m_itimer;
+	emu_timer *m_freerun_timer;
+	u32 freerun_timer_val;
 
     u16 m_inten;
     u16 m_intst;
@@ -158,6 +160,19 @@ protected:
 	uint8_t led_state_r(offs_t offset);
 	void led_state_w(offs_t offset, uint8_t data);
     bool m_int_state[4];
+
+	uint8_t apbus_cmd_r(offs_t offset);
+    void apbus_cmd_w(offs_t offset, uint8_t data);
+
+	//void freerun_clock(int context);
+
+	TIMER_CALLBACK_MEMBER(freerun_clock);
+
+	uint8_t hack1(offs_t offset);
+	uint8_t hack2(offs_t offset);
+	uint8_t hack3(offs_t offset);
+	uint8_t freerun_r(offs_t offset);
+	//uint8_t hack2_apbus_read(offs_t offset);
 };
 
 //FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
@@ -189,10 +204,20 @@ data
 	m_lcd_enable = false;
 	m_lcd_dim = false;
     */
+   m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+   
+}
+
+TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
+{
+	LOG("Freerun timer tick\n");
+	freerun_timer_val++;
 }
 
 void news_r4k_state::machine_reset()
 {
+	freerun_timer_val = 0;
+	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // TODO: what is the actual frequency of the freerunning clock?
 }
 
 void news_r4k_state::init_common()
@@ -200,6 +225,7 @@ void news_r4k_state::init_common()
     
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
+	
 	/*
 	// HACK: hardwire the rate until fdc is better understood
 	m_fdc->set_rate(500000);
@@ -238,13 +264,97 @@ void news_r4k_state::led_state_w(offs_t offset, uint8_t data) {
 	// LOG("Setting LED at offset 0x%x to 0x%x\n", offset, data);
 }
 
+uint8_t news_r4k_state::apbus_cmd_r(offs_t offset) {
+	// ugly hack, like everything else about this driver right now
+	// these values came from my NWS-5000X after it booted to the monitor
+	// so this is pretending to be fully initialized. Needless to say, that
+	// *might* cause problems with the monitor
+	uint8_t value = 0x0;
+	if(offset == 7) {
+		value = 0x1;
+	} else if (offset == 11) {
+		value =  0x1;
+	} else if (offset == 15) {
+		value =  0xc8;
+	} else if (offset == 19) {
+		value = 0x32;
+	}
+	LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+	return value;
+}
+
+void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data) {
+	LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
+}
+
+uint8_t news_r4k_state::hack1(offs_t offset) {
+	if(offset % 4 == 0 || offset % 4 == 1) {
+		return 0x0;
+	} else if (offset % 4 == 2) {
+		return 0x6f;
+	} else if (offset % 4 == 3) {
+		return 0xe0;
+	} else {
+		LOG("uh oh!\n");
+		return 0x0;
+	}
+}
+
+uint8_t news_r4k_state::hack2(offs_t offset) {
+	if(offset < 1) 
+	{
+		return 0x0;
+	}
+	else if (offset == 1) 
+	{
+		return 0x3;
+	}
+	else if (offset == 2) 
+	{
+		return 0xff;
+	} 
+	else if (offset == 3)
+	{
+		return 0x17;
+	} 
+	else 
+	{
+		return 0x0;
+	}
+}
+
+uint8_t news_r4k_state::hack3(offs_t offset) {
+	if(offset < 1) 
+	{
+		return 0x0;
+	}
+	else if (offset == 1)
+	{
+		return 0x0;
+	}
+	else if (offset == 2) 
+	{
+		return 0x03;
+	} 
+	else if (offset == 3) 
+	{
+		return 0x28;
+	} 
+	else 
+	{
+		return 0x0;
+	}
+}
+
+uint8_t news_r4k_state::freerun_r(offs_t offset) {
+	return freerun_timer_val & 0x000F << (4 * offset);
+}
+
 /*
  * cpu_map
  * 
  * Assign the address map for the CPU
  * Reference: https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
- * 
- * TODO: should these be 1xxxxxxx instead of bxxxxxxx?
  * 
  */
 void news_r4k_state::cpu_map(address_map &map)
@@ -254,15 +364,15 @@ void news_r4k_state::cpu_map(address_map &map)
     // Monitor ROM (NEWS firmware)
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
 
-    // map(0x1f3d0000, 0x1f3d0000); // DIP_SWITCH
+    map(0x1f3d0000, 0x1f3d0003).ram(); // DIP_SWITCH
     map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
     // map(0x1f800000, 0x1f800000); // TIMER0
-    // map(0x1f840000, 0x1f840000); // FREERUN
+    map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
     
 	// ST TIMEKEEPER RAM+RTC
 	// 2Kb SRAM (0x800 bytes)
 	// RTC ports are remapped to 1fe0
-	map(0x1f880000, 0x1f8817ff).ram();  // monitor NVRAM, mapped in an interesting way
+	map(0x1f880000, 0x1f8817ff).ram();  // AP-bus + monitor NVRAM, mapped in an interesting way
 	map(0x1f881fe0, 0x1f881fff); // RTC registers (TODO)
 
     // // Interrupt clear ports; // INTCLR0
@@ -298,7 +408,8 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1f3f0000, 0x1f3f0014).rw(FUNC(news_r4k_state::led_state_r), FUNC(news_r4k_state::led_state_w));
 
     // APBus region
-    // map(0x1f520004, 0x1f520004); // WBFLUSH
+	// map(0x1f520004, 0x1f520007); // WBFLUSH
+	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
     // map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
     // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
@@ -309,18 +420,25 @@ void news_r4k_state::cpu_map(address_map &map)
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
     // Serial port (TODO: other serial ports)
-    map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
-	//map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+    //map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
+	map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
-	// TESTING - needed for mrom to boot
-	//map(0x1e980000, 0x1e9fffff).ram();
+	// TESTING - needed for mrom to boot - work RAM? or some unknown devices??
+	map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
 	//map(0x1f3f0000, 0x1f3f0017);
-	map(0x1ff03000, 0x1ff04003).ram();
+	map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
+	//map(0x1f840000, 0x1f84ffff).ram(); // what is this
+	map(0x1f3e0000, 0x1f3efff0).r(FUNC(news_r4k_state::hack1)); // ditto ;__;
+	map(0x1f4c0000, 0x1f4c0007).ram(); // Register for something that is accessed very early in mrom flow (0xbfc0040C)
+
+	map(0x14400004, 0x14400007).r(FUNC(news_r4k_state::hack2));
+	map(0x14900004, 0x14900007).r(FUNC(news_r4k_state::hack3));
+	map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
 
 	// Unknown regions that mrom accesses
 	//map(0x1f4c0000, 0x1f4c0003).ram();
-	//map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, ???
-	//map(0x1f520008, 0x1f52000B).ram(); 
+	//map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, APBus init?
+	//map(0x1f520008, 0x1f52000B).ram();  // waiting for AP-Bus to come up?
 	//map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
 
 	// TODO: ESCCF?
@@ -618,7 +736,7 @@ void news_r4k_state::common(machine_config &config)
 	m_scc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// scc channel A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 	m_serial[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	m_serial[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
