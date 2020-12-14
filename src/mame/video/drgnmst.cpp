@@ -212,7 +212,7 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
 
-		int bgys = m_vidregs[0x8]; // skyscraper lift stage confirms this reg?
+		int bgys = m_vidregs[0xb]; // skyscraper lift stage confirms this reg?
 		m_bg_tilemap->set_scrolly(0, (bgys>>1)-0x280);
 	}
 
