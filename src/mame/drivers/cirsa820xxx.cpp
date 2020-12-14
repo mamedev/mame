@@ -73,12 +73,16 @@ void cirsa820xxx_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x67ff).ram();
+	map(0x7403, 0x7403).nopw();
+	map(0x7800, 0x7801).w("psg", FUNC(ay8910_device::address_data_w));
 }
 
 void cirsa820xxx_state::io_map(address_map &map)
 {
-	map.global_mask(0xff);
 	map.unmap_value_high();
+	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x14, 0x14).nopr(); // watchdog?
+	map(0x19, 0x19).r("psg", FUNC(ay8910_device::data_r));
 }
 
 
@@ -114,10 +118,12 @@ void cirsa820xxx_state::cirsa820xxx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cirsa820xxx_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &cirsa820xxx_state::io_map);
 
-	PIT8254(config, "i8254", 0);
+	PIT8254(config, "pit");
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", 6'000'000 / 4)); // XTAL value was unreadable, guessed for now. Unknown divider
+	psg.port_a_read_callback().set_ioport("DSW1");
+	psg.port_b_read_callback().set_ioport("DSW2");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
