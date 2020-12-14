@@ -450,11 +450,11 @@ void drgnmst_ym_state::drgnmst_ym(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_ym_state::drgnmst_main_map_with_ym);
 
 	ym2151_device &ym2151(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* verified on pcb */
-	ym2151.add_route(0, "mono", 0.35);
-	ym2151.add_route(1, "mono", 0.35);
+	ym2151.add_route(0, "mono", 0.05);
+	ym2151.add_route(1, "mono", 0.05);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.90);
 }
 
 ROM_START( mastfury )
