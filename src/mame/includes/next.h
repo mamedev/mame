@@ -43,11 +43,13 @@ public:
 	void nexts2(machine_config &config);
 	void nextctc(machine_config &config);
 	void next(machine_config &config);
+	void nextc(machine_config &config);
 	void nextstc(machine_config &config);
 	void nexts(machine_config &config);
 
 	void init_nexts2();
 	void init_next();
+	void init_nextc();
 	void init_nextsc();
 	void init_nextst();
 	void init_nextct();

@@ -1066,6 +1066,13 @@ void next_state::next_fdc_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("next");
 }
 
+void next_state::nextc(machine_config &config)
+{
+	next_fdc_base(config);
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
+
 void next_state::nexts(machine_config &config)
 {
 	next_fdc_base(config);
@@ -1154,6 +1161,10 @@ ROM_START(next)
 	ROM_NEXT_V1
 ROM_END
 
+ROM_START(nextc)
+	ROM_NEXT_V2
+ROM_END
+
 ROM_START(nexts)
 	ROM_NEXT_V2
 ROM_END
@@ -1183,6 +1194,11 @@ ROM_START(nextctc)
 ROM_END
 
 void next_state::init_next()
+{
+	setup(0x00010002, 1120, 832, 2, false);
+}
+
+void next_state::init_nextc()
 {
 	setup(0x00010002, 1120, 832, 2, false);
 }
@@ -1225,11 +1241,12 @@ void next_state::init_nextctc()
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY              FULLNAME                     FLAGS
-COMP( 1987, next,    0,      0,      next,    next,  next_state, init_next,    "Next Software Inc", "NeXT Cube",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, next,    0,      0,      next,    next,  next_state, init_next,    "Next Software Inc", "NeXT Computer",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, nexts,   0,      0,      nexts,   next,  next_state, init_nexts,   "Next Software Inc", "NeXTstation",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextc,   nexts,  0,      next,    next,  next_state, init_nextc,   "Next Software Inc", "NeXTcube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1990, nexts2,  nexts,  0,      nexts2,  next,  next_state, init_nexts2,  "Next Software Inc", "NeXTstation (X15 variant)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextsc,  nexts,  0,      nextsc,  next,  next_state, init_nextsc,  "Next Software Inc", "NeXTstation color",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextst,  0,      0,      nextst,  next,  next_state, init_nextst,  "Next Software Inc", "NeXTstation turbo",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextstc, nextst, 0,      nextstc, next,  next_state, init_nextstc, "Next Software Inc", "NeXTstation turbo color",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( ????, nextct,  nextst, 0,      nextct,  next,  next_state, init_nextct,  "Next Software Inc", "NeXT Cube turbo",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( ????, nextctc, nextst, 0,      nextctc, next,  next_state, init_nextctc, "Next Software Inc", "NeXT Cube turbo color",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextsc,  nexts,  0,      nextsc,  next,  next_state, init_nextsc,  "Next Software Inc", "NeXTstation Color",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextst,  0,      0,      nextst,  next,  next_state, init_nextst,  "Next Software Inc", "NeXTstation Turbo",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextstc, nextst, 0,      nextstc, next,  next_state, init_nextstc, "Next Software Inc", "NeXTstation Turbo Color",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, nextct,  nextst, 0,      nextct,  next,  next_state, init_nextct,  "Next Software Inc", "NeXTcube Turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, nextctc, nextst, 0,      nextctc, next,  next_state, init_nextctc, "Next Software Inc", "NeXTcube Turbo Color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
