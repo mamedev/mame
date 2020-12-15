@@ -520,6 +520,14 @@ void pacman_state::nmouse_interrupt_vector_w(uint8_t data)
 }
 
 
+void pacman_state::mspacii_interrupt_vector_w(uint8_t data)
+{
+	if (data == 0xfb) data = 0xfe;
+	if (data == 0xfc) data = 0xfc;
+	m_interrupt_vector = data;
+}
+
+
 
 /*************************************
  *
@@ -1434,6 +1442,12 @@ void epospm_state::epos_portmap(address_map &map)
 {
 	writeport(map);
 	map(0x00, 0xff).r(FUNC(epospm_state::epos_decryption_w));   /* Switch protection logic */
+}
+
+void pacman_state::mspacii_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).w(FUNC(pacman_state::mspacii_interrupt_vector_w));
 }
 
 void pacman_state::mschamp_portmap(address_map &map)
@@ -3970,6 +3984,15 @@ void pacman_state::rocktrv2(machine_config &config)
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+}
+
+
+void pacman_state::mspacii(machine_config &config)
+{
+	woodpek(config);
+
+	// Basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &pacman_state::mspacii_portmap);
 }
 
 
@@ -7873,8 +7896,8 @@ GAME( 1981, mspacmab4,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,
 GAME( 1981, mspacmbe,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe, ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mspacmbmc,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmbn,   mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1, ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii,    mspacman, woodpek,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii2,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii2,   mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacpls,   mspacman, woodpek,  mspacpls, pacman_state,  empty_init,    ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
