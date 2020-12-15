@@ -1070,6 +1070,7 @@ void next_state::next_base(machine_config &config)
 	net->tx_drq().set(FUNC(next_state::net_tx_drq));
 	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 
+	SOFTWARE_LIST(config, "cdrom_list").set_original("next_cdrom");
 	SOFTWARE_LIST(config, "hdd_list").set_original("next_hdd");
 }
 
