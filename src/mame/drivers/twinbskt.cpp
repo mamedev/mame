@@ -37,7 +37,7 @@ INPUT_PORTS_END
 
 void twinbskt_state::twinbskt(machine_config &config)
 {
-	ST6228(config, m_maincpu, XTAL(8'000'000)); // ST62T25B6/HWD
+	ST6228(config, m_maincpu, XTAL(8'000'000));
 }
 
 ROM_START( twinbskt )
