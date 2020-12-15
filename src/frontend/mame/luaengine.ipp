@@ -268,8 +268,8 @@ bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler
 // map_handler_type customisation
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
 
-// endianness customisation
-int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
+// endianness_t customisation
+int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value);
 
 
 template <typename T>

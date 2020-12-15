@@ -144,7 +144,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_manager_type["count_players"] = &ioport_manager::count_players;
 	ioport_manager_type["type_group"] = &ioport_manager::type_group;
 	ioport_manager_type["type_seq"] =
-		[this] (ioport_manager &im, ioport_type type, int player, std::string const &seq_type_string)
+		[] (ioport_manager &im, ioport_type type, int player, std::string const &seq_type_string)
 		{
 			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			return im.type_seq(type, player, seq_type);
