@@ -40990,6 +40990,9 @@ vulcan                          // GX785 (c) 1988
 vulcana                         // GX785 (c) 1988
 vulcanb                         // GX785 (c) 1988
 
+@source:twinbskt.cpp
+twinbskt                        // (c) 1995 Recreativos Pasqual
+
 @source:twincobr.cpp
 fnshark                         // bootleg
 fshark                          // B02 / TP-007 (c) 1987 Taito Corporation (World)
