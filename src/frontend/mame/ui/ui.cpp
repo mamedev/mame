@@ -11,8 +11,9 @@
 #include "emu.h"
 #include "ui/ui.h"
 
-#include "luaengine.h"
 #include "infoxml.h"
+#include "iptseqpoll.h"
+#include "luaengine.h"
 #include "mame.h"
 #include "ui/filemngr.h"
 #include "ui/info.h"
@@ -110,7 +111,6 @@ static input_item_id const non_char_keys[] =
 // messagebox buffer
 std::string mame_ui_manager::messagebox_text;
 std::string mame_ui_manager::messagebox_poptext;
-rgb_t mame_ui_manager::messagebox_backcolor;
 
 // slider info
 std::vector<ui::menu_item> mame_ui_manager::slider_list;
@@ -203,8 +203,13 @@ void mame_ui_manager::init()
 	update_target_font_height();
 
 	// more initialization
-	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
+	set_handler(
+			ui_callback_type::GENERAL,
+			[this] (render_container &container) -> uint32_t
+			{
+				draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, colors().background_color());
+				return 0;
+			});
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
@@ -406,31 +411,56 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	show_gameinfo = show_warnings = false;
 #endif
 
-	// loop over states
+	// set up event handlers
 	using namespace std::placeholders;
+	switch_code_poller poller(machine().input());
+	std::string warning_text;
+	rgb_t warning_color;
+	auto handler_messagebox_anykey =
+		[this, &poller, &warning_text, &warning_color] (render_container &container) -> uint32_t
+		{
+			// draw a standard message window
+			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
+
+			if (machine().ui_input().pressed(IPT_UI_CANCEL))
+			{
+				// if the user cancels, exit out completely
+				machine().schedule_exit();
+				return UI_HANDLER_CANCEL;
+			}
+			else if (poller.poll() != INPUT_CODE_INVALID)
+			{
+				// if any key is pressed, just exit
+				return UI_HANDLER_CANCEL;
+			}
+
+			return 0;
+		};
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+
+	// loop over states
 	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
-		messagebox_backcolor = colors().background_color();
-		messagebox_text.clear();
+		warning_color = colors().background_color();
+		warning_text.clear();
 
 		// pick the next state
 		switch (state)
 		{
 		case 0:
 			if (show_gameinfo)
-				messagebox_text = machine_info().game_info_string();
-			if (!messagebox_text.empty())
+				warning_text = machine_info().game_info_string();
+			if (!warning_text.empty())
 			{
-				messagebox_text.append(_("\n\nPress any key to continue"));
-				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+				warning_text.append(_("\n\nPress any key to continue"));
+				set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
 			}
 			break;
 
 		case 1:
-			messagebox_text = machine_info().warnings_string();
-			m_has_warnings = !messagebox_text.empty();
+			warning_text = machine_info().warnings_string();
+			m_has_warnings = !warning_text.empty();
 			if (show_warnings)
 			{
 				bool need_warning = m_has_warnings;
@@ -496,9 +526,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				}
 				if (need_warning)
 				{
-					messagebox_text.append(_("\n\nPress any key to continue"));
-					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-					messagebox_backcolor = machine_info().warnings_color();
+					warning_text.append(_("\n\nPress any key to continue"));
+					set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
+					warning_color = machine_info().warnings_color();
 				}
 			}
 			break;
@@ -519,15 +549,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			break;
 		}
 
-		// clear the input memory
-		machine().input().reset_polling();
-		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
+		// clear the input memory and wait for all keys to be released
+		poller.reset();
+		while (poller.poll() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
 		while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
-		{
 			machine().video().frame_update();
-		}
 
 		// clear the handler and force an update
 		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
@@ -556,7 +584,6 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 
 	// copy in the new text
 	messagebox_text.assign(text);
-	messagebox_backcolor = colors().background_color();
 
 	// don't update more than 4 times/second
 	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
@@ -598,7 +625,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext, ui::text_layout::CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_poptext, ui::text_layout::CENTER, 0.5f, 0.9f, colors().background_color());
 	else
 		m_popup_text_end = 0;
 
@@ -945,46 +972,6 @@ bool mame_ui_manager::is_menu_active(void)
 /***************************************************************************
     UI HANDLERS
 ***************************************************************************/
-
-//-------------------------------------------------
-//  handler_messagebox - displays the current
-//  messagebox_text string but handles no input
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_messagebox(render_container &container)
-{
-	draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  handler_messagebox_anykey - displays the
-//  current messagebox_text string and waits for
-//  any keypress
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_messagebox_anykey(render_container &container)
-{
-	uint32_t state = 0;
-
-	// draw a standard message window
-	draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
-
-	// if the user cancels, exit out completely
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
-	{
-		machine().schedule_exit();
-		state = UI_HANDLER_CANCEL;
-	}
-
-	// if any key is pressed, just exit
-	else if (machine().input().poll_switches() != INPUT_CODE_INVALID)
-		state = UI_HANDLER_CANCEL;
-
-	return state;
-}
-
 
 //-------------------------------------------------
 //  process_natural_keyboard - processes any
@@ -2232,7 +2219,6 @@ void mame_ui_manager::popup_time_string(int seconds, std::string message)
 {
 	// extract the text
 	messagebox_poptext = message;
-	messagebox_backcolor = colors().background_color();
 
 	// set a timer
 	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;

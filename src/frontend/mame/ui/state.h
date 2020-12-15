@@ -14,8 +14,11 @@
 
 #include "ui/menu.h"
 
+#include "iptseqpoll.h"
+
 #include <chrono>
 #include <unordered_map>
+
 
 namespace ui {
 
@@ -54,6 +57,7 @@ private:
 
 	static std::string                              s_last_file_selected;
 
+	switch_code_poller                              m_switch_poller;
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
 	std::string_view const                          m_header;

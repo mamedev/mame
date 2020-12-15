@@ -240,7 +240,7 @@ menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 	, data()
 	, pollingitem(nullptr)
-	, seq_poll(machine().input())
+	, seq_poll()
 	, errormsg()
 	, erroritem(nullptr)
 	, lastitem(nullptr)
@@ -269,7 +269,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 {
 	if (pollingitem)
 	{
-		const std::string seqname = machine().input().seq_name(seq_poll.sequence());
+		const std::string seqname = machine().input().seq_name(seq_poll->sequence());
 		char const *const text[] = { seqname.c_str() };
 		draw_text_box(
 				std::begin(text), std::end(text),
@@ -326,7 +326,7 @@ void menu_input::handle()
 		{
 			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
-			if (!seq_poll.modified())
+			if (!seq_poll->modified())
 			{
 				// cancelled immediately - toggle between default and none
 				record_next = false;
@@ -338,14 +338,15 @@ void menu_input::handle()
 				// entered something before cancelling - abandon change
 				invalidate = true;
 			}
+			seq_poll.reset();
 		}
-		else if (seq_poll.poll()) // poll again; if finished, update the sequence
+		else if (seq_poll->poll()) // poll again; if finished, update the sequence
 		{
 			pollingitem = nullptr;
-			if (seq_poll.valid())
+			if (seq_poll->valid())
 			{
 				record_next = true;
-				item->seq = seq_poll.sequence();
+				item->seq = seq_poll->sequence();
 				seqchangeditem = item;
 			}
 			else
@@ -355,6 +356,7 @@ void menu_input::handle()
 				errormsg = _("Invalid sequence entered");
 				erroritem = item;
 			}
+			seq_poll.reset();
 		}
 	}
 	else if (menu_event && menu_event->itemref)
@@ -369,10 +371,14 @@ void menu_input::handle()
 			pollingitem = &item;
 			lastitem = &item;
 			starting_seq = item.seq;
-			if (record_next)
-				seq_poll.start((item.type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, item.seq);
+			if (INPUT_TYPE_ANALOG == item.type)
+				seq_poll.reset(new axis_sequence_poller(machine().input()));
 			else
-				seq_poll.start((item.type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH);
+				seq_poll.reset(new switch_sequence_poller(machine().input()));
+			if (record_next)
+				seq_poll->start(item.seq);
+			else
+				seq_poll->start();
 			invalidate = true;
 			break;
 

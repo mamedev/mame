@@ -605,15 +605,21 @@ function cheat.startplugin()
 		local menu = {}
 		if hotkeymenu then
 			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
-			menu[2] = {"---", "", "off"}
+			menu[2] = {_("Press UI Clear to clear hotkey"), "", "off"}
+			menu[3] = {"---", "", "off"}
 			hotkeylist = {}
 
-			local function hkcbfunc(cheat)
+			local function hkcbfunc(cheat, event)
+				if event == "clear" then
+					cheat.hotkeys = nil
+					return
+				end
+
 				local input = manager:machine():input()
-				local poller = input:sequence_poller()
-				manager:machine():popmessage(_("Press button for hotkey or wait to clear"))
+				local poller = input:switch_sequence_poller()
+				manager:machine():popmessage(_("Press button for hotkey or wait to leave unchanged"))
 				manager:machine():video():frame_update(true)
-				poller:start("switch")
+				poller:start()
 				local time = os.clock()
 				local clearmsg = true
 				while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
@@ -627,10 +633,8 @@ function cheat.startplugin()
 						manager:machine():video():frame_update(true)
 					end
 				end
-				if poller.valid then
+				if poller.modified and poller.valid then
 					cheat.hotkeys = { pressed = false, keys = poller.sequence }
-				else
-					cheat.hotkeys = nil
 				end
 				if clearmsg then
 					manager:machine():popmessage()
@@ -641,7 +645,7 @@ function cheat.startplugin()
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
 					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or _("None"), ""}
-					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
+					hotkeylist[#hotkeylist + 1] = function(event) return hkcbfunc(cheat, event) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
@@ -701,12 +705,12 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager:machine():popmessage()
 		if hotkeymenu then
-			if event == "select" then
-				index = index - 2
+			if event == "select" or event == "clear" then
+				index = index - 3
 				if index >= 1 and index <= #hotkeylist then
-					hotkeylist[index]()
+					hotkeylist[index](event)
 					return true
-				elseif index == #hotkeylist + 2 then
+				elseif index == #hotkeylist + 2 and event == "select" then
 					hotkeymenu = false
 					return true
 				end

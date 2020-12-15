@@ -379,6 +379,7 @@ public:
 	// operators
 	constexpr bool operator==(const input_code &rhs) const noexcept { return m_internal == rhs.m_internal; }
 	constexpr bool operator!=(const input_code &rhs) const noexcept { return m_internal != rhs.m_internal; }
+	constexpr bool operator<(const input_code &rhs) const noexcept { return m_internal < rhs.m_internal; }
 
 	// getters
 	constexpr bool internal() const noexcept { return device_class() == DEVICE_CLASS_INTERNAL; }
@@ -504,12 +505,6 @@ public:
 	s32 code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
-
-	// input code polling
-	void reset_polling();
-	input_code poll_axes();
-	input_code poll_switches();
-	input_code poll_keyboard_switches();
 
 	// input code helpers
 	input_device *device_from_code(input_code code) const;

@@ -1236,8 +1236,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			auto const ticks = std::chrono::steady_clock::now();
 			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
-			// check for a double-click
-			if (ticks - window->m_lastclicktime < std::chrono::milliseconds(GetDoubleClickTime()) &&
+			// check for a double-click - avoid overflow by adding times rather than subtracting
+			if (ticks < (window->m_lastclicktime + std::chrono::milliseconds(GetDoubleClickTime())) &&
 				GET_X_LPARAM(lparam) >= window->m_lastclickx - 4 && GET_X_LPARAM(lparam) <= window->m_lastclickx + 4 &&
 				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
 			{

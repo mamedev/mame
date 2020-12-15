@@ -175,7 +175,7 @@ function gdbstub.startplugin()
 					local data = ""
 					local space = cpu.spaces["program"]
 					for count = 1, len do
-						data = data .. string.format("%.2x", space:read_log_u8(addr))
+						data = data .. string.format("%.2x", space:readv_u8(addr))
 						addr = addr + 1
 					end
 					socket:write("+$" .. data .. "#" .. chksum(data))
@@ -188,7 +188,7 @@ function gdbstub.startplugin()
 				if addr and len and data then
 					addr = tonumber(addr, 16)
 					local space = cpu.spaces["program"]
-					data:gsub("%x%x", function(s) space:write_log_u8(addr + count, tonumber(s, 16)) count = count + 1 end)
+					data:gsub("%x%x", function(s) space:writev_u8(addr + count, tonumber(s, 16)) count = count + 1 end)
 					socket:write("+$OK#9a")
 				else
 					socket:write("+$E00#a5")

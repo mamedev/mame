@@ -299,50 +299,6 @@ bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler
 	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
 }
 
-int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value)
-{
-	const char *typestr;
-	switch(value)
-	{
-		case AMH_NONE:
-			typestr = "none";
-			break;
-		case AMH_RAM:
-			typestr = "ram";
-			break;
-		case AMH_ROM:
-			typestr = "rom";
-			break;
-		case AMH_NOP:
-			typestr = "nop";
-			break;
-		case AMH_UNMAP:
-			typestr = "unmap";
-			break;
-		case AMH_DEVICE_DELEGATE:
-		case AMH_DEVICE_DELEGATE_M:
-		case AMH_DEVICE_DELEGATE_S:
-		case AMH_DEVICE_DELEGATE_SM:
-		case AMH_DEVICE_DELEGATE_MO:
-		case AMH_DEVICE_DELEGATE_SMO:
-			typestr = "delegate";
-			break;
-		case AMH_PORT:
-			typestr = "port";
-			break;
-		case AMH_BANK:
-			typestr = "bank";
-			break;
-		case AMH_DEVICE_SUBMAP:
-			typestr = "submap";
-			break;
-		default:
-			typestr = "unknown";
-			break;
-	}
-	return sol::stack::push(L, typestr);
-}
-
 
 //-------------------------------------------------
 //  process_snapshot_filename - processes a snapshot
