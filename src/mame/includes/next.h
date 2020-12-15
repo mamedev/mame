@@ -35,8 +35,12 @@ public:
 			floppy0(*this, "fdc:0"),
 			vram(*this, "vram") { }
 
+	void next_mo_config(machine_config &config);
+	void next_fdc_config(machine_config &config);
 	void next_base(machine_config &config);
+	void next_mo_base(machine_config &config);
 	void next_fdc_base(machine_config &config);
+	void next_mo_fdc_base(machine_config &config);
 	void nextst(machine_config &config);
 	void nextsc(machine_config &config);
 	void nextct(machine_config &config);
@@ -65,7 +69,7 @@ private:
 	required_device<nscsi_bus_device> scsibus;
 	required_device<ncr5390_device> scsi;
 	required_device<mb8795_device> net;
-	required_device<nextmo_device> mo;
+	optional_device<nextmo_device> mo; // cube only
 	optional_device<n82077aa_device> fdc; // 040 only
 	optional_device<floppy_connector> floppy0; // 040 only
 
@@ -140,11 +144,15 @@ private:
 
 	void ncr5390(device_t *device);
 	void next_0b_m_mem(address_map &map);
+	void next_0b_m_mo_mem(address_map &map);
 	void next_0b_m_nofdc_mem(address_map &map);
 	void next_0c_c_mem(address_map &map);
 	void next_0c_m_mem(address_map &map);
+	void next_0c_c_mo_mem(address_map &map);
+	void next_0c_m_mo_mem(address_map &map);
 	void next_2c_c_mem(address_map &map);
 	void next_fdc_mem(address_map &map);
+	void next_mo_mem(address_map &map);
 	void next_mem(address_map &map);
 
 	struct dma_slot {
