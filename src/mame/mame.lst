@@ -11638,6 +11638,7 @@ dbox                            // (c) 1996 Nokia Multimedia
 @source:dbz.cpp
 dbz                             // (c) 1993 Banpresto
 dbz2                            // (c) 1994 Banpresto
+dbz2bl                          // bootleg
 dbza                            // (c) 1993 Banpresto
 
 @source:dccons.cpp
@@ -38113,6 +38114,7 @@ toto                            //
 twinadv                         // (c) 1995 Barko Corp
 twinadvk                        // (c) 1995 Barko Corp
 twinkle                         // (c) 1997 SemiCom
+twinklea                        // (c) 1997 SemiCom
 wintbob                         // bootleg
 yutnori                         // (c) 199? yutnori
 
