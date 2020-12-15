@@ -31,6 +31,7 @@
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
+#include "unicode.h"
 
 #include <atomic>
 #include <condition_variable>

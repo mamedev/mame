@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "uiinput.h"
 #include "strconv.h"
+#include "unicode.h"
 
 // MAMEOS headers
 #include "input_common.h"

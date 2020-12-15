@@ -30,6 +30,7 @@
 #include "debugger.h"
 #include "r4000.h"
 #include "mips3dsm.h"
+#include "unicode.h"
 
 #include "softfloat3/source/include/softfloat.h"
 

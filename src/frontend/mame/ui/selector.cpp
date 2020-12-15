@@ -13,6 +13,7 @@
 
 #include "ui/ui.h"
 #include "ui/utils.h"
+#include "unicode.h"
 
 
 namespace ui {

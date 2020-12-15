@@ -18,6 +18,7 @@
 #include "video/rgbutil.h"
 
 #include "nanosvg.h"
+#include "unicode.h"
 #include "vecstream.h"
 #include "xmlfile.h"
 
@@ -3156,7 +3157,7 @@ protected:
 					while (!s.empty())
 					{
 						char32_t schar;
-						int scharcount = uchar_from_utf8(&schar, &s[0], s.length());
+						int scharcount = uchar_from_utf8(&schar, s);
 
 						if (scharcount == -1)
 							break;
@@ -3307,7 +3308,7 @@ private:
 					while (!s.empty())
 					{
 						char32_t schar;
-						int scharcount = uchar_from_utf8(&schar, &s[0], s.length());
+						int scharcount = uchar_from_utf8(&schar, s);
 
 						if (scharcount == -1)
 							break;
@@ -3693,7 +3694,7 @@ void layout_element::component::draw_text(
 	while (!str.empty())
 	{
 		char32_t schar;
-		int scharcount = uchar_from_utf8(&schar, &str[0], str.length());
+		int scharcount = uchar_from_utf8(&schar, str);
 
 		if (scharcount == -1)
 			break;

@@ -38,7 +38,6 @@
 
 // commonly-referenced utilities imported from lib/util
 #include "palette.h"
-#include "unicode.h"
 #include "strformat.h"
 #include "vecstream.h"
 

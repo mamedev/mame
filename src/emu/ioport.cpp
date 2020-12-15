@@ -100,6 +100,7 @@
 #include "natkeyboard.h"
 
 #include "osdepend.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <ctime>

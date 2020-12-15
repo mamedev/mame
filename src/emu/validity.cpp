@@ -14,6 +14,7 @@
 #include "emuopts.h"
 #include "romload.h"
 #include "video/rgbutil.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <type_traits>
