@@ -3579,7 +3579,7 @@ ROM_START( sackids )
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
-ROM_START( dfeverg ) // TODO: ROM loading order is probably wrong
+ROM_START( dfeverg )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) // SH2 code
@@ -3594,7 +3594,8 @@ ROM_START( dfeverg ) // TODO: ROM loading order is probably wrong
 	ROM_LOAD16_WORD_SWAP( "9",     0x2000000, 0x400000, CRC(4ffbba8d) SHA1(526b5ba3b874c0ee7ce3fca7631bed1e0b84fea1) )
 	ROM_LOAD16_WORD_SWAP( "10",    0x2400000, 0x400000, CRC(4b2a4397) SHA1(e8499e20939f26009f4678b85d3bfb5f02f4ddcb) )
 	ROM_LOAD16_WORD_SWAP( "11",    0x2800000, 0x400000, CRC(58877b19) SHA1(fff50cc05ae39a3b8313756d606e27ae2e62af26) )
-	// IC12 is tested but wasn't included in the dump. Missing?
+	// IC12 is tested but wasn't included in the dump. This causes missing backgrounds
+	ROM_LOAD16_WORD_SWAP( "12",    0x2c00000, 0x400000, NO_DUMP )
 ROM_END
 
 ROM_START( skychal )
