@@ -66,7 +66,7 @@ imgtool::simple_charconverter::simple_charconverter(const char32_t lowpage[0x80]
 void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *src, size_t src_length) const
 {
 	// normalize the incoming unicode
-	std::string normalized_src = normalize_unicode(src, src_length, m_norm);
+	std::string normalized_src = normalize_unicode(src, m_norm);
 
 	auto iter = normalized_src.begin();
 	while (iter != normalized_src.end())
