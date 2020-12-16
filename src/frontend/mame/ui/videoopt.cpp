@@ -20,6 +20,8 @@ namespace {
 
 constexpr uintptr_t ITEM_ROTATE         = 0x00000100;
 constexpr uintptr_t ITEM_ZOOM           = 0x00000101;
+constexpr uintptr_t ITEM_UNEVENSTRETCH  = 0x00000102;
+constexpr uintptr_t ITEM_KEEPASPECT     = 0x00000103;
 constexpr uintptr_t ITEM_TOGGLE_FIRST   = 0x00000200;
 constexpr uintptr_t ITEM_VIEW_FIRST     = 0x00000300;
 
@@ -123,9 +125,35 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ROTATE));
 
 	// cropping
-	int enabled;
-	enabled = m_target.zoom_to_screen();
-	item_append_on_off(_("Zoom to Screen Area"), enabled, 0, reinterpret_cast<void *>(ITEM_ZOOM));
+	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), 0, reinterpret_cast<void *>(ITEM_ZOOM));
+
+	// uneven stretch
+	switch (m_target.scale_mode())
+	{
+	case SCALE_FRACTIONAL:
+		subtext = _("On");
+		break;
+
+	case SCALE_FRACTIONAL_X:
+		subtext = _("X Only");
+		break;
+
+	case SCALE_FRACTIONAL_Y:
+		subtext = _("Y Only");
+		break;
+
+	case SCALE_FRACTIONAL_AUTO:
+		subtext = _("X or Y (Auto)");
+		break;
+
+	case SCALE_INTEGER:
+		subtext = _("Off");
+		break;
+	}
+	item_append(_("Non-Integer Scaling"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_UNEVENSTRETCH));
+
+	// keep aspect
+	item_append_on_off(_("Keep Aspect"), m_target.keepaspect(), 0, reinterpret_cast<void *>(ITEM_KEEPASPECT));
 }
 
 
@@ -165,6 +193,71 @@ void menu_video_options::handle()
 			if ((menu_event->iptkey == IPT_UI_LEFT) || (menu_event->iptkey == IPT_UI_RIGHT))
 			{
 				m_target.set_zoom_to_screen(menu_event->iptkey == IPT_UI_RIGHT);
+				changed = true;
+			}
+			break;
+
+		// non-integer scaling: rotate through options
+		case ITEM_UNEVENSTRETCH:
+			if (menu_event->iptkey == IPT_UI_LEFT)
+			{
+				switch (m_target.scale_mode())
+				{
+				case SCALE_FRACTIONAL:
+					m_target.set_scale_mode(SCALE_INTEGER);
+					break;
+
+				case SCALE_FRACTIONAL_X:
+					m_target.set_scale_mode(SCALE_FRACTIONAL);
+					break;
+
+				case SCALE_FRACTIONAL_Y:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_X);
+					break;
+
+				case SCALE_FRACTIONAL_AUTO:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_Y);
+					break;
+
+				case SCALE_INTEGER:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
+					break;
+				}
+				changed = true;
+			}
+			else if (menu_event->iptkey == IPT_UI_RIGHT)
+			{
+				switch (m_target.scale_mode())
+				{
+				case SCALE_FRACTIONAL:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_X);
+					break;
+
+				case SCALE_FRACTIONAL_X:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_Y);
+					break;
+
+				case SCALE_FRACTIONAL_Y:
+					m_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
+					break;
+
+				case SCALE_FRACTIONAL_AUTO:
+					m_target.set_scale_mode(SCALE_INTEGER);
+					break;
+
+				case SCALE_INTEGER:
+					m_target.set_scale_mode(SCALE_FRACTIONAL);
+					break;
+				}
+				changed = true;
+			}
+			break;
+
+		// keep aspect handles left/right keys the same (toggle)
+		case ITEM_KEEPASPECT:
+			if ((menu_event->iptkey == IPT_UI_LEFT) || (menu_event->iptkey == IPT_UI_RIGHT))
+			{
+				m_target.set_keepaspect(menu_event->iptkey == IPT_UI_RIGHT);
 				changed = true;
 			}
 			break;

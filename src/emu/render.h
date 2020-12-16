@@ -1066,6 +1066,7 @@ public:
 	u32 width() const { return m_width; }
 	u32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	bool keepaspect() const { return m_keepaspect; }
 	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
