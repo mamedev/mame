@@ -2,12 +2,12 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-    Skeleton driver for "Twin Basket", by Recreativos Pasqual
+    Skeleton driver for "Twin Basket", by Automatics Pasqual
 
     TODO:
     	- Implement ST6225 microcontroller handling based on existing
     	  ST6228 core
-        - Everything else (peripherals, artwork, etc.)
+    	- Everything else (peripherals, artwork, etc.)
 
 *******************************************************************************/
 
@@ -47,5 +47,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                FULLNAME       FLAGS
-GAME( 1995, twinbskt, 0,      twinbskt, twinbskt, twinbskt_state, empty_init, ROT0, "Recreativos Pasqual", "Twin Basket", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY               FULLNAME       FLAGS
+GAME( 1995, twinbskt, 0,      twinbskt, twinbskt, twinbskt_state, empty_init, ROT0, "Automatics Pasqual", "Twin Basket", MACHINE_IS_SKELETON )
