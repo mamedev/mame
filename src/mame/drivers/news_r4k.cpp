@@ -52,7 +52,7 @@ public:
 		  m_ram(*this, "ram"),
 		  //m_dma(*this, "dma"),
 		  //m_rtc(*this, "rtc"),
-		  m_scc(*this, "scc"),
+		  m_escc(*this, "escc"),
 		  //m_net(*this, "net"),
 		  //m_fdc(*this, "fdc"),
 		  //m_lcd(*this, "lcd"),
@@ -128,7 +128,7 @@ protected:
 	required_device<ram_device> m_ram;
 	//required_device<dmac_0448_device> m_dma;
 	//required_device<m48t02_device> m_rtc;
-	required_device<z80scc_device> m_scc;
+	required_device<z80scc_device> m_escc;
 	//required_device<am7990_device> m_net;
 	// required_device<upd72067_device> m_fdc;
 
@@ -210,7 +210,7 @@ data
 
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
 {
-	LOG("Freerun timer tick\n");
+	// LOG("Freerun timer tick\n");
 	freerun_timer_val++;
 }
 
@@ -444,9 +444,9 @@ void news_r4k_state::cpu_map(address_map &map)
 	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
 	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
-	// Serial port (TODO: other serial ports)
-	//map(0x1e950000, 0x1e950003).rw(FUNC(news_r4k_state::log_mem_access_r), FUNC(news_r4k_state::log_mem_access_w)); // SCCPORT0A
-	map(0x1e950000, 0x1e950003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	// Serial port (doesn't work, ESCC driver complains about empty FIFO, so I'm probably doing something wrong - maybe the FIFO IC has to be used in some way?)
+	// The MROM hangs waiting for something from this, if you comment out this line, the MROM will make it further into the boot process
+	map(0x1e950000, 0x1e950003).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)); // SCCPORT0A
 
 	// TESTING - needed for mrom to boot - work RAM? or some unknown devices??
 	map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
@@ -480,7 +480,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// xb (Sony DSC-39 video card)
 	// map(0x14900000, 0x14900000);
 
-	// sb (???)
+	// sb (???) Likely Fujitsu MB86431 audio chip
 	// map(0x1ed00000, 0x1ed00000);
 
 	// spifi controller 1 (????, related to DMAC DMA)
@@ -530,7 +530,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
 	//map(0x1fe70000, 0x1fe9ffff).ram(); // ??
 	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0).mirror(0x0003ff00);
-	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	map(0x1fec0000, 0x1fec0003).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
 	map(0x1ff40000, 0x1ff407ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
@@ -752,24 +752,24 @@ void news_r4k_state::common(machine_config &config)
 	M48T02(config, m_rtc);
 	*/
 
-	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
-	m_scc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
+	SCC85230(config, m_escc, 4.9152_MHz_XTAL);
+	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// scc channel A
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
-	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
-	m_serial[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
-	m_serial[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
-	m_scc->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
-	m_scc->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
+	m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
+	m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
+	m_escc->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+	m_escc->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 
 	// scc channel B
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
-	m_serial[1]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
-	m_serial[1]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
-	m_serial[1]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
-	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
-	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsb_w));
+	m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcdb_w));
+	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
+	m_escc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+	m_escc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	/*
 	AM7990(config, m_net);
