@@ -111,7 +111,7 @@ public:
 		if (target != nullptr)
 			return target->keepaspect();
 		else
-			return machine().options().keep_aspect();
+			return false;
 	}
 
 	virtual osd_dim get_size() = 0;

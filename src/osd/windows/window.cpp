@@ -1309,7 +1309,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
-			if (keepaspect() && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			if (window->keepaspect() && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
 				rect->top = r.top();
