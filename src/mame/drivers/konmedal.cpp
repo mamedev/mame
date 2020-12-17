@@ -1107,7 +1107,7 @@ ROM_END
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
-GAME( 1993, tsupenta, 0,     tsupenta, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, tsupenta, 0,     tsupenta, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Tsurikko Penta", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 452574A boards (GX tilemaps)
 GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
