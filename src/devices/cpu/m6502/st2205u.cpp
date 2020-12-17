@@ -988,6 +988,57 @@ void st2205u_base_device::lvctr_w(u8 data)
 	m_lvctr = data & 0x0f;
 }
 
+void st2302u_device::unk18_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $18\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk6d_w(u8 data)
+{
+	// $6D is PCMH on ST2205U, but not here?
+	logerror("%s: Writing %02X to unknown register $6D\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk6e_w(u8 data)
+{
+	// $6E is MULL on ST2205U, but not here?
+	logerror("%s: Writing %02X to unknown register $6E\n", machine().describe_context(), data);
+}
+
+u8 st2302u_device::unk7b_r()
+{
+	// code usually waits for bit 3 to set itself after writing #$01 to this address
+	return 0x08;
+}
+
+void st2302u_device::unk7b_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $7B\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7c_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $7C\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7d_w(u8 data)
+{
+	// usually written with #$05 after the $7B wait is over
+	logerror("%s: Writing %02X to unknown register $7D\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7e_w(u8 data)
+{
+	// written in succession with $7F, sometimes several times
+	logerror("%s: Writing %02X to unknown register $7E\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7f_w(u8 data)
+{
+	// written in succession with $7E, sometimes several times
+	logerror("%s: Writing %02X to unknown register $7F\n", machine().describe_context(), data);
+}
+
 u8 st2205u_device::ram_r(offs_t offset)
 {
 	return downcast<mi_st2205u &>(*mintf).ram[0x0080 + offset];
@@ -1144,12 +1195,19 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));
 	map(0x0015, 0x0015).rw(FUNC(st2302u_device::smod_r), FUNC(st2302u_device::smod_w));
-	//map(0x0018, 0x0018).(?);
+	map(0x0018, 0x0018).w(FUNC(st2302u_device::unk18_w));
 	map(0x0040, 0x0047).rw(FUNC(st2302u_device::psg_r), FUNC(st2302u_device::psg_w));
 	map(0x0048, 0x004b).rw(FUNC(st2302u_device::vol_r), FUNC(st2302u_device::vol_w));
 	map(0x004c, 0x004d).rw(FUNC(st2302u_device::volm_r), FUNC(st2302u_device::volm_w));
 	map(0x004e, 0x004e).rw(FUNC(st2302u_device::psgc_r), FUNC(st2302u_device::psgc_w));
 	map(0x004f, 0x004f).rw(FUNC(st2302u_device::psgm_r), FUNC(st2302u_device::psgm_w));
+	map(0x006d, 0x006d).w(FUNC(st2302u_device::unk6d_w));
+	map(0x006e, 0x006e).w(FUNC(st2302u_device::unk6e_w));
+	map(0x007b, 0x007b).rw(FUNC(st2302u_device::unk7b_r), FUNC(st2302u_device::unk7b_w));
+	map(0x007c, 0x007c).w(FUNC(st2302u_device::unk7c_w));
+	map(0x007d, 0x007d).w(FUNC(st2302u_device::unk7d_w));
+	map(0x007e, 0x007e).w(FUNC(st2302u_device::unk7e_w));
+	map(0x007f, 0x007f).w(FUNC(st2302u_device::unk7f_w));
 	map(0x0080, 0x07ff).ram();
 	map(0x4000, 0x7fff).rw(FUNC(st2302u_device::pmem_r), FUNC(st2302u_device::pmem_w));
 	map(0x8000, 0xffff).rw(FUNC(st2302u_device::dmem_r), FUNC(st2302u_device::dmem_w));

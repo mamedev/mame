@@ -271,6 +271,16 @@ private:
 		void dwrite(u16 adr, u8 val);
 	};
 
+	void unk18_w(u8 data);
+	void unk6d_w(u8 data);
+	void unk6e_w(u8 data);
+	u8 unk7b_r();
+	void unk7b_w(u8 data);
+	void unk7c_w(u8 data);
+	void unk7d_w(u8 data);
+	void unk7e_w(u8 data);
+	void unk7f_w(u8 data);
+
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	u8 pmem_r(offs_t offset);
