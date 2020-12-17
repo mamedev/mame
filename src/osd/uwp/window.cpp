@@ -463,6 +463,7 @@ void uwp_window_info::destroy()
 
 	// free the render target
 	machine().render().target_free(m_target);
+	m_target = nullptr;
 }
 
 
@@ -952,8 +953,9 @@ void uwp_window_info::update_minmax_state()
 		RECT bounds;
 
 		// compare the maximum bounds versus the current bounds
-		osd_dim minbounds = get_min_bounds(video_config.keepaspect);
-		osd_dim maxbounds = get_max_bounds(video_config.keepaspect);
+		const bool keep_aspect = keepaspect();
+		osd_dim minbounds = get_min_bounds(keep_aspect);
+		osd_dim maxbounds = get_max_bounds(keep_aspect);
 		//GetWindowRect(platform_window<HWND>(), &bounds);
 
 		// if either the width or height matches, we were maximized
@@ -980,7 +982,7 @@ void uwp_window_info::minimize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	osd_dim newsize = get_min_bounds(video_config.keepaspect);
+	osd_dim newsize = get_min_bounds(keepaspect());
 
 	// get the window rect
 	//RECT bounds;
@@ -1001,7 +1003,7 @@ void uwp_window_info::maximize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	osd_dim newsize = get_max_bounds(video_config.keepaspect);
+	osd_dim newsize = get_max_bounds(keepaspect());
 
 	// center within the work area
 	osd_rect work = m_monitor->usuable_position_size();
@@ -1033,7 +1035,7 @@ void uwp_window_info::adjust_window_position_after_major_change()
 	if (!fullscreen())
 	{
 		// constrain the existing size to the aspect ratio
-		if (video_config.keepaspect)
+		if (keepaspect())
 			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
 	}
 

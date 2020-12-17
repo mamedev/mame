@@ -175,9 +175,7 @@ void sdl_osd_interface::extract_video_config()
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
 	video_config.filter        = options().filter();
-	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
-	video_config.fullstretch   = options().uneven_stretch();
 	#ifdef SDLMAME_X11
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif
