@@ -401,27 +401,27 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1f881fe0, 0x1f881fff);	   // RTC registers (TODO)
 
 	// // Interrupt clear ports; // INTCLR0
-	// map(0x1f4e0004, 0x1f4e0004); // INTCLR1
-	// map(0x1f4e0008, 0x1f4e0008); // INTCLR2
-	// map(0x1f4e000c, 0x1f4e000c); // INTCLR3
-	// map(0x1f4e0010, 0x1f4e0010); // INTCLR4
-	// map(0x1f4e0014, 0x1f4e0014); // INTCLR5
+	// map(0x1f4e0004, 0x1f4e0007).ram(); // INTCLR1
+	// map(0x1f4e0008, 0x1f4e000b).ram(); // INTCLR2
+	// map(0x1f4e000c, 0x1f4e000f).ram(); // INTCLR3
+	// map(0x1f4e0010, 0x1f4e0013).ram(); // INTCLR4
+	// map(0x1f4e0014, 0x1f4e0017).ram(); // INTCLR5
 
-	// // Interrupt enable ports
-	// map(0x1fa00000, 0x1fa00000); // INTEN0
-	// map(0x1fa00004, 0x1fa00004); // INTEN1
-	// map(0x1fa00008, 0x1fa00008); // INTEN2
-	// map(0x1fa0000c, 0x1fa0000c); // INTEN3
-	// map(0x1fa00010, 0x1fa00010); // INTEN4
-	// map(0x1fa00014, 0x1fa00014); // INTEN5
+	// // // Interrupt enable ports
+	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
+	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
+	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
+	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
+	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
+	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
 
-	// // Interrupt status ports
-	// map(0x1fa00020, 0x1fa00020); // INTST0
-	// map(0x1fa00024, 0x1fa00024); // INTST1
-	// map(0x1fa00028, 0x1fa00028); // INTST2
-	// map(0x1fa0002c, 0x1fa0002c); // INTST3
-	// map(0x1fa00030, 0x1fa00030); // INTST4
-	// map(0x1fa00034, 0x1fa00034); // INTST5
+	// // // Interrupt status ports
+	// map(0x1fa00020, 0x1fa00023).ram(); // INTST0
+	// map(0x1fa00024, 0x1fa00027).ram(); // INTST1
+	// map(0x1fa00028, 0x1fa0002b).ram(); // INTST2
+	// map(0x1fa0002c, 0x1fa0002f).ram(); // INTST3
+	// map(0x1fa00030, 0x1fa00033).ram(); // INTST4
+	// map(0x1fa00034, 0x1fa00037).ram(); // INTST5
 
 	// LEDs
 	// map(0x1f3f0000, 0x1f3f0000); // LED_POWER
@@ -435,6 +435,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// APBus region
 	// map(0x1f520004, 0x1f520007); // WBFLUSH
 	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
+	//map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
 	// map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
 	// map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
 	// map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
@@ -444,9 +445,8 @@ void news_r4k_state::cpu_map(address_map &map)
 	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
 	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
-	// Serial port (doesn't work, ESCC driver complains about empty FIFO, so I'm probably doing something wrong - maybe the FIFO IC has to be used in some way?)
-	// The MROM hangs waiting for something from this, if you comment out this line, the MROM will make it further into the boot process
-	map(0x1e950000, 0x1e950003).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)); // SCCPORT0A
+	// Serial port
+	map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff); // SCCPORT0A
 
 	// TESTING - needed for mrom to boot - work RAM? or some unknown devices??
 	map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
@@ -458,7 +458,12 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	map(0x14400004, 0x14400007).r(FUNC(news_r4k_state::hack2));
 	map(0x14900004, 0x14900007).r(FUNC(news_r4k_state::hack3));
-	map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
+	//map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
+	//map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
+	//map(0x1e380074, 0x1e380077); // Fully booted: 1e380074: 00000001
+	// map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) {
+	// 	return 0x80;
+	// }));
 
 	// Unknown regions that mrom accesses
 	//map(0x1f4c0000, 0x1f4c0003).ram();
@@ -466,16 +471,17 @@ void news_r4k_state::cpu_map(address_map &map)
 	//map(0x1f520008, 0x1f52000B).ram();  // waiting for AP-Bus to come up?
 	//map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
 
-	// TODO: ESCCF?
+	// TODO: ESCCF? ESCC FIFO?
 	// TODO: map(0x1e900000, 0x1e900000);
 
 	// Sonic network controller (https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD)
 	// map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
 
 	// DMA Controller 0
-	//map(0x1e200000, 0x1e20000f); // End addr meeds confirmation
+	map(0x1e200000, 0x1e20000f).ram(); // End addr meeds confirmation
+
 	// DMA Controller 1
-	// map(0x1e300000, 0x1e30000f); // End addr meeds confirmation
+	map(0x1e300000, 0x1e30000f); // End addr meeds confirmation
 
 	// xb (Sony DSC-39 video card)
 	// map(0x14900000, 0x14900000);
@@ -718,8 +724,8 @@ void news_r4k_state::debug_w(u8 data)
 
 void news_r4k_state::common(machine_config &config)
 {
-	R4400BE32(config, m_cpu, 25_MHz_XTAL);					  // TODO: Main crystal frequency
-	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map); // TODO: Split PROGRAM/IO?
+	R4400BE32(config, m_cpu, 25_MHz_XTAL); // TODO: Main crystal frequency
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 	//	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	//void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
 	m_cpu->set_icache_size(16384);
@@ -727,18 +733,6 @@ void news_r4k_state::common(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("64M");
-
-	/*
-	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768);
-	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
-
-	// 3 banks of 4x30-pin SIMMs with parity, first bank is soldered
-	RAM(config, m_ram);
-	m_ram->set_default_size("16M");
-	// TODO: confirm each bank supports 4x1M or 4x4M
-	m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
-	*/
 
 	//DMAC_0448(config, m_dma, 0);
 	//m_dma->set_bus(m_cpu, 0);
@@ -752,7 +746,9 @@ void news_r4k_state::common(machine_config &config)
 	M48T02(config, m_rtc);
 	*/
 
-	SCC85230(config, m_escc, 4.9152_MHz_XTAL);
+	// 9.8304MHz per NetBSD source
+	// Using 9.8304MHz also yields the correct baud rate of 9600 with the config that the mrom uses
+	SCC85230(config, m_escc, 9.8304_MHz_XTAL);
 	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// scc channel A
@@ -762,6 +758,7 @@ void news_r4k_state::common(machine_config &config)
 	m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
 	m_escc->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
 	m_escc->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_escc->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
 
 	// scc channel B
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -770,6 +767,7 @@ void news_r4k_state::common(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
 	m_escc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_escc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 
 	/*
 	AM7990(config, m_net);
