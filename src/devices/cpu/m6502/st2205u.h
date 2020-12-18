@@ -36,6 +36,7 @@ public:
 		ST_VOL3,
 		ST_VOLM0,
 		ST_VOLM1,
+		ST_MUL,
 		ST_DMS0,
 		ST_DMS1,
 		ST_DMD0,
@@ -124,6 +125,11 @@ protected:
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
+	u8 mull_r();
+	void mull_w(u8 data);
+	u8 mulh_r();
+	void mulh_w(u8 data);
+
 	void base_map(address_map &map);
 
 	u8 m_btc;
@@ -140,6 +146,7 @@ protected:
 	u8 m_psg_on;
 	u8 m_psg_vol[4];
 	u8 m_psg_volm[2];
+	u16 m_mul;
 	u8 m_usbcon;
 	u8 m_usbien;
 	u16 m_dptr[4];
