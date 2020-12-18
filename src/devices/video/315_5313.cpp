@@ -6,9 +6,9 @@
 	TODO:
     - Video, DMA timing and HV counter is seems to incorrect,
       Needs verifications from real hardware.
-	- Support 128KB VRAM configuration, Any hardware used it?
-	- Border area is displayable?
-	- 32X overlay with H32 mode, all known software used this?
+    - Support 128KB VRAM configuration, Any hardware used it?
+    - Border area is displayable?
+    - 32X overlay with H32 mode, all known software used this?
 */
 
 #include "emu.h"
