@@ -148,7 +148,7 @@ void dbz_state::dbz2bl_map(address_map &map)
 	map(0x4d4f00, 0x4d4f1f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
 
 	map(0x4e4000, 0x4e4001).unmapr();
-	map(0x4e0004, 0x4e4005).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
+	map(0x4e0004, 0x4e0005).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
 
 	map(0x4e3011, 0x4e3011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x4f0000, 0x4f0001).unmapw();
