@@ -217,7 +217,10 @@ TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
 void news_r4k_state::machine_reset()
 {
 	freerun_timer_val = 0;
-	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // TODO: what is the actual frequency of the freerunning clock?
+
+	// TODO: what is the actual frequency of the freerunning clock?
+	// Too fast causes the mrom to overwhelm the ESCC and gets off into the weeds
+	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1000));
 }
 
 void news_r4k_state::init_common()
@@ -752,22 +755,22 @@ void news_r4k_state::common(machine_config &config)
 	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// scc channel A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
-	m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
-	m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
-	m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
-	m_escc->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
-	m_escc->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
-	m_escc->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
+	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
+	m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
+	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
+	m_escc->out_rtsa_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+	m_escc->out_txda_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_escc->out_dtra_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 
 	// scc channel B
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
-	m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsb_w));
-	m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcdb_w));
-	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
-	m_escc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
-	m_escc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
-	m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
+	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsb_w));
+	m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcdb_w));
+	m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
+	m_escc->out_rtsb_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+	m_escc->out_txdb_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_escc->out_dtrb_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
 
 	/*
 	AM7990(config, m_net);
