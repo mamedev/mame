@@ -29,6 +29,7 @@
 
 #include "cpu/m6502/st2205u.h"
 #include "machine/bl_handhelds_menucontrol.h"
+#include "video/bl_handhelds_lcdc.h"
 
 #include "screen.h"
 #include "emupal.h"
@@ -44,16 +45,13 @@ public:
 		m_spirom(*this, "spi"),
 		m_io_p1(*this, "IN0"),
 		m_io_p2(*this, "IN1"),
-		m_menucontrol(*this, "menucontrol")
+		m_menucontrol(*this, "menucontrol"),
+		m_lcdc(*this, "lcdc")
 	{ }
 
 	void bbl380(machine_config &config);
 
 private:
-	void lcdc_command_w(u8 data);
-	u8 lcdc_data_r();
-	void lcdc_data_w(u8 data);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -68,13 +66,6 @@ private:
 	void output2_w(u8 data);
 
 	u8 m_output2val;
-
-	u8 m_displaybuffer[256 * 256 * 2];
-	u16 m_posx, m_posy;
-	u16 m_posminx, m_posmaxx;
-	u16 m_posminy, m_posmaxy;
-	u8 m_command;
-	u8 m_commandstep;
 
 	enum spistate : u8
 	{
@@ -98,6 +89,7 @@ private:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
+	required_device<bl_handhelds_lcdc_device> m_lcdc;
 
 	u8 ff_r() { return 0xff; }
 };
@@ -124,42 +116,13 @@ void bbl380_state::output2_w(u8 data)
 
 u32 bbl380_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 128; y++)
-	{
-		u32* dst = &bitmap.pix(y);
-
-		for (int x = 0; x < 160; x++)
-		{
-			int count = (y * 0x200) + x;
-
-			u16 dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
-
-			int b = ((dat >> 0) & 0x1f) << 3;
-			int g = ((dat >> 5) & 0x3f) << 2;
-			int r = ((dat >> 11) & 0x1f) << 3;
-
-			dst[x] = (r << 16) | (g << 8) | (b << 0);
-		}
-	}
-
-	return 0;
+	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
 }
 
 void bbl380_state::machine_start()
 {
 	// port related
 	save_item(NAME(m_output2val));
-
-	// LCDC / display related
-	save_item(NAME(m_displaybuffer));
-	save_item(NAME(m_posx));
-	save_item(NAME(m_posy));
-	save_item(NAME(m_posminx));
-	save_item(NAME(m_posmaxx));
-	save_item(NAME(m_posminy));
-	save_item(NAME(m_posmaxy));
-	save_item(NAME(m_command));
-	save_item(NAME(m_commandstep));
 
 	// SPI related
 	save_item(NAME(m_spistate));
@@ -176,67 +139,8 @@ void bbl380_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0010, 0x0011, read8smo_delegate(*this, FUNC(bbl380_state::spi_r)), write8smo_delegate(*this, FUNC(bbl380_state::spi_w))); // SPI related
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0014, 0x0014, read8smo_delegate(*this, FUNC(bbl380_state::ff_r))); // SPI related
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(bbl380_state::output_w))); // Port A output hack, SPI state needs resetting on every port write here or some gfx won't copy fully eg red squares on right of parachute, Soc implementation filters writes
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x007b, 0x007b, read8smo_delegate(*this, FUNC(bbl380_state::ff_r))); // unknown internal register
 }
 
-void bbl380_state::lcdc_command_w(u8 data)
-{
-	m_command = data;
-	m_commandstep = 0;
-
-	if (m_command == 0x2c)
-	{
-		m_posx = m_posminx << 1;
-		m_posy = m_posminy;
-	}
-}
-
-u8 bbl380_state::lcdc_data_r()
-{
-	return 0;
-}
-
-void bbl380_state::lcdc_data_w(u8 data)
-{
-	if (m_command == 0x2b)
-	{
-		switch (m_commandstep)
-		{
-		case 0: m_posminy = data << 8 | (m_posminy & 0xff); break;
-		case 1: m_posminy = (m_posminy & 0xff00) | data; break;
-		case 2: m_posmaxy = data << 8 | (m_posmaxy & 0xff); break;
-		case 3: m_posmaxy = (m_posmaxy & 0xff00) | data; break;
-		}
-		m_commandstep++;
-	}
-	else if (m_command == 0x2a)
-	{
-		switch (m_commandstep)
-		{
-		case 0: m_posminx = data << 8 | (m_posminx & 0xff); break;
-		case 1: m_posminx = (m_posminx & 0xff00) | data; break;
-		case 2: m_posmaxx = data << 8 | (m_posmaxx & 0xff); break;
-		case 3: m_posmaxx = (m_posmaxx & 0xff00) | data; break;
-		}
-		m_commandstep++;
-	}
-	else if (m_command == 0x2c)
-	{
-		m_displaybuffer[((m_posx + (m_posy * 0x400))) & 0x1ffff] = data;
-
-		m_posx++;
-		if (m_posx > ((m_posmaxx << 1) + 1))
-		{
-			m_posx = m_posminx << 1;
-			m_posy++;
-
-			if (m_posy > m_posmaxy)
-			{
-				m_posy = m_posminy;
-			}
-		}
-	}
-}
 
 void bbl380_state::spi_w(u8 data)
 {
@@ -333,8 +237,8 @@ u8 bbl380_state::spi_r()
 void bbl380_state::bbl380_map(address_map &map)
 {
 	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
-	map(0x1800000, 0x1800000).w(FUNC(bbl380_state::lcdc_command_w));
-	map(0x1804000, 0x1804000).rw(FUNC(bbl380_state::lcdc_data_r), FUNC(bbl380_state::lcdc_data_w));
+	map(0x1800000, 0x1800000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
+	map(0x1804000, 0x1804000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
 }
 
 static INPUT_PORTS_START(bbl380)
@@ -362,6 +266,8 @@ void bbl380_state::bbl380(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
+
+
 	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
 	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
 	// TODO, hook these up properly
@@ -376,6 +282,7 @@ void bbl380_state::bbl380(machine_config &config)
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
 
 	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
+	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
