@@ -16,7 +16,8 @@
 
     The slapstic was a security chip made by Atari, which was used for
     bank switching and security in several coin-operated video games from
-    1984 through 1990.
+    1984 through 1990.  It means "SLA Protection from Software Thievery IC",
+    where SLA is a Storage/Logic Array, an early form of gate array.
 
 
     What is a SLOOP?
@@ -171,10 +172,23 @@
     independently. Later chips (111-118) provided a mechanism of adding
     1, 2, or 3 to the number of the current bank.
 
+    One important detail is that some accesses must be done with CS=0,
+    while others don't care.  CS=0 usually means the access is in the
+    slapstic banked region.  Specifically:
+      - on 101 and 102, the 2nd alt access must be done outside of
+        the bank region
+      - on 103 to 108, the 1st alt access can be done anywhere
+      - on 110 to 118, the 1st and 3rd alt access can be done anywhere 
+
+    These out-of-range accesses pose technical difficulties we're not fully
+    handling yet.  Similarly, accesses that must be done in sequence get
+    broken by an out-of-range access.
+
     Surprisingly, the slapstic appears to have used DRAM cells to store
     the current bank. After 5 or 6 seconds without a clock, the chip
     reverts to the default bank, with the chip reset (bank select
-    addresses are enabled). Typically, the slapstic region is accessed
+    addresses are enabled). Typically, the clock is connnected to the
+    cpu memory access line (AS on the 68000 for instance), accessing
     often enough to avoid the problem.
 
     For full details, see the MAME source code.
@@ -260,6 +274,10 @@ static const struct slapstic_data slapstic101 =
 	{ 0x0080,0x0090,0x00a0,0x00b0 },/* bank select values */
 
 	/* alternate banking */
+	// Real values, to be worked on later
+//	{ 0x1f00,0x1e00 },              /* 1st mask/value in sequence */
+//	{ 0x1fff,0x1fff },              /* 2nd mask/value in sequence, *outside* of the range */
+
 	{ 0x1fff,0x1dfe },              /* 1st mask/value in sequence */
 	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
 	{ 0x1ffc,0x1b5c },              /* 3rd mask/value in sequence */
@@ -287,6 +305,9 @@ static const struct slapstic_data slapstic103 =
 	{ 0x0040,0x0050,0x0060,0x0070 },/* bank select values */
 
 	/* alternate banking */
+	// Real values, to be worked on later
+//	{ 0x3e00,0x3a00 },              /* 1st mask/value in sequence */
+//	{ 0x3ffe,0x3ffe },              /* 2nd mask/value in sequence, *outside* of the range */
 	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
 	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
 	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */
