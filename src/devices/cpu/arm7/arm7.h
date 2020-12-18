@@ -368,17 +368,17 @@ protected:
 	/* fast RAM info */
 	struct fast_ram_info
 	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
+		offs_t              start = 0;                  /* start of the RAM block */
+		offs_t              end = 0;                    /* end of the RAM block */
+		bool                readonly = false;           /* true if read-only */
+		void *              base = nullptr;             /* base in memory where the RAM lives */
 	};
 
 	struct hotspot_info
 	{
-		uint32_t             pc;
-		uint32_t             opcode;
-		uint32_t             cycles;
+		uint32_t             pc = 0;
+		uint32_t             opcode = 0;
+		uint32_t             cycles = 0;
 	};
 
 	/* internal compiler state */
@@ -386,9 +386,9 @@ protected:
 	{
 		compiler_state &operator=(compiler_state const &) = delete;
 
-		uint32_t              cycles;                     /* accumulated cycles */
-		uint8_t               checkints;                  /* need to check interrupts before next instruction */
-		uint8_t               checksoftints;              /* need to check software interrupts before next instruction */
+		uint32_t         cycles = 0;                 /* accumulated cycles */
+		uint8_t          checkints = 0;              /* need to check interrupts before next instruction */
+		uint8_t          checksoftints = 0;          /* need to check software interrupts before next instruction */
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
@@ -396,45 +396,45 @@ protected:
 	struct arm7imp_state
 	{
 		/* core state */
-		drc_cache *         cache;                      /* pointer to the DRC code cache */
-		drcuml_state *      drcuml;                     /* DRC UML generator state */
-		//arm7_frontend *     drcfe;                      /* pointer to the DRC front-end state */
-		uint32_t              drcoptions;                 /* configurable DRC options */
+		std::unique_ptr<drc_cache> cache;               /* pointer to the DRC code cache */
+		std::unique_ptr<drcuml_state> drcuml;           /* DRC UML generator state */
+		//arm7_frontend *     drcfe = nullptr;            /* pointer to the DRC front-end state */
+		uint32_t            drcoptions = 0;             /* configurable DRC options */
 
 		/* internal stuff */
-		uint8_t               cache_dirty;                /* true if we need to flush the cache */
-		uint32_t              jmpdest;                    /* destination jump target */
+		uint8_t             cache_dirty = 0;            /* true if we need to flush the cache */
+		uint32_t            jmpdest = 0;                /* destination jump target */
 
 		/* parameters for subroutines */
-		uint64_t              numcycles;                  /* return value from gettotalcycles */
-		uint32_t              mode;                       /* current global mode */
-		const char *        format;                     /* format string for print_debug */
-		uint32_t              arg0;                       /* print_debug argument 1 */
-		uint32_t              arg1;                       /* print_debug argument 2 */
+		uint64_t            numcycles = 0;              /* return value from gettotalcycles */
+		uint32_t            mode = 0;                   /* current global mode */
+		const char *        format = nullptr;           /* format string for print_debug */
+		uint32_t            arg0 = 0;                   /* print_debug argument 1 */
+		uint32_t            arg1 = 0;                   /* print_debug argument 2 */
 
 		/* register mappings */
-		uml::parameter   regmap[/*NUM_REGS*/37];               /* parameter to register mappings for all 16 integer registers */
+		uml::parameter      regmap[/*NUM_REGS*/37];     /* parameter to register mappings for all 16 integer registers */
 
 		/* subroutines */
-		uml::code_handle *   entry;                      /* entry point */
-		uml::code_handle *   nocode;                     /* nocode exception handler */
-		uml::code_handle *   out_of_cycles;              /* out of cycles exception handler */
-		uml::code_handle *   tlb_translate;              /* tlb translation handler */
-		uml::code_handle *   detect_fault;               /* tlb fault detection handler */
-		uml::code_handle *   check_irq;                  /* irq check handler */
-		uml::code_handle *   read8;                      /* read byte */
-		uml::code_handle *   write8;                     /* write byte */
-		uml::code_handle *   read16;                     /* read half */
-		uml::code_handle *   write16;                    /* write half */
-		uml::code_handle *   read32;                     /* read word */
-		uml::code_handle *   write32;                    /* write word */
+		uml::code_handle *  entry = nullptr;            /* entry point */
+		uml::code_handle *  nocode = nullptr;           /* nocode exception handler */
+		uml::code_handle *  out_of_cycles = nullptr;    /* out of cycles exception handler */
+		uml::code_handle *  tlb_translate = nullptr;    /* tlb translation handler */
+		uml::code_handle *  detect_fault = nullptr;     /* tlb fault detection handler */
+		uml::code_handle *  check_irq = nullptr;        /* irq check handler */
+		uml::code_handle *  read8 = nullptr;            /* read byte */
+		uml::code_handle *  write8 = nullptr;           /* write byte */
+		uml::code_handle *  read16 = nullptr;           /* read half */
+		uml::code_handle *  write16 = nullptr;          /* write half */
+		uml::code_handle *  read32 = nullptr;           /* read word */
+		uml::code_handle *  write32 = nullptr;          /* write word */
 
 		/* fast RAM */
-		uint32_t              fastram_select;
+		uint32_t            fastram_select = 0;
 		fast_ram_info       fastram[ARM7_MAX_FASTRAM];
 
 		/* hotspots */
-		uint32_t              hotspot_select;
+		uint32_t            hotspot_select = 0;
 		hotspot_info        hotspot[ARM7_MAX_HOTSPOTS];
 	} m_impstate;
 

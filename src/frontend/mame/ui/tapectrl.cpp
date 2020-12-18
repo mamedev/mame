@@ -116,14 +116,11 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 
 void menu_tape_control::handle()
 {
-	// rebuild the menu (so to update the selected device, if the user has pressed L or R, and the tape counter)
-	repopulate(reset_options::REMEMBER_POSITION);
-
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);
 	if (event != nullptr)
 	{
-		switch(event->iptkey)
+		switch (event->iptkey)
 		{
 		case IPT_UI_LEFT:
 			if (event->itemref == TAPECMD_SLIDER)
@@ -155,6 +152,9 @@ void menu_tape_control::handle()
 			break;
 		}
 	}
+
+	// hacky way to update the tape counter by repopulating every frame
+	reset(reset_options::REMEMBER_POSITION);
 }
 
 

@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 
@@ -27,6 +28,7 @@ protected:
 	input_code_poller(input_manager &manager) noexcept;
 
 	input_manager &m_manager;
+	std::vector<std::pair<input_device_item *, s32> > m_axis_memory;
 };
 
 
@@ -38,7 +40,7 @@ public:
 protected:
 	switch_code_poller_base(input_manager &manager) noexcept;
 
-	bool code_pressed_once(input_code code);
+	bool code_pressed_once(input_code code, bool moved);
 
 private:
 	std::vector<input_code> m_switch_memory;

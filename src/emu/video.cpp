@@ -120,7 +120,7 @@ video_manager::video_manager(running_machine &machine)
 
 	// create a render target for snapshots
 	const char *viewname = machine.options().snap_view();
-	m_snap_native = !no_screens && (viewname[0] == 0 || strcmp(viewname, "native") == 0);
+	m_snap_native = !no_screens && !strcmp(viewname, "native");
 
 	if (m_snap_native)
 	{
@@ -426,13 +426,13 @@ void video_manager::begin_recording_screen(const std::string &filename, uint32_t
 	// create the emu_file
 	bool is_absolute_path = !filename.empty() && osd_is_absolute_path(filename);
 	std::unique_ptr<emu_file> movie_file = std::make_unique<emu_file>(
-		is_absolute_path ? "" : machine().options().snapshot_directory(),
-		OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			is_absolute_path ? "" : machine().options().snapshot_directory(),
+			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	// and open the actual file
 	osd_file::error filerr = filename.empty()
-		? open_next(*movie_file, extension)
-		: movie_file->open(filename);
+			? open_next(*movie_file, extension)
+			: movie_file->open(filename);
 	if (filerr != osd_file::error::NONE)
 	{
 		osd_printf_error("Error creating movie, osd_file::error=%d\n", int(filerr));
@@ -552,16 +552,6 @@ void video_manager::postload()
 		x->set_next_frame_time(machine().time());
 }
 
-
-//-------------------------------------------------
-//  is_recording - returns whether or not any
-//  screen is currently recording
-//-------------------------------------------------
-
-bool video_manager::is_recording() const
-{
-	return !m_movie_recordings.empty();
-}
 
 //-------------------------------------------------
 //  effective_autoframeskip - return the effective

@@ -88,16 +88,16 @@ protected:
 	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form4 { static constexpr bool value = false; };
 	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form5 { static constexpr bool value = false; };
 	template <typename Input, typename Result, typename Func, typename Enable = void> struct is_transform_form6 { static constexpr bool value = false; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form3<Input, Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func (offs_t &, Input, std::make_unsigned_t<Input> &)>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form4<Input, Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func (offs_t &, Input)>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Input, typename Result, typename Func> struct is_transform_form6<Input, Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func (Input)>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Input, typename Result, typename Func> struct is_transform_form3<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Input, typename Result, typename Func> struct is_transform_form4<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t &, Input>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Input, typename Result, typename Func> struct is_transform_form6<Input, Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, Input>, Result>::value> > { static constexpr bool value = true; };
 	template <typename Input, typename Result, typename Func> struct is_transform { static constexpr bool value = is_transform_form1<Input, Result, Func>::value || is_transform_form2<Input, Result, Func>::value || is_transform_form3<Input, Result, Func>::value || is_transform_form4<Input, Result, Func>::value || is_transform_form5<Input, Result, Func>::value || is_transform_form6<Input, Result, Func>::value; };
 
 	// Determining the result type of a transform function
 	template <typename Input, typename Result, typename Func, typename Enable = void> struct transform_result;
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form3<Input, Result, Func>::value> > { using type = std::result_of_t<Func (offs_t &, Input, std::make_unsigned_t<Input> &)>; };
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form4<Input, Result, Func>::value> > { using type = std::result_of_t<Func (offs_t &, Input)>; };
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form6<Input, Result, Func>::value> > { using type = std::result_of_t<Func (Input)>; };
+	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form3<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>; };
+	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form4<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t &, Input>; };
+	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form6<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, Input>; };
 	template <typename Input, typename Result, typename Func> using transform_result_t = typename transform_result<Input, Result, Func>::type;
 
 	// Mapping method types to delegate types
@@ -214,16 +214,16 @@ protected:
 	template <typename Result, typename Func, typename Enable = void> struct is_read_form1 { static constexpr bool value = false; };
 	template <typename Result, typename Func, typename Enable = void> struct is_read_form2 { static constexpr bool value = false; };
 	template <typename Result, typename Func, typename Enable = void> struct is_read_form3 { static constexpr bool value = false; };
-	template <typename Result, typename Func> struct is_read_form1<Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func (offs_t, Result)>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Result, typename Func> struct is_read_form2<Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func (offs_t)>, Result>::value> > { static constexpr bool value = true; };
-	template <typename Result, typename Func> struct is_read_form3<Result, Func, std::enable_if_t<std::is_convertible<std::result_of_t<Func ()>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Result, typename Func> struct is_read_form1<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t, Result>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Result, typename Func> struct is_read_form2<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func, offs_t>, Result>::value> > { static constexpr bool value = true; };
+	template <typename Result, typename Func> struct is_read_form3<Result, Func, std::enable_if_t<std::is_convertible<std::invoke_result_t<Func>, Result>::value> > { static constexpr bool value = true; };
 	template <typename Result, typename Func> struct is_read { static constexpr bool value = is_read_form1<Result, Func>::value || is_read_form2<Result, Func>::value || is_read_form3<Result, Func>::value; };
 
 	// Determining the result type of a read function
 	template <typename Result, typename Func, typename Enable = void> struct read_result;
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form1<Result, Func>::value> > { using type = std::result_of_t<Func (offs_t, std::make_unsigned_t<Result>)>; };
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form2<Result, Func>::value> > { using type = std::result_of_t<Func (offs_t)>; };
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form3<Result, Func>::value> > { using type = std::result_of_t<Func ()>; };
+	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form1<Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t, std::make_unsigned_t<Result>>; };
+	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form2<Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t>; };
+	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form3<Result, Func>::value> > { using type = std::invoke_result_t<Func>; };
 	template <typename Result, typename Func> using read_result_t = typename read_result<Result, Func>::type;
 
 	// Detecting candidates for read delegates
@@ -278,9 +278,9 @@ protected:
 	template <typename Input, typename Func, typename Enable = void> struct is_write_form1 { static constexpr bool value = false; };
 	template <typename Input, typename Func, typename Enable = void> struct is_write_form2 { static constexpr bool value = false; };
 	template <typename Input, typename Func, typename Enable = void> struct is_write_form3 { static constexpr bool value = false; };
-	template <typename Input, typename Func> struct is_write_form1<Input, Func, void_t<std::result_of_t<Func (offs_t, Input, std::make_unsigned_t<Input>)> > > { static constexpr bool value = true; };
-	template <typename Input, typename Func> struct is_write_form2<Input, Func, void_t<std::result_of_t<Func (offs_t, Input)> > > { static constexpr bool value = true; };
-	template <typename Input, typename Func> struct is_write_form3<Input, Func, void_t<std::result_of_t<Func (Input)> > > { static constexpr bool value = true; };
+	template <typename Input, typename Func> struct is_write_form1<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input, std::make_unsigned_t<Input>> > > { static constexpr bool value = true; };
+	template <typename Input, typename Func> struct is_write_form2<Input, Func, void_t<std::invoke_result_t<Func, offs_t, Input> > > { static constexpr bool value = true; };
+	template <typename Input, typename Func> struct is_write_form3<Input, Func, void_t<std::invoke_result_t<Func, Input> > > { static constexpr bool value = true; };
 	template <typename Input, typename Func> struct is_write { static constexpr bool value = is_write_form1<Input, Func>::value || is_write_form2<Input, Func>::value || is_write_form3<Input, Func>::value; };
 
 	// Detecting candidates for write delegates

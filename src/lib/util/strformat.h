@@ -106,11 +106,12 @@
     The format string type can be a pointer to a NUL-terminated string,
     an array containing a NUL-terminated or non-terminated string, or a
     STL contiguous container holding a string (e.g. std::string,
-    std::vector or std::array).  Note that NUL characters characters are
-    only treated as terminators for pointers and arrays, they are
-    treated as normal characters for other containers.  A non-contiguous
-    container (e.g. std::list or std::deque) will result in undesirable
-    behaviour likely culminating in a crash.
+    std::string_view, std::vector or std::array).  Note that NUL
+    characters characters are only treated as terminators for pointers
+    and arrays, they are treated as normal characters for other
+    containers.  Using a non-contiguous container (e.g. std::list or
+    std::deque) will result in undesirable behaviour likely culminating
+    in a crash.
 
     The value type of the format string and the character type of the
     output stream/string need to match.  You can't use a wchar_t format
@@ -184,6 +185,7 @@
 #include <locale>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -576,10 +578,16 @@ template <typename Stream, typename T>
 class format_output
 {
 private:
+	template <typename U> struct string_semantics
+	{ static constexpr bool value = false; };
+	template <typename CharT, typename Traits, typename Allocator> struct string_semantics<std::basic_string<CharT, Traits, Allocator> >
+	{ static constexpr bool value = true; };
+	template <typename CharT, typename Traits> struct string_semantics<std::basic_string_view<CharT, Traits> >
+	{ static constexpr bool value = true; };
 	template <typename U> struct signed_integer_semantics
-	{ static constexpr bool value = std::is_integral<U>::value && std::is_signed<U>::value; };
+	{ static constexpr bool value = std::is_integral_v<U>&& std::is_signed_v<U>; };
 	template <typename U> struct unsigned_integer_semantics
-	{ static constexpr bool value = std::is_integral<U>::value && !std::is_signed<U>::value; };
+	{ static constexpr bool value = std::is_integral_v<U>&& !std::is_signed_v<U>; };
 
 	static void apply_signed(Stream &str, char16_t const &value)
 	{
@@ -590,19 +598,14 @@ private:
 		str << std::make_signed_t<std::uint_least32_t>(std::uint_least32_t(value));
 	}
 	template <typename U>
-	static std::enable_if_t<std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value> apply_signed(Stream &str, U const &value)
+	static std::enable_if_t<std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> > || std::is_integral_v<U> > apply_signed(Stream &str, U const &value)
 	{
-		str << int(std::make_signed_t<U>(value));
-	}
-	template <typename U>
-	static std::enable_if_t<!std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value && signed_integer_semantics<U>::value> apply_signed(Stream &str, U const &value)
-	{
-		str << value;
-	}
-	template <typename U>
-	static std::enable_if_t<!std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value && unsigned_integer_semantics<U>::value> apply_signed(Stream &str, U const &value)
-	{
-		str << std::make_signed_t<U>(value);
+		if constexpr (std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> >)
+			str << int(std::make_signed_t<U>(value));
+		else if constexpr (std::is_signed_v<U>)
+			str << value;
+		else
+			str << std::make_signed_t<U>(value);
 	}
 
 	static void apply_unsigned(Stream &str, char16_t const &value)
@@ -614,26 +617,49 @@ private:
 		str << std::uint_least32_t(value);
 	}
 	template <typename U>
-	static std::enable_if_t<std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value> apply_unsigned(Stream &str, U const &value)
+	static std::enable_if_t<std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> > || std::is_integral_v<U> > apply_unsigned(Stream &str, U const &value)
 	{
-		str << unsigned(std::make_unsigned_t<U>(value));
-	}
-	template <typename U>
-	static std::enable_if_t<!std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value && signed_integer_semantics<U>::value> apply_unsigned(Stream &str, U const &value)
-	{
-		str << std::make_unsigned_t<U>(value);
-	}
-	template <typename U>
-	static std::enable_if_t<!std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value && unsigned_integer_semantics<U>::value> apply_unsigned(Stream &str, U const &value)
-	{
-		str << value;
+		if constexpr (std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> >)
+			str << unsigned(std::make_unsigned_t<U>(value));
+		else if constexpr (std::is_signed_v<U>)
+			str << std::make_unsigned_t<U>(value);
+		else
+			str << value;
 	}
 
 public:
 	template <typename U>
 	static void apply(Stream &str, format_flags const &flags, U const &value)
 	{
-		if constexpr (signed_integer_semantics<U>::value)
+		if constexpr (string_semantics<U>::value)
+		{
+			int const precision(flags.get_precision());
+			if ((0 <= precision) && (value.size() > unsigned(precision)))
+			{
+				if constexpr (std::is_same_v<typename U::value_type, typename Stream::char_type>)
+				{
+					unsigned width(flags.get_field_width());
+					bool const pad(unsigned(precision) < width);
+					typename Stream::fmtflags const adjust(str.flags() & Stream::adjustfield);
+					if (!pad || (Stream::left == adjust)) str.write(&*value.begin(), unsigned(precision));
+					if (pad)
+					{
+						for (width -= precision; 0U < width; --width) str.put(str.fill());
+						if (Stream::left != adjust) str.write(&*value.begin(), unsigned(precision));
+					}
+					str.width(0);
+				}
+				else
+				{
+					str << value.substr(0, unsigned(precision));
+				}
+			}
+			else
+			{
+				str << value;
+			}
+		}
+		else if constexpr (signed_integer_semantics<U>::value)
 		{
 			switch (flags.get_conversion())
 			{
@@ -830,35 +856,6 @@ public:
 			break;
 		default:
 			if (flags.get_alternate_format()) str.setf(Stream::boolalpha);
-			str << value;
-		}
-	}
-	template <typename CharT, typename Traits, typename Allocator>
-	static void apply(Stream &str, format_flags const &flags, std::basic_string<CharT, Traits, Allocator> const &value)
-	{
-		int const precision(flags.get_precision());
-		if ((0 <= precision) && (value.size() > unsigned(precision)))
-		{
-			if constexpr (std::is_same_v<CharT, typename Stream::char_type>)
-			{
-				unsigned width(flags.get_field_width());
-				bool const pad(unsigned(precision) < width);
-				typename Stream::fmtflags const adjust(str.flags() & Stream::adjustfield);
-				if (!pad || (Stream::left == adjust)) str.write(&*value.begin(), unsigned(precision));
-				if (pad)
-				{
-					for (width -= precision; 0U < width; --width) str.put(str.fill());
-					if (Stream::left != adjust) str.write(&*value.begin(), unsigned(precision));
-				}
-				str.width(0);
-			}
-			else
-			{
-				str << value.substr(0, unsigned(precision));
-			}
-		}
-		else
-		{
 			str << value;
 		}
 	}

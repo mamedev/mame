@@ -176,33 +176,23 @@ void menu_network_devices::handle()
     information menu
 -------------------------------------------------*/
 
-void menu_bookkeeping::handle()
-{
-	attotime curtime;
-
-	/* if the time has rolled over another second, regenerate */
-	curtime = machine().time();
-	if (prevtime.seconds() != curtime.seconds())
-	{
-		prevtime = curtime;
-		repopulate(reset_options::SELECT_FIRST);
-	}
-
-	/* process the menu */
-	process(0);
-}
-
-
-/*-------------------------------------------------
-    menu_bookkeeping - handle the bookkeeping
-    information menu
--------------------------------------------------*/
 menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
 menu_bookkeeping::~menu_bookkeeping()
 {
+}
+
+void menu_bookkeeping::handle()
+{
+	/* process the menu */
+	process(0);
+
+	/* if the time has rolled over another second, regenerate */
+	attotime const curtime = machine().time();
+	if (prevtime.seconds() != curtime.seconds())
+		reset(reset_options::REMEMBER_POSITION);
 }
 
 void menu_bookkeeping::populate(float &customtop, float &custombottom)
@@ -212,6 +202,7 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 	int ctrnum;
 
 	/* show total time first */
+	prevtime = machine().time();
 	if (prevtime.seconds() >= (60 * 60))
 		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else

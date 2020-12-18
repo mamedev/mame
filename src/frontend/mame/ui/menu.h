@@ -182,9 +182,6 @@ protected:
 
 	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
-	// repopulate the menu items
-	void repopulate(reset_options options);
-
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }

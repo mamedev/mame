@@ -47,7 +47,7 @@ int luaopen_lsqlite3(lua_State *L);
 template <typename T>
 struct lua_engine::devenum
 {
-	devenum(device_t &d) : device(d), iter(d) { }
+	template <typename... U> devenum(device_t &d, U &&... args) : device(d), iter(d, std::forward<U>(args)...) { }
 
 	device_t &device;
 	T iter;
@@ -55,17 +55,84 @@ struct lua_engine::devenum
 };
 
 
-template <typename T>
-struct lua_engine::object_ptr_vector_wrapper
-{
-	object_ptr_vector_wrapper(std::vector<std::unique_ptr<T>> const &v) : vec(v) { }
+namespace {
 
-	std::vector<std::unique_ptr<T>> const &vec;
+void do_draw_box(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
+{
+	float const sc_width(sdev.visible_area().width());
+	float const sc_height(sdev.visible_area().height());
+	x1 = std::min(std::max(0.0f, x1), sc_width) / sc_width;
+	y1 = std::min(std::max(0.0f, y1), sc_height) / sc_height;
+	x2 = std::min(std::max(0.0f, x2), sc_width) / sc_width;
+	y2 = std::min(std::max(0.0f, y2), sc_height) / sc_height;
+	mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
+}
+
+void do_draw_line(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color)
+{
+	float const sc_width(sdev.visible_area().width());
+	float const sc_height(sdev.visible_area().height());
+	x1 = std::min(std::max(0.0f, x1), sc_width) / sc_width;
+	y1 = std::min(std::max(0.0f, y1), sc_height) / sc_height;
+	x2 = std::min(std::max(0.0f, x2), sc_width) / sc_width;
+	y2 = std::min(std::max(0.0f, y2), sc_height) / sc_height;
+	sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+}
+
+void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y, const char *msg, rgb_t fgcolor, rgb_t bgcolor)
+{
+	float const sc_width(sdev.visible_area().width());
+	float const sc_height(sdev.visible_area().height());
+	auto justify = ui::text_layout::LEFT;
+	float x = 0;
+	if (xobj.is<float>())
+	{
+		x = std::min(std::max(0.0f, xobj.as<float>()), sc_width) / sc_width;
+	}
+	else if (xobj.is<char const *>())
+	{
+		char const *const justifystr(xobj.as<char const *>());
+		if (!strcmp(justifystr, "left"))
+			justify = ui::text_layout::LEFT;
+		else if (!strcmp(justifystr, "right"))
+			justify = ui::text_layout::RIGHT;
+		else if (!strcmp(justifystr, "center"))
+			justify = ui::text_layout::CENTER;
+	}
+	else
+	{
+		luaL_error(L, "Error in param 1 to draw_text");
+		return;
+	}
+	y = std::min(std::max(0.0f, y), sc_height) / sc_height;
+	mame_machine_manager::instance()->ui().draw_text_full(
+			sdev.container(),
+			msg,
+			x, y, (1.0f - x),
+			justify, ui::text_layout::WORD,
+			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
+}
+
+
+struct image_interface_formats
+{
+	image_interface_formats(device_image_interface &i) : image(i) { }
+	device_image_interface::formatlist_type const &items() { return image.formatlist(); }
+
+	static image_device_format const &unwrap(device_image_interface::formatlist_type::const_iterator const &it) { return **it; }
+	static int push_key(lua_State *L, device_image_interface::formatlist_type::const_iterator const &it, std::size_t ix) { return sol::stack::push_reference(L, (*it)->name()); }
+
+	device_image_interface &image;
 };
+
+} // anonymous namespace
 
 
 namespace sol
 {
+
+template <> struct is_container<image_interface_formats> : std::true_type { };
+
 
 sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
 {
@@ -181,74 +248,30 @@ public:
 };
 
 
-template <typename T>
-struct usertype_container<lua_engine::object_ptr_vector_wrapper<T> > : lua_engine::immutable_collection_helper<lua_engine::object_ptr_vector_wrapper<T>, std::vector<std::unique_ptr<T>> const, typename std::vector<std::unique_ptr<T>>::const_iterator>
+template <>
+struct usertype_container<image_interface_formats> : lua_engine::immutable_sequence_helper<image_interface_formats, device_image_interface::formatlist_type const, device_image_interface::formatlist_type::const_iterator>
 {
 private:
-	static int next_pairs(lua_State *L)
-	{
-		typename usertype_container::indexed_iterator &i(stack::unqualified_get<user<typename usertype_container::indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
-			return stack::push(L, lua_nil);
-		int result;
-		result = stack::push(L, i.ix + 1);
-		result += stack::push_reference(L, i.it->get());
-		++i;
-		return result;
-	}
+	using format_list = device_image_interface::formatlist_type;
 
 public:
-	static int at(lua_State *L)
+	static int get(lua_State *L)
 	{
-		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.vec.size() < index))
-			return stack::push(L, lua_nil);
-		return stack::push_reference(L, self.vec[index - 1].get());
-	}
-
-	static int get(lua_State *L) { return at(L); }
-	static int index_get(lua_State *L) { return at(L); }
-
-	static int index_of(lua_State *L)
-	{
-		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
-		T &target(stack::unqualified_get<T>(L, 2));
-		auto it(self.vec.begin());
-		std::ptrdiff_t ix(0);
-		while ((self.vec.end() != it) && (it->get() != &target))
-		{
-			++it;
-			++ix;
-		}
-		if (self.vec.end() == it)
-			return stack::push(L, lua_nil);
+		image_interface_formats &self(get_self(L));
+		char const *const name(stack::unqualified_get<char const *>(L));
+		auto const found(std::find_if(
+					self.image.formatlist().begin(),
+					self.image.formatlist().end(),
+					[&name] (std::unique_ptr<image_device_format> const &v) { return v->name() == name; }));
+		if (self.image.formatlist().end() != found)
+			return stack::push_reference(L, **found);
 		else
-			return stack::push(L, ix + 1);
+			return stack::push(L, lua_nil);
 	}
 
-	static int size(lua_State *L)
+	static int index_get(lua_State *L)
 	{
-		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
-		return stack::push(L, self.vec.size());
-	}
-
-	static int empty(lua_State *L)
-	{
-		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
-		return stack::push(L, self.vec.empty());
-	}
-
-	static int next(lua_State *L) { return stack::push(L, next_pairs); }
-	static int pairs(lua_State *L) { return ipairs(L); }
-
-	static int ipairs(lua_State *L)
-	{
-		lua_engine::object_ptr_vector_wrapper<T> &self(usertype_container::get_self(L));
-		stack::push(L, next_pairs);
-		stack::push<user<typename usertype_container::indexed_iterator> >(L, self.vec, self.vec.begin());
-		stack::push(L, lua_nil);
-		return 3;
+		return get(L);
 	}
 };
 
@@ -297,6 +320,40 @@ template <typename Handler>
 bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
 {
 	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+}
+
+
+int sol_lua_push(sol::types<screen_type_enum>, lua_State *L, screen_type_enum &&value)
+{
+	switch (value)
+	{
+	case SCREEN_TYPE_INVALID:   return sol::stack::push(L, "invalid");
+	case SCREEN_TYPE_RASTER:    return sol::stack::push(L, "raster");
+	case SCREEN_TYPE_VECTOR:    return sol::stack::push(L, "vector");
+	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "svg");
+	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "none");
+	}
+	return sol::stack::push(L, "unknown");
+}
+
+int sol_lua_push(sol::types<image_init_result>, lua_State *L, image_init_result &&value)
+{
+	switch (value)
+	{
+	case image_init_result::PASS:   return sol::stack::push(L, "pass");
+	case image_init_result::FAIL:   return sol::stack::push(L, "fail");
+	}
+	return sol::stack::push(L, "invalid");
+}
+
+int sol_lua_push(sol::types<image_verify_result>, lua_State *L, image_verify_result &&value)
+{
+	switch (value)
+	{
+	case image_verify_result::PASS: return sol::stack::push(L, "pass");
+	case image_verify_result::FAIL: return sol::stack::push(L, "fail");
+	}
+	return sol::stack::push(L, "invalid");
 }
 
 
@@ -558,14 +615,6 @@ void lua_engine::initialize()
 	};
 
 
-	static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser =
-	{
-		{ "left", ui::text_layout::LEFT },
-		{ "right", ui::text_layout::RIGHT },
-		{ "center", ui::text_layout::CENTER },
-	};
-
-
 	static const enum_parser<int, 3> s_seek_parser =
 	{
 		{ "set", SEEK_SET },
@@ -616,6 +665,7 @@ void lua_engine::initialize()
  *
  * emu.device_enumerator(dev) - get device enumerator starting at arbitrary point in tree
  * emu.screen_enumerator(dev) - get screen device enumerator starting at arbitrary point in tree
+ * emu.image_enumerator(dev) - get image interface enumerator starting at arbitrary point in tree
  * emu.image_enumerator(dev) - get image interface enumerator starting at arbitrary point in tree
  */
 
@@ -712,9 +762,21 @@ void lua_engine::initialize()
 			osd_subst_env(result, str);
 			return result;
 		};
-	emu["device_enumerator"] = [] (device_t &d) { return devenum<device_enumerator>(d); };
-	emu["screen_enumerator"] = [] (device_t &d) { return devenum<screen_device_enumerator>(d); };
-	emu["image_enumerator"] = [] (device_t &d) { return devenum<image_interface_enumerator>(d); };
+	emu["device_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
+	emu["screen_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<screen_device_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<screen_device_enumerator>(dev, maxdepth); });
+	emu["cassette_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<cassette_device_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<cassette_device_enumerator>(dev, maxdepth); });
+	emu["image_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<image_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<image_interface_enumerator>(dev, maxdepth); });
+	emu["slot_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
 
 
 /* emu_file library
@@ -1313,33 +1375,6 @@ void lua_engine::initialize()
 	game_driver_type["is_incomplete"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) != 0; });
 
 
-/* device_t library
- *
- * manager:machine().devices[device_tag]
- *
- * device:subtag(tag) - get absolute tag relative to this device
- * device:siblingtag(tag) - get absolute tag relative to this device
- * device:memregion(tag) - get memory region
- * device:memshare(tag) - get memory share
- * device:membank(tag) - get memory bank
- * device:ioport(tag) - get I/O port
- * device:subdevice(tag) - get subdevice
- * device:siblingdevice(tag) - get sibling device
- * device:debug() - debug interface, CPUs only
- *
- * device.tag - device tree tag
- * device.basetag - last component of tag ("root" for root device)
- * device.name - device type full name
- * device.shortname - device type short name
- * device.owner - parent device (nil for root device)
- * device.configured - whether configuration is complete
- * device.started - whether the device has been started
- * device.spaces[] - device address spaces table (k=name, v=addr_space)
- * device.state[] - device state entries table (k=name, v=device_state_entry)
- * device.items[] - device save state items table (k=name, v=index)
- * device.roms[] - device rom entry table (k=name, v=rom_entry)
- */
-
 	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
 	device_type["subtag"] = &device_t::subtag;
 	device_type["siblingtag"] = &device_t::siblingtag;
@@ -1349,13 +1384,6 @@ void lua_engine::initialize()
 	device_type["ioport"] = &device_t::ioport;
 	device_type["subdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::subdevice);
 	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::siblingdevice);
-	device_type["debug"] =
-		[this] (device_t &dev) -> sol::object
-		{
-			if (!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
-				return sol::make_object(sol(), sol::lua_nil);
-			return sol::make_object(sol(), dev.debug());
-		};
 	device_type["tag"] = sol::property(&device_t::tag);
 	device_type["basetag"] = sol::property(&device_t::basetag);
 	device_type["name"] = sol::property(&device_t::name);
@@ -1363,20 +1391,28 @@ void lua_engine::initialize()
 	device_type["owner"] = sol::property(&device_t::owner);
 	device_type["configured"] = sol::property(&device_t::configured);
 	device_type["started"] = sol::property(&device_t::started);
+	device_type["debug"] = sol::property(
+			[this] (device_t &dev) -> sol::object
+			{
+				if (!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not cpu
+					return sol::make_object(sol(), sol::lua_nil);
+				return sol::make_object(sol(), dev.debug());
+			});
 	device_type["spaces"] = sol::property(
 			[this] (device_t &dev)
 			{
-				device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(&dev);
+				device_memory_interface *const memdev = dynamic_cast<device_memory_interface *>(&dev);
 				sol::table sp_table = sol().create_table();
-				if(!memdev)
+				if (!memdev)
 					return sp_table;
-				for(int sp = 0; sp < memdev->max_space_count(); ++sp)
+				for (int sp = 0; sp < memdev->max_space_count(); ++sp)
 				{
-					if(memdev->has_space(sp))
+					if (memdev->has_space(sp))
 						sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
 				}
 				return sp_table;
 			});
+	// FIXME: improve this
 	device_type["state"] = sol::property(
 			[this] (device_t &dev)
 			{
@@ -1388,39 +1424,244 @@ void lua_engine::initialize()
 					st_table[s->symbol()] = s.get();
 				return st_table;
 			});
+	// FIXME: turn into a wrapper - it's stupid slow to walk on every property access
+	// also, this mixes up things like RAM areas with stuff saved by the device itself, so there's potential for key conflicts
 	device_type["items"] = sol::property(
 			[this] (device_t &dev)
 			{
 				sol::table table = sol().create_table();
-				std::string tag = dev.tag();
-				// 10000 is enough?
-				for(int i = 0; i < 10000; i++)
+				std::string const tag = dev.tag();
+				for (int i = 0; ; i++)
 				{
-					std::string name;
-					const char *item;
+					char const *item;
 					void *base;
 					uint32_t size, valcount, blockcount, stride;
 					item = dev.machine().save().indexed_item(i, base, size, valcount, blockcount, stride);
-					if(!item)
+					if (!item)
 						break;
-					name = &(strchr(item, '/')[1]);
-					if(name.substr(0, name.find('/')) == tag)
-					{
-						name = name.substr(name.find('/') + 1, std::string::npos);
-						table[name] = i;
-					}
+
+					char const *name = &strchr(item, '/')[1];
+					if (!strncmp(tag.c_str(), name, tag.length()) && (name[tag.length()] == '/'))
+						table[name + tag.length() + 1] = i;
 				}
 				return table;
 			});
+	// FIXME: this is useless in its current form
 	device_type["roms"] = sol::property(
 			[this] (device_t &dev)
 			{
 				sol::table table = sol().create_table();
-				for(auto rom : dev.rom_region_vector())
-					if(!rom.name().empty())
+				for (auto rom : dev.rom_region_vector())
+					if (!rom.name().empty())
 						table[rom.name()] = rom;
 				return table;
 			});
+
+
+	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
+			"screen_dev",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t>());
+	screen_dev_type["draw_box"] = sol::overload(
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
+			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, bgcolor); },
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor)
+			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, mame_machine_manager::instance()->ui().colors().background_color()); },
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
+			{ auto const &colors(mame_machine_manager::instance()->ui().colors()); do_draw_box(sdev, x1, y1, x2, y2, colors.text_color(), colors.background_color()); });
+	screen_dev_type["draw_line"] = sol::overload(
+			&do_draw_line,
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
+			{ do_draw_line(sdev, x1, y1, x2, y2, mame_machine_manager::instance()->ui().colors().text_color()); });
+	screen_dev_type["draw_text"] = sol::overload(
+			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor, uint32_t bgcolor)
+			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, bgcolor); },
+			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor)
+			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, 0); },
+			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg)
+			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, mame_machine_manager::instance()->ui().colors().text_color(), 0); });
+	screen_dev_type["orientation"] =
+		[] (screen_device &sdev)
+		{
+			uint32_t flags = sdev.orientation();
+			int rotation_angle = 0;
+			switch (flags)
+			{
+			case ORIENTATION_SWAP_XY:
+			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+				rotation_angle = 90;
+				flags ^= ORIENTATION_FLIP_X;
+				break;
+			case ORIENTATION_FLIP_Y:
+			case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+				rotation_angle = 180;
+				flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
+				break;
+			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+				rotation_angle = 270;
+				flags ^= ORIENTATION_FLIP_Y;
+				break;
+			}
+			return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
+		};
+	screen_dev_type["time_until_pos"] = sol::overload(
+			[] (screen_device &sdev, int vpos) { return sdev.time_until_pos(vpos).as_double(); },
+			[] (screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
+	screen_dev_type["time_until_vblank_start"] = &screen_device::time_until_vblank_start;
+	screen_dev_type["time_until_vblank_end"] = &screen_device::time_until_vblank_end;
+	screen_dev_type["snapshot"] =
+		[this] (screen_device &sdev, char const *filename) -> sol::object
+		{
+			std::string snapstr;
+			bool is_absolute_path = false;
+			if (filename)
+			{
+				// a filename was specified; if it isn't absolute post-process it
+				snapstr = process_snapshot_filename(machine(), filename);
+				is_absolute_path = osd_is_absolute_path(snapstr);
+			}
+
+			// open the file
+			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			osd_file::error filerr;
+			if (!snapstr.empty())
+				filerr = file.open(snapstr);
+			else
+				filerr = machine().video().open_next(file, "png");
+			if (filerr != osd_file::error::NONE)
+				return sol::make_object(sol(), filerr);
+
+			// and save the snapshot
+			machine().video().save_snapshot(&sdev, file);
+			return sol::make_object(sol(), sol::lua_nil);
+		};
+	screen_dev_type["pixel"] = [] (screen_device &sdev, s32 x, s32 y) { return sdev.pixel(x, y); };
+	screen_dev_type["pixels"] =
+		[] (screen_device &sdev, sol::this_state s)
+		{
+			lua_State *L = s;
+			const rectangle &visarea = sdev.visible_area();
+			luaL_Buffer buff;
+			int size = visarea.height() * visarea.width() * 4;
+			u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
+			sdev.pixels(ptr);
+			luaL_pushresultsize(&buff, size);
+			return sol::make_reference(L, sol::stack_reference(L, -1));
+		};
+	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
+	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
+	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
+	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); });
+	screen_dev_type["refresh_attoseconds"] = sol::property([] (screen_device &sdev) { return sdev.refresh_attoseconds(); });
+	screen_dev_type["xofffset"] = sol::property(&screen_device::xoffset);
+	screen_dev_type["yofffset"] = sol::property(&screen_device::yoffset);
+	screen_dev_type["xscale"] = sol::property(&screen_device::xscale);
+	screen_dev_type["yscale"] = sol::property(&screen_device::yscale);
+	screen_dev_type["pixel_period"] = sol::property([] (screen_device &sdev) { return sdev.pixel_period().as_double(); });
+	screen_dev_type["scan_period"] = sol::property([] (screen_device &sdev) { return sdev.scan_period().as_double(); });
+	screen_dev_type["frame_period"] = sol::property([] (screen_device &sdev) { return sdev.frame_period().as_double(); });
+	screen_dev_type["frame_number"] = &screen_device::frame_number;
+	screen_dev_type["container"] = sol::property(&screen_device::container);
+
+
+	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
+			"cassette",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t, device_image_interface>());
+	cass_type["stop"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE); };
+	cass_type["play"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE); };
+	cass_type["record"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE); };
+	cass_type["forward"] = &cassette_image_device::go_forward;
+	cass_type["reverse"] = &cassette_image_device::go_reverse;
+	cass_type["seek"] = [] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
+	cass_type["is_stopped"] = sol::property(&cassette_image_device::is_stopped);
+	cass_type["is_playing"] = sol::property(&cassette_image_device::is_playing);
+	cass_type["is_recording"] = sol::property(&cassette_image_device::is_recording);
+	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
+	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
+	cass_type["position"] = sol::property(&cassette_image_device::get_position);
+	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
+
+
+	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
+	image_type["load"] = &device_image_interface::load;
+	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::load_software);
+	image_type["unload"] = &device_image_interface::unload;
+	image_type["create"] = static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::create);
+	image_type["display"] = &device_image_interface::call_display;
+	image_type["is_readable"] = sol::property(&device_image_interface::is_readable);
+	image_type["is_writeable"] = sol::property(&device_image_interface::is_writeable);
+	image_type["is_creatable"] = sol::property(&device_image_interface::is_creatable);
+	image_type["must_be_loaded"] = sol::property(&device_image_interface::must_be_loaded);
+	image_type["is_reset_on_load"] = sol::property(&device_image_interface::is_reset_on_load);
+	image_type["image_type_name"] = sol::property(&device_image_interface::image_type_name);
+	image_type["instance_name"] = sol::property(&device_image_interface::instance_name);
+	image_type["brief_instance_name"] = sol::property(&device_image_interface::brief_instance_name);
+	image_type["formatlist"] = sol::property([] (device_image_interface &image) { return image_interface_formats(image); });
+	image_type["exists"] = sol::property(&device_image_interface::exists);
+	image_type["readonly"] = sol::property(&device_image_interface::is_readonly);
+	image_type["filename"] = sol::property(&device_image_interface::filename);
+	image_type["crc"] = sol::property(&device_image_interface::crc);
+	image_type["loaded_through_softlist"] = sol::property(&device_image_interface::loaded_through_softlist);
+	image_type["software_list_name"] = sol::property(&device_image_interface::software_list_name);
+	image_type["software_longname"] = sol::property(
+			[] (device_image_interface &di)
+			{
+				software_info const *const si(di.software_entry());
+				return si ? si->longname().c_str() : nullptr;
+			});
+	image_type["software_publisher"] = sol::property(
+			[] (device_image_interface &di)
+			{
+				software_info const *const si(di.software_entry());
+				return si ? si->publisher().c_str() : nullptr;
+			});
+	image_type["software_year"] = sol::property(
+			[] (device_image_interface &di)
+			{
+				software_info const *const si(di.software_entry());
+				return si ? si->year().c_str() : nullptr;
+			});
+	image_type["software_parent"] = sol::property(
+			[] (device_image_interface &di)
+			{
+				software_info const *const si(di.software_entry());
+				return si ? si->parentname().c_str() : nullptr;
+			});
+	image_type["device"] = sol::property(static_cast<device_t & (device_image_interface::*)()>(&device_image_interface::device));
+
+
+	auto format_type = sol().registry().new_usertype<image_device_format>("image_format", sol::no_constructor);
+	format_type["name"] = sol::property(&image_device_format::name);
+	format_type["description"] = sol::property(&image_device_format::description);
+	format_type["extensions"] = sol::property(
+			[this] (image_device_format const &format)
+			{
+				int index = 1;
+				sol::table option_table = sol().create_table();
+				for (std::string const &ext : format.extensions())
+					option_table[index++] = ext;
+				return option_table;
+			});
+	format_type["option_spec"] = sol::property(&image_device_format::optspec);
+
+
+	auto slot_type = sol().registry().new_usertype<device_slot_interface>("slot", sol::no_constructor);
+	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
+	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
+	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
+	slot_type["options"] = sol::property([] (device_slot_interface const &slot) { return standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
+	slot_type["device"] = sol::property(static_cast<device_t & (device_slot_interface::*)()>(&device_slot_interface::device));
+
+
+	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("dislot_option", sol::no_constructor);
+	dislot_option_type["name"] = sol::property(&device_slot_interface::slot_option::name);
+	dislot_option_type["device_fullname"] = sol::property([] (device_slot_interface::slot_option &opt) { return opt.devtype().fullname(); });
+	dislot_option_type["device_shortname"] = sol::property([] (device_slot_interface::slot_option &opt) { return opt.devtype().shortname(); });
+	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
+	dislot_option_type["default_bios"] = sol::property(static_cast<char const * (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::default_bios));
+	dislot_option_type["clock"] = sol::property(static_cast<u32 (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::clock));
 
 
 /*  parameters_manager library
@@ -1537,160 +1778,6 @@ void lua_engine::initialize()
 	sound_type.set("attenuation", sol::property(&sound_manager::attenuation, &sound_manager::set_attenuation));
 
 
-/* screen_device library
- *
- * manager:machine().screens[screen_tag]
- *
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol
- *                                                     filled with fillcol, color is 32bit argb
- * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y
- *                                                                            with left/right/center justification
- * screen:height() - screen height
- * screen:width() - screen width
- * screen:orientation() - screen angle, flipx, flipy
- * screen:refresh() - screen refresh rate in Hz
- * screen:refresh_attoseconds() - screen refresh rate in attoseconds
- * screen:snapshot([opt] filename) - save snap shot
- * screen:type() - screen drawing type
- * screen:frame_number() - screen frame count
- * screen:xscale() - screen x scale factor
- * screen:yscale() - screen y scale factor
- * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
- * screen:pixels() - get whole screen binary bitmap as string
- * screen:time_until_pos(vpos, hpos) - get the time until this screen pos is reached
- */
-
-	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
-			"screen_dev",
-			sol::no_constructor,
-			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type.set("container", sol::property(&screen_device::container));
-	screen_dev_type.set("draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
-			int sc_width = sdev.visible_area().width();
-			int sc_height = sdev.visible_area().height();
-			x1 = std::min(std::max(0.0f, x1), float(sc_width-1)) / float(sc_width);
-			y1 = std::min(std::max(0.0f, y1), float(sc_height-1)) / float(sc_height);
-			x2 = std::min(std::max(0.0f, x2), float(sc_width-1)) / float(sc_width);
-			y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
-			mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
-		});
-	screen_dev_type.set("draw_line", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color) {
-			int sc_width = sdev.visible_area().width();
-			int sc_height = sdev.visible_area().height();
-			x1 = std::min(std::max(0.0f, x1), float(sc_width-1)) / float(sc_width);
-			y1 = std::min(std::max(0.0f, y1), float(sc_height-1)) / float(sc_height);
-			x2 = std::min(std::max(0.0f, x2), float(sc_width-1)) / float(sc_width);
-			y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
-			sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		});
-	screen_dev_type.set("draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color, sol::object bcolor) {
-			int sc_width = sdev.visible_area().width();
-			int sc_height = sdev.visible_area().height();
-			auto justify = ui::text_layout::LEFT;
-			float x = 0;
-			if(xobj.is<float>())
-			{
-				x = std::min(std::max(0.0f, xobj.as<float>()), float(sc_width-1)) / float(sc_width);
-				y = std::min(std::max(0.0f, y), float(sc_height-1)) / float(sc_height);
-			}
-			else if(xobj.is<const char *>())
-			{
-				justify = s_text_justify_parser(xobj.as<const char *>());
-			}
-			else
-			{
-				luaL_error(m_lua_state, "Error in param 1 to draw_text");
-				return;
-			}
-			rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
-			rgb_t bgcolor = 0;
-			if(color.is<uint32_t>())
-				textcolor = rgb_t(color.as<uint32_t>());
-			if(bcolor.is<uint32_t>())
-				bgcolor = rgb_t(bcolor.as<uint32_t>());
-			mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
-								justify, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, textcolor, bgcolor);
-		});
-	screen_dev_type.set("height", [](screen_device &sdev) { return sdev.visible_area().height(); });
-	screen_dev_type.set("width", [](screen_device &sdev) { return sdev.visible_area().width(); });
-	screen_dev_type.set("orientation", [](screen_device &sdev) {
-			uint32_t flags = sdev.orientation();
-			int rotation_angle = 0;
-			switch (flags)
-			{
-				case ORIENTATION_FLIP_X:
-					rotation_angle = 0;
-					break;
-				case ORIENTATION_SWAP_XY:
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-					rotation_angle = 90;
-					break;
-				case ORIENTATION_FLIP_Y:
-				case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					rotation_angle = 180;
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					rotation_angle = 270;
-					break;
-			}
-			return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
-		});
-	screen_dev_type.set("refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); });
-	screen_dev_type.set("refresh_attoseconds", [](screen_device &sdev) { return sdev.refresh_attoseconds(); });
-	screen_dev_type.set("snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
-			std::string snapstr;
-			bool is_absolute_path = false;
-			if (filename.is<const char *>())
-			{
-				// a filename was specified; if it isn't absolute postprocess it
-				snapstr = process_snapshot_filename(machine(), filename.as<const char *>());
-				is_absolute_path = osd_is_absolute_path(snapstr);
-			}
-
-			// open the file
-			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr;
-			if (!snapstr.empty())
-				filerr = file.open(snapstr);
-			else
-				filerr = machine().video().open_next(file, "png");
-			if (filerr != osd_file::error::NONE)
-				return sol::make_object(sol(), filerr);
-
-			// and save the snapshot
-			machine().video().save_snapshot(&sdev, file);
-			return sol::make_object(sol(), sol::lua_nil);
-		});
-	screen_dev_type.set("type", [](screen_device &sdev) {
-			switch (sdev.screen_type())
-			{
-				case SCREEN_TYPE_RASTER:  return "raster"; break;
-				case SCREEN_TYPE_VECTOR:  return "vector"; break;
-				case SCREEN_TYPE_LCD:     return "lcd"; break;
-				case SCREEN_TYPE_SVG:     return "svg"; break;
-				default: break;
-			}
-			return "unknown";
-		});
-	screen_dev_type.set("frame_number", &screen_device::frame_number);
-	screen_dev_type.set("xscale", &screen_device::xscale);
-	screen_dev_type.set("yscale", &screen_device::yscale);
-	screen_dev_type.set("pixel", [](screen_device &sdev, float x, float y) { return sdev.pixel((s32)x, (s32)y); });
-	screen_dev_type.set("pixels", [](screen_device &sdev, sol::this_state s) {
-			lua_State *L = s;
-			const rectangle &visarea = sdev.visible_area();
-			luaL_Buffer buff;
-			int size = visarea.height() * visarea.width() * 4;
-			u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
-			sdev.pixels(ptr);
-			luaL_pushresultsize(&buff, size);
-			return sol::make_reference(L, sol::stack_reference(L, -1));
-		});
-	screen_dev_type.set("time_until_pos", [](screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
-
-
 /*  mame_ui_manager library
  *
  * manager:ui()
@@ -1797,160 +1884,6 @@ void lua_engine::initialize()
 		});
 	output_type.set("name_to_id", &output_manager::name_to_id);
 	output_type.set("id_to_name", &output_manager::id_to_name);
-
-
-/* device_image_interface library
- *
- * manager:machine().images[image_type]
- *
- * image:exists()
- * image:filename() - full path to the image file
- * image:longname()
- * image:manufacturer()
- * image:year()
- * image:software_list_name()
- * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
- * image:load(filename)
- * image:load_software(softlist_name)
- * image:unload()
- * image:create()
- * image:crc()
- * image:display()
- *
- * image.device - get associated device_t
- * image.instance_name
- * image.brief_instance_name
- * image.software_parent
- * image.is_readable
- * image.is_writeable
- * image.is_creatable
- * image.is_reset_on_load
- * image.must_be_loaded
- * image.formatlist
- */
-
-	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
-	image_type.set("exists", &device_image_interface::exists);
-	image_type.set("filename", &device_image_interface::filename);
-	image_type.set("longname", &device_image_interface::longname);
-	image_type.set("manufacturer", &device_image_interface::manufacturer);
-	image_type.set("year", &device_image_interface::year);
-	image_type.set("software_list_name", &device_image_interface::software_list_name);
-	image_type.set("software_parent", sol::property([](device_image_interface &di) {
-			const software_info *si = di.software_entry();
-			return si ? si->parentname() : "";
-		}));
-	image_type.set("image_type_name", &device_image_interface::image_type_name);
-	image_type.set("load", &device_image_interface::load);
-	image_type.set("load_software", static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::load_software));
-	image_type.set("unload", &device_image_interface::unload);
-	image_type.set("create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); });
-	image_type.set("crc", &device_image_interface::crc);
-	image_type.set("display", [](device_image_interface &di) { return di.call_display(); });
-	image_type.set("device", sol::property(static_cast<device_t & (device_image_interface::*)()>(&device_image_interface::device)));
-	image_type.set("instance_name", sol::property(&device_image_interface::instance_name));
-	image_type.set("brief_instance_name", sol::property(&device_image_interface::brief_instance_name));
-	image_type.set("is_readable", sol::property(&device_image_interface::is_readable));
-	image_type.set("is_writeable", sol::property(&device_image_interface::is_writeable));
-	image_type.set("is_creatable", sol::property(&device_image_interface::is_creatable));
-	image_type.set("is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
-	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
-	image_type.set("formatlist", sol::property([](const device_image_interface &image) { return object_ptr_vector_wrapper<image_device_format>(image.formatlist()); }));
-
-
-/*	image_device_format library
- *
- * manager:machine().images[tag].formatlist[index]
- * 
- * format.name - name of the format (e.g. - "dsk")
- * format.description - the description of the format
- * format.extensions - all of the extensions, as an array
- * format.optspec - the option spec associated with the format
- * 
- */
-	auto format_type = sol().registry().new_usertype<image_device_format>("image_format", sol::no_constructor);
-	format_type["name"] = sol::property(&image_device_format::name);
-	format_type["description"] = sol::property(&image_device_format::description);
-	format_type["optspec"] = sol::property(&image_device_format::optspec);
-	format_type["extensions"] = sol::property([this](const image_device_format &format) {
-			int index = 1;
-			sol::table option_table = sol().create_table();
-			for (const std::string &ext : format.extensions())
-				option_table[index++] = ext;
-			return option_table;
-		});
-
-
-/* device_slot_interface library
- *
- * manager:machine().slots[slot_name]
- *
- * slot.fixed - whether this slot is fixed, and hence not selectable by the user
- * slot.has_selectable_options - does this slot have any selectable options at all?
- * slot.default_option - returns the default option if one exists
- * slot.options[] - get options table (k=name, v=device_slot_interface::slot_option)
- */
-
-	auto slot_type = sol().registry().new_usertype<device_slot_interface>("slot", sol::no_constructor);
-	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
-	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
-	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
-	slot_type["options"] = sol::property([] (device_slot_interface const &slot) { return standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
-
-
-/* device_slot_interface::slot_option library
- *
- * manager:machine().slots[slot_name].options[option_name]
- *
- * slot_option.selectable - is this item selectable by the user?
- * slot_option.default_bios - the default bios for this option
- * slot_option.clock - the clock speed associated with this option
- */
-
-	auto dislot_option_type = sol().registry().new_usertype<device_slot_interface::slot_option>("dislot_option", sol::no_constructor);
-	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
-	dislot_option_type["default_bios"] = sol::property(static_cast<char const * (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::default_bios));
-	dislot_option_type["clock"] = sol::property(static_cast<u32 (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::clock));
-
-
-/* cassette_image_device library
- *
- * manager:machine().cassettes[cass_name]
- *
- * cass:play()
- * cass:stop()
- * cass:record()
- * cass:forward() - forward play direction
- * cass:reverse() - reverse play direction
- * cass:seek(time, origin) - seek time sec from origin: "set", "cur", "end"
- *
- * cass.is_stopped
- * cass.is_playing
- * cass.is_recording
- * cass.motor_state
- * cass.speaker_state
- * cass.position
- * cass.length
- * cass.image - get the device_image_interface for this cassette device
- */
-
-	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
-			"cassette",
-			sol::no_constructor,
-			sol::base_classes, sol::bases<device_t, device_image_interface>());
-	cass_type["stop"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE); };
-	cass_type["play"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE); };
-	cass_type["record"] = [] (cassette_image_device &c) { c.change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE); };
-	cass_type["forward"] = &cassette_image_device::go_forward;
-	cass_type["reverse"] = &cassette_image_device::go_reverse;
-	cass_type["seek"] = [] (cassette_image_device &c, double time, const char* origin) { if (c.exists()) c.seek(time, s_seek_parser(origin)); };
-	cass_type["is_stopped"] = sol::property(&cassette_image_device::is_stopped);
-	cass_type["is_playing"] = sol::property(&cassette_image_device::is_playing);
-	cass_type["is_recording"] = sol::property(&cassette_image_device::is_recording);
-	cass_type["motor_state"] = sol::property(&cassette_image_device::motor_on, &cassette_image_device::set_motor);
-	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
-	cass_type["position"] = sol::property(&cassette_image_device::get_position);
-	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
 
 /* mame_machine_manager library

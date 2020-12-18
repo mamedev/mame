@@ -295,7 +295,7 @@ function cheat.startplugin()
 			error("bpset not permitted in oneshot cheat")
 			return
 		end
-		local idx = dev:debug():bpset(addr)
+		local idx = dev.debug:bpset(addr)
 		breaks[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
@@ -308,7 +308,7 @@ function cheat.startplugin()
 			error("bad space in wpset")
 			return
 		end
-		local idx = dev.debug():wpset(space, wptype, addr, len)
+		local idx = dev.debug:wpset(space, wptype, addr, len)
 		watches[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
@@ -318,12 +318,12 @@ function cheat.startplugin()
 		end
 		for num, bp in pairs(breaks) do
 			if cheat == bp.cheat then
-				bp.dev.debug():bpclr(num)
+				bp.dev.debug:bpclr(num)
 			end
 		end
 		for num, wp in pairs(watches) do
 			if cheat == wp.cheat then
-				wp.dev.debug():wpclr(num)
+				wp.dev.debug:wpclr(num)
 			end
 		end
 	end
@@ -485,7 +485,7 @@ function cheat.startplugin()
 			for name, tag in pairs(cheat.cpu) do
 				if manager:machine():debugger() then
 					local dev = manager:machine().devices[tag]
-					if not dev or not dev:debug() then
+					if not dev or not dev.debug then
 						cheat_error(cheat, "missing or invalid device " .. tag)
 						return
 					end
@@ -895,7 +895,7 @@ function cheat.startplugin()
 			elseif draw.type == "line" then
 				draw.scr:draw_line(draw.x1, draw.y1, draw.x2, draw.y2, draw.color)
 			elseif draw.type == "box" then
-				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.bgcolor, draw.linecolor)
+				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.linecolor, draw.bgcolor)
 			end
 		end
 		output = {}
