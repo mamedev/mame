@@ -4,6 +4,7 @@
 
         SED1520 LCD controller
         SED1560 LCD controller
+        EPL43102 LCD controller
 
         TODO:
         - busy flag
@@ -20,8 +21,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520")
-DEFINE_DEVICE_TYPE(SED1560, sed1560_device, "sed1560", "Epson SED1560")
+DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520 LCD Driver")
+DEFINE_DEVICE_TYPE(SED1560, sed1560_device, "sed1560", "Epson SED1560 LCD Driver")
+DEFINE_DEVICE_TYPE(EPL43102, epl43102_device, "epl43102", "Elan EPL43102 LCD Driver")
 
 
 //**************************************************************************
@@ -55,9 +57,19 @@ sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-sed1560_device::sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sed15xx_device_base(mconfig, SED1560, tag, owner, clock, 1349, 166)   // 166 × 65-bit display RAM
+sed1560_device::sed1560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size)
+	: sed15xx_device_base(mconfig, type, tag, owner, clock, ddr_size, page_size)
 	, m_screen_update_cb(*this)
+{
+}
+
+sed1560_device::sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1560_device(mconfig, SED1560, tag, owner, clock, 1349, 166)   // 166 × 65-bit display RAM
+{
+}
+
+epl43102_device::epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1560_device(mconfig, EPL43102, tag, owner, clock, 455, 102)   // 102 × 43-bit display RAM (TODO: page map is not straightforward)
 {
 }
 
@@ -207,7 +219,7 @@ uint8_t sed15xx_device_base::data_read()
 {
 	uint8_t data = m_data;
 	m_data = m_ddr[(m_page * m_page_size + m_column) % m_ddr_size];
-	if (!m_modify_write && m_column < m_page_size)
+	if (!machine().side_effects_disabled() && !m_modify_write && m_column < m_page_size)
 		m_column++;
 
 	return data;
