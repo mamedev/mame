@@ -1197,6 +1197,9 @@ void riscii_series_device::execute_sub(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
 	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
 	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
 	bool cy = u16(data) >= m_acc + (c ? ~m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) >= (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0);
@@ -1270,6 +1273,9 @@ void riscii_series_device::execute_subdb(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
 	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
 	u16 tmp = u16(data) - m_acc - (~m_status & 0x01);
 	bool dc = (data & 0x0f) + (~m_acc & 0x0f) + (m_status & 0x01) >= 0x0a;
 	if (dc)
@@ -1530,7 +1536,7 @@ void riscii_series_device::execute_inc(u8 reg, bool a)
 		m_regs.write_byte(addr, tmp & 0xff);
 		multi_byte_carry(addr, (tmp >> 8) != 0);
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_dec(u8 reg, bool a)
@@ -1542,9 +1548,10 @@ void riscii_series_device::execute_dec(u8 reg, bool a)
 	else
 	{
 		m_regs.write_byte(addr, tmp & 0xff);
-		multi_byte_borrow(addr, (tmp >> 8) != 0);
+		// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+		multi_byte_borrow(addr, tmp == (addr == 0x0009 ? 0x7f : 0xff));
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_rpt(u8 reg)

@@ -85,7 +85,8 @@ EPL43102_UPDATE_CB(vreadere_state::lcd_update)
 
 WRITE_LINE_MEMBER(vreadere_state::power_on_w)
 {
-	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	// state is already inverted here
+	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void vreadere_state::portb_w(u8 data)
@@ -119,7 +120,7 @@ void vreadere_state::prog_map(address_map &map)
 
 static INPUT_PORTS_START(vreadere)
 	PORT_START("POWER")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_TOGGLE PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
 INPUT_PORTS_END
 
 void vreadere_state::vreadere(machine_config &config)
