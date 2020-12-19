@@ -129,6 +129,7 @@ private:
 	bool    m_fill;
 	bool    m_line_inv;
 	uint8_t m_line_inv_num;
+protected:
 	uint8_t m_contrast;
 };
 
@@ -140,6 +141,16 @@ class epl43102_device : public sed1560_device
 public:
 	// construction/destruction
 	epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual void control_write(uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// internal state
+	uint8_t m_last_command;
 };
 
 
