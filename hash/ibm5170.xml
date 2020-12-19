@@ -6149,9 +6149,23 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- installs and runs, but MAME does not emulate a modem -->
+	<software name="aol15" supported="no">
+		<description>America Online for Windows 1.5</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="1.5" />
+		<info name="serial" value="00000926" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="America Online 00000926.img" size="1474560" crc="69790ac8" sha1="34b14ba376ca57232b3a423b18cdf6a45c9e6ae7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aol20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
-		<description>America Online 2.0 for Windows</description>
+		<description>America Online for Windows 2.0</description>
 		<year>1994</year>
 		<publisher>America Online</publisher>
 		<info name="version" value="2.0" />
@@ -6162,12 +6176,25 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="aol30">
+	<software name="aol20mi" cloneof="aol20" supported="no">
+		<description>America Online for Windows 2.0 MI (Manual Installer)</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="2.0 MI" />
+		<info name="serial" value="00001061" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="AOL 2.0.img" size="1474560" crc="86606b15" sha1="eb953c7203363a5f173f38801d74387cee1909d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol30" supported="no">
 		<description>America Online 3.0 for Windows</description>
 		<year>1996</year>
 		<publisher>America Online</publisher>
 		<info name="version" value="3.0" />
-		<info name="serial" value="RO2286" />
+		<info name="serial" value="RO2286" /> <!-- also matches a dump from a disk labelled R01792 -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Explore for 50 Hours Free - America Online - RO2286 - For Windows Version 3.0.img" size="1474560" crc="3d10bc4a" sha1="3d2ef1dd4010a4bf29dc1fa661c0ccb1e39be558"/>
@@ -10542,37 +10569,37 @@ license:CC0
 		<info name="version" value="Version 2.0C" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="f6462e17" sha1="e2e03c4fd8a4e9217f6d2f60e34ca3831845132b"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="f6462e17" sha1="e2e03c4fd8a4e9217f6d2f60e34ca3831845132b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="157cd876" sha1="425fa708f64f2134c4e8f4ee1126e2c6a1b7ddd7"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="157cd876" sha1="425fa708f64f2134c4e8f4ee1126e2c6a1b7ddd7"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="cecd4ff4" sha1="f43eca93e92cdea865456824321daa209a90b24f"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="cecd4ff4" sha1="f43eca93e92cdea865456824321daa209a90b24f"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="125320f4" sha1="d215dc48b9d6ed696a1f8f4d4acbf1f4edc54e21"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="125320f4" sha1="d215dc48b9d6ed696a1f8f4d4acbf1f4edc54e21"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="11a4a530" sha1="583a3adf9a8a9b384d132f19045f974ba91897d9"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="11a4a530" sha1="583a3adf9a8a9b384d132f19045f974ba91897d9"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="44b294b7" sha1="35386a32e017a40bbf73ae87d7a89a68dc4d69cb"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="44b294b7" sha1="35386a32e017a40bbf73ae87d7a89a68dc4d69cb"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="dragonphere [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="cb5a9cd9" sha1="0639e04d8379d1428f38d881c58950cd85b58640"/>
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="cb5a9cd9" sha1="0639e04d8379d1428f38d881c58950cd85b58640"/>
 			</dataarea>
 		</part>
 	</software>
