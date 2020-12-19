@@ -4516,7 +4516,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="win31g" cloneof="win31">
+	<software name="win31de" cloneof="win31">
 		<description>Windows Version 3.1 (German)</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
@@ -4843,7 +4843,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wfw311g" cloneof="wfw311">
+	<software name="wfw311de" cloneof="wfw311">
 		<!-- KryoFlux dump from original disks, shows as unmodified -->
 		<description>Windows for Workgroups Version 3.11 (German)</description>
 		<year>1993</year>
@@ -10728,30 +10728,30 @@ license:CC0
 	</software>
 
 	<software name="dune2us" cloneof="dune2">
-		<description>Dune II - The Bulding Of A Dynasty (USA)</description>
+		<description>Dune II - The Building Of A Dynasty (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
 		<info name="version" value="V1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II - The Bulding Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e7e728b" sha1="faf37428171731a338dd73c1cdf0d81d411bd53d"/>
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e7e728b" sha1="faf37428171731a338dd73c1cdf0d81d411bd53d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II - The Bulding Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="aa1ba86b" sha1="6e720a4e85d0322b0e0a32fa0241a2b8aa4884dc"/>
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="aa1ba86b" sha1="6e720a4e85d0322b0e0a32fa0241a2b8aa4884dc"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II - The Bulding Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="15917fb7" sha1="14ba35a35676742f95bddb3f9cebdfb79d176c2a"/>
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="15917fb7" sha1="14ba35a35676742f95bddb3f9cebdfb79d176c2a"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- Modified root -->
-				<rom name="Dune II - The Bulding Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="5d8718b5" sha1="4aa6b229574327d420599699e1785dd674e7268d" status="baddump"/>
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="5d8718b5" sha1="4aa6b229574327d420599699e1785dd674e7268d" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11553,7 +11553,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="goblins3g" cloneof="goblins3">
+	<software name="goblins3de" cloneof="goblins3">
 		<description>Goblins Quest 3 (Germany)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
@@ -13337,7 +13337,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="megaloge">
+	<software name="megalode">
 		<description>Mega lo Mania (Germany)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -13516,7 +13516,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="monkey2g" cloneof="monkey2">
+	<software name="monkey2de" cloneof="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
@@ -13658,7 +13658,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mkg" cloneof="mk">
+	<software name="mkde" cloneof="mk">
 		<description>Mortal Kombat (Germany)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -14346,7 +14346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="samnmaxg" cloneof="samnmax">
+	<software name="samnmaxde" cloneof="samnmax">
 		<description>Sam &amp; Max Hit the Road (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -15044,7 +15044,7 @@ license:CC0
 	</software>
 
 	<software name="trek25th">
-		<description>Star Trek - 25th Anniversary (USA, 5.25" HD, v1.00) (include 'Out Of This World' demo)</description>
+		<description>Star Trek - 25th Anniversary (USA, 5.25" HD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Interplay" />
@@ -15125,7 +15125,7 @@ license:CC0
 	</software>
 
 	<software name="trek25thb" cloneof="trek25th">
-		<description>Star Trek - 25th Anniversary (USA, 3.5" DD, v1.00) (include 'Out Of This World' demo)</description>
+		<description>Star Trek - 25th Anniversary (USA, 3.5" DD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Interplay" />
