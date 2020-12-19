@@ -41730,6 +41730,7 @@ pyros                           // B25 / TP-009 (c) 1987 Taito America Corporati
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
 wardnerb                        // bootleg
 wardnerj                        // B25 / TP-009 (c) 1987 Taito Corporation (Japan)
+wardnerjb                       // bootleg
 
 @source:warpsped.cpp
 warpsped                        // 197?
