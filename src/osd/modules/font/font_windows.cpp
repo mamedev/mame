@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /*
- * font_windows.c
+ * font_windows.cpp
  *
  */
 
@@ -15,6 +15,7 @@
 #include "modules/osdmodule.h"
 
 #include "strconv.h"
+#include "unicode.h"
 #include "corestr.h"
 #include "corealloc.h"
 

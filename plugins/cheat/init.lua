@@ -295,7 +295,7 @@ function cheat.startplugin()
 			error("bpset not permitted in oneshot cheat")
 			return
 		end
-		local idx = dev:debug():bpset(addr)
+		local idx = dev.debug:bpset(addr)
 		breaks[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
@@ -308,7 +308,7 @@ function cheat.startplugin()
 			error("bad space in wpset")
 			return
 		end
-		local idx = dev.debug():wpset(space, wptype, addr, len)
+		local idx = dev.debug:wpset(space, wptype, addr, len)
 		watches[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
@@ -318,12 +318,12 @@ function cheat.startplugin()
 		end
 		for num, bp in pairs(breaks) do
 			if cheat == bp.cheat then
-				bp.dev.debug():bpclr(num)
+				bp.dev.debug:bpclr(num)
 			end
 		end
 		for num, wp in pairs(watches) do
 			if cheat == wp.cheat then
-				wp.dev.debug():wpclr(num)
+				wp.dev.debug:wpclr(num)
 			end
 		end
 	end
@@ -485,7 +485,7 @@ function cheat.startplugin()
 			for name, tag in pairs(cheat.cpu) do
 				if manager:machine():debugger() then
 					local dev = manager:machine().devices[tag]
-					if not dev or not dev:debug() then
+					if not dev or not dev.debug then
 						cheat_error(cheat, "missing or invalid device " .. tag)
 						return
 					end
@@ -605,15 +605,21 @@ function cheat.startplugin()
 		local menu = {}
 		if hotkeymenu then
 			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
-			menu[2] = {"---", "", "off"}
+			menu[2] = {_("Press UI Clear to clear hotkey"), "", "off"}
+			menu[3] = {"---", "", "off"}
 			hotkeylist = {}
 
-			local function hkcbfunc(cheat)
+			local function hkcbfunc(cheat, event)
+				if event == "clear" then
+					cheat.hotkeys = nil
+					return
+				end
+
 				local input = manager:machine():input()
-				local poller = input:sequence_poller()
-				manager:machine():popmessage(_("Press button for hotkey or wait to clear"))
+				local poller = input:switch_sequence_poller()
+				manager:machine():popmessage(_("Press button for hotkey or wait to leave unchanged"))
 				manager:machine():video():frame_update(true)
-				poller:start("switch")
+				poller:start()
 				local time = os.clock()
 				local clearmsg = true
 				while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
@@ -627,10 +633,8 @@ function cheat.startplugin()
 						manager:machine():video():frame_update(true)
 					end
 				end
-				if poller.valid then
+				if poller.modified and poller.valid then
 					cheat.hotkeys = { pressed = false, keys = poller.sequence }
-				else
-					cheat.hotkeys = nil
 				end
 				if clearmsg then
 					manager:machine():popmessage()
@@ -641,7 +645,7 @@ function cheat.startplugin()
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
 					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or _("None"), ""}
-					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
+					hotkeylist[#hotkeylist + 1] = function(event) return hkcbfunc(cheat, event) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
@@ -701,12 +705,12 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager:machine():popmessage()
 		if hotkeymenu then
-			if event == "select" then
-				index = index - 2
+			if event == "select" or event == "clear" then
+				index = index - 3
 				if index >= 1 and index <= #hotkeylist then
-					hotkeylist[index]()
+					hotkeylist[index](event)
 					return true
-				elseif index == #hotkeylist + 2 then
+				elseif index == #hotkeylist + 2 and event == "select" then
 					hotkeymenu = false
 					return true
 				end
@@ -891,7 +895,7 @@ function cheat.startplugin()
 			elseif draw.type == "line" then
 				draw.scr:draw_line(draw.x1, draw.y1, draw.x2, draw.y2, draw.color)
 			elseif draw.type == "box" then
-				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.bgcolor, draw.linecolor)
+				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.linecolor, draw.bgcolor)
 			end
 		end
 		output = {}

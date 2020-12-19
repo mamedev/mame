@@ -140,42 +140,18 @@ void lua_engine::initialize_input(sol::table &emu)
 	};
 
 
-/* ioport_manager library
- *
- * manager:machine():ioport()
- *
- * ioport:count_players() - get count of player controllers
- * ioport:type_group(type, player)
- * ioport:type_seq(type, player, seqtype) - get input sequence for ioport type/player
- *
- * ioport.ports[] - ioports table (k=tag, v=ioport_port)
- * ioport.natkeyboard - get natural keyboard manager
- */
-
 	auto ioport_manager_type = sol().registry().new_usertype<ioport_manager>("ioport", sol::no_constructor);
 	ioport_manager_type["count_players"] = &ioport_manager::count_players;
 	ioport_manager_type["type_group"] = &ioport_manager::type_group;
-	ioport_manager_type["type_seq"] = &ioport_manager::type_seq;
+	ioport_manager_type["type_seq"] =
+		[] (ioport_manager &im, ioport_type type, int player, std::string const &seq_type_string)
+		{
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
+			return im.type_seq(type, player, seq_type);
+		};
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
 	ioport_manager_type["natkeyboard"] = sol::property(&ioport_manager::natkeyboard);
 
-
-/* natural_keyboard library
- *
- * manager:machine():ioport().natkeyboard
- *
- * natkeyboard:post(text) - post data to natural keyboard
- * natkeyboard:post_coded(text) - post data to natural keyboard
- * natkeyboard:paste() - paste host clipboard text
- * natkeyboard:dump() - returns human-readable description of character mappings
- *
- * natkeyboard.empty - is the natural keyboard buffer empty?
- * natkeyboard.full - is the natural keyboard buffer full?
- * natkeyboard.can_post - does the system support posting characters via natural keyboard?
- * natkeyboard.is_posting - is a post operation currently in progress?
- * natkeyboard.in_use - is natural keyboard mode enabled (read/write)?
- * natkeyboard.keyboards[] - get keyboard devices in system (k=tag, v=natkbd_kbd_dev)
- */
 
 	auto natkeyboard_type = sol().registry().new_usertype<natural_keyboard>("natkeyboard", sol::no_constructor);
 	natkeyboard_type["post"] = [] (natural_keyboard &nat, std::string const &text) { nat.post_utf8(text); };
@@ -189,19 +165,6 @@ void lua_engine::initialize_input(sol::table &emu)
 	natkeyboard_type["in_use"] = sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use);
 	natkeyboard_type["keyboards"] = sol::property([] (natural_keyboard &nat) { return natkbd_kbd_list(nat); });
 
-
-/* natkbd_kbd_dev library
- *
- * manager:machine():ioport().natkeyboard.keyboards[tag]
- *
- * keyboard.device - underlying device that the inputs belong to
- * keyboard.tag - absolute tag of the device
- * keyboard.basetag - last component of the device tag ("root" for root device)
- * keyboard.name - device type full name
- * keyboard.shortname - device type short name
- * keyboard.is_keypad - does the device have keypad inputs but no keyboard inputs?
- * keyboard.enabled - are the device's keyboard/keypad inputs enabled (read/write)?
- */
 
 	auto natkbddev_type = sol().registry().new_usertype<natkbd_kbd_dev>("natkeyboard_device", sol::no_constructor);
 	natkbddev_type["device"] = sol::property([] (natkbd_kbd_dev const &kbd) -> device_t & { return kbd.manager.keyboard_device(kbd.index); });
@@ -220,21 +183,6 @@ void lua_engine::initialize_input(sol::table &emu)
 					kbd.manager.disable_keyboard(kbd.index);
 			});
 
-
-/* ioport_port library
- *
- * manager:machine():ioport().ports[port_tag]
- *
- * port:read() - get port value
- * port:write(val, mask) - set port to value & mask (output fields only, for other fields use field:set_value(val))
- * port:field(mask) - get ioport_field for port and mask
- *
- * port.device - get device that the port belongs to
- * port.tag - get port tag
- * port.active - get port status
- * port.live - get port ioport_port_live (TODO: not usable from lua as of now)
- * port.fields[] - get ioport_field table (k=name, v=ioport_field)
- */
 
 	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor);
 	ioport_port_type["read"] = &ioport_port::read;
@@ -267,48 +215,6 @@ void lua_engine::initialize_input(sol::table &emu)
 				return f_table;
 			});
 
-
-/* ioport_field library
- *
- * manager:machine():ioport().ports[port_tag].fields[field_name]
- *
- * field:set_value(value)
- * field:set_input_seq(seq_type, seq)
- * field:input_seq(seq_type)
- * field:set_default_input_seq(seq_type, seq)
- * field:default_input_seq(seq_type)
- * field:keyboard_codes(which)
- *
- * field.device - get associated device_t
- * field.port - get associated ioport_port
- * field.live - get ioport_field_live
- * field.name
- * field.default_name
- * field.player
- * field.mask
- * field.defvalue
- * field.sensitivity
- * field.way - amount of available directions
- * field.type_class
- * field.is_analog
- * field.is_digital_joystick
- * field.enabled
- * field.optional
- * field.cocktail
- * field.toggle - whether field is a toggle
- * field.rotated
- * field.analog_reverse
- * field.analog_reset
- * field.analog_wraps
- * field.analog_invert
- * field.impulse
- * field.type
- * field.crosshair_scale
- * field.crosshair_offset
- * field.user_value
- *
- * field.settings[] - ioport_setting table (k=value, v=name)
- */
 
 	auto ioport_field_type = sol().registry().new_usertype<ioport_field>("ioport_field", sol::no_constructor);
 	ioport_field_type["set_value"] = &ioport_field::set_value;
@@ -350,6 +256,8 @@ void lua_engine::initialize_input(sol::table &emu)
 		};
 	ioport_field_type["device"] = sol::property(&ioport_field::device);
 	ioport_field_type["port"] = sol::property(&ioport_field::port);
+	ioport_field_type["live"] = sol::property(&ioport_field::live);
+	ioport_field_type["type"] = sol::property(&ioport_field::type);
 	ioport_field_type["name"] = sol::property(&ioport_field::name);
 	ioport_field_type["default_name"] = sol::property(
 			[] (ioport_field &f)
@@ -387,8 +295,6 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["analog_wraps"] = sol::property(&ioport_field::analog_wraps);
 	ioport_field_type["analog_invert"] = sol::property(&ioport_field::analog_invert);
 	ioport_field_type["impulse"] = sol::property(&ioport_field::impulse);
-	ioport_field_type["type"] = sol::property(&ioport_field::type);
-	ioport_field_type["live"] = sol::property(&ioport_field::live);
 	ioport_field_type["crosshair_scale"] = sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale);
 	ioport_field_type["crosshair_offset"] = sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset);
 	ioport_field_type["user_value"] = sol::property(
@@ -416,36 +322,9 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-/* ioport_field_live library
- *
- * manager:machine():ioport().ports[port_tag].fields[field_name].live
- *
- * live.name
- */
-
 	auto ioport_field_live_type = sol().registry().new_usertype<ioport_field_live>("ioport_field_live", sol::no_constructor);
 	ioport_field_live_type["name"] = &ioport_field_live::name;
 
-
-/* input_manager library
- *
- * manager:machine():input()
- *
- * input:code_value(code) -
- * input:code_pressed(code) - get pressed state for input_code
- * input:code_pressed_once(code) -
- * input:code_name(code) - get code friendly name
- * input:code_to_token(code) - get KEYCODE_* string token for code
- * input:code_from_token(token) - get input_code for KEYCODE_* string token
- * input:seq_pressed(seq) - get pressed state for input_seq
- * input:seq_clean(seq) - clean the seq and remove invalid elements
- * input:seq_name(seq) - get seq friendly name
- * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
- * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
- * input:sequence_poller() - get an input sequence poller
- *
- * input.device_classes[] - returns device classes (k=name, v=input_device_class)
- */
 
 	auto input_type = sol().registry().new_usertype<input_manager>("input", sol::no_constructor);
 	input_type["code_value"] = &input_manager::code_value;
@@ -465,7 +344,11 @@ void lua_engine::initialize_input(sol::table &emu)
 			input.seq_from_tokens(seq, tokens);
 			return seq;
 		};
-	input_type["sequence_poller"] = [] (input_manager &input) { return input_sequence_poller(input); };
+	input_type["axis_code_poller"] = [] (input_manager &input) { return std::unique_ptr<input_code_poller>(new axis_code_poller(input)); };
+	input_type["switch_code_poller"] = [] (input_manager &input) { return std::unique_ptr<input_code_poller>(new switch_code_poller(input)); };
+	input_type["keyboard_code_poller"] = [] (input_manager &input) { return std::unique_ptr<input_code_poller>(new keyboard_code_poller(input)); };
+	input_type["axis_sequence_poller"] = [] (input_manager &input) { return std::unique_ptr<input_sequence_poller>(new axis_sequence_poller(input)); };
+	input_type["switch_sequence_poller"] = [] (input_manager &input) { return std::unique_ptr<input_sequence_poller>(new switch_sequence_poller(input)); };
 	input_type["device_classes"] = sol::property(
 			[this] (input_manager &input)
 			{
@@ -479,60 +362,25 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-/* input_sequence_poller library
- *
- * manager:machine():input():seq_poll()
- *
- * poller:start(class, [opt] start_seq) - start polling for input_item_class passed as string
- *                                                (switch/abs[olute]/rel[ative]/max[imum])
- * poller:poll() - poll once, returns true if input was fetched
- *
- * poller.sequence - get current input_seq
- * poller.valid - true if input sequence is valid
- * poller.modified - true if input sequence was modified
- */
+	auto codepoll_type = sol().registry().new_usertype<input_code_poller>("input_code_poller", sol::no_constructor);
+	codepoll_type["reset"] = &input_code_poller::reset;
+	codepoll_type["poll"] = &input_code_poller::poll;
+
 
 	auto seqpoll_type = sol().registry().new_usertype<input_sequence_poller>("input_seq_poller", sol::no_constructor);
-	seqpoll_type["start"] =
-		[] (input_sequence_poller &poller, char const *cls_string, sol::object seq)
-		{
-			input_item_class cls;
-			if (!strcmp(cls_string, "switch"))
-				cls = ITEM_CLASS_SWITCH;
-			else if (!strcmp(cls_string, "absolute") || !strcmp(cls_string, "abs"))
-				cls = ITEM_CLASS_ABSOLUTE;
-			else if (!strcmp(cls_string, "relative") || !strcmp(cls_string, "rel"))
-				cls = ITEM_CLASS_RELATIVE;
-			else if (!strcmp(cls_string, "maximum") || !strcmp(cls_string, "max"))
-				cls = ITEM_CLASS_MAXIMUM;
-			else
-				cls = ITEM_CLASS_INVALID;
-
-			if (seq.is<sol::user<input_seq>>())
-				poller.start(cls, seq.as<input_seq>());
-			else
-				poller.start(cls);
-		};
+	seqpoll_type["start"] = sol::overload(
+			[] (input_sequence_poller &poller) { return poller.start(); },
+			[] (input_sequence_poller &poller, input_seq const &seq) { return poller.start(seq); });
 	seqpoll_type["poll"] = &input_sequence_poller::poll;
 	seqpoll_type["sequence"] = sol::property(&input_sequence_poller::sequence);
 	seqpoll_type["valid"] = sol::property(&input_sequence_poller::valid);
 	seqpoll_type["modified"] = sol::property(&input_sequence_poller::modified);
 
 
-/* input_class library
- *
- * manager:machine():input().device_classes[devclass]
- *
- * devclass.name
- * devclass.enabled
- * devclass.multi
- * devclass.devices[]
- */
-
-	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", "new", sol::no_constructor);
+	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);
 	input_class_type["name"] = sol::property(&input_class::name);
-	input_class_type["enabled"] = sol::property(&input_class::enabled, &input_class::enable);
-	input_class_type["multi"] = sol::property(&input_class::multi, &input_class::set_multi);
+	input_class_type["enabled"] = sol::property(&input_class::enabled);
+	input_class_type["multi"] = sol::property(&input_class::multi);
 	input_class_type["devices"] = sol::property(
 			[this] (input_class &devclass)
 			{
@@ -540,7 +388,7 @@ void lua_engine::initialize_input(sol::table &emu)
 				int index = 1;
 				for (int devindex = 0; devindex <= devclass.maxindex(); devindex++)
 				{
-					input_device *dev = devclass.device(devindex);
+					input_device *const dev = devclass.device(devindex);
 					if (dev)
 						result[index++] = dev;
 				}
@@ -548,17 +396,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-/* input_device library
- *
- * manager:machine():input().device_classes[devclass].devices[index]
- *
- * device.name -
- * device.id -
- * device.devindex -
- * device.items[] -
- */
-
-	auto input_device_type = sol().registry().new_usertype<input_device>("input_device", "new", sol::no_constructor);
+	auto input_device_type = sol().registry().new_usertype<input_device>("input_device", sol::no_constructor);
 	input_device_type["name"] = sol::property(&input_device::name);
 	input_device_type["id"] = sol::property(&input_device::id);
 	input_device_type["devindex"] = sol::property(&input_device::devindex);
@@ -576,40 +414,24 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-/* input_device_item library
- *
- * manager:machine():input().device_classes[devclass].devices[index].items[item_id]
- *
- * item.name -
- * item.code -
- * item.token -
- * item.current -
- */
-
-	auto input_device_item_type = sol().registry().new_usertype<input_device_item>("input_device_item", "new", sol::no_constructor);
+	auto input_device_item_type = sol().registry().new_usertype<input_device_item>("input_device_item", sol::no_constructor);
 	input_device_item_type["name"] = sol::property(&input_device_item::name);
 	input_device_item_type["code"] = sol::property(&input_device_item::code);
 	input_device_item_type["token"] = sol::property(&input_device_item::token);
 	input_device_item_type["current"] = sol::property(&input_device_item::current);
 
 
-/* ui_input_manager library
- *
- * manager:machine():uiinput()
- *
- * uiinput:find_mouse() - return x, y, button state, ui render target
- * uiinput:pressed(key) - get pressed state for ui key
- * uiinput.presses_enabled - enable/disable ui key presses
- */
-
-	auto uiinput_type = sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor);
-	uiinput_type.set("find_mouse", [](ui_input_manager &ui) {
+	auto uiinput_type = sol().registry().new_usertype<ui_input_manager>("uiinput", sol::no_constructor);
+	uiinput_type["find_mouse"] =
+		[] (ui_input_manager &ui)
+		{
 			int32_t x, y;
 			bool button;
 			render_target *rt = ui.find_mouse(&x, &y, &button);
-			return std::tuple<int32_t, int32_t, bool, render_target *>(x, y, button, rt);
-		});
-	uiinput_type.set("pressed", &ui_input_manager::pressed);
-	uiinput_type.set("presses_enabled", sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled));
+			return std::make_tuple(x, y, button, rt);
+		};
+	uiinput_type["pressed"] = &ui_input_manager::pressed;
+	uiinput_type["pressed_repeat"] = &ui_input_manager::pressed_repeat;
+	uiinput_type["presses_enabled"] = sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled);
 
 }

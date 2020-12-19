@@ -167,7 +167,7 @@ namespace emu::detail {
 template <typename... T> struct void_wrapper { using type = void; };
 template <typename... T> using void_t = typename void_wrapper<T...>::type;
 
-template <typename D, typename T, typename Enable = void> struct rw_device_class  { };
+template <typename D, typename T, typename Enable = void> struct rw_device_class { };
 
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...), const char *>::value> > { using type = T; };

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
+#include "unicode.h"
 
 #include <algorithm>
 

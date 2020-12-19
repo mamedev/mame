@@ -79,6 +79,9 @@ Golden Winner - Reben
 //#include "machine/nvram.h"
 #include "sound/ay8910.h"
 
+
+namespace {
+
 class missbamby_state : public driver_device
 {
 public:
@@ -217,6 +220,8 @@ ROM_START( unkslot )
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )

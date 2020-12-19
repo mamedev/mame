@@ -105,18 +105,16 @@ public:
 	input_code code() const;
 	const char *token() const { return m_token.c_str(); }
 	s32 current() const { return m_current; }
-	s32 memory() const { return m_memory; }
 
 	// helpers
 	s32 update_value();
-	void set_memory(s32 value) { m_memory = value; }
-	bool check_axis(input_item_modifier modifier);
+	bool check_axis(input_item_modifier modifier, s32 memory);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) = 0;
 	virtual s32 read_as_relative(input_item_modifier modifier) = 0;
 	virtual s32 read_as_absolute(input_item_modifier modifier) = 0;
-	virtual bool item_check_axis(input_item_modifier modifier) = 0;
+	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) = 0;
 
 protected:
 	// internal state
@@ -130,7 +128,6 @@ protected:
 
 	// live state
 	s32                     m_current;              // current raw value
-	s32                     m_memory;               // "memory" value, to remember where we started during polling
 };
 
 

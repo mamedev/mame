@@ -16,6 +16,8 @@
 #include "romload.h"
 #include "validity.h"
 
+#include "unicode.h"
+
 #include <cctype>
 
 

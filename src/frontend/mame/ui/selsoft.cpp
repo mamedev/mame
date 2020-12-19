@@ -24,6 +24,7 @@
 #include "softlist_dev.h"
 #include "uiinput.h"
 #include "luaengine.h"
+#include "unicode.h"
 
 #include <algorithm>
 #include <iterator>

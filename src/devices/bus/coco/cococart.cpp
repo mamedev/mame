@@ -58,7 +58,17 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_LINE                0
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+#define LOG_CART (1U << 1) // shows cart line changes
+#define LOG_NMI  (1U << 2) // shows switch changes
+#define LOG_HALT (1U << 3) // shows switch changes
+// #define VERBOSE (LOG_CART)
+
+#include "logmacro.h"
+
+#define LOGCART(...) LOGMASKED(LOG_CART,  __VA_ARGS__)
+#define LOGNMI(...)  LOGMASKED(LOG_NMI,  __VA_ARGS__)
+#define LOGHALT(...) LOGMASKED(LOG_HALT,  __VA_ARGS__)
 
 
 /***************************************************************************
@@ -150,15 +160,15 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 	switch(id)
 	{
 		case TIMER_CART:
-			set_line("CART", m_cart_line, (line_value) param);
+			set_line(line::CART, m_cart_line, (line_value) param);
 			break;
 
 		case TIMER_NMI:
-			set_line("NMI", m_nmi_line, (line_value) param);
+			set_line(line::NMI, m_nmi_line, (line_value) param);
 			break;
 
 		case TIMER_HALT:
-			set_line("HALT", m_halt_line, (line_value) param);
+			set_line(line::HALT, m_halt_line, (line_value) param);
 			break;
 	}
 }
@@ -242,14 +252,26 @@ const char *cococart_slot_device::line_value_string(line_value value)
 //  set_line
 //-------------------------------------------------
 
-void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &line, cococart_slot_device::line_value value)
+void cococart_slot_device::set_line(line ln, coco_cartridge_line &line, cococart_slot_device::line_value value)
 {
 	if ((line.value != value) || (value == line_value::Q))
 	{
 		line.value = value;
 
-		if (LOG_LINE)
-			logerror("[%s]: set_line(): %s <= %s\n", machine().describe_context(), line_name, line_value_string(value));
+		switch (ln)
+		{
+		case line::CART:
+			LOGCART( "set_line: CART, value: %s\n", line_value_string(value));
+			break;
+		case line::NMI:
+			LOGNMI( "set_line: NMI, value: %s\n", line_value_string(value));
+			break;
+		case line::HALT:
+			LOGHALT( "set_line: HALT, value: %s\n", line_value_string(value));
+			break;
+		case line::SOUND_ENABLE:
+			break;
+		}
 
 		// engage in a bit of gymnastics for this odious 'Q' value
 		switch(line.value)

@@ -672,7 +672,7 @@ bool input_manager::code_pressed_once(input_code code)
 		if (m_switch_memory[memnum] == code)
 		{
 			// if no longer pressed, clear entry
-			if (curvalue == false)
+			if (!curvalue)
 				m_switch_memory[memnum] = INPUT_CODE_INVALID;
 
 			// always return false
@@ -684,205 +684,15 @@ bool input_manager::code_pressed_once(input_code code)
 			empty = memnum;
 	}
 
-	// if we get here, we were not previously pressed; if still not pressed, return 0
-	if (curvalue == false)
+	// if we get here, we were not previously pressed; if still not pressed, return false
+	if (!curvalue)
 		return false;
 
-	// otherwise, add ourself to the memory and return 1
+	// otherwise, add the code to the memory and return true
 	assert(empty != -1);
 	if (empty != -1)
 		m_switch_memory[empty] = code;
 	return true;
-}
-
-
-//-------------------------------------------------
-//  reset_polling - reset memories in preparation
-//  for polling
-//-------------------------------------------------
-
-void input_manager::reset_polling()
-{
-	// reset switch memory
-	reset_memory();
-
-	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
-		{
-			// fetch the device; ignore if nullptr
-			input_device *device = m_class[devclass]->device(devnum);
-			if (device == nullptr)
-				continue;
-
-			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
-			{
-				// for any non-switch items, set memory equal to the current value
-				input_device_item *item = device->item(itemid);
-				if (item != nullptr && item->itemclass() != ITEM_CLASS_SWITCH)
-					item->set_memory(code_value(item->code()));
-			}
-		}
-}
-
-
-//-------------------------------------------------
-//  poll_switches - poll for any input
-//-------------------------------------------------
-
-input_code input_manager::poll_switches()
-{
-	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-	{
-		// skip device class if disabled
-		if (!m_class[devclass]->enabled())
-			continue;
-
-		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
-		{
-			// fetch the device; ignore if nullptr
-			input_device *device = m_class[devclass]->device(devnum);
-			if (device == nullptr)
-				continue;
-
-			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
-			{
-				input_device_item *item = device->item(itemid);
-				if (item != nullptr)
-				{
-					input_code code = item->code();
-
-					// if the item is natively a switch, poll it
-					if (item->itemclass() == ITEM_CLASS_SWITCH)
-					{
-						if (code_pressed_once(code))
-							return code;
-						else
-							continue;
-					}
-
-					// skip if there is not enough axis movement
-					if (!item->check_axis(code.item_modifier()))
-						continue;
-
-					// otherwise, poll axes digitally
-					code.set_item_class(ITEM_CLASS_SWITCH);
-
-					// if this is a joystick X axis, check with left/right modifiers
-					if (devclass == DEVICE_CLASS_JOYSTICK && code.item_id() == ITEM_ID_XAXIS)
-					{
-						code.set_item_modifier(ITEM_MODIFIER_LEFT);
-						if (code_pressed_once(code))
-							return code;
-						code.set_item_modifier(ITEM_MODIFIER_RIGHT);
-						if (code_pressed_once(code))
-							return code;
-					}
-
-					// if this is a joystick Y axis, check with up/down modifiers
-					else if (devclass == DEVICE_CLASS_JOYSTICK && code.item_id() == ITEM_ID_YAXIS)
-					{
-						code.set_item_modifier(ITEM_MODIFIER_UP);
-						if (code_pressed_once(code))
-							return code;
-						code.set_item_modifier(ITEM_MODIFIER_DOWN);
-						if (code_pressed_once(code))
-							return code;
-					}
-
-					// any other axis, check with pos/neg modifiers
-					else
-					{
-						code.set_item_modifier(ITEM_MODIFIER_POS);
-						if (code_pressed_once(code))
-							return code;
-						code.set_item_modifier(ITEM_MODIFIER_NEG);
-						if (code_pressed_once(code))
-							return code;
-					}
-				}
-			}
-		}
-	}
-
-	// if nothing, return an invalid code
-	return INPUT_CODE_INVALID;
-}
-
-
-//-------------------------------------------------
-//  poll_keyboard_switches - poll for any
-//  keyboard-specific input
-//-------------------------------------------------
-
-input_code input_manager::poll_keyboard_switches()
-{
-	// iterate over devices within each class
-	input_class &keyboard_class = device_class(DEVICE_CLASS_KEYBOARD);
-	for (int devnum = 0; devnum < keyboard_class.maxindex(); devnum++)
-	{
-		// fetch the device; ignore if nullptr
-		input_device *device = keyboard_class.device(devnum);
-		if (device == nullptr)
-			continue;
-
-		// iterate over items within each device
-		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
-		{
-			input_device_item *item = device->item(itemid);
-			if (item != nullptr && item->itemclass() == ITEM_CLASS_SWITCH)
-			{
-				input_code code = item->code();
-				if (code_pressed_once(code))
-					return code;
-			}
-		}
-	}
-
-	// if nothing, return an invalid code
-	return INPUT_CODE_INVALID;
-}
-
-
-//-------------------------------------------------
-//  poll_axes - poll for any input
-//-------------------------------------------------
-
-input_code input_manager::poll_axes()
-{
-	// iterate over device classes and devices
-	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-	{
-		// skip device class if disabled
-		if (!m_class[devclass]->enabled())
-			continue;
-
-		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
-		{
-			// fetch the device; ignore if nullptr
-			input_device *device = m_class[devclass]->device(devnum);
-			if (device == nullptr)
-				continue;
-
-			// iterate over items within each device
-			for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem(); ++itemid)
-			{
-				input_device_item *item = device->item(itemid);
-				if (item != nullptr && item->itemclass() != ITEM_CLASS_SWITCH)
-				{
-					input_code code = item->code();
-					if (item->check_axis(code.item_modifier()))
-						return code;
-				}
-			}
-		}
-	}
-
-	// if nothing, return an invalid code
-	return INPUT_CODE_INVALID;
 }
 
 

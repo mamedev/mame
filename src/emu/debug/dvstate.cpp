@@ -255,6 +255,9 @@ void debug_view_state::view_update()
 			default:
 				curitem.update(source.m_stateintf->state_int(curitem.index()), cycles_changed);
 				valstr = source.m_stateintf->state_string(curitem.index());
+				// state_string may not always provide the maximum number of characters with some formats
+				valstr.resize(curitem.value_length(), ' ');
+				break;
 			}
 
 			// if this row is visible, add it to the buffer

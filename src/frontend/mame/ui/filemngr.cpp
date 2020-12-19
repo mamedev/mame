@@ -60,7 +60,7 @@ menu_file_manager::~menu_file_manager()
 void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// access the path
-	std::string_view path = selected_device ? selected_device->filename() : std::string_view();
+	std::string_view path = selected_device && selected_device->exists() ? selected_device->filename() : std::string_view();
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 

@@ -12,6 +12,7 @@
 #include "text.h"
 #include "rendfont.h"
 #include "render.h"
+#include "unicode.h"
 
 #include <cstddef>
 #include <cstring>
@@ -133,7 +134,7 @@ void text_layout::add_text(std::string_view text, const char_style &style)
 		{
 			// get the current character
 			char32_t schar;
-			int const scharcount = uchar_from_utf8(&schar, &text[0], text.length());
+			int const scharcount = uchar_from_utf8(&schar, text);
 			if (scharcount < 0)
 				break;
 
@@ -151,7 +152,7 @@ void text_layout::add_text(std::string_view text, const char_style &style)
 
 		// get the current character
 		char32_t ch;
-		int const scharcount = uchar_from_utf8(&ch, &text[0], text.length());
+		int const scharcount = uchar_from_utf8(&ch, text);
 		if (scharcount < 0)
 			break;
 		text.remove_prefix(scharcount);

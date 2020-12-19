@@ -276,6 +276,7 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			linkoptions {
+				"-framework AudioToolbox",
 				"-framework AudioUnit",
 				"-framework CoreAudio",
 				"-framework Carbon",

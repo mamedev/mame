@@ -302,9 +302,11 @@ function cheatfind.startplugin()
 		for tag, list in pairs(space_table) do
 			for name, space in pairs(list) do
 				local ram = {}
-				for num, entry in pairs(space.map) do
-					if entry.writetype == "ram" then
-						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
+				for num, entry in pairs(space.map.entries) do
+					if entry.write.handlertype == "ram" then
+						ram[#ram + 1] = {
+							offset = entry.address_start & space.address_mask,
+							size = (entry.address_end & space.address_mask) - (entry.address_start & space.address_mask) }
 						if space.shift > 0 then
 							ram[#ram].size = ram[#ram].size >> space.shift
 						elseif space.shift < 0 then

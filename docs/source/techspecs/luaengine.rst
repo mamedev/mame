@@ -129,7 +129,7 @@ is tagged as ``:screen``, and we can further inspect it:
 
     [MAME]> -- keep a reference to the main screen in a variable
     [MAME]> s = manager:machine().screens[":screen"]
-    [MAME]> print(s:width() .. "x" .. s:height())
+    [MAME]> print(s.width .. "x" .. s.height)
     320x224
 
 We have several methods to draw a HUD on the screen composed of lines, boxes and
@@ -139,11 +139,11 @@ text:
 
     [MAME]> -- we define a HUD-drawing function, and then call it
     [MAME]> function draw_hud()
-    [MAME]>> s:draw_text(40, 40, "foo"); -- (x0, y0, msg)
-    [MAME]>> s:draw_box(20, 20, 80, 80, 0, 0xff00ffff); -- (x0, y0, x1, y1, fill-color, line-color)
-    [MAME]>> s:draw_line(20, 20, 80, 80, 0xff00ffff); -- (x0, y0, x1, y1, line-color)
+    [MAME]>> s:draw_text(40, 40, "foo") -- (x0, y0, msg)
+    [MAME]>> s:draw_box(20, 20, 80, 80, 0xff00ffff, 0) -- (x0, y0, x1, y1, line-color, fill-color)
+    [MAME]>> s:draw_line(20, 20, 80, 80, 0xff00ffff) -- (x0, y0, x1, y1, line-color)
     [MAME]>> end
-    [MAME]> draw_hud();
+    [MAME]> draw_hud()
 
 This will draw some useless art on the screen.  However, when resuming the game,
 your HUD needs to be refreshed otherwise it will just disappear.  In order to do

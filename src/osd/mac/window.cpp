@@ -370,6 +370,7 @@ void mac_window_info::destroy()
 
 	// free the render target, after the textures!
 	machine().render().target_free(m_target);
+	m_target = nullptr;
 }
 
 
@@ -579,9 +580,13 @@ int mac_window_info::complete_create()
 		temp = m_windowed_dim;
 	}
 	else if (m_startmaximized)
-		temp = get_max_bounds(video_config.keepaspect );
+	{
+		temp = get_max_bounds(keepaspect());
+	}
 	else
-		temp = get_min_bounds(video_config.keepaspect );
+	{
+		temp = get_min_bounds(keepaspect());
+	}
 
 	// create the window .....
 	osd_printf_verbose("Enter mac_window_info::complete_create\n");

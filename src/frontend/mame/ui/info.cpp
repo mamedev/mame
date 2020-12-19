@@ -567,28 +567,30 @@ void menu_image_info::image_info(device_image_interface *image)
 		// if image has been loaded through softlist, let's add some more info
 		if (image->loaded_through_softlist())
 		{
-			// display long filename
-			item_append(image->longname(), FLAG_DISABLE, nullptr);
+			software_info const &swinfo(*image->software_entry());
 
-			// display manufacturer and year
-			item_append(string_format("%s, %s", image->manufacturer(), image->year()), FLAG_DISABLE, nullptr);
+			// display full name, publisher and year
+			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
+			item_append(string_format("%1$s, %2$s", swinfo.publisher(), swinfo.year()), FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
-			switch (image->supported())
+			switch (swinfo.supported())
 			{
-				case SOFTWARE_SUPPORTED_NO:
-					item_append(_("Not supported"), FLAG_DISABLE, nullptr);
-					break;
-				case SOFTWARE_SUPPORTED_PARTIAL:
-					item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
-					break;
-				default:
-					break;
+			case SOFTWARE_SUPPORTED_NO:
+				item_append(_("Not supported"), FLAG_DISABLE, nullptr);
+				break;
+			case SOFTWARE_SUPPORTED_PARTIAL:
+				item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
+				break;
+			default:
+				break;
 			}
 		}
 	}
 	else
+	{
 		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
+	}
 	item_append(std::string(), FLAG_DISABLE, nullptr);
 }
 

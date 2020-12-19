@@ -105,6 +105,15 @@ public:
 		return orientation_swap_xy ^ rotation_swap_xy;
 	};
 
+	bool keepaspect()
+	{
+		render_target *target = this->target();
+		if (target != nullptr)
+			return target->keepaspect();
+		else
+			return false;
+	}
+
 	virtual osd_dim get_size() = 0;
 
 	virtual osd_monitor_info *monitor() const = 0;
@@ -253,9 +262,7 @@ struct osd_video_config
 	// global configuration
 	int                 windowed;                   // start windowed?
 	int                 prescale;                   // prescale factor
-	int                 keepaspect;                 // keep aspect ratio
 	int                 numscreens;                 // number of screens
-	int                 fullstretch;                // fractional stretch
 
 	// hardware options
 	int                 mode;                       // output mode

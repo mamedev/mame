@@ -10351,8 +10351,8 @@ wotw                            // (c) 1981
 wotwc                           // (c) 1981
 
 @source:circus.cpp
+circuso                         // no copyright notice [1977?]
 circus                          // no copyright notice [1977?]
-circusb                         // bootleg
 crash                           // Exidy [1979?]
 crasha                          // no copyright notice [1979?]
 ripcord                         // Exidy [1977?]
@@ -10367,6 +10367,9 @@ circusc3                        // GX380 (c) 1984
 circusc4                        // GX380 (c) 1984
 circuscc                        // GX380 (c) 1984 + Centuri license
 circusce                        // GX380 (c) 1984 + Centuri license
+
+@source:cirsa820xxx.cpp
+unk820501
 
 @source:cischeat.cpp
 armchmp2                        // (c) 1992 Jaleco
@@ -11635,6 +11638,7 @@ dbox                            // (c) 1996 Nokia Multimedia
 @source:dbz.cpp
 dbz                             // (c) 1993 Banpresto
 dbz2                            // (c) 1994 Banpresto
+dbz2bl                          // bootleg
 dbza                            // (c) 1993 Banpresto
 
 @source:dccons.cpp
@@ -19095,6 +19099,8 @@ shuriboy
 fuusenpn
 tsukande
 mariorou
+tsupenta
+slimekun
 
 @source:konmedal68k.cpp
 dobouchn
@@ -19106,6 +19112,7 @@ kzaurus
 pwrchanc
 ymcapsul
 spcpokan
+unkkonmd
 
 @source:quickpick5.cpp
 quickp5
@@ -19432,6 +19439,8 @@ lcmate2                         //
 
 @source:leapfrog_iquest.cpp
 iquest
+ttwistbq
+ttwistm
 turboex
 
 @source:leapfrog_leappad.cpp
@@ -22339,6 +22348,7 @@ rad_sonicp
 rad_orun
 msi_sf2
 dgunl3227
+ra145
 
 @source:megadriv_sunplus_hybrid.cpp
 reactmd
@@ -32372,6 +32382,10 @@ ppgc200g
 dgun2869
 
 @source:nes_vt09.cpp
+cybar120
+dturbogt
+jl2050
+joypad65
 msiwwe
 msiwwea
 msidd
@@ -32379,16 +32393,13 @@ msimpac
 msimm2
 msisinv
 msifrog
-cybar120
-vsmaxtx2
-senario25
 rcapnp
-dturbogt
+senario25
 ventur25
-vgpocket
-vgpmini
 vgtablet
-joypad65
+vgpmini
+vgpocket
+vsmaxtx2
 
 @source:nes_vt32.cpp
 dgun2573
@@ -32476,6 +32487,7 @@ mp2100
 
 @source:next.cpp
 next                            //
+nextc                           //
 nextct                          //
 nextctc                         //
 nexts                           //
@@ -38106,6 +38118,7 @@ toto                            //
 twinadv                         // (c) 1995 Barko Corp
 twinadvk                        // (c) 1995 Barko Corp
 twinkle                         // (c) 1997 SemiCom
+twinklea                        // (c) 1997 SemiCom
 wintbob                         // bootleg
 yutnori                         // (c) 199? yutnori
 
@@ -38136,6 +38149,7 @@ sorcererd                       // Sorcerer with Micropolis fdc
 
 @source:st22xx_bbl338.cpp
 bbl338
+dphh8213
 
 @source:storio.cpp
 innotab2                        // (c) 2011 V.Tech
@@ -40981,6 +40995,9 @@ miaj                            // GX808 (c) 1989 (Japan)
 vulcan                          // GX785 (c) 1988
 vulcana                         // GX785 (c) 1988
 vulcanb                         // GX785 (c) 1988
+
+@source:twinbskt.cpp
+twinbskt                        // (c) 1995 Recreativos Pasqual
 
 @source:twincobr.cpp
 fnshark                         // bootleg

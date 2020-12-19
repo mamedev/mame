@@ -84,6 +84,7 @@ menu_load_save_state_base::file_entry::file_entry(std::string &&file_name, std::
 
 menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container &container, std::string_view header, std::string_view footer, bool must_exist)
 	: menu(mui, container)
+	, m_switch_poller(machine().input())
 	, m_header(header)
 	, m_footer(footer)
 	, m_must_exist(must_exist)
@@ -224,7 +225,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		machine().pause();
 
 	// get ready to poll inputs
-	machine().input().reset_polling();
+	m_switch_poller.reset();
 	m_keys_released = false;
 }
 
@@ -279,7 +280,7 @@ std::string menu_load_save_state_base::get_visible_name(const std::string &file_
 
 std::string menu_load_save_state_base::poll_inputs()
 {
-	input_code const code = machine().input().poll_switches();
+	input_code const code = m_switch_poller.poll();
 	if (INPUT_CODE_INVALID == code)
 	{
 		m_keys_released = true;

@@ -15,6 +15,7 @@
 
 #include "osdepend.h"
 #include "uismall.fh"
+#include "unicode.h"
 
 #include "ui/uicmd14.fh"
 #include "ui/cmddata.h"
@@ -380,7 +381,7 @@ std::string convert_command_glyph(std::string_view str)
 	{
 		// decode UTF-8
 		char32_t uchar;
-		int const codelen(uchar_from_utf8(&uchar, &str[0], str.length()));
+		int const codelen(uchar_from_utf8(&uchar, str));
 		if (0 >= codelen)
 			break;
 		str.remove_prefix(codelen);
@@ -861,7 +862,7 @@ float render_font::string_width(float height, float aspect, std::string_view str
 	// loop over characters
 	while (!string.empty())
 	{
-		int scharcount = uchar_from_utf8(&schar, &string[0], string.length());
+		int scharcount = uchar_from_utf8(&schar, string);
 		totwidth += get_char(schar).width;
 		string.remove_prefix(scharcount);
 	}
@@ -884,7 +885,7 @@ float render_font::utf8string_width(float height, float aspect, std::string_view
 	while (!utf8string.empty())
 	{
 		char32_t uchar;
-		int count = uchar_from_utf8(&uchar, &utf8string[0], utf8string.length());
+		int count = uchar_from_utf8(&uchar, utf8string);
 		if (count < 0)
 			break;
 

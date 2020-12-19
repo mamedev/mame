@@ -1128,6 +1128,7 @@ void ti99_paged379i_cartridge::write(offs_t offset, uint8_t data)
   Cartridge type: paged378
   This type is intended for high-capacity cartridges of up to 512 KiB
   plus GROM space of 120KiB (not supported yet)
+  For smaller ROMs, the ROM is automatically mirrored in the bank space.
 
   Due to its huge GROM space it is also called the "UberGROM"
 
@@ -1160,7 +1161,10 @@ void ti99_paged378_cartridge::write(offs_t offset, uint8_t data)
 	// x = don't care, bbbb = bank
 	if (m_romspace_selected)
 	{
-		m_rom_page = ((offset >> 1)&0x003f);
+		// Auto-adapt to the size of the ROM
+		int mask = ((m_rom_size / 8192) - 1) & 0x3f;
+		m_rom_page = ((offset >> 1)&mask);
+
 		if ((offset & 1)==0)
 			LOGMASKED(LOG_BANKSWITCH, "Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}

@@ -498,6 +498,10 @@ void rampart_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x140000, 0x147fff, 0x438000, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range rampart actually needs
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x040000, 0x041fff, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
 
 

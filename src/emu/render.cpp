@@ -3366,17 +3366,21 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	}
 
 	// iterate over targets
-	for (int targetnum = 0; targetnum < 1000; targetnum++)
+	for (int targetnum = 0; ; ++targetnum)
 	{
 		// get this target and break when we fail
 		render_target *target = target_by_index(targetnum);
-		if (target == nullptr)
+		if (!target)
+		{
 			break;
-
-		// create a node
-		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
-		if (targetnode && !target->config_save(*targetnode))
-			targetnode->delete_node();
+		}
+		else if (!target->hidden())
+		{
+			// create a node
+			util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
+			if (targetnode && !target->config_save(*targetnode))
+				targetnode->delete_node();
+		}
 	}
 
 	// iterate over screen containers
