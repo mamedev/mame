@@ -3089,6 +3089,92 @@ static INPUT_PORTS_START( megaman )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megaman_cps15 )
+	PORT_INCLUDE( cps1_3b )
+
+	PORT_MODIFY("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x1f, 0x1f, DEF_STR( Coinage ) )                  PORT_DIPLOCATION("SW(A):1,2,3,4,5")
+	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x12, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x13, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x15, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x16, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0e, "2 Coins to Start, 1 to Continue" )
+	PORT_DIPSETTING(    0x1f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x1d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x1b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x1a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x19, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x17, DEF_STR( 1C_9C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( Free_Play ) )
+	/* 0x00 to 0x0c 1 Coin/1 Credit */
+	PORT_DIPNAME( 0x60, 0x60, "Coin slots" )                        PORT_DIPLOCATION("SW(A):6,7")
+//  PORT_DIPSETTING(    0x00, "Invalid" )
+	PORT_DIPSETTING(    0x20, "1, Common" )
+	PORT_DIPSETTING(    0x60, "2, Common" )
+	PORT_DIPSETTING(    0x40, "2, Individual" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )               PORT_DIPLOCATION("SW(B):1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Time" )                              PORT_DIPLOCATION("SW(B):3,4")
+	PORT_DIPSETTING(    0x0c, "100" )
+	PORT_DIPSETTING(    0x08, "90" )
+	PORT_DIPSETTING(    0x04, "70" )
+	PORT_DIPSETTING(    0x00, "60" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(B):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
+	PORT_DIPNAME( 0x40, 0x40, "Voice" )                             PORT_DIPLOCATION("SW(B):7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )              PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )           PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(C):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(C):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(C):6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(C):7" )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                          PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+
+	PORT_START("IN2")      /* Read by wofch */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")      /* Player 4 - not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+INPUT_PORTS_END
+
 /* Needs further checking */
 /* Same as 'megaman' but no "Voice" Dip Switch */
 static INPUT_PORTS_START( rockmanj )
@@ -12959,6 +13045,45 @@ ROM_START( megaman )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
+ROM_START( megaman_cps15 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "rcmu_23b.8f", 0x000000, 0x80000, CRC(1cd33c7a) SHA1(687fb3b6d660d7350447193f1911c47972e7a020) )
+	ROM_LOAD16_WORD_SWAP( "rcmu_22b.7f", 0x080000, 0x80000, CRC(708268c4) SHA1(554e011cad285b95dd1b6aa19be61b2413662a3a) )
+	ROM_LOAD16_WORD_SWAP( "rcmu_21a.6f", 0x100000, 0x80000, CRC(4376ea95) SHA1(7370ceffca513aa9f68a74f6869d561476589200) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD64_WORD( "rcm_01.3a",  0x000000, 0x80000, CRC(6ecdf13f) SHA1(2a8fe06bf5011e3f990f90d9224f91d8631ec0cc) )
+	ROM_LOAD64_WORD( "rcm_02.4a",  0x000002, 0x80000, CRC(944d4f0f) SHA1(665dc9a537e9c9b565f6136f939ff5c2861f875f) )    // Dumped as rcm_03.5a
+	ROM_LOAD64_WORD( "rcm_03.5a",  0x000004, 0x80000, CRC(36f3073c) SHA1(457d68e63599d06a136e152a9ad60adac1c91edd) )    // Dumped as rcm_02.4a
+	ROM_LOAD64_WORD( "rcm_04.6a",  0x000006, 0x80000, CRC(54e622ff) SHA1(36f6297e3d410f041be5e582919478b0d52520ca) )
+	ROM_LOAD64_WORD( "rcm_05.7a",  0x200000, 0x80000, CRC(5dd131fd) SHA1(1a7fc8cf38901245d40901996e946e7ad9c0e0c5) )
+	ROM_LOAD64_WORD( "rcm_06.8a",  0x200002, 0x80000, CRC(f0faf813) SHA1(adff01c2ecc4c8ce6f8a50cbd07d8f8bb9f48168) )    // Dumped as rcm_07.9a
+	ROM_LOAD64_WORD( "rcm_07.9a",  0x200004, 0x80000, CRC(826de013) SHA1(47f36b1d92a487c43c8dadc8293b8e6f40649286) )    // Dumped as rcm_06.8a
+	ROM_LOAD64_WORD( "rcm_08.10a", 0x200006, 0x80000, CRC(fbff64cf) SHA1(f0cb531ef195dc1dcd224a208906a62fb5d199a1) )
+	ROM_LOAD64_WORD( "rcm_10.3c",  0x400000, 0x80000, CRC(4dc8ada9) SHA1(776c2b3ef24c2b8f390c05a9c6728b14ceec696e) )
+	ROM_LOAD64_WORD( "rcm_11.4c",  0x400002, 0x80000, CRC(f2b9ee06) SHA1(db315b00d1caed1a8c0f6e0ae726e8fa05b011fa) )    // Dumped as rcm_12.5c
+	ROM_LOAD64_WORD( "rcm_12.5c",  0x400004, 0x80000, CRC(fed5f203) SHA1(23db14490519b5e2d0bb92ffe6e14540d1999e4b) )    // Dumped as rcm_11.4c
+	ROM_LOAD64_WORD( "rcm_13.6c",  0x400006, 0x80000, CRC(5069d4a9) SHA1(b832b98be94371af52bd4bb911e18ec57430a7db) )
+	ROM_LOAD64_WORD( "rcm_14.7c",  0x600000, 0x80000, CRC(303be3bd) SHA1(1e5c3fd71966ea9f457840c40582795b501c323e) )
+	ROM_LOAD64_WORD( "rcm_15.8c",  0x600002, 0x80000, CRC(4f2d372f) SHA1(db6a94d1f92c1b96e404b38ebcb1eedbec3ae6cc) )    // Dumped as rcm_16.9c
+	ROM_LOAD64_WORD( "rcm_16.9c",  0x600004, 0x80000, CRC(93d97fde) SHA1(e4be5216f98ad08a9118d629d398be2bd54e2e2a) )    // Dumped as rcm_15.8c
+	ROM_LOAD64_WORD( "rcm_17.10c", 0x600006, 0x80000, CRC(92371042) SHA1(c55833cbaddcc986edd23c009a3e3c7ff09c2708) )
+
+	ROM_REGION(QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "rcm.01",   0x00000, 0x08000, CRC(d60cf8a3) SHA1(dccd84b93e62489c703011422d0fe84444c7f7db) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "rcm.51",   0x000000, 0x80000, CRC(b6d07080) SHA1(b8f07553c01b1f67b0696110cd4e35e4cf4fa158) )
+	ROM_LOAD16_WORD_SWAP( "rcm.52",   0x080000, 0x80000, CRC(dfddc493) SHA1(56b5129f24d05d2c85a767b0a632bf260f5425b2) )
+	ROM_LOAD16_WORD_SWAP( "rcm.53",   0x100000, 0x80000, CRC(6062ae3a) SHA1(28a4d59bce0c341c240ee8cc92f85850ea8ffb10) )
+	ROM_LOAD16_WORD_SWAP( "rcm.54",   0x180000, 0x80000, CRC(08c6f3bf) SHA1(6b8175748ff25b90572f914e4565935e27aa09a5) )
+	ROM_LOAD16_WORD_SWAP( "rcm.55",   0x200000, 0x80000, CRC(f97dfccc) SHA1(752a3855d78e55dc31291e14d0223104691784f4) )
+	ROM_LOAD16_WORD_SWAP( "rcm.56",   0x280000, 0x80000, CRC(ade475bc) SHA1(02ae6bc21d5e41e05595845f264c9ad040d70b37) )
+	ROM_LOAD16_WORD_SWAP( "rcm.57",   0x300000, 0x80000, CRC(075effb3) SHA1(4be02d966d933c0d92908c5e05842c6b33c9703b) )
+	ROM_LOAD16_WORD_SWAP( "rcm.58",   0x380000, 0x80000, CRC(f6c1f87b) SHA1(d6cd8d2bac96404b6983d738093b7177d478f12e) )
+ROM_END
+
 /* B-Board 91634B-2 */
 ROM_START( megamana )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -13864,6 +13989,7 @@ GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state, init_cps1,  
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state, init_ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Pokonyan! Balloon (Japan 940322)", MACHINE_SUPPORTS_SAVE ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
 GAME( 1993, sfzch_cps15, 0,        qsound,     sfzch_cps15, cps_state, init_sfzch_cps15, ROT0,   "Capcom", "SFZCH for CPS1.5", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1995,megaman_cps15,0,        qsound,  megaman_cps15,  cps_state, init_sfzch_cps15, ROT0,   "Capcom", "Mega Man: The Power Battle for CPS1.5", MACHINE_SUPPORTS_SAVE )
 
 /* Games released on CPS-1 hardware by Mitchell */
 

@@ -1653,6 +1653,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wofch",       CPS_B_21_DEF, mapper_TK263B },
 
 	{"sfzch_cps15", CPS_B_21_DEF, mapper_sfzch }, 
+	{"megaman_cps15",     CPS_B_21_DEF, mapper_RCM63B },
 
 	/* CPS2 games */
 
