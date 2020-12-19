@@ -22,6 +22,8 @@ public:
 
 	void vreadere(machine_config &config);
 
+	DECLARE_WRITE_LINE_MEMBER(power_on_w);
+
 protected:
 	virtual void machine_start() override;
 
@@ -49,8 +51,41 @@ void vreadere_state::machine_start()
 
 EPL43102_UPDATE_CB(vreadere_state::lcd_update)
 {
-	// TODO
+	if (lcd_on)
+	{
+		for (int y = 0; y < 32; y++)
+		{
+			int ys = (y + start_line) & 31;
+			for (int x = 0; x < 68; x++)
+			{
+				int bitpos = ((ys & ~7) * 102 + x * 8 + (ys & 7)) % (42 * 102);
+				bitmap.pix(y, x) = BIT(dram[bitpos / 8], bitpos & 7) ? !reverse : reverse;
+			}
+		}
+		for (int y = 32; y < 48; y++)
+		{
+			int ys = (y + start_line) & 15;
+			for (int x = 0; x < 34; x++)
+			{
+				int bitpos = (((ys & ~7) | 16) * 102 + (68 + x) * 8 + (ys & 7)) % (42 * 102);
+				bitmap.pix(y, x) = BIT(dram[bitpos / 8], bitpos & 7) ? !reverse : reverse;
+			}
+			for (int x = 34; x < 68; x++)
+			{
+				int bitpos = ((ys & ~7) * 102 + (135 - x) * 8 + (ys & 7)) % (42 * 102);
+				bitmap.pix(y, x) = BIT(dram[bitpos / 8], bitpos & 7) ? !reverse : reverse;
+			}
+		}
+	}
+	else
+		bitmap.fill(0, cliprect);
+
 	return 0;
+}
+
+WRITE_LINE_MEMBER(vreadere_state::power_on_w)
+{
+	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void vreadere_state::portb_w(u8 data)
@@ -82,7 +117,9 @@ void vreadere_state::prog_map(address_map &map)
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 }
 
-static INPUT_PORTS_START( vreadere )
+static INPUT_PORTS_START(vreadere)
+	PORT_START("POWER")
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
 INPUT_PORTS_END
 
 void vreadere_state::vreadere(machine_config &config)
@@ -97,8 +134,8 @@ void vreadere_state::vreadere(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_size(68, 48);
+	screen.set_visarea_full();
 	screen.set_screen_update(m_epl, FUNC(epl43102_device::screen_update));
 	screen.set_palette("palette");
 
