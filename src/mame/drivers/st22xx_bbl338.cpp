@@ -67,6 +67,20 @@ u8 st22xx_bbl338_sim_state::sim15a_r()
 	{
 		u8 command = (u8)m_maincpu->state_int(M6502_X);
 		logerror("%04x: reached 0x15a, need to execute BIOS simulation for command %02x\n", pc, command);
+		if (command == 0x0a)
+		{
+			// this is related to drawing a graphic element on dphh8213 (skipping one call causes a single menu item to not show)
+			// same here?
+			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+			u8 param0 = mainspace.read_byte(0x100);
+			u8 param1 = mainspace.read_byte(0x101);
+			u8 param2 = mainspace.read_byte(0x102);
+			u8 param3 = mainspace.read_byte(0x103);
+			u8 param4 = mainspace.read_byte(0x104);
+			u8 param5 = mainspace.read_byte(0x105);
+
+			logerror("command 0x0a (draw?) using params %02x %02x %02x %02x %02x %02x\n", param0, param1, param2, param3, param4, param5);
+		}
 	}
 	return m_15a_dat;
 }
