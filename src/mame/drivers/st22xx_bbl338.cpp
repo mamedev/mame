@@ -79,7 +79,8 @@ u8 st22xx_bbl338_sim_state::sim15a_r()
 			u8 param4 = mainspace.read_byte(0x104);
 			u8 param5 = mainspace.read_byte(0x105);
 
-			logerror("command 0x0a (draw?) using params Xpos: %02x Ypos: %02x ObjectNum: %02x unk: %02x unk: %02x Saturation: %02x\n", param0, param1, param2, param3, param4, param5);
+			// Flags --- --Ff  f = flipX F = flipY, others not checked
+			logerror("command 0x0a (draw?) using params Xpos: %02x Ypos: %02x ObjectNum: %02x%02x Flags: %02x Saturation: %02x\n", param0, param1, param3, param2, param4, param5);
 		}
 	}
 	return m_15a_dat;
