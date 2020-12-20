@@ -344,6 +344,11 @@ namespace bx
 		return square(_a)*(3.0f - 2.0f*_a);
 	}
 
+	inline BX_CONST_FUNC float invSmoothStep(float _a)
+	{
+		return 0.5f - sin(asin(1.0f - 2.0f * _a) / 3.0f);
+	}
+
 	inline BX_CONSTEXPR_FUNC float bias(float _time, float _bias)
 	{
 		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
