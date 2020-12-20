@@ -54,20 +54,26 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u8 sim15a_r();
-	void sim15a_w(u8 data);
-	u8 m_15a_dat;
+	u8 sim152_r();
+	void sim152_w(u8 data);
+	u8 m_152_dat;
 };
 
-u8 st22xx_bbl338_sim_state::sim15a_r()
+u8 st22xx_bbl338_sim_state::sim152_r()
 {
 	u16 pc = m_maincpu->pc();
 
-	if (!machine().side_effects_disabled() && pc == 0x158)
+	if (!machine().side_effects_disabled() && pc == 0x150)
 	{
 		u8 command = (u8)m_maincpu->state_int(M6502_X);
-		logerror("%04x: reached 0x15a, need to execute BIOS simulation for command %02x\n", pc, command);
-		if (command == 0x0a)
+		switch (command)
+		{
+		// 0x00
+		// 0x02
+		case 0x04: break; // command 0x04 = draw text number
+		case 0x06: break; // command 0x06 = draw boxes in sudoku
+		case 0x08: break; // command 0x08 = some kind of positioning logic for things (characters in risker)
+		case 0x0a:
 		{
 			// this is related to drawing a graphic element on dphh8213 (skipping one call causes a single menu item to not show)
 			// same here?
@@ -81,14 +87,40 @@ u8 st22xx_bbl338_sim_state::sim15a_r()
 
 			// Flags --- --Ff  f = flipX F = flipY, others not checked
 			logerror("command 0x0a (draw?) using params Xpos: %02x Ypos: %02x ObjectNum: %02x%02x Flags: %02x Saturation: %02x\n", param0, param1, param3, param2, param4, param5);
+
+			break;
 		}
+		case 0x0c: break; // command 0x0c = related to drawing platforms in risker?
+		case 0x0e: break; // important for king boxing to show anything outside of char select
+		case 0x10: break; // command 0x10 = clear out some line buffer for rendering?
+		case 0x12: break; // command 0x12 = clear background in angry pigs?
+		case 0x14: break; // command 0x14 = draw basic text
+		case 0x16: break; // important for collisions in risker?
+		// 0x18
+		case 0x1a: break; // when pause is pressed? maybe music related?
+		case 0x1c: break; // unknown, little effect? maybe play music?
+		// 0x1e
+		// 0x20
+		case 0x22: break; // command 0x22 = unknown, used before 'shooting zombies' titlescreen
+		case 0x24: break; // command 0x24 = play sound
+		case 0x26: break; // command 0x26 = force stop sound(s)?
+
+		default:
+		{
+			logerror("%04x: reached 0x152, need to execute BIOS simulation for command %02x\n", pc, command);
+		}
+
+		}
+
+		//if (command == 0x06)
+		//	return 0x60;
 	}
-	return m_15a_dat;
+	return m_152_dat;
 }
 
-void st22xx_bbl338_sim_state::sim15a_w(u8 data)
+void st22xx_bbl338_sim_state::sim152_w(u8 data)
 {
-	m_15a_dat = data;
+	m_152_dat = data;
 }
 
 
@@ -96,7 +128,7 @@ void st22xx_bbl338_sim_state::machine_reset()
 {
 	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
-	mainspace.install_readwrite_handler(0x015a, 0x015a, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim15a_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim15a_w)));
+	mainspace.install_readwrite_handler(0x0152, 0x0152, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_w)));
 
 	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
 	const uint8_t ramcode[40] = {
@@ -108,7 +140,7 @@ void st22xx_bbl338_sim_state::machine_reset()
 		0x5a,             // 000155:         phy     /
 		0x64, 0x32,       // 000156:         stz $32 | - Zero Bank (manually optimized compared to the dphh8213 implementation to reduce code size so call to 0x0164 is correct)
 		0x64, 0x33,       // 000158:         stz $33 / 
-		//0x20, 0x3d, 0x41, // 00015a:         jsr $xxxx   -- this needs to go to a jump table to process the command stored in X
+		//0x20, 0x3d, 0x41, // 000152:         jsr $xxxx   -- this needs to go to a jump table to process the command stored in X
 		0xea, 0xea, 0xea, // NOP above out for now as it isn't clear where to jump to
 		0x7a,             // 00015d:         ply     |- restore previous bank
 		0x84, 0x32,       // 00015e:         sty $32 |
@@ -139,7 +171,7 @@ void st22xx_bbl338_sim_state::machine_reset()
 void st22xx_bbl338_sim_state::machine_start()
 {
 	st22xx_bbl338_state::machine_start();
-	save_item(NAME(m_15a_dat));
+	save_item(NAME(m_152_dat));
 }
 
 void st22xx_bbl338_state::machine_start()
