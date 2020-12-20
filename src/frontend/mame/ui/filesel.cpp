@@ -12,8 +12,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/filesel.h"
+
 #include "ui/ui.h"
 #include "ui/utils.h"
 
@@ -24,7 +24,9 @@
 #include <cstring>
 #include <locale>
 
+
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -310,8 +312,8 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 
 	case SELECTOR_ENTRY_TYPE_DRIVE:
 	case SELECTOR_ENTRY_TYPE_DIRECTORY:
-		// drive/directory - first check the path
 		{
+			// drive/directory - first check the path
 			util::zippath_directory::ptr dir;
 			osd_file::error const err = util::zippath_directory::open(entry.fullpath, dir);
 			if (err != osd_file::error::NONE)

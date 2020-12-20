@@ -56,9 +56,8 @@ void menu_video_targets::populate(float &customtop, float &custombottom)
 		item_append(util::string_format(_("Screen #%d"), targetnum), 0, target);
 	}
 
-	// add option for snapshot target if it has multiple views
-	if (machine().video().snapshot_target().view_name(1))
-		item_append("Snapshot", 0, &machine().video().snapshot_target());
+	// add option for snapshot target
+	item_append("Snapshot", 0, &machine().video().snapshot_target());
 }
 
 /*-------------------------------------------------
@@ -98,8 +97,11 @@ menu_video_options::menu_video_options(
 	, m_show_title(false)
 	, m_snapshot(snapshot)
 {
-	set_selected_index(target.view());
-	reset(reset_options::REMEMBER_POSITION);
+	if (!m_snapshot || !machine().video().snap_native())
+	{
+		set_selected_index(target.view());
+		reset(reset_options::REMEMBER_POSITION);
+	}
 }
 
 menu_video_options::menu_video_options(
@@ -114,8 +116,11 @@ menu_video_options::menu_video_options(
 	, m_show_title(true)
 	, m_snapshot(snapshot)
 {
-	set_selected_index(target.view() + 2);
-	reset(reset_options::REMEMBER_POSITION);
+	if (!m_snapshot || !machine().video().snap_native())
+	{
+		set_selected_index(target.view() + 2);
+		reset(reset_options::REMEMBER_POSITION);
+	}
 }
 
 menu_video_options::~menu_video_options()
@@ -134,9 +139,12 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 	}
 
 	// add items for each view
-	for (char const *name = m_target.view_name(ref = 0); name; name = m_target.view_name(++ref))
-		item_append(name, 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
-	item_append(menu_item_type::SEPARATOR);
+	if (!m_snapshot || !machine().video().snap_native())
+	{
+		for (char const *name = m_target.view_name(ref = 0); name; name = m_target.view_name(++ref))
+			item_append(name, 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
+		item_append(menu_item_type::SEPARATOR);
+	}
 
 	// add items for visibility toggles
 	auto const &toggles = m_target.visibility_toggles();
@@ -169,7 +177,8 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ROTATE));
 
 	// cropping
-	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), 0, reinterpret_cast<void *>(ITEM_ZOOM));
+	bool const canzoom(m_target.current_view().has_art() && !m_target.current_view().visible_screens().empty());
+	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), canzoom ? 0U : (FLAG_INVERT | FLAG_DISABLE), reinterpret_cast<void *>(ITEM_ZOOM));
 
 	if (!m_snapshot)
 	{

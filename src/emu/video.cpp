@@ -349,10 +349,9 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 void video_manager::save_active_screen_snapshots()
 {
-	// if we're native, then write one snapshot per visible screen
 	if (m_snap_native)
 	{
-		// write one snapshot per visible screen
+		// if we're native, then write one snapshot per visible screen
 		for (screen_device &screen : screen_device_enumerator(machine().root_device()))
 			if (machine().render().is_live(screen))
 			{
@@ -362,10 +361,9 @@ void video_manager::save_active_screen_snapshots()
 					save_snapshot(&screen, file);
 			}
 	}
-
-	// otherwise, just write a single snapshot
 	else
 	{
+		// otherwise, just write a single snapshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		osd_file::error filerr = open_next(file, "png");
 		if (filerr == osd_file::error::NONE)

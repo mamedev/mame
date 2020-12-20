@@ -77,9 +77,9 @@ of device, to find devices of a particular type, or to find devices that
 implement a particular interface.  When iterating using ``pairs`` or ``ipairs``,
 devices are returned by walking the device tree depth-first in creation order.
 
-The index get operator looks up a device by tag.  It returns ``nil`` no device
-with the specified tag is found, or if the device with the specified tag does
-not meet the type/interface requirements of the device enumerator.  The
+The index get operator looks up a device by tag.  It returns ``nil`` if no
+device with the specified tag is found, or if the device with the specified tag
+does not meet the type/interface requirements of the device enumerator.  The
 complexity is O(1) if the result is cached, but an uncached device lookup is
 expensive.  The ``at`` method has O(n) complexity.
 
@@ -383,7 +383,7 @@ screen.pixel_period (read-only)
 screen.scan_period (read-only)
     The interval taken to draw a scan line (including the horizontal blanking
     interval), as a floating-point number in units of seconds.
-screen.pixel_period (read-only)
+screen.frame_period (read-only)
     The interval taken to draw a complete frame (including blanking intervals),
     as a floating-point number in units of seconds.
 screen.frame_number (read-only)
@@ -619,8 +619,8 @@ Slot option
 ~~~~~~~~~~~
 
 Wraps MAME’s ``device_slot_interface::slot_option`` class, which represents a
-child device that a :ref:`slot device <luareference-dev-dislot>` slot device can
-be configured to instantiate.
+child device that a :ref:`slot device <luareference-dev-dislot>` can be
+configured to instantiate.
 
 Instantiation
 ^^^^^^^^^^^^^
