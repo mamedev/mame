@@ -16271,4 +16271,154 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="horses">
+		<description>Horses</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234736">
+				<rom name="horses.woz" size="234736" crc="40cc52e7" sha1="afc59d569bc30ca26aece790ab9a551cfef0a568"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrcycls">
+		<description>Motorcycles</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="motorcycles.woz" size="234741" crc="c3f8adb0" sha1="0b5494ae379ccf14cc19cef3944a3c8f6e74fb0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbunyan">
+		<description>Paul Bunyan</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="paul bunyan.woz" size="234741" crc="631f1848" sha1="7be38cff6392cda6d5e32b52b61cd6ffc310ecda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tseasons">
+		<description>The Seasons</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="the seasons.woz" size="234741" crc="7cf0ba08" sha1="492c2a744c5945affff28aa15a3ea6a1747725e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbee">
+		<description>The Spelling Bee</description>
+		<year>1985</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="the spelling bee.woz" size="234771" crc="4ce1d2fc" sha1="c5b2eef97a5f5d5c857e25f00221f44270c6b07f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casechic">
+		<description>Case of the Missing Chick: Finding The Main Idea</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="case of the missing chick - main idea and supporting details.woz" size="234797" crc="c02fae11" sha1="cf32964f2852d299008965e9dadc337e9932df1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casegtr">
+		<description>Case of the Great Train Robbery: Fact and Opinion</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="case of the great train robbery - fact or opinion.woz" size="234786" crc="7c129532" sha1="52d5d4207c13c082ca85bf2af1e9922e82cbc0f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrswiggl">
+		<description>Mrs. Wigglesworth's Secret</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="mrs. wigglesworth's secret - drawing conclusions.woz" size="234785" crc="692a79e3" sha1="778bab447ebcd74dd1886b8c2e7e1291c00ef66d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lrn2time">
+		<description>Learning to Tell Time</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="learning to tell time.woz" size="234751" crc="ab2804c5" sha1="77a74d6c72a35bb43797b8fab783420412c643df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algncroc">
+		<description>Alligators and Crocodiles</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="alligators and crocodiles.woz" size="234780" crc="ce4f1d6d" sha1="5d9bdbe3cf47723775b18e79a14fd2df6dce2659"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
