@@ -14968,6 +14968,24 @@ license:CC0
 	</software>
 
 	<software name="specfrce">
+		<description>Special Forces (3.5")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Sleepless Knights" />
+		<info name="version" value="Version 1.00  7th August 1992" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Special Forces [MicroProse] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="6994fb27" sha1="abbb83901f041346ece08681faaae8ca8194c7c3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Special Forces [MicroProse] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="eb6bc62c" sha1="60e2f69e745c10c32d0b706e6ead3afb83474a7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specfrce525" cloneof="specfrce">
 		<description>Special Forces (5.25")</description>
 		<year>1992</year>
 		<publisher>MicroProse</publisher>
