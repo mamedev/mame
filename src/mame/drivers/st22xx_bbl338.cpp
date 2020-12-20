@@ -68,8 +68,8 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 		u8 command = (u8)m_maincpu->state_int(M6502_X);
 		switch (command)
 		{
-		// 0x00
-		// 0x02
+		case 0x00: break; // command 0x00 = draw jewels in columns
+		// 0x02 not seen
 		case 0x04: break; // command 0x04 = draw text number
 		case 0x06: break; // command 0x06 = draw boxes in sudoku
 		case 0x08: break; // command 0x08 = some kind of positioning logic for things (characters in risker)
@@ -96,11 +96,11 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 		case 0x12: break; // command 0x12 = clear background in angry pigs?
 		case 0x14: break; // command 0x14 = draw basic text
 		case 0x16: break; // important for collisions in risker?
-		// 0x18
+		// 0x18 not seen
 		case 0x1a: break; // when pause is pressed? maybe music related?
 		case 0x1c: break; // unknown, little effect? maybe play music?
-		// 0x1e
-		// 0x20
+		// 0x1e not seen
+		// 0x20 not seen
 		case 0x22: break; // command 0x22 = unknown, used before 'shooting zombies' titlescreen
 		case 0x24: break; // command 0x24 = play sound
 		case 0x26: break; // command 0x26 = force stop sound(s)?
@@ -112,7 +112,7 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 
 		}
 
-		//if (command == 0x06)
+		//if (command == 0x00)
 		//	return 0x60;
 	}
 	return m_152_dat;
@@ -215,33 +215,40 @@ void st22xx_bbl338_state::portb_w(u8 data)
 }
 
 static INPUT_PORTS_START(st22xx_bbl338)
+	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
+	// document them for now, but maybe comment them out later as they seem to cause problems
+	// in games not designed for them, suggesting the feature was never used with this code
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN) // left?
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // up?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 
 	PORT_START("IN4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B") PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 
 	PORT_START("PORTC")
 	PORT_CONFNAME( 0x01,  0x01, DEF_STR( Language ) )
