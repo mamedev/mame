@@ -24,13 +24,14 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	required_device<st2xxx_device> m_maincpu;
+
 private:
 	u8 porta_r();
 	void portb_w(u8 data);
 
 	void st22xx_bbl338_map(address_map &map);
 
-	required_device<st2xxx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<bl_handhelds_lcdc_device> m_lcdc;
 	required_ioport_array<4> m_input_matrix;
@@ -40,6 +41,61 @@ private:
 	u8 m_portb;
 };
 
+class st22xx_bbl338_sim_state : public st22xx_bbl338_state
+{
+public:
+	st22xx_bbl338_sim_state(const machine_config& mconfig, device_type type, const char* tag)
+		: st22xx_bbl338_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_reset() override;
+};
+
+void st22xx_bbl338_sim_state::machine_reset()
+{
+	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
+
+	const uint8_t ramcode[40] = {
+
+		// this is the 'execute BIOS function' call
+		0xa4, 0x33,       // 000150:         ldy $33 |- Push current bank onto stack
+		0x5a,             // 000152:         phy     |
+		0xa4, 0x32,       // 000153:         ldy $32 |
+		0x5a,             // 000155:         phy     /
+		0x64, 0x32,       // 000156:         stz $32 | - Zero Bank (manually optimized compared to the dphh8213 implementation to reduce code size so call to 0x0164 is correct)
+		0x64, 0x33,       // 000158:         stz $33 / 
+		//0x20, 0x3d, 0x41, // 00015a:         jsr $xxxx   -- this needs to go to a jump table to process the command stored in X
+		0xea, 0xea, 0xea, // NOP above out for now as it isn't clear where to jump to
+		0x7a,             // 00015d:         ply     |- restore previous bank
+		0x84, 0x32,       // 00015e:         sty $32 |
+		0x7a,             // 000160:         ply     | 
+		0x84, 0x33,       // 000161:         sty $33 /
+		0x60,             // 000163:         rts
+
+		// this is the 2nd call to RAM, the bank to call is in y/x with the address modified in the code here before calling
+		0xa5, 0x33,       // 000164:         lda $33 |- store old bank on stack
+		0x48,             // 000166:         pha     |
+		0xa5, 0x32,       // 000167:         lda $32 |
+		0x48,             // 000169:         pha     /
+		0x84, 0x33,       // 00016a:         sty $33 |- set bank from X and Y  (y is always 0 in dphh8213, not here, suggesting ROM doesn't map at 0)
+		0x86, 0x32,       // 00016c:         stx $32 /
+		0x20, 0x00, 0x00, // 00016e:         jsr xxxx the address here is set before the call with a ldx #$93 / stx $016f, ldx #$42 / stx $0170 type sequence
+		0x7a,             // 000171:         ply     |- restore old bank
+		0x84, 0x32,       // 000172:         sty $32 |
+		0x7a,             // 000174:         ply     |
+		0x84, 0x33,       // 000175:         sty $33 /
+		0x60              // 000177:         rts
+	};
+
+	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+
+	for (int i = 0; i < 40; i++)
+		mainspace.write_byte(0x150+i, ramcode[i]);
+
+}
+
 void st22xx_bbl338_state::machine_start()
 {
 	save_item(NAME(m_portb));
@@ -47,10 +103,11 @@ void st22xx_bbl338_state::machine_start()
 
 void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x0000000, 0x01fffff).rom().region("maincpu", 0);
+	map(0x1000000, 0x11fffff).rom().region("maincpu", 0); // bbl338 (because internal ROM would map at 0?)
 
-	map(0x600000, 0x600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x604000, 0x604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
 }
 
 u32 st22xx_bbl338_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -152,7 +209,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 
 // Language controlled by port bit, set at factory, low resolution
 COMP( 201?, dphh8213, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
