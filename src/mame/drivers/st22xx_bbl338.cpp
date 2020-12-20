@@ -50,13 +50,40 @@ public:
 	}
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	u8 sim15a_r();
+	void sim15a_w(u8 data);
+	u8 m_15a_dat;
 };
+
+u8 st22xx_bbl338_sim_state::sim15a_r()
+{
+	u16 pc = m_maincpu->pc();
+
+	if (!machine().side_effects_disabled() && pc == 0x158)
+	{
+		u8 command = (u8)m_maincpu->state_int(M6502_X);
+		logerror("%04x: reached 0x15a, need to execute BIOS simulation for command %02x\n", pc, command);
+	}
+	return m_15a_dat;
+}
+
+void st22xx_bbl338_sim_state::sim15a_w(u8 data)
+{
+	m_15a_dat = data;
+}
+
 
 void st22xx_bbl338_sim_state::machine_reset()
 {
-	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
+	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
+	mainspace.install_readwrite_handler(0x015a, 0x015a, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim15a_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim15a_w)));
+
+	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
 	const uint8_t ramcode[40] = {
 
 		// this is the 'execute BIOS function' call
@@ -89,11 +116,15 @@ void st22xx_bbl338_sim_state::machine_reset()
 		0x60              // 000177:         rts
 	};
 
-	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
-
 	for (int i = 0; i < 40; i++)
 		mainspace.write_byte(0x150+i, ramcode[i]);
 
+}
+
+void st22xx_bbl338_sim_state::machine_start()
+{
+	st22xx_bbl338_state::machine_start();
+	save_item(NAME(m_15a_dat));
 }
 
 void st22xx_bbl338_state::machine_start()
