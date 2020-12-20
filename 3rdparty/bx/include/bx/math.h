@@ -283,6 +283,9 @@ namespace bx
 	BX_CONSTEXPR_FUNC float smoothStep(float _a);
 
 	///
+	BX_CONST_FUNC float invSmoothStep(float _a);
+
+	///
 	BX_CONSTEXPR_FUNC float bias(float _time, float _bias);
 
 	///
