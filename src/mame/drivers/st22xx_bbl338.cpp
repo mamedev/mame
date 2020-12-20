@@ -216,8 +216,7 @@ void st22xx_bbl338_state::portb_w(u8 data)
 
 static INPUT_PORTS_START(st22xx_bbl338)
 	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
-	// document them for now, but maybe comment them out later as they seem to cause problems
-	// in games not designed for them, suggesting the feature was never used with this code
+	// document them for now, but maybe comment them out later for accuracy.
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
