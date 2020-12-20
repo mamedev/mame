@@ -192,15 +192,15 @@ void galpani2_state::galpani2_mcu_nmi1()
 	uint8_t len = mspace.read_byte(0x100020);
 	for(uint8_t slot = 0; slot < len; slot += 4) {
 		uint8_t command = mspace.read_byte(0x100021 + slot);
-		uint16_t address = 0x100000 | mspace.read_word(0x100022 + slot);
+		uint32_t address = 0x100000 | mspace.read_word(0x100022 + slot);
 
 		switch (command)
 		{
 		case 0x02: { //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
-			uint16_t src  = mspace.read_word(address + 0x100002);
-			uint16_t dst  = mspace.read_word(address + 0x100006);
-			uint16_t size = mspace.read_word(address + 0x100008);
-			logerror("MCU master %02x:%04x copy s:%04x, m:%04x, size:%04x\n", slot, address, src, dst, size);
+			uint16_t src  = mspace.read_word(address + 2);
+			uint16_t dst  = mspace.read_word(address + 6);
+			uint16_t size = mspace.read_word(address + 8);
+			logerror("MCU master %02x:%06x copy s:%04x, m:%04x, size:%04x\n", slot, address, src, dst, size);
 
 			for(uint16_t i = 0; i != size; i++)
 			{
@@ -212,10 +212,10 @@ void galpani2_state::galpani2_mcu_nmi1()
 		}
 
 		case 0x0a: { // Copy N bytes from RAM1 to RAM2
-			uint16_t src  = mspace.read_word(address + 0x100002);
-			uint16_t dst  = mspace.read_word(address + 0x100006);
-			uint16_t size = mspace.read_word(address + 0x100008);
-			logerror("MCU master %02x:%04x copy m:%04x, s:%04x, size:%04x\n", slot, address, src, dst, size);
+			uint16_t src  = mspace.read_word(address + 2);
+			uint16_t dst  = mspace.read_word(address + 6);
+			uint16_t size = mspace.read_word(address + 8);
+			logerror("MCU master %02x:%06x copy m:%04x, s:%04x, size:%04x\n", slot, address, src, dst, size);
 
 			for(uint16_t i = 0; i != size; i++)
 			{
@@ -242,7 +242,7 @@ void galpani2_state::galpani2_mcu_nmi1()
 
 		/* Raise a "job done" flag */
 		if (command)
-			mspace.write_word(address + 0x100000, 0xffff);
+			mspace.write_word(address, 0xffff);
 	}
 	if (len)
 		mspace.write_byte(0x100020, 0x00);
@@ -255,19 +255,25 @@ void galpani2_state::galpani2_mcu_nmi2()
 	uint8_t len = sspace.read_byte(0x101012);
 	for(uint8_t slot = 0; slot < len; slot += 4) {
 		uint8_t command = sspace.read_byte(0x101013 + slot);
-		uint16_t address = 0x100000 | sspace.read_word(0x101014 + slot);
+		uint32_t address = 0x100000 | sspace.read_word(0x101014 + slot);
 
 		switch (command)
 		{
+		case 0x0c: {
+			uint16_t a = sspace.read_word(address);
+			logerror("MCU slave %02x:%06x: command 0c: %04x\n", slot, address, a);
+			break;
+		}
+
 		default:
 			machine().debug_break();
-			logerror("MCU slave %02x:%04x: unknown command %02x\n", slot, address, command);
+			logerror("MCU slave %02x:%06x: unknown command %02x\n", slot, address, command);
 			break;
 		}
 
 		/* Raise a "job done" flag */
 		if (command)
-			sspace.write_word(address + 0x100000, 0xffff);
+			sspace.write_word(address, 0xffff);
 	}
 	if (len)
 		sspace.write_byte(0x101012, 0x00);
