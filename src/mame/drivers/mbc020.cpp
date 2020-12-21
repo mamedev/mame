@@ -82,13 +82,15 @@ void mbc020_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x8000, 0x8fff).rom().region("monitor", 0x2000);
-	map(0x9000, 0x900f).m("via", FUNC(via6522_device::map));
+	map(0x9000, 0x900f).m("extvia", FUNC(via6522_device::map));
+	map(0x9900, 0x990f).m("via", FUNC(via6522_device::map));
 	map(0x9a00, 0x9a03).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9c00, 0x9c00).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
 	map(0x9c01, 0x9c01).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
 	map(0xa000, 0xa7ff).ram();
 	map(0xa800, 0xafff).ram().share("videoram");
-	map(0xb000, 0xcfff).rom().region("monitor", 0);
+	map(0xb000, 0xbfff).rom().region("monitor", 0);
+	map(0xe000, 0xefff).rom().region("monitor", 0x1000);
 	map(0xf800, 0xffff).rom().region("monitor", 0x2800);
 }
 
@@ -129,7 +131,9 @@ void mbc020_state::mbc020(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc020_state::mem_map);
 
 	via6522_device &via(VIA6522(config, "via", 16_MHz_XTAL / 8)); // R6522AP
-	via.readpa_handler().set_ioport("PA");
+
+	via6522_device &extvia(VIA6522(config, "extvia", 16_MHz_XTAL / 8)); // not on main board
+	extvia.readpa_handler().set_ioport("PA");
 
 	mos6551_device &acia(MOS6551(config, "acia", 16_MHz_XTAL / 8)); // S6551AP
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -166,7 +170,7 @@ ROM_START(mbc020) // Silkscreened on PCB: "© 1980 by SYM Systems Corp."
 	ROM_LOAD("02-0054a.u5", 0x000, 0x800, CRC(3ed97af7) SHA1(26d5a1c96b9896336e7ccf9e66dbeb2733ab4593))
 
 	ROM_REGION(0x20, "mmap", 0) // Memory mapping PROM (decodes A11–A15)
-	ROM_LOAD("n82s123n.u17", 0x00, 0x20, NO_DUMP)
+	ROM_LOAD("n82s123n.u17", 0x00, 0x20, CRC(f219550d) SHA1(b149f9872bc9091b28b0da65f0206ce9893083be))
 ROM_END
 
 COMP(1983, mbc020, 0, 0, mbc020, mbc020, mbc020_state, empty_init, "Sym Systems / Torque Systems", "MBC020-65 CPU/Video Board (Torque Systems OEM)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
