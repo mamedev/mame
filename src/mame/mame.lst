@@ -16252,6 +16252,9 @@ tmscramb                        // Tomy
 tmtennis                        // Tomy
 ufombs                          // Bambino
 
+@source:hhhippos.cpp
+hhhippos                        // (c) 1991 ICE
+
 @source:hhtiger.cpp
 hhtiger                         // 1983 H/H Tiger
 

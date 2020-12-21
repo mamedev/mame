@@ -4898,6 +4898,7 @@ files {
 	MAME_DIR .. "src/mame/video/gumbo.cpp",
 	MAME_DIR .. "src/mame/drivers/gunpey.cpp",
 	MAME_DIR .. "src/mame/drivers/hapyfish.cpp",
+	MAME_DIR .. "src/mame/drivers/hhhippos.cpp",
 	MAME_DIR .. "src/mame/drivers/hideseek.cpp",
 	MAME_DIR .. "src/mame/drivers/hazelgr.cpp",
 	MAME_DIR .. "src/mame/drivers/headonb.cpp",
