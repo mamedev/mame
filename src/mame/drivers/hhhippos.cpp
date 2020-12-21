@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:
 /******************************************************************************
 
     Skeleton driver for "Hungry Hungy Hippos", by ICE (Innovative Concepts in
