@@ -644,6 +644,7 @@ public:
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+	void view_register(memory_view *view);
 
 protected:
 	// miscellaneous helpers
@@ -836,6 +837,7 @@ private:
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::list<devcb_base *> m_callbacks;
+	std::vector<memory_view *> m_viewlist;          // list of views
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
