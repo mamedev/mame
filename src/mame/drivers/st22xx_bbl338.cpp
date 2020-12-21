@@ -24,13 +24,14 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	required_device<st2xxx_device> m_maincpu;
+
 private:
 	u8 porta_r();
 	void portb_w(u8 data);
 
 	void st22xx_bbl338_map(address_map &map);
 
-	required_device<st2xxx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<bl_handhelds_lcdc_device> m_lcdc;
 	required_ioport_array<4> m_input_matrix;
@@ -40,6 +41,139 @@ private:
 	u8 m_portb;
 };
 
+class st22xx_bbl338_sim_state : public st22xx_bbl338_state
+{
+public:
+	st22xx_bbl338_sim_state(const machine_config& mconfig, device_type type, const char* tag)
+		: st22xx_bbl338_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u8 sim152_r();
+	void sim152_w(u8 data);
+	u8 m_152_dat;
+};
+
+u8 st22xx_bbl338_sim_state::sim152_r()
+{
+	u16 pc = m_maincpu->pc();
+
+	if (!machine().side_effects_disabled() && pc == 0x150)
+	{
+		u8 command = (u8)m_maincpu->state_int(M6502_X);
+		switch (command)
+		{
+		case 0x00: break; // command 0x00 = draw jewels in columns
+		// 0x02 not seen
+		case 0x04: break; // command 0x04 = draw text number
+		case 0x06: break; // command 0x06 = draw boxes in sudoku
+		case 0x08: break; // command 0x08 = some kind of positioning logic for things (characters in risker)
+		case 0x0a:
+		{
+			// this is related to drawing a graphic element on dphh8213 (skipping one call causes a single menu item to not show)
+			// same here?
+			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+			u8 param0 = mainspace.read_byte(0x100);
+			u8 param1 = mainspace.read_byte(0x101);
+			u8 param2 = mainspace.read_byte(0x102);
+			u8 param3 = mainspace.read_byte(0x103);
+			u8 param4 = mainspace.read_byte(0x104);
+			u8 param5 = mainspace.read_byte(0x105);
+
+			// Flags --- --Ff  f = flipX F = flipY, others not checked
+			logerror("command 0x0a (draw?) using params Xpos: %02x Ypos: %02x ObjectNum: %02x%02x Flags: %02x Saturation: %02x\n", param0, param1, param3, param2, param4, param5);
+
+			break;
+		}
+		case 0x0c: break; // command 0x0c = related to drawing platforms in risker?
+		case 0x0e: break; // important for king boxing to show anything outside of char select
+		case 0x10: break; // command 0x10 = clear out some line buffer for rendering?
+		case 0x12: break; // command 0x12 = clear background in angry pigs?
+		case 0x14: break; // command 0x14 = draw basic text
+		case 0x16: break; // important for collisions in risker?
+		// 0x18 not seen
+		case 0x1a: break; // when pause is pressed? maybe music related?
+		case 0x1c: break; // unknown, little effect? maybe play music?
+		// 0x1e not seen
+		// 0x20 not seen
+		case 0x22: break; // command 0x22 = unknown, used before 'shooting zombies' titlescreen
+		case 0x24: break; // command 0x24 = play sound
+		case 0x26: break; // command 0x26 = force stop sound(s)?
+
+		default:
+		{
+			logerror("%04x: reached 0x152, need to execute BIOS simulation for command %02x\n", pc, command);
+		}
+
+		}
+
+		//if (command == 0x00)
+		//	return 0x60;
+	}
+	return m_152_dat;
+}
+
+void st22xx_bbl338_sim_state::sim152_w(u8 data)
+{
+	m_152_dat = data;
+}
+
+
+void st22xx_bbl338_sim_state::machine_reset()
+{
+	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+
+	mainspace.install_readwrite_handler(0x0152, 0x0152, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_w)));
+
+	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
+	const uint8_t ramcode[40] = {
+
+		// this is the 'execute BIOS function' call
+		0xa4, 0x33,       // 000150:         ldy $33 |- Push current bank onto stack
+		0x5a,             // 000152:         phy     |
+		0xa4, 0x32,       // 000153:         ldy $32 |
+		0x5a,             // 000155:         phy     /
+		0x64, 0x32,       // 000156:         stz $32 | - Zero Bank (manually optimized compared to the dphh8213 implementation to reduce code size so call to 0x0164 is correct)
+		0x64, 0x33,       // 000158:         stz $33 / 
+		//0x20, 0x3d, 0x41, // 000152:         jsr $xxxx   -- this needs to go to a jump table to process the command stored in X
+		0xea, 0xea, 0xea, // NOP above out for now as it isn't clear where to jump to
+		0x7a,             // 00015d:         ply     |- restore previous bank
+		0x84, 0x32,       // 00015e:         sty $32 |
+		0x7a,             // 000160:         ply     | 
+		0x84, 0x33,       // 000161:         sty $33 /
+		0x60,             // 000163:         rts
+
+		// this is the 2nd call to RAM, the bank to call is in y/x with the address modified in the code here before calling
+		0xa5, 0x33,       // 000164:         lda $33 |- store old bank on stack
+		0x48,             // 000166:         pha     |
+		0xa5, 0x32,       // 000167:         lda $32 |
+		0x48,             // 000169:         pha     /
+		0x84, 0x33,       // 00016a:         sty $33 |- set bank from X and Y  (y is always 0 in dphh8213, not here, suggesting ROM doesn't map at 0)
+		0x86, 0x32,       // 00016c:         stx $32 /
+		0x20, 0x00, 0x00, // 00016e:         jsr xxxx the address here is set before the call with a ldx #$93 / stx $016f, ldx #$42 / stx $0170 type sequence
+		0x7a,             // 000171:         ply     |- restore old bank
+		0x84, 0x32,       // 000172:         sty $32 |
+		0x7a,             // 000174:         ply     |
+		0x84, 0x33,       // 000175:         sty $33 /
+		0x60              // 000177:         rts
+	};
+
+	for (int i = 0; i < 40; i++)
+		mainspace.write_byte(0x150+i, ramcode[i]);
+
+}
+
+void st22xx_bbl338_sim_state::machine_start()
+{
+	st22xx_bbl338_state::machine_start();
+	save_item(NAME(m_152_dat));
+}
+
 void st22xx_bbl338_state::machine_start()
 {
 	save_item(NAME(m_portb));
@@ -47,10 +181,11 @@ void st22xx_bbl338_state::machine_start()
 
 void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x0000000, 0x01fffff).rom().region("maincpu", 0);
+	map(0x1000000, 0x11fffff).rom().region("maincpu", 0); // bbl338 (because internal ROM would map at 0?)
 
-	map(0x600000, 0x600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x604000, 0x604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
 }
 
 u32 st22xx_bbl338_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -80,33 +215,39 @@ void st22xx_bbl338_state::portb_w(u8 data)
 }
 
 static INPUT_PORTS_START(st22xx_bbl338)
+	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
+	// document them for now, but maybe comment them out later for accuracy.
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN) // left?
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // up?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 
 	PORT_START("IN4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B") PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 
 	PORT_START("PORTC")
 	PORT_CONFNAME( 0x01,  0x01, DEF_STR( Language ) )
@@ -152,7 +293,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 
 // Language controlled by port bit, set at factory, low resolution
 COMP( 201?, dphh8213, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
