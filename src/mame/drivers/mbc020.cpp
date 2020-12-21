@@ -37,6 +37,7 @@ public:
 	mbc020_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_videoram(*this, "videoram")
 		, m_chargen(*this, "chargen")
 	{
 	}
@@ -50,12 +51,26 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_chargen;
 };
 
 MC6845_UPDATE_ROW(mbc020_state::update_row)
 {
-	// TODO
+	u32 *pix = &bitmap.pix(y);
+
+	for (int x = 0; x < x_count; x++)
+	{
+		u8 data = m_videoram[(ma + x) & 0x7ff];
+
+		// No XOR logic evident on PCB
+		u8 dots = x == cursor_x ? 0xff : m_chargen[(data & 0x7f) | (ra & 15) << 7];
+
+		// Guess as to how "Dual Intensity Video Levels" works
+		rgb_t fg = BIT(data, 7) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+		for (int n = 7; n >= 0; n--)
+			*pix++ = BIT(dots, n) ? fg : rgb_t::black();
+	}
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED(mbc020_state::update_cb)
@@ -71,7 +86,8 @@ void mbc020_state::mem_map(address_map &map)
 	map(0x9a00, 0x9a03).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9c00, 0x9c00).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
 	map(0x9c01, 0x9c01).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
-	map(0xa000, 0xafff).ram();
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xafff).ram().share("videoram");
 	map(0xb000, 0xcfff).rom().region("monitor", 0);
 	map(0xf800, 0xffff).rom().region("monitor", 0x2800);
 }
@@ -89,6 +105,14 @@ static INPUT_PORTS_START(mbc020)
 	PORT_CONFSETTING(0x38, "19200")
 	PORT_BIT(0xc3, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -124,7 +148,8 @@ void mbc020_state::mbc020(machine_config &config)
 	crtc.set_update_row_callback(FUNC(mbc020_state::update_row));
 	crtc.set_on_update_addr_change_callback(FUNC(mbc020_state::update_cb));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
 	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
@@ -140,7 +165,7 @@ ROM_START(mbc020) // Silkscreened on PCB: "© 1980 by SYM Systems Corp."
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("02-0054a.u5", 0x000, 0x800, CRC(3ed97af7) SHA1(26d5a1c96b9896336e7ccf9e66dbeb2733ab4593))
 
-	ROM_REGION(0x20, "mmap", 0) // memory mapping PROM (decodes A11–A15)
+	ROM_REGION(0x20, "mmap", 0) // Memory mapping PROM (decodes A11–A15)
 	ROM_LOAD("n82s123n.u17", 0x00, 0x20, NO_DUMP)
 ROM_END
 
