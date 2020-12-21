@@ -2,7 +2,7 @@
 // copyright-holders:
 /******************************************************************************
 
-    Skeleton driver for "Hungry Hungy Hippos", by ICE (Innovative Concepts in
+    Skeleton driver for "Hungry Hungry Hippos", by ICE (Innovative Concepts in
     Entertainment, Inc.)
 
     TODO:
