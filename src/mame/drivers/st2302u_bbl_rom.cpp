@@ -172,6 +172,18 @@ void st22xx_bbl338_sim_state::machine_reset()
 	mainspace.write_byte(0x32, 0x00);
 	mainspace.write_byte(0x33, 0x04);
 
+	// force interrupts to be fetched from external space (complete?)
+	mainspace.write_byte(0x30, 0x00);
+	mainspace.write_byte(0x31, 0x04);
+
+	// timers / timer interrupt init sequence
+	mainspace.write_byte(0x28, 0x08);
+	mainspace.write_byte(0x29, 0xc0);
+	mainspace.write_byte(0x26, 0xff);
+	mainspace.write_byte(0x27, 0xdf);
+	mainspace.write_byte(0x3e, 0x10);
+	mainspace.write_byte(0x3c, 0x00);
+	mainspace.write_byte(0x39, 0x12);
 }
 
 void st22xx_bbl338_sim_state::machine_start()
