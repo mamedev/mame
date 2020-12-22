@@ -18,7 +18,7 @@
 #include "emu.h"
 
 // Devices
-#include "cpu/mips/mips3.h" // TODO: change to mips3.h
+#include "cpu/mips/mips3.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h" // 5000X has an M48T02-150PC1
 #include "machine/z80scc.h"
@@ -51,7 +51,7 @@ public:
 		  m_cpu(*this, "cpu"),
 		  m_ram(*this, "ram"),
 		  //m_dma(*this, "dma"),
-		  //m_rtc(*this, "rtc"),
+		  m_rtc(*this, "rtc"),
 		  m_escc(*this, "escc"),
 		  //m_net(*this, "net"),
 		  //m_fdc(*this, "fdc"),
@@ -127,7 +127,7 @@ protected:
 	required_device<r4400be_32_device> m_cpu;
 	required_device<ram_device> m_ram;
 	//required_device<dmac_0448_device> m_dma;
-	//required_device<m48t02_device> m_rtc;
+	required_device<m48t02_device> m_rtc;
 	required_device<z80scc_device> m_escc;
 	//required_device<am7990_device> m_net;
 	// required_device<upd72067_device> m_fdc;
@@ -208,18 +208,13 @@ data
 	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
-TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
-{
-	// LOG("Freerun timer tick\n");
-	freerun_timer_val++;
-}
+TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
 
 void news_r4k_state::machine_reset()
 {
-	freerun_timer_val = 0;
-
 	// TODO: what is the actual frequency of the freerunning clock?
 	// Too fast causes the mrom to overwhelm the ESCC and gets off into the weeds
+	freerun_timer_val = 0;
 	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1000));
 }
 
@@ -254,14 +249,9 @@ void news_r4k_state::log_mem_access_w(offs_t offset, uint8_t data)
 	LOG("Write 0x%x to 0x%x\n", data, offset);
 }
 
-uint8_t news_r4k_state::debug_mem_r(offs_t offset)
-{
-	return 0;
-}
+uint8_t news_r4k_state::debug_mem_r(offs_t offset) { return 0xff; }
 
-void news_r4k_state::debug_mem_w(offs_t offset, uint8_t data)
-{
-}
+void news_r4k_state::debug_mem_w(offs_t offset, uint8_t data) { return; }
 
 uint8_t news_r4k_state::led_state_r(offs_t offset)
 {
@@ -269,6 +259,12 @@ uint8_t news_r4k_state::led_state_r(offs_t offset)
 }
 void news_r4k_state::led_state_w(offs_t offset, uint8_t data)
 {
+	// map(0x1f3f0000, 0x1f3f0000); // LED_POWER
+	// map(0x1f3f0004, 0x1f3f0004); // LED_DISK
+	// map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
+	// map(0x1f3f000c, 0x1f3f000c); // LED_SEC
+	// map(0x1f3f0010, 0x1f3f0010); // LED_NET
+	// map(0x1f3f0014, 0x1f3f0014); // LED_CD
 	// LOG("Setting LED at offset 0x%x to 0x%x\n", offset, data);
 }
 
@@ -398,12 +394,18 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
 
 	// ST TIMEKEEPER RAM+RTC
-	// 2Kb SRAM (0x800 bytes)
-	// RTC ports are remapped to 1fe0
-	map(0x1f880000, 0x1f8817ff).ram(); // AP-bus + monitor NVRAM, mapped in an interesting way
-	map(0x1f881fe0, 0x1f881fff);	   // RTC registers (TODO)
+	map(0x1f880000, 0x1f8817ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
+	map(0x1f881fe0, 0x1f881fff).lrw8(
+		NAME([this](offs_t offset) {   // RTC register read
+			return m_rtc->read(0x7f8 + offset);
+		}),
+		NAME([this](offs_t offset, uint8_t data) {   // RTC register write
+			return m_rtc->write(0x7f8 + offset, data);
+		})
+	).umask32(0x000000ff);
 
-	// // Interrupt clear ports; // INTCLR0
+	// // Interrupt clear ports
+	// map(0x1f4e0000, 0x1f4e0003).ram(); // INTCLR0
 	// map(0x1f4e0004, 0x1f4e0007).ram(); // INTCLR1
 	// map(0x1f4e0008, 0x1f4e000b).ram(); // INTCLR2
 	// map(0x1f4e000c, 0x1f4e000f).ram(); // INTCLR3
@@ -427,12 +429,6 @@ void news_r4k_state::cpu_map(address_map &map)
 	// map(0x1fa00034, 0x1fa00037).ram(); // INTST5
 
 	// LEDs
-	// map(0x1f3f0000, 0x1f3f0000); // LED_POWER
-	// map(0x1f3f0004, 0x1f3f0004); // LED_DISK
-	// map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
-	// map(0x1f3f000c, 0x1f3f000c); // LED_SEC
-	// map(0x1f3f0010, 0x1f3f0010); // LED_NET
-	// map(0x1f3f0014, 0x1f3f0014); // LED_CD
 	map(0x1f3f0000, 0x1f3f0014).rw(FUNC(news_r4k_state::led_state_r), FUNC(news_r4k_state::led_state_w));
 
 	// APBus region
@@ -489,13 +485,13 @@ void news_r4k_state::cpu_map(address_map &map)
 	// xb (Sony DSC-39 video card)
 	// map(0x14900000, 0x14900000);
 
-	// sb (???) Likely Fujitsu MB86431 audio chip
+	// sb (Likely Fujitsu MB86431 audio chip)
 	// map(0x1ed00000, 0x1ed00000);
 
-	// spifi controller 1 (????, related to DMAC DMA)
+	// spifi controller 1 (scsi, related to DMAC DMA)
 	// map(0x1e280000, 0x1e280000);
 
-	// spifi controller 2 (????, related ot DMAC DMA)
+	// spifi controller 2 (scsi, related to DMAC DMA)
 	//map(0x1e380000, 0x1e380000);
 
 	// ms (mouse)
@@ -507,7 +503,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// kb (keyboard)
 	//map(0x1f900000, 0x1f900000);
 
-	// fd (???)
+	// fd (floppy disk?)
 	//map(0x1ed20000, 0x1ed20000);
 
 	/*
@@ -744,10 +740,8 @@ void news_r4k_state::common(machine_config &config)
 	//m_dma->dma_w_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_w));
 	// TODO: channel 2 audio
 	// TODO: channel 3 video
-	/*
 
 	M48T02(config, m_rtc);
-	*/
 
 	// 9.8304MHz per NetBSD source
 	// Using 9.8304MHz also yields the correct baud rate of 9600 with the config that the mrom uses
