@@ -256,6 +256,7 @@ void st22xx_bbl338_state::portb_w(u8 data)
 	m_portb = data;
 }
 
+// input multiplexing not verified for bbl338
 static INPUT_PORTS_START(dphh8213)
 	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
 	// document them for now, but maybe comment them out later for accuracy.
@@ -264,15 +265,15 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // bbl338 - must be IP_ACTIVE_HIGH to avoid system hanging with 'wai' opcode after code turns on port interrupt if not in test mode (power off?)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
@@ -299,63 +300,6 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0xf6, IP_ACTIVE_LOW, IPT_UNUSED) // probably unused
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(bbl338) // not clear if inputs are multiplxed in the same way
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Up or Left (1)" ) // must be ON for test mode (up or left)
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Up or Left (2)" ) // must be ON for test mode (up or left)
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Power?" ) // must be ON to avoid system hanging with 'wai' opcode after code turns on port interrupt if not in test mode (power off?)
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_START("IN3")
-	PORT_START("IN4")
-INPUT_PORTS_END
 
 void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 {
@@ -379,8 +323,9 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24000000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_bbl338_map);
-	m_maincpu->in_pa_callback().set_ioport("IN0");
-	m_maincpu->in_pb_callback().set_ioport("IN1");
+	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
+	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
+	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	// incorrect for bbl338
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -412,7 +357,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 
 // Language controlled by port bit, set at factory, low resolution
 COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
