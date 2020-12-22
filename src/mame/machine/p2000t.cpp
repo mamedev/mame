@@ -145,7 +145,8 @@ void p2000t_state::p2000t_port_101f_w(uint8_t data)
     bit 6 - \
     bit 7 - Video disable (0 = enabled)
 */
-void p2000t_state::p2000t_port_303f_w(uint8_t data) { 
+void p2000t_state::p2000t_port_303f_w(uint8_t data) 
+{ 
     m_port_303f = data; 
 }
 
@@ -161,7 +162,10 @@ void p2000t_state::p2000t_port_303f_w(uint8_t data) {
     bit 6 - Unused
     bit 7 - Unused
 */
-void p2000t_state::p2000t_port_505f_w(uint8_t data) { m_speaker->level_w(BIT(data, 0)); }
+void p2000t_state::p2000t_port_505f_w(uint8_t data) 
+{ 
+    m_speaker->level_w(BIT(data, 0)); 
+}
 
 /*
     DISAS 0x7x (P2000M only) 40/80 (P2000T only)
@@ -179,8 +183,12 @@ void p2000t_state::p2000t_port_505f_w(uint8_t data) { m_speaker->level_w(BIT(dat
     video refresh is disabled when the CPU accesses video memory
 
 */
-void p2000t_state::p2000t_port_707f_w(uint8_t data) { m_port_707f = data; }
-uint8_t p2000t_state::p2000t_port_707f_r() { 
+void p2000t_state::p2000t_port_707f_w(uint8_t data) 
+{ 
+    m_port_707f = data; 
+}
+uint8_t p2000t_state::p2000t_port_707f_r() 
+{ 
     return m_port_707f; 
 }
 
@@ -188,7 +196,8 @@ void p2000t_state::p2000t_port_888b_w(uint8_t data) {}
 void p2000t_state::p2000t_port_8c90_w(uint8_t data) {}
 
 
-void p2000t_state::p2000t_port_9494_w(uint8_t data) {
+void p2000t_state::p2000t_port_9494_w(uint8_t data)
+{
 	//  The memory region E000-FFFF (8k) is bank switched
 	int available_banks = (m_ram->size() - 0xe000) / 0x2000;
 	if (data < available_banks)
@@ -199,7 +208,8 @@ void p2000t_state::machine_start()
 {
     auto program = &m_maincpu->space(AS_PROGRAM);
     auto ramsize = m_ram->size();
-    switch(ramsize) {
+    switch(ramsize) 
+    {
         case 0x4000: // 16kb
             program->unmap_readwrite(0xa000, 0xffff);
             break;
@@ -216,6 +226,11 @@ void p2000t_state::machine_start()
     }
 }
 
+void p2000h_state::machine_start()
+{
+    p2000t_state::machine_start();
+    m_hiresrom = memregion("hirescpu")->base();
+}
 
 /** -------------------- Hires CPU output/input ports ---------------------- **/
 /* 
@@ -231,60 +246,44 @@ void p2000t_state::machine_start()
    0x6B  channel B control address  (output)
 
  */
-void p2000h_state::hirespio_emulate_sync() {
+uint8_t p2000h_state::mainpio_pa_r_cb() 
+{
+    return (m_channel_a_data & 0xfe) | (m_hirespio->rdy_b() ? 0x1 : 0x0);
+}
+void p2000h_state::mainpio_pa_w_cb(uint8_t data) 
+{
+    // 00 11 00 00 (0x30) only bits 4+5 to write by P2000T rest remain as is
+    m_channel_a_data = (data & 0x30) | (m_channel_a_data & ~0x30);  
+    // main-PIO output is connected to hires-PIO input
+    m_hirespio->strobe_a(1);
+    // Clock data into Hires CPU PIO
+    m_hirespio->strobe_a(0);
+}
+uint8_t p2000h_state::mainpio_pb_r_cb() 
+{
+    return m_channel_b_data;
+}
+void p2000h_state::mainpio_pb_w_cb(uint8_t data) 
+{
+    // main-PIO output is connected to hires-PIO input
+    m_channel_b_data = data;
+    m_hirespio->strobe_b(1);
+    // Clock data into Hires CPU PIO
+    m_hirespio->strobe_b(0);
+}
+
+void p2000h_state::hirespio_emulate_sync() 
+{
      /* toggle bit 2 & 3 [00 00 11 00 =0xc] to emulate image syncs */
-	if (m_hires_channel_a_data & 0x0c) {
-		m_hires_channel_a_data &= ~0x0c;
-	} else{
-		m_hires_channel_a_data |= 0x0c;
-	}
+    m_channel_a_data = (m_channel_a_data & 0x0c) ? (m_channel_a_data & ~0x0c) : (m_channel_a_data | 0x0c);
 }
 
 void p2000h_state::p2000t_port_2c_w(uint8_t data)
 {
-    osd_printf_verbose("Reset Hires\n");
     m_hires_LutRedCnt = 0;
     m_hires_LutBlueCnt = 0;
     m_hires_LutGreenCnt = 0;
     m_hirescpu->reset();
-}
-
-uint8_t p2000h_state::p2000t_port_68_r() 
-{
-    return m_hires_channel_a_data;
-}
-void p2000h_state::p2000t_port_68_w(uint8_t data) 
-{
-    // 00 11 00 00 (0x30) only bits 4+5 to write by P2000T rest remain as is
-    m_hires_channel_a_data = (data & 0x30) | (m_hires_channel_a_data & ~0x30);  
-}
-void p2000h_state::p2000t_port_6A_w(uint8_t data) 
-{
-    //osd_printf_verbose("Port 6A write: 0x%02x\n", data);
-}
-void p2000h_state::p2000t_port_69_w(uint8_t data) 
-{
-    m_hires_channel_b_data = data;
-    if (m_p2000_Z80PIO_mode == Z80PIO_MODE_OUTPUT) {
-        // Reset Data channel ready bit - when in output mode
-        m_hires_channel_a_data &= 0xFE;
-    }
- 
-    // Inform hires something happend on the PIO by sending a interrupt
-    m_hirescpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, m_hires_int_vector);
-}
-uint8_t p2000h_state::p2000t_port_69_r() 
-{
-    if (m_p2000_Z80PIO_mode == Z80PIO_MODE_INPUT) {
-        // Reset Data channel ready bit - when in input mode
-        m_hires_channel_a_data &= 0xFE;
-    }
-    return m_hires_channel_b_data; 
-}
-void p2000h_state::p2000t_port_6B_w(uint8_t data) 
-{
-    m_p2000_Z80PIO_mode = (data >> 6) & 0x3;
-    osd_printf_verbose("Z80PIO mode: 0x%02x\n", m_p2000_Z80PIO_mode);
 }
 
 /* 
@@ -323,22 +322,18 @@ void p2000h_state::p2000h_port_a0af_w(uint8_t data)
 }
 void p2000h_state::p2000h_port_b0bf_w(uint8_t data) 
 {
-    osd_printf_verbose("Hires: Image select register: 0x%02x\n", data);
     m_hires_image_select = data & 0x0F; 
 }
 void p2000h_state::p2000h_port_c0cf_w(uint8_t data) 
 {
-    osd_printf_verbose((data & 0x1) ? "Hires: Memory bank 0 now RAM\n" : "Hires: Memory bank 0 now ROM\n", data);
     m_hiresmem_bank0_ROM = (data & 0x1) ? false : true; 
 }
 void p2000h_state::p2000h_port_d0df_w(uint8_t data) 
 {
-    //osd_printf_verbose("Hires: Scroll register: 0x%02x\n", data);
     m_hires_scroll_reg = data; 
 }
 void p2000h_state::p2000h_port_e0ef_w(uint8_t data) 
 {
-    osd_printf_verbose("Hires: Mode register: 0x%02x\n", data);
     m_hires_image_mode = data; 
 }
 
@@ -351,64 +346,28 @@ void p2000h_state::p2000h_port_e0ef_w(uint8_t data)
         0xf1  channel B data address    
         0xf3  channel B control address 
   */
-
-uint8_t p2000h_state::p2000h_port_f0_r() 
+ uint8_t p2000h_state::hirespio_pa_r_cb() 
 {
-    return m_hires_channel_a_data; 
+    return m_channel_a_data;
 }
-void p2000h_state::p2000h_port_f0_w(uint8_t data) 
+void p2000h_state::hirespio_pa_w_cb(uint8_t data) 
 {
-    static int recoverycnt = 0;
-
     // 11 00 00 11 (0xc3) only bits 0,1,6,7 to write by hires rest remain as is
-    m_hires_channel_a_data = (data & 0xC3) | (m_hires_channel_a_data & ~0xC3);  
-
-    if ((data & 0x40) == 0x40) {
-        if (m_p2000_Z80PIO_mode == Z80PIO_MODE_OUTPUT) {
-            if (((m_hires_channel_a_data & 0x01) == 0) && recoverycnt < 30) {
-                recoverycnt++;
-            } else {
-                // If Z80 PIO is ready to receive a byte  - Set Data channel ready bit
-                m_hires_channel_a_data |= 0x01;
-                recoverycnt = 0;
-            }
-        }
-        
-    }
+    m_channel_a_data = (data & 0xC3) | (m_channel_a_data & ~0xC3);  
+    // hires-PIO output is connected to main-PIO input
+    m_mainpio->strobe_a(1);
+    // Clock data into MAIN CPU PIO
+    m_mainpio->strobe_a(0);
 }
-void p2000h_state::p2000h_port_f2_w(uint8_t data) 
+uint8_t p2000h_state::hirespio_pb_r_cb() 
 {
-    if ((data & 0xF0) == 0) {
-        // If Z80 PIO is ready to receive a byte  - Set Data channel ready bit
-        m_hires_channel_a_data |= 0x01;
-    }
+    return m_channel_b_data;
 }
-
-uint8_t p2000h_state::p2000h_port_f1_r() 
+void p2000h_state::hirespio_pb_w_cb(uint8_t data) 
 {
-    if (m_p2000_Z80PIO_mode == Z80PIO_MODE_OUTPUT) {
-        // Set Data channel ready bit - when in output mode
-        m_hires_channel_a_data |= 0x01;
-    }
-    // Reset interrupt flag if still set
-    if (m_hirescpu->input_state(INPUT_LINE_IRQ0)) {
-        m_hirescpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-        osd_printf_verbose("WARNING: Clear INT\n");
-    }
-    return m_hires_channel_b_data ; 
-}
-void p2000h_state::p2000h_port_f1_w(uint8_t data) 
-{
-    if (m_p2000_Z80PIO_mode == Z80PIO_MODE_INPUT) {
-        // Set Data channel ready bit - when in output mode
-        m_hires_channel_a_data |= 0x01;
-    }
-    m_hires_channel_b_data = data; 
-}
-void p2000h_state::p2000h_port_f3_w(uint8_t data) 
-{
-    if ((data & 0x1) == 0) {
-        osd_printf_verbose("Set interrupt vector: 0x%02x\n", data);
-        m_hires_int_vector = data;
-    }
+    // hires-PIO output is connected to main-PIO input
+    m_channel_b_data = data;
+    m_mainpio->strobe_b(1);
+    // Clock data into MAIN CPU PIO
+    m_mainpio->strobe_b(0);
 }

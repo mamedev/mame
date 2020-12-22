@@ -95,23 +95,29 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 	 * bit  2: BLUE channel visible
 	 * bit  3: P2000T channel visible
 	 */
-	if (BIT(m_hires_image_select, HIRES_IMAGE_P2000T_ENABLE_BIT)) {
+	if (BIT(m_hires_image_select, HIRES_IMAGE_P2000T_ENABLE_BIT)) 
+	{
 		m_saa5050->screen_update(screen, bitmap, cliprect);
 	}
 
 	if (BIT(m_hires_image_select, HIRES_IMAGE_RED_ENALBE_BIT) || 
 		BIT(m_hires_image_select, HIRES_IMAGE_BLUE_ENABLE_BIT) || 
-		BIT(m_hires_image_select, HIRES_IMAGE_GREEN_ENABLE_BIT)) {
+		BIT(m_hires_image_select, HIRES_IMAGE_GREEN_ENABLE_BIT)) 
+	{
 
 		uint8_t  pixelByte0, pixelByte1, pixelByte2, pixelByte3;
 		int ofsByte0, ofsByte1, ofsByte2, ofsByte3;
 
-		if (BIT(m_hires_image_mode, HIRES_MODE_512_BIT)) {
+		if (BIT(m_hires_image_mode, HIRES_MODE_512_BIT)) 
+		{
 			// Set tranlate parameters for 512 pixels per line
-			if (BIT(m_hires_image_mode, HIRES_MODE_1_ON_1_BIT)) {
+			if (BIT(m_hires_image_mode, HIRES_MODE_1_ON_1_BIT)) 
+			{
 				PIX_TRANS_X = ((in_80char_mode() ? 800 : 400) / 51.2);
 				PIX_TRANS_X_OFSET = (in_80char_mode() ? 60 : 30);
-			} else {
+			} 
+			else 
+			{
 				PIX_TRANS_X = ((in_80char_mode() ? 960 : 480) / 51.2);
 				PIX_TRANS_X_OFSET = 0;
 			}
@@ -121,12 +127,17 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 			ofsByte1 = (BIT(m_hires_image_mode, HIRES_MODE_PAGE_5_BIT) ? 6 : 2) * 0x2000;
 			ofsByte2 = (BIT(m_hires_image_mode, HIRES_MODE_PAGE_4_BIT) ? 5 : 1) * 0x2000;
 			ofsByte3 = (BIT(m_hires_image_mode, HIRES_MODE_PAGE_5_BIT) ? 7 : 3) * 0x2000;
-		} else {
+		} 
+		else 
+		{
 			// Set tranlate parameters for 256 pixels per line
-			if (BIT(m_hires_image_mode, HIRES_MODE_1_ON_1_BIT)) {
+			if (BIT(m_hires_image_mode, HIRES_MODE_1_ON_1_BIT)) 
+			{
 				PIX_TRANS_X = ((in_80char_mode() ? 800 : 400) / 25.6);
 				PIX_TRANS_X_OFSET = (in_80char_mode() ? 60 : 30);
-			} else {
+			}
+			else
+			{
 				PIX_TRANS_X = ((in_80char_mode() ? 960 : 480) / 25.6);
 				PIX_TRANS_X_OFSET = 0;
 			}
@@ -141,26 +152,32 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 		int pixel = 0; 
 		uint32_t color = 0;
 		int ypos = 0;
-		for (int yposcnt = 0; yposcnt < 256; yposcnt++) {
+		for (int yposcnt = 0; yposcnt < 256; yposcnt++) 
+		{
 			// Y-lines are stored reversed in memory also take scroll reg into account
 			ypos = (m_hires_scroll_reg + yposcnt) % 256;
 			// Bit 4 of image mode toggles up-side down
-			if (!BIT(m_hires_image_mode, HIRES_MODE_UP_DOWN_BIT)) {
+			if (!BIT(m_hires_image_mode, HIRES_MODE_UP_DOWN_BIT)) 
+			{
 				ypos = 256 - ypos;
 			}
 			
-			if (BIT(m_hires_image_mode, HIRES_MODE_512_BIT)) {
+			if (BIT(m_hires_image_mode, HIRES_MODE_512_BIT)) 
+			{
 				// We are in 512 pixels per line
-				for (int xpos = 0; xpos < (512 / 16); xpos++) {
+				for (int xpos = 0; xpos < (512 / 16); xpos++) 
+				{
 					// Read per byte (representing 2 times 8 pixels of 2 bits)
 					pixelByte0 = m_hiresram->read(ofsByte1 + (ypos * 32) + xpos);
 					pixelByte1 = m_hiresram->read(ofsByte0 + (ypos * 32) + xpos);
 
 					pixelByte2 = m_hiresram->read(ofsByte3 + (ypos * 32) + xpos);
 					pixelByte3 = m_hiresram->read(ofsByte2 + (ypos * 32) + xpos);
-					for (int xposb = 0; xposb < 8; xposb++) {
+					for (int xposb = 0; xposb < 8; xposb++) 
+					{
 						// if ressh bit is set (bit 7) a black hires image is generated 
-						if (!BIT(m_hires_image_mode, HIRES_MODE_RESSH_BIT) ) {
+						if (!BIT(m_hires_image_mode, HIRES_MODE_RESSH_BIT) ) 
+						{
 							// Each video line has 512 pixels (so 16 bit * 32 bytes)
 							// Per pixel use 1 bit of the 2 video pages combined pages as 0-1, 3-4, 5-6, 7-8
 							// In 512 mode the color LUTs are  0=0,1,2,4,5 1=2,3,6,7 2=8,9,c,d 3=a,b,e,f
@@ -187,7 +204,9 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 											 		 (PIX_TRANS_Y * yposcnt) / 10,
 													((PIX_TRANS_X * ((xpos * 16) + (16-(xposb * 2)))) / 10) + PIX_TRANS_X_OFSET, 
 												 	 color, 2, PIX_TRANS_X_WIDTH);
-						} else {
+						}
+						else
+						{
 							// Scale one pixel in 512*256 grid to multiple pixels in 480*480 grid
 							screen_update_p2000h_draw_pixel(bitmap, 
 													 (PIX_TRANS_Y * yposcnt) / 10, 
@@ -196,17 +215,21 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 						}
 					}
 				}
-			} else {
-				for (int xpos = 0; xpos < (256 / 8); xpos++) {
+			} 
+			else
+			{
+				for (int xpos = 0; xpos < (256 / 8); xpos++) 
+				{
 					// Read per byte (representing 8 pixels of 8 bit color)
 					pixelByte0 = m_hiresram->read(ofsByte0 + (ypos * 32) + xpos);
 					pixelByte1 = m_hiresram->read(ofsByte1 + (ypos * 32) + xpos);
 					pixelByte2 = m_hiresram->read(ofsByte2 + (ypos * 32) + xpos);
 					pixelByte3 = m_hiresram->read(ofsByte3 + (ypos * 32) + xpos);
-					for (int xposb = 0; xposb < 8; xposb++) {
-
+					for (int xposb = 0; xposb < 8; xposb++) 
+					{
 						// if ressh bit is set (bit 7) a black hires image is generated 
-						if (!BIT(m_hires_image_mode, HIRES_MODE_RESSH_BIT) ) {
+						if (!BIT(m_hires_image_mode, HIRES_MODE_RESSH_BIT) ) 
+						{
 							// Each video line has 256 pixels (so 8 bit * 32 bytes)
 							// Per pixel use 1 bit of the 4 video pages
 							pixel = (BIT(pixelByte3, xposb)) << 3 |
@@ -218,7 +241,9 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 										BIT(m_hires_image_select, 1) ? m_hires_LutGreen[pixel] : 0,	
 										BIT(m_hires_image_select, 2) ? m_hires_LutBlue[pixel] : 0
 									);
-						} else {
+						}
+						else
+						{
 							color =  rgb_t::black();
 						}
 						// Scale one pixel in 256*256 grid to multiple pixels in 480*480 grid
@@ -236,15 +261,18 @@ uint32_t p2000h_state::screen_update_p2000h(screen_device &screen, bitmap_rgb32 
 
 void p2000h_state::screen_update_p2000h_draw_pixel(bitmap_rgb32 &bitmap, int ypos, int xpos, uint32_t color, int ylen, int xlen )
 {
-	for (int absypos = ypos; absypos < ylen + ypos; absypos++ ) {
-		for (int absxpos = xpos; absxpos < xlen + xpos; absxpos++ ) {
-			if (absypos < 480 && absxpos < 960 ) {
+	for (int absypos = ypos; absypos < ylen + ypos; absypos++ ) 
+	{
+		for (int absxpos = xpos; absxpos < xlen + xpos; absxpos++ ) 
+		{
+			if (absypos < 480 && absxpos < 960 ) 
+			{
 				// Do not overwrite P2000T image pixel
-				if (!BIT(m_hires_image_select, HIRES_IMAGE_P2000T_ENABLE_BIT) || (bitmap.pix(absypos, absxpos) & 0x00ffffff) == 0) {
+				if (!BIT(m_hires_image_select, HIRES_IMAGE_P2000T_ENABLE_BIT) || (bitmap.pix(absypos, absxpos) & 0x00ffffff) == 0) 
+				{
 					bitmap.pix(absypos, absxpos) = color;
 				}
 			}
 		}
 	}
-	
 }

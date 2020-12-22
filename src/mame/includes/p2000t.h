@@ -16,15 +16,10 @@
 #include "video/saa5050.h"
 #include "machine/p2000t_mdcr.h"
 #include "machine/ram.h"
+#include "machine/z80pio.h"
+#include "machine/z80daisy.h"
 #include "emupal.h"
 #include "screen.h"
-
-#define LUT_TABLE_SIZE 16 
-
-#define Z80PIO_MODE_OUTPUT 0x00
-#define Z80PIO_MODE_INPUT  0x01
-#define Z80PIO_MODE_BIDIR  0x02
-#define Z80PIO_MODE_CTRL   0x03
 
 class p2000t_state : public driver_device
 {
@@ -67,8 +62,8 @@ protected:
 	void p2000t_mem(address_map &map);
 	void p2000t_io(address_map &map);
     bool in_80char_mode() { return BIT(m_port_707f, 0); }
-	
-	required_device<saa5050_device> m_saa5050;
+
+	optional_device<saa5050_device> m_saa5050; // Only available on P2000T not on M-model
     required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -77,7 +72,7 @@ protected:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mdcr_device> m_mdcr;
 	required_device<ram_device> m_ram;
-
+	
 	required_memory_bank m_bank;
 	
 
@@ -97,8 +92,10 @@ public:
 		: p2000t_state(mconfig, type, tag)
 		, m_hirescpu(*this, "hirescpu") 
 		, m_hiresram(*this, "hiresram")
-	{
+		, m_mainpio(*this, "mainpio")
+		, m_hirespio(*this, "hirespio")
 		
+	{
 	}
 
 	void p2000h(machine_config &config);
@@ -107,6 +104,7 @@ protected:
 	uint32_t screen_update_p2000h(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
     void screen_update_p2000h_draw_pixel(bitmap_rgb32 &bitmap, int xpos, int ypos, uint32_t color, int xlen, int ylen );
 
+	virtual void machine_start() override;
 	void p2000h_mem(address_map &map);
 	void p2000t_io(address_map &map);
 	void p2000h_io(address_map &map);
@@ -115,23 +113,12 @@ protected:
 
     /* P2000T CPU side */
     void p2000t_port_2c_w(uint8_t data);
-	
-	void p2000t_port_68_w(uint8_t data);
-	uint8_t p2000t_port_68_r();
-	void p2000t_port_6A_w(uint8_t data);
-	void p2000t_port_69_w(uint8_t data);
-	uint8_t p2000t_port_69_r(); 
-	void p2000t_port_6B_w(uint8_t data);
-	
+	uint8_t mainpio_pa_r_cb();
+	void mainpio_pa_w_cb(uint8_t data);
+	uint8_t mainpio_pb_r_cb();
+	void mainpio_pb_w_cb(uint8_t data);
+
 	/* hires CPU side */
-	
-	uint8_t p2000h_port_f0_r();
-	void p2000h_port_f0_w(uint8_t data);
-	uint8_t p2000h_port_f1_r();
-	void p2000h_port_f1_w(uint8_t data);
-	void p2000h_port_f2_w(uint8_t data);
-	void p2000h_port_f3_w(uint8_t data);
-	
 	void p2000h_port_808f_w(uint8_t data);
 	void p2000h_port_909f_w(uint8_t data);
 	void p2000h_port_a0af_w(uint8_t data);
@@ -140,30 +127,31 @@ protected:
 	void p2000h_port_d0df_w(uint8_t data);
 	void p2000h_port_e0ef_w(uint8_t data);
 
-	required_device<cpu_device> m_hirescpu;
+	uint8_t hirespio_pa_r_cb();
+	void hirespio_pa_w_cb(uint8_t data);
+	uint8_t hirespio_pb_r_cb();
+	void hirespio_pb_w_cb(uint8_t data);
+
+	required_device<z80_device> m_hirescpu;
 	required_device<ram_device> m_hiresram;
-	 
+	required_device<z80pio_device> m_mainpio;
+	required_device<z80pio_device> m_hirespio;
 
 private:
 	/* Hires implementation */
+	uint8_t m_channel_a_data;
+	uint8_t m_channel_b_data;
 	
-	uint8_t m_hires_channel_a_ctrl;
-	uint8_t m_hires_channel_a_data;
-	uint8_t m_hires_channel_b_ctrl;
-	uint8_t m_hires_channel_b_data;
-    
-	void hirespio_emulate_sync();
+  	void hirespio_emulate_sync();
 	
 	uint8_t m_hires_image_mode;
 	uint8_t m_hires_image_select;
 	uint8_t m_hires_scroll_reg;
-
-	uint8_t m_p2000_Z80PIO_mode;
-	uint8_t m_hires_int_vector;
-
+ 
     bool m_hiresmem_bank0_ROM = true;
 	u8 *m_hiresrom = NULL;
 
+	static const size_t LUT_TABLE_SIZE = 16;
 	uint8_t m_hires_LutRed[LUT_TABLE_SIZE];
 	uint8_t m_hires_LutRedCnt = 0;
 	uint8_t m_hires_LutBlue[LUT_TABLE_SIZE];

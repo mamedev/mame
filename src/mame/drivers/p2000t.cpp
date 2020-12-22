@@ -32,15 +32,6 @@ Philips P2000T Memory map
 
     Display: SAA5050
 
-2020-12-16 Bekkie: 
-		- Added 80/40 character per line switch support [out 0,0 / out 0,1]
-		  Required an additional PCB in the passed
-		- Added Hires graphics card support
-          Additional rom "GOS36.bin" and Basic loader "Taalje 1.1 32k.cas" is required
-		  see: P2000T preservation page [https://github.com/p2000t/software]
-		- TODO: Adding m2200 floppy drive support
-		- TODO: Adding MSX mouse emulator support
-		
 	Hires CPU: Z80
         0000-1fff   ROM + Video RAM page 0
 		2000-3fff   ROM + Video RAM page 1
@@ -72,6 +63,7 @@ Philips P2000T Memory map
 
 #include "emu.h"
 #include "includes/p2000t.h"
+#include "machine/z80daisy.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -98,21 +90,12 @@ void p2000h_state::p2000t_io(address_map &map)
 	p2000t_state::p2000t_io(map);
 
     map(0x2c, 0x2c).w(FUNC(p2000h_state::p2000t_port_2c_w));
-	
-    map(0x68, 0x68).rw(FUNC(p2000h_state::p2000t_port_68_r), FUNC(p2000h_state::p2000t_port_68_w));
-	map(0x6A, 0x6A).w(FUNC(p2000h_state::p2000t_port_6A_w));
-	map(0x69, 0x69).rw(FUNC(p2000h_state::p2000t_port_69_r), FUNC(p2000h_state::p2000t_port_69_w));
-	map(0x6B, 0x6B).w(FUNC(p2000h_state::p2000t_port_6B_w));
+	map(0x68, 0x6b).rw(m_mainpio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 void p2000h_state::p2000h_io(address_map &map)
 {
 	map.global_mask(0xff);
-	
-	map(0xf0, 0xf0).rw(FUNC(p2000h_state::p2000h_port_f0_r), FUNC(p2000h_state::p2000h_port_f0_w));
-	map(0xf1, 0xf1).rw(FUNC(p2000h_state::p2000h_port_f1_r), FUNC(p2000h_state::p2000h_port_f1_w));
-	map(0xf2, 0xf2).w(FUNC(p2000h_state::p2000h_port_f2_w));
-	map(0xf3, 0xf3).w(FUNC(p2000h_state::p2000h_port_f3_w));
 	
 	map(0x80, 0x8f).w(FUNC(p2000h_state::p2000h_port_808f_w));
 	map(0x90, 0x9f).w(FUNC(p2000h_state::p2000h_port_909f_w));
@@ -122,6 +105,7 @@ void p2000h_state::p2000h_io(address_map &map)
 	map(0xc0, 0xcf).w(FUNC(p2000h_state::p2000h_port_c0cf_w));
 	map(0xd0, 0xdf).w(FUNC(p2000h_state::p2000h_port_d0df_w));
 	map(0xe0, 0xef).w(FUNC(p2000h_state::p2000h_port_e0ef_w));
+	map(0xf0, 0xf3).rw(m_hirespio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 
@@ -142,12 +126,9 @@ void p2000h_state::p2000h_mem(address_map &map)
 
 u8 p2000h_state::memory_read(offs_t offset)
 {
-	/* if port c0-cf bit 0 is set mem page 0 (0x0000-0x1fff) and 1 (0x2000-0x3fff) is addressed as rom on reading else as RAM */
+	/* if port c0-cf bit 0 is set mem page 0 (0x0000-0x1fff) is addressed as rom on reading else as RAM */
 	if ((offset < 0x2000) && m_hiresmem_bank0_ROM)
 	{
-		if (m_hiresrom == NULL) {
-			m_hiresrom = memregion("hirescpu")->base();
-		}
 		return m_hiresrom[offset];
 	}
 	return m_hiresram->read(offset);
@@ -314,7 +295,7 @@ INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-		
+
 }
 
 uint8_t p2000t_state::videoram_r(offs_t offset)
@@ -337,12 +318,12 @@ void p2000t_state::p2000t(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(80 * 12, 24 * 20);
 	m_screen->set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
-	m_screen->set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
-	
+	m_screen->set_screen_update(m_saa5050, FUNC(saa5050_device::screen_update));
+
 	SAA5050(config, m_saa5050, 6000000);
 	m_saa5050->d_cb().set(FUNC(p2000t_state::videoram_r));
 	m_saa5050->set_screen_size(80, 24, 80);
-	
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -351,22 +332,43 @@ void p2000t_state::p2000t(machine_config &config)
 	MDCR(config, m_mdcr, 0);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K,32K,48K,64K,80K,102K");
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
 }
+
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "hirespio" },
+	{ nullptr }
+};
 
 /* Machine definition */
 void p2000h_state::p2000h(machine_config &config)
 {
+	osd_printf_verbose("Hires state\n");
 	/* Basic machine hardware */
 	Z80(config, m_hirescpu, 2500000);
 	m_hirescpu->set_addrmap(AS_PROGRAM, &p2000h_state::p2000h_mem);
 	m_hirescpu->set_addrmap(AS_IO, &p2000h_state::p2000h_io);
-	// m_pio_hires->out_int_callback().set_inputline(m_hirescpu, INPUT_LINE_IRQ0);
+	m_hirescpu->set_daisy_config(daisy_chain);
 	
 	/* Init P2000T side */
 	p2000t_state::p2000t(config);
 	m_maincpu->set_addrmap(AS_IO, & p2000h_state::p2000t_io);
 
+	/* PIO devices */
+	Z80PIO(config, m_mainpio, 2500000);
+	m_mainpio->in_pa_callback().set(FUNC(p2000h_state::mainpio_pa_r_cb));
+	m_mainpio->out_pa_callback().set(FUNC(p2000h_state::mainpio_pa_w_cb));
+	m_mainpio->in_pb_callback().set(FUNC(p2000h_state::mainpio_pb_r_cb));
+	m_mainpio->out_pb_callback().set(FUNC(p2000h_state::mainpio_pb_w_cb));
+
+	Z80PIO(config, m_hirespio, 2500000);
+	m_hirespio->out_int_callback().set_inputline(m_hirescpu, INPUT_LINE_IRQ0);
+	m_hirespio->in_pa_callback().set(FUNC(p2000h_state::hirespio_pa_r_cb));
+	m_hirespio->out_pa_callback().set(FUNC(p2000h_state::hirespio_pa_w_cb));
+	m_hirespio->in_pb_callback().set(FUNC(p2000h_state::hirespio_pb_r_cb));
+	m_hirespio->out_pb_callback().set(FUNC(p2000h_state::hirespio_pb_w_cb));
+	
 	/* video hardware handler */
 	m_screen->set_screen_update(FUNC(p2000h_state::screen_update_p2000h));
 
@@ -393,7 +395,7 @@ void p2000m_state::p2000m(machine_config &config)
 	screen.set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
 	screen.set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
 	screen.set_palette(m_palette);
-
+	
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
 	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
 
@@ -429,7 +431,7 @@ ROM_START(p2000h)
 	ROM_LOAD("basic.rom", 0x1000, 0x4000, CRC(9d9d38f9) SHA1(fb5100436c99634a2592a10dff867f85bcff7aec))
 
 	ROM_REGION(0x10000, "hirescpu",0)
-	ROM_LOAD("GOS36.bin", 0x0000, 0x2000, CRC(279a13f8) SHA1(71bbe2275e63492747a98e1f469de126999fb617))
+	ROM_LOAD("gos36.bin", 0x0000, 0x2000, CRC(279a13f8) SHA1(71bbe2275e63492747a98e1f469de126999fb617))
 ROM_END
 
 
