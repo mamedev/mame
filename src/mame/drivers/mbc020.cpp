@@ -130,7 +130,7 @@ void mbc020_state::mbc020(machine_config &config)
 	M6512(config, m_maincpu, 16_MHz_XTAL / 8); // SYU6512A
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc020_state::mem_map);
 
-	via6522_device &via(VIA6522(config, "via", 16_MHz_XTAL / 8)); // R6522AP
+	VIA6522(config, "via", 16_MHz_XTAL / 8); // R6522AP
 
 	via6522_device &extvia(VIA6522(config, "extvia", 16_MHz_XTAL / 8)); // not on main board
 	extvia.readpa_handler().set_ioport("PA");
