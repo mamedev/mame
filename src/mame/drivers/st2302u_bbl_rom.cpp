@@ -112,8 +112,16 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 			// on bbl338 this is used for the 'draw text' functionality in test mode instead of 0x14, see 0x4866 which is
 			// the 'draw letter stored in A at position' function, calling this command.
 			// The equivalent code in dphh8213 is at 0x43e4 instead and calls 0x14
-			 break;
-		 }
+			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+			u8 param0 = mainspace.read_byte(0x100);
+			u8 param1 = mainspace.read_byte(0x101);
+			u8 param2 = mainspace.read_byte(0x102);
+			u8 param3 = mainspace.read_byte(0x103);
+
+			logerror("command 0x28 (draw text direct) using params Xpos: %02x Ypos: %02x char '%c' unk %02x\n", param0, param1, param2, param3);
+		
+			break;
+		}
 
 		default:
 		{
@@ -248,7 +256,7 @@ void st22xx_bbl338_state::portb_w(u8 data)
 	m_portb = data;
 }
 
-static INPUT_PORTS_START(st22xx_bbl338)
+static INPUT_PORTS_START(dphh8213)
 	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
 	// document them for now, but maybe comment them out later for accuracy.
 	PORT_START("IN1")
@@ -291,6 +299,64 @@ static INPUT_PORTS_START(st22xx_bbl338)
 	PORT_BIT(0xf6, IP_ACTIVE_LOW, IPT_UNUSED) // probably unused
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(bbl338) // not clear if inputs are multiplxed in the same way
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Up or Left (1)" ) // must be ON for test mode (up or left)
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Up or Left (2)" ) // must be ON for test mode (up or left)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Power?" ) // must be ON to avoid system hanging with 'wai' opcode after code turns on port interrupt if not in test mode (power off?)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_START("IN3")
+	PORT_START("IN4")
+INPUT_PORTS_END
+
 void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24000000);
@@ -313,9 +379,8 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24000000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_bbl338_map);
-	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
-	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
-	m_maincpu->in_pc_callback().set_ioport("PORTC");
+	m_maincpu->in_pa_callback().set_ioport("IN0");
+	m_maincpu->in_pb_callback().set_ioport("IN1");
 
 	// incorrect for bbl338
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -347,7 +412,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 
 // Language controlled by port bit, set at factory, low resolution
-COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
+COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
