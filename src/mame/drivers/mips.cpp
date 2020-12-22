@@ -750,7 +750,7 @@ void rx2030_state::rx2030(machine_config &config)
 	V50(config, m_iop, 20_MHz_XTAL);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
-	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_iop->tout2_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
