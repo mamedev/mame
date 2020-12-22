@@ -75,7 +75,7 @@ void p2000t_state::p2000t_port_00_w(uint8_t data)
         m_screen->set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
         // Set bit 0 on 0x70 indicating we are in 80 char mode
         m_port_707f |= 0x1;
-	} 
+    } 
     else
     {
         /* Switch back to 40 chars/line */
@@ -274,7 +274,7 @@ void p2000h_state::mainpio_pb_w_cb(uint8_t data)
 
 void p2000h_state::hirespio_emulate_sync() 
 {
-     /* toggle bit 2 & 3 [00 00 11 00 =0xc] to emulate image syncs */
+    /* toggle bit 2 & 3 [00 00 11 00 =0xc] to emulate image syncs */
     m_channel_a_data = (m_channel_a_data & 0x0c) ? (m_channel_a_data & ~0x0c) : (m_channel_a_data | 0x0c);
 }
 
@@ -297,11 +297,11 @@ void p2000h_state::p2000t_port_2c_w(uint8_t data)
 		d0-df       Scroll register
 		e0-ef       Mode register
 
-      Status channel
+    Status channel
         0xf0  channel A data address  bits 012367 (0xCF) output bits 45 (0x30) input
         0xf2  channel A control address
 
-      Data channel
+    Data channel
         0xf1  channel B data address    
         0xf3  channel B control address 
   */
@@ -338,11 +338,11 @@ void p2000h_state::p2000h_port_e0ef_w(uint8_t data)
 }
 
  /*
-      Status channel
+    Status channel
         0xf0  channel A data address  bits 012367 (0xCF) output bits 45 (0x30) input
         0xf2  channel A control address
 
-      Data channel
+    Data channel
         0xf1  channel B data address    
         0xf3  channel B control address 
   */

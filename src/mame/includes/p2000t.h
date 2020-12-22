@@ -61,10 +61,10 @@ protected:
 
 	void p2000t_mem(address_map &map);
 	void p2000t_io(address_map &map);
-    bool in_80char_mode() { return BIT(m_port_707f, 0); }
+	bool in_80char_mode() { return BIT(m_port_707f, 0); }
 
 	optional_device<saa5050_device> m_saa5050; // Only available on P2000T not on M-model
-    required_device<screen_device> m_screen;
+	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -102,7 +102,7 @@ public:
 
 protected:
 	uint32_t screen_update_p2000h(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-    void screen_update_p2000h_draw_pixel(bitmap_rgb32 &bitmap, int xpos, int ypos, uint32_t color, int xlen, int ylen );
+	void screen_update_p2000h_draw_pixel(bitmap_rgb32 &bitmap, int xpos, int ypos, uint32_t color, int xlen, int ylen );
 
 	virtual void machine_start() override;
 	void p2000h_mem(address_map &map);
@@ -111,8 +111,8 @@ protected:
 	u8 memory_read(offs_t offset);
 	void memory_write(offs_t offset, u8 data);
 
-    /* P2000T CPU side */
-    void p2000t_port_2c_w(uint8_t data);
+	/* P2000T CPU side */
+	void p2000t_port_2c_w(uint8_t data);
 	uint8_t mainpio_pa_r_cb();
 	void mainpio_pa_w_cb(uint8_t data);
 	uint8_t mainpio_pb_r_cb();
@@ -148,7 +148,7 @@ private:
 	uint8_t m_hires_image_select;
 	uint8_t m_hires_scroll_reg;
  
-    bool m_hiresmem_bank0_ROM = true;
+	bool m_hiresmem_bank0_ROM = true;
 	u8 *m_hiresrom = NULL;
 
 	static const size_t LUT_TABLE_SIZE = 16;

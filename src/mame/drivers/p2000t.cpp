@@ -19,13 +19,13 @@ Philips P2000T Memory map
         20-2f       Input ports  (2c Hires reset port)
         30-3f       Scroll reg (T ver)
         50-5f       Beeper
-		68-6b       Hires communication ports
-					68: PIO A DATA status channel 
-					6a: PIO A ctrl status channel 
-					69: PIO B DATA status channel 
-					6b: PIO B ctrl status channel 
+        68-6b       Hires communication ports
+                    68: PIO A DATA status channel 
+                    6a: PIO A ctrl status channel 
+                    69: PIO B DATA status channel 
+                    6b: PIO B ctrl status channel 
         70-7f       DISAS (M ver)
-		88-8B       CTC
+        88-8B       CTC
         8C-90       Floppy ctrl
         94          RAM Bank select
 
@@ -34,29 +34,29 @@ Philips P2000T Memory map
 
 	Hires CPU: Z80
         0000-1fff   ROM + Video RAM page 0
-		2000-3fff   ROM + Video RAM page 1
+        2000-3fff   ROM + Video RAM page 1
         4000-5fff   Video RAM page 2
-		6000-7fff   Video RAM page 3
+        6000-7fff   Video RAM page 3
         8000-9fff   Video RAM page 4
-		a000-bfff   Video RAM page 5
-		c000-dfff   Video RAM page 6
+        a000-bfff   Video RAM page 5
+        c000-dfff   Video RAM page 6
         e000-ffff   Video RAM page 7
         
     Hires Interrupts:
 
     Hires Ports:
         80-8f       Red color table
-		90-9f       Green color table
-		a0-af       Red color table
-		b0-bf       RGB-P2000T image switch
-		c0-cf       Memory map
-		d0-df       Scroll register
-		e0-ef       Mode register
+        90-9f       Green color table
+        a0-af       Red color table
+        b0-bf       RGB-P2000T image switch
+        c0-cf       Memory map
+        d0-df       Scroll register
+        e0-ef       Mode register
         f0,f1,f2,f3 Communication channels (PIO A+B)
-					f0: PIO A DATA status channel 
-					f2: PIO A ctrl status channel 
-					f1: PIO B DATA status channel 
-					f3: PIO B ctrl status channel 
+                    f0: PIO A DATA status channel 
+                    f2: PIO A ctrl status channel 
+                    f1: PIO B DATA status channel 
+                    f3: PIO B ctrl status channel 
         
 
 ************************************************************************/
@@ -89,7 +89,7 @@ void p2000h_state::p2000t_io(address_map &map)
 {
 	p2000t_state::p2000t_io(map);
 
-    map(0x2c, 0x2c).w(FUNC(p2000h_state::p2000t_port_2c_w));
+	map(0x2c, 0x2c).w(FUNC(p2000h_state::p2000t_port_2c_w));
 	map(0x68, 0x6b).rw(m_mainpio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
