@@ -1917,8 +1917,8 @@ void screen_device::finalize_burnin()
 		util::png_info pnginfo;
 
 		// add two text entries describing the image
-		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
-		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()));
 
 		// now do the actual work
 		util::png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);

@@ -21,6 +21,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -63,7 +64,7 @@ public:
 	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
 	png_error expand_buffer_8bit();
 
-	png_error add_text(char const *keyword, char const *text);
+	png_error add_text(std::string_view keyword, std::string_view text);
 
 	void free_data();
 	void reset() { free_data(); operator=(png_info()); }
