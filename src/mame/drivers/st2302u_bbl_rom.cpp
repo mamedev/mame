@@ -20,6 +20,7 @@ public:
 	}
 	
 	void st22xx_bbl338(machine_config &config);
+	void st22xx_dphh8213(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -31,6 +32,7 @@ private:
 	void portb_w(u8 data);
 
 	void st22xx_bbl338_map(address_map &map);
+	void st22xx_dphh8213_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<bl_handhelds_lcdc_device> m_lcdc;
@@ -130,7 +132,7 @@ void st22xx_bbl338_sim_state::machine_reset()
 
 	mainspace.install_readwrite_handler(0x0152, 0x0152, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_w)));
 
-	// The code that needs to be in RAM doesn't seem to be in the ROM, missing internal area?
+	// The code that needs to be in RAM doesn't seem to be in the ROM
 	const uint8_t ramcode[40] = {
 
 		// this is the 'execute BIOS function' call
@@ -166,6 +168,10 @@ void st22xx_bbl338_sim_state::machine_reset()
 	for (int i = 0; i < 40; i++)
 		mainspace.write_byte(0x150+i, ramcode[i]);
 
+	// force it to boot from external space (missing internal code to copy above segment to RAM however)
+	mainspace.write_byte(0x32, 0x00);
+	mainspace.write_byte(0x33, 0x04);
+
 }
 
 void st22xx_bbl338_sim_state::machine_start()
@@ -179,10 +185,18 @@ void st22xx_bbl338_state::machine_start()
 	save_item(NAME(m_portb));
 }
 
-void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
+void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
 {
 	map(0x0000000, 0x01fffff).rom().region("maincpu", 0);
-	map(0x1000000, 0x11fffff).rom().region("maincpu", 0); // bbl338 (because internal ROM would map at 0?)
+
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+}
+
+void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
+{
+	//map(0x0000000, 0x0003fff).rom().region("internal", 0); // not dumped, so ensure any accesses here are logged
+	map(0x1000000, 0x11fffff).rom().region("maincpu", 0);
 
 	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
 	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
@@ -257,6 +271,24 @@ static INPUT_PORTS_START(st22xx_bbl338)
 	PORT_BIT(0xf6, IP_ACTIVE_LOW, IPT_UNUSED) // probably unused
 INPUT_PORTS_END
 
+void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
+{
+	ST2302U(config, m_maincpu, 24000000);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_dphh8213_map);
+	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
+	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
+	m_maincpu->in_pc_callback().set_ioport("PORTC");
+
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(160, 128); 
+	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
+	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
+
+	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+}
+
 void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24000000);
@@ -277,16 +309,18 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
 }
 
+
 ROM_START( bbl338 )
-	// is internal ROM used? the code in the external ROM contains a bank for 4000-6fff including vectors at least.
-	// it sets stack to 14f, but quickly jumps to 150 in RAM where there is no code? was something meant to have copied
-	// code there earlier?
+	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
+	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
 
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "en29lv160ab.u1", 0x000000, 0x200000, CRC(2c73e16c) SHA1(e2c69b3534e32ef384c0c2f5618118a419326e3a) )
 ROM_END
 
 ROM_START( dphh8213 )
+	// internal area not used
+
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "mx29lv160cb.u1", 0x000000, 0x200000, CRC(c8e7e355) SHA1(726f28c2c9ab012a6842f9f30a0a71538741ba14) )
 	ROM_FILL( 0x00009f, 2, 0xea ) // NOP out SPI check
@@ -296,4 +330,4 @@ ROM_END
 COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
 
 // Language controlled by port bit, set at factory, low resolution
-COMP( 201?, dphh8213, 0,      0,      st22xx_bbl338, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
+COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, st22xx_bbl338, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
