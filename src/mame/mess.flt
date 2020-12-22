@@ -685,6 +685,7 @@ novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
+novag_snova.cpp
 novag_supremo.cpp
 ns5652.cpp
 o2.cpp

@@ -3,23 +3,17 @@
 // thanks-to:Berger
 /******************************************************************************
 
-Novag Supremo
+Novag Super Nova (model 904)
 
 Hardware notes:
-- Hitachi HD63A03YP MCU @ 8MHz (2MHz internal)
-- 32KB ROM(TC57256AD-12), 2KB RAM(TC5516APL)
+- Hitachi HD63A03YP MCU @ 16MHz (4MHz internal)
+- 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
 - LCD with 4 digits and custom segments, no LCD chip
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
-Novag Primo is assumed to be on similar hardware
-Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
-instead of black, otherwise it's the same game.
-
 TODO:
-- does not work, most likely due to incomplete cpu emulation (unemulated timer registers),
-  could also be a bad rom dump on top of that - even when adding IRQ3 with a hack, it
-  doesn't do much at all
-- is 1988 version the same ROM?
+- everything
+- if it turns out that the hardware is similar enough to supremo, merge drivers?
 
 ******************************************************************************/
 
@@ -34,10 +28,10 @@ TODO:
 
 namespace {
 
-class supremo_state : public driver_device
+class snova_state : public driver_device
 {
 public:
-	supremo_state(const machine_config &mconfig, device_type type, const char *tag) :
+	snova_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -45,7 +39,7 @@ public:
 	{ }
 
 	// machine configs
-	void supremo(machine_config &config);
+	void snova(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -59,7 +53,7 @@ private:
 	void main_map(address_map &map);
 };
 
-void supremo_state::machine_start()
+void snova_state::machine_start()
 {
 }
 
@@ -77,11 +71,11 @@ void supremo_state::machine_start()
     Address Maps
 ******************************************************************************/
 
-void supremo_state::main_map(address_map &map)
+void snova_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0040, 0x013f).ram(); // internal
-	map(0x4000, 0x47ff).ram();
+	map(0x4000, 0x5fff).ram();
 	map(0x8000, 0xffff).rom();
 }
 
@@ -91,7 +85,7 @@ void supremo_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( supremo )
+static INPUT_PORTS_START( snova )
 INPUT_PORTS_END
 
 
@@ -100,15 +94,11 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void supremo_state::supremo(machine_config &config)
+void snova_state::snova(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6303Y(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &supremo_state::main_map);
-
-	// THIS IS A HACK, vector @ 0xffec, use ROM_COPY
-	//const attotime irq_period = attotime::from_ticks(4 * 128 * 10, 8_MHz_XTAL);
-	//m_maincpu->set_periodic_int(FUNC(supremo_state::irq0_line_hold), irq_period);
+	HD6303Y(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::main_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -125,9 +115,9 @@ void supremo_state::supremo(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( supremo )
+ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, BAD_DUMP CRC(745d010f) SHA1(365a8e2afcf63678ba0161b9082f6439a9d78c9f) )
+	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
 ROM_END
 
 } // anonymous namespace
@@ -138,6 +128,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1990, supremo, 0,      0,      supremo,  supremo, supremo_state, empty_init, "Novag", "Supremo - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
