@@ -606,6 +606,7 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
+miuchiz.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
