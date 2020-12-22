@@ -96,7 +96,7 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 		case 0x0e: break; // important for king boxing to show anything outside of char select
 		case 0x10: break; // command 0x10 = clear out some line buffer for rendering?
 		case 0x12: break; // command 0x12 = clear background in angry pigs?
-		case 0x14: break; // command 0x14 = draw basic text
+		case 0x14: break; // command 0x14 = draw basic text (dphh8213 test mode, see 0x28 for bbl338)
 		case 0x16: break; // important for collisions in risker?
 		// 0x18 not seen
 		case 0x1a: break; // when pause is pressed? maybe music related?
@@ -106,6 +106,14 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 		case 0x22: break; // command 0x22 = unknown, used before 'shooting zombies' titlescreen
 		case 0x24: break; // command 0x24 = play sound
 		case 0x26: break; // command 0x26 = force stop sound(s)?
+
+		 case 0x28:
+		 {
+			// on bbl338 this is used for the 'draw text' functionality in test mode instead of 0x14, see 0x4866 which is
+			// the 'draw letter stored in A at position' function, calling this command.
+			// The equivalent code in dphh8213 is at 0x43e4 instead and calls 0x14
+			 break;
+		 }
 
 		default:
 		{
