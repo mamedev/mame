@@ -783,8 +783,8 @@ void megapc_state::megapc(machine_config &config)
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_mb_device::kbd_clk_w));
-	pc_kbdc.out_data_cb().set("keybc", FUNC(at_mb_device::kbd_data_w));
+	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");
