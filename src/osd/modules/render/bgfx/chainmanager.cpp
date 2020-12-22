@@ -392,7 +392,7 @@ int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int i
 
 	if (str != nullptr)
 	{
-		*str = string_format("%s", m_available_chains[m_current_chain[id]].m_name);
+		*str = m_available_chains[m_current_chain[id]].m_name;
 	}
 
 	return m_current_chain[id];
