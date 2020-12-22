@@ -168,7 +168,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			plugin *p = m_plugins->find(incl);
 			if (!p)
-				fatalerror("Fatal error: Could not load plugin: %s\n", incl.c_str());
+				fatalerror("Fatal error: Could not load plugin: %s\n", incl);
 			p->m_start = true;
 		}
 
@@ -177,7 +177,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			plugin *p = m_plugins->find(excl);
 			if (!p)
-				fatalerror("Fatal error: Unknown plugin: %s\n", excl.c_str());
+				fatalerror("Fatal error: Unknown plugin: %s\n", excl);
 			p->m_start = false;
 		}
 	}

@@ -885,7 +885,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 		machine_config config(*m_system, *this);
 		software_list_device_enumerator iter(config.root_device());
 		if (iter.count() == 0)
-			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier.c_str());
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier);
 
 		// and finally set up the stack
 		std::stack<std::string> software_identifier_stack;

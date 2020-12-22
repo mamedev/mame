@@ -833,7 +833,7 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent, int index)
 {
-	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name().c_str(), index + m_output_base, sample_rate());
+	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name(), index + m_output_base, sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{

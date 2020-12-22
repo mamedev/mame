@@ -103,7 +103,7 @@ int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t n
 			file_name = file.substr(0, last_dot);
 		}
 
-		*str = string_format("%s", file_name.c_str());
+		*str = file_name;
 	}
 
 	return m_current_texture;

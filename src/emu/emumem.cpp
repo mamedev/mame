@@ -960,7 +960,7 @@ void memory_bank::set_entry(int entrynum)
 	if (entrynum < 0 || entrynum >= int(m_entries.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
 	if (m_entries[entrynum] == nullptr)
-		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
+		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag, entrynum);
 
 	m_curentry = entrynum;
 }

@@ -222,10 +222,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && !m_options.attempted_system_name().empty())
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.attempted_system_name().c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.attempted_system_name());
 
 		// otherwise, error on the options
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message().c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message());
 	}
 
 	// determine the base name of the EXE
@@ -310,7 +310,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
-					"supported machines (best match first):\n\n", m_options.attempted_system_name().c_str());
+					"supported machines (best match first):\n\n", m_options.attempted_system_name());
 			for (int match : matches)
 			{
 				if (0 <= match)
@@ -941,7 +941,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat);
 
 		++it;
 	}
@@ -950,9 +950,9 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	{
 		// if we didn't get anything at all, display a generic end message
 		if (notfound > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", args[0].c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", args[0]);
 		else
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", args[0].c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", args[0]);
 	}
 	else
 	{
@@ -1533,7 +1533,7 @@ template <typename T, typename U> void cli_frontend::apply_action(const std::vec
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat);
 
 		++it;
 	}
@@ -1717,7 +1717,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 	if (!m_osd.execute_command(m_options.command().c_str()))
 		// if we get here, we don't know what has been requested
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command().c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command());
 }
 
 

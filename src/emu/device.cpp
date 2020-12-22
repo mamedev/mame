@@ -613,7 +613,7 @@ void device_t::start()
 
 	// have the views register their state
 	if (!m_viewlist.empty())
-		osd_printf_verbose("%s: Registering %d views\n", m_tag.c_str(), int(m_viewlist.size()));
+		osd_printf_verbose("%s: Registering %d views\n", m_tag, int(m_viewlist.size()));
 	for (memory_view *view : m_viewlist)
 		view->register_state();
 
