@@ -173,7 +173,6 @@ public:
 	TILE_GET_INFO_MEMBER(harem_get_tile_info);
 
 	DECLARE_MACHINE_RESET(galaxold);
-	DECLARE_MACHINE_RESET(devilfsg);
 	DECLARE_MACHINE_RESET(hunchbkg);
 
 	void galaxold_palette(palette_device &palette);
@@ -209,7 +208,6 @@ public:
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
-	DECLARE_VIDEO_START(bagmanmc);
 
 	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -263,8 +261,6 @@ public:
 	void start_stars_scroll_timer();
 	void draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, uint8_t *spriteram, size_t spriteram_size);
-	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
-	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
 	void galaxian(machine_config &config);
 	void galaxold_base(machine_config &config);
@@ -279,7 +275,6 @@ public:
 	void scrambler(machine_config &config);
 	void spcwarp(machine_config &config);
 	void dkongjrmc(machine_config &config);
-	void bagmanmc(machine_config &config);
 	void bullsdrtg(machine_config &config);
 	void drivfrcg(machine_config &config);
 	void rockclim(machine_config &config);
@@ -291,7 +286,6 @@ public:
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
-	void bagmanmc_map(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);

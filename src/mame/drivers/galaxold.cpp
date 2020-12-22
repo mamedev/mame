@@ -41,12 +41,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
     (check code at 0x1043 which changes player and routines that handle players inputs :
     0x1741 UP and DOWN - 0x1796 LEFT and RIGHT - 0x24e6 BUTTON1 - 0x2615 BUTTON2).
 
-2) 'bagmanmc'
-
-  - DSW bit 6 was previously used for "Bonus Lives" settings, but it has no effect
-    in this set because of 'NOP' instructions from 0x3501 to 0x3507.
-
-3) 'tazzmang'
+2) 'tazzmang'
 
   - If you press COIN2 during the boot-up sequence, you enter sort of "test mode"
     where you can access to all inputs, but this doesn't give a clue about what
@@ -410,29 +405,6 @@ void galaxold_state::_4in1_map(address_map &map)
 	map(0x7800, 0x78ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
 	map(0x8000, 0x8000).w(FUNC(galaxold_state::_4in1_bank_w));
 	map(0xc000, 0xdfff).rom();     /* fixed menu code */
-}
-
-
-void galaxold_state::bagmanmc_map(address_map &map)
-{
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x67ff).ram();
-	map(0x9000, 0x93ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).r(FUNC(galaxold_state::galaxold_videoram_r));
-	map(0x9800, 0x983f).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x9840, 0x985f).ram().share("spriteram");
-	map(0x9860, 0x987f).ram().share("bulletsram");
-	map(0x9880, 0x98ff).ram();
-	map(0xa000, 0xa000).portr("IN0");
-	map(0xa003, 0xa003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	map(0xa800, 0xa800).portr("IN1");
-	map(0xa803, 0xa803).w("cust", FUNC(galaxian_sound_device::noise_enable_w));
-	map(0xb000, 0xb000).portr("DSW");
-	map(0xb001, 0xb001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0xb002, 0xb002).w(FUNC(galaxold_state::galaxold_gfxbank_w));
-	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
-	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
-	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
 }
 
 
@@ -1242,54 +1214,6 @@ static INPUT_PORTS_START( 4in1 )
 INPUT_PORTS_END
 
 
-/* verified from Z80 code */
-static INPUT_PORTS_START( bagmanmc )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* stored to 0x6163 bit 4 but not tested */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 2C/1C  B 1C/1C" )
-	PORT_DIPSETTING(    0x04, "A 1C/1C  B 1C/2C" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                   /* see notes */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          /* check code at 0x2d78 and 0x2e6b - affect initials entry */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 /* Coinage Dips are spread across two input ports */
 template <int Mask>
 CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
@@ -2001,20 +1925,6 @@ void galaxold_state::_4in1(machine_config &config)
 }
 
 
-void galaxold_state::bagmanmc(machine_config &config)
-{
-	mooncrst(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::bagmanmc_map);
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state, bagmanmc)
-}
-
-
 void galaxold_state::dkongjrm(machine_config &config)
 {
 	mooncrst(config);
@@ -2413,41 +2323,6 @@ ROM_START( 4in1 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
-ROM_START( bagmanmc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b1.bin",       0x0000, 0x1000, CRC(b74c75ee) SHA1(620083c30136e24a37b79eb4647d99b997107693) )
-	ROM_LOAD( "b2.bin",       0x1000, 0x1000, CRC(a7d99916) SHA1(13185e8ff6de92ad5135895e5a7fc8b956f009d3) )
-	ROM_LOAD( "b3.bin",       0x2000, 0x1000, CRC(c78f5360) SHA1(7ce9e94c33f1b8e60cc12a3df5f9555f1ca6130f) )
-	ROM_LOAD( "b4.bin",       0x3000, 0x1000, CRC(eebd3bd1) SHA1(03200383e87b0759f607888d9b290a0a777b597e) )
-	ROM_LOAD( "b5.bin",       0x4000, 0x1000, CRC(0fe24b8c) SHA1(205a36fd346d49d2dda6911198295e202caae81f) )
-	ROM_LOAD( "b6.bin",       0x5000, 0x1000, CRC(f50390e7) SHA1(b4ebe647458c26e52461750d63856aea4262f110) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 ) // if the gfx roms from bagmanm2 are used, then it works fine
-	ROM_LOAD( "g1-l.bin",     0x0000, 0x0800, BAD_DUMP CRC(2ae6b5ab) SHA1(59bdebf75d28a247293440ec2ad83eaf30e3de00) )
-	ROM_LOAD( "g2-u.bin",     0x1000, 0x1000, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
-	ROM_LOAD( "g2-l.bin",     0x2000, 0x0800, BAD_DUMP CRC(98b37397) SHA1(29914435a10cebbbce04382c45e13a64a0cd18cb) )
-	ROM_LOAD( "g1-u.bin",     0x3000, 0x1000, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
-	ROM_COPY("gfx1",0x3800,0x2800,0x0800)
-	ROM_COPY("gfx1",0x1800,0x0800,0x0800)
-
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
-	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
-ROM_START( bagmanm2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bagmanm2.1",   0x0000, 0x2000, CRC(53769ebe) SHA1(af5bf808a009a1cf94d0b73d23f7595bf72ba295) )
-	ROM_LOAD( "bagmanm2.2",   0x2000, 0x2000, CRC(9435bb87) SHA1(97fa2dee3cb715ecd418873bc7bb007c3ab72195) )
-	ROM_LOAD( "bagmanm2.3",   0x4000, 0x2000, CRC(f37ba7f6) SHA1(612ae21fbb94afa28dee096094a66a453a398fb2) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "bagmanm2.9",   0x0000, 0x2000, CRC(f1e70d9e) SHA1(b804727bba582e2b938811ba32106241b0606f5c) )
-	ROM_LOAD( "bagmanm2.7",   0x2000, 0x2000, CRC(777e48c4) SHA1(7fee7f999bbc6fea3faf8745bf89417626bcca91) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
-	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( dkongjrm )
@@ -2901,8 +2776,6 @@ GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_ini
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambleo, scramble, scrambleo, scrambleo, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi)", "Scramble (Okapi bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
