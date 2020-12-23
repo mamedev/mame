@@ -117,8 +117,8 @@ protected:
 	// DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// Devices
-	// MIPS R4400 CPU (32-bit mode)
-	required_device<r4400be_32_device> m_cpu;
+	// MIPS R4400 CPU
+	required_device<r4400be_device> m_cpu;
 
 	// Main memory
 	required_device<ram_device> m_ram;
@@ -188,7 +188,7 @@ void news_r4k_state::machine_common(machine_config &config)
 {
 	// CPU setup
 	// Board has a 75MHz crystal, multiplier (if any) TBD
-	R4400BE32(config, m_cpu, 75000000);
+	R4400BE(config, m_cpu, 75000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 	m_cpu->set_icache_size(16384);
 	m_cpu->set_dcache_size(16384);
@@ -243,15 +243,19 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0); // Monitor ROM
 	map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
 
-	// Front panel DIP switches
-	map(0x1f3d0000, 0x1f3d0003).ram(); //.portr("FRONT_PANEL"); <- causes it to crash?
+	// Front panel DIP switches - TODO: mirror length
+	map(0x1f3d0000, 0x1f3d0007).lr64(NAME([this](offs_t offset) {
+		ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
+		dipsw |= 0xff00; // Matches physical platform
+		return ((unsigned long) dipsw << 32) | dipsw;
+	}));
 	
 	// Hardware timers
 	// map(0x1f800000, 0x1f800000); // TIMER0
 	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
 
 	// Timekeeper NVRAM
-	map(0x1f880000, 0x1f8817ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
+	map(0x1f880000, 0x1f8817f7).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 	// Timekeeper RTC
 	map(0x1f881fe0, 0x1f881fff).lrw8(
 		NAME([this](offs_t offset) {
@@ -728,12 +732,11 @@ static INPUT_PORTS_START(nws5000)
 INPUT_PORTS_END
 
 ROM_START(nws5000x)
-ROM_REGION32_BE(0x40000, "mrom", 0)
+ROM_REGION64_BE(0x40000, "mrom", 0)
 ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-// TODO: change file extension??
-ROMX_LOAD("mpu-33__ver3.201__1994_sony.ic64", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-ROM_REGION32_BE(0x400, "idrom", 0)
+ROM_REGION64_BE(0x400, "idrom", 0)
 ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 ROM_END
 
