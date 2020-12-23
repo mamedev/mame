@@ -9847,7 +9847,7 @@ GAME( 1990, aurailj,    aurail,   system16b_fd1089a,     aurail,   segas16b_stat
 
 GAME( 1989, bayroute,   0,        system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
 GAME( 1989, bayroutej,  bayroute, system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
-GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", 0 )
+GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", MACHINE_NO_SOUND )
 
 GAME( 1987, bullet,     0,        system16b_fd1094,      bullet,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
 
