@@ -178,6 +178,13 @@ protected:
 	uint8_t hack2(offs_t offset);
 	uint8_t hack3(offs_t offset);
 	uint8_t freerun_r(offs_t offset);
+
+	// Constants
+	const uint32_t XTAL_75_MHz = 75000000;
+	const uint32_t ICACHE_SIZE = 16384;
+	const uint32_t DCACHE_SIZE = 16384;
+	const uint32_t NVRAM_SIZE = 0x7f8;
+	const char* MAIN_MEMORY_DEFAULT = "64M";
 };
 
 //FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
@@ -188,14 +195,14 @@ void news_r4k_state::machine_common(machine_config &config)
 {
 	// CPU setup
 	// Board has a 75MHz crystal, multiplier (if any) TBD
-	R4400BE(config, m_cpu, 75000000);
+	R4400BE(config, m_cpu, XTAL_75_MHz);
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
-	m_cpu->set_icache_size(16384);
-	m_cpu->set_dcache_size(16384);
+	m_cpu->set_icache_size(ICACHE_SIZE);
+	m_cpu->set_dcache_size(DCACHE_SIZE);
 
 	// Main memory
 	RAM(config, m_ram);
-	m_ram->set_default_size("64M");
+	m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
 	// Timekeeper IC
 	M48T02(config, m_rtc);
@@ -203,7 +210,7 @@ void news_r4k_state::machine_common(machine_config &config)
 	// General ESCC setup
 	// 9.8304MHz per NetBSD source
 	SCC85230(config, m_escc, 9.8304_MHz_XTAL);
-	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
+	// m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// ESCC channel A (mapped to serial port 1)
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -259,10 +266,10 @@ void news_r4k_state::cpu_map(address_map &map)
 	// Timekeeper RTC
 	map(0x1f881fe0, 0x1f881fff).lrw8(
 		NAME([this](offs_t offset) {
-			return m_rtc->read(0x7f8 + offset);
+			return m_rtc->read(NVRAM_SIZE + offset);
 		}),
 		NAME([this](offs_t offset, uint8_t data) {
-			return m_rtc->write(0x7f8 + offset, data);
+			return m_rtc->write(NVRAM_SIZE + offset, data);
 		})
 	).umask32(0x000000ff);
 

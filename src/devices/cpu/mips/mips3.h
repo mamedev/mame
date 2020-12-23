@@ -25,7 +25,6 @@ MIPS III/IV emulator.
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
 DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
-DECLARE_DEVICE_TYPE(R4400BE32, r4400be_32_device)
 DECLARE_DEVICE_TYPE(R4400LE, r4400le_device)
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
 DECLARE_DEVICE_TYPE(VR4300BE, vr4300be_device)
@@ -678,15 +677,6 @@ public:
 	// construction/destruction
 	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 64)
-	{
-	}
-};
-
-class r4400be_32_device : public mips3_device {
-public:
-	// construction/destruction
-	r4400be_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 32)
 	{
 	}
 };
