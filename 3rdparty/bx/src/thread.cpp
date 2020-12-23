@@ -32,15 +32,11 @@
 #	endif // BX_PLATFORM_
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOXONE
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <limits.h>
 #	include <errno.h>
-#	if BX_PLATFORM_WINRT
-using namespace Platform;
-using namespace Windows::Foundation;
-using namespace Windows::System::Threading;
-#	endif // BX_PLATFORM_WINRT
 #endif // BX_PLATFORM_
 
 namespace bx
@@ -146,7 +142,8 @@ namespace bx
 			return false;
 		}
 #elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_XBOXONE
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 		ti->m_handle = ::CreateThread(NULL
 				, m_stackSize
 				, (LPTHREAD_START_ROUTINE)ti->threadFunc
@@ -158,23 +155,6 @@ namespace bx
 		{
 			return false;
 		}
-#elif BX_PLATFORM_WINRT
-		ti->m_handle = CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
-
-		if (NULL == ti->m_handle)
-		{
-			return false;
-		}
-
-		auto workItemHandler = ref new WorkItemHandler([=](IAsyncAction^)
-			{
-				m_exitCode = ti->threadFunc(this);
-				SetEvent(ti->m_handle);
-			}
-			, CallbackContext::Any
-			);
-
-		ThreadPool::RunAsync(workItemHandler, WorkItemPriority::Normal, WorkItemOptions::TimeSliced);
 #elif BX_PLATFORM_POSIX
 		int result;
 		BX_UNUSED(result);
