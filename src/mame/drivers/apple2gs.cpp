@@ -3066,7 +3066,7 @@ void apple2gs_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 //  printf("read_slot_rom: sl %d offs %x, cnxx_slot %d\n", slotnum, offset, m_cnxx_slot);
 
@@ -3087,7 +3087,7 @@ u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 
 void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	slow_cycle();
 
@@ -3116,7 +3116,7 @@ u8 apple2gs_state::read_int_rom(int slotbias, int offset)
 
 u8 apple2gs_state::c100_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	slow_cycle();
 
@@ -3133,7 +3133,7 @@ u8 apple2gs_state::c100_r(offs_t offset)
 
 void apple2gs_state::c100_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	accel_slot(slot);
 
@@ -3151,7 +3151,7 @@ void apple2gs_state::c300_w(offs_t offset, u8 data) { accel_slot(3 + ((offset >>
 
 u8 apple2gs_state::c400_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 4;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3167,7 +3167,7 @@ u8 apple2gs_state::c400_r(offs_t offset)
 
 void apple2gs_state::c400_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3185,19 +3185,9 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
-		else
-		{
-			rv = m_rom[offset + 0x3c800];
-		}
-
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return rv;
+		return 0xff;
 	}
 
 	if (m_cnxx_slot == CNXX_INTROM)
