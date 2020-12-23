@@ -23,20 +23,8 @@
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
-#include "machine/dmac_0448.h"
 #include "machine/news_hid.h"
-#include "machine/cxd1185.h"
-#include "screen.h"
-#include "sound/spkrdev.h"
-#include "speaker.h"
-#include "machine/nscsi_bus.h"
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-#include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 
 // MAME infra imports
 #include "debugger.h"
@@ -53,7 +41,7 @@ public:
 		  m_ram(*this, "ram"),
 		  m_rtc(*this, "rtc"),
 		  m_escc(*this, "escc"),
-		  m_serial(*this, "serial%u", 0U) { }
+		  m_serial(*this, "serial%u", 0U) {}
 
 public:
 	// NWS-5000X
@@ -155,9 +143,11 @@ protected:
 
 	// Hardware timers
 	// emu_timer *m_itimer;
-	emu_timer *m_freerun_timer;
-	u32 freerun_timer_val;
-	TIMER_CALLBACK_MEMBER(freerun_clock);
+
+	// See notes in freerun_r method for why this is commented out
+	// emu_timer *m_freerun_timer;
+	// u32 freerun_timer_val;
+	// TIMER_CALLBACK_MEMBER(freerun_clock);
 
 	// Interrupts and other platform state
 	u16 m_inten;
@@ -177,14 +167,14 @@ protected:
 	uint8_t hack1(offs_t offset);
 	uint8_t hack2(offs_t offset);
 	uint8_t hack3(offs_t offset);
-	uint8_t freerun_r(offs_t offset);
+	uint32_t freerun_r(offs_t offset);
 
 	// Constants
 	const uint32_t XTAL_75_MHz = 75000000;
 	const uint32_t ICACHE_SIZE = 16384;
 	const uint32_t DCACHE_SIZE = 16384;
 	const uint32_t NVRAM_SIZE = 0x7f8;
-	const char* MAIN_MEMORY_DEFAULT = "64M";
+	const char *MAIN_MEMORY_DEFAULT = "64M";
 };
 
 //FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
@@ -247,16 +237,16 @@ void news_r4k_state::cpu_map(address_map &map)
 	map.unmap_value_high();
 
 	// NEWS firmware
-	map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0); // Monitor ROM
+	map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM
 	map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
 
 	// Front panel DIP switches - TODO: mirror length
 	map(0x1f3d0000, 0x1f3d0007).lr64(NAME([this](offs_t offset) {
 		ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
 		dipsw |= 0xff00; // Matches physical platform
-		return ((unsigned long) dipsw << 32) | dipsw;
+		return ((unsigned long)dipsw << 32) | dipsw;
 	}));
-	
+
 	// Hardware timers
 	// map(0x1f800000, 0x1f800000); // TIMER0
 	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
@@ -264,14 +254,13 @@ void news_r4k_state::cpu_map(address_map &map)
 	// Timekeeper NVRAM
 	map(0x1f880000, 0x1f8817f7).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 	// Timekeeper RTC
-	map(0x1f881fe0, 0x1f881fff).lrw8(
-		NAME([this](offs_t offset) {
-			return m_rtc->read(NVRAM_SIZE + offset);
-		}),
-		NAME([this](offs_t offset, uint8_t data) {
-			return m_rtc->write(NVRAM_SIZE + offset, data);
-		})
-	).umask32(0x000000ff);
+	map(0x1f881fe0, 0x1f881fff).lrw8(NAME([this](offs_t offset) {
+										 return m_rtc->read(NVRAM_SIZE + offset);
+									 }),
+									 NAME([this](offs_t offset, uint8_t data) {
+										 return m_rtc->write(NVRAM_SIZE + offset, data);
+									 }))
+		.umask32(0x000000ff);
 
 	// Interrupt clear ports
 	// map(0x1f4e0000, 0x1f4e0003).ram(); // INTCLR0
@@ -352,7 +341,6 @@ void news_r4k_state::cpu_map(address_map &map)
 	// fd (floppy disk?)
 	// map(0x1ed20000, 0x1ed20000);
 
-
 	// Everything below this comment is just for debug
 	map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
 	//map(0x1f3f0000, 0x1f3f0017);
@@ -404,17 +392,16 @@ data
     */
 
 	// Allocate freerunning clock
-	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+	//m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
-TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
+//TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
 
 void news_r4k_state::machine_reset()
 {
 	// TODO: what is the actual frequency of the freerunning clock?
-	// Too fast causes the mrom to overwhelm the ESCC and gets off into the weeds
-	freerun_timer_val = 0;
-	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1000));
+	// freerun_timer_val = 0;
+	//m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
 }
 
 void news_r4k_state::init_common()
@@ -550,9 +537,16 @@ uint8_t news_r4k_state::hack3(offs_t offset)
 	}
 }
 
-uint8_t news_r4k_state::freerun_r(offs_t offset)
+uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
-	return freerun_timer_val & 0x000F << (4 * offset);
+	// Need to determine the actual frequency, and find a good way to implement this.
+	// With an unscientific method, I calculated the timer value to increment roughly once per us
+	// Probably need to have a timer running on its own thread or something that
+	// doesn't require conversion to be useful.
+	// The timer callback seemed to be too slow (although I could easily be doing something wrong)
+	// Also WAY too slow to use: machine().scheduler().time().as_ticks(1000000);
+	// The below is a fast version that has even less basis in reality, but sorta kind ""works""?
+	return machine().scheduler().time().as_ticks(1000000) << 10;
 }
 
 u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
@@ -661,37 +655,6 @@ void news_r4k_state::itimer(void *ptr, s32 param)
     */
 }
 
-void news_r4k_state::debug_w(u8 data)
-{
-	/*
-	 * The low four bits of this register control the diagnostic LEDs labelled 1-4
-	 * with bit 0 correspondig to LED #1, and a 0 value enabling the LED. A non-
-	 * exhaustive list of diagnostic codes produced by the PROM follows:
-	 *
-	 *  4321  Stage
-	 *  ...x  EPROM checksum
-	 *  ..x.  NVRAM test (byte)
-	 *  ..xx  NVRAM test (word)
-	 *  .x..  NVRAM test (dword)
-	 *  .x.x  read dip-switch SW2
-	 *  .xx.  write test 0x1fe70000-1fe9ffff?
-	 *  .xxx  address decode
-	 *  x...  NVRAM test (dword)
-	 *  x..x  RAM sizing
-	 *  x.x.  inventory/boot
-	 *
-	 */
-	/*
-	LOG("debug_w 0x%02x (%s)\n", data, machine().describe_context());
-
-	for (unsigned i = 0; i < 4; i++)
-		if (BIT(data, i + 4))
-			m_led[i] = BIT(data, i);
-
-	m_debug = data;
-    */
-}
-
 /*static void news_scsi_devices(device_slot_interface &device)
 {
     //device.option_add("harddisk", NSCSI_HARDDISK);
@@ -713,38 +676,38 @@ void news_r4k_state::debug_w(u8 data)
 static INPUT_PORTS_START(nws5000)
 	PORT_START("FRONT_PANEL")
 	PORT_DIPNAME(0x01, 0x00, "Console") PORT_DIPLOCATION("FRONT_PANEL:1")
-	PORT_DIPSETTING(0x00, "Serial Terminal")
-	PORT_DIPSETTING(0x01, "Bitmap")
+		PORT_DIPSETTING(0x00, "Serial Terminal")
+		PORT_DIPSETTING(0x01, "Bitmap")
 	PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
-	PORT_DIPSETTING(0x00, "Enable built-in bitmap")
-	PORT_DIPSETTING(0x02, "Disable inner bitmap")
+		PORT_DIPSETTING(0x00, "Enable built-in bitmap")
+		PORT_DIPSETTING(0x02, "Disable inner bitmap")
 	PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
-	PORT_DIPSETTING(0x00, "Disable Abort/Resume")
-	PORT_DIPSETTING(0x04, "Enable Abort/Resume")
+		PORT_DIPSETTING(0x00, "Disable Abort/Resume")
+		PORT_DIPSETTING(0x04, "Enable Abort/Resume")
 	PORT_DIPNAME(0x08, 0x00, "Clear NVRAM") PORT_DIPLOCATION("FRONT_PANEL:4")
-	PORT_DIPSETTING(0x00, "Do not clear")
-	PORT_DIPSETTING(0x08, "Clear NVRAM")
+		PORT_DIPSETTING(0x00, "Do not clear")
+		PORT_DIPSETTING(0x08, "Clear NVRAM")
 	PORT_DIPNAME(0x10, 0x00, "Auto Boot") PORT_DIPLOCATION("FRONT_PANEL:5")
-	PORT_DIPSETTING(0x00, "Auto Boot Disable")
-	PORT_DIPSETTING(0x10, "Auto Boot Enable")
+		PORT_DIPSETTING(0x00, "Auto Boot Disable")
+		PORT_DIPSETTING(0x10, "Auto Boot Enable")
 	PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
-	PORT_DIPSETTING(0x00, "No Diagnostic Test")
-	PORT_DIPSETTING(0x20, "Run Diagnostic Test")
+		PORT_DIPSETTING(0x00, "No Diagnostic Test")
+		PORT_DIPSETTING(0x20, "Run Diagnostic Test")
 	PORT_DIPNAME(0x40, 0x00, "External APSlot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
-	PORT_DIPSETTING(0x00, "Enable External APSlot Probe")
-	PORT_DIPSETTING(0x40, "Disable External APSlot Probe")
+		PORT_DIPSETTING(0x00, "Enable External APSlot Probe")
+		PORT_DIPSETTING(0x40, "Disable External APSlot Probe")
 	PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
-	PORT_DIPSETTING(0x00, "Main Memory Enabled")
-	PORT_DIPSETTING(0x80, "Main Memory Disabled");
+		PORT_DIPSETTING(0x00, "Main Memory Enabled")
+		PORT_DIPSETTING(0x80, "Main Memory Disabled");
 INPUT_PORTS_END
 
 ROM_START(nws5000x)
-ROM_REGION64_BE(0x40000, "mrom", 0)
-ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+	ROM_REGION64_BE(0x40000, "mrom", 0)
+	ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
+	ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+	ROM_REGION64_BE(0x400, "idrom", 0)
+	ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 ROM_END
 
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
