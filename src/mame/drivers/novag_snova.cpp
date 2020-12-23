@@ -15,7 +15,7 @@ Hardware notes:
 TODO:
 - NMI on power-off switch, it sets 0x14 bit 7 for standby power (see below)
 - add nvram, MCU is missing standby power emulation
-- add lcd screen
+- beeps are glitchy, as if interrupted for too long
 - internal artwork
 - rs232 port isn't working?
 - unmapped reads from 0x33/0x34
@@ -30,6 +30,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -203,14 +204,14 @@ static INPUT_PORTS_START( snova )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // king
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // go
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // verify
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // new game
 INPUT_PORTS_END
 
 
@@ -237,12 +238,18 @@ void snova_state::snova(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
 	m_lcd_pwm->output_x().set(FUNC(snova_state::lcd_pwm_w));
 
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/3, 591/3);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
+	/* rs232 (configure after video) */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
@@ -255,6 +262,9 @@ void snova_state::snova(machine_config &config)
 ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
+
+	ROM_REGION( 50926, "screen", 0 )
+	ROM_LOAD("nsnova.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
 ROM_END
 
 } // anonymous namespace
