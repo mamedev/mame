@@ -17,6 +17,8 @@
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/nscsi/devices.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/nec/v5x.h"
 #include "formats/pc_dsk.h"
@@ -28,6 +30,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 class lbpc_state : public driver_device
 {
 public:
@@ -37,11 +42,16 @@ public:
 		, m_expbus(*this, "expbus")
 		, m_fdc(*this, "fdc")
 		, m_scsic(*this, "scsi:7:ncr")
+		, m_kbd(*this, "kbd")
 		, m_speaker(*this, "speaker")
 		, m_dma_channel(0xff)
 		, m_eop_active(false)
 		, m_port61(0xff)
 		, m_speaker_data(false)
+		, m_kbd_clock(true)
+		, m_kbd_data(true)
+		, m_kbd_irq(false)
+		, m_kbd_input(0xff)
 	{
 	}
 
@@ -59,6 +69,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(iochck_w);
 	template <int Line> DECLARE_WRITE_LINE_MEMBER(dmaak_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
+
+	void keyboard_shift_in();
+	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+	u8 keyboard_r();
 	u8 port61_r();
 	void port61_w(u8 data);
 	u8 port62_r();
@@ -73,12 +88,17 @@ private:
 	required_device<isa8_device> m_expbus;
 	required_device<wd37c65c_device> m_fdc;
 	required_device<ncr53c80_device> m_scsic;
+	required_device<pc_kbdc_device> m_kbd;
 	required_device<speaker_sound_device> m_speaker;
 
 	u8 m_dma_channel;
 	bool m_eop_active;
 	u8 m_port61;
 	bool m_speaker_data;
+	bool m_kbd_clock;
+	bool m_kbd_data;
+	bool m_kbd_irq;
+	u8 m_kbd_input;
 };
 
 
@@ -88,6 +108,9 @@ void lbpc_state::machine_start()
 	save_item(NAME(m_eop_active));
 	save_item(NAME(m_port61));
 	save_item(NAME(m_speaker_data));
+	save_item(NAME(m_kbd_clock));
+	save_item(NAME(m_kbd_irq));
+	save_item(NAME(m_kbd_input));
 }
 
 void lbpc_state::machine_reset()
@@ -154,6 +177,44 @@ WRITE_LINE_MEMBER(lbpc_state::eop_w)
 	}
 }
 
+void lbpc_state::keyboard_shift_in()
+{
+	if (BIT(m_port61, 7) || m_kbd_irq)
+		return;
+
+	if (BIT(m_kbd_input, 0))
+	{
+		m_kbd_irq = true;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, 1);
+	}
+
+	m_kbd_input >>= 1;
+	if (m_kbd_data)
+	{
+		m_kbd_input |= 0x80;
+		LOG("%s: Shifting in 1 bit (%02X)\n", machine().describe_context(), m_kbd_input);
+	}
+	else
+		LOG("%s: Shifting in 0 bit (%02X)\n", machine().describe_context(), m_kbd_input);
+}
+
+WRITE_LINE_MEMBER(lbpc_state::kbd_clock_w)
+{
+	if (m_kbd_clock && !state)
+		keyboard_shift_in();
+	m_kbd_clock = state;
+}
+
+WRITE_LINE_MEMBER(lbpc_state::kbd_data_w)
+{
+	m_kbd_data = state;
+}
+
+u8 lbpc_state::keyboard_r()
+{
+	return m_kbd_input;
+}
+
 u8 lbpc_state::port61_r()
 {
 	return m_port61;
@@ -166,6 +227,32 @@ void lbpc_state::port61_w(u8 data)
 	else if (!BIT(m_port61, 1) && BIT(data, 1))
 		m_speaker->level_w(m_speaker_data);
 	m_maincpu->tctl2_w(BIT(data, 0));
+
+	if (BIT(m_port61, 3) != BIT(data, 3))
+	{
+		LOG("%s: PB3 changed to %d\n", machine().describe_context(), BIT(data, 3));
+		m_kbd->data_write_from_mb(BIT(data, 3));
+	}
+	if (BIT(m_port61, 6) != BIT(data, 6))
+	{
+		LOG("%s: PB6 changed to %d\n", machine().describe_context(), BIT(data, 6));
+		m_kbd->clock_write_from_mb(BIT(data, 6));
+	}
+	if (BIT(m_port61, 7) != BIT(data, 7))
+	{
+		LOG("%s: PB7 changed to %d\n", machine().describe_context(), BIT(data, 7));
+		if (BIT(data, 7))
+		{
+			m_kbd_input = 0;
+			if (m_kbd_irq)
+			{
+				m_kbd_irq = false;
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, 0);
+			}
+		}
+	}
+	if (BIT(m_port61, 2) != BIT(data, 2))
+		LOG("%s: PB2 changed to %d\n", machine().describe_context(), BIT(data, 2));
 
 	m_port61 = data;
 }
@@ -198,6 +285,7 @@ void lbpc_state::mem_map(address_map &map)
 
 void lbpc_state::io_map(address_map &map)
 {
+	map(0x0060, 0x0060).r(FUNC(lbpc_state::keyboard_r));
 	map(0x0061, 0x0061).rw(FUNC(lbpc_state::port61_r), FUNC(lbpc_state::port61_w));
 	map(0x0062, 0x0062).r(FUNC(lbpc_state::port62_r));
 	map(0x0330, 0x0337).rw(m_scsic, FUNC(ncr53c80_device::read), FUNC(ncr53c80_device::write));
@@ -268,6 +356,10 @@ void lbpc_state::lbpc(machine_config &config)
 	m_maincpu->out_dack_cb<2>().set(FUNC(lbpc_state::dmaak_w<2>));
 	m_maincpu->in_ior_cb<2>().set(m_scsic, FUNC(ncr53c80_device::dma_r));
 	m_maincpu->out_iow_cb<2>().set(m_scsic, FUNC(ncr53c80_device::dma_w));
+
+	PC_KBDC(config, m_kbd, pc_xt_keyboards, STR_KBD_IBM_PC_XT_83);
+	m_kbd->out_clock_cb().set(FUNC(lbpc_state::kbd_clock_w));
+	m_kbd->out_data_cb().set(FUNC(lbpc_state::kbd_data_w));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
