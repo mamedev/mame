@@ -465,7 +465,7 @@ void vpp_state::i8243_port_w(u8 data)
 
 	m_screen->update_now();
 
-	if constexpr (P & 2)
+	if constexpr ((P & 2) != 0)
 		m_mix_i8244 = (m_mix_i8244 & ~mask) | (data & mask);
 	else
 		m_mix_ef934x = (m_mix_ef934x & ~mask) | (data & mask);
