@@ -855,6 +855,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/saa5240.h,VIDEOS["SAA5240"] = true
+--------------------------------------------------
+
+if (VIDEOS["SAA5240"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/saa5240.cpp",
+		MAME_DIR .. "src/devices/video/saa5240.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
 --------------------------------------------------
 if (VIDEOS["PWM_DISPLAY"]~=null) then
