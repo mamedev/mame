@@ -1298,6 +1298,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/f4702.h,MACHINES["F4702"] = true
+---------------------------------------------------
+
+if (MACHINES["F4702"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/f4702.cpp",
+		MAME_DIR .. "src/devices/machine/f4702.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/fga002.h,MACHINES["FGA002"] = true
 ---------------------------------------------------
 

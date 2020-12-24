@@ -489,6 +489,7 @@ MACHINES["EEPROMDEV"] = true
 --MACHINES["ER1400"] = true
 MACHINES["ER2055"] = true
 MACHINES["F3853"] = true
+--MACHINES["F4702"] = true
 --MACHINES["HD63450"] = true
 --MACHINES["HD64610"] = true
 MACHINES["I2CMEM"] = true
