@@ -168,6 +168,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grapplerplus.h"
 #include "bus/a2bus/laser128.h"
@@ -4562,6 +4563,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

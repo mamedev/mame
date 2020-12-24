@@ -83,6 +83,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grapplerplus.h"
 #include "bus/a2bus/laser128.h"
@@ -1330,6 +1331,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
 	device.option_add("uniprint", A2BUS_UNIPRINT);	   /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 void apple2_state::apple2_common(machine_config &config)
