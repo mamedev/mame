@@ -176,6 +176,8 @@ public:
 	{ }
 
 protected:
+	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
 	required_memory_bank m_mainbank;
@@ -222,9 +224,6 @@ public:
 	{ }
 
 	void doraemon(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 
 private:
 	required_device<ticket_dispenser_device> m_hopper;
@@ -477,11 +476,16 @@ static GFXDECODE_START( gfx_champbwl )
 GFXDECODE_END
 
 
-void champbwl_state::machine_start()
+void champbwl_base_state::machine_start()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	m_mainbank->configure_entries(0, 4, &rom[0], 0x4000);
+}
+
+void champbwl_state::machine_start()
+{
+	champbwl_base_state::machine_start();
 
 	save_item(NAME(m_last_trackball_val));
 }
@@ -518,8 +522,8 @@ void champbwl_state::champbwl(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SETA001_SPRITE(config, m_seta001, 16_MHz_XTAL, "palette", gfx_champbwl);
-	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
+	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
+	m_seta001->set_bg_yoffsets(0x01, -0x01);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -548,12 +552,6 @@ WRITE_LINE_MEMBER(doraemon_state::screen_vblank)
 	// rising edge
 	if (state)
 		m_seta001->setac_eof();
-}
-
-void doraemon_state::machine_start()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-	m_mainbank->configure_entries(0, 4, &rom[0], 0x4000);
 }
 
 
