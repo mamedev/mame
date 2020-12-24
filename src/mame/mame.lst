@@ -35548,6 +35548,9 @@ ds2                             //
 oz750                           // 199? Sharp Wizard OZ-750
 rex6000                         //
 
+@source:rf51w14cg.cpp
+rf51w14cg                       // (c) 2003 Recreativos Franco
+
 @source:rfslots8085.cpp
 unkrfslt                        //
 
