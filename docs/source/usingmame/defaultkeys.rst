@@ -182,11 +182,11 @@ and saving/loading save states.
 **Insert**
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
-    (*SDL MAME only*)
+    (*Windows non-SDL MAME only*)
 **Page Down**
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
-    (*Windows non-SDL MAME only*)
+    (*SDL MAME only*)
 **Left Alt+Enter**
     Toggles between full-screen and windowed mode.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)
