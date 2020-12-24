@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Wilbert Pol
+// copyright-holders:R. Belmont, Wilbert Pol, Nigel Barnes
 /***************************************************************************
 
     Acorn Communicator
@@ -7,8 +7,19 @@
     Driver-in-progress by R. Belmont
     Electron ULA emulation by Wilbert Pol
 
-    Main CPU: 65C816
-    Other chips: 6850 UART, 6522 VIA, SAA5240(teletext), AM7910(modem), PCF0335(dialler?), PCF8573P(RTC)
+    Main CPU:
+      65C816
+
+    Other chips:
+      6850 UART
+      6522 VIA
+      SAA5240 (Teletext)
+      MC68B54 (Econet)
+      AM7910  (Modem)
+      PCD3312 (Tone Generator)
+      PCF0335 (Pulse Dialler?)
+      PCF8573 (RTC)
+      SCN2641 (RS423)
 
 ****************************************************************************/
 
@@ -22,8 +33,11 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/pcf8573.h"
+#include "machine/scn_pci.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
+#include "sound/pcd3311.h"
+#include "video/saa5240.h"
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -51,12 +65,15 @@ public:
 		m_maincpu_region(*this, "maincpu"),
 		m_irqs(*this, "irqs"),
 		m_screen(*this, "screen"),
+		m_cct(*this, "saa5240"),
 		m_beeper(*this, "beeper"),
+		m_dtmf(*this, "dtmf"),
 		m_ram(*this, RAM_TAG),
 		m_rtc(*this, "rtc"),
 		m_via(*this, "via6522"),
 		m_acia(*this, "acia"),
 		m_acia_clock(*this, "acia_clock"),
+		m_scn2641(*this, "aci"),
 		m_adlc(*this, "mc6854"),
 		m_vram(*this, "vram"),
 		m_keybd1(*this, "LINE1.%u", 0),
@@ -67,6 +84,7 @@ public:
 	{ }
 
 	void accomm(machine_config &config);
+	void accommi(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
@@ -92,18 +110,22 @@ private:
 	void accomm_palette(palette_device &palette) const;
 
 	void main_map(address_map &map);
+	void saa5240_map(address_map &map);
 
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	required_device<input_merger_device> m_irqs;
 	required_device<screen_device> m_screen;
+	required_device<saa5240_device> m_cct;
 	required_device<beep_device> m_beeper;
+	required_device<pcd3311_device> m_dtmf;
 	required_device<ram_device> m_ram;
 	required_device<pcf8573_device> m_rtc;
 	required_device<via6522_device> m_via;
 	required_device<acia6850_device> m_acia;
 	required_device<clock_device> m_acia_clock;
+	required_device<scn2641_device> m_scn2641;
 	required_device<mc6854_device> m_adlc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_ioport_array<14> m_keybd1, m_keybd2;
@@ -670,10 +692,10 @@ void accomm_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rw(FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));               /* System RAM */
 	map(0x200000, 0x3fffff).noprw();                                                                /* External expansion RAM */
-	map(0x400000, 0x400000).noprw();                                                                /* MODEM */
+	map(0x400000, 0x400001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* MODEM */
 	map(0x410000, 0x410000).ram();                                                                  /* Econet ID */
 	map(0x420000, 0x42000f).m(m_via, FUNC(via6522_device::map));                                    /* 6522 VIA (printer etc) */
-	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* 2641 ACIA (RS423) */
+	map(0x430000, 0x430003).rw(m_scn2641, FUNC(scn2641_device::read), FUNC(scn2641_device::write)); /* 2641 ACIA (RS423) */
 	map(0x440000, 0x44ffff).w(FUNC(accomm_state::ch00switch_w));                                    /* CH00SWITCH */
 	map(0x450000, 0x457fff).ram().share("vram");                                                    /* Video RAM */
 	map(0x458000, 0x459fff).r(FUNC(accomm_state::read_keyboard1));                                  /* Video ULA */
@@ -690,6 +712,12 @@ void accomm_state::main_map(address_map &map)
 	map(0xfd0000, 0xfdffff).rom().region("maincpu", 0x020000);                                      /* ROM bank 2 (ROM Slot 1) */
 	map(0xfe0000, 0xfeffff).rom().region("maincpu", 0x000000);                                      /* ROM bank 0 (ROM Slot 0) */
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
+}
+
+void accomm_state::saa5240_map(address_map &map)
+{
+	map.global_mask(0x07ff);
+	map(0x0000, 0x07ff).ram();
 }
 
 INPUT_CHANGED_MEMBER(accomm_state::trigger_reset)
@@ -901,31 +929,48 @@ void accomm_state::accomm(machine_config &config)
 	m_rtc->comp_cb().set(m_via, FUNC(via6522_device::write_cb1));
 
 	/* teletext */
-	//SAA5240(config, m_cct);
+	SAA5240A(config, m_cct, 6_MHz_XTAL);
+	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
 
 	/* via */
 	VIA6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);
+	m_via->readpb_handler().append(m_cct, FUNC(saa5240a_device::read_sda)).bit(0);
 	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
 	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
+	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_sda)).bit(1).invert();
+	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_scl)).bit(2).invert();
 	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	/* acia */
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
-	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
-	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+	/* rs423 */
+	SCN2641(config, m_scn2641, 3.6864_MHz_XTAL);
+	m_scn2641->txd_handler().set("rs423", FUNC(rs232_port_device::write_txd));
+	m_scn2641->rts_handler().set("rs423", FUNC(rs232_port_device::write_rts));
+	m_scn2641->intr_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
-	serial.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	serial.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
-	serial.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
+	rs232_port_device &rs423(RS232_PORT(config, "rs423", default_rs232_devices, nullptr));
+	rs423.rxd_handler().set(m_scn2641, FUNC(scn2641_device::rxd_w));
+	rs423.dcd_handler().set(m_scn2641, FUNC(scn2641_device::dcd_w));
+	rs423.cts_handler().set(m_scn2641, FUNC(scn2641_device::cts_w));
+
+	/* modem */
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "null_modem"));
+	modem.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	modem.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	modem.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
 	CLOCK(config, m_acia_clock, 16_MHz_XTAL / 13);
 	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
+	PCD3311(config, m_dtmf, 3.57864_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3312
 
 	/* econet */
 	MC6854(config, m_adlc);
@@ -945,6 +990,17 @@ void accomm_state::accomm(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(cent_data_out);
 }
+
+
+void accomm_state::accommi(machine_config &config)
+{
+	accomm(config);
+
+	/* teletext */
+	SAA5240B(config.replace(), m_cct, 6_MHz_XTAL);
+	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
+}
+
 
 ROM_START(accomm)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1031,7 +1087,9 @@ ROM_START(accommi)
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
 
-COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
-COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
-COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )
+
+/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                          FLAGS */
+COMP( 1986, accomm,  0,      0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
+COMP( 1985, accommp, accomm, 0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, accommb, accomm, 0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
+COMP( 1988, accommi, accomm, 0,     accommi, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )
