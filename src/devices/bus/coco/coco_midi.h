@@ -9,5 +9,6 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(COCO_MIDI, device_cococart_interface)
+DECLARE_DEVICE_TYPE(DRAGON_MIDI, device_cococart_interface)
 
 #endif // MAME_BUS_COCO_COCO_MIDI_H
