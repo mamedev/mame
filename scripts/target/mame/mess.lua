@@ -394,6 +394,7 @@ VIDEOS["PWM_DISPLAY"] = true
 VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
+VIDEOS["SED1356"] = true
 VIDEOS["SED1500"] = true
 VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
@@ -655,6 +656,7 @@ MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
 MACHINES["S3C44B0"] = true
 MACHINES["SA1110"] = true
+MACHINES["SA1111"] = true
 MACHINES["SAA1043"] = true
 MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
@@ -2596,6 +2598,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
 	MAME_DIR .. "src/mame/drivers/hp95lx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9825.cpp",
+	MAME_DIR .. "src/mame/drivers/jornada.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")

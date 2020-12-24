@@ -13,13 +13,15 @@
 #define LOG_UART        (1 << 2)
 #define LOG_UART_HF		(1 << 3)
 #define LOG_MCP			(1 << 4)
-#define LOG_OSTIMER		(1 << 5)
-#define LOG_RTC			(1 << 6)
-#define LOG_POWER       (1 << 7)
-#define LOG_RESET       (1 << 8)
-#define LOG_GPIO		(1 << 9)
-#define LOG_INTC        (1 << 10)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
+#define LOG_SSP			(1 << 5)
+#define LOG_OSTIMER		(1 << 6)
+#define LOG_OSTIMER_HF	(1 << 7)
+#define LOG_RTC			(1 << 8)
+#define LOG_POWER       (1 << 9)
+#define LOG_RESET       (1 << 10)
+#define LOG_GPIO		(1 << 11)
+#define LOG_INTC        (1 << 12)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_SSP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
@@ -34,6 +36,7 @@ sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, cons
 	, m_mcp_irqs(*this, "mcpirq")
 	, m_codec(*this, finder_base::DUMMY_TAG)
 	, m_gpio_out(*this)
+	, m_ssp_out(*this)
 {
 }
 
@@ -709,6 +712,238 @@ void sa1110_periphs_device::mcp_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 /*
 
+  Intel SA-1110 SSP - Synchronous Serial Port
+
+  pg. 331 to 347 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::ssp_rx_callback)
+{
+	// TODO: Implement receiving data serially rather than in bulk.
+}
+
+TIMER_CALLBACK_MEMBER(sa1110_periphs_device::ssp_tx_callback)
+{
+	// TODO: Implement transmitting data serially rather than in bulk.
+	if (m_ssp_regs.tx_fifo_count)
+	{
+		const uint16_t data = m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_read_idx];
+		m_ssp_out(data);
+
+		m_ssp_regs.tx_fifo_read_idx = (m_ssp_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_count--;
+
+		m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
+
+		ssp_update_tx_level();
+	}
+}
+
+void sa1110_periphs_device::ssp_update_enable_state()
+{
+	if (BIT(m_ssp_regs.sscr0, SSCR0_SSE_BIT))
+	{
+		if (m_ssp_regs.tx_fifo_count != ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+			m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_TNF_BIT);
+
+		if (m_ssp_regs.rx_fifo_count != 0)
+			m_ssp_regs.sssr |= (1 << SSSR_RNE_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_RNE_BIT);
+
+		if (m_ssp_regs.tx_fifo_count != 0)
+			m_ssp_regs.sssr |= (1 << SSSR_BSY_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_BSY_BIT);
+
+		if (m_ssp_regs.tx_fifo_count <= 4)
+			m_ssp_regs.sssr |= (1 << SSSR_TFS_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_TFS_BIT);
+
+		if (m_ssp_regs.rx_fifo_count >= 4)
+			m_ssp_regs.sssr |= (1 << SSSR_RFS_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_RFS_BIT);
+
+		uint64_t bit_count = (m_ssp_regs.sscr0 & SSCR0_DSS_MASK) >> SSCR0_DSS_BIT;
+		uint32_t clock_rate = 2 * (((m_ssp_regs.sscr0 & SSCR0_SCR_MASK) >> SSCR0_SCR_BIT) + 1);
+		attotime packet_rate = attotime::from_ticks(bit_count * clock_rate, 3686400);
+		m_ssp_regs.rx_timer->adjust(packet_rate, 0, packet_rate);
+		m_ssp_regs.tx_timer->adjust(packet_rate, 0, packet_rate);
+	}
+	else
+	{
+		m_ssp_regs.sssr &= ~(1 << SSSR_TFS_BIT);
+		m_ssp_regs.sssr &= ~(1 << SSSR_RFS_BIT);
+
+		m_ssp_regs.rx_fifo_read_idx = 0;
+		m_ssp_regs.rx_fifo_write_idx = 0;
+		m_ssp_regs.rx_fifo_count = 0;
+		m_ssp_regs.tx_fifo_read_idx = 0;
+		m_ssp_regs.tx_fifo_write_idx = 0;
+		m_ssp_regs.tx_fifo_count = 0;
+
+		m_ssp_regs.rx_timer->adjust(attotime::never);
+		m_ssp_regs.tx_timer->adjust(attotime::never);
+	}
+}
+
+void sa1110_periphs_device::ssp_update_rx_level()
+{
+	if (m_ssp_regs.rx_fifo_count >= 4)
+		m_ssp_regs.sssr |= (1 << SSSR_RFS_BIT);
+	else
+		m_ssp_regs.sssr &= ~(1 << SSSR_RFS_BIT);
+}
+
+void sa1110_periphs_device::ssp_rx_fifo_push(const uint16_t data)
+{
+	if (m_ssp_regs.rx_fifo_count < ARRAY_LENGTH(m_ssp_regs.rx_fifo))
+	{
+		m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_write_idx] = data;
+		m_ssp_regs.rx_fifo_write_idx = (m_ssp_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_count++;
+
+		m_ssp_regs.sssr |= (1 << SSSR_RNE_BIT);
+
+		ssp_update_rx_level();
+	}
+}
+
+void sa1110_periphs_device::ssp_update_tx_level()
+{
+	if (m_ssp_regs.tx_fifo_count <= 4)
+		m_ssp_regs.sssr |= (1 << SSSR_TFS_BIT);
+	else
+		m_ssp_regs.sssr &= ~(1 << SSSR_TFS_BIT);
+}
+
+void sa1110_periphs_device::ssp_tx_fifo_push(const uint16_t data)
+{
+	if (m_ssp_regs.tx_fifo_count < ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+	{
+		m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_write_idx] = data;
+		m_ssp_regs.tx_fifo_write_idx = (m_ssp_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_count++;
+
+		if (m_ssp_regs.tx_fifo_count != ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+			m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
+		else
+			m_ssp_regs.sssr &= ~(1 << SSSR_TNF_BIT);
+
+		ssp_update_tx_level();
+	}
+
+	if (m_ssp_regs.tx_fifo_count || m_ssp_regs.rx_fifo_count)
+		m_ssp_regs.sssr |= (1 << SSSR_BSY_BIT);
+	else
+		m_ssp_regs.sssr &= ~(1 << SSSR_BSY_BIT);
+}
+
+uint16_t sa1110_periphs_device::ssp_rx_fifo_pop()
+{
+	uint16_t data = m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_read_idx];
+	if (m_ssp_regs.rx_fifo_count)
+	{
+		m_ssp_regs.rx_fifo_read_idx = (m_ssp_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_count--;
+
+		if (m_ssp_regs.rx_fifo_count == 0)
+			m_ssp_regs.sssr &= ~(1 << SSSR_RNE_BIT);
+
+		ssp_update_rx_level();
+	}
+	return data;
+}
+
+uint32_t sa1110_periphs_device::ssp_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_SSCR0:
+		LOGMASKED(LOG_SSP, "%s: ssp_r: SSP Control Register 0: %08x & %08x\n", machine().describe_context(), m_ssp_regs.sscr0, mem_mask);
+		return m_ssp_regs.sscr0;
+	case REG_SSCR1:
+		LOGMASKED(LOG_SSP, "%s: ssp_r: SSP Control Register 1: %08x & %08x\n", machine().describe_context(), m_ssp_regs.sscr1, mem_mask);
+		return m_ssp_regs.sscr1;
+	case REG_SSDR:
+	{
+		const uint32_t data = ssp_rx_fifo_pop();
+		LOGMASKED(LOG_SSP, "%s: ssp_r: SSP Data Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		return data;
+	}
+	case REG_SSSR:
+		LOGMASKED(LOG_SSP, "%s: ssp_r: SSP Status Register: %08x & %08x\n", machine().describe_context(), m_ssp_regs.sssr, mem_mask);
+		LOGMASKED(LOG_SSP, "%s:        Transmit FIFO Not Full: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_TNF_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Receive FIFO Not Empty: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_RNE_BIT));
+		LOGMASKED(LOG_SSP, "%s:        SSP Busy: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_BSY_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Transmit FIFO Service Request: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_TFS_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Receive FIFO Service Request: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_RFS_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Receive Overrun: %d\n", machine().describe_context(), BIT(m_ssp_regs.sssr, SSSR_ROR_BIT));
+		return m_ssp_regs.sssr;
+	default:
+		LOGMASKED(LOG_SSP | LOG_UNKNOWN, "%s: ssp_r: Unknown address: %08x & %08x\n", machine().describe_context(), SSP_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_SSCR0:
+	{
+		static const char *const s_dss_sizes[16] =
+		{
+			"Invalid [1]", "Invalid [2]", "Invalid [3]", "4-bit",
+			"5-bit", "6-bit", "7-bit", "8-bit",
+			"9-bit", "10-bit", "11-bit", "12-bit",
+			"13-bit", "14-bit", "15-bit", "16-bit"
+		};
+		static const char *const s_frf_formats[4] = { "Motorola SPI", "TI Synchronous Serial", "National Microwire", "Reserved" };
+		LOGMASKED(LOG_SSP, "%s: ssp_w: SSP Control Register 0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_SSP, "%s:        Data Size Select: %s\n", machine().describe_context(), s_dss_sizes[(data & SSCR0_DSS_MASK) >> SSCR0_DSS_BIT]);
+		LOGMASKED(LOG_SSP, "%s:        Frame Format: %s\n", machine().describe_context(), s_frf_formats[(data & SSCR0_FRF_MASK) >> SSCR0_FRF_BIT]);
+		LOGMASKED(LOG_SSP, "%s:        SSP Enable: %d\n", machine().describe_context(), BIT(data, SSCR0_SSE_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Serial Clock Rate Divisor: %d\n", machine().describe_context(), 2 * (data & SSCR0_DSS_MASK) >> SSCR0_DSS_BIT);
+		const uint32_t old = m_ssp_regs.sscr0;
+		COMBINE_DATA(&m_ssp_regs.sscr0);
+		if (BIT(old ^ m_ssp_regs.sscr0, SSCR0_SSE_BIT))
+			ssp_update_enable_state();
+		break;
+	}
+	case REG_SSCR1:
+	{
+		LOGMASKED(LOG_SSP, "%s: ssp_w: SSP Control Register 1: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_SSP, "%s:        Receive FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, SSCR1_RIE_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Transmit FIFO Interrupt Enable: %d\n", machine().describe_context(), BIT(data, SSCR1_TIE_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Loopback Mode Enable: %d\n", machine().describe_context(), BIT(data, SSCR1_LBM_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Serial Clock Polarity: %d\n", machine().describe_context(), BIT(data, SSCR1_SPO_BIT));
+		LOGMASKED(LOG_SSP, "%s:        Serial Clock Phase: %d\n", machine().describe_context(), BIT(data, SSCR1_SPH_BIT));
+		LOGMASKED(LOG_SSP, "%s:        External Clock Select: %d\n", machine().describe_context(), BIT(data, SSCR1_ECS_BIT));
+		COMBINE_DATA(&m_ssp_regs.sscr1);
+		break;
+	}
+	case REG_SSDR:
+		LOGMASKED(LOG_SSP, "%s: ssp_w: SSP Data Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		ssp_tx_fifo_push((uint16_t)data);
+		break;
+	case REG_SSSR:
+		LOGMASKED(LOG_SSP, "%s: ssp_w: SSP Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_SSP, "%s:        Clear Receive Overrun: %d\n", machine().describe_context(), BIT(data, SSSR_ROR_BIT));
+		break;
+	default:
+		LOGMASKED(LOG_SSP | LOG_UNKNOWN, "%s: ssp_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), SSP_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
+	}
+}
+
+/*
+
   Intel SA-1110 Operating System Timer
 
   pg. 92 to 96 Intel StrongARM SA-1110 Microprocessor Developer's Manual
@@ -730,6 +965,9 @@ void sa1110_periphs_device::ostimer_update_count()
 {
 	const attotime time_delta = machine().time() - m_ostmr_regs.last_count_sync;
 	const uint64_t ticks_elapsed = time_delta.as_ticks(INTERNAL_OSC);
+	if (ticks_elapsed == 0ULL) // Accrue time until we can tick at least once
+		return;
+
 	const uint32_t wrapped_ticks = (uint32_t)ticks_elapsed;
 	m_ostmr_regs.oscr += wrapped_ticks;
 	m_ostmr_regs.last_count_sync = machine().time();
@@ -762,7 +1000,7 @@ uint32_t sa1110_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
 		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 3: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[3], mem_mask);
 		return m_ostmr_regs.osmr[3];
 	case REG_OSCR:
-		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Counter Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.oscr, mem_mask);
+		LOGMASKED(LOG_OSTIMER_HF, "%s: ostimer_r: OS Timer Counter Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.oscr, mem_mask);
 		return m_ostmr_regs.oscr;
 	case REG_OSSR:
 		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Status Register: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.ossr, mem_mask);
@@ -1225,7 +1463,7 @@ void sa1110_periphs_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 	case REG_GPCR:
 	{
-		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin Output Clear Register (ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_GPIO, "%s: gpio_w: GPIO Pin Output Clear Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		const uint32_t old = m_gpio_regs.output_latch;
 		m_gpio_regs.output_latch &= ~(data & mem_mask);
 		const uint32_t changed = ((old ^ m_gpio_regs.output_latch) & m_gpio_regs.gpdr) & ~m_gpio_regs.gafr;
@@ -1412,6 +1650,20 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_mcp_regs.telecom_tx_fifo_count));
 	m_mcp_regs.telecom_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_telecom_tx_callback), this));
 
+	save_item(NAME(m_ssp_regs.sscr0));
+	save_item(NAME(m_ssp_regs.sscr1));
+	save_item(NAME(m_ssp_regs.sssr));
+	save_item(NAME(m_ssp_regs.rx_fifo));
+	save_item(NAME(m_ssp_regs.rx_fifo_read_idx));
+	save_item(NAME(m_ssp_regs.rx_fifo_write_idx));
+	save_item(NAME(m_ssp_regs.rx_fifo_count));
+	m_ssp_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_rx_callback), this));
+	save_item(NAME(m_ssp_regs.tx_fifo));
+	save_item(NAME(m_ssp_regs.tx_fifo_read_idx));
+	save_item(NAME(m_ssp_regs.tx_fifo_write_idx));
+	save_item(NAME(m_ssp_regs.tx_fifo_count));
+	m_ssp_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_tx_callback), this));
+
 	save_item(NAME(m_ostmr_regs.osmr));
 	save_item(NAME(m_ostmr_regs.oscr));
 	save_item(NAME(m_ostmr_regs.ossr));
@@ -1459,6 +1711,7 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_intc_regs.icpr));
 
 	m_gpio_out.resolve_all_safe();
+	m_ssp_out.resolve_safe();
 }
 
 void sa1110_periphs_device::device_reset()
@@ -1503,6 +1756,21 @@ void sa1110_periphs_device::device_reset()
 	m_mcp_regs.telecom_tx_fifo_write_idx = 0;
 	m_mcp_regs.telecom_tx_fifo_count = 0;
 	m_mcp_regs.telecom_tx_timer->adjust(attotime::never);
+
+	// init SSP regs
+	m_ssp_regs.sscr0 = 0;
+	m_ssp_regs.sscr1 = 0;
+	m_ssp_regs.sssr = (1 << SSSR_TNF_BIT);
+	memset(m_ssp_regs.rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.rx_fifo));
+	m_ssp_regs.rx_fifo_read_idx = 0;
+	m_ssp_regs.rx_fifo_write_idx = 0;
+	m_ssp_regs.rx_fifo_count = 0;
+	m_ssp_regs.rx_timer->adjust(attotime::never);
+	memset(m_ssp_regs.tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.tx_fifo));
+	m_ssp_regs.tx_fifo_read_idx = 0;
+	m_ssp_regs.tx_fifo_write_idx = 0;
+	m_ssp_regs.tx_fifo_count = 0;
+	m_ssp_regs.tx_timer->adjust(attotime::never);
 
 	// init OS timers
 	memset(m_ostmr_regs.osmr, 0, sizeof(uint32_t) * 4);

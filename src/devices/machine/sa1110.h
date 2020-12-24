@@ -41,10 +41,15 @@ public:
 	template <unsigned Line> void gpio_in(int state) { gpio_in(Line, state); }
 	template <unsigned Line> auto gpio_out() { return m_gpio_out[Line].bind(); }
 
+	void ssp_in(uint16_t data) { ssp_rx_fifo_push(data); }
+	auto ssp_out() { return m_ssp_out.bind(); }
+
 	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
 	void uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t mcp_r(offs_t offset, uint32_t mem_mask = ~0);
 	void mcp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ssp_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ostimer_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ostimer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -92,6 +97,15 @@ protected:
 	void mcp_codec_read(offs_t offset);
 	void mcp_codec_write(offs_t offset, uint16_t data);
 
+	TIMER_CALLBACK_MEMBER(ssp_rx_callback);
+	TIMER_CALLBACK_MEMBER(ssp_tx_callback);
+	void ssp_update_enable_state();
+	void ssp_update_rx_level();
+	void ssp_update_tx_level();
+	void ssp_rx_fifo_push(const uint16_t data);
+	void ssp_tx_fifo_push(const uint16_t data);
+	uint16_t ssp_rx_fifo_pop();
+
 	TIMER_CALLBACK_MEMBER(ostimer_tick_cb);
 	void ostimer_update_count();
 	void ostimer_update_match_timer(int channel);
@@ -125,6 +139,12 @@ protected:
 		REG_MCDR1       = (0x0000000c >> 2),
 		REG_MCDR2       = (0x00000010 >> 2),
 		REG_MCSR        = (0x00000018 >> 2),
+
+		SSP_BASE_ADDR	= 0x80070000,
+		REG_SSCR0		= (0x00000060 >> 2),
+		REG_SSCR1		= (0x00000064 >> 2),
+		REG_SSDR		= (0x0000006c >> 2),
+		REG_SSSR		= (0x00000074 >> 2),
 
 		OSTMR_BASE_ADDR	= 0x90000000,
 		REG_OSMR0       = (0x00000000 >> 2),
@@ -240,6 +260,28 @@ protected:
 		MCSR_CRC_BIT	= 13,
 		MCSR_ACE_BIT	= 14,
 		MCSR_TCE_BIT	= 15,
+
+		SSCR0_DSS_BIT	= 0,
+		SSCR0_DSS_MASK	= 0x0000000f,
+		SSCR0_FRF_BIT	= 4,
+		SSCR0_FRF_MASK	= 0x00000030,
+		SSCR0_SSE_BIT	= 7,
+		SSCR0_SCR_BIT	= 8,
+		SSCR0_SCR_MASK	= 0x0000ff00,
+
+		SSCR1_RIE_BIT	= 0,
+		SSCR1_TIE_BIT	= 1,
+		SSCR1_LBM_BIT	= 2,
+		SSCR1_SPO_BIT	= 3,
+		SSCR1_SPH_BIT	= 4,
+		SSCR1_ECS_BIT	= 5,
+
+		SSSR_TNF_BIT	= 1,
+		SSSR_RNE_BIT	= 2,
+		SSSR_BSY_BIT	= 3,
+		SSSR_TFS_BIT	= 4,
+		SSSR_RFS_BIT	= 5,
+		SSSR_ROR_BIT	= 6,
 
 		RTSR_AL_BIT		= 0,
 		RTSR_AL_MASK	= (1 << RTSR_AL_BIT),
@@ -360,6 +402,25 @@ protected:
 		emu_timer *telecom_tx_timer;
 	};
 
+	struct ssp_regs
+	{
+		uint32_t sscr0;
+		uint32_t sscr1;
+		uint32_t sssr;
+
+		uint16_t rx_fifo[8];
+		int rx_fifo_read_idx;
+		int rx_fifo_write_idx;
+		int rx_fifo_count;
+		emu_timer *rx_timer;
+
+		uint16_t tx_fifo[8];
+		int tx_fifo_read_idx;
+		int tx_fifo_write_idx;
+		int tx_fifo_count;
+		emu_timer *tx_timer;
+	};
+
 	struct ostimer_regs
 	{
 		uint32_t osmr[4];
@@ -423,6 +484,7 @@ protected:
 
 	uart_regs		m_uart_regs;
 	mcp_regs		m_mcp_regs;
+	ssp_regs		m_ssp_regs;
 	ostimer_regs	m_ostmr_regs;
 	rtc_regs		m_rtc_regs;
 	power_regs		m_power_regs;
@@ -436,6 +498,7 @@ protected:
 	optional_device<ucb1200_device> m_codec;
 
 	devcb_write_line::array<28> m_gpio_out;
+	devcb_write16 m_ssp_out;
 };
 
 DECLARE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device)
