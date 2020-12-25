@@ -18,7 +18,7 @@
 #define LOG_MCU		(1 << 1)
 #define LOG_ALL		(LOG_MCU)
 
-#define VERBOSE		(LOG_ALL)
+#define VERBOSE		(0) // (LOG_ALL)
 #include "logmacro.h"
 
 #define SA1110_CLOCK 206000000
@@ -240,8 +240,7 @@ void jornada_state::machine_start()
 {
 	save_item(NAME(m_mcu_state));
 	save_item(NAME(m_mcu_key_send_idx));
-	save_item(NAME(m_mcu_key_codes[0]));
-	save_item(NAME(m_mcu_key_codes[1]));
+	save_item(NAME(m_mcu_key_codes));
 	save_item(NAME(m_mcu_key_count));
 
 	save_item(NAME(m_eeprom_cmd));
@@ -290,10 +289,10 @@ void jornada_state::jornada720(machine_config &config)
 
 ROM_START( jorn720 )
 	ROM_REGION32_LE( 0x2000000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "jornada720.bin", 0x0000000, 0x2000000, CRC(cb47d854) SHA1(d3664b748387026987ddc71f9840ee21e5753afd) )
+	ROM_LOAD( "jornada720.bin", 0x0000000, 0x2000000, CRC(5fcd433a) SHA1(f05f7b377b582a7355bf119d74435f0ee6104cca) )
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "jorn720_eeprom.bin", 0x00, 0x80, CRC(12345678) SHA1(1234567812345678123456781234567812345678) )
+	ROM_LOAD( "jorn720_eeprom.bin", 0x00, 0x80, CRC(54ffaaff) SHA1(5b8296782b6dc1c60b80169c071fb157d0681567) )
 ROM_END
 
 } // anonymous namespace
