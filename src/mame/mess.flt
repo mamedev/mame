@@ -214,6 +214,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datacast.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp

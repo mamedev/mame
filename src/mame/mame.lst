@@ -11621,6 +11621,9 @@ thndzone4                       // MAJ (c) 1991 Data East Corporation (World) - 
 thndzonea                       // MAJ (c) 1991 Data East Corporation (World)
 thndzonej                       // MAJ (c) 1991 Data East Corporation (Japan) - Some MASK ROMS stamped MAL
 
+@source:datacast.cpp
+datacast                        //
+
 @source:datum.cpp
 datum                           // 1982
 

@@ -4404,6 +4404,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/d6800.cpp",
 	MAME_DIR .. "src/mame/drivers/d6809.cpp",
 	MAME_DIR .. "src/mame/drivers/daruma.cpp",
+	MAME_DIR .. "src/mame/drivers/datacast.cpp",
 	MAME_DIR .. "src/mame/drivers/design.cpp",
 	MAME_DIR .. "src/mame/drivers/dg680.cpp",
 	MAME_DIR .. "src/mame/drivers/diablo1300.cpp",
