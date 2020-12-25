@@ -8,7 +8,7 @@ Driver by Angelo Salese & Robbbert.
 
 TODO:
 - implement printer;
-- Challenge Golf: has gfx and input bugs (starts with home/end keys!?);
+- Challenge Golf: has gfx and (possible) input bugs;
 - Colours are incorrect
 
 Notes:
@@ -25,14 +25,40 @@ Notes:
 - To stop a cmt load, press STOP + SHIFT keys
 
 Known programs:
-- BS_BASIC V1.0
+- ABC Word Game
+- Animation Graphics
+- BS-BASIC Version 1.0
+- Cannon Ball
+- Card World
 - Challenge Golf
-- Excite Tennis
+- Champion Racer
+- Creative Graphics
+- Donjara
 - Excite Baseball
+- Excite Tennis
+- Graphics Mathematics
+- Hamburger Shop
+- Healthy Life Plan
+- Hitsujiya~i
+- Japanese Word Processor
+- Keisan Ensyu Drill
+- Mobile Suit Gundam: Battle of Luna II
+- Music Master
 - Perfect Mah-Jongg
-- Mobile Suit (says Mobil Suit on the start screen)
-- The ProWrestling
-- 3-dimension graphics
+- Printer Interface
+- Reisen (Zerosen)
+- Rengo Kantai
+- RX-78 Z-80 Personal Assembler
+- Sansu Tsuma Zuki
+- Sekigahara
+- Space Capsule
+- Space Enemy
+- Super Motocross
+- Tatakae! Ultraman
+- The Pro Wrestling
+- Yellow Cab
+- 3D Graphics
+(See hash/rx78.xml for further info on these.)
 
 ==============================================================================================================
 Summary of Monitor commands.
