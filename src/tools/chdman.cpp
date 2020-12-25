@@ -6,6 +6,7 @@
 
 ****************************************************************************/
 #include <stdio.h> // must be stdio.h and here otherwise issues with I64FMT in MINGW
+#include <dirent.h>
 
 // osd
 #include "osdcore.h"
@@ -1017,6 +1018,69 @@ static void guess_chs(std::string *filename, uint64_t filesize, int sectorsize, 
 
 
 //-------------------------------------------------
+//  reopen_chd_with_parent - find a parent chd in the
+//  directory specified
+//-------------------------------------------------
+
+static chd_error reopen_chd_with_parents(chd_file &input, const char* chd_path, const std::string parents_dirpath, bool writeable = false)
+{
+	if (!input.opened()) {
+		input.open(chd_path, writeable);
+	}
+	chd_file *parent = new chd_file;
+	chd_file *child = NULL;
+
+	DIR *dir;
+	struct dirent *entry;
+	int depth = 0;
+	std::string paths[8];
+	std::string filepath;
+	util::sha1_t parent_sha1 = input.parent_sha1();
+	chd_error err;
+	while (true)
+	{
+		dir = opendir(parents_dirpath.c_str());
+		while((entry = readdir(dir)) != NULL)
+		{
+			filepath = parents_dirpath + PATH_SEPARATOR + entry->d_name;
+			err = parent->open(filepath.c_str());
+			if (err != CHDERR_NONE)
+				continue;
+			if (parent->sha1() == parent_sha1) {
+				paths[depth] = filepath;
+				break;
+			}
+			parent->close();
+		}
+		// No parent found in parents_dirpath
+		if (!parent->opened())
+			return CHDERR_REQUIRES_PARENT;
+		if (parent->parent_sha1() == util::sha1_t::null)
+			break;
+
+		depth++;
+		// Don't dive deeper than 8 parents
+		if (depth >= 8)
+			return CHDERR_REQUIRES_PARENT;
+		parent_sha1 = parent->parent_sha1();
+		parent->close();
+	}
+	for (int d = depth-1; d >= 0; d--) {
+		child = new chd_file;
+		err = child->open(paths[d].c_str(), writeable, parent);
+		// Should not happen, unless files changed since loop above
+		if (err != CHDERR_NONE) {
+			printf("Error Loading: %d %s: %s\n", d, paths[d].c_str(), chd_file::error_string(err));
+			return err;
+		}
+		parent = child;
+	}
+	input.close();
+	input.open(chd_path, writeable, parent);
+	return CHDERR_NONE;
+}
+
+//-------------------------------------------------
 //  parse_input_chd_parameters - parse the
 //  standard set of input CHD parameters
 //-------------------------------------------------
@@ -1030,6 +1094,17 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		chd_error err = input_parent_chd.open(input_chd_parent_str->second->c_str());
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening parent CHD file (%s): %s", input_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		if (input_parent_chd.parent_sha1() != util::sha1_t::null) {
+			std::string chd_dir;
+			const size_t sep_index = input_chd_parent_str->second->rfind(PATH_SEPARATOR);
+			if (sep_index != std::string::npos)
+				chd_dir = input_chd_parent_str->second->substr(0, sep_index);
+			else
+				chd_dir = ".";
+			err = reopen_chd_with_parents(input_parent_chd, input_chd_parent_str->second->c_str(), chd_dir, writeable);
+			if (err != CHDERR_NONE)
+				report_error(1, "Error opening parent CHD file (%s): %s", input_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		}
 	}
 
 	// process input file
@@ -1039,6 +1114,17 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		chd_error err = input_chd.open(input_chd_str->second->c_str(), writeable, input_parent_chd.opened() ? &input_parent_chd : nullptr);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening CHD file (%s): %s", input_chd_str->second->c_str(), chd_file::error_string(err));
+		if (input_chd_parent_str == params.end() && input_chd.parent_sha1() != util::sha1_t::null) {
+			std::string chd_dir;
+			const size_t sep_index = input_chd_str->second->rfind(PATH_SEPARATOR);
+			if (sep_index != std::string::npos)
+				chd_dir = input_chd_str->second->substr(0, sep_index);
+			else
+				chd_dir = ".";
+			err = reopen_chd_with_parents(input_chd, input_chd_str->second->c_str(), chd_dir, writeable);
+			if (err != CHDERR_NONE)
+				report_error(1, "Error opening CHD file (%s): %s", input_chd_str->second->c_str(), chd_file::error_string(err));
+		}
 	}
 }
 
@@ -1118,6 +1204,17 @@ static std::string *parse_output_chd_parameters(const parameters_map &params, ch
 		chd_error err = output_parent_chd.open(output_chd_parent_str->second->c_str());
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening parent CHD file (%s): %s", output_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		if (output_parent_chd.parent_sha1() != util::sha1_t::null) {
+			std::string chd_dir;
+			const size_t sep_index = output_chd_parent_str->second->rfind(PATH_SEPARATOR);
+			if (sep_index != std::string::npos)
+				chd_dir = output_chd_parent_str->second->substr(0, sep_index);
+			else
+				chd_dir = ".";
+			err = reopen_chd_with_parents(output_parent_chd, output_chd_parent_str->second->c_str(), chd_dir, false);
+			if (err != CHDERR_NONE)
+				report_error(1, "Error opening parent CHD file (%s): %s", output_chd_parent_str->second->c_str(), chd_file::error_string(err));
+		}
 	}
 
 	// process output file
