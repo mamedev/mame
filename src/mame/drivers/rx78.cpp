@@ -24,41 +24,7 @@ Notes:
      obvious issues made it out the door.
 - To stop a cmt load, press STOP + SHIFT keys
 
-Known programs:
-- ABC Word Game
-- Animation Graphics
-- BS-BASIC Version 1.0
-- Cannon Ball
-- Card World
-- Challenge Golf
-- Champion Racer
-- Creative Graphics
-- Donjara
-- Excite Baseball
-- Excite Tennis
-- Graphics Mathematics
-- Hamburger Shop
-- Healthy Life Plan
-- Hitsujiya~i
-- Japanese Word Processor
-- Keisan Ensyu Drill
-- Mobile Suit Gundam: Battle of Luna II
-- Music Master
-- Perfect Mah-Jongg
-- Printer Interface
-- Reisen (Zerosen)
-- Rengo Kantai
-- RX-78 Z-80 Personal Assembler
-- Sansu Tsuma Zuki
-- Sekigahara
-- Space Capsule
-- Space Enemy
-- Super Motocross
-- Tatakae! Ultraman
-- The Pro Wrestling
-- Yellow Cab
-- 3D Graphics
-(See hash/rx78.xml for further info on these.)
+For a list of all known software and devices for the system, please see hash/rx78.xml.
 
 ==============================================================================================================
 Summary of Monitor commands.
