@@ -106,7 +106,7 @@ void datacast_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
 	map(0xc0000, 0xc0000).rw(FUNC(datacast_state::keypad_r), FUNC(datacast_state::keypad_w)).umask16(0x00ff);
-	map(0xc0080, 0xc0080).lr8([this]() { return 0xff; }, "dips"); // unknown purpose
+	map(0xc0080, 0xc0080).lr8([]() { return 0xff; }, "dips"); // unknown purpose
 	map(0xc0100, 0xc010f).noprw(); //.rw(m_saa5250, FUNC(saa5250_device::read), FUNC(saa5250_device::write)).umask16(0x00ff);
 	map(0xc0180, 0xc0180).rw(FUNC(datacast_state::i2c_r), FUNC(datacast_state::i2c_w)).umask16(0x00ff);
 	map(0xc0200, 0xc0203).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
