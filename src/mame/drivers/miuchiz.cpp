@@ -3,7 +3,12 @@
 // thanks-to: ChrisMiuchiz
 /*
 	Driver for the Miuchiz handhelds
-	CPU: ST2205U
+	CPU: ST2205U;
+		XTAL: Y1 16MHz
+		XTAL: Y2 32.768KHz
+	LCDC: ST7626 (https://www.crystalfontz.com/controllers/Sitronix/ST7626/)
+		the ST7626 is embedded into a epoxy part just below the screen glass with the flex cable attached to iter_swap
+		it has internal 98x68x16bit ram
 
 	Extremely preliminary
 	The inputs are mapped in an input array, but aren't actually hooked anywhere yet.
@@ -13,16 +18,17 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/m6502/st2205u.h"
+//include "video/st7626lcdc.h"
 #include "screen.h"
-
-namespace {
 
 // defines and logging
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
-
 #include "logmacro.h"
+
+namespace {
+
 #define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 
 // class definition
@@ -49,9 +55,15 @@ private:
 // address maps
 void miuchiz_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom().region("otp", 0);
+	map(0x0000000, 0x0003fff).rom().region("otp", 0);
+	/*
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(st7626lcdc_device::lcdc_command_w));
+	map(0x0600001, 0x0600001).w(m_lcdc, FUNC(st7626lcdc_device::lcdc_data_w));
+	*/
+	map(0x0800000, 0x09fffff).rom().region("flash", 0);
 }
 
+// flash map?
 //	map(0x01000000, 0x011fffff).rom().region("flash", 0);
 
 
@@ -66,12 +78,12 @@ static INPUT_PORTS_START( miuchiz )
     PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Menu")
     PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Upside-up")
     PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Upside-down")
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Screen-top-left")
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Screen-top-right")
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Screen-bottom-left")
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Screen-bottom-right")
+    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Screen-up-left")
+    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Screen-up-right")
+    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Screen-low-left")
+    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Screen-low-right")
     PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action")
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Mute")
+    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Mute/Pause")
     PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -85,15 +97,15 @@ u32 miuchiz_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 // machine driver
 void miuchiz_state::miuchiz(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 24000000); // clock speed is unknown, guessed 24MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &miuchiz_state::mem_map);
+	ST2205U(config, m_maincpu, XTAL(16'000'000)/2); // Y1 is a hynix HY16.000 crystal, divider is unknown. Y2 is a 32.768KHz xtal for clock
+	m_maincpu->set_addrmap(AS_DATA, &miuchiz_state::mem_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(67, 98);
-	m_screen->set_visarea(0, 67 - 1, 0, 98 - 1);
+	m_screen->set_size(68, 98);
+	m_screen->set_visarea(0, 68 - 1, 0, 98 - 1);
 	m_screen->set_screen_update(FUNC(miuchiz_state::screen_update));
 
 	/* serial hardware */
@@ -103,6 +115,7 @@ void miuchiz_state::miuchiz(machine_config &config)
 
 // rom definitions
 ROM_START( miuchiz )
+	//ROM_REGION(0x100000000, "maincpu", 0)
 	ROM_REGION(0x4000, "otp", 0) // aka 'bootrom', in on-st2205u-chip mask or flash ROM, common for all versions
 	ROM_LOAD( "otp.dat",            0x000000, 0x004000, CRC(2ff7ec96) SHA1(633365fd19a3d0f2ce56cb499b2577a5fb53e466) )
 
@@ -131,7 +144,7 @@ ROM_START( miuchiz )
 	ROM_LOAD( "yasmin_2.03.01.dat", 0x000000, 0x200000, CRC(cdc4d525) SHA1(e17f280b54647ec76deb9dab8e5fbf35f1a48266) )
 ROM_END
 
-}
+} // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME                      FLAGS
 COMP( 2006, miuchiz, 0,      0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "MIUCHIZ Virtual Companions", MACHINE_IS_SKELETON )
