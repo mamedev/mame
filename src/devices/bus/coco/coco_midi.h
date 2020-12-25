@@ -8,7 +8,7 @@
 #pragma once
 
 // device type definition
-DECLARE_DEVICE_TYPE(COCO_MIDI, device_cococart_interface)
-DECLARE_DEVICE_TYPE(DRAGON_MIDI, device_cococart_interface)
+DECLARE_DEVICE_TYPE(COCO_MIDI, coco_midi_device)
+DECLARE_DEVICE_TYPE(DRAGON_MIDI, dragon_midi_device)
 
 #endif // MAME_BUS_COCO_COCO_MIDI_H
