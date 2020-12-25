@@ -29,7 +29,7 @@
 #define LOG_MPLUG_WR	(1 << 12)
 #define LOG_ALL			(LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_LUT_RD | LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
 
-#define VERBOSE		(LOG_ALL)
+#define VERBOSE		(0) // (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SED1356, sed1356_device, "sed1356", "Epson SED1356")

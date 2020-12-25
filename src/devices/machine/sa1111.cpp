@@ -23,7 +23,7 @@
 #define LOG_CARD		(1 << 12)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
-#define VERBOSE         (LOG_ALL)
+#define VERBOSE         (0) // (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SA1111, sa1111_device, "sa1111", "Intel SA1111 Microprocessor Companion Chip")

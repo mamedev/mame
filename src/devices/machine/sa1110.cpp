@@ -23,7 +23,7 @@
 #define LOG_INTC        (1 << 12)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_SSP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
-#define VERBOSE         (LOG_ALL)
+#define VERBOSE         (0) // (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device, "sa1110_periphs", "Intel XScale SA1110 Peripherals")
