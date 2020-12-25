@@ -524,13 +524,12 @@ void southbridge_extended_device::device_add_mconfig(machine_config &config)
 	keybc.hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
 	keybc.gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
 	keybc.kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
-	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
-	PC_KBDC(config, m_pc_kbdc, 0);
+	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_pc_kbdc->out_clock_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	m_pc_kbdc->out_data_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(m_pc_kbdc);
 
 	ds12885_device &rtc(DS12885(config, "rtc"));
 	rtc.irq().set("pic8259_slave", FUNC(pic8259_device::ir0_w));
@@ -546,7 +545,7 @@ southbridge_extended_device::southbridge_extended_device(const machine_config &m
 	: southbridge_device(mconfig, type, tag, owner, clock),
 	m_keybc(*this, "keybc"),
 	m_ds12885(*this, "rtc"),
-	m_pc_kbdc(*this, "pc_kbdc")
+	m_pc_kbdc(*this, "kbd")
 {
 }
 

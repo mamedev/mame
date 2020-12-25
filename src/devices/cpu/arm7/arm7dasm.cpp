@@ -150,7 +150,8 @@ void arm7_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t op
 
 	util::stream_format(
 		stream,
-		", R%d", /* Operand 1 register, Operand 2 register, shift type */
+		",%sR%d", /* Operand 1 register, (optional) sign, Operand 2 register, shift type */
+		(opcode&0x800000)?" ":"-",
 		(opcode >> 0) & 0xf);
 
 	//check for LSL 0

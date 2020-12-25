@@ -54,7 +54,7 @@ private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	optional_device<dac_bit_interface> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	void main_map(address_map &map);
 };

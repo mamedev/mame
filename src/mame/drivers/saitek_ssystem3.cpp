@@ -308,7 +308,7 @@ void ssystem3_state::lcd2_output_w(offs_t offset, u32 data)
 
 	m_lcd2_data = u64(data) << 32 | m_lcd2_data >> 32;
 
-	if (N == 1)
+	if constexpr (N == 1)
 		lcd2_update();
 }
 

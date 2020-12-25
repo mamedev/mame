@@ -271,14 +271,26 @@ void v50_base_device::OPCN_w(u8 data)
 	// bit 6: unused
 	// bit 5: unused
 	// bit 4: unused
-	// bit 3: IRSW
-	// bit 2: IRSW
-	// bit 1: PF
-	// bit 0: PF
+	// bit 3: IRSW (INT2 source select)
+	// bit 2: IRSW (INT1 source select)
+	// bit 1: PF (DMA3/SCU I/O select)
+	// bit 0: PF (INTAK/SRDY/TOUT1 output select)
 
 	LOG("OPCN_w %02x\n", data);
-	m_OPCN = data;
-	install_peripheral_io();
+	m_OPCN = data & 0x0f;
+
+	m_tout1_callback((data & 0x03) == 0x03 ? m_tout1 : 1);
+	m_icu->ir1_w(BIT(data, 2) ? 0 : m_intp1);
+	m_icu->ir2_w(BIT(data, 3) ? m_tout1 : m_intp2);
+}
+
+WRITE_LINE_MEMBER(v50_base_device::tout1_w)
+{
+	m_tout1 = state;
+	if ((m_OPCN & 0x03) == 0x01)
+		m_tout1_callback(state);
+	if (BIT(m_OPCN, 3))
+		m_icu->ir2_w(state);
 }
 
 void v50_base_device::device_reset()
@@ -286,6 +298,7 @@ void v50_base_device::device_reset()
 	nec_common_device::device_reset();
 
 	m_OPCN = 0;
+	m_tout1_callback(1);
 }
 
 void v50_base_device::device_start()
@@ -293,9 +306,14 @@ void v50_base_device::device_start()
 	nec_common_device::device_start();
 	m_internal_io = &space(AS_INTERNAL_IO);
 
+	m_tout1_callback.resolve_safe();
+
 	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
 	save_item(NAME(m_OPCN));
+	save_item(NAME(m_tout1));
+	save_item(NAME(m_intp1));
+	save_item(NAME(m_intp2));
 }
 
 void v40_device::install_peripheral_io()
@@ -417,6 +435,21 @@ void v50_base_device::internal_port_map(address_map &map)
 
 void v50_base_device::execute_set_input(int irqline, int state)
 {
+	switch (irqline)
+	{
+	case INPUT_LINE_IRQ1:
+		m_intp1 = state;
+		if (BIT(m_OPCN, 2))
+			return;
+		break;
+
+	case INPUT_LINE_IRQ2:
+		m_intp2 = state;
+		if (BIT(m_OPCN, 3))
+			return;
+		break;
+	}
+
 	v5x_set_input(irqline, state);
 }
 
@@ -424,8 +457,13 @@ void v50_base_device::device_add_mconfig(machine_config &config)
 {
 	v5x_add_mconfig(config);
 
-	// V50 timer 0 is internally connected to INT0
+	// Timer 0 is internally connected to INT0
 	m_tcu->out_handler<0>().set(m_icu, FUNC(pic8259_device::ir0_w));
+
+	// Timer 1 is internally connected to RxC/TxC
+	m_tcu->out_handler<1>().set(m_scu, FUNC(v5x_scu_device::write_rxc));
+	m_tcu->out_handler<1>().append(m_scu, FUNC(v5x_scu_device::write_txc));
+	m_tcu->out_handler<1>().append(FUNC(v50_base_device::tout1_w));
 }
 
 device_memory_interface::space_config_vector v50_base_device::memory_space_config() const
@@ -441,6 +479,11 @@ device_memory_interface::space_config_vector v50_base_device::memory_space_confi
 v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type)
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, is_16bit)
+	, m_tout1_callback(*this)
+	, m_OPCN(0)
+	, m_tout1(false)
+	, m_intp1(false)
+	, m_intp2(false)
 {
 }
 

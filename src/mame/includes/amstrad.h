@@ -152,6 +152,7 @@ public:
 		m_io_mouse(*this,"mouse_input%u", 1U),
 		m_io_solder_links(*this, "solder_links"),
 		m_io_green_display(*this, "green_display"),
+		m_io_cheetah(*this, "cheetah"),
 		m_io_ctrltype(*this,"controller_type"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -270,6 +271,7 @@ protected:
 	optional_ioport_array<3> m_io_mouse;
 	required_ioport m_io_solder_links;
 	required_ioport m_io_green_display;
+	optional_ioport m_io_cheetah;
 	optional_ioport m_io_ctrltype;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

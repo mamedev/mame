@@ -1175,30 +1175,28 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 		std::uint8_t *dst(&textbuf[0]);
 
 		// convert keyword to ISO-8859-1
-		char const *const kwend(text.first.c_str() + text.first.length());
-		for (char const *src = text.first.c_str(); kwend > src; ++dst)
+		for (std::string_view src = text.first; !src.empty(); ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, kwend - src));
+			int const len(uchar_from_utf8(&ch, src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);
-			src += len;
+			src.remove_prefix(len);
 		}
 
 		// NUL separator between keword and text
 		*dst++ = 0;
 
 		// convert text to ISO-8859-1
-		char const *const textend(text.second.c_str() + text.second.length());
-		for (char const *src = text.second.c_str(); textend > src; ++dst)
+		for (std::string_view src = text.second; !src.empty(); ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, textend - src));
+			int const len(uchar_from_utf8(&ch, src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);
-			src += len;
+			src.remove_prefix(len);
 		}
 
 		error = write_chunk(fp, &textbuf[0], PNG_CN_tEXt, dst - &textbuf[0]);

@@ -855,6 +855,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/saa5240.h,VIDEOS["SAA5240"] = true
+--------------------------------------------------
+
+if (VIDEOS["SAA5240"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/saa5240.cpp",
+		MAME_DIR .. "src/devices/video/saa5240.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
 --------------------------------------------------
 if (VIDEOS["PWM_DISPLAY"]~=null) then
@@ -883,6 +895,17 @@ if (VIDEOS["SED1330"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/sed1330.cpp",
 		MAME_DIR .. "src/devices/video/sed1330.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sed1356.h,VIDEOS["SED1356"] = true
+--------------------------------------------------
+if (VIDEOS["SED1356"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sed1356.cpp",
+		MAME_DIR .. "src/devices/video/sed1356.h",
 	}
 end
 

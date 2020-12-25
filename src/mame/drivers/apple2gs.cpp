@@ -112,6 +112,7 @@
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grapplerplus.h"
@@ -123,6 +124,7 @@
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/sider.h"
 #include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
@@ -3065,7 +3067,7 @@ void apple2gs_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 //  printf("read_slot_rom: sl %d offs %x, cnxx_slot %d\n", slotnum, offset, m_cnxx_slot);
 
@@ -3086,7 +3088,7 @@ u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 
 void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	slow_cycle();
 
@@ -3115,7 +3117,7 @@ u8 apple2gs_state::read_int_rom(int slotbias, int offset)
 
 u8 apple2gs_state::c100_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	slow_cycle();
 
@@ -3132,7 +3134,7 @@ u8 apple2gs_state::c100_r(offs_t offset)
 
 void apple2gs_state::c100_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	accel_slot(slot);
 
@@ -3150,7 +3152,7 @@ void apple2gs_state::c300_w(offs_t offset, u8 data) { accel_slot(3 + ((offset >>
 
 u8 apple2gs_state::c400_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 4;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3166,7 +3168,7 @@ u8 apple2gs_state::c400_r(offs_t offset)
 
 void apple2gs_state::c400_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3184,19 +3186,9 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
-		else
-		{
-			rv = m_rom[offset + 0x3c800];
-		}
-
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return rv;
+		return 0xff;
 	}
 
 	if (m_cnxx_slot == CNXX_INTROM)
@@ -4773,6 +4765,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
