@@ -25,6 +25,7 @@
 
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_midi.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_psg.h"
 #include "bus/coco/coco_ram.h"
@@ -213,6 +214,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
+	device.option_add("midi", DRAGON_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("pak", COCO_PAK);
 	device.option_add("premier_fdc", PREMIER_FDC);
