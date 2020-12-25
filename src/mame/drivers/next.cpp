@@ -288,7 +288,7 @@ const char *next_state::dma_name(int slot)
 
 void next_state::dma_drq_w(int slot, bool state)
 {
-	//  fprintf(stderr, "DMA drq_w %d, %d\n", slot, state);
+	//  logerror("DMA drq_w %d, %d\n", slot, state);
 	dma_slot &ds = dma_slots[slot];
 	ds.drq = state;
 	if(state && (ds.state & DMA_ENABLE)) {
@@ -520,9 +520,9 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 {
 	const char *name = dma_name(slot);
 #if 0
-	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
+	logerror("dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
 
-	fprintf(stderr, "  ->%s%s%s%s%s%s%s\n",
+	logerror("  ->%s%s%s%s%s%s%s\n",
 			data & DMA_SETENABLE ? " enable" : "",
 			data & DMA_SETSUPDATE ? " supdate" : "",
 			data & DMA_SETREAD ? " read" : "",
@@ -553,7 +553,7 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 	}
 	if(data & DMA_SETENABLE) {
 		ds.state |= DMA_ENABLE;
-		//      fprintf(stderr, "dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
+		//      logerror("dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
 		if(ds.drq)
 			dma_drq_w(slot, ds.drq);
 	}
@@ -813,13 +813,13 @@ void next_state::ramdac_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+			logerror("ramdac_w %d, %02x\n", offset, data);
 			break;
 		}
 		break;
 
 	default:
-		fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+		logerror("ramdac_w %d, %02x\n", offset, data);
 		break;
 	}
 }
