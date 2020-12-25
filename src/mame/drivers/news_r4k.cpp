@@ -19,7 +19,13 @@
 #include "emu.h"
 
 // Devices
+// #define NO_MIPS3
+#ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
+#else
+#include "cpu/mips/r4000.h"
+#endif
+
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "machine/z80scc.h"
@@ -106,7 +112,11 @@ protected:
 
 	// Devices
 	// MIPS R4400 CPU
+	#ifndef NO_MIPS3
 	required_device<r4400be_device> m_cpu;
+	#else
+	required_device<r4400_device> m_cpu;
+	#endif
 
 	// Main memory
 	required_device<ram_device> m_ram;
@@ -185,10 +195,19 @@ void news_r4k_state::machine_common(machine_config &config)
 {
 	// CPU setup
 	// Board has a 75MHz crystal, multiplier (if any) TBD
+
+	#ifndef NO_MIPS3
 	R4400BE(config, m_cpu, XTAL_75_MHz);
+	#else
+	R4400(config, m_cpu, XTAL_75_MHz);
+	#endif
+
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
+
+	#ifndef NO_MIPS3
 	m_cpu->set_icache_size(ICACHE_SIZE);
 	m_cpu->set_dcache_size(DCACHE_SIZE);
+	#endif
 
 	// Main memory
 	RAM(config, m_ram);
@@ -351,18 +370,19 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	map(0x14400004, 0x14400007).r(FUNC(news_r4k_state::hack2));
 	map(0x14900004, 0x14900007).r(FUNC(news_r4k_state::hack3));
-	//map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
-	//map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
-	//map(0x1e380074, 0x1e380077); // Fully booted: 1e380074: 00000001
+	// map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
+	// map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
+	// map(0x1e380074, 0x1e380077); // Fully booted: 1e380074: 00000001
 	// map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) {
-	// 	return 0x80;
+	// 	 return 0x80;
 	// }));
+	// map(0x1ed60000, 0x1ed6ffff).ram();
 
 	// Unknown regions that mrom accesses
-	//map(0x1f4c0000, 0x1f4c0003).ram();
-	//map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, APBus init?
-	//map(0x1f520008, 0x1f52000B).ram();  // waiting for AP-Bus to come up?
-	//map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
+	// map(0x1f4c0000, 0x1f4c0003).ram();
+	// map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, APBus init?
+	// map(0x1f520008, 0x1f52000B).ram();  // waiting for AP-Bus to come up?
+	// map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
 }
 
 void news_r4k_state::machine_start()
