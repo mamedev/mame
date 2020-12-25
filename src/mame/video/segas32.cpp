@@ -277,11 +277,11 @@ void segas32_state::device_start()
 	m_solid_ffff = make_unique_clear<uint16_t[],0xff>(512);
 
 	/* allocate background color per line*/
-	m_prev_startx = std::make_unique<int[]>(512);
-	m_prev_endx = std::make_unique<int[]>(512);
-	m_bgcolor_line = std::make_unique<int[]>(512);
-	std::fill_n(&m_prev_startx[0], 512, -1);
-	std::fill_n(&m_prev_endx[0], 512, -1);
+	m_prev_bgstartx = std::make_unique<int32_t[]>(512);
+	m_prev_bgendx = std::make_unique<int32_t[]>(512);
+	m_bgcolor_line = std::make_unique<int32_t[]>(512);
+	std::fill_n(&m_prev_bgstartx[0], 512, -1);
+	std::fill_n(&m_prev_bgendx[0], 512, -1);
 	std::fill_n(&m_bgcolor_line[0], 512, -1);
 
 	/* initialize videoram */
@@ -301,17 +301,15 @@ void segas32_state::device_start()
 	save_item(NAME(m_sound_dummy_value));
 	save_item(NAME(m_sound_bank));
 
-	for (int i = 0; i < 2; i++)
-		save_item(NAME(m_mixer_control[i]), i);
-
+	save_item(NAME(m_mixer_control));
 	save_item(NAME(m_system32_displayenable));
 	save_item(NAME(m_system32_tilebank_external));
 	save_item(NAME(m_sprite_render_count));
 	save_item(NAME(m_sprite_control_latched));
 	save_item(NAME(m_sprite_control));
 	save_pointer(NAME(m_spriteram_32bit), 0x20000/4);
-	save_pointer(NAME(m_prev_startx), 512);
-	save_pointer(NAME(m_prev_endx), 512);
+	save_pointer(NAME(m_prev_bgstartx), 512);
+	save_pointer(NAME(m_prev_bgendx), 512);
 	save_pointer(NAME(m_bgcolor_line), 512);
 }
 
@@ -1262,13 +1260,13 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 			color = m_videoram[0x1ff5e/2] & 0x1e00;
 
 		/* if the color doesn't match, fill */
-		if ((m_bgcolor_line[y & 0x1ff] != color) || (m_prev_startx[y & 0x1ff] != cliprect.min_x) || (m_prev_endx[y & 0x1ff] != cliprect.max_x))
+		if ((m_bgcolor_line[y & 0x1ff] != color) || (m_prev_bgstartx[y & 0x1ff] != cliprect.min_x) || (m_prev_bgendx[y & 0x1ff] != cliprect.max_x))
 		{
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = color;
 
-			m_prev_startx[y & 0x1ff] = cliprect.min_x;
-			m_prev_endx[y & 0x1ff] = cliprect.max_x;
+			m_prev_bgstartx[y & 0x1ff] = cliprect.min_x;
+			m_prev_bgendx[y & 0x1ff] = cliprect.max_x;
 			m_bgcolor_line[y & 0x1ff] = color;
 		}
 	}
