@@ -73,10 +73,10 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	// Interrupts (not implemented yet)
-	void inten_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 inten_r(offs_t offset);
-	u16 intst_r(offs_t offset);
-	void intclr_w(offs_t offset, u16 data, u16 mem_mask);
+	void inten_w(offs_t offset, uint32_t data);
+	uint32_t inten_r(offs_t offset);
+	uint32_t intst_r(offs_t offset);
+	void intclr_w(offs_t offset, uint32_t data);
 
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
 	enum irq_number : unsigned
@@ -98,16 +98,13 @@ protected:
 		ABORT = 14,
 		PERR = 15,
 	}; // TODO: Needs to be scrubbed
-	template <irq_number Number>
-	void irq_w(int state);
+	template <irq_number Number> void irq_w(int state);
 	void int_check();
 
 	// Platform hardware emulation methods
 	u32 bus_error();
 	void itimer_w(u8 data);
 	void itimer(void *ptr, s32 param);
-	u8 debug_r() { return m_debug; }
-	void debug_w(u8 data);
 
 // DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -156,9 +153,8 @@ protected:
 
 	// Interrupts and other platform state
 	bool m_int_state[4];
-	u16 m_inten;
-	u16 m_intst;
-	u8 m_debug;
+	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
+	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
 	// Hardware timers
 	// emu_timer *m_itimer;
@@ -282,7 +278,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// APBus region
 	// map(0x1f520004, 0x1f520007); // WBFLUSH
 	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
-	//map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
+	// map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
 	// map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
 	// map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
 	// map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
@@ -292,14 +288,17 @@ void news_r4k_state::cpu_map(address_map &map)
 	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
 	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
-	// Serial port
-	map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff); // SCCPORT0A
+	// ESCC (serial) mapping
+	map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff);
 
 	// TODO: ESCCF? ESCC FIFO?
-	// TODO: map(0x1e900000, 0x1e900000);
+	// map(0x1e900000, 0x1e900000);
 
-	// Sonic network controller (https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD)
-	// map(0x1e600000, 0x1e600000); // TODO: this (see https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c, https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h)
+	// Sonic network controller 
+	// Potential references: https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD
+	//						 https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c
+	//                       https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h
+	// map(0x1e600000, 0x1e600000);
 
 	// DMAC3 DMA Controller 0
 	// map(0x1e200000, 0x1e20000f); // End addr meeds confirmation
@@ -319,14 +318,12 @@ void news_r4k_state::cpu_map(address_map &map)
 	// spifi controller 2 (scsi bus 1)
 	// map(0x1e380000, 0x1e380000);
 
-	// ms (mouse)
-	// map(0x1f900014, 0x1f900014);
+	// HID
+	// map(0x1f900000, 0x1f900000); // kb (keyboard)
+	// map(0x1f900014, 0x1f900014); // ms (mouse)
 
 	// lp (printer port??)
 	// map(0x1ed30000, 0x1ed30000);
-
-	// kb (keyboard)
-	// map(0x1f900000, 0x1f900000);
 
 	// fd (floppy disk?)
 	// map(0x1ed20000, 0x1ed20000);
@@ -365,7 +362,6 @@ void news_r4k_state::machine_start()
 	// save_pointer(NAME(m_net_ram), 65536);
 
 	/*
-
 	save_item(NAME(m_inten));
 	save_item(NAME(m_intst));
 	save_item(NAME(m_debug));
@@ -391,7 +387,7 @@ void news_r4k_state::machine_reset()
 {
 	// TODO: what is the actual frequency of the freerunning clock?
 	// freerun_timer_val = 0;
-	//m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
+	// m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
 }
 
 void news_r4k_state::init_common()
@@ -558,48 +554,26 @@ u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	return 0;
 }
 
-void news_r4k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
+void news_r4k_state::inten_w(offs_t offset, uint32_t data)
 {
-	LOG("inten_w: Offset 0x%x, Data 0x%x, Mask 0x%x\n", offset, data, mem_mask);
-	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
-	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
-	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
-	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
-	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
-	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
-	/*
-	COMBINE_DATA(&m_inten);
-
+	LOG("inten_w: INTEN%d = 0x%x\n", offset, data);
+	m_inten[offset] = data;
 	int_check();
-    */
 }
 
-u16 news_r4k_state::inten_r(offs_t offset)
+uint32_t news_r4k_state::inten_r(offs_t offset)
 {
-	LOG("inten_r: Offset 0x%x\n", offset);
-	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
-	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
-	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
-	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
-	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
-	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
-	return m_inten;
+	LOG("inten_r: INTEN%d = 0x%x\n", offset, m_inten[offset]);
+	return m_inten[offset];
 }
 
-u16 news_r4k_state::intst_r(offs_t offset)
+uint32_t news_r4k_state::intst_r(offs_t offset)
 {
-	LOG("intst_r: Offset 0x%x\n", offset);
-	// map(0x1fa00020, 0x1fa00023).ram(); // INTST0
-	// map(0x1fa00024, 0x1fa00027).ram(); // INTST1
-	// map(0x1fa00028, 0x1fa0002b).ram(); // INTST2
-	// map(0x1fa0002c, 0x1fa0002f).ram(); // INTST3
-	// map(0x1fa00030, 0x1fa00033).ram(); // INTST4
-	// map(0x1fa00034, 0x1fa00037).ram(); // INTST5
-	return m_intst;
+	LOG("intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
+	return m_intst[offset];
 }
 
-template <news_r4k_state::irq_number Number>
-void news_r4k_state::irq_w(int state)
+template <news_r4k_state::irq_number Number> void news_r4k_state::irq_w(int state)
 {
 	/*
 	LOG("irq number %d state %d\n",  Number, state);
@@ -613,15 +587,9 @@ void news_r4k_state::irq_w(int state)
     */
 }
 
-void news_r4k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
+void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
-	LOG("intclr_w: Offset 0x%x, Data 0x%x, Mask 0x%x\n", offset, data, mem_mask);
-	// map(0x1f4e0000, 0x1f4e0003).ram(); // INTCLR0
-	// map(0x1f4e0004, 0x1f4e0007).ram(); // INTCLR1
-	// map(0x1f4e0008, 0x1f4e000b).ram(); // INTCLR2
-	// map(0x1f4e000c, 0x1f4e000f).ram(); // INTCLR3
-	// map(0x1f4e0010, 0x1f4e0013).ram(); // INTCLR4
-	// map(0x1f4e0014, 0x1f4e0017).ram(); // INTCLR5
+	LOG("intclr_w<not implemented>: INTCLR%d = 0x%x\n", offset, data);
 	/*
 	m_intst &= ~(data & mem_mask);
 
@@ -631,6 +599,7 @@ void news_r4k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
 
 void news_r4k_state::int_check()
 {
+	LOG("int_check: not implemented\n");
 	/*
 	// TODO: assume 44422222 11100000
 	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
@@ -651,10 +620,12 @@ void news_r4k_state::int_check()
 
 u32 news_r4k_state::bus_error()
 {
-#ifdef NO_MIPS3 // Is there a mips3.h device equivalent?
+#ifndef NO_MIPS3 // Is there a mips3.h device equivalent?
+	LOG("bus_error: not implemented for this CPU type\n");
+#else
 	m_cpu->bus_error();
 #endif
-	/*
+	/* NEWS r3k version:
 	if (!machine().side_effects_disabled())
 		irq_w<BERR>(ASSERT_LINE);
 	*/
