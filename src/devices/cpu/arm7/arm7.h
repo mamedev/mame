@@ -147,17 +147,35 @@ protected:
 	uint32_t m_r[/*NUM_REGS*/37];
 
 	void update_insn_prefetch(uint32_t curr_pc);
-	virtual uint16_t insn_fetch_thumb(uint32_t pc);
-	uint32_t insn_fetch_arm(uint32_t pc);
-	int get_insn_prefetch_index(uint32_t address);
+	bool insn_fetch_thumb(uint32_t pc, uint32_t &out_insn);
+	bool insn_fetch_arm(uint32_t pc, uint32_t &out_insn);
 
 	uint32_t m_insn_prefetch_depth;
 	uint32_t m_insn_prefetch_count;
 	uint32_t m_insn_prefetch_index;
 	uint32_t m_insn_prefetch_buffer[3];
 	uint32_t m_insn_prefetch_address[3];
+	bool m_insn_prefetch_valid[3];
 	const uint32_t m_prefetch_word0_shift;
 	const uint32_t m_prefetch_word1_shift;
+	int m_tlb_log;
+	int m_actual_log;
+
+	struct tlb_entry
+	{
+		bool valid;
+		uint8_t domain;
+		uint8_t access;
+		uint32_t table_bits;
+		uint32_t base_addr;
+		uint8_t type;
+	};
+	tlb_entry m_dtlb_entries[64];
+	tlb_entry m_itlb_entries[64];
+	uint8_t m_dtlb_entry_start[32];
+	uint8_t m_itlb_entry_start[32];
+	uint8_t m_dtlb_entry_index[32];
+	uint8_t m_itlb_entry_index[32];
 
 	bool m_pendingIrq;
 	bool m_pendingFiq;
@@ -235,8 +253,15 @@ protected:
 	void arm9ops_e(uint32_t insn);
 
 	void set_cpsr(uint32_t val);
-	bool arm7_tlb_translate(offs_t &addr, int flags, bool no_exception = false);
-	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
+	bool translate_vaddr_to_paddr(offs_t &addr, const int flags);
+	bool page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a);
+	bool page_table_translate(offs_t &vaddr, const int flags);
+	tlb_entry *tlb_map_entry(const offs_t vaddr, const int flags);
+	tlb_entry *tlb_probe(const offs_t vaddr, const int flags);
+	uint32_t get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, const int flags);
+	uint32_t tlb_check_permissions(tlb_entry *entry, const int flags);
+	offs_t tlb_translate(tlb_entry *entry, const offs_t vaddr);
+	uint32_t get_lvl2_desc_from_page_table(uint32_t granularity, uint32_t first_desc, uint32_t vaddr);
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
 	void update_irq_state();

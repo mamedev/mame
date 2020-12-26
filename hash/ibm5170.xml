@@ -4516,7 +4516,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="win31g" cloneof="win31">
+	<software name="win31de" cloneof="win31">
 		<description>Windows Version 3.1 (German)</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
@@ -4843,7 +4843,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wfw311g" cloneof="wfw311">
+	<software name="wfw311de" cloneof="wfw311">
 		<!-- KryoFlux dump from original disks, shows as unmodified -->
 		<description>Windows for Workgroups Version 3.11 (German)</description>
 		<year>1993</year>
@@ -6149,9 +6149,23 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- installs and runs, but MAME does not emulate a modem -->
+	<software name="aol15" supported="no">
+		<description>America Online for Windows 1.5</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="1.5" />
+		<info name="serial" value="00000926" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="America Online 00000926.img" size="1474560" crc="69790ac8" sha1="34b14ba376ca57232b3a423b18cdf6a45c9e6ae7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aol20" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
-		<description>America Online 2.0 for Windows</description>
+		<description>America Online for Windows 2.0</description>
 		<year>1994</year>
 		<publisher>America Online</publisher>
 		<info name="version" value="2.0" />
@@ -6162,12 +6176,25 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="aol30">
+	<software name="aol20mi" cloneof="aol20" supported="no">
+		<description>America Online for Windows 2.0 MI (Manual Installer)</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="2.0 MI" />
+		<info name="serial" value="00001061" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="AOL 2.0.img" size="1474560" crc="86606b15" sha1="eb953c7203363a5f173f38801d74387cee1909d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol30" supported="no">
 		<description>America Online 3.0 for Windows</description>
 		<year>1996</year>
 		<publisher>America Online</publisher>
 		<info name="version" value="3.0" />
-		<info name="serial" value="RO2286" />
+		<info name="serial" value="RO2286" /> <!-- also matches a dump from a disk labelled R01792 -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Explore for 50 Hours Free - America Online - RO2286 - For Windows Version 3.0.img" size="1474560" crc="3d10bc4a" sha1="3d2ef1dd4010a4bf29dc1fa661c0ccb1e39be558"/>
@@ -10290,6 +10317,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dogfight">
+		<description>Dogfight: 80 Years of Dogfighting (Euro)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Vektor Grafix" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk A].img" size="1474560" crc="34a6bd08" sha1="2d6df5f445641384a698bee2df0ee557237fc03f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk B].img" size="1474560" crc="b9229411" sha1="02e6874ada928283c2e9d7c38607982c63a9b01b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk C].img" size="1474560" crc="c05adb5a" sha1="4565889b40be565bb7c2e6cbb15c9144230dc37b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Dogfight [MicroProse] [1993] [3.5HD] [Disk D].img" size="1474560" crc="394de70c" sha1="30ed6f27caa0fc7ad124559b8d64982325d569d0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dogz">
 		<description>Dogz, Your Computer Pet</description>
 		<year>1995</year>
@@ -10507,6 +10561,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drgsphere">
+		<description>DragonSphere</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="Version 2.0C" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="f6462e17" sha1="e2e03c4fd8a4e9217f6d2f60e34ca3831845132b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="157cd876" sha1="425fa708f64f2134c4e8f4ee1126e2c6a1b7ddd7"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="cecd4ff4" sha1="f43eca93e92cdea865456824321daa209a90b24f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="125320f4" sha1="d215dc48b9d6ed696a1f8f4d4acbf1f4edc54e21"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="11a4a530" sha1="583a3adf9a8a9b384d132f19045f974ba91897d9"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="44b294b7" sha1="35386a32e017a40bbf73ae87d7a89a68dc4d69cb"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="DragonSphere [MicroProse] [1994] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="cb5a9cd9" sha1="0639e04d8379d1428f38d881c58950cd85b58640"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="duke">
 		<!-- Dumped via Kryoflux from an original disk, all tracks show as modified - most likely not professionally duplicated -->
 		<!-- from a registered version ordered circa 2004 -->
@@ -10569,6 +10666,32 @@ license:CC0
 		<description>Dune (3.5")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="developer" value="CRYO" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dune [Virgin] [1992] [3.5DD] [Disk 1 of 3].img" size="737280" crc="14b58699" sha1="d78147e26e9b5b8e6b14d81fd55b2811431086c7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dune [Virgin] [1992] [3.5DD] [Disk 2 of 3].img" size="737280" crc="80938bac" sha1="2e5d99a8f7166ecf25d333979ff9e63c4c9abd64"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dune [Virgin] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="ca6a8e66" sha1="ec2c28399e3e32d15595382d46ef7b8ace500cae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only two files are different from the Dune parent set ("dune.bat" and "install.exe") -->
+	<!-- dune.bat - configured for the spanish language -->
+	<!-- install.exe - the 3rd option says: "Change the hardware configuration" and the parent set in the same option says: "Change language and configuration" -->
+	<software name="dunea" cloneof="dune">
+		<description>Dune (3.5", alt)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="CRYO" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="dune_disk1.img" size="737280" crc="1538a981" sha1="aaa06cf87b769fa57018775fc76db264eae4ed24"/>
@@ -10590,6 +10713,7 @@ license:CC0
 		<description>Dune (5.25")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="developer" value="CRYO" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Dune (1992)(Virgin Games)(Disk 1 of 2).dsk" size="1228800" crc="373be931" sha1="484f3e25773caf433616f12c6b56984425270d64"/>
@@ -10603,28 +10727,86 @@ license:CC0
 	</software>
 
 	<software name="dune2">
-		<description>Dune II - The Battle for Arrakis</description>
+		<description>Dune II - The Battle for Arrakis (Euro)</description>
 		<year>1993</year>
-		<publisher>Westwood Studios</publisher>
-		<info name="version" value="1.07" />
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="V1.07" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II (USA, Europe) (3.5'') (Disk 1).img" size="1474560" crc="7c92c98b" sha1="6bc5772718d3a6f3654638dbccf4c73d1ae12034"/>
+				<rom name="Dune II - The Battle for Arrakis [Virgin] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7c92c98b" sha1="6bc5772718d3a6f3654638dbccf4c73d1ae12034"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II (USA, Europe) (3.5'') (Disk 2).img" size="1474560" crc="e6c6e1e3" sha1="71881f48bc46f4e6f401c342ce717e01dc62b9f3"/>
+				<rom name="Dune II - The Battle for Arrakis [Virgin] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="e6c6e1e3" sha1="71881f48bc46f4e6f401c342ce717e01dc62b9f3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II (USA, Europe) (3.5'') (Disk 3).img" size="1474560" crc="e0fc633a" sha1="c2085cac2df9d6f237bfe0c682bda4ec7bab2ca1"/>
+				<rom name="Dune II - The Battle for Arrakis [Virgin] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="e0fc633a" sha1="c2085cac2df9d6f237bfe0c682bda4ec7bab2ca1"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Dune II (USA, Europe) (3.5'') (Disk 4).img" size="1474560" crc="ce7a9528" sha1="955f517874554891b7ddd69c267c099659affd97"/>
+				<rom name="Dune II - The Battle for Arrakis [Virgin] [1993] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="ce7a9528" sha1="955f517874554891b7ddd69c267c099659affd97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dune2us" cloneof="dune2">
+		<description>Dune II - The Building Of A Dynasty (USA)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="6e7e728b" sha1="faf37428171731a338dd73c1cdf0d81d411bd53d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="aa1ba86b" sha1="6e720a4e85d0322b0e0a32fa0241a2b8aa4884dc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="15917fb7" sha1="14ba35a35676742f95bddb3f9cebdfb79d176c2a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- Modified root -->
+				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="5d8718b5" sha1="4aa6b229574327d420599699e1785dd674e7268d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecoquest">
+		<description>EcoQuest: The Search For Cetus</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="EcoQuest [Sierra] [1991] [3.5HD] [Disk 1 of 4] [Startup Disk].img" size="1474560" crc="86e8f34c" sha1="9443392f0ccb769231060d5f0a1ea54b220d2338"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="EcoQuest [Sierra] [1991] [3.5HD] [Disk 2 of 4] [Disk 1].img" size="1474560" crc="11192bec" sha1="8fba911b622dcc45fc435c478888e452070dfa3e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="EcoQuest [Sierra] [1991] [3.5HD] [Disk 3 of 4] [Disk 2].img" size="1474560" crc="a78322b4" sha1="3a09d7ec38b002460286c15a388c092f2569611d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="EcoQuest [Sierra] [1991] [3.5HD] [Disk 4 of 4] [Disk 3].img" size="737280" crc="60ab06db" sha1="80e3c10cd2999f443bb997e85c3141ca4470f259"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11398,7 +11580,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="goblins3g" cloneof="goblins3">
+	<software name="goblins3de" cloneof="goblins3">
 		<description>Goblins Quest 3 (Germany)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
@@ -13182,7 +13364,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="megaloge">
+	<software name="megalode">
 		<description>Mega lo Mania (Germany)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -13361,6 +13543,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="monkey2de" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5", Germany)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="v1.0D 17Feb92" />
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="972fe32e" sha1="8bcc616fa1c7c10f5907aaed1cd5bd616fdc9023"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="9892105d" sha1="3c144ffabc731cd23739bc36b427e09381658b71"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="c13e3621" sha1="6f508241b87f3593573dfe07fb28e945c6be1a55"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="eaccbf49" sha1="55186766f3953759686383cb6abfbec2e5bbc9c3"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 (Germany) [LucasArts] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="fddb2a3a" sha1="3a6abe5d401c13743a0d76ee2085945fff79e389"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monkey2k" cloneof="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
 		<year>1994</year>
@@ -13470,7 +13685,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mkg" cloneof="mk">
+	<software name="mkde" cloneof="mk">
 		<description>Mortal Kombat (Germany)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -14158,7 +14373,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="samnmaxg" cloneof="samnmax">
+	<software name="samnmaxde" cloneof="samnmax">
 		<description>Sam &amp; Max Hit the Road (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
@@ -14753,6 +14968,24 @@ license:CC0
 	</software>
 
 	<software name="specfrce">
+		<description>Special Forces (3.5")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Sleepless Knights" />
+		<info name="version" value="Version 1.00  7th August 1992" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Special Forces [MicroProse] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="6994fb27" sha1="abbb83901f041346ece08681faaae8ca8194c7c3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Special Forces [MicroProse] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="eb6bc62c" sha1="60e2f69e745c10c32d0b706e6ead3afb83474a7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specfrce525" cloneof="specfrce">
 		<description>Special Forces (5.25")</description>
 		<year>1992</year>
 		<publisher>MicroProse</publisher>
@@ -14856,9 +15089,11 @@ license:CC0
 	</software>
 
 	<software name="trek25th">
-		<description>Star Trek - 25th Anniversary</description>
+		<description>Star Trek - 25th Anniversary (USA, 5.25" HD, v1.00) (includes 'Out Of This World' demo)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
+		<info name="developer" value="Interplay" />
+		<info name="version" value="Version 1.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 1 of 5).dsk" size="1228800" crc="cb4848bc" sha1="f3c14bc156b2e2cda22cd5441d48ab4b330cf418"/>
@@ -14882,6 +15117,102 @@ license:CC0
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Star Trek - 25th Anniversary (1992)(Interplay)(Disk 5 of 5).dsk" size="1228800" crc="cb1a3a83" sha1="aa3c3fe165e8171d3dcf83dde922d64e2131b425"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek25tha" cloneof="trek25th">
+		<description>Star Trek - 25th Anniversary (3.5" DD, v1.0)</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Interplay" />
+		<info name="version" value="Version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 1 of 8].img" size="737280" crc="4d7acf14" sha1="966942257d9db3bda2eac312572b7913d838f6cf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 2 of 8].img" size="737280" crc="94632ab6" sha1="6d5489c5083d7efb95fa636c5c3027d4e17a58ad"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 3 of 8].img" size="737280" crc="00954e90" sha1="6ebb84c230ad72378990c39bb07a38030e3c0b84"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 4 of 8].img" size="737280" crc="989d7981" sha1="d1c95b55ba6bfb56ae0252c2ad69b8ee6fc276d5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 5 of 8].img" size="737280" crc="08f0e75f" sha1="6587317f005658578e28b50fed87c576240f2874"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 6 of 8].img" size="737280" crc="de5bac76" sha1="5ad18ccd9928229787aa5e9d497251c79780ce05"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 7 of 8].img" size="737280" crc="dd77b042" sha1="afafc37ba9b1640b05f1f758e86a561997b0e36b"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary [Interplay] [1992] [3.5DD] [Disk 8 of 8].img" size="737280" crc="cdbceb93" sha1="65892dbdfa353f1e0fdee64b667a49235380c72d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek25thb" cloneof="trek25th">
+		<description>Star Trek - 25th Anniversary (USA, 3.5" DD, v1.00) (includes 'Out Of This World' demo)</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Interplay" />
+		<info name="version" value="Version 1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 1 of 8].img" size="737280" crc="ca3b4ce7" sha1="9ccdaf49920750914ee281fe026134acbce4ed67"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 2 of 8].img" size="737280" crc="980dd1b0" sha1="97892246e8dc6f0d4304bf8411cc8b6d022f707b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 3 of 8].img" size="737280" crc="59e836f7" sha1="de925aa7d4c46dd0f1201b71cdf57d471b5fd9d4"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 4 of 8].img" size="737280" crc="f329ac34" sha1="28d93c5f95643afc91f4edff25fd0ed435114da8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 5 of 8].img" size="737280" crc="d4913476" sha1="f1223aa760c6fe1a783a87d7f0e30875f197c784"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 6 of 8].img" size="737280" crc="54205e1f" sha1="f7e9eacc3a84b115dabd92226ab3ee9f701d4156"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 7 of 8].img" size="737280" crc="663a386f" sha1="4c2057ef7a0c3f3d687a73347d481cb092c8c99e"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Star Trek - 25th Anniversary (USA) [Interplay] [1992] [3.5DD] [Disk 8 of 8].img" size="737280" crc="a78ac4ed" sha1="05b1e5138fdf23a25bf789b4309dbe7778422987"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16243,8 +16574,8 @@ license:CC0
 
 	<!-- Needs a drastic redump from Original Disks -->
 
-	<software name="airduel">
-		<description>Air Duel - 80 Years of Dogfighting</description>
+	<software name="airduel" cloneof="dogfight">
+		<description>Air Duel: 80 Years of Dogfighting</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">

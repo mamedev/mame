@@ -117,10 +117,10 @@ screens:
 
 ::
 
-    [MAME]> for tag, screen in pairs(manager:machine().screens) do print(tag) end
+    [MAME]> for tag, screen in pairs(manager.machine.screens) do print(tag) end
     :screen
 
-``manager:machine()`` is the root object of your currently running machine: we
+``manager.machine`` is the root object of your currently running machine: we
 will be using this often.  ``screens`` is a table with all available screens;
 most machines only have one main screen.  In our case, the main and only screen
 is tagged as ``:screen``, and we can further inspect it:
@@ -128,7 +128,7 @@ is tagged as ``:screen``, and we can further inspect it:
 ::
 
     [MAME]> -- keep a reference to the main screen in a variable
-    [MAME]> s = manager:machine().screens[":screen"]
+    [MAME]> s = manager.machine.screens[":screen"]
     [MAME]> print(s.width .. "x" .. s.height)
     320x224
 
@@ -160,7 +160,7 @@ Similarly to screens, you can inspect all the devices attached to a machine:
 
 ::
 
-    [MAME]> for tag, device in pairs(manager:machine().devices) do print(tag) end
+    [MAME]> for tag, device in pairs(manager.machine.devices) do print(tag) end
     :audiocpu
     :maincpu
     :saveram
@@ -172,7 +172,7 @@ On some of them, you can also inspect and manipulate memory and state:
 
 ::
 
-    [MAME]> cpu = manager:machine().devices[":maincpu"]
+    [MAME]> cpu = manager.machine.devices[":maincpu"]
     [MAME]> -- enumerate, read and write state registers
     [MAME]> for k, v in pairs(cpu.state) do print(k) end
     D5

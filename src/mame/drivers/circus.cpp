@@ -419,9 +419,9 @@ void circus_state::ripcord(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-ROM_START( circuso ) // older set, there exist several bootlegs identical to this set with unlabeled roms/proms; as a bootleg this was found both on a PCB and a PROMs blister, labeled 'Circus - punteggio basso' ('Circus - low scoring')
+ROM_START( circus )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(68e710ba) SHA1(63957802f8db3b4ac7bbab83376771ce1744c6b3) )
+	ROM_LOAD( "9004a.1a",   0x1000, 0x0200, CRC(7654ea75) SHA1(fa29417618157002b8ecb21f4c15104c8145a742) )
 	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
 	ROM_LOAD( "9006.3a",    0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
 	ROM_LOAD( "9007.5a",    0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
@@ -445,9 +445,9 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
-ROM_START( circus )
+ROM_START( circuso ) // older set, there exist several bootlegs identical to this set with unlabeled roms/proms; as a bootleg this was found both on a PCB and a PROMs blister, labeled 'Circus - punteggio basso' ('Circus - low scoring')
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9004a.1a",   0x1000, 0x0200, CRC(7654ea75) SHA1(fa29417618157002b8ecb21f4c15104c8145a742) )
+	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(68e710ba) SHA1(63957802f8db3b4ac7bbab83376771ce1744c6b3) )
 	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
 	ROM_LOAD( "9006.3a",    0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
 	ROM_LOAD( "9007.5a",    0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
@@ -622,8 +622,8 @@ void circus_state::init_ripcord()
 	m_game_id = 4;
 }
 
-GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
 GAMEL( 1977, circus,   0,      circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
+GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
 GAMEL( 1977, springbd, circus, circus,   circus,   circus_state, init_circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
 GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, circus_state, init_robotbwl, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL( 1979, crash,    0,      crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )

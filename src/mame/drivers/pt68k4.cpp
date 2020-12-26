@@ -85,7 +85,6 @@ TODO: 68230 device
 #define DUART2_TAG  "duart2"
 #define TIMEKEEPER_TAG  "timekpr"
 #define ISABUS_TAG "isa"
-#define KBDC_TAG "pc_kbdc"
 #define SPEAKER_TAG "speaker"
 #define WDFDC_TAG   "wdfdc"
 
@@ -412,10 +411,9 @@ void pt68k4_state::pt68k2(machine_config &config)
 
 	MC68681(config, m_duart2, 3.6864_MHz_XTAL);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(&pc_kbdc);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -453,10 +451,9 @@ void pt68k4_state::pt68k4(machine_config &config)
 
 	MC68681(config, m_duart2, XTAL(16'000'000) / 4);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(&pc_kbdc);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 

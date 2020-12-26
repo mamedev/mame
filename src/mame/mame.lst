@@ -10544,6 +10544,9 @@ cmrltv75                        // (c) 2001 Coinmaster-Gaming, Ltd.
 colorama                        // (c) 2000 Coinmaster-Gaming, Ltd.
 coloramas                       // (c) 2000 Coinmaster-Gaming, Ltd.
 
+@source:cointek.cpp
+unkct                           //
+
 @source:coleco.cpp
 coleco                          // ColecoVision (Original BIOS)
 colecop                         // Colecovision PAL (Italy)
@@ -11620,6 +11623,9 @@ thndzone                        // MAJ (c) 1991 Data East Corporation (World) - 
 thndzone4                       // MAJ (c) 1991 Data East Corporation (World) - 4 Player only
 thndzonea                       // MAJ (c) 1991 Data East Corporation (World)
 thndzonej                       // MAJ (c) 1991 Data East Corporation (Japan) - Some MASK ROMS stamped MAL
+
+@source:datacast.cpp
+datacast                        //
 
 @source:datum.cpp
 datum                           // 1982
@@ -14197,6 +14203,8 @@ atlantis                        // (c) 1981 Comsoft
 atlantis2                       // (c) 1981 Comsoft
 atlantisb                       // bootleg
 azurian                         // (c) 1982 Rait Electronics Ltd
+bagmanm2                        // (c) 1984 Valadon Automation / GIB
+bagmanmc                        // bootleg
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
 bomber                          //
@@ -14423,8 +14431,6 @@ zigzagb2                        // (c) 1982 LAX (bootleg)
 
 @source:galaxold.cpp
 4in1                            // (c) 1981 Armenia / Food and Fun
-bagmanm2                        // (c) 1984 Valadon Automation / GIB
-bagmanmc                        // bootleg
 bullsdrtg                       // 1985 Senko
 dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
@@ -17298,6 +17304,9 @@ jongkyo                         // (c) 1985 Kiwako
 
 @source:jonos.cpp
 jonos                           //
+
+@source:jornada.cpp
+jorn720                         // (c) 2000 Hewlett Packard
 
 @source:joystand.cpp
 joystand                        // 1997 Yuvo
@@ -22150,6 +22159,9 @@ greatgun                        // (c) 1983
 mazerbla                        // (c) 1983
 mazerblaa                       // (c) 1983
 
+@source:mbc020.cpp
+mbc020                          //
+
 @source:mbc200.cpp
 mbc200                          //
 
@@ -23029,8 +23041,10 @@ mkyawdim4                       // bootleg
 mkyturbo                        // hack
 mkyturboe                       // hack
 narc                            // (c) 1988 Williams
+narc1                           // (c) 1988 Williams
 narc2                           // (c) 1988 Williams
 narc3                           // (c) 1988 Williams
+narc4                           // (c) 1988 Williams
 shimpact                        // (c) 1991 Midway
 shimpactp4                      // (c) 1991 Midway
 shimpactp5                      // (c) 1991 Midway
@@ -23213,6 +23227,9 @@ spangj                          // --/--/1990 (c) 1990 Mitchell (Japan)
 
 @source:mits680b.cpp
 mits680b                        //
+
+@source:miuchiz.cpp
+miuchiz                         // (c) 2006 MGA Entertainment
 
 @source:mjkjidai.cpp
 mjkjidai                        // (c) 1986 Sanritsu
@@ -32784,6 +32801,9 @@ sforteb                         //
 sfortec                         //
 sfortec1                        //
 
+@source:novag_snova.cpp
+nsnova
+
 @source:novag_supremo.cpp
 supremo
 
@@ -35534,6 +35554,9 @@ ds2                             //
 oz750                           // 199? Sharp Wizard OZ-750
 rex6000                         //
 
+@source:rf51w14cg.cpp
+rf51w14cg                       // (c) 2003 Recreativos Franco
+
 @source:rfslots8085.cpp
 unkrfslt                        //
 
@@ -38070,6 +38093,7 @@ ikari3k                         // A7007 'IK3'(c) 1989
 ikari3u                         // A7007 'IK3'(c) 1989
 ikari3w                         // A7007 'IK3'(c) 1989
 pow                             // A7008 'DG' (c) 1988
+powa                            // A7008 'DG' (c) 1988
 powb                            // bootleg
 powj                            // A7008 'DG' (c) 1988
 searchar                        // A8007 'BH' (c) 1989
@@ -38147,9 +38171,18 @@ sorcerera                       // Sorcerer with Dreamdisk fdc
 sorcererb                       // Sorcerer with Digitrio fdc
 sorcererd                       // Sorcerer with Micropolis fdc
 
-@source:st22xx_bbl338.cpp
+@source:st2302u_bbl_rom.cpp
 bbl338
 dphh8213
+
+@source:st2302u_bbl_spi.cpp
+bbl380
+rhhc152
+ragc153
+dphh8630
+dgun2953
+supreme
+arcade10
 
 @source:storio.cpp
 innotab2                        // (c) 2011 V.Tech
@@ -41113,15 +41146,6 @@ uts20                           //
 @source:unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
-@source:unk6502_st2xxx.cpp
-bbl380
-rhhc152
-ragc153
-dphh8630
-dgun2953
-supreme
-arcade10
-
 @source:unkhorse.cpp
 unkhorse                        //
 
@@ -41730,6 +41754,7 @@ pyros                           // B25 / TP-009 (c) 1987 Taito America Corporati
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
 wardnerb                        // bootleg
 wardnerj                        // B25 / TP-009 (c) 1987 Taito Corporation (Japan)
+wardnerjb                       // bootleg
 
 @source:warpsped.cpp
 warpsped                        // 197?

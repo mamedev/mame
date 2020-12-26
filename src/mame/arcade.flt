@@ -247,6 +247,7 @@ cobra.cpp
 cocoloco.cpp
 coinmstr.cpp
 coinmvga.cpp
+cointek.cpp
 combatsc.cpp
 comebaby.cpp
 commando.cpp
@@ -1028,6 +1029,7 @@ regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
+rf51w14cg.cpp
 rfslots8085.cpp
 rfslotspcpent.cpp
 rgum.cpp

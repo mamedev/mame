@@ -1617,25 +1617,29 @@ Core State/Playback Options
 
 **-snapview** *<viewname>*
 
-    Specifies the view to use when rendering snapshots and movies.
+    Specifies the view to use when rendering snapshots and videos.  The
+    *<viewname>* does not need to be the full name of a view, MAME will choose
+    the first view with a name that has the *<viewname>* as a prefix.  For
+    example **-snapview "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
 
-    By default, both use a special 'internal' view, which renders a separate
-    snapshot per screen or renders movies only of the first screen.  By
-    specifying this option, you can override this default behavior and select a
-    single view that will apply to all snapshots and movies.  Note that
-    <viewname> does not need to be a perfect match; rather, it will select the
-    first view whose name matches all the characters specified by <viewname>.
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select a view
+    based on the number of emulated screens in the system, and the available
+    external and internal artwork.  MAME tries to select a view that shows all
+    emulated screens by default.
 
-    For example, **-snapview native** will match the "Native (15:14)" view even
-    though it is not a perfect match.  <viewname> can also be 'auto', which
-    selects the first view with all screens present.
+    If the *<viewname>* is ``native``, MAME uses special internal view to save a
+    separate snapshot for each visible emulated screen, or to record a video for
+    the first visible screen only.  The snapshot(s) or video will have the same
+    resolution as the emulated screen(s) with no artwork elements drawn or
+    effects applied.
 
-    The default value is ``internal``.
+    The default value is ``auto``.
 
     Example:
         .. code-block:: bash
 
-            mame64 pang -snapview pixel
+            mame64 wrecking -snapview cocktail
 
 
 .. _mame-commandline-nosnapbilinear:
@@ -1643,7 +1647,7 @@ Core State/Playback Options
 **-[no]snapbilinear**
 
     Specify if the snapshot or movie should have bilinear filtering applied.
-    Shutting this off can improve performance while recording video to a file.
+    Disabling this off can improve performance while recording video to a file.
 
     The default is ON (**-snapbilinear**).
 
@@ -2402,18 +2406,23 @@ Core Per-Window Options
 
 **-view3** *<viewname>*
 
-    Specifies the initial view setting for each window.  The *<viewname>* does
-    not need to be a perfect match; rather, it will select the first view whose
-    name matches all the characters specified by *<viewname>*.  For example,
-    **-view native** will match the "*Native (15:14)*" view even though it is
-    not a perfect match.  The value ``auto`` is also supported, and requests
-    that MAME perform a default selection.
+    Specifies the initial view setting for each window/screen.  The *<viewname>*
+    does not need to be the full name of a view, MAME will choose the first view
+    with a name that has the *<viewname>* as a prefix.  For example
+    **-view "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
+
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select views
+    based on the number of emulated screens in the system, the number of
+    windows/screens MAME is using, and the available external and internal
+    artwork.  MAME tries to select views so that all emulated screens are
+    visible by default.
 
     The default value for these options is ``auto``.
 
     The **-view0**, **-view1**, **-view2**, **-view3** parameters apply to the
-    specific window.  The **-view** parameter applies to all windows. The
-    window-specific options override values from the all window option.
+    specific window.  The **-view** parameter applies to all windows.  The
+    window-specific options override values from the all windows option.
 
     Example:
         .. code-block:: bash

@@ -12,7 +12,7 @@ exports.author = { name = "Carl" }
 local timer = exports
 
 function timer.startplugin()
-	local dir = emu.subst_env(manager:options().entries.homepath:value())
+	local dir = emu.subst_env(manager.options.entries.homepath:value())
 	local timer_db = dir .. "/timer/timer.db"
 	local timer_started = false
 	local total_time = 0

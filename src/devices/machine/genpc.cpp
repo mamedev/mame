@@ -268,7 +268,7 @@ WRITE_LINE_MEMBER( ibm5150_mb_device::keyboard_clock_w )
 		m_ppi_shift_register |= m_ppi_data_signal << 7;
 
 		m_pic8259->ir1_w(m_ppi_shift_enable);
-		m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+		m_kbddata_callback(!m_ppi_shift_enable);
 	}
 }
 
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER( ec1841_mb_device::keyboard_clock_w )
 		m_ppi_shift_register |= m_ppi_data_signal << 7;
 
 		m_pic8259->ir1_w(m_ppi_shift_enable);
-		m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+		m_kbddata_callback(!m_ppi_shift_enable);
 	}
 }
 
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 		m_ppi_shift_register |= m_ppi_data_signal << 7;
 
 		m_pic8259->ir1_w(m_ppi_shift_enable);
-		m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+		m_kbddata_callback(!m_ppi_shift_enable);
 	}
 }
 
@@ -380,9 +380,9 @@ void ibm5160_mb_device::pc_ppi_portb_w(uint8_t data)
 		m_pic8259->ir1_w(m_ppi_shift_enable);
 	}
 
-	m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+	m_kbddata_callback(!m_ppi_shift_enable);
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
+	m_kbdclk_callback(m_ppi_clock_signal);
 }
 
 
@@ -450,7 +450,7 @@ void ibm5160_mb_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set(FUNC(ibm5160_mb_device::pic_int_w));
 
-	I8255A(config, m_ppi8255, 0);
+	I8255A(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(ibm5160_mb_device::pc_ppi_porta_r));
 	m_ppi8255->out_pb_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portc_r));
@@ -468,10 +468,6 @@ void ibm5160_mb_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq2_callback().set(m_dma8237, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(ibm5160_mb_device::iochck_w));
-
-	PC_KBDC(config, m_pc_kbdc, 0);
-	m_pc_kbdc->out_clock_cb().set(FUNC(ibm5160_mb_device::keyboard_clock_w));
-	m_pc_kbdc->out_data_cb().set(FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -540,10 +536,11 @@ ibm5160_mb_device::ibm5160_mb_device(
 	, m_ppi8255(*this, "ppi8255")
 	, m_speaker(*this, "speaker")
 	, m_isabus(*this, "isa")
-	, m_pc_kbdc(*this, "pc_kbdc")
 	, m_ram(*this, ":" RAM_TAG)
 	, m_int_callback(*this)
 	, m_nmi_callback(*this)
+	, m_kbdclk_callback(*this)
+	, m_kbddata_callback(*this)
 {
 }
 
@@ -568,6 +565,8 @@ void ibm5160_mb_device::device_resolve_objects()
 {
 	m_int_callback.resolve_safe();
 	m_nmi_callback.resolve_safe();
+	m_kbdclk_callback.resolve_safe();
+	m_kbddata_callback.resolve_safe();
 }
 
 
@@ -627,8 +626,6 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 void ibm5150_mb_device::device_add_mconfig(machine_config &config)
 {
 	ibm5160_mb_device::device_add_mconfig(config);
-
-	subdevice<pc_kbdc_device>("pc_kbdc")->out_clock_cb().set(FUNC(ibm5150_mb_device::keyboard_clock_w));
 
 	m_ppi8255->out_pb_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portc_r));
@@ -787,9 +784,9 @@ void ibm5150_mb_device::pc_ppi_portb_w(uint8_t data)
 		m_pic8259->ir1_w(m_ppi_shift_enable);
 	}
 
-	m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+	m_kbddata_callback(!m_ppi_shift_enable);
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
+	m_kbdclk_callback(m_ppi_clock_signal);
 }
 
 //**************************************************************************
@@ -920,8 +917,6 @@ void ec1841_mb_device::device_add_mconfig(machine_config &config)
 
 	m_ppi8255->out_pb_callback().set(FUNC(ec1841_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ec1841_mb_device::pc_ppi_portc_r));
-
-	subdevice<pc_kbdc_device>("pc_kbdc")->out_clock_cb().set(FUNC(ec1841_mb_device::keyboard_clock_w));
 }
 
 static INPUT_PORTS_START( ec1841_mb )
@@ -1005,9 +1000,9 @@ void ec1841_mb_device::pc_ppi_portb_w(uint8_t data)
 		m_pic8259->ir1_w(m_ppi_shift_enable);
 	}
 
-	m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+	m_kbddata_callback(!m_ppi_shift_enable);
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
+	m_kbdclk_callback(m_ppi_clock_signal);
 }
 
 uint8_t ec1841_mb_device::pc_ppi_portc_r()
@@ -1050,7 +1045,6 @@ void pc_noppi_mb_device::device_add_mconfig(machine_config &config)
 {
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	config.device_remove("pc_kbdc");
 	config.device_remove("ppi8255");
 }
 

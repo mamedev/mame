@@ -984,10 +984,14 @@ void running_machine::handle_saveload()
 					file.remove_on_close();
 			}
 			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
+			}
 			else
+			{
 				popmessage("Error: Failed to open file for %s operation.", opname);
+			}
 		}
 	}
 

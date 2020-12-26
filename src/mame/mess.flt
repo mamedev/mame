@@ -214,6 +214,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datacast.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
@@ -463,6 +464,7 @@ jade.cpp
 jazz.cpp
 jensen.cpp
 jonos.cpp
+jornada.cpp
 jr100.cpp
 jr200.cpp
 jtc.cpp
@@ -541,6 +543,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -605,6 +608,7 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
+miuchiz.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
@@ -684,6 +688,7 @@ novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
+novag_snova.cpp
 novag_supremo.cpp
 ns5652.cpp
 o2.cpp
@@ -948,7 +953,8 @@ spg2xx_zone.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
-st22xx_bbl338.cpp
+st2302u_bbl_rom.cpp
+st2302u_bbl_spi.cpp
 storio.cpp
 studio2.cpp
 sun1.cpp
@@ -1066,7 +1072,6 @@ unior.cpp
 unistar.cpp
 univac.cpp
 unixpc.cpp
-unk6502_st2xxx.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp

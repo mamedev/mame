@@ -282,7 +282,7 @@ bool mng_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 	if (current_frame() == 0)
 	{
 		for (auto &ent : m_info_fields)
-			pnginfo.add_text(ent.first.c_str(), ent.second.c_str());
+			pnginfo.add_text(ent.first, ent.second);
 	}
 
 	util::png_error error = util::mng_capture_frame(*m_mng_file, pnginfo, bitmap, palette_entries, palette);

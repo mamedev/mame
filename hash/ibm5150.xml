@@ -2544,6 +2544,35 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="wcsoccer">
+		<description>World Championship Soccer (5.25")</description>
+		<year>1991</year>
+		<publisher>Elite</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4a11940c" sha1="073745c4068a75728a4651d51efa9b2aed7811b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="63188d60" sha1="548afbdb42bab9b2ce8102938e7fa46ce9caf3c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcsoccer35" cloneof="wcsoccer">
+		<description>World Championship Soccer (3.5")</description>
+		<year>1991</year>
+		<publisher>Elite</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="World Championship Soccer [Elite] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="af6ecc3f" sha1="be4b5d14d6d252b033b482aa71ac64b56cac4a63"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseball">
 		<description>The World's Greatest Baseball Game</description>
 		<year>1985</year>
@@ -7622,6 +7651,127 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="altdest">
+		<description>Altered Destiny (5.25")</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 1 of 8].img" size="368640" crc="26269b65" sha1="57d9e60bc894244e7dc3a429c9fe9e65c79973b9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 2 of 8].img" size="368640" crc="ce9c45ae" sha1="949855b7d9a3daddba13f2199c5dd7b27b83efdb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 3 of 8].img" size="368640" crc="4c5dc80e" sha1="284b0e9da98371ae8532729ca824330a8ff400f9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 4 of 8].img" size="368640" crc="6d76710d" sha1="1b588f2c08053923d9b4ca543c1af2b1c0e0824f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 5 of 8].img" size="368640" crc="1cbf6d2b" sha1="27553055a013e75a918a603da4d21fa297d766e2"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 6 of 8].img" size="368640" crc="b88795f5" sha1="5fefac17c7a97a3627752760b0ae219f5f3976c8"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 7 of 8].img" size="368640" crc="0f8f36a3" sha1="55f5442cd53358e63545dbc502f0ec2ce20c4f60"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny [Accolade] [1990] [5.25DD] [Disk 8 of 8].img" size="368640" crc="102fade1" sha1="03bbc8bf38cf579b653bd9f93127efc5dea7fbe7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altdesta" cloneof="altdest">
+		<description>Altered Destiny (5.25", older)</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 1 of 8].img" size="368640" crc="ee338e24" sha1="251cb77d85cfe2ef9a20f3c2600a63f0556ad8bd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 2 of 8].img" size="368640" crc="ce9c45ae" sha1="949855b7d9a3daddba13f2199c5dd7b27b83efdb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 3 of 8].img" size="368640" crc="4c5dc80e" sha1="284b0e9da98371ae8532729ca824330a8ff400f9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 4 of 8].img" size="368640" crc="6d76710d" sha1="1b588f2c08053923d9b4ca543c1af2b1c0e0824f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 5 of 8].img" size="368640" crc="1cbf6d2b" sha1="27553055a013e75a918a603da4d21fa297d766e2"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 6 of 8].img" size="368640" crc="b88795f5" sha1="5fefac17c7a97a3627752760b0ae219f5f3976c8"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 7 of 8].img" size="368640" crc="0f8f36a3" sha1="55f5442cd53358e63545dbc502f0ec2ce20c4f60"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Altered Destiny (older) [Accolade] [1990] [5.25DD] [Disk 8 of 8].img" size="368640" crc="102fade1" sha1="03bbc8bf38cf579b653bd9f93127efc5dea7fbe7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altdest35" cloneof="altdest">
+		<description>Altered Destiny (3.5")</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Altered Destiny [Accolade] [1990] [3.5DD] [Disk 1 of 4].img" size="737280" crc="2b9d8856" sha1="521ec40a5d4c72771818579b5b678fa4c7f5b3d9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Altered Destiny [Accolade] [1990] [3.5DD] [Disk 2 of 4].img" size="737280" crc="7f0450d7" sha1="eb70a96dec1297baea5fe4c7e17fe4c7f261f85c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Altered Destiny [Accolade] [1990] [3.5DD] [Disk 3 of 4].img" size="737280" crc="98badbb9" sha1="8d05f10a24da5edc44eb44cb0ce23fed81914758"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Altered Destiny [Accolade] [1990] [3.5DD] [Disk 4 of 4].img" size="737280" crc="05264074" sha1="f4a4e64998f2a68353fadd770c661e4ae4066a65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spidermn">
 		<description>The Amazing Spider-Man</description>
 		<year>1990</year>
@@ -8041,6 +8191,22 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Battle Chess (EGA version - 2nd release) [Interplay] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="040ff059" sha1="b21954c1c0ae2e44e78f8d4d5cb955ba6f4967a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlches2">
+		<description>Battle Chess II: Chinese Chess</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Battle Chess II [Interplay] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="23afe17e" sha1="cbd4ee56c0d9a04cf1f5e4062f94d31b59579913"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Battle Chess II [Interplay] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="fabf0dfa" sha1="d7fbc5c626f2020ffbd709bd18995b61f21c40a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8892,6 +9058,43 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dicktrcs">
+		<description>Dick Tracy: The Crime-Solving Adventure</description>
+		<year>1991</year>
+		<publisher>Walt Disney Computer Software</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 1 of 6].img" size="368640" crc="e0d7efc8" sha1="53ad373ecce74a10da96ba1450482100b2a34731"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 2 of 6].img" size="368640" crc="668328bc" sha1="95b5cac2aba1f4aa3cf0589af54013fcdc207f73"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 3 of 6].img" size="368640" crc="d929159f" sha1="4f963ca78b7118675a47942b3bdf8198c89c83ff"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 4 of 6].img" size="368640" crc="7d64e652" sha1="f3961779db9133cef15dd6f7f438b832e8b4580d"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 5 of 6].img" size="368640" crc="c62a8853" sha1="d25905161b42f6b3c596f7a5fb7f84139d5670a6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dick Tracy The Crime-Solving Adventure [Disney] [1991] [5.25DD] [Disk 6 of 6].img" size="368640" crc="51dbf6d1" sha1="bd161bc26f536ab93baa633125e3f056d8f4ae2c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diehard">
 		<description>Die Hard (5.25")</description>
 		<year>1989</year>
@@ -9251,6 +9454,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Drakkhen (USA, Europe) (EGA, CGA) (5.25'') (Disk 5).img" size="368640" crc="0f814482" sha1="1f12e5315de9e3d82b74ccfeb7b3711dd6bac41e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ducktale">
+		<description>Duck Tales: The Quest for Gold</description>
+		<year>1990</year>
+		<publisher>Walt Disney Computer Software</publisher>
+		<info name="developer" value="Incredible Technologies" />
+		<info name="version" value="version 1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DuckTales - The Quest for Gold [Disney] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4dbc4e43" sha1="263c7222e77d4ac12cc38c94095fb90b3d1add70"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DuckTales - The Quest for Gold [Disney] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="5310b7e3" sha1="f0c60c11f400374b0ee63b85e95e74b901cc81bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11626,7 +11847,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="paprboy2">
+	<software name="paperbo2">
 		<description>Paperboy 2</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
@@ -12554,12 +12775,29 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="2.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994"/>
+				<rom name="SimCity Classic [Maxis] [1993] [3.5DD] [Disk 1 of 2].img" size="737280" crc="40e80233" sha1="6fc894f9e8abb25e1429d6df9aea93abfdc3c670"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893"/>
+				<rom name="SimCity Classic [Maxis] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="83292905" sha1="6512895b53e3132195b8e7b0d18391188d08ee13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityclg">
+		<description>SimCity Classic Graphics (SimCity Classic addon)</description>
+		<year>1994</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic Graphics [Maxis] [1994] [3.5DD] [Disk 1 of 2].img" size="737280" crc="3f50caad" sha1="2719e16277cec240876649246c5a79bde77c67b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic Graphics [Maxis] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e4047260" sha1="785316e028a64a31d57e352cb87a234a7ddcf742"/>
 			</dataarea>
 		</part>
 	</software>

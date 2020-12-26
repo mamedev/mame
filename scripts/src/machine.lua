@@ -985,6 +985,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/com52c50.h,MACHINES["COM52C50"] = true
+---------------------------------------------------
+
+if (MACHINES["COM52C50"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/com52c50.cpp",
+		MAME_DIR .. "src/devices/machine/com52c50.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/com8116.h,MACHINES["COM8116"] = true
 ---------------------------------------------------
 
@@ -1281,6 +1293,18 @@ if (MACHINES["F3853"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/f3853.cpp",
 		MAME_DIR .. "src/devices/machine/f3853.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/f4702.h,MACHINES["F4702"] = true
+---------------------------------------------------
+
+if (MACHINES["F4702"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/f4702.cpp",
+		MAME_DIR .. "src/devices/machine/f4702.h",
 	}
 end
 
@@ -2859,6 +2883,18 @@ if (MACHINES["SA1110"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sa1110.cpp",
 		MAME_DIR .. "src/devices/machine/sa1110.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sa1111.h,MACHINES["SA1111"] = true
+---------------------------------------------------
+
+if (MACHINES["SA1111"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sa1111.cpp",
+		MAME_DIR .. "src/devices/machine/sa1111.h",
 	}
 end
 

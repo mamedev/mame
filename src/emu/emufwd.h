@@ -52,9 +52,6 @@ class chd_file;
 // declared in unzip.h
 namespace util { class archive_file; }
 
-// declared in wavwrite.h
-struct wav_file;
-
 // declared in xmlfile.h
 namespace util::xml { class data_node; }
 

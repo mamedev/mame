@@ -15,7 +15,7 @@ function layout.startplugin()
 	local scripts = {}
 	local function prepare_layout(file, script)
 		local env = {
-			machine = manager:machine(),
+			machine = manager.machine,
 			emu = {
 				render_bounds = emu.render_bounds,
 				render_color = emu.render_color,
@@ -42,7 +42,7 @@ function layout.startplugin()
 
 	emu.register_callback(prepare_layout, "layout")
 	emu.register_frame(function()
-		if manager:machine().paused then
+		if manager.machine.paused then
 			return
 		end
 		for num, scr in pairs(scripts) do

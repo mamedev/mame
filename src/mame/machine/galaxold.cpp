@@ -74,11 +74,6 @@ MACHINE_RESET_MEMBER(galaxold_state,galaxold)
 	machine_reset_common(INPUT_LINE_NMI);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
-{
-	machine_reset_common(0);
-}
-
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(0);

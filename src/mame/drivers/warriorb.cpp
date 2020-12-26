@@ -395,7 +395,7 @@ void warriorb_state::machine_start()
 void warriorb_state::machine_reset()
 {
 	/**** mixer control enable ****/
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 }
 
 void warriorb_state::darius2d(machine_config &config)

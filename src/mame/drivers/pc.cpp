@@ -30,6 +30,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist.h"
 
 /******************************************************* Generic PC with CGA ***/
@@ -206,10 +207,12 @@ void pc_state::pccga(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
@@ -220,7 +223,9 @@ void pc_state::pccga(machine_config &config)
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -676,10 +681,12 @@ void pc_state::ibm5550(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::ibm5550_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
@@ -689,7 +696,9 @@ void pc_state::ibm5550(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -981,10 +990,12 @@ void pc_state::poisk2(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false); // FIXME: determine ISA bus clock
@@ -993,7 +1004,9 @@ void pc_state::poisk2(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -1079,10 +1092,12 @@ void pc_state::iskr3104(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr3104));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "ega", false).set_option_default_bios("ega", "iskr3104"); // FIXME: determine ISA bus clock
@@ -1091,7 +1106,9 @@ void pc_state::iskr3104(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -1162,10 +1179,12 @@ void pc_state::siemens(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(siemens));
 
 	// FIXME: determine ISA bus clock
@@ -1177,7 +1196,9 @@ void pc_state::siemens(machine_config &config)
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5150_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5150_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -1334,10 +1355,12 @@ void pc_state::zenith(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
@@ -1346,7 +1369,9 @@ void pc_state::zenith(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5150_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5150_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
@@ -1427,8 +1452,11 @@ SW1 and SW2 DIP switch blocks
 void pc_state::cadd810(machine_config &config)
 {
 	pccga(config);
-	config.device_remove("kbd");
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	auto &kbd(*subdevice<pc_kbdc_device>("kbd"));
+	kbd.option_reset();
+	pc_at_keyboards(kbd);
+	kbd.set_default_option(STR_KBD_IBM_PC_AT_101);
 }
 
 ROM_START( cadd810 )
@@ -1500,10 +1528,12 @@ void pc_state::juko16(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
@@ -1512,7 +1542,9 @@ void pc_state::juko16(machine_config &config)
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
@@ -1840,10 +1872,12 @@ void pc_state::alphatp50(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc_state::pc16_io);
 	downcast<i80186_cpu_device &>(*m_maincpu).set_irmx_irq_ack("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
@@ -1854,7 +1888,9 @@ void pc_state::alphatp50(machine_config &config)
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
@@ -2001,10 +2037,12 @@ void pc_state::modernxt(machine_config &config) // this is just to load the ROMs
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "vga", false); // FIXME: determine ISA bus clock
@@ -2014,7 +2052,9 @@ void pc_state::modernxt(machine_config &config) // this is just to load the ROMs
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K");

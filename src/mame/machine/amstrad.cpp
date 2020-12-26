@@ -2698,13 +2698,28 @@ uint8_t amstrad_state::amstrad_psg_porta_read()
 		{
 			if(m_system_type != SYSTEM_GX4000)
 			{
-				if (m_io_ctrltype.read_safe(0) == 1 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				if (m_io_ctrltype.read_safe(0) == 0 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				{
+					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0) & 0x80) | 0x7f;
+				}
+				// AMX mouse
+				if (m_io_ctrltype.read_safe(0) == 2 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
 				{
 					return m_amx_mouse_data;
 				}
-				if (m_io_ctrltype.read_safe(0) == 2 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				// Cheetah 125 Special rotational joystick
+				if (m_io_ctrltype.read_safe(0) == 4 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
 				{
-					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0) & 0x80) | 0x7f;
+					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0) & 0x80) | (m_io_cheetah->read() & 0x1f) | 0x60;
+				}
+				if (m_io_ctrltype.read_safe(0) == 4 && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 6)
+				{
+					uint8_t p = (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0));
+					if(!(m_io_cheetah->read() & 0x20))
+						p &= ~0x04;
+					if(!(m_io_cheetah->read() & 0x40))
+						p &= ~0x08;
+					return p;
 				}
 			}
 
@@ -2743,7 +2758,7 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 	if(m_system_type != SYSTEM_GX4000)
 		{
 			// update AMX mouse inputs (normally done every 1/300th of a second)
-			if (m_io_ctrltype.read_safe(0) == 1)
+			if (m_io_ctrltype.read_safe(0) == 2)
 			{
 				static uint8_t prev_x,prev_y;
 				uint8_t data_x, data_y;

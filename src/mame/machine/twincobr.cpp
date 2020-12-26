@@ -193,7 +193,6 @@ WRITE_LINE_MEMBER(twincobr_state::int_enable_w)
 
 WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 {
-	m_dsp_on = state;
 	if (state)
 	{
 		// assert the INT line to the DSP
@@ -209,11 +208,6 @@ WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
-}
-
-void twincobr_state::device_post_load()
-{
-	dsp_int_w(m_dsp_on);
 }
 
 
@@ -261,7 +255,6 @@ void twincobr_state::machine_reset()
 void twincobr_state::driver_savestate()
 {
 	save_item(NAME(m_intenable));
-	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
 	save_item(NAME(m_dsp_bio));

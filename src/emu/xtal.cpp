@@ -543,7 +543,7 @@ void XTAL::fail(double base_clock, const std::string &message)
 	else
 		full_message += util::string_format(" Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
 	full_message += util::string_format(" Context: %s\n", message);
-	fatalerror("%s\n", full_message.c_str());
+	fatalerror("%s\n", full_message);
 }
 
 /*

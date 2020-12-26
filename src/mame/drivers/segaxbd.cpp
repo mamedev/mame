@@ -526,7 +526,7 @@ void segaxbd_state::pd_0_w(uint8_t data)
 	// Output port:
 	//  D7: Amplifier mute control (1= sounding, 0= muted)
 	//  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	generic_iochip0_lamps_w(data);
 }
@@ -767,7 +767,7 @@ uint8_t segaxbd_state::lastsurv_port_r()
 
 void segaxbd_state::lastsurv_muxer_w(uint8_t data)
 {
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	m_lastsurv_mux = (data >> 5) & 3;
 	generic_iochip0_lamps_w(data & 0x9f);

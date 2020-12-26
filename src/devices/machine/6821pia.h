@@ -104,6 +104,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -175,8 +176,8 @@ private:
 	uint8_t m_out_ca2;
 	uint8_t m_ddr_a;
 	uint8_t m_ctl_a;
-	uint8_t m_irq_a1;
-	uint8_t m_irq_a2;
+	bool m_irq_a1;
+	bool m_irq_a2;
 	uint8_t m_irq_a_state;
 
 	uint8_t m_in_b;
@@ -187,8 +188,8 @@ private:
 	uint8_t m_last_out_cb2_z;
 	uint8_t m_ddr_b;
 	uint8_t m_ctl_b;
-	uint8_t m_irq_b1;
-	uint8_t m_irq_b2;
+	bool m_irq_b1;
+	bool m_irq_b2;
 	uint8_t m_irq_b_state;
 
 	// variables that indicate if access a line externally -

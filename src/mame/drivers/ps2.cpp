@@ -8,6 +8,7 @@
 #include "machine/ram.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
 
 // According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
@@ -99,7 +100,9 @@ void ps2_state::ps2m30286(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	AT_MB(config, m_mb, 0);
+	AT_MB(config, m_mb);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -110,7 +113,10 @@ void ps2_state::ps2m30286(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "ide", false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "comat", false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
+	kbd.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	kbd.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
@@ -123,7 +129,9 @@ void ps2_state::ps2386(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_32_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0);
+	AT_MB(config, m_mb);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 	at_softlists(config);
@@ -139,7 +147,10 @@ void ps2_state::ps2386(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	kbd.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	kbd.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");

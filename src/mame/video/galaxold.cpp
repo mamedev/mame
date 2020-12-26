@@ -1721,21 +1721,3 @@ uint32_t galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_in
 
 	return 0;
 }
-
-void galaxold_state::bagmanmc_modify_charcode(uint16_t *code, uint8_t x)
-{
-	*code |= (m_gfxbank[0] << 9);
-}
-
-void galaxold_state::bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	*code |= (m_gfxbank[0] << 7) | 0x40;
-}
-
-VIDEO_START_MEMBER(galaxold_state,bagmanmc)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode = &galaxold_state::bagmanmc_modify_charcode;
-	m_modify_spritecode = &galaxold_state::bagmanmc_modify_spritecode;
-}

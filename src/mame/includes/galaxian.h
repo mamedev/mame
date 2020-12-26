@@ -193,6 +193,7 @@ public:
 	void init_pacmanbl();
 	void init_tenspot();
 	void init_devilfsg();
+	void init_bagmanmc();
 	void init_zigzag();
 	void init_jumpbug();
 	void init_checkman();
@@ -363,6 +364,7 @@ public:
 	void scorpnmc(machine_config &config);
 	void ckongg(machine_config &config);
 	void ckongmc(machine_config &config);
+	void bagmanmc(machine_config &config);
 	void fourplay(machine_config &config);
 	void videight(machine_config &config);
 	void astroamb(machine_config &config);
@@ -378,6 +380,8 @@ protected:
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
 	void astroamb_map(address_map &map);
+	void bagmanmc_map(address_map &map);
+	void bagmanmc_io_map(address_map &map);
 	void bongo_map(address_map &map);
 	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);

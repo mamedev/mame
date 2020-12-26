@@ -23,6 +23,7 @@ public:
 	void vreadere(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(power_on_w);
+	DECLARE_WRITE_LINE_MEMBER(power_off_w);
 
 protected:
 	virtual void machine_start() override;
@@ -35,6 +36,8 @@ private:
 	void portc_w(u8 data);
 
 	void prog_map(address_map &map);
+
+	void palette_init(palette_device &palette);
 
 	required_device<riscii_series_device> m_maincpu;
 	required_device<epl43102_device> m_epl;
@@ -85,8 +88,12 @@ EPL43102_UPDATE_CB(vreadere_state::lcd_update)
 
 WRITE_LINE_MEMBER(vreadere_state::power_on_w)
 {
-	// state is already inverted here
-	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(vreadere_state::power_off_w)
+{
+	m_maincpu->set_input_line(riscii_series_device::PA7_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void vreadere_state::portb_w(u8 data)
@@ -120,8 +127,15 @@ void vreadere_state::prog_map(address_map &map)
 
 static INPUT_PORTS_START(vreadere)
 	PORT_START("POWER")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_TOGGLE PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_POWER_ON) PORT_WRITE_LINE_MEMBER(vreadere_state, power_on_w)
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_POWER_OFF) PORT_WRITE_LINE_MEMBER(vreadere_state, power_off_w)
 INPUT_PORTS_END
+
+void vreadere_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(131, 136, 139));
+	palette.set_pen_color(1, rgb_t(  0,   0,   0));
+}
 
 void vreadere_state::vreadere(machine_config &config)
 {
@@ -140,7 +154,7 @@ void vreadere_state::vreadere(machine_config &config)
 	screen.set_screen_update(m_epl, FUNC(epl43102_device::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", FUNC(vreadere_state::palette_init), 2);
 
 	EPL43102(config, m_epl);
 	m_epl->set_screen_update_cb(FUNC(vreadere_state::lcd_update));

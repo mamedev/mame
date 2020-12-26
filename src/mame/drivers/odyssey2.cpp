@@ -270,6 +270,7 @@ void odyssey2_state::odyssey2_palette(palette_device &palette) const
 
 void odyssey2_state::adjust_palette()
 {
+	// JO7400 has an RGB port, on other consoles it's an optional homebrew modification
 	if (ioport("CONF")->read() & 1)
 		m_i8244->i8244_palette(*m_palette);
 	else
@@ -456,7 +457,7 @@ void vpp_state::i8243_port_w(u8 data)
 	// P4,P5: color mix I8244 side (IC674)
 	// P6,P7: color mix EF9340 side (IC678)
 	u8 mask = 0xf;
-	if (~P & 1)
+	if constexpr (~P & 1)
 	{
 		data <<= 4;
 		mask <<= 4;
@@ -464,7 +465,7 @@ void vpp_state::i8243_port_w(u8 data)
 
 	m_screen->update_now();
 
-	if (P & 2)
+	if constexpr ((P & 2) != 0)
 		m_mix_i8244 = (m_mix_i8244 & ~mask) | (data & mask);
 	else
 		m_mix_ef934x = (m_mix_ef934x & ~mask) | (data & mask);

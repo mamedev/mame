@@ -459,6 +459,8 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 	m_direct_mode(false),
 
 	m_keyint(*this),
+	m_keyb_clk(*this),
+	m_keyb_data(*this),
 	m_keyboard_shift_reg(0),
 	m_keyboard_last_clock(CLEAR_LINE),
 	m_keyboard_data_in(CLEAR_LINE),
@@ -466,7 +468,6 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 
 	m_pal(*owner, GENEVE_PAL_TAG),
 	m_peribox(*owner, TI_PERIBOX_TAG),
-	m_keyb_conn(*owner, GENEVE_KEYBOARD_CONN_TAG),
 
 	m_debug(false)
 {
@@ -564,7 +565,7 @@ void geneve_gate_array_device::cru_ctrl_write(offs_t offset, uint8_t data)
 */
 WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
 {
-	m_keyb_conn->clock_write_from_mb(state);
+	m_keyb_clk(state);
 }
 
 /*
@@ -594,7 +595,7 @@ void geneve_gate_array_device::shift_reg_changed()
 	// The level of the data line is the inverse of the rightmost bit of
 	// the shift register. This means that once the start bit reaches that
 	// position, it will pull down the data line and stop the transfer.
-	m_keyb_conn->data_write_from_mb(1 - (m_keyboard_shift_reg & 1));
+	m_keyb_data(1 - (m_keyboard_shift_reg & 1));
 	m_keyint((m_keyboard_shift_reg & 1)? ASSERT_LINE : CLEAR_LINE);
 	if (m_keyboard_shift_reg & 1)
 		LOGMASKED(LOG_KEYBOARD, "Scan code complete; raise interrupt, hold down data line\n");
@@ -1082,6 +1083,8 @@ int geneve_gate_array_device::get_prefix(int lines)
 void geneve_gate_array_device::device_start()
 {
 	m_keyint.resolve_safe();
+	m_keyb_clk.resolve_safe();
+	m_keyb_data.resolve_safe();
 
 	m_geneve_mode = false;
 	m_direct_mode = true;

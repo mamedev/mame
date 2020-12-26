@@ -56,8 +56,6 @@
 #include "sound/votrax.h"
 #include "speaker.h"
 
-namespace {
-
 #include "hc110.lh"
 
 // defines
@@ -70,6 +68,8 @@ namespace {
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
+
+namespace {
 
 #define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)

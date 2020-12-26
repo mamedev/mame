@@ -886,7 +886,7 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			plugin *p = plugins.find((const char*)menu_event->itemref);
+			plugin_options::plugin *p = plugins.find((const char*)menu_event->itemref);
 			if (p)
 			{
 				p->m_start = !p->m_start;

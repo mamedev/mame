@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER(thepit_state::coin_lockout_w)
 
 WRITE_LINE_MEMBER(thepit_state::sound_enable_w)
 {
-	machine().sound().system_enable(state);
+	machine().sound().system_mute(!state);
 }
 
 WRITE_LINE_MEMBER(thepit_state::nmi_mask_w)

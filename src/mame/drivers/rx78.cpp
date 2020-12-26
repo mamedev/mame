@@ -8,7 +8,7 @@ Driver by Angelo Salese & Robbbert.
 
 TODO:
 - implement printer;
-- Challenge Golf: has gfx and input bugs (starts with home/end keys!?);
+- Challenge Golf: has gfx and (possible) input bugs;
 - Colours are incorrect
 
 Notes:
@@ -24,15 +24,7 @@ Notes:
      obvious issues made it out the door.
 - To stop a cmt load, press STOP + SHIFT keys
 
-Known programs:
-- BS_BASIC V1.0
-- Challenge Golf
-- Excite Tennis
-- Excite Baseball
-- Perfect Mah-Jongg
-- Mobile Suit (says Mobil Suit on the start screen)
-- The ProWrestling
-- 3-dimension graphics
+For a list of all known software and devices for the system, please see hash/rx78.xml.
 
 ==============================================================================================================
 Summary of Monitor commands.

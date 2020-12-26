@@ -1585,6 +1585,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/asc88.h",
 		MAME_DIR .. "src/devices/bus/isa/bblue2.cpp",
 		MAME_DIR .. "src/devices/bus/isa/bblue2.h",
+		MAME_DIR .. "src/devices/bus/isa/3xtwin.cpp",
+		MAME_DIR .. "src/devices/bus/isa/3xtwin.h",
 	}
 end
 
@@ -2393,6 +2395,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat840k_hle.h",
 		MAME_DIR .. "src/devices/bus/a2bus/byte8251.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/byte8251.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ccs7710.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ccs7710.h",
 		MAME_DIR .. "src/devices/bus/a2bus/cmsscsi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/cmsscsi.h",
 		MAME_DIR .. "src/devices/bus/a2bus/computereyes2.cpp",
@@ -2429,6 +2433,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/timemasterho.h",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.h",
+		MAME_DIR .. "src/devices/bus/a2bus/uniprint.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/uniprint.h",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
 	}
@@ -3403,6 +3409,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_midi.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_midi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_orch90.cpp",
