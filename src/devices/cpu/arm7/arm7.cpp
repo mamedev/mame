@@ -453,10 +453,10 @@ int arm7_cpu_device::detect_fault(int desc_lvl1, int ap, int flags)
 
 arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, const int flags)
 {
-	const uint32_t bucket = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
 	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
-	const uint32_t start = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_start[bucket] : m_itlb_entry_start[bucket];
-	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[bucket] : m_itlb_entry_index[bucket];
+	const uint32_t start = section << 1;
+	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
 
 	bool entry_found = false;
 
@@ -476,19 +476,19 @@ arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, c
 	}
 
 	if (flags & ARM7_TLB_ABORT_D)
-		m_dtlb_entry_index[bucket] = index;
+		m_dtlb_entry_index[section >> 1] = index;
 	else
-		m_itlb_entry_index[bucket] = index;
+		m_itlb_entry_index[section >> 1] = index;
 
 	return &entries[start + index];
 }
 
 arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_probe(const offs_t vaddr, const int flags)
 {
-	const uint32_t bucket = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
 	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
-	const uint32_t start = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_start[bucket] : m_itlb_entry_start[bucket];
-	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[bucket] : m_itlb_entry_index[bucket];
+	const uint32_t start = section << 1;
+	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
 
 	for (uint32_t i = 0; i < 2; i++)
 	{
