@@ -109,7 +109,7 @@ as well as the emulated device tree.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine()
+manager.machine
     Gets the running machine instance for the current emulation session.
 
 Methods
@@ -224,7 +224,7 @@ emulated video drawing, speed throttling, and reading host inputs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().video
+manager.machine.video
     Gets the video manager for the current emulation session.
 
 Methods
@@ -308,7 +308,7 @@ graph and coordinates sound output.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().sound
+manager.machine.sound
     Gets the sound manager for the current emulation session.
 
 Methods
@@ -360,7 +360,7 @@ can be used for interactive artwork or consumed by external programs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().output
+manager.machine.output
     Gets the output manager for the current emulation session.
 
 Methods
@@ -397,7 +397,7 @@ store for metadata from system ROM definitions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().parameters
+manager.machine.parameters
     Gets the parameters manager for the current emulation session.
 
 Methods
@@ -610,19 +610,19 @@ example this will test whether a device implements the media image interface:
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices
+manager.machine.devices
     Returns a device enumerator that will iterate over
     :ref:`devices <luareference-dev-device>` in the system.
-manager:machine().screens
+manager.machine.screens
     Returns a device enumerator that will iterate over
     :ref:`screen devices <luareference-dev-screen>` in the system.
-manager:machine().cassettes
+manager.machine.cassettes
     Returns a device enumerator that will iterate over
     :ref:`cassette image devices <luareference-dev-cass>` in the system.
-manager:machine().images
+manager.machine.images
     Returns a device enumerator that will iterate over
     :ref:`media image devices <luareference-dev-diimage>` in the system.
-manager:machine().slots
+manager.machine.slots
     Returns a device enumerator that will iterate over
     :ref:`slot devices <luareference-dev-dislot>` in the system.
 emu.device_enumerator(device, [depth])
@@ -673,10 +673,10 @@ Wraps MAME’s ``device_t`` class, which is a base of all device classes.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]
+manager.machine.devices[tag]
     Gets a device by tag relative to the root machine device, or ``nil`` if no
     such device exists.
-manager:machine().devices[tag]:subdevice(tag)
+manager.machine.devices[tag]:subdevice(tag)
     Gets a device by tag relative to another arbitrary device, or ``nil`` if no
     such device exists.
 
@@ -747,7 +747,7 @@ Wraps MAME’s ``screen_device`` class, which represents an emulated video outpu
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().screens[tag]
+manager.machine.screens[tag]
     Gets a screen device by tag relative to the root machine device, or ``nil``
     if no such device exists or it is not a screen device.
 
@@ -916,7 +916,7 @@ mechanism typically used by a home computer for program storage.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().cassettes[tag]
+manager.machine.cassettes[tag]
     Gets a cassette image device by tag relative to the root machine device, or
     ``nil`` if no such device exists or it is not a cassette image device.
 
@@ -978,7 +978,7 @@ devices that can load media image files.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().images[tag]
+manager.machine.images[tag]
     Gets an image device by tag relative to the root machine device, or ``nil``
     if no such device exists or it is not a media image device.
 
@@ -1075,7 +1075,7 @@ devices that instantiate a user-specified child device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().slots[tag]
+manager.machine.slots[tag]
     Gets an slot device by tag relative to the root machine device, or ``nil``
     if no such device exists or it is not a slot device.
 
@@ -1108,7 +1108,7 @@ supported by a :ref:`media image device <luareference-dev-diimage>`.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().images[tag].formatlist[name]
+manager.machine.images[tag].formatlist[name]
     Gets a media image format supported by a given device by name.
 
 Properties
@@ -1137,7 +1137,7 @@ configured to instantiate.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().slots[tag].options[name]
+manager.machine.slots[tag].options[name]
     Gets a slot option for a given :ref:`slot device <luareference-dev-dislot>`
     by name (i.e. the value used to select the option).
 
@@ -1187,7 +1187,7 @@ regions in a system to be enumerated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().memory
+manager.machine.memory
     Gets the global memory manager instance for the emulated system.
 
 Properties
@@ -1217,7 +1217,7 @@ belonging to a device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name]
+manager.machine.devices[tag].spaces[name]
     Gets the address space with the specified name for a given device.  Note
     that names are specific to the device type.
 
@@ -1309,7 +1309,7 @@ space.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map
+manager.machine.devices[tag].spaces[name].map
     Gets the configured address map for an address space, or ``nil`` if no map
     is configured.
 
@@ -1340,7 +1340,7 @@ address map.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map.entries[index]
+manager.machine.devices[tag].spaces[name].map.entries[index]
     Gets an entry from the configured map for an address space.
 
 Properties
@@ -1384,9 +1384,9 @@ handlers in address maps.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map.entries[index].read
+manager.machine.devices[tag].spaces[name].map.entries[index].read
     Gets the read handler data for an address map entry.
-manager:machine().devices[tag].spaces[name].map.entries[index].write
+manager.machine.devices[tag].spaces[name].map.entries[index].write
     Gets the write handler data for an address map entry.
 
 Properties
@@ -1414,10 +1414,10 @@ Wraps MAME’s ``memory_share`` class, representing a named allocated memory zon
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().memory.shares[tag]
+manager.machine.memory.shares[tag]
     Gets a memory share by absolute tag, or ``nil`` if no such memory share
     exists.
-manager:machine().devices[tag]:memshare(tag)
+manager.machine.devices[tag]:memshare(tag)
     Gets a memory share by tag relative to a device, or ``nil`` if no such
     memory share exists.
 
@@ -1464,10 +1464,10 @@ indirection.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().memory.banks[tag]
+manager.machine.memory.banks[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory bank
     exists.
-manager:machine().devices[tag]:membank(tag)
+manager.machine.devices[tag]:membank(tag)
     Gets a memory region by tag relative to a device, or ``nil`` if no such
     memory bank exists.
 
@@ -1490,10 +1490,10 @@ read-only data like ROMs or the result of fixed decryptions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().memory.regions[tag]
+manager.machine.memory.regions[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory region
     exists.
-manager:machine().devices[tag]:memregion(tag)
+manager.machine.devices[tag]:memregion(tag)
     Gets a memory region by tag relative to a device, or ``nil`` if no such
     memory region exists.
 
@@ -1549,7 +1549,7 @@ ports and handles input configuration.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport
+manager.machine.ioport
     Gets the global I/O port manager instance for the emulated machine.
 
 Methods
@@ -1591,7 +1591,7 @@ keypad inputs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport.natkeyboard
+manager.machine.ioport.natkeyboard
     Gets the global natural keyboard manager instance for the emulated machine.
 
 Methods
@@ -1655,7 +1655,7 @@ Represents a keyboard or keypad input device managed by the
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport.natkeyboard.keyboards[tag]
+manager.machine.ioport.natkeyboard.keyboards[tag]
     Gets the keyboard input device with the specified tag, or ``nil`` if the tag
     does not correspond to a keyboard input device.
 
@@ -1691,10 +1691,10 @@ Wraps MAME’s ``ioport_port`` class, representing an emulated I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport.ports[tag]
+manager.machine.ioport.ports[tag]
     Gets an emulated I/O port by absolute tag, or ``nil`` if the tag does not
     correspond to an I/O port.
-manager:machine().devices[devtag]:ioport(porttag)
+manager.machine.devices[devtag]:ioport(porttag)
     Gets an emulated I/O port by tag relative to a device, or ``nil`` if no such
     I/O port exists.
 
@@ -1737,9 +1737,9 @@ Wraps MAME’s ``ioport_field`` class, representing a field within an I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport.ports[tag]:field[mask]
+manager.machine.ioport.ports[tag]:field[mask]
     Gets a field for the given port by bit mask.
-manager:machine().ioport.ports[tag].fields[name]
+manager.machine.ioport.ports[tag].fields[name]
     Gets a field for the given port by display name.
 
 Methods
@@ -1860,7 +1860,7 @@ port field.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().ioport.ports[tag]:field(mask).live
+manager.machine.ioport.ports[tag]:field(mask).live
     Gets the live state for an I/O port field.
 
 Properties
@@ -1880,7 +1880,7 @@ whether configured inputs are active.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input
+manager.machine.input
     Gets the global input manager instance for the emulated system.
 
 Methods
@@ -1955,12 +1955,12 @@ activated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input:axis_code_poller()
+manager.machine.input:axis_code_poller()
     Returns an input code poller that polls for analog inputs being activated.
-manager:machine().input:switch_code_poller()
+manager.machine.input:switch_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated.
-manager:machine().input:keyboard_code_poller()
+manager.machine.input:keyboard_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated, only considering keyboard input devices.
 
@@ -1986,10 +1986,10 @@ assign host input combinations to emulated inputs and other actions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input:axis_sequence_poller()
+manager.machine.input:axis_sequence_poller()
     Returns an input sequence poller for assigning host inputs to an analog
     input.
-manager:machine().input:switch_sequence_poller()
+manager.machine.input:switch_sequence_poller()
     Returns an input sequence poller for assigning host inputs to a switch
     input.
 
@@ -2029,7 +2029,7 @@ devices (e.g. keyboards or joysticks).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input.device_classes[name]
+manager.machine.input.device_classes[name]
     Gets an input device class by name.
 
 Properties
@@ -2057,7 +2057,7 @@ Wraps MAME’s ``input_device`` class, representing a host input device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input.device_classes[name].devices[index]
+manager.machine.input.device_classes[name].devices[index]
     Gets a specific host input device.
 
 Properties
@@ -2086,7 +2086,7 @@ a key, button, or axis).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().input.device_classes[name].devices[index].items[id]
+manager.machine.input.device_classes[name].devices[index].items[id]
     Gets an individual host input item.  The item ID is an enumerated value.
 
 Properties
@@ -2119,7 +2119,7 @@ Wraps MAME’s ``ui_input_manager`` class, which is used for high-level input.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().uiinput
+manager.machine.uiinput
     Gets the global UI input manager instance for the machine.
 
 Methods
@@ -2287,7 +2287,7 @@ and textures.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().render
+manager.machine.render
     Gets the global render manager instance for the emulation session.
 
 Properties
@@ -2320,13 +2320,13 @@ screenshots.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().render.targets[index]
+manager.machine.render.targets[index]
     Gets a render target by index.
-manager:machine().render.ui_target
+manager.machine.render.ui_target
     Gets the render target used to display the user interface (including menus,
     sliders and pop-up messages).  This is usually the first host window or
     screen.
-manager:machine().video.snapshot_target
+manager.machine.video.snapshot_target
     Gets the render target used to produce snapshots and video recordings.
 
 Properties
@@ -2384,10 +2384,10 @@ Wraps MAME’s ``render_container`` class.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().render.ui_container
+manager.machine.render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
-manager:machine().screens[tag].container
+manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
 
 Properties
@@ -2426,7 +2426,7 @@ adjustments applied to a
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().screens[tag].container
+manager.machine.screens[tag].container
     Gets the current container user settings for a given screen.
 
 Properties
@@ -2514,7 +2514,7 @@ Instantiation
 
 Layout scripts generally
 
-manager:machine().render.targets[index].current_view
+manager.machine.render.targets[index].current_view
     Gets the currently selected view for a given render target.
 
 Methods
@@ -2697,7 +2697,7 @@ the debugger.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().debugger
+manager.machine.debugger
     Returns the global debugger manager instance, or ``nil`` if the debugger is
     not enabled.
 
@@ -2736,7 +2736,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug()
+manager.machine.devices[tag]:debug()
     Returns the debugger interface for an emulated CPU device, or ``nil`` if the
     device is not a CPU.
 
@@ -2821,7 +2821,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug():bplist()[bp]
+manager.machine.devices[tag]:debug():bplist()[bp]
     Gets the specified breakpoint for an emulated CPU device, or ``nil`` if no
     breakpoint corresponds to the specified index.
 
@@ -2855,7 +2855,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug():wplist(space)[wp]
+manager.machine.devices[tag]:debug():wplist(space)[wp]
     Gets the specified watchpoint for an address space of an emulated CPU
     device, or ``nil`` if no watchpoint in the address space corresponds to the
     specified index.
