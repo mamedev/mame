@@ -475,13 +475,14 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t x = tile_index & 0x1f;
+	uint8_t y = tile_index >> 5;
 
 	uint16_t code = videoram[tile_index];
 	uint8_t attrib = m_spriteram[x*2+1];
 	uint8_t color = attrib & 7;
 
 	if (m_extend_tile_info_ptr != nullptr)
-		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x);
+		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x, y);
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -1242,7 +1243,7 @@ void galaxian_state::theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &c
  *************************************/
 
 /*** generic ***/
-void galaxian_state::upper_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::upper_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	/* tiles are in the upper half of a larger ROM */
 	*code += 0x100;
@@ -1256,7 +1257,7 @@ void galaxian_state::upper_extend_sprite_info(const uint8_t *base, uint8_t *sx, 
 
 
 /*** Frogger ***/
-void galaxian_state::frogger_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::frogger_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
 }
@@ -1268,7 +1269,7 @@ void galaxian_state::frogger_extend_sprite_info(const uint8_t *base, uint8_t *sx
 
 
 /*** Ghostmuncher Galaxian ***/
-void galaxian_state::gmgalax_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::gmgalax_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= m_gfxbank[0] << 9;
 //  *color |= m_gfxbank[0] << 3;
@@ -1282,7 +1283,7 @@ void galaxian_state::gmgalax_extend_sprite_info(const uint8_t *base, uint8_t *sx
 
 
 /*** Pisces ***/
-void galaxian_state::pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= m_gfxbank[0] << 8;
 }
@@ -1294,7 +1295,7 @@ void galaxian_state::pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx,
 
 
 /*** Mighty Monkey ***/
-void galaxian_state::mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= m_gfxbank[0] << 8 | m_gfxbank[2] << 9;
 }
@@ -1306,7 +1307,7 @@ void galaxian_state::mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *s
 
 
 /*** Batman Part 2 ***/
-void galaxian_state::batman2_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::batman2_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	if (*code & 0x80)
 		*code |= m_gfxbank[0] << 8;
@@ -1314,7 +1315,7 @@ void galaxian_state::batman2_extend_tile_info(uint16_t *code, uint8_t *color, ui
 
 
 /*** Moon Cresta ***/
-void galaxian_state::mooncrst_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::mooncrst_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	if (m_gfxbank[2] && (*code & 0xc0) == 0x80)
 		*code = (*code & 0x3f) | (m_gfxbank[0] << 6) | (m_gfxbank[1] << 7) | 0x0100;
@@ -1328,7 +1329,7 @@ void galaxian_state::mooncrst_extend_sprite_info(const uint8_t *base, uint8_t *s
 
 
 /*** Moon Quasar ***/
-void galaxian_state::moonqsr_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::moonqsr_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= (attrib & 0x20) << 3;
 }
@@ -1340,7 +1341,7 @@ void galaxian_state::moonqsr_extend_sprite_info(const uint8_t *base, uint8_t *sx
 
 
 /*** Moon Shuttle ***/
-void galaxian_state::mshuttle_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::mshuttle_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= (attrib & 0x30) << 4;
 }
@@ -1364,7 +1365,7 @@ void galaxian_state::calipso_extend_sprite_info(const uint8_t *base, uint8_t *sx
 
 
 /*** Jumpbug ***/
-void galaxian_state::jumpbug_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::jumpbug_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	if ((*code & 0xc0) == 0x80 && (m_gfxbank[2] & 0x01))
 		*code += 128 + (( m_gfxbank[0] & 0x01) << 6) +
@@ -1382,6 +1383,62 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
 	}
 }
 
+void galaxian_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y) // should be in namenayo_state
+{
+	// main game display
+	if ((attrib & 0x01) == 0x00)
+	{
+		int attr = m_exattrram[y & 0x1f];
+		*code += ((attr & 0x38) >> 3) * 0x100;
+		*color = attr & 0x07;
+	}
+	// status bar
+	else
+	{
+		// course map
+		if ((attrib & 0xfe) == 0x20)
+			*code += 0x400;
+	}
+}
+
+void galaxian_state::namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	if (base[2] & 0x08)
+		*code += 0x40;
+
+	// sprite colours are from the 2nd PROM
+	*color += 8;
+}
+
+void namenayo_state::namenayo_unk_d800_w(uint8_t data)
+{
+	// seems to be connected to scroll position?
+	// popmessage("namenayo_unk_d800_w %02x", data);
+}
+
+
+void galaxian_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	rectangle draw;
+
+	if (m_flipscreen_x)
+	{
+		draw = cliprect;
+		draw.min_x = std::max(draw.min_x, 72 * m_x_scale);
+	}
+	else
+	{
+		draw = cliprect;
+		draw.max_x = std::min(draw.max_x, 184 * m_x_scale - 1);
+	}
+
+	// draw an opaque copy of the tilemap in part of the screen to ensure some of the graphics are correct
+	// this can't extend past the playfield or you get unwanted fill near the status bar
+	// this might not be 100% how the hardware works.
+	m_bg_tilemap->draw(*m_screen, bitmap, draw, TILEMAP_DRAW_OPAQUE, 0);
+}
 
 
 /*************************************
@@ -1408,7 +1465,7 @@ void galaxian_state::fourplay_rombank_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void galaxian_state::videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x)
+void galaxian_state::videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= (m_gfxbank[0] << 8);
 	*color |= (m_gfxbank[4] << 3);
@@ -1457,3 +1514,9 @@ void galaxian_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 		galaxian_gfxbank_w( 0, data+4 );
 }
 
+void namenayo_state::namenayo_extattr_w(offs_t offset, uint8_t data)
+{
+	m_screen->update_partial(m_screen->vpos());
+	m_exattrram[offset] = data;
+	m_bg_tilemap->mark_all_dirty();
+}
