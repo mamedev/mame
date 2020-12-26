@@ -10544,6 +10544,9 @@ cmrltv75                        // (c) 2001 Coinmaster-Gaming, Ltd.
 colorama                        // (c) 2000 Coinmaster-Gaming, Ltd.
 coloramas                       // (c) 2000 Coinmaster-Gaming, Ltd.
 
+@source:cointek.cpp
+unkct                           //
+
 @source:coleco.cpp
 coleco                          // ColecoVision (Original BIOS)
 colecop                         // Colecovision PAL (Italy)
