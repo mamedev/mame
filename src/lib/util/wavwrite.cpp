@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <new>
+#include <string>
 #include <vector>
 
 
