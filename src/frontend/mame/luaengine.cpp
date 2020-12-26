@@ -717,7 +717,7 @@ void lua_engine::initialize()
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
 	emu["romname"] = [this] () { return machine().basename(); };
 	emu["softname"] = [this] () { return machine().options().software_name(); };
-	emu["keypost"] = [this] (const char *keys) { machine().ioport().natkeyboard().post_utf8(keys); };
+	emu["keypost"] = [this] (const char *keys) { machine().natkeyboard().post_utf8(keys); };
 	emu["time"] = [this] () { return machine().time().as_double(); };
 	emu["start"] =
 		[this](const char *driver)
@@ -1287,6 +1287,7 @@ void lua_engine::initialize()
 				else
 					return sol::lua_nil;
 			});
+	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
 	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);

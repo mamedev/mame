@@ -109,7 +109,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	if (machine().ioport().natkeyboard().keyboard_count())
+	if (machine().natkeyboard().keyboard_count())
 		item_append(_("Keyboard Mode"), 0, (void *)KEYBOARD_MODE);
 
 	item_append(_("Slider Controls"), 0, (void *)SLIDERS);

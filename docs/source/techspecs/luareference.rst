@@ -183,6 +183,9 @@ machine.render (read-only)
 machine.debugger (read-only)
     The :ref:`debugger manager <luareference-debug-manager>` for the current
     emulation session, or ``nil`` if the debugger is not enabled.
+machine.natkeyboard (read-only)
+    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
+    for controlling keyboard and keypad input to the emulated system.
 machine.options (read-only)
     The user-specified :ref:`options <luareference-core-emuopts>` for the
     current emulation session.
@@ -1596,9 +1599,6 @@ ioport.ports[]
     Gets the emulated :ref:`I/O ports <luareference-input-ioport>` in the
     system.  Keys are absolute tags.  The ``at`` and ``index_of`` methods have
     O(n) complexity; all other supported operations have O(1) complexity.
-ioport.natkeyboard
-    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
-    for controlling keyboard and keypad input to the emulated system.
 
 .. _luareference-input-natkbd:
 
@@ -1611,7 +1611,7 @@ keypad inputs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.ioport.natkeyboard
+manager.machine.natkeyboard
     Gets the global natural keyboard manager instance for the emulated machine.
 
 Methods
@@ -1675,7 +1675,7 @@ Represents a keyboard or keypad input device managed by the
 Instantiation
 ^^^^^^^^^^^^^
 
-manager.machine.ioport.natkeyboard.keyboards[tag]
+manager.machine.natkeyboard.keyboards[tag]
     Gets the keyboard input device with the specified tag, or ``nil`` if the tag
     does not correspond to a keyboard input device.
 
