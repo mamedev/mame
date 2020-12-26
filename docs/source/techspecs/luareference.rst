@@ -174,6 +174,9 @@ machine.ioport (read-only)
 machine.input (read-only)
     The :ref:`input manager <luareference-input-inputman>` for the current
     emulation session.
+machine.natkeyboard (read-only)
+    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
+    for controlling keyboard and keypad input to the emulated system.
 machine.uiinput (read-only)
     The :ref:`UI input manager <luareference-input-uiinput>` for the current
     emulation session.
@@ -183,9 +186,6 @@ machine.render (read-only)
 machine.debugger (read-only)
     The :ref:`debugger manager <luareference-debug-manager>` for the current
     emulation session, or ``nil`` if the debugger is not enabled.
-machine.natkeyboard (read-only)
-    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
-    for controlling keyboard and keypad input to the emulated system.
 machine.options (read-only)
     The user-specified :ref:`options <luareference-core-emuopts>` for the
     current emulation session.
