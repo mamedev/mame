@@ -101,11 +101,6 @@ protected:
 	template <irq_number Number> void irq_w(int state);
 	void int_check();
 
-	// Platform hardware emulation methods
-	u32 bus_error();
-	void itimer_w(u8 data);
-	void itimer(void *ptr, s32 param);
-
 // DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// Devices
@@ -152,27 +147,28 @@ protected:
 	const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
 
 	// Interrupts and other platform state
-	bool m_int_state[4];
+	bool m_int_state[6];
 	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
 	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
-	// Hardware timers
+	// Hardware timer
 	// emu_timer *m_itimer;
+	emu_timer *m_freerun_timer;
+	void itimer_w(u8 data);
+	void itimer(void *ptr, s32 param);
 
-	// See notes in freerun_r method for why this is commented out
-	// emu_timer *m_freerun_timer;
-	// u32 freerun_timer_val;
-	// TIMER_CALLBACK_MEMBER(freerun_clock);
+	// Freerun timer
+	uint32_t freerun_timer_val;
+	TIMER_CALLBACK_MEMBER(freerun_clock);
+	uint32_t freerun_r(offs_t offset);
+	void freerun_w(offs_t offset, uint32_t data);
 
 	// APBus control (will be split into a device eventually)
 	uint8_t apbus_cmd_r(offs_t offset);
 	void apbus_cmd_w(offs_t offset, uint8_t data);
 
-	// Temporary workarounds
-	uint8_t hack1(offs_t offset);
-	uint8_t hack2(offs_t offset);
-	uint8_t hack3(offs_t offset);
-	uint32_t freerun_r(offs_t offset);
+	// Other platform hardware emulation methods
+	u32 bus_error();
 
 	// Constants
 	const uint32_t XTAL_75_MHz = 75000000;
@@ -262,7 +258,7 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	// Hardware timers
 	// map(0x1f800000, 0x1f800000); // TIMER0
-	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
+	map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w)); // FREERUN
 
 	// Timekeeper NVRAM and RTC (note: MROM doesn't seem to use all of the NVRAM space)
 	map(0x1f880000, 0x1f881fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
@@ -333,11 +329,30 @@ void news_r4k_state::cpu_map(address_map &map)
 	//map(0x1f3f0000, 0x1f3f0017);
 	map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
 	//map(0x1f840000, 0x1f84ffff).ram(); // what is this
-	map(0x1f3e0000, 0x1f3efff0).r(FUNC(news_r4k_state::hack1)); // ditto ;__;
+	map(0x1f3e0000, 0x1f3efff0).lr8(
+		NAME([this](offs_t offset) {
+			if (offset % 4 == 0 || offset % 4 == 1) { return 0x0; }
+			else if (offset % 4 == 2) { return 0x6f; }
+			else if (offset % 4 == 3) { return 0xe0; }
+			else { LOG("0x1f3e-1f3ef uh oh!\n"); return 0x0;}})); // ditto ;__;
+	map(0x14400004, 0x14400007).lr8(
+		NAME([this](offs_t offset) {
+			if (offset < 1) { return 0x0; }
+			else if (offset == 1) { return 0x3; }
+			else if (offset == 2) { return 0xff; }
+			else if (offset == 3) { return 0x17; }
+			else { return 0x0; }}));
+	map(0x14900004, 0x14900007).lr8(
+		NAME([this](offs_t offset) {
+			if (offset < 1) { return 0x0; }
+			else if (offset == 1) { return 0x0; }
+			else if (offset == 2) { return 0x03; }
+			else if (offset == 3) { return 0x28; }
+			else { return 0x0; }}));
+	 
 	map(0x1f4c0000, 0x1f4c0007).ram();							// Register for something that is accessed very early in mrom flow (0xbfc0040C)
 
-	map(0x14400004, 0x14400007).r(FUNC(news_r4k_state::hack2));
-	map(0x14900004, 0x14900007).r(FUNC(news_r4k_state::hack3));
+
 	// map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
 	// map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
 	// map(0x1e380074, 0x1e380077); // Fully booted: 1e380074: 00000001
@@ -378,31 +393,23 @@ data
     */
 
 	// Allocate freerunning clock
-	//m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
 }
 
-//TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
+TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
 
 void news_r4k_state::machine_reset()
 {
 	// TODO: what is the actual frequency of the freerunning clock?
-	// freerun_timer_val = 0;
-	// m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
+	freerun_timer_val = 0;
+	// m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); tick disabled for now
 }
 
 void news_r4k_state::init_common()
 {
-
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
-
-	/*
-	// HACK: hardwire the rate until fdc is better understood
-	m_fdc->set_rate(500000);
-
-	// HACK: signal floppy density?
-	m_scsi->port_w(0x02);
-    */
 }
 
 void news_r4k_state::init_nws5000x()
@@ -448,75 +455,6 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data)
 	LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
-uint8_t news_r4k_state::hack1(offs_t offset)
-{
-	if (offset % 4 == 0 || offset % 4 == 1)
-	{
-		return 0x0;
-	}
-	else if (offset % 4 == 2)
-	{
-		return 0x6f;
-	}
-	else if (offset % 4 == 3)
-	{
-		return 0xe0;
-	}
-	else
-	{
-		LOG("uh oh!\n");
-		return 0x0;
-	}
-}
-
-uint8_t news_r4k_state::hack2(offs_t offset)
-{
-	if (offset < 1)
-	{
-		return 0x0;
-	}
-	else if (offset == 1)
-	{
-		return 0x3;
-	}
-	else if (offset == 2)
-	{
-		return 0xff;
-	}
-	else if (offset == 3)
-	{
-		return 0x17;
-	}
-	else
-	{
-		return 0x0;
-	}
-}
-
-uint8_t news_r4k_state::hack3(offs_t offset)
-{
-	if (offset < 1)
-	{
-		return 0x0;
-	}
-	else if (offset == 1)
-	{
-		return 0x0;
-	}
-	else if (offset == 2)
-	{
-		return 0x03;
-	}
-	else if (offset == 3)
-	{
-		return 0x28;
-	}
-	else
-	{
-		return 0x0;
-	}
-}
-
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
 	// Need to determine the actual frequency, and find a good way to implement this.
@@ -527,6 +465,12 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
 	// Also WAY too slow to use: machine().scheduler().time().as_ticks(1000000);
 	// The below is a fast version that has even less basis in reality, but sorta kind ""works""?
 	return machine().scheduler().time().as_ticks(1000000) << 10;
+	//return freerun_timer_val;
+}
+
+void news_r4k_state::freerun_w(offs_t offset, uint32_t data) {
+	LOG("freerun_w: Set freerun timer to 0x%x\n", data);
+	freerun_timer_val = data;
 }
 
 u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
@@ -620,6 +564,7 @@ void news_r4k_state::int_check()
 
 u32 news_r4k_state::bus_error()
 {
+	LOG("bus_error: address access caused bus error\n");
 #ifndef NO_MIPS3 // Is there a mips3.h device equivalent?
 	LOG("bus_error: not implemented for this CPU type\n");
 #else
@@ -697,14 +642,16 @@ static INPUT_PORTS_START(nws5000)
 		PORT_DIPSETTING(0x80, "Main Memory Disabled");
 INPUT_PORTS_END
 
+// ROM definitions
 ROM_START(nws5000x)
-ROM_REGION64_BE(0x40000, "mrom", 0)
-ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+	ROM_REGION64_BE(0x40000, "mrom", 0)
+	ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
+	ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+	ROM_REGION64_BE(0x400, "idrom", 0)
+	ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 ROM_END
 
+// Machine definitions
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
 COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
