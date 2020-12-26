@@ -62,6 +62,7 @@ protected:
 
 	// address maps
 	void cpu_map(address_map &map);
+	void cpu_map_debug(address_map &map);
 
 	// machine config
 	void machine_common(machine_config &config);
@@ -169,6 +170,7 @@ protected:
 
 	// Other platform hardware emulation methods
 	u32 bus_error();
+	uint64_t front_panel_r(offs_t offset);
 
 	// Constants
 	const uint32_t XTAL_75_MHz = 75000000;
@@ -250,11 +252,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
 
 	// Front panel DIP switches - TODO: mirror length
-	map(0x1f3d0000, 0x1f3d0007).lr64(NAME([this](offs_t offset) {
-		ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
-		dipsw |= 0xff00; // Matches physical platform
-		return ((unsigned long)dipsw << 32) | dipsw;
-	}));
+	map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
 
 	// Hardware timers
 	// map(0x1f800000, 0x1f800000); // TIMER0
@@ -270,19 +268,6 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	// LEDs
 	map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
-
-	// APBus region
-	// map(0x1f520004, 0x1f520007); // WBFLUSH
-	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
-	// map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
-	// map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
-	// map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
-	// map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
-	// map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
-	// map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
-	// map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
-	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
-	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
 	// ESCC (serial) mapping
 	map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff);
@@ -324,7 +309,25 @@ void news_r4k_state::cpu_map(address_map &map)
 	// fd (floppy disk?)
 	// map(0x1ed20000, 0x1ed20000);
 
-	// Everything below this comment is just for debug
+	// Assign debug mappings
+	cpu_map_debug(map);
+}
+
+void news_r4k_state::cpu_map_debug(address_map &map)
+{
+	// APBus region
+	// map(0x1f520004, 0x1f520007); // WBFLUSH
+	map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
+	// map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
+	// map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
+	// map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
+	// map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
+	// map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
+	// map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
+	// map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
+	// map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
+	// map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
+
 	map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
 	//map(0x1f3f0000, 0x1f3f0017);
 	map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
@@ -350,8 +353,7 @@ void news_r4k_state::cpu_map(address_map &map)
 			else if (offset == 3) { return 0x28; }
 			else { return 0x0; }}));
 	 
-	map(0x1f4c0000, 0x1f4c0007).ram();							// Register for something that is accessed very early in mrom flow (0xbfc0040C)
-
+	map(0x1f4c0000, 0x1f4c0007).ram(); // Register for something that is accessed very early in mrom flow (0xbfc0040C)
 
 	// map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
 	// map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
@@ -385,16 +387,14 @@ void news_r4k_state::machine_start()
 	save_item(NAME(m_lcd_dim));
 
 	m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::itimer), this));
-data
 	for (bool &int_state : m_int_state)
 		int_state = false;
 	m_lcd_enable = false;
 	m_lcd_dim = false;
     */
 
-	// Allocate freerunning clock
-	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
-	m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1));
+	// Allocate freerunning clock (disabled for now)
+	// m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
@@ -415,6 +415,13 @@ void news_r4k_state::init_common()
 void news_r4k_state::init_nws5000x()
 {
 	init_common();
+}
+
+uint64_t news_r4k_state::front_panel_r(offs_t offset)
+{
+	ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
+	dipsw |= 0xff00; // Matches physical platform
+	return ((unsigned long)dipsw << 32) | dipsw;
 }
 
 void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
