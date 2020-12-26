@@ -19,6 +19,7 @@
 #include "emu.h"
 
 // Devices
+
 // #define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
@@ -47,9 +48,9 @@ public:
 		  m_ram(*this, "ram"),
 		  m_rtc(*this, "rtc"),
 		  m_escc(*this, "escc"),
-		  m_serial(*this, "serial%u", 0U) {}
+		  m_serial(*this, "serial%u", 0U),
+		  m_led(*this, "led%u", 0U) {}
 
-public:
 	// NWS-5000X
 	void nws5000x(machine_config &config);
 	void init_nws5000x();
@@ -73,8 +74,8 @@ protected:
 
 	// Interrupts (not implemented yet)
 	void inten_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 inten_r() { return m_inten; }
-	u16 intst_r() { return m_intst; }
+	u16 inten_r(offs_t offset);
+	u16 intst_r(offs_t offset);
 	void intclr_w(offs_t offset, u16 data, u16 mem_mask);
 
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
@@ -108,15 +109,15 @@ protected:
 	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
 
-	// DECLARE_FLOPPY_FORMATS(floppy_formats);
+// DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// Devices
 	// MIPS R4400 CPU
-	#ifndef NO_MIPS3
+#ifndef NO_MIPS3
 	required_device<r4400be_device> m_cpu;
-	#else
+#else
 	required_device<r4400_device> m_cpu;
-	#endif
+#endif
 
 	// Main memory
 	required_device<ram_device> m_ram;
@@ -148,8 +149,16 @@ protected:
 	// 5000X has a DSC-39 "xb" video card
 	// required_shared_ptr<u32> m_vram;
 
-	// TBD: LEDs
-	// output_finder<4> m_led;
+	// LED control
+	output_finder<6> m_led;
+	void led_state_w(offs_t offset, uint32_t data);
+	const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
+
+	// Interrupts and other platform state
+	bool m_int_state[4];
+	u16 m_inten;
+	u16 m_intst;
+	u8 m_debug;
 
 	// Hardware timers
 	// emu_timer *m_itimer;
@@ -158,16 +167,6 @@ protected:
 	// emu_timer *m_freerun_timer;
 	// u32 freerun_timer_val;
 	// TIMER_CALLBACK_MEMBER(freerun_clock);
-
-	// Interrupts and other platform state
-	u16 m_inten;
-	u16 m_intst;
-	u8 m_debug;
-
-	// LED control
-	uint8_t led_state_r(offs_t offset);
-	void led_state_w(offs_t offset, uint8_t data);
-	bool m_int_state[4];
 
 	// APBus control (will be split into a device eventually)
 	uint8_t apbus_cmd_r(offs_t offset);
@@ -194,20 +193,20 @@ protected:
 void news_r4k_state::machine_common(machine_config &config)
 {
 	// CPU setup
-	// Board has a 75MHz crystal, multiplier (if any) TBD
+	// CPU board has a 75MHz crystal, multiplier (if any) TBD
 
-	#ifndef NO_MIPS3
+#ifndef NO_MIPS3
 	R4400BE(config, m_cpu, XTAL_75_MHz);
-	#else
+#else
 	R4400(config, m_cpu, XTAL_75_MHz);
-	#endif
+#endif
 
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 
-	#ifndef NO_MIPS3
+#ifndef NO_MIPS3
 	m_cpu->set_icache_size(ICACHE_SIZE);
 	m_cpu->set_dcache_size(DCACHE_SIZE);
-	#endif
+#endif
 
 	// Main memory
 	RAM(config, m_ram);
@@ -217,18 +216,8 @@ void news_r4k_state::machine_common(machine_config &config)
 	M48T02(config, m_rtc);
 
 	// General ESCC setup
-	// 9.8304MHz per NetBSD source
-	SCC85230(config, m_escc, 9.8304_MHz_XTAL);
+	SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
 	// m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
-
-	// ESCC channel A (mapped to serial port 1)
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
-	m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
-	m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
-	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
-	m_escc->out_rtsa_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
-	m_escc->out_txda_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
-	m_escc->out_dtra_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 
 	// ESCC channel B (mapped to serial port 0)
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
@@ -238,6 +227,15 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_escc->out_rtsb_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
 	m_escc->out_txdb_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_escc->out_dtrb_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
+
+	// ESCC channel A (mapped to serial port 1)
+	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
+	m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
+	m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
+	m_escc->out_rtsa_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+	m_escc->out_txda_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_escc->out_dtra_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 }
 
 void news_r4k_state::nws5000x(machine_config &config)
@@ -270,43 +268,16 @@ void news_r4k_state::cpu_map(address_map &map)
 	// map(0x1f800000, 0x1f800000); // TIMER0
 	map(0x1f840000, 0x1f840003).r(FUNC(news_r4k_state::freerun_r)); // FREERUN
 
-	// Timekeeper NVRAM
-	map(0x1f880000, 0x1f8817f7).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
-	// Timekeeper RTC
-	map(0x1f881fe0, 0x1f881fff).lrw8(NAME([this](offs_t offset) {
-										 return m_rtc->read(NVRAM_SIZE + offset);
-									 }),
-									 NAME([this](offs_t offset, uint8_t data) {
-										 return m_rtc->write(NVRAM_SIZE + offset, data);
-									 }))
-		.umask32(0x000000ff);
+	// Timekeeper NVRAM and RTC (note: MROM doesn't seem to use all of the NVRAM space)
+	map(0x1f880000, 0x1f881fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 
-	// Interrupt clear ports
-	// map(0x1f4e0000, 0x1f4e0003).ram(); // INTCLR0
-	// map(0x1f4e0004, 0x1f4e0007).ram(); // INTCLR1
-	// map(0x1f4e0008, 0x1f4e000b).ram(); // INTCLR2
-	// map(0x1f4e000c, 0x1f4e000f).ram(); // INTCLR3
-	// map(0x1f4e0010, 0x1f4e0013).ram(); // INTCLR4
-	// map(0x1f4e0014, 0x1f4e0017).ram(); // INTCLR5
-
-	// Interrupt enable ports
-	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
-	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
-	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
-	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
-	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
-	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
-
-	// Interrupt status ports
-	// map(0x1fa00020, 0x1fa00023).ram(); // INTST0
-	// map(0x1fa00024, 0x1fa00027).ram(); // INTST1
-	// map(0x1fa00028, 0x1fa0002b).ram(); // INTST2
-	// map(0x1fa0002c, 0x1fa0002f).ram(); // INTST3
-	// map(0x1fa00030, 0x1fa00033).ram(); // INTST4
-	// map(0x1fa00034, 0x1fa00037).ram(); // INTST5
+	// Interrupt ports
+	map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));								  // Clear
+	map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w)); // Enable
+	map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));								  // Status
 
 	// LEDs
-	map(0x1f3f0000, 0x1f3f0014).rw(FUNC(news_r4k_state::led_state_r), FUNC(news_r4k_state::led_state_w));
+	map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
 
 	// APBus region
 	// map(0x1f520004, 0x1f520007); // WBFLUSH
@@ -387,9 +358,8 @@ void news_r4k_state::cpu_map(address_map &map)
 
 void news_r4k_state::machine_start()
 {
-	/*
+	// Init front panel LEDs
 	m_led.resolve();
-	*/
 
 	// m_net_ram = std::make_unique<u16[]>(65536);
 	// save_pointer(NAME(m_net_ram), 65536);
@@ -444,16 +414,10 @@ void news_r4k_state::init_nws5000x()
 	init_common();
 }
 
-uint8_t news_r4k_state::led_state_r(offs_t offset) { return 0; }
-void news_r4k_state::led_state_w(offs_t offset, uint8_t data)
+void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
-	// map(0x1f3f0000, 0x1f3f0000); // LED_POWER
-	// map(0x1f3f0004, 0x1f3f0004); // LED_DISK
-	// map(0x1f3f0008, 0x1f3f0008); // LED_FLOPPY
-	// map(0x1f3f000c, 0x1f3f000c); // LED_SEC
-	// map(0x1f3f0010, 0x1f3f0010); // LED_NET
-	// map(0x1f3f0014, 0x1f3f0014); // LED_CD
-	// LOG("Setting LED at offset 0x%x to 0x%x\n", offset, data);
+	LOG(LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
+	m_led[offset] = data;
 }
 
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
@@ -596,11 +560,42 @@ u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 
 void news_r4k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	LOG("inten_w: Offset 0x%x, Data 0x%x, Mask 0x%x\n", offset, data, mem_mask);
+	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
+	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
+	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
+	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
+	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
+	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
 	/*
 	COMBINE_DATA(&m_inten);
 
 	int_check();
     */
+}
+
+u16 news_r4k_state::inten_r(offs_t offset)
+{
+	LOG("inten_r: Offset 0x%x\n", offset);
+	// map(0x1fa00000, 0x1fa00003).ram(); // INTEN0
+	// map(0x1fa00004, 0x1fa00007).ram(); // INTEN1
+	// map(0x1fa00008, 0x1fa0000b).ram(); // INTEN2
+	// map(0x1fa0000c, 0x1fa0000f).ram(); // INTEN3
+	// map(0x1fa00010, 0x1fa00013).ram(); // INTEN4
+	// map(0x1fa00014, 0x1fa00017).ram(); // INTEN5
+	return m_inten;
+}
+
+u16 news_r4k_state::intst_r(offs_t offset)
+{
+	LOG("intst_r: Offset 0x%x\n", offset);
+	// map(0x1fa00020, 0x1fa00023).ram(); // INTST0
+	// map(0x1fa00024, 0x1fa00027).ram(); // INTST1
+	// map(0x1fa00028, 0x1fa0002b).ram(); // INTST2
+	// map(0x1fa0002c, 0x1fa0002f).ram(); // INTST3
+	// map(0x1fa00030, 0x1fa00033).ram(); // INTST4
+	// map(0x1fa00034, 0x1fa00037).ram(); // INTST5
+	return m_intst;
 }
 
 template <news_r4k_state::irq_number Number>
@@ -620,6 +615,13 @@ void news_r4k_state::irq_w(int state)
 
 void news_r4k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	LOG("intclr_w: Offset 0x%x, Data 0x%x, Mask 0x%x\n", offset, data, mem_mask);
+	// map(0x1f4e0000, 0x1f4e0003).ram(); // INTCLR0
+	// map(0x1f4e0004, 0x1f4e0007).ram(); // INTCLR1
+	// map(0x1f4e0008, 0x1f4e000b).ram(); // INTCLR2
+	// map(0x1f4e000c, 0x1f4e000f).ram(); // INTCLR3
+	// map(0x1f4e0010, 0x1f4e0013).ram(); // INTCLR4
+	// map(0x1f4e0014, 0x1f4e0017).ram(); // INTCLR5
 	/*
 	m_intst &= ~(data & mem_mask);
 
@@ -649,6 +651,9 @@ void news_r4k_state::int_check()
 
 u32 news_r4k_state::bus_error()
 {
+#ifdef NO_MIPS3 // Is there a mips3.h device equivalent?
+	m_cpu->bus_error();
+#endif
 	/*
 	if (!machine().side_effects_disabled())
 		irq_w<BERR>(ASSERT_LINE);
@@ -722,12 +727,12 @@ static INPUT_PORTS_START(nws5000)
 INPUT_PORTS_END
 
 ROM_START(nws5000x)
-	ROM_REGION64_BE(0x40000, "mrom", 0)
-	ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-	ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+ROM_REGION64_BE(0x40000, "mrom", 0)
+ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
+ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-	ROM_REGION64_BE(0x400, "idrom", 0)
-	ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+ROM_REGION64_BE(0x400, "idrom", 0)
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 ROM_END
 
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
