@@ -7116,7 +7116,7 @@ void galaxian_state::bongo(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongo_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxian_state::bongo_io_map);
-	
+
 	// sound hardware
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/4);
 	m_ay8910[0]->port_a_read_callback().set_ioport("DSW");

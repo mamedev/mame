@@ -534,7 +534,7 @@ void vtech1_state::laser310(machine_config &config)
 void laser310h_state::laser310h(machine_config &config)
 {
 	vtech1(config);
-	
+
 	m_maincpu->set_clock(VZ300_XTAL1_CLK / 5);  /* 3.546894 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser310h_state::vtech1_shrg_mem);
 	m_maincpu->set_addrmap(AS_IO, &laser310h_state::vtech1_shrg_io);

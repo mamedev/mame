@@ -5,7 +5,7 @@
 
     TODO:
     - verify hardware configuration;
-	- suchie2: on attract gals background display is cut off on the right side;
+    - suchie2: on attract gals background display is cut off on the right side;
 
     used by:
     ms32.cpp

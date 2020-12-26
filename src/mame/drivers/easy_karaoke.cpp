@@ -2,54 +2,54 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-	Easy Karaoke (c)IVL Technologies
+    Easy Karaoke (c)IVL Technologies
 
-	A version of this was also released in France by Lexibook, with French songs
+    A version of this was also released in France by Lexibook, with French songs
 
 
-	This uses
+    This uses
 
-	Clarity 4.3 ARM
-	SVI1186
-	NV0165  0317
-	Sound Vision Inc.
+    Clarity 4.3 ARM
+    SVI1186
+    NV0165  0317
+    Sound Vision Inc.
 
-	an overview for 4.1 and 4.2 can be found at 
-	http://web.archive.org/web/20031212120255fw_/http://www.soundvisioninc.com/OEMProducts/C4datasheet072401.pdf
-	Amusingly this datasheet advertises 'MAME Game emulation' as one of the capabilities despite the chip
-	clocking in at only 72Mhz
+    an overview for 4.1 and 4.2 can be found at
+    http://web.archive.org/web/20031212120255fw_/http://www.soundvisioninc.com/OEMProducts/C4datasheet072401.pdf
+    Amusingly this datasheet advertises 'MAME Game emulation' as one of the capabilities despite the chip
+    clocking in at only 72Mhz
 
-	Support chip is
+    Support chip is
 
-	IVL
-	Technologies
-	ICS0253R1.0
-	UA1068ABK-RD
-	0327 A01491F
+    IVL
+    Technologies
+    ICS0253R1.0
+    UA1068ABK-RD
+    0327 A01491F
 
-	RAM chip is
+    RAM chip is
 
-	IC42S16400-7T
+    IC42S16400-7T
 
-	ROM is
+    ROM is
 
-	IVL
-	Technologies
-	ICS0303-B
-	(c)1985-1986
-	3415BAI THAI
+    IVL
+    Technologies
+    ICS0303-B
+    (c)1985-1986
+    3415BAI THAI
 
-	--------------
+    --------------
 
-	Cartridges contain:
+    Cartridges contain:
 
-	1x MX 29LV040TC-90 (Flash ROM)
+    1x MX 29LV040TC-90 (Flash ROM)
 
-	1x HC573A
+    1x HC573A
 
-	1x ICSI IC89LV52A-24PQ (80C52 MCU with 8KBytes Flash memory, can be read protected)
+    1x ICSI IC89LV52A-24PQ (80C52 MCU with 8KBytes Flash memory, can be read protected)
 
-	presumably manages a serial protocol to send data to the main unit
+    presumably manages a serial protocol to send data to the main unit
 
 *******************************************************************************/
 
@@ -172,7 +172,7 @@ void easy_karaoke_state::easy_karaoke(machine_config &config)
 
 ROM_START( easykara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )	
+	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )
 ROM_END
 
 CONS( 2004, easykara,      0,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies", "Easy Karaoke Groove Station", MACHINE_IS_SKELETON )

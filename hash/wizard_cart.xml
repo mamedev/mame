@@ -64,51 +64,51 @@ AC-2E           Nikon F90x/N90s Card                                      NO
 
 Cart pinout
 ______________________________________________
-1  VCC      
-2  NC    
-3  NC    
-4  VBATT      
-5  VCC?  Connects to pin 9 of TSOP32  (unused)    
-6  A15      
-7  A14      
-8  A13      
-9  A12      
-10  A11      
-11  A10      
-12  A9      
-13  A8      
-14  A7      
-15  A6      
-16  A5      
-17  A4      
-18  A3      
-19  A2      
-20  A1      
-21  A0      
-22  D0      
-23  D1      
-24  D2      
-25  D3      
-26  D4      
-27  D5      
-28  D6      
-29  D7      
-30  /CE    Mask ROM  
-31  /CE    SRAM 1  
-32  /CE    SRAM 2  
-33  /CE    EPROM  
-34  /WR      
-35  /OE      
-36  NC    
-37  gpio  A18?    
-38  gpio  A17    
-39  gpio  A16    
+1  VCC
+2  NC
+3  NC
+4  VBATT
+5  VCC?  Connects to pin 9 of TSOP32  (unused)
+6  A15
+7  A14
+8  A13
+9  A12
+10  A11
+11  A10
+12  A9
+13  A8
+14  A7
+15  A6
+16  A5
+17  A4
+18  A3
+19  A2
+20  A1
+21  A0
+22  D0
+23  D1
+24  D2
+25  D3
+26  D4
+27  D5
+28  D6
+29  D7
+30  /CE    Mask ROM
+31  /CE    SRAM 1
+32  /CE    SRAM 2
+33  /CE    EPROM
+34  /WR
+35  /OE
+36  NC
+37  gpio  A18?
+38  gpio  A17
+39  gpio  A16
 40  \  NC
 41  /  NC
-42  NC  GPIO  
-43  NC  GPIO  
-44  NC    
-45  GND      
+42  NC  GPIO
+43  NC  GPIO
+44  NC
+45  GND
 
 -->
 

@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Intel XScale SA1110 peripheral emulation
+    Intel XScale SA1110 peripheral emulation
 
 ***************************************************************************/
 
@@ -11,16 +11,16 @@
 
 #define LOG_UNKNOWN     (1 << 1)
 #define LOG_UART        (1 << 2)
-#define LOG_UART_HF		(1 << 3)
-#define LOG_MCP			(1 << 4)
-#define LOG_SSP			(1 << 5)
-#define LOG_OSTIMER		(1 << 6)
-#define LOG_OSTIMER_HF	(1 << 7)
-#define LOG_RTC			(1 << 8)
+#define LOG_UART_HF     (1 << 3)
+#define LOG_MCP         (1 << 4)
+#define LOG_SSP         (1 << 5)
+#define LOG_OSTIMER     (1 << 6)
+#define LOG_OSTIMER_HF  (1 << 7)
+#define LOG_RTC         (1 << 8)
 #define LOG_POWER       (1 << 9)
 #define LOG_RESET       (1 << 10)
-#define LOG_GPIO		(1 << 11)
-#define LOG_GPIO_HF		(1 << 12)
+#define LOG_GPIO        (1 << 11)
+#define LOG_GPIO_HF     (1 << 12)
 #define LOG_INTC        (1 << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_SSP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 

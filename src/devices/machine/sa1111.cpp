@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Intel SA1111 Microprocessor Companion Chip skeleton
+    Intel SA1111 Microprocessor Companion Chip skeleton
 
 ***************************************************************************/
 
@@ -10,17 +10,17 @@
 #include "sa1111.h"
 
 #define LOG_UNKNOWN     (1 << 1)
-#define LOG_SBI			(1 << 2)
-#define LOG_SK			(1 << 3)
-#define LOG_USB			(1 << 4)
-#define LOG_AUDIO		(1 << 5)
-#define LOG_SSP			(1 << 6)
-#define LOG_SSP_HF		(1 << 7)
-#define LOG_TRACK		(1 << 8)
-#define LOG_MOUSE		(1 << 9)
-#define LOG_GPIO		(1 << 10)
-#define LOG_INTC		(1 << 11)
-#define LOG_CARD		(1 << 12)
+#define LOG_SBI         (1 << 2)
+#define LOG_SK          (1 << 3)
+#define LOG_USB         (1 << 4)
+#define LOG_AUDIO       (1 << 5)
+#define LOG_SSP         (1 << 6)
+#define LOG_SSP_HF      (1 << 7)
+#define LOG_TRACK       (1 << 8)
+#define LOG_MOUSE       (1 << 9)
+#define LOG_GPIO        (1 << 10)
+#define LOG_INTC        (1 << 11)
+#define LOG_CARD        (1 << 12)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
 #define VERBOSE         (0) // (LOG_ALL)

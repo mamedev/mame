@@ -15,21 +15,21 @@
 #include "sed1356.h"
 #include "screen.h"
 
-#define LOG_MISC_RD		(1 << 1)
-#define LOG_MISC_WR		(1 << 2)
-#define LOG_LCD_RD		(1 << 3)
-#define LOG_LCD_WR		(1 << 4)
-#define LOG_CRT_RD		(1 << 5)
-#define LOG_CRT_WR		(1 << 6)
-#define LOG_BITBLT_RD	(1 << 7)
-#define LOG_BITBLT_WR	(1 << 8)
-#define LOG_LUT_RD		(1 << 9)
-#define LOG_LUT_WR		(1 << 10)
-#define LOG_MPLUG_RD	(1 << 11)
-#define LOG_MPLUG_WR	(1 << 12)
-#define LOG_ALL			(LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_LUT_RD | LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
+#define LOG_MISC_RD     (1 << 1)
+#define LOG_MISC_WR     (1 << 2)
+#define LOG_LCD_RD      (1 << 3)
+#define LOG_LCD_WR      (1 << 4)
+#define LOG_CRT_RD      (1 << 5)
+#define LOG_CRT_WR      (1 << 6)
+#define LOG_BITBLT_RD   (1 << 7)
+#define LOG_BITBLT_WR   (1 << 8)
+#define LOG_LUT_RD      (1 << 9)
+#define LOG_LUT_WR      (1 << 10)
+#define LOG_MPLUG_RD    (1 << 11)
+#define LOG_MPLUG_WR    (1 << 12)
+#define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_LUT_RD | LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
 
-#define VERBOSE			(0) // (LOG_ALL)
+#define VERBOSE         (0) // (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SED1356, sed1356_device, "sed1356", "Epson SED1356")

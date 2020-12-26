@@ -8990,7 +8990,7 @@ ROM_START( tturf )
 	ROM_LOAD( "epr-12328.a10", 0x00000, 0x08000, CRC(13a346de) SHA1(4e8cb12b7936c4c5d8ebc9ba563099ac2056ee60) )
 	ROM_LOAD( "opr-12329.a11", 0x10000, 0x10000, CRC(ed9a686d) SHA1(da433033d501ee871429ee676b3972b14179df9f) )     // speech
 	// note: it needs this hole otherwise voice samples won't playback
-    ROM_LOAD( "opr-12330.a12", 0x30000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
+	ROM_LOAD( "opr-12330.a12", 0x30000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "317-0104.c2", 0x00000, 0x1000, NO_DUMP )

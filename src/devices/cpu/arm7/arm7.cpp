@@ -41,7 +41,7 @@ TODO:
 #define LOG_COPRO_WRITES    (1 << 3)
 #define LOG_COPRO_UNKNOWN   (1 << 4)
 #define LOG_COPRO_RESERVED  (1 << 5)
-#define LOG_TLB				(1 << 6)
+#define LOG_TLB             (1 << 6)
 
 #define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"

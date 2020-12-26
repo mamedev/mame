@@ -6,16 +6,16 @@
 
     Tobacco vending machines
 
-	Hardware:
-	- Intel P8051
-	- 27C256 EPROM
-	- NEC D446C-2 SRAM
-	- OKI M62X428 RTC
-	- Rockwell 10937P-50 A8201-17 display controller
+    Hardware:
+    - Intel P8051
+    - 27C256 EPROM
+    - NEC D446C-2 SRAM
+    - OKI M62X428 RTC
+    - Rockwell 10937P-50 A8201-17 display controller
 
     TODO:
-	- The coin mech isn't emulated. It's an Azkoyen L66S coin selector,
-	  which uses a PIC16C76/PIC16F76 (undumped).
+    - The coin mech isn't emulated. It's an Azkoyen L66S coin selector,
+      which uses a PIC16C76/PIC16F76 (undumped).
 
 ***************************************************************************/
 
@@ -85,7 +85,7 @@ void design6_state::io_map(address_map &map)
 void design6_state::iobanked_map(address_map &map)
 {
 	map(0x00000, 0x00000).portr("in0");
-//	map(0x00000, 0x00007).w // coin return motor
+//  map(0x00000, 0x00007).w // coin return motor
 	map(0x00010, 0x00010).portr("in1");
 	map(0x00015, 0x00015).lw8(NAME([this] (uint8_t data) { m_vfd->data(BIT(data, 0)); }));
 	map(0x00016, 0x00016).lw8(NAME([this] (uint8_t data) { m_vfd->sclk(BIT(data, 0)); }));

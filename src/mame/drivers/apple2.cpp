@@ -1330,7 +1330,7 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
-	device.option_add("uniprint", A2BUS_UNIPRINT);	   /* Videx Uniprint parallel printer card */
+	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 

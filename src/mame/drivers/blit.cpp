@@ -105,21 +105,21 @@ void blit_state::blit_mem(address_map &map)
 	map(0x000000, 0x03ffff).ram().share("p_ram");
 	map(0x040000, 0x045fff).rom().region(M68K_TAG, 0);
 	// octal 0000, 0002 - 16-bit
-//	map(0x060000, 0x060003).r(FUNC(blit_state::mouse_xy));
+//  map(0x060000, 0x060003).r(FUNC(blit_state::mouse_xy));
 	// octal 0011, 0013 - 8-bit - host
 	map(0x060008, 0x060009).rw(m_acia0, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
 	map(0x06000a, 0x06000b).rw(m_acia0, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
 	// octal 0021 - 8-bit
-//	map(0x060010, 0x060011).r(FUNC(blit_state::mouse_buttons)).mask(0x00ff);
+//  map(0x060010, 0x060011).r(FUNC(blit_state::mouse_buttons)).mask(0x00ff);
 	// octal 0025 - mirror
-//	map(0x060014, 0x060015).r(FUNC(blit_state::mouse_buttons)).mask(0x00ff);
+//  map(0x060014, 0x060015).r(FUNC(blit_state::mouse_buttons)).mask(0x00ff);
 	// octal 0027 - ???
 	// octal 0030 - 16-bit
 	map(0x060018, 0x060019).w(FUNC(blit_state::start_write));
 	// octal 0040 - 16-bit
 	map(0x060020, 0x060029).ram().share("misccr");
 	// octal 0050 - 16-bit
-//	map(0x060028, 0x060029).w(FUNC(blit_state::init_write));
+//  map(0x060028, 0x060029).w(FUNC(blit_state::init_write));
 	// octal 0060, 0062 - 8-bit - keyboard
 	map(0x060030, 0x060031).rw(m_acia1, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
 	map(0x060032, 0x060033).rw(m_acia1, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));

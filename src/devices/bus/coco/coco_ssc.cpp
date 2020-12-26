@@ -485,7 +485,7 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 		m_stream(nullptr),
 		m_index(0)
 {
- 	std::fill(std::begin(m_rms), std::end(m_rms), 0);
+	std::fill(std::begin(m_rms), std::end(m_rms), 0);
 }
 
 

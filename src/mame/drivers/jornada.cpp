@@ -18,10 +18,10 @@
 #include "screen.h"
 #include "emupal.h"
 
-#define LOG_MCU		(1 << 1)
-#define LOG_ALL		(LOG_MCU)
+#define LOG_MCU     (1 << 1)
+#define LOG_ALL     (LOG_MCU)
 
-#define VERBOSE		(LOG_ALL)
+#define VERBOSE     (LOG_ALL)
 #include "logmacro.h"
 
 #define SA1110_CLOCK 206000000
@@ -230,14 +230,14 @@ INPUT_CHANGED_MEMBER(jornada_state::key_changed)
 	uint8_t scan_code = 0;
 	switch (param)
 	{
-	case KEY_ON_OFF:	scan_code = 0x7f;	break;
-	case KEY_S:			scan_code = 0x32;	break;
-	case KEY_K:			scan_code = 0x38;	break;
-	case KEY_1:			scan_code = 0x11;	break;
-	case KEY_2:			scan_code = 0x12;	break;
-	case KEY_3:			scan_code = 0x13;	break;
-	case KEY_4:			scan_code = 0x14;	break;
-	case KEY_9:			scan_code = 0x19;	break;
+	case KEY_ON_OFF:    scan_code = 0x7f;   break;
+	case KEY_S:         scan_code = 0x32;   break;
+	case KEY_K:         scan_code = 0x38;   break;
+	case KEY_1:         scan_code = 0x11;   break;
+	case KEY_2:         scan_code = 0x12;   break;
+	case KEY_3:         scan_code = 0x13;   break;
+	case KEY_4:         scan_code = 0x14;   break;
+	case KEY_9:         scan_code = 0x19;   break;
 	default: return;
 	}
 
