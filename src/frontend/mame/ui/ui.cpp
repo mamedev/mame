@@ -1381,7 +1381,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-		machine().video().toggle_throttle();
+		machine().video().set_throttled(!machine().video().throttled());
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))

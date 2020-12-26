@@ -385,7 +385,7 @@ void astinvad_state::kamikaze_sound1_w(uint8_t data)
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
 	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 }
 
 void astinvad_state::kamikaze_sound2_w(uint8_t data)
@@ -418,7 +418,7 @@ void astinvad_state::spcking2_sound1_w(uint8_t data)
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
 	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 	m_screen_red = data & 0x04; // ?
 }
 
@@ -465,7 +465,7 @@ void astinvad_state::spaceint_sound2_w(uint8_t data)
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
 
-	machine().sound().system_enable(data & 0x02);
+	machine().sound().system_mute(!BIT(data, 1));
 
 	if (bits_gone_hi & 0x04) m_samples->start(3, SND_INVADERHIT);
 

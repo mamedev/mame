@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "wavwrite.h"
+
 /***********************************************************************
  *
  *  MAME - Discrete sound system emulation library
@@ -130,12 +132,12 @@ private:
 DISCRETE_CLASS(dso_csvlog, 0,
 	FILE *m_csv_file;
 	int64_t m_sample_num;
-	char  m_name[32];
+	char m_name[32];
 );
 
 DISCRETE_CLASS(dso_wavlog, 0,
-	wav_file *m_wavfile;
-	char      m_name[32];
+	util::wav_file_ptr m_wavfile;
+	char m_name[32];
 );
 
 /*************************************

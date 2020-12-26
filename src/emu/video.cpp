@@ -185,18 +185,18 @@ video_manager::video_manager(running_machine &machine)
 
 void video_manager::set_frameskip(int frameskip)
 {
-	// -1 means autoframeskip
-	if (frameskip == -1)
+	if (0 > frameskip)
 	{
+		// -1 means autoframeskip
+		if (!m_auto_frameskip)
+			m_frameskip_level = 0;
 		m_auto_frameskip = true;
-		m_frameskip_level = 0;
 	}
-
-	// any other level is a direct control
-	else if (frameskip >= 0 && frameskip <= MAX_FRAMESKIP)
+	else
 	{
+		// any other level is a direct control
 		m_auto_frameskip = false;
-		m_frameskip_level = frameskip;
+		m_frameskip_level = std::min<int>(frameskip, MAX_FRAMESKIP);
 	}
 }
 
@@ -247,17 +247,19 @@ void video_manager::frame_update(bool from_debugger)
 
 	emulator_info::periodic_check();
 
-	// perform tasks for this frame
 	if (!from_debugger)
+	{
+		// perform tasks for this frame
 		machine().call_notifiers(MACHINE_NOTIFY_FRAME);
 
-	// update frameskipping
-	if (!from_debugger && phase > machine_phase::INIT)
-		update_frameskip();
+		// update frameskipping
+		if (phase > machine_phase::INIT)
+			update_frameskip();
 
-	// update speed computations
-	if (!from_debugger && !skipped_it && phase > machine_phase::INIT)
-		recompute_speed(current_time);
+		// update speed computations
+		if (!skipped_it && phase > machine_phase::INIT)
+			recompute_speed(current_time);
+	}
 
 	// call the end-of-frame callback
 	if (phase == machine_phase::RUNNING)
@@ -708,17 +710,6 @@ void video_manager::update_throttle(attotime emutime)
            restoring from a saved state
 
 */
-	static const u8 popcount[256] =
-	{
-		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4, 1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7, 4,5,5,6,5,6,6,7, 5,6,6,7,6,7,7,8
-	};
 
 	// outer scope so we can break out in case of a resync
 	while (1)
@@ -791,7 +782,7 @@ void video_manager::update_throttle(attotime emutime)
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
 		// is taking longer than the real frame, we just need to resync
 		if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
-			(real_is_ahead_attoseconds < 0 && popcount[m_throttle_history & 0xff] < 6))
+			(real_is_ahead_attoseconds < 0 && population_count_32(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);
@@ -883,12 +874,12 @@ void video_manager::update_frameskip()
 	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
 	{
 		// calibrate the "adjusted speed" based on the target
-		double adjusted_speed_percent = m_speed_percent / (double) m_throttle_rate;
+		double adjusted_speed_percent = m_speed_percent / double(m_throttle_rate);
 
-		// if we're too fast, attempt to decrease the frameskip
 		double speed = m_speed * 0.001;
 		if (adjusted_speed_percent >= 0.995 * speed)
 		{
+			// if we're too fast, attempt to decrease the frameskip
 			// but only after 3 consecutive frames where we are too fast
 			if (++m_frameskip_adjust >= 3)
 			{
@@ -897,16 +888,12 @@ void video_manager::update_frameskip()
 					m_frameskip_level--;
 			}
 		}
-
-		// if we're too slow, attempt to increase the frameskip
 		else
 		{
-			// if below 80% speed, be more aggressive
-			if (adjusted_speed_percent < 0.80 *  speed)
+			// if we're too slow, attempt to increase the frameskip
+			if (adjusted_speed_percent < 0.80 *  speed) // if below 80% speed, be more aggressive
 				m_frameskip_adjust -= (0.90 * speed - m_speed_percent) / 0.05;
-
-			// if we're close, only force it up to frameskip 8
-			else if (m_frameskip_level < 8)
+			else if (m_frameskip_level < 8) // if we're close, only force it up to frameskip 8
 				m_frameskip_adjust--;
 
 			// perform the adjustment
@@ -1042,7 +1029,7 @@ typedef software_renderer<u32, 0,0,0, 16,8,0, false, false> snap_renderer;
 void video_manager::create_snapshot_bitmap(screen_device *screen)
 {
 	// select the appropriate view in our dummy target
-	if (m_snap_native && screen != nullptr)
+	if (m_snap_native && screen)
 	{
 		screen_device_enumerator iter(machine().root_device());
 		int view_index = iter.indexof(*screen);
@@ -1050,14 +1037,12 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 		m_snap_target->set_view(view_index);
 	}
 
-	// get the minimum width/height and set it on the target
+	// get the minimum width/height and set it on the target and bitmap
 	s32 width, height;
 	compute_snapshot_size(width, height);
 	m_snap_target->set_bounds(width, height);
-
-	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (!m_snap_bitmap.valid() || width != m_snap_bitmap.width() || height != m_snap_bitmap.height())
-		m_snap_bitmap.allocate(width, height);
+	if (width != m_snap_bitmap.width() || height != m_snap_bitmap.height())
+		m_snap_bitmap.resize(width, height);
 
 	// render the screen there
 	render_primitive_list &primlist = m_snap_target->get_primitives();
@@ -1264,15 +1249,6 @@ void video_manager::record_frame()
 	if (error)
 		end_recording();
 	g_profiler.stop();
-}
-
-//-------------------------------------------------
-//  toggle_throttle
-//-------------------------------------------------
-
-void video_manager::toggle_throttle()
-{
-	set_throttled(!throttled());
 }
 
 

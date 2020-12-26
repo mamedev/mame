@@ -23,7 +23,7 @@ function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
 	local hiscore_path = "hi";
-	local config_path = emu.subst_env(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
+	local config_path = emu.subst_env(manager.options.entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 
 	local current_checksum = 0;
 	local default_checksum = 0;
@@ -68,13 +68,13 @@ function hiscore.startplugin()
 		else
 			local cpu, mem;
 			local cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
-			cpu = manager:machine().devices[cputag];
+			cpu = manager.machine.devices[cputag];
 			if not cpu then
 				error(cputag .. " device not found")
 			end
 			local rgnname, rgntype = space:match("([^/]*)/?([^/]*)")
 			if rgntype == "share" then
-				mem = manager:machine():memory().shares[rgnname]
+				mem = manager.machine.memory.shares[rgnname]
 			else
 				mem = cpu.spaces[space]
 			end

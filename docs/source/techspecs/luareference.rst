@@ -58,6 +58,512 @@ c:index_of(v)
     value.
 
 
+.. _luareference-core:
+
+Core classes
+------------
+
+Many of MAME’s core classes used to implement an emulation session are available
+to Lua scripts.
+
+.. _luareference-core-mameman:
+
+MAME machine manager
+~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``mame_machine_manager`` class, which holds the running machine, UI
+manager, and other global components.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager
+    The MAME machine manager is available as a global variable in the Lua
+    environment.
+
+Properties
+^^^^^^^^^^
+
+manager.machine (read-only)
+    The :ref:`running machine <luareference-core-machine>` for the current
+    emulation session.
+manager.ui (read-only)
+    The :ref:`UI manager <luareference-core-uiman>` for the current session.
+manager.options (read-only)
+    The :ref:`emulation options <luareference-core-emuopts>` for the current
+    session.
+manager.plugins[] (read-only)
+    Gets information about the :ref:`Lua plugins <luareference-core-plugin>`
+    that are present, indexed by name.  The index get, ``at`` and ``index_of``
+    methods have O(n) complexity.
+
+.. _luareference-core-machine:
+
+Running machine
+~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``running_machine`` class, which represents an emulation session.
+It provides access to the other core objects that implement an emulation session
+as well as the emulated device tree.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager:machine()
+    Gets the running machine instance for the current emulation session.
+
+Methods
+^^^^^^^
+
+machine:exit()
+    Schedules an exit from the current emulation session.  This will either
+    return to the system selection menu or exit the application, depending on
+    how it was started.  This method returns immediately, before the scheduled
+    exit takes place.
+machine:hard_reset()
+    Schedules a hard reset.  This is implemented by tearing down the emulation
+    session and starting another emulation session for the same system.  This
+    method returns immediately, before the scheduled reset takes place.
+machine:soft_reset()
+    Schedules a soft reset.  This is implemented by calling the reset method of
+    the root device, which is propagated down the device tree.  This method
+    returns immediately, before the scheduled reset takes place.
+machine:save(filename)
+    Schedules saving machine state to the specified file.  If the file name is a
+    relative path, it is considered to be relative to the first configured save
+    state directory.  This method returns immediately, before the machine state
+    is saved.  If this method is called when a save or load operation is already
+    pending, the previously pending operation will be cancelled.
+machine:load(filename)
+    Schedules loading machine state from the specified file.  If the file name
+    is a relative path, the configured save state directories will be searched.
+    This method returns immediately, before the machine state is saved.  If this
+    method is called when a save or load operation is already pending, the
+    previously pending operation will be cancelled.
+machine:popmessage([msg])
+    Displays a pop-up message to the user.  If the message is not provided, the
+    currently displayed pop-up message (if any) will be hidden.
+machine:logerror(msg)
+    Writes the message to the machine error log.  This may be displayed in a
+    debugger window, written to a file, or written to the standard error output.
+
+Properties
+^^^^^^^^^^
+
+machine.system (read-only)
+    The :ref:`driver metadata <luareference-core-driver>` for the current
+    system.
+machine.parameters (read-only)
+    The :ref:`parameters manager <luareference-core-paramman>` for the current
+    emulation session.
+machine.video (read-only)
+    The :ref:`video manager <luareference-core-videoman>` for the current
+    emulation session.
+machine.sound (read-only)
+    The :ref:`sound manager <luareference-core-soundman>` for the current
+    emulation session.
+machine.output (read-only)
+    The :ref:`output manager <luareference-core-outputman>` for the current
+    emulation session.
+machine.memory (read-only)
+    The :ref:`emulated memory manager <luareference-mem-manager>` for the
+    current emulation session.
+machine.ioport (read-only)
+    The :ref:`I/O port manager <luareference-input-ioportman>` for the current
+    emulation session.
+machine.input (read-only)
+    The :ref:`input manager <luareference-input-inputman>` for the current
+    emulation session.
+machine.uiinput (read-only)
+    The :ref:`UI input manager <luareference-input-uiinput>` for the current
+    emulation session.
+machine.render (read-only)
+    The :ref:`render manager <luareference-render-manager>` for the current
+    emulation session.
+machine.debugger (read-only)
+    The :ref:`debugger manager <luareference-debug-manager>` for the current
+    emulation session, or ``nil`` if the debugger is not enabled.
+machine.options (read-only)
+    The user-specified :ref:`options <luareference-core-emuopts>` for the
+    current emulation session.
+machine.samplerate (read-only)
+    The output audio sample rate in Hertz.
+machine.paused (read-only)
+    A Boolean indicating whether emulation is not currently running, usually
+    because the session has been paused or the emulated system has not completed
+    starting.
+machine.exit_pending (read-only)
+    A Boolean indicating whether the emulation session is scheduled to exit.
+machine.hard_reset_pending (read-only)
+    A Boolean indicating whether a hard reset of the emulated system is pending.
+machine.devices (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`devices <luareference-dev-device>` in the emulated system.
+machine.screens (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`screen devices <luareference-dev-screen>` in the emulated system.
+machine.cassettes (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`cassette image devices <luareference-dev-cass>` in the emulated
+    system.
+machine.images (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`media image devices <luareference-dev-diimage>` in the emulated system.
+machine.slots (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`slot devices <luareference-dev-dislot>` in the emulated system.
+
+.. _luareference-core-videoman:
+
+Video manager
+~~~~~~~~~~~~~
+
+Wraps MAME’s ``video_manager`` class, which is responsible for coordinating
+emulated video drawing, speed throttling, and reading host inputs.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager:machine().video
+    Gets the video manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+video:frame_update()
+    Updates emulated screens, reads host inputs, and updates video output.
+video:snapshot()
+    Saves snapshot files according to the current configuration.  If MAME is
+    configured to take native emulated screen snapshots, one snapshot will be
+    saved for each emulated screen that is visible in a host window/screen with
+    the current view configuration.  If MAME is not configured to use take
+    native emulated screen snapshots or if the system has no emulated screens, a
+    single snapshot will be saved using the currently selected snapshot view.
+video:begin_recording([filename], [format])
+    Stops any video recordings currently in progress and starts recording either
+    the visible emulated screens or the current snapshot view, depending on
+    whether MAME is configured to take native emulated screen snapshots.
+
+    If the file name is not supplied, the configured snapshot file name is used.
+    If the file name is a relative path, it is interpreted relative to the first
+    configured snapshot directory.  If the format is supplied, it must be
+    ``"avi"`` or ``"mng"``.  If the format is not supplied, it defaults to AVI.
+video:end_recording()
+    Stops any video recordings that are in progress.
+video:snapshot_size()
+    Returns the width and height in pixels of snapshots created with the current
+    snapshot target configuration and emulated screen state.  This may be
+    configured explicitly by the user, or calculated based on the selected
+    snapshot view and the resolution of any visible emulated screens.
+video:snapshot_pixels()
+    Returns the pixels of a snapshot created using the current snapshot target
+    configuration as 32-bit integers packed into a binary string in host Endian
+    order.  Pixels are organised in row-major order, from left to right then top
+    to bottom.  Pixel values are colours in RGB format packed into 32-bit
+    integers.
+
+Properties
+^^^^^^^^^^
+
+video.speed_factor (read-only)
+    Configured emulation speed adjustment in per mille (i.e. the ratio to normal
+    speed multiplied by 1,000).
+video.throttled (read/write)
+    A Boolean indicating whether MAME should wait before video updates to avoid
+    running faster than the target speed.
+video.throttle_rate (read/write)
+    The target emulation speed as a ratio of full speed adjusted by the speed
+    factor (i.e. 1 is normal speed adjusted by the speed factor, larger numbers
+    are faster, and smaller numbers are slower).
+video.frameskip (read/write)
+    The number of emulated video frames to skip drawing out of every twelve, or
+    -1 to automatically adjust the number of frames to skip to maintain the
+    target emulation speed.
+video.speed_percent (read-only)
+    The current emulated speed as a percentage of the full speed adjusted by the
+    speed factor.
+video.effective_frameskip (read-only)
+    The number of emulated frames that are skipped out of every twelve.
+video.skip_this_frame (read-only)
+    A Boolean indicating whether the video manager will skip drawing emulated
+    screens for the current frame.
+video.snap_native (read-only)
+    A Boolean indicating whether the video manager will take native emulated
+    screen snapshots.  In addition to the relevant configuration setting, the
+    emulated system must have at least one emulated screen.
+video.is_recording (read-only)
+    A Boolean indicating whether any video recordings are currently in progress.
+video.snapshot_target (read-only)
+    The :ref:`render target <luareference-render-target>` used to produce
+    snapshots and video recordings.
+
+.. _luareference-core-soundman:
+
+Sound manager
+~~~~~~~~~~~~~
+
+Wraps MAME’s ``sound_manager`` class, which manages the emulated sound stream
+graph and coordinates sound output.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager:machine().sound
+    Gets the sound manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+sound:start_recording([filename])
+    Starts recording to a WAV file.  Has no effect if currently recording.  If
+    the file name is not supplied, uses the configured WAV file name (from
+    command line or INI file), or has no effect if no WAV file name is
+    configured.  Returns ``true`` if recording started, or ``false`` if
+    recording is already in progress, opening the output file failed, or no file
+    name was supplied or configured.
+sound:stop_recording()
+    Stops recording and closes the file if currently recording to a WAV file.
+sound:get_samples()
+    Returns the current contents of the output sample buffer as a binary string.
+    Samples are 16-bit integers in host byte order.  Samples for left and right
+    stereo channels are interleaved.
+
+Properties
+^^^^^^^^^^
+
+sound.muted (read-only)
+    A Boolean indicating whether sound output is muted for any reason.
+sound.ui_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    user.
+sound.debugger_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    debugger.
+sound.system_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    emulated system.
+sound.attenuation (read/write)
+    The output volume attenuation in decibels.  Should generally be a negative
+    integer or zero.
+sound.recording (read-only)
+    A Boolean indicating whether sound output is currently being recorded to a
+    WAV file.
+
+.. _luareference-core-outputman:
+
+Output manager
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``output_manager`` class, providing access to system outputs that
+can be used for interactive artwork or consumed by external programs.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager:machine().output
+    Gets the output manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+output:set_value(name, val)
+    Sets the specified output value.  The value must be an integer.  The output
+    will be created if it does not already exist.
+output:set_indexed_value(prefix, index, val)
+    Appends the index (formatted as a decimal integer) to the prefix and sets
+    the value of the corresponding output.  The value must be an integer.  The
+    output will be created if it does not already exist.
+output:get_value(name)
+    Returns the value of the specified output, or zero if it doesn’t exist.
+output:get_indexed_value(prefix, index)
+    Appends the index (formatted as a decimal integer) to the prefix and returns
+    the value of the corresponding output, or zero if it doesn’t exist.
+output:name_to_id(name)
+    Gets the per-session unique integer ID for the specified output, or zero if
+    it doesn’t exist.
+output:id_to_name(id)
+    Gets the name for the output with the specified per-session unique ID, or
+    ``nil`` if it doesn’t exist.  This method has O(n) complexity, so avoid
+    calling it when performance is important.
+
+.. _luareference-core-paramman:
+
+Parameters manager
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``parameters_manager`` class, which provides a simple key-value
+store for metadata from system ROM definitions.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager:machine().parameters
+    Gets the parameters manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+parameters:lookup(tag)
+    Gets the value for the specified parameter if it is set, or an empty string
+    if it is not set.
+parameters:add(tag, value)
+    Sets the specified parameter if it is not set.  Has no effect if the
+    specified parameter is already set.
+
+.. _luareference-core-uiman:
+
+UI manager
+~~~~~~~~~~
+
+Wraps MAME’s ``mame_ui_manager`` class, which handles menus and other user
+interface functionality.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.ui
+    Gets the UI manager for the current session.
+
+Methods
+^^^^^^^
+
+ui:get_char_width(ch)
+    Gets the width of a Unicode character as a proportion of the width of the UI
+    container in the current font at the configured UI line height.
+ui:get_string_width(str)
+    Gets the width of a string as a proportion of the width of the UI container
+    in the current font at the configured UI line height.
+ui:set_aggressive_input_focus(enable)
+    On some platforms, this controls whether MAME should accept input focus in
+    more situations than when its windows have UI focus.
+
+Properties
+^^^^^^^^^^
+
+ui.options (read-only)
+    The UI :ref:`options <luareference-core-coreopts>` for the current session.
+ui.line_height (read-only)
+    The configured UI text line height as a proportion of the height of the UI
+    container.
+ui.menu_active (read-only)
+    A Boolean indicating whether an interactive UI element is currently active.
+    Examples include menus and slider controls.
+ui.single_step (read/write)
+    A Boolean controlling whether the emulated system should be automatically
+    paused when the next frame is drawn.  This property is automatically reset
+    when the automatic pause happens.
+ui.show_fps (read/write)
+    A Boolean controlling whether the current emulation speed and frame skipping
+    settings should be displayed.
+ui.show_profiler (read/write)
+    A Boolean controlling whether profiling statistics should be displayed.
+
+.. _luareference-core-driver:
+
+System driver metadata
+~~~~~~~~~~~~~~~~~~~~~~
+
+Provides some metadata for an emulated system.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.driver_find(name)
+    Gets the driver metadata for the system with the specified short name, or
+    ``nil`` if no such system exists.
+manager.machine.system
+    Gets the driver metadata for the current system.
+
+Properties
+^^^^^^^^^^
+
+driver.name (read-only)
+    The short name of the system, as used on the command line, in configuration
+    files, and when searching for resources.
+driver.description (read-only)
+    The full display name for the system.
+driver.year (read-only)
+    The release year for the system.  May contain question marks if not known
+    definitively.
+driver.manufacturer (read-only)
+    The manufacturer, developer or distributor of the system.
+driver.parent (read-only)
+    The short name of parent system for organisation purposes, or ``"0"`` if the
+    system has no parent.
+driver.compatible_with (read-only)
+    The short name of a system that this system is compatible with software for,
+    or ``nil`` if the system is not listed as compatible with another system.
+driver.source_file (read-only)
+    The source file where this system driver is defined.  The path format
+    depends on the toolchain the emulator was built with.
+driver.rotation (read-only)
+    A string indicating the rotation applied to all screens in the system after
+    the screen orientation specified in the machine configuration is applied.
+    Will be one of ``"rot0"``, ``"rot90"``, ``"rot180"`` or ``"rot270"``.
+driver.type (read-only)
+    A string providing a system type.  Will be one of ``"arcade"``,
+    ``"console"``, ``"computer"`` or ``"other"``.  This is for informational
+    purposes only, and may not be supported in the future.
+driver.not_working (read-only)
+    A Boolean indicating whether the system is marked as not working.
+driver.supports_save (read-only)
+    A Boolean indicating whether the system supports save states.
+driver.no_cocktail (read-only)
+    A Boolean indicating whether screen flipping in cocktail mode is
+    unsupported.
+driver.is_bios_root (read-only)
+    A Boolean indicating whether this system represents a system that runs
+    software from removable media without media present.
+driver.requires_artwork (read-only)
+    A Boolean indicating whether the system requires external artwork to be
+    usable.
+driver.clickable_artwork (read-only)
+    A Boolean indicating whether the system requires clickable artwork features
+    to be usable.
+driver.unofficial (read-only)
+    A Boolean indicating whether this is an unofficial but common user
+    modification to a system.
+driver.no_sound_hw (read-only)
+    A Boolean indicating whether the system has no sound output hardware.
+driver.mechanical (read-only)
+    A Boolean indicating whether the system depends on mechanical features that
+    cannot be properly simulated.
+driver.is_incomplete (read-only)
+    A Boolean indicating whether the system is a prototype with incomplete
+    functionality.
+
+.. _luareference-core-plugin:
+
+Lua plugin
+~~~~~~~~~~
+
+Provides a description of an available Lua plugin.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.plugins[name]
+    Gets the description of the Lua plugin with the specified name, or ``nil``
+    if no such plugin is available
+
+Properties
+^^^^^^^^^^
+
+plugin.name (read-only)
+    The short name of the plugin, used in configuration and when accessing the
+    plugin programmatically.
+plugin.description (read-only)
+    The display name for the plugin.
+plugin.type (read-only)
+    The plugin type.  May be ``"plugin"`` for user-loadable plugins, or
+    ``"library"`` for libraries providing common functionality to multiple
+    plugins.
+plugin.directory (read-only)
+    The path to the directory containing the plugin’s files.
+plugin.start (read-only)
+    A Boolean indicating whether the plugin enabled.
+
+
 .. _luareference-dev:
 
 Devices
@@ -112,7 +618,7 @@ manager:machine().screens
     :ref:`screen devices <luareference-dev-screen>` in the system.
 manager:machine().cassettes
     Returns a device enumerator that will iterate over
-    :ref:`cassette devices <luareference-dev-cass>` in the system.
+    :ref:`cassette image devices <luareference-dev-cass>` in the system.
 manager:machine().images
     Returns a device enumerator that will iterate over
     :ref:`media image devices <luareference-dev-diimage>` in the system.
@@ -135,11 +641,12 @@ emu.screen_enumerator(device, [depth])
     will limit iteration to the device and its immediate children).
 emu.cassette_enumerator(device, [depth])
     Returns a device enumerator that will iterate over
-    :ref:`cassette devices <luareference-dev-cass>` in the sub-tree starting at
-    the specified device.  The specified device will be included if it is a
-    cassette device.  If the depth is provided, it must be an integer specifying
-    the maximum number of levels to iterate below the specified device (i.e. 1
-    will limit iteration to the device and its immediate children).
+    :ref:`cassette image devices <luareference-dev-cass>` in the sub-tree
+    starting at the specified device.  The specified device will be included if
+    it is a cassette image device.  If the depth is provided, it must be an
+    integer specifying the maximum number of levels to iterate below the
+    specified device (i.e. 1 will limit iteration to the device and its
+    immediate children).
 emu.image_enumerator(device, [depth])
     Returns a device enumerator that will iterate over
     :ref:`media image devices <luareference-dev-diimage>` in the sub-tree
@@ -196,6 +703,9 @@ device:subdevice(tag)
     Gets a device by tag relative to the device.
 device:siblingdevice(tag)
     Gets a device by tag relative to the device’s parent.
+device:parameter(tag)
+    Gets a parameter value by tag relative to the device, or an empty string if
+    the parameter is not set.
 
 Properties
 ^^^^^^^^^^
@@ -252,7 +762,9 @@ Methods
 screen:orientation()
     Returns the rotation angle in degrees (will be one of 0, 90, 180 or 270),
     whether the screen is flipped left-to-right, and whether the screen is
-    flipped top-to-bottom.
+    flipped top-to-bottom.  This is the final screen orientation after the
+    screen orientation specified in the machine configuration and the rotation
+    for the system driver are applied.
 screen:time_until_pos(v, [h])
     Gets the time remaining until the raster reaches the specified position.  If
     the horizontal component of the position is not specified, it defaults to
@@ -675,7 +1187,7 @@ regions in a system to be enumerated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory()
+manager:machine().memory
     Gets the global memory manager instance for the emulated system.
 
 Properties
@@ -902,7 +1414,7 @@ Wraps MAME’s ``memory_share`` class, representing a named allocated memory zon
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().shares[tag]
+manager:machine().memory.shares[tag]
     Gets a memory share by absolute tag, or ``nil`` if no such memory share
     exists.
 manager:machine().devices[tag]:memshare(tag)
@@ -952,7 +1464,7 @@ indirection.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().banks[tag]
+manager:machine().memory.banks[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory bank
     exists.
 manager:machine().devices[tag]:membank(tag)
@@ -978,7 +1490,7 @@ read-only data like ROMs or the result of fixed decryptions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().regions[tag]
+manager:machine().memory.regions[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory region
     exists.
 manager:machine().devices[tag]:memregion(tag)
@@ -1037,7 +1549,7 @@ ports and handles input configuration.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport()
+manager:machine().ioport
     Gets the global I/O port manager instance for the emulated machine.
 
 Methods
@@ -1079,7 +1591,7 @@ keypad inputs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().natkeyboard
+manager:machine().ioport.natkeyboard
     Gets the global natural keyboard manager instance for the emulated machine.
 
 Methods
@@ -1143,7 +1655,7 @@ Represents a keyboard or keypad input device managed by the
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().natkeyboard.keyboards[tag]
+manager:machine().ioport.natkeyboard.keyboards[tag]
     Gets the keyboard input device with the specified tag, or ``nil`` if the tag
     does not correspond to a keyboard input device.
 
@@ -1179,7 +1691,7 @@ Wraps MAME’s ``ioport_port`` class, representing an emulated I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]
+manager:machine().ioport.ports[tag]
     Gets an emulated I/O port by absolute tag, or ``nil`` if the tag does not
     correspond to an I/O port.
 manager:machine().devices[devtag]:ioport(porttag)
@@ -1225,9 +1737,9 @@ Wraps MAME’s ``ioport_field`` class, representing a field within an I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]:field[mask]
+manager:machine().ioport.ports[tag]:field[mask]
     Gets a field for the given port by bit mask.
-manager:machine():ioport().ports[tag].fields[name]
+manager:machine().ioport.ports[tag].fields[name]
     Gets a field for the given port by display name.
 
 Methods
@@ -1348,7 +1860,7 @@ port field.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]:field(mask).live
+manager:machine().ioport.ports[tag]:field(mask).live
     Gets the live state for an I/O port field.
 
 Properties
@@ -1368,7 +1880,7 @@ whether configured inputs are active.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input()
+manager:machine().input
     Gets the global input manager instance for the emulated system.
 
 Methods
@@ -1443,12 +1955,12 @@ activated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input():axis_code_poller()
+manager:machine().input:axis_code_poller()
     Returns an input code poller that polls for analog inputs being activated.
-manager:machine():input():switch_code_poller()
+manager:machine().input:switch_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated.
-manager:machine():input():keyboard_code_poller()
+manager:machine().input:keyboard_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated, only considering keyboard input devices.
 
@@ -1474,10 +1986,10 @@ assign host input combinations to emulated inputs and other actions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input():axis_sequence_poller()
+manager:machine().input:axis_sequence_poller()
     Returns an input sequence poller for assigning host inputs to an analog
     input.
-manager:machine():input():switch_sequence_poller()
+manager:machine().input:switch_sequence_poller()
     Returns an input sequence poller for assigning host inputs to a switch
     input.
 
@@ -1517,7 +2029,7 @@ devices (e.g. keyboards or joysticks).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name]
+manager:machine().input.device_classes[name]
     Gets an input device class by name.
 
 Properties
@@ -1545,7 +2057,7 @@ Wraps MAME’s ``input_device`` class, representing a host input device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name].devices[index]
+manager:machine().input.device_classes[name].devices[index]
     Gets a specific host input device.
 
 Properties
@@ -1574,7 +2086,7 @@ a key, button, or axis).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name].devices[index].items[id]
+manager:machine().input.device_classes[name].devices[index].items[id]
     Gets an individual host input item.  The item ID is an enumerated value.
 
 Properties
@@ -1607,7 +2119,7 @@ Wraps MAME’s ``ui_input_manager`` class, which is used for high-level input.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():uiinput()
+manager:machine().uiinput
     Gets the global UI input manager instance for the machine.
 
 Methods
@@ -1775,7 +2287,7 @@ and textures.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render()
+manager:machine().render
     Gets the global render manager instance for the emulation session.
 
 Properties
@@ -1808,12 +2320,14 @@ screenshots.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render().targets[index]
-    Get a render target by index.
-manager:machine():render():ui_target()
-    Get the render target used to display the user interface (including menus,
+manager:machine().render.targets[index]
+    Gets a render target by index.
+manager:machine().render.ui_target
+    Gets the render target used to display the user interface (including menus,
     sliders and pop-up messages).  This is usually the first host window or
     screen.
+manager:machine().video.snapshot_target
+    Gets the render target used to produce snapshots and video recordings.
 
 Properties
 ^^^^^^^^^^
@@ -1870,7 +2384,7 @@ Wraps MAME’s ``render_container`` class.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render().ui_container
+manager:machine().render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
 manager:machine().screens[tag].container
@@ -2000,7 +2514,7 @@ Instantiation
 
 Layout scripts generally
 
-manager:machine():render().targets[index].current_view
+manager:machine().render.targets[index].current_view
     Gets the currently selected view for a given render target.
 
 Methods
@@ -2183,7 +2697,7 @@ the debugger.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():debugger()
+manager:machine().debugger
     Returns the global debugger manager instance, or ``nil`` if the debugger is
     not enabled.
 

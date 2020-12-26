@@ -692,10 +692,10 @@ void segaorun_state::outrun_custom_io_w(offs_t offset, uint16_t data, uint16_t m
 				//  D2: Start lamp
 				//  D1: Brake lamp
 				//  other bits: ?
-				machine().sound().system_enable(data & 0x80);
-				output().set_value("Vibration_motor", data >> 5 & 1);
-				output().set_value("Start_lamp", data >> 2 & 1);
-				output().set_value("Brake_lamp", data >> 1 & 1);
+				machine().sound().system_mute(!BIT(data, 7));
+				output().set_value("Vibration_motor", BIT(data, 5));
+				output().set_value("Start_lamp", BIT(data, 2));
+				output().set_value("Brake_lamp", BIT(data, 1));
 			}
 			return;
 
