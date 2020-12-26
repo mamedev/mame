@@ -604,8 +604,10 @@ function cheat.startplugin()
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
+			local ioport = manager.machine.ioport
+			local input = manager.machine.input
 			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
-			menu[2] = {_("Press UI Clear to clear hotkey"), "", "off"}
+			menu[2] = {string.format(_("Press %s to clear hotkey"), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), "", "off"}
 			menu[3] = {"---", "", "off"}
 			hotkeylist = {}
 
@@ -615,7 +617,6 @@ function cheat.startplugin()
 					return
 				end
 
-				local input = manager.machine.input
 				local poller = input:switch_sequence_poller()
 				manager.machine:popmessage(_("Press button for hotkey or wait to leave unchanged"))
 				manager.machine.video:frame_update()
@@ -644,7 +645,7 @@ function cheat.startplugin()
 
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager.machine.input:seq_name(cheat.hotkeys.keys) or _("None"), ""}
+					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and input:seq_name(cheat.hotkeys.keys) or _("None"), ""}
 					hotkeylist[#hotkeylist + 1] = function(event) return hkcbfunc(cheat, event) end
 				end
 			end

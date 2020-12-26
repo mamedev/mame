@@ -35,14 +35,17 @@ Features
 The API is not yet complete, but this is a partial list of capabilities
 currently available to Lua scripts:
 
--  machine metadata (app version, current emulated system, ROM details)
--  machine control (starting, pausing, resetting, stopping)
--  machine hooks (on frame painting and on user events)
+-  session information (app version, current emulated system, ROM details)
+-  session control (starting, pausing, resetting, stopping)
+-  event hooks (on frame painting and on user events)
 -  device introspection (device tree listing, memory and register enumeration)
 -  screen introspection (screens listing, screen details, frame counting)
--  screen HUD drawing (text, lines, boxes on multiple screens)
+-  screen overlay drawing (text, lines, boxes on multiple screens)
 -  memory read/write (8/16/32/64 bits, signed and unsigned)
 -  register and state control (state enumeration, get and set)
+
+Many of the classes are documented on the
+:ref:`Lua class reference <luareference>` page.
 
 
 .. _luaengine-usage:
@@ -50,10 +53,10 @@ currently available to Lua scripts:
 Usage
 -----
 
-MAME supports external scripting via Lua (>= 5.3) scripts, either written on the
+MAME supports external scripting via Lua (>= 5.3) scripts, either entered at the
 interactive console or loaded as a file. To reach the console, enable the
 console plugin (e.g. run MAME with ``-plugin console``) and you will be greeted
-by a ``[MAME]>`` prompt where you can enter your script.
+with a ``[MAME]>`` prompt where you can enter Lua script interactively.
 
 To load a whole script at once, store it in a plain text file and pass it using
 ``-autoboot_script``. Please note that script loading may be delayed (a few
@@ -71,7 +74,7 @@ hooks to be invoked on specific events (e.g. at each frame rendering).
 Walkthrough
 -----------
 
-Let's first run MAME in a terminal to reach the Lua console:
+Let’s first run MAME in a terminal to reach the Lua console:
 
 ::
 
@@ -95,14 +98,14 @@ Let's first run MAME in a terminal to reach the Lua console:
 
     [MAME]>
 
-At this point, your game is probably running in demo mode, let's pause it:
+At this point, your game is probably running in demo mode, let’s pause it:
 
 ::
 
     [MAME]> emu.pause()
     [MAME]>
 
-Even without textual feedback on the console, you'll notice the game is now
+Even without textual feedback on the console, you’ll notice the game is now
 paused.  In general, commands are quiet and only print back error messages.
 
 You can check at runtime which version of MAME you are running, with:
@@ -120,10 +123,12 @@ screens:
     [MAME]> for tag, screen in pairs(manager.machine.screens) do print(tag) end
     :screen
 
-``manager.machine`` is the root object of your currently running machine: we
-will be using this often.  ``screens`` is a table with all available screens;
-most machines only have one main screen.  In our case, the main and only screen
-is tagged as ``:screen``, and we can further inspect it:
+``manager.machine`` is the :ref:`running machine <luareference-core-machine>`
+object for your current emulation session.  We will be using this frequently.
+``screens`` is a :ref:`device enumerator <luareference-dev-enum>` that yields
+all emulated screens in the system; most arcade games only have one main screen.
+In our case, the main and only screen is tagged as ``:screen``, and we can
+further inspect it:
 
 ::
 

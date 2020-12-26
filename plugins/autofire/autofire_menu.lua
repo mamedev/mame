@@ -52,8 +52,11 @@ end
 -- Main menu
 
 local function populate_main_menu(buttons)
+	local ioport = manager.machine.ioport
+	local input = manager.machine.input
 	local menu = {}
 	menu[#menu + 1] = {_('Autofire buttons'), '', 'off'}
+	menu[#menu + 1] = {string.format(_('Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
@@ -63,7 +66,7 @@ local function populate_main_menu(buttons)
 		-- Round to two decimal places
 		rate = math.floor(rate * 100) / 100
 		local text = button.button.name .. ' [' .. rate .. ' Hz]'
-		local subtext = manager.machine.input:seq_name(button.key)
+		local subtext = input:seq_name(button.key)
 		menu[#menu + 1] = {text, subtext, ''}
 	end
 	content_height = #menu
@@ -76,7 +79,6 @@ end
 local function handle_main_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if section == MENU_SECTIONS.CONTENT then
-		manager.machine:popmessage(_('Press UI Clear to delete'))
 		if event == 'select' then
 			current_button = buttons[adjusted_index]
 			table.insert(menu_stack, MENU_TYPES.EDIT)
