@@ -5327,9 +5327,8 @@ static INPUT_PORTS_START( scramble )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-// unknown button config, button 1 moves up the screen, with up being jump and down being drop item
-// using standard mapping, but maybe that is correct?
-// single bank of 6 dipswitches
+// Input mapping confirmed from instruction sheet, Up is Jump, Down is release item, A is accelerate
+// There is a single bank of 6 dipswitches
 static INPUT_PORTS_START( namenayo )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
