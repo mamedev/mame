@@ -206,17 +206,17 @@ license:CC0
 	<element name="label1_14_5"><text string="who"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_15_5"><text string="what"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="label1_1_6"><text string="My name is..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_2_6"><text string="I am..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_3_6"><text string="I have..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_4_6"><text string="I want..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_5_6"><text string="I'd like..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_6_6"><text string="I'm going..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_1_6"><text string="My name is . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_6"><text string="I am . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_6"><text string="I have . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_6"><text string="I want . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_6"><text string="I'd like . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_6"><text string="I'm going. . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_7_6"><text string="How are you?"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_8_6"><text string="I'm fine."><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_9_6"><text string="I'm ready."><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_10_6"><text string="I need help."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label1_11_6"><text string="I don't undertstand"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_6"><text string="I don't understand"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_12_6"><text string="Would you come here?"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_13_6"><text string="My feelings are hurt."><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label1_14_6"><text string="Please leave me alone."><color red="0.0" green="0.0" blue="0.0" /></text></element>
@@ -500,67 +500,67 @@ license:CC0
 
 	<!-- level 4 labels -->
 
-	<element name="label4_1_0"><text string="/A1//e1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_2_0"><text string="/A2//e2/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_3_0"><text string="//AE1//ae1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_4_0"><text string="/AH1//a1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_5_0"><text string="/AH2//a2/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_6_0"><text string="/AW1//o1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_7_0"><text string="/AW2//o2/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_8_0"><text string="/AY//iv/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_9_0"><text string="/E1//i1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_10_0"><text string="/EH1//£1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_11_0"><text string="/EH3//£3/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_12_0"><text string="/I1//I1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_13_0"><text string="/I3//I3/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_14_0"><text string="/IU//#/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_15_0"><text string="/O1//o1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_1_0"><text string="/A1//e₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_0"><text string="/A2//e₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_0"><text string="//AE1//ae₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_0"><text string="/AH1//a₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_0"><text string="/AH2//a₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_0"><text string="/AW1//ɔ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_0"><text string="/AW2//ɔ₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_0"><text string="/AY//iⱽ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_0"><text string="/E1//i₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_0"><text string="/EH1//ɛ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_0"><text string="/EH3//ɛ₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_0"><text string="/I1//I₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_0"><text string="/I3//I₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_0"><text string="/IU//ʉ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_0"><text string="/O1//o₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="label4_1_1"><text string="/O2//o2/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_2_1"><text string="/OO1//u1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_3_1"><text string="/U1//u1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_4_1"><text string="/UH1//^1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_5_1"><text string="/UH3//e3/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_6_1"><text string="/Y1//j1/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_1_1"><text string="/O2//o₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_1"><text string="/OO1//ʊ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_1"><text string="/U1//u₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_1"><text string="/UH1//ʌ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_1"><text string="/UH3//ə₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_1"><text string="/Y1//j₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_7_1"><text string="/B//b/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_8_1"><text string="/CH//tS/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_1"><text string="/CH//ʧ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_9_1"><text string="/D//d/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_10_1"><text string="/F//f/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_11_1"><text string="/G//g/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_12_1"><text string="/H//h/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_13_1"><text string="/J//d3/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_1"><text string="/J//ʤ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_14_1"><text string="/K//k/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_15_1"><text string="/L//l/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
 	<element name="label4_1_2"><text string="/M//m/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_2_2"><text string="/N//n/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_3_2"><text string="/NG//n/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_2"><text string="/NG//ŋ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_4_2"><text string="/P//p/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_5_2"><text string="/R//r/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_6_2"><text string="/S//s/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_7_2"><text string="/SH//S/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_8_2"><text string="/T//t/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_9_2"><text string="/TH//0/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_10_2"><text string="/THV//o/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_2"><text string="/SH//ʃ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_2"><text string="/T/ /t/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_2"><text string="/TH//θ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_2"><text string="/THV//ð/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_11_2"><text string="/V//v/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_12_2"><text string="/W//w/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_13_2"><text string="/Y//j/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_14_2"><text string="/Z//z/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_15_2"><text string="/ZH//3/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_2"><text string="/ZH//ʒ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="label4_1_3"><text string="con..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_2_3"><text string="dis..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_3_3"><text string="...ed"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_4_3"><text string="...en"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_5_3"><text string="...er"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_6_3"><text string="...es"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_7_3"><text string="...et"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_8_3"><text string="...ez"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_9_3"><text string="...ful"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_10_3"><text string="...ing"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_11_3"><text string="...less"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_12_3"><text string="...ly"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="label4_13_3"><text string="un..."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_1_3"><text string="con . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_3"><text string="dis . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_3"><text string=". . . ed"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_3"><text string=". . . en"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_3"><text string=". . . er/ə^/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_3"><text string=". . . es"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_3"><text string=". . . et"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_3"><text string=". . . ez"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_3"><text string=". . . ful"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_3"><text string=". . . ing"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_3"><text string=". . . less"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_3"><text string=". . . ly"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_3"><text string="un . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_14_3"><text string="again"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="label4_15_3"><text string="at"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 

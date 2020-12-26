@@ -9,12 +9,14 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/devopt.h"
+
+#include "ui/ui.h"
 #include "romload.h"
 
 
 namespace ui {
+
 /*-------------------------------------------------
  device_config - handle the game information
  menu
@@ -293,7 +295,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			str << _("[None]\n");
 
 	mconfig.device_remove(m_option->name());
-	item_append(str.str(), "", FLAG_MULTILINE, nullptr);
+	item_append(str.str(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_device_config::handle()

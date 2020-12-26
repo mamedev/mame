@@ -11,8 +11,9 @@
 #include "emu.h"
 #include "ui/ui.h"
 
-#include "luaengine.h"
 #include "infoxml.h"
+#include "iptseqpoll.h"
+#include "luaengine.h"
 #include "mame.h"
 #include "ui/filemngr.h"
 #include "ui/info.h"
@@ -110,7 +111,6 @@ static input_item_id const non_char_keys[] =
 // messagebox buffer
 std::string mame_ui_manager::messagebox_text;
 std::string mame_ui_manager::messagebox_poptext;
-rgb_t mame_ui_manager::messagebox_backcolor;
 
 // slider info
 std::vector<ui::menu_item> mame_ui_manager::slider_list;
@@ -203,8 +203,13 @@ void mame_ui_manager::init()
 	update_target_font_height();
 
 	// more initialization
-	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
+	set_handler(
+			ui_callback_type::GENERAL,
+			[this] (render_container &container) -> uint32_t
+			{
+				draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, colors().background_color());
+				return 0;
+			});
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
@@ -406,31 +411,56 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	show_gameinfo = show_warnings = false;
 #endif
 
-	// loop over states
+	// set up event handlers
 	using namespace std::placeholders;
+	switch_code_poller poller(machine().input());
+	std::string warning_text;
+	rgb_t warning_color;
+	auto handler_messagebox_anykey =
+		[this, &poller, &warning_text, &warning_color] (render_container &container) -> uint32_t
+		{
+			// draw a standard message window
+			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
+
+			if (machine().ui_input().pressed(IPT_UI_CANCEL))
+			{
+				// if the user cancels, exit out completely
+				machine().schedule_exit();
+				return UI_HANDLER_CANCEL;
+			}
+			else if (poller.poll() != INPUT_CODE_INVALID)
+			{
+				// if any key is pressed, just exit
+				return UI_HANDLER_CANCEL;
+			}
+
+			return 0;
+		};
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+
+	// loop over states
 	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
-		messagebox_backcolor = colors().background_color();
-		messagebox_text.clear();
+		warning_color = colors().background_color();
+		warning_text.clear();
 
 		// pick the next state
 		switch (state)
 		{
 		case 0:
 			if (show_gameinfo)
-				messagebox_text = machine_info().game_info_string();
-			if (!messagebox_text.empty())
+				warning_text = machine_info().game_info_string();
+			if (!warning_text.empty())
 			{
-				messagebox_text.append(_("\n\nPress any key to continue"));
-				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+				warning_text.append(_("\n\nPress any key to continue"));
+				set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
 			}
 			break;
 
 		case 1:
-			messagebox_text = machine_info().warnings_string();
-			m_has_warnings = !messagebox_text.empty();
+			warning_text = machine_info().warnings_string();
+			m_has_warnings = !warning_text.empty();
 			if (show_warnings)
 			{
 				bool need_warning = m_has_warnings;
@@ -496,9 +526,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				}
 				if (need_warning)
 				{
-					messagebox_text.append(_("\n\nPress any key to continue"));
-					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-					messagebox_backcolor = machine_info().warnings_color();
+					warning_text.append(_("\n\nPress any key to continue"));
+					set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
+					warning_color = machine_info().warnings_color();
 				}
 			}
 			break;
@@ -519,15 +549,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			break;
 		}
 
-		// clear the input memory
-		machine().input().reset_polling();
-		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
+		// clear the input memory and wait for all keys to be released
+		poller.reset();
+		while (poller.poll() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
 		while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
-		{
 			machine().video().frame_update();
-		}
 
 		// clear the handler and force an update
 		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
@@ -556,7 +584,6 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 
 	// copy in the new text
 	messagebox_text.assign(text);
-	messagebox_backcolor = colors().background_color();
 
 	// don't update more than 4 times/second
 	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
@@ -598,7 +625,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext.c_str(), ui::text_layout::CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_poptext, ui::text_layout::CENTER, 0.5f, 0.9f, colors().background_color());
 	else
 		m_popup_text_end = 0;
 
@@ -703,7 +730,7 @@ float mame_ui_manager::get_char_width(char32_t ch)
 //  character string
 //-------------------------------------------------
 
-float mame_ui_manager::get_string_width(const char *s, float text_size)
+float mame_ui_manager::get_string_width(std::string_view s, float text_size)
 {
 	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
 }
@@ -741,7 +768,7 @@ void mame_ui_manager::draw_outlined_box(render_container &container, float x0, f
 //  draw_text - simple text renderer
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text(render_container &container, const char *buf, float x, float y)
+void mame_ui_manager::draw_text(render_container &container, std::string_view buf, float x, float y)
 {
 	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
 }
@@ -753,7 +780,7 @@ void mame_ui_manager::draw_text(render_container &container, const char *buf, fl
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container &container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, justify, wrap);
@@ -782,7 +809,7 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
 	float maximum_width = 1.0f - box_lr_border() * 2;
@@ -829,7 +856,7 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_message_window(render_container &container, const char *text)
+void mame_ui_manager::draw_message_window(render_container &container, std::string_view text)
 {
 	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
 }
@@ -947,46 +974,6 @@ bool mame_ui_manager::is_menu_active(void)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  handler_messagebox - displays the current
-//  messagebox_text string but handles no input
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_messagebox(render_container &container)
-{
-	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  handler_messagebox_anykey - displays the
-//  current messagebox_text string and waits for
-//  any keypress
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_messagebox_anykey(render_container &container)
-{
-	uint32_t state = 0;
-
-	// draw a standard message window
-	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
-
-	// if the user cancels, exit out completely
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
-	{
-		machine().schedule_exit();
-		state = UI_HANDLER_CANCEL;
-	}
-
-	// if any key is pressed, just exit
-	else if (machine().input().poll_switches() != INPUT_CODE_INVALID)
-		state = UI_HANDLER_CANCEL;
-
-	return state;
-}
-
-
-//-------------------------------------------------
 //  process_natural_keyboard - processes any
 //  natural keyboard input
 //-------------------------------------------------
@@ -1005,7 +992,7 @@ void mame_ui_manager::process_natural_keyboard()
 	{
 		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == ui_event::type::IME_CHAR)
-			machine().ioport().natkeyboard().post_char(event.ch);
+			machine().natkeyboard().post_char(event.ch);
 	}
 
 	// process natural keyboard keys that don't get UI_EVENT_CHARs
@@ -1028,7 +1015,7 @@ void mame_ui_manager::process_natural_keyboard()
 			*key_down_ptr |= key_down_mask;
 
 			// post the key
-			machine().ioport().natkeyboard().post_char(UCHAR_MAMEKEY_BEGIN + code.item_id());
+			machine().natkeyboard().post_char(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
@@ -1090,7 +1077,7 @@ bool mame_ui_manager::can_paste()
 
 void mame_ui_manager::draw_fps_counter(render_container &container)
 {
-	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().speed_text(), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1102,7 +1089,7 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 void mame_ui_manager::draw_timecode_counter(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().timecode_text(tempstring), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1114,7 +1101,7 @@ void mame_ui_manager::draw_timecode_counter(render_container &container)
 void mame_ui_manager::draw_timecode_total(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+	draw_text_full(container, machine().video().timecode_total_text(tempstring), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1125,7 +1112,7 @@ void mame_ui_manager::draw_timecode_total(render_container &container)
 
 void mame_ui_manager::draw_profiler(render_container &container)
 {
-	const char *text = g_profiler.text(machine());
+	std::string_view text = g_profiler.text(machine());
 	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
@@ -1172,7 +1159,7 @@ void mame_ui_manager::image_handler_ingame()
 			std::string str = image.call_display();
 			if (!str.empty())
 			{
-				layout.add_text(str.c_str());
+				layout.add_text(str);
 				layout.add_text("\n");
 			}
 		}
@@ -1257,14 +1244,14 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == machine_phase::RUNNING))
+	if (machine().natkeyboard().in_use() && (machine().phase() == machine_phase::RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)
 	{
 		// paste command
 		if (machine().ui_input().pressed(IPT_UI_PASTE))
-			machine().ioport().natkeyboard().paste();
+			machine().natkeyboard().paste();
 	}
 
 	image_handler_ingame();
@@ -1394,7 +1381,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-		machine().video().toggle_throttle();
+		machine().video().set_throttled(!machine().video().throttled());
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
@@ -1445,7 +1432,7 @@ uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
 			ui_select_text,
 			ui_cancel_text);
 
-	draw_text_box(container, quit_message.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	draw_text_box(container, quit_message, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine().pause();
 
 	// if the user press ENTER, quit the game
@@ -1839,9 +1826,8 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_brightness = (float)newval * 0.001f;
@@ -1861,9 +1847,8 @@ int32_t mame_ui_manager::slider_brightness(running_machine &machine, void *arg, 
 int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_contrast = (float)newval * 0.001f;
@@ -1882,9 +1867,8 @@ int32_t mame_ui_manager::slider_contrast(running_machine &machine, void *arg, in
 int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_gamma = (float)newval * 0.001f;
@@ -1904,9 +1888,8 @@ int32_t mame_ui_manager::slider_gamma(running_machine &machine, void *arg, int i
 int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xscale = (float)newval * 0.001f;
@@ -1926,9 +1909,8 @@ int32_t mame_ui_manager::slider_xscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yscale = (float)newval * 0.001f;
@@ -1948,9 +1930,8 @@ int32_t mame_ui_manager::slider_yscale(running_machine &machine, void *arg, int 
 int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_xoffset = (float)newval * 0.001f;
@@ -1970,9 +1951,8 @@ int32_t mame_ui_manager::slider_xoffset(running_machine &machine, void *arg, int
 int32_t mame_ui_manager::slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	render_container::user_settings settings;
 
-	screen->container().get_user_settings(settings);
+	render_container::user_settings settings = screen->container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.m_yoffset = (float)newval * 0.001f;
@@ -2204,7 +2184,7 @@ ui::text_layout mame_ui_manager::create_layout(render_container &container, floa
 //  wrap_text
 //-------------------------------------------------
 
-int mame_ui_manager::wrap_text(render_container &container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+int mame_ui_manager::wrap_text(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);
@@ -2239,7 +2219,6 @@ void mame_ui_manager::popup_time_string(int seconds, std::string message)
 {
 	// extract the text
 	messagebox_poptext = message;
-	messagebox_backcolor = colors().background_color();
 
 	// set a timer
 	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;

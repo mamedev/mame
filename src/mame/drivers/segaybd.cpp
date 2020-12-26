@@ -147,7 +147,7 @@ void segaybd_state::output2_w(uint8_t data)
 
 	// D7 = /MUTE
 	// D6-D0 = FLT31-25
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 }
 
 

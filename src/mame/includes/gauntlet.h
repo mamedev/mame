@@ -35,6 +35,7 @@ public:
 		m_tms5220(*this, "tms"),
 		m_soundctl(*this, "soundctl"),
 		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_playfield_tilemap(*this, "playfield"),
@@ -86,6 +87,7 @@ private:
 	required_device<tms5220_device> m_tms5220;
 	required_device<ls259_device> m_soundctl;
 	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -101,6 +103,8 @@ private:
 	uint8_t           m_playfield_color_bank;
 
 	static const atari_motion_objects_config s_mob_config;
+
+	void slapstic_tweak(offs_t offset, u16 &, u16);
 };
 
 #endif // MAME_INCLUDES_GAUNTLET_H

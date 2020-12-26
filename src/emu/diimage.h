@@ -175,11 +175,6 @@ public:
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
 
-	const std::string &longname() const noexcept { return m_longname; }
-	const std::string &manufacturer() const noexcept { return m_manufacturer; }
-	const std::string &year() const noexcept { return m_year; }
-	u32 supported() const noexcept { return m_supported; }
-
 	const software_info *software_entry() const noexcept;
 	const software_part *part_entry() const noexcept { return m_software_part_ptr; }
 	const char *software_list_name() const noexcept { return m_software_list_name.c_str(); }
@@ -300,12 +295,6 @@ private:
 
 	// working directory; persists across mounts
 	std::string m_working_directory;
-
-	// info read from the hash file/software list
-	std::string m_longname;
-	std::string m_manufacturer;
-	std::string m_year;
-	u32 m_supported;
 
 	// flags
 	bool m_readonly;

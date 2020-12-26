@@ -270,7 +270,7 @@ void play_2_state::port06_w(uint8_t data)
 
 void play_2_state::port07_w(uint8_t data)
 {
-	m_soundlatch = (data & 0x70) >> 4; // Zira (manual doesn't say where data comes from)
+	m_soundlatch = (data & 0x70) >> 4; // Zira, Cerberus
 	m_4013b->clear_w(0);
 	m_4013b->clear_w(1);
 	if (!BIT(data, 7))
@@ -339,7 +339,7 @@ void play_2_state::sound_g_w(uint8_t data)
 
 uint8_t play_2_state::sound_in_r()
 {
-	return m_soundlatch;
+	return ~m_soundlatch & 7;
 }
 
 uint8_t play_2_state::psg_r()

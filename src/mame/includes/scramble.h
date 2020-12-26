@@ -43,7 +43,6 @@ public:
 	memory_bank_creator m_cavelon_bank_object;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 	uint8_t hncholms_prot_r();
 	uint8_t scramble_soundram_r(offs_t offset);
 	uint8_t mars_ppi8255_0_r(offs_t offset);
@@ -114,12 +113,10 @@ public:
 	void devilfsh(machine_config &config);
 	void triplep(machine_config &config);
 	void newsin7(machine_config &config);
-	void ckongs(machine_config &config);
 	void mrkougb(machine_config &config);
 	void ad2083_map(address_map &map);
 	void ad2083_sound_io_map(address_map &map);
 	void ad2083_sound_map(address_map &map);
-	void ckongs_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void harem_map(address_map &map);
 	void harem_sound_io_map(address_map &map);

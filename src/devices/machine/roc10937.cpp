@@ -131,6 +131,7 @@ static const int roc10937poslut[]=
 rocvfd_device::rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_outputs(),
+	m_cursor_pos(0),
 	m_port_val(0)
 {
 }

@@ -452,7 +452,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
-	titlewidth = ui_font->string_width(chheight, aspect, title.c_str());
+	titlewidth = ui_font->string_width(chheight, aspect, title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -743,7 +743,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
-	const float titlewidth = ui_font->string_width(chheight, aspect, title.c_str());
+	const float titlewidth = ui_font->string_width(chheight, aspect, title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -1148,7 +1148,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
-	titlewidth = ui_font->string_width(chheight, aspect, title.c_str());
+	titlewidth = ui_font->string_width(chheight, aspect, title);
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
 		boxbounds.x0 = 0.5f - 0.5f * (titlewidth + chwidth);

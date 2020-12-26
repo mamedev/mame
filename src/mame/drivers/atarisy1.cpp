@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
 void atarisy1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x087fff).rom(); // slapstic maps here
+	map(0x080000, 0x081fff).mirror(0x6000).bankr(m_slapstic_bank); // slapstic maps here
 	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::atarisy1_int3state_r));
 	map(0x400000, 0x401fff).ram();
 	map(0x800000, 0x800001).w(FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
@@ -788,14 +788,16 @@ void atarisy1_state::atarisy1(machine_config &config)
 void atarisy1_state::marble(machine_config &config)
 {
 	atarisy1(config);
-	SLAPSTIC(config, "slapstic", 103, true);
+	SLAPSTIC(config, m_slapstic, 103);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 void atarisy1_state::peterpak(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
-	SLAPSTIC(config, "slapstic", 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
 	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
@@ -809,7 +811,8 @@ void atarisy1_state::indytemp(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, "slapstic", 105, true);
+	SLAPSTIC(config, m_slapstic, 105);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
 	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
@@ -823,7 +826,8 @@ void atarisy1_state::roadrunn(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, "slapstic", 108, true);
+	SLAPSTIC(config, m_slapstic, 108);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Hall-effect analog joystick
 	m_adc->in_callback<6>().set_ioport("IN0");
@@ -835,7 +839,8 @@ void atarisy1_state::roadb109(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, "slapstic", 109, true);
+	SLAPSTIC(config, m_slapstic, 109);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
 	m_adc->in_callback<2>().set_ioport("IN1");
@@ -846,7 +851,8 @@ void atarisy1_state::roadb110(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, "slapstic", 110, true);
+	SLAPSTIC(config, m_slapstic, 110);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
 	m_adc->in_callback<2>().set_ioport("IN1");
@@ -2479,9 +2485,22 @@ ROM_END
  *
  *************************************/
 
+void atarisy1_state::init_slapstic()
+{
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x80000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x80000, 0x87fff, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+
+	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range marble madness actually needs
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x2ff5a, 0x2ff5b, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+}
+
 void atarisy1_state::init_marble()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	init_slapstic();
 
 	m_trackball_type = 1;   /* rotated */
 }
@@ -2489,7 +2508,7 @@ void atarisy1_state::init_marble()
 
 void atarisy1_state::init_peterpak()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	init_slapstic();
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2497,7 +2516,7 @@ void atarisy1_state::init_peterpak()
 
 void atarisy1_state::init_indytemp()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	init_slapstic();
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2505,7 +2524,7 @@ void atarisy1_state::init_indytemp()
 
 void atarisy1_state::init_roadrunn()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	init_slapstic();
 
 	m_trackball_type = 0;   /* none */
 }
@@ -2513,7 +2532,7 @@ void atarisy1_state::init_roadrunn()
 
 void atarisy1_state::init_roadblst()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
+	init_slapstic();
 
 	m_trackball_type = 2;   /* steering wheel */
 }

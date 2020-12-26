@@ -187,23 +187,23 @@ rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
  *
  *************************************/
 
-uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset)
+uint16_t atarisy2_state::slapstic_r(offs_t offset)
 {
 	int result = m_slapstic_region[offset + 0100000/2];
-	m_slapstic->slapstic_tweak(space, offset);
+	m_slapstic->tweak(offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
+	m_vrambank->set_bank(m_slapstic->tweak(0x1234));
 	return result;
 }
 
 
-void atarisy2_state::slapstic_w(address_space &space, offs_t offset, uint16_t data)
+void atarisy2_state::slapstic_w(offs_t offset, uint16_t data)
 {
-	m_slapstic->slapstic_tweak(space, offset);
+	m_slapstic->tweak(offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
+	m_vrambank->set_bank(m_slapstic->tweak(0x1234));
 }
 
 

@@ -126,4 +126,4 @@ INPUT_CHANGED_MEMBER(hle_hp_46060b_device::mouse_button)
 	mouse_buttons = data;
 }
 
-} // namesapce bus::hp_hil
+} // namespace bus::hp_hil

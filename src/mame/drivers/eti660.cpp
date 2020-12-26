@@ -109,13 +109,11 @@ private:
 	/* video state */
 	u8 m_color_ram[0xc0];
 	u8 m_color;
-	bool m_color_on;
 };
 
 
 /* Read/Write Handlers */
 // Schematic is wrong, PCB layout is correct: D0-7 swapped around on PIA.
-// There's still a bug in the PIA: if ca2 is instructed to go low, nothing happens.
 u8 eti660_state::pia_r()
 {
 	u8 pia_offset = m_maincpu->get_memory_address() & 0x03;
@@ -128,19 +126,14 @@ void eti660_state::pia_w(u8 data)
 	u8 pia_offset = m_maincpu->get_memory_address() & 0x03;
 	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	m_pia->write(pia_offset, data);
-
-	// handle bug in PIA
-	if ((pia_offset == 1) && ((data & 0x30) == 0x30))
-		ca2_w(BIT(data, 3));
 }
 
 WRITE_LINE_MEMBER( eti660_state::ca2_w ) // test with Wipeout game - it should start up in colour
 {
-	m_color_on = !state;
 	m_cti->con_w(state);
 }
 
- void eti660_state::colorram_w(offs_t offset, u8 data)
+void eti660_state::colorram_w(offs_t offset, u8 data)
 {
 	offset = m_maincpu->get_memory_address() - 0xc80;
 
@@ -245,15 +238,10 @@ void eti660_state::dma_w(offs_t offset, u8 data)
 
 	m_color = 7;
 
-	if (m_color_on)
-	{
-		u8 colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
+	u8 colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
 
-		if (colorram_offset < 0xc0)
-			m_color = m_color_ram[colorram_offset];
-	}
-	else
-		m_color = m_p_videoram[offset] ? 7 : 0;
+	if (colorram_offset < 0xc0)
+		m_color = m_color_ram[colorram_offset];
 
 	m_cti->dma_w(data);
 }
@@ -309,8 +297,6 @@ void eti660_state::pia_pa_w(u8 data)
 void eti660_state::machine_reset()
 {
 	m_resetcnt = 0;
-	m_color_on = 0;
-	m_cti->con_w(0);
 	m_maincpu->reset();  // needed
 }
 
@@ -320,7 +306,6 @@ void eti660_state::machine_start()
 
 	save_item(NAME(m_color_ram));
 	save_item(NAME(m_color));
-	save_item(NAME(m_color_on));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_resetcnt));
 }

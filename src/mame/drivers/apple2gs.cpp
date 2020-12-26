@@ -112,6 +112,7 @@
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/byte8251.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grapplerplus.h"
@@ -123,6 +124,7 @@
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/sider.h"
 #include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
@@ -150,10 +152,7 @@
 #define RS232A_TAG "printer"
 #define RS232B_TAG "modem"
 
-#define A2GS_C100_TAG "c1bank"
 #define A2GS_C300_TAG "c3bank"
-#define A2GS_C400_TAG "c4bank"
-#define A2GS_C800_TAG "c8bank"
 #define A2GS_LCBANK_TAG "lcbank"
 #define A2GS_LCAUX_TAG "lcaux"
 #define A2GS_LC00_TAG "lc00"
@@ -196,10 +195,7 @@ public:
 		  m_upperaux(*this, A2GS_AUXUPPER_TAG),
 		  m_upper00(*this, A2GS_00UPPER_TAG),
 		  m_upper01(*this, A2GS_01UPPER_TAG),
-		  m_c100bank(*this, A2GS_C100_TAG),
 		  m_c300bank(*this, A2GS_C300_TAG),
-		  m_c400bank(*this, A2GS_C400_TAG),
-		  m_c800bank(*this, A2GS_C800_TAG),
 		  m_b0_0000bank(*this, A2GS_B00000_TAG),
 		  m_b0_0200bank(*this, A2GS_B00200_TAG),
 		  m_b0_0400bank(*this, A2GS_B00400_TAG),
@@ -239,7 +235,7 @@ public:
 	required_device<apple2_gameio_device> m_gameio;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
-	required_device<address_map_bank_device> m_c100bank, m_c300bank, m_c400bank, m_c800bank;
+	required_device<address_map_bank_device> m_c300bank;
 	required_device<address_map_bank_device> m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
 	required_device<address_map_bank_device> m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
 	required_device<z80scc_device> m_scc;
@@ -388,10 +384,7 @@ public:
 
 	void apple2gs_map(address_map &map);
 	void vectors_map(address_map &map);
-	void c100bank_map(address_map &map);
 	void c300bank_map(address_map &map);
-	void c400bank_map(address_map &map);
-	void c800bank_map(address_map &map);
 	void inhbank_map(address_map &map);
 	void inhaux_map(address_map &map);
 	void inh00_map(address_map &map);
@@ -455,16 +448,13 @@ private:
 	u8 c080_r(offs_t offset);
 	void c080_w(offs_t offset, u8 data);
 	u8 c100_r(offs_t offset);
-	u8 c100_int_r(offs_t offset);
 	void c100_w(offs_t offset, u8 data);
 	u8 c300_r(offs_t offset);
 	u8 c300_int_r(offs_t offset);
 	void c300_w(offs_t offset, u8 data);
 	u8 c400_r(offs_t offset);
-	u8 c400_int_r(offs_t offset);
 	void c400_w(offs_t offset, u8 data);
 	u8 c800_r(offs_t offset);
-	u8 c800_int_r(offs_t offset);
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
 	void inh_w(offs_t offset, u8 data);
@@ -1842,25 +1832,7 @@ void apple2gs_state::auxbank_update()
 
 void apple2gs_state::update_slotrom_banks()
 {
-	int cxswitch = 0;
-
-	if (m_intcxrom)
-	{
-		cxswitch = 1;
-	}
-
-	m_c100bank->set_bank(cxswitch);
-	m_c400bank->set_bank(cxswitch);
-
 	//printf("update_slotrom_banks: intcxrom %d cnxx_slot %d SLOT %02x\n", m_intcxrom, m_cnxx_slot, m_slotromsel);
-	if ((m_intcxrom) || (m_cnxx_slot < 0))
-	{
-		m_c800bank->set_bank(1);
-	}
-	else
-	{
-		m_c800bank->set_bank(0);
-	}
 
 	// slot 3 ROM is controlled exclusively by SLOTC3ROM
 	if (!m_slotc3rom)
@@ -3095,7 +3067,7 @@ void apple2gs_state::c080_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 //  printf("read_slot_rom: sl %d offs %x, cnxx_slot %d\n", slotnum, offset, m_cnxx_slot);
 
@@ -3116,7 +3088,7 @@ u8 apple2gs_state::read_slot_rom(int slotbias, int offset)
 
 void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias;
+	const int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	slow_cycle();
 
@@ -3145,7 +3117,7 @@ u8 apple2gs_state::read_int_rom(int slotbias, int offset)
 
 u8 apple2gs_state::c100_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	slow_cycle();
 
@@ -3162,7 +3134,7 @@ u8 apple2gs_state::c100_r(offs_t offset)
 
 void apple2gs_state::c100_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 1;
 
 	accel_slot(slot);
 
@@ -3174,15 +3146,13 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	}
 }
 
-u8 apple2gs_state::c100_int_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); slow_cycle(); return read_int_rom(0x3c100, offset); }
 u8 apple2gs_state::c300_int_r(offs_t offset)  { accel_slot(3 + ((offset >> 8) & 0x7)); slow_cycle(); return read_int_rom(0x3c300, offset); }
-u8 apple2gs_state::c400_int_r(offs_t offset)  { accel_slot(4 + ((offset >> 8) & 0x7)); slow_cycle(); return read_int_rom(0x3c400, offset); }
 u8 apple2gs_state::c300_r(offs_t offset)  { accel_slot(3 + ((offset >> 8) & 0x7)); slow_cycle(); return read_slot_rom(3, offset); }
 void apple2gs_state::c300_w(offs_t offset, u8 data) { accel_slot(3 + ((offset >> 8) & 0x7)); slow_cycle(); write_slot_rom(3, offset, data); }
 
 u8 apple2gs_state::c400_r(offs_t offset)
 {
-	int slot = ((offset>>8) & 0xf) + 4;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3198,7 +3168,7 @@ u8 apple2gs_state::c400_r(offs_t offset)
 
 void apple2gs_state::c400_w(offs_t offset, u8 data)
 {
-	int slot = ((offset>>8) & 0xf) + 1;
+	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
 
@@ -3216,34 +3186,9 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		u8 rv = 0xff;
-		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-		{
-			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-		}
-
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return rv;
-	}
-
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
-	}
-
-	return read_floatingbus();
-}
-
-u8 apple2gs_state::c800_int_r(offs_t offset)
-{
-	slow_cycle();
-
-	if ((offset == 0x7ff) && !machine().side_effects_disabled())
-	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
-		update_slotrom_banks();
-		return m_rom[offset + 0x3c800];
+		return 0xff;
 	}
 
 	if (m_cnxx_slot == CNXX_INTROM)
@@ -3251,7 +3196,12 @@ u8 apple2gs_state::c800_int_r(offs_t offset)
 		return m_rom[offset + 0x3c800];
 	}
 
-	return read_floatingbus();
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	{
+		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+	}
+
+	return 0xff;
 }
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
@@ -3868,19 +3818,19 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	map(0xe00000, 0xe0bfff).rw(FUNC(apple2gs_state::ram0000_r), FUNC(apple2gs_state::ram0000_w));
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0xe0c100, 0xe0c2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xe0c100, 0xe0c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
 	map(0xe0c300, 0xe0c3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xe0c400, 0xe0c7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xe0c800, 0xe0cfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xe0c400, 0xe0c7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	map(0xe0c800, 0xe0cfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 	map(0xe0d000, 0xe0ffff).m(A2GS_UPPERBANK_TAG, FUNC(address_map_bank_device::amap8));
 
 	map(0xe10000, 0xe1bfff).rw(FUNC(apple2gs_state::auxram0000_r), FUNC(apple2gs_state::auxram0000_w));
 	map(0xe1c000, 0xe1c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe1c080, 0xe1c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0xe1c100, 0xe1c2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xe1c100, 0xe1c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
 	map(0xe1c300, 0xe1c3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0xe1c400, 0xe1c7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0xe1c800, 0xe1cfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xe1c400, 0xe1c7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	map(0xe1c800, 0xe1cfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 	map(0xe1d000, 0xe1ffff).m(m_upperaux, FUNC(address_map_bank_device::amap8));
 
 	map(0xfc0000, 0xffffff).rom().region("maincpu", 0x00000);
@@ -3891,28 +3841,10 @@ void apple2gs_state::vectors_map(address_map &map)
 	map(0x00, 0x1f).r(FUNC(apple2gs_state::apple2gs_read_vector));
 }
 
-void apple2gs_state::c100bank_map(address_map &map)
-{
-	map(0x0000, 0x01ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
-	map(0x0200, 0x03ff).r(FUNC(apple2gs_state::c100_int_r)).nopw();
-}
-
 void apple2gs_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2gs_state::c300_r), FUNC(apple2gs_state::c300_w));
 	map(0x0100, 0x01ff).r(FUNC(apple2gs_state::c300_int_r)).nopw();
-}
-
-void apple2gs_state::c400bank_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
-	map(0x0400, 0x07ff).rw(FUNC(apple2gs_state::c400_int_r), FUNC(apple2gs_state::c400_w));
-}
-
-void apple2gs_state::c800bank_map(address_map &map)
-{
-	map(0x0000, 0x07ff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	map(0x0800, 0x0fff).rw(FUNC(apple2gs_state::c800_int_r), FUNC(apple2gs_state::c800_w));
 }
 
 void apple2gs_state::inhbank_map(address_map &map)
@@ -3968,10 +3900,10 @@ void apple2gs_state::bank0_iolc_map(address_map &map)
 	map(0x0000, 0x3fff).rw(FUNC(apple2gs_state::bank0_c000_r), FUNC(apple2gs_state::bank0_c000_w));
 	map(0x4000, 0x407f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0x4080, 0x40ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0x4100, 0x42ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0x4100, 0x42ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
 	map(0x4300, 0x43ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0x4400, 0x47ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0x4800, 0x4fff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0x4400, 0x47ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	map(0x4800, 0x4fff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 	map(0x5000, 0x7fff).m(m_upper00,  FUNC(address_map_bank_device::amap8));
 }
 
@@ -3980,10 +3912,10 @@ void apple2gs_state::bank1_iolc_map(address_map &map)
 	map(0x0000, 0x3fff).rw(FUNC(apple2gs_state::bank1_c000_r), FUNC(apple2gs_state::bank1_c000_w));
 	map(0x4000, 0x407f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0x4080, 0x40ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0x4100, 0x42ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0x4100, 0x42ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
 	map(0x4300, 0x43ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0x4400, 0x47ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
-	map(0x4800, 0x4fff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0x4400, 0x47ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	map(0x4800, 0x4fff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 	map(0x5000, 0x7fff).m(m_upper01,  FUNC(address_map_bank_device::amap8));
 }
 
@@ -4833,6 +4765,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4918,17 +4852,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
-	/* C100 banking */
-	ADDRESS_MAP_BANK(config, A2GS_C100_TAG).set_map(&apple2gs_state::c100bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
 	/* C300 banking */
 	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
-
-	/* C400 banking */
-	ADDRESS_MAP_BANK(config, A2GS_C400_TAG).set_map(&apple2gs_state::c400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
-
-	/* C800 banking */
-	ADDRESS_MAP_BANK(config, A2GS_C800_TAG).set_map(&apple2gs_state::c800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x800);
 
 	/* built-in language card emulation */
 	ADDRESS_MAP_BANK(config, A2GS_LCBANK_TAG).set_map(&apple2gs_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);

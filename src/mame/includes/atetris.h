@@ -55,7 +55,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 
 	void irq_ack_w(uint8_t data);
-	uint8_t slapstic_r(address_space &space, offs_t offset);
+	uint8_t slapstic_r(offs_t offset);
 	void coincount_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);

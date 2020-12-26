@@ -25,7 +25,7 @@ public:
 		, m_z80bank(*this, "z80bank%u", 1)
 		, m_sprite_ctrl(*this, "sprite_ctrl")
 	{ }
-	
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -180,7 +180,7 @@ public:
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
 		// TODO: COPROs
 	{}
-	
+
 	void f1superb(machine_config &config);
 	void init_f1superb();
 
@@ -191,16 +191,16 @@ private:
 
 	void ms32_irq2_guess_w(u32 data);
 	void ms32_irq5_guess_w(u32 data);
-	
+
 	memory_share_creator<u16> m_road_vram;
 
 	void f1superb_map(address_map &map);
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);
-	
+
 	u32 analog_r();
-	
+
 	tilemap_t* m_extra_tilemap;
 };
 

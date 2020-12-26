@@ -47,6 +47,8 @@ public:
 	auto out_rxdrqb_callback() { return m_out_rxdrqb_cb.bind(); }
 	auto out_txdrqb_callback() { return m_out_txdrqb_cb.bind(); }
 
+	auto wdtout_cb() { return m_wdtout_cb.bind(); }
+
 	// CTC callbacks
 	template<unsigned N> auto zc_callback() { return m_zc_cb[N].bind(); }
 
@@ -108,9 +110,6 @@ public:
 
 	/////////////////////////////////////////////////////////
 
-	void irq_priority_w(uint8_t data);
-
-	void tmpz84c015_internal_io_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -130,6 +129,8 @@ private:
 
 	// internal state
 	uint8_t m_irq_priority;
+	uint8_t m_wdtmr;
+	emu_timer *m_watchdog_timer;
 
 	// callbacks
 	devcb_write_line m_out_txda_cb;
@@ -158,6 +159,18 @@ private:
 	devcb_read8 m_in_pb_cb;
 	devcb_write8 m_out_pb_cb;
 	devcb_write_line m_out_brdy_cb;
+
+	devcb_write_line m_wdtout_cb;
+
+	uint8_t wdtmr_r();
+	void wdtmr_w(uint8_t data);
+	void wdtcr_w(uint8_t data);
+	void watchdog_clear();
+	TIMER_CALLBACK_MEMBER(watchdog_timeout);
+
+	void irq_priority_w(uint8_t data);
+
+	void internal_io_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( out_txda_cb_trampoline_w ) { m_out_txda_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( out_dtra_cb_trampoline_w ) { m_out_dtra_cb(state); }

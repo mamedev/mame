@@ -11,6 +11,7 @@ class romp_device : public cpu_device
 public:
 	romp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	void err_w(int state) { m_error = state; }
 	void clk_w(int state);
 
 protected:
@@ -23,14 +24,14 @@ protected:
 	enum scr : unsigned
 	{
 		COUS =  6, // counter source
-		COU =   7, // counter
-		TS  =   8, // timer status
-		MQ  =  10, // multiplier quotient
+		COU  =  7, // counter
+		TS   =  8, // timer status
+		MQ   = 10, // multiplier quotient
 		MPCS = 11, // machine/program check status
-		IRB =  12, // interrupt request buffer
-		IAR =  13, // instruction address register
-		ICS =  14, // interrupt control status
-		CS  =  15, // condition status
+		IRB  = 12, // interrupt request buffer
+		IAR  = 13, // instruction address register
+		ICS  = 14, // interrupt control status
+		CS   = 15, // condition status
 	};
 
 	enum ts_mask : u32
@@ -131,11 +132,13 @@ private:
 	void flags_add(u32 const op1, u32 const op2);
 	void flags_sub(u32 const op1, u32 const op2);
 
+	void set_space(u32 const ics) { space(((ics & ICS_US) ? 4 : 0) + ((ics & ICS_TM) ? 1 : 0)).cache(m_mem); }
 	void set_scr(unsigned scr, u32 data);
 
 	void interrupt_check();
 	void machine_check(u32 mcs);
-	void program_check(u32 pcs);
+	void program_check(u32 pcs, u32 iar);
+	void program_check(u32 pcs) { program_check(pcs, m_scr[IAR]); }
 	void interrupt_enter(unsigned vector, u32 iar, u16 svc = 0);
 
 	// address spaces
@@ -151,6 +154,11 @@ private:
 	u32 m_scr[16];
 	u32 m_gpr[16];
 
+	// input line state
+	u8 m_reqi;
+	bool m_trap;
+	bool m_error;
+
 	// internal state
 	enum branch_state : unsigned
 	{
@@ -158,10 +166,11 @@ private:
 		BRANCH    = 1, // branch subject instruction active
 		DELAY     = 2, // delayed branch instruction active
 		EXCEPTION = 3,
+		WAIT      = 4,
 	}
 	m_branch_state;
+	u32 m_branch_source;
 	u32 m_branch_target;
-	bool m_trap;
 };
 
 DECLARE_DEVICE_TYPE(ROMP, romp_device)

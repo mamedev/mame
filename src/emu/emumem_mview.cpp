@@ -608,6 +608,14 @@ std::string memory_view::memory_view_entry::key() const
 
 memory_view::memory_view(device_t &device, std::string name) : m_device(device), m_name(name), m_config(nullptr), m_addrstart(0), m_addrend(0), m_space(nullptr), m_handler_read(nullptr), m_handler_write(nullptr), m_cur_id(-1), m_cur_slot(-1)
 {
+	device.view_register(this);
+}
+
+void memory_view::register_state()
+{
+	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_slot));
+	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_id));
+	m_device.machine().save().register_postload(save_prepost_delegate(NAME([this]() { m_select_a(m_cur_id); })));
 }
 
 void memory_view::disable()

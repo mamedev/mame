@@ -200,7 +200,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), "", 0, ITEMREF_RESET);
+	item_append(_("Reset"), 0, ITEMREF_RESET);
 
 	// leave space for the name of the current option at the bottom
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();

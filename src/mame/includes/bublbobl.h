@@ -99,6 +99,7 @@ public:
 	uint8_t tokiob_mcu_r();
 	void bublbobl_soundcpu_reset_w(uint8_t data);
 	uint8_t common_sound_semaphores_r();
+	IRQ_CALLBACK_MEMBER(mcram_vect_r);
 	uint8_t bublbobl_mcu_ddr1_r();
 	void bublbobl_mcu_ddr1_w(uint8_t data);
 	uint8_t bublbobl_mcu_ddr2_r();

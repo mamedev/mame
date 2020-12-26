@@ -230,6 +230,7 @@ cidelsa.cpp
 cinemat.cpp
 circus.cpp
 circusc.cpp
+cirsa820xxx.cpp
 cischeat.cpp
 citycon.cpp
 clayshoo.cpp
@@ -246,6 +247,7 @@ cobra.cpp
 cocoloco.cpp
 coinmstr.cpp
 coinmvga.cpp
+cointek.cpp
 combatsc.cpp
 comebaby.cpp
 commando.cpp
@@ -1027,6 +1029,7 @@ regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
+rf51w14cg.cpp
 rfslots8085.cpp
 rfslotspcpent.cpp
 rgum.cpp
@@ -1356,6 +1359,7 @@ tutankhm.cpp
 tvcapcom.cpp
 tvg01.cpp
 twin16.cpp
+twinbskt.cpp
 twincobr.cpp
 twinkle.cpp
 twins.cpp

@@ -6,34 +6,35 @@
 
 #include <cstdio>
 #include <new>
-#include <memory>
+#include <string>
+#include <vector>
 
+
+namespace util {
 
 struct wav_file
 {
 	FILE *file = nullptr;
+	std::vector<std::int16_t> temp;
 	std::uint32_t total_offs = 0U;
 	std::uint32_t data_offs = 0U;
 };
 
 
-wav_file *wav_open(const char *filename, int sample_rate, int channels)
+wav_file_ptr wav_open(std::string_view filename, int sample_rate, int channels)
 {
 	std::uint32_t temp32;
 	std::uint16_t temp16;
 
 	// allocate memory for the wav struct
-	auto *const wav = new (std::nothrow) wav_file;
+	wav_file_ptr wav(new (std::nothrow) wav_file);
 	if (!wav)
 		return nullptr;
 
-	// create the file */
-	wav->file = std::fopen(filename, "wb");
+	// create the file
+	wav->file = std::fopen(std::string(filename).c_str(), "wb"); // ugly - need to force NUL termination on filename
 	if (!wav->file)
-	{
-		delete wav;
 		return nullptr;
-	}
 
 	// write the 'RIFF' header
 	std::fwrite("RIFF", 1, 4, wav->file);
@@ -96,93 +97,99 @@ void wav_close(wav_file *wav)
 	if (!wav)
 		return;
 
-	std::uint32_t temp32;
-	std::uint32_t const total = std::ftell(wav->file);
+	if (wav->file)
+	{
+		std::uint32_t temp32;
+		std::uint32_t const total = std::ftell(wav->file);
 
-	// update the total file size
-	std::fseek(wav->file, wav->total_offs, SEEK_SET);
-	temp32 = total - (wav->total_offs + 4);
-	temp32 = little_endianize_int32(temp32);
-	std::fwrite(&temp32, 1, 4, wav->file);
+		// update the total file size
+		std::fseek(wav->file, wav->total_offs, SEEK_SET);
+		temp32 = total - (wav->total_offs + 4);
+		temp32 = little_endianize_int32(temp32);
+		std::fwrite(&temp32, 1, 4, wav->file);
 
-	// update the data size
-	std::fseek(wav->file, wav->data_offs, SEEK_SET);
-	temp32 = total - (wav->data_offs + 4);
-	temp32 = little_endianize_int32(temp32);
-	std::fwrite(&temp32, 1, 4, wav->file);
+		// update the data size
+		std::fseek(wav->file, wav->data_offs, SEEK_SET);
+		temp32 = total - (wav->data_offs + 4);
+		temp32 = little_endianize_int32(temp32);
+		std::fwrite(&temp32, 1, 4, wav->file);
 
-	std::fclose(wav->file);
+		std::fclose(wav->file);
+	}
+
 	delete wav;
 }
 
 
-void wav_add_data_16(wav_file *wav, int16_t *data, int samples)
+void wav_add_data_16(wav_file &wav, int16_t *data, int samples)
 {
-	if (!wav)
-		return;
-
 	// just write and flush the data
-	std::fwrite(data, 2, samples, wav->file);
-	std::fflush(wav->file);
+	std::fwrite(data, 2, samples, wav.file);
+	std::fflush(wav.file);
 }
 
 
-void wav_add_data_32(wav_file *wav, int32_t *data, int samples, int shift)
+void wav_add_data_32(wav_file &wav, int32_t *data, int samples, int shift)
 {
-	if (!wav || !samples)
+	if (!samples)
 		return;
 
-	// resize dynamic array
-	std::unique_ptr<int16_t []> temp(new int16_t [samples]);
+	// resize dynamic array - don't want it to copy if it needs to expand
+	wav.temp.clear();
+	wav.temp.resize(samples);
 
 	// clamp
 	for (int i = 0; i < samples; i++)
 	{
 		int val = data[i] >> shift;
-		temp[i] = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
+		wav.temp[i] = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 	}
 
 	// write and flush
-	std::fwrite(&temp[0], 2, samples, wav->file);
-	std::fflush(wav->file);
+	std::fwrite(&wav.temp[0], 2, samples, wav.file);
+	std::fflush(wav.file);
 }
 
 
-void wav_add_data_16lr(wav_file *wav, int16_t *left, int16_t *right, int samples)
+void wav_add_data_16lr(wav_file &wav, int16_t *left, int16_t *right, int samples)
 {
-	if (!wav || !samples)
+	if (!samples)
 		return;
 
-	// resize dynamic array
-	std::unique_ptr<int16_t []> temp(new int16_t [samples * 2]);
+	// resize dynamic array - don't want it to copy if it needs to expand
+	wav.temp.clear();
+	wav.temp.resize(samples * 2);
 
 	// interleave
 	for (int i = 0; i < samples * 2; i++)
-		temp[i] = (i & 1) ? right[i / 2] : left[i / 2];
+		wav.temp[i] = (i & 1) ? right[i / 2] : left[i / 2];
 
 	// write and flush
-	std::fwrite(&temp[0], 4, samples, wav->file);
-	std::fflush(wav->file);
+	std::fwrite(&wav.temp[0], 4, samples, wav.file);
+	std::fflush(wav.file);
 }
 
 
-void wav_add_data_32lr(wav_file *wav, int32_t *left, int32_t *right, int samples, int shift)
+void wav_add_data_32lr(wav_file &wav, int32_t *left, int32_t *right, int samples, int shift)
 {
-	if (!wav || !samples)
+	if (!samples)
 		return;
 
-	// resize dynamic array
-	std::unique_ptr<int16_t []> temp(new int16_t [samples * 2]);
+	// resize dynamic array - don't want it to copy if it needs to expand
+	wav.temp.clear();
+	wav.temp.resize(samples * 2);
 
 	// interleave
 	for (int i = 0; i < samples * 2; i++)
 	{
 		int val = (i & 1) ? right[i / 2] : left[i / 2];
 		val >>= shift;
-		temp[i] = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
+		wav.temp[i] = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 	}
 
 	// write and flush
-	std::fwrite(&temp[0], 4, samples, wav->file);
-	std::fflush(wav->file);
+	std::fwrite(&wav.temp[0], 4, samples, wav.file);
+	std::fflush(wav.file);
 }
+
+} // namespace util

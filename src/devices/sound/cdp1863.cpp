@@ -53,6 +53,10 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 	, m_stream(nullptr)
 	, m_clock1(clock)
 	, m_clock2(0)
+	, m_oe(0)
+	, m_latch(0)
+	, m_signal(0)
+	, m_incr(0)
 {
 }
 

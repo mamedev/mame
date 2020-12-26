@@ -87,7 +87,7 @@ void  alinvade_state::sound_w(uint8_t data)
 
 void alinvade_state::sounden_w(uint8_t data)
 {
-	machine().sound().system_enable(data == 4);
+	machine().sound().system_mute(data != 4);
 }
 
 uint8_t alinvade_state::irqmask_r()

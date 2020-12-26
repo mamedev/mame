@@ -460,8 +460,8 @@ void bwidow_state::spacduel_map(address_map &map)
 	map(0x0e00, 0x0e00).w(FUNC(bwidow_state::irq_ack_w)); // interrupt acknowledge
 	map(0x0e80, 0x0e80).w(FUNC(bwidow_state::earom_control_w));
 	map(0x0f00, 0x0f3f).w(FUNC(bwidow_state::earom_write));
-	map(0x1000, 0x10ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1400, 0x14ff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1000, 0x10ff).mirror(0x0300).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1400, 0x14ff).mirror(0x0300).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2000, 0x27ff).ram(); // vector RAM
 	map(0x2800, 0x3fff).rom(); // vector ROM
 	map(0x4000, 0xffff).rom();

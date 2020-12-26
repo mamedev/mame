@@ -20,7 +20,7 @@ license:CC0
 		local last_state = false
 
 		local function get_mouse()
-			local x, y, button, target = machine:uiinput():find_mouse()
+			local x, y, button, target = machine.uiinput:find_mouse()
 			if not button then
 				last_state = false
 				return nil
@@ -29,12 +29,12 @@ license:CC0
 				return nil
 			end
 			last_state = true
-			local h = target:height()
-			local w = target:width()
-			local x0, x1, y0, y1 = target:view_bounds()
-			local vw = (x1 - x0)
-			local vh = (y1 - y0)
-			if machine:options().entries.keepaspect:value() then
+			local h = target.height
+			local w = target.width
+			local vb = target.current_view.bounds
+			local vw = (vb.x1 - vb.x0)
+			local vh = (vb.y1 - vb.y0)
+			if machine.options.entries.keepaspect:value() then
 				if (vh / h) < (vw / w) then
 					local oh = h
 					h = w * (vh / vw)
@@ -46,20 +46,20 @@ license:CC0
 				end
 			end
 
-			x = ((x / w) * vw) + x0
-			y = ((y / h) * vh) + y0
+			x = ((x / w) * vw) + vb.x0
+			y = ((y / h) * vh) + vb.y0
 			return x, y
 		end
 
 		function layout.reset()
 			for num, col in pairs(walls) do
 				for num2, wall in pairs(col[2]) do
-					machine:outputs():set_indexed_value("colwall", (num * 10) + num2, 0)
+					machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
 				end
 			end
 			for num, row in pairs(walls) do
 				for num2, wall in pairs(row[2]) do
-					machine:outputs():set_indexed_value("rowwall", (num * 10) + num2, 0)
+					machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
 				end
 			end
 		end
@@ -73,8 +73,8 @@ license:CC0
 				if col[1] < x and (col[1] + 2.5) > x then
 					for num2, wall in pairs(col[2]) do
 							if wall &lt; y and (wall + 7.5) &gt; y then
-							local state = machine:outputs():get_indexed_value("colwall", (num * 10) + num2)
-							machine:outputs():set_indexed_value("colwall", (num * 10) + num2, (~state) &amp; 1)
+							local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
+							machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) &amp; 1)
 							return
 						end
 					end
@@ -84,8 +84,8 @@ license:CC0
 				if row[1] < y and (row[1] + 2.5) > y then
 					for num2, wall in pairs(row[2]) do
 						if wall < x and (wall + 7.5) > x then
-							local state = machine:outputs():get_indexed_value("rowwall", (num * 10) + num2)
-							machine:outputs():set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
+							local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
+							machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
 							return
 						end
 					end

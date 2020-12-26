@@ -70,7 +70,7 @@ protected:
 	input_item_data *pollingitem;
 
 private:
-	input_sequence_poller seq_poll;
+	std::unique_ptr<input_sequence_poller> seq_poll;
 	std::string errormsg;
 	input_item_data *erroritem;
 	input_item_data *lastitem;

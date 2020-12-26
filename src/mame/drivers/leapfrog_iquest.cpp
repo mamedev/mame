@@ -139,6 +139,28 @@ public:
 	void leapfrog_turboex(machine_config &config);
 };
 
+class leapfrog_turbotwistmath_state : public leapfrog_iquest_state
+{
+public:
+	leapfrog_turbotwistmath_state(const machine_config &mconfig, device_type type, const char *tag)
+		: leapfrog_iquest_state(mconfig, type, tag)
+	{ }
+
+	void leapfrog_turbotwistmath(machine_config &config);
+};
+
+
+
+class leapfrog_turbotwistbrainquest_state : public leapfrog_iquest_state
+{
+public:
+	leapfrog_turbotwistbrainquest_state(const machine_config &mconfig, device_type type, const char *tag)
+		: leapfrog_iquest_state(mconfig, type, tag)
+	{ }
+
+	void leapfrog_turbotwistbrainquest(machine_config &config);
+};
+
 
 void leapfrog_iquest_state::machine_start()
 {
@@ -409,7 +431,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
-	
+
 	//map(0xf001, 0xf056).ram(); // written as a block
 	map(0xf000, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
 
@@ -417,7 +439,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xfc01, 0xfc04).r(FUNC(leapfrog_iquest_state::unk_fc01_r));
 
 	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w)); // ROM / RAM window in main space at 0000-7fff
-	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff 
+	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff
 	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w)); // ROM / RAM window in ext space at 0000-7fff
 
 	map(0xfc22, 0xfc22).w(FUNC(leapfrog_iquest_state::unk_fc22_w));
@@ -433,7 +455,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	// strings to transmit over the serial.
 	// however, mapping this area as RAM instead results in the program stalling much earlier, waiting for $24.3 to
 	// be cleared.
-	// 017658: 20 23 fd  jb    $24.3,$17658 
+	// 017658: 20 23 fd  jb    $24.3,$17658
 	//
 	//The only realistic place for this to be cleared is deep in the interrupt handler for
 	// Serial Receive/Transmit
@@ -601,7 +623,7 @@ void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
-	m_screen->set_size(64, 32); // unknown resolution
+	m_screen->set_size(64, 32); // unknown resolution, lower than iquest
 	m_screen->set_visarea(0, 64-1, 0, 32-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turboextreme_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(leapfrog_turboextreme_state::rx_line_hack));
@@ -613,9 +635,49 @@ void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turboextreme_cart");
 }
 
+void leapfrog_turbotwistmath_state::leapfrog_turbotwistmath(machine_config &config)
+{
+	leapfrog_iquest_state::leapfrog_base(config);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_size(64, 8); // unknown resolution, single row display
+	m_screen->set_visarea(0, 64-1, 0, 8-1);
+	m_screen->set_screen_update(FUNC(leapfrog_turbotwistmath_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(leapfrog_turbotwistmath_state::rx_line_hack));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_turbotwistmath_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(leapfrog_turbotwistmath_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistmath_cart");
+}
+
+void leapfrog_turbotwistbrainquest_state::leapfrog_turbotwistbrainquest(machine_config &config)
+{
+	leapfrog_iquest_state::leapfrog_base(config);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_size(64, 8); // unknown resolution, single row display
+	m_screen->set_visarea(0, 64-1, 0, 8-1);
+	m_screen->set_screen_update(FUNC(leapfrog_turbotwistbrainquest_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(leapfrog_turbotwistbrainquest_state::rx_line_hack));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_turbotwistbrainquest_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(leapfrog_turbotwistbrainquest_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_turbotwistbrainquest_cart");
+}
+
 ROM_START( iquest )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "iquest.bin", 0x000000, 0x400000, CRC(f785dc4e) SHA1(ec002c18df536737334fe6b7db0e7342bad7b66b))
+
+	// there is also a 39vf512 flash containing user data
 ROM_END
 
 ROM_START( turboex )
@@ -623,12 +685,39 @@ ROM_START( turboex )
 	ROM_LOAD( "turbotwistextreme.bin", 0x000000, 0x400000, CRC(d7cabcff) SHA1(7813811c0518aba017f7a79fd477be5ed9fa7529))
 ROM_END
 
-//    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
+ROM_START( ttwistm )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "turbotwistmath.bin", 0x000000, 0x200000, CRC(a21d3723) SHA1(d0ae245621d7bc92bdf9fd683908690db6e25133))
+ROM_END
+
+ROM_START( ttwistbq )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "turbotwistbrainquest.bin", 0x000000, 0x200000, CRC(b184a517) SHA1(181975da58b3d117a389c54ac025b6a9b24342b2))
+ROM_END
+
+//    year, name,        parent,    compat, machine,                         input,            class,                                init,       company,    fullname,                         flags
 // it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
-CONS( 2004, iquest,      0,         0,      leapfrog_iquest,    leapfrog_iquest,  leapfrog_iquest_state,  empty_init, "LeapFrog", "IQuest 4.0 (US)",                    MACHINE_IS_SKELETON )
+CONS( 2004, iquest,      0,         0,      leapfrog_iquest,                 leapfrog_iquest,  leapfrog_iquest_state,                empty_init, "LeapFrog", "IQuest 4.0 (US)",                MACHINE_IS_SKELETON )
 
-CONS( 2004, turboex,     0,         0,      leapfrog_turboex,   leapfrog_iquest,  leapfrog_turboextreme_state,  empty_init, "LeapFrog", "Turbo Extreme (US)",           MACHINE_IS_SKELETON )
+CONS( 2004, turboex,     0,         0,      leapfrog_turboex,                leapfrog_iquest,  leapfrog_turboextreme_state,          empty_init, "LeapFrog", "Turbo Extreme (US)",             MACHINE_IS_SKELETON )
 
-// Turbo Twist Math
+// from a silver unit with orange lettering (there are different case styles, it is unknown if the software changed)
+CONS( 2002, ttwistm,     0,         0,      leapfrog_turbotwistmath,         leapfrog_iquest,  leapfrog_turbotwistmath_state,        empty_init, "LeapFrog", "Turbo Twist Math (US)",          MACHINE_IS_SKELETON )
+
+CONS( 2002, ttwistbq,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Brain Quest (US)",   MACHINE_IS_SKELETON )
+
+// Undumped units
+
+// Similar to above
+// Turbo Twist Fact Blaster (compatible with Brain Quest cartridges)
 // Turbo Twist Spelling
-// more?
+// Turbo Twist Vocabulator
+
+// These have 2 digit 7-seg style displays, it is unknown if they are on related hardware
+// Twist & Shout Addition
+// Twist & Shout Subtraction
+// Twist & Shout Multiplication
+// Twist & Shout Division
+
+// This appears to have a 4 digit 7-seg style display, unknown if it is on related hardware
+// Twist & Shout Phonics

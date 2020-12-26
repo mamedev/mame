@@ -8,9 +8,9 @@
  *   - http://bitsavers.org/pdf/ibm/pc/rt/6489893_RT_PC_Technical_Reference_Volume_1_Nov85.pdf
  *
  * TODO:
- *   - mmu/iocc exceptions
- *   - unimplemented instructions (multiply, divide, wait)
- *   - timer/counter
+ *   - instruction fetch and rmw cycles
+ *   - multiple exceptions
+ *   - check stop mask
  */
 
 #include "emu.h"
@@ -37,6 +37,7 @@ romp_device::romp_device(machine_config const &mconfig, char const *tag, device_
 	, m_mem_config("memory", ENDIANNESS_BIG, 32, 32)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 24, -2)
 	, m_icount(0)
+	, m_reqi(0)
 {
 }
 
@@ -66,7 +67,13 @@ void romp_device::device_start()
 	// register state for saving
 	save_item(NAME(m_scr));
 	save_item(NAME(m_gpr));
+
+	save_item(NAME(m_reqi));
+	save_item(NAME(m_trap));
+	save_item(NAME(m_error));
+
 	save_item(NAME(m_branch_state));
+	save_item(NAME(m_branch_source));
 	save_item(NAME(m_branch_target));
 }
 
@@ -88,8 +95,6 @@ void romp_device::state_string_export(device_state_entry const &entry, std::stri
 
 void romp_device::device_reset()
 {
-	space(0).cache(m_mem);
-
 	// TODO: assumed
 	for (u32 &scr : m_scr)
 		scr = 0;
@@ -99,9 +104,14 @@ void romp_device::device_reset()
 		gpr = 0;
 
 	// initialize the state
-	m_scr[IAR] = m_mem.read_dword(0);
-	m_branch_state = DEFAULT;
+	set_space(m_scr[ICS]);
+
 	m_trap = false;
+	m_error = false;
+	m_branch_state = DEFAULT;
+
+	// fetch initial iar
+	m_scr[IAR] = m_mem.read_dword(0);
 }
 
 void romp_device::execute_run()
@@ -109,63 +119,104 @@ void romp_device::execute_run()
 	// core execution loop
 	while (m_icount-- > 0)
 	{
-		// debugging
-		debugger_instruction_hook(m_scr[IAR]);
+		m_error = false;
 
-		if (m_branch_state == DEFAULT)
+		if (m_branch_state != BRANCH)
 			interrupt_check();
+
+		if (m_branch_state == WAIT)
+		{
+			m_icount = 0;
+			return;
+		}
+		else
+			debugger_instruction_hook(m_scr[IAR]);
 
 		// fetch instruction
 		u16 const op = m_mem.read_word(m_scr[IAR]);
 		u32 updated_iar = m_scr[IAR] + 2;
+		if (m_error)
+			program_check(PCS_PCK | PCS_IAE);
 
 		switch (op >> 12)
 		{
 		case 0x0: // jb/jnb: jump on [not] condition bit
-			if (m_branch_state == BRANCH)
-				program_check(PCS_PCK | PCS_IOC);
-			else if (BIT(m_scr[CS], ((op >> 8) & 7) ^ 7) == BIT(op, 11))
+			if (m_branch_state != BRANCH)
 			{
-				m_branch_target = m_scr[IAR] + ji(op);
-				m_branch_state = BRANCH;
-				m_icount -= 4;
+				if (BIT(m_scr[CS], ((op >> 8) & 7) ^ 7) == BIT(op, 11))
+				{
+					m_branch_target = m_scr[IAR] + ji(op);
+					m_branch_state = BRANCH;
+					m_icount -= 4;
+				}
 			}
+			else
+				program_check(PCS_PCK | PCS_IOC, m_branch_source);
 			break;
 		case 0x1: // stcs: store character short
 			m_mem.write_byte(r3_0(R3) + ((op >> 8) & 15), m_gpr[R2]);
+			if (m_error)
+				program_check(PCS_PCK | PCS_DAE);
 			m_icount -= 4;
 			break;
 		case 0x2: // sths: store half short
 			m_mem.write_word(r3_0(R3) + ((op >> 7) & 30), m_gpr[R2]);
+			if (m_error)
+				program_check(PCS_PCK | PCS_DAE);
 			m_icount -= 4;
 			break;
 		case 0x3: // sts: store short
 			m_mem.write_dword(r3_0(R3) + ((op >> 6) & 60), m_gpr[R2]);
+			if (m_error)
+				program_check(PCS_PCK | PCS_DAE);
 			m_icount -= 4;
 			break;
 		case 0x4: // lcs: load character short
-			m_gpr[R2] = m_mem.read_byte(r3_0(R3) + ((op >> 8) & 15));
-			m_icount -= 4;
+			{
+				u8 const data = m_mem.read_byte(r3_0(R3) + ((op >> 8) & 15));
+				if (!m_error)
+					m_gpr[R2] = data;
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				m_icount -= 4;
+			}
 			break;
 		case 0x5: // lhas: load half algebraic short
-			m_gpr[R2] = s32(s16(m_mem.read_word(r3_0(R3) + ((op >> 7) & 30))));
-			m_icount -= 4;
+			{
+				s32 const data = s32(s16(m_mem.read_word(r3_0(R3) + ((op >> 7) & 30))));
+				if (!m_error)
+					m_gpr[R2] = data;
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				m_icount -= 4;
+			}
 			break;
 		case 0x6: // cas: compute address short
 			m_gpr[(op >> 8) & 15] = m_gpr[R2] + r3_0(R3);
 			break;
 		case 0x7: // ls: load short
-			m_gpr[R2] = m_mem.read_dword(r3_0(R3) + ((op >> 6) & 60));
-			m_icount -= 4;
+			{
+				u32 const data = m_mem.read_dword(r3_0(R3) + ((op >> 6) & 60));
+				if (!m_error)
+					m_gpr[R2] = data;
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				m_icount -= 4;
+			}
 			break;
 		case 0x8: // BI, BA format
 			{
 				u16 const b = m_mem.read_word(updated_iar);
 				updated_iar += 2;
+				if (m_error)
+				{
+					program_check(PCS_PCK | PCS_IAE);
+					break;
+				}
 
 				if (m_branch_state == BRANCH)
 				{
-					program_check(PCS_PCK | PCS_IOC);
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 					break;
 				}
 
@@ -182,6 +233,7 @@ void romp_device::execute_run()
 				case 0x89: // bnbx: branch on not condition bit immediate with execute
 					if (!BIT(m_scr[CS], R2 ^ 15))
 					{
+						m_branch_source = m_scr[IAR];
 						m_branch_target = m_scr[IAR] + bi(op, b);
 						m_branch_state = DELAY;
 						m_icount -= 4;
@@ -195,6 +247,7 @@ void romp_device::execute_run()
 					break;
 				case 0x8b: // balax: branch and link absolute with execute
 					m_gpr[15] = updated_iar + 4;
+					m_branch_source = m_scr[IAR];
 					m_branch_target = ba(op, b);
 					m_branch_state = DELAY;
 					m_icount -= 4;
@@ -207,6 +260,7 @@ void romp_device::execute_run()
 					break;
 				case 0x8d: // balix: branch and link immediate with execute
 					m_gpr[R2] = updated_iar + 4;
+					m_branch_source = m_scr[IAR];
 					m_branch_target = m_scr[IAR] + bi(op, b);
 					m_branch_state = DELAY;
 					m_icount -= 4;
@@ -222,6 +276,7 @@ void romp_device::execute_run()
 				case 0x8f: // bbx: branch on condition bit immediate with execute
 					if (BIT(m_scr[CS], R2 ^ 15))
 					{
+						m_branch_source = m_scr[IAR];
 						m_branch_target = m_scr[IAR] + bi(op, b);
 						m_branch_state = DELAY;
 						m_icount -= 4;
@@ -240,6 +295,11 @@ void romp_device::execute_run()
 			{
 				u16 const i = m_mem.read_word(updated_iar);
 				updated_iar += 2;
+				if (m_error)
+				{
+					program_check(PCS_PCK | PCS_IAE);
+					break;
+				}
 
 				u32 const r3 = R3 ? m_gpr[R3] : 0;
 
@@ -254,7 +314,7 @@ void romp_device::execute_run()
 						m_icount -= 15;
 					}
 					else
-						program_check(PCS_PCK | PCS_IOC);
+						program_check(PCS_PCK | PCS_IOC, m_branch_source);
 					break;
 				case 0xc1: // ai: add immediate
 					flags_add(m_gpr[R3], s32(s16(i)));
@@ -289,57 +349,103 @@ void romp_device::execute_run()
 				case 0xc9: // lm: load multiple
 					for (unsigned reg = R2, offset = r3 + s16(i); reg < 16; reg++, offset += 4)
 					{
-						m_gpr[reg] = m_mem.read_dword(offset);
+						u32 const data = m_mem.read_dword(offset);
+						if (!m_error)
+							m_gpr[reg] = data;
 						m_icount -= 2;
 					}
+					if (m_error)
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount -= (m_scr[ICS] & ICS_TM) ? 3 : 1;
 					break;
 				case 0xca: // lha: load half algebraic
-					m_gpr[R2] = s32(s16(m_mem.read_word(r3 + s16(i))));
-					m_icount -= 4;
+					{
+						s32 const data = s32(s16(m_mem.read_word(r3 + s16(i))));
+						if (!m_error)
+							m_gpr[R2] = data;
+						else
+							program_check(PCS_PCK | PCS_DAE);
+						m_icount -= 4;
+					}
 					break;
 				case 0xcb: // ior: input/output read
-					if (r3 + i < 0x0100'0000U)
+					if (!((r3 + i) & 0xff00'0000U))
 						m_gpr[R2] = space(AS_IO).read_dword(r3 + i);
 					else
-						program_check(PCS_PCK | PCS_IOC);
+						program_check(PCS_PCK | PCS_DAE);
 					break;
 				case 0xcc: // ti: trap on condition immediate
-					if (m_branch_state == BRANCH)
-						program_check(PCS_PCK | PCS_IOC);
-					else if ((BIT(op, 6) && (m_gpr[R3] < u32(s32(s16(i)))))
-						|| (BIT(op, 5) && (m_gpr[R3] == u32(s32(s16(i)))))
-						|| (BIT(op, 4) && (m_gpr[R3] > u32(s32(s16(i))))))
-						program_check(PCS_PCK | PCS_PT);
+					if (m_branch_state != BRANCH)
+					{
+						if ((BIT(op, 6) && (m_gpr[R3] < u32(s32(s16(i)))))
+							|| (BIT(op, 5) && (m_gpr[R3] == u32(s32(s16(i)))))
+							|| (BIT(op, 4) && (m_gpr[R3] > u32(s32(s16(i))))))
+							program_check(PCS_PCK | PCS_PT);
+					}
+					else
+						program_check(PCS_PCK | PCS_IOC, m_branch_source);
 					break;
 				case 0xcd: // l: load
-					m_gpr[R2] = m_mem.read_dword(r3 + s16(i));
-					m_icount -= 4;
+					{
+						u32 const data = m_mem.read_dword(r3 + s16(i));
+						if (!m_error)
+							m_gpr[R2] = data;
+						else
+							program_check(PCS_PCK | PCS_DAE);
+						m_icount -= 4;
+					}
 					break;
 				case 0xce: // lc: load character
-					m_gpr[R2] = m_mem.read_byte(r3 + s16(i));
-					m_icount -= 4;
+					{
+						u8 const data = m_mem.read_byte(r3 + s16(i));
+						if (!m_error)
+							m_gpr[R2] = data;
+						else
+							program_check(PCS_PCK | PCS_DAE);
+						m_icount -= 4;
+					}
 					break;
 				case 0xcf: // tsh: test and set half
-					m_gpr[R2] = m_mem.read_word(r3 + s16(i));
-					m_mem.write_byte(r3 + s16(i), 0xff);
-					m_icount -= 4;
+					{
+						u16 const data = m_mem.read_word(r3 + s16(i));
+						if (!m_error)
+						{
+							m_gpr[R2] = data;
+							m_mem.write_word(r3 + s16(i), 0xff00, 0xff00);
+							if (m_error)
+								program_check(PCS_PCK | PCS_DAE);
+						}
+						else
+							program_check(PCS_PCK | PCS_DAE);
+
+						m_icount -= 4;
+					}
 					break;
 
 				case 0xd0: // lps: load program status
-					if (m_branch_state != BRANCH)
+					if (!(m_scr[ICS] & ICS_US))
 					{
-						m_branch_target = m_mem.read_dword(r3 + s16(i) + 0);
-						m_branch_state = BRANCH;
-						m_scr[ICS] = m_mem.read_word(r3 + s16(i) + 4);
-						m_scr[CS] = m_mem.read_word(r3 + s16(i) + 6);
-						m_scr[MPCS] &= ~0xffff;
-						// TODO: defer interrupt enable
+						if (m_branch_state != BRANCH)
+						{
+							m_branch_target = m_mem.read_dword(r3 + s16(i) + 0);
+							m_branch_state = BRANCH;
+							m_scr[ICS] = m_mem.read_word(r3 + s16(i) + 4);
+							m_scr[CS] = m_mem.read_word(r3 + s16(i) + 6);
+							if (m_scr[MPCS] & MCS_ALL)
+								m_scr[MPCS] &= ~MCS_ALL;
+							else
+								m_scr[MPCS] &= ~PCS_ALL;
+							// TODO: defer interrupt enable
 
-						m_icount -= 15;
+							set_space(m_scr[ICS]);
+
+							m_icount -= 15;
+						}
+						else
+							program_check(PCS_PCK | PCS_IOC, m_branch_source);
 					}
 					else
-						program_check(PCS_PCK | PCS_IOC);
+						program_check(PCS_PCK | PCS_PIE);
 					break;
 				case 0xd1: // aei: add extended immediate
 					flags_add(m_gpr[R3], s32(s16(i)) + bool(m_scr[CS] & CS_C));
@@ -388,29 +494,43 @@ void romp_device::execute_run()
 						m_mem.write_dword(offset, m_gpr[reg]);
 						m_icount -= (m_scr[ICS] & ICS_TM) ? 3 : 2;
 					}
+					if (m_error)
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount -= (m_scr[ICS] & ICS_TM) ? 3 : 2;
 					break;
 				case 0xda: // lh: load half
-					m_gpr[R2] = m_mem.read_word(r3 + s16(i));
-					m_icount -= 4;
+					{
+						u16 const data = m_mem.read_word(r3 + s16(i));
+						if (!m_error)
+							m_gpr[R2] = data;
+						else
+							program_check(PCS_PCK | PCS_DAE);
+						m_icount -= 4;
+					}
 					break;
 				case 0xdb: // iow: input/output write
-					if (r3 + i < 0x0100'0000U)
+					if (!((r3 + i) & 0xff00'0000U))
 						space(AS_IO).write_dword(r3 + i, m_gpr[R2]);
 					else
-						program_check(PCS_PCK | PCS_IOC);
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount--;
 					break;
 				case 0xdc: // sth: store half
 					m_mem.write_word(r3 + s16(i), m_gpr[R2]);
+					if (m_error)
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount -= 4;
 					break;
 				case 0xdd: // st: store
 					m_mem.write_dword(r3 + s16(i), m_gpr[R2]);
+					if (m_error)
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount -= 4;
 					break;
 				case 0xde: // stc: store character
 					m_mem.write_byte(r3 + s16(i), m_gpr[R2]);
+					if (m_error)
+						program_check(PCS_PCK | PCS_DAE);
 					m_icount -= 4;
 					break;
 
@@ -456,10 +576,15 @@ void romp_device::execute_run()
 				m_icount -= 3;
 				break;
 			case 0x96: // mfs: move from scr
-				if (R2 == IAR)
-					m_gpr[R3] = updated_iar;
+				if (!(m_scr[ICS] & ICS_US) || R2 == MQ || R2 == CS)
+				{
+					if (R2 == IAR)
+						m_gpr[R3] = updated_iar;
+					else
+						m_gpr[R3] = m_scr[R2];
+				}
 				else
-					m_gpr[R3] = m_scr[R2];
+					program_check(PCS_PCK | PCS_PIE);
 				m_icount--;
 				break;
 			case 0x97: // setsb: set scr bit
@@ -588,8 +713,32 @@ void romp_device::execute_run()
 				m_icount -= 2;
 				break;
 			case 0xb6: // d: divide step
-				// m_icount -= 2;
-				fatalerror("divide step (%s)\n", machine().describe_context());
+				{
+					m_scr[CS] &= ~(CS_C | CS_O);
+
+					s64 sum = (s64(s32(m_gpr[R2])) << 1) | (m_scr[MQ] >> 31);
+
+					if (BIT(m_gpr[R2], 31) == BIT(m_gpr[R3], 31))
+						sum -= s32(m_gpr[R3]);
+					else
+						sum += s32(m_gpr[R3]);
+
+					// update remainder
+					m_gpr[R2] = sum;
+
+					// update quotient
+					m_scr[MQ] <<= 1;
+					if (BIT(sum, 32) == BIT(m_gpr[R3], 31))
+					{
+						m_scr[MQ] |= 1;
+						m_scr[CS] |= CS_C;
+					}
+
+					// overflow test
+					if (BIT(sum, 32) == BIT(m_gpr[R2], 31))
+						m_scr[CS] |= CS_O;
+				}
+				m_icount -= 2;
 				break;
 			case 0xb8: // sr: shift right
 				m_gpr[R2] >>= (m_gpr[R3] & 63);
@@ -614,24 +763,32 @@ void romp_device::execute_run()
 					m_gpr[R2] &= ~(0x8000'0000U >> (m_gpr[R3] & 31));
 				break;
 			case 0xbd: // tgte: trap if register greater than or equal
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (m_gpr[R2] >= m_gpr[R3])
+				if (m_branch_state != BRANCH)
 				{
-					program_check(PCS_PCK | PCS_PT);
-					m_icount -= 14;
+					if (m_gpr[R2] >= m_gpr[R3])
+					{
+						program_check(PCS_PCK | PCS_PT);
+						m_icount -= 14;
+					}
+
+					m_icount--;
 				}
-				m_icount--;
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xbe: // tlt: trap if register less than
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (m_gpr[R2] < m_gpr[R3])
+				if (m_branch_state != BRANCH)
 				{
-					program_check(PCS_PCK | PCS_PT);
-					m_icount -= 14;
+					if (m_gpr[R2] < m_gpr[R3])
+					{
+						program_check(PCS_PCK | PCS_PT);
+						m_icount -= 14;
+					}
+
+					m_icount--;
 				}
-				m_icount--;
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xbf: // mttb: move to test bit
 				if (m_gpr[R2] & (0x8000'0000U >> (m_gpr[R3] & 31)))
@@ -670,91 +827,150 @@ void romp_device::execute_run()
 				flags_log(m_gpr[R2]);
 				break;
 			case 0xe6: // m: multiply step
-				// m_icount -= 3;
-				fatalerror("multiply step (%s)\n", machine().describe_context());
+				{
+					s64 sum = s32(m_gpr[R2]);
+
+					if (m_scr[CS] & CS_C)
+					{
+						// no carry
+						switch (m_scr[MQ] & 3)
+						{
+						case 1: sum += s32(m_gpr[R3]); break;
+						case 2: sum -= s64(s32(m_gpr[R3])) * 2; break;
+						case 3: sum -= s32(m_gpr[R3]); break;
+						}
+					}
+					else
+					{
+						// carry
+						switch (m_scr[MQ] & 3)
+						{
+						case 0: sum += s32(m_gpr[R3]); break;
+						case 1: sum += s64(s32(m_gpr[R3])) * 2; break;
+						case 2: sum -= s32(m_gpr[R3]); break;
+						}
+					}
+
+					// update carry flag
+					if (m_scr[MQ] & 2)
+						m_scr[CS] &= ~CS_C;
+					else
+						m_scr[CS] |= CS_C;
+
+					m_scr[MQ] = (sum << 30) | (m_scr[MQ] >> 2);
+					m_gpr[R2] = sum >> 2;
+				}
+				m_icount -= 3;
 				break;
 			case 0xe7: // x: exclusive or
 				m_gpr[R2] ^= m_gpr[R3];
 				flags_log(m_gpr[R2]);
 				break;
 			case 0xe8: // bnbr: branch on not condition bit
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (!BIT(m_scr[CS], R2 ^ 15))
+				if (m_branch_state != BRANCH)
 				{
-					m_branch_target = m_gpr[R3] & ~1;
-					m_branch_state = BRANCH;
+					if (!BIT(m_scr[CS], R2 ^ 15))
+					{
+						m_branch_target = m_gpr[R3] & ~1;
+						m_branch_state = BRANCH;
+					}
 				}
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xe9: // bnbrx: branch on not condition bit with execute
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (!BIT(m_scr[CS], R2 ^ 15))
+				if (m_branch_state != BRANCH)
 				{
-					m_branch_target = m_gpr[R3] & ~1;
-					m_branch_state = DELAY;
+					if (!BIT(m_scr[CS], R2 ^ 15))
+					{
+						m_branch_source = m_scr[IAR];
+						m_branch_target = m_gpr[R3] & ~1;
+						m_branch_state = DELAY;
+					}
 				}
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 
 			case 0xeb: // lhs: load half short
-				m_gpr[R2] = m_mem.read_word(m_gpr[R3]);
-				m_icount -= 4;
+				{
+					u16 const data = m_mem.read_word(m_gpr[R3]);
+					if (!m_error)
+						m_gpr[R2] = data;
+					else
+						program_check(PCS_PCK | PCS_DAE);
+					m_icount -= 4;
+				}
 				break;
 			case 0xec: // balr: branch and link
 				if (m_branch_state != BRANCH)
 				{
-					m_gpr[R2] = updated_iar;
 					m_branch_target = m_gpr[R3] & ~1;
 					m_branch_state = BRANCH;
+					m_gpr[R2] = updated_iar;
 					m_icount -= 4;
 				}
 				else
-					program_check(PCS_PCK | PCS_IOC);
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xed: // balrx: branch and link with execute
 				if (m_branch_state != BRANCH)
 				{
-					m_gpr[R2] = updated_iar + 4;
+					m_branch_source = m_scr[IAR];
 					m_branch_target = m_gpr[R3] & ~1;
 					m_branch_state = DELAY;
+					m_gpr[R2] = updated_iar + 4;
 					m_icount -= 4;
 				}
 				else
-					program_check(PCS_PCK | PCS_IOC);
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xee: // bbr: branch on condition bit
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (BIT(m_scr[CS], R2 ^ 15))
+				if (m_branch_state != BRANCH)
 				{
-					m_branch_target = m_gpr[R3] & ~1;
-					m_branch_state = BRANCH;
-					m_icount -= 4;
+					if (BIT(m_scr[CS], R2 ^ 15))
+					{
+						m_branch_target = m_gpr[R3] & ~1;
+						m_branch_state = BRANCH;
+						m_icount -= 4;
+					}
 				}
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 			case 0xef: // bbrx: branch on condition bit with execute
-				if (m_branch_state == BRANCH)
-					program_check(PCS_PCK | PCS_IOC);
-				else if (BIT(m_scr[CS], R2 ^ 15))
+				if (m_branch_state != BRANCH)
 				{
-					m_branch_target = m_gpr[R3] & ~1;
-					m_branch_state = DELAY;
-					m_icount -= 4;
+					if (BIT(m_scr[CS], R2 ^ 15))
+					{
+						m_branch_source = m_scr[IAR];
+						m_branch_target = m_gpr[R3] & ~1;
+						m_branch_state = DELAY;
+						m_icount -= 4;
+					}
 				}
+				else
+					program_check(PCS_PCK | PCS_IOC, m_branch_source);
 				break;
 
 			case 0xf0: // wait: wait
-				// if (m_branch_state == BRANCH)
-				// program_check(PCS_PCK | PCS_IOC);
-				fatalerror("wait (%s)\n", machine().describe_context());
+				if (!(m_scr[ICS] & ICS_US))
+				{
+					if (m_branch_state != BRANCH)
+						m_branch_state = WAIT;
+					else
+						program_check(PCS_PCK | PCS_IOC, m_branch_source);
+				}
+				else
+					program_check(PCS_PCK | PCS_PIE);
 				break;
 			case 0xf1: // ae: add extended
 				flags_add(m_gpr[R2], m_gpr[R3] + bool(m_scr[CS] & CS_C));
 				m_gpr[R2] += m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf2: // se: subtract extended
-				flags_sub(m_gpr[R2], m_gpr[R3] + bool(m_scr[CS] & CS_C));
-				m_gpr[R2] -= m_gpr[R3] + bool(m_scr[CS] & CS_C);
+				flags_add(m_gpr[R2], ~m_gpr[R3] + bool(m_scr[CS] & CS_C));
+				m_gpr[R2] += ~m_gpr[R3] + bool(m_scr[CS] & CS_C);
 				break;
 			case 0xf3: // ca16: compute address 16-bit
 				m_gpr[R2] = (m_gpr[R3] & 0xffff'0000U) | (u16(m_gpr[R2]) + u16(m_gpr[R3]));
@@ -816,6 +1032,12 @@ void romp_device::execute_run()
 		case EXCEPTION:
 			m_branch_state = DEFAULT;
 			break;
+
+		case WAIT:
+			// TODO: assume iar is updated
+			m_scr[IAR] = updated_iar;
+			break;
+
 		}
 	}
 }
@@ -830,17 +1052,19 @@ void romp_device::set_scr(unsigned scr, u32 data)
 
 	LOG("set_scr %s data 0x%08x (%s)\n", scr_names[scr], data, machine().describe_context());
 
-	switch (scr)
+	if (!(m_scr[ICS] & ICS_US) || scr == MQ || scr == CS)
 	{
-	case ICS:
-		space(bool(data & ICS_TM)).cache(m_mem);
-		break;
+		switch (scr)
+		{
+		case ICS:
+			set_space(data);
+			break;
+		}
 
-	default:
-		break;
+		m_scr[scr] = data;
 	}
-
-	m_scr[scr] = data;
+	else
+		program_check(PCS_PCK | PCS_PIE);
 }
 
 void romp_device::execute_set_input(int irqline, int state)
@@ -853,25 +1077,28 @@ void romp_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-	// interrupt lines are active low
-	if (!state)
-	{
-		m_scr[IRB] |= (IRB_L0 >> irqline);
+		// interrupt lines are active low
+		if (!state)
+		{
+			m_reqi |= 1U << irqline;
 
-		// enable debugger interrupt breakpoints
-		standard_irq_callback(irqline);
-	}
-	else
-		m_scr[IRB] &= ~(IRB_L0 >> irqline);
+			// enable debugger interrupt breakpoints
+			standard_irq_callback(irqline);
+		}
+		else
+			m_reqi &= ~(1U << irqline);
+		break;
 	}
 }
 
 device_memory_interface::space_config_vector romp_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(0, &m_mem_config),   // untranslated
-		std::make_pair(1, &m_mem_config),   // translated
-		std::make_pair(AS_IO, &m_io_config)
+		std::make_pair(0, &m_mem_config), // privileged, untranslated
+		std::make_pair(1, &m_mem_config), // privileged, translated
+		std::make_pair(2, &m_io_config),
+		std::make_pair(4, &m_mem_config), // unprivileged, untranslated
+		std::make_pair(5, &m_mem_config), // unprivileged, translated
 	};
 }
 
@@ -925,7 +1152,7 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 {
 	u32 const result = op1 - op2;
 
-	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_C | CS_O);
+	m_scr[CS] &= ~(CS_L | CS_E | CS_G | CS_O);
 
 	if (result == 0)
 		m_scr[CS] |= CS_E;
@@ -935,8 +1162,10 @@ void romp_device::flags_sub(u32 const op1, u32 const op2)
 		else
 			m_scr[CS] |= CS_G;
 
-	// carry
+	// borrow
 	if ((!BIT(op2, 31) && BIT(op1, 31)) || (BIT(result, 31) && (!BIT(op2, 31) || BIT(op1, 31))))
+		m_scr[CS] &= ~CS_C;
+	else
 		m_scr[CS] |= CS_C;
 
 	// overflow
@@ -949,22 +1178,19 @@ void romp_device::interrupt_check()
 	if (m_trap)
 	{
 		// TODO: traps with check-stop mask 0
-		program_check(PCS_PCK);
 		machine_check(MCS_IOT);
 		m_trap = false;
-
-		m_branch_state = DEFAULT;
 		return;
 	}
 
 	// interrupts masked or no interrupts
-	if ((m_scr[ICS] & ICS_IM) || !(m_scr[IRB] & IRB_ALL))
+	if ((m_scr[ICS] & ICS_IM) || !(m_reqi || (m_scr[IRB] & IRB_ALL)))
 		return;
 
 	unsigned const priority = m_scr[ICS] & ICS_PP;
 	for (unsigned irl = 0; irl < priority; irl++)
 	{
-		if (BIT(m_scr[IRB], 15 - irl))
+		if (BIT(m_reqi, irl) || BIT(m_scr[IRB], 15 - irl))
 		{
 			LOGMASKED(LOG_INTERRUPT, "interrupt_check taking interrupt request level %d\n", irl);
 			interrupt_enter(irl, m_scr[IAR]);
@@ -984,11 +1210,9 @@ void romp_device::machine_check(u32 mcs)
 	m_scr[MPCS] |= (mcs & MCS_ALL);
 
 	interrupt_enter(7, m_scr[IAR]);
-
-	m_branch_state = EXCEPTION;
 }
 
-void romp_device::program_check(u32 pcs)
+void romp_device::program_check(u32 pcs, u32 iar)
 {
 	debugger_exception_hook(8);
 
@@ -997,7 +1221,7 @@ void romp_device::program_check(u32 pcs)
 	m_scr[MPCS] &= ~PCS_ALL;
 	m_scr[MPCS] |= (pcs & PCS_ALL);
 
-	interrupt_enter(8, m_scr[IAR]);
+	interrupt_enter(8, iar);
 
 	m_branch_state = EXCEPTION;
 }
@@ -1020,7 +1244,9 @@ void romp_device::interrupt_enter(unsigned vector, u32 iar, u16 svc)
 	if (vector < 7)
 		m_scr[CS] = space(0).read_word(address + 14);
 
-	space(bool(m_scr[ICS] & ICS_TM)).cache(m_mem);
+	set_space(m_scr[ICS]);
+
+	m_branch_state = DEFAULT;
 }
 
 void romp_device::clk_w(int state)
@@ -1046,7 +1272,7 @@ void romp_device::clk_w(int state)
 
 				// raise interrupt
 				if ((m_scr[TS] & TS_P) < 7)
-					m_scr[IRB] |= 0x8000U >> (m_scr[TS] & TS_P);
+					m_scr[IRB] |= IRB_L0 >> (m_scr[TS] & TS_P);
 			}
 
 			// reload counter

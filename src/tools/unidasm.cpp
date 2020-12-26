@@ -38,6 +38,7 @@ using util::BIT;
 #include "cpu/cosmac/cosdasm.h"
 #include "cpu/cp1610/1610dasm.h"
 #include "cpu/cr16b/cr16bdasm.h"
+#include "cpu/cr16c/cr16cdasm.h"
 #include "cpu/cubeqcpu/cubedasm.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
@@ -78,6 +79,7 @@ using util::BIT;
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
 #include "cpu/lr35902/lr35902d.h"
+#include "cpu/m32c/m32cdasm.h"
 #include "cpu/m37710/m7700ds.h"
 #include "cpu/m6502/m4510d.h"
 #include "cpu/m6502/m6502d.h"
@@ -386,6 +388,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cp1610",          be, -1, []() -> util::disasm_interface * { return new cp1610_disassembler; } },
 	{ "cr16a",           le,  0, []() -> util::disasm_interface * { return new cr16a_disassembler; } },
 	{ "cr16b",           le,  0, []() -> util::disasm_interface * { return new cr16b_disassembler; } },
+	{ "cr16c",           le,  0, []() -> util::disasm_interface * { return new cr16c_disassembler; } },
 	{ "cquestlin",       be, -3, []() -> util::disasm_interface * { return new cquestlin_disassembler; } },
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
@@ -451,6 +454,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },
 	{ "m146805",         be,  0, []() -> util::disasm_interface * { return new m146805_disassembler; } },
+	{ "m32c",            le,  0, []() -> util::disasm_interface * { return new m32c_disassembler; } },
 	{ "m37710",          le,  0, []() -> util::disasm_interface * { return new m7700_disassembler(&m7700_unidasm); } },
 	{ "m4510",           le,  0, []() -> util::disasm_interface * { return new m4510_disassembler; } },
 	{ "m58846",          le, -1, []() -> util::disasm_interface * { return new melps4_disassembler; } },

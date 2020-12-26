@@ -29,24 +29,25 @@ struct wrap_textbuf
 };
 
 
-sol::object do_breakpoint_enable(lua_State *L, device_debug &dev, sol::object &index, bool enable)
+template <bool Enable>
+sol::object do_breakpoint_enable(device_debug &dev, sol::this_state s, sol::object index)
 {
 	if (index == sol::lua_nil)
 	{
-		dev.breakpoint_enable_all(enable);
+		dev.breakpoint_enable_all(Enable);
 		dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 		dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 		return sol::lua_nil;
 	}
 	else if (index.is<int>())
 	{
-		bool result(dev.breakpoint_enable(index.as<int>(), enable));
+		bool result(dev.breakpoint_enable(index.as<int>(), Enable));
 		if (result)
 		{
 			dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 			dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 		}
-		return sol::make_object(L, result);
+		return sol::make_object(s, result);
 	}
 	else
 	{
@@ -56,20 +57,21 @@ sol::object do_breakpoint_enable(lua_State *L, device_debug &dev, sol::object &i
 }
 
 
-sol::object do_watchpoint_enable(lua_State *L, device_debug &dev, sol::object &index, bool enable)
+template <bool Enable>
+sol::object do_watchpoint_enable(device_debug &dev, sol::this_state s, sol::object index)
 {
 	if (index == sol::lua_nil)
 	{
-		dev.watchpoint_enable_all(enable);
+		dev.watchpoint_enable_all(Enable);
 		dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 		return sol::lua_nil;
 	}
 	else if (index.is<int>())
 	{
-		bool result(dev.watchpoint_enable(index.as<int>(), enable));
+		bool result(dev.watchpoint_enable(index.as<int>(), Enable));
 		if (result)
 			dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
-		return sol::make_object(L, result);
+		return sol::make_object(s, result);
 	}
 	else
 	{
@@ -81,7 +83,7 @@ sol::object do_watchpoint_enable(lua_State *L, device_debug &dev, sol::object &i
 } // anonymous namespace
 
 
-void lua_engine::initialize_debug()
+void lua_engine::initialize_debug(sol::table &emu)
 {
 
 	static const enum_parser<read_or_write, 4> s_read_or_write_parser =
@@ -92,18 +94,6 @@ void lua_engine::initialize_debug()
 		{ "wr", read_or_write::READWRITE }
 	};
 
-
-/* debugger_manager library (requires debugger to be active)
- *
- * manager:machine():debugger()
- *
- * debugger:command(command_string) - run command_string in debugger console
- *
- * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
- * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
- * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
- * debugger.execution_state - accessor for active cpu run state
- */
 
 	auto debugger_type = sol().registry().new_usertype<debugger_manager>("debugger", sol::no_constructor);
 	debugger_type["command"] = [] (debugger_manager &debug, std::string const &cmd) { debug.console().execute_command(cmd, false); };
@@ -116,7 +106,7 @@ void lua_engine::initialize_debug()
 			[] (debugger_manager &debug) { return debug.cpu().is_stopped() ? "stop" : "run"; },
 			[] (debugger_manager &debug, std::string const &state)
 			{
-				if(state == "stop")
+				if (state == "stop")
 					debug.cpu().set_execution_stopped();
 				else
 					debug.cpu().set_execution_running();
@@ -139,27 +129,6 @@ void lua_engine::initialize_debug()
 			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
 
 
-/* device_debug library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug()
- *
- * debug:step([opt] steps) - run cpu steps, default 1
- * debug:go() - run cpu
- * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
- *                                            expressions. returns breakpoint index
- * debug:bpclr(idx) - clear breakpoint
- * debug:bpenable(idx) - enable breakpoint
- * debug:bpdisable(idx) - disable breakpoint
- * debug:bplist()[] - table of breakpoints (k=index, v=debug_breakpoint)
- * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
- *                                                              are debugger expressions.
- *                                                              returns watchpoint index
- * debug:wpclr(idx) - clear watchpoint
- * debug:wpenable(idx) - enable watchpoint
- * debug:wpdisable(idx) - disable watchpoint
- * debug:wplist(space)[] - table of watchpoints (k=index, v=debug_watchpoint)
- */
-
 	auto device_debug_type = sol().registry().new_usertype<device_debug>("device_debug", sol::no_constructor);
 	device_debug_type["step"] =
 		[] (device_debug &dev, sol::object num)
@@ -178,34 +147,25 @@ void lua_engine::initialize_debug()
 			dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 			return result;
 		};
-	device_debug_type["bpclear"] =
-		[this] (device_debug &dev, sol::object index) -> sol::object
-		{
-			if (index == sol::lua_nil)
+	device_debug_type["bpclear"] = sol::overload(
+			[] (device_debug &dev, int index)
 			{
-				dev.breakpoint_clear_all();
-				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
-				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
-				return sol::lua_nil;
-			}
-			else if (index.is<int>())
-			{
-				bool result(dev.breakpoint_clear(index.as<int>()));
+				bool result(dev.breakpoint_clear(index));
 				if (result)
 				{
 					dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 					dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 				}
-				return sol::make_object(sol(), result);
-			}
-			else
+				return result;
+			},
+			[] (device_debug &dev)
 			{
-				osd_printf_error("[LUA ERROR] must call bpclear with integer or nil");
-				return sol::lua_nil;
-			}
-		};
-	device_debug_type["bpenable"] = [this] (device_debug &dev, sol::object index) { return do_breakpoint_enable(sol(), dev, index, true); };
-	device_debug_type["bpdisable"] = [this] (device_debug &dev, sol::object index) { return do_breakpoint_enable(sol(), dev, index, false); };
+				dev.breakpoint_clear_all();
+				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
+				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
+			});
+	device_debug_type["bpenable"] = &do_breakpoint_enable<true>;
+	device_debug_type["bpdisable"] = &do_breakpoint_enable<false>;
 	device_debug_type["bplist"] =
 		[this] (device_debug &dev)
 		{
@@ -222,30 +182,21 @@ void lua_engine::initialize_debug()
 			dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 			return result;
 		};
-	device_debug_type["wpclear"] =
-		[this] (device_debug &dev, sol::object index) -> sol::object
-		{
-			if (index == sol::lua_nil)
+	device_debug_type["wpclear"] = sol::overload(
+			[] (device_debug &dev, int index)
+			{
+				bool result(dev.watchpoint_clear(index));
+				if (result)
+					dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
+				return result;
+			},
+			[] (device_debug &dev)
 			{
 				dev.watchpoint_clear_all();
 				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
-				return sol::lua_nil;
-			}
-			else if (index.is<int>())
-			{
-				bool result(dev.watchpoint_clear(index.as<int>()));
-				if (result)
-					dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
-				return sol::make_object(sol(), result);
-			}
-			else
-			{
-				osd_printf_error("[LUA ERROR] must call wpclear with integer or nil");
-				return sol::lua_nil;
-			}
-		};
-	device_debug_type["wpenable"] = [this] (device_debug &dev, sol::object index) { return do_watchpoint_enable(sol(), dev, index, true); };
-	device_debug_type["wpdisable"] = [this] (device_debug &dev, sol::object index) { return do_watchpoint_enable(sol(), dev, index, false); };
+			});
+	device_debug_type["wpenable"] = &do_watchpoint_enable<true>;
+	device_debug_type["wpdisable"] = &do_watchpoint_enable<false>;
 	device_debug_type["wplist"] =
 		[this] (device_debug &dev, addr_space &sp)
 		{
@@ -256,17 +207,6 @@ void lua_engine::initialize_debug()
 		};
 
 
-/* debug_breakpoint library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug():bplist()[index]
- *
- * breakpoint.index - stable index of breakpoint
- * breakpoint.enabled - whether breakpoint is enabled
- * breakpoint.address -
- * breakpoint.condition -
- * breakpoint.action -
- */
-
 	auto breakpoint_type = sol().registry().new_usertype<debug_breakpoint>("breakpoint", sol::no_constructor);
 	breakpoint_type["index"] = sol::property(&debug_breakpoint::index);
 	breakpoint_type["enabled"] = sol::property(&debug_breakpoint::enabled);
@@ -274,19 +214,6 @@ void lua_engine::initialize_debug()
 	breakpoint_type["condition"] = sol::property(&debug_breakpoint::condition);
 	breakpoint_type["action"] = sol::property(&debug_breakpoint::action);
 
-
-/* debug_watchpoint library (requires debugger to be active)
- *
- * manager:machine().devices[device_tag]:debug():wplist()[index]
- *
- * watchpoint.index - stable index of watchpoint
- * watchpoint.enabled - whether breakpoint is enabled
- * watchpoint.type - type of access to watch ("r", "w" or "rw")
- * watchpoint.address - start of address range to watch
- * watchpoint.length - lenght of address range to watch
- * watchpoint.condition -
- * watchpoint.action -
- */
 
 	auto watchpoint_type = sol().registry().new_usertype<debug_watchpoint>("watchpoint", sol::no_constructor);
 	watchpoint_type["index"] = sol::property(&debug_watchpoint::index);

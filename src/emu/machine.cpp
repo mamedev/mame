@@ -84,6 +84,7 @@
 #include "network.h"
 #include "romload.h"
 #include "tilemap.h"
+#include "natkeyboard.h"
 #include "ui/uimain.h"
 #include <ctime>
 #include <rapidjson/writer.h>
@@ -217,6 +218,9 @@ void running_machine::start()
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
 		m_base_time = newbase;
+
+	// initialize natural keyboard support after ports have been initialized
+	m_natkeyboard = std::make_unique<natural_keyboard>(*this);
 
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
@@ -984,10 +988,14 @@ void running_machine::handle_saveload()
 					file.remove_on_close();
 			}
 			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
+			}
 			else
+			{
 				popmessage("Error: Failed to open file for %s operation.", opname);
+			}
 		}
 	}
 

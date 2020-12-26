@@ -68,11 +68,8 @@ stream_buffer::stream_buffer(u32 sample_rate) :
 stream_buffer::~stream_buffer()
 {
 #if (SOUND_DEBUG)
-	if (m_wav_file != nullptr)
-	{
+	if (m_wav_file)
 		flush_wav();
-		close_wav();
-	}
 #endif
 }
 
@@ -184,7 +181,7 @@ void stream_buffer::open_wav(char const *filename)
 {
 	// always open at 48k so that sound programs can handle it
 	// re-sample as needed
-	m_wav_file = wav_open(filename, 48000, 1);
+	m_wav_file = util::wav_open(filename, 48000, 1);
 }
 #endif
 
@@ -197,7 +194,7 @@ void stream_buffer::open_wav(char const *filename)
 void stream_buffer::flush_wav()
 {
 	// skip if no file
-	if (m_wav_file == nullptr)
+	if (!m_wav_file)
 		return;
 
 	// grab a view of the data from the last-written point
@@ -218,22 +215,8 @@ void stream_buffer::flush_wav()
 			buffer[sampindex] = s16(view.get(samplebase + sampindex) * 32768.0);
 
 		// write to the WAV
-		wav_add_data_16(m_wav_file, buffer, cursamples);
+		util::wav_add_data_16(*m_wav_file, buffer, cursamples);
 	}
-}
-#endif
-
-
-//-------------------------------------------------
-//  close_wav - close the logging WAV file
-//-------------------------------------------------
-
-#if (SOUND_DEBUG)
-void stream_buffer::close_wav()
-{
-	if (m_wav_file != nullptr)
-		wav_close(m_wav_file);
-	m_wav_file = nullptr;
 }
 #endif
 
@@ -833,7 +816,7 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent, int index)
 {
-	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name().c_str(), index + m_output_base, sample_rate());
+	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name(), index + m_output_base, sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{
@@ -1089,7 +1072,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_nosound_mode(machine.osd().no_sound()),
 	m_attenuation(0),
 	m_unique_id(0),
-	m_wavfile(nullptr),
+	m_wavfile(),
 	m_first_reset(true)
 {
 	// get filename for WAV file or AVI file if specified
@@ -1156,12 +1139,19 @@ sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outp
 //  start_recording - begin audio recording
 //-------------------------------------------------
 
-void sound_manager::start_recording()
+bool sound_manager::start_recording(std::string_view filename)
+{
+	if (m_wavfile)
+		return false;
+	m_wavfile = util::wav_open(filename, machine().sample_rate(), 2);
+	return bool(m_wavfile);
+}
+
+bool sound_manager::start_recording()
 {
 	// open the output WAV file if specified
-	const char *wavfile = machine().options().wav_write();
-	if (wavfile[0] != 0 && m_wavfile == nullptr)
-		m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
+	char const *const filename = machine().options().wav_write();
+	return *filename ? start_recording(filename) : false;
 }
 
 
@@ -1172,9 +1162,7 @@ void sound_manager::start_recording()
 void sound_manager::stop_recording()
 {
 	// close any open WAV file
-	if (m_wavfile != nullptr)
-		wav_close(m_wavfile);
-	m_wavfile = nullptr;
+	m_wavfile.reset();
 }
 
 
@@ -1311,9 +1299,11 @@ void sound_manager::reset()
 		for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		{
 			int dummy;
-			sound_stream *output = speaker.output_to_stream_output(0, dummy);
-			if (output != nullptr)
+			sound_stream *const output = speaker.output_to_stream_output(0, dummy);
+			if (output)
 				recursive_remove_stream_from_orphan_list(output);
+
+			m_speakers.emplace_back(speaker);
 		}
 
 #if (SOUND_DEBUG)
@@ -1487,7 +1477,7 @@ void sound_manager::update(void *ptr, int param)
 	std::fill_n(&m_rightmix[0], m_samples_this_update, 0);
 
 	// force all the speaker streams to generate the proper number of samples
-	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
+	for (speaker_device &speaker : m_speakers)
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// determine the maximum in this section
@@ -1582,8 +1572,8 @@ void sound_manager::update(void *ptr, int param)
 			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
 		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
 		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
-		if (m_wavfile != nullptr)
-			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
+		if (m_wavfile)
+			util::wav_add_data_16(*m_wavfile, finalmix, finalmix_offset);
 	}
 
 	// update any orphaned streams so they don't get too far behind

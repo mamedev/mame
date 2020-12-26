@@ -359,7 +359,7 @@ void cdp1864_device::dma_w(uint8_t data)
 	int sx = screen().hpos() + 4;
 	int y = screen().vpos();
 
-	if (!m_con)
+	if (m_con)
 	{
 		rdata = m_read_rdata();
 		bdata = m_read_bdata();
@@ -384,11 +384,16 @@ void cdp1864_device::dma_w(uint8_t data)
 
 //-------------------------------------------------
 //  con_w - color on write
+//  At start, color is disabled. If the CON
+//  pin is taken low (or pulsed low), color is
+//  enabled. It can only be disabled again by
+//  resetting the chip.
 //-------------------------------------------------
 
 void cdp1864_device::con_w(int state)
 {
-	m_con = state;
+	if (!state)
+		m_con = true;
 }
 
 

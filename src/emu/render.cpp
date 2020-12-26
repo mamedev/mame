@@ -1061,8 +1061,8 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 {
 	layout_view *view = nullptr;
 
-	// auto view just selects the nth view
-	if (strcmp(viewname, "auto") != 0)
+	// if it isn't "auto" or an empty string, try to match it as a view name prefix
+	if (viewname && *viewname && strcmp(viewname, "auto"))
 	{
 		// scan for a matching view name
 		size_t const viewlen = strlen(viewname);
@@ -1343,6 +1343,7 @@ render_primitive_list &render_target::get_primitives()
 	if (m_manager.machine().phase() >= machine_phase::RESET)
 	{
 		// we're running - iterate over items in the view
+		current_view().prepare_items();
 		for (layout_view::item &curitem : current_view().visible_items())
 		{
 			// first apply orientation to the bounds
@@ -2633,10 +2634,8 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		// apply the opposite orientation to the UI
 		if (is_ui_target())
 		{
-			render_container::user_settings settings;
 			render_container &ui_container = m_manager.ui_container();
-
-			ui_container.get_user_settings(settings);
+			render_container::user_settings settings = ui_container.get_user_settings();
 			settings.m_orientation = orientation_add(orientation_reverse(rotate), settings.m_orientation);
 			ui_container.set_user_settings(settings);
 		}
@@ -3316,7 +3315,7 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
 	{
 		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
-		if (target)
+		if (target && !target->hidden())
 			target->config_load(*targetnode);
 	}
 
@@ -3325,10 +3324,9 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 	{
 		int const index = screennode->get_attribute_int("index", -1);
 		render_container *container = m_screen_container_list.find(index);
-		render_container::user_settings settings;
 
 		// fetch current settings
-		container->get_user_settings(settings);
+		render_container::user_settings settings = container->get_user_settings();
 
 		// fetch color controls
 		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
@@ -3368,17 +3366,21 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	}
 
 	// iterate over targets
-	for (int targetnum = 0; targetnum < 1000; targetnum++)
+	for (int targetnum = 0; ; ++targetnum)
 	{
 		// get this target and break when we fail
 		render_target *target = target_by_index(targetnum);
-		if (target == nullptr)
+		if (!target)
+		{
 			break;
-
-		// create a node
-		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
-		if (targetnode && !target->config_save(*targetnode))
-			targetnode->delete_node();
+		}
+		else if (!target->hidden())
+		{
+			// create a node
+			util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
+			if (targetnode && !target->config_save(*targetnode))
+				targetnode->delete_node();
+		}
 	}
 
 	// iterate over screen containers
@@ -3394,8 +3396,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			// output the basics
 			screennode->set_attribute_int("index", scrnum);
 
-			render_container::user_settings settings;
-			container->get_user_settings(settings);
+			render_container::user_settings settings = container->get_user_settings();
 
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())

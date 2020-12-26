@@ -272,7 +272,7 @@ std::pair<const char *, device_t *> machine_config::resolve_owner(const char *ta
 		part.assign(tag, next - tag);
 		owner = owner->subdevices().find(part);
 		if (!owner)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
+			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part, orig_tag);
 		tag = next+1;
 	}
 	assert(tag[0] != '\0');

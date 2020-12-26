@@ -404,9 +404,18 @@ void deadang_state::deadang(machine_config &config)
 	ym2203_device &ym2(YM2203(config, "ym2", XTAL(14'318'181)/4));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	SEIBU_ADPCM(config, m_adpcm1, 8000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	SEIBU_ADPCM(config, m_adpcm1, XTAL(12'000'000)/32/48, "msm1");
+	SEIBU_ADPCM(config, m_adpcm2, XTAL(12'000'000)/32/48, "msm2");
 
-	SEIBU_ADPCM(config, m_adpcm2, 8000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	msm5205_device &msm1(MSM5205(config, "msm1", XTAL(12'000'000)/32));
+	msm1.vck_callback().set(m_adpcm1, FUNC(seibu_adpcm_device::msm_int));
+	msm1.set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	msm1.add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	msm5205_device &msm2(MSM5205(config, "msm2", XTAL(12'000'000)/32));
+	msm2.vck_callback().set(m_adpcm2, FUNC(seibu_adpcm_device::msm_int));
+	msm2.set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	msm2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void popnrun_state::popnrun(machine_config &config)
@@ -428,6 +437,8 @@ void popnrun_state::popnrun(machine_config &config)
 
 	config.device_remove("ym1");
 	config.device_remove("ym2");
+	config.device_remove("msm1");
+	config.device_remove("msm2");
 	config.device_remove("adpcm1");
 	config.device_remove("adpcm2");
 

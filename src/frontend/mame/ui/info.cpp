@@ -490,8 +490,7 @@ menu_game_info::~menu_game_info()
 
 void menu_game_info::populate(float &customtop, float &custombottom)
 {
-	std::string tempstring = ui().machine_info().game_info_string();
-	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+	item_append(ui().machine_info().game_info_string(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_game_info::handle()
@@ -515,8 +514,7 @@ menu_warn_info::~menu_warn_info()
 
 void menu_warn_info::populate(float &customtop, float &custombottom)
 {
-	std::string tempstring = ui().machine_info().warnings_string();
-	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+	item_append(ui().machine_info().warnings_string(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_warn_info::handle()
@@ -540,8 +538,8 @@ menu_image_info::~menu_image_info()
 
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
-	item_append(machine().system().type.fullname(), "", FLAG_DISABLE, nullptr);
-	item_append("", "", FLAG_DISABLE, nullptr);
+	item_append(machine().system().type.fullname(), FLAG_DISABLE, nullptr);
+	item_append(std::string(), FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
@@ -569,29 +567,31 @@ void menu_image_info::image_info(device_image_interface *image)
 		// if image has been loaded through softlist, let's add some more info
 		if (image->loaded_through_softlist())
 		{
-			// display long filename
-			item_append(image->longname(), "", FLAG_DISABLE, nullptr);
+			software_info const &swinfo(*image->software_entry());
 
-			// display manufacturer and year
-			item_append(string_format("%s, %s", image->manufacturer(), image->year()), "", FLAG_DISABLE, nullptr);
+			// display full name, publisher and year
+			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
+			item_append(string_format("%1$s, %2$s", swinfo.publisher(), swinfo.year()), FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
-			switch (image->supported())
+			switch (swinfo.supported())
 			{
-				case SOFTWARE_SUPPORTED_NO:
-					item_append(_("Not supported"), "", FLAG_DISABLE, nullptr);
-					break;
-				case SOFTWARE_SUPPORTED_PARTIAL:
-					item_append(_("Partially supported"), "", FLAG_DISABLE, nullptr);
-					break;
-				default:
-					break;
+			case SOFTWARE_SUPPORTED_NO:
+				item_append(_("Not supported"), FLAG_DISABLE, nullptr);
+				break;
+			case SOFTWARE_SUPPORTED_PARTIAL:
+				item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
+				break;
+			default:
+				break;
 			}
 		}
 	}
 	else
+	{
 		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
-	item_append("", "", FLAG_DISABLE, nullptr);
+	}
+	item_append(std::string(), FLAG_DISABLE, nullptr);
 }
 
 } // namespace ui

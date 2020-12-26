@@ -74,7 +74,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_WAVWRITE,                                   nullptr,     OPTION_STRING,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     OPTION_STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      OPTION_STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
-	{ OPTION_SNAPVIEW,                                   "internal",  OPTION_STRING,     "specify snapshot/movie view or 'internal' to use internal pixel-aspect views" },
+	{ OPTION_SNAPVIEW,                                   "auto",      OPTION_STRING,     "snapshot/movie view - 'auto' for default, or 'native' for per-screen pixel-aspect views" },
 	{ OPTION_SNAPBILINEAR,                               "1",         OPTION_BOOLEAN,    "specify if the snapshot/movie should have bilinear filtering applied" },
 	{ OPTION_STATENAME,                                  "%g",        OPTION_STRING,     "override of the default state subfolder naming; %g == gamename" },
 	{ OPTION_BURNIN,                                     "0",         OPTION_BOOLEAN,    "create burn-in snapshots for each screen" },
@@ -885,7 +885,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 		machine_config config(*m_system, *this);
 		software_list_device_enumerator iter(config.root_device());
 		if (iter.count() == 0)
-			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier.c_str());
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier);
 
 		// and finally set up the stack
 		std::stack<std::string> software_identifier_stack;

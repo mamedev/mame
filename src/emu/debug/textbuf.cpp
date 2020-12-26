@@ -139,32 +139,31 @@ void text_buffer_clear(text_buffer &text)
 
 ***************************************************************************/
 
-/*-------------------------------------------------
-    text_buffer_print - print data to the text
-    buffer
--------------------------------------------------*/
+//-------------------------------------------------
+//  text_buffer_print - print data to the text
+//  buffer
+//-------------------------------------------------
 
-void text_buffer_print(text_buffer &text, const char *data)
+void text_buffer_print(text_buffer &text, std::string_view data)
 {
 	text_buffer_print_wrap(text, data, MAX_LINE_LENGTH);
 }
 
 
-/*-------------------------------------------------
-    text_buffer_print_wrap - print data to the
-    text buffer with word wrapping to a given
-    column
--------------------------------------------------*/
+//-------------------------------------------------
+//  text_buffer_print_wrap - print data to the
+//  text buffer with word wrapping to a given
+//  column
+//-------------------------------------------------
 
-void text_buffer_print_wrap(text_buffer &text, const char *data, int wrapcol)
+void text_buffer_print_wrap(text_buffer &text, std::string_view data, int wrapcol)
 {
 	s32 const stopcol = (wrapcol < MAX_LINE_LENGTH) ? wrapcol : MAX_LINE_LENGTH;
-	s32 needed_space;
 
-	/* we need to ensure there is enough space for this string plus enough for the max line length */
-	needed_space = s32(strlen(data)) + MAX_LINE_LENGTH;
+	// we need to ensure there is enough space for this string plus enough for the max line length
+	s32 const needed_space = s32(data.length()) + MAX_LINE_LENGTH;
 
-	/* make space in the buffer if we need to */
+	// make space in the buffer if we need to
 	while (text.buffer_space() < needed_space && text.linestart != text.lineend)
 	{
 		text.linestartseq++;
@@ -173,56 +172,55 @@ void text_buffer_print_wrap(text_buffer &text, const char *data, int wrapcol)
 		text.bufstart = text.lineoffs[text.linestart];
 	}
 
-	/* now add the data */
-	for ( ; *data; data++)
+	// now add the data
+	for (int ch : data)
 	{
-		int ch = *data;
 		int linelen;
 
-		/* a CR resets our position */
+		// a CR resets our position
 		if (ch == '\r')
 			text.bufend = text.lineoffs[text.lineend];
 
-		/* non-CR data is just characters */
+		// non-CR data is just characters
 		else if (ch != '\n')
 			text.buffer[text.bufend++] = ch;
 
-		/* an explicit newline or line-too-long condition inserts a newline */
+		// an explicit newline or line-too-long condition inserts a newline */
 		linelen = text.bufend - text.lineoffs[text.lineend];
 		if (ch == '\n' || linelen >= stopcol)
 		{
 			int overflow = 0;
 
-			/* if we're wrapping, back off until we hit a space */
+			// if we're wrapping, back off until we hit a space
 			if (linelen >= wrapcol)
 			{
-				/* scan backwards, removing characters along the way */
+				// scan backwards, removing characters along the way
 				overflow = 1;
 				while (overflow < linelen && text.buffer[text.bufend - overflow] != ' ')
 					overflow++;
 
-				/* if we found a space, take it; otherwise, reset and pretend we didn't try */
+				// if we found a space, take it; otherwise, reset and pretend we didn't try
 				if (overflow < linelen)
 					linelen -= overflow;
 				else
 					overflow = 0;
 			}
 
-			/* did we beat the max width */
+			// did we beat the max width
 			if (linelen > text.maxwidth)
 				text.maxwidth = linelen;
 
-			/* append a terminator */
+			// append a terminator
 			if (overflow == 0)
 				text.buffer[text.bufend++] = 0;
 			else
 				text.buffer[text.bufend - overflow] = 0;
 
-			/* determine what the next line will be */
+			// determine what the next line will be
 			if (++text.lineend >= text.linesize)
 				text.lineend = 0;
 
-			/* if we're out of lines, consume the next one */
+			// if we're out of lines, consume the next one
 			if (text.lineend == text.linestart)
 			{
 				text.linestartseq++;
@@ -231,16 +229,16 @@ void text_buffer_print_wrap(text_buffer &text, const char *data, int wrapcol)
 				text.bufstart = text.lineoffs[text.linestart];
 			}
 
-			/* if we don't have enough room in the buffer for a max line, wrap to the start */
+			// if we don't have enough room in the buffer for a max line, wrap to the start
 			if (text.bufend + MAX_LINE_LENGTH + 1 >= text.bufsize)
 				text.bufend = 0;
 
-			/* create a new empty line */
+			// create a new empty line
 			text.lineoffs[text.lineend] = text.bufend - (overflow ? (overflow - 1) : 0);
 		}
 	}
 
-	/* nullptr terminate what we have on this line */
+	// null terminate what we have on this line
 	text.buffer[text.bufend] = 0;
 }
 
@@ -305,7 +303,7 @@ const char *text_buffer_get_seqnum_line(text_buffer const &text, u32 seqnum)
     Gets the line that the iterator currently points to.
 -----------------------------------------------------------------------*/
 
-text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
+std::string_view text_buffer_lines::text_buffer_line_iterator::operator*() const
 {
 	char const *const line = &m_buffer.buffer[m_buffer.lineoffs[m_lineptr]];
 
@@ -321,7 +319,7 @@ text_buffer_line text_buffer_lines::text_buffer_line_iterator::operator*() const
 	if (difference < 0)
 		difference += m_buffer.bufsize;
 
-	return text_buffer_line{ line, size_t(difference) };
+	return std::string_view{ line, std::string_view::size_type(difference) };
 }
 
 /*---------------------------------------------------------------------

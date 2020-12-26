@@ -56,6 +56,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -443,8 +444,8 @@ public:
 	float yscale() const { return m_user.m_yscale; }
 	float xoffset() const { return m_user.m_xoffset; }
 	float yoffset() const { return m_user.m_yoffset; }
-	bool is_empty() const { return (m_itemlist.count() == 0); }
-	void get_user_settings(user_settings &settings) const { settings = m_user; }
+	bool is_empty() const { return m_itemlist.empty(); }
+	const user_settings &get_user_settings() const { return m_user; }
 
 	// setters
 	void set_overlay(bitmap_argb32 *bitmap);
@@ -591,7 +592,7 @@ private:
 		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, std::string_view str, int align, const render_color &color);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
@@ -724,6 +725,9 @@ public:
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
 	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device> >;
+	using prepare_items_delegate = delegate<void ()>;
+	using preload_delegate = delegate<void ()>;
+	using recomputed_delegate = delegate<void ()>;
 
 	/// \brief A single item in a view
 	///
@@ -930,7 +934,13 @@ public:
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
 
+	// set handlers
+	void set_prepare_items_callback(prepare_items_delegate &&handler);
+	void set_preload_callback(preload_delegate &&handler);
+	void set_recomputed_callback(recomputed_delegate &&handler);
+
 	// operations
+	void prepare_items() { if (!m_prepare_items.isnull()) m_prepare_items(); }
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
 	void preload();
 
@@ -972,6 +982,11 @@ private:
 	edge_vector                 m_interactive_edges_x;
 	edge_vector                 m_interactive_edges_y;
 	screen_ref_vector           m_screens;          // list screens visible in current configuration
+
+	// handlers
+	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
+	preload_delegate            m_preload;          // additional actions when visible items change
+	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
 
 	// cold items
 	std::string                 m_name;             // display name for the view
@@ -1051,6 +1066,7 @@ public:
 	u32 width() const { return m_width; }
 	u32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	bool keepaspect() const { return m_keepaspect; }
 	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }

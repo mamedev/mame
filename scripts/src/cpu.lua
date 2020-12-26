@@ -1465,6 +1465,15 @@ if (CPUS["MELPS4"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Mitsubishi M32C, disassembler only
+--------------------------------------------------
+
+if (_OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m32c/m32cdasm.h")
+end
+
+--------------------------------------------------
 -- Mitsubishi M37702 and M37710 (based on 65C816)
 --@src/devices/cpu/m37710/m37710.h,CPUS["M37710"] = true
 --------------------------------------------------
@@ -3141,7 +3150,7 @@ end
 
 --------------------------------------------------
 -- National Semiconductor CR16B
---@src/devices/cpu/cr16b/cr16bdasm.h,CPUS["CR16B"] = true
+--@src/devices/cpu/cr16b/cr16b.h,CPUS["CR16B"] = true
 --------------------------------------------------
 
 if (CPUS["CR16B"]~=null) then
@@ -3154,6 +3163,15 @@ end
 if (CPUS["CR16B"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor CR16C, disassembler only
+--------------------------------------------------
+
+if (_OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16c/cr16cdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16c/cr16cdasm.h")
 end
 
 --------------------------------------------------

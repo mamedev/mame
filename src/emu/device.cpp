@@ -522,6 +522,7 @@ bool device_t::findit(validity_checker *valid) const
 	return allfound;
 }
 
+
 //-------------------------------------------------
 //  resolve_pre_map - find objects that may be used
 //  in memory maps
@@ -533,6 +534,7 @@ void device_t::resolve_pre_map()
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
 }
+
 
 //-------------------------------------------------
 //  resolve - find objects
@@ -546,6 +548,16 @@ void device_t::resolve_post_map()
 
 	// allow implementation to do additional setup
 	device_resolve_objects();
+}
+
+
+//-------------------------------------------------
+//  view_register - register a view for future state saving
+//-------------------------------------------------
+
+void device_t::view_register(memory_view *view)
+{
+	m_viewlist.push_back(view);
 }
 
 
@@ -598,6 +610,12 @@ void device_t::start()
 	save_item(NAME(m_clock));
 	save_item(NAME(m_unscaled_clock));
 	save_item(NAME(m_clock_scale));
+
+	// have the views register their state
+	if (!m_viewlist.empty())
+		osd_printf_verbose("%s: Registering %d views\n", m_tag, int(m_viewlist.size()));
+	for (memory_view *view : m_viewlist)
+		view->register_state();
 
 	// we're now officially started
 	m_started = true;

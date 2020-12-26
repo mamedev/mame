@@ -522,7 +522,7 @@ or banks.
     (...).mirror(mask)
 
 Duplicate the range on the addresses reachable by setting any of the 1
-bits present in mask.  For instance, a range 0-0x1f with mask 0x300
+bits present in mask.  For instance, a range 0-0x1f with mirror 0x300
 will be present on 0-0x1f, 0x100-0x11f, 0x200-0x21f and 0x300-0x31f.
 The addresses passed in to the handler stay in the 0-0x1f range, the
 mirror bits are not seen by the handler.

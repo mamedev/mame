@@ -61,6 +61,8 @@
 #ifndef MAME_EMU_SOUND_H
 #define MAME_EMU_SOUND_H
 
+#include "wavwrite.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -209,11 +211,10 @@ public:
 	// for debugging, provide an interface to write a WAV stream
 	void open_wav(char const *filename);
 	void flush_wav();
-	void close_wav();
 
 private:
 	// internal debugging state
-	wav_file *m_wav_file = nullptr;       // pointer to the current WAV file
+	util::wav_file_ptr m_wav_file;        // pointer to the current WAV file
 	u32 m_last_written = 0;               // last written sample index
 #endif
 };
@@ -767,20 +768,23 @@ public:
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
 
-	// begin recording a WAV file if options has requested it
-	void start_recording();
-
-	// stop recording the WAV file
+	// WAV recording
+	bool is_recording() const { return bool(m_wavfile); }
+	bool start_recording();
+	bool start_recording(std::string_view filename);
 	void stop_recording();
 
 	// set the global OSD attenuation level
 	void set_attenuation(float attenuation);
 
 	// mute sound for one of various independent reasons
-	void ui_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_UI); }
-	void debugger_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_DEBUGGER); }
-	void system_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_SYSTEM); }
-	void system_enable(bool turn_on = true) { mute(!turn_on, MUTE_REASON_SYSTEM); }
+	bool muted() const { return bool(m_muted); }
+	bool ui_mute() const { return bool(m_muted & MUTE_REASON_UI); }
+	bool debugger_mute() const { return bool(m_muted & MUTE_REASON_DEBUGGER); }
+	bool system_mute() const { return bool(m_muted & MUTE_REASON_SYSTEM); }
+	void ui_mute(bool turn_off) { mute(turn_off, MUTE_REASON_UI); }
+	void debugger_mute(bool turn_off) { mute(turn_off, MUTE_REASON_DEBUGGER); }
+	void system_mute(bool turn_off) { mute(turn_off, MUTE_REASON_SYSTEM); }
 
 	// return information about the given mixer input, by index
 	bool indexed_mixer_input(int index, mixer_input &info) const;
@@ -818,6 +822,7 @@ private:
 	// internal state
 	running_machine &m_machine;           // reference to the running machine
 	emu_timer *m_update_timer;            // timer that runs the update function
+	std::vector<std::reference_wrapper<speaker_device> > m_speakers;
 
 	u32 m_update_number;                  // current update index; used for sample rate updates
 	attotime m_last_update;               // time of the last update
@@ -834,7 +839,7 @@ private:
 	bool m_nosound_mode;                  // true if we're in "nosound" mode
 	int m_attenuation;                    // current attentuation level (at the OSD)
 	int m_unique_id;                      // unique ID used for stream identification
-	wav_file *m_wavfile;                  // WAV file for streaming
+	util::wav_file_ptr m_wavfile;         // WAV file for streaming
 
 	// streams data
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list; // list of streams

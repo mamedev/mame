@@ -167,7 +167,7 @@ namespace emu::detail {
 template <typename... T> struct void_wrapper { using type = void; };
 template <typename... T> using void_t = typename void_wrapper<T...>::type;
 
-template <typename D, typename T, typename Enable = void> struct rw_device_class  { };
+template <typename D, typename T, typename Enable = void> struct rw_device_class { };
 
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...), const char *>::value> > { using type = T; };
@@ -1811,6 +1811,7 @@ class memory_view
 	friend class memory_view_entry;
 	friend class address_map_entry;
 	friend class address_map;
+	friend class device_t;
 
 	DISABLE_COPYING(memory_view);
 
@@ -1868,6 +1869,7 @@ private:
 	std::pair<handler_entry *, handler_entry *> make_handlers(address_space &space, offs_t addrstart, offs_t addrend);
 	void make_subdispatch(std::string context);
 	int id_to_slot(int id) const;
+	void register_state();
 };
 
 
@@ -1918,10 +1920,9 @@ private:
 	running_machine &           m_machine;              // reference to the machine
 
 	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
-	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
-	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
-	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
-
+	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks
+	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map of shares
+	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // map of memory regions
 
 	// Allocate the address spaces
 	void allocate(device_memory_interface &memory);

@@ -69,7 +69,7 @@ void xybots_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x007fff).mirror(0x7c0000).rom();
-	map(0x008000, 0x00ffff).mirror(0x7c0000).rom(); /* slapstic maps here */
+	map(0x008000, 0x009fff).mirror(0x7c6000).bankr(m_slapstic_bank); /* slapstic maps here */
 	map(0x010000, 0x03ffff).mirror(0x7c0000).rom();
 	map(0x800000, 0x800fff).mirror(0x7f8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x801000, 0x802dff).mirror(0x7f8000).ram();
@@ -181,7 +181,8 @@ void xybots_state::xybots(machine_config &config)
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
-	SLAPSTIC(config, "slapstic", 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -384,10 +385,14 @@ ROM_END
  *
  *************************************/
 
-void xybots_state::init_xybots()
+void xybots_state::machine_start()
 {
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xffff, 0x7c0000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+
 	m_h256 = 0x0400;
-	m_slapstic->legacy_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
 }
 
 
@@ -398,8 +403,8 @@ void xybots_state::init_xybots()
  *
  *************************************/
 
-GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
-GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
-GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
-GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
-GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 )
+GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, empty_init, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
+GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, empty_init, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
+GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, empty_init, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
+GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, empty_init, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
+GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, empty_init, ROT0, "Atari Games", "Xybots (rev 0)", 0 )

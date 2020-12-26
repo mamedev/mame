@@ -16,7 +16,8 @@
 
     The slapstic was a security chip made by Atari, which was used for
     bank switching and security in several coin-operated video games from
-    1984 through 1990.
+    1984 through 1990.  It means "SLA Protection from Software Thievery IC",
+    where SLA is a Storage/Logic Array, an early form of gate array.
 
 
     What is a SLOOP?
@@ -171,10 +172,23 @@
     independently. Later chips (111-118) provided a mechanism of adding
     1, 2, or 3 to the number of the current bank.
 
+    One important detail is that some accesses must be done with CS=0,
+    while others don't care.  CS=0 usually means the access is in the
+    slapstic banked region.  Specifically:
+      - on 101 and 102, the 2nd alt access must be done outside of
+        the bank region
+      - on 103 to 108, the 1st alt access can be done anywhere
+      - on 110 to 118, the 1st and 3rd alt access can be done anywhere
+
+    These out-of-range accesses pose technical difficulties we're not fully
+    handling yet.  Similarly, accesses that must be done in sequence get
+    broken by an out-of-range access.
+
     Surprisingly, the slapstic appears to have used DRAM cells to store
     the current bank. After 5 or 6 seconds without a clock, the chip
     reverts to the default bank, with the chip reset (bank select
-    addresses are enabled). Typically, the slapstic region is accessed
+    addresses are enabled). Typically, the clock is connnected to the
+    cpu memory access line (AS on the 68000 for instance), accessing
     often enough to avoid the problem.
 
     For full details, see the MAME source code.
@@ -209,10 +223,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	bit_bank(0),
 	add_bank(0),
 	bit_xor(0),
-	m_legacy_configured(false),
-	m_legacy_space(nullptr),
-	m_legacy_memptr(nullptr),
-	m_legacy_bank(0)
+	m_bank(*this, finder_base::DUMMY_TAG)
 {
 	slapstic.bankstart = 0;
 	slapstic.bank[0] = slapstic.bank[1] = slapstic.bank[2] = slapstic.bank[3] = 0;
@@ -249,28 +260,6 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	slapstic.add3.value = 0;
 }
 
-
-
-void atari_slapstic_device::device_start()
-{
-}
-
-void atari_slapstic_device::device_reset()
-{
-	// reset the slapstic
-	if (m_legacy_configured)
-	{
-		slapstic_reset();
-		legacy_update_bank(slapstic_bank());
-	}
-}
-
-void atari_slapstic_device::device_post_load()
-{
-	if (m_legacy_configured)
-		legacy_update_bank(slapstic_bank());
-}
-
 /*************************************
  *
  *  Slapstic definitions
@@ -285,7 +274,11 @@ static const struct slapstic_data slapstic101 =
 	{ 0x0080,0x0090,0x00a0,0x00b0 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,UNKNOWN },             /* 1st mask/value in sequence */
+	// Real values, to be worked on later
+//  { 0x1f00,0x1e00 },              /* 1st mask/value in sequence */
+//  { 0x1fff,0x1fff },              /* 2nd mask/value in sequence, *outside* of the range */
+
+	{ 0x1fff,0x1dfe },              /* 1st mask/value in sequence */
 	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
 	{ 0x1ffc,0x1b5c },              /* 3rd mask/value in sequence */
 	{ 0x1fcf,0x0080 },              /* 4th mask/value in sequence */
@@ -312,6 +305,9 @@ static const struct slapstic_data slapstic103 =
 	{ 0x0040,0x0050,0x0060,0x0070 },/* bank select values */
 
 	/* alternate banking */
+	// Real values, to be worked on later
+//  { 0x3e00,0x3a00 },              /* 1st mask/value in sequence */
+//  { 0x3ffe,0x3ffe },              /* 2nd mask/value in sequence, *outside* of the range */
 	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
 	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
 	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */
@@ -780,14 +776,10 @@ void atari_slapstic_device::device_validity_check(validity_checker &valid) const
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_init()
+void atari_slapstic_device::device_start()
 {
 	/* set up the parameters */
 	slapstic = *slapstic_table[m_chipnum - 101];
-
-	/* reset the chip */
-	slapstic_reset();
-
 
 	/* save state */
 	save_item(NAME(state));
@@ -799,13 +791,16 @@ void atari_slapstic_device::slapstic_init()
 }
 
 
-void atari_slapstic_device::slapstic_reset(void)
+void atari_slapstic_device::device_reset(void)
 {
 	/* reset the chip */
 	state = DISABLED;
 
 	/* the 111 and later chips seem to reset to bank 0 */
 	current_bank = slapstic.bankstart;
+
+	if(m_bank)
+		m_bank->set_entry(current_bank);
 }
 
 
@@ -816,56 +811,9 @@ void atari_slapstic_device::slapstic_reset(void)
  *
  *************************************/
 
-int atari_slapstic_device::slapstic_bank(void)
+int atari_slapstic_device::bank(void)
 {
 	return current_bank;
-}
-
-
-
-/*************************************
- *
- *  Kludge to catch alt seqeuences
- *
- *************************************/
-
-int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
-{
-	/* Of the 3 alternate addresses, only the middle one needs to actually hit
-	   in the slapstic region; the first and third ones can be anywhere in the
-	   address space. For this reason, the read/write handlers usually only
-	   see the 2nd access. For the 68000-based games, we do the following
-	   kludge to examine the opcode that is executing and look for the 1st
-	   and 3rd accesses. */
-
-	if (access_68k)
-	{
-		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(space.device().state().pc() >> 1, slapstic.alt1))
-		{
-			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			u16 opcode = space.read_word(space.device().state().pcbase() & 0xffffff);
-			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
-			{
-				/* fetch the value of the register for the second operand, and see */
-				/* if it matches the third alternate */
-				u32 regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
-				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
-				{
-					alt_bank = (regval >> slapstic.altshift) & 3;
-					return ALTERNATE3;
-				}
-			}
-		}
-
-		/* if there's no second memory hit within this instruction, the next */
-		/* opcode fetch will botch the operation, so just fall back to */
-		/* the enabled state */
-		return ENABLED;
-	}
-
-	/* kludge for ESB */
-	return ALTERNATE2;
 }
 
 
@@ -876,8 +824,10 @@ int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
  *
  *************************************/
 
-int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
+int atari_slapstic_device::tweak(offs_t offset)
 {
+	offset &= 0x3fff;
+
 	/* reset is universal */
 	if (offset == 0x0000)
 	{
@@ -914,13 +864,6 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 					state = ALTERNATE1;
 				}
 
-				/* special kludge for catching the second alternate address if */
-				/* the first one was missed (since it's usually an opcode fetch) */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
-				{
-					state = alt2_kludge(space, offset);
-				}
-
 				/* check for standard bankswitches */
 				else if (offset == slapstic.bank[0])
 				{
@@ -945,10 +888,15 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 				break;
 
 			/* ALTERNATE1 state: look for alternate2 offset, or else fall back to ENABLED */
+			/* Can also go to ADDITIVE1.  Not a hack, it's real. */
 			case ALTERNATE1:
 				if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
 				{
 					state = ALTERNATE2;
+				}
+				else if (MATCHES_MASK_VALUE(offset, slapstic.add1))
+				{
+					state = ADDITIVE1;
 				}
 				else
 				{
@@ -1072,10 +1020,9 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 				}
 				break;
 
-			/* ADDITIVE3 state: waiting for a bank to seal the deal */
+			/* ADDITIVE3 state: waiting for the commit, which is common with alt, but can be delayed */
 			case ADDITIVE3:
-				if (offset == slapstic.bank[0] || offset == slapstic.bank[1] ||
-					offset == slapstic.bank[2] || offset == slapstic.bank[3])
+				if (MATCHES_MASK_VALUE(offset, slapstic.alt4))
 				{
 					state = DISABLED;
 					current_bank = add_bank;
@@ -1086,7 +1033,10 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(machine(), offset);
+		slapstic_log(offset);
+
+	if(m_bank)
+		m_bank->set_entry(current_bank);
 
 	/* return the active bank */
 	return current_bank;
@@ -1100,139 +1050,23 @@ int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_log(running_machine &machine, offs_t offset)
+void atari_slapstic_device::slapstic_log(offs_t offset)
 {
-	static attotime last_time;
-
-	if (!slapsticlog)
-		slapsticlog = fopen("slapstic.log", "w");
-	if (slapsticlog)
+	const char *mode = "UNKNOWN";
+	switch (state)
 	{
-		attotime time = machine.time();
-
-		if ((time - last_time) > attotime::from_seconds(1))
-			fprintf(slapsticlog, "------------------------------------\n");
-		last_time = time;
-
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context().c_str(), offset, current_bank);
-		switch (state)
-		{
-			case DISABLED:
-				fprintf(slapsticlog, "DISABLED\n");
-				break;
-			case ENABLED:
-				fprintf(slapsticlog, "ENABLED\n");
-				break;
-			case ALTERNATE1:
-				fprintf(slapsticlog, "ALTERNATE1\n");
-				break;
-			case ALTERNATE2:
-				fprintf(slapsticlog, "ALTERNATE2\n");
-				break;
-			case ALTERNATE3:
-				fprintf(slapsticlog, "ALTERNATE3\n");
-				break;
-			case BITWISE1:
-				fprintf(slapsticlog, "BITWISE1\n");
-				break;
-			case BITWISE2:
-				fprintf(slapsticlog, "BITWISE2\n");
-				break;
-			case BITWISE3:
-				fprintf(slapsticlog, "BITWISE3\n");
-				break;
-			case ADDITIVE1:
-				fprintf(slapsticlog, "ADDITIVE1\n");
-				break;
-			case ADDITIVE2:
-				fprintf(slapsticlog, "ADDITIVE2\n");
-				break;
-			case ADDITIVE3:
-				fprintf(slapsticlog, "ADDITIVE3\n");
-				break;
-		}
-		fflush(slapsticlog);
+	case DISABLED:   mode = "DISABLED"; break;
+	case ENABLED:    mode = "ENABLED"; break;
+	case ALTERNATE1: mode = "ALTERNATE1"; break;
+	case ALTERNATE2: mode = "ALTERNATE2"; break;
+	case ALTERNATE3: mode = "ALTERNATE3"; break;
+	case BITWISE1:   mode = "BITWISE1"; break;
+	case BITWISE2:   mode = "BITWISE2"; break;
+	case BITWISE3:   mode = "BITWISE3"; break;
+	case ADDITIVE1:  mode = "ADDITIVE1"; break;
+	case ADDITIVE2:  mode = "ADDITIVE2"; break;
+	case ADDITIVE3:  mode = "ADDITIVE3"; break;
 	}
-}
 
-
-//**************************************************************************
-//  LEGACY HANDLING
-//**************************************************************************
-
-void atari_slapstic_device::legacy_update_bank(int bank)
-{
-	// if the bank has changed, copy the memory; Pit Fighter needs this
-	if (bank != m_legacy_bank)
-	{
-		// bank 0 comes from the copy we made earlier
-		if (bank == 0)
-			memcpy(m_legacy_memptr, &m_legacy_bank0[0], 0x2000);
-		else
-			memcpy(m_legacy_memptr, &m_legacy_memptr[bank * 0x1000], 0x2000);
-
-		// remember the current bank
-		m_legacy_bank = bank;
-	}
-}
-
-
-//-------------------------------------------------
-//  legacy_configure: Installs memory handlers for the
-//  slapstic
-//-------------------------------------------------
-
-void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem)
-{
-	// initialize the slapstic
-	m_legacy_configured = true;
-	slapstic_init();
-	save_item(NAME(m_legacy_bank));
-
-	// install the memory handlers
-	m_legacy_space = &device.space(AS_PROGRAM);
-	m_legacy_space->install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_r)), write16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_w)));
-	m_legacy_memptr = (u16 *)mem;
-
-	// allocate memory for a copy of bank 0
-	m_legacy_bank0.resize(0x2000);
-	memcpy(&m_legacy_bank0[0], m_legacy_memptr, 0x2000);
-
-	// ensure we recopy memory for the bank
-	m_legacy_bank = 0xff;
-}
-
-
-//-------------------------------------------------
-//  slapstic_w: Assuming that the slapstic sits in
-//  ROM memory space, we just simply tweak the slapstic at this
-//  address and do nothing more.
-//-------------------------------------------------
-
-void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	assert(m_legacy_configured);
-
-	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
-}
-
-
-//-------------------------------------------------
-//  slapstic_r: Tweaks the slapstic at the appropriate
-//  address and then reads a word from the underlying memory.
-//-------------------------------------------------
-
-u16 atari_slapstic_device::slapstic_r(offs_t offset, u16 mem_mask)
-{
-	assert(m_legacy_configured);
-
-	// fetch the result from the current bank first
-	u16 result = m_legacy_memptr[offset & 0xfff];
-
-	if (!machine().side_effects_disabled())
-	{
-		// then determine the new one
-		legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
-	}
-	return result;
+	logerror("%s: %04x B=%d AB=%d %s %s\n", machine().time().as_string(), offset, current_bank, add_bank, mode, machine().describe_context());
 }

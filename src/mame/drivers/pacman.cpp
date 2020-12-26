@@ -407,36 +407,43 @@ MACHINE_RESET_MEMBER(pacman_state,maketrax)
 WRITE_LINE_MEMBER(pacman_state::vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
-WRITE_LINE_MEMBER(pacman_state::rocktrv2_vblank_irq)
-{
-	if (state)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(pacman_state::periodic_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(pacman_state::vblank_nmi)
 {
 	if (state && m_irq_mask)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
 {
 	m_irq_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(pacman_state::nmi_mask_w)
+{
+	m_irq_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void pacman_state::pacman_interrupt_vector_w(uint8_t data)
 {
-	m_maincpu->set_input_line_vector(0, data); // Z80
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_interrupt_vector = data;
+}
+
+IRQ_CALLBACK_MEMBER(pacman_state::interrupt_vector_r)
+{
+	return m_interrupt_vector;
 }
 
 
@@ -500,7 +507,7 @@ void pacman_state::piranha_interrupt_vector_w(uint8_t data)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data ); // Z80
+	m_interrupt_vector = data;
 }
 
 
@@ -509,7 +516,15 @@ void pacman_state::nmouse_interrupt_vector_w(uint8_t data)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data ); // Z80
+	m_interrupt_vector = data;
+}
+
+
+void pacman_state::mspacii_interrupt_vector_w(uint8_t data)
+{
+	if (data == 0xfb) data = 0xfe;
+	if (data == 0xfc) data = 0xfc;
+	m_interrupt_vector = data;
 }
 
 
@@ -1429,6 +1444,12 @@ void epospm_state::epos_portmap(address_map &map)
 	map(0x00, 0xff).r(FUNC(epospm_state::epos_decryption_w));   /* Switch protection logic */
 }
 
+void pacman_state::mspacii_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).w(FUNC(pacman_state::mspacii_interrupt_vector_w));
+}
+
 void pacman_state::mschamp_portmap(address_map &map)
 {
 	writeport(map);
@@ -1467,7 +1488,7 @@ void pacman_state::crushs_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay8912", FUNC(ay8912_device::data_address_w));
-	map(0x01, 0x01).portr("DSW2");
+	map(0x01, 0x01).r("ay8912", FUNC(ay8912_device::data_r));
 	map(0x02, 0x02).portr("DSW1");
 }
 
@@ -1843,7 +1864,7 @@ static INPUT_PORTS_START( birdiy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_4WAY
-	PORT_DIPNAME(0x10, 0x10, "Rack Test (Cheat)" )  PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x10, 0x10, "Test mode?" ) // Some kind of test/debug mode
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1855,10 +1876,10 @@ static INPUT_PORTS_START( birdiy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_4WAY PORT_COCKTAIL
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW:1,2")
@@ -1874,13 +1895,13 @@ static INPUT_PORTS_START( birdiy )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x20, "Skip Screen" )       PORT_DIPLOCATION("SW:7") /* Used to skip "Act" (AKA level)?? - How do you activate it? */
+	PORT_DIPNAME( 0x20, 0x20, "Skip Screen" )           PORT_DIPLOCATION("SW:7") // End level after the first worm fed to your baby
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Stop Screen" )       PORT_DIPLOCATION("SW:8") /* Seems to have no function? */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -3629,6 +3650,7 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	Z80(config, m_maincpu, MASTER_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::pacman_map);
 	m_maincpu->set_addrmap(AS_IO, &pacman_state::writeport);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pacman_state::interrupt_vector_r));
 
 	if (latch)
 	{
@@ -3701,11 +3723,8 @@ void pacman_state::birdiy(machine_config &config)
 	Z80(config.replace(), m_maincpu, MASTER_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::birdiy_map);
 
-	// 74LS259 at 8K or 4099 at 7K
 	m_mainlatch->q_out_cb<0>().set_nop();
 	m_mainlatch->q_out_cb<1>().set(FUNC(pacman_state::irq_mask_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(pacman_state::flipscreen_w));
-	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
 }
@@ -3798,6 +3817,7 @@ void pacman_state::dremshpr(machine_config &config)
 	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::dremshpr_map);
 	m_maincpu->set_addrmap(AS_IO, &pacman_state::dremshpr_portmap);
+	m_maincpu->remove_irq_acknowledge_callback();
 
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(pacman_state::vblank_nmi));
 
@@ -3805,6 +3825,7 @@ void pacman_state::dremshpr(machine_config &config)
 	config.device_remove("namco");
 	AY8910(config, "ay8910", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.50);
 
+	m_mainlatch->q_out_cb<0>().set(FUNC(pacman_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set_nop();
 }
 
@@ -3855,6 +3876,7 @@ void pacman_state::vanvan(machine_config &config)
 	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::dremshpr_map);
 	m_maincpu->set_addrmap(AS_IO, &pacman_state::vanvan_portmap);
+	m_maincpu->remove_irq_acknowledge_callback();
 
 	// Video hardware
 	screen_device &screen(*subdevice<screen_device>("screen"));
@@ -3868,6 +3890,7 @@ void pacman_state::vanvan(machine_config &config)
 
 	SN76496(config, "sn2", 1789750).add_route(ALL_OUTPUTS, "mono", 0.75);
 
+	m_mainlatch->q_out_cb<0>().set(FUNC(pacman_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set_nop();
 }
 
@@ -3880,6 +3903,7 @@ void pacman_state::bigbucks(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::bigbucks_map);
 	m_maincpu->set_addrmap(AS_IO, &pacman_state::bigbucks_portmap);
 	m_maincpu->set_periodic_int(FUNC(pacman_state::periodic_irq), attotime::from_hz(20*60));
+	m_maincpu->remove_irq_acknowledge_callback();
 
 	subdevice<screen_device>("screen")->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
 
@@ -3960,7 +3984,15 @@ void pacman_state::rocktrv2(machine_config &config)
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
-	screen.screen_vblank().set(FUNC(pacman_state::rocktrv2_vblank_irq));
+}
+
+
+void pacman_state::mspacii(machine_config &config)
+{
+	woodpek(config);
+
+	// Basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &pacman_state::mspacii_portmap);
 }
 
 
@@ -4009,9 +4041,12 @@ void pacman_state::crushs(machine_config &config)
 	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::crushs_map);
 	m_maincpu->set_addrmap(AS_IO, &pacman_state::crushs_portmap);
+	m_maincpu->remove_irq_acknowledge_callback();
 
 	// Sound hardware
-	AY8912(config, "ay8912", 1789750).add_route(ALL_OUTPUTS, "mono", 0.75);
+	ay8912_device &ay8912(AY8912(config, "ay8912", 1789750));
+	ay8912.port_a_read_callback().set_ioport("DSW2");
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void pacman_state::cannonbp(machine_config &config)
@@ -6633,33 +6668,6 @@ ROM_START( theglobme )
 ROM_END
 
 
-ROM_START( theglobpb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8.bin", 0x0000, 0x0800, CRC(3fb1ab3d) SHA1(29b8600c86a5161c90e1797cfec86875c948cf5d) )
-	ROM_LOAD( "4.bin", 0x0800, 0x0800, CRC(554a0461) SHA1(149a0e317d91465c09fb3406073c331cc4e4aa95) )
-	ROM_LOAD( "7.bin", 0x1000, 0x0800, CRC(07a2faf7) SHA1(7f1e95ae94fc404b65ef4465e7f147dbd3093ffb) )
-	ROM_LOAD( "3.bin", 0x1800, 0x0800, CRC(b097cb29) SHA1(bfe750dffebcf6bc1b0acf5a4147fb445559b926) )
-	ROM_LOAD( "6.bin", 0x2000, 0x0800, CRC(b459ba66) SHA1(563259523a4e525eeb01c733fb3c192897725a45) )
-	ROM_LOAD( "2.bin", 0x2800, 0x0800, CRC(d8ef9f98) SHA1(caaefdda74d7415be28abacc192b57a87a72baf7) )
-	ROM_LOAD( "5.bin", 0x3000, 0x0800, CRC(7204e11d) SHA1(ca680a835edad78859b0b3bf54360b1963795850) )
-	ROM_LOAD( "1.bin", 0x3800, 0x0800, CRC(edac5b91) SHA1(8a6f29442370cca8114e7941a36747aa96e4f1bc) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "9.bin",  0x0000, 0x0800, CRC(36408c76) SHA1(f5bb18e38de57adc2aed6211048d9f0ee0e58df7) )
-	ROM_LOAD( "11.bin", 0x0800, 0x0800, CRC(b8ba069c) SHA1(f8d8e40afd8214a6d951af8de2761703b0651f79) )
-	ROM_LOAD( "10.bin", 0x1000, 0x0800, CRC(e0478b4e) SHA1(9697c7fd92752d052aea4c46292b1b7cae28f606) )
-	ROM_LOAD( "12.bin", 0x1800, 0x0800, CRC(7c4456a4) SHA1(74f55ae921cdf8f1f7a866d75a63244187426f17) )
-
-	ROM_REGION( 0x0120, "proms", 0 ) // Sound PROMs, not dumped for this set
-	ROM_LOAD( "n82s123an_a.7f", 0x0000, 0x0020, BAD_DUMP CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
-	ROM_LOAD( "n82s129n_b.4a",  0x0020, 0x0100, BAD_DUMP CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
-
-	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs, not dumped for this set
-	ROM_LOAD( "63s141_b.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "63s141_b.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
-ROM_END
-
-
 ROM_START( beastfp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "bf-u2.bin",    0x0000, 0x2000, CRC(3afc517b) SHA1(5b74bca9e9cd4d8bcf94a340f8f0e53fe1dcfc1d) )
@@ -7888,8 +7896,8 @@ GAME( 1981, mspacmab4,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,
 GAME( 1981, mspacmbe,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe, ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mspacmbmc,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmbn,   mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1, ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii,    mspacman, woodpek,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii2,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii2,   mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacpls,   mspacman, woodpek,  mspacpls, pacman_state,  empty_init,    ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
@@ -7972,7 +7980,6 @@ GAME( 1983, bwcasino, 0,        acitya,   bwcasino, epospm_state,  empty_init,  
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,    ROT90,  "Epos Corporation", "Atlantic City Action", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglobpb,suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg",                  "The Glob (Pac-Man hardware, bootleg)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )

@@ -131,7 +131,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 						driver ? driver->type.fullname() : "",
 						audited + 1,
 						m_total));
-			ui().draw_text_box(container(), text.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+			ui().draw_text_box(container(), text, ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		}
 		break;
 	}
@@ -139,7 +139,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 
 void menu_audit::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Start Audit"), "", 0, ITEMREF_START);
+	item_append(_("Start Audit"), 0, ITEMREF_START);
 	customtop = (ui().get_line_height() * 2.0f) + (ui().box_tb_border() * 3.0f);
 }
 

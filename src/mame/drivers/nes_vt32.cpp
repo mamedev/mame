@@ -347,6 +347,11 @@ ROM_START( rminitv )
 	ROM_LOAD( "29gl256.bin", 0x00000, 0x2000000, CRC(cb4048d4) SHA1(9877ce5716d13f8498abfc1cbfaefa9426205d3e) )
 ROM_END
 
+ROM_START( dgunl3201 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl256.u2", 0x00000, 0x2000000,  CRC(8174088a) SHA1(4854d83a5657f3043b9568b1356e54c7f8282491) )
+ROM_END
+
 ROM_START( dgunl3202 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "dg308n1_s29gl256p90tfcr1_0001227e.bin", 0x00000, 0x2000000, CRC(489c806f) SHA1(979b2c00eec459646de5a658863aff0eaacc2402) )
@@ -366,10 +371,12 @@ CONS( 2015, rminitv,   0,  0,  nes_vt32_pal_32mb, nes_vt32, nes_vt32_unk_state, 
 
 // This was available in at least 3 other form factors, some of those have been shown to use different menu backgrounds
 // Gamestation Wireless : https://youtu.be/rlX-LGO-ewM Fish background
-// Pixel Classic (DGUNL-3201) : https://youtu.be/XOUtT_wRXa4 Plane background
+// Pixel Classic (DGUNL-3201) : https://youtu.be/XOUtT_wRXa4 Plane background, note, different revision, the copyright text on some games (eg. Heavy Barrel) hasn't been updated as it has on the dgunl3201 set here
 // However, sometimes the different models use the same background as this one (confirmed on one Pixel Classic at least), so there doesn't appear to be a clear way of knowing without powering them on
+CONS( 201?, dgunl3201, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Classic (308-in-1) (DGUNL-3201)", MACHINE_NOT_WORKING ) // from a UK unit, single 32Mbyte bank!
+CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics - Pixel Player (308-in-1) (DGUNL-3202)", MACHINE_NOT_WORKING ) // from a US unit single 32Mbyte bank!
+
 // There was also a 34-in-1 version of the Data East Classics in a mini-cabinet, NOT running on VT hardware, but using proper arcade ROMs, that one is reportedly running an old MAME build on an ARM SoC (although some sources say FBA)
-CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Data East Classics Pixel Player (308-in-1) (DGUNL-3202)", MACHINE_NOT_WORKING ) // single 32Mbyte bank!
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)

@@ -37,6 +37,11 @@
 #endif
 #endif
 
+// Fix for MacOS compilation errors
+#if defined(__APPLE__) && !defined(_DARWIN_C_SOURCE)
+#define _DARWIN_C_SOURCE
+#endif
+
 // MAME headers
 #include "posixfile.h"
 #include "unicode.h"

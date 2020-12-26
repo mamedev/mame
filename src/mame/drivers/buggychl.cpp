@@ -113,7 +113,7 @@ void buggychl_state::sound_enable_w(uint8_t data)
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
 	//logerror("Sound_enable_w written with data of %02x\n", data);
-	machine().sound().system_enable(data & 1);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 uint8_t buggychl_state::mcu_status_r()

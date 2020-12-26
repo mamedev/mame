@@ -2,38 +2,38 @@
 // copyright-holders:Angelo Salese, Alex Marshall
 /******************************************************************************
 
-	Jaleco MS32 System Control Unit
+    Jaleco MS32 System Control Unit
 
-	A simple system controller for late 90s Jaleco HWs
-	
-	Known features: 
-	- CRTC & screen(s?) control;
-	- dot clock control;
-	- irq/reset controller;
-	- programmable timer;
-	- watchdog;
-	
-	First use in MS32, then their later (?) 68k revision. 
+    A simple system controller for late 90s Jaleco HWs
 
-	TODO:
-	- pinpoint exact timing generation for programmable irq
-	  (free counter or based on host screen beams)
-	- interface with multiple screens is a mystery, 
-	  cfr. dual screen bnstars, stepping stage HW. 
-	  Most likely former effectively controls both screens in demux while 
-	  latter has no way to set the other screen(s)?
-	- watchdog timing;
-	- upper address line seems unconnected by 68k,
-	  and is it a mystery how watchdog is supposed to route here and assuming
-	  it is and not actually disabled by pin.
-	- network/COPROs irq connections, specifically for f1superb;
-	- actual chip name;
+    Known features:
+    - CRTC & screen(s?) control;
+    - dot clock control;
+    - irq/reset controller;
+    - programmable timer;
+    - watchdog;
 
-	BTANBs:
-	- in p47aces v1.0 (p47acesa) code messes up the prg irq timer setup, 
-	  causing SFX overloads by using Spitfire ship with 30 Hz autofire 
-	  and shooting at point blank range over walls/enemies. 
-	  This has been fixed in v1.1
+    First use in MS32, then their later (?) 68k revision.
+
+    TODO:
+    - pinpoint exact timing generation for programmable irq
+      (free counter or based on host screen beams)
+    - interface with multiple screens is a mystery,
+      cfr. dual screen bnstars, stepping stage HW.
+      Most likely former effectively controls both screens in demux while
+      latter has no way to set the other screen(s)?
+    - watchdog timing;
+    - upper address line seems unconnected by 68k,
+      and is it a mystery how watchdog is supposed to route here and assuming
+      it is and not actually disabled by pin.
+    - network/COPROs irq connections, specifically for f1superb;
+    - actual chip name;
+
+    BTANBs:
+    - in p47aces v1.0 (p47acesa) code messes up the prg irq timer setup,
+      causing SFX overloads by using Spitfire ship with 30 Hz autofire
+      and shooting at point blank range over walls/enemies.
+      This has been fixed in v1.1
 
 *******************************************************************************/
 
@@ -71,7 +71,7 @@ jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mco
 
 void jaleco_ms32_sysctrl_device::amap(address_map& map)
 {
-//	0xba0000 in 68k, 0xfce00000 in MS32 mapped at lower 16-bits mask
+//  0xba0000 in 68k, 0xfce00000 in MS32 mapped at lower 16-bits mask
 	map(0x00, 0x01).w(FUNC(jaleco_ms32_sysctrl_device::control_w));
 	map(0x02, 0x03).w(FUNC(jaleco_ms32_sysctrl_device::hblank_w));
 	map(0x04, 0x05).w(FUNC(jaleco_ms32_sysctrl_device::hdisplay_w));
@@ -85,7 +85,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 	map(0x1a, 0x1b).w(FUNC(jaleco_ms32_sysctrl_device::timer_ack_w));
 	map(0x1c, 0x1d).w(FUNC(jaleco_ms32_sysctrl_device::sound_reset_w));
 	map(0x1e, 0x1f).w(FUNC(jaleco_ms32_sysctrl_device::irq_ack_w));
-//	map(0x24, 0x27).w // sound comms bidirectional acks?
+//  map(0x24, 0x27).w // sound comms bidirectional acks?
 	map(0x26, 0x27).w(FUNC(jaleco_ms32_sysctrl_device::sound_ack_w));
 	map(0x28, 0x29).nopw(); // watchdog on MS32
 	map(0x2c, 0x2d).w(FUNC(jaleco_ms32_sysctrl_device::field_ack_w));
@@ -99,7 +99,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
 {
-//	TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1); 
+//  TIMER(config, "scantimer").configure_scanline(FUNC(jaleco_ms32_sysctrl_device::scanline_cb), m_screen, 0, 1);
 
 	// TODO: watchdog
 }
@@ -128,7 +128,7 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_crtc.vert_display));
 	save_item(NAME(m_flip_screen_state));
 	save_item(NAME(m_timer.irq_enable));
-	
+
 	m_timer.prg_irq = timer_alloc(PRG_TIMER);
 	m_timer_scanline = timer_alloc(SCANLINE_TIMER);
 }
@@ -152,7 +152,7 @@ void jaleco_ms32_sysctrl_device::device_reset()
 	// we currently compensate by basically giving one frame of time,
 	// ofc on the real thing the first vblank is really when screen sync occurs.
 	flush_scanline_timer(m_crtc.vert_display-1);
-//	m_timer_scanline->adjust(attotime::never);
+//  m_timer_scanline->adjust(attotime::never);
 	// put flipping in a default state
 	m_flip_screen_state = false;
 	m_flip_screen_cb(0);
@@ -179,8 +179,8 @@ void jaleco_ms32_sysctrl_device::flush_prg_timer()
 void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
 {
 	// in typical Jaleco fashion (cfr. mega system 1), both irqs are somehow configurable (a pin?).
-	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs 
-	// at half speed, but then their config can't possibly work with p47aces (i.e. wants 10 and 9 respectively), 
+	// Examples are tp2ms32 and wpksocv2, wanting vblank as vector 9 and field as 10 otherwise they runs
+	// at half speed, but then their config can't possibly work with p47aces (i.e. wants 10 and 9 respectively),
 	// plus bnstars that locks up off the bat if the wrong irq runs at 60 Hz.
 	// We currently hardwire via an init time setter here, making the irq acks to trigger properly as well.
 
@@ -191,7 +191,7 @@ void jaleco_ms32_sysctrl_device::flush_scanline_timer(int current_scanline)
 	// TODO: unknown mechanics where this happens, is it even tied to scanline?
 	if (current_scanline == 0 && m_screen->frame_number() & 1)
 		m_invert_vblank_lines ? m_vblank_cb(1) : m_field_cb(1);
-	
+
 	uint32_t next_scanline = (current_scanline + 1) % crtc_vtotal();
 	m_timer_scanline->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
@@ -251,7 +251,7 @@ inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 
 void jaleco_ms32_sysctrl_device::control_w(u16 data)
 {
-	/* 
+	/*
 	 * ---- x--- programmable irq timer enable
 	 * ---- -x-- used by f1superb, stepstag, bnstars
 	 * ---- --x- flip screen
@@ -262,7 +262,7 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 		m_dotclock_setting = BIT(data, 0);
 		crtc_refresh_screen_params();
 	}
-	
+
 	const bool current_flip = bool(BIT(data, 1));
 	if (current_flip != m_flip_screen_state)
 	{
@@ -271,7 +271,7 @@ void jaleco_ms32_sysctrl_device::control_w(u16 data)
 	}
 	if (data & 0xf4)
 		logerror("%s: enabled unknown bit in control_w %02x\n", this->tag(), data & 0xf4);
-	
+
 	m_timer.irq_enable = bool(BIT(data, 3));
 	flush_prg_timer();
 }
@@ -290,12 +290,12 @@ void jaleco_ms32_sysctrl_device::hdisplay_w(u16 data)
 
 void jaleco_ms32_sysctrl_device::hbp_w(u16 data)
 {
-	logerror("%s: HSYNC back porch %d\n", this->tag(), 0x1000 - data); 
+	logerror("%s: HSYNC back porch %d\n", this->tag(), 0x1000 - data);
 }
 
 void jaleco_ms32_sysctrl_device::hfp_w(u16 data)
 {
-	logerror("%s: HSYNC front porch %d\n", this->tag(), 0x1000 - data); 
+	logerror("%s: HSYNC front porch %d\n", this->tag(), 0x1000 - data);
 }
 
 void jaleco_ms32_sysctrl_device::vblank_w(u16 data)
@@ -362,8 +362,8 @@ void jaleco_ms32_sysctrl_device::sound_ack_w(u16 data)
 
 void jaleco_ms32_sysctrl_device::irq_ack_w(u16 data)
 {
-	// guess: 68k games calls this in vblank routine instead of 
-	// the designated line, maybe it's a 68k version difference 
+	// guess: 68k games calls this in vblank routine instead of
+	// the designated line, maybe it's a 68k version difference
 	// or maybe this is right
 	m_vblank_cb(0);
 	m_field_cb(0);

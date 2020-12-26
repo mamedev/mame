@@ -79,7 +79,7 @@ void liberate_state::deco16_bank_w(uint8_t data)
 	if (m_bank)
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x800f, memshare("bank1")->ptr());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x800f, memregion("maincpu")->base());
 }
 
 uint8_t liberate_state::prosoccr_bank_r(offs_t offset)

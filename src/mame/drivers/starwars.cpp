@@ -58,15 +58,6 @@ void starwars_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 
 void starwars_state::machine_reset()
 {
-	/* ESB-specific */
-	if (m_slapstic_device.found())
-	{
-		/* reset the slapstic */
-		m_slapstic_device->slapstic_reset();
-		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
-		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
-	}
-
 	/* reset the matrix processor */
 	starwars_mproc_reset();
 }
@@ -84,39 +75,6 @@ void starwars_state::irq_ack_w(uint8_t data)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-
-
-/*************************************
- *
- *  ESB Slapstic handler
- *
- *************************************/
-
-void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
-{
-	int new_bank = m_slapstic_device->slapstic_tweak(space, offset);
-
-	/* update for the new bank */
-	if (new_bank != m_slapstic_current_bank)
-	{
-		m_slapstic_current_bank = new_bank;
-		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
-	}
-}
-
-
-uint8_t starwars_state::esb_slapstic_r(address_space &space, offs_t offset)
-{
-	int result = m_slapstic_base[offset];
-	esb_slapstic_tweak(space, offset);
-	return result;
-}
-
-
-void starwars_state::esb_slapstic_w(address_space &space, offs_t offset, uint8_t data)
-{
-	esb_slapstic_tweak(space, offset);
-}
 
 
 /*************************************
@@ -159,7 +117,7 @@ void starwars_state::main_map(address_map &map)
 void starwars_state::esb_main_map(address_map &map)
 {
 	main_map(map);
-	map(0x8000, 0x9fff).rw(FUNC(starwars_state::esb_slapstic_r), FUNC(starwars_state::esb_slapstic_w));
+	map(0x8000, 0x9fff).bankr(m_slapstic_bank);
 	map(0xa000, 0xffff).bankr("bank2");
 }
 
@@ -371,7 +329,8 @@ void starwars_state::esb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 101, false);
+	SLAPSTIC(config, m_slapstic_device, 101);
+	m_slapstic_device->set_bank(m_slapstic_bank);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
 }
@@ -566,9 +525,11 @@ void starwars_state::init_esb()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	m_slapstic_device->slapstic_init();
-	m_slapstic_source = &rom[0x14000];
-	m_slapstic_base = &rom[0x08000];
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x14000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0x9fff, 0, "slapstic",
+													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); },
+													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); });
+
 
 	/* prepare the matrix processor */
 	starwars_mproc_init();
@@ -578,9 +539,6 @@ void starwars_state::init_esb()
 	membank("bank1")->set_entry(0);
 	membank("bank2")->configure_entries(0, 2, rom + 0xa000, 0x1c000 - 0xa000);
 	membank("bank2")->set_entry(0);
-
-	/* additional globals for state saving */
-	save_item(NAME(m_slapstic_current_bank));
 }
 
 
