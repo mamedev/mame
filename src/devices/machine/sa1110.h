@@ -44,6 +44,8 @@ public:
 	void ssp_in(uint16_t data) { ssp_rx_fifo_push(data); }
 	auto ssp_out() { return m_ssp_out.bind(); }
 
+	auto uart3_tx_out() { return m_uart3_tx_out.bind(); }
+
 	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
 	void uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t mcp_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -72,8 +74,10 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(uart3_irq_callback);
 	void uart_recalculate_divisor();
 	void uart_update_eif_status();
+	void uart_write_receive_fifo(uint16_t data_and_flags);
 	uint8_t uart_read_receive_fifo();
 	void uart_write_transmit_fifo(uint8_t data);
+	void uart_check_rx_fifo_service();
 	void uart_check_tx_fifo_service();
 	void uart_set_receiver_idle();
 	void uart_begin_of_break();
@@ -499,6 +503,7 @@ protected:
 
 	devcb_write_line::array<28> m_gpio_out;
 	devcb_write16 m_ssp_out;
+	devcb_write_line m_uart3_tx_out;
 };
 
 DECLARE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device)

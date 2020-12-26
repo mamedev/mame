@@ -20,7 +20,8 @@
 #define LOG_POWER       (1 << 9)
 #define LOG_RESET       (1 << 10)
 #define LOG_GPIO		(1 << 11)
-#define LOG_INTC        (1 << 12)
+#define LOG_GPIO_HF		(1 << 12)
+#define LOG_INTC        (1 << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_SSP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
 #define VERBOSE         (0) // (LOG_ALL)
@@ -37,6 +38,7 @@ sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, cons
 	, m_codec(*this, finder_base::DUMMY_TAG)
 	, m_gpio_out(*this)
 	, m_ssp_out(*this)
+	, m_uart3_tx_out(*this)
 {
 }
 
@@ -56,6 +58,16 @@ WRITE_LINE_MEMBER(sa1110_periphs_device::uart3_irq_callback)
 // Rx completed receiving byte
 void sa1110_periphs_device::rcv_complete()
 {
+	receive_register_extract();
+
+	uint16_t data_and_flags = 0;
+	if (is_receive_framing_error())
+		data_and_flags |= 0x200;
+	if (is_receive_parity_error())
+		data_and_flags |= 0x100;
+	data_and_flags |= get_received_char();
+
+	uart_write_receive_fifo(data_and_flags);
 }
 
 // Tx completed sending byte
@@ -76,7 +88,8 @@ void sa1110_periphs_device::tra_complete()
 // Tx send bit
 void sa1110_periphs_device::tra_callback()
 {
-	transmit_register_get_data_bit();
+	// TODO: Handle loopback mode
+	m_uart3_tx_out(transmit_register_get_data_bit());
 }
 
 void sa1110_periphs_device::uart_recalculate_divisor()
@@ -115,6 +128,28 @@ void sa1110_periphs_device::uart_update_eif_status()
 	}
 }
 
+void sa1110_periphs_device::uart_write_receive_fifo(uint16_t data_and_flags)
+{
+	if (m_uart_regs.rx_fifo_count >= ARRAY_LENGTH(m_uart_regs.rx_fifo))
+		return;
+	if (!BIT(m_uart_regs.utcr[3], UTCR3_RXE_BIT))
+		return;
+
+	// fill FIFO entry
+	m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_write_idx] = data_and_flags;
+	m_uart_regs.rx_fifo_count++;
+	m_uart_regs.rx_fifo_write_idx = (m_uart_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+
+	// update receiver-not-full flag
+	m_uart_regs.utsr1 |= (1 << UTSR1_RNE_BIT);
+
+	// update error flags
+	uart_update_eif_status();
+
+	// update FIFO-service interrupt
+	uart_check_rx_fifo_service();
+}
+
 uint8_t sa1110_periphs_device::uart_read_receive_fifo()
 {
 	const uint8_t data = m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_read_idx];
@@ -128,8 +163,30 @@ uint8_t sa1110_periphs_device::uart_read_receive_fifo()
 			m_uart_regs.utsr1 &= ~((1 << UTSR1_PRE_BIT) | (1 << UTSR1_FRE_BIT) | (1 << UTSR1_ROR_BIT));
 			m_uart_regs.utsr1 |= fifo_bottom_flags << UTSR1_PRE_BIT;
 		}
+		else
+		{
+			m_uart_regs.utsr1 &= ~(1 << UTSR1_RNE_BIT);
+		}
+		uart_update_eif_status();
 	}
 	return data;
+}
+
+void sa1110_periphs_device::uart_check_rx_fifo_service()
+{
+	if (m_uart_regs.rx_fifo_count > 4 && BIT(m_uart_regs.utcr[3], UTCR3_RXE_BIT))
+	{
+		m_uart_regs.utsr0 |= (1 << UTSR0_RFS_BIT);
+		if (BIT(m_uart_regs.utcr[3], UTCR3_RIE_BIT))
+		{
+			m_uart3_irqs->in_w<UART3_RFS>(1);
+		}
+	}
+	else
+	{
+		m_uart_regs.utsr0 &= ~(1 << UTSR0_RFS_BIT);
+		m_uart3_irqs->in_w<UART3_RFS>(0);
+	}
 }
 
 void sa1110_periphs_device::uart_write_transmit_fifo(uint8_t data)
@@ -192,6 +249,19 @@ void sa1110_periphs_device::uart_end_of_break()
 
 void sa1110_periphs_device::uart_set_receiver_enabled(bool enabled)
 {
+	if (!enabled)
+	{
+		m_uart_regs.utsr0 &= ~(1 << UTSR0_RFS_BIT);
+		m_uart3_irqs->in_w<UART3_RFS>(0);
+
+		m_uart_regs.utsr1 &= ~(1 << UTSR1_RNE_BIT);
+
+		m_uart_regs.rx_fifo_count = 0;
+		m_uart_regs.rx_fifo_read_idx = 0;
+		m_uart_regs.rx_fifo_write_idx = 0;
+
+		receive_register_reset();
+	}
 }
 
 void sa1110_periphs_device::uart_set_transmitter_enabled(bool enabled)
@@ -253,7 +323,7 @@ uint32_t sa1110_periphs_device::uart3_r(offs_t offset, uint32_t mem_mask)
 		LOGMASKED(LOG_UART_HF, "%s: uart3_r: UART Status Register 0: %08x & %08x\n", machine().describe_context(), m_uart_regs.utsr0, mem_mask);
 		return m_uart_regs.utsr0;
 	case REG_UTSR1:
-		LOGMASKED(LOG_UART, "%s: uart3_r: UART Status Register 1: %08x & %08x\n", machine().describe_context(), m_uart_regs.utsr1, mem_mask);
+		LOGMASKED(LOG_UART_HF, "%s: uart3_r: UART Status Register 1: %08x & %08x\n", machine().describe_context(), m_uart_regs.utsr1, mem_mask);
 		return m_uart_regs.utsr1;
 	default:
 		LOGMASKED(LOG_UART | LOG_UNKNOWN, "%s: uart3_r: Unknown address: %08x & %08x\n", machine().describe_context(), UART_BASE_ADDR | (offset << 2), mem_mask);
@@ -988,7 +1058,7 @@ uint32_t sa1110_periphs_device::ostimer_r(offs_t offset, uint32_t mem_mask)
 	switch (offset)
 	{
 	case REG_OSMR0:
-		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 0: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[0], mem_mask);
+		LOGMASKED(LOG_OSTIMER_HF, "%s: ostimer_r: OS Timer Match Register 0: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[0], mem_mask);
 		return m_ostmr_regs.osmr[0];
 	case REG_OSMR1:
 		LOGMASKED(LOG_OSTIMER, "%s: ostimer_r: OS Timer Match Register 1: %08x & %08x\n", machine().describe_context(), m_ostmr_regs.osmr[1], mem_mask);
@@ -1024,7 +1094,7 @@ void sa1110_periphs_device::ostimer_w(offs_t offset, uint32_t data, uint32_t mem
 	switch (offset)
 	{
 	case REG_OSMR0:
-		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Match Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_OSTIMER_HF, "%s: ostimer_w: OS Timer Match Register 0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		COMBINE_DATA(&m_ostmr_regs.osmr[0]);
 		ostimer_update_match_timer(0);
 		break;
@@ -1065,7 +1135,7 @@ void sa1110_periphs_device::ostimer_w(offs_t offset, uint32_t data, uint32_t mem
 		break;
 	case REG_OSSR:
 	{
-		LOGMASKED(LOG_OSTIMER, "%s: ostimer_w: OS Timer Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_OSTIMER_HF, "%s: ostimer_w: OS Timer Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		const uint32_t old = m_ostmr_regs.ossr;
 		m_ostmr_regs.ossr &= ~(data & mem_mask);
 		if (old != m_ostmr_regs.ossr)
@@ -1161,7 +1231,7 @@ void sa1110_periphs_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		break;
 	case REG_RTSR:
 	{
-		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_RTC, "%s: rtc_w: RTC Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 
 		const uint32_t old = m_rtc_regs.rtsr;
 		const bool old_alarm_int = BIT(old, RTSR_AL_MASK) && BIT(m_rtc_regs.rtsr, RTSR_ALE_MASK);
@@ -1712,6 +1782,7 @@ void sa1110_periphs_device::device_start()
 
 	m_gpio_out.resolve_all_safe();
 	m_ssp_out.resolve_safe();
+	m_uart3_tx_out.resolve_safe();
 }
 
 void sa1110_periphs_device::device_reset()

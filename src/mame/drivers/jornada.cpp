@@ -4,6 +4,9 @@
 
     HP Jornada PDA skeleton driver
 
+    Notes:
+    - GPIO1: IRQ from SA-1111
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -18,7 +21,7 @@
 #define LOG_MCU		(1 << 1)
 #define LOG_ALL		(LOG_MCU)
 
-#define VERBOSE		(0) // (LOG_ALL)
+#define VERBOSE		(LOG_ALL)
 #include "logmacro.h"
 
 #define SA1110_CLOCK 206000000
@@ -46,7 +49,14 @@ public:
 
 	enum
 	{
-		KEY_ON_OFF
+		KEY_ON_OFF,
+		KEY_S,
+		KEY_K,
+		KEY_1,
+		KEY_2,
+		KEY_3,
+		KEY_4,
+		KEY_9
 	};
 
 protected:
@@ -93,7 +103,7 @@ protected:
 void jornada_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).rom().region("firmware", 0);
-	map(0x1a000000, 0x1a000fff).noprw();
+	map(0x1a000000, 0x1a000fff).noprw(); // Debug Attachment Region
 	map(0x40000000, 0x40001fff).m(m_companion, FUNC(sa1111_device::map));
 	map(0x48000000, 0x481fffff).m(m_epson, FUNC(sed1356_device::map));
 	map(0x48200000, 0x4827ffff).m(m_epson, FUNC(sed1356_device::vram_map));
@@ -101,12 +111,14 @@ void jornada_state::main_map(address_map &map)
 	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
 	map(0x80070000, 0x80070077).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ssp_r), FUNC(sa1110_periphs_device::ssp_w));
 	map(0x90000000, 0x9000001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ostimer_r), FUNC(sa1110_periphs_device::ostimer_w));
-	map(0x90010000, 0x9001000f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
+	map(0x90010000, 0x9001001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
 	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
 	map(0x90030000, 0x90030007).rw(m_sa_periphs, FUNC(sa1110_periphs_device::reset_r), FUNC(sa1110_periphs_device::reset_w));
 	map(0x90040000, 0x90040023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_r), FUNC(sa1110_periphs_device::gpio_w));
 	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
 	map(0xc0000000, 0xc1ffffff).ram().share("ram");
+	map(0xe0000000, 0xe0003fff).noprw(); // Cache-Flush Region 0
+	map(0xe0100000, 0xe01003ff).noprw(); // Cache-Flush Region 1
 }
 
 void jornada_state::device_reset_after_children()
@@ -154,7 +166,7 @@ void jornada_state::mcu_byte_received(uint16_t data)
 		{
 			m_mcu_key_count[m_mcu_key_send_idx]--;
 			response = m_mcu_key_codes[m_mcu_key_send_idx][m_mcu_key_count[m_mcu_key_send_idx]];
-			if (m_mcu_key_send_idx)
+			if (m_mcu_key_count[m_mcu_key_send_idx])
 			{
 				LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_KBD_SEND_CODES: TxDummy, sending scan code %02x with %d remaining\n", response, m_mcu_key_count[m_mcu_key_send_idx]);
 			}
@@ -215,25 +227,41 @@ void jornada_state::eeprom_cmd_received(uint16_t data)
 
 INPUT_CHANGED_MEMBER(jornada_state::key_changed)
 {
-	const uint8_t state = m_kbd_port->read();
-	if (BIT(state, 0))
+	uint8_t scan_code = 0;
+	switch (param)
 	{
-		m_sa_periphs->gpio_in<0>(1);
-		m_sa_periphs->gpio_in<0>(0);
+	case KEY_ON_OFF:	scan_code = 0x7f;	break;
+	case KEY_S:			scan_code = 0x32;	break;
+	case KEY_K:			scan_code = 0x38;	break;
+	case KEY_1:			scan_code = 0x11;	break;
+	case KEY_2:			scan_code = 0x12;	break;
+	case KEY_3:			scan_code = 0x13;	break;
+	case KEY_4:			scan_code = 0x14;	break;
+	case KEY_9:			scan_code = 0x19;	break;
+	default: return;
+	}
 
-		const uint8_t key_recv_idx = 1 - m_mcu_key_send_idx;
-		if (m_mcu_key_count[key_recv_idx] < 8)
-		{
-			m_mcu_key_codes[key_recv_idx][m_mcu_key_count[key_recv_idx]] = 0x7f;
-			m_mcu_key_count[key_recv_idx]++;
-		}
+	m_sa_periphs->gpio_in<0>(1);
+	m_sa_periphs->gpio_in<0>(0);
+
+	const uint8_t key_recv_idx = 1 - m_mcu_key_send_idx;
+	if (m_mcu_key_count[key_recv_idx] < 8)
+	{
+		m_mcu_key_codes[key_recv_idx][m_mcu_key_count[key_recv_idx]] = scan_code | (newval ? 0x00 : 0x80);
+		m_mcu_key_count[key_recv_idx]++;
 	}
 }
 
 static INPUT_PORTS_START( jornada720 )
 	PORT_START("KBD0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("On/Off") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_ON_OFF)
-	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_S)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_K)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_1)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_2)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3") PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_3)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_4)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("9") PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, jornada_state, key_changed, jornada_state::KEY_9)
 INPUT_PORTS_END
 
 void jornada_state::machine_start()
@@ -273,6 +301,7 @@ void jornada_state::jornada720(machine_config &config)
 	m_companion->ssp_out().set(FUNC(jornada_state::eeprom_cmd_received));
 
 	SED1356(config, m_epson);
+	m_epson->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -292,7 +321,7 @@ ROM_START( jorn720 )
 	ROM_LOAD( "jornada720.bin", 0x0000000, 0x2000000, CRC(5fcd433a) SHA1(f05f7b377b582a7355bf119d74435f0ee6104cca) )
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "jorn720_eeprom.bin", 0x00, 0x80, CRC(54ffaaff) SHA1(5b8296782b6dc1c60b80169c071fb157d0681567) )
+	ROM_LOAD( "jorn720_eeprom.bin", 0x00, 0x80, CRC(54ffaaff) SHA1(5b8296782b6dc1c60b80169c071fb157d0681567) BAD_DUMP )
 ROM_END
 
 } // anonymous namespace
