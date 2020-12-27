@@ -9,7 +9,7 @@ Hardware notes:
 - Hitachi HD63A03YP MCU @ 16MHz (4MHz internal)
 - 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
 - LCD with 4 digits and custom segments, no LCD chip
-- RS232 port for Novag Super System (like the one in sexpertc)
+- RJ-12 port for Novag Super System (like the one in sexpertc)
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
 TODO:
