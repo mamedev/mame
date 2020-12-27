@@ -290,8 +290,8 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	// Sonic network controller
 	// Potential references: https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD
-	//						 https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c
-	//                       https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h
+	//						 https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/if_sn_ap.c
+	//                       https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/if_snreg.h
 	// map(0x1e600000, 0x1e600000);
 
 	// DMAC3 DMA Controller 0
@@ -606,15 +606,15 @@ void news_r4k_state::int_check()
 {
 	// The R4000 has 6 hardware interrupt pins
 	// These map to the 6 INTST/EN/CLR groups on the NEWS platform
-	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c#L82
-	// and https://github.com/NetBSD/src/blob/4618257c9b66cbfb216387cd3d0740f2b1b70750/sys/arch/newsmips/apbus/apbus.c#L202
+	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c
+	// and https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
 	// This still needs to be tested - may or may not be fully accurate.
 
 	for (int i = 0; i < 6; i++)
 	{
 		bool state = m_intst[i] & m_inten[i];
-		if (state)
-		{ // Interrupt active and interrupt enabled
+		if (state != m_int_state[i])  // Interrupt changed state
+		{
 			m_int_state[i] = state;
 			m_cpu->set_input_line(interrupt_map[i], state);
 		}
