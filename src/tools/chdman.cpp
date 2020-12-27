@@ -6,7 +6,6 @@
 
 ****************************************************************************/
 #include <stdio.h> // must be stdio.h and here otherwise issues with I64FMT in MINGW
-#include <dirent.h>
 
 // osd
 #include "osdcore.h"
@@ -1030,8 +1029,6 @@ static chd_error reopen_chd_with_parents(chd_file &input, const char* chd_path, 
 	chd_file *parent = new chd_file;
 	chd_file *child = NULL;
 
-	DIR *dir;
-	struct dirent *entry;
 	int depth = 0;
 	std::string paths[8];
 	std::string filepath;
@@ -1039,10 +1036,11 @@ static chd_error reopen_chd_with_parents(chd_file &input, const char* chd_path, 
 	chd_error err;
 	while (true)
 	{
-		dir = opendir(parents_dirpath.c_str());
-		while((entry = readdir(dir)) != NULL)
+		osd::directory::ptr dir = osd::directory::open(parents_dirpath);
+		const osd::directory::entry *entry;
+		while((entry = dir->read()) != nullptr)
 		{
-			filepath = parents_dirpath + PATH_SEPARATOR + entry->d_name;
+			filepath = parents_dirpath + PATH_SEPARATOR + entry->name;
 			err = parent->open(filepath.c_str());
 			if (err != CHDERR_NONE)
 				continue;
