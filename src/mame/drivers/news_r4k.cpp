@@ -6,14 +6,13 @@
  * Sony NEWS R4000/4400-based workstations.
  *
  * Sources/More Information:
- *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
  *   - http://ozuma.o.oo7.jp/nws5000x.htm
  *   - https://katsu.watanabe.name/doc/sonynews/
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
  *   - https://github.com/briceonk/news-os
  *
- *  Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
+ * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
  */
 
 #include "emu.h"
@@ -73,36 +72,53 @@ protected:
 	// Bitmap update (not implemented yet)
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	// Interrupts (not implemented yet)
+	// Interrupts
 	void inten_w(offs_t offset, uint32_t data);
 	uint32_t inten_r(offs_t offset);
 	uint32_t intst_r(offs_t offset);
 	void intclr_w(offs_t offset, uint32_t data);
 
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
-	enum irq_number : unsigned
+	enum irq0_number : unsigned
 	{
-		EXT3 = 0,
-		EXT1 = 1,
-		SLOT3 = 2,
-		SLOT1 = 3,
-		DMA = 4,
-		LANCE = 5,
-		SCC = 6,
-		BEEP = 7,
-		CBSY = 8,
-		CFLT = 9,
-		MOUSE = 10,
-		KBD = 11,
-		TIMER = 12,
-		BERR = 13,
-		ABORT = 14,
-		PERR = 15,
-	}; // TODO: Needs to be scrubbed
-	template <irq_number Number> void irq_w(int state);
-	void int_check();
+		DMAC = 0x01,
+		SONIC = 0x02,
+		FDC = 0x10
+	};
 
-// DECLARE_FLOPPY_FORMATS(floppy_formats);
+	enum irq1_number : unsigned
+	{
+		KBD = 0x01,
+		SCC = 0x02,
+		AUDIO0 = 0x04,
+		AUDIO1 = 0x08,
+		PARALLEL = 0x20,
+		FB = 0x80
+	};
+
+	enum irq2_number : unsigned
+	{
+		TIMER0 = 0x01,
+		TIMER1 = 0x02
+	};
+
+	enum irq4_number : unsigned
+	{
+		APBUS = 0x01
+	};
+
+	template <irq0_number Number>
+	void irq_w(int state);
+	template <irq1_number Number>
+	void irq_w(int state);
+	template <irq2_number Number>
+	void irq_w(int state);
+	template <irq4_number Number>
+	void irq_w(int state);
+	void int_check();
+	const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
+
+	// DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// Devices
 	// MIPS R4400 CPU
@@ -122,10 +138,10 @@ protected:
 	required_device<z80scc_device> m_escc;
 	required_device_array<rs232_port_device, 2> m_serial;
 
-	// 5000X has a DMAC3 DMA controller
+	// DMAC3 DMA controller
 	// required_device<dmac_0448_device> m_dma;
 
-	// 5000X has a SONIC ethernet controller
+	// SONIC ethernet controller
 	// required_device<am7990_device> m_net;
 	// std::unique_ptr<u16[]> m_net_ram;
 
@@ -135,11 +151,11 @@ protected:
 	// NEWS keyboard and mouse
 	// required_device<news_hid_hle_device> m_hid;
 
-	// 5000X has an HP SPIFI3 SCSI controller
+	// HP SPIFI3 SCSI controller
 	// required_device<cxd1185_device> m_scsi;
 	// required_device<nscsi_bus_device> m_scsibus;
 
-	// 5000X has a DSC-39 "xb" video card
+	// DSC-39 "xb" video card
 	// required_shared_ptr<u32> m_vram;
 
 	// LED control
@@ -191,16 +207,13 @@ void news_r4k_state::machine_common(machine_config &config)
 
 #ifndef NO_MIPS3
 	R4400BE(config, m_cpu, XTAL_75_MHz);
+	m_cpu->set_icache_size(ICACHE_SIZE);
+	m_cpu->set_dcache_size(DCACHE_SIZE);
 #else
 	R4400(config, m_cpu, XTAL_75_MHz);
 #endif
 
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
-
-#ifndef NO_MIPS3
-	m_cpu->set_icache_size(ICACHE_SIZE);
-	m_cpu->set_dcache_size(DCACHE_SIZE);
-#endif
 
 	// Main memory
 	RAM(config, m_ram);
@@ -211,7 +224,7 @@ void news_r4k_state::machine_common(machine_config &config)
 
 	// General ESCC setup
 	SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
-	// m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
+	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
 
 	// ESCC channel B (mapped to serial port 0)
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
@@ -275,7 +288,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	// TODO: ESCCF? ESCC FIFO?
 	// map(0x1e900000, 0x1e900000);
 
-	// Sonic network controller 
+	// Sonic network controller
 	// Potential references: https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD
 	//						 https://github.com/NetBSD/src/blob/fc1bde7fb56cf2ceb6c98f29a7547fbd92d9ca25/sys/arch/newsmips/apbus/if_sn_ap.c
 	//                       https://github.com/NetBSD/src/blob/64b8a48e1288eb3902ed73113d157af50b2ec596/sys/arch/newsmips/apbus/if_snreg.h
@@ -332,27 +345,24 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 	//map(0x1f3f0000, 0x1f3f0017);
 	map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
 	//map(0x1f840000, 0x1f84ffff).ram(); // what is this
-	map(0x1f3e0000, 0x1f3efff0).lr8(
-		NAME([this](offs_t offset) {
+	map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
 			if (offset % 4 == 0 || offset % 4 == 1) { return 0x0; }
 			else if (offset % 4 == 2) { return 0x6f; }
 			else if (offset % 4 == 3) { return 0xe0; }
-			else { LOG("0x1f3e-1f3ef uh oh!\n"); return 0x0;}})); // ditto ;__;
-	map(0x14400004, 0x14400007).lr8(
-		NAME([this](offs_t offset) {
+			else { LOG("0x1f3e-1f3ef uh oh!\n"); return 0x0;} })); // ditto ;__;
+	map(0x14400004, 0x14400007).lr8(NAME([this](offs_t offset) {
 			if (offset < 1) { return 0x0; }
 			else if (offset == 1) { return 0x3; }
 			else if (offset == 2) { return 0xff; }
 			else if (offset == 3) { return 0x17; }
-			else { return 0x0; }}));
-	map(0x14900004, 0x14900007).lr8(
-		NAME([this](offs_t offset) {
+			else { return 0x0; } }));
+	map(0x14900004, 0x14900007).lr8(NAME([this](offs_t offset) {
 			if (offset < 1) { return 0x0; }
 			else if (offset == 1) { return 0x0; }
 			else if (offset == 2) { return 0x03; }
 			else if (offset == 3) { return 0x28; }
-			else { return 0x0; }}));
-	 
+			else { return 0x0; } }));
+
 	map(0x1f4c0000, 0x1f4c0007).ram(); // Register for something that is accessed very early in mrom flow (0xbfc0040C)
 
 	// map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
@@ -421,7 +431,7 @@ uint64_t news_r4k_state::front_panel_r(offs_t offset)
 {
 	ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
 	dipsw |= 0xff00; // Matches physical platform
-	return ((unsigned long)dipsw << 32) | dipsw;
+	return ((uint64_t)dipsw << 32) | dipsw;
 }
 
 void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
@@ -475,7 +485,8 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
 	//return freerun_timer_val;
 }
 
-void news_r4k_state::freerun_w(offs_t offset, uint32_t data) {
+void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
+{
 	LOG("freerun_w: Set freerun timer to 0x%x\n", data);
 	freerun_timer_val = data;
 }
@@ -524,49 +535,90 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
 	return m_intst[offset];
 }
 
-template <news_r4k_state::irq_number Number> void news_r4k_state::irq_w(int state)
+template <news_r4k_state::irq0_number Number>
+void news_r4k_state::irq_w(int state)
 {
-	/*
-	LOG("irq number %d state %d\n",  Number, state);
-
+	LOG("INTST0 %d set to %d\n", Number, state);
 	if (state)
-		m_intst |= 1U << Number;
+	{
+		m_intst[0] |= Number;
+	}
 	else
-		m_intst &= ~(1U << Number);
-
+	{
+		m_intst[0] &= ~Number;
+	}
 	int_check();
-    */
+}
+
+template <news_r4k_state::irq1_number Number>
+void news_r4k_state::irq_w(int state)
+{
+	LOG("INTST1 %d set to %d\n", Number, state);
+	if (state)
+	{
+		m_intst[1] |= Number;
+	}
+	else
+	{
+		m_intst[1] &= ~Number;
+	}
+	int_check();
+}
+
+template <news_r4k_state::irq2_number Number>
+void news_r4k_state::irq_w(int state)
+{
+	LOG("INTST2 %d set to %d\n", Number, state);
+	if (state)
+	{
+		m_intst[2] |= Number;
+	}
+	else
+	{
+		m_intst[2] &= ~Number;
+	}
+	int_check();
+}
+
+template <news_r4k_state::irq4_number Number>
+void news_r4k_state::irq_w(int state)
+{
+	LOG("INTST4 %d set to %d\n", Number, state);
+	if (state)
+	{
+		m_intst[4] |= Number;
+	}
+	else
+	{
+		m_intst[4] &= ~Number;
+	}
+	int_check();
 }
 
 void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
-	LOG("intclr_w<not implemented>: INTCLR%d = 0x%x\n", offset, data);
-	/*
-	m_intst &= ~(data & mem_mask);
-
+	LOG("intclr_w: INTCLR%d = 0x%x\n", offset, data);
+	m_intst[offset] &= ~data; // TODO: is this correct?
 	int_check();
-    */
 }
 
 void news_r4k_state::int_check()
 {
-	LOG("int_check: not implemented\n");
-	/*
-	// TODO: assume 44422222 11100000
-	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
-	static u16 const int_mask[] = { 0x001f, 0x00e0, 0x1f00, 0xe000 };
+	// The R4000 has 6 hardware interrupt pins
+	// These map to the 6 INTST/EN/CLR groups on the NEWS platform
+	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c#L82
+	// and https://github.com/NetBSD/src/blob/4618257c9b66cbfb216387cd3d0740f2b1b70750/sys/arch/newsmips/apbus/apbus.c#L202
+	// This still needs to be tested - may or may not be fully accurate.
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
+	for (int i = 0; i < 6; i++)
 	{
-		bool const int_state = m_intst & m_inten & int_mask[i];
-
-		if (m_int_state[i] != int_state)
-		{
-			m_int_state[i] = int_state;
-			m_cpu->set_input_line(int_line[i], int_state);
+		bool state = m_intst[i] & m_inten[i];
+		if (state)
+		{ // Interrupt active and interrupt enabled
+			m_int_state[i] = state;
+			m_cpu->set_input_line(interrupt_map[i], state);
 		}
 	}
-    */
 }
 
 u32 news_r4k_state::bus_error()
