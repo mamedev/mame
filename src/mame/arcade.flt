@@ -553,6 +553,7 @@ hyperspt.cpp
 hyprduel.cpp
 icecold.cpp
 ice_bozopail.cpp
+ice_hhhippos.cpp
 ice_tbd.cpp
 ichiban.cpp
 idsa.cpp

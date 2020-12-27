@@ -16648,6 +16648,9 @@ icatel                          //
 @source:ice_bozopail.cpp
 ice_bozo                        // ICE - Bozo Pail Toss
 
+@source:ice_hhhippos.cpp
+hhhippos                        //
+
 @source:ice_tbd.cpp
 ice_tbd                         // ICE - Turbo Drive
 
