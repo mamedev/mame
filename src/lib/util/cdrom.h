@@ -58,6 +58,22 @@ enum
 #define CD_FLAG_GDROM   0x00000001  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
 #define CD_FLAG_GDROMLE 0x00000002  // legacy GD-ROM, with little-endian CDDA data
 
+enum gdrom_area
+{
+	GDROM_SINGLE_DENSITY = 0,
+	GDROM_HIGH_DENSITY
+};
+
+enum gdrom_pattern
+{
+	GDROM_TYPE_UNKNOWN = 0,
+	GDROM_TYPE_I,
+	GDROM_TYPE_II,
+	GDROM_TYPE_III,
+	GDROM_TYPE_III_SPLIT
+};
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -138,6 +154,9 @@ const char *cdrom_get_type_string(uint32_t trktype);
 const char *cdrom_get_subtype_string(uint32_t subtype);
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
 chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
+
+/* GDROM utilities */
+enum gdrom_pattern gdrom_identify_pattern(const cdrom_toc *toc);
 
 // ECC utilities
 bool ecc_verify(const uint8_t *sector);

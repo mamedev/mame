@@ -36,19 +36,6 @@
 #define TOKENIZE i = tokenize( linebuffer, i, sizeof(linebuffer), token, sizeof(token) );
 
 
-enum gdi_area {
-	SINGLE_DENSITY,
-	HIGH_DENSITY
-};
-
-enum gdi_pattern {
-	TYPE_UNKNOWN = 0,
-	TYPE_I,
-	TYPE_II,
-	TYPE_III,
-	TYPE_III_SPLIT
-};
-
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -1225,8 +1212,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	std::string lastfname;
 	uint32_t wavlen, wavoffs;
 	std::string path = std::string(tocfname);
-	enum gdi_area current_area = SINGLE_DENSITY;
-	enum gdi_pattern disc_pattern = TYPE_UNKNOWN;
+	enum gdrom_area current_area = GDROM_SINGLE_DENSITY;
 
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
@@ -1255,14 +1241,14 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 			/* single-density area starts LBA = 0 */
 			if (!strncmp(linebuffer, "REM SINGLE-DENSITY AREA", 23))
 			{
-				current_area = SINGLE_DENSITY;
+				current_area = GDROM_SINGLE_DENSITY;
 				continue;
 			}
 
 			/* high-density area starts LBA = 45000 */
 			if (!strncmp(linebuffer, "REM HIGH-DENSITY AREA", 21))
 			{
-				current_area = HIGH_DENSITY;
+				current_area = GDROM_HIGH_DENSITY;
 				continue;
 			}
 
@@ -1518,28 +1504,6 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	}
 
 	/*
-	 * Dreamcast patterns are identified by track types and number of tracks
-	 */
-	if (outtoc.numtrks > 4 && outtoc.tracks[outtoc.numtrks-1].pgtype == CD_TRACK_MODE1_RAW)
-	{
-		if (outtoc.tracks[outtoc.numtrks-2].pgtype == CD_TRACK_AUDIO)
-			disc_pattern = TYPE_III_SPLIT;
-		else
-			disc_pattern = TYPE_III;
-	}
-	else if (outtoc.numtrks > 3)
-	{
-		if (outtoc.tracks[outtoc.numtrks-1].pgtype == CD_TRACK_AUDIO)
-			disc_pattern = TYPE_II;
-		else
-			disc_pattern = TYPE_III;
-	}
-	else if (outtoc.numtrks == 3)
-	{
-		disc_pattern = TYPE_I;
-	}
-
-	/*
 	 * Strip pregaps from Redump tracks and adjust the LBA offset to match TOSEC layout
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
@@ -1581,7 +1545,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	/*
 	 * Special handling for TYPE_III_SPLIT, pregap in last track contains 75 frames audio and 150 frames data
 	 */
-	if (disc_pattern == TYPE_III_SPLIT)
+	if (gdrom_identify_pattern(&outtoc) == GDROM_TYPE_III_SPLIT)
 	{
 		assert(outtoc.tracks[outtoc.numtrks-1].pregap == 225);
 
@@ -1601,7 +1565,7 @@ chd_error chdcd_parse_gdicue(const char *tocfname, cdrom_toc &outtoc, chdcd_trac
 	 */
 	for (trknum = 1; trknum < outtoc.numtrks; trknum++)
 	{
-		if (outtoc.tracks[trknum].multicuearea == HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == SINGLE_DENSITY)
+		if (outtoc.tracks[trknum].multicuearea == GDROM_HIGH_DENSITY && outtoc.tracks[trknum-1].multicuearea == GDROM_SINGLE_DENSITY)
 		{
 			outtoc.tracks[trknum].physframeofs = 45000;
 			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
