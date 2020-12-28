@@ -1041,6 +1041,8 @@ static chd_error reopen_chd_with_parents(chd_file &input, const char* chd_path, 
 		const osd::directory::entry *entry;
 		while((entry = dir->read()) != nullptr)
 		{
+			if (entry->type != osd::directory::entry::entry_type::FILE)
+				continue;
 			filepath = parents_dirpath + PATH_SEPARATOR + entry->name;
 			err = parent->open(filepath.c_str());
 			if (err != CHDERR_NONE)
