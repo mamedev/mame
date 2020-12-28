@@ -57,6 +57,7 @@ const uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 const int MODE_NORMAL = 0;
 const int MODE_CUEBIN = 1;
 const int MODE_GDI = 2;
+const int MODE_GDROM_CUEBIN = 3;
 
 // command modifier
 #define REQUIRED "~"
@@ -1321,10 +1322,11 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		bool needquote = strchr(filename, ' ') != nullptr;
 		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
 	}
-	else if (mode == MODE_CUEBIN)
+	else if (mode == MODE_CUEBIN || mode == MODE_GDROM_CUEBIN)
 	{
 		// first track specifies the file
-		if (tracknum == 0)
+		// GDROM .cue/.bin has one file per track
+		if (tracknum == 0 || mode == MODE_GDROM_CUEBIN)
 			file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
@@ -2376,6 +2378,33 @@ static void do_extract_raw(parameters_map &params)
 
 
 //-------------------------------------------------
+//  gdrom_convert_toc() - Redump uses .cue/.bin
+//  for GDROM dumps. TOSEC uses .gdi/.bin instead.
+//  Redump and TOSEC also have slightly different
+//  TOC layouts.
+//
+//  When creating CHDs from Redump GDROM dumps we
+//  adjust Redumps TOC so it matches TOSEC. This
+//  ensures there's only one TOC layout for GDROM
+//  stored in CHD. The TOSEC layout.
+//
+//  Extractcd to .cue/.bin reverts the TOC to the
+//  Redump layout. If we didn't do this createcd
+//  followed by extractcd would corrupt the GDROM.
+//  This means .cue/.bin is always Redump layout.
+//
+//  In summary:
+//
+//     GDROM in .cue/.bin - Redump TOC
+//     GDROM in .gdi/.bin - TOSEC TOC
+//     GDROM in .chd      - TOSEC TOC
+//-------------------------------------------------
+static void gdrom_convert_toc(cdrom_toc *toc)
+{
+}
+
+
+//-------------------------------------------------
 //  do_extract_cd - extract a CD file from a
 //  CHD image
 //-------------------------------------------------
@@ -2391,7 +2420,7 @@ static void do_extract_cd(parameters_map &params)
 	cdrom_file *cdrom = cdrom_open(&input_chd);
 	if (cdrom == nullptr)
 		report_error(1, "Unable to recognize CHD file as a CD");
-	const cdrom_toc *toc = cdrom_get_toc(cdrom);
+	cdrom_toc toc = *(cdrom_get_toc(cdrom));
 
 	// verify output file doesn't exist
 	auto output_file_str = params.find(OPTION_OUTPUT);
@@ -2436,13 +2465,19 @@ static void do_extract_cd(parameters_map &params)
 			mode = MODE_GDI;
 		}
 
+		if (mode == MODE_CUEBIN && toc.flags == CD_FLAG_GDROM)
+		{
+			mode = MODE_GDROM_CUEBIN;
+			gdrom_convert_toc(&toc);
+		}
+
 		// process output file
 		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
 		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// process output BIN file
-		if (mode != MODE_GDI)
+		if (mode != MODE_GDI && mode != MODE_GDROM_CUEBIN)
 		{
 			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
 			if (filerr != osd_file::error::NONE)
@@ -2451,29 +2486,35 @@ static void do_extract_cd(parameters_map &params)
 
 		// determine total frames
 		uint64_t total_bytes = 0;
-		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
-			total_bytes += toc->tracks[tracknum].frames * (toc->tracks[tracknum].datasize + toc->tracks[tracknum].subsize);
+		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+			total_bytes += toc.tracks[tracknum].frames * (toc.tracks[tracknum].datasize + toc.tracks[tracknum].subsize);
 
 		// GDI must start with the # of tracks
 		if (mode == MODE_GDI)
 		{
-			output_toc_file->printf("%d\n", toc->numtrks);
+			output_toc_file->printf("%d\n", toc.numtrks);
+		}
+
+		// GDROM .cue/.bin starts with SINGLE-DENSITY marker
+		if (mode == MODE_GDROM_CUEBIN)
+		{
+			output_toc_file->printf("REM SINGLE-DENSITY AREA\n");
 		}
 
 		// iterate over tracks and copy all data
 		uint64_t outputoffs = 0;
 		uint32_t discoffs = 0;
 		std::vector<uint8_t> buffer;
-		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
+		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
 			std::string trackbin_name(basename);
 
-			if (mode == MODE_GDI)
+			if (mode == MODE_GDI || mode == MODE_GDROM_CUEBIN)
 			{
 				char temp[11];
 				sprintf(temp, "%02d", tracknum+1);
 				trackbin_name.append(temp);
-				if (toc->tracks[tracknum].trktype == CD_TRACK_AUDIO)
+				if (toc.tracks[tracknum].trktype == CD_TRACK_AUDIO)
 					trackbin_name.append(".raw");
 				else
 					trackbin_name.append(".bin");
@@ -2487,11 +2528,21 @@ static void do_extract_cd(parameters_map &params)
 				outputoffs = 0;
 			}
 
+			// GDROM .cue/.bin HIGH-DENSITY marker when area changes
+			if (mode == MODE_GDROM_CUEBIN && tracknum > 1 && toc.tracks[tracknum].multicuearea != toc.tracks[tracknum-1].multicuearea)
+			{
+				output_toc_file->printf("REM HIGH-DENSITY AREA\n");
+			}
+
 			// output the metadata about the track to the TOC file
-			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
+			cdrom_track_info &trackinfo = toc.tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
 				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
+			}
+			else if (mode == MODE_GDROM_CUEBIN)
+			{
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), 0, outputoffs);
 			}
 			else
 			{
@@ -2501,7 +2552,7 @@ static void do_extract_cd(parameters_map &params)
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
 			uint32_t output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
-			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
+			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI) || (mode == MODE_GDROM_CUEBIN))
 			{
 				printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
 				printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
@@ -2510,6 +2561,13 @@ static void do_extract_cd(parameters_map &params)
 
 			// resize the buffer for the track
 			buffer.resize((TEMP_BUFFER_SIZE / output_frame_size) * output_frame_size);
+
+			// GDROM .cue/.bin embeds pregap in output file
+			if (mode == MODE_GDROM_CUEBIN && (trackinfo.pregap > 0) && (trackinfo.pgdatasize > 0))
+			{
+				outputoffs += trackinfo.pregap * trackinfo.pgdatasize;
+				trackinfo.frames -= trackinfo.pregap;
+			}
 
 			// now read and output the actual data
 			uint32_t bufferoffs = 0;
@@ -2523,7 +2581,7 @@ static void do_extract_cd(parameters_map &params)
 
 				// for CDRWin and GDI audio tracks must be reversed
 				// in the case of GDI and CHD version < 5 we assuming source CHD image is GDROM so audio tracks is already reversed
-				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (trackinfo.trktype == CD_TRACK_AUDIO))
+				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN) || (mode == MODE_GDROM_CUEBIN)) && (trackinfo.trktype == CD_TRACK_AUDIO))
 					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
 					{
 						uint8_t swaptemp = buffer[bufferoffs + swapindex];
