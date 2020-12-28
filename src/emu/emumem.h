@@ -1859,8 +1859,6 @@ private:
 	address_space *                                 m_space;
 	handler_entry *                                 m_handler_read;
 	handler_entry *                                 m_handler_write;
-	std::function<void (int)>                       m_select_a;
-	std::function<void (int)>                       m_select_u;
 	int                                             m_cur_id;
 	int                                             m_cur_slot;
 	std::string                                     m_context;
