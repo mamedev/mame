@@ -1107,13 +1107,9 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		if (input_parent_chd.parent_sha1() != util::sha1_t::null)
     {
 			std::string chd_dir;
-#if defined(WIN32)
-			const size_t sep_index = input_chd_parent_str->second->find_last_of("/\\:");
-#else
-			const size_t sep_index = input_chd_parent_str->second->find_last_of(PATH_SEPARATOR);
-#endif
-			if (sep_index != std::string::npos)
-				chd_dir = input_chd_parent_str->second->substr(0, sep_index);
+			auto const dirsep(std::find_if(input_chd_parent_str->second->rbegin(), input_chd_parent_str->second->rend(), &util::is_directory_separator));
+			if (dirsep != input_chd_parent_str->second->rend())
+				chd_dir = input_chd_parent_str->second->substr(0, std::distance(input_chd_parent_str->second->begin(), dirsep.base()));
 			else
 				chd_dir = ".";
 			err = reopen_chd_with_parents(input_parent_chd, input_chd_parent_str->second->c_str(), chd_dir, writeable);
@@ -1132,9 +1128,9 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		if (input_chd_parent_str == params.end() && input_chd.parent_sha1() != util::sha1_t::null)
     {
 			std::string chd_dir;
-			const size_t sep_index = input_chd_str->second->rfind(PATH_SEPARATOR);
-			if (sep_index != std::string::npos)
-				chd_dir = input_chd_str->second->substr(0, sep_index);
+			auto const dirsep(std::find_if(input_chd_str->second->rbegin(), input_chd_str->second->rend(), &util::is_directory_separator));
+			if (dirsep != input_chd_str->second->rend())
+				chd_dir = input_chd_str->second->substr(0, std::distance(input_chd_str->second->begin(), dirsep.base()));
 			else
 				chd_dir = ".";
 			err = reopen_chd_with_parents(input_chd, input_chd_str->second->c_str(), chd_dir, writeable);
@@ -1223,9 +1219,9 @@ static std::string *parse_output_chd_parameters(const parameters_map &params, ch
 		if (output_parent_chd.parent_sha1() != util::sha1_t::null)
     {
 			std::string chd_dir;
-			const size_t sep_index = output_chd_parent_str->second->rfind(PATH_SEPARATOR);
-			if (sep_index != std::string::npos)
-				chd_dir = output_chd_parent_str->second->substr(0, sep_index);
+			auto const dirsep(std::find_if(output_chd_parent_str->second->rbegin(), output_chd_parent_str->second->rend(), &util::is_directory_separator));
+			if (dirsep != output_chd_parent_str->second->rend())
+				chd_dir = output_chd_parent_str->second->substr(0, std::distance(output_chd_parent_str->second->begin(), dirsep.base()));
 			else
 				chd_dir = ".";
 			err = reopen_chd_with_parents(output_parent_chd, output_chd_parent_str->second->c_str(), chd_dir, false);
