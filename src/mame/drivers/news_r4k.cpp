@@ -12,7 +12,7 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
  *   - https://github.com/briceonk/news-os
  *
- * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
+ * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
  * 
  *  CPU configuration:
  *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
@@ -77,6 +77,7 @@ public:
 		  m_rtc(*this, "rtc"),
 		  m_escc(*this, "escc"),
 		  m_serial(*this, "serial%u", 0U),
+		  m_hid(*this, "hid"),
 		  m_led(*this, "led%u", 0U) {}
 
 	// NWS-5000X
@@ -177,7 +178,7 @@ protected:
 	// required_device<upd72067_device> m_fdc;
 
 	// NEWS keyboard and mouse
-	// required_device<news_hid_hle_device> m_hid;
+	required_device<news_hid_hle_device> m_hid;
 
 	// HP SPIFI3 SCSI controller (2x)
 	// required_device<cxd1185_device> m_scsi;
@@ -236,7 +237,7 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_cpu->set_icache_size(ICACHE_SIZE);
 	m_cpu->set_dcache_size(DCACHE_SIZE);
 	m_cpu->set_secondary_cache_line_size(0x40); // because config[23:22] = 0b10
-	m_cpu->set_system_clock(XTAL_75_MHz / 3);	// because config [30:28] = 0b001
+	m_cpu->set_system_clock(XTAL_75_MHz / 3);	// because config[30:28] = 0b001
 #else
 	R4400(config, m_cpu, XTAL_75_MHz);
 #endif
@@ -271,6 +272,14 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_escc->out_rtsa_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_escc->out_txda_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_escc->out_dtra_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
+
+	// Keyboard and mouse
+	// Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
+	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
+	// where the mouse interrupt handler is initialized using the Keyboard interrupt.
+	NEWS_HID_HLE(config, m_hid);
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 }
 
 void news_r4k_state::nws5000x(machine_config &config)
@@ -340,9 +349,8 @@ void news_r4k_state::cpu_map(address_map &map)
 	// spifi controller 2 (scsi bus 1)
 	// map(0x1e380000, 0x1e380000);
 
-	// HID
-	// map(0x1f900000, 0x1f900000); // kb (keyboard)
-	// map(0x1f900014, 0x1f900014); // ms (mouse)
+	// HID (kb + ms)
+	map(0x1f900000, 0x1f900023).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
 	// lp (printer port??)
 	// map(0x1ed30000, 0x1ed30000);

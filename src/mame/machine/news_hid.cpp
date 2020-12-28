@@ -60,6 +60,28 @@ void news_hid_hle_device::map_68k(address_map &map)
 	map(0x7, 0x7).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
 }
 
+void news_hid_hle_device::map_apbus(address_map &map)
+{
+	// see https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/kb_ap.c#L44
+	map(0x0, 0x3).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
+	map(0x4, 0x7).r(FUNC(news_hid_hle_device::status_r<KEYBOARD>));
+	map(0x8, 0xb).w(FUNC(news_hid_hle_device::init_w<KEYBOARD>));
+	map(0xc, 0xf).w(FUNC(news_hid_hle_device::reset_w<KEYBOARD>));
+	// kb_rx_speed
+	map(0x14, 0x17).r(FUNC(news_hid_hle_device::data_r<MOUSE>));
+	map(0x18, 0x1b).r(FUNC(news_hid_hle_device::status_r<MOUSE>));
+	map(0x1c, 0x1f).w(FUNC(news_hid_hle_device::init_w<MOUSE>));
+	map(0x20, 0x23).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
+	// ms_rx_speed
+	// kb_buzzf
+	// kb_buzz
+	// kb_tx_data
+	// kb_tx_stat
+	// kb_tx_intr_en
+	// kb_tx_reset
+	// kb_tx_speed
+}
+
 void news_hid_hle_device::device_start()
 {
 	m_irq_out_cb.resolve_all_safe();
