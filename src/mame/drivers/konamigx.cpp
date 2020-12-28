@@ -1083,7 +1083,6 @@ void konamigx_state::gx_type2_map(address_map &map)
 void konamigx_state::gx_type3_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
@@ -1100,7 +1099,6 @@ void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();
