@@ -13,6 +13,35 @@
  *   - https://github.com/briceonk/news-os
  *
  * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
+ * 
+ *  CPU configuration:
+ * 	 - CPU card has a 75MHz crystal, multiplier (if any) TBD
+ *   - PRId = 0x450 (MIPS3 emulator implementation sets revision to 40 instead of 50 for R4400)
+ *   	- The user manual warns against using the revision field of PRId in software, so hopefully that won't cause any deltas in behavior.
+ *   - config register = 0x1081E4BF
+ *  	[31]    CM = 0 (MC mode off)
+ *  	[30:28] EC = 001 (clock frequency divided by 3)
+ *  	[27:24] EP = 00000 (doubleword every cycle)
+ *  	[23:22] SB = 10 (16 word scache line size)
+ *  	[21]    SS = 0 (unified scache)
+ *  	[20]    SW = 0 (128-bit data path to scache)
+ *  	[19:18] EW = 0 (64-bit system port width)
+ *  	[17]    SC = 0 (scache present)
+ *  	[16]    SM = 1 (Dirty Shared state disabled)
+ *  	[15]    BE = 1 (Big endian)
+ *  	[14]    EM = 1 (Parity mode)
+ *  	[13]    EB = 1 (Sub-block ordering)
+ *  	[12]    Reserved (0)
+ *  	[11:9]  IC = 2 (16 KByte icache)
+ *  	[8:6]   DC = 2 (16 KByte dcache)
+ *  	Per page 90 of the R4400 user guide, the following bits ([5:0]) are mutable by software at runtime.
+ *  	[5]     IB = 1 (32 byte icache line)
+ *  	[4]     DB = 1 (32 byte icache line)
+ *  	[3]     CU = 1 (SC uses cacheable coherent update on write)
+ *  	[2:0]   K0 = 7 (cache coherency algo, 7 is reserved)
+ *   - Known R4400 config differences between this driver and the physical platform:
+ * 		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
+ *      - emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
  */
 
 #include "emu.h"
@@ -203,12 +232,12 @@ protected:
 void news_r4k_state::machine_common(machine_config &config)
 {
 	// CPU setup
-	// CPU board has a 75MHz crystal, multiplier (if any) TBD
-
 #ifndef NO_MIPS3
 	R4400BE(config, m_cpu, XTAL_75_MHz);
 	m_cpu->set_icache_size(ICACHE_SIZE);
 	m_cpu->set_dcache_size(DCACHE_SIZE);
+	m_cpu->set_secondary_cache_line_size(0x40); // because config[23:22] = 0b10
+	m_cpu->set_system_clock(XTAL_75_MHz / 3); // because config [30:28] = 0b001
 #else
 	R4400(config, m_cpu, XTAL_75_MHz);
 #endif
@@ -371,7 +400,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 	// map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) {
 	// 	 return 0x80;
 	// }));
-	// map(0x1ed60000, 0x1ed6ffff).ram();
+	map(0x1ed60000, 0x1ed6ffff);
 
 	// Unknown regions that mrom accesses
 	// map(0x1f4c0000, 0x1f4c0003).ram();
