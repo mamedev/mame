@@ -15,10 +15,10 @@
  * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE TOOLS=1 -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
  * 
  *  CPU configuration:
- * 	 - CPU card has a 75MHz crystal, multiplier (if any) TBD
- *   - PRId = 0x450 (MIPS3 emulator implementation sets revision to 40 instead of 50 for R4400)
- *   	- The user manual warns against using the revision field of PRId in software, so hopefully that won't cause any deltas in behavior.
- *   - config register = 0x1081E4BF
+ *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
+ *	- PRId = 0x450 (MIPS3 emulator implementation sets revision to 40 instead of 50 for R4400)
+ *		- The user manual warns against using the revision field of PRId in software, so hopefully that won't cause any deltas in behavior.
+ * 	- config register = 0x1081E4BF
  *  	[31]    CM = 0 (MC mode off)
  *  	[30:28] EC = 001 (clock frequency divided by 3)
  *  	[27:24] EP = 00000 (doubleword every cycle)
@@ -39,9 +39,9 @@
  *  	[4]     DB = 1 (32 byte icache line)
  *  	[3]     CU = 1 (SC uses cacheable coherent update on write)
  *  	[2:0]   K0 = 7 (cache coherency algo, 7 is reserved)
- *   - Known R4400 config differences between this driver and the physical platform:
- * 		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
- *      - emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
+ *	- Known R4400 config differences between this driver and the physical platform:
+ *		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
+ *		- emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
  */
 
 #include "emu.h"
@@ -237,7 +237,7 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_cpu->set_icache_size(ICACHE_SIZE);
 	m_cpu->set_dcache_size(DCACHE_SIZE);
 	m_cpu->set_secondary_cache_line_size(0x40); // because config[23:22] = 0b10
-	m_cpu->set_system_clock(XTAL_75_MHz / 3); // because config [30:28] = 0b001
+	m_cpu->set_system_clock(XTAL_75_MHz / 3);	// because config [30:28] = 0b001
 #else
 	R4400(config, m_cpu, XTAL_75_MHz);
 #endif
@@ -400,7 +400,9 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 	// map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) {
 	// 	 return 0x80;
 	// }));
-	map(0x1ed60000, 0x1ed6ffff);
+
+	// Makes log less verbose
+	map(0x1ed60000, 0x1ed6ffff).lrw8(NAME([this](offs_t offset) { return 0xff; }), NAME([this](offs_t offset, uint8_t data) {}));
 
 	// Unknown regions that mrom accesses
 	// map(0x1f4c0000, 0x1f4c0003).ram();
@@ -492,13 +494,13 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 	{
 		value = 0x32;
 	}
-	LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+	// LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
 	return value;
 }
 
 void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data)
 {
-	LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
+	// LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
 uint32_t news_r4k_state::freerun_r(offs_t offset)
@@ -642,7 +644,7 @@ void news_r4k_state::int_check()
 	for (int i = 0; i < 6; i++)
 	{
 		bool state = m_intst[i] & m_inten[i];
-		if (state != m_int_state[i])  // Interrupt changed state
+		if (state != m_int_state[i]) // Interrupt changed state
 		{
 			m_int_state[i] = state;
 			m_cpu->set_input_line(interrupt_map[i], state);
