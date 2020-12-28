@@ -106,16 +106,17 @@ protected:
 	uint32_t inten_r(offs_t offset);
 	uint32_t intst_r(offs_t offset);
 	void intclr_w(offs_t offset, uint32_t data);
+	void generic_irq_w(uint32_t irq, uint32_t mask, int state);
 
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
-	enum irq0_number : unsigned
+	enum irq0_number : uint32_t
 	{
 		DMAC = 0x01,
 		SONIC = 0x02,
 		FDC = 0x10
 	};
 
-	enum irq1_number : unsigned
+	enum irq1_number : uint32_t
 	{
 		KBD = 0x01,
 		SCC = 0x02,
@@ -125,29 +126,26 @@ protected:
 		FB = 0x80
 	};
 
-	enum irq2_number : unsigned
+	enum irq2_number : uint32_t
 	{
 		TIMER0 = 0x01,
 		TIMER1 = 0x02
 	};
 
-	enum irq4_number : unsigned
+	enum irq4_number : uint32_t
 	{
 		APBUS = 0x01
 	};
-
 	template <irq0_number Number>
-	void irq_w(int state);
+	void irq_w(int state) { generic_irq_w(0, Number, state); }
 	template <irq1_number Number>
-	void irq_w(int state);
+	void irq_w(int state) { generic_irq_w(1, Number, state); }
 	template <irq2_number Number>
-	void irq_w(int state);
+	void irq_w(int state) { generic_irq_w(2, Number, state); }
 	template <irq4_number Number>
-	void irq_w(int state);
+	void irq_w(int state) { generic_irq_w(4, Number, state); }
 	void int_check();
 	const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
-
-	// DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// Devices
 	// MIPS R4400 CPU
@@ -175,12 +173,13 @@ protected:
 	// std::unique_ptr<u16[]> m_net_ram;
 
 	// TBD: Floppy controller type
+	// DECLARE_FLOPPY_FORMATS(floppy_formats);
 	// required_device<upd72067_device> m_fdc;
 
 	// NEWS keyboard and mouse
 	// required_device<news_hid_hle_device> m_hid;
 
-	// HP SPIFI3 SCSI controller
+	// HP SPIFI3 SCSI controller (2x)
 	// required_device<cxd1185_device> m_scsi;
 	// required_device<nscsi_bus_device> m_scsibus;
 
@@ -566,62 +565,16 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
 	return m_intst[offset];
 }
 
-template <news_r4k_state::irq0_number Number>
-void news_r4k_state::irq_w(int state)
+void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
-	LOG("INTST0 %d set to %d\n", Number, state);
+	LOG("generic_irq_w: INTST%d IRQ %d set to %d", irq, mask, state);
 	if (state)
 	{
-		m_intst[0] |= Number;
+		m_intst[irq] |= mask;
 	}
 	else
 	{
-		m_intst[0] &= ~Number;
-	}
-	int_check();
-}
-
-template <news_r4k_state::irq1_number Number>
-void news_r4k_state::irq_w(int state)
-{
-	LOG("INTST1 %d set to %d\n", Number, state);
-	if (state)
-	{
-		m_intst[1] |= Number;
-	}
-	else
-	{
-		m_intst[1] &= ~Number;
-	}
-	int_check();
-}
-
-template <news_r4k_state::irq2_number Number>
-void news_r4k_state::irq_w(int state)
-{
-	LOG("INTST2 %d set to %d\n", Number, state);
-	if (state)
-	{
-		m_intst[2] |= Number;
-	}
-	else
-	{
-		m_intst[2] &= ~Number;
-	}
-	int_check();
-}
-
-template <news_r4k_state::irq4_number Number>
-void news_r4k_state::irq_w(int state)
-{
-	LOG("INTST4 %d set to %d\n", Number, state);
-	if (state)
-	{
-		m_intst[4] |= Number;
-	}
-	else
-	{
-		m_intst[4] &= ~Number;
+		m_intst[irq] &= ~mask;
 	}
 	int_check();
 }
