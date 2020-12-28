@@ -18,9 +18,7 @@ public:
 	playmark_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_videoram1(*this, "videoram1"),
-		m_videoram2(*this, "videoram2"),
-		m_videoram3(*this, "videoram3"),
+		m_videoram(*this, "videoram%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
 		m_sprtranspen(0),
@@ -49,66 +47,71 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_bgvideoram;
-	required_shared_ptr<uint16_t> m_videoram1;
-	optional_shared_ptr<uint16_t> m_videoram2;
-	optional_shared_ptr<uint16_t> m_videoram3;
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_rowscroll;
+	// memory pointers
+	optional_shared_ptr<u16> m_bgvideoram;
+	optional_shared_ptr_array<u16, 3> m_videoram;
+	required_shared_ptr<u16> m_spriteram;
+	optional_shared_ptr<u16> m_rowscroll;
 
-	/* video-related */
-	tilemap_t   *m_tx_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	tilemap_t   *m_bg_tilemap;
-	int         m_bgscrollx;
-	int         m_bgscrolly;
-	int         m_bg_enable;
-	int         m_bg_full_size;
-	int         m_fgscrollx;
-	int         m_fg_rowscroll_enable;
+	// video-related
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	s32 m_bgscrollx;
+	s16 m_bgscrolly;
+	bool m_bg_enable;
+	bool m_bg_full_size;
+	u32 m_fgscrollx;
+	bool m_fg_rowscroll_enable;
 
-	int         m_xoffset;
-	int         m_yoffset;
-	int         m_pri_masks[3];
-	uint16_t      m_scroll[7];
-	int         m_sprtranspen;
+	s8 m_xoffset;
+	s8 m_yoffset;
+	u16 m_pri_masks[3];
+	u16 m_scroll[7];
+	u8 m_sprtranspen;
 
-	/* misc */
-	uint16_t      m_snd_command;
-	uint16_t      m_snd_flag;
-	uint8_t       m_oki_control;
-	uint8_t       m_oki_command;
-	uint8_t       m_dispenser_latch;
-	int         m_oki_numbanks;
+	// misc
+	u16 m_snd_command;
+	u16 m_snd_flag;
+	u8 m_oki_control;
+	u8 m_oki_command;
+	u8 m_dispenser_latch;
+	u8 m_oki_numbanks;
 	void configure_oki_banks();
 
-	/* devices */
+	// devices
 	required_device<okim6295_device> m_oki;
 	optional_memory_bank m_okibank;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	void coinctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void wbeachvl_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hotmind_coin_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void luckboomh_dispenser_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hrdtimes_coin_w(uint16_t data);
-	void playmark_snd_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t playmark_snd_command_r();
-	uint8_t playmark_snd_flag_r();
-	void playmark_oki_w(uint8_t data);
-	void playmark_snd_control_w(uint8_t data);
-	void hrdtimes_snd_control_w(uint8_t data);
-	void wbeachvl_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void wbeachvl_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void wbeachvl_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hrdtimes_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hrdtimes_fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hrdtimes_bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void bigtwin_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void wbeachvl_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void excelsr_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void hrdtimes_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void playmark_oki_banking_w(uint8_t data);
+	required_device<cpu_device> m_maincpu;
+	optional_device<pic16c57_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_ticket;
+	optional_device<ticket_dispenser_device> m_token;
+
+private:
+	void coinctrl_w(u8 data);
+	void wbeachvl_coin_eeprom_w(u8 data);
+	void hotmind_coin_eeprom_w(u8 data);
+	void luckboomh_dispenser_w(u8 data);
+	void playmark_snd_command_w(u8 data);
+	u8 playmark_snd_command_r();
+	u8 playmark_snd_flag_r();
+	void playmark_oki_w(u8 data);
+	void playmark_snd_control_w(u8 data);
+	void hrdtimes_snd_control_w(u8 data);
+	void wbeachvl_txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void wbeachvl_fgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void wbeachvl_bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void hrdtimes_txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void hrdtimes_fgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void hrdtimes_bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bigtwin_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void wbeachvl_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void excelsr_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void hrdtimes_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void playmark_oki_banking_w(u8 data);
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);
@@ -126,22 +129,16 @@ protected:
 	DECLARE_VIDEO_START(hrdtimes);
 	DECLARE_VIDEO_START(luckboomh);
 	TILEMAP_MAPPER_MEMBER(playmark_tilemap_scan_pages);
-	uint32_t screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
 	void bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
 	void draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	uint8_t playmark_asciitohex(uint8_t data);
+	u8 playmark_asciitohex(u8 data);
 	void playmark_decode_pic_hex_dump(void);
-	required_device<cpu_device> m_maincpu;
-	optional_device<pic16c57_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<ticket_dispenser_device> m_ticket;
-	optional_device<ticket_dispenser_device> m_token;
 
 	void bigtwin_main_map(address_map &map);
 	void bigtwinb_main_map(address_map &map);
