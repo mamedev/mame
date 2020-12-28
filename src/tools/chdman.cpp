@@ -1043,6 +1043,12 @@ static chd_error reopen_chd_with_parents(chd_file &input, const char* chd_path, 
 		{
 			if (entry->type != osd::directory::entry::entry_type::FILE)
 				continue;
+			std::string name(entry->name);
+			if (name.size() < 4)
+				continue;
+			std::string ext(name.substr(name.size()-4), name.size());
+			if (ext.compare(".chd") != 0 || ext.compare(".CHD") != 0)
+				continue;
 			filepath = parents_dirpath + PATH_SEPARATOR + entry->name;
 			err = parent->open(filepath.c_str());
 			if (err != CHDERR_NONE)
