@@ -2401,6 +2401,75 @@ static void do_extract_raw(parameters_map &params)
 //-------------------------------------------------
 static void gdrom_convert_toc(cdrom_toc *toc)
 {
+	// restore the pregaps for Redump .cue/.bin export
+	for (int trknum = 0; trknum < toc->numtrks; trknum++)
+	{
+		toc->tracks[trknum].multicuearea = ((trknum < 2) ? GDROM_SINGLE_DENSITY : GDROM_HIGH_DENSITY);
+		toc->tracks[trknum].pgtype = toc->tracks[trknum].trktype;
+		toc->tracks[trknum].pregap = 150;
+		toc->tracks[trknum].pgdatasize = 2352;
+	}
+
+	// first track in each DENSITY area has 0 pregap
+	toc->tracks[0].pregap = 0;
+	toc->tracks[2].pregap = 0;
+
+	// strip the SINGLE density leadout (45000 LBA)
+	toc->tracks[1].frames -= toc->tracks[1].padframes;
+	toc->tracks[1].padframes = 0;
+
+	// adjust padding and frames to match Redump layout
+	for (int trknum = 0; trknum < toc->numtrks - 1; trknum++)
+	{
+		if (toc->tracks[trknum].pgtype == CD_TRACK_MODE1_RAW)
+		{
+			// un-pad DATA track
+			toc->tracks[trknum].frames -= toc->tracks[trknum].padframes;
+			toc->tracks[trknum].padframes = 0;
+		}
+
+		if (toc->tracks[trknum].pgtype == CD_TRACK_AUDIO && toc->tracks[trknum+1].pgtype == CD_TRACK_AUDIO)
+		{
+			// un-shift consecutive AUDIO tracks
+			toc->tracks[trknum].splitframes = toc->tracks[trknum].pregap;
+		}
+
+		if (toc->tracks[trknum].pgtype == CD_TRACK_AUDIO && toc->tracks[trknum+1].pgtype == CD_TRACK_MODE1_RAW)
+		{
+			// un-shrink AUDIO track preceding DATA track
+			toc->tracks[trknum].frames += toc->tracks[trknum].pregap;
+		}
+	}
+
+	// special handling for last tracks based on GDROM pattern
+	switch (gdrom_identify_pattern(toc))
+	{
+		case GDROM_TYPE_I:
+			// do nothing
+			break;
+
+		case GDROM_TYPE_II:
+			// TBD
+			break;
+
+		case GDROM_TYPE_III:
+			// TBD
+			break;
+
+		case GDROM_TYPE_III_SPLIT:
+			// second last AUDIO track extends 75 frames into last DATA tracks 225 pregap
+			toc->tracks[toc->numtrks-2].frames -= 225;
+			toc->tracks[toc->numtrks-2].padframes = 0;
+			toc->tracks[toc->numtrks-2].splitframes = 75;
+
+			// grow the last track by 225 pregap (75 frames actual-zeroes, 150 frames data-zeroes with PQ and sync)
+			toc->tracks[toc->numtrks-1].frames += 225;
+			toc->tracks[toc->numtrks-1].pregap = 225;
+			break;
+
+		case GDROM_TYPE_UNKNOWN:
+			break;
+	}
 }
 
 
@@ -2552,7 +2621,7 @@ static void do_extract_cd(parameters_map &params)
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
 			uint32_t output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
-			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI) || (mode == MODE_GDROM_CUEBIN))
+			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI) || (mode == MODE_GDROM_CUEBIN)))
 			{
 				printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
 				printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
