@@ -2449,7 +2449,8 @@ static void gdrom_convert_toc(cdrom_toc *toc)
 			break;
 
 		case GDROM_TYPE_II:
-			// TBD
+			// un-shrink final AUDIO track
+			toc->tracks[toc->numtrks-1].frames += toc->tracks[toc->numtrks-1].pregap;
 			break;
 
 		case GDROM_TYPE_III:
