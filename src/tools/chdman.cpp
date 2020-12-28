@@ -1101,7 +1101,11 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		if (input_parent_chd.parent_sha1() != util::sha1_t::null)
     {
 			std::string chd_dir;
-			const size_t sep_index = input_chd_parent_str->second->rfind(PATH_SEPARATOR);
+#if defined(WIN32)
+			const size_t sep_index = input_chd_parent_str->second->find_last_of("/\\:");
+#else
+			const size_t sep_index = input_chd_parent_str->second->find_last_of(PATH_SEPARATOR);
+#endif
 			if (sep_index != std::string::npos)
 				chd_dir = input_chd_parent_str->second->substr(0, sep_index);
 			else
