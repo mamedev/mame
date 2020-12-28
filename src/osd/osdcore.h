@@ -664,23 +664,37 @@ void osd_work_item_release(osd_work_item *item);
 
 /// \brief Allocate memory that can contain executable code
 ///
-/// Allocated memory must be both writable and executable.  Allocated
-/// memory must be freed by calling #osd_free_executable passing the
+/// Allocated memory must be readable, writable, and executable.  Allocated
+/// memory must be freed by calling #osd_free_mmap passing the
 /// same size.
+/// NOTE: This will segfault on some platforms, particularly Apple M1
 /// \param [in] size Number of bytes to allocate.
 /// \return Pointer to allocated memory, or nullptr if allocation
 ///   failed.
-/// \sa osd_free_executable
-void *osd_alloc_executable(size_t size);
+/// \sa osd_free_mmap
+void *osd_alloc_mmap_rwx(size_t size);
 
-
-/// \brief Free memory allocated by osd_alloc_executable
+/// \brief Allocate memory that contains read/write code
 ///
-/// \param [in] ptr Pointer returned by #osd_alloc_executable.
+/// Allocated memory must be readable, writable, and not executable.
+/// Allocated memory must be freed by calling #osd_free_mmap passing the
+/// same size.
+/// This is provided as a temporary workaround for the Apple M1 platform.
+/// \return Pointer to allocated memory, or nullptr if allocation
+///   failed.
+/// \sa osd_alloc_mmap_rwx
+/// \sa osd_free_mmap
+void *osd_alloc_mmap_rw(size_t size);
+
+
+/// \brief Free memory allocated by osd_alloc_mmap_rw or osd_alloc_mmap_rwx
+///
+/// \param [in] ptr Pointer returned by #osd_alloc_mmap_rw or #osd_alloc_mmap_rwx.
 /// \param [in] size Number of bytes originally requested.  Must match
-///   the value passed to #osd_alloc_executable.
-/// \sa osd_alloc_executable
-void osd_free_executable(void *ptr, size_t size);
+///   the value passed to #osd_alloc_mmap_rw or osd_alloc_mmap_rwx.
+/// \sa osd_alloc_mmap_rw
+/// \sa osd_alloc_mmap_rwx
+void osd_free_mmap(void *ptr, size_t size);
 
 
 /// \brief Break into host debugger if attached

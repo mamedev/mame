@@ -32,7 +32,13 @@
 //-------------------------------------------------
 
 drc_cache::drc_cache(size_t bytes)
-	: m_near((drccodeptr)osd_alloc_executable(bytes)),
+	: m_near(
+#ifndef NATIVE_DRC
+			(drccodeptr)osd_alloc_mmap_rw(bytes)
+#else
+			(drccodeptr)osd_alloc_mmap_rwx(bytes)
+#endif
+		),
 		m_neartop(m_near),
 		m_base(m_near + NEAR_CACHE_SIZE),
 		m_top(m_base),
@@ -52,7 +58,7 @@ drc_cache::drc_cache(size_t bytes)
 drc_cache::~drc_cache()
 {
 	// release the memory
-	osd_free_executable(m_near, m_size);
+	osd_free_mmap(m_near, m_size);
 }
 
 

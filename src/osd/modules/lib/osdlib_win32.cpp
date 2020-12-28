@@ -83,29 +83,42 @@ void osd_process_kill()
 }
 
 //============================================================
-//  osd_alloc_executable
+//  osd_alloc_mmap_rwx
 //
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
+//  allocates "size" bytes of read/write/execute memory.
+//  This should take things like NX support into account.
 //============================================================
 
-void *osd_alloc_executable(size_t size)
+void *osd_alloc_mmap_rwx(size_t size)
 {
 	return VirtualAlloc(nullptr, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 }
 
-
 //============================================================
-//  osd_free_executable
+//  osd_alloc_mmap_rw
 //
-//  frees memory allocated with osd_alloc_executable
+//  allocates "size" bytes of read/write (but not executable)
+//  memory.  This is for working around Apple M1 memory
+//  protection where we do not have a recompiler yet, as
+//  the MAME DRC does not currently take into account
+//  Apple's implementation of NX support
 //============================================================
 
-void osd_free_executable(void *ptr, size_t size)
+void *osd_alloc_mmap_rw(size_t size)
+{
+	return VirtualAlloc(nullptr, size, MEM_COMMIT, PAGE_READWRITE);
+}
+
+//============================================================
+//  osd_free_mmap
+//
+//  frees memory allocated with osd_alloc_mmap_*
+//============================================================
+
+void osd_free_mmap(void *ptr, size_t size)
 {
 	VirtualFree(ptr, 0, MEM_RELEASE);
 }
-
 
 //============================================================
 //  osd_break_into_debugger
