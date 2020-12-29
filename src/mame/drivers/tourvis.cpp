@@ -215,7 +215,6 @@ private:
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void tourvision_8085_map(address_map &map);
-	void vdc_mem(address_map &map);
 
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
@@ -350,11 +349,6 @@ void tourvision_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
-void tourvision_state::vdc_mem(address_map &map)
-{
-	map(0x00000, 0x07fff).ram();
-}
-
 void tourvision_state::tourvision_8085_d000_w(uint8_t data)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
@@ -426,7 +420,7 @@ void tourvision_state::tourvision(machine_config &config)
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
 	huc6270_device &huc6270(HUC6270(config, "huc6270", XTAL(21'477'272)));
-	huc6270.set_addrmap(0, &tourvision_state::vdc_mem);
+	huc6270.set_addrmap(0, &pce_common_state::vdc_mem);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));

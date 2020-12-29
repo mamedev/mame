@@ -121,6 +121,15 @@ inline void huc6270_device::fetch_bat_tile_row()
 	uint16_t data4 = (data3 >> 5) & 0x7F8;
 	data3 <<= 2;
 
+	// apply 4 color mode
+	if (MWR_VM() == 0x03)
+	{
+		if (MWR_CM())
+			data1 = data2 = 0;
+		else
+			data3 = data4 = 0;
+	}
+
 	for (int i = 7; i >= 0; i--)
 	{
 		uint16_t c = (data1 & 0x01) | (data2 & 0x02) | (data3 & 0x04) | (data4 & 0x08);
@@ -153,7 +162,7 @@ void huc6270_device::add_sprite(int index, int x, int pattern, int line, int fli
 
 		pattern += ((line >> 4) << 1);
 
-		if ((m_mwr & 0x0c) == 0x04)
+		if (MWR_SM() == 0x01)
 		{
 			if (!sat_lsb)
 			{
@@ -279,7 +288,7 @@ void huc6270_device::select_sprites()
 	if (m_sprites_this_line >= 16)
 	{
 		/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
-		if (m_cr & 0x02)
+		if (sprite_overflow_int_enable())
 		{
 			m_status |= HUC6270_OR;
 			m_irq_changed_cb(ASSERT_LINE);
@@ -292,7 +301,7 @@ inline void huc6270_device::handle_vblank()
 {
 	if (!m_vd_triggered)
 	{
-		if (m_cr & 0x08)
+		if (vblank_int_enable())
 		{
 			m_status |= HUC6270_VD;
 			m_irq_changed_cb(ASSERT_LINE);
@@ -301,7 +310,7 @@ inline void huc6270_device::handle_vblank()
 		/* Should we initiate a VRAM->SATB DMA transfer.
 		   The timing for this is incorrect.
 		 */
-		if (m_dvssr_written || (m_dcr & 0x10))
+		if (m_dvssr_written || DCR_DSR())
 		{
 			int i;
 
@@ -316,7 +325,7 @@ inline void huc6270_device::handle_vblank()
 			m_dvssr_written = 0;
 
 			/* Generate SATB interrupt if requested */
-			if (m_dcr & 0x01)
+			if (DCR_DSC())
 			{
 				m_satb_countdown = 4;
 //                  m_status |= HUC6270_DS;
@@ -335,12 +344,12 @@ inline void huc6270_device::next_vert_state()
 	{
 	case v_state::VSW:
 		m_vert_state = v_state::VDS;
-		m_vert_to_go = ((m_vpr >> 8) & 0xFF) + 2;
+		m_vert_to_go = VPR_VDS();
 		break;
 
 	case v_state::VDS:
 		m_vert_state = v_state::VDW;
-		m_vert_to_go = (m_vdw & 0x1FF) + 1;
+		m_vert_to_go = VDR_VDW();
 		m_byr_latched = m_byr;
 		m_vd_triggered = 0;
 		break;
@@ -353,7 +362,7 @@ inline void huc6270_device::next_vert_state()
 
 	case v_state::VCR:
 		m_vert_state = v_state::VSW;
-		m_vert_to_go = (m_vpr & 0x1F) + 1;
+		m_vert_to_go = VPR_VSW();
 		break;
 	}
 }
@@ -366,15 +375,15 @@ inline void huc6270_device::next_horz_state()
 	case h_state::HDS:
 		m_bxr_latched = m_bxr;
 		m_horz_state = h_state::HDW;
-		m_horz_to_go = (m_hdr & 0x7F) + 1;
+		m_horz_to_go = HDR_HDE();
 		{
 			static const int width_shift[4] = { 5, 6, 7, 7 };
 			uint16_t v;
 
-			v = (m_byr_latched) & ((m_mwr & 0x40) ? 0x1FF : 0xFF);
+			v = (m_byr_latched) & (bg_height() ? 0x1FF : 0xFF);
 			m_bat_row = v & 7;
-			m_bat_address_mask = (1 << width_shift[(m_mwr >> 4) & 0x03]) - 1;
-			m_bat_address = ((v >> 3) << (width_shift[(m_mwr >> 4) & 0x03]))
+			m_bat_address_mask = (1 << width_shift[bg_width()]) - 1;
+			m_bat_address = ((v >> 3) << (width_shift[bg_width()]))
 				| ((m_bxr_latched >> 3) & m_bat_address_mask);
 			m_bat_column = m_bxr & 7;
 			fetch_bat_tile_row();
@@ -383,17 +392,17 @@ inline void huc6270_device::next_horz_state()
 
 	case h_state::HDW:
 		m_horz_state = h_state::HDE;
-		m_horz_to_go = ((m_hdr >> 8) & 0x7F) + 1;
+		m_horz_to_go = HDR_HDW();
 		break;
 
 	case h_state::HDE:
 		m_horz_state = h_state::HSW;
-		m_horz_to_go = (m_hsr & 0x1F) + 1;
+		m_horz_to_go = HSR_HSW();
 		break;
 
 	case h_state::HSW:
 		m_horz_state = h_state::HDS;
-		m_horz_to_go = std::max(((m_hsr >> 8) & 0x7F), 2) + 1;
+		m_horz_to_go = std::max<int>(HSR_HDS(), 3);
 
 		/* If section has ended, advance to next vertical state */
 		while (m_vert_to_go == 0)
@@ -420,10 +429,10 @@ u16 huc6270_device::next_pixel()
 			uint8_t sprite_data = m_sprite_row[m_sprite_row_index] & 0x00FF;
 			int collission = (m_sprite_row[m_sprite_row_index] & 0x8000) ? 1 : 0;
 
-			if (m_cr & 0x80)
+			if (CR_BB())
 			{
 				data = HUC6270_BACKGROUND | m_bat_tile_row[m_bat_column];
-				if (sprite_data && (m_cr & 0x40))
+				if (sprite_data && CR_SB())
 				{
 					if (m_sprite_row[m_sprite_row_index] & 0x4000)
 					{
@@ -440,7 +449,7 @@ u16 huc6270_device::next_pixel()
 			}
 			else
 			{
-				if (m_cr & 0x40)
+				if (CR_SB())
 				{
 					data = HUC6270_SPRITE | sprite_data;
 				}
@@ -456,7 +465,7 @@ u16 huc6270_device::next_pixel()
 				fetch_bat_tile_row();
 			}
 
-			if (collission && (m_cr & 0x01))
+			if (collission && (CR_IE() & 0x01))
 			{
 				m_status |= HUC6270_CR;
 				m_irq_changed_cb(ASSERT_LINE);
@@ -549,7 +558,7 @@ WRITE_LINE_MEMBER(huc6270_device::hsync_changed)
 		{
 			/* Check for high->low HSYNC transition */
 			// RCR IRQ happens near the end of the HDW period
-			if (m_raster_count == m_rcr && (m_cr & 0x04))
+			if (m_raster_count == m_rcr && scanline_int_enable())
 			{
 				m_status |= HUC6270_RR;
 				m_irq_changed_cb(ASSERT_LINE);
@@ -567,8 +576,8 @@ inline void huc6270_device::handle_dma()
 	 */
 	if (m_dma_enabled)
 	{
-		int desr_inc = (m_dcr & 0x0008) ? -1 : +1;
-		int sour_inc = (m_dcr & 0x0004) ? -1 : +1;
+		int desr_inc = DCR_DI_D() ? -1 : +1;
+		int sour_inc = DCR_SI_D() ? -1 : +1;
 
 		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr);
 
@@ -579,7 +588,7 @@ inline void huc6270_device::handle_dma()
 			m_lenr -= 1;
 		} while (m_lenr != 0xFFFF);
 
-		if (m_dcr & 0x0002)
+		if (DCR_DVC())
 		{
 			m_status |= HUC6270_DV;
 			m_irq_changed_cb(ASSERT_LINE);
@@ -613,7 +622,7 @@ u8 huc6270_device::read(offs_t offset)
 			{
 				if (m_register_index == VxR)
 				{
-					m_marr += vram_increments[(m_cr >> 11) & 3];
+					m_marr += vram_increments[CR_IW()];
 					m_vrr = m_vram_cache.read_word(m_marr);
 				}
 			}
@@ -655,7 +664,7 @@ void huc6270_device::write(offs_t offset, u8 data)
 
 				case RCR:       /* raster compare register LSB */
 					m_rcr = (m_rcr & 0x0300) | data;
-//                  if (m_raster_count == m_rcr && m_cr & 0x04)
+//                  if (m_raster_count == m_rcr && scanline_int_enable())
 //                  {
 //                      m_status |= HUC6270_RR;
 //                      m_irq_changed_cb(ASSERT_LINE);
@@ -743,7 +752,7 @@ void huc6270_device::write(offs_t offset, u8 data)
 				case RCR:       /* raster compare register MSB */
 					m_rcr = (m_rcr & 0x00FF) | ((data & 0x03) << 8);
 //printf("%s: RCR set to %03x\n", machine().describe_context().c_str(), m_rcr);
-//                  if (m_raster_count == m_rcr && m_cr & 0x04)
+//                  if (m_raster_count == m_rcr && scanline_int_enable())
 //                  {
 //                      m_status |= HUC6270_RR;
 //                      m_irq_changed_cb(ASSERT_LINE);

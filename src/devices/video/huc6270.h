@@ -29,7 +29,7 @@
          MA13 -|                                               |-VD5
          MA14 -|                                               |-VD6
          MA15 -|                                               |-VD7
-         /IRQ -|                                               |-SP8G
+         /IRQ -|                                               |-SPBG
         /BUSY -|                                               |-DISP
            A0 -|                                               |-/HSYN
            A1 -|                                               |-/VSYN
@@ -56,14 +56,218 @@
     /MWR: Memory write enable
     /HSYN: Horizontal sync
     /VSYN: Vertical sync
+    DISP: Programmable; See below
     MA0-15: Memory address
     MD0-15: Memory data
     VD0-7: Pixel data output
-    SP8G: Sprite/Background flag, Also highest bit of pixel data output
+    SPBG: Sprite/Background flag, Also highest bit of pixel data output
     A0-1: Host interface address
     D0-15: Host interface data
     8/16: 8 or 16 bit host interface mode?
-    DISP: Unknown, display related?
+
+	Register format
+		Bit               Description
+		fedcba98 76543210
+	00 AR Register select (W)
+		-------- ---xxxxx Register select
+
+	00 SR Status (R)
+		-------- -x------ BUSY (when VDC accessed VRAM)
+		-------- --x----- VD (Vblank flag)
+		-------- ---x---- DV (VRAM-VRAM DMA done)
+		-------- ----x--- DS (VRAM-SATB DMA done)
+		-------- -----x-- RR (Scanline interrupt flag)
+		-------- ------x- OV (Sprite overflow flag)
+		-------- -------x CR (Collision flag)
+
+	02 Register data LSB
+	03 Register data MSB
+	MAWR Memory Address Write (00h W)
+		xxxxxxxx xxxxxxxx Memory address for write
+
+	MARR Memory Address Read (01h W)
+		xxxxxxxx xxxxxxxx Memory address for read
+
+	VWR Memory Data Write (02h W)
+		xxxxxxxx xxxxxxxx data to memory
+
+	VRR Memory Data Read (02h R)
+		xxxxxxxx xxxxxxxx data from memory
+
+	03h Reserved
+
+	04h Reserved
+
+	CR Control register (05h W)
+		---xx--- -------- IW (VRAM address increment value)
+		---00--- -------- +1
+		---01--- -------- +20h
+		---10--- -------- +40h
+		---11--- -------- +80h
+		-----x-- -------- DR (Dynamic RAM refresh)
+		------xx -------- TE (DISP pin output select)
+		------00 -------- H during Display
+		------01 -------- L when Indicates the position in which Color Burst is inserted
+		------10 -------- Internal horizontal sync
+		------11 -------- Invaild
+		-------- x------- BB (Background enable(1) / disable(0))
+		-------- -x------ SB (Sprite enable(1) / disable(0))
+		-------- 00------ Burst mode
+		-------- --xx---- EX (External sync mode)
+		-------- --00---- Both /VSYNC and /HSYNC are input
+		-------- --01---- /VSYNC input, /HSYNC output
+		-------- --10---- Invaild
+		-------- --11---- Both /VSYNC and /HSYNC are output
+		-------- ----xxxx IE (Interrupt enable)
+		-------- ----x--- Vertical blank interrupt
+		-------- -----x-- Scanline interrupt
+		-------- ------x- Sprite overflow interrupt
+		-------- -------x Collision interrupt
+
+	RCR Scanline interrupt position (06h W)
+		------xx xxxxxxxx Scanline interrupt position
+
+	BXR Background X scroll (07h W)
+		------xx xxxxxxxx Background X
+
+	BYR Background Y scroll (08h W)
+		-------x xxxxxxxx Background Y
+
+	MWR Memory access width (09h W)
+		-------- x------- CM (Fetch CG block in next scanline for 4 clock mode)
+		-------- 0------- (CG0)CH0, CH1
+		-------- 1------- (CG1)CH2, CH3
+		-------- -xxx---- SCREEN (Background layer size)
+		-------- -0------ 32 Tile height (256 pixel)
+		-------- -1------ 64 Tile height (512 pixel)
+		-------- --00---- 32 Tile width (256 pixel)
+		-------- --01---- 64 Tile width (512 pixel)
+		-------- --1----- 128 Tile width (1024 pixel)
+		-------- ----xx-- SM (Sprite access width mode, see below)
+		-------- ------xx VM (VRAM access width mode, see below)
+
+	HSR Horizontal sync (0Ah W)
+		-xxxxxxx -------- HDS (Horizontal display start position - 1 * 8)
+		-------- ---xxxxx HSW (Horizontal sync pulse width - 1 * 8)
+
+	HDR Horizontal display (0Bh W)
+		-xxxxxxx -------- HDW (Horizontal display width - 1 * 8)
+		-------- -xxxxxxx HDE (Horizontal display end position - 1 * 8)
+
+	VPR Vertical sync (0Ch W)
+		xxxxxxxx -------- VDS (Vertical display start position - 2)
+		-------- ---xxxxx VSW (Vertical sync pulse width - 1)
+
+	VDR Vertical display width (0Dh W)
+		-------x xxxxxxxx VDW (Vertical display width - 1)
+
+	VCR Vertical display end position (0Eh W)
+		-------- xxxxxxxx VCR (Vertical display end position)
+
+	DCR DMA control registers (0Fh W)
+		-------- ---x---- DSR (Repeat VRAM-SATB DMA in every VBlanks)
+		-------- ----x--- DI/D (Destination address increment(0) / decrement(1))
+		-------- -----x-- SI/D (Source address increment(0) / decrement(1))
+		-------- ------x- DVC (VRAM-VRAM DMA interrupt enable)
+		-------- -------x DSC (VRAM-SATB DMA interrupt enable)
+
+	SOUR VRAM-VRAM DMA source address (10h W)
+		xxxxxxxx xxxxxxxx SOUR (VRAM-VRAM DMA source address)
+
+	DESR VRAM-VRAM DMA destination address (11h W)
+		xxxxxxxx xxxxxxxx DESR (VRAM-VRAM DMA destination address)
+
+	LENR VRAM-VRAM DMA length counter (12h W)
+		xxxxxxxx xxxxxxxx LENR (VRAM-VRAM DMA length counter - 1)
+
+	DVSSR VRAM-SATB DMA source address (13h W)
+		xxxxxxxx xxxxxxxx DVSSR (VRAM-SATB DMA source address)
+
+	SM assignment
+	+-----------+--------------+-----------------------------------------------+
+	|  SM bit   |              |      Assignment for one character cycle       |
+	+-----+-----+ Access width +-----+-----+-----+-----+-----+-----+-----+-----+
+	|  3  |  2  |              |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  0  |      1       | SP0 | SP1 | SP2 | SP3 | SP0 | SP1 | SP2 | SP3 |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  1  |      2       |  SP0/SP2  |  SP1/SP3  |  SP0/SP2  |  SP1/SP3  |*1
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |      2       |    SP0    |    SP1    |    SP2    |    SP3    |
+	+-----+-----+--------------+-----------+-----------+-----------+-----------+
+	|  1  |  1  |      4       |        SP0, SP2       |        SP1, SP3       |*2
+	+-----+-----+--------------+-----------------------+-----------------------+
+	*1 LSB of pattern select bit is select (SP0, SP1) or (SP2, SP3).
+	*2 SPO-SP3 are fetched during two consecutive character cycles.
+
+	VM assignment
+	+-----------+--------------+-----------------------------------------------+
+	|  VM bit   |              |  Assignment for one character cycle (8 dot)   |
+	+-----+-----+ Access width +-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |              |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  0  |      1       | CPU | BAT | CPU |  -  | CPU | CG0 | CPU | CG1 |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  1  |      2       |    BAT    |    CPU    |    CG0    |    CG1    |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |      2       |    BAT    |    CPU    |    CG0    |    CG1    |
+	+-----+-----+--------------+-----------+-----------+-----------+-----------+
+	|  1  |  1  |      4       |          BAT          |       CG0 or CG1      |
+	+-----+-----+--------------+-----------------------+-----------------------+
+
+	BAT data (single word per tile)
+	Bit               Description
+	fedcba98 76543210
+	xxxx---- -------- CG color
+	----xxxx xxxxxxxx Character code select (16 word each)
+
+	SAT data (4 word per each sprites)
+	Offset Bit               Description
+	       fedcba98 76543210
+	00     ------xx xxxxxxxx Y coordinate - 64
+	01     ------xx xxxxxxxx X coordinate - 32
+	02     -----xxx xxxxxxxx PC (Pattern code, 64 word each)
+	       -------- -------x SG0/SG1, SG2/SG3 select, for 4 color mode
+	03     x------- -------- Flip Y
+	       --xx---- -------- CGY (Sprite height)
+		   --00---- -------- 1 tile (16 pixel)
+		   --01---- -------- 2 tiles (32 pixel)
+		   --10---- -------- Not used
+		   --11---- -------- 4 tiles (64 pixel)
+		   ----x--- -------- Flip X
+		   -------x -------- CGX (Sprite width)
+		   -------0 -------- 1 tile (16 pixel)
+		   -------1 -------- 2 tiles (32 pixel)
+		   -------- x------- SPBG (Sprite VS Background priority)
+		   -------- 0------- Behind background
+		   -------- 1------- Above background
+		   -------- ----xxxx SPRITE COLOR
+
+	VD0-7, SPBG output
+	Background:
+	Bit       Description
+	8 7654 3210
+	0 ---- ---- 0 for background
+	- xxxx ---- CG Color (when VD0-VD3 != 0)
+	- ---- x--- CG3 (or 0 for 4 clocks, CG0 selected)
+	- ---- -x-- CG2 (or 0 for 4 clocks, CG0 selected)
+	- ---- --x- CG1 (or 0 for 4 clocks, CG1 selected)
+	- ---- ---x CG0 (or 0 for 4 clocks, CG1 selected)
+	- ---- 0000 Transparency, bit 7-4 is forced to 0
+
+	Sprite:
+	Bit       Description
+	8 7654 3210
+	1 ---- ---- 1 for sprite
+	- xxxx ---- Sprite Color (when VD0-VD3 != 0)
+	- ---- x--- SG3
+	- ---- -x-- SG2
+	- ---- --x- SG1
+	- ---- ---x SG0
+	- ---- 0000 Transparency, bit 7-4 is forced to 0
+
+	Border:
+	1 0000 0000 Border color, during blanking period
 
 **********************************************************************/
 
@@ -89,7 +293,7 @@ public:
 	u16 read16(offs_t offset);
 	void write16(offs_t offset, u16 data);
 	*/
-	// VD0-7, SP8G output 
+	// VD0-7, SPBG output 
 	u16 next_pixel();
 	inline u16 time_until_next_event()
 	{
@@ -137,7 +341,6 @@ private:
 		HSW
 	};
 
-
 	/* VRAM space */
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_vram_cache;
 
@@ -167,6 +370,52 @@ private:
 	uint16_t  m_lenr;
 	uint16_t  m_dvssr;
 	uint8_t   m_status;
+
+	// CR register
+	const uint16_t CR_IW() { return BIT(m_cr, 11, 2); }
+	const bool CR_DR()     { return BIT(m_cr, 10); }
+	const uint16_t CR_TE() { return BIT(m_cr, 8, 2); }
+	const bool CR_BB()     { return BIT(m_cr, 7); }
+	const bool CR_SB()     { return BIT(m_cr, 6); }
+	const uint16_t CR_EX() { return BIT(m_cr, 4, 2); }
+	const uint16_t CR_IE() { return BIT(m_cr, 0, 4); }
+
+	const bool burst_mode()                 { return (!CR_BB()) && (!CR_SB()); }
+	const bool collision_int_enable()       { return BIT(CR_IE(), 0); }
+	const bool sprite_overflow_int_enable() { return BIT(CR_IE(), 1); }
+	const bool scanline_int_enable()        { return BIT(CR_IE(), 2); }
+	const bool vblank_int_enable()          { return BIT(CR_IE(), 3); }
+
+	// MWR register
+	const bool MWR_CM()         { return BIT(m_mwr, 7); }
+	const uint16_t MWR_SCREEN() { return BIT(m_mwr, 4, 3); }
+	const uint16_t MWR_SM()     { return BIT(m_mwr, 2, 2); }
+	const uint16_t MWR_VM()     { return BIT(m_mwr, 0, 2); }
+
+	const bool bg_height()    { return BIT(MWR_SCREEN(), 2); }
+	const uint16_t bg_width() { return BIT(MWR_SCREEN(), 0, 2); }
+
+	// HSR register
+	const uint16_t HSR_HDS() { return BIT(m_hsr, 8, 7) + 1; }
+	const uint16_t HSR_HSW() { return BIT(m_hsr, 0, 5) + 1; }
+
+	// HDR register
+	const uint16_t HDR_HDW() { return BIT(m_hdr, 8, 7) + 1; }
+	const uint16_t HDR_HDE() { return BIT(m_hdr, 0, 7) + 1; }
+
+	// VPR register
+	const uint16_t VPR_VDS() { return BIT(m_vpr, 8, 8) + 2; }
+	const uint16_t VPR_VSW() { return BIT(m_vpr, 0, 5) + 1; }
+
+	// VDR register
+	const uint16_t VDR_VDW() { return BIT(m_vdw, 0, 9) + 1; }
+
+	// DCR register
+	const bool DCR_DSR() { return BIT(m_dcr, 4); }
+	const bool DCR_DI_D() { return BIT(m_dcr, 3); }
+	const bool DCR_SI_D() { return BIT(m_dcr, 2); }
+	const bool DCR_DVC() { return BIT(m_dcr, 1); }
+	const bool DCR_DSC() { return BIT(m_dcr, 0); }
 
 	/* To keep track of external hsync and vsync signals */
 	int m_hsync;

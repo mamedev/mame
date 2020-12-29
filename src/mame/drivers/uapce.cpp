@@ -143,7 +143,6 @@ private:
 
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
-	void vdc_mem(address_map &map);
 	void z80_map(address_map &map);
 };
 
@@ -321,11 +320,6 @@ void uapce_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
-void uapce_state::vdc_mem(address_map &map)
-{
-	map(0x00000, 0x07fff).ram();
-}
-
 
 void uapce_state::uapce(machine_config &config)
 {
@@ -356,7 +350,7 @@ void uapce_state::uapce(machine_config &config)
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
 	huc6270_device &huc6270(HUC6270(config, "huc6270", XTAL(21'477'272)));
-	huc6270.set_addrmap(0, &uapce_state::vdc_mem);
+	huc6270.set_addrmap(0, &pce_common_state::vdc_mem);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();

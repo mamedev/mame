@@ -52,7 +52,6 @@ private:
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
 	void oki_map(address_map &map);
-	void vdc1_mem(address_map &map);
 	void vdc2_mem(address_map &map);
 
 	required_device <msm6242_device> m_rtc;
@@ -115,11 +114,7 @@ void ggconnie_state::oki_map(address_map &map)
 	map(0x10000, 0x3ffff).rom().region("oki", 0);
 }
 
-void ggconnie_state::vdc1_mem(address_map &map)
-{
-	map(0x00000, 0x07fff).ram();
-}
-
+// separated space for extra VDC
 void ggconnie_state::vdc2_mem(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
@@ -342,7 +337,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
 
 	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", XTAL(21'477'272)));
-	huc6270_0.set_addrmap(0, &ggconnie_state::vdc1_mem);
+	huc6270_0.set_addrmap(0, &pce_common_state::vdc1_mem);
 	huc6270_0.irq().set_inputline(m_maincpu, 0);
 
 	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", XTAL(21'477'272)));

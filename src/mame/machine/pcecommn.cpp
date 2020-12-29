@@ -63,3 +63,8 @@ uint32_t pce_common_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	m_huc6260->video_update( bitmap, cliprect );
 	return 0;
 }
+
+void pce_common_state::vdc_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+}
