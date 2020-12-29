@@ -28,46 +28,82 @@ Magic Sticks:
 
 namespace {
 
-class powerbal_state : public playmark_state
+class powerbal_state : public playmark_base_state
 {
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: playmark_state(mconfig, type, tag)
+		: playmark_base_state(mconfig, type, tag)
 	{ }
 
 	void init_powerbal();
-	void init_magicstk();
 
-	void magicstk(machine_config &config);
 	void powerbal(machine_config &config);
-	void atombjt(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-private:
 	u8 m_tilebank;
 	s8 m_bg_yoffset;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_VIDEO_START(powerbal);
-	DECLARE_VIDEO_START(atombjt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void magicstk_coin_eeprom_w(u8 data);
 	void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_banking_w(u16 data);
-	void atombjt_tile_banking_w(u16 data);
 	void oki_banking(u16 data);
-	void magicstk_main_map(address_map &map);
+
 	void oki_map(address_map &map);
-	void powerbal_main_map(address_map &map);
-	void atombjt_map(address_map &map);
+
+private:
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
 };
 
+class atombjt_state : public powerbal_state
+{
+public:
+	atombjt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: powerbal_state(mconfig, type, tag)
+	{ }
 
-void powerbal_state::magicstk_coin_eeprom_w(u8 data)
+	void atombjt(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	void tile_banking_w(u16 data);
+
+	void main_map(address_map &map);
+};
+
+class magicstk_state : public powerbal_state
+{
+public:
+	magicstk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: powerbal_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom"),
+		m_ticket(*this, "ticket"),
+		m_token(*this, "token")
+	{ }
+
+	void init_magicstk();
+
+	void magicstk(machine_config &config);
+
+private:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<ticket_dispenser_device> m_ticket;
+	required_device<ticket_dispenser_device> m_token;
+
+	void coin_eeprom_w(u8 data);
+
+	void main_map(address_map &map);
+};
+
+void magicstk_state::coin_eeprom_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x20);
 
@@ -78,7 +114,7 @@ void powerbal_state::magicstk_coin_eeprom_w(u8 data)
 
 void powerbal_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_videoram[0][offset]);
+	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -91,7 +127,7 @@ void powerbal_state::tile_banking_w(u16 data)
 	}
 }
 
-void powerbal_state::atombjt_tile_banking_w(u16 data)
+void atombjt_state::tile_banking_w(u16 data)
 {
 	if ((data & 0x0f) != m_tilebank)
 	{
@@ -106,35 +142,35 @@ void powerbal_state::oki_banking(u16 data)
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
-void powerbal_state::magicstk_main_map(address_map &map)
+void magicstk_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
-	map(0x098180, 0x09917f).ram().w(FUNC(powerbal_state::bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(FUNC(magicstk_state::tile_banking_w));
+	map(0x098180, 0x09917f).ram().w(FUNC(magicstk_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
-	map(0x0c2015, 0x0c2015).w(FUNC(powerbal_state::magicstk_coin_eeprom_w));
+	map(0x0c2015, 0x0c2015).w(FUNC(magicstk_state::coin_eeprom_w));
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(magicstk_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0e0000, 0x0fffff).ram();
-	map(0x100000, 0x100fff).ram().share("spriteram");
+	map(0x100000, 0x100fff).ram().share(m_spriteram);
 }
 
-void powerbal_state::powerbal_main_map(address_map &map)
+void powerbal_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
 	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
-	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::bgvideoram_w)).share("videoram1");
+	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x099000, 0x09bfff).ram(); // not used
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
@@ -145,37 +181,37 @@ void powerbal_state::powerbal_main_map(address_map &map)
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0f0000, 0x0fffff).ram();
-	map(0x101000, 0x101fff).ram().share("spriteram");
+	map(0x101000, 0x101fff).ram().share(m_spriteram);
 	map(0x102000, 0x10200d).nopw(); // not used scroll regs?
 	map(0x103000, 0x103fff).ram();
 }
 
-void powerbal_state::atombjt_map(address_map &map)
+void atombjt_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080008, 0x080009).nopr(); // remnant of the original?
 	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(FUNC(powerbal_state::atombjt_tile_banking_w));
+	map(0x094000, 0x094001).w(FUNC(atombjt_state::tile_banking_w));
 	map(0x094002, 0x094003).noprw();    // IRQ enable?
-	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(powerbal_state::bgvideoram_w)).share("videoram1");
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(atombjt_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(atombjt_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw(); // always 0?
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x0f0000, 0x0fffff).ram();
 	map(0x100000, 0x100fff).ram();
-	map(0x101000, 0x101fff).ram().share("spriteram");
+	map(0x101000, 0x101fff).ram().share(m_spriteram);
 }
 
 void powerbal_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 static INPUT_PORTS_START( powerbal )
@@ -295,33 +331,33 @@ static INPUT_PORTS_START( magicstk )
 	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )
 	PORT_DIPSETTING(    0x01, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DSW1",0x01,EQUALS,0x01)
-	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1",0x01,NOTEQUALS,0x01)
+	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) ) PORT_CONDITION("DSW1" ,0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -522,16 +558,16 @@ INPUT_PORTS_END
 
 TILE_GET_INFO_MEMBER(powerbal_state::get_bg_tile_info)
 {
-	int code = (m_videoram[0][tile_index] & 0x07ff) + m_tilebank * 0x800;
-	int colr = m_videoram[0][tile_index] & 0xf000;
+	int code = (m_bgvideoram[tile_index] & 0x07ff) + m_tilebank * 0x800;
+	int colr = m_bgvideoram[tile_index] & 0xf000;
 
-	if (m_videoram[0][tile_index] & 0x800)
+	if (m_bgvideoram[tile_index] & 0x800)
 		code |= 0x8000;
 
 	tileinfo.set(1, code, colr >> 12, 0);
 }
 
-void powerbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void powerbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int height = m_gfxdecode->gfx(0)->height();
 
@@ -547,15 +583,15 @@ void powerbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int code = m_spriteram[offs + 2];
 		int color = (m_spriteram[offs + 1] & 0xf000) >> 12;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 				code,
 				color,
 				flipx,0,
-				sx + m_xoffset,sy + m_yoffset,m_sprtranspen);
+				sx + m_xoffset, sy + m_yoffset, m_sprtranspen);
 	}
 }
 
-VIDEO_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbal_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -564,9 +600,9 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
-VIDEO_START_MEMBER(powerbal_state,atombjt)
+void atombjt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbal_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atombjt_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_xoffset = 0x23;
 	m_yoffset = 0x09;
@@ -630,7 +666,7 @@ void powerbal_state::powerbal(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::powerbal_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
 
 	// video hardware
@@ -645,8 +681,6 @@ void powerbal_state::powerbal(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -655,12 +689,12 @@ void powerbal_state::powerbal(machine_config &config)
 	m_oki->set_addrmap(0, &powerbal_state::oki_map);
 }
 
-void powerbal_state::magicstk(machine_config &config)
+void magicstk_state::magicstk(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::magicstk_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicstk_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(magicstk_state::irq2_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -670,33 +704,32 @@ void powerbal_state::magicstk(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(128*8, 64*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(powerbal_state::screen_update));
+	screen.set_screen_update(FUNC(magicstk_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-	m_oki->set_addrmap(0, &powerbal_state::oki_map);
+	m_oki->set_addrmap(0, &magicstk_state::oki_map);
 }
 
-void powerbal_state::atombjt(machine_config &config)
+void atombjt_state::atombjt(machine_config &config)
 {
 	powerbal(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::atombjt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &atombjt_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(atombjt_state::irq6_line_hold));
 
 	subdevice<screen_device>("screen")->set_size(512, 256);
 	subdevice<screen_device>("screen")->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,atombjt)
 }
 
 /*
@@ -778,7 +811,7 @@ ROM_START( powerbal )
 ROM_END
 
 ROM_START( magicstk )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "12.u67", 0x00000, 0x20000, CRC(70a9c66f) SHA1(0cf4b2d0f796e35881d68adc69eca4360d6ad693) )
 	ROM_LOAD16_BYTE( "11.u66", 0x00001, 0x20000, CRC(a9d7c90e) SHA1(e12517776dc14747b4bbe49f93c4d7e83e8eae01) )
 
@@ -805,7 +838,7 @@ ROM_END
 
 
 ROM_START( hotminda )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "rom1.rom",       0x00001, 0x20000, CRC(33aaceba) SHA1(a914400b081eabd869f1ca2c843a91b03af510b1) )
 	ROM_LOAD16_BYTE( "rom2.rom",       0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) )
 
@@ -853,7 +886,7 @@ void powerbal_state::init_powerbal()
 	m_yoffset = -8;
 }
 
-void powerbal_state::init_magicstk()
+void magicstk_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;
@@ -868,6 +901,6 @@ void powerbal_state::init_magicstk()
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT           ROT      COMPANY             FULLNAME                           FLAGS
 GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original, does this really support flip screen?
+GAME( 1995, magicstk, 0,       magicstk, magicstk, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  atombjt_state,  empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original

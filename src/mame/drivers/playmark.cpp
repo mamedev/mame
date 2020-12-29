@@ -260,13 +260,13 @@ void playmark_state::bigtwin_main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x304000, 0x304001).noprw();             // watchdog? irq ack?
 	map(0x440000, 0x4403ff).ram().share("spriteram");
-	map(0x500000, 0x500fff).w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x500000, 0x500fff).w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share(m_fgvideoram);
 	map(0x501000, 0x501fff).nopw();    // unused RAM?
-	map(0x502000, 0x503fff).w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x502000, 0x503fff).w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share(m_txtvideoram);
 	map(0x504000, 0x50ffff).nopw();    // unused RAM?
 	map(0x510000, 0x51000b).w(FUNC(playmark_state::bigtwin_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    // always 3?
-	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x600000, 0x67ffff).ram().share(m_bgvideoram);
 	map(0x700010, 0x700011).portr("SYSTEM");
 	map(0x700012, 0x700013).portr("P1");
 	map(0x700014, 0x700015).portr("P2");
@@ -282,9 +282,9 @@ void playmark_state::bigtwin_main_map(address_map &map)
 void playmark_state::bigtwinb_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share(m_bgvideoram);
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share(m_fgvideoram);
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share(m_txtvideoram);
 	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x201000, 0x2013ff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -302,10 +302,10 @@ void playmark_state::wbeachvl_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x440000, 0x440fff).ram().share("spriteram");
-	map(0x500000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_bgvideoram_w)).share("videoram3");
-	map(0x504000, 0x505fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
-	map(0x508000, 0x509fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
-	map(0x50f000, 0x50ffff).ram().share("rowscroll");
+	map(0x500000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_bgvideoram_w)).share(m_bgvideoram);
+	map(0x504000, 0x505fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share(m_fgvideoram);
+	map(0x508000, 0x509fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share(m_txtvideoram);
+	map(0x50f000, 0x50ffff).ram().share(m_rowscroll);
 	map(0x510000, 0x51000b).w(FUNC(playmark_state::wbeachvl_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    // 2 and 3
 //  map(0x700000, 0x700001) ?? written on startup
@@ -326,11 +326,11 @@ void playmark_state::excelsr_main_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x304000, 0x304001).nopw();                // watchdog? irq ack?
 	map(0x440000, 0x440cff).ram().share("spriteram");
-	map(0x500000, 0x500fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
-	map(0x501000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x500000, 0x500fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share(m_fgvideoram);
+	map(0x501000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share(m_txtvideoram);
 	map(0x510000, 0x51000b).w(FUNC(playmark_state::excelsr_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    // 2 and 3
-	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x600000, 0x67ffff).ram().share(m_bgvideoram);
 	map(0x700010, 0x700011).portr("SYSTEM");
 	map(0x700012, 0x700013).portr("P1");
 	map(0x700014, 0x700015).portr("P2");
@@ -347,11 +347,11 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x0bffff).ram();
 	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0x0c0000);
-	map(0x100000, 0x1007ff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3"); // 32*32?
+	map(0x100000, 0x1007ff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share(m_bgvideoram); // 32*32?
 	map(0x100800, 0x103fff).ram();
-	map(0x104000, 0x105fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2"); // 128*32?
+	map(0x104000, 0x105fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share(m_fgvideoram); // 128*32?
 	map(0x106000, 0x107fff).ram();
-	map(0x108000, 0x109fff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1"); // 64*64?
+	map(0x108000, 0x109fff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share(m_txtvideoram); // 64*64?
 	map(0x10a000, 0x10bfff).ram();
 	map(0x10c000, 0x10ffff).ram(); // Unused
 	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
@@ -371,9 +371,9 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 void playmark_state::hotmind_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share(m_bgvideoram);
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share(m_fgvideoram);
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share(m_txtvideoram);
 	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x200000, 0x200fff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -391,9 +391,9 @@ void playmark_state::hotmind_main_map(address_map &map)
 void playmark_state::luckboomh_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share(m_bgvideoram);
+	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share(m_fgvideoram);
+	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share(m_txtvideoram);
 	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x200000, 0x200fff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -411,7 +411,7 @@ void playmark_state::luckboomh_main_map(address_map &map)
 void playmark_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 
@@ -985,7 +985,7 @@ static GFXDECODE_START( gfx_bigtwinb )
 	GFXDECODE_ENTRY( "gfx1", 0x40000, hotmind_charlayout,  0x200, 16 )    // colors 0x200-0x2ff
 GFXDECODE_END
 
-void playmark_state::configure_oki_banks()
+void playmark_base_state::configure_oki_banks()
 {
 	if (m_okibank)
 	{
@@ -1428,7 +1428,7 @@ ROM_START( wbeachvl2 )
 	ROM_LOAD( "wbv_01.bin",   0x00000, 0x100000, CRC(ac33f25f) SHA1(5d9ed16650aeb297d565376a99b31c88ab611668) )
 ROM_END
 
-ROM_START( wbeachvl3 )
+ROM_START( wbeachvl3 ) // PCB marked PM285
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2.u16",   0x000000, 0x40000, CRC(f0f4c282) SHA1(94850b45368c3d09629852adc8ca08164b7a7a94) )
 	ROM_LOAD16_BYTE( "3.u15",   0x000001, 0x40000, CRC(99775c21) SHA1(fa80a81c59142abcf751352d7a7f9e0d3b5172c9) )
@@ -1457,7 +1457,7 @@ ROM_START( wbeachvl3 )
 	ROM_LOAD( "wbv_01.bin",   0x00000, 0x100000, CRC(ac33f25f) SHA1(5d9ed16650aeb297d565376a99b31c88ab611668) )
 ROM_END
 
-ROM_START( excelsr )
+ROM_START( excelsr ) // PCB marked EXC
 	ROM_REGION( 0x300000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "22.u301", 0x000001, 0x80000, CRC(f0aa1c1b) SHA1(5ed68181defe6cde6f4979508f0cfce9e9743912) ) // sldh w/excelsra
 	ROM_LOAD16_BYTE( "19.u302", 0x000000, 0x80000, CRC(9a8acddc) SHA1(c7868317998bb98c630685a0b242ffd1fbdc54ed) ) // sldh w/excelsra
@@ -1521,7 +1521,7 @@ ROM_START( excelsra )
 	ROM_LOAD( "16.i013",      0x000000, 0x80000, CRC(7ed9da5d) SHA1(352f1e89613feb1902b6d87adb996ed1c1d8108e) )
 ROM_END
 
-ROM_START( hrdtimes )
+ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "31.u67",       0x00000, 0x80000, CRC(53eb041b) SHA1(7437da1ceb26e9518a3085560b8a42f37e77ace9) )
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
@@ -1618,7 +1618,7 @@ Notes:
       HSync           - 14.25kHz
 */
 
-ROM_START( hotmind )
+ROM_START( hotmind ) // PCB marked Hard Times 28-06-94
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(e9000f7f) SHA1(c19fee7b774d3f30f4d4025a63ec396ec119c855) )
 	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(2c518ec5) SHA1(6d9e81ddb5793d64e22dc0254519b947f6ec6954) )
