@@ -1069,8 +1069,8 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 
 void firebeat_state::cdrom_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 0.5);
 	device = device->subdevice("cdda");
 }
 
@@ -1212,8 +1212,8 @@ void firebeat_state::firebeat_spu(machine_config &config)
 	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
 
 	rf5c400_device &rf5c400(RF5C400(config, "rf5c400", XTAL(16'934'400)));
-	rf5c400.add_route(0, "lspeaker", 1.0);
-	rf5c400.add_route(1, "rspeaker", 1.0);
+	rf5c400.add_route(0, "lspeaker", 0.5);
+	rf5c400.add_route(1, "rspeaker", 0.5);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
