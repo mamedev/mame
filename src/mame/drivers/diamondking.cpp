@@ -168,7 +168,7 @@ ROM_START(diamondking)
 	ROM_LOAD("mb_d_segasa_m-12_diamond_king_3d65_97-5848_b2018.u2",      0x10000, 0x10000, CRC(36d16147) SHA1(03060841482444eb032eca7dab777fe56f124654))
 
 	ROM_REGION(0x100000, "iocpu", 0)
-	ROM_LOAD("io_na_6.0_segasa_m-12_diamond_king8e96_01-1105_b-00-2194.u2", 0x00000, 0x100000, CRC(e0760b1f) SHA1(eafdab3832a70e3f848a2cb9a3cb4ff6f36815db))
+	ROM_LOAD("io_na_6.0_segasa_m-12_diamond_king_8e96_01-1105_b-00-2194.u2", 0x00000, 0x100000, CRC(e0760b1f) SHA1(eafdab3832a70e3f848a2cb9a3cb4ff6f36815db))
 ROM_END
 
 } // anonymous namespace
