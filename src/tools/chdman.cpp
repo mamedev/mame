@@ -2401,6 +2401,9 @@ static void do_extract_raw(parameters_map &params)
 //-------------------------------------------------
 static void gdrom_convert_toc(cdrom_toc *toc)
 {
+	// GDROM should have at least 3 tracks
+	assert(toc->numtrks > 2);
+
 	// restore the pregaps for Redump .cue/.bin export
 	for (int trknum = 0; trknum < toc->numtrks; trknum++)
 	{
@@ -2454,7 +2457,13 @@ static void gdrom_convert_toc(cdrom_toc *toc)
 			break;
 
 		case GDROM_TYPE_III:
-			// TBD
+			// second last DATA track extends 225 frames into last DATA tracks 225 pregap
+			toc->tracks[toc->numtrks-2].frames -= 225;
+			toc->tracks[toc->numtrks-2].splitframes = 225;
+
+			// grow the last track by 225 pregap (225 frames data from end of previous track)
+			toc->tracks[toc->numtrks-1].frames += 225;
+			toc->tracks[toc->numtrks-1].pregap = 225;
 			break;
 
 		case GDROM_TYPE_III_SPLIT:
