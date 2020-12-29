@@ -101,7 +101,8 @@ constexpr uint8_t huc6270_device::vram_increments[4];
 
 huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6270, tag, owner, clock)
-	, m_vram_size(0)
+	, device_memory_interface(mconfig, *this)
+	, m_vram_space_config("vram_space", ENDIANNESS_LITTLE, 16, 16, -1) // 16 bit data and address bus, word addressing only
 	, m_irq_changed_cb(*this)
 {
 }
@@ -112,20 +113,20 @@ huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, d
 */
 inline void huc6270_device::fetch_bat_tile_row()
 {
-	const uint16_t bat_data = m_vram[ m_bat_address & m_vram_mask ];
-	const uint16_t tile_palette = ( bat_data >> 8 ) & 0xF0;
-	uint16_t data1 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 0 ) & m_vram_mask ];
-	uint16_t data2 = ( data1 >> 7 ) & 0x1FE;
-	uint16_t data3 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 8 ) & m_vram_mask ];
-	uint16_t data4 = ( data3 >> 5 ) & 0x7F8;
+	const uint16_t bat_data = m_vram_cache.read_word(m_bat_address);
+	const uint16_t tile_palette = (bat_data >> 8) & 0xF0;
+	uint16_t data1 = m_vram_cache.read_word((((bat_data & 0x0FFF) << 4) + m_bat_row + 0));
+	uint16_t data2 = (data1 >> 7) & 0x1FE;
+	uint16_t data3 = m_vram_cache.read_word((((bat_data & 0x0FFF) << 4) + m_bat_row + 8));
+	uint16_t data4 = (data3 >> 5) & 0x7F8;
 	data3 <<= 2;
 
-	for ( int i = 7; i >= 0; i-- )
+	for (int i = 7; i >= 0; i--)
 	{
-		uint16_t c = ( data1 & 0x01 ) | ( data2 & 0x02 ) | ( data3 & 0x04 ) | ( data4 & 0x08 );
+		uint16_t c = (data1 & 0x01) | (data2 & 0x02) | (data3 & 0x04) | (data4 & 0x08);
 
 		/* Colour 0 for background tiles is always taken from palette 0 */
-		if ( c )
+		if (c)
 			c |= tile_palette;
 
 		m_bat_tile_row[i] = c;
@@ -138,63 +139,63 @@ inline void huc6270_device::fetch_bat_tile_row()
 }
 
 
-void huc6270_device::add_sprite( int index, int x, int pattern, int line, int flip_x, int palette, int priority, int sat_lsb )
+void huc6270_device::add_sprite(int index, int x, int pattern, int line, int flip_x, int palette, int priority, int sat_lsb)
 {
 	int i = m_sprites_this_line;
 
-	if ( i < 16 )
+	if (i < 16)
 	{
 		uint32_t b0, b1, b2, b3;
 		int j;
 
-		if ( flip_x )
+		if (flip_x)
 			flip_x = 0x0F;
 
-		pattern += ( ( line >> 4 ) << 1 );
+		pattern += ((line >> 4) << 1);
 
-		if ( ( m_mwr & 0x0c ) == 0x04 )
+		if ((m_mwr & 0x0c) == 0x04)
 		{
-			if ( ! sat_lsb )
+			if (!sat_lsb)
 			{
-				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) & m_vram_mask ];
-				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) & m_vram_mask ] << 1;
+				b0 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x00));
+				b1 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x10)) << 1;
 			}
 			else
 			{
-				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) & m_vram_mask ];
-				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) & m_vram_mask ] << 1;
+				b0 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x20));
+				b1 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x30)) << 1;
 			}
 			b2 = 0;
 			b3 = 0;
 		}
 		else
 		{
-			b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) & m_vram_mask ];
-			b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) & m_vram_mask ] << 1;
-			b2 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) & m_vram_mask ] << 2;
-			b3 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) & m_vram_mask ] << 3;
+			b0 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x00));
+			b1 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x10)) << 1;
+			b2 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x20)) << 2;
+			b3 = m_vram_cache.read_word(((pattern * 0x40) + (line & 0x0F) + 0x30)) << 3;
 		}
 
-		for ( j = 15; j >= 0; j-- )
+		for (j = 15; j >= 0; j--)
 		{
-			uint8_t data = ( b3 & 0x08 ) | ( b2 & 0x04 ) | ( b1 & 0x02 ) | ( b0 & 0x01 );
+			uint8_t data = (b3 & 0x08) | (b2 & 0x04) | (b1 & 0x02) | (b0 & 0x01);
 
-			if ( data )
+			if (data)
 			{
 				data |= palette << 4;
 
-				if ( x + ( j ^ flip_x ) < 1024 )
+				if (x + (j ^ flip_x) < 1024)
 				{
-					if (! m_sprite_row[ x + ( j ^ flip_x ) ] )
+					if (!m_sprite_row[x + (j ^ flip_x)])
 					{
-						m_sprite_row[ x + ( j ^ flip_x ) ] = ( priority ? 0x4000 : 0x0000 ) | ( index << 8 ) | data;
+						m_sprite_row[x + (j ^ flip_x)] = (priority ? 0x4000 : 0x0000) | (index << 8) | data;
 					}
 					else
 					{
-						if ( ! ( m_sprite_row[ x + ( j ^ flip_x ) ] & 0xFF00 ) )
+						if (!(m_sprite_row[x + (j ^ flip_x)] & 0xFF00))
 						{
 							/* Sprite 0 collission */
-							m_sprite_row[ x + ( j ^ flip_x ) ] |= 0x8000;
+							m_sprite_row[x + (j ^ flip_x)] |= 0x8000;
 						}
 					}
 				}
@@ -216,17 +217,17 @@ void huc6270_device::select_sprites()
 	int i;
 
 	m_sprites_this_line = 0;
-	memset( m_sprite_row, 0, sizeof( m_sprite_row ) );
+	memset(m_sprite_row, 0, sizeof(m_sprite_row));
 	m_sprite_row_index = 0x20;
 
-	for ( i = 0; i < 4 * 64; i += 4 )
+	for (i = 0; i < 4 * 64; i += 4)
 	{
 		static const int cgy_table[4] = { 16, 32, 64, 64 };
-		int cgy = ( m_sat[i+3] >> 12 ) & 0x03;
-		int height = cgy_table[ cgy ];
+		int cgy = (m_sat[i+3] >> 12) & 0x03;
+		int height = cgy_table[cgy];
 		int sprite_line = m_raster_count - m_sat[i];
 
-		if ( sprite_line >= 0 && sprite_line < height )
+		if (sprite_line >= 0 && sprite_line < height)
 		{
 			int pattern = m_sat[i+2] >> 1;
 			int sat_lsb = m_sat[i+2] & 0x01;
@@ -235,53 +236,53 @@ void huc6270_device::select_sprites()
 			int cgx = m_sat[i+3] & 0x0100;
 
 			/* If CGY is set to 1, bit 1 of the sprite pattern index is forced to 0 */
-			if ( cgy & 1 )
+			if (cgy & 1)
 				pattern &= ~0x0002;
 
 			/* If CGY is set to 2 or 3, bits 1 and 2 of the sprite pattern index are forced to 0 */
-			if ( cgy & 2 )
+			if (cgy & 2)
 				pattern &= ~0x0006;
 
 			/* Recalculate line index when sprite is flipped vertically */
-			if ( m_sat[i+3] & 0x8000 )
-				sprite_line = ( height - 1 ) - sprite_line;
+			if (m_sat[i+3] & 0x8000)
+				sprite_line = (height - 1) - sprite_line;
 
 			/* Is the sprite 32 pixels wide */
-			if ( cgx )
+			if (cgx)
 			{
 				/* If CGX is set, bit 0 of the sprite pattern index is forced to 0 */
 				pattern &= ~0x0001;
 
 				/* Check for horizontal flip */
-				if ( m_sat[i+3] & 0x0800 )
+				if (m_sat[i+3] & 0x0800)
 				{
 					/* Add to our list of sprites for this line */
-					add_sprite( i/4, m_sat[i+1], pattern + 1, sprite_line, 1, palette, priority, sat_lsb );
-					add_sprite( i/4, m_sat[i+1] + 16, pattern, sprite_line, 1, palette, priority, sat_lsb );
+					add_sprite(i/4, m_sat[i+1], pattern + 1, sprite_line, 1, palette, priority, sat_lsb);
+					add_sprite(i/4, m_sat[i+1] + 16, pattern, sprite_line, 1, palette, priority, sat_lsb);
 				}
 				else
 				{
 					/* Add to our list of sprites for this line */
-					add_sprite( i/4, m_sat[i+1], pattern, sprite_line, 0, palette, priority, sat_lsb );
-					add_sprite( i/4, m_sat[i+1] + 16, pattern + 1, sprite_line, 0, palette, priority, sat_lsb );
+					add_sprite(i/4, m_sat[i+1], pattern, sprite_line, 0, palette, priority, sat_lsb);
+					add_sprite(i/4, m_sat[i+1] + 16, pattern + 1, sprite_line, 0, palette, priority, sat_lsb);
 				}
 			}
 			else
 			{
 				/* Add to our list of sprites for this line */
-				add_sprite( i/4, m_sat[i+1], pattern, sprite_line, m_sat[i+3] & 0x0800, palette, priority, sat_lsb );
+				add_sprite(i/4, m_sat[i+1], pattern, sprite_line, m_sat[i+3] & 0x0800, palette, priority, sat_lsb);
 			}
 		}
 	}
 
 	/* Check for sprite overflow */
-	if ( m_sprites_this_line >= 16 )
+	if (m_sprites_this_line >= 16)
 	{
 		/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
-		if ( m_cr & 0x02 )
+		if (m_cr & 0x02)
 		{
 			m_status |= HUC6270_OR;
-			m_irq_changed_cb( ASSERT_LINE );
+			m_irq_changed_cb(ASSERT_LINE);
 		}
 	}
 }
@@ -289,37 +290,37 @@ void huc6270_device::select_sprites()
 
 inline void huc6270_device::handle_vblank()
 {
-	if ( ! m_vd_triggered )
+	if (!m_vd_triggered)
 	{
-		if ( m_cr & 0x08 )
+		if (m_cr & 0x08)
 		{
 			m_status |= HUC6270_VD;
-			m_irq_changed_cb( ASSERT_LINE );
+			m_irq_changed_cb(ASSERT_LINE);
 		}
 
 		/* Should we initiate a VRAM->SATB DMA transfer.
 		   The timing for this is incorrect.
 		 */
-		if ( m_dvssr_written || ( m_dcr & 0x10 ) )
+		if (m_dvssr_written || (m_dcr & 0x10))
 		{
 			int i;
 
-			LOG("SATB transfer from %05x\n", m_dvssr << 1 );
-			for ( i = 0; i < 4 * 64; i += 4 )
+			LOG("SATB transfer from %05x\n", m_dvssr << 1);
+			for (i = 0; i < 4 * 64; i += 4)
 			{
-				m_sat[i + 0] = m_vram[ ( m_dvssr + i + 0 ) & m_vram_mask ] & 0x03FF;
-				m_sat[i + 1] = m_vram[ ( m_dvssr + i + 1 ) & m_vram_mask ] & 0x03FF;
-				m_sat[i + 2] = m_vram[ ( m_dvssr + i + 2 ) & m_vram_mask ] & 0x07FF;
-				m_sat[i + 3] = m_vram[ ( m_dvssr + i + 3 ) & m_vram_mask ];
+				m_sat[i + 0] = m_vram_cache.read_word((m_dvssr + i + 0)) & 0x03FF;
+				m_sat[i + 1] = m_vram_cache.read_word((m_dvssr + i + 1)) & 0x03FF;
+				m_sat[i + 2] = m_vram_cache.read_word((m_dvssr + i + 2)) & 0x07FF;
+				m_sat[i + 3] = m_vram_cache.read_word((m_dvssr + i + 3));
 			}
 			m_dvssr_written = 0;
 
 			/* Generate SATB interrupt if requested */
-			if ( m_dcr & 0x01 )
+			if (m_dcr & 0x01)
 			{
 				m_satb_countdown = 4;
 //                  m_status |= HUC6270_DS;
-//                  m_irq_changed_cb( ASSERT_LINE );
+//                  m_irq_changed_cb(ASSERT_LINE);
 			}
 		}
 
@@ -330,29 +331,29 @@ inline void huc6270_device::handle_vblank()
 
 inline void huc6270_device::next_vert_state()
 {
-	switch ( m_vert_state )
+	switch (m_vert_state)
 	{
 	case v_state::VSW:
 		m_vert_state = v_state::VDS;
-		m_vert_to_go = ( ( m_vpr >> 8 ) & 0xFF ) + 2;
+		m_vert_to_go = ((m_vpr >> 8) & 0xFF) + 2;
 		break;
 
 	case v_state::VDS:
 		m_vert_state = v_state::VDW;
-		m_vert_to_go = ( m_vdw & 0x1FF ) + 1;
+		m_vert_to_go = (m_vdw & 0x1FF) + 1;
 		m_byr_latched = m_byr;
 		m_vd_triggered = 0;
 		break;
 
 	case v_state::VDW:
 		m_vert_state = v_state::VCR;
-		m_vert_to_go = ( m_vcr & 0xFF );
+		m_vert_to_go = (m_vcr & 0xFF);
 		handle_vblank();
 		break;
 
 	case v_state::VCR:
 		m_vert_state = v_state::VSW;
-		m_vert_to_go = ( m_vpr & 0x1F ) + 1;
+		m_vert_to_go = (m_vpr & 0x1F) + 1;
 		break;
 	}
 }
@@ -360,21 +361,21 @@ inline void huc6270_device::next_vert_state()
 
 inline void huc6270_device::next_horz_state()
 {
-	switch ( m_horz_state )
+	switch (m_horz_state)
 	{
 	case h_state::HDS:
 		m_bxr_latched = m_bxr;
 		m_horz_state = h_state::HDW;
-		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
+		m_horz_to_go = (m_hdr & 0x7F) + 1;
 		{
 			static const int width_shift[4] = { 5, 6, 7, 7 };
 			uint16_t v;
 
-			v = ( m_byr_latched ) & ( ( m_mwr & 0x40 ) ? 0x1FF : 0xFF );
+			v = (m_byr_latched) & ((m_mwr & 0x40) ? 0x1FF : 0xFF);
 			m_bat_row = v & 7;
-			m_bat_address_mask = ( 1 << width_shift[ ( m_mwr >> 4 ) & 0x03 ] ) - 1;
-			m_bat_address = ( ( v >> 3 ) << ( width_shift[ ( m_mwr >> 4 ) & 0x03 ] ) )
-				| ( ( m_bxr_latched >> 3 ) & m_bat_address_mask );
+			m_bat_address_mask = (1 << width_shift[(m_mwr >> 4) & 0x03]) - 1;
+			m_bat_address = ((v >> 3) << (width_shift[(m_mwr >> 4) & 0x03]))
+				| ((m_bxr_latched >> 3) & m_bat_address_mask);
 			m_bat_column = m_bxr & 7;
 			fetch_bat_tile_row();
 		}
@@ -382,20 +383,20 @@ inline void huc6270_device::next_horz_state()
 
 	case h_state::HDW:
 		m_horz_state = h_state::HDE;
-		m_horz_to_go = ( ( m_hdr >> 8 ) & 0x7F ) + 1;
+		m_horz_to_go = ((m_hdr >> 8) & 0x7F) + 1;
 		break;
 
 	case h_state::HDE:
 		m_horz_state = h_state::HSW;
-		m_horz_to_go = ( m_hsr & 0x1F ) + 1;
+		m_horz_to_go = (m_hsr & 0x1F) + 1;
 		break;
 
 	case h_state::HSW:
 		m_horz_state = h_state::HDS;
-		m_horz_to_go = std::max( ( ( m_hsr >> 8 ) & 0x7F ), 2 ) + 1;
+		m_horz_to_go = std::max(((m_hsr >> 8) & 0x7F), 2) + 1;
 
 		/* If section has ended, advance to next vertical state */
-		while ( m_vert_to_go == 0 )
+		while (m_vert_to_go == 0)
 			next_vert_state();
 
 		/* Select sprites for the coming line */
@@ -411,26 +412,26 @@ u16 huc6270_device::next_pixel()
 	uint16_t data = HUC6270_SPRITE;
 
 	/* Check if we're on an active display line */
-	if ( m_vert_state == v_state::VDW )
+	if (m_vert_state == v_state::VDW)
 	{
 		/* Check if we're in active display area */
-		if ( m_horz_state == h_state::HDW )
+		if (m_horz_state == h_state::HDW)
 		{
-			uint8_t sprite_data = m_sprite_row[ m_sprite_row_index ] & 0x00FF;
-			int collission = ( m_sprite_row[ m_sprite_row_index ] & 0x8000 ) ? 1 : 0;
+			uint8_t sprite_data = m_sprite_row[m_sprite_row_index] & 0x00FF;
+			int collission = (m_sprite_row[m_sprite_row_index] & 0x8000) ? 1 : 0;
 
-			if ( m_cr & 0x80 )
+			if (m_cr & 0x80)
 			{
-				data = HUC6270_BACKGROUND | m_bat_tile_row[ m_bat_column ];
-				if ( sprite_data && ( m_cr & 0x40 ) )
+				data = HUC6270_BACKGROUND | m_bat_tile_row[m_bat_column];
+				if (sprite_data && (m_cr & 0x40))
 				{
-					if ( m_sprite_row[ m_sprite_row_index ] & 0x4000 )
+					if (m_sprite_row[m_sprite_row_index] & 0x4000)
 					{
 						data = HUC6270_SPRITE | sprite_data;
 					}
 					else
 					{
-						if ( data == HUC6270_BACKGROUND )
+						if (data == HUC6270_BACKGROUND)
 						{
 							data = HUC6270_SPRITE | sprite_data;
 						}
@@ -439,7 +440,7 @@ u16 huc6270_device::next_pixel()
 			}
 			else
 			{
-				if ( m_cr & 0x40 )
+				if (m_cr & 0x40)
 				{
 					data = HUC6270_SPRITE | sprite_data;
 				}
@@ -447,28 +448,28 @@ u16 huc6270_device::next_pixel()
 
 			m_sprite_row_index = m_sprite_row_index + 1;
 			m_bat_column += 1;
-			if ( m_bat_column >= 8 )
+			if (m_bat_column >= 8)
 			{
-				m_bat_address = ( m_bat_address & ~m_bat_address_mask )
-					| ( ( m_bat_address + 1 ) & m_bat_address_mask );
+				m_bat_address = (m_bat_address & ~m_bat_address_mask)
+					| ((m_bat_address + 1) & m_bat_address_mask);
 				m_bat_column = 0;
 				fetch_bat_tile_row();
 			}
 
-			if ( collission && ( m_cr & 0x01 ) )
+			if (collission && (m_cr & 0x01))
 			{
 				m_status |= HUC6270_CR;
-				m_irq_changed_cb( ASSERT_LINE );
+				m_irq_changed_cb(ASSERT_LINE);
 			}
 		}
 	}
 
 	m_horz_steps++;
-	if ( m_horz_steps == 8 )
+	if (m_horz_steps == 8)
 	{
 		m_horz_to_go -= 1;
 		m_horz_steps = 0;
-		while ( m_horz_to_go == 0 )
+		while (m_horz_to_go == 0)
 			next_horz_state();
 	}
 	return data;
@@ -481,18 +482,18 @@ u16 huc6270_device::next_pixel()
 //}
 
 
-WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
+WRITE_LINE_MEMBER(huc6270_device::vsync_changed)
 {
 	state &= 0x01;
-	if ( m_vsync != state )
+	if (m_vsync != state)
 	{
 		/* Check for high->low VSYNC transition */
-		if ( !state )
+		if (!state)
 		{
 			m_vert_state = v_state::VCR;
 			m_vert_to_go = 0;
 
-			while ( m_vert_to_go == 0 )
+			while (m_vert_to_go == 0)
 				next_vert_state();
 		}
 		else
@@ -507,23 +508,23 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
+WRITE_LINE_MEMBER(huc6270_device::hsync_changed)
 {
 	state &= 0x01;
 
-	if(m_hsync != state)
+	if (m_hsync != state)
 	{
 		/* Check for low->high HSYNC transition */
-		if(state)
+		if (state)
 		{
-			if ( m_satb_countdown )
+			if (m_satb_countdown)
 			{
 				m_satb_countdown--;
 
-				if ( m_satb_countdown == 0 )
+				if (m_satb_countdown == 0)
 				{
 					m_status |= HUC6270_DS;
-					m_irq_changed_cb( ASSERT_LINE );
+					m_irq_changed_cb(ASSERT_LINE);
 				}
 			}
 
@@ -532,14 +533,14 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			m_horz_steps = 0;
 			m_byr_latched += 1;
 			m_raster_count += 1;
-			if ( m_vert_to_go == 1 && m_vert_state == v_state::VDS )
+			if (m_vert_to_go == 1 && m_vert_state == v_state::VDS)
 			{
 				m_raster_count = 0x40;
 			}
 
 			m_vert_to_go -= 1;
 
-			while ( m_horz_to_go == 0 )
+			while (m_horz_to_go == 0)
 				next_horz_state();
 
 			handle_dma();
@@ -548,10 +549,10 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 		{
 			/* Check for high->low HSYNC transition */
 			// RCR IRQ happens near the end of the HDW period
-			if ( m_raster_count == m_rcr && ( m_cr & 0x04 ) )
+			if (m_raster_count == m_rcr && (m_cr & 0x04))
 			{
 				m_status |= HUC6270_RR;
-				m_irq_changed_cb( ASSERT_LINE );
+				m_irq_changed_cb(ASSERT_LINE);
 			}
 		}
 	}
@@ -564,33 +565,24 @@ inline void huc6270_device::handle_dma()
 	/* Should we perform VRAM-VRAM dma.
 	   The timing for this is incorrect.
 	 */
-	if ( m_dma_enabled )
+	if (m_dma_enabled)
 	{
-		int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
-		int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
+		int desr_inc = (m_dcr & 0x0008) ? -1 : +1;
+		int sour_inc = (m_dcr & 0x0004) ? -1 : +1;
 
-		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
+		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr);
 
 		do {
-			uint16_t data;
-
-			// area 0x8000-0xffff cannot be r/w (open bus)
-			if(m_sour <= m_vram_mask)
-				data = m_vram[ m_sour ];
-			else
-				data = 0;
-
-			if(m_desr <= m_vram_mask)
-				m_vram[ m_desr ] = data;
+			m_vram_cache.write_word(m_desr, m_vram_cache.read_word(m_sour));
 			m_sour += sour_inc;
 			m_desr += desr_inc;
 			m_lenr -= 1;
-		} while ( m_lenr != 0xFFFF );
+		} while (m_lenr != 0xFFFF);
 
-		if ( m_dcr & 0x0002 )
+		if (m_dcr & 0x0002)
 		{
 			m_status |= HUC6270_DV;
-			m_irq_changed_cb( ASSERT_LINE );
+			m_irq_changed_cb(ASSERT_LINE);
 		}
 		m_dma_enabled = 0;
 	}
@@ -600,12 +592,15 @@ u8 huc6270_device::read(offs_t offset)
 {
 	uint8_t data = 0x00;
 
-	switch ( offset & 3 )
+	switch (offset & 3)
 	{
 		case 0x00:  /* status */
 			data = m_status;
-			m_status &= ~( HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS );
-			m_irq_changed_cb( CLEAR_LINE );
+			if (!machine().side_effects_disabled())
+			{
+				m_status &= ~(HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS);
+				m_irq_changed_cb(CLEAR_LINE);
+			}
 			break;
 
 		case 0x02:
@@ -614,17 +609,12 @@ u8 huc6270_device::read(offs_t offset)
 
 		case 0x03:
 			data = m_vrr >> 8;
-			if ( m_register_index == VxR )
+			if (!machine().side_effects_disabled())
 			{
-				m_marr += vram_increments[ ( m_cr >> 11 ) & 3 ];
-
-				if(m_marr <= m_vram_mask)
-					m_vrr = m_vram[ m_marr ];
-				else
+				if (m_register_index == VxR)
 				{
-					// TODO: test with real HW
-					m_vrr = 0;
-					logerror("%s Open Bus VRAM read (register read) %04x\n",this->tag(),m_marr);
+					m_marr += vram_increments[(m_cr >> 11) & 3];
+					m_vrr = m_vram_cache.read_word(m_marr);
 				}
 			}
 			break;
@@ -637,194 +627,182 @@ void huc6270_device::write(offs_t offset, u8 data)
 {
 	LOG("%s: huc6270 write %02x <- %02x ", machine().describe_context(), offset, data);
 
-	switch ( offset & 3 )
+	switch (offset & 3)
 	{
 		case 0x00:  /* VDC register select */
 			m_register_index = data & 0x1F;
 			break;
 
 		case 0x02:  /* VDC data LSB */
-			switch ( m_register_index )
+			switch (m_register_index)
 			{
 				case MAWR:      /* memory address write register LSB */
-					m_mawr = ( m_mawr & 0xFF00 ) | data;
+					m_mawr = (m_mawr & 0xFF00) | data;
 					break;
 
 				case MARR:      /* memory address read register LSB */
-					m_marr = ( m_marr & 0xFF00 ) | data;
-					if(m_marr <= m_vram_mask)
-						m_vrr = m_vram[ m_marr ];
-					else
-					{
-						// TODO: test with real HW
-						m_vrr = 0;
-						logerror("%s Open Bus VRAM read (memory address) %04x\n",this->tag(),m_marr);
-					}
+					m_marr = (m_marr & 0xFF00) | data;
+					m_vrr = m_vram_cache.read_word(m_marr);
 					break;
 
 				case VxR:       /* vram write data LSB */
-					m_vwr = ( m_vwr & 0xFF00 ) | data;
+					m_vwr = (m_vwr & 0xFF00) | data;
 					break;
 
 				case CR:        /* control register LSB */
-					m_cr = ( m_cr & 0xFF00 ) | data;
+					m_cr = (m_cr & 0xFF00) | data;
 					break;
 
 				case RCR:       /* raster compare register LSB */
-					m_rcr = ( m_rcr & 0x0300 ) | data;
-//                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
+					m_rcr = (m_rcr & 0x0300) | data;
+//                  if (m_raster_count == m_rcr && m_cr & 0x04)
 //                  {
 //                      m_status |= HUC6270_RR;
-//                      m_irq_changed_cb( ASSERT_LINE );
+//                      m_irq_changed_cb(ASSERT_LINE);
 //                  }
 					break;
 
 				case BXR:       /* background x-scroll register LSB */
-					m_bxr = ( m_bxr & 0x0300 ) | data;
+					m_bxr = (m_bxr & 0x0300) | data;
 					break;
 
 				case BYR:       /* background y-scroll register LSB */
-					m_byr = ( m_byr & 0x0100 ) | data;
+					m_byr = (m_byr & 0x0100) | data;
 					m_byr_latched = m_byr;
 					break;
 
 				case MWR:       /* memory width register LSB */
-					m_mwr = ( m_mwr & 0xFF00 ) | data;
+					m_mwr = (m_mwr & 0xFF00) | data;
 					break;
 
 				case HSR:       /* horizontal sync register LSB */
-					m_hsr = ( m_hsr & 0xFF00 ) | data;
+					m_hsr = (m_hsr & 0xFF00) | data;
 					break;
 
 				case HDR:       /* horizontal display register LSB */
-					m_hdr = ( m_hdr & 0xFF00 ) | data;
+					m_hdr = (m_hdr & 0xFF00) | data;
 					break;
 
 				case VPR:       /* vertical sync register LSB */
-					m_vpr = ( m_vpr & 0xFF00 ) | data;
+					m_vpr = (m_vpr & 0xFF00) | data;
 					break;
 
 				case VDW:       /* vertical display register LSB */
-					m_vdw = ( m_vdw & 0xFF00 ) | data;
+					m_vdw = (m_vdw & 0xFF00) | data;
 					break;
 
 				case VCR:       /* vertical display end position register LSB */
-					m_vcr = ( m_vcr & 0xFF00 ) | data;
+					m_vcr = (m_vcr & 0xFF00) | data;
 					break;
 
 				case DCR:       /* DMA control register LSB */
-					m_dcr = ( m_dcr & 0xFF00 ) | data;
+					m_dcr = (m_dcr & 0xFF00) | data;
 					break;
 
 				case SOUR:      /* DMA source address register LSB */
-					m_sour = ( m_sour & 0xFF00 ) | data;
+					m_sour = (m_sour & 0xFF00) | data;
 					break;
 
 				case DESR:      /* DMA destination address register LSB */
-					m_desr = ( m_desr & 0xFF00 ) | data;
+					m_desr = (m_desr & 0xFF00) | data;
 					break;
 
 				case LENR:      /* DMA length register LSB */
-					m_lenr = ( m_lenr & 0xFF00 ) | data;
+					m_lenr = (m_lenr & 0xFF00) | data;
 					break;
 
 				case DVSSR:     /* Sprite attribute table LSB */
-					m_dvssr = ( m_dvssr & 0xFF00 ) | data;
+					m_dvssr = (m_dvssr & 0xFF00) | data;
 					m_dvssr_written = 1;
 					break;
 			}
 			break;
 
 		case 0x03:  /* VDC data MSB */
-			switch ( m_register_index )
+			switch (m_register_index)
 			{
 				case MAWR:      /* memory address write register MSB */
-					m_mawr = ( m_mawr & 0x00FF ) | ( data << 8 );
+					m_mawr = (m_mawr & 0x00FF) | (data << 8);
 					break;
 
 				case MARR:      /* memory address read register MSB */
-					m_marr = ( m_marr & 0x00FF ) | ( data << 8 );
-					if(m_marr <= m_vram_mask)
-						m_vrr = m_vram[ m_marr ];
-					else
-						m_vrr = 0;
+					m_marr = (m_marr & 0x00FF) | (data << 8);
+					m_vrr = m_vram_cache.read_word(m_marr);
 					break;
 
 				case VxR:       /* vram write data MSB */
-					m_vwr = ( m_vwr & 0x00FF ) | ( data << 8 );
-					// area 0x8000-0xffff is NOP and cannot be written to.
-					if(m_mawr <= m_vram_mask)
-						m_vram[ m_mawr ] = m_vwr;
-					m_mawr += vram_increments[ ( m_cr >> 11 ) & 3 ];
+					m_vwr = (m_vwr & 0x00FF) | (data << 8);
+					m_vram_cache.write_word(m_mawr, m_vwr);
+					m_mawr += vram_increments[(m_cr >> 11) & 3];
 					break;
 
 				case CR:        /* control register MSB */
-					m_cr = ( m_cr & 0x00FF ) | ( data << 8 );
+					m_cr = (m_cr & 0x00FF) | (data << 8);
 					break;
 
 				case RCR:       /* raster compare register MSB */
-					m_rcr = ( m_rcr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
+					m_rcr = (m_rcr & 0x00FF) | ((data & 0x03) << 8);
 //printf("%s: RCR set to %03x\n", machine().describe_context().c_str(), m_rcr);
-//                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
+//                  if (m_raster_count == m_rcr && m_cr & 0x04)
 //                  {
 //                      m_status |= HUC6270_RR;
-//                      m_irq_changed_cb( ASSERT_LINE );
+//                      m_irq_changed_cb(ASSERT_LINE);
 //                  }
 					break;
 
 				case BXR:       /* background x-scroll register MSB */
-					m_bxr = ( m_bxr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
+					m_bxr = (m_bxr & 0x00FF) | ((data & 0x03) << 8);
 					break;
 
 				case BYR:       /* background y-scroll register MSB */
-					m_byr = ( m_byr & 0x00FF ) | ( ( data & 0x01 ) << 8 );
+					m_byr = (m_byr & 0x00FF) | ((data & 0x01) << 8);
 					m_byr_latched = m_byr;
 					break;
 
 				case MWR:       /* memory width register MSB */
-					m_mwr = ( m_mwr & 0x00FF ) | ( data << 8 );
+					m_mwr = (m_mwr & 0x00FF) | (data << 8);
 					break;
 
 				case HSR:       /* horizontal sync register MSB */
-					m_hsr = ( m_hsr & 0x00FF ) | ( data << 8 );
+					m_hsr = (m_hsr & 0x00FF) | (data << 8);
 					break;
 
 				case HDR:       /* horizontal display register MSB */
-					m_hdr = ( m_hdr & 0x00FF ) | ( data << 8 );
+					m_hdr = (m_hdr & 0x00FF) | (data << 8);
 					break;
 
 				case VPR:       /* vertical sync register MSB */
-					m_vpr = ( m_vpr & 0x00FF ) | ( data << 8 );
+					m_vpr = (m_vpr & 0x00FF) | (data << 8);
 					break;
 
 				case VDW:       /* vertical display register MSB */
-					m_vdw = ( m_vdw & 0x00FF ) | ( data << 8 );
+					m_vdw = (m_vdw & 0x00FF) | (data << 8);
 					break;
 
 				case VCR:       /* vertical display end position register MSB */
-					m_vcr = ( m_vcr & 0x00FF ) | ( data << 8 );
+					m_vcr = (m_vcr & 0x00FF) | (data << 8);
 					break;
 
 				case DCR:       /* DMA control register MSB */
-					m_dcr = ( m_dcr & 0x00FF ) | ( data << 8 );
+					m_dcr = (m_dcr & 0x00FF) | (data << 8);
 					break;
 
 				case SOUR:      /* DMA source address register MSB */
-					m_sour = ( m_sour & 0x00FF ) | ( data << 8 );
+					m_sour = (m_sour & 0x00FF) | (data << 8);
 					break;
 
 				case DESR:      /* DMA destination address register MSB */
-					m_desr = ( m_desr & 0x00FF ) | ( data << 8 );
+					m_desr = (m_desr & 0x00FF) | (data << 8);
 					break;
 
 				case LENR:      /* DMA length register MSB */
-					m_lenr = ( m_lenr & 0x00FF ) | ( data << 8 );
+					m_lenr = (m_lenr & 0x00FF) | (data << 8);
 					m_dma_enabled = 1;
 //logerror("DMA is not supported yet.\n");
 					break;
 
 				case DVSSR:     /* Sprite attribute table MSB */
-					m_dvssr = ( m_dvssr & 0x00FF ) | ( data << 8 );
+					m_dvssr = (m_dvssr & 0x00FF) | (data << 8);
 					m_dvssr_written = 1;
 					break;
 			}
@@ -839,10 +817,7 @@ void huc6270_device::device_start()
 	/* Resolve callbacks */
 	m_irq_changed_cb.resolve_safe();
 
-	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
-	m_vram_mask = (m_vram_size >> 1) - 1;
-
-	save_pointer(NAME(m_vram), m_vram_size/sizeof(uint16_t));
+	space(0).cache(m_vram_cache);
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));
@@ -927,4 +902,14 @@ void huc6270_device::device_reset()
 	m_byr_latched = 0;
 
 	memset(m_sat, 0, sizeof(m_sat));
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector huc6270_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_vram_space_config) };
 }

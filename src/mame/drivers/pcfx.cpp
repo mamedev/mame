@@ -55,6 +55,8 @@ private:
 
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
+	void vdc1_mem(address_map &map);
+	void vdc2_mem(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -203,6 +205,16 @@ void pcfx_state::pcfx_io(address_map &map)
 //  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r));
 	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);
 	map(0x80500000, 0x805000FF).noprw();   /* HuC6273 */
+}
+
+void pcfx_state::vdc1_mem(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+}
+
+void pcfx_state::vdc2_mem(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
 }
 
 
@@ -424,15 +436,15 @@ void pcfx_state::pcfx(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(pcfx_state::screen_update));
 	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pcfx_state::screen_update));
 
-	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", 0));
-	huc6270_a.set_vram_size(0x20000);
+	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
+	huc6270_a.set_addrmap(0, &pcfx_state::vdc1_mem);
 	huc6270_a.irq().set(FUNC(pcfx_state::irq12_w));
 
-	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", 0));
-	huc6270_b.set_vram_size(0x20000);
+	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", XTAL(21'477'272)));
+	huc6270_b.set_addrmap(0, &pcfx_state::vdc2_mem);
 	huc6270_b.irq().set(FUNC(pcfx_state::irq14_w));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));

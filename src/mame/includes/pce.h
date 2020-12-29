@@ -17,10 +17,6 @@
 #include "machine/pce_cd.h"
 #include "video/huc6260.h"
 
-#define C6280_TAG           "c6280"
-
-#define MAIN_CLOCK      21477270
-
 #define TG_16_JOY_SIG       0x00
 #define PCE_JOY_SIG         0x40
 #define NO_CD_SIG           0x80
@@ -89,6 +85,8 @@ private:
 	void pce_mem(address_map &map);
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
+	void vdc1_mem(address_map &map);
+	void vdc2_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PCE_H

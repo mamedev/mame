@@ -52,6 +52,8 @@ private:
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
 	void oki_map(address_map &map);
+	void vdc1_mem(address_map &map);
+	void vdc2_mem(address_map &map);
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
@@ -111,6 +113,16 @@ void ggconnie_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).bankr(m_okibank);
 	map(0x10000, 0x3ffff).rom().region("oki", 0);
+}
+
+void ggconnie_state::vdc1_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+}
+
+void ggconnie_state::vdc2_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
 }
 
 static INPUT_PORTS_START(ggconnie)
@@ -309,7 +321,7 @@ INPUT_PORTS_END
 void ggconnie_state::ggconnie(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	H6280(config, m_maincpu, XTAL(21'477'272)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggconnie_state::sgx_mem);
 	m_maincpu->set_addrmap(AS_IO, &ggconnie_state::sgx_io);
 	m_maincpu->port_in_cb().set_ioport("IN0");
@@ -319,25 +331,25 @@ void ggconnie_state::ggconnie(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272), huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(ggconnie_state::screen_update));
 	screen.set_palette(m_huc6260);
 
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
+	HUC6260(config, m_huc6260, XTAL(21'477'272));
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
 
-	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
-	huc6270_0.set_vram_size(0x10000);
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", XTAL(21'477'272)));
+	huc6270_0.set_addrmap(0, &ggconnie_state::vdc1_mem);
 	huc6270_0.irq().set_inputline(m_maincpu, 0);
 
-	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
-	huc6270_1.set_vram_size(0x10000);
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", XTAL(21'477'272)));
+	huc6270_1.set_addrmap(0, &ggconnie_state::vdc2_mem);
 	huc6270_1.irq().set_inputline(m_maincpu, 0);
 
-	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202_device &huc6202(HUC6202(config, "huc6202", XTAL(21'477'272)));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
@@ -356,7 +368,7 @@ void ggconnie_state::ggconnie(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH); /* unknown clock / pin 7 */
+	OKIM6295(config, m_oki, XTAL(21'477'272)/12, okim6295_device::PIN7_HIGH); /* unknown clock / pin 7 */
 	m_oki->set_addrmap(0, &ggconnie_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);

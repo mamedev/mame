@@ -14,7 +14,6 @@
 #include "cpu/h6280/h6280.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#define PCE_MAIN_CLOCK      21477270
 
 class pce_common_state : public driver_device
 {

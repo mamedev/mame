@@ -288,6 +288,15 @@ void pce_state::sgx_io(address_map &map)
 	map(0x00, 0x03).rw("huc6202", FUNC(huc6202_device::io_read), FUNC(huc6202_device::io_write));
 }
 
+void pce_state::vdc1_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+}
+
+void pce_state::vdc2_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+}
 
 uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -309,7 +318,7 @@ static void pce_cart(device_slot_interface &device)
 void pce_state::pce_common(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	H6280(config, m_maincpu, XTAL(21'477'272)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
 	m_maincpu->set_addrmap(AS_IO, &pce_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
@@ -321,18 +330,18 @@ void pce_state::pce_common(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272), huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_state::screen_update));
 	screen.set_palette(m_huc6260);
 
-	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	HUC6260(config, m_huc6260, XTAL(21'477'272));
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x10000);
+	huc6270_device &huc6270(HUC6270(config, "huc6270", XTAL(21'477'272)));
+	huc6270.set_addrmap(0, &pce_state::vdc1_mem);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -363,7 +372,7 @@ void pce_state::tg16(machine_config &config)
 void pce_state::sgx(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	H6280(config, m_maincpu, XTAL(21'477'272)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pce_state::sgx_io);
 	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
@@ -375,25 +384,25 @@ void pce_state::sgx(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272), huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_state::screen_update));
 	screen.set_palette(m_huc6260);
 
-	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	HUC6260(config, m_huc6260, XTAL(21'477'272));
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
 
-	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
-	huc6270_0.set_vram_size(0x10000);
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", XTAL(21'477'272)));
+	huc6270_0.set_addrmap(0, &pce_state::vdc1_mem);
 	huc6270_0.irq().set_inputline(m_maincpu, 0);
 
-	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
-	huc6270_1.set_vram_size(0x10000);
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", XTAL(21'477'272)));
+	huc6270_1.set_addrmap(0, &pce_state::vdc2_mem);
 	huc6270_1.irq().set_inputline(m_maincpu, 0);
 
-	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202_device &huc6202(HUC6202(config, "huc6202", XTAL(21'477'272)));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));

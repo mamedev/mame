@@ -143,6 +143,7 @@ private:
 
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
+	void vdc_mem(address_map &map);
 	void z80_map(address_map &map);
 };
 
@@ -320,11 +321,16 @@ void uapce_state::pce_io(address_map &map)
 	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 }
 
+void uapce_state::vdc_mem(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+}
+
 
 void uapce_state::uapce(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	H6280(config, m_maincpu, XTAL(21'477'272)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &uapce_state::pce_mem);
 	m_maincpu->set_addrmap(AS_IO, &uapce_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(uapce_state::pce_joystick_r));
@@ -339,18 +345,18 @@ void uapce_state::uapce(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272), huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_common_state::screen_update));
 	screen.set_palette("huc6260");
 
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
+	HUC6260(config, m_huc6260, XTAL(21'477'272));
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x10000);
+	huc6270_device &huc6270(HUC6270(config, "huc6270", XTAL(21'477'272)));
+	huc6270.set_addrmap(0, &uapce_state::vdc_mem);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();

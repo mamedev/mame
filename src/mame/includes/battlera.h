@@ -8,8 +8,6 @@
 #include "video/huc6270.h"
 #include "screen.h"
 
-#define MAIN_CLOCK      21477270
-
 class battlera_state : public driver_device
 {
 public:
@@ -48,4 +46,5 @@ public:
 	void battlera_map(address_map &map);
 	void battlera_portmap(address_map &map);
 	void sound_map(address_map &map);
+	void vdc_mem(address_map &map);
 };

@@ -180,6 +180,11 @@ void battlera_state::sound_map(address_map &map)
 	map(0x1f0000, 0x1f1fff).ram(); /* Main ram */
 }
 
+void battlera_state::vdc_mem(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+}
+
 /******************************************************************************/
 
 static INPUT_PORTS_START( battlera )
@@ -259,14 +264,14 @@ uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void battlera_state::battlera(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, 21477200/3);
+	H6280(config, m_maincpu, XTAL(21'477'272)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlera_state::battlera_map);
 	m_maincpu->set_addrmap(AS_IO, &battlera_state::battlera_portmap);
 	m_maincpu->port_in_cb().set(FUNC(battlera_state::control_data_r));
 	m_maincpu->port_out_cb().set(FUNC(battlera_state::control_data_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	H6280(config, m_audiocpu, 21477200/3);
+	H6280(config, m_audiocpu, XTAL(21'477'272)/3);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &battlera_state::sound_map);
 	m_audiocpu->port_in_cb().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_audiocpu->port_out_cb().set(FUNC(battlera_state::adpcm_reset_w));
@@ -274,18 +279,18 @@ void battlera_state::battlera(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	m_screen->set_raw(XTAL(21'477'272), huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	m_screen->set_screen_update(FUNC(battlera_state::screen_update));
 	m_screen->set_palette(m_huc6260);
 
-	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	HUC6260(config, m_huc6260, XTAL(21'477'272));
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x20000);
+	huc6270_device &huc6270(HUC6270(config, "huc6270", XTAL(21'477'272)));
+	huc6270.set_addrmap(0, &battlera_state::vdc_mem);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	/* sound hardware */
@@ -294,9 +299,9 @@ void battlera_state::battlera(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2203(config, "ymsnd", 12000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ymsnd", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(battlera_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B); /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.85);
