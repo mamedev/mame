@@ -1218,8 +1218,8 @@ void gunpey_state::gunpey(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	OKIM6295(config, m_oki, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.125);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.125);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
 	ymz.add_route(0, "lspeaker", 0.25);

@@ -3751,13 +3751,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO: prevent error.log spew
 	YMZ280B(config, m_ymz280b[0], 0);
 	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
-	m_ymz280b[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ymz280b[0]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymz280b[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YMZ280B(config, m_ymz280b[1], 0);
 	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
-	m_ymz280b[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ymz280b[1]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymz280b[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	RF5C164(config, m_rf5c164, 0);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);

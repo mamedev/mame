@@ -187,9 +187,9 @@ void zn_state::zn_1mb_vram(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.35);
-	spu.add_route(1, "rspeaker", 0.35);
+	SPU(config, m_spu, XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu"));
+	m_spu->add_route(0, "lspeaker", 0.35);
+	m_spu->add_route(1, "rspeaker", 0.35);
 
 	AT28C16(config, "at28c16", 0);
 }
@@ -232,9 +232,9 @@ void zn_state::zn2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.35);
-	spu.add_route(1, "rspeaker", 0.35);
+	SPU(config, m_spu, XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu"));
+	m_spu->add_route(0, "lspeaker", 0.35);
+	m_spu->add_route(1, "rspeaker", 0.35);
 
 	AT28C16(config, "at28c16", 0);
 }
@@ -2148,6 +2148,10 @@ void atlus_zn_state::coh1001l(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch16);
 	m_soundlatch16->data_pending_callback().set_inputline(m_audiocpu, 3);
+
+	m_spu->reset_routes();
+	m_spu->add_route(0, "lspeaker", 0.175);
+	m_spu->add_route(1, "rspeaker", 0.175);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
 	ymz.irq_handler().set_inputline(m_audiocpu, 2);
