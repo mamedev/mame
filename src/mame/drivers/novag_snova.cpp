@@ -5,6 +5,9 @@
 
 Novag Super Nova (model 904)
 
+The chess engine is by David Kittinger. Older versions of the program have a bug
+in the opening moves, always playing B5 after D4.
+
 Hardware notes:
 - Hitachi HD63A03YP MCU @ 16MHz (4MHz internal)
 - 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
@@ -279,5 +282,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
