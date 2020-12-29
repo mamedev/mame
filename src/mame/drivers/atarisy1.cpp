@@ -892,7 +892,7 @@ void atarisy1_state::roadb110(machine_config &config)
 	ROM_LOAD16_BYTE_BIOS(1, "136032.106.l12", 0x00001, 0x04000, CRC(76ee86c4) SHA1(cbcd424510435a04e9041967a13781fd19b0f2c4) ) \
 	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )                                                                             \
 	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
-	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) )
+	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
 
 #define MOTHERBOARD_ALPHA                                                                                              \
 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
