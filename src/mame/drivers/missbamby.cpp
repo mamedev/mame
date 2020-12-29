@@ -40,7 +40,7 @@ Miss Bamby - Automatics Pasqual
 |__|   _______           ___________________  |D  | | 3.6V    | |
 |__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| LM311N      |
+|__|                                  8 dips->|S__| LM311N      |
    |____________________________________________________________|
 
 Golden Winner - Reben
@@ -67,7 +67,7 @@ Golden Winner - Reben
 |__|   _______           ___________________  |D  |             |
 |__|   |LM380N|          |    AY-3-8910     | |I  |             |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| CA311E      |
+|__|                                  8 dips->|S__| CA311E      |
    |____________________________________________________________|
 */
 
@@ -136,6 +136,18 @@ static INPUT_PORTS_START( missbamby )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+INPUT_PORTS_END
+
+// 4 dipswitches on Cirsa 810601 A PCB
+static INPUT_PORTS_START( c_810601a )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
 INPUT_PORTS_END
 
 
@@ -233,7 +245,7 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, minisupf, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
