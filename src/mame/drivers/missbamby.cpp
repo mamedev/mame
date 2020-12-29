@@ -221,6 +221,15 @@ ROM_START( unkslot )
 	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
 ROM_END
 
+// PINBALL
+// CPU:   1 x I8085A
+// IO:    1 x I8155
+// Sound: 1 x AY8910
+ROM_START( trebol )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "m69.bin", 0x0000, 0x2000, CRC(8fb8cd39) SHA1(4ed505d06b489ce83316fdaa39f7ce128011fb4b) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -229,3 +238,4 @@ GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0
 GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, trebol,   0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",                                MACHINE_IS_SKELETON_MECHANICAL )
