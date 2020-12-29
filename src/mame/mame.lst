@@ -12173,6 +12173,9 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 @source:diablo1300.cpp
 diablo              //
 
+@source:diamondking.cpp
+diamondking                     // (c) 1997 SegaSA / Sonic
+
 @source:didact.cpp
 md6802                          //
 mp68a                           //
