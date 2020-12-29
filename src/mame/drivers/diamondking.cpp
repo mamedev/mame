@@ -152,13 +152,13 @@ void diamondking_state::diamondking(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(2'000'000))); // Frecuency unknown
+	ay8910_device &ay8910(AY8910(config, "ay8910", 2.0)); // Frecuency unknown
 	ay8910.port_a_read_callback().set_ioport("DSW1");
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 
-	M68340(config, m_iocpu, XTAL(16'000'000)); // Fecuency unknown
+	M68340(config, m_iocpu, 16.0); // Frecuency unknown
 
-	msm6585_device &msm6585(MSM6585(config, "msm6585", 640_kHz_XTAL)); // Frecuency unknown
+	msm6585_device &msm6585(MSM6585(config, "msm6585", 0.64)); // Frecuency unknown
 	msm6585.add_route(ALL_OUTPUTS, "mono", 1.0); // Guess
 }
 
