@@ -584,6 +584,13 @@ static INPUT_PORTS_START( indytemc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("F60000")    // F60000
+	PORT_BIT(0xfd00, IP_ACTIVE_LOW, IPT_UNUSED) // HACK: splitting IPT_UNUSED in indytemp using PORT_CONFNAME seems broken
+
+	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Flip_Screen ) ) // P103-21
+	PORT_CONFSETTING(      0x0200, DEF_STR( On ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 
@@ -2560,7 +2567,7 @@ GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indyt
 GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL)
 
 GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
