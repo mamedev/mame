@@ -79,6 +79,8 @@
 #include "screen.h"
 
 
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -582,10 +584,6 @@ ROM_START( pinpong )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( pongdbl )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( pursuit )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -615,6 +613,9 @@ ROM_START( coupfran ) // dummy to satisfy game entry
 ROM_END
 
 */
+
+} // Anonymous namespace
+
 
 GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
 GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
