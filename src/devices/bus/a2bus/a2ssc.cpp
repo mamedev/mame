@@ -113,6 +113,7 @@ void a2bus_ssc_device::device_add_mconfig(machine_config &config)
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(a2bus_ssc_device::acia_irq_w));
 	m_acia->txd_handler().set(SSC_RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set(SSC_RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia->dtr_handler().set(SSC_RS232_TAG, FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232(RS232_PORT(config, SSC_RS232_TAG, default_rs232_devices, nullptr));
