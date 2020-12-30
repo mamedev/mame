@@ -23,6 +23,7 @@ public:
 
     // DMAC3 has two controllers on-chip
     // The 5000X uses controllers 0 and 1 for SPIFI/SCSI bus 0 and 1 respectively
+    // Haven't determined yet if the DMA capabilities of the APBus and FIFO chips also use logic on the DMAC chip
     enum DMAC3_Controller {
         CTRL0 = 0,
         CTRL1 = 1,

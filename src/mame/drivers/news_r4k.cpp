@@ -180,8 +180,6 @@ protected:
     required_device<news_hid_hle_device> m_hid;
 
     // DMAC3 DMA controller
-    // Unlike previous NEWS generations, the DMAC3 is exclusive for the SPIFI3s to use.
-    // The other devices, like sound and the floppy controller, use the FIFO chips instead.
     required_device<dmac3_device> m_dmac;
 
     // HP SPIFI3 SCSI controller (2x)
@@ -284,7 +282,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 
-    // SCSI DMA controller
+    // DMA controller
     DMAC3(config, m_dmac, 0);
     m_dmac->set_bus(m_cpu, 0);
     m_dmac->out_int_cb().set(FUNC(news_r4k_state::irq_w<DMAC>));
