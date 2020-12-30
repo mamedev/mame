@@ -17,17 +17,13 @@
 #include "emu.h"
 #include "dmac3.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony DMA Controller 3")
 
 dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, DMAC3, tag, owner, clock)
-	, m_bus(*this, finder_base::DUMMY_TAG, -1, 64)
-	, m_out_int(*this)
-	, m_dma_r(*this)
-	, m_dma_w(*this)
+	: device_t(mconfig, DMAC3, tag, owner, clock), m_bus(*this, finder_base::DUMMY_TAG, -1, 64), m_out_int(*this), m_dma_r(*this), m_dma_w(*this)
 {
 }
 
@@ -170,4 +166,65 @@ void dmac3_device::dma_check(void *ptr, s32 param)
 	if (active)
 		m_dma_check->adjust(attotime::zero);
 	*/
+}
+
+uint32_t dmac3_device::cstat_r(DMAC3_Controller controller)
+{
+	uint32_t val = m_controllers[controller].cstat;
+	LOG("dmac%d cstat_r: 0x%x\n", controller, val);
+	return val;
+}
+uint32_t dmac3_device::ictl_r(DMAC3_Controller controller)
+{
+	uint32_t val = m_controllers[controller].ictl;
+	LOG("dmac%d ictl_r: 0x%x\n", controller, val);
+	return val;
+}
+uint32_t dmac3_device::trc_r(DMAC3_Controller controller)
+{
+	uint32_t val = m_controllers[controller].trc;
+	LOG("dmac%d trc_r: 0x%x\n", controller, val);
+	return val;
+}
+uint32_t dmac3_device::tra_r(DMAC3_Controller controller)
+{
+	uint32_t val = m_controllers[controller].tra;
+	LOG("dmac%d tra_r: 0x%x\n", controller, val);
+	return val;
+}
+uint32_t dmac3_device::cnf_r(DMAC3_Controller controller)
+{
+	uint32_t val = m_controllers[controller].cnf;
+	LOG("dmac%d cnf_r: 0x%x\n", controller, val);
+	return val;
+}
+
+void dmac3_device::cstat_w(DMAC3_Controller controller, uint32_t data)
+{
+	LOG("dmac%d cstat_w: 0x%x\n", controller, data);
+	m_controllers[controller].cstat = data;
+}
+
+void dmac3_device::ictl_w(DMAC3_Controller controller, uint32_t data)
+{
+	LOG("dmac%d ictl_w: 0x%x\n", controller, data);
+	m_controllers[controller].ictl = data;
+}
+
+void dmac3_device::trc_w(DMAC3_Controller controller, uint32_t data)
+{
+	LOG("dmac%d trc_w: 0x%x\n", controller, data);
+	m_controllers[controller].trc = data;
+}
+
+void dmac3_device::tra_w(DMAC3_Controller controller, uint32_t data)
+{
+	LOG("dmac%d tra_w: 0x%x\n", controller, data);
+	m_controllers[controller].tra = data;
+}
+
+void dmac3_device::cnf_w(DMAC3_Controller controller, uint32_t data)
+{
+	LOG("dmac%d cnf_w: 0x%x\n", controller, data);
+	m_controllers[controller].cnf = data;
 }

@@ -404,10 +404,14 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             else if (offset == 3) { return 0x28; }
             else { return 0x0; } })); // DSC-39 region
 
+    // SPIFI3 register - this causes the MROM to think SPIFIs are attached
+    // and enumerates both SPIFI3 and DMAC3. When this is set, the final value
+    // of DMAC3 registers matches the physical platform.
+    map(0x1e280070, 0x1e280077).lr64(NAME([this](offs_t offset) {return 0x1;})); // Fully booted: 1e280074: 00000001
+    map(0x1e380070, 0x1e380077).lr64(NAME([this](offs_t offset) {return 0x1;})); // Fully booted: 1e380074: 00000001
+
     // Unknown regions that mrom accesses
     // map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
-    // map(0x1e280074, 0x1e280077); // Fully booted: 1e280074: 00000001
-    // map(0x1e380074, 0x1e380077); // Fully booted: 1e380074: 00000001
     // map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) { return 0x80; }));
     // map(0x1f4c0000, 0x1f4c0003).ram();
     // map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, APBus init?
@@ -548,7 +552,7 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
 
 void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
-    LOG("generic_irq_w: INTST%d IRQ %d set to %d", irq, mask, state);
+    LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
     if (state)
     {
         m_intst[irq] |= mask;
