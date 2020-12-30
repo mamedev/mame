@@ -257,8 +257,18 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
 			strcpy((char*)filectx.curdir, (char*)filectx.filename);
 		} else {
-			strcat((char*)filectx.curdir, "/");
-			strcat((char*)filectx.curdir, (char*)filectx.filename);
+			std::string fullpath;
+			fullpath.reserve(1024);
+			fullpath.assign((const char *)filectx.curdir);
+			fullpath.append(PATH_SEPARATOR);
+			fullpath.append((const char*)filectx.filename);
+
+			if (fullpath.length() < 1024)
+			{
+			    strncpy((char*)filectx.curdir, fullpath.c_str(), 1024 - 1);
+			} else {
+			    osd_printf_error("Error: path too long.\n\n");
+			}
 		}
 		break;
 	case kFileCmdGetFirstListing:
