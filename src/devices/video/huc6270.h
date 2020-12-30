@@ -4,7 +4,7 @@
 
     Hudson/NEC HuC6270 interface
 
-    Pinouts, QFP64
+    Pinouts, QFP80
 
                                   )
                                   D
