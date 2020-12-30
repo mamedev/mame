@@ -57,6 +57,7 @@
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "machine/z80scc.h"
+#include "machine/dmac3.h"
 #include "machine/news_hid.h"
 #include "bus/rs232/rs232.h"
 
@@ -77,6 +78,7 @@ public:
           m_escc(*this, "escc"),
           m_serial(*this, "serial%u", 0U),
           m_hid(*this, "hid"),
+          m_dmac(*this, "dmac"),
           m_led(*this, "led%u", 0U) {}
 
     // NWS-5000X
@@ -166,9 +168,6 @@ protected:
     required_device<z80scc_device> m_escc;
     required_device_array<rs232_port_device, 2> m_serial;
 
-    // DMAC3 DMA controller
-    // required_device<dmac_0448_device> m_dma;
-
     // SONIC ethernet controller
     // required_device<am7990_device> m_net;
     // std::unique_ptr<u16[]> m_net_ram;
@@ -179,6 +178,11 @@ protected:
 
     // NEWS keyboard and mouse
     required_device<news_hid_hle_device> m_hid;
+
+    // DMAC3 DMA controller
+    // Unlike previous NEWS generations, the DMAC3 is exclusive for the SPIFI3s to use.
+    // The other devices, like sound and the floppy controller, use the FIFO chips instead.
+    required_device<dmac3_device> m_dmac;
 
     // HP SPIFI3 SCSI controller (2x)
     // required_device<cxd1185_device> m_scsi;
@@ -236,7 +240,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_cpu->set_icache_size(ICACHE_SIZE);
     m_cpu->set_dcache_size(DCACHE_SIZE);
     m_cpu->set_secondary_cache_line_size(0x40);         // because config[23:22] = 0b10
-    m_cpu->set_system_clock((75_MHz_XTAL).value() / 3);	// because config[30:28] = 0b001
+    m_cpu->set_system_clock((75_MHz_XTAL).value() / 3); // because config[30:28] = 0b001
 #else
     R4400(config, m_cpu, 75_MHz_XTAL);
 #endif
@@ -279,6 +283,11 @@ void news_r4k_state::machine_common(machine_config &config)
     NEWS_HID_HLE(config, m_hid);
     m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
+
+    // SCSI DMA controller
+    DMAC3(config, m_dmac, 0);
+    m_dmac->set_bus(m_cpu, 0);
+    m_dmac->out_int_cb().set(FUNC(news_r4k_state::irq_w<DMAC>));
 }
 
 void news_r4k_state::nws5000x(machine_config &config)
@@ -311,9 +320,9 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f880000, 0x1f881fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 
     // Interrupt ports
-    map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));								  // Clear
+    map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));                                // Clear
     map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w)); // Enable
-    map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));								  // Status
+    map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));                                 // Status
 
     // LEDs
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
@@ -330,23 +339,22 @@ void news_r4k_state::cpu_map(address_map &map)
     //                       https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/if_snreg.h
     // map(0x1e600000, 0x1e600000);
 
-    // DMAC3 DMA Controller 0
-    // map(0x1e200000, 0x1e20000f); // End addr meeds confirmation
-
-    // DMAC3 DMA Controller 1
-    // map(0x1e300000, 0x1e30000f); // End addr meeds confirmation
-
-    // xb (Sony DSC-39 video card)
-    // map(0x14900000, 0x14900000);
-
-    // sb (Likely Fujitsu MB86431 audio chip)
-    // map(0x1ed00000, 0x1ed00000);
+    // DMAC3 DMA Controller
+    map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
+    map(0x1e200000, 0x1e200013).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
+    map(0x1e300000, 0x1e300013).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // spifi controller 1 (scsi bus 0)
     // map(0x1e280000, 0x1e280000);
 
     // spifi controller 2 (scsi bus 1)
     // map(0x1e380000, 0x1e380000);
+
+    // xb (Sony DSC-39 video card)
+    // map(0x14900000, 0x14900000);
+
+    // sb (AIF5 audio + FIFO transfer + MB87077 volume)
+    // map(0x1ed00000, 0x1ed00000);
 
     // HID (kb + ms)
     map(0x1f900000, 0x1f900023).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
@@ -377,8 +385,8 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
 
     map(0x1f4c0000, 0x1f4c0007).noprw(); // TODO: Register for something that is accessed very early in mrom flow (0xbfc0040C)
-    map(0x1e980000, 0x1e9fffff).ram(); // is this mirrored?
-    map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
+    map(0x1e980000, 0x1e9fffff).ram();   // is this mirrored?
+    map(0x1fe00000, 0x1fffffff).ram();   // determine mirror of this RAM - it is smaller than this size
     map(0x1ed60000, 0x1ed6ffff).noprw(); // Makes log less verbose, not sure what this is yet.
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 0 || offset % 4 == 1) { return 0x0; }
@@ -396,7 +404,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             else if (offset == 1) { return 0x0; }
             else if (offset == 2) { return 0x03; }
             else if (offset == 3) { return 0x28; }
-            else { return 0x0; } }));
+            else { return 0x0; } })); // DSC-39 region
 
     // Unknown regions that mrom accesses
     // map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
