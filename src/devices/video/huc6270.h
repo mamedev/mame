@@ -301,9 +301,8 @@ public:
 		return m_horz_to_go * 8 + m_horz_steps;
 	}
 
-	// /VSYNC pin related
+	// VSYNC, HSYNC input, TODO: output mode?
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	// /HSYNC pin related
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 
 	static const uint16_t HUC6270_SPRITE     = 0x0100;    // sprite colour information
