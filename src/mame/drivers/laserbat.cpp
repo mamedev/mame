@@ -637,6 +637,14 @@ Sound Board 1b11107
 6802
 6821
 2*8910
+
+Labels are in the following format:
+
+   CAT'N MOUSE      <-- Game name, printed
+TYPE ____________   <-- Line to hand write type or revision?
+MEM. N. _________   <-- Line to hand write ROM number or PCB location
+
+* Sound ROM labels have "SOUND" in place of "TYPE"
 */
 
 ROM_START( catnmous )
@@ -665,66 +673,66 @@ ROM_START( catnmous )
 	ROM_CONTINUE(             0x7000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "type01.8g",    0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
-	ROM_LOAD( "type01.10g",   0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
-	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_8g.8g",   0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_10g.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_11g.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "cat_n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_14l.14l", 0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
-	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
+	ROM_LOAD( "82s100.10m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 
 	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
-	ROM_LOAD( "sound01.1f",   0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
-	ROM_LOAD( "sound01.1d",   0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1f.1f", 0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1d.1d", 0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1e.1e", 0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 ROM_START( catnmousa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "catnmous.7c",  0x0000, 0x0400, CRC(0bf9fc06) SHA1(7d5857121fe51f43e4ae7db34df720198994afdd) )
-	ROM_CONTINUE(             0x4000, 0x0400 )
-	ROM_LOAD( "catnmous.6c",  0x0400, 0x0400, CRC(b0e140a0) SHA1(68d8ca25642e872f2177d09b78d553c033411dd5) )
-	ROM_CONTINUE(             0x4400, 0x0400 )
-	ROM_LOAD( "catnmous.5c",  0x0800, 0x0400, CRC(7bbc0fe5) SHA1(d20e89d89a0958d45ac31b6d2c540fcf3d326068) )
-	ROM_CONTINUE(             0x4800, 0x0400 )
-	ROM_LOAD( "catnmous.3c",  0x0c00, 0x0400, CRC(0350531d) SHA1(6115f907544ab317e0090a10cce3adce26f4afd9) )
-	ROM_CONTINUE(             0x4c00, 0x0400 )
-	ROM_LOAD( "catnmous.2c",  0x1000, 0x0400, CRC(4a26e963) SHA1(be8dd98d3810319a228ce4c07b097eb75f2d1e5c) )
-	ROM_CONTINUE(             0x5000, 0x0400 )
-	ROM_LOAD( "catnmous.7b",  0x2000, 0x0400, CRC(d8d6a029) SHA1(7e5688fd3af97620ed07d9375335fe1deb6e483f) )
-	ROM_CONTINUE(             0x6000, 0x0400 )
-	ROM_LOAD( "catnmous.6b",  0x2400, 0x0400, CRC(ccc871d9) SHA1(355eff250ab3d1a75ed690369add1639e7061ee8) )
-	ROM_CONTINUE(             0x6400, 0x0400 )
-	ROM_LOAD( "catnmous.5b",  0x2800, 0x0400, CRC(23783b84) SHA1(97a3ef7c64e1ded5cc1999d3aa58652ca541166c) )
-	ROM_CONTINUE(             0x6800, 0x0400 )
-	ROM_LOAD( "catnmous.3b",  0x2c00, 0x0400, CRC(e99fce4b) SHA1(2c8efdea55bae5526b547fec53e8f3642fe2bd2e) )
-	ROM_CONTINUE(             0x6c00, 0x0400 )
-	// missing half rom
-	ROM_LOAD( "catnmous.2b",  0x3000, 0x0400, BAD_DUMP CRC(880728fa) SHA1(f204d669c190ad0cf2c885af12625026534db655) )
-	ROM_CONTINUE(             0x7000, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_1.7c",  0x0000, 0x0400, CRC(0bf9fc06) SHA1(7d5857121fe51f43e4ae7db34df720198994afdd) )
+	ROM_CONTINUE(                                0x4000, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_2.6c",  0x0400, 0x0400, CRC(b0e140a0) SHA1(68d8ca25642e872f2177d09b78d553c033411dd5) )
+	ROM_CONTINUE(                                0x4400, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_3.5c",  0x0800, 0x0400, CRC(7bbc0fe5) SHA1(d20e89d89a0958d45ac31b6d2c540fcf3d326068) )
+	ROM_CONTINUE(                                0x4800, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_4.3c",  0x0c00, 0x0400, CRC(0350531d) SHA1(6115f907544ab317e0090a10cce3adce26f4afd9) )
+	ROM_CONTINUE(                                0x4c00, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_5.2c",  0x1000, 0x0400, CRC(4a26e963) SHA1(be8dd98d3810319a228ce4c07b097eb75f2d1e5c) )
+	ROM_CONTINUE(                                0x5000, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_6.7b",  0x2000, 0x0400, CRC(d8d6a029) SHA1(7e5688fd3af97620ed07d9375335fe1deb6e483f) )
+	ROM_CONTINUE(                                0x6000, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_7.6b",  0x2400, 0x0400, CRC(ccc871d9) SHA1(355eff250ab3d1a75ed690369add1639e7061ee8) )
+	ROM_CONTINUE(                                0x6400, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_8.5b",  0x2800, 0x0400, CRC(23783b84) SHA1(97a3ef7c64e1ded5cc1999d3aa58652ca541166c) )
+	ROM_CONTINUE(                                0x6800, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_9.3b",  0x2c00, 0x0400, CRC(e99fce4b) SHA1(2c8efdea55bae5526b547fec53e8f3642fe2bd2e) )
+	ROM_CONTINUE(                                0x6c00, 0x0400 )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_10.2b", 0x3800, 0x0400, CRC(807b7109) SHA1(6c29197b437ab0132d8361f921e6d0d9b10f917e) )
+	ROM_CONTINUE(                                0x7800, 0x0400 )
+	ROM_CONTINUE(                                0x3000, 0x0400 )
+	ROM_CONTINUE(                                0x7000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "catnmous.8g",  0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
-	ROM_LOAD( "catnmous.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
-	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_8g.8g",   0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_10g.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_11g.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "cat_n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
+	ROM_LOAD( "cat_n_mouse_type_01_mem_n_14l.14l", 0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
-	ROM_REGION( 0x0100, "gfxmix", 0 )
-	// copied from parent set to give working graphics, need dump to confirm
-	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
+	ROM_REGION( 0x0100, "gfxmix", 0 ) // copied from parent set to give working graphics, need dump to confirm
+	ROM_LOAD( "cnm_82s100.10m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP ) // labeled C.N.M - 82S100
 
 	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 )
-	ROM_LOAD( "snd.1f",       0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
-	ROM_LOAD( "snd.1d",       0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1f.1f", 0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1d.1d", 0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
+	ROM_LOAD( "cat_n_mouse_sound_01_mem_n_1e.1e", 0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 
 GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, init_laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, init_laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
