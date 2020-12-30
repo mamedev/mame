@@ -41,14 +41,14 @@ protected:
 	virtual uint8_t read_c800(uint16_t offset) override;
 
 	required_ioport m_dsw1, m_dsw2;
+	required_ioport m_dswx;
 
 	required_device<mos6551_device> m_acia;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 
-	uint8_t *m_rom;
-	bool m_started;
+	required_region_ptr<uint8_t> m_rom;
 };
 
 // device type definition
