@@ -6,7 +6,7 @@
 Saitek Simultano, it is related to Saitek Stratos, see saitek_stratos.cpp
 But it's not similar enough to be a subdriver of it.
 
-Two versions are known: "B" from 1988, and "C" from 1989.
+Two versions are known: "B" from 1988/1989, and "C" from 1989.
 
 Hardware notes:
 - WDC W65C02P @ 5MHz
@@ -363,4 +363,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, simultano, 0,       0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, simultano, 0,       0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
