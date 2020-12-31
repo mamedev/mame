@@ -641,7 +641,7 @@ Sound Board 1b11107
 Labels are in the following format:
 
    CAT'N MOUSE      <-- Game name, printed
-TYPE ____________   <-- Line to hand write type (taken to mean revision and/or license)
+TYPE ____________   <-- Line to hand write type (revision and/or license?)
 MEM. N. _________   <-- Line to hand write ROM number or PCB location
 
 * Sound ROM labels have "SOUND" in place of "TYPE"
@@ -734,5 +734,5 @@ ROM_END
 
 GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, init_laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, init_laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (rev 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (rev 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (type 02 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (type 01 program)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
