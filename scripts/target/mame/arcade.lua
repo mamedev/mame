@@ -290,6 +290,7 @@ SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
 SOUNDS["TT5665"] = true
 --SOUNDS["RP2C33_SOUND"] = true
+--SOUNDS["UDA1344"] = true
 
 --------------------------------------------------
 -- specify available video cores
