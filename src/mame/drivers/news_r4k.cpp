@@ -59,6 +59,11 @@
 #include "machine/z80scc.h"
 #include "machine/dmac3.h"
 #include "machine/news_hid.h"
+#include "machine/spifi3.h"
+
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 
 // MAME infra imports
@@ -79,6 +84,10 @@ public:
           m_serial(*this, "serial%u", 0U),
           m_hid(*this, "hid"),
           m_dmac(*this, "dmac"),
+          m_scsi0(*this, "scsi0:7:spifi3"),
+          m_scsi1(*this, "scsi1:7:spifi3"),
+          m_scsibus0(*this, "scsi0"),
+          m_scsibus1(*this, "scsi1"),
           m_led(*this, "led%u", 0U) {}
 
     // NWS-5000X
@@ -183,8 +192,10 @@ protected:
     required_device<dmac3_device> m_dmac;
 
     // HP SPIFI3 SCSI controller (2x)
-    // required_device<cxd1185_device> m_scsi;
-    // required_device<nscsi_bus_device> m_scsibus;
+    required_device<spifi3_device> m_scsi0;
+    required_device<spifi3_device> m_scsi1;
+    required_device<nscsi_bus_device> m_scsibus0;
+    required_device<nscsi_bus_device> m_scsibus1;
 
     // DSC-39 "xb" video card
     // required_shared_ptr<u32> m_vram;
@@ -229,6 +240,12 @@ protected:
 //FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
 //FLOPPY_PC_FORMAT
 //FLOPPY_FORMATS_END
+
+static void news_scsi_devices(device_slot_interface &device)
+{
+    device.option_add("harddisk", NSCSI_HARDDISK);
+    device.option_add("cdrom", NSCSI_CDROM);
+}
 
 void news_r4k_state::machine_common(machine_config &config)
 {
@@ -286,6 +303,64 @@ void news_r4k_state::machine_common(machine_config &config)
     DMAC3(config, m_dmac, 0);
     m_dmac->set_bus(m_cpu, 0);
     m_dmac->out_int_cb().set(FUNC(news_r4k_state::irq_w<DMAC>));
+
+    // Create SCSI buses
+	NSCSI_BUS(config, m_scsibus0);
+    NSCSI_BUS(config, m_scsibus1);
+
+    // Create SCSI connectors
+	NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:3", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:3", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:4", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:5", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
+
+    // Connect SPIFI3s to the buses
+	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16_MHz_XTAL).machine_config( // TODO: clock?
+		[this](device_t *device)
+		{
+            /* TODO
+			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+
+			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+			adapter.port_out_cb().set(
+				[this](u8 data)
+				{
+					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+				});
+
+			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
+			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
+            */
+		});
+        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16_MHz_XTAL).machine_config( // TODO: clock?
+		[this](device_t *device)
+		{
+            /* TODO
+			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+
+			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+			adapter.port_out_cb().set(
+				[this](u8 data)
+				{
+					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+				});
+
+			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
+			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
+            */
+		});
 }
 
 void news_r4k_state::nws5000x(machine_config &config)
@@ -342,11 +417,11 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
-    // spifi controller 1 (scsi bus 0)
-    // map(0x1e280000, 0x1e280000);
-
-    // spifi controller 2 (scsi bus 1)
-    // map(0x1e380000, 0x1e380000);
+    // SPIFI SCSI controllers
+    // This mapping should probably go through the DMAC3 to match the
+    // platform setup. The DMAC has to swap modes when talking to the SPIFI
+    map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
     // xb (Sony DSC-39 video card)
     // map(0x14900000, 0x14900000);
@@ -403,12 +478,6 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             else if (offset == 2) { return 0x03; }
             else if (offset == 3) { return 0x28; }
             else { return 0x0; } })); // DSC-39 region
-
-    // SPIFI3 register - this causes the MROM to think SPIFIs are attached
-    // and enumerates both SPIFI3 and DMAC3. When this is set, the final value
-    // of DMAC3 registers matches the physical platform.
-    map(0x1e280070, 0x1e280077).lr64(NAME([this](offs_t offset) {return 0x1;})); // Fully booted: 1e280074: 00000001
-    map(0x1e380070, 0x1e380077).lr64(NAME([this](offs_t offset) {return 0x1;})); // Fully booted: 1e380074: 00000001
 
     // Unknown regions that mrom accesses
     // map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
@@ -622,12 +691,6 @@ void news_r4k_state::itimer(void *ptr, s32 param)
     irq_w<TIMER>(ASSERT_LINE);
     */
 }
-
-/*static void news_scsi_devices(device_slot_interface &device)
-{
-    //device.option_add("harddisk", NSCSI_HARDDISK);
-    //device.option_add("cdrom", NSCSI_CDROM);
-}*/
 
 /*
  * NWS-5000X DIP switches
