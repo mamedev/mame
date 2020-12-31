@@ -339,8 +339,8 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // DMAC3 DMA Controller
     map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
-    map(0x1e200000, 0x1e200013).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
-    map(0x1e300000, 0x1e300013).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
+    map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
+    map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // spifi controller 1 (scsi bus 0)
     // map(0x1e280000, 0x1e280000);
@@ -355,12 +355,12 @@ void news_r4k_state::cpu_map(address_map &map)
     // map(0x1ed00000, 0x1ed00000);
 
     // HID (kb + ms)
-    map(0x1f900000, 0x1f900023).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
+    map(0x1f900000, 0x1f900027).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
     // lp (printer port??)
     // map(0x1ed30000, 0x1ed30000);
 
-    // fd (floppy disk?)
+    // fd (floppy disk) - note that the FIFO address is here. The control register mapping is TBD
     // map(0x1ed20000, 0x1ed20000);
 
     // Assign debug mappings
@@ -433,7 +433,6 @@ void news_r4k_state::machine_start()
     // TODO: save LED state?
 
     /*
-
     m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::itimer), this));
     for (bool &int_state : m_int_state)
         int_state = false;
