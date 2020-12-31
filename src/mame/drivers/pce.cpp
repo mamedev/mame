@@ -256,14 +256,14 @@ void pce_state::pce_mem(address_map &map)
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
 	map(0x1EE800, 0x1EFFFF).noprw();
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000).share("user_ram");
-	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
 
 void pce_state::pce_io(address_map &map)
 {
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 }
 
 
@@ -275,9 +275,9 @@ void pce_state::sgx_mem(address_map &map)
 	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
 	map(0x1EE800, 0x1EFFFF).noprw();
 	map(0x1F0000, 0x1F7FFF).ram().share("user_ram");
-	map(0x1FE000, 0x1FE007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE000, 0x1FE007).rw("huc6270_0", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03E0);
 	map(0x1FE008, 0x1FE00F).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
-	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03E0);
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
@@ -398,14 +398,14 @@ void pce_state::sgx(machine_config &config)
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
 	huc6202.hsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read));
-	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write));
+	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read8));
+	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write8));
 	huc6202.next_pixel_1_callback().set("huc6270_1", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_1_callback().set("huc6270_1", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::vsync_changed));
 	huc6202.hsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
-	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
+	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read8));
+	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write8));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

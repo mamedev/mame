@@ -35,6 +35,273 @@
         ^end hsync
          ^start vsync (30 cycles after hsync)
 
+Hardware notes:
+
+    Pinouts (QFP80)
+
+                                  )
+                                  D
+                                  N
+                                  G
+                                  (
+                            5 4 3 3 2 1 0         3
+                5 4 3 2 1 0 1 1 1 s 1 1 1 9 8 7 6 d 5 4 3 2 1 0
+                A A A A A A D D D s D D D D D D D d D D D D D D
+                M M M M M M M M M V M M M M M M M V M M M M M M
+                | | | | | | | | | | | | | | | | | | | | | | | |
+               /-----------------------------------------------\
+          MA6 -|                                               |-/MRD
+          MA7 -|                                               |-/MWR
+          MA8 -|                                               |-VD0
+          MA9 -|                                               |-VD1
+         MA10 -|                                               |-VD2
+         MA11 -|                                               |-VD3
+    Vss4(GND) -|                                               |-VD4
+         Vdd4 -|                    HuC6270                    |-Vss2(GND)
+         MA12 -|                                               |-Vdd2
+         MA13 -|                                               |-VD5
+         MA14 -|                                               |-VD6
+         MA15 -|                                               |-VD7
+         /IRQ -|                                               |-SPBG
+        /BUSY -|                                               |-DISP
+           A0 -|                                               |-/HSYNC
+           A1 -|                                               |-/VSYNC
+               \-----------------------------------------------/
+                | | | | | | | | | | | | | | | | | | | | | | | |
+                / / / D D D D D D D V D D D D D D V D D D 8 C /
+                C W R 1 1 1 1 1 1 9 s 8 7 6 5 4 3 d 2 1 0 / K R
+                S R D 5 4 3 2 1 0   s             d       1   E
+                                    1             1       6   S
+                                    (                         E
+                                    G                         T
+                                    N
+                                    D
+                                    )
+
+    CK: Input clock
+    /RESET: Reset pin
+    /CS: Chip select
+    /WR: Write enable
+    /RD: Read enable
+    /IRQ: Interrupt output to host CPU
+    /BUSY: Busy flag
+    /MRD: Memory read enable
+    /MWR: Memory write enable
+    /HSYNC: Horizontal sync
+    /VSYNC: Vertical sync
+    DISP: Programmable; See below
+    MA0-15: Memory address
+    MD0-15: Memory data
+    VD0-7: Pixel data output
+    SPBG: Sprite/Background flag, Also highest bit of pixel data output
+    A0-1: Host interface address
+    D0-15: Host interface data
+    8/16: 8 or 16 bit host interface mode?
+
+	Register format
+		Bit               Description
+		fedcba98 76543210
+	00 AR Register select (W)
+		-------- ---xxxxx Register select
+
+	00 SR Status (R)
+		-------- -x------ BUSY (when VDC accessed VRAM)
+		-------- --x----- VD (Vblank flag)
+		-------- ---x---- DV (VRAM-VRAM DMA done)
+		-------- ----x--- DS (VRAM-SATB DMA done)
+		-------- -----x-- RR (Scanline interrupt flag)
+		-------- ------x- OV (Sprite overflow flag)
+		-------- -------x CR (Collision flag)
+
+	02 Register data LSB
+	03 Register data MSB
+	MAWR Memory Address Write (00h W)
+		xxxxxxxx xxxxxxxx Memory address for write
+
+	MARR Memory Address Read (01h W)
+		xxxxxxxx xxxxxxxx Memory address for read
+
+	VWR Memory Data Write (02h W)
+		xxxxxxxx xxxxxxxx data to memory
+
+	VRR Memory Data Read (02h R)
+		xxxxxxxx xxxxxxxx data from memory
+
+	03h Reserved
+
+	04h Reserved
+
+	CR Control register (05h W)
+		---xx--- -------- IW (VRAM address increment value)
+		---00--- -------- +1
+		---01--- -------- +20h
+		---10--- -------- +40h
+		---11--- -------- +80h
+		-----x-- -------- DR (Dynamic RAM refresh)
+		------xx -------- TE (DISP pin output select)
+		------00 -------- H during Display
+		------01 -------- L when Indicates the position in which Color Burst is inserted
+		------10 -------- Internal horizontal sync
+		------11 -------- Invaild
+		-------- x------- BB (Background enable(1) / disable(0))
+		-------- -x------ SB (Sprite enable(1) / disable(0))
+		-------- 00------ Burst mode
+		-------- --xx---- EX (External sync mode)
+		-------- --00---- Both /VSYNC and /HSYNC are input
+		-------- --01---- /VSYNC input, /HSYNC output
+		-------- --10---- Invaild
+		-------- --11---- Both /VSYNC and /HSYNC are output
+		-------- ----xxxx IE (Interrupt enable)
+		-------- ----x--- Vertical blank interrupt
+		-------- -----x-- Scanline interrupt
+		-------- ------x- Sprite overflow interrupt
+		-------- -------x Collision interrupt
+
+	RCR Scanline interrupt position (06h W)
+		------xx xxxxxxxx Scanline interrupt position
+
+	BXR Background X scroll (07h W)
+		------xx xxxxxxxx Background X
+
+	BYR Background Y scroll (08h W)
+		-------x xxxxxxxx Background Y
+
+	MWR Memory access width (09h W)
+		-------- x------- CM (Fetch CG block in next scanline for 4 clock mode)
+		-------- 0------- (CG0)CH0, CH1
+		-------- 1------- (CG1)CH2, CH3
+		-------- -xxx---- SCREEN (Background layer size)
+		-------- -0------ 32 Tile height (256 pixel)
+		-------- -1------ 64 Tile height (512 pixel)
+		-------- --00---- 32 Tile width (256 pixel)
+		-------- --01---- 64 Tile width (512 pixel)
+		-------- --1----- 128 Tile width (1024 pixel)
+		-------- ----xx-- SM (Sprite access width mode, see below)
+		-------- ------xx VM (VRAM access width mode, see below)
+
+	HSR Horizontal sync (0Ah W)
+		-xxxxxxx -------- HDS (Horizontal display start position - 1 * 8)
+		-------- ---xxxxx HSW (Horizontal sync pulse width - 1 * 8)
+
+	HDR Horizontal display (0Bh W)
+		-xxxxxxx -------- HDW (Horizontal display width - 1 * 8)
+		-------- -xxxxxxx HDE (Horizontal display end position - 1 * 8)
+
+	VPR Vertical sync (0Ch W)
+		xxxxxxxx -------- VDS (Vertical display start position - 2)
+		-------- ---xxxxx VSW (Vertical sync pulse width - 1)
+
+	VDR Vertical display width (0Dh W)
+		-------x xxxxxxxx VDW (Vertical display width - 1)
+
+	VCR Vertical display end position (0Eh W)
+		-------- xxxxxxxx VCR (Vertical display end position)
+
+	DCR DMA control registers (0Fh W)
+		-------- ---x---- DSR (Repeat VRAM-SATB DMA in every VBlanks)
+		-------- ----x--- DI/D (Destination address increment(0) / decrement(1))
+		-------- -----x-- SI/D (Source address increment(0) / decrement(1))
+		-------- ------x- DVC (VRAM-VRAM DMA interrupt enable)
+		-------- -------x DSC (VRAM-SATB DMA interrupt enable)
+
+	SOUR VRAM-VRAM DMA source address (10h W)
+		xxxxxxxx xxxxxxxx SOUR (VRAM-VRAM DMA source address)
+
+	DESR VRAM-VRAM DMA destination address (11h W)
+		xxxxxxxx xxxxxxxx DESR (VRAM-VRAM DMA destination address)
+
+	LENR VRAM-VRAM DMA length counter (12h W)
+		xxxxxxxx xxxxxxxx LENR (VRAM-VRAM DMA length counter - 1)
+
+	DVSSR VRAM-SATB DMA source address (13h W)
+		xxxxxxxx xxxxxxxx DVSSR (VRAM-SATB DMA source address)
+
+	SM assignment
+	+-----------+--------------+-----------------------------------------------+
+	|  SM bit   |              |      Assignment for one character cycle       |
+	+-----+-----+ Access width +-----+-----+-----+-----+-----+-----+-----+-----+
+	|  3  |  2  |              |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  0  |      1       | SP0 | SP1 | SP2 | SP3 | SP0 | SP1 | SP2 | SP3 |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  1  |      2       |  SP0/SP2  |  SP1/SP3  |  SP0/SP2  |  SP1/SP3  |*1
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |      2       |    SP0    |    SP1    |    SP2    |    SP3    |
+	+-----+-----+--------------+-----------+-----------+-----------+-----------+
+	|  1  |  1  |      4       |        SP0, SP2       |        SP1, SP3       |*2
+	+-----+-----+--------------+-----------------------+-----------------------+
+	*1 LSB of pattern select bit is select (SP0, SP1) or (SP2, SP3).
+	*2 SP0-SP3 are fetched during two consecutive character cycles.
+
+	VM assignment
+	+-----------+--------------+-----------------------------------------------+
+	|  VM bit   |              |  Assignment for one character cycle (8 dot)   |
+	+-----+-----+ Access width +-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |              |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  0  |      1       | CPU | BAT | CPU |  -  | CPU | CG0 | CPU | CG1 |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  0  |  1  |      2       |    BAT    |    CPU    |    CG0    |    CG1    |
+	+-----+-----+--------------+-----+-----+-----+-----+-----+-----+-----+-----+
+	|  1  |  0  |      2       |    BAT    |    CPU    |    CG0    |    CG1    |
+	+-----+-----+--------------+-----------+-----------+-----------+-----------+
+	|  1  |  1  |      4       |          BAT          |       CG0 or CG1      |
+	+-----+-----+--------------+-----------------------+-----------------------+
+
+	BAT data (single word per tile)
+	Bit               Description
+	fedcba98 76543210
+	xxxx---- -------- CG color
+	----xxxx xxxxxxxx Character code select (16 word each)
+
+	SAT data (4 word per each sprites)
+	Offset Bit               Description
+	       fedcba98 76543210
+	00     ------xx xxxxxxxx Y coordinate - 64
+	01     ------xx xxxxxxxx X coordinate - 32
+	02     -----xxx xxxxxxxx PC (Pattern code, 64 word each)
+	       -------- -------x SG0/SG1, SG2/SG3 select, for 4 color mode
+	03     x------- -------- Flip Y
+	       --xx---- -------- CGY (Sprite height)
+		   --00---- -------- 1 tile (16 pixel)
+		   --01---- -------- 2 tiles (32 pixel)
+		   --10---- -------- Not used
+		   --11---- -------- 4 tiles (64 pixel)
+		   ----x--- -------- Flip X
+		   -------x -------- CGX (Sprite width)
+		   -------0 -------- 1 tile (16 pixel)
+		   -------1 -------- 2 tiles (32 pixel)
+		   -------- x------- SPBG (Sprite VS Background priority)
+		   -------- 0------- Behind background
+		   -------- 1------- Above background
+		   -------- ----xxxx SPRITE COLOR
+
+	VD0-7, SPBG output
+	Background:
+	Bit         Description
+	8 7654 3210
+	0 ---- ---- 0 for background
+	- xxxx ---- CG Color (when VD0-VD3 != 0)
+	- ---- x--- CG3 (or 0 for 4 clocks, CG0 selected)
+	- ---- -x-- CG2 (or 0 for 4 clocks, CG0 selected)
+	- ---- --x- CG1 (or 0 for 4 clocks, CG1 selected)
+	- ---- ---x CG0 (or 0 for 4 clocks, CG1 selected)
+	- ---- 0000 Transparency, bit 7-4 is forced to 0
+
+	Sprite:
+	Bit         Description
+	8 7654 3210
+	1 ---- ---- 1 for sprite
+	- xxxx ---- Sprite Color (when VD0-VD3 != 0)
+	- ---- x--- SG3
+	- ---- -x-- SG2
+	- ---- --x- SG1
+	- ---- ---x SG0
+	- ---- 0000 Transparency, bit 7-4 is forced to 0
+
+	Border:
+	1 0000 0000 Border color, during blanking period
+
 
 KNOWN ISSUES
   - Violent Soldier (probably connected):
@@ -114,9 +381,10 @@ inline void huc6270_device::fetch_bat_tile_row()
 {
 	const uint16_t bat_data = m_vram[m_bat_address & m_vram_mask];
 	const uint16_t tile_palette = (bat_data >> 8) & 0xF0;
-	uint16_t data1 = ((m_mwr & 0x83) == 0x83) ? 0 : m_vram[(((bat_data & 0x0FFF) << 4) + m_bat_row + 0) & m_vram_mask];
+	// background bpp can be selected; low 2bit, high 2bit, or 4bit - verified from manual
+	uint16_t data1 = ((m_mwr & 0x83) == 0x83) ? 0 : m_vram[(((bat_data & 0x0FFF) << 4) + m_bat_row + 0) & m_vram_mask]; // CG0
 	uint16_t data2 = (data1 >> 7) & 0x1FE;
-	uint16_t data3 = ((m_mwr & 0x83) == 0x03) ? 0 : m_vram[(((bat_data & 0x0FFF) << 4) + m_bat_row + 8) & m_vram_mask];
+	uint16_t data3 = ((m_mwr & 0x83) == 0x03) ? 0 : m_vram[(((bat_data & 0x0FFF) << 4) + m_bat_row + 8) & m_vram_mask]; // CG1
 	uint16_t data4 = (data3 >> 5) & 0x7F8;
 	data3 <<= 2;
 
@@ -596,35 +864,37 @@ inline void huc6270_device::handle_dma()
 	}
 }
 
-u8 huc6270_device::read(offs_t offset)
+u16 huc6270_device::read16(offs_t offset, u16 mem_mask)
 {
-	uint8_t data = 0x00;
+	uint16_t data = 0x0000;
 
-	switch (offset & 3)
+	switch (offset & 1)
 	{
 		case 0x00:  /* status */
 			data = m_status;
-			m_status &= ~(HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS);
-			m_irq_changed_cb(CLEAR_LINE);
-			break;
-
-		case 0x02:
-			data = m_vrr & 0xFF;
-			break;
-
-		case 0x03:
-			data = m_vrr >> 8;
-			if (m_register_index == VxR)
+			if (ACCESSING_BITS_0_7 && !machine().side_effects_disabled())
 			{
-				m_marr += vram_increments[(m_cr >> 11) & 3];
+				m_status &= ~(HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS);
+				m_irq_changed_cb(CLEAR_LINE);
+			}
+			break;
 
-				if (m_marr <= m_vram_mask)
-					m_vrr = m_vram[m_marr];
-				else
+		case 0x01:
+			data = m_vrr;
+			if (ACCESSING_BITS_8_15 && !machine().side_effects_disabled())
+			{
+				if (m_register_index == VxR)
 				{
-					// TODO: test with real HW
-					m_vrr = 0;
-					logerror("%s Open Bus VRAM read (register read) %04x\n",this->tag(),m_marr);
+					m_marr += vram_increments[(m_cr >> 11) & 3];
+
+					if (m_marr <= m_vram_mask)
+						m_vrr = m_vram[m_marr];
+					else
+					{
+						// TODO: test with real HW
+						m_vrr = 0;
+						logerror("%s Open Bus VRAM read (register read) %04x\n",this->tag(),m_marr);
+					}
 				}
 			}
 			break;
@@ -633,25 +903,26 @@ u8 huc6270_device::read(offs_t offset)
 }
 
 
-void huc6270_device::write(offs_t offset, u8 data)
+void huc6270_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("%s: huc6270 write %02x <- %02x ", machine().describe_context(), offset, data);
+	LOG("%s: huc6270 write %02x <- %04x & %04x ", machine().describe_context(), offset, data, mem_mask);
 
-	switch (offset & 3)
+	switch (offset & 1)
 	{
 		case 0x00:  /* VDC register select */
-			m_register_index = data & 0x1F;
+			if (ACCESSING_BITS_0_7)
+				m_register_index = data & 0x1F;
 			break;
 
-		case 0x02:  /* VDC data LSB */
+		case 0x01:  /* VDC data */
 			switch (m_register_index)
 			{
-				case MAWR:      /* memory address write register LSB */
-					m_mawr = (m_mawr & 0xFF00) | data;
+				case MAWR:      /* memory address write register */
+					COMBINE_DATA(&m_mawr);
 					break;
 
-				case MARR:      /* memory address read register LSB */
-					m_marr = (m_marr & 0xFF00) | data;
+				case MARR:      /* memory address read register */
+					COMBINE_DATA(&m_marr);
 					if (m_marr <= m_vram_mask)
 						m_vrr = m_vram[m_marr];
 					else
@@ -662,108 +933,23 @@ void huc6270_device::write(offs_t offset, u8 data)
 					}
 					break;
 
-				case VxR:       /* vram write data LSB */
-					m_vwr = (m_vwr & 0xFF00) | data;
+				case VxR:       /* vram write data */
+					COMBINE_DATA(&m_vwr);
+					if (ACCESSING_BITS_8_15)
+					{
+						// area 0x8000-0xffff is NOP and cannot be written to.
+						if (m_mawr <= m_vram_mask)
+							m_vram[m_mawr] = m_vwr;
+						m_mawr += vram_increments[(m_cr >> 11) & 3];
+					}
 					break;
 
-				case CR:        /* control register LSB */
-					m_cr = (m_cr & 0xFF00) | data;
+				case CR:        /* control register */
+					COMBINE_DATA(&m_cr);
 					break;
 
-				case RCR:       /* raster compare register LSB */
-					m_rcr = (m_rcr & 0x0300) | data;
-//                  if (m_raster_count == m_rcr && m_cr & 0x04)
-//                  {
-//                      m_status |= HUC6270_RR;
-//                      m_irq_changed_cb(ASSERT_LINE);
-//                  }
-					break;
-
-				case BXR:       /* background x-scroll register LSB */
-					m_bxr = (m_bxr & 0x0300) | data;
-					break;
-
-				case BYR:       /* background y-scroll register LSB */
-					m_byr = (m_byr & 0x0100) | data;
-					m_byr_latched = m_byr;
-					break;
-
-				case MWR:       /* memory width register LSB */
-					m_mwr = (m_mwr & 0xFF00) | data;
-					break;
-
-				case HSR:       /* horizontal sync register LSB */
-					m_hsr = (m_hsr & 0xFF00) | data;
-					break;
-
-				case HDR:       /* horizontal display register LSB */
-					m_hdr = (m_hdr & 0xFF00) | data;
-					break;
-
-				case VPR:       /* vertical sync register LSB */
-					m_vpr = (m_vpr & 0xFF00) | data;
-					break;
-
-				case VDW:       /* vertical display register LSB */
-					m_vdw = (m_vdw & 0xFF00) | data;
-					break;
-
-				case VCR:       /* vertical display end position register LSB */
-					m_vcr = (m_vcr & 0xFF00) | data;
-					break;
-
-				case DCR:       /* DMA control register LSB */
-					m_dcr = (m_dcr & 0xFF00) | data;
-					break;
-
-				case SOUR:      /* DMA source address register LSB */
-					m_sour = (m_sour & 0xFF00) | data;
-					break;
-
-				case DESR:      /* DMA destination address register LSB */
-					m_desr = (m_desr & 0xFF00) | data;
-					break;
-
-				case LENR:      /* DMA length register LSB */
-					m_lenr = (m_lenr & 0xFF00) | data;
-					break;
-
-				case DVSSR:     /* Sprite attribute table LSB */
-					m_dvssr = (m_dvssr & 0xFF00) | data;
-					m_dvssr_written = 1;
-					break;
-			}
-			break;
-
-		case 0x03:  /* VDC data MSB */
-			switch (m_register_index)
-			{
-				case MAWR:      /* memory address write register MSB */
-					m_mawr = (m_mawr & 0x00FF) | (data << 8);
-					break;
-
-				case MARR:      /* memory address read register MSB */
-					m_marr = (m_marr & 0x00FF) | (data << 8);
-					if (m_marr <= m_vram_mask)
-						m_vrr = m_vram[m_marr];
-					else
-						m_vrr = 0;
-					break;
-
-				case VxR:       /* vram write data MSB */
-					m_vwr = (m_vwr & 0x00FF) | (data << 8);
-					// area 0x8000-0xffff is NOP and cannot be written to.
-					if (m_mawr <= m_vram_mask)
-						m_vram[m_mawr] = m_vwr;
-					m_mawr += vram_increments[(m_cr >> 11) & 3];
-					break;
-
-				case CR:        /* control register MSB */
-					m_cr = (m_cr & 0x00FF) | (data << 8);
-					break;
-
-				case RCR:       /* raster compare register MSB */
-					m_rcr = (m_rcr & 0x00FF) | ((data & 0x03) << 8);
+				case RCR:       /* raster compare register */
+					m_rcr = COMBINE_DATA(&m_rcr) & 0x3ff;
 //printf("%s: RCR set to %03x\n", machine().describe_context().c_str(), m_rcr);
 //                  if (m_raster_count == m_rcr && m_cr & 0x04)
 //                  {
@@ -772,59 +958,60 @@ void huc6270_device::write(offs_t offset, u8 data)
 //                  }
 					break;
 
-				case BXR:       /* background x-scroll register MSB */
-					m_bxr = (m_bxr & 0x00FF) | ((data & 0x03) << 8);
+				case BXR:       /* background x-scroll register */
+					m_bxr = COMBINE_DATA(&m_bxr) & 0x3ff;
 					break;
 
-				case BYR:       /* background y-scroll register MSB */
-					m_byr = (m_byr & 0x00FF) | ((data & 0x01) << 8);
+				case BYR:       /* background y-scroll register */
+					m_byr = COMBINE_DATA(&m_byr) & 0x1ff;
 					m_byr_latched = m_byr;
 					break;
 
-				case MWR:       /* memory width register MSB */
-					m_mwr = (m_mwr & 0x00FF) | (data << 8);
+				case MWR:       /* memory width register */
+					COMBINE_DATA(&m_mwr);
 					break;
 
-				case HSR:       /* horizontal sync register MSB */
-					m_hsr = (m_hsr & 0x00FF) | (data << 8);
+				case HSR:       /* horizontal sync register */
+					COMBINE_DATA(&m_hsr);
 					break;
 
-				case HDR:       /* horizontal display register MSB */
-					m_hdr = (m_hdr & 0x00FF) | (data << 8);
+				case HDR:       /* horizontal display register */
+					COMBINE_DATA(&m_hdr);
 					break;
 
-				case VPR:       /* vertical sync register MSB */
-					m_vpr = (m_vpr & 0x00FF) | (data << 8);
+				case VPR:       /* vertical sync register */
+					COMBINE_DATA(&m_vpr);
 					break;
 
-				case VDW:       /* vertical display register MSB */
-					m_vdw = (m_vdw & 0x00FF) | (data << 8);
+				case VDW:       /* vertical display register */
+					COMBINE_DATA(&m_vdw);
 					break;
 
-				case VCR:       /* vertical display end position register MSB */
-					m_vcr = (m_vcr & 0x00FF) | (data << 8);
+				case VCR:       /* vertical display end position register */
+					COMBINE_DATA(&m_vcr);
 					break;
 
-				case DCR:       /* DMA control register MSB */
-					m_dcr = (m_dcr & 0x00FF) | (data << 8);
+				case DCR:       /* DMA control register */
+					COMBINE_DATA(&m_dcr);
 					break;
 
-				case SOUR:      /* DMA source address register MSB */
-					m_sour = (m_sour & 0x00FF) | (data << 8);
+				case SOUR:      /* DMA source address register */
+					COMBINE_DATA(&m_sour);
 					break;
 
-				case DESR:      /* DMA destination address register MSB */
-					m_desr = (m_desr & 0x00FF) | (data << 8);
+				case DESR:      /* DMA destination address register */
+					COMBINE_DATA(&m_desr);
 					break;
 
-				case LENR:      /* DMA length register MSB */
-					m_lenr = (m_lenr & 0x00FF) | (data << 8);
-					m_dma_enabled = 1;
+				case LENR:      /* DMA length register */
+					COMBINE_DATA(&m_lenr);
+					if (ACCESSING_BITS_8_15)
+						m_dma_enabled = 1;
 //logerror("DMA is not supported yet.\n");
 					break;
 
-				case DVSSR:     /* Sprite attribute table MSB */
-					m_dvssr = (m_dvssr & 0x00FF) | (data << 8);
+				case DVSSR:     /* Sprite attribute table */
+					COMBINE_DATA(&m_dvssr);
 					m_dvssr_written = 1;
 					break;
 			}
@@ -833,6 +1020,18 @@ void huc6270_device::write(offs_t offset, u8 data)
 	LOG("\n");
 }
 
+u8 huc6270_device::read8(offs_t offset)
+{
+	const int shift = ((offset & 1) << 3);
+	return (read16(offset >> 1, 0xff << shift) >> shift) & 0xff;
+}
+
+
+void huc6270_device::write8(offs_t offset, u8 data)
+{
+	const int shift = ((offset & 1) << 3);
+	write16(offset >> 1, u16(data) << shift, 0xff << shift);
+}
 
 void huc6270_device::device_start()
 {

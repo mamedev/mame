@@ -311,13 +311,13 @@ void uapce_state::pce_mem(address_map &map)
 {
 	map(0x000000, 0x09FFFF).rom();
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
 void uapce_state::pce_io(address_map &map)
 {
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 }
 
 

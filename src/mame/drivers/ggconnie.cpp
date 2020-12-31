@@ -96,9 +96,9 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x1f7700, 0x1f7700).portr("IN1");
 	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
-	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03E0);
 	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
-	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03E0);
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
@@ -342,14 +342,14 @@ void ggconnie_state::ggconnie(machine_config &config)
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
 	huc6202.hsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read));
-	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write));
+	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read8));
+	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write8));
 	huc6202.next_pixel_1_callback().set("huc6270_1", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_1_callback().set("huc6270_1", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::vsync_changed));
 	huc6202.hsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
-	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
+	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read8));
+	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write8));
 
 	MSM6242(config, m_rtc, XTAL(32'768));
 

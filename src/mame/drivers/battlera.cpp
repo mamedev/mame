@@ -140,13 +140,13 @@ void battlera_state::battlera_map(address_map &map)
 	map(0x1e0800, 0x1e0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
 	map(0x1f0000, 0x1f1fff).ram(); /* Main ram */
-	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
 void battlera_state::battlera_portmap(address_map &map)
 {
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 }
 
 /******************************************************************************/
