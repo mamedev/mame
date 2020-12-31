@@ -60,11 +60,15 @@
 #include "machine/dmac3.h"
 #include "machine/news_hid.h"
 #include "machine/spifi3.h"
+#include "machine/upd765.h"
 
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
+
+#include "imagedev/floppy.h"
+#include "formats/pc_dsk.h"
 
 // MAME infra imports
 #include "debugger.h"
@@ -82,6 +86,7 @@ public:
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc"),
           m_serial(*this, "serial%u", 0U),
+          m_fdc(*this, "fdc"),
           m_hid(*this, "hid"),
           m_dmac(*this, "dmac"),
           m_scsi0(*this, "scsi0:7:spifi3"),
@@ -181,9 +186,9 @@ protected:
     // required_device<am7990_device> m_net;
     // std::unique_ptr<u16[]> m_net_ram;
 
-    // TBD: Floppy controller type
-    // DECLARE_FLOPPY_FORMATS(floppy_formats);
-    // required_device<upd72067_device> m_fdc;
+    // National Semiconductor PC8477B floppy controller
+    DECLARE_FLOPPY_FORMATS(floppy_formats);
+    optional_device<pc8477a_device> m_fdc;
 
     // NEWS keyboard and mouse
     required_device<news_hid_hle_device> m_hid;
@@ -237,9 +242,9 @@ protected:
     const char *MAIN_MEMORY_DEFAULT = "64M";
 };
 
-//FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
-//FLOPPY_PC_FORMAT
-//FLOPPY_FORMATS_END
+FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
+FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 static void news_scsi_devices(device_slot_interface &device)
 {
@@ -298,6 +303,18 @@ void news_r4k_state::machine_common(machine_config &config)
     NEWS_HID_HLE(config, m_hid);
     m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
+
+    // Floppy controller - National Semiconductor PC8477B
+    // TODO: find out the difference between B and A - only A is emulated in MAME ATM
+    // TODO: frequency? datasheet implies only 24MHz is valid. There is a 24MHz crystal on the I/O board, so this is probably right
+    //       but I need to confirm before locking it in with the XTAL macro
+    PC8477A(config, m_fdc, 24'000'000, pc8477a_device::mode_t::PS2);
+    /*
+    TODO: how does AP-bus/FIFO chip/etc deal with interrupts?
+    m_fdc->intrq_wr_callback().set(m_dmac, FUNC(dmac3_device::irq<1>));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(dmac3_device::drq<1>));
+    */
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
@@ -437,6 +454,9 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // fd (floppy disk) - note that the FIFO address is here. The control register mapping is TBD
     // map(0x1ed20000, 0x1ed20000);
+    map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff); // Floppy controller
+    // TODO: floppy aux register: 0x1ed60200
+    //map(0x1ed60200, ???);
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -460,7 +480,6 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     map(0x1f4c0000, 0x1f4c0007).noprw(); // TODO: Register for something that is accessed very early in mrom flow (0xbfc0040C)
     map(0x1e980000, 0x1e9fffff).ram();   // is this mirrored?
     map(0x1fe00000, 0x1fffffff).ram();   // determine mirror of this RAM - it is smaller than this size
-    map(0x1ed60000, 0x1ed6ffff).noprw(); // Makes log less verbose, not sure what this is yet.
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 0 || offset % 4 == 1) { return 0x0; }
             else if (offset % 4 == 2) { return 0x6f; }
