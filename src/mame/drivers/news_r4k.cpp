@@ -188,7 +188,7 @@ protected:
 
     // National Semiconductor PC8477B floppy controller
     DECLARE_FLOPPY_FORMATS(floppy_formats);
-    optional_device<pc8477a_device> m_fdc;
+    required_device<pc8477a_device> m_fdc;
 
     // NEWS keyboard and mouse
     required_device<news_hid_hle_device> m_hid;
