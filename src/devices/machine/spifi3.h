@@ -86,66 +86,85 @@ protected:
 
 private:
 
+	// AUXCTRL constants and functions
+	const uint32_t AUXCTRL_DMAEDGE = 0x04;
+	const uint32_t AUXCTRL_SETRST = 0x20;
+	const uint32_t AUXCTRL_CRST =	0x40;
+	const uint32_t AUXCTRL_SRST =	0x80;
+	uint32_t auxctrl_r();
+	void auxctrl_w(uint32_t data);
+
+	// FIFOCTRL constants and functions
+	const uint32_t FIFOC_FSLOT	 =	0x0f;	/* Free slots in FIFO - max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT) */
+	const uint32_t FIFOC_SSTKACT =	0x10;	/* Synchronous stack active (?) */
+	const uint32_t FIFOC_RQOVRN	 =	0x20;
+	const uint32_t FIFOC_CLREVEN =	0x00;
+	const uint32_t FIFOC_CLRODD	 =	0x40;
+	const uint32_t FIFOC_FLUSH	 =	0x80;
+	const uint32_t FIFOC_LOAD	 =	0xc0;
+	uint32_t fifoctrl_r();
+	void fifoctrl_w(uint32_t data);
+
 	struct spifi_cmd_entry
 	{
-		uint32_t cdb[12]; /* RW: Command descriptor block */
-		uint32_t quecode; /* RW: Queue code */
-		uint32_t quetag;  /* RW: Queue tag */
-		uint32_t idmsg;   /* RW: Identify message */
-		uint32_t status;  /* RW: SCSI status */
+		uint32_t cdb[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; /* RW: Command descriptor block */
+		uint32_t quecode = 0; /* RW: Queue code */
+		uint32_t quetag = 0;  /* RW: Queue tag */
+		uint32_t idmsg = 0;   /* RW: Identify message */
+		uint32_t status = 0;  /* RW: SCSI status */
 	};
 
 	struct register_file 
 	{
-/*00*/	uint32_t spstat;	  /* RO: SPIFI state */
-		uint32_t cmlen;	      /* RW: Command/message length	*/
-		uint32_t cmdpage;	  /* RW: Command page */
-		uint32_t count_hi;	  /* RW: Data count (high) */
+/*00*/	uint32_t spstat = 0;	  /* RO: SPIFI state */
+		uint32_t cmlen = 0;	      /* RW: Command/message length	*/
+		uint32_t cmdpage = 0;	  /* RW: Command page */
+		uint32_t count_hi = 0;	  /* RW: Data count (high) */
 
-/*10*/	uint32_t count_mid;	  /* RW:            (mid) */
-		uint32_t count_low;	  /* RW:            (low) */
-		uint32_t svptr_hi;	  /* RO: Saved data pointer (high) */
-		uint32_t svptr_mid;	  /* RO:                    (mid)  */
+/*10*/	uint32_t count_mid = 0;	  /* RW:            (mid) */
+		uint32_t count_low = 0;	  /* RW:            (low) */
+		uint32_t svptr_hi = 0;	  /* RO: Saved data pointer (high) */
+		uint32_t svptr_mid = 0;	  /* RO:                    (mid)  */
 		
-/*20*/	uint32_t svptr_low;	  /* RO:                    (low)  */
-		uint32_t intr;		  /* RW: Processor interrupt */
-		uint32_t imask;	      /* RW: Processor interrupt mask */
-		uint32_t prctrl;	  /* RW: Processor control */
+/*20*/	uint32_t svptr_low = 0;	  /* RO:                    (low)  */
+		uint32_t intr = 0;		  /* RW: Processor interrupt */
+		uint32_t imask = 0;	      /* RW: Processor interrupt mask */
+		uint32_t prctrl = 0;	  /* RW: Processor control */
 		
-/*30*/	uint32_t prstat;	  /* RO: Processor status */
-		uint32_t init_status; /* RO: Initiator status */
-		uint32_t fifoctrl;	  /* RW: FIFO control */
-		uint32_t fifodata;	  /* RW: FIFO data */
+/*30*/	uint32_t prstat = 0;	  /* RO: Processor status */
+		uint32_t init_status = 0; /* RO: Initiator status */
+		uint32_t fifoctrl = 0;	  /* RW: FIFO control */
+		uint32_t fifodata = 0;	  /* RW: FIFO data */
 		
-/*40*/	uint32_t config;	  /* RW: Configuration */
-		uint32_t data_xfer;	  /* RW: Data transfer */
-		uint32_t autocmd;	  /* RW: Auto command control */
-		uint32_t autostat;	  /* RW: Auto status control */
+/*40*/	uint32_t config = 0;	  /* RW: Configuration */
+		uint32_t data_xfer = 0;	  /* RW: Data transfer */
+		uint32_t autocmd = 0;	  /* RW: Auto command control */
+		uint32_t autostat = 0;	  /* RW: Auto status control */
 		
-/*50*/	uint32_t resel;	      /* RW: Reselection */
-		uint32_t select;	  /* RW: Selection */
-		uint32_t prcmd;	      /* WO: Processor command */
-		uint32_t auxctrl;	  /* RW: Aux control */
+/*50*/	uint32_t resel = 0;	      /* RW: Reselection */
+		uint32_t select = 0;	  /* RW: Selection  upper 4 bits seem to be the target ID (MSB always set?)*/
+		uint32_t prcmd = 0;	      /* WO: Processor command */
+		uint32_t auxctrl = 0;	  /* RW: Aux control */
 		
-/*60*/  uint32_t autodata;	  /* RW: Auto data control */
-		uint32_t loopctrl;	  /* RW: Loopback control */
-		uint32_t loopdata;	  /* RW: Loopback data */
-		uint32_t identify;	  /* WO: Identify (?) */
+/*60*/  uint32_t autodata = 0;	  /* RW: Auto data control */
+		uint32_t loopctrl = 0;	  /* RW: Loopback control */
+		uint32_t loopdata = 0;	  /* RW: Loopback data */
+		uint32_t identify = 0;	  /* WO: Identify (?) */
 		
-/*70*/  uint32_t complete;	  /* WO: Command complete (?) */
+/*70*/  uint32_t complete = 0;	  /* WO: Command complete (?) */
 		uint32_t scsi_status = 0x1; /* WO: SCSI status (?) */ // MROM reads this to check if the SPIFI is alive at system boot, so I think the WO description from NetBSD is wrong.
-		uint32_t data;		  /* RW: Data register (?) */
-		uint32_t icond;	      /* RO: Interrupt condition */
+		uint32_t data = 0;		  /* RW: Data register (?) */
+		uint32_t icond = 0;	      /* RO: Interrupt condition */
 		
-/*80*/	uint32_t fastwide;	  /* RW: Fast/wide enable */
-		uint32_t exctrl;	  /* RW: Extended control */
-		uint32_t exstat;	  /* RW: Extended status */
-		uint32_t test;		  /* RW: SPIFI test register */
+/*80*/	uint32_t fastwide = 0;	  /* RW: Fast/wide enable */
+		uint32_t exctrl = 0;	  /* RW: Extended control */
+		uint32_t exstat = 0;	  /* RW: Extended status */
+		uint32_t test = 0;		  /* RW: SPIFI test register */
 		
-/*90*/	uint32_t quematch;	  /* RW: Queue match */
-		uint32_t quecode;	  /* RW: Queue code */
-		uint32_t quetag;	  /* RW: Queue tag */
-		uint32_t quepage;	  /* RW: Queue page */
+/*90*/	uint32_t quematch = 0;	  /* RW: Queue match */
+		uint32_t quecode = 0;	  /* RW: Queue code */
+		uint32_t quetag = 0;	  /* RW: Queue tag */
+		uint32_t quepage = 0;	  /* RW: Queue page */
 		
 		// uint32_t image[88]; /* (image of the above) */
 		spifi_cmd_entry cmbuf[8];

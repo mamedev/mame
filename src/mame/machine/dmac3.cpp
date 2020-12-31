@@ -177,6 +177,8 @@ uint32_t dmac3_device::cstat_r(DMAC3_Controller controller)
 uint32_t dmac3_device::ictl_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].ictl;
+	// hack
+	val |= 0x1;
 	LOG("dmac%d ictl_r: 0x%x\n", controller, val);
 	return val;
 }
@@ -225,6 +227,12 @@ void dmac3_device::tra_w(DMAC3_Controller controller, uint32_t data)
 
 void dmac3_device::cnf_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac%d cnf_w: 0x%x\n", controller, data);
+	// Log is polluted with switching between SPIFI3 and regular mode
+	// Will probably remove the if at some point, but we can mostly trust all 3
+	// DMAC+SPIFI3 users (MROM, NEWS-OS, and NetBSD) to follow this correctly
+	if(data != CNF_FASTACCESS && data != CNF_SLOWACCESS)
+	{
+		LOG("dmac%d cnf_w: 0x%x\n", controller, data);
+	}
 	m_controllers[controller].cnf = data;
 }

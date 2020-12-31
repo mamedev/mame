@@ -164,8 +164,8 @@ protected:
         CNF_DCEN = 0x0800,
         CNF_ODDP = 0x0200, // if I had to guess, odd parity?
         CNF_WIDTH = 0x00ff,
-        CNF_SLOWACCESS = 0x0020, // SPIFI access? -> see /sys/newsapbus/dmac3reg.h and spifi code in NetBSD
-        CNF_FASTACCESS = 0x0001, // DEFAULT access? -> see /sys/newsapbus/dmac3reg.h and spifi code in NetBSD
+        CNF_SLOWACCESS = 0x0020, // SPIFI access? -> see spifi code in NetBSD
+        CNF_FASTACCESS = 0x0001, // DEFAULT access? -> see spifi code in NetBSD
     };
 
     // Composite interrupt state
