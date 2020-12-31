@@ -3367,6 +3367,7 @@ if (CPUS["ROMP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/romp/romp.cpp",
 		MAME_DIR .. "src/devices/cpu/romp/romp.h",
+		MAME_DIR .. "src/devices/cpu/romp/rsc.h",
 	}
 end
 

@@ -47,9 +47,6 @@ c:at(i)
     Returns the value at the 1-based index ``i``, or ``nil`` if it is out of
     range.
 c:find(v)
-    Returns the key for item ``v``, or ``nil`` if it is not in the collection.
-    The key is what you would pass to the index operator to get the value.
-c:find(v)
     Returns the key for item ``v``, or ``nil`` if it is not in the container.
     The key is what you would pass to the index operator to get the value.
 c:index_of(v)
@@ -1320,7 +1317,7 @@ Properties
 ^^^^^^^^^^
 
 map.spacenum (read-only)
-    The address space number of the address space the map is associated with
+    The address space number of the address space the map is associated with.
 map.device (read-only)
     The device that owns the address space the map is associated with.
 map.unmap_value (read-only)
