@@ -7,7 +7,6 @@ local function init()
 	local filepath
 	local dbver
 	local fh
-	local slaxml = require("xml")
 	
 	for path in mame_manager.ui.options.entries.historypath:value():gmatch("([^;]+)") do
 		filepath = emu.subst_env(path) .. "/" .. file
@@ -59,10 +58,8 @@ local function init()
 
 	for line in fh:lines() do
 		local match = line:match("<history([^>]*)>")
-		print(line, match)
 		if match then
 			match = match:match("version=\"([^\"]*)\"")
-			print(match)
 			if match then
 				ver = match
 				break
@@ -101,6 +98,7 @@ local function init()
 	local lasttag
 	local entry = {}
 	local rowid
+	local slaxml = require("xml")
 
 	local parser = slaxml:parser{
 		startElement = function(name)
@@ -161,7 +159,7 @@ function dat.check(set, softlist)
 		stmt:bind_values(set, softlist)
 	else
 		stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
-			AS f WHERE fi.name = ? AND fi.list = NULL AND f.rowid = fi.data]])
+			AS f WHERE fi.name = ? AND fi.list ISNULL AND f.rowid = fi.data]])
 		stmt:bind_values(set)
 	end
 	if stmt:step() == db.ROW then
