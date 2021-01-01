@@ -165,6 +165,7 @@ if (CPUS["ARM7"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
 	}
 end
 
