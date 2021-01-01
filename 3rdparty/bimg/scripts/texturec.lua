@@ -26,7 +26,7 @@ project "texturec"
 	configuration { "mingw-*" }
 		targetextension ".exe"
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		links {
 			"Cocoa.framework",
 		}
