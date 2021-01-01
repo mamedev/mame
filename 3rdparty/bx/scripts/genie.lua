@@ -81,7 +81,7 @@ project "bx.test"
 			"pthread",
 		}
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		links {
 			"Cocoa.framework",
 		}
@@ -126,7 +126,7 @@ project "bx.bench"
 			"pthread",
 		}
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		links {
 			"Cocoa.framework",
 		}
