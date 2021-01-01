@@ -1085,6 +1085,7 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 
 void cli_frontend::output_single_softlist(std::ostream &out, software_list_device &swlistdev)
 {
+	util::stream_format(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), util::xml::normalize_string(swlistdev.description().c_str()));
 	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		util::stream_format(out, "\t\t<software name=\"%s\"", util::xml::normalize_string(swinfo.shortname().c_str()));
