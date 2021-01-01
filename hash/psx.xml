@@ -40058,6 +40058,44 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="blckwars">
+		<!--
+		Unknown source
+		-->
+		<description>Block Wars (Jpn)</description>
+		<year>2001</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="SLPS-03219" />
+		<info name="release" value="20010906" />
+		<info name="alt_title" value="ブロックウォーズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="block wars (japan)" sha1="0cf0404feede8507c020704b1da1358c678461e9" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK, BGM cuts off -->
+	<software name="bldyroarj" cloneof="bldyroar" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Bloody Roar - Hyper Beast Duel (Jpn) (En,Ja)</description>
+		<year>1997</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="SLPS-01070" />
+		<info name="release" value="19971106" />
+		<info name="alt_title" value="ブラッディロア"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bloody roar - hyper beast duel (japan) (en,ja)" sha1="c2766b3dc2f6f85317c2c90faaf24862245931bf" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, sprite animations have black dots -->
 	<software name="bof3j" cloneof="bof3" supported="partial">
 		<!--
@@ -40336,6 +40374,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="burn out (japan) [slpm-86598]" sha1="68c7ccd8dbb306c15e4380405ef73491877f126b" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="bblade2j" cloneof="bblade2">
+		<!--
+		Unknown source
+		-->
+		<description>Bushido Blade 2 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Squaresoft</publisher>
+		<info name="serial" value="SLPS-01294" />
+		<info name="release" value="19980312" />
+		<info name="alt_title" value="ブシドーブレード弐"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bushido blade 2 (japan)" sha1="cddc09c26a97c13f53be2673f02a393c7ada8424" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40912,6 +40969,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="coolboa2j" cloneof="coolboa2">
+		<!--
+		Unknown source
+		-->
+		<description>Cool Boarders 2: Killing Session (Jpn)</description>
+		<year>1997</year>
+		<publisher>UEP Systems</publisher>
+		<info name="serial" value="SLPS-00967" />
+		<info name="release" value="19970828" />
+		<info name="alt_title" value="クールボーダーズ2 Killing Session"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cool boarders 2 - killing session (japan)" sha1="cfd18faa8db599baea51e65a343fa5acd507a8d2" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Hangs at PS logo -->
 	<software name="cosmicrc" supported="no">
 		<!--
@@ -41442,6 +41518,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- unsure if this is the regular or the limited release -->
+	<!-- boot OK -->
+	<software name="dungcr">
+		<!--
+		Unknown source
+		-->
+		<description>Dungeon Creator (Jpn)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="SLPS-00349" />
+		<info name="release" value="19960531" />
+		<info name="alt_title" value="ダンジョンクリエイター"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dungeon creator (japan)" sha1="aeeef2660bb055a3bc63f6dfd05073cb6ef7cf67" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="dboxing">
 		<!--
@@ -41650,6 +41746,30 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="defeat lightning (japan) [slps-00853]" sha1="08dca46966cbe41fb613ff3a95cd4c22ec104343" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="dekirugc" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Dekiru! Game Center (Jpn)</description>
+		<year>1999</year>
+		<publisher>Shoeisha</publisher>
+		<info name="serial" value="SLPS-01810" />
+		<info name="release" value="19990114" />
+		<info name="alt_title" value="できる！ゲームセンター"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dekiru game center (japan) (disc 1) [slps-01810]" sha1="8a5caf9c4b17bd600c67c742af7bfe66836ab7a5" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dekiru game center (japan) (disc 2) [slps-01811]" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43978,6 +44098,44 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Black screen after PS logo -->
+	<software name="gaiamast">
+		<!--
+		Unknown source
+		-->
+		<description>Gaia Master - Kamigami no Board Game (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPS-02075" />
+		<info name="release" value="20000413" />
+		<info name="alt_title" value="ガイアマスター～神々のボードゲーム"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gaiamaster - kamigami no board game (japan)" sha1="4f8dce40d356915c7b1523f785bab84be17b97a0" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="gal3">
+		<!--
+		Unknown source
+		-->
+		<description>Galaxian&#x00b3; (Jpn)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-00270" />
+		<info name="release" value="19960426" />
+		<info name="alt_title" value="ギャラクシアン&#x00b3;"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="galaxian^3 (japan)" sha1="7db6514588da2b2b2312780519d11518f0e3131f" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, intro is without gfxs (can be skipped) -->
 	<software name="galaxyfg" supported="partial">
 		<!--
@@ -44080,6 +44238,64 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gamera 2000 (japan) [slps-00833]" sha1="5db337e4f781f6d0ea5684f83d861b1bcf186968" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="garouwa" cloneof="fatfurwa">
+		<!--
+		Unknown source
+		-->
+		<description>Garou Densetsu - Wild Ambition (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="SLPM-86236" />
+		<info name="release" value="19990624" />
+		<info name="alt_title" value="餓狼伝説 ワイルドアンビション"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="garou densetsu - wild ambition (japan)" sha1="8f1170167e2569abf019a224077a6d1771c265dd" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- claims 1996 on title screen, maybe it's the rerelease version? -->
+	<!-- choosing new then load then new again causes GFX background to be grey filled, bad GFXs also at first dialogue -->
+	<software name="suikodenj" cloneof="suikoden" supported="no">
+		<!--
+		Unknown source
+		-->
+		<description>Gensou Suikoden (Jpn) (v1.1)</description>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SLPS-00097" />
+		<info name="release" value="19951215" />
+		<info name="alt_title" value="幻想水滸伝"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gensou suikoden (japan) (v1.1)" sha1="67edae4b59f4420abdfd71e8934b8afacc5d61b4" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="suikodn2j" cloneof="suikodn2">
+		<!--
+		Unknown source
+		-->
+		<description>Gensou Suikoden II (Jpn)</description>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SLPM-86168" />
+		<info name="release" value="19981217" />
+		<info name="alt_title" value="幻想水滸伝2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gensou suikoden ii (japan)" sha1="948cc7acf2f57fcaf820272efb6a0f3d5db7b42b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45002,6 +45218,64 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Unsure if this is SLPS-00929 (with GunCon bundle) or SLPS-00930 -->
+	<!-- boot OK, missing GunCon emulation -->
+	<software name="gunbull" cloneof="ptblank">
+		<!--
+		Unknown source
+		-->
+		<description>GunBullet (Jpn) (v1.0)</description>
+		<year>1997</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-00930" />
+		<info name="release" value="19970807" />
+		<info name="alt_title" value="ガンバレット"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunbullet (japan) (v1.0)" sha1="e8dedfcb652339821464673e7c437fbc47157a01" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK, missing GunCon emulation -->
+	<software name="gunbarl" cloneof="ptblank2">
+		<!--
+		Unknown source
+		-->
+		<description>Gunbarl (Jpn)</description>
+		<year>1998</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-01500" />
+		<info name="release" value="19980608" />
+		<info name="alt_title" value="ガンバァール"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunbarl (japan)" sha1="939447174d8bb1dae7c09cbb19e1999ff8b34524" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK, missing GunCon emulation -->
+	<software name="gunbalin" cloneof="ptblank3">
+		<!--
+		Unknown source
+		-->
+		<description>Gunbalina (Jpn)</description>
+		<year>2000</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-03100" />
+		<info name="release" value="20001221" />
+		<info name="alt_title" value="ガンバリーナ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunbalina (japan)" sha1="6346041b3b3c5db836ac475be3afad70cc663b84" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, gameplay cursor/portraits flickers, unresponsive inputs -->
 	<software name="gunghobr" supported="no">
 		<!--
@@ -45038,6 +45312,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Has erratic timings during gameplay, map screen inputs detect way too fast -->
+	<software name="gunnm" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Gunnm - Kasei no Kioku (Jpn)</description>
+		<year>1998</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="SLPS-01408" />
+		<info name="release" value="19980827" />
+		<info name="alt_title" value="銃夢 ～火星の記憶～"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunnm - kasei no kioku (japan)" sha1="e765fee4c9dac390e5b0b2fae0ac922c87d4ea96" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="gunparad">
 		<!--
@@ -45055,6 +45348,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gunparade march (japan) [scps-10136]" sha1="1c1ce8054bc4b0f1bc4835865c504252ee7ad7d0" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="gunpey">
+		<!--
+		Unknown source
+		-->
+		<description>Gunpey (Jpn)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SLPS-02485" />
+		<info name="release" value="19991216" />
+		<info name="alt_title" value="グンペイ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gunpey (japan)" sha1="4005bdd4a5ee937ea6f4331d3608cd1b2c81ca09" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45228,6 +45540,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="hard boiled (japan) [slps-01484]" sha1="dcc7f002e74545fea8e40155e10c22c6ae8f735e" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="hardedge" cloneof="trag">
+		<!--
+		Unknown source
+		-->
+		<description>Hard Edge (Jpn)</description>
+		<year>1998</year>
+		<publisher>SunSoft</publisher>
+		<info name="serial" value="SLPS-01733" />
+		<info name="release" value="19980312" />
+		<info name="alt_title" value="ハードエッジ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hard edge (japan)" sha1="dc7d6fefd9c2ae16f86f741ea00f68860f7ef160" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46265,6 +46596,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="iqubej" cloneof="iqube">
+		<!--
+		Unknown source
+		-->
+		<description>I.Q - Intelligent Qube (Jpn)</description>
+		<year>1997</year>
+		<publisher>SCEI</publisher>
+		<info name="serial" value="SCPS-10029" />
+		<info name="release" value="19970131" />
+		<info name="alt_title" value="アイキューIntelligent Qube"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="i.q - intelligent qube (japan)" sha1="bc7e0da778cb51a718382af1b01b281cf55610bf" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Hardlocks MAME after intro FMVs -->
 	<software name="inuyasha" supported="no">
 		<!--
@@ -46420,6 +46770,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- unsure if this is regular or JAL release -->
+	<!-- boot OK, missing extra controller emulation -->
+	<software name="jetdego">
+		<!--
+		Unknown source
+		-->
+		<description>Jet de Go! Let's Go by Airliner (Jpn) (v1.0)</description>
+		<year>2000</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="SLPM-86323 (TCPS10016)" />
+		<info name="release" value="20000203" />
+		<info name="alt_title" value="ジェットでGO!"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet de go let's go by airliner (japan) (v1.0)" sha1="a9efaaaa061ad1c1b06a3e33a9546e6104cc55b4" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="jellyfsh">
 		<!--
@@ -46525,6 +46895,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="jikkyou oshaberi parodius - forever with me (japan)" sha1="2ccce47c444030d1ec6751ec54e943f80fbf9164"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hangs on loading screen after pressing start on intro -->
+	<software name="jojobaj" cloneof="jojoba" supported="no">
+		<!--
+		Unknown source
+		-->
+		<description>Jojo no Kimyou na Bouken (Jpn)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPS-02236" />
+		<info name="release" value="19991014" />
+		<info name="alt_title" value="ジョジョの奇妙な冒険"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo no kimyou na bouken (japan)" sha1="2d646d00670ad51a2a5b5c843dde73c592f51f09" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48622,6 +49011,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- boot OK -->
+	<software name="maghopp" cloneof="pandemon">
+		<!--
+		Unknown source
+		-->
+		<description>Magical Hoppers (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SLPS-00737" />
+		<info name="release" value="19970228" />
+		<info name="alt_title" value="マジカルホッパーズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="magical hoppers (japan)" sha1="f249fa178f9f4d1215cc9d93ee030bbda9bb96d7" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<!-- boot OK -->
 	<software name="magmedic">
 		<!--
 		Unknown source
@@ -49214,6 +49623,44 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="mslugj">
+		<!--
+		Unknown source
+		-->
+		<description>Metal Slug - Super Vehicle-001 (Jpn)</description>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="SLPS-00950" />
+		<info name="release" value="19970807" />
+		<info name="alt_title" value="メタルスラッグ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal slug - super vehicle-001 (japan)" sha1="ca24e62960b3c7fea4fa5d0fd62525c439ad1bb6" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Long hardlock after choosing a character -->
+	<software name="mslugxj" cloneof="mslugx" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Metal Slug X - Super Vehicle-001 (Jpn)</description>
+		<year>2001</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="SLPM-86456" />
+		<info name="release" value="20010125" />
+		<info name="alt_title" value="メタルスラッグX"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal slug x - super vehicle-001 (japan)" sha1="9406f016a94f1820bed8f5185102ecb617b24ed5" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, 2nd disc is missing from the set -->
 	<software name="metamorv" supported="no">
 		<!--
@@ -49532,6 +49979,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- boot OK -->
+	<software name="mjkiwap2">
+		<!--
+		Unknown source
+		-->
+		<description>Pro Mahjong Kiwame Plus II (Jpn)</description>
+		<year>1998</year>
+		<publisher>Athena</publisher>
+		<info name="serial" value="SLPS-01605" />
+		<info name="release" value="19981210" />
+		<info name="alt_title" value="プロ麻雀 極 プラス II"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pro mahjong kiwame plus ii (japan)" sha1="426219ee85d60879c4d0d29bab403e2f6c89eeca" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
 	<software name="mjkiwamt">
 		<!--
 		Unknown source
@@ -49716,6 +50182,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mori no oukoku - kingdom of forest (japan) [slps-01861]" sha1="84911ebb3e48a8bd55de2135519ab455f921ae4c" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="mk2j">
+		<!--
+		Unknown source
+		-->
+		<description>Mortal Kombat II (Jpn)</description>
+		<year>1996</year>
+		<publisher>Acclaim Japan</publisher>
+		<info name="serial" value="SLPS-00444" />
+		<info name="release" value="19960802" />
+		<info name="alt_title" value="モータルコンバットII"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mortal kombat ii (japan)" sha1="d61fc74d6c722b80c81b65f2dd14983989414a9c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -51176,6 +51661,24 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, requires PocketStation to work properly -->
+	<software name="paqa" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>PAQA (Jpn)</description>
+		<year>1999</year>
+		<publisher>SCEI</publisher>
+		<info name="serial" value="SCPS-10097" />
+		<info name="release" value="19990922" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="paqa (japan)" sha1="56833e00894d4c2d2fa0dc50b2644babdff364e3" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="paradice">
 		<!--
@@ -52424,6 +52927,44 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- boot OK -->
+	<software name="rtypedj" cloneof="rtyped">
+		<!--
+		Unknown source
+		-->
+		<description>R-Type Delta (Jpn)</description>
+		<year>1998</year>
+		<publisher>Irem</publisher>
+		<info name="serial" value="SLPS-01688" />
+		<info name="release" value="19981119" />
+		<info name="alt_title" value="アール・タイプ デルタ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="r-type delta (japan)" sha1="c6b06020d9a51652a9ec16002bf7aa9328670298" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="rtypesj">
+		<!--
+		Unknown source
+		-->
+		<description>R-Types (Jpn)</description>
+		<year>1998</year>
+		<publisher>Irem</publisher>
+		<info name="serial" value="SLPS-01236" />
+		<info name="release" value="19980205" />
+		<info name="alt_title" value="アール・タイプス"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="r-types (japan)" sha1="fa9f94413cfba828536847fd19a211a9e439acde" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
 	<software name="racedriv">
 		<!--
 		Unknown source
@@ -52614,6 +53155,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="rageracej" cloneof="ragerace">
+		<!--
+		Unknown source
+		-->
+		<description>Rage Racer (Jpn) (v1.1)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-00600" />
+		<info name="release" value="19961203" />
+		<info name="alt_title" value="レイジレーサー"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rage racer (japan) (v1.1)" sha1="ec980d364c6906d949f3c2fe1ef7c82c7d79871c" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, FMVs have repeated GFXs at sides -->
 	<software name="raymanj" cloneof="rayman">
 		<!--
@@ -52656,6 +53216,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, has mangled FMV colors -->
+	<software name="rcdegoj" cloneof="rcdego" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>RC de GO! (Jpn)</description>
+		<year>2000</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="SLPM-86546" />
+		<info name="release" value="20000706" />
+		<info name="alt_title" value="RCでGO!"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rc de go (japan)" sha1="8b5e9507ac72141812f8a921f59df569792ee243" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="rbffs">
 		<!--
@@ -52681,6 +53260,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu special - dominated mind (limited edition) (japan) (disc 2) [slpm-86091]" sha1="a0f645f96cdef8b378103bca91666ff0c8f48b1c" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="rebus" cloneof="kartia">
+		<!--
+		Unknown source
+		-->
+		<description>Rebus (Jpn)</description>
+		<year>1998</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="SLPS-01343" />
+		<info name="release" value="19980326" />
+		<info name="alt_title" value="レブス"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rebus (japan)" sha1="47e34e4ac806c6ec9eaf9050b9e575066c885161" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -52789,6 +53387,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Hangs at PS logo -->
+	<software name="ridgeracj" cloneof="ridgerac" supported="no">
+		<!--
+		Unknown source
+		-->
+		<description>Ridge Racer (Jpn)</description>
+		<year>1994</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-00001" />
+		<info name="release" value="19941203" />
+		<info name="alt_title" value="リッジレーサー"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ridge racer (japan) [slps-00001]" sha1="76f69082ee3ccab0ea351d5a5503a38133a5323b" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="riotstar">
 		<!--
@@ -52849,6 +53466,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="rising zan - the samurai gunman (japan) [slps-01691]" sha1="b66481789dc9c1227bcad847a324ebcee8265194" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- black screen after PS logo -->
+	<software name="rockman" supported="no">
+		<!--
+		Unknown source
+		-->
+		<description>RockMan (Jpn)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPS-02220" />
+		<info name="release" value="19990805" />
+		<info name="alt_title" value="洛克人"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rockman (japan)" sha1="9b51089f477f308694c6c876f814529fa4460c7a" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -53461,6 +54097,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="schrodinger no neko - die katze von schrodinger (japan) [slps-00780]" sha1="f5b024ce306d6bdfd105b748a7f426bd3410c882" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="simcit2kj" cloneof="simcit2k">
+		<!--
+		Unknown source
+		-->
+		<description>SimCity 2000 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Artdink</publisher>
+		<info name="serial" value="SLPS-00420" />
+		<info name="release" value="19961220" />
+		<info name="alt_title" value="シムシティ2000"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity 2000 (japan)" sha1="26a1c4475d72f89b3dd60e392b15615226db4963" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54146,6 +54801,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- boot OK -->
+	<software name="sfexpaj" cloneof="sfexpa">
+		<!--
+		Unknown source
+		-->
+		<description>Street Fighter EX Plus Alpha (Jpn)</description>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPM-86041" />
+		<info name="release" value="19970717" />
+		<info name="alt_title" value="ストリートファイターEX plus α"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="street fighter ex plus alpha (japan)" sha1="1042f19a912005e9ce3471a252632b5fa9bb6946" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- boot OK -->
 	<software name="shacheyu">
@@ -55828,6 +56503,63 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- erratic shadows, mostly noticeable on squash training (trapezoid shaped) -->
+	<software name="smashcr2j" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Smash Court 2 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-01693" />
+		<info name="release" value="19981112" />
+		<info name="alt_title" value="スマッシュコート2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="smash court 2 (japan)" sha1="a9b4d17c68357ea5f4382afe640ff088fd25da67" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="soukobns">
+		<!--
+		Unknown source
+		-->
+		<description>Soukoban - Nanmon Shinan (Jpn)</description>
+		<year>1999</year>
+		<publisher>Unbalance</publisher>
+		<info name="serial" value="SLPS-02010" />
+		<info name="release" value="19990401" />
+		<info name="alt_title" value="倉庫番 難問指南"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="soukoban - nanmon shinan (japan)" sha1="4579584b1bb5713e55fc0abd3dd21f5488dc14ec" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Volume slider doesn't work, Edge Master Mode has map glitch in the diary, eventually crashes in Edge Master during 1st battle loading (used Hwang) -->
+	<software name="souledge" cloneof="soulblad" supported="partial">
+		<!--
+		Unknown source
+		-->
+		<description>Soul Edge (Jpn) (v1.1)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SLPS-00555" />
+		<info name="release" value="19961220" />
+		<info name="alt_title" value="ソウルエッジ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="soul edge (japan) (v1.1)" sha1="2b038f2d61aaa6df76161da8f737063af4be2c69" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK, MAME hardlocks after ending -->
 	<software name="stahlfed" supported="partial">
 		<!--
@@ -55903,6 +56635,31 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="kotetsu reiki - steel dom (japan) [slps-00431]" sha1="ac7026ab8680cb9428a496dd6794fd745ea81c31" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- technically a clone of BOTH strider and strider2 sets -->
+	<!-- Both discs hangs -->
+	<software name="strider2j" cloneof="strider2" supported="no">
+		<!--
+		Unknown source
+		-->
+		<description>Strider Hiryuu 1 &amp; 2 (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPS-02620" />
+		<info name="release" value="20000224" />
+		<info name="alt_title" value="ストライダー飛竜 1&amp;2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strider hiryuu 1 &amp; 2 (japan) (disc 1) (strider hiryuu)" sha1="b3eaff827eac9c96c4d70f93515b6795ba295b7d" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strider hiryuu 1 &amp; 2 (japan) (disc 2) (strider hiryuu 2)" sha1="3178546a197e351a8e4a3bc806dd30f9ae8e8706" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56649,6 +57406,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="t kara hajimaru monogatari (japan) [slps-01350]" sha1="62f3fb91d8735a050522a6d6892f94dcf3470bfd" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK, has few glitchy FMV frames on Dream Factory logo -->
+	<software name="tobal2">
+		<!--
+		Unknown source
+		-->
+		<description>Tobal 2 (Jpn)</description>
+		<year>1997</year>
+		<publisher>Squaresoft</publisher>
+		<info name="serial" value="SLPM-86033" />
+		<info name="release" value="19970425" />
+		<info name="alt_title" value="トバル2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tobal 2 (japan) [slpm-86033]" sha1="22e572ebed30d44efc42ea056dc9ee1d94854679" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57760,6 +58536,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, has constant buzz on first rooms -->
+	<software name="vagstoryj" cloneof="vagstory">
+		<!--
+		Unknown source
+		-->
+		<description>Vagrant Story (Jpn)</description>
+		<year>2000</year>
+		<publisher>SquareSoft</publisher>
+		<info name="serial" value="SLPS-02377" />
+		<info name="release" value="20000210" />
+		<info name="alt_title" value="ベイグラントストーリー"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vagrant story (japan)" sha1="8efbc7c140ad6a0a92d31edfc84e693d699462e4" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="valken2">
 		<!--
@@ -58227,6 +59022,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="white diamond (japan) [slps-02352]" sha1="f3336e373dafd32fe3ea405893cca15e68789407" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- boot OK -->
+	<software name="wildarmsj" cloneof="wildarms">
+		<!--
+		Unknown source
+		-->
+		<description>Wild Arms (Jpn) (v1.1)</description>
+		<year>1996</year>
+		<publisher>SCEI</publisher>
+		<info name="serial" value="SCPS-10028" />
+		<info name="release" value="19961220" />
+		<info name="alt_title" value="ワイルドアームズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wild arms (japan) (v1.1)" sha1="b89140cab7c6f2a37a2f32a46779df931e044f9a" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
