@@ -424,7 +424,7 @@ Basic programs:
 		<publisher>Computerland of Nashua</publisher>
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="619052">
-				<rom name="k7_computerlandofnashua_nightmare6" size="619052" crc="53252477" sha1="33cbb123d408ed7e171f99c712b8599e3a6b20fb"/>
+				<rom name="k7_computerlandofnashua_nightmare6.wav" size="619052" crc="53252477" sha1="33cbb123d408ed7e171f99c712b8599e3a6b20fb"/>
 			</dataarea>
 		</part>
 	</software>
