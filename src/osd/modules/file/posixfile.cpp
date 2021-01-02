@@ -44,6 +44,7 @@
 
 // MAME headers
 #include "posixfile.h"
+#include "osdcore.h"
 #include "unicode.h"
 
 #include <cassert>

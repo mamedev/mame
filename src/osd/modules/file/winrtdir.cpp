@@ -12,10 +12,10 @@
 #include <tchar.h>
 
 // MAME headers
-#include "osdcore.h"
 #include "strformat.h"
 
 // MAMEOS headers
+#include "osdfile.h"
 #include "strconv.h"
 #include "../../windows/winutil.h"
 

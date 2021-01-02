@@ -438,27 +438,27 @@ private:
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uphysicalxaspect", i);
-				try_insert(std::string_view(tmp), s64(physaspect.first));
+				try_insert(util::buf_to_string_view(tmp), s64(physaspect.first));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uphysicalyaspect", i);
-				try_insert(std::string_view(tmp), s64(physaspect.second));
+				try_insert(util::buf_to_string_view(tmp), s64(physaspect.second));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativexaspect", i);
-				try_insert(std::string_view(tmp), xaspect);
+				try_insert(util::buf_to_string_view(tmp), xaspect);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativeyaspect", i);
-				try_insert(std::string_view(tmp), yaspect);
+				try_insert(util::buf_to_string_view(tmp), yaspect);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uwidth", i);
-				try_insert(std::string_view(tmp), w);
+				try_insert(util::buf_to_string_view(tmp), w);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uheight", i);
-				try_insert(std::string_view(tmp), h);
+				try_insert(util::buf_to_string_view(tmp), h);
 
 				++i;
 			}
@@ -539,7 +539,7 @@ private:
 		else
 		{
 			m_buffer.write(&str[start], str.length() - start);
-			return std::string_view(m_buffer);
+			return util::buf_to_string_view(m_buffer);
 		}
 	}
 

@@ -12,8 +12,12 @@
 #include <cctype>
 #include <new>
 #include <cassert>
-#include "osdcore.h"
+#include "corefile.h"
+#include "corestr.h"
+#include "osdcomm.h"
 #include "png.h"
+
+using util::string_format;
 
 
 /***************************************************************************

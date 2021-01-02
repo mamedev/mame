@@ -10,6 +10,8 @@
 
 #include "xmlfile.h"
 
+#include "osdcore.h"
+
 #include <expat.h>
 
 #include <algorithm>

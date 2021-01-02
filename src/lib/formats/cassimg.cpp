@@ -11,6 +11,8 @@
 #include "cassimg.h"
 #include "imageutl.h"
 
+#include "corealloc.h" // make_unique_clear
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>

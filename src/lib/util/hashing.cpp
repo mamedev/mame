@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "hashing.h"
+#include "strformat.h"
 
 #include <zlib.h>
 

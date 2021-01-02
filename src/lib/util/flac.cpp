@@ -8,9 +8,11 @@
 
 ***************************************************************************/
 
-#include <cassert>
-
 #include "flac.h"
+
+#include "osdcomm.h"
+
+#include <cassert>
 #include <new>
 
 

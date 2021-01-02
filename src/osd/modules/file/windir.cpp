@@ -12,7 +12,7 @@
 #include <tchar.h>
 
 // MAME headers
-#include "osdcore.h"
+#include "osdfile.h"
 #include "strformat.h"
 
 // MAMEOS headers

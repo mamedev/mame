@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "unzip.h"
-#include "osdcore.h"
+#include "osdfile.h"
 #include "osdcomm.h"
 #include "hash.h"
 
