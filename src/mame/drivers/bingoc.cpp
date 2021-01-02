@@ -72,7 +72,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_x;
+	//uint8_t m_x;
 	[[maybe_unused]] void main_sound_latch_w(uint8_t data);
 	void sound_play_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
