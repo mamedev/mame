@@ -347,7 +347,7 @@ Basic programs:
 	</software>
 
 	<software name="hamurabi">
-		<description>Hamurabi</description>
+		<description>Hamurabi (Apple)</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc</publisher>
 			<!-- P/N A1T005X-->
@@ -360,7 +360,7 @@ Basic programs:
 	</software>
 	
 	<software name="hamurabicn">
-		<description>Hamurabi</description>
+		<description>Hamurabi (Computerland)</description>
 		<year>197?</year>
 		<publisher>Computerland of Nashua</publisher>
 		<part name="cass" interface="apple1_cass">
