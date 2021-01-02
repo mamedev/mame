@@ -147,6 +147,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { update_regptr(); }
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
