@@ -72,6 +72,30 @@ files {
 
 --------------------------------------------------
 --
+--@src/devices/machine/acorn_ioc.h,MACHINES["ACORN_IOC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_IOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_ioc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_ioc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/machine/acorn_memc.h,MACHINES["ACORN_MEMC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_MEMC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_memc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_memc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/machine/acorn_vidc.h,MACHINES["ACORN_VIDC"] = true
 --------------------------------------------------
 
