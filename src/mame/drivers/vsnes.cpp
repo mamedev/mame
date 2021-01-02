@@ -1723,6 +1723,86 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fromblw )
+	PORT_INCLUDE( vsnes )
+
+	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x1C, 0x00, "PPU" )      PORT_DIPLOCATION("SW1:!3,!4,!5")
+	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
+	PORT_DIPSETTING(    0x04, "RP2C04-0002" )
+	PORT_DIPSETTING(    0x08, "RP2C04-0003" )
+	PORT_DIPSETTING(    0x0C, "RP2C04-0004" )
+	PORT_DIPSETTING(    0x10, "2C03/2C05" )
+	PORT_DIPSETTING(    0x14, "2C02 (NES)" )
+	PORT_DIPNAME( 0x20, 0x00, "Disable Music" )      PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Disable SFX" )      PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Disable Attract Mode Sound" )      PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fromblwd )
+	PORT_INCLUDE( vsnes_dual )
+
+	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_DIPNAME( 0x01, 0x00, "Free Play (left side)" )      PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Coinage (left side)" )      PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x1C, 0x00, "PPU (left side)" )      PORT_DIPLOCATION("SW1:!3,!4,!5")
+	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
+	PORT_DIPSETTING(    0x04, "RP2C04-0002" )
+	PORT_DIPSETTING(    0x08, "RP2C04-0003" )
+	PORT_DIPSETTING(    0x0C, "RP2C04-0004" )
+	PORT_DIPSETTING(    0x10, "2C03/2C05" )
+	PORT_DIPSETTING(    0x14, "2C02 (NES)" )
+	PORT_DIPNAME( 0x20, 0x00, "Disable Music (left side)" )      PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Disable SFX (left side)" )      PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Disable Attract Mode Sound (left side)" )      PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_DIPNAME( 0x01, 0x00, "Free Play (right side)" )      PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Coinage (right side)" )      PORT_DIPLOCATION("SW2:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x1C, 0x00, "PPU (right side)" )      PORT_DIPLOCATION("SW2:!3,!4,!5")
+	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
+	PORT_DIPSETTING(    0x04, "RP2C04-0002" )
+	PORT_DIPSETTING(    0x08, "RP2C04-0003" )
+	PORT_DIPSETTING(    0x0C, "RP2C04-0004" )
+	PORT_DIPSETTING(    0x10, "2C03/2C05" )
+	PORT_DIPSETTING(    0x14, "2C02 (NES)" )
+	PORT_DIPNAME( 0x20, 0x00, "Disable Music (right side)" )      PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Disable SFX (right side)" )      PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Disable Attract Mode Sound (right side)" )      PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void vsnes_state::vsnes(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2545,6 +2625,29 @@ ROM_START( nvs_mightybj )
 	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
+ROM_START( fromblw )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1d.bin",  0x08000, 0x02000, CRC(1aebf43b) SHA1(45e5aa6a8a7df503c1488acf6bd406aed17075af) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1c.bin",  0x0a000, 0x02000, CRC(345ae82e) SHA1(531ceb32bed3e641aef5c875c9cca540944e77cc) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1b.bin",  0x0c000, 0x02000, CRC(d991120e) SHA1(bbcb7c069d90124f61b0aecece438aed5f50996d) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1a.bin",  0x0e000, 0x02000, CRC(37445c70) SHA1(494cb76e5d79a86da1f584d7cd71790f657de82c) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.chr.2b.bin",  0x0000, 0x2000, CRC(7f2e1b5b) SHA1(949af8437d6789c1b1e60a242bc1e1da2d07b468) )
+
+	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6d.bin",  0x08000, 0x02000, CRC(1aebf43b) SHA1(45e5aa6a8a7df503c1488acf6bd406aed17075af) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6c.bin",  0x0a000, 0x02000, CRC(345ae82e) SHA1(531ceb32bed3e641aef5c875c9cca540944e77cc) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6b.bin",  0x0c000, 0x02000, CRC(d991120e) SHA1(bbcb7c069d90124f61b0aecece438aed5f50996d) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6a.bin",  0x0e000, 0x02000, CRC(37445c70) SHA1(494cb76e5d79a86da1f584d7cd71790f657de82c) )
+
+	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.chr.8b.bin",  0x0000, 0x2000, CRC(7f2e1b5b) SHA1(949af8437d6789c1b1e60a242bc1e1da2d07b468) )
+
+	/* also compatible with 2C02, 2C03, 2C04-0002, 2C04-0003, 2C04-0004, 2C05 via dipswitches */
+	PALETTE_2C04_0001("ppu1:palette")
+ROM_END
+
 /* Dual System */
 
 ROM_START( balonfgt )
@@ -2829,6 +2932,30 @@ ROM_START( iceclmrd )
 	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
+ROM_START( fromblwd )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1d.bin",  0x08000, 0x02000, CRC(1aebf43b) SHA1(45e5aa6a8a7df503c1488acf6bd406aed17075af) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1c.bin",  0x0a000, 0x02000, CRC(345ae82e) SHA1(531ceb32bed3e641aef5c875c9cca540944e77cc) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1b.bin",  0x0c000, 0x02000, CRC(d991120e) SHA1(bbcb7c069d90124f61b0aecece438aed5f50996d) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.1a.bin",  0x0e000, 0x02000, CRC(37445c70) SHA1(494cb76e5d79a86da1f584d7cd71790f657de82c) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.chr.2b.bin",  0x0000, 0x2000, CRC(7f2e1b5b) SHA1(949af8437d6789c1b1e60a242bc1e1da2d07b468) )
+
+	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6d.bin",  0x08000, 0x02000, CRC(1aebf43b) SHA1(45e5aa6a8a7df503c1488acf6bd406aed17075af) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6c.bin",  0x0a000, 0x02000, CRC(345ae82e) SHA1(531ceb32bed3e641aef5c875c9cca540944e77cc) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6b.bin",  0x0c000, 0x02000, CRC(d991120e) SHA1(bbcb7c069d90124f61b0aecece438aed5f50996d) )
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.prg.6a.bin",  0x0e000, 0x02000, CRC(37445c70) SHA1(494cb76e5d79a86da1f584d7cd71790f657de82c) )
+
+	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
+	ROM_LOAD( "from_below_vs_2020_12_21_v_0_8_0.nes.chr.8b.bin",  0x0000, 0x2000, CRC(7f2e1b5b) SHA1(949af8437d6789c1b1e60a242bc1e1da2d07b468) )
+
+	/* also compatible with 2C02, 2C03, 2C04-0002, 2C04-0003, 2C04-0004, 2C05 via dipswitches */
+	PALETTE_2C04_0001("ppu1:palette")
+	PALETTE_2C04_0001("ppu2:palette")
+ROM_END
+
 /******************************************************************************/
 /* Sets by region:
    World (C) Nintendo
@@ -2877,6 +3004,7 @@ GAME( 1985, jajamaru, 0,         jajamaru,      jajamaru, vsnes_state, init_vsno
 GAME( 1987, topgun,   0,         topgun,        topgun,   vsnes_state, init_vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
 GAME( 1985, bnglngby, 0,         vsnes,         bnglngby, vsnes_state, init_bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
 GAME( 1986, supxevs,  0,         vsnes,         supxevs,  vsnes_state, init_supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
+GAME( 2020, fromblw,  0,         vsnes,         fromblw,  vsnes_state, init_vsnormal, ROT0, "Matt Hughson",           "Vs. From Below (Beta 0.8.0)", 0 )
 
 /* Light Gun games */
 GAME( 1985, duckhunt, 0,         vsnes,         duckhunt, vsnes_state, init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
@@ -2896,3 +3024,4 @@ GAME( 1984, vsbballj, vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdu
 GAME( 1984, vsbballja,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)",     0 )
 GAME( 1984, vsbballjb,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)",     0 )
 GAME( 1984, iceclmrd, 0,         vsdual_pi,     iceclmrj, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )
+GAME( 2020, fromblwd, fromblw,   vsdual,        fromblwd, vsnes_state, init_vsdual,   ROT0, "Matt Hughson",           "Vs. From Below (Beta 0.8.0, dual screen)", 0 )
