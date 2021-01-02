@@ -140,6 +140,7 @@ public:
 
 	// calls for accessing the raw cassette image
 	void image_read(void *buffer, uint64_t offset, size_t length);
+	uint8_t image_read_byte(uint64_t offset);
 	void image_write(const void *buffer, uint64_t offset, size_t length);
 	uint64_t image_size();
 
