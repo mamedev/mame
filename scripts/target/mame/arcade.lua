@@ -4041,6 +4041,7 @@ files {
 	MAME_DIR .. "src/mame/includes/gunbustr.h",
 	MAME_DIR .. "src/mame/video/gunbustr.cpp",
 	MAME_DIR .. "src/mame/drivers/halleys.cpp",
+	MAME_DIR .. "src/mame/drivers/heromem.cpp",
 	MAME_DIR .. "src/mame/drivers/invqix.cpp",
 	MAME_DIR .. "src/mame/drivers/jollyjgr.cpp",
 	MAME_DIR .. "src/mame/drivers/ksayakyu.cpp",

@@ -16003,6 +16003,9 @@ hektor                          // Hektor
 hektor2                         // Hektor II
 hektor3                         // Hektor III
 
+@source:heromem.cpp
+heromem                         //
+
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
