@@ -44,7 +44,7 @@ public:
 	void set_acceleration(double accel);
 	void set_set_points(double slow_sp , double fast_sp);
 	void set_tick_size(hti_format_t::tape_pos_t size);
-	void set_bits_per_word(unsigned bits);
+	void set_image_format(hti_format_t::image_format_t fmt);
 	void set_go_threshold(double threshold);
 
 	// Commands

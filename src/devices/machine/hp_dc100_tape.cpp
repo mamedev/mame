@@ -169,9 +169,9 @@ void hp_dc100_tape_device::set_tick_size(hti_format_t::tape_pos_t size)
 	m_tick_size = size;
 }
 
-void hp_dc100_tape_device::set_bits_per_word(unsigned bits)
+void hp_dc100_tape_device::set_image_format(hti_format_t::image_format_t fmt)
 {
-	m_image.set_bits_per_word(bits);
+	m_image.set_image_format(fmt);
 }
 
 void hp_dc100_tape_device::set_go_threshold(double threshold)
@@ -181,7 +181,7 @@ void hp_dc100_tape_device::set_go_threshold(double threshold)
 
 void hp_dc100_tape_device::set_track_no(unsigned track)
 {
-	if (m_track != track) {
+	if (m_track != track && track < m_image.no_of_tracks()) {
 		LOG_DBG("Setting track %u (op=%d)\n" , track , static_cast<int>(m_current_op));
 		auto saved_op = m_current_op;
 		if (m_current_op != OP_IDLE) {
@@ -434,7 +434,7 @@ void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_siz
 		hti_format_t::track_iterator_t it;
 		found = m_image.next_data(get_track_no() , tmp , fwd , true , it);
 		if (found) {
-			tmp = hti_format_t::farthest_end(it , !fwd);
+			tmp = m_image.farthest_end(it , !fwd);
 		}
 	}
 	if (found && m_image.next_gap(get_track_no() , tmp , fwd , min_gap_size)) {
@@ -875,7 +875,7 @@ void hp_dc100_tape_device::load_rd_word()
 			m_bit_idx = 0;
 		}
 		// This is actually the nearest end (dir is inverted)
-		m_rw_pos = m_next_bit_pos = hti_format_t::farthest_end(m_rd_it , !fwd);
+		m_rw_pos = m_next_bit_pos = m_image.farthest_end(m_rd_it , !fwd);
 		// Compute end of bit cell
 		hti_format_t::tape_pos_t bit_len = m_image.bit_length(BIT(m_rd_it->second , m_bit_idx));
 		if (!fwd) {
