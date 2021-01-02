@@ -1655,7 +1655,7 @@ void cli_frontend::execute_commands(const char *exename)
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
-		file.puts(m_options.output_ini().c_str());
+		file.puts(m_options.output_ini());
 
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1663,7 +1663,7 @@ void cli_frontend::execute_commands(const char *exename)
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
 		// generate the updated INI
-		file_ui.puts(ui_opts.output_ini().c_str());
+		file_ui.puts(ui_opts.output_ini());
 
 		plugin_options plugin_opts;
 		path_iterator iter(m_options.plugins_path());
@@ -1678,7 +1678,7 @@ void cli_frontend::execute_commands(const char *exename)
 			throw emu_fatalerror("Unable to create file plugin.ini\n");
 
 		// generate the updated INI
-		file_plugin.puts(plugin_opts.output_ini().c_str());
+		file_plugin.puts(plugin_opts.output_ini());
 
 		return;
 	}

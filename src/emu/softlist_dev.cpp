@@ -559,7 +559,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 						// make sure the hash is valid
 						util::hash_collection hashes;
-						if (!hashes.from_internal_string(romp->hashdata().c_str()))
+						if (!hashes.from_internal_string(romp->hashdata()))
 							osd_printf_error("%s: %s part %s ROM '%s' has invalid hash string '%s'\n", filename(), shortname, part.name(), romp->name(), romp->hashdata());
 					}
 

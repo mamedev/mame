@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Intel XScale SA1110 peripheral emulation
+    Intel XScale SA1110 peripheral emulation
 
 ***************************************************************************/
 
@@ -137,20 +137,20 @@ protected:
 		REG_UTSR0       = (0x0000001c >> 2),
 		REG_UTSR1       = (0x00000020 >> 2),
 
-		MCP_BASE_ADDR	= 0x80060000,
+		MCP_BASE_ADDR   = 0x80060000,
 		REG_MCCR0       = (0x00000000 >> 2),
 		REG_MCDR0       = (0x00000008 >> 2),
 		REG_MCDR1       = (0x0000000c >> 2),
 		REG_MCDR2       = (0x00000010 >> 2),
 		REG_MCSR        = (0x00000018 >> 2),
 
-		SSP_BASE_ADDR	= 0x80070000,
-		REG_SSCR0		= (0x00000060 >> 2),
-		REG_SSCR1		= (0x00000064 >> 2),
-		REG_SSDR		= (0x0000006c >> 2),
-		REG_SSSR		= (0x00000074 >> 2),
+		SSP_BASE_ADDR   = 0x80070000,
+		REG_SSCR0       = (0x00000060 >> 2),
+		REG_SSCR1       = (0x00000064 >> 2),
+		REG_SSDR        = (0x0000006c >> 2),
+		REG_SSSR        = (0x00000074 >> 2),
 
-		OSTMR_BASE_ADDR	= 0x90000000,
+		OSTMR_BASE_ADDR = 0x90000000,
 		REG_OSMR0       = (0x00000000 >> 2),
 		REG_OSMR1       = (0x00000004 >> 2),
 		REG_OSMR2       = (0x00000008 >> 2),
@@ -160,7 +160,7 @@ protected:
 		REG_OWER        = (0x00000018 >> 2),
 		REG_OIER        = (0x0000001c >> 2),
 
-		RTC_BASE_ADDR	= 0x90010000,
+		RTC_BASE_ADDR   = 0x90010000,
 		REG_RTAR        = (0x00000000 >> 2),
 		REG_RCNR        = (0x00000004 >> 2),
 		REG_RTTR        = (0x00000008 >> 2),
@@ -176,19 +176,19 @@ protected:
 		REG_PGSR        = (0x00000018 >> 2),
 		REG_POSR        = (0x0000001c >> 2),
 
-		RESET_BASE_ADDR	= 0x90030000,
-		REG_RSRR		= (0x00000000 >> 2),
-		REG_RCSR		= (0x00000004 >> 2),
+		RESET_BASE_ADDR = 0x90030000,
+		REG_RSRR        = (0x00000000 >> 2),
+		REG_RCSR        = (0x00000004 >> 2),
 
-		GPIO_BASE_ADDR	= 0x90040000,
-		REG_GPLR		= (0x00000000 >> 2),
-		REG_GPDR		= (0x00000004 >> 2),
-		REG_GPSR		= (0x00000008 >> 2),
-		REG_GPCR		= (0x0000000c >> 2),
-		REG_GRER		= (0x00000010 >> 2),
-		REG_GFER		= (0x00000014 >> 2),
-		REG_GEDR		= (0x00000018 >> 2),
-		REG_GAFR		= (0x0000001c >> 2),
+		GPIO_BASE_ADDR  = 0x90040000,
+		REG_GPLR        = (0x00000000 >> 2),
+		REG_GPDR        = (0x00000004 >> 2),
+		REG_GPSR        = (0x00000008 >> 2),
+		REG_GPCR        = (0x0000000c >> 2),
+		REG_GRER        = (0x00000010 >> 2),
+		REG_GFER        = (0x00000014 >> 2),
+		REG_GEDR        = (0x00000018 >> 2),
+		REG_GAFR        = (0x0000001c >> 2),
 
 		INTC_BASE_ADDR  = 0x90050000,
 		REG_ICIP        = (0x00000000 >> 2),
@@ -202,159 +202,159 @@ protected:
 	// register contents
 	enum : uint32_t
 	{
-		UART3_FIFO_PRE	= 8,
-		UART3_FIFO_FRE	= 9,
-		UART3_FIFO_ROR	= 10,
+		UART3_FIFO_PRE  = 8,
+		UART3_FIFO_FRE  = 9,
+		UART3_FIFO_ROR  = 10,
 
-		UTCR3_RXE_BIT	= 0,
-		UTCR3_TXE_BIT	= 1,
-		UTCR3_BRK_BIT	= 2,
-		UTCR3_RIE_BIT	= 3,
-		UTCR3_TIE_BIT	= 4,
-		UTCR3_LBM_BIT	= 5,
+		UTCR3_RXE_BIT   = 0,
+		UTCR3_TXE_BIT   = 1,
+		UTCR3_BRK_BIT   = 2,
+		UTCR3_RIE_BIT   = 3,
+		UTCR3_TIE_BIT   = 4,
+		UTCR3_LBM_BIT   = 5,
 
-		UTSR0_TFS_BIT	= 0,
-		UTSR0_RFS_BIT	= 1,
-		UTSR0_RID_BIT	= 2,
-		UTSR0_RBB_BIT	= 3,
-		UTSR0_REB_BIT	= 4,
-		UTSR0_EIF_BIT	= 5,
+		UTSR0_TFS_BIT   = 0,
+		UTSR0_RFS_BIT   = 1,
+		UTSR0_RID_BIT   = 2,
+		UTSR0_RBB_BIT   = 3,
+		UTSR0_REB_BIT   = 4,
+		UTSR0_EIF_BIT   = 5,
 
-		UTSR1_TBY_BIT	= 0,
-		UTSR1_RNE_BIT	= 1,
-		UTSR1_TNF_BIT	= 2,
-		UTSR1_PRE_BIT	= 3,
-		UTSR1_FRE_BIT	= 4,
-		UTSR1_ROR_BIT	= 5,
+		UTSR1_TBY_BIT   = 0,
+		UTSR1_RNE_BIT   = 1,
+		UTSR1_TNF_BIT   = 2,
+		UTSR1_PRE_BIT   = 3,
+		UTSR1_FRE_BIT   = 4,
+		UTSR1_ROR_BIT   = 5,
 
-		MCCR0_ASD_BIT	= 0,
-		MCCR0_ASD_MASK	= 0x0000007f,
-		MCCR0_TSD_BIT	= 8,
-		MCCR0_TSD_MASK	= 0x00007f00,
-		MCCR0_MCE_BIT	= 16,
-		MCCR0_ECS_BIT	= 17,
-		MCCR0_ADM_BIT	= 18,
-		MCCR0_TTE_BIT	= 19,
-		MCCR0_TRE_BIT	= 20,
-		MCCR0_ATE_BIT	= 21,
-		MCCR0_ARE_BIT	= 22,
-		MCCR0_LBM_BIT	= 23,
-		MCCR0_ECP_BIT	= 24,
-		MCCR0_ECP_MASK	= 0x03000000,
+		MCCR0_ASD_BIT   = 0,
+		MCCR0_ASD_MASK  = 0x0000007f,
+		MCCR0_TSD_BIT   = 8,
+		MCCR0_TSD_MASK  = 0x00007f00,
+		MCCR0_MCE_BIT   = 16,
+		MCCR0_ECS_BIT   = 17,
+		MCCR0_ADM_BIT   = 18,
+		MCCR0_TTE_BIT   = 19,
+		MCCR0_TRE_BIT   = 20,
+		MCCR0_ATE_BIT   = 21,
+		MCCR0_ARE_BIT   = 22,
+		MCCR0_LBM_BIT   = 23,
+		MCCR0_ECP_BIT   = 24,
+		MCCR0_ECP_MASK  = 0x03000000,
 
-		MCCR1_CFS_BIT	= 20,
+		MCCR1_CFS_BIT   = 20,
 
-		MCDR2_RW_BIT	= 16,
-		MCDR2_ADDR_BIT	= 17,
-		MCDR2_ADDR_MASK	= 0x001e0000,
+		MCDR2_RW_BIT    = 16,
+		MCDR2_ADDR_BIT  = 17,
+		MCDR2_ADDR_MASK = 0x001e0000,
 
-		MCSR_ATS_BIT	= 0,
-		MCSR_ARS_BIT	= 1,
-		MCSR_TTS_BIT	= 2,
-		MCSR_TRS_BIT	= 3,
-		MCSR_ATU_BIT	= 4,
-		MCSR_ARO_BIT	= 5,
-		MCSR_TTU_BIT	= 6,
-		MCSR_TRO_BIT	= 7,
-		MCSR_ANF_BIT	= 8,
-		MCSR_ANE_BIT	= 9,
-		MCSR_TNF_BIT	= 10,
-		MCSR_TNE_BIT	= 11,
-		MCSR_CWC_BIT	= 12,
-		MCSR_CRC_BIT	= 13,
-		MCSR_ACE_BIT	= 14,
-		MCSR_TCE_BIT	= 15,
+		MCSR_ATS_BIT    = 0,
+		MCSR_ARS_BIT    = 1,
+		MCSR_TTS_BIT    = 2,
+		MCSR_TRS_BIT    = 3,
+		MCSR_ATU_BIT    = 4,
+		MCSR_ARO_BIT    = 5,
+		MCSR_TTU_BIT    = 6,
+		MCSR_TRO_BIT    = 7,
+		MCSR_ANF_BIT    = 8,
+		MCSR_ANE_BIT    = 9,
+		MCSR_TNF_BIT    = 10,
+		MCSR_TNE_BIT    = 11,
+		MCSR_CWC_BIT    = 12,
+		MCSR_CRC_BIT    = 13,
+		MCSR_ACE_BIT    = 14,
+		MCSR_TCE_BIT    = 15,
 
-		SSCR0_DSS_BIT	= 0,
-		SSCR0_DSS_MASK	= 0x0000000f,
-		SSCR0_FRF_BIT	= 4,
-		SSCR0_FRF_MASK	= 0x00000030,
-		SSCR0_SSE_BIT	= 7,
-		SSCR0_SCR_BIT	= 8,
-		SSCR0_SCR_MASK	= 0x0000ff00,
+		SSCR0_DSS_BIT   = 0,
+		SSCR0_DSS_MASK  = 0x0000000f,
+		SSCR0_FRF_BIT   = 4,
+		SSCR0_FRF_MASK  = 0x00000030,
+		SSCR0_SSE_BIT   = 7,
+		SSCR0_SCR_BIT   = 8,
+		SSCR0_SCR_MASK  = 0x0000ff00,
 
-		SSCR1_RIE_BIT	= 0,
-		SSCR1_TIE_BIT	= 1,
-		SSCR1_LBM_BIT	= 2,
-		SSCR1_SPO_BIT	= 3,
-		SSCR1_SPH_BIT	= 4,
-		SSCR1_ECS_BIT	= 5,
+		SSCR1_RIE_BIT   = 0,
+		SSCR1_TIE_BIT   = 1,
+		SSCR1_LBM_BIT   = 2,
+		SSCR1_SPO_BIT   = 3,
+		SSCR1_SPH_BIT   = 4,
+		SSCR1_ECS_BIT   = 5,
 
-		SSSR_TNF_BIT	= 1,
-		SSSR_RNE_BIT	= 2,
-		SSSR_BSY_BIT	= 3,
-		SSSR_TFS_BIT	= 4,
-		SSSR_RFS_BIT	= 5,
-		SSSR_ROR_BIT	= 6,
+		SSSR_TNF_BIT    = 1,
+		SSSR_RNE_BIT    = 2,
+		SSSR_BSY_BIT    = 3,
+		SSSR_TFS_BIT    = 4,
+		SSSR_RFS_BIT    = 5,
+		SSSR_ROR_BIT    = 6,
 
-		RTSR_AL_BIT		= 0,
-		RTSR_AL_MASK	= (1 << RTSR_AL_BIT),
-		RTSR_HZ_BIT		= 1,
-		RTSR_HZ_MASK	= (1 << RTSR_HZ_BIT),
-		RTSR_ALE_BIT	= 2,
-		RTSR_ALE_MASK	= (1 << RTSR_ALE_BIT),
-		RTSR_HZE_BIT	= 3,
-		RTSR_HZE_MASK	= (1 << RTSR_HZE_BIT)
+		RTSR_AL_BIT     = 0,
+		RTSR_AL_MASK    = (1 << RTSR_AL_BIT),
+		RTSR_HZ_BIT     = 1,
+		RTSR_HZ_MASK    = (1 << RTSR_HZ_BIT),
+		RTSR_ALE_BIT    = 2,
+		RTSR_ALE_MASK   = (1 << RTSR_ALE_BIT),
+		RTSR_HZE_BIT    = 3,
+		RTSR_HZE_MASK   = (1 << RTSR_HZE_BIT)
 	};
 
 	// interrupt bits
 	enum : uint32_t
 	{
-		INT_GPIO0		= 0,
-		INT_GPIO1		= 1,
-		INT_GPIO2		= 2,
-		INT_GPIO3		= 3,
-		INT_GPIO4		= 4,
-		INT_GPIO5		= 5,
-		INT_GPIO6		= 6,
-		INT_GPIO7		= 7,
-		INT_GPIO8		= 8,
-		INT_GPIO9		= 9,
-		INT_GPIO10		= 10,
-		INT_GPIOHI		= 11,
-		INT_LCD			= 12,
-		INT_UDC			= 13,
-		INT_UART1		= 15,
-		INT_UART2		= 16,
-		INT_UART3		= 17,
-		INT_MCP			= 18,
-		INT_SSP			= 19,
-		INT_DMA0		= 20,
-		INT_DMA1		= 21,
-		INT_DMA2		= 22,
-		INT_DMA3		= 23,
-		INT_DMA4		= 24,
-		INT_DMA5		= 25,
-		INT_OSTIMER0	= 26,
-		INT_OSTIMER1	= 27,
-		INT_OSTIMER2	= 28,
-		INT_OSTIMER3	= 29,
-		INT_RTC_TICK	= 30,
-		INT_RTC_ALARM	= 31
+		INT_GPIO0       = 0,
+		INT_GPIO1       = 1,
+		INT_GPIO2       = 2,
+		INT_GPIO3       = 3,
+		INT_GPIO4       = 4,
+		INT_GPIO5       = 5,
+		INT_GPIO6       = 6,
+		INT_GPIO7       = 7,
+		INT_GPIO8       = 8,
+		INT_GPIO9       = 9,
+		INT_GPIO10      = 10,
+		INT_GPIOHI      = 11,
+		INT_LCD         = 12,
+		INT_UDC         = 13,
+		INT_UART1       = 15,
+		INT_UART2       = 16,
+		INT_UART3       = 17,
+		INT_MCP         = 18,
+		INT_SSP         = 19,
+		INT_DMA0        = 20,
+		INT_DMA1        = 21,
+		INT_DMA2        = 22,
+		INT_DMA3        = 23,
+		INT_DMA4        = 24,
+		INT_DMA5        = 25,
+		INT_OSTIMER0    = 26,
+		INT_OSTIMER1    = 27,
+		INT_OSTIMER2    = 28,
+		INT_OSTIMER3    = 29,
+		INT_RTC_TICK    = 30,
+		INT_RTC_ALARM   = 31
 	};
 
 	// UART3 interrupt sources
 	enum : unsigned
 	{
-		UART3_TFS		= 0,
-		UART3_RFS		= 1,
-		UART3_RID		= 2,
-		UART3_RBB		= 3,
-		UART3_REB		= 4,
-		UART3_EIF		= 5,
+		UART3_TFS       = 0,
+		UART3_RFS       = 1,
+		UART3_RID       = 2,
+		UART3_RBB       = 3,
+		UART3_REB       = 4,
+		UART3_EIF       = 5,
 	};
 
 	// MCP interrupt sources
 	enum : unsigned
 	{
-		MCP_AUDIO_TX			= 0,
-		MCP_AUDIO_RX			= 1,
-		MCP_TELECOM_TX			= 2,
-		MCP_TELECOM_RX			= 3,
-		MCP_AUDIO_UNDERRUN		= 4,
-		MCP_AUDIO_OVERRUN		= 5,
-		MCP_TELECOM_UNDERRUN	= 6,
-		MCP_TELECOM_OVERRUN		= 7
+		MCP_AUDIO_TX            = 0,
+		MCP_AUDIO_RX            = 1,
+		MCP_TELECOM_TX          = 2,
+		MCP_TELECOM_RX          = 3,
+		MCP_AUDIO_UNDERRUN      = 4,
+		MCP_AUDIO_OVERRUN       = 5,
+		MCP_TELECOM_UNDERRUN    = 6,
+		MCP_TELECOM_OVERRUN     = 7
 	};
 
 	struct uart_regs
@@ -373,7 +373,7 @@ protected:
 		int     tx_fifo_write_idx;
 		int     tx_fifo_count;
 
-		bool	rx_break_interlock;
+		bool    rx_break_interlock;
 	};
 
 	struct mcp_regs
@@ -486,15 +486,15 @@ protected:
 		uint32_t icpr;
 	};
 
-	uart_regs		m_uart_regs;
-	mcp_regs		m_mcp_regs;
-	ssp_regs		m_ssp_regs;
-	ostimer_regs	m_ostmr_regs;
-	rtc_regs		m_rtc_regs;
-	power_regs		m_power_regs;
-	uint32_t		m_rcsr;
-	gpio_regs		m_gpio_regs;
-	intc_regs		m_intc_regs;
+	uart_regs       m_uart_regs;
+	mcp_regs        m_mcp_regs;
+	ssp_regs        m_ssp_regs;
+	ostimer_regs    m_ostmr_regs;
+	rtc_regs        m_rtc_regs;
+	power_regs      m_power_regs;
+	uint32_t        m_rcsr;
+	gpio_regs       m_gpio_regs;
+	intc_regs       m_intc_regs;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;

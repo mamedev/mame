@@ -154,6 +154,11 @@ image_init_result o2_cart_slot_device::call_load()
 			u32 size = length();
 			fread(m_cart->m_rom, size);
 
+			m_cart->m_rom_size = size;
+			m_cart->m_exrom_size = 0;
+			m_cart->m_voice_size = 0;
+			m_b = 0;
+
 			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		}
 
@@ -180,8 +185,6 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 		u32 size = hook.image_file()->size();
 		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
-
-		//printf("type: %s\n", slot_string);
 
 		return std::string(slot_string);
 	}

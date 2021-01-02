@@ -16,12 +16,12 @@
 #include "st62xx.h"
 #include "st62xx_dasm.h"
 
-#define LOG_UNIMPL		(1 << 1)
-#define LOG_GPIO		(1 << 2)
-#define LOG_TIMER		(1 << 3)
-#define LOG_ALL			(LOG_UNIMPL | LOG_GPIO | LOG_TIMER)
+#define LOG_UNIMPL      (1 << 1)
+#define LOG_GPIO        (1 << 2)
+#define LOG_TIMER       (1 << 3)
+#define LOG_ALL         (LOG_UNIMPL | LOG_GPIO | LOG_TIMER)
 
-#define VERBOSE			(LOG_ALL)
+#define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ST6228,   st6228_device,   "st6228",   "STmicro ST6228")
@@ -372,8 +372,8 @@ void st6228_device::watchdog_w(offs_t offset, uint8_t data)
 uint8_t st6228_device::gpio_data_r(offs_t offset)
 {
 	const uint8_t data = (m_port_data[offset] & m_port_dir[offset]) |
-		                 (m_port_input[offset] & ~m_port_dir[offset]) |
-		                 (m_port_pullup[offset] & ~m_port_dir[offset]);
+						 (m_port_input[offset] & ~m_port_dir[offset]) |
+						 (m_port_pullup[offset] & ~m_port_dir[offset]);
 	LOGMASKED(LOG_GPIO, "%s: gpio_data_r: Port %c Data: %02x\n", machine().describe_context(), offset + 'A', data);
 	return data;
 }

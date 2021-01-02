@@ -464,7 +464,7 @@ void dec0_state::ffantasybl_map(address_map &map)
 	map(0x00242024, 0x00242025).r(FUNC(dec0_state::ffantasybl_242024_r));
 	map(0x00ff87ee, 0x00ff87ef).portr("VBLANK");
 }
-	
+
 void dec0_state::dec0_tb_map(address_map &map)
 {
 	dec0_map(map);

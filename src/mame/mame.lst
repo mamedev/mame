@@ -1077,6 +1077,7 @@ aplatoon                        // (c) 199? Nova?
 crimep2                         // (c) 1993
 crimep2_11                      // (c) 1993
 crimepat                        // (c) 1993
+crimepat_10                     // (c) 1993
 crimepat_12                     // (c) 1993
 crimepat_14                     // (c) 1993
 fastdraw                        // (c) 1995
@@ -11518,6 +11519,7 @@ cwheel                          // (c) 19?? Gamebar
 ch2001
 
 @source:cxg_dominator.cpp
+scmder
 sdtor
 
 @source:cxg_scptchess.cpp
@@ -12172,6 +12174,9 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 
 @source:diablo1300.cpp
 diablo              //
+
+@source:diamondking.cpp
+diamondking                     // (c) 1997 SegaSA / Sonic
 
 @source:didact.cpp
 md6802                          //
@@ -14326,6 +14331,7 @@ mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlea                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
+namenayo                        // (c) 1982 Cat's
 ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
 olmandingo                      // bootleg
@@ -15997,6 +16003,9 @@ hektor                          // Hektor
 hektor2                         // Hektor II
 hektor3                         // Hektor III
 
+@source:heromem.cpp
+heromem                         //
+
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
@@ -16646,6 +16655,9 @@ icatel                          //
 
 @source:ice_bozopail.cpp
 ice_bozo                        // ICE - Bozo Pail Toss
+
+@source:ice_hhhippos.cpp
+hhhippos                        //
 
 @source:ice_tbd.cpp
 ice_tbd                         // ICE - Turbo Drive
@@ -23174,6 +23186,7 @@ gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
 minisupf                        // (c) 1981 Cirsa
 msbamby                         // (c) 198? Automatics Pasqual
+trebol                          // 1985 Regama
 unkslot                         // (c) 198? MGA or Costa Net?
 
 @source:missile.cpp
@@ -32683,6 +32696,7 @@ vandykejal                      // UPL-90064 (c) Jaleco
 vandykejal2                     // UPL-90064 (c) Jaleco
 
 @source:nmkmedal.cpp
+hpierrot                        // NMK
 trocana                         // NTC / NMK
 
 @source:nightmare.cpp
@@ -35522,9 +35536,6 @@ zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
 
-@source:regama.cpp
-trebol                          // 1985 Regama
-
 @source:regence.cpp
 regence
 
@@ -36130,6 +36141,7 @@ schess
 
 @source:saitek_simultano.cpp
 simultano
+simultanoa
 
 @source:saitek_ssystem3.cpp
 ssystem3
@@ -39966,6 +39978,7 @@ apache3                         // (c) 1988 Tatsumi
 apache3a                        // (c) 1988 Tatsumi
 apache3b                        // (c) 1988 Tatsumi + Kana Corporation license
 bigfight                        // (c) 1992 Tatsumi
+bigfightj                       // (c) 1992 Tatsumi
 cyclwarr                        // (c) 1991 Tatsumi
 cyclwarra                       // (c) 1991 Tatsumi
 cyclwarrb                       // (c) 1991 Tatsumi

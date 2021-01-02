@@ -1953,7 +1953,7 @@ void itech8_state::ninclown(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	//	m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
+	//  m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
 
 	M68000(config, m_maincpu, CLOCK_12MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);

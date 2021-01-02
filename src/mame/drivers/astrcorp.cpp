@@ -48,6 +48,8 @@ To do:
 #include "speaker.h"
 
 
+namespace {
+
 class astrocorp_state : public driver_device
 {
 public:
@@ -179,9 +181,6 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
-		int x, y;
-		int xwrap, ywrap;
-
 		int sx      = source[ 0x0/2 ];
 		int code    = source[ 0x2/2 ];
 		int sy      = source[ 0x4/2 ];
@@ -199,13 +198,13 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		sx &= 0x01ff;
 		sy &= 0x00ff;
 
-		for (y = 0 ; y < dimy ; y++)
+		for (int y = 0 ; y < dimy ; y++)
 		{
-			for (x = 0 ; x < dimx ; x++)
+			for (int x = 0 ; x < dimx ; x++)
 			{
-				for (ywrap = 0 ; ywrap <= 0x100 ; ywrap += 0x100)
+				for (int ywrap = 0 ; ywrap <= 0x100 ; ywrap += 0x100)
 				{
-					for (xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
+					for (int xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
 					{
 						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 								code, 0,
@@ -424,9 +423,9 @@ void astrocorp_state::magibomb_map(address_map &map) // TODO: check everything, 
 	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	// tbd
-	map(0xe00000, 0xe00001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0xe80000, 0xe80001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
-	map(0xf00001, 0xf00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	//map(0xX00000, 0xX00001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	//map(0xX80000, 0xX80001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	//map(0xX00001, 0xX00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 /***************************************************************************
@@ -1467,7 +1466,9 @@ void astrocorp_state::init_magibomb() // to be checked, game still doesn't work.
 	for(u32 i = 0; i < 0x20000; i++)
 	{
 		u32 dest =
-			(i & 0xffffe0ff) |
+			(i & 0xffff20ff) |
+			(BIT(i, 14)  << 15) |
+			(BIT(i, 15)  << 14) |
 			(BIT(i, 8)   << 12) |
 			(BIT(i, 12)  << 11) |
 			(BIT(i, 9)   << 10) |
@@ -1477,17 +1478,24 @@ void astrocorp_state::init_magibomb() // to be checked, game still doesn't work.
 	}
 }
 
+} // Anonymous namespace
+
+
 GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, init_showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",             MACHINE_SUPPORTS_SAVE )
+
+// Encrypted games (not working):
+
+// Simpler encryption
 GAME( 2001?, magibomb,  0,        magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
 GAME( 2002,  magibomba, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// one bad program ROM, no gfx dumps, less complex encryption
 GAME( 2002,  magibombb, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
 GAME( 2001,  magibombc, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
 GAME( 2001?, magibombe, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",             MACHINE_SUPPORTS_SAVE )
 
-// Encrypted games (not working):
+// Heavier encryption
 GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, init_astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2005,  magibombd, magibomb, magibomb, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // and no gfx dump

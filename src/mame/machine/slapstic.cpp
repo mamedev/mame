@@ -178,7 +178,7 @@
       - on 101 and 102, the 2nd alt access must be done outside of
         the bank region
       - on 103 to 108, the 1st alt access can be done anywhere
-      - on 110 to 118, the 1st and 3rd alt access can be done anywhere 
+      - on 110 to 118, the 1st and 3rd alt access can be done anywhere
 
     These out-of-range accesses pose technical difficulties we're not fully
     handling yet.  Similarly, accesses that must be done in sequence get
@@ -275,8 +275,8 @@ static const struct slapstic_data slapstic101 =
 
 	/* alternate banking */
 	// Real values, to be worked on later
-//	{ 0x1f00,0x1e00 },              /* 1st mask/value in sequence */
-//	{ 0x1fff,0x1fff },              /* 2nd mask/value in sequence, *outside* of the range */
+//  { 0x1f00,0x1e00 },              /* 1st mask/value in sequence */
+//  { 0x1fff,0x1fff },              /* 2nd mask/value in sequence, *outside* of the range */
 
 	{ 0x1fff,0x1dfe },              /* 1st mask/value in sequence */
 	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
@@ -306,8 +306,8 @@ static const struct slapstic_data slapstic103 =
 
 	/* alternate banking */
 	// Real values, to be worked on later
-//	{ 0x3e00,0x3a00 },              /* 1st mask/value in sequence */
-//	{ 0x3ffe,0x3ffe },              /* 2nd mask/value in sequence, *outside* of the range */
+//  { 0x3e00,0x3a00 },              /* 1st mask/value in sequence */
+//  { 0x3ffe,0x3ffe },              /* 2nd mask/value in sequence, *outside* of the range */
 	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
 	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
 	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */

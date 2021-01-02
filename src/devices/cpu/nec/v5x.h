@@ -85,6 +85,7 @@ protected:
 	void WCY1_w(u8 data) {}
 	void WCY0_w(u8 data) {}
 	void WAC_w(u8 data) {}
+	u8 TCKS_r();
 	void TCKS_w(u8 data);
 	void SBCR_w(u8 data) {}
 	void RFC_w(u8 data) {}
@@ -92,11 +93,17 @@ protected:
 	void WCY2_w(u8 data) {}
 	void WCY3_w(u8 data) {}
 	void WCY4_w(u8 data) {}
+	u8 SULA_r();
 	void SULA_w(u8 data);
+	u8 TULA_r();
 	void TULA_w(u8 data);
+	u8 IULA_r();
 	void IULA_w(u8 data);
+	u8 DULA_r();
 	void DULA_w(u8 data);
+	u8 OPHA_r();
 	void OPHA_w(u8 data);
+	u8 OPSEL_r();
 	void OPSEL_w(u8 data);
 	u8 get_pic_ack() { return 0; }
 	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
@@ -167,6 +174,7 @@ protected:
 
 	void internal_port_map(address_map &map);
 
+	u8 OPCN_r();
 	void OPCN_w(u8 data);
 
 private:
@@ -244,6 +252,7 @@ protected:
 	void internal_port_map(address_map &map);
 	virtual void install_peripheral_io() override;
 
+	u8 SCTL_r();
 	void SCTL_w(u8 data);
 
 private:

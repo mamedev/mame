@@ -1028,9 +1028,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0x400000, 0x7fffff).rom(); // data ROM
 	map(0xc00000, 0xc1ffff).ram().share("workram");
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
-	map(0xd20000, 0xd20fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
-	map(0xd21000, 0xd21fff).ram(); // second bank of sprite RAM, accessed thru ESC
-	map(0xd22000, 0xd23fff).ram(); // extra bank checked at least by sexyparo, pending further investigation.
+	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0xd44000, 0xd4400f).w(FUNC(konamigx_state::konamigx_tilebank_w));
 	map(0xd48000, 0xd48007).w(m_k055673, FUNC(k055673_device::k053246_w));
@@ -1085,7 +1083,6 @@ void konamigx_state::gx_type2_map(address_map &map)
 void konamigx_state::gx_type3_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
@@ -1102,7 +1099,6 @@ void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();

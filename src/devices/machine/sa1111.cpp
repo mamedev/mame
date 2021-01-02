@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Intel SA1111 Microprocessor Companion Chip skeleton
+    Intel SA1111 Microprocessor Companion Chip skeleton
 
 ***************************************************************************/
 
@@ -10,17 +10,17 @@
 #include "sa1111.h"
 
 #define LOG_UNKNOWN     (1 << 1)
-#define LOG_SBI			(1 << 2)
-#define LOG_SK			(1 << 3)
-#define LOG_USB			(1 << 4)
-#define LOG_AUDIO		(1 << 5)
-#define LOG_SSP			(1 << 6)
-#define LOG_SSP_HF		(1 << 7)
-#define LOG_TRACK		(1 << 8)
-#define LOG_MOUSE		(1 << 9)
-#define LOG_GPIO		(1 << 10)
-#define LOG_INTC		(1 << 11)
-#define LOG_CARD		(1 << 12)
+#define LOG_SBI         (1 << 2)
+#define LOG_SK          (1 << 3)
+#define LOG_USB         (1 << 4)
+#define LOG_AUDIO       (1 << 5)
+#define LOG_SSP         (1 << 6)
+#define LOG_SSP_HF      (1 << 7)
+#define LOG_TRACK       (1 << 8)
+#define LOG_MOUSE       (1 << 9)
+#define LOG_GPIO        (1 << 10)
+#define LOG_INTC        (1 << 11)
+#define LOG_CARD        (1 << 12)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
 #define VERBOSE         (0) // (LOG_ALL)
@@ -32,6 +32,8 @@ sa1111_device::sa1111_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SA1111, tag, owner, clock)
 	, m_gpio_out(*this)
 	, m_ssp_out(*this)
+	, m_l3_addr_out(*this)
+	, m_l3_data_out(*this)
 {
 }
 
@@ -434,6 +436,12 @@ void sa1111_device::usb_int_test_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 */
 
+WRITE_LINE_MEMBER(sa1111_device::l3wd_in)
+{
+	if (state)
+		m_audio_regs.sasr0 |= (1 << SASR0_L3WD_BIT);
+}
+
 TIMER_CALLBACK_MEMBER(sa1111_device::audio_rx_callback)
 {
 }
@@ -617,7 +625,7 @@ void sa1111_device::sacr0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void sa1111_device::sacr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sacr1_w: Serial Audio Alternate Mode Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	LOGMASKED(LOG_AUDIO, "%s:          Alternade Mode Operation: %s\n", machine().describe_context(), BIT(data, SACR1_AMSL_BIT) ? "MSB-Justified" : "I2S");
+	LOGMASKED(LOG_AUDIO, "%s:          Alternate Mode Operation: %s\n", machine().describe_context(), BIT(data, SACR1_AMSL_BIT) ? "MSB-Justified" : "I2S");
 	LOGMASKED(LOG_AUDIO, "%s:          Enable L3 Control Bus: %d\n", machine().describe_context(), BIT(data, SACR1_L3EN_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          L3 Control Bus Data Multi-Byte Transfer: %s\n", machine().describe_context(), BIT(data, SACR1_L3MB_BIT) ? "Multiple-Byte" : "Last Byte");
 	LOGMASKED(LOG_AUDIO, "%s:          Disable Recording Function: %d\n", machine().describe_context(), BIT(data, SACR1_DREC_BIT));
@@ -676,12 +684,14 @@ void sa1111_device::l3car_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: l3car_w: L3 Control Bus Address Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_audio_regs.l3car);
+	m_l3_addr_out((uint8_t)data);
 }
 
 void sa1111_device::l3cdr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: l3cdr_w: L3 Control Bus Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_audio_regs.l3cdr);
+	m_l3_data_out((uint8_t)data);
 }
 
 void sa1111_device::accar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -1633,6 +1643,8 @@ void sa1111_device::device_start()
 
 	m_gpio_out.resolve_all_safe();
 	m_ssp_out.resolve_safe();
+	m_l3_addr_out.resolve_safe();
+	m_l3_data_out.resolve_safe();
 }
 
 void sa1111_device::device_reset()
@@ -1725,7 +1737,7 @@ void sa1111_device::device_reset()
 
 	m_card_regs.pccr = 0;
 	m_card_regs.pcssr = 0;
-	m_card_regs.pcsr = 0x0000000f;
+	m_card_regs.pcsr = 0x0000000c;
 }
 
 void sa1111_device::device_add_mconfig(machine_config &config)

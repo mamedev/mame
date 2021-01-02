@@ -225,7 +225,7 @@ void galpani2_state::galpani2_mcu_nmi1()
 			}
 			break;
 		}
-			
+
 		//case 0x10: //? Clear gal?
 		//case 0x14: //? Display gal?
 		//until

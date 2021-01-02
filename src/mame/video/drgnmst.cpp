@@ -213,10 +213,10 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
 
 		// this reg seems to be more closely related to md_tilemap again? is it some kind of split pos?
-		//int bgys = m_vidregs[0xb] & 0x1ff; 
+		//int bgys = m_vidregs[0xb] & 0x1ff;
 
 		int bgys = m_vidregs[0x10]; // skyscraper lift stage confirms this reg?
-		m_bg_tilemap->set_scrolly(0, bgys); 
+		m_bg_tilemap->set_scrolly(0, bgys);
 	}
 
 	// TODO: figure out which bits relate to the order, like cps1?
@@ -240,7 +240,7 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 			// but explicitly changes from 2cc0 to display scores, which indicates there is maybe a difference)
 			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x2780: // mastfury skyscraper lift stage all ok
 		case 0x279a: // mastfury continue screen all ok

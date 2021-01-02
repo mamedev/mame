@@ -4,7 +4,7 @@
 
     Fairchild 4702B Programmable Bit Rate Generator
 
-    Originally numbered 34702 in Fairchild's isoplanar CMOS series (whose 
+    Originally numbered 34702 in Fairchild's isoplanar CMOS series (whose
     lower-numbered products were logical equivalents of RCA CD4000 and
     Motorola MC14500 series devices), this BRG incorporates some unusually
     sophisticated features into its 16-pin package, which may be why

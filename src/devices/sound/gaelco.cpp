@@ -265,6 +265,11 @@ void gaelco_gae1_device::device_start()
 		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
 }
 
+void gaelco_gae1_device::device_reset()
+{
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+		m_channel[ch].active = 0;
+}
 
 void gaelco_gae1_device::device_stop()
 {

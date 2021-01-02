@@ -3930,7 +3930,7 @@ void debugger_commands::execute_unmount(int ref, const std::vector<std::string> 
 
 void debugger_commands::execute_input(int ref, const std::vector<std::string> &params)
 {
-	m_machine.ioport().natkeyboard().post_coded(params[0].c_str());
+	m_machine.natkeyboard().post_coded(params[0].c_str());
 }
 
 
@@ -3956,7 +3956,7 @@ void debugger_commands::execute_dumpkbd(int ref, const std::vector<std::string> 
 	}
 
 	// loop through all codes
-	std::string buffer = m_machine.ioport().natkeyboard().dump();
+	std::string buffer = m_machine.natkeyboard().dump();
 
 	// and output it as appropriate
 	if (file != nullptr)

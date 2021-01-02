@@ -354,15 +354,15 @@ INPUT_CHANGED_MEMBER(vg5k_state::delta_button)
 void vg5k_state::machine_start()
 {
 	save_item(NAME(m_ef9345_offset));
-    save_item(NAME(m_printer_latch));
-    save_item(NAME(m_printer_signal));
+	save_item(NAME(m_printer_latch));
+	save_item(NAME(m_printer_signal));
 }
 
 void vg5k_state::machine_reset()
 {
-    m_ef9345_offset = 0;
-    m_printer_latch = 0;
-    m_printer_signal = 0;
+	m_ef9345_offset = 0;
+	m_printer_latch = 0;
+	m_printer_signal = 0;
 }
 
 

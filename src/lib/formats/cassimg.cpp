@@ -355,6 +355,15 @@ void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 
 
 
+uint8_t cassette_image::image_read_byte(uint64_t offset)
+{
+	uint8_t data;
+	io_generic_read(&m_io, &data, offset, 1);
+	return data;
+}
+
+
+
 void cassette_image::image_write(const void *buffer, uint64_t offset, size_t length)
 {
 	io_generic_write(&m_io, buffer, offset, length);

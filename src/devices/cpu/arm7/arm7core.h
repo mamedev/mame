@@ -83,18 +83,18 @@ enum
 };
 
 /* Coprocessor-related macros */
-#define COPRO_DOMAIN_NO_ACCESS				0
-#define COPRO_DOMAIN_CLIENT					1
-#define COPRO_DOMAIN_RESV					2
-#define COPRO_DOMAIN_MANAGER				3
+#define COPRO_DOMAIN_NO_ACCESS              0
+#define COPRO_DOMAIN_CLIENT                 1
+#define COPRO_DOMAIN_RESV                   2
+#define COPRO_DOMAIN_MANAGER                3
 
-#define COPRO_FAULT_NONE					0
-#define COPRO_FAULT_TRANSLATE_SECTION		5
-#define COPRO_FAULT_TRANSLATE_PAGE			7
-#define COPRO_FAULT_DOMAIN_SECTION			9
-#define COPRO_FAULT_DOMAIN_PAGE				11
-#define COPRO_FAULT_PERM_SECTION			13
-#define COPRO_FAULT_PERM_PAGE				15
+#define COPRO_FAULT_NONE                    0
+#define COPRO_FAULT_TRANSLATE_SECTION       5
+#define COPRO_FAULT_TRANSLATE_PAGE          7
+#define COPRO_FAULT_DOMAIN_SECTION          9
+#define COPRO_FAULT_DOMAIN_PAGE             11
+#define COPRO_FAULT_PERM_SECTION            13
+#define COPRO_FAULT_PERM_PAGE               15
 
 #define COPRO_TLB_BASE                      m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
@@ -122,10 +122,10 @@ enum
 #define COPRO_TLB_COARSE_TABLE              1
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
-#define COPRO_TLB_TYPE_SECTION				0
-#define COPRO_TLB_TYPE_LARGE				1
-#define COPRO_TLB_TYPE_SMALL				2
-#define COPRO_TLB_TYPE_TINY					3
+#define COPRO_TLB_TYPE_SECTION              0
+#define COPRO_TLB_TYPE_LARGE                1
+#define COPRO_TLB_TYPE_SMALL                2
+#define COPRO_TLB_TYPE_TINY                 3
 
 #define COPRO_CTRL                          m_control
 #define COPRO_CTRL_MMU_EN                   0x00000001

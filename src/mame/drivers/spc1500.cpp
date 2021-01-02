@@ -941,7 +941,7 @@ ROM_END
 
 } // Anonymous namespace
 
- 
+
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS

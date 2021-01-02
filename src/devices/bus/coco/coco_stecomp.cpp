@@ -5,10 +5,10 @@
     coco_stecomp.cpp
 
 
-	Code for emulating The Stereo Composer by Speech Systems
+    Code for emulating The Stereo Composer by Speech Systems
 
-	This cartridge is a simple sound cartridge. It had two 8-bit DACs
-	connected thru a PIA. It contained no ROM.
+    This cartridge is a simple sound cartridge. It had two 8-bit DACs
+    connected thru a PIA. It contained no ROM.
 
 ***************************************************************************/
 
@@ -52,7 +52,7 @@ namespace
 		virtual void device_start() override
 		{
 			// install handlers
- 			install_readwrite_handler( 0xFF70, 0xFF73, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
+			install_readwrite_handler( 0xFF70, 0xFF73, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
 		}
 
 	private:

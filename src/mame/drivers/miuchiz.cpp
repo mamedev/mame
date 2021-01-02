@@ -2,17 +2,17 @@
 // copyright-holders:Jonathan Gevaryahu
 // thanks-to: ChrisMiuchiz
 /*
-	Driver for the Miuchiz handhelds
-	CPU: ST2205U;
-		XTAL: Y1 16MHz
-		XTAL: Y2 32.768KHz
-	LCDC: ST7626 (https://www.crystalfontz.com/controllers/Sitronix/ST7626/)
-		the ST7626 is embedded into a epoxy part just below the screen glass with the flex cable attached to iter_swap
-		it has internal 98x68x16bit ram
+    Driver for the Miuchiz handhelds
+    CPU: ST2205U;
+        XTAL: Y1 16MHz
+        XTAL: Y2 32.768KHz
+    LCDC: ST7626 (https://www.crystalfontz.com/controllers/Sitronix/ST7626/)
+        the ST7626 is embedded into a epoxy part just below the screen glass with the flex cable attached to iter_swap
+        it has internal 98x68x16bit ram
 
-	Extremely preliminary
-	The inputs are mapped in an input array, but aren't actually hooked anywhere yet.
-	The screen is a dummy and just displays nothing for now.
+    Extremely preliminary
+    The inputs are mapped in an input array, but aren't actually hooked anywhere yet.
+    The screen is a dummy and just displays nothing for now.
 */
 
 /* Core includes */
@@ -64,27 +64,27 @@ void miuchiz_state::mem_map(address_map &map)
 }
 
 // flash map?
-//	map(0x01000000, 0x011fffff).rom().region("flash", 0);
+//  map(0x01000000, 0x011fffff).rom().region("flash", 0);
 
 
 // input ports
 static INPUT_PORTS_START( miuchiz )
-    PORT_START("INPUTS")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up")
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down")
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Left")
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right")
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Power")
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Menu")
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Upside-up")
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Upside-down")
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Screen-up-left")
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Screen-up-right")
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Screen-low-left")
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Screen-low-right")
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action")
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Mute/Pause")
-    PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Power")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Upside-up")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Upside-down")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Screen-up-left")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Screen-up-right")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Screen-low-left")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Screen-low-right")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Mute/Pause")
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 // machine specific functions

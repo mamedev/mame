@@ -431,7 +431,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 
 	map(0xc260, 0xc52f).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
 	map(0xc530, 0xc7ff).ram(); // = clears 0x2d0 bytes (90*64 / 8) display buffer?
-	
+
 	//map(0xf001, 0xf056).ram(); // written as a block
 	map(0xf000, 0xf5ff).ram(); // ? 0xf400 - 0xf427 written as a block, other areas uncertain, might be more registers in here as there are reads too
 
@@ -439,7 +439,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	map(0xfc01, 0xfc04).r(FUNC(leapfrog_iquest_state::unk_fc01_r));
 
 	map(0xfc06, 0xfc07).rw(FUNC(leapfrog_iquest_state::lowerbank_r), FUNC(leapfrog_iquest_state::lowerbank_w)); // ROM / RAM window in main space at 0000-7fff
-	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff 
+	map(0xfc08, 0xfc09).rw(FUNC(leapfrog_iquest_state::upperbank_r), FUNC(leapfrog_iquest_state::upperbank_w)); // ROM / RAM window in main space at 8000-ffff
 	map(0xfc0a, 0xfc0b).rw(FUNC(leapfrog_iquest_state::iobank_r), FUNC(leapfrog_iquest_state::iobank_w)); // ROM / RAM window in ext space at 0000-7fff
 
 	map(0xfc22, 0xfc22).w(FUNC(leapfrog_iquest_state::unk_fc22_w));
@@ -455,7 +455,7 @@ void leapfrog_iquest_state::ext_map(address_map &map)
 	// strings to transmit over the serial.
 	// however, mapping this area as RAM instead results in the program stalling much earlier, waiting for $24.3 to
 	// be cleared.
-	// 017658: 20 23 fd  jb    $24.3,$17658 
+	// 017658: 20 23 fd  jb    $24.3,$17658
 	//
 	//The only realistic place for this to be cleared is deep in the interrupt handler for
 	// Serial Receive/Transmit

@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Intel XScale SA1110 peripheral emulation
+    Intel XScale SA1110 peripheral emulation
 
 ***************************************************************************/
 
@@ -11,16 +11,16 @@
 
 #define LOG_UNKNOWN     (1 << 1)
 #define LOG_UART        (1 << 2)
-#define LOG_UART_HF		(1 << 3)
-#define LOG_MCP			(1 << 4)
-#define LOG_SSP			(1 << 5)
-#define LOG_OSTIMER		(1 << 6)
-#define LOG_OSTIMER_HF	(1 << 7)
-#define LOG_RTC			(1 << 8)
+#define LOG_UART_HF     (1 << 3)
+#define LOG_MCP         (1 << 4)
+#define LOG_SSP         (1 << 5)
+#define LOG_OSTIMER     (1 << 6)
+#define LOG_OSTIMER_HF  (1 << 7)
+#define LOG_RTC         (1 << 8)
 #define LOG_POWER       (1 << 9)
 #define LOG_RESET       (1 << 10)
-#define LOG_GPIO		(1 << 11)
-#define LOG_GPIO_HF		(1 << 12)
+#define LOG_GPIO        (1 << 11)
+#define LOG_GPIO_HF     (1 << 12)
 #define LOG_INTC        (1 << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_UART | LOG_MCP | LOG_SSP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC)
 
@@ -1618,7 +1618,10 @@ uint32_t sa1110_periphs_device::intc_r(offs_t offset, uint32_t mem_mask)
 	switch (offset)
 	{
 	case REG_ICIP:
-		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icip, mem_mask);
+		if (m_intc_regs.icip != 0x04000000)
+		{
+			LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icip, mem_mask);
+		}
 		return m_intc_regs.icip;
 	case REG_ICMR:
 		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Mask Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icmr, mem_mask);

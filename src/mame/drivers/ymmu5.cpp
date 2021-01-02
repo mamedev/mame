@@ -218,7 +218,7 @@ INPUT_PORTS_END
 void mu5_state::mu5(machine_config &config)
 {
 	/* basic machine hardware */
-	H83002(config, m_maincpu, 10_MHz_XTAL);	// clock verified by schematics
+	H83002(config, m_maincpu, 10_MHz_XTAL); // clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
 	m_maincpu->set_addrmap(AS_IO, &mu5_state::mu5_io_map);
 

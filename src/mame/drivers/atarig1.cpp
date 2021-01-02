@@ -1335,7 +1335,7 @@ void atarig1_state::init_pitfightb()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x38000, 0x3ffff, 0, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { pitfightb_cheap_slapstic_tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { pitfightb_cheap_slapstic_tweak(offset >> 1); });
-	
+
 	/* not primed by default */
 	m_bslapstic_primed = false;
 

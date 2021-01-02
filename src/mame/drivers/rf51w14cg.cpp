@@ -6,7 +6,7 @@
     "RF51W14-CG" is the legal registry name, the game commercial name is unknown.
 
     TODO:
-    	- Everything
+        - Everything
 
    ________________________________________________________________
   |   ___J16_____  ___J17____  __J18__  _______________________   |

@@ -129,7 +129,7 @@ void altair_state::altair(machine_config &config)
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.dcd_handler().set("acia", FUNC(acia6850_device::write_dcd));
 	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
-	rs232.txc_handler().set("brg", FUNC(f4702_device::im_w)); // molex pin 7 to be connected to cable pin 15	
+	rs232.txc_handler().set("brg", FUNC(f4702_device::im_w)); // molex pin 7 to be connected to cable pin 15
 
 	f4702_device &brg(F4702(config, "brg", 2.4576_MHz_XTAL));
 	brg.s_callback().set_ioport("BAUD");

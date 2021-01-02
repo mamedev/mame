@@ -4,8 +4,8 @@
 
     coco_midi.cpp
 
-	Emulation of Rutherford Research's Midi Pak and also compatible with
-	Go4Retro's MIDI Maestro.
+    Emulation of Rutherford Research's Midi Pak and also compatible with
+    Go4Retro's MIDI Maestro.
 
 ***************************************************************************/
 

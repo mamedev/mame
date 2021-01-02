@@ -750,9 +750,9 @@ struct factory_sector
         char total_number[16];
         uint8_t sum;        // byte sum of above
         struct {
-            uint8_t sum_inv;	// ~(UID byte sum)
-            uint8_t sum;		// UID byte sum
-            uint8_t id[6];		// UID
+            uint8_t sum_inv;    // ~(UID byte sum)
+            uint8_t sum;        // UID byte sum
+            uint8_t id[6];      // UID
         } machine_id;
         uint8_t machine_type;   // FF - Dreamcast
         uint8_t machine_version;// FF - VA0, FE - VA1, FD - VA2, NOTE: present in 1st factory record only, in 2nd always FF
