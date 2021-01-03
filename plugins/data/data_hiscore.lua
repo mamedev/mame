@@ -5,6 +5,7 @@ local dat = {}
 local env = {}
 local output
 local curset
+local path = emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")) 
 
 function env.open(file, size)
 	if file == ".hi" then
@@ -187,7 +188,8 @@ function env.basechar(bytes, base)
 	return bytes
 end
 
-function env.charset_conv(bytes, charset)
+function env.charset_conv(bytes, charset, offset)
+	if not offset then offset = 0 end
 	if type(charset) == "string" then
 		local chartype, offset, delta = charset:match("CS_(%w*)%[?(%-?%d?%d?),?(%d?%d?)%]?")
 		if chartype == "NUMBER" then
@@ -197,7 +199,7 @@ function env.charset_conv(bytes, charset)
 		return bytes
 	end
 	for num, char in ipairs(bytes) do
-		char = string.byte(char)
+		char = string.byte(char) - offset
 		if charset[char] then
 			bytes[num] = charset[char]
 		elseif charset.default then
@@ -242,10 +244,8 @@ function dat.check(set, softlist)
 	if softlist then
 		return nil
 	end
-	local datpath
 	local function xml_parse(file)
 		local table
-		datpath = file:fullpath():gsub(".zip", "/")
 		local data = file:read(file:size())
 		data = data:match("<hi2txt.->(.*)</ *hi2txt>")
 		local function get_tags(str, parent)
@@ -299,7 +299,7 @@ function dat.check(set, softlist)
 	local function parse_table(xml)
 		local total_size = 0
 		local s = { "local data = open('" .. xml.structure[1].file .. "', size)\nlocal offset = 1\nlocal arr = {}",
-				"local elem, bytes, offset, value, lastindex, output"}
+				"local elem, bytes, offset, value, index, output"}
 		local fparam = {}
 		if xml.bitmask then
 			local bitmask = "local bitmask = {"
@@ -446,7 +446,20 @@ function dat.check(set, softlist)
 					elseif op.tag == "multiply" then
 						format[#format + 1] = "val = val * " .. op.text
 					elseif op.tag == "divide" then
-						format[#format + 1] = "val = val / " .. op.text
+						if op.text then
+							format[#format + 1] = "val = val / " .. op.text
+						else
+							format[#format + 1] = "val = 0"
+							for num2, col in ipairs(op) do
+								param[#param + 1] = col["id"]
+								if col["format"] then
+									local colform = check_format(col["format"])
+									format[#format + 1] = colform .. " val = val / tempform(val)"
+								else
+									format[#format + 1] = "val = val / param[" .. #param .. "]"
+								end
+							end
+						end
 					elseif op.tag == "sum" then
 						format[#format + 1] = "val = 0"
 						for num2, col in ipairs(op) do
@@ -528,10 +541,10 @@ function dat.check(set, softlist)
 					elseif op.tag == "case" then
 						format[#format + 1] = "val = temp"
 						if not tonumber(op["src"]) then
-							op["src"] = "'" .. op["src"] .. "'"
+							op["src"] = "'" .. op["src"]:gsub("'", "\\'") .. "'"
 						end
 						if not tonumber(op["dst"]) then
-							op["dst"] = "'" .. op["dst"] .. "'"
+							op["dst"] = "'" .. op["dst"]:gsub("'", "\\'") .. "'"
 						end
 						if op["default"] == "yes" then
 							format[#format + 1] = "local default = " .. op["dst"]
@@ -580,9 +593,9 @@ function dat.check(set, softlist)
 				if elem["skip-first-bytes"] then
 					s[#s + 1] = "offset = offset + " .. elem["skip-first-bytes"]
 				end
-				s[#s + 1] = "for i = 1, " .. elem["count"] .. " do"
+				s[#s + 1] = "for i = 0, " .. elem["count"] - 1 .. " do"
 				for num, elt in ipairs(elem) do
-					index = parse_elem(elt, elem)
+					parse_elem(elt, elem)
 				end
 				s[#s + 1] = "end"
 				if elem["skip-last-bytes"] then
@@ -653,10 +666,14 @@ function dat.check(set, softlist)
 						elem["charset"]:gsub("([^;]*)", function(s) charsets[#charsets + 1] = s return "" end)
 						for num, charset in pairs(charsets) do
 							if charset:match("^CS_") then
-								s[#s + 1] = "bytes = charset_conv(bytes, " .. charset .. ")"
+								s[#s + 1] = "bytes = charset_conv(bytes, " .. charset
 							elseif charset ~= "" then
-								s[#s + 1] = "bytes = charset_conv(bytes, charset['" .. charset .. "'])"
+								s[#s + 1] = "bytes = charset_conv(bytes, charset['" .. charset .. "']"
 							end
+							if elem["ascii-offset"] then
+								s[#s] = s[#s] .. ", " .. elem["ascii-offset"]
+							end
+							s[#s] = s[#s] .. ")"
 						end
 					end
 					s[#s + 1] = "elem.val = table.concat(bytes)"
@@ -674,24 +691,24 @@ function dat.check(set, softlist)
 						elem["table-index"]:match("([%w ]*):([%a_]*)")
 					end
 					if not elem["table-index"] or elem["table-index"] == "loop_index" then
-						index = "(i - 1) * " .. step .. " + " .. start
+						index = "i * " .. step .. " + " .. start
 					elseif elem["table-index"] == "loop_reverse_index" then
-						index = "(" .. total  .. "- i) * " .. step .. " + " .. start
+						index = "(" .. total  .. "- i - 1) * " .. step .. " + " .. start
 					elseif elem["table-index"] == "itself" then
 						index = "value"
-					elseif elem["table-index"] == "last" then
-						index = "lastindex"
 					elseif reftype then
 						index = reftype .. "(arr, '" .. ref .. "')"
 					end
 				end
-				if index then
-					s[#s + 1] = "elem.index = " .. index
-					s[#s + 1] = "lastindex = elem.index"
+				if loopelem then
+					if index then
+						s[#s + 1] = "index = " .. index
+					end
+					s[#s + 1] = "arr['" .. elem["id"] .. "'][index] = elem"
+				else
+					s[#s + 1] = "arr['" .. elem["id"] .. "'] = elem"
 				end
-				s[#s + 1] = "arr['" .. elem["id"] .. "'][#arr['" .. elem["id"] .. "'] + 1] = elem"
 			end
-			return index
 		end
 		for num, elem in ipairs(xml.structure[1]) do
 			if elem["tag"] == "loop" or elem["tag"] == "elt" then
@@ -719,6 +736,7 @@ function dat.check(set, softlist)
 					local head = {}
 					local dat = {}
 					local loopcnt
+					local cols = 0
 					local igncol, ignval
 					if fld["line-ignore"] then
 						igncol, ignval = fld["line-ignore"]:match("([^:]*):(.*)")
@@ -731,15 +749,16 @@ function dat.check(set, softlist)
 							if not col["src"] then
 								col["src"] = col["id"]
 							end
-							if not loopcnt and col["src"] ~= "index" then
-								table.insert(dat, 1, "for i = 1, #arr['" .. col["src"] .. "'] do")
-								table.insert(dat, 2, "local index = arr['" .. col["src"] .. "'][i].index or i - 1")
-								table.insert(dat, 3, "local line = ''")
+							if not loopcnt and col["src"] ~= "index" and col["src"] ~= "unsorted_index" then
+								table.insert(dat, 1, "for i = 0, #arr['" .. col["src"] .. "'] do")
+								table.insert(dat, 2, "local line = ''")
 								loopcnt = true
 							end
 							head[#head + 1] = "output = output .. '" .. col["id"] .. "\\t'"
 							if col["src"] == "index" then
-								dat[#dat + 1] = "value = index"
+								dat[#dat + 1] = "value = i"
+							elseif col["src"] == "unsorted_index" then
+								dat[#dat + 1] = "value = i"
 							else
 								dat[#dat + 1] = "if arr['"  .. col["src"] .. "'] then value = arr['" .. col["src"] .. "'][i].val end"
 							end
@@ -751,15 +770,18 @@ function dat.check(set, softlist)
 								dat[#dat + 1] = "local checkval = value"
 							end
 							dat[#dat + 1] = "line = line .. value .. '\\t'"
+							cols = cols + 1
 						end
 					end
-					if igncol then
-						dat[#dat + 1] = "if checkval ~= " .. ignval .. " then output = output .. line .. '\\n' end\nend"
-					else
-						dat[#dat + 1] = "output = output .. line .. '\\n'\nend"
+					if cols > 0 then
+						if igncol then
+							dat[#dat + 1] = "if checkval ~= " .. ignval .. " then output = output .. line .. '\\n' end\nend"
+						else
+							dat[#dat + 1] = "output = output .. line .. '\\n'\nend"
+						end
+						s[#s + 1] = table.concat(head, "\n") .. "\noutput = output .. '\\n'"
+						s[#s + 1] = table.concat(dat, "\n")
 					end
-					s[#s + 1] = table.concat(head, "\n") .. "\noutput = output .. '\\n'"
-					s[#s + 1] = table.concat(dat, "\n")
 				end
 			end
 		end
@@ -767,7 +789,7 @@ function dat.check(set, softlist)
 
 		-- cache script
 		local script = table.concat(s, "\n")
-		local scrpath = datpath .. "/"
+		local scrpath = path:match("[^;]*") .. "/"
 		local scrfile = io.open(scrpath .. set .. ".lua", "w+")
 		if not scrfile then
 			lfs.mkdir(scrpath)
@@ -789,12 +811,12 @@ function dat.check(set, softlist)
 	output = nil
 	curset = set
 
-	local scrfile = emu.file(emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
+	local scrfile = emu.file(path, 1)
 	local ret = scrfile:open(set .. ".lua")
 	local script
 	if ret then
 		function get_xml_table(fileset)
-			local file = emu.file(emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
+			local file = emu.file(path, 1)
 			local ret = file:open(fileset .. ".xml")
 			if ret then
 				return nil

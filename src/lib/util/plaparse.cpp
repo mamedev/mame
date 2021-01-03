@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, hap
 /***************************************************************************
 
-    plaparse.h
+    plaparse.cpp
 
     Simple parser for Berkeley standard PLA files into raw fusemaps.
     It supports no more than one output matrix, and is limited to
@@ -10,12 +10,14 @@
 
 ***************************************************************************/
 
+#include "plaparse.h"
+
+#include "osdcomm.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "jedparse.h"
-#include "plaparse.h"
 
 
 

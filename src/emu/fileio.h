@@ -179,7 +179,7 @@ public:
 
 	// writing
 	u32 write(const void *buffer, u32 length);
-	int puts(const char *s);
+	int puts(std::string_view s);
 	int vprintf(util::format_argument_pack<std::ostream> const &args);
 	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
 	{

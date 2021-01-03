@@ -35,7 +35,7 @@ ROM_START( ssc )
 ROM_END
 
 ROM_START( ssi )
-	ROM_REGION(0x2000, "program", 0)
+	ROM_REGION(0x2000, "program", 0) // "SSI Version 1.1"
 	ROM_LOAD( "apricorn super serial imager - rom.bin", 0x0000, 0x2000, CRC(d251f7f1) SHA1(19f2bc1e60c3fd5e179c4a38f7ca4e3221553562) )
 ROM_END
 

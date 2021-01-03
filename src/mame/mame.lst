@@ -9252,6 +9252,7 @@ tripjok                         //
 
 @source:bingoc.cpp
 bingoc                          // (c) 1989 Sega
+bingoct                         // (c) 1989 Sega
 
 @source:bingoman.cpp
 bingoman                        //
@@ -12174,6 +12175,9 @@ xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored fo
 
 @source:diablo1300.cpp
 diablo              //
+
+@source:diamondking.cpp
+diamondking                     // (c) 1997 SegaSA / Sonic
 
 @source:didact.cpp
 md6802                          //
@@ -15999,6 +16003,9 @@ victor                          //
 hektor                          // Hektor
 hektor2                         // Hektor II
 hektor3                         // Hektor III
+
+@source:heromem.cpp
+heromem                         //
 
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
@@ -32690,6 +32697,7 @@ vandykejal                      // UPL-90064 (c) Jaleco
 vandykejal2                     // UPL-90064 (c) Jaleco
 
 @source:nmkmedal.cpp
+hpierrot                        // NMK
 trocana                         // NTC / NMK
 
 @source:nightmare.cpp
@@ -36134,6 +36142,7 @@ schess
 
 @source:saitek_simultano.cpp
 simultano
+simultanoa
 
 @source:saitek_ssystem3.cpp
 ssystem3

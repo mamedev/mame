@@ -9,7 +9,6 @@
 ****************************************************************************/
 
 #include "corestr.h"
-#include "osdcore.h"
 
 #include <algorithm>
 #include <memory>

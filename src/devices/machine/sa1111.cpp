@@ -32,6 +32,8 @@ sa1111_device::sa1111_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, SA1111, tag, owner, clock)
 	, m_gpio_out(*this)
 	, m_ssp_out(*this)
+	, m_l3_addr_out(*this)
+	, m_l3_data_out(*this)
 {
 }
 
@@ -434,6 +436,12 @@ void sa1111_device::usb_int_test_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 */
 
+WRITE_LINE_MEMBER(sa1111_device::l3wd_in)
+{
+	if (state)
+		m_audio_regs.sasr0 |= (1 << SASR0_L3WD_BIT);
+}
+
 TIMER_CALLBACK_MEMBER(sa1111_device::audio_rx_callback)
 {
 }
@@ -617,7 +625,7 @@ void sa1111_device::sacr0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void sa1111_device::sacr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sacr1_w: Serial Audio Alternate Mode Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	LOGMASKED(LOG_AUDIO, "%s:          Alternade Mode Operation: %s\n", machine().describe_context(), BIT(data, SACR1_AMSL_BIT) ? "MSB-Justified" : "I2S");
+	LOGMASKED(LOG_AUDIO, "%s:          Alternate Mode Operation: %s\n", machine().describe_context(), BIT(data, SACR1_AMSL_BIT) ? "MSB-Justified" : "I2S");
 	LOGMASKED(LOG_AUDIO, "%s:          Enable L3 Control Bus: %d\n", machine().describe_context(), BIT(data, SACR1_L3EN_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          L3 Control Bus Data Multi-Byte Transfer: %s\n", machine().describe_context(), BIT(data, SACR1_L3MB_BIT) ? "Multiple-Byte" : "Last Byte");
 	LOGMASKED(LOG_AUDIO, "%s:          Disable Recording Function: %d\n", machine().describe_context(), BIT(data, SACR1_DREC_BIT));
@@ -676,12 +684,14 @@ void sa1111_device::l3car_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: l3car_w: L3 Control Bus Address Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_audio_regs.l3car);
+	m_l3_addr_out((uint8_t)data);
 }
 
 void sa1111_device::l3cdr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: l3cdr_w: L3 Control Bus Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_audio_regs.l3cdr);
+	m_l3_data_out((uint8_t)data);
 }
 
 void sa1111_device::accar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -1633,6 +1643,8 @@ void sa1111_device::device_start()
 
 	m_gpio_out.resolve_all_safe();
 	m_ssp_out.resolve_safe();
+	m_l3_addr_out.resolve_safe();
+	m_l3_data_out.resolve_safe();
 }
 
 void sa1111_device::device_reset()
@@ -1725,7 +1737,7 @@ void sa1111_device::device_reset()
 
 	m_card_regs.pccr = 0;
 	m_card_regs.pcssr = 0;
-	m_card_regs.pcsr = 0x0000000f;
+	m_card_regs.pcsr = 0x0000000c;
 }
 
 void sa1111_device::device_add_mconfig(machine_config &config)

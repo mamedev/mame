@@ -74,7 +74,7 @@ protected:
 		ARM9_COPRO_ID_STEP_SA1110_A0 = 0,
 		ARM9_COPRO_ID_STEP_SA1110_B0 = 4,
 		ARM9_COPRO_ID_STEP_SA1110_B1 = 5,
-		ARM9_COPRO_ID_STEP_SA1110_B2 = 6,
+		ARM9_COPRO_ID_STEP_SA1110_B2 = 8,
 		ARM9_COPRO_ID_STEP_SA1110_B4 = 8,
 
 		ARM9_COPRO_ID_STEP_PXA255_A0 = 6,
@@ -146,9 +146,20 @@ protected:
 
 	uint32_t m_r[/*NUM_REGS*/37];
 
+	void translate_insn_command(int ref, const std::vector<std::string> &params);
+	void translate_data_command(int ref, const std::vector<std::string> &params);
+	void translate_command(int ref, const std::vector<std::string> &params, int intention);
+
 	void update_insn_prefetch(uint32_t curr_pc);
 	bool insn_fetch_thumb(uint32_t pc, uint32_t &out_insn);
 	bool insn_fetch_arm(uint32_t pc, uint32_t &out_insn);
+
+	void add_ce_kernel_addr(offs_t addr, std::string value);
+	void init_ce_kernel_addrs();
+	void print_ce_kernel_address(const offs_t addr);
+
+	std::string m_ce_kernel_addrs[0x10400];
+	bool m_ce_kernel_addr_present[0x10400];
 
 	uint32_t m_insn_prefetch_depth;
 	uint32_t m_insn_prefetch_count;
@@ -170,12 +181,10 @@ protected:
 		uint32_t base_addr;
 		uint8_t type;
 	};
-	tlb_entry m_dtlb_entries[64];
-	tlb_entry m_itlb_entries[64];
-	uint8_t m_dtlb_entry_start[32];
-	uint8_t m_itlb_entry_start[32];
-	uint8_t m_dtlb_entry_index[32];
-	uint8_t m_itlb_entry_index[32];
+	tlb_entry m_dtlb_entries[0x2000];
+	tlb_entry m_itlb_entries[0x2000];
+	uint8_t m_dtlb_entry_index[0x1000];
+	uint8_t m_itlb_entry_index[0x1000];
 
 	bool m_pendingIrq;
 	bool m_pendingFiq;

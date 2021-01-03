@@ -12,8 +12,15 @@
 #define MAME_LIB_UTIL_OPTIONS_H
 
 #include "corefile.h"
+#include <algorithm>
+#include <functional>
+#include <memory>
 #include <unordered_map>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 
 //**************************************************************************

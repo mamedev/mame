@@ -8,11 +8,14 @@
 
 ***************************************************************************/
 
+#include "pool.h"
+
+#include "coreutil.h"
+#include "osdcomm.h"
+
 #include <cstdarg>
 #include <cstddef>
 #include <cstdlib>
-#include "pool.h"
-#include "coreutil.h"
 
 
 /***************************************************************************

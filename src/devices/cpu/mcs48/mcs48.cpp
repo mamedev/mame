@@ -1096,20 +1096,34 @@ void mcs48_cpu_device::device_config_complete()
 
 void mcs48_cpu_device::device_start()
 {
-	/* External access line
-	 * EA=1 : read from external rom
-	 * EA=0 : read from internal rom
-	 */
+	// zerofill
+	m_prevpc = 0;
+	m_pc = 0;
 
 	m_a = 0;
+	m_psw = 0;
+	m_p1 = 0;
+	m_p2 = 0;
 	m_timer = 0;
 	m_prescaler = 0;
 	m_t1_history = 0;
 	m_dbbi = 0;
 	m_dbbo = 0;
-	m_irq_state = 0;
 
-	/* FIXME: Current implementation suboptimal */
+	m_irq_state = false;
+	m_irq_polled = false;
+	m_irq_in_progress = false;
+	m_timer_overflow = false;
+	m_timer_flag = false;
+	m_tirq_enabled = false;
+	m_xirq_enabled = false;
+	m_timecount_enabled = 0;
+	m_flags_enabled = false;
+	m_dma_enabled = false;
+	m_a11 = 0;
+
+	// External access line, EA=1: read from external rom, EA=0: read from internal rom
+	// FIXME: Current implementation suboptimal
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	space(AS_PROGRAM).cache(m_program);
@@ -1125,7 +1139,10 @@ void mcs48_cpu_device::device_start()
 	m_test_in_cb.resolve_all_safe(0);
 	m_prog_out_cb.resolve_safe();
 
-	/* set up the state table */
+	// ensure that regptr is valid before get_info gets called
+	update_regptr();
+
+	// set up the state table
 	{
 		state_add(MCS48_PC,        "PC",        m_pc).mask(0xfff);
 		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
@@ -1157,9 +1174,7 @@ void mcs48_cpu_device::device_start()
 
 	}
 
-	/* ensure that regptr is valid before get_info gets called */
-	update_regptr();
-
+	// register for savestates
 	save_item(NAME(m_prevpc));
 	save_item(NAME(m_pc));
 
