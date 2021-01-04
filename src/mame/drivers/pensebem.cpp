@@ -107,7 +107,6 @@ Port B, bit 1
 #include "cpu/avr8/avr8.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
