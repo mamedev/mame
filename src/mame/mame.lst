@@ -16005,7 +16005,7 @@ hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:heromem.cpp
-heromem                         //
+heromem                         // E34 (c) 1997 Taito
 
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
@@ -36430,6 +36430,10 @@ sbasketh                        // GX405 (c) 1984 (Version H, Unprotected)
 
 @source:sbc6510.cpp
 sbc6510                         //
+
+@source:sbmjb.cpp
+sbmjb                           // E41 (c) 1998 Taito
+
 
 @source:sbowling.cpp
 sbowling                        // KB  (c) 1982 Taito Corporation
