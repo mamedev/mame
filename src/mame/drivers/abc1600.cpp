@@ -983,7 +983,7 @@ void abc1600_state::abc1600(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("1M");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("abc1600");
+	SOFTWARE_LIST(config, "flop_list").set_original("abc1600_flop");
 }
 
 
