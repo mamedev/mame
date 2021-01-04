@@ -48,9 +48,6 @@ private:
 	required_device<sp0256_device> m_speech;
 	required_device<o2_cart_slot_device> m_subslot;
 
-	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
-
-	int m_lrq_state = 0;
 	u8 m_control = 0;
 };
 
