@@ -55,6 +55,7 @@ public:
 	void isbc8605(machine_config &config);
 	void isbc286(machine_config &config);
 	void isbc8630(machine_config &config);
+	void sm1810(machine_config &config);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
@@ -82,6 +83,7 @@ private:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
+	void sm1810_io(address_map &map);
 
 	virtual void machine_reset() override;
 
@@ -152,6 +154,12 @@ void isbc_state::isbc8630_io(address_map &map)
 	map(0x00c0, 0x00c7).w(FUNC(isbc_state::edge_intr_clear_w)).umask16(0xff00);
 	map(0x00c8, 0x00df).w(FUNC(isbc_state::status_register_w)).umask16(0xff00);
 	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
+}
+
+void isbc_state::sm1810_io(address_map &map)
+{
+	isbc8630_io(map);
+	map(0x00ca, 0x00cb).lr8(NAME([]() { return 0x40; })).umask16(0x00ff); // it reads this without configuring the ppi
 }
 
 void isbc_state::isbc86_mem(address_map &map)
@@ -515,6 +523,15 @@ void isbc_state::isbc2861(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::isbc2861_mem);
 }
 
+void isbc_state::sm1810(machine_config &config)
+{
+	isbc8630(config);
+	m_maincpu->set_clock(XTAL(4'000'000)); // calibrated clock to pass self test
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::sm1810_io);
+
+	m_uart8251->dtr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+}
+
 /* ROM definition */
 ROM_START( isbc86 )
 	ROM_REGION16_LE( 0x4000, "bios", ROMREGION_ERASEFF )
@@ -648,6 +665,15 @@ ROM_START( rpc86 )
 	ROM_LOAD16_BYTE( "145070-001.bin", 0x4000, 0x1000, CRC(8c8303ef) SHA1(60f94daa76ab9dea6e309ac580152eb212b847a0))
 	ROM_LOAD16_BYTE( "145071-001.bin", 0x6000, 0x1000, CRC(a49681d8) SHA1(e81f8b092cfa2d1737854b1fa270a4ce07d61a9f))
 ROM_END
+
+ROM_START( sm1810 )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "sm1810.42-1.06-1.bin", 0x0000, 0x2000, CRC(de8b42e7) SHA1(bb93335b4ef79638f88c38adedfb7dd9ed9d1e31))
+	ROM_LOAD16_BYTE( "sm1810.42-1.06-0.bin", 0x0001, 0x2000, CRC(352bb060) SHA1(2112fcbf9903ad8af29a5a8d4b57eaeb5cd74739))
+	ROM_LOAD16_BYTE( "sm1810.42-1.06-2.bin", 0x4000, 0x2000, CRC(ae015240) SHA1(2c345a9e0832a0f26493bda394b2c4ad7ada7aad))
+	ROM_LOAD16_BYTE( "sm1810.42-1.06-3.bin", 0x4001, 0x2000, CRC(9741a51a) SHA1(c9d3a6a5c51fe9814986517b0f4cbeae8200babc))
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS */
@@ -658,3 +684,4 @@ COMP( 1981, isbc8630,  0,      0,      isbc8630, isbc,  isbc_state, empty_init, 
 COMP( 19??, isbc286,   0,      0,      isbc286,  isbc,  isbc_state, empty_init, "Intel", "iSBC 286",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 COMP( 1983, isbc2861,  0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/10", MACHINE_NO_SOUND_HW)
 COMP( 1983, isbc28612, 0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/12", MACHINE_NO_SOUND_HW)
+COMP( 19??, sm1810,    0,      0,      sm1810,   isbc,  isbc_state, empty_init, "<unknown>", "SM1810",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
