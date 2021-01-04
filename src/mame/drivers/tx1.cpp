@@ -48,8 +48,8 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "rendlay.h"
 
+#include "layout/generic.h"
 #include "tx1.lh"
 #include "buggyboy.lh"
 #include "buggybjr.lh"

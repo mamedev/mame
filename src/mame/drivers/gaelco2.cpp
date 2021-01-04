@@ -42,7 +42,7 @@
 #include "machine/eepromser.h"
 #include "sound/gaelco.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 

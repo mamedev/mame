@@ -132,7 +132,7 @@ better notes (complete chip lists) for each board still needed
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/c140.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 #include "video/namco_c355spr.h"
 #include "machine/namcos21_dsp_c67.h"

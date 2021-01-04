@@ -154,7 +154,7 @@ Colscroll effects?
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 

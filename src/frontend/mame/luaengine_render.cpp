@@ -12,6 +12,7 @@
 #include "luaengine.ipp"
 
 #include "render.h"
+#include "rendlay.h"
 
 #include <iterator>
 

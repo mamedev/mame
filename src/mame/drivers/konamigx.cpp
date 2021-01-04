@@ -106,8 +106,9 @@
 #include "sound/k054539.h"
 //#include "machine/k056230.h"
 #include "sound/k056800.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 // TODO: check on PCB

@@ -52,6 +52,8 @@
     STANDARD LAYOUTS
 ***************************************************************************/
 
+#include "layout/generic.h"
+
 // screenless layouts
 #include "noscreens.lh"
 
@@ -4056,7 +4058,7 @@ layout_view::item *layout_view::get_item(std::string const &id)
 //  the specified screen
 //-------------------------------------------------
 
-bool layout_view::has_screen(screen_device &screen)
+bool layout_view::has_screen(screen_device const &screen) const
 {
 	return std::find_if(m_items.begin(), m_items.end(), [&screen] (auto &itm) { return itm.screen() == &screen; }) != m_items.end();
 }
@@ -4067,7 +4069,7 @@ bool layout_view::has_screen(screen_device &screen)
 //  has the given screen visble
 //-------------------------------------------------
 
-bool layout_view::has_visible_screen(screen_device &screen) const
+bool layout_view::has_visible_screen(screen_device const &screen) const
 {
 	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
