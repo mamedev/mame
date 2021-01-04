@@ -249,7 +249,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<publisher>Philips</publisher>
 		<info name="usage" value="Test 1: press all joystick inputs. Test 4: type NAGEL137. Hold UP to advance." />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_test" />
 			<dataarea name="rom" size="0x800">
 				<rom name="testcart.bin" size="0x800" crc="3fb92bf1" sha1="e5e24c7fcdacde54ea433cb024e89ac0983917b1" />
 			</dataarea>

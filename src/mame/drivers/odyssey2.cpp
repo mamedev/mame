@@ -79,7 +79,6 @@ TODO:
   then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
   will also cause video glitches to look different on some games when compared
   to the real console, for example powerlrd.
-- joystick access (bus read) is only supposed to work from the internal BIOS
 - verify odyssey3 cpu/video clocks
 - problems with natural keyboard: videopacp has two enter keys, odyssey3 has
   alternate inputs for -, =, +
@@ -347,7 +346,7 @@ u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
-	
+
 	// P14, A7: RAM _CS
 	if (!(m_p1 & 0x10) && ~offset & 0x80)
 		data &= m_ram[offset];
@@ -407,7 +406,7 @@ void odyssey2_state::p2_write(u8 data)
 
 u8 odyssey2_state::bus_read()
 {
-	u8 data = 0xff;
+	u8 data = m_cart->bus_read();
 
 	// same chip as keyboard
 	if (!(m_p1 & 0x04))
@@ -747,7 +746,8 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->bus_out_cb().set(m_cart, FUNC(o2_cart_slot_device::bus_write));
+	m_maincpu->t0_in_cb().set(m_cart, FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
 	/* video hardware */
@@ -807,7 +807,8 @@ void vpp_state::g7400(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(vpp_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(vpp_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(vpp_state::bus_read));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->bus_out_cb().set(m_cart, FUNC(o2_cart_slot_device::bus_write));
+	m_maincpu->t0_in_cb().set(m_cart, FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(vpp_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
@@ -878,28 +879,28 @@ void vpp_state::odyssey3(machine_config &config)
 ******************************************************************************/
 
 ROM_START (videopac)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (odyssey2)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (videopacf)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
 ROM_END
 
 
 ROM_START (videopacp)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 ROM_END
 
 ROM_START (jopac)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
 ROM_END
 

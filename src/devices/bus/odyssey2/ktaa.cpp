@@ -11,7 +11,7 @@ Bankswitched ROM with page size of 3KB.
 #include "emu.h"
 #include "ktaa.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Odyssey 2 Homebrew KTAA")
+DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Videopac+ KTAA Cartridge")
 
 
 //-------------------------------------------------

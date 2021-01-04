@@ -43,6 +43,7 @@ enum
 	O2_KTAA,
 	O2_CHESS,
 	O2_HOMECOMP,
+	O2_TEST,
 	O2_VOICE
 };
 
@@ -65,6 +66,8 @@ public:
 
 	virtual void io_write(offs_t offset, u8 data) { }
 	virtual u8 io_read(offs_t offset) { return 0xff; }
+	virtual void bus_write(u8 data) { }
+	virtual u8 bus_read() { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 	virtual int b_read() { return -1; }
 
@@ -133,7 +136,9 @@ public:
 	u8 read_rom0c(offs_t offset);
 	void io_write(offs_t offset, u8 data);
 	u8 io_read(offs_t offset);
-	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
+	void bus_write(u8 data);
+	u8 bus_read();
+	DECLARE_READ_LINE_MEMBER(t0_read);
 	int b_read();
 
 	void write_p1(u8 data) { if (m_cart) m_cart->write_p1(data); }

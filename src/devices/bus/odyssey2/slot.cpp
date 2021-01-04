@@ -7,7 +7,6 @@
 
 ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -98,6 +97,7 @@ static const o2_slot slot_list[] =
 	{ O2_KTAA,     "o2_ktaa" },
 	{ O2_CHESS,    "o2_chess" },
 	{ O2_HOMECOMP, "o2_homecomp" },
+	{ O2_TEST,     "o2_test" },
 	{ O2_VOICE,    "o2_voice" }
 };
 
@@ -192,6 +192,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 	return software_get_default_slot("o2_rom");
 }
 
+
 /*-------------------------------------------------
  read_rom**
 -------------------------------------------------*/
@@ -212,6 +213,7 @@ u8 o2_cart_slot_device::read_rom0c(offs_t offset)
 		return 0xff;
 }
 
+
 /*-------------------------------------------------
  io
 -------------------------------------------------*/
@@ -224,10 +226,23 @@ void o2_cart_slot_device::io_write(offs_t offset, u8 data)
 
 u8 o2_cart_slot_device::io_read(offs_t offset)
 {
+	return (m_cart) ? m_cart->io_read(offset) : 0xff;
+}
+
+void o2_cart_slot_device::bus_write(u8 data)
+{
 	if (m_cart)
-		return m_cart->io_read(offset);
-	else
-		return 0xff;
+		m_cart->bus_write(data);
+}
+
+u8 o2_cart_slot_device::bus_read()
+{
+	return (m_cart) ? m_cart->bus_read() : 0xff;
+}
+
+READ_LINE_MEMBER(o2_cart_slot_device::t0_read)
+{
+	return (m_cart) ? m_cart->t0_read() : 0;
 }
 
 int o2_cart_slot_device::b_read()
@@ -249,6 +264,7 @@ int o2_cart_slot_device::b_read()
 #include "bus/odyssey2/ktaa.h"
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/homecomp.h"
+#include "bus/odyssey2/test.h"
 #include "bus/odyssey2/voice.h"
 
 void o2_cart(device_slot_interface &device)
@@ -259,5 +275,6 @@ void o2_cart(device_slot_interface &device)
 	device.option_add_internal("o2_ktaa",     O2_ROM_KTAA);
 	device.option_add_internal("o2_chess",    O2_ROM_CHESS);
 	device.option_add_internal("o2_homecomp", O2_ROM_HOMECOMP);
+	device.option_add_internal("o2_test",     O2_ROM_TEST);
 	device.option_add_internal("o2_voice",    O2_ROM_VOICE);
 }

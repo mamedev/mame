@@ -19,7 +19,7 @@ Used in:
 #include "emu.h"
 #include "rally.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Odyssey 2 Videopac+ 60")
+DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Videopac+ 60 Cartridge")
 
 
 //-------------------------------------------------

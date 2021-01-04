@@ -1759,6 +1759,8 @@ if (BUSES["O2"]~=null) then
 		MAME_DIR .. "src/devices/bus/odyssey2/ktaa.h",
 		MAME_DIR .. "src/devices/bus/odyssey2/rally.cpp",
 		MAME_DIR .. "src/devices/bus/odyssey2/rally.h",
+		MAME_DIR .. "src/devices/bus/odyssey2/test.cpp",
+		MAME_DIR .. "src/devices/bus/odyssey2/test.h",
 		MAME_DIR .. "src/devices/bus/odyssey2/voice.cpp",
 		MAME_DIR .. "src/devices/bus/odyssey2/voice.h",
 	}

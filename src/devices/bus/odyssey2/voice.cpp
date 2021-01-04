@@ -21,7 +21,7 @@ TODO:
 #include "voice.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Passthrough Cart")
+DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Cartridge")
 
 //-------------------------------------------------
 //  o2_voice_device - constructor
