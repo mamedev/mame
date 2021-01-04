@@ -23385,41 +23385,43 @@ zerogunaj                       // 1997.12 Zero Gunner (Japan)
 zerogunj                        // 1997.12 Zero Gunner (Japan)
 
 @source:model3.cpp
-bass                            // 1997.12 Get Bass
-bassdx                          //
+bassdx                          // 1997.12 Sega Bass Fishing Deluxe (USA)
 dayto2pe                        // 1998.12 Daytone USA 2 Power Edition
 daytona2                        // 1998.06 Daytona USA 2
-dirtdvls                        // 1998.10 Dirt Devils
-dirtdvlsa                       //
-dirtdvlsj                       //
-dirtdvlsg                       //
+dirtdvls                        // 1998.10 Dirt Devils (rev A) - Export
+dirtdvlsj                       // 1998.10 Dirt Devils (rev A) - Japan
+dirtdvlsg                       // Export Ver. G?
+dirtdvlsu                       // 1998.10 Dirt Devils (rev A) - USA
+dirtdvlsau                      // 1998.10 Dirt Devils (rev A) - Australia
 eca                             // 1999.10 Kyukyuusya Emergency Call Ambulance
 ecap                            // 1999.12 Emergency Call Ambulance - US proto or location test
 ecaj                            //
 ecau                            //
 fvipers2                        // 1998.04 Fighting Vipers 2 (rev A)
 fvipers2o                       // 1998.?? Fighting Vipers 2
-getbass                         //
+getbass                         // 1997.12 Get Bass Standard (Japan)
+getbassdx                       // 1997.12 Get Bass Deluxe (Japan
+getbassur                       // 1997.12 Get Bass Upright (Japan
 harley                          // 199?.?? Harley Davidson & L.A.Riders (rev B)
 harleya                         // 1997.12 Harley Davidson & L.A.Riders (rev A)
-lamachin                        // 1998.12 L.A. Machine Guns
-lemans24                        // 1997.09 Le Mans 24
+lamachin                        // 1998.12 L.A. Machine Guns (Japan)
+lemans24                        // 1997.09 Le Mans 24 (Japan
 lostwsga                        // 1997.07 Lost World Jurassic Park
 lostwsgp                        // 1997.06 Lost World Jurassic Park (location test)
-magtruck                        // 1999.03 Magical Truck Adventure (US)
-oceanhun                        // 1998.09 Ocean Hunter
-scud                            // 1996.12 Scud Race
-scuda                           //
-scudj                           //
-scudplus                        // 1997.09 Scud Race Plus (rev A)
-scudplusa                       // 1997.09 Scud Race Plus
+magtruck                        // 1999.03 Magical Truck Adventure (Japan)
+oceanhun                        // 1998.09 Ocean Hunter (Japan)
+scud                            // 1996.12 Scud Race Twin/DX
+scudau                          // 1996.12 Scud Race Twin/DX - Australia
+scuddx                          // 1996.12 Scud Race Deluxe
+scudplus                        // 1997.09 Scud Race Plus Twin/DX (rev A)
+scudplusa                       // 1997.09 Scud Race Plus Twin/DX
 skichamp                        // 1998.01 Ski Champ
 spikeofe                        // 1999.01 Spikeout Final Edition
 spikeout                        // 1998.09 Spikeout
 srally2                         // 1998.02 Sega Rally 2 Championship
 srally2p                        // 1997.12 Sega Rally 2 (prototype, 29 Dec 1997)
+srally2dx                       //
 srally2pa                       // 1997.12 Sega Rally 2 (prototype, 8 Dec 1997)
-srally2x                        //
 swtrilgy                        // 1998.12 Star Wars Trilogy Arcade (rev A)
 swtrilgya                       // 1998.11 Star Wars Trilogy Arcade
 swtrilgyp                       // 1998.09 Star Wars Trilogy Arcade (prototype)
