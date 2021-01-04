@@ -61,15 +61,9 @@ TODO:
 - 8244(NTSC) is not supposed to show characters near the upper border, but
   hiding them will cause bugs in some Euro games
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
-  be correct
-- according to tests, 8244 does not have a sound interrupt, but the Philips
-  service test cartridge for 8245 tests for it and fails if it did not get an irq
-- likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
-- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but
-  that is inconsistent with the Philips service test cartridge: It reads X, Y, X,
-  then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
-  will also cause video glitches to look different on some games when compared
-  to the real console, for example powerlrd.
+  be correct. The 8245 is put into slave mode at vblank, timing signals and
+  vblank IRQ are taken over during it (the Videopac pcb even has extra TTL to
+  catch the I/O read from 0xA1 to acknowledge the IRQ)
 - ppp(the tetris game) does not work properly on PAL, it does look like PAL/NTSC
   detection is working, see internal RAM $3D d7. So maybe it is due to inaccurate
   PAL video timing. The game does mid-scanline video updates.
@@ -77,6 +71,15 @@ TODO:
 - g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
   caused by bus conflict or because they write to P2?
+- according to tests, 8244 does not have a sound interrupt, but the Philips
+  service test cartridge for 8245 tests for it and fails if it did not get an irq
+- likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
+- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but that
+  is inconsistent with the Philips service test cartridge: It reads X, Y, X,
+  then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
+  will also cause video glitches to look different on some games when compared
+  to the real console, for example powerlrd.
+- joystick access (bus read) is only supposed to work from the internal BIOS
 - verify odyssey3 cpu/video clocks
 - problems with natural keyboard: videopacp has two enter keys, odyssey3 has
   alternate inputs for -, =, +
@@ -344,9 +347,12 @@ u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
+	
+	// P14, A7: RAM _CS
 	if (!(m_p1 & 0x10) && ~offset & 0x80)
 		data &= m_ram[offset];
 
+	// P13: 824x _CS, 824x RD is only enabled if P16 is low
 	if ((m_p1 & 0x48) == 0)
 		data &= m_i8244->read(offset);
 
@@ -355,6 +361,7 @@ u8 odyssey2_state::io_read(offs_t offset)
 
 void odyssey2_state::io_write(offs_t offset, u8 data)
 {
+	// external write is only enabled if P16 is low
 	if (!(m_p1 & 0x40))
 	{
 		m_cart->io_write(offset, data);
@@ -382,6 +389,7 @@ u8 odyssey2_state::p2_read()
 
 	if (!(m_p1 & 0x04))
 	{
+		// P12: 74156 keyboard decoder enable, 74156 inputs from P20-P22
 		// 74148 priority encoder, GS to P24, outputs to P25-P27
 		u8 inp = count_leading_zeros(m_keyboard[m_p2 & 0x07]->read()) - 24;
 		if (inp < 8)
@@ -401,6 +409,7 @@ u8 odyssey2_state::bus_read()
 {
 	u8 data = 0xff;
 
+	// same chip as keyboard
 	if (!(m_p1 & 0x04))
 	{
 		u8 sel = m_p2 & 0x07;

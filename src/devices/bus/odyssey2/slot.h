@@ -7,10 +7,31 @@
 
 #include "softlist_dev.h"
 
+/*
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
+Videopac / Odyssey 2 cartridge pinout:
+
+         bot. top
+    T0   1    A  I/O _WR
+    B0   2    B  GND
+    B1   3    C  GND
+    B2   4    D  VCC
+    B3   5    E  I/O RD
+    B4   6    F  _PSEN
+    B5   7    G  A0
+    B6   8    H  A1
+    B7   9    J  A2
+    A10 10    K  A3
+    P14 11    L  A4
+    P11 12    M  A5
+    P10 13    N  A6
+    A11 14    P  A7
+    A9  15    R  A8
+
+A8-A11 are the same pins as P20-P23
+on Videopac+, B is used for video mixer override
+
+*/
 
 
 /* PCB */

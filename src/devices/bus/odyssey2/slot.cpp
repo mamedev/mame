@@ -5,7 +5,7 @@
     Magnavox Odyssey 2 cart emulation
     (through slot devices)
 
- ***********************************************************************************************************/
+***********************************************************************************************************/
 
 
 #include "emu.h"
@@ -127,7 +127,7 @@ static const char *o2_get_slot(int type)
 
 /*-------------------------------------------------
  call load
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 image_init_result o2_cart_slot_device::call_load()
 {
@@ -175,7 +175,7 @@ image_init_result o2_cart_slot_device::call_load()
 
 /*-------------------------------------------------
  get default card software
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 std::string o2_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
@@ -194,7 +194,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 
 /*-------------------------------------------------
  read_rom**
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 u8 o2_cart_slot_device::read_rom04(offs_t offset)
 {
@@ -214,7 +214,7 @@ u8 o2_cart_slot_device::read_rom0c(offs_t offset)
 
 /*-------------------------------------------------
  io
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 void o2_cart_slot_device::io_write(offs_t offset, u8 data)
 {
