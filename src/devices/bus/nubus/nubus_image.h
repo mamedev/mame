@@ -25,27 +25,6 @@ public:
 	nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	enum
-	{
-		kFileCmdGetDir = 1,
-		kFileCmdSetDir,
-		kFileCmdGetFirstListing,
-		kFileCmdGetNextListing,
-		kFileCmdGetFile,
-		kFileCmdPutFile
-	};
-
-	struct nbfilectx
-	{
-		uint32_t curcmd;
-		uint8_t filename[128];
-		uint8_t curdir[1024];
-		osd::directory::ptr dirp;
-		osd_file::ptr fd;
-		uint64_t filelen;
-		uint32_t bytecount;
-	};
-
 	nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -62,17 +41,8 @@ protected:
 	void image_w(uint32_t data);
 	uint32_t image_super_r(offs_t offset, uint32_t mem_mask = ~0);
 	void image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t file_cmd_r();
-	void file_cmd_w(uint32_t data);
-	uint32_t file_data_r();
-	void file_data_w(uint32_t data);
-	uint32_t file_len_r();
-	void file_len_w(uint32_t data);
-	uint32_t file_name_r(offs_t offset);
-	void file_name_w(offs_t offset, uint32_t data);
 
 	messimg_disk_image_device *m_image;
-	nbfilectx filectx;
 };
 
 
