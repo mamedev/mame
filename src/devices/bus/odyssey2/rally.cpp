@@ -39,8 +39,7 @@ void o2_rally_device::device_start()
 
 void o2_rally_device::cart_init()
 {
-	u32 size = m_rom_size;
-	if (size & (size - 1) || size < 0x800)
+	if (m_rom_size & (m_rom_size - 1) || m_rom_size < 0x800)
 		fatalerror("o2_rally_device: ROM size must be 2^x\n");
 }
 

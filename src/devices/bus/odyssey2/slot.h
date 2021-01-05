@@ -15,7 +15,7 @@ Videopac / Odyssey 2 cartridge pinout:
     T0   1    A  I/O _WR
     B0   2    B  GND
     B1   3    C  GND
-    B2   4    D  VCC
+    B2   4    D  5V
     B3   5    E  I/O RD
     B4   6    F  _PSEN
     B5   7    G  A0

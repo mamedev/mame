@@ -615,7 +615,7 @@ static INPUT_PORTS_START( o2 )
 
 	PORT_START("CONF")
 	PORT_CONFNAME( 0x01, 0x00, "Color Output" ) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, palette_changed, 0)
-	PORT_CONFSETTING(    0x00, "Composite" )
+	PORT_CONFSETTING(    0x00, "RF" )
 	PORT_CONFSETTING(    0x01, "RGB" )
 INPUT_PORTS_END
 

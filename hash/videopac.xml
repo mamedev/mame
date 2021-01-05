@@ -2646,8 +2646,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_ktaa" />
 			<feature name="b_pin" value="1" />
-			<dataarea name="rom" size="12288">
-				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" />
+			<dataarea name="rom" size="0x3000">
+				<rom name="ktaa.bin" size="0x3000" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" />
 			</dataarea>
 		</part>
 	</software>
