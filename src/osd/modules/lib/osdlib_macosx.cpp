@@ -8,26 +8,26 @@
 //
 //============================================================
 
-#include <cstdlib>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/sysctl.h>
-#include <sys/types.h>
-#include <csignal>
-#include <dlfcn.h>
+// MAME headers
+#include "osdcore.h"
+#include "osdlib.h"
 
+#include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <iomanip>
 #include <memory>
 
+#include <dlfcn.h>
+#include <sys/mman.h>
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <Carbon/Carbon.h>
 
-// MAME headers
-#include "osdcore.h"
-#include "osdlib.h"
 
 //============================================================
 //  osd_getenv
@@ -54,42 +54,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 void osd_process_kill()
 {
 	kill(getpid(), SIGKILL);
-}
-
-//============================================================
-//  osd_alloc_executable
-//
-//  allocates "size" bytes of executable memory.  this must take
-//  things like NX support into account.
-//============================================================
-
-void *osd_alloc_executable(size_t size)
-{
-#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
-	#ifdef __aarch64__
-	// $$$$HACK!  This assumes no DRC on Apple Silicon; making that work will be much more involved.
-	return (void *)mmap(0, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0);
-	#else
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
-	#endif
-#elif defined(SDLMAME_UNIX)
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
-#endif
-}
-
-//============================================================
-//  osd_free_executable
-//
-//  frees memory allocated with osd_alloc_executable
-//============================================================
-
-void osd_free_executable(void *ptr, size_t size)
-{
-#ifdef SDLMAME_SOLARIS
-	munmap((char *)ptr, size);
-#else
-	munmap(ptr, size);
-#endif
 }
 
 //============================================================
@@ -202,25 +166,23 @@ int osd_getpid(void)
 	return getpid();
 }
 
-//============================================================
-//  dynamic_module_posix_impl
-//============================================================
 
 namespace osd {
+
+namespace {
+
 class dynamic_module_posix_impl : public dynamic_module
 {
 public:
-	dynamic_module_posix_impl(std::vector<std::string> &libraries)
-		: m_module(nullptr)
+	dynamic_module_posix_impl(std::vector<std::string> &&libraries) : m_libraries(std::move(libraries))
 	{
-		m_libraries = libraries;
 	}
 
 	virtual ~dynamic_module_posix_impl() override
 	{
-		if (m_module != nullptr)
+		if (m_module)
 			dlclose(m_module);
-	};
+	}
 
 protected:
 	virtual generic_fptr_t get_symbol_address(char const *symbol) override
@@ -230,19 +192,17 @@ protected:
 		 * one of them, all additional symbols will be loaded from the same library
 		 */
 		if (m_module)
-		{
 			return reinterpret_cast<generic_fptr_t>(dlsym(m_module, symbol));
-		}
 
 		for (auto const &library : m_libraries)
 		{
-			void *module = dlopen(library.c_str(), RTLD_LAZY);
+			void *const module = dlopen(library.c_str(), RTLD_LAZY);
 
 			if (module != nullptr)
 			{
-				generic_fptr_t function = reinterpret_cast<generic_fptr_t>(dlsym(module, symbol));
+				generic_fptr_t const function = reinterpret_cast<generic_fptr_t>(dlsym(module, symbol));
 
-				if (function != nullptr)
+				if (function)
 				{
 					m_module = module;
 					return function;
@@ -259,12 +219,61 @@ protected:
 
 private:
 	std::vector<std::string> m_libraries;
-	void *                   m_module;
+	void *                   m_module = nullptr;
 };
+
+} // anonymous namespace
+
+
+bool invalidate_instruction_cache(void const *start, std::size_t size)
+{
+	char const *const begin(reinterpret_cast<char const *>(start));
+	char const *const end(begin + size);
+	__builtin___clear_cache(const_cast<char *>(begin), const_cast<char *>(end));
+	return true;
+}
+
+
+void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, std::size_t &size, std::size_t &page_size)
+{
+	long const p(sysconf(_SC_PAGE_SIZE));
+	if (0 >= p)
+		return nullptr;
+	std::size_t s(0);
+	for (std::size_t b : blocks)
+		s += (b + p - 1) / p;
+	s *= p;
+	if (!s)
+		return nullptr;
+	void *const result(mmap(nullptr, s, PROT_NONE, MAP_ANON | MAP_SHARED, -1, 0));
+	if (result == (void *)-1)
+		return nullptr;
+	size = s;
+	page_size = p;
+	return result;
+}
+
+void virtual_memory_allocation::do_free(void *start, std::size_t size)
+{
+	munmap(start, size);
+}
+
+bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access)
+{
+	int prot((NONE == access) ? PROT_NONE : 0);
+	if (access & READ)
+		prot |= PROT_READ;
+	if (access & WRITE)
+		prot |= PROT_WRITE;
+	if (access & EXECUTE)
+		prot |= PROT_EXEC;
+	return mprotect(start, size, prot) == 0;
+}
+
 
 dynamic_module::ptr dynamic_module::open(std::vector<std::string> &&names)
 {
-	return std::make_unique<dynamic_module_posix_impl>(names);
+	return std::make_unique<dynamic_module_posix_impl>(std::move(names));
 }
 
 } // namespace osd
