@@ -771,7 +771,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 		if (win->monitor() == monitor.get())
 			window->m_fullscreen_safe = FALSE;
 
-	create_target();
+	window->create_target();
 
 	// remember the current values in case they change
 	window->m_targetview = window->target()->view();
