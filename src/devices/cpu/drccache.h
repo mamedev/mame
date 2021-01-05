@@ -93,6 +93,7 @@ private:
 	drccodeptr          m_end;              // first allocated byte in cache
 	drccodeptr          m_codegen;          // start of current generated code block
 	size_t const        m_size;             // size of the cache in bytes
+	bool                m_executable;       // whether cached code is currently executable
 
 	// oob management
 	struct oob_handler

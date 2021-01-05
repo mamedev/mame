@@ -350,7 +350,6 @@ void drcuml_block::end()
 	// generate the code via the back-end
 	m_drcuml.cache().codegen_init();
 	m_drcuml.generate(*this, &m_inst[0], m_nextinst);
-	m_drcuml.cache().codegen_complete();
 
 	// block is no longer in use
 	m_inuse = false;

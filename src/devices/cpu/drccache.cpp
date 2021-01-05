@@ -47,7 +47,8 @@ drc_cache::drc_cache(size_t bytes) :
 	m_limit(m_near + m_cache.size()),
 	m_end(m_limit),
 	m_codegen(nullptr),
-	m_size(m_cache.size())
+	m_size(m_cache.size()),
+	m_executable(false)
 {
 	// alignment and page size must be powers of two, cache must be page-aligned
 	assert(!(CACHE_ALIGNMENT & (CACHE_ALIGNMENT - 1)));
@@ -83,7 +84,11 @@ void drc_cache::flush()
 
 	// just reset the top back to the base and re-seed
 	m_top = m_base;
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+	if (m_executable)
+	{
+		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+		m_executable = false;
+	}
 }
 
 
@@ -169,7 +174,11 @@ void *drc_cache::alloc_temporary(size_t bytes)
 		return nullptr;
 
 	// otherwise, update the cache top
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+	if (m_executable)
+	{
+		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+		m_executable = false;
+	}
 	m_top = ALIGN_PTR_UP(ptr + bytes, CACHE_ALIGNMENT);
 	return ptr;
 }
@@ -198,13 +207,21 @@ void drc_cache::dealloc(void *memory, size_t bytes)
 
 void drc_cache::codegen_init()
 {
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+	if (m_executable)
+	{
+		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+		m_executable = false;
+	}
 }
 
 
 void drc_cache::codegen_complete()
 {
-	m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
+	if (!m_executable)
+	{
+		m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
+		m_executable = true;
+	}
 }
 
 
@@ -223,7 +240,11 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 		return nullptr;
 
 	// otherwise, return a pointer to the cache top
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+	if (m_executable)
+	{
+		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+		m_executable = false;
+	}
 	m_codegen = m_top;
 	return &m_top;
 }
