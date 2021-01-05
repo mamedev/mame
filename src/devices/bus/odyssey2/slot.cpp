@@ -107,7 +107,7 @@ static int o2_get_pcb_id(const char *slot)
 	if (slot)
 		for (auto & elem : slot_list)
 		{
-			if (!core_stricmp(elem.slot_option, slot))
+			if (!strcmp(elem.slot_option, slot))
 				return elem.pcb_id;
 		}
 

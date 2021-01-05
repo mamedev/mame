@@ -748,12 +748,12 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 		return image_init_result::FAIL;
 	else
 	{
-		if (!core_stricmp("genesis", pcb_name))
+		if (!strcmp("genesis", pcb_name))
 		{
 			osd_printf_debug("cart%d is genesis\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 1;
 		}
-		else if (!core_stricmp("sms", pcb_name))
+		else if (!strcmp("sms", pcb_name))
 		{
 			osd_printf_debug("cart%d is sms\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 0;
