@@ -13,7 +13,8 @@ all:
 	$(GENIE) --gcc=mingw-gcc gmake
 	$(GENIE) --gcc=linux-gcc gmake
 	$(GENIE) --gcc=haiku gmake
-	$(GENIE) --gcc=osx gmake
+	$(GENIE) --gcc=osx-x64 gmake
+	$(GENIE) --gcc=osx-arm64 gmake
 	$(GENIE) --gcc=ios-arm gmake
 	$(GENIE) --gcc=ios-simulator gmake
 	$(GENIE) --gcc=ios-simulator64 gmake
@@ -86,13 +87,13 @@ mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw
 .build/projects/vs2017:
 	$(GENIE) vs2017
 
-.build/projects/gmake-osx:
-	$(GENIE) --gcc=osx gmake
-osx-debug64: .build/projects/gmake-osx
-	make -C .build/projects/gmake-osx config=debug64
-osx-release64: .build/projects/gmake-osx
-	make -C .build/projects/gmake-osx config=release64
-osx: osx-debug64 osx-release64
+.build/projects/gmake-osx-x64:
+	$(GENIE) --gcc=osx-x64 gmake
+osx-x64-debug: .build/projects/gmake-osx-x64
+	make -C .build/projects/gmake-osx config=debug
+osx-x64-release: .build/projects/gmake-osx-x64
+	make -C .build/projects/gmake-osx config=release
+osx-x64: osx-x64-debug osx-x64-release
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake
@@ -143,9 +144,9 @@ ifeq ($(UNAME),$(filter $(UNAME),Linux GNU Darwin Haiku))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin Haiku))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
-BUILD_PROJECT_DIR=gmake-osx
-BUILD_OUTPUT_DIR=osx64_clang
-BUILD_TOOLS_CONFIG=release64
+BUILD_PROJECT_DIR=gmake-osx-x64
+BUILD_OUTPUT_DIR=osx-x64
+BUILD_TOOLS_CONFIG=release
 EXE=
 else
 OS=haiku
@@ -170,10 +171,10 @@ EXE=.exe
 endif
 
 # bin2c
-.build/osx64_clang/bin/bin2cRelease: .build/projects/gmake-osx
-	$(SILENT) make -C .build/projects/gmake-osx bin2c config=$(BUILD_TOOLS_CONFIG)
+.build/osx-x64/bin/bin2cRelease: .build/projects/gmake-osx-x64
+	$(SILENT) make -C .build/projects/gmake-osx-x64 bin2c config=$(BUILD_TOOLS_CONFIG)
 
-tools/bin/darwin/bin2c: .build/osx64_clang/bin/bin2cRelease
+tools/bin/darwin/bin2c: .build/osx-x64/bin/bin2cRelease
 	$(SILENT) cp $(<) $(@)
 
 .build/linux64_gcc/bin/bin2cRelease: .build/projects/gmake-linux
@@ -197,10 +198,10 @@ tools/bin/windows/bin2c.exe: .build/win64_mingw-gcc/bin/bin2cRelease.exe
 bin2c: tools/bin/$(OS)/bin2c$(EXE)
 
 # lemon
-.build/osx64_clang/bin/lemonRelease: .build/projects/gmake-osx
-	$(SILENT) make -C .build/projects/gmake-osx lemon config=$(BUILD_TOOLS_CONFIG)
+.build/osx-x64/bin/lemonRelease: .build/projects/gmake-osx-x64
+	$(SILENT) make -C .build/projects/gmake-osx-x64 lemon config=$(BUILD_TOOLS_CONFIG)
 
-tools/bin/darwin/lemon: .build/osx64_clang/bin/lemonRelease
+tools/bin/darwin/lemon: .build/osx-x64/bin/lemonRelease
 	$(SILENT) cp $(<) $(@)
 
 .build/linux64_gcc/bin/lemonRelease: .build/projects/gmake-linux
