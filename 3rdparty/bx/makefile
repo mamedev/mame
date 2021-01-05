@@ -6,19 +6,20 @@
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
-	$(GENIE) vs2017
-	$(GENIE) --gcc=android-arm gmake
-	$(GENIE) --gcc=android-arm64 gmake
-	$(GENIE) --gcc=android-x86 gmake
-	$(GENIE) --gcc=mingw-gcc gmake
-	$(GENIE) --gcc=linux-gcc gmake
-	$(GENIE) --gcc=haiku gmake
-	$(GENIE) --gcc=osx-x64 gmake
-	$(GENIE) --gcc=osx-arm64 gmake
-	$(GENIE) --gcc=ios-arm gmake
-	$(GENIE) --gcc=ios-simulator gmake
+	$(GENIE)                       vs2017
+	$(GENIE)                       vs2019
+	$(GENIE) --gcc=android-arm     gmake
+	$(GENIE) --gcc=android-arm64   gmake
+	$(GENIE) --gcc=android-x86     gmake
+	$(GENIE) --gcc=mingw-gcc       gmake
+	$(GENIE) --gcc=linux-gcc       gmake
+	$(GENIE) --gcc=haiku           gmake
+	$(GENIE) --gcc=osx-x64         gmake
+	$(GENIE) --gcc=osx-arm64       gmake
+	$(GENIE) --gcc=ios-arm         gmake
+	$(GENIE) --gcc=ios-simulator   gmake
 	$(GENIE) --gcc=ios-simulator64 gmake
-	$(GENIE) xcode8
+	$(GENIE)                       xcode8
 
 .build/projects/gmake-android-arm:
 	$(GENIE) --gcc=android-arm gmake
