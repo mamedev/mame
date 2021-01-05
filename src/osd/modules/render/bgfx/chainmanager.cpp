@@ -157,7 +157,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
-		osd_printf_warning("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to open chain file %s, falling back to no post processing\n", path);
 		return nullptr;
 	}
 
@@ -176,8 +176,8 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	if (document.HasParseError())
 	{
 		std::string error(GetParseError_En(document.GetParseError()));
-		osd_printf_warning("Unable to parse chain %s. Errors returned:\n", path.c_str());
-		osd_printf_warning("%s\n", error.c_str());
+		osd_printf_warning("Unable to parse chain %s. Errors returned:\n", path);
+		osd_printf_warning("%s\n", error);
 		return nullptr;
 	}
 
@@ -185,7 +185,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 
 	if (chain == nullptr)
 	{
-		osd_printf_warning("Unable to load chain %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to load chain %s, falling back to no post processing\n", path);
 		return nullptr;
 	}
 
@@ -392,7 +392,7 @@ int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int i
 
 	if (str != nullptr)
 	{
-		*str = string_format("%s", m_available_chains[m_current_chain[id]].m_name.c_str());
+		*str = m_available_chains[m_current_chain[id]].m_name;
 	}
 
 	return m_current_chain[id];

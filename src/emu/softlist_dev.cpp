@@ -16,6 +16,8 @@
 #include "romload.h"
 #include "validity.h"
 
+#include "unicode.h"
+
 #include <cctype>
 
 
@@ -189,7 +191,7 @@ void software_list_device::release()
 software_list_device *software_list_device::find_by_name(const machine_config &config, const std::string &name)
 {
 	// iterate over each device in the system and find a match
-	for (software_list_device &swlistdev : software_list_device_iterator(config.root_device()))
+	for (software_list_device &swlistdev : software_list_device_enumerator(config.root_device()))
 		if (swlistdev.list_name() == name)
 			return &swlistdev;
 	return nullptr;
@@ -205,7 +207,7 @@ software_list_device *software_list_device::find_by_name(const machine_config &c
 void software_list_device::display_matches(const machine_config &config, const char *interface, const std::string &name)
 {
 	// check if there is at least one software list
-	software_list_device_iterator deviter(config.root_device());
+	software_list_device_enumerator deviter(config.root_device());
 	if (deviter.first() != nullptr)
 		osd_printf_error("\n\"%s\" approximately matches the following\n"
 			"supported software items (best match first):\n\n", name.c_str());
@@ -361,7 +363,7 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 	if (mount != nullptr && strcmp(mount, "no") == 0)
 		return nullptr;
 
-	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
+	for (device_image_interface &image : image_interface_enumerator(mconfig.root_device()))
 	{
 		const char *interface = image.image_interface();
 		if (interface != nullptr && part.matches_interface(interface) && filter(image))

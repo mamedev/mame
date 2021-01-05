@@ -696,22 +696,6 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 	m_modify_spritecode = &galaxold_state::harem_modify_spritecode;
 }
 
-VIDEO_START_MEMBER(galaxold_state,ozon1)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-}
-
-VIDEO_START_MEMBER(galaxold_state,bongo)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-
-	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
-}
-
 TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 {
 	uint8_t x = tile_index & 0x1f;
@@ -1736,22 +1720,4 @@ uint32_t galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_in
 	};
 
 	return 0;
-}
-
-void galaxold_state::bagmanmc_modify_charcode(uint16_t *code, uint8_t x)
-{
-	*code |= (m_gfxbank[0] << 9);
-}
-
-void galaxold_state::bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	*code |= (m_gfxbank[0] << 7) | 0x40;
-}
-
-VIDEO_START_MEMBER(galaxold_state,bagmanmc)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode = &galaxold_state::bagmanmc_modify_charcode;
-	m_modify_spritecode = &galaxold_state::bagmanmc_modify_spritecode;
 }

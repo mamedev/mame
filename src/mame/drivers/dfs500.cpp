@@ -231,20 +231,20 @@ void dfs500_state::machine_reset()
 
 uint32_t dfs500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-	const bitmap_argb32 *input_bitmap = &m_input[m_input_sel_A & 3]->get_bitmap();
+	const bitmap_argb32 &input_bitmap = m_input[m_input_sel_A & 3]->get_bitmap();
 	// FIXME: This is simply bypassing the inputs directly into the output.
 	//        Emulation of the video hardware (DSP signal path) for GFX processing is still needed here.
-	if (input_bitmap->valid())
+	if (input_bitmap.valid())
 	{
 		// convert arbitrary sized ARGB32 image to a full-screen image
-		double stepx = double (input_bitmap->width()) / VIDEO_WIDTH;
-		double stepy = double (input_bitmap->height()) / VIDEO_HEIGHT;
+		double stepx = double (input_bitmap.width()) / VIDEO_WIDTH;
+		double stepy = double (input_bitmap.height()) / VIDEO_HEIGHT;
 
 		for (unsigned screen_y = screen.visible_area().min_y; screen_y <= screen.visible_area().max_y; screen_y++)
 		{
 			for (unsigned screen_x = screen.visible_area().min_x; screen_x <= screen.visible_area().max_x; screen_x++)
 			{
-				bitmap.pix(screen_y, screen_x) = input_bitmap->pix(
+				bitmap.pix(screen_y, screen_x) = input_bitmap.pix(
 					int(double (screen_y % VIDEO_HEIGHT) * stepy),
 					int(double (screen_x % VIDEO_WIDTH) * stepx));
 			}

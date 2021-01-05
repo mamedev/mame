@@ -29,27 +29,27 @@ private:
 	};
 
 	// internal helpers
-	static inline bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
-	static inline bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
+	static constexpr bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
+	static constexpr bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
 	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
 	static inline float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
-	static inline _PixelType dest_assemble_rgb(u32 r, u32 g, u32 b) { return (r << _DstShiftR) | (g << _DstShiftG) | (b << _DstShiftB); }
-	static inline _PixelType dest_rgb_to_pixel(u32 r, u32 g, u32 b) { return dest_assemble_rgb(r >> _SrcShiftR, g >> _SrcShiftG, b >> _SrcShiftB); }
+	static constexpr _PixelType dest_assemble_rgb(u32 r, u32 g, u32 b) { return (r << _DstShiftR) | (g << _DstShiftG) | (b << _DstShiftB); }
+	static constexpr _PixelType dest_rgb_to_pixel(u32 r, u32 g, u32 b) { return dest_assemble_rgb(r >> _SrcShiftR, g >> _SrcShiftG, b >> _SrcShiftB); }
 
 	// source 32-bit pixels are in MAME standardized format
-	static inline u32 source32_r(u32 pixel) { return (pixel >> (16 + _SrcShiftR)) & (0xff >> _SrcShiftR); }
-	static inline u32 source32_g(u32 pixel) { return (pixel >> ( 8 + _SrcShiftG)) & (0xff >> _SrcShiftG); }
-	static inline u32 source32_b(u32 pixel) { return (pixel >> ( 0 + _SrcShiftB)) & (0xff >> _SrcShiftB); }
+	static constexpr u32 source32_r(u32 pixel) { return (pixel >> (16 + _SrcShiftR)) & (0xff >> _SrcShiftR); }
+	static constexpr u32 source32_g(u32 pixel) { return (pixel >> ( 8 + _SrcShiftG)) & (0xff >> _SrcShiftG); }
+	static constexpr u32 source32_b(u32 pixel) { return (pixel >> ( 0 + _SrcShiftB)) & (0xff >> _SrcShiftB); }
 
 	// destination pixel masks are based on the template parameters as well
-	static inline u32 dest_r(_PixelType pixel) { return (pixel >> _DstShiftR) & (0xff >> _SrcShiftR); }
-	static inline u32 dest_g(_PixelType pixel) { return (pixel >> _DstShiftG) & (0xff >> _SrcShiftG); }
-	static inline u32 dest_b(_PixelType pixel) { return (pixel >> _DstShiftB) & (0xff >> _SrcShiftB); }
+	static constexpr u32 dest_r(_PixelType pixel) { return (pixel >> _DstShiftR) & (0xff >> _SrcShiftR); }
+	static constexpr u32 dest_g(_PixelType pixel) { return (pixel >> _DstShiftG) & (0xff >> _SrcShiftG); }
+	static constexpr u32 dest_b(_PixelType pixel) { return (pixel >> _DstShiftB) & (0xff >> _SrcShiftB); }
 
 	// generic conversion with special optimization for destinations in the standard format
-	static inline _PixelType source32_to_dest(u32 pixel)
+	static constexpr _PixelType source32_to_dest(u32 pixel)
 	{
 		if (_SrcShiftR == 0 && _SrcShiftG == 0 && _SrcShiftB == 0 && _DstShiftR == 16 && _DstShiftG == 8 && _DstShiftB == 0)
 			return pixel;
@@ -67,12 +67,12 @@ private:
 	//  The document also contains the constants below as floats.
 	//-------------------------------------------------
 
-	static inline u32 clamp16_shift8(u32 x)
+	static constexpr u32 clamp16_shift8(u32 x)
 	{
 		return ((s32(x) < 0) ? 0 : (x > 65535 ? 255: x >> 8));
 	}
 
-	static inline u32 ycc_to_rgb(u32 ycc)
+	static constexpr u32 ycc_to_rgb(u32 ycc)
 	{
 		// original equations:
 		//
@@ -131,7 +131,7 @@ private:
 	static inline u32 get_texel_palette16(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		const rgb_t *palbase = texture.palette;
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
 			s32 u1 = 1;
@@ -167,7 +167,7 @@ private:
 	static inline u32 get_texel_palette16a(const render_texinfo &texture, s32 curu, s32 curv)
 	{
 		const rgb_t *palbase = texture.palette;
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
 			s32 u1 = 1;
@@ -198,7 +198,7 @@ private:
 
 	static inline u32 get_texel_yuy16(const render_texinfo &texture, s32 curu, s32 curv)
 	{
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
 			s32 u1 = 1;
@@ -260,7 +260,7 @@ private:
 
 	static inline u32 get_texel_rgb32(const render_texinfo &texture, s32 curu, s32 curv)
 	{
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
 			s32 u1 = 1;
@@ -291,7 +291,7 @@ private:
 
 	static inline u32 get_texel_argb32(const render_texinfo &texture, s32 curu, s32 curv)
 	{
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			s32 u0 = curu >> 16;
 			s32 u1 = 1;
@@ -901,7 +901,7 @@ private:
 	static void draw_quad_yuy16_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
 		// simply can't do this without reading from the dest
-		if (_NoDestRead)
+		if constexpr (_NoDestRead)
 			return;
 
 		// fast case: no coloring, no alpha
@@ -1738,7 +1738,7 @@ private:
 		setup.startv += (setup.dvdx + setup.dvdy) / 2;
 
 		// if we're bilinear filtering, we need to offset u/v by half a texel
-		if (_BilinearFilter)
+		if constexpr (_BilinearFilter)
 		{
 			setup.startu -= 0x8000;
 			setup.startv -= 0x8000;

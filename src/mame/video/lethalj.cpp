@@ -92,6 +92,8 @@ void lethalj_state::video_start()
 	m_blitter_rows = m_blitter_base.length() / BLITTER_SOURCE_WIDTH;
 
 	m_gen_ext1_int_timer = timer_alloc(TIMER_GEN_EXT1_INT);
+
+	m_vispage = 0;
 }
 
 

@@ -166,6 +166,9 @@ endif
 ifneq ($(filter aarch64%,$(UNAME_M)),)
 PLATFORM := arm64
 endif
+ifneq ($(filter arm64%,$(UNAME_M)),)
+PLATFORM := arm64
+endif
 ifneq ($(filter aarch64%,$(UNAME_P)),)
 PLATFORM := arm64
 endif
@@ -394,6 +397,13 @@ endif
 
 # ppc has inline assembly support but no DRC
 ifeq ($(findstring ppc,$(UNAME)),ppc)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+# ARM / ARM64
+ifeq ($(findstring arm,$(UNAME)),arm)
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
@@ -1031,7 +1041,11 @@ ifneq ($(TARGETOS),asmjs)
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
 else
+ifneq ($(filter arm64%,$(UNAME_M)),)
+ARCHITECTURE := _arm64_clang
+else
 ARCHITECTURE := _x86_clang
+endif
 endif
 endif
 endif
@@ -1460,6 +1474,11 @@ $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
+	$(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
+
+.PHONY: macosx_arm64_clang
+macosx_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
 
@@ -1741,7 +1760,6 @@ generate: \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/mame/machine/mulcd.hxx \
 		$(GENDIR)/includes/SDL2
 
 $(GENDIR)/includes/SDL2:
@@ -1759,14 +1777,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.226"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.227"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.226" > $@
+	@echo #define BARE_BUILD_VERSION "0.227" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1777,10 +1795,6 @@ endif
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
 	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
-
-$(GENDIR)/mame/machine/mulcd.hxx: $(SRC)/mame/machine/mulcd.ppm scripts/build/file2str.py | $(GEN_FOLDERS)
-	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ mulcd_bkg uint8_t
 
 %.mo: %.po
 	@echo Converting translation $<...

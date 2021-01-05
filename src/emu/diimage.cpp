@@ -94,7 +94,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	, m_file()
 	, m_mame_file()
 	, m_software_part_ptr(nullptr)
-	, m_supported(0)
 	, m_readonly(false)
 	, m_created(false)
 	, m_create_format(0)
@@ -479,15 +478,14 @@ const char *device_image_interface::get_feature(const char *feature_name) const
 //  load_software_region -
 //-------------------------------------------------
 
-bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<u8> &ptr)
+bool device_image_interface::load_software_region(const char *tag, std::unique_ptr<u8[]> &ptr)
 {
 	size_t size = get_software_region_length(tag);
 
 	if (size)
 	{
-		ptr.allocate(size);
-
-		memcpy(ptr, get_software_region(tag), size);
+		ptr = std::make_unique<u8[]>(size);
+		memcpy(ptr.get(), get_software_region(tag), size);
 	}
 
 	return size > 0;
@@ -577,7 +575,8 @@ u32 device_image_interface::crc()
 	u32 crc = 0;
 
 	image_checkhash();
-	m_hash.crc(crc);
+	if (!m_hash.crc(crc))
+		crc = 0;
 
 	return crc;
 }
@@ -1074,11 +1073,6 @@ image_init_result device_image_interface::load_software(const std::string &softw
 	if (swinfo.longname().empty() || swinfo.publisher().empty() || swinfo.year().empty())
 		fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
-	// store
-	m_longname = swinfo.longname();
-	m_manufacturer = swinfo.publisher();
-	m_year = swinfo.year();
-
 	// set file type
 	std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
 			? m_mame_file->filename()
@@ -1205,9 +1199,6 @@ void device_image_interface::clear()
 	m_create_format = 0;
 	m_create_args = nullptr;
 
-	m_longname.clear();
-	m_manufacturer.clear();
-	m_year.clear();
 	m_basename.clear();
 	m_basename_noext.clear();
 	m_filetype.clear();
@@ -1215,6 +1206,8 @@ void device_image_interface::clear()
 	m_full_software_name.clear();
 	m_software_part_ptr = nullptr;
 	m_software_list_name.clear();
+
+	m_hash.reset();
 }
 
 
@@ -1261,7 +1254,7 @@ void device_image_interface::update_names()
 	// count instances of the general image type, or device type if custom
 	int count = 0;
 	int index = -1;
-	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
+	for (const device_image_interface &image : image_interface_enumerator(device().mconfig().root_device()))
 	{
 		if (this == &image)
 			index = count;
@@ -1303,7 +1296,7 @@ const software_part *device_image_interface::find_software_item(const std::strin
 		: nullptr;
 
 	// find the software list if explicitly specified
-	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
+	for (software_list_device &swlistdev : software_list_device_enumerator(device().mconfig().root_device()))
 	{
 		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{

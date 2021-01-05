@@ -14,7 +14,7 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 
-premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++14"', 'CLANG_CXX_LIBRARY = "libc++"' }
+premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++17"', 'CLANG_CXX_LIBRARY = "libc++"' }
 
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
@@ -497,6 +497,9 @@ configuration { "vs20*" }
 	buildoptions {
 		"/bigobj",
 	}
+	buildoptions_cpp {
+		"/std:c++17",
+	}
 	flags {
 		"ExtraWarnings",
 	}
@@ -713,14 +716,14 @@ else
 	}
 	-- For iOS in libretro, don't specify the arch since it's already specified in $(CC) and $(CXX)
 	if _OPTIONS["targetos"]=="macosx"  and _OPTIONS["LIBRETRO_IOS"] ~= "1" and _OPTIONS["LIBRETRO_TVOS"] ~= "1" then
-		configuration { "x64" }
+		configuration { "x64", "not arm64" }
 			buildoptions {
 				"-arch x86_64",
 			}
 			linkoptions {
 				"-arch x86_64",
 			}
-		configuration { "x32" }
+		configuration { "x32", "not arm64" }
 			buildoptions {
 				"-arch i386",
 			}
@@ -788,23 +791,13 @@ end
 	}
 
 local version = str_to_version(_OPTIONS["gcc_version"])
-if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
-		"-std=c++1y",
+		"-std=c++17",
 	}
 
 	buildoptions_objcpp {
-		"-std=c++1y",
+		"-std=c++17",
 	}
-else
-	buildoptions_cpp {
-		"-std=c++14",
-	}
-
-	buildoptions_objcpp {
-		"-std=c++14",
-	}
-end
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	if not ("pnacl" == _OPTIONS["gcc"]) then
 		buildoptions {
@@ -1038,11 +1031,11 @@ end
 	buildoptions {
 		"-Wall",
 		"-Wcast-align",
-		"-Wundef",
 		"-Wformat-security",
+		"-Wundef",
 		"-Wwrite-strings",
-		"-Wno-sign-compare",
 		"-Wno-conversion",
+		"-Wno-sign-compare",
 		"-Wno-error=deprecated-declarations",
 	}
 -- warnings only applicable to C compiles
@@ -1104,34 +1097,25 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-			if (version < 50000) then
-				print("Clang version 5.0 or later needed")
+			if (version < 60000) then
+				print("Clang version 6.0 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
-				"-Wno-cast-align",
-				"-Wno-tautological-compare",
-				"-Wno-unused-value",
-				"-Wno-constant-logical-operand",
 				"-fdiagnostics-show-note-include-stack",
-				"-Wno-unknown-warning-option",
+				"-Wno-cast-align",
+				"-Wno-constant-logical-operand",
 				"-Wno-extern-c-compat",
+				"-Wno-ignored-qualifiers",
+				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				"-Wno-tautological-compare",
 				"-Wno-unknown-attributes",
-				"-Wno-ignored-qualifiers"
+				"-Wno-unknown-warning-option",
+				"-Wno-unused-value",
 			}
-			if (version >= 60000) then
+			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
 				buildoptions {
-					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
-				}
-			end
-			if (version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx') then -- TODO when Xcode includes clang 10, update this to detect the vanity version number
-				buildoptions {
-					"-Wno-xor-used-as-pow " -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
-				}
-			end
-			if (version < 60000) or ((_OPTIONS["targetos"] == "macosx") and (version <= 90000)) then
-				buildoptions {
-					"-Wno-missing-braces" -- std::array brace initialization not fixed until 6.0.0 (https://reviews.llvm.org/rC314838)
+					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 				}
 			end
 		else
@@ -1139,6 +1123,12 @@ end
 				print("GCC version 7.0 or later needed")
 				os.exit(-1)
 			end
+				buildoptions_cpp {
+					"-Wimplicit-fallthrough",
+				}
+				buildoptions_objcpp {
+					"-Wimplicit-fallthrough",
+				}
 				buildoptions {
 					"-Wno-unused-result", -- needed for fgets,fread on linux
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
@@ -1213,7 +1203,7 @@ configuration { "asmjs" }
 		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
-		"-std=c++14",
+		"-std=c++17",
 		"-s DISABLE_EXCEPTION_CATCHING=2",
 		"-s EXCEPTION_CATCHING_WHITELIST=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 	}
@@ -1231,7 +1221,7 @@ configuration { "android*" }
 		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
-		"-std=c++14",
+		"-std=c++17",
 		"-Wno-extern-c-compat",
 		"-Wno-tautological-constant-out-of-range-compare",
 		"-Wno-tautological-pointer-compare",
@@ -1249,7 +1239,7 @@ configuration { "pnacl" }
 		"-Wno-inline-new-delete",
 	}
 	buildoptions_cpp {
-		"-std=c++14",
+		"-std=c++17",
 	}
 	archivesplit_size "20"
 
@@ -1332,14 +1322,6 @@ configuration { "mingw*" }
 			"shell32",
 			"userenv",
 		}
-
-configuration { "mingw-clang" }
-	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
-		linkoptions {
-			"-pthread",
-		}
-	end
 
 configuration { "vsllvm" }
 	defines {

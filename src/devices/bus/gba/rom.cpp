@@ -301,6 +301,7 @@ uint32_t gba_rom_device::read_gpio(offs_t offset, uint32_t mem_mask)
 				}
 				if (ACCESSING_BITS_16_31)
 					return m_gpio_regs[1] << 16;
+				[[fallthrough]];
 			case 1:
 				if (ACCESSING_BITS_0_15)
 					return m_gpio_regs[2];

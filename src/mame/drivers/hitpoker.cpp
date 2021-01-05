@@ -100,7 +100,7 @@ private:
 
 void hitpoker_state::video_start()
 {
-	m_videoram = std::make_unique<uint8_t[]>(0x35ff);
+	m_videoram = std::make_unique<uint8_t[]>(0x3600);
 	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
 	m_colorram = std::make_unique<uint8_t[]>(0x2000);
 }

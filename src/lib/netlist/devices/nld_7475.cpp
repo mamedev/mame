@@ -36,10 +36,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	template<bool HasQQ>
 	NETLIB_OBJECT(7475_GATE_BASE)
 	{
@@ -97,5 +95,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(7475_GATE, "TTL_7475_GATE", "")
 	NETLIB_DEVICE_IMPL(7477_GATE, "TTL_7477_GATE", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

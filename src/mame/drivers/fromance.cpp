@@ -126,7 +126,7 @@ uint8_t fromance_state::fromance_busycheck_sub_r()
 
 void fromance_state::fromance_rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data);
+	m_rombank->set_entry(data);
 }
 
 
@@ -261,7 +261,7 @@ void fromance_state::fromance_main_map(address_map &map)
 void fromance_state::nekkyoku_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_rombank);
 	map(0xc000, 0xefff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xffff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
@@ -270,7 +270,7 @@ void fromance_state::nekkyoku_sub_map(address_map &map)
 void fromance_state::fromance_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_rombank);
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
 	map(0xd000, 0xffff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
@@ -864,11 +864,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(fromance_state,fromance)
+void fromance_state::machine_start()
 {
 	uint8_t *ROM = memregion("sub")->base();
 
-	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
+	m_rombank->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
 	save_item(NAME(m_portselect));
 
@@ -879,7 +879,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(fromance_state,fromance)
+void fromance_state::machine_reset()
 {
 	m_portselect = 0;
 
@@ -913,9 +913,6 @@ void fromance_state::nekkyoku(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
-
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -958,9 +955,6 @@ void fromance_state::idolmj(machine_config &config)
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
 
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1002,9 +996,6 @@ void fromance_state::fromance(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_sublatch);
 	m_sublatch->set_separate_acknowledge(true);
-
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

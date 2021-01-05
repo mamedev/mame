@@ -985,9 +985,9 @@ ROM_START( ojankoca )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankoc_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankoc_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankoy_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankoy_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ccasino_state, empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

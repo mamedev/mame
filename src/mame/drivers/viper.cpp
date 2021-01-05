@@ -360,6 +360,8 @@ some other components. It will be documented at a later date.
 #include "speaker.h"
 
 
+namespace {
+
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
@@ -392,6 +394,10 @@ public:
 	void init_viperhd();
 
 	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint32_t epic_r(offs_t offset);
@@ -434,9 +440,6 @@ private:
 	uint32_t m_mpc8240_regs[256/4];
 
 	void viper_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -2374,20 +2377,20 @@ void viper_state::machine_start()
 	save_item(NAME(m_epic.i2c_cr));
 	save_item(NAME(m_epic.i2c_sr));
 	save_item(NAME(m_epic.i2c_state));
-	for (int i = 0; i < MPC8240_NUM_INTERRUPTS; i ++)
-	{
-		save_item(NAME(m_epic.irq[i].vector), i);
-		save_item(NAME(m_epic.irq[i].priority), i);
-		save_item(NAME(m_epic.irq[i].destination), i); // written but never read
-		save_item(NAME(m_epic.irq[i].active), i);
-		save_item(NAME(m_epic.irq[i].pending), i);
-		save_item(NAME(m_epic.irq[i].mask), i);
-	}
-	for (int i = 0; i < 4; i ++)
-	{
-		save_item(NAME(m_epic.global_timer[i].base_count), i);
-		save_item(NAME(m_epic.global_timer[i].enable), i);
-	}
+
+	save_item(STRUCT_MEMBER(m_epic.irq, vector));
+	save_item(STRUCT_MEMBER(m_epic.irq, priority));
+	save_item(STRUCT_MEMBER(m_epic.irq, destination)); // written but never read
+	save_item(STRUCT_MEMBER(m_epic.irq, active));
+	save_item(STRUCT_MEMBER(m_epic.irq, pending));
+	save_item(STRUCT_MEMBER(m_epic.irq, mask));
+
+	save_item(STRUCT_MEMBER(m_epic.global_timer, base_count));
+	save_item(STRUCT_MEMBER(m_epic.global_timer, enable));
+
+	m_ds2430_data_count = 0;
+	m_ds2430_state = 0;
+	m_ds2430_reset = 0;
 }
 
 void viper_state::machine_reset()
@@ -3052,6 +3055,10 @@ ROM_START(mfightcc) //*
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c09c04", 0, SHA1(bf5f7447d74399d34edd4eb6dfcca7f6fc2154f2) )
 ROM_END
+
+
+} // Anonymous namespace
+
 
 /*****************************************************************************/
 

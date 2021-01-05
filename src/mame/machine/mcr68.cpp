@@ -20,14 +20,8 @@
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr68_state,mcr68)
-{
-}
-
-
-MACHINE_RESET_MEMBER(mcr68_state,mcr68)
-{
-	/* for the most part all MCR/68k games are the same */
+void mcr68_state::machine_reset()
+{   /* for the most part all MCR/68k games are the same */
 	m_v493_callback = timer_expired_delegate(FUNC(mcr68_state::mcr68_493_callback),this);
 }
 

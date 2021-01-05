@@ -138,7 +138,7 @@ private:
 	void menghong_shared_w(offs_t offset, uint8_t data);
 	uint8_t crzyddz2_shared_r(offs_t offset);
 	void crzyddz2_shared_w(offs_t offset, uint8_t data);
-	uint8_t *m_sharedram;
+	std::unique_ptr<uint8_t []> m_sharedram;
 };
 
 
@@ -335,7 +335,7 @@ void menghong_state::crzyddz2_mem(address_map &map)
 
 void menghong_state::machine_start()
 {
-	m_sharedram = auto_alloc_array_clear(machine(), uint8_t, 0x10000);
+	m_sharedram = make_unique_clear<uint8_t []>(0x10000);
 
 	if (m_mainbank)
 	{

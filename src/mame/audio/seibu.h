@@ -5,8 +5,8 @@
     Seibu Sound System v1.02, games using this include:
 
     Cross Shooter    1987   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812)
-    Cabal            1988   * "Michel/Seibu    sound 11/04/88" (YM2151 substituted for YM3812, unknown ADPCM)
-    Dead Angle       1988   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (2xYM2203 substituted for YM3812, unknown ADPCM)
+    Cabal            1988   * "Michel/Seibu    sound 11/04/88" (YM2151 substituted for YM3812, MSM5205 ADPCM)
+    Dead Angle       1988   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (2xYM2203 substituted for YM3812, MSM5205 ADPCM)
     Dynamite Duke    1989   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     Toki             1989   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     Raiden           1990   * "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
@@ -16,10 +16,10 @@
     Related sound programs (not implemented yet):
 
     Zero Team                 "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
-    Legionnaire               "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812)
+    Legionnaire               "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     Raiden 2                  "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812, plus extra MSM6205)
     Raiden DX                 "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812, plus extra MSM6205)
-    Cup Soccer                "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812, plus extra MSM6205)
+    Cup Soccer                "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     SD Gundam Psycho Salamander "Copyright by King Bee Sol 1991"
     * = encrypted
 
@@ -30,7 +30,7 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "sound/okiadpcm.h"
+#include "sound/msm5205.h"
 #include "dirom.h"
 
 class seibu_sound_common {
@@ -129,28 +129,30 @@ DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
 
 // Seibu ADPCM device
 
-class seibu_adpcm_device : public device_t,
-									public device_sound_interface
+class seibu_adpcm_device : public device_t
 {
 public:
+	template <typename T> seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&msm5205_tag)
+		: seibu_adpcm_device(mconfig, tag, owner, clock)
+	{
+		m_msm.set_tag(std::forward<T>(msm5205_tag));
+	}
 	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~seibu_adpcm_device() { }
 
 	void decrypt();
 	void adr_w(offs_t offset, u8 data);
 	void ctl_w(u8 data);
+	void msm_int(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	oki_adpcm_state m_adpcm;
-	sound_stream *m_stream;
+	required_device<msm5205_device> m_msm;
 	uint32_t m_current;
 	uint32_t m_end;
 	uint8_t m_nibble;

@@ -225,6 +225,11 @@ configuration { "gmake or ninja" }
 buildoptions_cpp {
 	"-x c++",
 }
+if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
+	buildoptions_cpp {
+		"-Wno-error=implicit-fallthrough",
+	}
+end
 
 configuration { "vs*" }
 buildoptions {
@@ -663,8 +668,8 @@ end
 
 	configuration { "vsllvm" }
 		buildoptions {
-			"-Wno-unused-function",
 			"-Wno-enum-conversion",
+			"-Wno-unused-function",
 		}
 
 	configuration { }
@@ -733,8 +738,8 @@ project "7z"
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-undef",
 			"-Wno-strict-prototypes",
+			"-Wno-undef",
 		}
 if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
 		buildoptions_c {
@@ -1004,10 +1009,10 @@ project "sqlite3"
 
 	configuration { "gmake" }
 		buildoptions_c {
-			"-Wno-discarded-qualifiers",
-			"-Wno-unused-but-set-variable",
 			"-Wno-bad-function-cast",
+			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
+			"-Wno-unused-but-set-variable",
 		}
 if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		buildoptions_c {
@@ -1170,15 +1175,6 @@ project "bx"
 		}
 
 	configuration { }
-
-	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
-		if version < 60000 then
-			buildoptions {
-				"-Wno-strict-overflow",
-			}
-		end
-	end
 
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
@@ -1363,10 +1359,9 @@ end
 	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-uninitialized",
+			"-Wno-unused-but-set-variable",
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
-			"-Wno-unused-but-set-variable",
-			"-Wno-format-extra-args", -- temp for mingw 6.1 till update bgfx code
 		}
 	configuration { "rpi" }
 		buildoptions {
@@ -1478,6 +1473,7 @@ end
 		}
 		buildoptions {
 			"-x objective-c++",
+			"-D BGFX_CONFIG_MULTITHREADED=0",
 		}
 	end
 
@@ -1516,21 +1512,21 @@ project "portaudio"
 		buildoptions {
 			"-Wno-deprecated-declarations",
 			"-Wno-missing-braces",
-			"-Wno-unused-variable",
 			"-Wno-switch",
 			"-Wno-unused-function",
+			"-Wno-unused-variable",
 		}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
-			"-Wno-undef",
 			"-Wno-missing-braces",
-			"-Wno-unused-variable",
-			"-Wno-unused-value",
-			"-Wno-unused-function",
+			"-Wno-strict-prototypes",
+			"-Wno-undef",
 			"-Wno-unknown-pragmas",
+			"-Wno-unused-function",
+			"-Wno-unused-value",
+			"-Wno-unused-variable",
 		}
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
@@ -1544,15 +1540,13 @@ project "portaudio"
 				"-Wno-sometimes-uninitialized",
 			}
 		else
-			if (version >= 40600) then
-				buildoptions_c {
-					"-Wno-unused-but-set-variable",
-					"-Wno-maybe-uninitialized",
-					"-Wno-sometimes-uninitialized",
-					"-w",
-					"-Wno-incompatible-pointer-types-discards-qualifiers",
-				}
-			end
+			buildoptions_c {
+				"-Wno-maybe-uninitialized",
+				"-Wno-sometimes-uninitialized",
+				"-Wno-unused-but-set-variable",
+				"-Wno-incompatible-pointer-types-discards-qualifiers",
+				"-w",
+			}
 		end
 		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
 			buildoptions_c {
@@ -2124,13 +2118,13 @@ end
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		}
 		buildoptions_c {
-			"-Wno-undef",
+			"-Wno-bad-function-cast",
+			"-Wno-discarded-qualifiers",
 			"-Wno-format",
 			"-Wno-format-security",
-			"-Wno-strict-prototypes",
-			"-Wno-bad-function-cast",
 			"-Wno-pointer-to-int-cast",
-			"-Wno-discarded-qualifiers",
+			"-Wno-strict-prototypes",
+			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
 		}
 
@@ -2150,6 +2144,7 @@ end
 
 		buildoptions_c {
 			"-Wno-bad-function-cast",
+			"-Wno-strict-prototypes",
 		}
 
 	configuration { "android-*"}

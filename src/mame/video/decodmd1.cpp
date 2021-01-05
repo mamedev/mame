@@ -186,7 +186,7 @@ void decodmd_type1_device::decodmd1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("dmdbank2"); // last 16k of ROM
 	map(0x4000, 0x7fff).bankr("dmdbank1");
-	map(0x8000, 0x9fff).bankrw("dmdram");
+	map(0x8000, 0x9fff).ram().share("dmdram");
 }
 
 void decodmd_type1_device::decodmd1_io_map(address_map &map)
@@ -212,8 +212,6 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 	dmd.set_screen_update(FUNC(decodmd_type1_device::screen_update));
 	dmd.set_refresh_hz(50);
 
-	RAM(config, RAM_TAG).set_default_size("8K");
-
 	HC259(config, m_bitlatch); // U4
 	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();
 	m_bitlatch->q_out_cb<3>().set(FUNC(decodmd_type1_device::blank_w));
@@ -229,7 +227,7 @@ decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const 
 	, m_cpu(*this, "dmdcpu")
 	, m_rombank1(*this, "dmdbank1")
 	, m_rombank2(*this, "dmdbank2")
-	, m_ram(*this, RAM_TAG)
+	, m_ram(*this, "dmdram")
 	, m_bitlatch(*this, "bitlatch")
 	, m_rom(*this, finder_base::DUMMY_TAG)
 {}
@@ -241,9 +239,7 @@ void decodmd_type1_device::device_start()
 
 void decodmd_type1_device::device_reset()
 {
-	uint8_t* RAM = m_ram->pointer();
-
-	memset(RAM,0,0x2000);
+	memset(m_ram,0,0x2000);
 	memset(m_pixels,0,0x200*sizeof(uint32_t));
 
 	m_rombank1->configure_entries(0, 8, &m_rom[0x0000], 0x4000);

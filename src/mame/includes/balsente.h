@@ -109,7 +109,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
 	uint8_t novram_8bit_r(address_space &space, offs_t offset);
 	void novram_8bit_w(offs_t offset, uint8_t data);
-	void acia_w(offs_t offset, uint8_t data);
 	uint8_t adc_data_r();
 	void adc_select_w(offs_t offset, uint8_t data);
 	void spiker_expand_w(offs_t offset, uint8_t data);

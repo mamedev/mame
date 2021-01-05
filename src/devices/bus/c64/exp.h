@@ -148,10 +148,10 @@ public:
 protected:
 	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<uint8_t> m_roml;
-	optional_shared_ptr<uint8_t> m_romh;
-	optional_shared_ptr<uint8_t> m_romx;
-	optional_shared_ptr<uint8_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_roml;
+	std::unique_ptr<uint8_t[]> m_romh;
+	std::unique_ptr<uint8_t[]> m_romx;
+	std::unique_ptr<uint8_t[]> m_nvram;
 
 	int m_game;
 	int m_exrom;

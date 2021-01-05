@@ -137,9 +137,10 @@ private:
 	device_cococart_interface   *m_cart;
 
 	// methods
-	void set_line(const char *line_name, coco_cartridge_line &line, line_value value);
+	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+public:
 	static const char *line_value_string(line_value value);
 };
 
@@ -224,5 +225,11 @@ private:
 	cococart_slot_device *           m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
+
+// methods for configuring CoCo slot devices (the expansion cart
+// itself, as well as slots on the Multi-Pak)
+void coco_cart_add_basic_devices(device_slot_interface &device);
+void coco_cart_add_fdcs(device_slot_interface &device);
+void coco_cart_add_multi_pak(device_slot_interface &device);
 
 #endif // MAME_BUS_COCO_COCOCART_H

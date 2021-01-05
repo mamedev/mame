@@ -12,10 +12,7 @@
 
 #include <array>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	// -----------------------------------------------------------------------------
 	// nld_base_proxy
@@ -184,6 +181,4 @@ namespace netlist
 		}
 	}
 
-
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

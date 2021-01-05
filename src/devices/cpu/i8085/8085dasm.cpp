@@ -74,7 +74,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x2f: util::stream_format(stream, "cma"); break;
 		case 0x30: util::stream_format(stream, "sim"); break;
 		case 0x31: util::stream_format(stream, "lxi  sp,$%04x", params.r16(pc)); pc+=2; break;
-		case 0x32: util::stream_format(stream, "stax $%04x", params.r16(pc)); pc+=2; break;
+		case 0x32: util::stream_format(stream, "sta  $%04x", params.r16(pc)); pc+=2; break;
 		case 0x33: util::stream_format(stream, "inx  sp"); break;
 		case 0x34: util::stream_format(stream, "inr  m"); break;
 		case 0x35: util::stream_format(stream, "dcr  m"); break;
@@ -82,7 +82,7 @@ offs_t i8085_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x37: util::stream_format(stream, "stc"); break;
 		case 0x38: util::stream_format(stream, "ldes $%02x (*)", params.r8(pc)); pc++; break;
 		case 0x39: util::stream_format(stream, "dad  sp"); break;
-		case 0x3a: util::stream_format(stream, "ldax $%04x", params.r16(pc)); pc+=2; break;
+		case 0x3a: util::stream_format(stream, "lda  $%04x", params.r16(pc)); pc+=2; break;
 		case 0x3b: util::stream_format(stream, "dcx  sp"); break;
 		case 0x3c: util::stream_format(stream, "inr  a"); break;
 		case 0x3d: util::stream_format(stream, "dcr  a"); break;

@@ -654,7 +654,6 @@ void thomson_state::to7_base(machine_config &config)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
-	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();

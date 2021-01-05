@@ -11,7 +11,7 @@
   epoxy block which probably contains a standard Z80 + PALs.
 
   The encryption affects D3, D5, and D7, and depends on M1, A0, A4, A8 and A12.
-  D0, D1, D3, D4 and D6 are always unaffected.
+  D0, D1, D2, D4 and D6 are always unaffected.
 
   The encryption consists of a permutation of the three bits, which can also be
   inverted. Therefore there are 3! * 2^3 = 48 different possible encryptions.

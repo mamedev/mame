@@ -105,19 +105,6 @@ protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
-
-class nes_vt369_vtunknown_swap_op_d5_d6_state : public nes_vt369_vtunknown_state
-{
-public:
-	nes_vt369_vtunknown_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt369_vtunknown_vh2009_8mb(machine_config& config);
-protected:
-};
-
-
 class nes_vt369_vtunknown_cy_state : public nes_vt369_vtunknown_state
 {
 public:
@@ -171,8 +158,12 @@ public:
 	{ }
 
 	void nes_vt369_vtunknown_hh(machine_config& config);
+	void nes_vt369_vtunknown_hh_1mb(machine_config& config);
 	void nes_vt369_vtunknown_hh_4mb(machine_config& config);
 	void nes_vt369_vtunknown_hh_8mb(machine_config& config);
+	void nes_vt369_vtunknown_hh_16mb(machine_config& config);
+
+	void nes_vt369_vtunknown_hh_swap_8mb(machine_config& config);
 
 	void nes_vt369_vtunknown_unk(machine_config& config);
 	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
@@ -470,10 +461,22 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh(machine_config &confi
 	m_soc->force_bad_dma();
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_8mb(machine_config& config)
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_swap_8mb(machine_config &config)
+{
+	nes_vt369_vtunknown_4k_ram(config);
+
+	NES_VT369_SOC_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_1mb(machine_config& config)
 {
 	nes_vt369_vtunknown_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_4mb(machine_config& config)
@@ -481,6 +484,20 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_4mb(machine_config& c
 	nes_vt369_vtunknown_hh(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
 }
+
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_8mb(machine_config& config)
+{
+	nes_vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_16mb(machine_config& config)
+{
+	nes_vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
+}
+
+
 
 
 static INPUT_PORTS_START( nes_vt369_vtunknown )
@@ -561,19 +578,6 @@ void nes_vt369_vtunknown_dg_fapocket_state::nes_vt369_vtunknown_fa_4x16mb(machin
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_w));
 }
 
-
-void nes_vt369_vtunknown_swap_op_d5_d6_state::nes_vt369_vtunknown_vh2009_8mb(machine_config& config)
-{
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	NES_VT02_VT03_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
-}
-
-
 static INPUT_PORTS_START( nes_vt369_vtunknown_fa )
 	PORT_INCLUDE(nes_vt369_vtunknown)
 
@@ -583,8 +587,7 @@ static INPUT_PORTS_START( nes_vt369_vtunknown_fa )
 	PORT_DIPSETTING(    0x01, "130-in-1" )
 INPUT_PORTS_END
 
-
-
+// below use Flash ROMs
 
 ROM_START( dgun2561 )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
@@ -595,6 +598,12 @@ ROM_START( dgun2593 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "dreamgear300.bin", 0x00000, 0x8000000, CRC(4fe0ed02) SHA1(a55590557bacca65ed9a17c5bcf0a4e5cb223126) )
 ROM_END
+
+ROM_START( 240in1ar )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "mw-106-2g.u3", 0x00000, 0x8000000, CRC(c46d2ca9) SHA1(0fff7d3461ff620c5b5e43f54f9e7badd089b951) )
+ROM_END
+
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -644,6 +653,12 @@ ROM_START( lxcmcycr )
 	ROM_LOAD( "lexibook cars.bin", 0x00000, 0x4000000, CRC(198fe11b) SHA1(5e35caa3fc319ec69812c187a3ec89f01749f749) )
 ROM_END
 
+ROM_START( lxcmcypj )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// sub-board was marked for 1GB capacity (A0-A25 address lines), but only address lines A0-A24 are connected to the chip
+	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x4000000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
+ROM_END
+
 ROM_START( lxcmcypp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
@@ -673,30 +688,9 @@ ROM_START( red5mam )
 	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
 ROM_END
 
-ROM_START( lpgm240 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
-ROM_END
-
-ROM_START( sy889 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
-ROM_END
-
-ROM_START( sy888b )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "sy888b_f25q32.bin", 0x00000, 0x400000, CRC(a8298c33) SHA1(7112dd13d5fb5f9f9d496816758defd22773ec6e) )
-ROM_END
-
-
 ROM_START( bittboy )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "bittboy_flash_read_s29gl256n-tf-v2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
-ROM_END
-
-ROM_START( mc_cb280 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "w25q32.u5", 0x00000, 0x400000, CRC(c9541bdf) SHA1(f0ce46f18658ca5dbed881e5a80460e59820bbd0) )
 ROM_END
 
 ROM_START( mc_pg150 )
@@ -714,26 +708,145 @@ ROM_START( dvnimbus )
 	ROM_LOAD( "2012-7-4-v1.bin", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
 ROM_END
 
+ROM_START( fapocket )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
+ROM_END
+
+ROM_START( zonefusn )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
+ROM_END
+
+ROM_START( sealvt )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "l157-44 v02.u1", 0x00000, 0x1000000, CRC(0fabced0) SHA1(3f8cd85b12b125b01c831c9f2f2937e29c1b6205) )
+ROM_END
+
+ROM_START( gcs2mgp )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "gcs2_v4.u3", 0x00000, 0x1000000, CRC(3b5be765) SHA1(c54f1a732d638b0ee582ca822715c9d3a3af5ef3) )
+ROM_END
+
+// VT369 using BGA on Subboards
+
+ROM_START( retro400 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) )
+ROM_END
+
+// VT369 using SPI ROMs
+
+ROM_START( lpgm240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+ROM_END
+
+ROM_START( tup240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+ROM_END
+
+ROM_START( sy889 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
+ROM_END
+
+ROM_START( sy888b )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "sy888b_f25q32.bin", 0x00000, 0x400000, CRC(a8298c33) SHA1(7112dd13d5fb5f9f9d496816758defd22773ec6e) )
+ROM_END
+
+ROM_START( mc_cb280 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "w25q32.u5", 0x00000, 0x400000, CRC(c9541bdf) SHA1(f0ce46f18658ca5dbed881e5a80460e59820bbd0) )
+ROM_END
+
 ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
+ROM_START( dgun2577 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "blackarcade_dump_dreambook-my_arcade.bin", 0x00000, 0x800000, CRC(9b95b912) SHA1(573c938a0f1acca8f3b75900fd0185bfe28d4fa5) )
+ROM_END
+
+ROM_START( lxcyber )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexibook_dump_correct.bin", 0x00000, 0x800000, CRC(74b71846) SHA1(e7dcfa7c53cc7d30678763c6e60f7a3250768849) )
+ROM_END
+
+ROM_START( gtct885 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "ct-885 g25q64c.bin", 0x00000, 0x800000, CRC(a5b2b568) SHA1(79de79364fa731e421627ec68e3bfa9d311aa7fc) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(8173c1c2) SHA1(7521a4676166a81a79209638491026b2d8e32895) )
+ROM_END
+
+ROM_START( rd5_240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "red5.bin", 0x00000, 0x800000, CRC(0e564e73) SHA1(c29a927c830ab3876e9b63e2d41bef962c05518f) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+ROM_END
+
+ROM_START( myarccn )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+ROM_END
+
+ROM_START( hkb502 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "red console.bin", 0x00000, 0x400000, CRC(e4766383) SHA1(64b0c20592f38928b3a639fa42b468ff09664808) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+ROM_END
+
+ROM_START( hkb502a )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+ROM_END
+
+ROM_START( lxcap )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexibook_cyber_arcade_pocket.bin", 0x00000, 0x800000, CRC(245d0cd3) SHA1(d91cca2d0f99a6ca202fa9ba6d03587ea8af0cd9) )
+
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(491d206b) SHA1(a5411a7afe3b4df93b1b22e5533f5010bd3aaa93) )
+ROM_END
 
 ROM_START( denv150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
 ROM_END
 
+ROM_START( egame150 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x800000, CRC(a19644ea) SHA1(01c004d126edf792f71c1e9ed98b3c96d9278a69) )
+ROM_END
+
 ROM_START( mog_m320 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
-ROM_END
-
-
-ROM_START( fapocket )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
 ROM_START( otrail )
@@ -744,10 +857,6 @@ ROM_START( otrail )
 	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
-ROM_START( zonefusn )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
-ROM_END
 
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
@@ -769,27 +878,13 @@ CONS( 201?, mc_pg150,   0,        0,  nes_vt369_vtunknown_bt_2x16mb, nes_vt369_v
 CONS( 201?, mc_hh210,   0,        0,  nes_vt369_vtunknown_4k_ram_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  nes_vt369_vtunknown_unk_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
- // probably another Thumbs Up product? cursor doesn't work unless nes_vt369_vtunknown_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
+
 
 // is this vt09 or vt32?
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
 CONS( 2017, fapocket,   0,        0,  nes_vt369_vtunknown_fa_4x16mb, nes_vt369_vtunknown_fa, nes_vt369_vtunknown_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
-
-
-
-
-// Runs well, minor GFX issues in intro
-CONS( 2017, sy889,      0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2016, sy888b,     0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-
-// Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
-
-// Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
 /****************************************************************************************************************
 
@@ -813,6 +908,7 @@ CONS( 200?, lxcmcyfz,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 200?, lxcmcysp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 200?, lxcmcycr,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcypj,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 // the data order is swapped for this one, maybe other internal differences?
 CONS( 200?, lxcmcypp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
@@ -831,7 +927,6 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
     (handheld units, use standard AAA batteries)
     Lexibook Compact Cyber Arcade - Barbie
     Lexibook Compact Cyber Arcade - Finding Dory
-    Lexibook Compact Cyber Arcade - PJ Masks
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
     Lexibook Console Colour - Barbie
@@ -850,19 +945,74 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 
 */
 
-// confirmed VT369
-CONS( 201?, denv150,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// uncertain, uses SPI ROM
-CONS( 200?, lpgm240,    0,  0,  nes_vt369_vtunknown_vh2009_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
-
-// incertain, uses SPI ROM
-CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// uncertain, intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-// uncertain, very similar to red5mam
-CONS( 2016, dgun2593,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
 // uncertain, NOT SPI ROM
 CONS( 200?, zonefusn,  0,         0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+// same as above but without Jungle's Soft boot logo? model number taken from cover of manual
+CONS( 200?, sealvt,    zonefusn,  0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+
+// NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
+
+// Uncertain, intial code isn't valid? scrambled?
+CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+// Uncertain, very similar to red5mam
+CONS( 2016, dgun2593,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+// Similar, starts with a '6a' ror a opcode which is presumably encrypted / extended, then normal looking code, then unknown instructions
+CONS( 200?, gcs2mgp,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
+// Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
+// Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
+CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
+
+/*****************************************************************************
+* below are VT369 games that use BGA on sub
+*****************************************************************************/
+
+// doesn't use most features, M705-128A6 sub-board with BGA
+CONS( 201?, retro400,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+/*****************************************************************************
+* below are VT369 games that use SQI / SPI ROM
+*****************************************************************************/
+
+// Runs well, minor GFX issues in intro
+CONS( 2017, sy889,      0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, sy888b,     0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+
+// Same hardware as SY-889
+CONS( 201?, mc_cb280,   0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Plays intro music but then crashes. same hardware as SY-88x but uses more features
+CONS( 2016, mog_m320,   0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+
+// VT369, but doesn't use most features
+CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
+
+// VT369, but doesn't use most features
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcyber,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ // menu is protected with code from extra ROM
+CONS( 201?, gtct885,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ // similar to above, but with 40 extra games, menu is protected with code from extra ROM (although RTS opcodes seem to work)
+CONS( 201?, rd5_240,    0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, hkb502,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
+// contains a protection chip, command 80 XX returns a byte
+CONS( 201?, lxcap,    0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+
+// VT369, but doesn't use most features
+CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// confirmed VT369, uses more features (including sound CPU)
+CONS( 201?, denv150,   0,        0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uncertain, uses SPI ROM so probably VT369
+CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+

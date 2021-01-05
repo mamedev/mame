@@ -100,6 +100,7 @@
 #include "natkeyboard.h"
 
 #include "osdepend.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <ctime>
@@ -1675,7 +1676,7 @@ time_t ioport_manager::initialize()
 	init_port_types();
 
 	// if we have a token list, proceed
-	device_iterator iter(machine().root_device());
+	device_enumerator iter(machine().root_device());
 	for (device_t &device : iter)
 	{
 		std::string errors;
@@ -3059,7 +3060,7 @@ ioport_configurer& ioport_configurer::port_modify(const char *tag)
 	// find the existing port
 	m_curport = m_portlist.find(fulltag)->second.get();
 	if (m_curport == nullptr)
-		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
+		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag);
 
 	// bump the modification count, and reset current field/setting
 	m_curport->m_modcount++;
@@ -3113,7 +3114,7 @@ ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char3
 		util::stream_format(s, "%s%d", is_first ? "" : ",", (int)ch);
 		is_first = false;
 	}
-	throw emu_fatalerror("PORT_CHAR(%s) could not be added - maximum amount exceeded\n", s.str().c_str());
+	throw emu_fatalerror("PORT_CHAR(%s) could not be added - maximum amount exceeded\n", s.str());
 }
 
 

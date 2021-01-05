@@ -425,6 +425,8 @@ void pic8259_device::device_start()
 	save_item(NAME(m_is_x86));
 	save_item(NAME(m_current_level));
 	save_item(NAME(m_inta_sequence));
+
+	m_inta_sequence = 0;
 }
 
 

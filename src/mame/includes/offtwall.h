@@ -25,7 +25,7 @@ public:
 		m_jsa(*this, "jsa"),
 		m_vad(*this, "vad"),
 		m_mainram(*this, "mainram"),
-		m_bankrom_base(*this, "bankrom_base")
+		m_bankrom_base(*this, "maincpu")
 	{ }
 
 	void offtwall(machine_config &config);
@@ -49,7 +49,7 @@ private:
 	required_shared_ptr<uint16_t> m_mainram;
 
 	uint16_t *m_bankswitch_base;
-	required_shared_ptr<uint16_t> m_bankrom_base;
+	required_region_ptr<uint16_t> m_bankrom_base;
 	uint32_t m_bank_offset;
 
 	uint16_t *m_spritecache_count;

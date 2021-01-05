@@ -448,7 +448,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_r)), write16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_w)));
 			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate(*this));
 			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate(*this));
-			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(*this, FUNC(segaorun_state::nop_w)));
+			mapper.map_as_region(0x00000, 0x60000, 0xf00000, "subcpu", write16_delegate(*this, FUNC(segaorun_state::nop_w)));
 			break;
 
 		case 4:
@@ -692,10 +692,10 @@ void segaorun_state::outrun_custom_io_w(offs_t offset, uint16_t data, uint16_t m
 				//  D2: Start lamp
 				//  D1: Brake lamp
 				//  other bits: ?
-				machine().sound().system_enable(data & 0x80);
-				output().set_value("Vibration_motor", data >> 5 & 1);
-				output().set_value("Start_lamp", data >> 2 & 1);
-				output().set_value("Brake_lamp", data >> 1 & 1);
+				machine().sound().system_mute(!BIT(data, 7));
+				output().set_value("Vibration_motor", BIT(data, 5));
+				output().set_value("Start_lamp", BIT(data, 2));
+				output().set_value("Brake_lamp", BIT(data, 1));
 			}
 			return;
 
@@ -876,7 +876,7 @@ void segaorun_state::sub_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xfffff);
-	map(0x000000, 0x05ffff).rom().share("cpu1rom");
+	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x067fff).mirror(0x018000).ram().share("cpu1ram");
 	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("segaic16road:roadram");
 	map(0x090000, 0x09ffff).rw(m_segaic16road, FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));

@@ -148,7 +148,7 @@ void megazone_state::megazone_map(address_map &map)
 	map(0x2800, 0x2bff).ram().share("colorram");
 	map(0x2c00, 0x2fff).ram().share("colorram2");
 	map(0x3000, 0x33ff).ram().share("spriteram");
-	map(0x3800, 0x3fff).ram().share("share1");
+	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_share1[off]; }, "share_r", [this](offs_t off, u8 data) { m_share1[off] = data; }, "share_w");
 	map(0x4000, 0xffff).rom();     /* 4000->5FFF is a debug rom */
 }
 

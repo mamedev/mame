@@ -235,8 +235,8 @@ protected:
 	/* DSPCOM board */
 	void hddspcom_control_w(offs_t offset, uint16_t data);
 
-	void rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t rd68k_slapstic_r(address_space &space, offs_t offset);
+	void rd68k_slapstic_w(offs_t offset, uint16_t data);
+	uint16_t rd68k_slapstic_r(offs_t offset);
 
 	/* Game-specific protection */
 	void st68k_sloop_w(offs_t offset, uint16_t data);
@@ -351,11 +351,11 @@ protected:
 	uint32_t                  m_adsp_speedup_count[4];
 
 	uint8_t                   m_gsp_multisync;
-	optional_shared_ptr<uint8_t>  m_gsp_vram;
-	optional_shared_ptr<uint16_t> m_gsp_control_lo;
-	optional_shared_ptr<uint16_t> m_gsp_control_hi;
-	optional_shared_ptr<uint16_t> m_gsp_paletteram_lo;
-	optional_shared_ptr<uint16_t> m_gsp_paletteram_hi;
+	optional_shared_ptr<uint16_t>  m_gsp_vram;
+	optional_shared_ptr<uint16_t>  m_gsp_control_lo;
+	optional_shared_ptr<uint16_t>  m_gsp_control_hi;
+	memory_share_creator<uint16_t> m_gsp_paletteram_lo;
+	memory_share_creator<uint16_t> m_gsp_paletteram_hi;
 
 	required_ioport m_in0;
 	optional_ioport m_sw1;
@@ -450,7 +450,7 @@ protected:
 	uint8_t                   m_shiftreg_enable;
 
 	uint32_t                  m_mask_table[65536 * 4];
-	uint8_t *                 m_gsp_shiftreg_source;
+	uint16_t *                m_gsp_shiftreg_source;
 
 	int8_t                    m_gfx_finescroll;
 	uint8_t                   m_gfx_palettebank;

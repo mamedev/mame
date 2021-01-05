@@ -47,6 +47,6 @@ protected:
 DECLARE_DEVICE_TYPE(BARCODE_READER, barcode_reader_device)
 
 // device type iterator
-typedef device_type_iterator<barcode_reader_device> barcode_reader_device_iterator;
+typedef device_type_enumerator<barcode_reader_device> barcode_reader_device_enumerator;
 
 #endif // MAME_DEVICES_MACHINE_BCREADER_H

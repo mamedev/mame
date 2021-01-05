@@ -150,7 +150,6 @@ files{
 	MAME_DIR .. "src/mame/drivers/victory.cpp",
 	MAME_DIR .. "src/mame/includes/victory.h",
 	MAME_DIR .. "src/mame/video/victory.cpp",
-	MAME_DIR .. "src/mame/audio/targ.cpp",
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
 	MAME_DIR .. "src/mame/includes/astrocde.h",
 	MAME_DIR .. "src/mame/video/astrocde.cpp",

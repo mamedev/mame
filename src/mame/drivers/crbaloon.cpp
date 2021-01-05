@@ -157,29 +157,29 @@ uint8_t crbaloon_state::pc3259_r(offs_t offset)
 
 void crbaloon_state::port_sound_w(uint8_t data)
 {
-	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
+	// D0 - interrupt enable - also goes to PC3259 as /HTCTRL
 	m_irq_mask = data & 0x01;
-	crbaloon_set_clear_collision_address((data & 0x01) ? true : false);
+	crbaloon_set_clear_collision_address(BIT(data, 0));
 
-	/* D1 - SOUND STOP */
-	machine().sound().system_enable((data & 0x02) ? true : false);
+	// D1 - SOUND STOP
+	machine().sound().system_mute(!BIT(data, 1));
 
-	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable((data & 0x04) ? true : false);
+	// D2 - unlabeled - music enable
+	crbaloon_audio_set_music_enable(BIT(data, 2));
 
-	/* D3 - EXPLOSION */
-	crbaloon_audio_set_explosion_enable((data & 0x08) ? true : false);
+	// D3 - EXPLOSION
+	crbaloon_audio_set_explosion_enable(BIT(data, 3));
 
-	/* D4 - BREATH */
-	crbaloon_audio_set_breath_enable((data & 0x10) ? true : false);
+	// D4 - BREATH
+	crbaloon_audio_set_breath_enable(BIT(data, 4));
 
-	/* D5 - APPEAR */
-	crbaloon_audio_set_appear_enable((data & 0x20) ? true : false);
+	// D5 - APPEAR
+	crbaloon_audio_set_appear_enable(BIT(data, 5));
 
-	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable((data & 0x40) ? true : false);
+	// D6 - unlabeled - laugh enable
+	crbaloon_audio_set_laugh_enable(BIT(data, 6));
 
-	/* D7 - unlabeled - goes to PC3259 pin 16 */
+	// D7 - unlabeled - goes to PC3259 pin 16
 
 	pc3259_update();
 }

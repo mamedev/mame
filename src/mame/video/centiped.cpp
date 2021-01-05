@@ -161,7 +161,7 @@ WRITE_LINE_MEMBER(centiped_state::flip_screen_w)
  *
  *************************************/
 
-void centiped_state::multiped_gfxbank_w(uint8_t data)
+void multiped_state::multiped_gfxbank_w(uint8_t data)
 {
 	// d0-d6: N/C?
 	// d7: gfx rom bank

@@ -1060,6 +1060,7 @@ void jangou_state::luckygrl(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &jangou_state::cntrygrl_cpu0_io);
 	maincpu.set_addrmap(AS_OPCODES, &jangou_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x5000);
 	maincpu.set_vblank_int("screen", FUNC(jangou_state::irq0_line_hold));
 }
 

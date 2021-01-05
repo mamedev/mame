@@ -769,9 +769,8 @@ void bebox_state::init_bebox()
 	membank("bank2")->set_base(memregion("user2")->base());
 
 	/* install MESS managed RAM */
-	space_0.install_readwrite_bank(0, m_ram->size() - 1, 0x02000000, "bank3");
-	space_1.install_readwrite_bank(0, m_ram->size() - 1, 0x02000000, "bank3");
-	membank("bank3")->set_base(m_ram->pointer());
+	space_0.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
+	space_1.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
@@ -791,7 +790,6 @@ void bebox_state::init_bebox()
 			/* bcctr 0x14, 0 */
 			0x4E80042000000000U
 		};
-		space_1.install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
-		membank("bank1")->set_base(ops);
+		space_1.install_rom(0x9421FFF0, 0x9421FFFF, ops);
 	}
 }

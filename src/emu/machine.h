@@ -166,7 +166,7 @@ public:
 	const game_driver &system() const { return m_system; }
 	osd_interface &osd() const;
 	machine_manager &manager() const { return m_manager; }
-	resource_pool &respool() { return m_respool; }
+	[[deprecated("use smart pointers to manage object lifecycles")]] resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }

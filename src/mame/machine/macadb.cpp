@@ -204,9 +204,7 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this),
-		m_bIsMCUMode(false),
-		m_bIsPMU(false),
-		m_bIsPMUVIA1(false)
+		m_bIsMCUMode(false)
 {
 }
 
@@ -224,14 +222,6 @@ void macadb_device::device_start()
 
 	this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macadb_device::mac_adb_tick),this));
 	this->m_adb_timer->adjust(attotime::never);
-
-	// also allocate PMU timer
-	if (m_bIsPMU)
-	{
-		m_pmu_send_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macadb_device::mac_pmu_tick),this));
-		this->m_adb_timer->adjust(attotime::never);
-		m_pmu_int_status = 0;
-	}
 
 	save_item(NAME(m_last_adb_time));
 	save_item(NAME(m_key_matrix));
@@ -263,19 +253,6 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_pram));
-	save_item(NAME(m_pm_ack));
-	save_item(NAME(m_pm_cmd));
-	save_item(NAME(m_pm_out));
-	save_item(NAME(m_pm_dptr));
-	save_item(NAME(m_pm_sptr));
-	save_item(NAME(m_pm_slen));
-	save_item(NAME(m_pm_state));
-	save_item(NAME(m_pm_data_recv));
-	save_item(NAME(m_pmu_int_status));
-	save_item(NAME(m_pmu_last_adb_command));
-	save_item(NAME(m_pmu_poll));
-	save_item(NAME(m_pm_req));
-	save_item(NAME(m_pm_data_send));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -973,416 +950,15 @@ void macadb_device::mac_adb_newaction(int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(macadb_device::mac_pmu_tick)
-{
-	// state 10 means this is in response to an ADB command
-	if (m_pm_state == 10)
-	{
-		#if LOG_ADB
-		printf("PM: was state 10, chunk-chunking CB1\n");
-		#endif
-		m_pm_state = 0;
-
-		// tick CB1, which should cause a PMU interrupt on PMU machines
-		m_adb_extclock ^= 1;
-		write_via_clock(m_adb_extclock);
-		m_adb_extclock ^= 1;
-		write_via_clock(m_adb_extclock);
-	}
-	else
-	{
-		#if LOG_ADB
-		printf("PM: timer tick, lowering ACK\n");
-		#endif
-		m_pm_ack &= ~2;    // lower ACK to handshake next step
-	}
-}
-
-void macadb_device::pmu_one_byte_reply(uint8_t result)
-{
-	m_pm_out[0] = m_pm_out[1] = 1;  // length
-	m_pm_out[2] = result;
-	m_pm_slen = 3;
-	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-}
-
-void macadb_device::pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3)
-{
-	m_pm_out[0] = m_pm_out[1] = 3;  // length
-	m_pm_out[2] = result1;
-	m_pm_out[3] = result2;
-	m_pm_out[4] = result3;
-	m_pm_slen = 5;
-	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-}
-
-WRITE_LINE_MEMBER(macadb_device::pmu_req_w)
-{
-	if ((state) && !(m_pm_req & 1))
-	{
-		#if LOG_ADB
-		printf("PM: 68k dropping /REQ\n");
-		#endif
-
-		if (m_pm_state == 0)     // do this in receive state only
-		{
-			m_pm_data_recv = 0xff;
-			m_pm_ack |= 2;
-
-			// check if length byte matches
-			if ((m_pm_dptr >= 2) && (m_pm_cmd[1] == (m_pm_dptr-2)))
-			{
-				pmu_exec();
-				#if LOG_ADB
-				printf("PMU exec: command %02x length %d\n", m_pm_cmd[0], m_pm_cmd[1]);
-				#endif
-			}
-		}
-	}
-	else if (!(state) && (m_pm_req & 1))
-	{
-		if (m_pm_state == 0)
-		{
-			#if LOG_ADB
-			printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", m_pm_dptr, m_pm_data_send);
-			#endif
-			m_pm_ack &= ~2; // clear, we're waiting for more bytes
-			m_pm_cmd[m_pm_dptr++] = m_pm_data_send;
-		}
-		else    // receiving, so this is different
-		{
-			m_pm_data_recv = m_pm_out[m_pm_sptr++];
-			m_pm_slen--;
-			m_pm_ack |= 2;  // raise ACK to indicate available byte
-			#if LOG_ADB
-			printf("PM: 68k asserted /REQ, sending byte %02x\n", m_pm_data_recv);
-			#endif
-
-			// another byte to send?
-			if (m_pm_slen)
-			{
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-			}
-			else
-			{
-				m_pm_state = 0; // back to receive state
-				m_pmu_send_timer->adjust(attotime::never);
-			}
-		}
-	}
-
-	m_pm_req = state ? 1 : 0;
-}
-
-void macadb_device::pmu_exec()
-{
-	m_pm_sptr = 0;  // clear send pointer
-	m_pm_slen = 0;  // and send length
-	m_pm_dptr = 0;  // and receive pointer
-
-	printf("PMU: Command %02x\n", m_pm_cmd[0]);
-	switch (m_pm_cmd[0])
-	{
-		case 0x10:  // subsystem power and clock ctrl
-			break;
-
-		case 0x20:  // send ADB command (PMU must issue an IRQ on completion)
-			#if 0
-			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x %02x\n",
-					m_pm_cmd[0],    // 0x20
-					m_pm_cmd[1],    // ???
-					m_pm_cmd[2],    // adb flags (2 for autopoll active, 3 to reset bus?)
-					m_pm_cmd[3],    // length of ADB data
-					m_pm_cmd[4],    // adb data
-					m_pm_cmd[5]);
-			#endif
-
-			if (((m_pm_cmd[2] == 0xfc) || (m_pm_cmd[2] == 0x2c)) && (m_pm_cmd[3] == 4))
-			{
-//              printf("PMU: request to poll ADB, returning nothing\n");
-				m_pm_slen = 0;
-				m_pmu_int_status = 0;
-			}
-			else
-			{
-				m_pm_state = 10;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				if (m_bIsPMUVIA1)
-				{
-					m_pmu_int_status = 0x1;
-				}
-				else
-				{
-					m_pmu_int_status = 0x10;
-				}
-
-				m_pmu_last_adb_command = m_pm_cmd[2];
-			}
-
-			m_adb_command = m_pm_cmd[2];
-			m_adb_waiting_cmd = 1;
-			adb_talk();
-			break;
-
-		case 0x21:  // turn ADB auto-poll off (does this need a reply?)
-			break;
-
-		case 0x28:  // read ADB
-			if (m_adb_datasize > 0)
-			{
-				m_adb_datasize = 1; // hack
-
-				m_pm_out[0] = m_pm_out[1] = 3 + m_adb_datasize;
-				m_pm_out[2] = 0;
-//              m_pm_out[3] = m_pmu_last_adb_command;
-				m_pm_out[3] = 0;
-				m_pm_out[4] = m_adb_datasize;
-				for (int i = 0; i < m_adb_datasize; i++)
-				{
-					m_pm_out[5+i] = 0; //mac->m_adb_buffer[i];
-				}
-				m_pm_slen = 5 + m_adb_datasize;
-			}
-			else
-			{
-				m_pm_out[0] = m_pm_out[1] = 4;
-				m_pm_out[2] = 0;
-				m_pm_out[3] = 0;
-//              m_pm_out[3] = m_pmu_last_adb_command;
-				m_pm_out[4] = 1;    // length of following data
-				m_pm_out[5] = 0;
-				m_pm_slen = 6;
-			}
-/*          printf("ADB packet: ");
-            for (int i = 0; i < m_pm_slen; i++)
-            {
-                printf("%02x ", m_pm_out[i]);
-            }
-            printf("\n");*/
-			m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1000)));
-			break;
-
-		case 0x31:  // write first 20 bytes of PRAM
-			{
-				for (int i = 0; i < 20; i++)
-				{
-					m_adb_pram[i] = m_pm_cmd[1+i];
-				}
-			}
-			break;
-
-		case 0x32:  // write extended PRAM byte(s).  cmd[2] = address, cmd[3] = length, cmd[4...] = data
-			if ((m_pm_cmd[2] + m_pm_cmd[3]) < 0x100)
-			{
-				int i;
-
-				for (i = 0; i < m_pm_cmd[3]; i++)
-				{
-					m_adb_pram[m_pm_cmd[2] + i] = m_pm_cmd[4+i];
-				}
-			}
-			break;
-
-		case 0x38:  // read time
-			{
-				m_pm_out[0] = m_pm_out[1] = 4;
-				m_pm_out[2] = 0x63; // famous Mac RTC value of 8/27/56 8:35:00 PM
-				m_pm_out[3] = 0x0b;
-				m_pm_out[4] = 0xd1;
-				m_pm_out[5] = 0x78;
-				m_pm_slen = 6;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x39:  // read first 20 bytes of PRAM
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = 20;
-				for (i = 0; i < 20; i++)
-				{
-					m_pm_out[2 + i] = m_adb_pram[i];
-				}
-				m_pm_slen = 22;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x3a:  // read extended PRAM byte(s).  cmd[2] = address, cmd[3] = length
-			if ((m_pm_cmd[2] + m_pm_cmd[3]) < 0x100)
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = m_pm_cmd[3];
-				for (i = 0; i < m_pm_cmd[3]; i++)
-				{
-					m_pm_out[2 + i] = m_adb_pram[m_pm_cmd[2] + i];
-				}
-				m_pm_slen = m_pm_out[0] + 2;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0x40:  // set screen contrast
-			break;
-
-		case 0x41:
-			break;
-
-		case 0x58:  // read internal modem status
-			pmu_one_byte_reply(0);
-			break;
-
-		case 0x60:  // set low power warning and cutoff battery levels
-			break;
-
-		case 0x68:  // read battery/charger level
-			pmu_three_byte_reply(255, 255, 255);
-			break;
-
-		case 0x69:  // read battery/charger instantaneous level and status
-			pmu_three_byte_reply(255, 255, 255);
-			break;
-
-		case 0x6b:  // read extended battery/charger level and status (wants an 8 byte reply)
-			m_pm_out[0] = m_pm_out[1] = 8;  // length
-			m_pm_out[2] = 255;
-			m_pm_out[3] = 255;
-			m_pm_out[4] = 255;
-			m_pm_out[5] = 255;
-			m_pm_out[6] = 255;
-			m_pm_out[7] = 255;
-			m_pm_out[8] = 255;
-			m_pm_out[9] = 255;
-			m_pm_slen = 10;
-			m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			break;
-
-		case 0x6c:  // read battery ID
-			pmu_one_byte_reply(1);
-			break;
-
-		case 0x78:  // read interrupt flag
-			if (!m_bIsPMUVIA1)   // PB 140/170 use a "leaner" PMU protocol where you get the data for a PMU interrupt here
-			{
-				#if 0
-				if ((m_pmu_int_status&0xf0) == 0x10)
-				{
-					if (m_adb_datasize > 0)
-					{
-						m_adb_datasize = 1; // hack
-						m_pm_out[0] = m_pm_out[1] = 2 + m_adb_datasize;
-						m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-						m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent
-						for (int i = 0; i < m_adb_datasize; i++)
-						{
-							m_pm_out[4+i] = 0; //m_adb_buffer[i];
-						}
-						m_pm_slen = 4 + m_adb_datasize;
-						m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-
-/*                      printf("ADB packet: ");
-                        for (int i = 0; i < m_pm_slen; i++)
-                        {
-                            printf("%02x ", m_pm_out[i]);
-                        }
-                        printf("\n");*/
-					}
-					else
-					{
-						m_pm_out[0] = m_pm_out[1] = 2;
-						m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-						m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent OR 0x80 for extra error-ness
-						m_pm_out[4] = 0;                              // return data
-						m_pm_slen = 4;
-						m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-					}
-				}
-				else
-				{
-					pmu_one_byte_reply(m_pmu_int_status);
-				}
-				#else
-				if ((m_pmu_int_status&0xf0) == 0x10)
-				{
-					m_pm_out[0] = m_pm_out[1] = 2;
-					m_pm_out[2] = m_pmu_int_status; // ADB status in low nibble
-					m_pm_out[3] = m_pmu_last_adb_command;         // ADB command that was sent OR 0x80 for extra error-ness
-					m_pm_out[4] = 0;                              // return data
-					m_pm_slen = 4;
-					m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
-				}
-				else
-				{
-					pmu_one_byte_reply(m_pmu_int_status);
-				}
-				#endif
-			}
-			else
-			{
-				pmu_one_byte_reply(m_pmu_int_status);
-			}
-
-			m_pmu_int_status = 0;
-			break;
-
-		case 0x90: // sound power control
-			break;
-
-		case 0x98:  // read sound power state
-			pmu_one_byte_reply(1);
-			break;
-
-		case 0xd8:  // read A/D converter (not sure what this does)
-			pmu_one_byte_reply(0);
-			break;
-
-		case 0xe0:  // write PMU internal RAM
-			break;
-
-		case 0xe8:  // read PMU internal RAM (just return zeroes)
-			{
-				int i;
-
-				m_pm_out[0] = m_pm_out[1] = m_pm_cmd[4];
-//              printf("PMU read at %x\n", m_pm_cmd[2] | (m_pm_cmd[3]<<8));
-
-				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
-				// (actually 0x00EE, the 50753 port 6)
-
-				for (i = 0; i < m_pm_cmd[4]; i++)
-				{
-					m_pm_out[2 + i] = 0xff;
-				}
-				m_pm_slen = m_pm_out[0] + 2;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-			}
-			break;
-
-		case 0xec:  // PMU self-test (send 1 count byte + reply)
-			pmu_one_byte_reply(0);
-			break;
-
-		default:
-			fatalerror("PMU: Unhandled command %02x\n", m_pm_cmd[0]);
-	}
-
-	if (m_pm_slen > 0)
-	{
-		m_pm_state = 1;
-	}
-}
-
 void macadb_device::adb_vblank()
 {
-	if ((m_adb_state == ADB_STATE_IDLE) || ((m_bIsPMU) && (m_pmu_poll)))
+	if (m_adb_state == ADB_STATE_IDLE)
 	{
 		if (this->adb_pollmouse())
 		{
 			// if the mouse was the last TALK, we can just send the new data
 			// otherwise we need to pull SRQ
-			if ((m_adb_last_talk == m_adb_mouseaddr) && !(m_bIsPMU))
+			if (m_adb_last_talk == m_adb_mouseaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
@@ -1402,7 +978,7 @@ void macadb_device::adb_vblank()
 		}
 		else if (this->adb_pollkbd(0))
 		{
-			if ((m_adb_last_talk == m_adb_keybaddr) && !(m_bIsPMU))
+			if (m_adb_last_talk == m_adb_keybaddr)
 			{
 				// repeat last TALK to get updated data
 				m_adb_waiting_cmd = 1;
@@ -1411,16 +987,6 @@ void macadb_device::adb_vblank()
 				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
-			#if 0
-			else if (m_bIsPMU)
-			{
-				m_adb_waiting_cmd = 1;
-				this->adb_talk();
-				m_pm_state = 10;
-				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				m_pmu_int_status = 0x1;
-			}
-			#endif
 			else
 			{
 				write_adb_irq(ASSERT_LINE);
@@ -1437,8 +1003,6 @@ void macadb_device::device_reset()
 {
 	int i;
 
-	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
-	m_pm_state = 0;
 	m_adb_srq_switch = 0;
 	write_adb_irq(CLEAR_LINE);      // no interrupt
 	m_adb_timer_ticks = 0;
@@ -1448,7 +1012,6 @@ void macadb_device::device_reset()
 	m_adb_waiting_cmd = 0;
 	m_adb_state = 0;
 	m_adb_srqflag = false;
-	m_pmu_poll = 0;
 	m_adb_state = ADB_STATE_NOTINIT;
 	m_adb_direction = 0;
 	m_adb_datasize = 0;

@@ -56,6 +56,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -172,10 +173,12 @@ struct render_texinfo
 };
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 struct bounds_step
 {
+	void get(render_bounds &result) const { result = bounds; }
+
 	int             state;
 	render_bounds   bounds;
 	render_bounds   delta;
@@ -184,6 +187,8 @@ using bounds_vector = std::vector<bounds_step>;
 
 struct color_step
 {
+	void get(render_color &result) const { result = color; }
+
 	int             state;
 	render_color    color;
 	render_color    delta;
@@ -194,7 +199,7 @@ using color_vector = std::vector<color_step>;
 class layout_environment;
 class view_environment;
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 // ======================> render_layer_config
@@ -439,8 +444,8 @@ public:
 	float yscale() const { return m_user.m_yscale; }
 	float xoffset() const { return m_user.m_xoffset; }
 	float yoffset() const { return m_user.m_yoffset; }
-	bool is_empty() const { return (m_itemlist.count() == 0); }
-	void get_user_settings(user_settings &settings) const { settings = m_user; }
+	bool is_empty() const { return m_itemlist.empty(); }
+	const user_settings &get_user_settings() const { return m_user; }
 
 	// setters
 	void set_overlay(bitmap_argb32 *bitmap);
@@ -587,7 +592,7 @@ private:
 		virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 		// drawing helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, std::string_view str, int align, const render_color &color);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
@@ -720,6 +725,9 @@ public:
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
 	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device> >;
+	using prepare_items_delegate = delegate<void ()>;
+	using preload_delegate = delegate<void ()>;
+	using recomputed_delegate = delegate<void ()>;
 
 	/// \brief A single item in a view
 	///
@@ -731,6 +739,10 @@ public:
 		friend class layout_view;
 
 	public:
+		using state_delegate = delegate<int ()>;
+		using bounds_delegate = delegate<void (render_bounds &)>;
+		using color_delegate = delegate<void (render_color &)>;
+
 		// construction/destruction
 		item(
 				view_environment &env,
@@ -742,10 +754,13 @@ public:
 		~item();
 
 		// getters
+		std::string const &id() const { return m_id; }
 		layout_element *element() const { return m_element; }
 		screen_device *screen() { return m_screen; }
-		render_bounds bounds() const;
-		render_color color() const;
+		bool bounds_animated() const { return m_bounds.size() > 1U; }
+		bool color_animated() const { return m_color.size() > 1U; }
+		render_bounds bounds() const { render_bounds result; m_get_bounds(result); return result; }
+		render_color color() const { render_color result; m_get_color(result); return result; }
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
@@ -757,7 +772,17 @@ public:
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
-		int state() const;
+		int element_state() const { return m_get_elem_state(); }
+		int animation_state() const { return m_get_anim_state(); }
+
+		// set state
+		void set_state(int state) { m_elem_state = state; }
+
+		// set handlers
+		void set_element_state_callback(state_delegate &&handler);
+		void set_animation_state_callback(state_delegate &&handler);
+		void set_bounds_callback(bounds_delegate &&handler);
+		void set_color_callback(color_delegate &&handler);
 
 		// resolve tags, if any
 		void resolve_tags();
@@ -766,7 +791,19 @@ public:
 		using bounds_vector = emu::render::detail::bounds_vector;
 		using color_vector = emu::render::detail::color_vector;
 
-		int animation_state() const;
+		state_delegate default_get_elem_state();
+		state_delegate default_get_anim_state();
+		bounds_delegate default_get_bounds();
+		color_delegate default_get_color();
+		int get_state() const;
+		int get_output() const;
+		int get_input_raw() const;
+		int get_input_field_cached() const;
+		int get_input_field_conditional() const;
+		int get_anim_output() const;
+		int get_anim_input() const;
+		void get_interpolated_bounds(render_bounds &result) const;
+		void get_interpolated_color(render_color &result) const;
 
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
@@ -780,30 +817,36 @@ public:
 
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
+		state_delegate          m_get_elem_state;   // resolved element state function
+		state_delegate          m_get_anim_state;   // resolved animation state function
+		bounds_delegate         m_get_bounds;       // resolved bounds function
+		color_delegate          m_get_color;        // resolved color function
 		output_finder<>         m_output;           // associated output
 		output_finder<>         m_animoutput;       // associated output for animation if different
-		bool const              m_have_output;      // whether we actually have an output
-		bool const              m_have_animoutput;  // whether we actually have an output for animation
 		ioport_port *           m_animinput_port;   // input port used for animation
+		int                     m_elem_state;       // element state used in absence of bindings
 		ioport_value const      m_animmask;         // mask for animation state
 		u8 const                m_animshift;        // shift for animation state
 		ioport_port *           m_input_port;       // input port of this item
 		ioport_field const *    m_input_field;      // input port field of this item
 		ioport_value const      m_input_mask;       // input mask of this item
 		u8 const                m_input_shift;      // input mask rightshift for raw (trailing 0s)
-		bool const              m_input_raw;        // get raw data from input port
 		bool                    m_clickthrough;     // should click pass through to lower elements
 		screen_device *         m_screen;           // pointer to screen
-		int                     m_orientation;      // orientation of this item
+		int const               m_orientation;      // orientation of this item
 		bounds_vector           m_bounds;           // bounds of the item
 		color_vector const      m_color;            // color of the item
 		int                     m_blend_mode;       // blending mode to use when drawing
 		u32                     m_visibility_mask;  // combined mask of parent visibility groups
 
 		// cold items
+		std::string const       m_id;               // optional unique item identifier
 		std::string const       m_input_tag;        // input tag of this item
 		std::string const       m_animinput_tag;    // tag of input port for animation state
 		bounds_vector const     m_rawbounds;        // raw (original) bounds of the item
+		bool const              m_have_output;      // whether we actually have an output
+		bool const              m_input_raw;        // get raw data from input port
+		bool const              m_have_animoutput;  // whether we actually have an output for animation
 		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};
 	using item_list = std::list<item>;
@@ -872,9 +915,11 @@ public:
 	~layout_view();
 
 	// getters
+	item *get_item(std::string const &id);
 	item_list &items() { return m_items; }
 	bool has_screen(screen_device &screen);
 	const std::string &name() const { return m_name; }
+	const std::string &unqualified_name() const { return m_unqualified_name; }
 	size_t visible_screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
@@ -889,7 +934,13 @@ public:
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
 
+	// set handlers
+	void set_prepare_items_callback(prepare_items_delegate &&handler);
+	void set_preload_callback(preload_delegate &&handler);
+	void set_recomputed_callback(recomputed_delegate &&handler);
+
 	// operations
+	void prepare_items() { if (!m_prepare_items.isnull()) m_prepare_items(); }
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
 	void preload();
 
@@ -898,6 +949,12 @@ public:
 
 private:
 	struct layer_lists;
+
+	using item_id_map = std::unordered_map<
+			std::reference_wrapper<std::string const>,
+			item &,
+			std::hash<std::string>,
+			std::equal_to<std::string> >;
 
 	// add items, recursing for groups
 	void add_items(
@@ -916,7 +973,6 @@ private:
 	static std::string make_name(layout_environment &env, util::xml::data_node const &viewnode);
 
 	// internal state
-	std::string                 m_name;             // name of the layout
 	float                       m_effaspect;        // X/Y of the layout in current configuration
 	render_bounds               m_bounds;           // computed bounds of the view in current configuration
 	item_list                   m_items;            // list of layout items
@@ -927,7 +983,15 @@ private:
 	edge_vector                 m_interactive_edges_y;
 	screen_ref_vector           m_screens;          // list screens visible in current configuration
 
+	// handlers
+	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
+	preload_delegate            m_preload;          // additional actions when visible items change
+	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
+
 	// cold items
+	std::string                 m_name;             // display name for the view
+	std::string                 m_unqualified_name; // the name exactly as specified in the layout file
+	item_id_map                 m_items_by_id;      // items with non-empty ID indexed by ID
 	visibility_toggle_vector    m_vistoggles;       // collections of items that can be shown/hidden
 	render_bounds               m_expbounds;        // explicit bounds of the view
 	u32                         m_defvismask;       // default visibility mask
@@ -945,15 +1009,23 @@ public:
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
 	using view_list = std::list<layout_view>;
+	using resolve_tags_delegate = delegate<void ()>;
 
 	// construction/destruction
 	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *searchpath, char const *dirname);
 	~layout_file();
 
 	// getters
+	device_t &device() const { return m_device; }
 	element_map const &elements() const { return m_elemmap; }
 	view_list &views() { return m_viewlist; }
 	view_list const &views() const { return m_viewlist; }
+
+	// resolve tags, if any
+	void resolve_tags();
+
+	// set handlers
+	void set_resolve_tags_callback(resolve_tags_delegate &&handler);
 
 private:
 	using environment = emu::render::detail::layout_environment;
@@ -967,8 +1039,10 @@ private:
 			bool init);
 
 	// internal state
-	element_map     m_elemmap;      // list of shared layout elements
-	view_list       m_viewlist;     // list of views
+	device_t &              m_device;       // device that caused file to be loaded
+	element_map             m_elemmap;      // list of shared layout elements
+	view_list               m_viewlist;     // list of views
+	resolve_tags_delegate   m_resolve_tags; // additional actions after resolving tags
 };
 
 // ======================> render_target
@@ -992,6 +1066,7 @@ public:
 	u32 width() const { return m_width; }
 	u32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	bool keepaspect() const { return m_keepaspect; }
 	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }

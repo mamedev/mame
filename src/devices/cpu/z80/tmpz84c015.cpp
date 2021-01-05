@@ -8,7 +8,7 @@
     TODO:
     - SIO configuration, or should that be up to the driver?
     - CGC (clock generator/controller)
-    - WDT (watchdog timer)
+    - Halt modes
 
 ***************************************************************************/
 
@@ -17,22 +17,26 @@
 
 DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
-void tmpz84c015_device::tmpz84c015_internal_io_map(address_map &map)
+void tmpz84c015_device::internal_io_map(address_map &map)
 {
 	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x1c, 0x1f).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xf0, 0xf0).mirror(0xff00).rw(FUNC(tmpz84c015_device::wdtmr_r), FUNC(tmpz84c015_device::wdtmr_w));
+	map(0xf1, 0xf1).mirror(0xff00).w(FUNC(tmpz84c015_device::wdtcr_w));
 	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
 }
 
 
 tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	z80_device(mconfig, TMPZ84C015, tag, owner, clock),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::tmpz84c015_internal_io_map), this)),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::internal_io_map), this)),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
 	m_pio(*this, "tmpz84c015_pio"),
 	m_irq_priority(-1), // !
+	m_wdtmr(0xfb),
+	m_watchdog_timer(nullptr),
 
 	m_out_txda_cb(*this),
 	m_out_dtra_cb(*this),
@@ -59,7 +63,9 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 
 	m_in_pb_cb(*this),
 	m_out_pb_cb(*this),
-	m_out_brdy_cb(*this)
+	m_out_brdy_cb(*this),
+
+	m_wdtout_cb(*this)
 {
 }
 
@@ -107,8 +113,14 @@ void tmpz84c015_device::device_start()
 	m_out_pb_cb.resolve_safe();
 	m_out_brdy_cb.resolve_safe();
 
+	m_wdtout_cb.resolve();
+
+	// setup watchdog timer
+	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmpz84c015_device::watchdog_timeout), this));
+
 	// register for save states
 	save_item(NAME(m_irq_priority));
+	save_item(NAME(m_wdtmr));
 }
 
 
@@ -119,6 +131,9 @@ void tmpz84c015_device::device_start()
 void tmpz84c015_device::device_reset()
 {
 	irq_priority_w(0);
+	m_wdtmr = 0xfb;
+	watchdog_clear();
+
 	z80_device::device_reset();
 }
 
@@ -175,6 +190,65 @@ void tmpz84c015_device::irq_priority_w(uint8_t data)
 		m_irq_priority = data;
 	}
 }
+
+
+uint8_t tmpz84c015_device::wdtmr_r()
+{
+	return m_wdtmr;
+}
+
+void tmpz84c015_device::wdtmr_w(uint8_t data)
+{
+	if ((data & 0x07) != 0x03)
+		logerror("%s: Writing %d%d%d to WDTMR reserved bits\n", machine().describe_context(), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+
+	// check for watchdog timer enable
+	uint8_t old_data = std::exchange(m_wdtmr, data);
+	if (!BIT(old_data, 7) && BIT(data, 7))
+		watchdog_clear();
+}
+
+void tmpz84c015_device::wdtcr_w(uint8_t data)
+{
+	// write specific values only
+	switch (data)
+	{
+	case 0x4e:
+		watchdog_clear();
+		break;
+
+	case 0xb1:
+		// WDTER must be cleared first
+		if (!BIT(m_wdtmr, 7))
+		{
+			logerror("%s: Watchdog timer disabled\n", machine().describe_context());
+			m_watchdog_timer->adjust(attotime::never);
+		}
+		break;
+
+	default:
+		logerror("%s: Writing %02X to WDTCR\n", machine().describe_context(), data);
+		break;
+	}
+}
+
+void tmpz84c015_device::watchdog_clear()
+{
+	if (!m_wdtout_cb.isnull())
+		m_wdtout_cb(CLEAR_LINE);
+
+	if (BIT(m_wdtmr, 7))
+		m_watchdog_timer->adjust(cycles_to_attotime(0x10000 << (BIT(m_wdtmr, 5, 2) * 2)));
+}
+
+TIMER_CALLBACK_MEMBER(tmpz84c015_device::watchdog_timeout)
+{
+	if (!m_wdtout_cb.isnull())
+		m_wdtout_cb(ASSERT_LINE);
+	else
+		logerror("Watchdog timeout\n");
+}
+
 
 void tmpz84c015_device::device_add_mconfig(machine_config &config)
 {

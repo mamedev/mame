@@ -68,52 +68,42 @@ void liberatr_state::bitmap_w(offs_t offset, uint8_t data)
 
 void liberatr_state::init_planet(planet &liberatr_planet, uint8_t *planet_rom)
 {
-	uint16_t longitude;
+	const uint8_t *const latitude_scale = memregion("user1")->base();
+	const uint8_t *const longitude_scale = memregion("user2")->base();
 
-	const uint8_t *latitude_scale = memregion("user1")->base();
-	const uint8_t *longitude_scale = memregion("user2")->base();
-
-	/* for each starting longitude */
-	for (longitude = 0; longitude < 0x100; longitude++)
+	// for each starting longitude
+	for (uint16_t longitude = 0; longitude < 0x100; longitude++)
 	{
-		uint8_t i, latitude, start_segment, segment_count;
-		uint8_t *buffer;
-
 		planet_frame frame;
-		planet_frame_line *line = nullptr;
-
 		uint16_t total_segment_count = 0;
 
-		/* for each latitude */
-		for (latitude = 0; latitude < 0x80; latitude++)
+		// for each latitude
+		for (uint8_t latitude = 0; latitude < 0x80; latitude++)
 		{
-			uint8_t segment, longitude_scale_factor, latitude_scale_factor, color, x=0;
 			uint8_t x_array[32], color_array[32], visible_array[32];
 
-			/* point to the structure which will hold the data for this line */
-			line = &frame.lines[latitude];
+			// point to the structure which will hold the data for this line
+			planet_frame_line *line = &frame.lines[latitude];
 
-			latitude_scale_factor = latitude_scale[latitude];
+			uint8_t latitude_scale_factor = latitude_scale[latitude];
 
-			/* for this latitude, load the 32 segments into the arrays */
-			for (segment = 0; segment < 0x20; segment++)
+			// for this latitude, load the 32 segments into the arrays
+			for (uint8_t segment = 0; segment < 0x20; segment++)
 			{
-				uint16_t length, planet_data, address;
+				uint16_t address;
 
-				/*
-				   read the planet picture ROM and get the
-				   latitude and longitude scaled from the scaling PROMS
-				*/
+				// read the planet picture ROM and get the latitude and longitude scaled from the scaling PROMS
 				address = (latitude << 5) + segment;
-				planet_data = (planet_rom[address] << 8) | planet_rom[address + 0x1000];
+				uint16_t planet_data = (planet_rom[address] << 8) | planet_rom[address + 0x1000];
 
-				color  =  (planet_data >> 8) & 0x0f;
-				length = ((planet_data << 1) & 0x1fe) + ((planet_data >> 15) & 0x01);
+				uint8_t  color  =  (planet_data >> 8) & 0x0f;
+				uint16_t length = ((planet_data << 1) & 0x1fe) + ((planet_data >> 15) & 0x01);
 
 
-				/* scale the longitude limit (adding the starting longitude) */
-				address = longitude + ( length >> 1 ) + ( length & 1 );     /* shift with rounding */
-				visible_array[segment] = (( address & 0x100 ) ? 1 : 0);
+				// scale the longitude limit (adding the starting longitude)
+				address = longitude + (length >> 1) + (length & 1);     // shift with rounding
+				visible_array[segment] = BIT(address, 8);
+				uint8_t longitude_scale_factor;
 				if (address & 0x80)
 				{
 					longitude_scale_factor = 0xff;
@@ -128,29 +118,28 @@ void liberatr_state::init_planet(planet &liberatr_planet, uint8_t *planet_rom)
 				color_array[segment] = color;
 			}
 
-			/*
-			   determine which segment is the western horizon and
-			     leave 'segment' indexing it.
-			*/
-			for (segment = 0; segment < 0x1f; segment++)    /* if not found, 'segment' = 0x1f */
-				if (visible_array[segment]) break;
+			// determine which segment is the western horizon and leave 'start_segment' indexing it.
+			uint8_t start_segment;
+			for (start_segment = 0; start_segment < 0x1f; start_segment++)    // if not found, 'start_segment' = 0x1f
+				if (visible_array[start_segment]) break;
 
-			/* transfer from the temporary arrays to the structure */
+			// transfer from the temporary arrays to the structure
 			line->max_x = (latitude_scale_factor * 0xc0) >> 8;
 			if (line->max_x & 1)
-				line->max_x += 1;               /* make it even */
+				line->max_x += 1;               // make it even
 
 			/*
 			   as part of the quest to reduce memory usage (and to a lesser degree
 			     execution time), stitch together segments that have the same color
 			*/
-			segment_count = 0;
-			i = 0;
-			start_segment = segment;
+			uint8_t segment = start_segment;
+			uint8_t segment_count = 0;
+			uint8_t i = 0;
+			uint8_t x = 0;
 
 			do
 			{
-				color = color_array[segment];
+				uint8_t color = color_array[segment];
 				while (color == color_array[segment])
 				{
 					x = x_array[segment];
@@ -173,25 +162,20 @@ void liberatr_state::init_planet(planet &liberatr_planet, uint8_t *planet_rom)
 		   many segments it will take to store the description, allocate the
 		   space for it and copy the data to it.
 		*/
-		buffer = auto_alloc_array(machine(), uint8_t, 2*(128 + total_segment_count));
+		liberatr_planet.frames[longitude] = std::make_unique<uint8_t []>(2 * (128 + total_segment_count));
+		uint8_t *buffer = liberatr_planet.frames[longitude].get();
 
-		liberatr_planet.frames[longitude] = buffer;
-
-		for (latitude = 0; latitude < 0x80; latitude++)
+		for (uint8_t latitude = 0; latitude < 0x80; latitude++)
 		{
-			uint8_t last_x;
-
-
-			line = &frame.lines[latitude];
-			segment_count = line->segment_count;
+			planet_frame_line *line = &frame.lines[latitude];
+			uint8_t segment_count = line->segment_count;
 			*buffer++ = segment_count;
-			last_x = 0;
 
 			/* calculate the bitmap's x coordinate for the western horizon
 			   center of bitmap - (the number of planet pixels) / 4 */
 			*buffer++ = (m_screen->width() / 2) - ((line->max_x + 2) / 4);
 
-			for (i = 0; i < segment_count; i++)
+			for (uint8_t i = 0, last_x = 0; i < segment_count; i++)
 			{
 				uint8_t current_x = (line->x_array[i] + 1) / 2;
 
@@ -249,7 +233,7 @@ void liberatr_state::get_pens(pen_t *pens)
 
 void liberatr_state::draw_planet(bitmap_rgb32 &bitmap, pen_t *pens)
 {
-	uint8_t const *buffer = m_planets[m_planet_select].frames[*m_planet_frame];
+	uint8_t const *buffer = m_planets[m_planet_select].frames[*m_planet_frame].get();
 
 	/* for each latitude */
 	for (uint8_t latitude = 0; latitude < 0x80; latitude++)

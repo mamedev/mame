@@ -148,6 +148,7 @@ public:
 private:
 	void nvram_bank_w(uint8_t data);
 
+	void cuebrickj_main_map(address_map &map);
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };
 

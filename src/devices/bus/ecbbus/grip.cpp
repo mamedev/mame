@@ -567,7 +567,7 @@ ecb_grip21_device::ecb_grip21_device(const machine_config &mconfig, const char *
 	m_centronics(*this, CENTRONICS_TAG),
 	m_palette(*this, "palette"),
 	m_speaker(*this, "speaker"),
-	m_video_ram(*this, "video_ram"),
+	m_video_ram(*this, "video_ram", VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 	m_j3a(*this, "J3A"),
 	m_j3b(*this, "J3B"),
 	m_j7(*this, "J7"),
@@ -581,9 +581,6 @@ ecb_grip21_device::ecb_grip21_device(const machine_config &mconfig, const char *
 
 void ecb_grip21_device::device_start()
 {
-	// allocate video RAM
-	m_video_ram.allocate(VIDEORAM_SIZE);
-
 	// setup GRIP memory banking
 	membank("videoram")->configure_entries(0, 2, m_video_ram, 0x8000);
 	membank("videoram")->set_entry(0);

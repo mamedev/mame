@@ -28,7 +28,7 @@
 //#include "bus/s100/s100.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
+#include "machine/f4702.h"
 #include "imagedev/snapquik.h"
 
 
@@ -74,6 +74,22 @@ void altair_state::io_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( altair )
+	PORT_START("BAUD")
+	PORT_DIPNAME(0xf, 0x8, "Bit Rate") PORT_DIPLOCATION("S3-S0:4,3,2,1")
+	PORT_DIPSETTING(0x0, "External Rate")
+	PORT_DIPSETTING(0x2, "50")
+	PORT_DIPSETTING(0x3, "75")
+	PORT_DIPSETTING(0xf, "110")
+	PORT_DIPSETTING(0x4, "134.5")
+	PORT_DIPSETTING(0xe, "150")
+	PORT_DIPSETTING(0x5, "200")
+	PORT_DIPSETTING(0xd, "300")
+	PORT_DIPSETTING(0x6, "600")
+	PORT_DIPSETTING(0xb, "1200")
+	PORT_DIPSETTING(0xa, "1800")
+	PORT_DIPSETTING(0x7, "2400")
+	PORT_DIPSETTING(0x9, "4800")
+	PORT_DIPSETTING(0x8, "9600")
 INPUT_PORTS_END
 
 
@@ -113,10 +129,12 @@ void altair_state::altair(machine_config &config)
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.dcd_handler().set("acia", FUNC(acia6850_device::write_dcd));
 	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+	rs232.txc_handler().set("brg", FUNC(f4702_device::im_w)); // molex pin 7 to be connected to cable pin 15
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600)); // TODO: this is set using jumpers S3/S2/S1/S0
-	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	f4702_device &brg(F4702(config, "brg", 2.4576_MHz_XTAL));
+	brg.s_callback().set_ioport("BAUD");
+	brg.z_callback().set("acia", FUNC(acia6850_device::write_txc));
+	brg.z_callback().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(altair_state::quickload_cb));

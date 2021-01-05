@@ -44,7 +44,7 @@ T8 (Plymate Amsterdam)
 - 32KB ROM, rest similar to A0
 
 A3 (Plymate Victoria)
-- W65C02S8P-14(14? probably replaced chip from a repair) @ 6.144Mhz (12.288MHz XTAL)
+- W65C02S8P-14(14? probably replaced chip from a repair) @ 6.144MHz (12.288MHz XTAL)
 - 32KB ROM, rest similar to A0
 
 Library modules:

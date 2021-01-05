@@ -48,7 +48,7 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_nvram_interface> nvram_interface_iterator;
+typedef device_interface_enumerator<device_nvram_interface> nvram_interface_enumerator;
 
 
 #endif  /* MAME_EMU_DINVRAM */

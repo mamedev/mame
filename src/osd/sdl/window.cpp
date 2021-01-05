@@ -475,7 +475,7 @@ void sdl_window_info::destroy()
 
 	// free the render target, after the textures!
 	machine().render().target_free(m_target);
-
+	m_target = nullptr;
 }
 
 
@@ -607,7 +607,7 @@ void sdl_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_iterator(machine().root_device()).byindex(m_index);
+				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(m_index);
 				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else
@@ -681,9 +681,13 @@ int sdl_window_info::complete_create()
 		temp = m_windowed_dim;
 	}
 	else if (m_startmaximized)
-		temp = get_max_bounds(video_config.keepaspect );
+	{
+		temp = get_max_bounds(keepaspect());
+	}
 	else
-		temp = get_min_bounds(video_config.keepaspect );
+	{
+		temp = get_min_bounds(keepaspect());
+	}
 
 	// create the window .....
 

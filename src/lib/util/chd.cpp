@@ -2218,6 +2218,7 @@ void chd_file::decompress_v5_map()
 			// pseudo-types; convert into base types
 			case COMPRESSION_SELF_1:
 				last_self++;
+				[[fallthrough]];
 			case COMPRESSION_SELF_0:
 				rawmap[0] = COMPRESSION_SELF;
 				offset = last_self;
@@ -2230,6 +2231,7 @@ void chd_file::decompress_v5_map()
 
 			case COMPRESSION_PARENT_1:
 				last_parent += m_hunkbytes / m_unitbytes;
+				[[fallthrough]];
 			case COMPRESSION_PARENT_0:
 				rawmap[0] = COMPRESSION_PARENT;
 				offset = last_parent;

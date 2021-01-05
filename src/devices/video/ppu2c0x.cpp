@@ -135,7 +135,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 
 ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
-	m_palette_data(*this, "palette", 0xc0)
+	m_palette_data(*this, "palette")
 {
 }
 
@@ -201,7 +201,7 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* 
 // Vs. Unisystem (Super Mario Bros. bootlegs)
 ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
-	m_palette_data(*this, "palette", 0x100)
+	m_palette_data(*this, "palette")
 {
 	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
 	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;

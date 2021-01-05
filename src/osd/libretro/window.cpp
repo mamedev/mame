@@ -404,7 +404,7 @@ int retro_window_info::window_init()
 	
 	oldfps=retro_fps;
 
-    const screen_device *primary_screen = screen_device_iterator(machine().root_device()).first();
+    const screen_device *primary_screen = screen_device_enumerator(machine().root_device()).first();
 
     if (primary_screen != nullptr){
         retro_fps = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -591,7 +591,7 @@ void retro_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_iterator(machine().root_device()).byindex(m_index);
+				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(m_index);
 				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else
@@ -665,9 +665,9 @@ int retro_window_info::complete_create()
 		temp = m_windowed_dim;
 	}
 	else if (m_startmaximized)
-		temp = get_max_bounds(video_config.keepaspect );
+		temp = get_max_bounds(keepaspect());
 	else
-		temp = get_min_bounds(video_config.keepaspect );
+		temp = get_min_bounds(keepaspect());
 
 	// create the window .....
 

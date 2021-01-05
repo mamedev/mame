@@ -18,6 +18,7 @@
 #include "video/rgbutil.h"
 
 #include "nanosvg.h"
+#include "unicode.h"
 #include "vecstream.h"
 #include "xmlfile.h"
 
@@ -86,7 +87,7 @@ constexpr layout_group::transform identity_transform{{ {{ 1.0F, 0.0F, 0.0F }}, {
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  HELPERS
 //**************************************************************************
 
 inline void render_bounds_transform(render_bounds &bounds, layout_group::transform const &trans)
@@ -133,7 +134,7 @@ class layout_reference_error : public std::out_of_range { using std::out_of_rang
 } // anonymous namespace
 
 
-namespace emu { namespace render { namespace detail {
+namespace emu::render::detail {
 
 class layout_environment
 {
@@ -415,7 +416,7 @@ private:
 			try_insert("deviceshortname", device().shortname());
 			util::ovectorstream tmp;
 			unsigned i(0U);
-			for (screen_device const &screen : screen_device_iterator(machine().root_device()))
+			for (screen_device const &screen : screen_device_enumerator(machine().root_device()))
 			{
 				std::pair<u64, u64> const physaspect(screen.physical_aspect());
 				s64 const w(screen.visible_area().width()), h(screen.visible_area().height());
@@ -950,7 +951,7 @@ public:
 	u32 visibility_mask() const { return m_visibility_mask; }
 };
 
-} } } // namespace emu::render::detail
+} // namespace emu::render::detail
 
 
 namespace {
@@ -1165,7 +1166,7 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(env, *compnode)));
+		component const &newcomp(*m_complist.emplace_back(make_func->second(env, *compnode)));
 
 		// accumulate bounds
 		if (first)
@@ -2295,7 +2296,7 @@ protected:
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
-		draw_text(*font, dest, bounds, m_string.c_str(), m_textalign, color(state));
+		draw_text(*font, dest, bounds, m_string, m_textalign, color(state));
 	}
 
 private:
@@ -2985,7 +2986,7 @@ protected:
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		auto font = machine.render().font_alloc("default");
-		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state).c_str(), m_textalign, color(state));
+		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state), m_textalign, color(state));
 	}
 
 private:
@@ -3137,18 +3138,13 @@ protected:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-					const char *origs = m_stopnames[fruit].c_str();
-					const char *ends = origs + strlen(origs);
-					const char *s = origs;
-					char32_t schar;
-
 					// get the width of the string
 					float aspect = 1.0f;
 					s32 width;
 
 					while (1)
 					{
-						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
+						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
 						aspect *= 0.9f;
@@ -3157,9 +3153,11 @@ protected:
 					s32 curx = bounds.left() + (bounds.width() - width) / 2;
 
 					// loop over characters
-					while (*s != 0)
+					std::string_view s = m_stopnames[fruit];
+					while (!s.empty())
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						char32_t schar;
+						int scharcount = uchar_from_utf8(&schar, s);
 
 						if (scharcount == -1)
 							break;
@@ -3199,7 +3197,7 @@ protected:
 
 						// advance in the X direction
 						curx += font->char_width(ourheight/num_shown, aspect, schar);
-						s += scharcount;
+						s.remove_prefix(scharcount);
 					}
 				}
 			}
@@ -3294,7 +3292,7 @@ private:
 					s32 width;
 					while (1)
 					{
-						width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
+						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
 						aspect *= 0.9f;
@@ -3305,15 +3303,12 @@ private:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-					const char *origs = m_stopnames[fruit].c_str();
-					const char *ends = origs + strlen(origs);
-					const char *s = origs;
-					char32_t schar;
-
 					// loop over characters
-					while (*s != 0)
+					std::string_view s = m_stopnames[fruit];
+					while (!s.empty())
 					{
-						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+						char32_t schar;
+						int scharcount = uchar_from_utf8(&schar, s);
 
 						if (scharcount == -1)
 							break;
@@ -3353,7 +3348,7 @@ private:
 
 						// advance in the X direction
 						curx += font->char_width(dest.height(), aspect, schar);
-						s += scharcount;
+						s.remove_prefix(scharcount);
 					}
 				}
 			}
@@ -3650,7 +3645,7 @@ void layout_element::component::draw_text(
 		render_font &font,
 		bitmap_argb32 &dest,
 		const rectangle &bounds,
-		const char *str,
+		std::string_view str,
 		int align,
 		const render_color &color)
 {
@@ -3696,15 +3691,10 @@ void layout_element::component::draw_text(
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 	// loop over characters
-	const char *origs = str;
-	const char *ends = origs + strlen(origs);
-	const char *s = origs;
-	char32_t schar;
-
-	// loop over characters
-	while (*s != 0)
+	while (!str.empty())
 	{
-		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+		char32_t schar;
+		int scharcount = uchar_from_utf8(&schar, str);
 
 		if (scharcount == -1)
 			break;
@@ -3743,7 +3733,7 @@ void layout_element::component::draw_text(
 
 		// advance in the X direction
 		curx += font.char_width(bounds.height(), aspect, schar);
-		s += scharcount;
+		str.remove_prefix(scharcount);
 	}
 }
 
@@ -3950,9 +3940,9 @@ layout_view::layout_view(
 		util::xml::data_node const &viewnode,
 		element_map &elemmap,
 		group_map &groupmap)
-	: m_name(make_name(env, viewnode))
-	, m_effaspect(1.0f)
-	, m_items()
+	: m_effaspect(1.0f)
+	, m_name(make_name(env, viewnode))
+	, m_unqualified_name(env.get_attribute_string(viewnode, "name", ""))
 	, m_defvismask(0U)
 	, m_has_art(false)
 {
@@ -4039,6 +4029,16 @@ layout_view::layout_view(
 		m_items.splice(m_items.end(), layers.marquees);
 	}
 
+	// index items with keys supplied
+	for (item &curitem : m_items)
+	{
+		if (!curitem.id().empty())
+		{
+			if (!m_items_by_id.emplace(curitem.id(), curitem).second)
+				throw layout_syntax_error("view contains item with duplicate id attribute");
+		}
+	}
+
 	// calculate metrics
 	recompute(default_visibility_mask(), false);
 	for (group_map::value_type &group : groupmap)
@@ -4056,8 +4056,19 @@ layout_view::~layout_view()
 
 
 //-------------------------------------------------
+//  get_item - get item by ID
+//-------------------------------------------------
+
+layout_view::item *layout_view::get_item(std::string const &id)
+{
+	auto const found(m_items_by_id.find(id));
+	return (m_items_by_id.end() != found) ? &found->second : nullptr;
+}
+
+
+//-------------------------------------------------
 //  has_screen - return true if this view contains
-//  the given screen
+//  the specified screen
 //-------------------------------------------------
 
 bool layout_view::has_screen(screen_device &screen)
@@ -4162,7 +4173,8 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// normalize all the item bounds
 	for (item &curitem : items())
 	{
-		curitem.m_bounds = curitem.m_rawbounds;
+		assert(curitem.m_rawbounds.size() == curitem.m_bounds.size());
+		std::copy(curitem.m_rawbounds.begin(), curitem.m_rawbounds.end(), curitem.m_bounds.begin());
 		normalize_bounds(curitem.m_bounds, target_bounds.x0, target_bounds.y0, xoffs, yoffs, xscale, yscale);
 	}
 
@@ -4192,7 +4204,45 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 		for (edge const &e : m_interactive_edges_y)
 			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
+
+	// additional actions typically supplied by script
+	if (!m_recomputed.isnull())
+		m_recomputed();
 }
+
+
+//-------------------------------------------------
+//  set_prepare_items_callback - set handler called
+//  before adding items to render target
+//-------------------------------------------------
+
+void layout_view::set_prepare_items_callback(prepare_items_delegate &&handler)
+{
+	m_prepare_items = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_preload_callback - set handler called
+//  after preloading elements
+//-------------------------------------------------
+
+void layout_view::set_preload_callback(preload_delegate &&handler)
+{
+	m_preload = std::move(handler);
+}
+
+
+//-------------------------------------------------
+//  set_recomputed_callback - set handler called
+//  after recomputing item bounds
+//-------------------------------------------------
+
+void layout_view::set_recomputed_callback(recomputed_delegate &&handler)
+{
+	m_recomputed = std::move(handler);
+}
+
 
 //-------------------------------------------------
 //  preload - perform expensive loading upfront
@@ -4206,6 +4256,9 @@ void layout_view::preload()
 		if (curitem.element())
 			curitem.element()->preload();
 	}
+
+	if (!m_preload.isnull())
+		m_preload();
 }
 
 
@@ -4389,8 +4442,8 @@ void layout_view::add_items(
 std::string layout_view::make_name(layout_environment &env, util::xml::data_node const &viewnode)
 {
 	char const *const name(env.get_attribute_string(viewnode, "name", nullptr));
-	if (!name)
-		throw layout_syntax_error("view must have name attribute");
+	if (!name || !*name)
+		throw layout_syntax_error("view must have non-empty name attribute");
 
 	if (env.is_root_device())
 	{
@@ -4425,31 +4478,33 @@ layout_view::item::item(
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
-	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
 	, m_animinput_port(nullptr)
+	, m_elem_state(m_element ? m_element->default_state() : 0)
 	, m_animmask(make_animmask(env, itemnode))
 	, m_animshift(get_state_shift(m_animmask))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
 	, m_input_shift(get_state_shift(m_input_mask))
-	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
 	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
 	, m_color(make_color(env, itemnode, color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
+	, m_id(env.get_attribute_string(itemnode, "id", ""))
 	, m_input_tag(make_input_tag(env, itemnode))
 	, m_animinput_tag(make_animinput_tag(env, itemnode))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
+	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
+	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
+	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
 	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
-		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
+		m_screen = screen_device_enumerator(env.machine().root_device()).byindex(index);
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -4470,6 +4525,10 @@ layout_view::item::item(
 	{
 		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
+
+	// this can be called before resolving tags, make it return something valid
+	m_bounds = m_rawbounds;
+	m_get_bounds = bounds_delegate(&emu::render::detail::bounds_step::get, &m_bounds.front());
 }
 
 
@@ -4483,70 +4542,68 @@ layout_view::item::~item()
 
 
 //-------------------------------------------------
-//  bounds - get bounds for current state
+//  set_element_state_callback - set callback to
+//  obtain element state value
 //-------------------------------------------------
 
-render_bounds layout_view::item::bounds() const
+void layout_view::item::set_element_state_callback(state_delegate &&handler)
 {
-	if (m_bounds.size() == 1U)
-		return m_bounds.front().bounds;
+	if (!handler.isnull())
+		m_get_elem_state = std::move(handler);
 	else
-		return interpolate_bounds(m_bounds, animation_state());
+		m_get_elem_state = default_get_elem_state();
 }
 
 
 //-------------------------------------------------
-//  color - get color for current state
+//  set_animation_state_callback - set callback to
+//  obtain animation state
 //-------------------------------------------------
 
-render_color layout_view::item::color() const
+void layout_view::item::set_animation_state_callback(state_delegate &&handler)
 {
-	if (m_color.size() == 1U)
-		return m_color.front().color;
+	if (!handler.isnull())
+		m_get_anim_state = std::move(handler);
 	else
-		return interpolate_color(m_color, animation_state());
+		m_get_anim_state = default_get_anim_state();
 }
 
 
 //-------------------------------------------------
-//  state - fetch state based on configured source
+//  set_bounds_callback - set callback to obtain
+//  bounds
 //-------------------------------------------------
 
-int layout_view::item::state() const
+void layout_view::item::set_bounds_callback(bounds_delegate &&handler)
 {
-	assert(m_element);
-
-	if (m_have_output)
-	{
-		// if configured to track an output, fetch its value
-		return m_output;
-	}
-	else if (m_input_port)
-	{
-		// if configured to an input, fetch the input value
-		if (m_input_raw)
-		{
-			return (m_input_port->read() & m_input_mask) >> m_input_shift;
-		}
-		else
-		{
-			ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
-			if (field)
-				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-		}
-	}
-
-	// default to zero
-	return 0;
+	if (!handler.isnull())
+		m_get_bounds = std::move(handler);
+	else
+		m_get_bounds = default_get_bounds();
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
+//  set_color_callback - set callback to obtain
+//  color
+//-------------------------------------------------
+
+void layout_view::item::set_color_callback(color_delegate &&handler)
+{
+	if (!handler.isnull())
+		m_get_color = std::move(handler);
+	else
+		m_get_color = default_get_color();
+}
+
+
+//-------------------------------------------------
 //  resolve_tags - resolve tags, if any are set
-//---------------------------------------------
+//-------------------------------------------------
 
 void layout_view::item::resolve_tags()
 {
+	// resolve element state output and set default value
 	if (m_have_output)
 	{
 		m_output.resolve();
@@ -4554,12 +4611,15 @@ void layout_view::item::resolve_tags()
 			m_output = m_element->default_state();
 	}
 
+	// resolve animation state output
 	if (m_have_animoutput)
 		m_animoutput.resolve();
 
+	// resolve animation state input
 	if (!m_animinput_tag.empty())
 		m_animinput_port = m_element->machine().root_device().ioport(m_animinput_tag);
 
+	// resolve element state input
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
@@ -4581,27 +4641,179 @@ void layout_view::item::resolve_tags()
 				m_clickthrough = false;
 		}
 	}
+
+	// choose optimal handlers
+	m_get_elem_state = default_get_elem_state();
+	m_get_anim_state = default_get_anim_state();
+	m_get_bounds = default_get_bounds();
+	m_get_color = default_get_color();
 }
 
 
-//---------------------------------------------
-//  find_element - find element definition
-//---------------------------------------------
+//-------------------------------------------------
+//  default_get_elem_state - get default element
+//  state handler
+//-------------------------------------------------
 
-inline int layout_view::item::animation_state() const
+layout_view::item::state_delegate layout_view::item::default_get_elem_state()
+{
+	if (m_have_output)
+		return state_delegate(&item::get_output, this);
+	else if (!m_input_port)
+		return state_delegate(&item::get_state, this);
+	else if (m_input_raw)
+		return state_delegate(&item::get_input_raw, this);
+	else if (m_input_field)
+		return state_delegate(&item::get_input_field_cached, this);
+	else
+		return state_delegate(&item::get_input_field_conditional, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_anim_state - get default animation
+//  state handler
+//-------------------------------------------------
+
+layout_view::item::state_delegate layout_view::item::default_get_anim_state()
 {
 	if (m_have_animoutput)
-		return (s32(m_animoutput) & m_animmask) >> m_animshift;
+		return state_delegate(&item::get_anim_output, this);
 	else if (m_animinput_port)
-		return (m_animinput_port->read() & m_animmask) >> m_animshift;
+		return state_delegate(&item::get_anim_input, this);
 	else
-		return state();
+		return default_get_elem_state();
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
+//  default_get_bounds - get default bounds handler
+//-------------------------------------------------
+
+layout_view::item::bounds_delegate layout_view::item::default_get_bounds()
+{
+	return (m_bounds.size() == 1U)
+			? bounds_delegate(&emu::render::detail::bounds_step::get, &m_bounds.front())
+			: bounds_delegate(&item::get_interpolated_bounds, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_color - get default color handler
+//-------------------------------------------------
+
+layout_view::item::color_delegate layout_view::item::default_get_color()
+{
+	return (m_color.size() == 1U)
+			? color_delegate(&emu::render::detail::color_step::get, &const_cast<emu::render::detail::color_step &>(m_color.front()))
+			: color_delegate(&item::get_interpolated_color, this);
+}
+
+
+//-------------------------------------------------
+//  get_state - get state when no bindings
+//-------------------------------------------------
+
+int layout_view::item::get_state() const
+{
+	return m_elem_state;
+}
+
+
+//-------------------------------------------------
+//  get_output - get element state output
+//-------------------------------------------------
+
+int layout_view::item::get_output() const
+{
+	assert(m_have_output);
+	return int(s32(m_output));
+}
+
+
+//-------------------------------------------------
+//  get_input_raw - get element state input
+//-------------------------------------------------
+
+int layout_view::item::get_input_raw() const
+{
+	assert(m_input_port);
+	return int(std::make_signed_t<ioport_value>((m_input_port->read() & m_input_mask) >> m_input_shift));
+}
+
+
+//-------------------------------------------------
+//  get_input_field_cached - element state
+//-------------------------------------------------
+
+int layout_view::item::get_input_field_cached() const
+{
+	assert(m_input_port);
+	assert(m_input_field);
+	return ((m_input_port->read() ^ m_input_field->defvalue()) & m_input_mask) ? 1 : 0;
+}
+
+
+//-------------------------------------------------
+//  get_input_field_conditional - element state
+//-------------------------------------------------
+
+int layout_view::item::get_input_field_conditional() const
+{
+	assert(m_input_port);
+	assert(!m_input_field);
+	ioport_field const *const field(m_input_port->field(m_input_mask));
+	return (field && ((m_input_port->read() ^ field->defvalue()) & m_input_mask)) ? 1 : 0;
+}
+
+
+//-------------------------------------------------
+//  get_anim_output - get animation output
+//-------------------------------------------------
+
+int layout_view::item::get_anim_output() const
+{
+	assert(m_have_animoutput);
+	return int(unsigned((u32(s32(m_animoutput) & m_animmask) >> m_animshift)));
+}
+
+
+//-------------------------------------------------
+//  get_anim_input - get animation input
+//-------------------------------------------------
+
+int layout_view::item::get_anim_input() const
+{
+	assert(m_animinput_port);
+	return int(std::make_signed_t<ioport_value>((m_animinput_port->read() & m_animmask) >> m_animshift));
+}
+
+
+//-------------------------------------------------
+//  get_interpolated_bounds - animated bounds
+//-------------------------------------------------
+
+void layout_view::item::get_interpolated_bounds(render_bounds &result) const
+{
+	assert(m_bounds.size() > 1U);
+	result = interpolate_bounds(m_bounds, m_get_anim_state());
+}
+
+
+//-------------------------------------------------
+//  get_interpolated_color - animated color
+//-------------------------------------------------
+
+void layout_view::item::get_interpolated_color(render_color &result) const
+{
+	assert(m_color.size() > 1U);
+	result = interpolate_color(m_color, m_get_anim_state());
+}
+
+
+//-------------------------------------------------
 //  find_element - find element definition
-//---------------------------------------------
+//-------------------------------------------------
 
 layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
@@ -4618,9 +4830,9 @@ layout_element *layout_view::item::find_element(view_environment &env, util::xml
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  make_bounds - get transformed bounds
-//---------------------------------------------
+//-------------------------------------------------
 
 layout_view::item::bounds_vector layout_view::item::make_bounds(
 		view_environment &env,
@@ -4651,9 +4863,9 @@ layout_view::item::bounds_vector layout_view::item::make_bounds(
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  make_color - get color inflection points
-//---------------------------------------------
+//-------------------------------------------------
 
 layout_view::item::color_vector layout_view::item::make_color(
 		view_environment &env,
@@ -4685,10 +4897,9 @@ layout_view::item::color_vector layout_view::item::make_color(
 }
 
 
-//---------------------------------------------
-//  make_animoutput_tag - get animation output
-//  tag
-//---------------------------------------------
+//-------------------------------------------------
+//  make_animoutput_tag - get animation output tag
+//-------------------------------------------------
 
 std::string layout_view::item::make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
@@ -4700,9 +4911,9 @@ std::string layout_view::item::make_animoutput_tag(view_environment &env, util::
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  make_animmask - get animation state mask
-//---------------------------------------------
+//-------------------------------------------------
 
 ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::data_node const &itemnode)
 {
@@ -4711,10 +4922,10 @@ ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  make_animinput_tag - get absolute tag for
 //  animation input
-//---------------------------------------------
+//-------------------------------------------------
 
 std::string layout_view::item::make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
@@ -4724,9 +4935,9 @@ std::string layout_view::item::make_animinput_tag(view_environment &env, util::x
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  make_input_tag - get absolute input tag
-//---------------------------------------------
+//-------------------------------------------------
 
 std::string layout_view::item::make_input_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
@@ -4735,9 +4946,9 @@ std::string layout_view::item::make_input_tag(view_environment &env, util::xml::
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  get_blend_mode - explicit or implicit blend
-//---------------------------------------------
+//-------------------------------------------------
 
 int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_node const &itemnode)
 {
@@ -4767,9 +4978,9 @@ int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_nod
 }
 
 
-//---------------------------------------------
+//-------------------------------------------------
 //  get_state_shift - shift to right-align LSB
-//---------------------------------------------
+//-------------------------------------------------
 
 unsigned layout_view::item::get_state_shift(ioport_value mask)
 {
@@ -4814,7 +5025,8 @@ layout_file::layout_file(
 		util::xml::data_node const &rootnode,
 		char const *searchpath,
 		char const *dirname)
-	: m_elemmap()
+	: m_device(device)
+	, m_elemmap()
 	, m_viewlist()
 {
 	try
@@ -4851,6 +5063,14 @@ layout_file::layout_file(
 				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name", ""), err.what());
 			}
 		}
+
+		// load the content of the first script node
+		if (!m_viewlist.empty())
+		{
+			util::xml::data_node const *const scriptnode = mamelayoutnode->get_child("script");
+			if (scriptnode)
+				emulator_info::layout_script_cb(*this, scriptnode->get_value());
+		}
 	}
 	catch (layout_syntax_error const &err)
 	{
@@ -4866,6 +5086,31 @@ layout_file::layout_file(
 
 layout_file::~layout_file()
 {
+}
+
+
+//-------------------------------------------------
+//  resolve_tags - resolve tags
+//-------------------------------------------------
+
+void layout_file::resolve_tags()
+{
+	for (layout_view &view : views())
+		view.resolve_tags();
+
+	if (!m_resolve_tags.isnull())
+		m_resolve_tags();
+}
+
+
+//-------------------------------------------------
+//  set_resolve_tags_callback - set callback for
+//  additional tasks after resolving tags
+//-------------------------------------------------
+
+void layout_file::set_resolve_tags_callback(resolve_tags_delegate &&handler)
+{
+	m_resolve_tags = std::move(handler);
 }
 
 

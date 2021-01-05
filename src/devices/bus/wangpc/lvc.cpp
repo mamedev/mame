@@ -164,7 +164,7 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_LVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
-	m_video_ram(*this, "video_ram"),
+	m_video_ram(*this, "video_ram", RAM_SIZE, ENDIANNESS_LITTLE),
 	m_option(0), m_scroll(0),
 	m_irq(CLEAR_LINE)
 {
@@ -177,9 +177,6 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 
 void wangpc_lvc_device::device_start()
 {
-	// allocate memory
-	m_video_ram.allocate(RAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_option));
 	save_item(NAME(m_scroll));

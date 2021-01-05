@@ -227,6 +227,6 @@ protected:
 	}
 };
 
-typedef device_interface_iterator<device_slot_interface> slot_interface_iterator;
+typedef device_interface_enumerator<device_slot_interface> slot_interface_enumerator;
 
 #endif // MAME_EMU_DISLOT_H

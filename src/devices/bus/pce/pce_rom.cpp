@@ -214,6 +214,7 @@ void pce_tennokoe_device::write_cart(offs_t offset, uint8_t data)
 			// TODO: lock/unlock mechanism is a complete guess, needs real HW study
 			// (writes to ports $c0000, $d0000, $f0000)
 			m_bram_locked = (data == 0);
+			[[fallthrough]];
 		default:
 			logerror("tennokoe: ROM writing at %06x %02x\n",offset,data);
 			break;

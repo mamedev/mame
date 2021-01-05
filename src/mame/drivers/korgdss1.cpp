@@ -513,7 +513,7 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	m_msrkcpu->out_iow_cb<1>().set(m_scsic, FUNC(ncr53c80_device::dma_w));
 	m_msrkcpu->out_eop_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	//m_msrkcpu->out_eop_cb().append(m_scsic, FUNC(ncr53c80_device::eop_w));
-	m_msrkcpu->out_handler<1>().set(m_msrkcpu, FUNC(v40_device::tclk_w));
+	m_msrkcpu->tout1_cb().set(m_msrkcpu, FUNC(v40_device::tclk_w));
 
 	klm780(config);
 	config.device_remove("cpu1");

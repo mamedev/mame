@@ -25,11 +25,12 @@ void pastelg_state::romsel_w(uint8_t data)
 	m_palbank = ((data & 0x10) >> 4);
 	m_nb1413m3->sndrombank1_w(data);
 
-	if ((m_gfxbank << 16) > m_blitter_rom.mask())
+	if ((m_gfxbank << 16) >= m_blitter_rom.length())
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
+		// FIXME: this isn't a power-of-two size, subtracting 1 doesn't generate a valid mask
 		m_gfxbank &= (m_blitter_rom.length() / 0x20000 - 1);
 	}
 }
@@ -185,7 +186,7 @@ void pastelg_common_state::gfxdraw()
 		{
 			gfxaddr = (m_gfxbank << 16) + ((m_blitter_src_addr + count));
 
-			if (gfxaddr > m_blitter_rom.mask())
+			if (gfxaddr >= m_blitter_rom.length())
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");

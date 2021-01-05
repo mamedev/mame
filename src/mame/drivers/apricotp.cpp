@@ -97,8 +97,7 @@ public:
 		, m_floppy1(*this, WD2797_TAG":1")
 		, m_floppy(nullptr)
 		, m_centronics(*this, CENTRONICS_TAG)
-		, m_work_ram(*this, "work_ram")
-		, m_video_ram(*this, "video_ram")
+		, m_video_ram(*this, "video_ram", 0x20000, ENDIANNESS_LITTLE)
 	{ }
 
 	void fp(machine_config &config);
@@ -139,10 +138,10 @@ private:
 
 	void lat_ls259_w(offs_t offset, int state);
 
-	optional_shared_ptr<uint16_t> m_work_ram;
+	uint16_t *m_work_ram;
 
 	// video state
-	optional_shared_ptr<uint16_t> m_video_ram;
+	memory_share_creator<uint16_t> m_video_ram;
 	uint8_t m_video;
 
 	int m_centronics_busy;
@@ -168,8 +167,6 @@ private:
 
 void fp_state::video_start()
 {
-	// allocate memory
-	m_video_ram.allocate(0x20000);
 }
 
 MC6845_UPDATE_ROW( fp_state::update_row )
@@ -535,7 +532,7 @@ WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
 void fp_state::machine_start()
 {
 	// allocate memory
-	m_work_ram.allocate(m_ram->size() / 2);
+	m_work_ram = reinterpret_cast<uint16_t *>(m_ram->pointer());
 }
 
 

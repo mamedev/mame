@@ -18,7 +18,7 @@
 #include "machine/wd33c9x.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -132,7 +132,7 @@ private:
 	required_ioport m_jp201;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A590,  bus::amiga::zorro, a590_device)

@@ -38,7 +38,7 @@ void ondra_state::update_banks()
 	{
 		if (BIT(m_bank_status, 0))
 		{
-			space.install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_write_bank(0x0000, 0x3fff, m_bank1);
 			m_bank1->set_base(r);
 		}
 		else
@@ -57,7 +57,7 @@ void ondra_state::update_banks()
 		}
 		else
 		{
-			space.install_readwrite_bank(0xe000, 0xffff, "bank3");
+			space.install_readwrite_bank(0xe000, 0xffff, m_bank3);
 			m_bank3->set_base(r + 0xe000);
 		}
 	}

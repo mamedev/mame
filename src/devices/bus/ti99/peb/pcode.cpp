@@ -88,7 +88,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
@@ -356,4 +356,4 @@ ioport_constructor ti_pcode_card_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_pcode );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

@@ -454,10 +454,12 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 	{
 		case 0x1000:
 			return m_irq_count & 0xff;
-			set_irq_line(CLEAR_LINE);
+			set_irq_line(CLEAR_LINE); // FIXME: unreachable
+			[[fallthrough]];
 		case 0x1800:
 			return (m_irq_count >> 8) & 0xff;
-			set_irq_line(CLEAR_LINE);
+			set_irq_line(CLEAR_LINE); // FIXME: unreachable
+			[[fallthrough]];
 		default:
 			return 0x00;
 	}

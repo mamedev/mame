@@ -585,6 +585,7 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 					logerror("%s: CMOS low-power halt mode enabled\n", tag());
 			}
 			data &= ~0x20;
+			[[fallthrough]];
 		case 0x13:
 			// d0-d4: prescaler reload value
 			// d5: t2: cascade from t1

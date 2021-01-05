@@ -45,7 +45,7 @@ public:
 		m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_restore(*this, "RESTORE"),
 		m_lock(*this, "LOCK")
@@ -63,7 +63,7 @@ private:
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport m_restore;
 	required_ioport m_lock;
@@ -604,9 +604,6 @@ WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
 
 void vic10_state::machine_start()
 {
-	// allocate memory
-	m_color_ram.allocate(0x400);
-
 	// initialize memory
 	uint8_t data = 0xff;
 

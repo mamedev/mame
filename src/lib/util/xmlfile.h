@@ -7,11 +7,10 @@
     XML file parsing code.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_LIB_UTIL_XMLFILE_H
 #define MAME_LIB_UTIL_XMLFILE_H
+
+#pragma once
 
 #include "osdcore.h"
 #include "corefile.h"
@@ -25,7 +24,7 @@
 struct XML_ParserStruct;
 
 
-namespace util { namespace xml {
+namespace util::xml {
 
 /***************************************************************************
     CONSTANTS
@@ -246,6 +245,6 @@ private:
 /* normalize a string into something that can be written to an XML file */
 const char *normalize_string(const char *string);
 
-} } // namespace util::xml
+} // namespace util::xml
 
-#endif  /* MAME_LIB_UTIL_XMLFILE_H */
+#endif // MAME_LIB_UTIL_XMLFILE_H

@@ -946,6 +946,7 @@ uint32_t dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 
 	switch (m_hanamai_priority)
 	{
 		default:    popmessage("unknown priority %02x", m_hanamai_priority);
+		[[fallthrough]]; // FIXME: really?
 		case 0x10:  lay[0] = 0; lay[1] = 1; lay[2] = 2; lay[3] = 3; break;
 		case 0x11:  lay[0] = 0; lay[1] = 3; lay[2] = 2; lay[3] = 1; break;
 		case 0x12:  lay[0] = 0; lay[1] = 1; lay[2] = 3; lay[3] = 2; break;

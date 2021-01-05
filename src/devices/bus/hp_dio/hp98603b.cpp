@@ -13,8 +13,7 @@ DEFINE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device, "dio98603b
 
 #define HP98603B_ROM_REGION    "98603b_rom"
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 ROM_START(hp98603b)
 	ROM_REGION(0x100000, HP98603B_ROM_REGION, 0)
@@ -76,4 +75,3 @@ void dio16_98603b_device::rom_w(offs_t offset, uint16_t data)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

@@ -15,7 +15,7 @@
 #pragma once
 #include "cartridges.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_multi_cart_conn_device : public cartridge_connector_device
 {
@@ -55,7 +55,7 @@ private:
 	int     get_active_slot(bool changebase, offs_t offset);
 };
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::gromport, ti99_multi_cart_conn_device)
 

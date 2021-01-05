@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* 'Zone' systems */
+// JungleTac developed systems sold by under the 'Zone' and 'Wireless' brands these are mostly higer capacity (60+ game) units
+// also Waixing developed systems for the lower capacity (~40 game) units
 
 #include "emu.h"
 #include "includes/spg2xx.h"
@@ -303,14 +304,7 @@ ROM_START( zone40 )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
 ROM_END
 
-ROM_START( reactmd )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 ) // this contains the SunPlus games
-	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
-	ROM_IGNORE(0x4000000) // the 2nd half of the ROM can't be accessed by the PCB (address line tied low) (contains garbage? data)
 
-	ROM_REGION( 0x2000000, "mdrom", ROMREGION_ERASE00 ) // this contains the MD games and main boot menu
-	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
-ROM_END
 
 ROM_START( itvg49 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
@@ -358,6 +352,11 @@ ROM_START( react )
 	ROM_CONTINUE(0x3800000, 0x0800000)
 ROM_END
 
+ROM_START( lx_jg7410 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "55lv100.u4", 0x0000, 0x8000000, CRC(60476576) SHA1(83592e43d9169c95f6b22903e8d708e96ad02611) )
+ROM_END
+
 // These have games from Waixing and were likely manufactured  by Subor and sold by Ultimate Products Ltd.
 // Many of these games are rewrites of VT1682 based titles, which in turn were based on older NES/VT ones
 // Badminton hangs in units where it is present (cause not yet investigated), otherwise everything runs
@@ -369,10 +368,6 @@ CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactm
 CONS( 200?, zonemini, 0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Mini",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2009, react,    0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Reactor 32-in-1 (NTSC)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.
-// This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.
-// Badminton hangs, as it does in the 49-in-1 above
-CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega / Waixing",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // These have a newer selection of games by JungleTac instead of the Waixing ones
 
@@ -380,5 +375,6 @@ CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,
 CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Kids Station Toys Inc / Jungle Soft",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook / JungleTac",                        "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, lx_jg7410,0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Lexibook / JungleTac",                        "Lexibook JG7410 100-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // (c)2012 and JG7410_01 on box, JG7410 in other places
 
 

@@ -9,10 +9,7 @@
 
 #include <type_traits>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	template <typename D>
 	NETLIB_OBJECT(74125_base)
@@ -77,5 +74,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(74125,     "TTL_74125_GATE",     "")
 	NETLIB_DEVICE_IMPL(74126,     "TTL_74126_GATE",     "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

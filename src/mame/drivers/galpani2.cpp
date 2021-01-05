@@ -85,7 +85,6 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-
 /***************************************************************************
 
 
@@ -135,7 +134,6 @@ void galpani2_state::machine_start()
 	save_item(NAME(m_eeprom_word));
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));
-
 }
 
 void galpani2_state::machine_reset()
@@ -188,85 +186,45 @@ void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 
 void galpani2_state::galpani2_mcu_nmi1()
 {
-	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
-	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	uint32_t mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
+	address_space &mspace = m_maincpu->space(AS_PROGRAM);
+	address_space &sspace = m_subcpu->space(AS_PROGRAM);
 
-	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
-	{
-		mcu_command     =   srcspace.read_byte(mcu_list);
+	uint8_t len = mspace.read_byte(0x100020);
+	for(uint8_t slot = 0; slot < len; slot += 4) {
+		uint8_t command = mspace.read_byte(0x100021 + slot);
+		uint32_t address = 0x100000 | mspace.read_word(0x100022 + slot);
 
-		mcu_address     =   0x100000 +
-							(srcspace.read_byte(mcu_list + 1)<<8) +
-							(srcspace.read_byte(mcu_list + 2)<<0) ;
-
-		mcu_extra       =   srcspace.read_byte(mcu_list + 3); //0xff for command $A and $2, 0x02 for others
-
-		if (mcu_command != 0)
+		switch (command)
 		{
-			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
-			machine().describe_context(),
-			mcu_list,
-			srcspace.read_byte(0x100020),
-			mcu_command,
-			mcu_address,
-			mcu_extra
-			);
+		case 0x02: { //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
+			uint16_t src  = mspace.read_word(address + 2);
+			uint16_t dst  = mspace.read_word(address + 6);
+			uint16_t size = mspace.read_word(address + 8);
+			logerror("MCU master %02x:%06x copy s:%04x, m:%04x, size:%04x\n", slot, address, src, dst, size);
+
+			for(uint16_t i = 0; i != size; i++)
+			{
+				mspace.write_byte(0x100000 + dst, sspace.read_byte(0x100000 + src));
+				src ++;
+				dst ++;
+			}
+			break;
 		}
 
-		switch (mcu_command)
-		{
-		case 0x00:
-			break;
+		case 0x0a: { // Copy N bytes from RAM1 to RAM2
+			uint16_t src  = mspace.read_word(address + 2);
+			uint16_t dst  = mspace.read_word(address + 6);
+			uint16_t size = mspace.read_word(address + 8);
+			logerror("MCU master %02x:%06x copy m:%04x, s:%04x, size:%04x\n", slot, address, src, dst, size);
 
-		case 0x02: //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
-			mcu_src     =   (srcspace.read_byte(mcu_address + 2)<<8) +
-							(srcspace.read_byte(mcu_address + 3)<<0) ;
-
-			mcu_dst     =   (srcspace.read_byte(mcu_address + 6)<<8) +
-							(srcspace.read_byte(mcu_address + 7)<<0) ;
-
-			mcu_size    =   (srcspace.read_byte(mcu_address + 8)<<8) +
-							(srcspace.read_byte(mcu_address + 9)<<0) ;
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine().describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
-
-			for( ; mcu_size > 0 ; mcu_size-- )
+			for(uint16_t i = 0; i != size; i++)
 			{
-				mcu_src &= 0xffff;  mcu_dst &= 0xffff;
-				srcspace.write_byte(0x100000 + mcu_dst,dstspace.read_byte(0x100000 + mcu_src));
-				mcu_src ++;         mcu_dst ++;
+				sspace.write_byte(0x100000 + dst, mspace.read_byte(0x100000 + src));
+				src ++;
+				dst ++;
 			}
-
-			/* Raise a "job done" flag */
-			srcspace.write_byte(mcu_address+0,0xff);
-			srcspace.write_byte(mcu_address+1,0xff);
-
 			break;
-
-		case 0x0a:  // Copy N bytes from RAM1 to RAM2
-			mcu_src     =   (srcspace.read_byte(mcu_address + 2)<<8) +
-							(srcspace.read_byte(mcu_address + 3)<<0) ;
-
-			mcu_dst     =   (srcspace.read_byte(mcu_address + 6)<<8) +
-							(srcspace.read_byte(mcu_address + 7)<<0) ;
-
-			mcu_size    =   (srcspace.read_byte(mcu_address + 8)<<8) +
-							(srcspace.read_byte(mcu_address + 9)<<0) ;
-
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine().describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
-
-			for( ; mcu_size > 0 ; mcu_size-- )
-			{
-				mcu_src &= 0xffff;  mcu_dst &= 0xffff;
-				dstspace.write_byte(0x100000 + mcu_dst,srcspace.read_byte(0x100000 + mcu_src));
-				mcu_src ++;         mcu_dst ++;
-			}
-
-			/* Raise a "job done" flag */
-			srcspace.write_byte(mcu_address+0,0xff);
-			srcspace.write_byte(mcu_address+1,0xff);
-
-			break;
+		}
 
 		//case 0x10: //? Clear gal?
 		//case 0x14: //? Display gal?
@@ -277,22 +235,51 @@ void galpani2_state::galpani2_mcu_nmi1()
 		//case 0x6E: //? Display "Changed" monster?
 		//case 0x85: //? Do what?
 		default:
-			/* Raise a "job done" flag */
-			srcspace.write_byte(mcu_address+0,0xff);
-			srcspace.write_byte(mcu_address+1,0xff);
-
-			logerror("%s : MCU ERROR, unknown command $%02X\n",machine().describe_context(),mcu_command);
+			machine().debug_break();
+			logerror("MCU master %02x:%04x: unknown command %02x\n", slot, address, command);
+			break;
 		}
 
-		/* Erase command (so that it won't be processed again)? */
-		srcspace.write_byte(mcu_list,0x00);
+		/* Raise a "job done" flag */
+		if (command)
+			mspace.write_word(address, 0xffff);
 	}
+	if (len)
+		mspace.write_byte(0x100020, 0x00);
 }
 
 void galpani2_state::galpani2_mcu_nmi2()
 {
-		galpani2_write_kaneko(m_maincpu);
-		//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
+	address_space &sspace = m_subcpu->space(AS_PROGRAM);
+
+	uint8_t len = sspace.read_byte(0x101012);
+	for(uint8_t slot = 0; slot < len; slot += 4) {
+		uint8_t command = sspace.read_byte(0x101013 + slot);
+		uint32_t address = 0x100000 | sspace.read_word(0x101014 + slot);
+
+		switch (command)
+		{
+		case 0x0c: {
+			uint16_t a = sspace.read_word(address);
+			logerror("MCU slave %02x:%06x: command 0c: %04x\n", slot, address, a);
+			break;
+		}
+
+		default:
+			machine().debug_break();
+			logerror("MCU slave %02x:%06x: unknown command %02x\n", slot, address, command);
+			break;
+		}
+
+		/* Raise a "job done" flag */
+		if (command)
+			sspace.write_word(address, 0xffff);
+	}
+	if (len)
+		sspace.write_byte(0x101012, 0x00);
+
+	galpani2_write_kaneko(m_maincpu);
+	//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
 }
 
 void galpani2_state::galpani2_mcu_nmi1_w(uint8_t data) //driven by CPU1's int5 ISR

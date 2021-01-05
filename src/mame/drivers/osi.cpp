@@ -654,12 +654,12 @@ void sb2m600_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 4*1024:
-		program.install_readwrite_bank(0x0000, 0x0fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x0fff, membank("bank1"));
 		program.unmap_readwrite(0x1000, 0x1fff);
 		break;
 
 	case 8*1024:
-		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
 		break;
 	}
 
@@ -685,12 +685,12 @@ void c1p_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 8*1024:
-		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
 		program.unmap_readwrite(0x2000, 0x4fff);
 		break;
 
 	case 20*1024:
-		program.install_readwrite_bank(0x0000, 0x4fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x4fff, membank("bank1"));
 		break;
 	}
 

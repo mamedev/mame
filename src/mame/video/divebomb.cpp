@@ -131,7 +131,7 @@ void divebomb_state::divebomb_palette(palette_device &palette) const
 }
 
 
-VIDEO_START_MEMBER(divebomb_state,divebomb)
+void divebomb_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(divebomb_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);

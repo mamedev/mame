@@ -84,15 +84,15 @@ void c64_ocean_cartridge_device::device_reset()
 
 uint8_t c64_ocean_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!roml && m_roml.bytes())
+	if (!roml && m_roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_roml[addr & m_roml.mask()];
+		data = m_roml[addr];
 	}
-	else if (!romh && m_romh.bytes())
+	else if (!romh && m_romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_romh[addr & m_romh.mask()];
+		data = m_romh[addr];
 	}
 	else if (!io1)
 	{

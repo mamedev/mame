@@ -980,7 +980,7 @@ int ddenlovr_state::blit_draw( int src, int sx )
 
 			default:
 				log_draw_error(src, cmd);
-			// fall through
+				[[fallthrough]];
 			case BLIT_STOP:
 				return ((bit_addr + m_ddenlovr_blit_rom_bits - 1) / m_ddenlovr_blit_rom_bits) & 0xffffff;
 		}
@@ -2031,7 +2031,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
-//  map(0x201000, 0x2017ff).writeonly();                                      // ?
+//  map(0x201000, 0x2017ff).nopw();                                      // ?
 
 	map(0x300201, 0x300201).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                        // Coin Counters + more stuff written on startup
@@ -2085,7 +2085,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x000000, 0x07ffff).rom(); // ROM
 
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
-//  map(0x201000, 0x2017ff).writeonly();                                      // ? B0 on startup, then 00
+//  map(0x201000, 0x2017ff).nopq();                                      // ? B0 on startup, then 00
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2255,7 +2255,7 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0x200e0a, 0x200e0d).writeonly().share("protection1");                       // ""
-	map(0x201000, 0x2017ff).writeonly();                                               // ?
+	map(0x201000, 0x2017ff).nopw();                                               // ?
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2310,7 +2310,7 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0xd00c02, 0xd00c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0xd00e0a, 0xd00e0d).writeonly().share("protection1");                       // ""
 
-	map(0xd01000, 0xd017ff).writeonly();                                               // ?
+	map(0xd01000, 0xd017ff).nopw();                                               // ?
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2520,7 +2520,7 @@ void mmpanic_state::mmpanic_map(address_map &map)
 	map(0x0000, 0x5fff).rom();                                             // ROM
 	map(0x0051, 0x0051).r(FUNC(mmpanic_state::magic_r));                                   // ?
 	map(0x6000, 0x6fff).ram();                                             // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
+	map(0x7000, 0x7fff).ram();                                             // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
 	map(0x8000, 0x81ff).w(FUNC(mmpanic_state::ddenlovr_palette_w));
 }
@@ -4334,6 +4334,7 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 //          popmessage("COINS %02x",data);
 #endif
 			m_coins = data;
+			break;
 
 		case 0x0d:  break;  // ff resets input port sequence?
 

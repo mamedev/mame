@@ -1748,7 +1748,7 @@ void m68000_base_device::fmovem(u16 w2)
 			case 1: // Dynamic register list, postincrement or control addressing mode.
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
-
+				[[fallthrough]];
 			case 0:     // Static register list, predecrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)
@@ -1807,7 +1807,7 @@ void m68000_base_device::fmovem(u16 w2)
 			case 3: // Dynamic register list, predecrement addressing mode.
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
-
+				[[fallthrough]];
 			case 2:     // Static register list, postincrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)
@@ -2097,6 +2097,11 @@ void m68000_base_device::m68040_fpu_op1()
 				m68040_do_fsave(addr, -1, 1);
 				break;
 
+			case 6: // (An) + (Xn) + d8
+				addr = EA_AY_IX_16();
+				m68040_do_fsave(addr, -1, 1);
+				break;
+
 			case 7: //
 				switch (reg)
 				{
@@ -2141,6 +2146,11 @@ void m68000_base_device::m68040_fpu_op1()
 
 			case 5: // (D16, An)
 				addr = EA_AY_DI_16();
+				m68040_do_frestore(addr, -1);
+				break;
+
+			case 6: // (An) + (Xn) + d8
+				addr = EA_AY_IX_16();
 				m68040_do_frestore(addr, -1);
 				break;
 

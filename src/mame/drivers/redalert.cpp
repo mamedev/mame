@@ -511,8 +511,8 @@ ROM_START( redalert )
 	ROM_LOAD( "ras3",         0x2000, 0x1000, CRC(20d56f3e) SHA1(5c32ee3365407e6d3f7ab5662e9ecbac437ed4cb) )
 	ROM_LOAD( "ras4",         0x3000, 0x1000, CRC(130e66db) SHA1(385b8f889fee08fddbb2f75a691af569109eacd1) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "m-257sc.1a",   0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM, on an "M-33 SUB-2" daughterpcb with 8 resistors and a prom, plugged into a 20 pin socket; the actual prom is a TBP18s22N 256x8 prom, but the pcb is silkscreened 'S472' so it can handle either a 256x8 (82s135-style) or 512x8 (82s147-style) prom */
+	ROM_LOAD( "m-257sc.1a",   0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 256x8 data dumped from a 512*8 74S472 or compatible BPROM like a 82s147; note that since this was dumped as the 'wrong' type, A5 is tied low, and board A5 goes to prom A6, likewise BA6->A7, BA7->A8 */
 ROM_END
 
 

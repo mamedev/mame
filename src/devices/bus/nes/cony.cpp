@@ -237,6 +237,7 @@ void nes_cony_device::write_h(offs_t offset, uint8_t data)
 	{
 		case 0x0000:
 			m_latch1 = 1;
+			[[fallthrough]];
 		case 0x3000:
 		case 0x30ff:
 		case 0x31ff:
@@ -283,6 +284,7 @@ void nes_cony_device::write_h(offs_t offset, uint8_t data)
 		case 0x0314:
 		case 0x0315:
 			m_latch2 = 1;
+			[[fallthrough]];
 		case 0x0310:
 		case 0x0311:
 		case 0x0316:

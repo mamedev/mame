@@ -49,7 +49,7 @@ protected:
 	virtual void vcs_joy_w(uint8_t data);
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	emu_timer *t_joyb2;
 	int m_ram_a12_a7;

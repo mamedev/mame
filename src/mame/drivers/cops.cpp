@@ -430,7 +430,6 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 	switch(offset & 0x07)
 	{
 		case 0: /* IRQ enable Register 1 */
-		{
 			m_dacia_irq1_reg &= ~0x80;
 
 			if (data & 0x80) //enable bits
@@ -444,10 +443,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			if (LOG_DACIA) logerror("DACIA IRQ 1 Register: %02x\n", m_dacia_irq1_reg);
 			update_dacia_irq();
 			break;
-		}
 
 		case 1: /* Control / Format Register 1 */
-		{
 			if (data & 0x80) //Format Register
 			{
 				m_dacia_rts1 = (data & 0x01);
@@ -478,13 +475,12 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 
 			}
 			break;
-		}
+
 		case 2: /* Compare / Aux Ctrl Register 1 */
-		{
 			if (m_dacia_reg1 == CMP_REGISTER)
 			{
-				m_dacia_cmp1 =1;
-				m_dacia_cmpval1=data;
+				m_dacia_cmp1 = 1;
+				m_dacia_cmpval1 = data;
 				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);
 //              update_dacia_irq();
 			}
@@ -492,15 +488,13 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);
 			}
-		}
+			[[fallthrough]]; // FIXME: really?
 		case 3: /* Transmit Data Register 1 */
-		{
 			if (LOG_DACIA) logerror("DACIA Transmit: %02x %c\n", data, (char)data);
 			m_ld->command_w(data);
 			break;
-		}
+
 		case 4: /* IRQ enable Register 2 */
-		{
 			m_dacia_irq2_reg &= ~0x80;
 
 			if (data & 0x80) //enable bits
@@ -514,10 +508,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			if (LOG_DACIA) logerror("DACIA IRQ 2 Register: %02x\n", m_dacia_irq2_reg);
 			update_dacia_irq();
 			break;
-		}
 
 		case 5: /* Control / Format Register 2 */
-		{
 			if (data & 0x80) //Format Register
 			{
 				m_dacia_rts2 = (data & 0x01);
@@ -548,9 +540,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 
 			}
 			break;
-		}
+
 		case 6: /* Compare / Aux Ctrl Register 2 */
-		{
 			if (m_dacia_reg2 == CMP_REGISTER)
 			{
 				m_dacia_cmp2 =1;
@@ -562,9 +553,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				if (LOG_DACIA) logerror("DACIA Aux ctrl 2: %02x \n", data);
 			}
-		}
+			[[fallthrough]]; // FIXME: really?
 		case 7: /* Transmit Data Register 2 */
-		{
 			if (LOG_DACIA) logerror("DACIA Transmit 2: %02x %c\n", data, (char)data);
 
 		//  for (int i=0; i <8; i++)
@@ -573,7 +563,6 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			}
 //          m_ld->command_w(data);
 			break;
-		}
 	}
 }
 /*************************************

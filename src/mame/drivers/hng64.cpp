@@ -6,17 +6,17 @@ Driver by David Haywood, ElSemi, Andrew Gardner and Angelo Salese
 
 
 Notes:
-  * The top board is likely identical for all revisions and all "versions" of the hardware.
+  * The main board is identical for all revisions and all "versions" of the hardware.
     It contains the main MIPS CPU and a secondary communications KL5C80.
 
-  * The bottom board is what changes between hardware "versions".  It has a Toshiba MCU with
-    a protected internal ROM.  This MCU controls (at least) the inputs per game and communicates
+  * The I/O board is what changes between hardware "versions".  It has a Toshiba MCU with a protected
+    internal ROM which has been dumped. This MCU controls (at least) the inputs per game and communicates
     with the main board through dualport RAM.
 
   * I believe that this secondary board is used as a protection device.
     The "board type" code comes from it in dualport RAM, and each game reads its inputs differently through dualport.
-    It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
-    It probably has a lot to do with the network (Roads Edge network connectors are on this board).
+    It's capable of changing the input ports dynamically.
+    It has nothing to do with the network. The network connector and all network hardware is located on the main board.
 
   * The Toshiba CPU datasheet is here : http://kr.ic-on-line.cn/IOL/viewpdf/TMP87CH40N_1029113.htm
 
@@ -62,180 +62,454 @@ ToDo:
   * Correct cpu speed
   * How to use the FPGA data ('ROM1')
 
-*/
 
-/*
-NeoGeo Hyper 64 (Main Board)
-SNK, 1997
+------------------------------------------------------------------------------
+Hyper NeoGeo 64, SNK 1997-1999
+Hardware info by Guru
 
-This is a 3D system comprising one large PCB with many custom smt components
-on both sides, one interface PCB with JAMMA connector and sound circuitry, and
-one game cartridge. Only the Main PCB and interface PCB are detailed here.
+This is a 3D system comprising....
+- One large PCB with many custom surface-mounted components on both sides.
+- One separate interface PCB with JAMMA and/or several other connectors, I/O microcontroller, dualport RAM, video DAC and sound amp circuitry.
+- One game cartridge inside a metal case.
 
-PCB Layout (Top)
-----------------
+There are only 7 games on this system. In some cases the game name changes depending on the BIOS region.
+The games in order of release are....
+001 Roads Edge / Round Trip
+002 Samurai Shodown 64 / Samurai Spirits 64
+003 Xtreme Rally / Off Beat Racer!
+004 Beast Busters 2nd Nightmare
+005 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+006 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
+007 Buriki One: World Grapple Tournament '99 in Tokyo
+
+When powering a Hyper Neogeo 64 board, all four +5v pins on the JAMMA connector should have +5v going to them and ALL of the grounds should be
+connected, not just a couple. This is due to the main board requiring several amps to operate. Additionally, the power connector on the I/O
+board must be connected to the main board 5-pin connector otherwise the main board will not power up. The I/O board power connector is not
+optional. It is recommended to use a 15-Amp PSU to power the game.
+
+A correctly powered board will display a blue screen with white text as the game boots up.
+However the two Samurai Showdown games show a solid blue screen for a few seconds then a black screen with white text....
+'NOW I/O INITIALIZING SEQUENCE 1'
+and after a few seconds...
+'NOW I/O INITIALIZING SEQUENCE 2'
+
+The main board has one version. Any main board will play any game. The only thing that changes between main boards is the BIOS, either
+Japan, US or Export regions and the BIOS is easily changed by simply reflashing the ROM. There is another BIOS just for Korea which is said
+to only play the Samurai Showdown games. If you have this version and want to play other games, simply reflash the ROM to one of the more
+useful regions. For the three main BIOS dumps (excluding Korea), all of them will run any game with in-game differences like a changed title
+screen and some text shown in either English or a different language. The language can be changed between Japanese and English in the test
+mode but it doesn't change all texts. To have a fully English version of a game use a USA or World region BIOS. All chips on the main board
+are identical regardless of the region. The communication flashROM has been dumped from driving, fighting and gun main boards and was
+identical.
+Several BIOS ROMs were dumped from fighting, driving and the gun boards and matched existing archives.
+There are only 4 known BIOS regions.... Japan, USA, Export and Korea.
+
+
+Main Board PCB Layout (Top)
+---------------------
 
 LVS-MAC SNK 1997.06.02
 |--------------------------------------------------------------|
-|              CONN9                                           |
+|CON4          CON9                           CON1         IC2 |
+|                                               DPRAM1     LED2|
+|   ASIC1        ASIC3       U4   CPU1               U28   LED1|
+|                                                       ROM1   |
 |                                                              |
-|   ASIC1           ASIC3            CPU1                      |
-|                                                              |
-|                                               DPRAM1         |
-|                        OSC2        ASIC5                 ROM1|
-|   FSRAM1               OSC2                                  |
-|   FSRAM2                                             FPGA1   |
-|   FSRAM3                           ASIC10       OSC4         |
+|                  OSC2 OSC1      ASIC5  U24        FPGA1      |
+|   FSRAM1                                                     |
+|   FSRAM2                                                 CON8|
+|   FSRAM3                        ASIC10            OSC4       |
 |                                                              |
 |                                                 CPU3  IC4    |
-|   PSRAM1  ASIC7   ASIC8            DSP1 OSC3    SRAM5        |
-|   PSRAM2                                              FROM1  |
+|   PSRAM1  ASIC7   ASIC8         DSP1            SRAM5     IC3|
+|   PSRAM2                           OSC3               FROM1  |
 |                                                              |
 |                                                              |
-|              CONN10                                          |
+|              CON10                           CON6            |
 |--------------------------------------------------------------|
+Note All ICs shown.
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   ASIC1      NEO64-REN                 QFP304
-02   ASIC3      NEO64-GTE                 QFP208
-03   ASIC5      NEO64-SYS                 QFP208
-04   ASIC7      NEO64-BGC                 QFP240
-05   ASIC8      NEO64-SPR                 QFP208
-06   ASIC10     NEO64-SCC                 QFP208
-07   CPU1       NEC D30200GD-100 VR4300   QFP120
-08   CPU3       KL5C80A12CFP              QFP80
-09   DPRAM1*    IDT7133 LA35J             PLCC68
-10   DSP1       L7A1045 L6028 DSP-A       QFP120
-11   FPGA1      ALTERA EPF10K10QC208-4    QFP208
-12   FROM1      MBM29F400B-12             TSOP48 (archived as FROM1.BIN)
-13   FSRAM1     TC55V1664AJ-15            SOJ44
-14   FSRAM2     TC55V1664AJ-15            SOJ44
-15   FSRAM3     TC55V1664AJ-15            SOJ44
-16   IC4        SMC COM20020-5ILJ         PLCC28
-17   OSC1       M33.333 KDS 7M            -
-18   OSC2       M50.113 KDS 7L            -
-19   OSC3       A33.868 KDS 7M            -
-20   OSC4       A40.000 KDS 7L            -
-21   PSRAM1     TC551001BFL-70L           SOP32
-22   PSRAM2     TC551001BFL-70L           SOP32
-23   ROM1       ALTERA EPC1PC8            DIP8   (130817 bytes, archived as ROM1.BIN)
-24   SRAM5      TC55257DFL-85L            SOP28
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   ASIC1      NEO64-REN                 QFP304       3D Render Engine
+02   ASIC3      NEO64-GTE                 QFP208       2D Transform Engine
+03   ASIC5      NEO64-SYS                 QFP208       System Bus Controller
+04   ASIC7      NEO64-BGC                 QFP240       Background GFX Controller
+05   ASIC8      NEO64-SPR                 QFP208       Sprite Generator
+06   ASIC10     NEO64-SCC                 QFP208       Scroll Character Controller
+07   CPU1       NEC D30200GD-100 VR4300   QFP120       NEC VR4300 CPU; Clock Input 33.333MHz on pin 16. DivMode0=1, DivMode1=1; MasterClock=33.333MHz; PClock (Internal)=99.999MHz (i.e. 100MHz), TClock=33.333MHz
+08   CPU3       KL5C80A12CFP              QFP80        Communication CPU (Z80-based) with on-board peripherals and 512b RAM. Clock input 10.000MHz on pin 24 [40/4]
+09   DPRAM1*    IDT7133 LA35J             PLCC68       IDT7133 Dual-Port RAM
+10   DSP1       L7A1045 L6028 DSP-A       QFP120       L7A1045 DSP-A
+11   FPGA1      ALTERA EPF10K10QC208-4    QFP208       Altera FPGA, programmed as a network controller
+12   FROM1      MBM29F400B-12             TSOP48       Communication program, same on all versions of the main board. Dumped as FROM1.BIN
+13   FSRAM1     TC55V1664AJ-15            SOJ44        Static RAM
+14   FSRAM2     TC55V1664AJ-15            SOJ44        Static RAM
+15   FSRAM3     TC55V1664AJ-15            SOJ44        Static RAM
+16   IC4        SMC COM20020-5ILJ         PLCC28       5Mbps ARCNet Controller
+17   OSC1       M33.333 KDS 7M            7050         33.333MHz Oscillator, connected to the VR4300 CPU and NEO64-GTE
+18   OSC2       M50.113 KDS 7L            7050         50.113MHz Oscillator, connected to NEO64-BGC
+19   OSC3       A33.868 KDS 7M            7050         33.868MHz Oscillator, connected directly to the DSP-A
+20   OSC4       A40.000 KDS 7L            7050         40MHz Oscillator, connected to the Altera FPGA
+21   PSRAM1     TC551001BFL-70L           SOP32        Static RAM
+22   PSRAM2     TC551001BFL-70L           SOP32        Static RAM
+23   ROM1       ALTERA EPC1PC8            DIP8         FPGA Configuration IC. Dumped as ROM1.BIN (130817 bytes)
+24   SRAM5      TC55257DFL-85L            SOP28        Static RAM
+25   U4         LVX245                    TSSOP20      Logic
+26   IC3        75ALS181                  SOIC14       EIA 422/EIA 485 Differential Driver/Receiver
+27   U28        LCX16245                  TSSOP48      Logic
+28   U24        LCX157                    TSSOP16      Logic
+29   IC2        PQ3DF53                   TO-3P        3.3V 5A Regulator
+30   LED1                                              Lights up for 1/2 second at power-on then goes off
+31   LED2                                              Lights up when the power-up communication test passes and stays on
+32   CON9                                              \
+33   CON10                                             / Game cart plugs in here
+34   CON4                                              Power from I/O board plugs in here
+35   CON1                                              Unknown connector (accessible from the top for an option board)
+36   CON6                                              Unknown connector (accessible from the top for an option board)
+37   CON8                                              15 pin JST NH connector for network data (connects to 75ALS181)
 
-    * The IDT 7133 / 7143 lack interrupts and just act as 0x1000 bytes (2x 0x800 16-bit words) of RAM
+   * The IDT 7133 / 7143 lacks interrupts and just acts as 0x1000 bytes (2x 0x800 16-bit words) of RAM
      IDT 7133 - 32K (2K X 16 Bit) MASTER Dual-Port SRAM
      IDT 7143 - 32K (2K X 16 Bit) SLAVE Dual-Port SRAM
 
 
-PCB Layout (Bottom)
+Main Board PCB Layout (Bottom)
+---------------------
 
+LVS-MAC SNK 1997.06.02
 |--------------------------------------------------------------|
-|             CONN10                                           |
 |                                                              |
+|   U5  U6  U7  U8  U9  U10  U11 U12                           |
 |                                                              |
-|   PSRAM4  ASIC9                   SRAM4     CPU2  Y1         |
-|   PSRAM3         SRAM1            SRAM3                      |
-|                  SRAM2                                       |
-|                                                              |
-|   FSRAM6                        DRAM3                        |
-|   FSRAM5                                                     |
+|   PSRAM4  ASIC9            CON2   SRAM4     CPU2  Y1         |
+|   PSRAM3             SRAM1  CON3  SRAM3                      |
+|                      SRAM2                                   |
+|                                 U26         U23              |
+|   FSRAM6                        DRAM3  U21  U22              |
+|   FSRAM5                                       CON5          |
 |   FSRAM4                        DRAM1                        |
-|                   BROM1         DRAM2                        |
-|                                                              |
-|                                                              |
-|   ASIC2           ASIC4         ASIC6                        |
-|                                                              |
-|             CONN9                                            |
+|               U31    BROM1      DRAM2  U20  U27              |
+|                                        U19                   |
+|                                        U17                   |
+|   ASIC2              ASIC4      ASIC6  U16                   |
+|                                        U18                   |
+|                 U3 U2 U1          IC1                        |
 |--------------------------------------------------------------|
+Note All ICs shown.
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   ASIC2      NEO64-REN                 QFP304
-02   ASIC4      NEO64-TRI2                QFP208
-03   ASIC6      NEO64-CVR                 QFP120
-04   ASIC9      NEO64-CAL                 QFP208
-05   BROM1      MBM29F400B-12             TSOP48  (archived as BROM1.BIN)
-06   CPU2       NEC D70236AGJ-16 V53A     QFP120
-07   DRAM1      HY51V18164BJC-60          SOJ42
-08   DRAM2      HY51V18164BJC-60          SOJ42
-09   DRAM3      HY51V18164BJC-60          SOJ42
-10   FSRAM4     TC55V1664AJ-15            SOJ44
-11   FSRAM5     TC55V1664AJ-15            SOJ44
-12   FSRAM6     TC55V1664AJ-15            SOJ44
-13   PSRAM3     TC551001BFL-70L           SOP32
-14   PSRAM4     TC551001BFL-70L           SOP32
-15   SRAM1      TC55257DFL-85L            SOP28
-16   SRAM2      TC55257DFL-85L            SOP28
-17   SRAM3      TC551001BFL-70L           SOP32
-18   SRAM4      TC551001BFL-70L           SOP32
-19   Y1         D320L7                    XTAL (32MHz)
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   ASIC2      NEO64-REN                 QFP304       3D Render Engine
+02   ASIC4      NEO64-TRI2                QFP208       Triangle Engine
+03   ASIC6      NEO64-CVR                 QFP120       Possible RAM Controller (wired to the CPU)
+04   ASIC9      NEO64-CAL                 QFP208       I/O <-> Main board System Arbitrator (connected to I/O PCB via CON2/CON3)
+05   BROM1      MBM29F400B-12             TSOP48       BIOS, dumped as BROM1.BIN
+06   CPU2       NEC D70236AGJ-16 V53A     QFP120       NEC V53A CPU (code compatible with V20/V30). Clock input 32MHz. Internal Clock=Input Clock/2 (i.e. 16MHz)
+07   DRAM1      HY51V18164BJC-60          SOJ42        Dynamic RAM
+08   DRAM2      HY51V18164BJC-60          SOJ42        Dynamic RAM
+09   DRAM3      HY51V18164BJC-60          SOJ42        Dynamic RAM
+10   FSRAM4     TC55V1664AJ-15            SOJ44        Static RAM
+11   FSRAM5     TC55V1664AJ-15            SOJ44        Static RAM
+12   FSRAM6     TC55V1664AJ-15            SOJ44        Static RAM
+13   PSRAM3     TC551001BFL-70L           SOP32        Static RAM
+14   PSRAM4     TC551001BFL-70L           SOP32        Static RAM
+15   SRAM1      TC55257DFL-85L            SOP28        Static RAM
+16   SRAM2      TC55257DFL-85L            SOP28        Static RAM
+17   SRAM3      TC551001BFL-70L           SOP32        Static RAM
+18   SRAM4      TC551001BFL-70L           SOP32        Static RAM
+19   Y1         D320L7                    XTAL         32MHz Crystal tied directly to the V53A
+20   U5         LCX16374                  TSSOP48      Logic
+21   U6         LCX16374                  TSSOP48      Logic
+22   U7         LCX16374                  TSSOP48      Logic
+23   U8         LCX16374                  TSSOP48      Logic
+24   U9         LCX16374                  TSSOP48      Logic
+25   U10        LCX16374                  TSSOP48      Logic
+26   U11        LCX16374                  TSSOP48      Logic
+27   U12        LCX16374                  TSSOP48      Logic
+28   U26        S32X245                   TSSOP40      Logic
+29   CON2                                              \
+30   CON3                                              / I/O board plugs in here
+31   IC1        PST573J                   MMP-3A       System Reset, trigger 2.7V
+32   U16        LCX16245                  TSSOP48      Logic
+33   U17        LCX16245                  TSSOP48      Logic
+34   U18        LCX16245                  TSSOP48      Logic
+35   U19        LCX16245                  TSSOP48      Logic
+36   U20        LCX16245                  TSSOP48      Logic
+37   U21        LCX16245                  TSSOP48      Logic
+38   U22        LCX16245                  TSSOP48      Logic
+39   U23        LCX16245                  TSSOP48      Logic
+40   U27        LCX16245                  TSSOP48      Logic
+41   U31        S32X245                   TSSOP40      Logic
+42   U1         S32X245                   TSSOP40      Logic
+43   U2         S32X245                   TSSOP40      Logic
+44   U3         S32X245                   TSSOP40      Logic
+45   CON5       -                                      Unknown connector (accessible from the bottom for an option board)
+
+It seems that although there are extra connectors for option boards, none were actually made or used on any game.
+It is possible the option connectors were for factory testing.
 
 
-INTERFACE PCB
--------------
+I/O Boards
+----------
+
+A special I/O board is required to boot the system which plugs into two custom connectors on the bottom of the main board.
+There are 3 types:
+LVS-IOJ runs the driving games and the Samurai Showdown games.
+LVS-JAM runs all of the fighting games.
+LVS-IGX runs the gun game (Beast Busters 2nd Nightmare).
+Note using an incompatible game and I/O board combination will result in an error at bootup 'MACHINE CODE ERROR'
+For the driving games the network is also checked.
+As a work-around, to satisfy the network check on driving games simply join CON8 pins 1, 3, 5, 6, 7 & 8 then the
+network check will pass and the game will start.
+
+All of the I/O boards look completely different. Two boards are JAMMA. The third type doesn't have an edge connector and instead uses
+several JST connectors. The main control chip on this board is a Toshiba TMP87PH40AN (or TMP87CH40AN) microcontroller with an internal 32kb
+program. The MCU from any I/O board can be swapped across different I/O boards and works fine. Several chips have been documented and were
+all marked the same so there is only one revision of the control chip and it is identical on all versions of the I/O boards. The
+microcontroller has an external serial EEPROM connected to it to configure the control mode 'ID Code' which it puts into the dualport RAM on
+the I/O board and the game software checks it. I (Guru) confirmed that swapping the EEPROM from the LVS-JAM board onto a LVS-IOJ board
+allows the other fighting games to boot and run. An EEPROM from a driving I/O board was re-programmed with the LVS-JAM EEPROM dump and put
+onto the LVS-JAM I/O board and it worked fine. So to summarise, the driving I/O board can be converted to run all of the fighting games
+simply by re-programming the EEPROM using the LVS-JAM dump in MAME.
+
+The first I/O board 'LVS-IOJ' dated 6-6-1997 has a JAMMA edge connector and runs the driving games and the two Samurai Showdown games. Note
+the first game on this system was Roads Edge, so while this has been known as the 1st rev fighting I/O board, it is actually the driving I/O
+board that just happens to play the two Samurai Showdown games. The two custom connectors on the I/O board that plug into the main board do
+not have power running to them. There is a 6 pin JST VH connector on the back of the I/O board directly below the JAMMA power pins which
+must be plugged into the main board. This cable powers the main board so without it the game will not boot up. There is a small volume pot
+accessible on the front and two JST XH connectors for connection of extra buttons and other controls for the driving games. The JST
+connectors join with wires to some JST VL connectors in a bracket mounted to the bottom of the main board metal frame for MVS cabinet
+wiring hookups. The volume pot does nothing when the JAMMA connector is used. The output of the volume pot is connected to one of the JST
+connectors and only affects the volume when set to the MVS 3-Channel mode. Located just above the DPRAM1 chip, there are resistor pads
+labelled 'MONO' and '3ch' with a small 2.2k-ohm surface-mounted resistor (marked 222). The default factory position is '3ch'. When the
+resistor is moved to the mono position, amplified audio comes out through the JAMMA connector. However note the volume pot does not work, it
+is only for the 3-channel MVS audio. To change the JAMMA volume use the volume pot in the cabinet.
+
+LVS-IOJ SNK 1997.6.6
+|---------------------------------------------|
+|     VOL   CON2  J A M M A                   |
+|                                     OPAMP1  |
+| IC2                                         |
+|                                        IC1  |
+| IC3               U2                        |
+|                           IC8               |
+| IC4            IOCTR1          IC7  OPAMP2  |
+|                    8MHz                  IC6|
+|                      U17  U19    CON3       |
+|SW1   DPRAM1   BT1              CON1  IC5    |
+|---------------------------------------------|
+
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC5        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   U17        EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   U19        TC55257DFL-85L            SOP28        Static RAM
+06   IC1        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               4 position DIPSW; Appears to be unused
+09   U2         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-IOJ-BR9020F.U2
+10   OPAMP1     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+11   IC3        TA8201                                 Audio Power AMP
+12   IC4        TA8201                                 Audio Power Amp
+13   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+14   OPAMP2     uPC844                    SOIC14       Quad Operational Amplifier
+15   IC2        TA8201                                 16-bit Stereo D/A converter
+16   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+17   IC6        78D05                                  5V regulator
+18   IC7        78D05                                  5V regulator
+19   IC8        BU9480F                   SOP8         16-bit Stereo D/A converter
+20   CON1                                              \
+21   CON3                                              / Plugs into main board here
+22   CON2                                              6 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON2 to CON4:
+                                                       CON2 -> CON4 (Main Board)
+                                                       1    ->  1 (pink wire)
+                                                       2    ->  2 (orange wire)
+                                                       3    ->  3 (white wire)
+                                                       4 no connection
+                                                       5 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                       6 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                               CON4 pin 4 tied to 4 pin connector on front bracket (black wire GND)
+                                                               CON4 pin 5 tied to 4 pin connector on front bracket (black wire GND)
+Notes:
+       1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. 87CH and 87PH types exist but they are functionally equivalent.
+       4. Syncs measured at the JAMMA connector using Samurai Spirits 2 and the 1st I/O board. During gameplay and attract the syncs
+          definitely change. For example the Hyper Neogeo logo that shows at the start causes my WG D9200 monitor to emit a noise when the sync
+          changes and in-game the sync meter can't lock onto the frequency because it is changing. Meaning measuring the syncs is not all that
+          helpful, but anyway....
+          HSync - 16.28kHz
+          VSync - ~60Hz
+
+
+The second I/O board 'LVS-IGX' dated 10-11-1997 does not have a JAMMA edge connector. It has the same 6-pin JST VH power connector on the
+bottom of the board. There are several JST XA connectors for hooking up the controls. There is no audio power AMP or volume pot on the
+board. This board only runs the gun game 'Beast Busters 2nd Nightmare'.
+
+LVS-IGX SNK 1997.11.10
+|---------------------------------------------|
+| CON9  CON2 CON11   CON10     CON4  CON12 IC1|
+|                          IC3 IC4 OPAMP1     |
+|          U3      CON13                      |
+|                                      OPAMP3 |
+|      CON7   CON8  CON5    CON6  CON14       |
+|                              OPAMP2         |
+|    IOCTR1                        IC5 IC6 IC7|
+|       8MHz                       IC2        |
+|                      U21  U19    CON3       |
+|SW1   DPRAM1   BT1              CON1         |
+|---------------------------------------------|
+
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC2        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   U19        EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   U21        W24258S-70LE              SOP28        Static RAM
+06   IC1        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               4 position DIPSW; Appears to be unused
+09   OPAMP2     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+10   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+11   OPAMP1     uPC844                    SOIC14       Quad Operational Amplifier
+12   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+13   IC6        BU9480F                   SOP8         16-bit Stereo D/A converter
+14   IC7        BU9480F                   SOP8         16-bit Stereo D/A converter
+15   IC3        78D05                                  5V regulator
+16   IC4        78D05                                  5V regulator
+17   U3         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-IGX-BR9020F.U3
+18   CON11                                             6 pin JST XA connector
+19   CON12                                             12 pin JST XA connector
+20   CON4                                              4 pin JST VH connector
+21   CON10                                             13 pin JST XA connector
+22   CON13                                             20 pin JST NH connector
+23   CON7                                              15 pin JST XA connector
+24   CON8                                              4 pin JST XA connector
+25   CON5                                              20 pin JST XA connector
+26   CON6                                              11 pin JST XA connector
+27   CON14                                             5 pin JST XA connector
+28   CON1                                              \
+29   CON3                                              / Plugs into main board here
+30   CON2                                              6 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON2 to CON4:
+                                                       CON2 -> CON4 (Main Board)
+                                                       1    ->  1 (pink wire)
+                                                       2    ->  2 (orange wire)
+                                                       3    ->  3 (white wire)
+                                                       4 no connection
+                                                       5 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                       6 -> tied to 4 pin connector on front bracket (red wire +5V)
+                                                               CON4 pin 4 tied to 4 pin connector on front bracket (black wire GND)
+                                                               CON4 pin 5 tied to 4 pin connector on front bracket (black wire GND)
+Notes:
+       1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. 87CH and 87PH types exist but they are functionally equivalent.
+
+
+The third and final I/O board 'LVS-JAM' dated 1-20-1999 has a JAMMA edge connector. There is a 5 pin JST VH connector on the back of the I/O
+board directly below the JAMMA power pins which must be plugged into the main board. Note it has 5 pins, not 6 pins like the first I/O
+board. This board has several JST XA connectors on the top and front of the board. The JST XA connectors are used when the board is set to
+MVS mode using a switch labelled MVS/JAMMA. In JAMMA mode the JST connectors are not used. Those JST connectors join with wires to a bracket
+mounted to the bottom of the main board metal frame which contains several JST VL connectors. There is a thumb-wheel type potentiometer to
+adjust the volume. There are two toggle switches. One selects between mono/audio or MVS 2-channel audio. The other one selects between JAMMA
+controls and MVS controls. This board can run all of the fighting games.
 
 LVS-JAM SNK 1999.1.20
 |---------------------------------------------|
-|                 J A M M A                   |
+| VOL CON5 CON3    J A M M A            CON9  |
 |                                             |
-|                                             |
-|                                             |
-|     SW3             SW1                     |
-|                                             |
-| IC6                       IOCTR1            |
-|                           BACKUP            |
-|                           BKRAM1            |
-|     SW2   BT1  DPRAM1              IC1      |
+| IC3                                         |
+|                     SW1       U3            |
+|     SW3                                     |
+| IC4                       IOCTR1    OPAMP1  |
+| IC6  OPAMP3               BACKUP            |
+|     IC5                   BKRAM1            |
+| IC2 CON10                     CON4          |
+|     SW2   BT1  DPRAM1       CON2   IC1      |
 |---------------------------------------------|
 
-No.  PCB Label  IC Markings               IC Package
-----------------------------------------------------
-01   DPRAM1     IDT 71321 LA55PF          QFP64 *
-02   IC1        MC44200FT                 QFP44
-03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64
-04   BACKUP     EPSON RTC62423            SOP24
-05   BKRAM1     W24258S-70LE              SOP28
-06   IC6        NEC C1891ACY              DIP20
-07   BT1        3V Coin Battery
-08   SW1        2 position DIPSW  OFF = JAMMA       ON = MVS
-09   SW2        4 position DIPSW
-10   SW3        2 position DIPSW  OFF = MONO/JAMMA  ON = 2CH MVS
-
+No.  PCB Label  IC Markings               IC Package   Use
+----------------------------------------------------------------------------------------------------------------------------------------
+01   DPRAM1     IDT 71321 LA55PF *        QFP64        IDT 71321 High Speed 2k x8-bit Dual-Port Static Ram with Interrupts
+02   IC1        MC44200FT                 QFP44        Triple 8-bit Video DAC
+03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64       I/O Microcontroller with 32kb internal ROM. Clock Input 8.000MHz. Marked 'SNK-IOJ1.00A'. Dumped as TMP87PH40AN.BIN
+04   BACKUP     EPSON RTC62423            SOP24        Real-Time Clock. Clock input 32.768kHz
+05   BKRAM1     W24258S-70LE              SOP28        Static RAM
+06   IC6        NEC C1891ACY              DIP20-400mil NEC uPC1891 Matrix Surround Sound Processor
+07   BT1        2430                                   3V Coin Battery with Solder Tags
+08   SW1                                               2 position DIPSW for controls; OFF = JAMMA, ON = MVS
+09   SW2                                               4 position DIPSW; Appears to be unused
+10   SW3                                               2 position DIPSW for audio output. OFF = MONO/JAMMA, ON = 2CH MVS
+11   OPAMP1     AD8044                    SOIC14       Quad 150MHz Rail to Rail Amplifier
+12   IC3        TA7252                                 Audio Power AMP
+13   IC4        TA7252                                 Audio Power Amp
+14   OPAMP3     uPC844                    SOIC14       Quad Operational Amplifier
+15   OPAMP2     uPC844                    SOIC14       Quad Operational Amplifier
+16   IC2        BU9480F                   SOP8         16-bit Stereo D/A converter
+17   IC5        BU9480F                   SOP8         16-bit Stereo D/A converter
+18   U3         BR9020F                   SOP8         2k-bit (128 words x 16-bit) Serial EEPROM. Dumped as LVS-JAM-BR9020F.U3
+19   CON4                                              \
+20   CON2                                              / Plugs into main board here
+21   CON10                                             8 pin JST XA connector
+22   CON6                                              3 pin JST XA connector
+23   CON7                                              15 pin JST XA connector
+24   CON1                                              12 pin JST XA connector
+25   CON8                                              9 pin JST XA connector
+26   CON5                                              4 pin JST XA connector
+27   CON9                                              2x 10-pin Hirose HIF3BA-20PA-2.54DS(71) IDC flat cable connector
+28   CON3                                              5 pin JST VH connector for power. Tied to the main board CON4
+                                                       Pinout and wiring for CON3 to CON4:
+                                                       CON3 -> CON4 (Main Board)
+                                                       1    ->  1 (red wire)
+                                                       2    ->  2 (red wire)
+                                                       3    ->  3 (white wire)
+                                                       4    ->  4 (black wire)
+                                                       5    ->  5 (black wire)
 Notes:
        1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
-       2. If the game cart is not plugged in, the hardware shows nothing on screen.
-       3. The IOCTR I/O MCU runs at 8 MHz.
+       2. If the game cart is not plugged in, the hardware shows nothing on screen or shows a black or blue screen filled with vertical lines.
+       3. The IOCTR I/O MCU runs at 8 MHz. TMP87CH and TMP87PH types exist but they are functionally equivalent.
 
        *"IDT71321 is function-compatible (but not pin-compatible) with MB8421" ( src\devices\machine\mb8421.cpp )
-        It appears unlikely the interrupt function of the DPRAM is unused unless address pins are all inverted as
-        there aren't any accesses to 7ff / 7fe outside of the RAM testing, commands are put at byte 0 by the MIPS
+        The INTL & INTR pins are not connected to anything on the PCB.
+        There aren't any accesses to 7ff / 7fe outside of the RAM testing, commands are put at byte 0 by the MIPS
 
-Hyper Neo Geo game cartridges
------------------------------
 
-The game carts contains nothing except a huge pile of surface mounted ROMs
-on both sides of the PCB. On a DG1 cart all the roms are 32Mbits, for the
-DG2 cart the SC and SP roms are 64Mbit.
+Hyper Neogeo game cartridges
+----------------------------
+
+The game carts contain a large amount of surface mounted ROMs on both sides of the PCB.
+On a DG1 cart all the roms are 32Mbits, for the DG2 cart the SC and SP roms are 64Mbit.
 The DG1 cart can accept a maximum of 96 ROMs
 The DG2 cart can accept a maximum of 84 ROMs
 
-
-The actual carts are mostly only about 1/3rd to 1/2 populated.
+The actual carts are only about 1/4 to 1/3rd populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge, Samurai Shodown 64 / Samurai Spirits 64
+Games that use the LVS-DG1 cart: Road's Edge / Round Trip
+                                 Xtreme Rally / Off Beat Racer!
+                                 Beast Busters 2nd Nightmare
+                                 Samurai Shodown 64 / Samurai Spirits 64
 
-Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
+Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition
+                                 Buriki One
+                                 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
 
-There might be Rev.A boards for Buriki and Round Trip, we have Rev. B
+There might be a Rev.A program for Buriki One and Round Trip, we have Rev. B dumps.
 
 pr = program
-sc = scroll characters?
+sc = scroll characters
 sd = sound
 tx = textures
-sp = sprites?
-vt = vertex?
+sp = sprites
+vt = vertex (3D data)
 
 Top
 ---
@@ -263,7 +537,7 @@ LVS-DG1
 |                                                                            |
 |                                                                            |
 |                                                                            |
-|                            PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
+|  PQ3TZ53                   PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
 |                                                                            |
 |                                                                            |
 |                                                                            |
@@ -281,6 +555,8 @@ LVS-DG1
 |                                                                            |
 |                                                                            |
 |----------------------------------------------------------------------------|
+Notes:
+      PQ3TZ53 - 3.3V 0.5A Voltage Regulator
 
 Bottom
 ------
@@ -300,11 +576,11 @@ LVS-DG1
 |                                                                            |
 | SC11A.51  SC12A.52   SP21A.73   SP22A.74   SP23A.75   SP24A.76    SD04A.80 |
 |                                                                            |
-|                                                                            |
+|               LCX138 LCX138 LCX138                                         |
 |                                                                            |
 |                            PR16A.96   PR14A.94   PR12A.92   PR10A.90       |
 |                                                                            |
-|                                                                            |
+| LCX138 LCX138 LCX138 LCX138 LCX138 LCX138                                  |
 |                                                                            |
 | TX04A.4    TX04A.12        VT24A.40   VT23A.39   VT22A.38   PR08A.88       |
 |                                                                            |
@@ -324,7 +600,8 @@ LVS-DG1
 |                         |----------------------|                           |
 |                         |----------------------|                           |
 |----------------------------------------------------------------------------|
-
+Notes:
+      LCX138 - 3.3V Logic. Powered by the PQ3TZ53 on the other side of the PCB.
 
 Top
 ---
@@ -352,7 +629,7 @@ LVS-DG2
 |                                                                            |
 |                                                                            |
 |                                                                            |
-|                            PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
+|  PQ3TZ53                   PR15A.95   PR13A.93   PR11A.91   PR09A.89       |
 |                                                                            |
 |                                                                            |
 |                                                                            |
@@ -370,6 +647,8 @@ LVS-DG2
 |                                                                            |
 |                                                                            |
 |----------------------------------------------------------------------------|
+Notes:
+      PQ3TZ53 - 3.3V 0.5A Voltage Regulator
 
 Bottom
 ------
@@ -389,11 +668,11 @@ LVS-DG2
 |                                                                            |
 | SC07A.102  SC08A.104  SP05A.106  SP06A.110  SP07A.114  SP08A.118  SD04A.80 |
 |                                                                            |
-|                                                                            |
+|               LCX138 LCX138 LCX138                                         |
 |                                                                            |
 |                            PR16A.96   PR14A.94   PR12A.92   PR10A.90       |
 |                                                                            |
-|                                                                            |
+| LCX138 LCX138 LCX138 LCX138 LCX138 LCX138                                  |
 |                                                                            |
 | TX04A.4    TX04A.12        VT24A.40   VT23A.39   VT22A.38   PR08A.88       |
 |                                                                            |
@@ -414,29 +693,13 @@ LVS-DG2
 |                         |----------------------|                           |
 |----------------------------------------------------------------------------|
  Notes:
+      LCX138 - 3.3V Logic. Powered by the PQ3TZ53 on the other side of the PCB.
+
       Not all ROM positions are populated, check the source for exact ROM usage.
       ROMs are mirrored. i.e. TX/PR/SP/SC etc ROMs line up on both sides of the PCB.
       There are 4 copies of each TX ROM on the PCB.
 
-
-----
-
-info from Daemon
-
-There are various types of neogeo64 boards:
-FIGHTING (revision 1 & 2), RACING, SHOOTING, and SAMURAI SHODOWN ONLY (Korean)
-(MACHINE CODE ERROR): Is given when you try to put a "RACING GAME" on a "FIGHTING" board.
-
-FIGHTING boards will ONLY play fighting games.
-
-RACING boards will ONLY play racing games (and you need the extra gimmicks
-to connect analog wheel and pedals, otherwise it gives you yet another
-error).
-
-Shooter boards will only work with Beast Busters 2.
-
-And the Korean board only plays Samurai Shodown games (wont play Buriki One
-or Fatal Fury for example).
+------------------------------------------------------------------------------
 */
 
 
@@ -447,18 +710,25 @@ or Fatal Fury for example).
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define VERBOSE 1
+#define LOG_GENERAL         (1U << 0)
+#define LOG_COMRW           (1U << 1)
+#define LOG_SNDCOM_UNKNWN   (1U << 2)
+#define LOG_DMA             (1U << 3)
+#define LOG_VREGS           (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-uint32_t hng64_state::hng64_com_r(offs_t offset)
+
+uint32_t hng64_state::hng64_com_r(offs_t offset, uint32_t mem_mask)
 {
-	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
 	return m_idt7133_dpram[offset];
 }
 
 void hng64_state::hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
+	LOGMASKED(LOG_COMRW, "com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
@@ -513,7 +783,7 @@ void hng64_state::do_dma(address_space &space)
 {
 	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
 
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	LOGMASKED(LOG_DMA, "Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
 		uint32_t dat;
@@ -786,7 +1056,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
@@ -799,7 +1069,7 @@ uint16_t hng64_state::main_sound_comms_r(offs_t offset)
 		case 0x06:
 			return sound_latch[1];
 		default:
-			//printf("%08x R\n",offset*2);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%08x R\n",offset*2);
 			break;
 	}
 	return 0;
@@ -818,10 +1088,10 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 		case 0x08:
 			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 			if(data & 0xfe)
-				//printf("IRQ send %02x?\n",data);
+				LOGMASKED(LOG_SNDCOM_UNKNWN, "IRQ send %02x?\n",data);
 			break;
 		default:
-			//printf("%02x %04x\n",offset*2,data);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%02x %04x\n",offset*2,data);
 			break;
 	}
 }
@@ -831,7 +1101,7 @@ void hng64_state::hng_map(address_map &map)
 {
 	// main RAM / ROM
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
-	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
+	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0);
 
 	// Misc Peripherals
 	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
@@ -849,7 +1119,7 @@ void hng64_state::hng_map(address_map &map)
 	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
 	// BIOS ROM
-	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
+	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0);
 
 	// Sprites
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");
@@ -1775,6 +2045,8 @@ void hng64_state::machine_start()
 		m_videoregs[i] = 0xdeadbeef;
 	}
 
+	m_irq_pending = 0;
+
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
 
@@ -2236,15 +2508,19 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
 	/* TMP87PH40AN (I/O MCU) */ \
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
-
+	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) ) \
+	/* BR9020F (EEPROM) */ \
+	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
+	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
+	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
 
 ROM_START( hng64 )
 	/* BIOS */
 	HNG64_BIOS
 
 	/* To placate MAME */
-	ROM_REGION32_LE( 0x2000000, "gameprg", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x2000000, "gameprg", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "scrtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "sprtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
@@ -2256,9 +2532,9 @@ ROM_END
 ROM_START( roadedge )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "001pr01b.81", 0x0000000, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
-	ROM_LOAD32_WORD( "001pr02b.82", 0x0000002, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "001pr01b.81", 0x0000002, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
+	ROM_LOAD32_WORD_SWAP( "001pr02b.82", 0x0000000, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x1000000, "scrtile", 0 )
@@ -2309,11 +2585,11 @@ ROM_END
 ROM_START( sams64 )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
-	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
-	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
-	ROM_LOAD32_WORD( "002-pro4a.84", 0x0800002, 0x400000, CRC(5a8291e9) SHA1(ec1e5a5a0ba37393e8b93d78b4ac855109d45ec9) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "002-pro1a.81", 0x0000002, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
+	ROM_LOAD32_WORD_SWAP( "002-pro2a.82", 0x0000000, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
+	ROM_LOAD32_WORD_SWAP( "002-pro3a.83", 0x0800002, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
+	ROM_LOAD32_WORD_SWAP( "002-pro4a.84", 0x0800000, 0x400000, CRC(5a8291e9) SHA1(ec1e5a5a0ba37393e8b93d78b4ac855109d45ec9) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x2000000, "scrtile", 0 )
@@ -2364,9 +2640,9 @@ ROM_END
 ROM_START( xrally )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "003-pr01a.81", 0x0000000, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
-	ROM_LOAD32_WORD( "003-pr02a.82", 0x0000002, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "003-pr01a.81", 0x0000002, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
+	ROM_LOAD32_WORD_SWAP( "003-pr02a.82", 0x0000000, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x1000000, "scrtile", 0 )
@@ -2406,11 +2682,11 @@ ROM_END
 ROM_START( bbust2 )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "004-pr01a.81", 0x0000000, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
-	ROM_LOAD32_WORD( "004-pr02a.82", 0x0000002, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
-	ROM_LOAD32_WORD( "004-pr03a.83", 0x0800000, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
-	ROM_LOAD32_WORD( "004-pr04a.84", 0x0800002, 0x400000, CRC(9258312b) SHA1(fabac42c8a033e85d503be56f266f9386adff10b) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "004-pr01a.81", 0x0000002, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
+	ROM_LOAD32_WORD_SWAP( "004-pr02a.82", 0x0000000, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
+	ROM_LOAD32_WORD_SWAP( "004-pr03a.83", 0x0800002, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
+	ROM_LOAD32_WORD_SWAP( "004-pr04a.84", 0x0800000, 0x400000, CRC(9258312b) SHA1(fabac42c8a033e85d503be56f266f9386adff10b) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x1000000, "scrtile", 0 )
@@ -2454,15 +2730,15 @@ ROM_END
 ROM_START( sams64_2 )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "005pr01a.81", 0x0000000, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
-	ROM_LOAD32_WORD( "005pr02a.82", 0x0000002, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
-	ROM_LOAD32_WORD( "005pr03a.83", 0x0800000, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
-	ROM_LOAD32_WORD( "005pr04a.84", 0x0800002, 0x400000, CRC(6b504852) SHA1(fcdcab432162542d249818a6cd15b8f2e8230f97) )
-	ROM_LOAD32_WORD( "005pr05a.85", 0x1000000, 0x400000, CRC(32a743d3) SHA1(4088b930a1a4d6224a0939ef3942af1bf605cdb5) )
-	ROM_LOAD32_WORD( "005pr06a.86", 0x1000002, 0x400000, CRC(c09fa615) SHA1(697d6769c16b3c8f73a6df4a1e268ec40cb30d51) )
-	ROM_LOAD32_WORD( "005pr07a.87", 0x1800000, 0x400000, CRC(44286ad3) SHA1(1f890c74c0da0d34940a880468e68f7fb1417813) )
-	ROM_LOAD32_WORD( "005pr08a.88", 0x1800002, 0x400000, CRC(d094eb67) SHA1(3edc8d608c631a05223e1d05157cd3daf2d6597a) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "005pr01a.81", 0x0000002, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
+	ROM_LOAD32_WORD_SWAP( "005pr02a.82", 0x0000000, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
+	ROM_LOAD32_WORD_SWAP( "005pr03a.83", 0x0800002, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
+	ROM_LOAD32_WORD_SWAP( "005pr04a.84", 0x0800000, 0x400000, CRC(6b504852) SHA1(fcdcab432162542d249818a6cd15b8f2e8230f97) )
+	ROM_LOAD32_WORD_SWAP( "005pr05a.85", 0x1000002, 0x400000, CRC(32a743d3) SHA1(4088b930a1a4d6224a0939ef3942af1bf605cdb5) )
+	ROM_LOAD32_WORD_SWAP( "005pr06a.86", 0x1000000, 0x400000, CRC(c09fa615) SHA1(697d6769c16b3c8f73a6df4a1e268ec40cb30d51) )
+	ROM_LOAD32_WORD_SWAP( "005pr07a.87", 0x1800002, 0x400000, CRC(44286ad3) SHA1(1f890c74c0da0d34940a880468e68f7fb1417813) )
+	ROM_LOAD32_WORD_SWAP( "005pr08a.88", 0x1800000, 0x400000, CRC(d094eb67) SHA1(3edc8d608c631a05223e1d05157cd3daf2d6597a) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x4000000, "scrtile", 0 )
@@ -2526,11 +2802,11 @@ ROM_END
 ROM_START( fatfurwa )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "006pr01a.81", 0x0000000, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
-	ROM_LOAD32_WORD( "006pr02a.82", 0x0000002, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
-	ROM_LOAD32_WORD( "006pr03a.83", 0x0800000, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
-	ROM_LOAD32_WORD( "006pr04a.84", 0x0800002, 0x400000, CRC(de708d6c) SHA1(2c9848e7bbf61c574370f9ecab5f5a6ba63339fd) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "006pr01a.81", 0x0000002, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
+	ROM_LOAD32_WORD_SWAP( "006pr02a.82", 0x0000000, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
+	ROM_LOAD32_WORD_SWAP( "006pr03a.83", 0x0800002, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
+	ROM_LOAD32_WORD_SWAP( "006pr04a.84", 0x0800000, 0x400000, CRC(de708d6c) SHA1(2c9848e7bbf61c574370f9ecab5f5a6ba63339fd) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x4000000, "scrtile", 0 )
@@ -2591,13 +2867,13 @@ ROM_END
 ROM_START( buriki )
 	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
-	ROM_LOAD32_WORD( "007pr01b.81", 0x0000000, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
-	ROM_LOAD32_WORD( "007pr02b.82", 0x0000002, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
-	ROM_LOAD32_WORD( "007pr03a.83", 0x0800000, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )
-	ROM_LOAD32_WORD( "007pr04a.84", 0x0800002, 0x400000, CRC(befc7bce) SHA1(83d9ecf944e03a40cf25ee288077c2265d6a588a) )
-	ROM_LOAD32_WORD( "007pr05a.85", 0x1000000, 0x400000, CRC(013e28bc) SHA1(45e5ac45b42b26957c2877ac1042472c4b5ec914) )
-	ROM_LOAD32_WORD( "007pr06a.86", 0x1000002, 0x400000, CRC(0620fccc) SHA1(e0bffc56b019c79276a4ef5ec7354edda15b0889) )
+	ROM_REGION32_BE( 0x2000000, "gameprg", 0 )
+	ROM_LOAD32_WORD_SWAP( "007pr01b.81", 0x0000002, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
+	ROM_LOAD32_WORD_SWAP( "007pr02b.82", 0x0000000, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
+	ROM_LOAD32_WORD_SWAP( "007pr03a.83", 0x0800002, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )
+	ROM_LOAD32_WORD_SWAP( "007pr04a.84", 0x0800000, 0x400000, CRC(befc7bce) SHA1(83d9ecf944e03a40cf25ee288077c2265d6a588a) )
+	ROM_LOAD32_WORD_SWAP( "007pr05a.85", 0x1000002, 0x400000, CRC(013e28bc) SHA1(45e5ac45b42b26957c2877ac1042472c4b5ec914) )
+	ROM_LOAD32_WORD_SWAP( "007pr06a.86", 0x1000000, 0x400000, CRC(0620fccc) SHA1(e0bffc56b019c79276a4ef5ec7354edda15b0889) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
 	ROM_REGION( 0x4000000, "scrtile", 0 )
@@ -2660,7 +2936,7 @@ GAME( 1997, hng64,    0,     hng64_default, hng64,    hng64_state, init_hng64,  
 /* Games */
 GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
 GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
 GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
 GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */

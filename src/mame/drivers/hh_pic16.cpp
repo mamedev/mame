@@ -22,6 +22,7 @@
  @061     1655A   1980, Lakeside Le Boom
  @078     1655A   1980, Ideal Flash
  *081     1655A   1981, Ramtex Space Invaders/Block Buster
+ *085     1655A   1980, VTech Soccer 2/Grandstand Match of the Day Soccer
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *123     1655A?  1980, Kingsford Match Me/Mini Match Me

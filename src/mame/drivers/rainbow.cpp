@@ -1601,7 +1601,7 @@ uint8_t rainbow_modelb_state::rtc_r(offs_t offset)
 		case 0x2004:  // 0xFE004 (MIRROR)
 			if (m_rtc->chip_enable())
 				return (m_rtc->read_data() & 0x01);
-
+			[[fallthrough]]; // FIXME: really?
 		// (RTC ACTIVATION) read magic pattern 0
 		case 0x0100:  // 0xFC100
 		case 0x2100:  // 0xFE100 (MIRROR)

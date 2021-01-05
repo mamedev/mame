@@ -36,17 +36,17 @@ function gdbstub.startplugin()
 	local running
 
 	emu.register_start(function ()
-		debugger = manager:machine():debugger()
+		debugger = manager.machine.debugger
 		if not debugger then
 			print("gdbstub: debugger not enabled")
 			return
 		end
-		cpu = manager:machine().devices[":maincpu"]
+		cpu = manager.machine.devices[":maincpu"]
 		if not cpu then
 			print("gdbstub: maincpu not found")
 		end
-		if not regmaps[cpu:shortname()] then
-			print("gdbstub: no register map for cpu " .. cpu:shortname())
+		if not regmaps[cpu.shortname] then
+			print("gdbstub: no register map for cpu " .. cpu.shortname)
 			cpu = nil
 		end
 		consolelog = debugger.consolelog
@@ -98,7 +98,7 @@ function gdbstub.startplugin()
 		consolelast = #consolelog
 		if #consolelog > last and msg:find("Stopped at", 1, true) then
 			local point = tonumber(msg:match("Stopped at breakpoint ([0-9]+)"))
-			local map = regmaps[cpu:shortname()]
+			local map = regmaps[cpu.shortname]
 			running = false
 			if not point then
 				point = tonumber(msg:match("Stopped at watchpoint ([0-9]+"))
@@ -152,7 +152,7 @@ function gdbstub.startplugin()
 		if packet then
 			packet:gsub("}(.)", function(s) return string.char(string.byte(s) ~ 0x20) end)
 			local cmd = packet:sub(1, 1)
-			local map = regmaps[cpu:shortname()]
+			local map = regmaps[cpu.shortname]
 			if cmd == "g" then
 				local regs = {}
 				for reg, idx in pairs(map.togdb) do
@@ -175,7 +175,7 @@ function gdbstub.startplugin()
 					local data = ""
 					local space = cpu.spaces["program"]
 					for count = 1, len do
-						data = data .. string.format("%.2x", space:read_log_u8(addr))
+						data = data .. string.format("%.2x", space:readv_u8(addr))
 						addr = addr + 1
 					end
 					socket:write("+$" .. data .. "#" .. chksum(data))
@@ -188,14 +188,14 @@ function gdbstub.startplugin()
 				if addr and len and data then
 					addr = tonumber(addr, 16)
 					local space = cpu.spaces["program"]
-					data:gsub("%x%x", function(s) space:write_log_u8(addr + count, tonumber(s, 16)) count = count + 1 end)
+					data:gsub("%x%x", function(s) space:writev_u8(addr + count, tonumber(s, 16)) count = count + 1 end)
 					socket:write("+$OK#9a")
 				else
 					socket:write("+$E00#a5")
 				end
 			elseif cmd == "s" then
 				if #packet == 1 then
-					cpu:debug():step()
+					cpu.debug:step()
 					socket:write("+$OK#9a")
 					socket:write("$S05#B8")
 					running = false
@@ -204,7 +204,7 @@ function gdbstub.startplugin()
 				end
 			elseif cmd == "c" then
 				if #packet == 1 then
-					cpu:debug():go()
+					cpu.debug:go()
 					socket:write("+$OK#9a")
 				else
 					socket:write("+$E00#a5")
@@ -219,7 +219,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():bpset(addr)
+					local idx = cpu.debug:bpset(addr)
 					breaks.byaddr[addr] = idx
 					breaks.byidx[idx] = addr
 					socket:write("+$OK#9a")
@@ -228,7 +228,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "w", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "w", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "watch"}
 					socket:write("+$OK#9a")
@@ -237,7 +237,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "r", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "r", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "rwatch"}
 					socket:write("+$OK#9a")
@@ -246,7 +246,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "rw", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "rw", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "awatch"}
 					socket:write("+$OK#9a")
@@ -262,7 +262,7 @@ function gdbstub.startplugin()
 						return
 					end
 					local idx = breaks.byaddr[addr]
-					cpu:debug():bpclr(idx)
+					cpu.debug:bpclr(idx)
 					breaks.byaddr[addr] = nil
 					breaks.byidx[idx] = nil
 					socket:write("+$OK#9a")
@@ -272,7 +272,7 @@ function gdbstub.startplugin()
 						return
 					end
 					local idx = watches.byaddr[addr]
-					cpu:debug():wpclr(idx)
+					cpu.debug:wpclr(idx)
 					watches.byaddr[addr] = nil
 					watches.byidx[idx] = nil
 					socket:write("+$OK#9a")

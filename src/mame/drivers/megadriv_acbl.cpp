@@ -940,12 +940,13 @@ INPUT_PORTS_END
 void md_boot_state::megadrvb(machine_config &config)
 {
 	md_ntsc(config);
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 }
 
-MACHINE_START_MEMBER(md_boot_state, md_6button)
+
+void md_boot_6button_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(md_bootleg);
+	md_base_state::machine_start();
+	m_vdp->stop_timers();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
 	m_io_pad_6b[1] = ioport("EXTRA2");
@@ -957,11 +958,11 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
-void md_boot_state::megadrvb_6b(machine_config &config)
+void md_boot_6button_state::megadrvb_6b(machine_config &config)
 {
 	md_ntsc(config);
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
 }
+
 
 
 /*************************************
@@ -1041,11 +1042,8 @@ void md_boot_state::init_mk3mdb()
 void md_boot_state::init_ssf2mdb()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xA130F0, 0xA130FF); // custom banking is disabled (!)
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x400000, 0x5fffff, "bank5");
+	m_maincpu->space(AS_PROGRAM).install_rom(0x400000, 0x5fffff, memregion( "maincpu" )->base() + 0x400000);
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x5fffff);
-
-	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
-
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadrij();
@@ -1345,14 +1343,14 @@ ROM_END
  *************************************/
 
 GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)",                                       0 )
-GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)",                                        0 )
-GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0 )
+GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)",                                        0 )
+GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_6button_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0 )
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)",                                          0 )
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter",                                                                           0 )
 GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Megadrive clone hardware)",                            0 )
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)",                                       0 )
-GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
+GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
 GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation

@@ -39,7 +39,7 @@ PCB Layout
 |A                                   |
 | GW6582  LS02                       |
 |          |-----------| 4040        |
-|  74HC245 |Phillps    | 4040        |
+|  74HC245 |Philips    | 4040        |
 |          |SAA71111AH2|             |
 |          |20505650   |             |
 |          |bP0219     | 24-3.U3     |
@@ -63,6 +63,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class cham24_state : public driver_device
 {
 public:
@@ -71,6 +73,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
+	void cham24(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
@@ -87,13 +96,9 @@ public:
 	void cham24_IN0_w(uint8_t data);
 	uint8_t cham24_IN1_r();
 	void cham24_mapper_w(offs_t offset, uint8_t data);
-	void init_cham24();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void cham24_set_mirroring( int mirroring );
-	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
+	void cham24_ppu_map(address_map &map);
 };
 
 
@@ -229,6 +234,13 @@ void cham24_state::cham24_map(address_map &map)
 	map(0x8000, 0xffff).rom().w(FUNC(cham24_state::cham24_mapper_w));
 }
 
+void cham24_state::cham24_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3eff).rw(FUNC(cham24_state::nt_r), FUNC(cham24_state::nt_w));
+	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+}
+
 static INPUT_PORTS_START( cham24 )
 	PORT_START("P1") /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -251,10 +263,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void cham24_state::video_start()
-{
-}
-
 
 void cham24_state::machine_start()
 {
@@ -272,21 +280,14 @@ void cham24_state::machine_reset()
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
 
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
-
-	/* and read/write handlers */
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(cham24_state::nt_r)), write8sm_delegate(*this, FUNC(cham24_state::nt_w)));
 }
 
-void cham24_state::init_cham24()
-{
-}
 
 void cham24_state::cham24(machine_config &config)
 {
@@ -302,6 +303,7 @@ void cham24_state::cham24(machine_config &config)
 	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
+	m_ppu->set_addrmap(0, &cham24_state::cham24_ppu_map);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -323,4 +325,7 @@ ROM_START( cham24 )
 	ROM_LOAD( "24-3.u3", 0x0000, 0x10000, CRC(e97955fa) SHA1(6d686c5d0967c9c2f40dbd8e6a0c0907606f2c7d) ) // unknown rom
 ROM_END
 
-GAME( 2002, cham24, 0, cham24, cham24, cham24_state, init_cham24, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING )
+} // Anonymous namespace
+
+
+GAME( 2002, cham24, 0, cham24, cham24, cham24_state, empty_init, ROT0, "bootleg", "Chameleon 24", MACHINE_NOT_WORKING )

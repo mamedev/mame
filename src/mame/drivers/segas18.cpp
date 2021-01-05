@@ -2297,7 +2297,7 @@ ROM_END
     game No. 833-8830-02
     pcb  No. 837-8832-02 (171-5873-02b)
     ROM  No. 834-8831-02 (171-5987a)
-    CPU Hiatchi FD1094 317-0196
+    CPU Hitachi FD1094 317-0196
 */
 ROM_START( desertbr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 code - custom CPU 317-0196
@@ -2367,7 +2367,7 @@ ROM_END
     game No. 833-8830?
     pcb  No. 837-8832? (171-5873B)
     ROM  No. 834-8831 (171-5987A)
-    CPU Hiatchi FD1094 317-0194
+    CPU Hitachi FD1094 317-0194
 */
 ROM_START( desertbrj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 code - custom CPU 317-0196
@@ -2463,7 +2463,7 @@ ROM_START( hamaway )
 	ROM_LOAD16_BYTE( "c18.bin", 0x080001, 0x40000, CRC(0f8fe8bb) SHA1(e6f68442b8d4def29b106458496a47344f70d511) )
 	ROM_LOAD16_BYTE( "11.bin",  0x080000, 0x40000, CRC(2b5eacbc) SHA1(ba3690501588b9c88a31022b44bc3c82b44ae26b) )
 	ROM_LOAD16_BYTE( "c19.bin", 0x100001, 0x40000, CRC(3c616caa) SHA1(d48a6239b7a52ac13971f7513a65a17af492bfdf) ) // 11xxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
+	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway), also found with the second half filled with 0xff
 
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "c16.bin", 0x000000, 0x40000, CRC(913cc18c) SHA1(4bf4ec14937586c3ae77fcad57dcb21f6433ef81) )

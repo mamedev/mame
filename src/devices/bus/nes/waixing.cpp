@@ -746,6 +746,7 @@ void nes_waixing_h_device::write_h(offs_t offset, uint8_t data)
 					m_prg_base = (data << 5) & 0x40;
 					m_prg_mask = 0x3f;
 					set_prg(m_prg_base, m_prg_mask);
+					[[fallthrough]];
 				case 1:
 				case 2: case 3: case 4: case 5:
 					m_mmc_vrom_bank[cmd] = data;
@@ -787,6 +788,7 @@ void nes_waixing_h1_device::write_h(offs_t offset, uint8_t data)
 					m_prg_base = (data << 5) & 0x40;
 					m_prg_mask = 0x3f;
 					set_prg(m_prg_base, m_prg_mask);
+					[[fallthrough]];
 				case 1:
 				case 2: case 3: case 4: case 5:
 					m_mmc_vrom_bank[cmd] = data;

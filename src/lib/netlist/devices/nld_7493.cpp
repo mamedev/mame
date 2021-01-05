@@ -57,10 +57,7 @@
 #include "nl_base.h"
 
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	static constexpr std::array<netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
 
@@ -133,5 +130,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2,@VCC,@GND")
 
-	} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

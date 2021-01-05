@@ -12,8 +12,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/filesel.h"
+
 #include "ui/ui.h"
 #include "ui/utils.h"
 
@@ -24,7 +24,9 @@
 #include <cstring>
 #include <locale>
 
+
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -76,7 +78,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 {
 	// lay out extra text
 	auto layout = ui().create_layout(container());
-	layout.add_text(m_current_directory.c_str());
+	layout.add_text(m_current_directory);
 
 	// position this extra text
 	float x1, y1, x2, y2;
@@ -202,7 +204,7 @@ menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 	entry.fullpath = std::move(entry_fullpath);
 
 	// find the end of the list
-	return *m_entrylist.emplace(m_entrylist.end(), std::move(entry));
+	return m_entrylist.emplace_back(std::move(entry));
 }
 
 
@@ -310,8 +312,8 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 
 	case SELECTOR_ENTRY_TYPE_DRIVE:
 	case SELECTOR_ENTRY_TYPE_DIRECTORY:
-		// drive/directory - first check the path
 		{
+			// drive/directory - first check the path
 			util::zippath_directory::ptr dir;
 			osd_file::error const err = util::zippath_directory::open(entry.fullpath, dir);
 			if (err != osd_file::error::NONE)
@@ -533,12 +535,12 @@ menu_select_rw::~menu_select_rw()
 
 void menu_select_rw::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
-	item_append(_("Read-only"), "", 0, itemref_from_result(result::READONLY));
+	item_append(_("Select access mode"), FLAG_DISABLE, nullptr);
+	item_append(_("Read-only"), 0, itemref_from_result(result::READONLY));
 	if (m_can_in_place)
-		item_append(_("Read-write"), "", 0, itemref_from_result(result::READWRITE));
-	item_append(_("Read this image, write to another image"), "", 0, itemref_from_result(result::WRITE_OTHER));
-	item_append(_("Read this image, write to diff"), "", 0, itemref_from_result(result::WRITE_DIFF));
+		item_append(_("Read-write"), 0, itemref_from_result(result::READWRITE));
+	item_append(_("Read this image, write to another image"), 0, itemref_from_result(result::WRITE_OTHER));
+	item_append(_("Read this image, write to diff"), 0, itemref_from_result(result::WRITE_DIFF));
 }
 
 

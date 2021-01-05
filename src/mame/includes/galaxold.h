@@ -158,14 +158,12 @@ public:
 	uint8_t rescueb_a002_r() { return 0xfc; }
 	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
 	void init_bullsdrtg();
 	void init_ladybugg();
 	void init_4in1();
 	void init_guttangt();
-	void init_ckonggx();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -175,7 +173,6 @@ public:
 	TILE_GET_INFO_MEMBER(harem_get_tile_info);
 
 	DECLARE_MACHINE_RESET(galaxold);
-	DECLARE_MACHINE_RESET(devilfsg);
 	DECLARE_MACHINE_RESET(hunchbkg);
 
 	void galaxold_palette(palette_device &palette);
@@ -200,8 +197,6 @@ public:
 	DECLARE_VIDEO_START(dkongjrmc);
 	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
-	DECLARE_VIDEO_START(ozon1);
-	DECLARE_VIDEO_START(bongo);
 	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
 	DECLARE_VIDEO_START(rescue);
@@ -213,12 +208,10 @@ public:
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
-	DECLARE_VIDEO_START(bagmanmc);
 
 	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
@@ -268,14 +261,10 @@ public:
 	void start_stars_scroll_timer();
 	void draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, uint8_t *spriteram, size_t spriteram_size);
-	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
-	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
 	void galaxian(machine_config &config);
 	void galaxold_base(machine_config &config);
-	void ckongg(machine_config &config);
 	void _4in1(machine_config &config);
-	void bongo(machine_config &config);
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
@@ -286,27 +275,18 @@ public:
 	void scrambler(machine_config &config);
 	void spcwarp(machine_config &config);
 	void dkongjrmc(machine_config &config);
-	void bagmanmc(machine_config &config);
 	void bullsdrtg(machine_config &config);
 	void drivfrcg(machine_config &config);
 	void rockclim(machine_config &config);
 	void scramblb(machine_config &config);
-	void porter(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
-	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
-	void ckongmc(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
-	void bagmanmc_map(address_map &map);
-	void bongo_map(address_map &map);
-	void bongo_io(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
-	void ckongg_map(address_map &map);
-	void ckongmc_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);
 	void drivfrcg_program(address_map &map);
@@ -319,8 +299,6 @@ public:
 	void hunchbkg_data(address_map &map);
 	void hustlerb3_map(address_map &map);
 	void mooncrst_map(address_map &map);
-	void ozon1_io_map(address_map &map);
-	void ozon1_map(address_map &map);
 	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);

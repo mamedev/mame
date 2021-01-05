@@ -826,8 +826,7 @@ void screen_device::device_start()
 	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
-	render_container::user_settings settings;
-	m_container->get_user_settings(settings);
+	render_container::user_settings settings = m_container->get_user_settings();
 	settings.m_xoffset = m_xoffset;
 	settings.m_yoffset = m_yoffset;
 	settings.m_xscale = m_xscale;
@@ -890,7 +889,7 @@ void screen_device::device_start()
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
 
-	m_is_primary_screen = (this == screen_device_iterator(machine().root_device()).first());
+	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
 
 
@@ -1918,8 +1917,8 @@ void screen_device::finalize_burnin()
 		util::png_info pnginfo;
 
 		// add two text entries describing the image
-		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
-		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()));
 
 		// now do the actual work
 		util::png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);

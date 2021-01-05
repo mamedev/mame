@@ -371,6 +371,25 @@ void imagetek_i4100_device::device_start()
 
 void imagetek_i4100_device::device_reset()
 {
+	m_rombank = 0;
+	m_crtc_unlock = false;
+	m_sprite_count = 0;
+	m_sprite_priority = 0;
+	m_sprite_xoffset = 0;
+	m_sprite_yoffset = 0;
+	m_sprite_color_code = 0;
+
+	for(int i=0; i != 3; i++) {
+		m_layer_priority[i] = 0;
+		m_layer_tile_select[i] = false;
+	}
+
+	m_background_color = 0;
+	m_screen_xoffset = 0;
+	m_screen_yoffset = 0;
+	m_screen_blank = false;
+	m_screen_flip = false;
+
 	expand_gfx1();
 }
 

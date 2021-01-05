@@ -113,7 +113,7 @@ void buggychl_state::sound_enable_w(uint8_t data)
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
 	//logerror("Sound_enable_w written with data of %02x\n", data);
-	machine().sound().system_enable(data & 1);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 uint8_t buggychl_state::mcu_status_r()
@@ -233,7 +233,7 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd820, 0xd83f).ram(); // TODO
 	map(0xd840, 0xd85f).writeonly().share("scrollv");
 	map(0xdb00, 0xdbff).writeonly().share("scrollh");
-	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
+	map(0xdc04, 0xdc04).nopw(); /* should be fg scroll */
 	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
 }
 

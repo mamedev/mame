@@ -22,7 +22,7 @@
 #include <sstream>
 
 
-namespace util { namespace xml {
+namespace util::xml {
 
 namespace {
 
@@ -1019,5 +1019,4 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 	}
 }
 
-
-} } // namespace util::xml
+} // namespace util::xml

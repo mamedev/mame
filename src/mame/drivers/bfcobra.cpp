@@ -125,6 +125,8 @@
 #include "brkball.lh"
 
 
+namespace {
+
 /*
     Defines
 */
@@ -149,7 +151,7 @@ union ADDR_REG
 	struct { uint16_t hiword, loword ; } as16bit;
 	struct { uint8_t addr2, addr1, addr0; } as8bit;
 #endif
-	uint32_t addr;
+	uint32_t addr = 0;
 };
 
 /* Blitter register flag bits */
@@ -2981,6 +2983,9 @@ ROM_START( brkball )
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
 	ROM_LOAD("ledv1.bin",  0x00000, 0x10000, CRC(ea918cb9) SHA1(9e7047613cf1cb4b9a7fefb8a02d8479a7b09e6a))
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1989, inquiztr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor",                              MACHINE_NOT_WORKING )
 GAME( 1990, escounts, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )

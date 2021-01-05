@@ -1213,8 +1213,8 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vx = (s16)(src[0x5] >> 16);
 	m_camera_vy = (s16)(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
-	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
 	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
 	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
 
@@ -2460,7 +2460,7 @@ void namcos22_state::init_tables()
 
 	// init pointrom
 	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = auto_alloc_array(machine(), s32, m_pointrom_size);
+	m_pointrom = std::make_unique<s32[]>(m_pointrom_size);
 	u8* pointrom_low = memregion("pointrom")->base();
 	u8* pointrom_mid = pointrom_low + m_pointrom_size;
 	u8* pointrom_high = pointrom_mid + m_pointrom_size;

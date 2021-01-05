@@ -114,5 +114,5 @@ void isa8_svga_et4k_device::map_ram()
 
 void isa8_svga_et4k_device::map_rom()
 {
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000");
 }

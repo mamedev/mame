@@ -348,22 +348,14 @@ void jazz_state::jazz(machine_config &config)
 	AMD_28F020(config, m_flash);
 
 	// pc keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(&kbd_con);
-
 	// auxiliary connector
-	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
-	// auxiliary port
-	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-	aux.set_pc_kbdc_slot(&aux_con);
 
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);

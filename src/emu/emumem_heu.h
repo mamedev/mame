@@ -13,6 +13,7 @@ public:
 
 	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);
 	handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_read_units *src);
+	handler_entry_read_units(const handler_entry_read_units *src);
 	~handler_entry_read_units();
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -20,6 +21,7 @@ public:
 	std::string name() const override;
 
 	void enumerate_references(handler_entry::reflist &refs) const override;
+	handler_entry_read<Width, AddrShift, Endian> *dup() override;
 
 private:
 	static constexpr u32 SUBUNIT_COUNT = 1 << Width;
@@ -54,6 +56,7 @@ public:
 
 	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, address_space *space);
 	handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src);
+	handler_entry_write_units(const handler_entry_write_units *src);
 	~handler_entry_write_units();
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
@@ -61,6 +64,7 @@ public:
 	std::string name() const override;
 
 	void enumerate_references(handler_entry::reflist &refs) const override;
+	handler_entry_write<Width, AddrShift, Endian> *dup() override;
 
 private:
 	static constexpr u32 SUBUNIT_COUNT = 1 << Width;

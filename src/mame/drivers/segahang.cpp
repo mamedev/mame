@@ -111,7 +111,7 @@ void segahang_state::tilemap_sound_w(uint8_t data)
 	m_segaic16vid->tilemap_set_rowscroll(0, ~data & 0x02);
 
 	// bit 0: sound mute
-	machine().sound().system_enable(data & 0x01);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 
@@ -2241,8 +2241,8 @@ void segahang_state::init_endurobl()
 	init_enduror();
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
-	memcpy(m_decrypted_opcodes + 0x00000/2, rom + 0x30000/2, 0x10000);
-	memcpy(m_decrypted_opcodes + 0x10000/2, rom + 0x10000/2, 0x20000);
+	memcpy(&m_decrypted_opcodes[0x00000/2], rom + 0x30000/2, 0x10000);
+	memcpy(&m_decrypted_opcodes[0x10000/2], rom + 0x10000/2, 0x20000);
 }
 
 void segahang_state::init_endurob2()

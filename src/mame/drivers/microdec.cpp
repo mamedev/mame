@@ -45,11 +45,16 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy(nullptr)
+		, m_rom_view(*this, "rom")
 	{ }
 
 	void microdec(machine_config &config);
 
 	void init_microdec();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	uint8_t portf5_r();
@@ -64,12 +69,12 @@ private:
 
 	uint8_t m_portf8;
 	bool m_fdc_rdy;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
+	memory_view m_rom_view;
 };
 
 
@@ -80,7 +85,8 @@ d4   : ready (fdd)
 d5   : diag jumper (md3 only) */
 uint8_t microdec_state::portf5_r()
 {
-	m_fdc->set_ready_line_connected(m_fdc_rdy);
+	if (!machine().side_effects_disabled())
+		m_fdc->set_ready_line_connected(m_fdc_rdy);
 
 	uint8_t data = m_portf8 | ioport("DIAG")->read() | 0xc0;
 	return data;
@@ -89,22 +95,26 @@ uint8_t microdec_state::portf5_r()
 // disable eprom
 uint8_t microdec_state::portf6_r()
 {
-	membank("bankr0")->set_entry(0); // point at ram
+	if (!machine().side_effects_disabled())
+		m_rom_view.disable(); // point at ram
 	return 0xff;
 }
 
 // TC pin on fdc
 uint8_t microdec_state::portf7_r()
 {
-	m_fdc->tc_w(1);
-	m_fdc->tc_w(0);
+	if (!machine().side_effects_disabled())
+	{
+		m_fdc->tc_w(1);
+		m_fdc->tc_w(0);
+	}
 	return 0xff;
 }
 
 // enable eprom
 void microdec_state::portf6_w(uint8_t data)
 {
-	membank("bankr0")->set_entry(1); // point at rom
+	m_rom_view.select(0); // point at rom
 }
 
 // sets up VFO stuff
@@ -130,8 +140,9 @@ void microdec_state::portf8_w(uint8_t data)
 void microdec_state::microdec_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
-	map(0x1000, 0xffff).ram();
+	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x0fff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0x0fff).rom().region("maincpu", 0);
 }
 
 void microdec_state::microdec_io(address_map &map)
@@ -173,9 +184,7 @@ void microdec_state::machine_start()
 
 void microdec_state::machine_reset()
 {
-	membank("bankr0")->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	m_maincpu->set_input_line_vector(0, 0x7f); // Z80
+	m_rom_view.select(0); // point at rom
 }
 
 static void microdec_floppies(device_slot_interface &device)
@@ -185,13 +194,7 @@ static void microdec_floppies(device_slot_interface &device)
 
 void microdec_state::init_microdec()
 {
-	uint8_t *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x1000]);
-	membank("bankw0")->configure_entry(0, &main[0x1000]);
 	m_fdc->set_ready_line_connected(1);
-	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy
 }
 
 void microdec_state::microdec(machine_config &config)
@@ -200,15 +203,16 @@ void microdec_state::microdec(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microdec_state::microdec_mem);
 	m_maincpu->set_addrmap(AS_IO, &microdec_state::microdec_io);
+	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int) -> int { return 0x7f; })); // 7407 drives D7 low
 
 	/* video hardware */
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 4 / 13 / 2)); // TODO: rate configured by SW1/SW1 or PIT
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1", 16_MHz_XTAL / 8));
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -218,7 +222,7 @@ void microdec_state::microdec(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2", 16_MHz_XTAL / 8));
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
@@ -228,7 +232,7 @@ void microdec_state::microdec(machine_config &config)
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	FLOPPY_CONNECTOR(config, "fdc:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//FLOPPY_CONNECTOR(config, "fdc:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);

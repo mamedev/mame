@@ -301,6 +301,13 @@ void model2_tgp_state::machine_reset()
 	m_copro_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+void model2o_gtx_state::machine_reset()
+{
+	model2_tgp_state::machine_reset();
+
+	m_gtx_state = 0;
+}
+
 void model2a_state::machine_reset()
 {
 	model2_tgp_state::machine_reset();
@@ -318,6 +325,9 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+
+	m_iop_data = 0;
+	m_iop_write_num = 0;
 }
 
 void model2c_state::machine_reset()
@@ -7062,14 +7072,14 @@ u32 model2_state::doa_unk_r()
 void model2_state::sega_0229_map(address_map &map)
 {
 	// view the protection device has into RAM, this might need endian swapping
-	map(0x000000, 0x007fff).ram().share("protram0229");
+	map(0x000000, 0x007fff).lrw8([this](offs_t offset){ return m_maincpu->space(AS_PROGRAM).read_byte(0x1d80000+offset); }, "prot", [this](offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x1d80000+offset, data); }, "prot");
 }
 
 /* common map for 0229 protection */
 void model2_state::model2_0229_mem(address_map &map)
 {
 	// the addresses here suggest this is only connected to a 0x8000 byte window, not 0x80000 like ST-V
-	map(0x01d80000, 0x01d87fff).ram().share("protram0229");
+	map(0x01d80000, 0x01d87fff).ram();
 	map(0x01d87ff0, 0x01d87ff3).w(m_0229crypt, FUNC(sega_315_5838_comp_device::srcaddr_w));
 	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::data_w_doa));
 	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));
@@ -7088,9 +7098,9 @@ void model2_state::init_doa()
 }
 
 // Model 2 (TGPs, Model 1 sound board)
-GAME( 1994, daytona,    0,       daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonase,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, daytona93,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytona,    0,       daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, daytonase,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA Special Edition (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, daytona93,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, daytonas,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994?,daytonat,   daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994?,daytonata,  daytona, daytona,      daytona, model2o_state,  empty_init,   ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

@@ -30,6 +30,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class pinball2k_state : public pcat_base_state
 {
 public:
@@ -48,6 +50,11 @@ public:
 
 	void init_mediagx();
 	void init_pinball2k();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -98,9 +105,6 @@ private:
 	uint32_t port800_r();
 	void port800_w(uint32_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -583,6 +587,8 @@ INPUT_PORTS_END
 
 void pinball2k_state::machine_start()
 {
+	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
+	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
 }
 
 void pinball2k_state::machine_reset()
@@ -702,6 +708,8 @@ ROM_START( rfmpbr2 )
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 ROM_END
+
+} // Anonymous namespace
 
 /*****************************************************************************/
 

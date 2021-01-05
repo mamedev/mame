@@ -59,7 +59,7 @@ function xml.conv_cheat(data)
 	data = xml_parse(data)
 	local cpu_spaces = {}
 
-	for tag, device in pairs(manager:machine().devices) do
+	for tag, device in pairs(manager.machine.devices) do
 		local sp
 		for name, space in pairs(device.spaces) do
 			if not sp then

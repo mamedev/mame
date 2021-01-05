@@ -17,10 +17,10 @@ class simpsons_state : public driver_device
 public:
 	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_palette_view(*this, "palette_view"),
+		m_video_view(*this, "video_view"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_bank0000(*this, "bank0000"),
-		m_bank2000(*this, "bank2000"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251")
@@ -47,11 +47,13 @@ private:
 	int        m_firq_enabled;
 	u64        m_nmi_enabled;
 
+	/* views */
+	memory_view m_palette_view;
+	memory_view m_video_view;
+
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<address_map_bank_device> m_bank0000;
-	required_device<address_map_bank_device> m_bank2000;
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;

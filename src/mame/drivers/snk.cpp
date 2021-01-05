@@ -225,7 +225,7 @@ A6004UP02-01
  |      2018  2018                           SKT64      |-|
  |-------------------------------------------------------|
 Notes:
-      CN5/6 - Auxilliary power input connectors
+      CN5/6 - Auxiliary power input connectors
       GV*   - OTP EPROMs
       6116  - 2k x8-bit SRAM
       2018  - Toshiba TMM2018 2k x8-bit SRAM
@@ -256,7 +256,7 @@ A6004UP01-01
  |                             16MHz                    |-|
  |-------------------------------------------------------|
 Notes:
-      CN4      - Auxilliary power input connectors
+      CN4      - Auxiliary power input connectors
       ^        - These parts not populated
       GV*      - OTP EPROMs
       A6003-1  - PAL
@@ -305,7 +305,7 @@ Notes:
       DIP1/2  - 8-position DIP switches
       4559    - NEC uPC4559 Dual Operational Amplifier
       YM3014  - Yamaha YM3014 DAC
-      CN5/7    - Auxilliary power input connectors
+      CN5/7    - Auxiliary power input connectors
       CN9-12  - 4-position connectors (extra control?)
       X       - Space for a DIP28 ROM, but not populated with anything
 
@@ -340,7 +340,7 @@ Notes:
       6116  - 2k x8-bit SRAM
       2018  - Toshiba TMM2018 2k x8-bit SRAM
       SNK8* - SNK SDIP64 custom chips
-      CN5/7 - Auxilliary power input connectors
+      CN5/7 - Auxiliary power input connectors
       JP*   - 2x 2-pin jumper to set ROM sizes 1M/512K for ROMs 2J-2T. Jumper is set to 512K
 
 
@@ -583,6 +583,11 @@ TODO:
 #include "sound/8950intf.h"
 #include "speaker.h"
 
+
+void snk_state::machine_start()
+{
+	m_countryc_trackball = 0;
+}
 
 /*********************************************************************/
 // Interrupt handlers common to all SNK triple Z80 games

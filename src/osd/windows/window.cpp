@@ -850,6 +850,7 @@ void win_window_info::destroy()
 
 	// free the render target
 	machine().render().target_free(m_target);
+	m_target = nullptr;
 }
 
 
@@ -1236,8 +1237,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			auto const ticks = std::chrono::steady_clock::now();
 			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
-			// check for a double-click
-			if (ticks - window->m_lastclicktime < std::chrono::milliseconds(GetDoubleClickTime()) &&
+			// check for a double-click - avoid overflow by adding times rather than subtracting
+			if (ticks < (window->m_lastclicktime + std::chrono::milliseconds(GetDoubleClickTime())) &&
 				GET_X_LPARAM(lparam) >= window->m_lastclickx - 4 && GET_X_LPARAM(lparam) <= window->m_lastclickx + 4 &&
 				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
 			{
@@ -1280,6 +1281,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// pause the system when we start a menu or resize
 	case WM_ENTERSIZEMOVE:
 		window->m_resize_state = RESIZE_STATE_RESIZING;
+		[[fallthrough]];
 	case WM_ENTERMENULOOP:
 		winwindow_ui_pause(window->machine(), TRUE);
 		break;
@@ -1287,6 +1289,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	// unpause the system when we stop a menu or resize and force a redraw
 	case WM_EXITSIZEMOVE:
 		window->m_resize_state = RESIZE_STATE_PENDING;
+		[[fallthrough]];
 	case WM_EXITMENULOOP:
 		winwindow_ui_pause(window->machine(), FALSE);
 		InvalidateRect(wnd, nullptr, FALSE);
@@ -1306,7 +1309,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
-			if (video_config.keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			if (window->keepaspect() && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
 				rect->top = r.top();
@@ -1679,8 +1682,9 @@ void win_window_info::update_minmax_state()
 		RECT bounds;
 
 		// compare the maximum bounds versus the current bounds
-		osd_dim minbounds = get_min_bounds(video_config.keepaspect);
-		osd_dim maxbounds = get_max_bounds(video_config.keepaspect);
+		const bool keep_aspect = keepaspect();
+		osd_dim minbounds = get_min_bounds(keep_aspect);
+		osd_dim maxbounds = get_max_bounds(keep_aspect);
 		GetWindowRect(platform_window(), &bounds);
 
 		// if either the width or height matches, we were maximized
@@ -1707,7 +1711,7 @@ void win_window_info::minimize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	osd_dim newsize = get_min_bounds(video_config.keepaspect);
+	osd_dim newsize = get_min_bounds(keepaspect());
 
 	// get the window rect
 	RECT bounds;
@@ -1730,7 +1734,7 @@ void win_window_info::maximize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	osd_dim newsize = get_max_bounds(video_config.keepaspect);
+	osd_dim newsize = get_max_bounds(keepaspect());
 
 	// center within the work area
 	osd_rect work = m_monitor->usuable_position_size();
@@ -1762,7 +1766,7 @@ void win_window_info::adjust_window_position_after_major_change()
 	if (!fullscreen())
 	{
 		// constrain the existing size to the aspect ratio
-		if (video_config.keepaspect)
+		if (keepaspect())
 			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
 
 		// restrict the window to one monitor and avoid toolbars if possible

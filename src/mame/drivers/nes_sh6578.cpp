@@ -724,7 +724,17 @@ ROM_START( vsmaxx25 )
 	ROM_LOAD( "vsmaxx25_am29lv160dt_000122c4.bin", 0x00000, 0x200000, CRC(0efd1625) SHA1(34e83f748af3eee475c5b2b24ff03c00c1b5b8ed) )
 ROM_END
 
+ROM_START( dgun806 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.bin", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
+ROM_END
 
+
+
+ROM_START( dancmix3 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
+ROM_END
 
 CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 
@@ -744,7 +754,12 @@ CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init
 
 // This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
 // A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)
-CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1", MACHINE_NOT_WORKING )
+CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1 (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+// DGUN-806 on sticker on battery compartment. DreamGear had some other products with the same pad type but different DGUN numbers on the packaging, is the ROM the same?
+CONS( 2004?, dgun806,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "dreamGEAR", "Plug 'N' Play 25-in-1 (DGUN-806)", MACHINE_NOT_WORKING )
+
+
 
 // titles below need inputs mapping to go further
 
@@ -754,3 +769,9 @@ CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
+// Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// Handy Max 15-in-1 https://youtu.be/jQTUHj1cP-k - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// has sampled audio, not supported (make sure it isn't being done by an external device)
+CONS( 201?, dancmix3, 0, 0, nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Venom", "TV Dance Mat 4 Games in 1 (Mix Party 3 / Dance Mix 3)", MACHINE_NOT_WORKING )

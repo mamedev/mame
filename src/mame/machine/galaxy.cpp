@@ -144,8 +144,7 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 void galaxy_state::init_galaxy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank( 0x2800, 0x2800 + m_ram->size() - 1, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram( 0x2800, 0x2800 + m_ram->size() - 1, m_ram->pointer());
 
 	if (m_ram->size() < (6 + 48) * 1024)
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);

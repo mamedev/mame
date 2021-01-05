@@ -238,12 +238,12 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 		{
 			//cartridge memory is writable
 			if (data & 0x02)
-				program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
+				program.install_readwrite_bank(0x4000, 0x7fff, m_bank2);
 			else
 				program.unmap_write(0x4000, 0x7fff);
 
 			if (data & 0x04)
-				program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
+				program.install_readwrite_bank(0x8000, 0xbfff, m_bank3);
 			else
 				program.unmap_write(0x8000, 0xbfff);
 		}
@@ -251,7 +251,7 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 		{
 			//cartridge memory is read-only
 			program.unmap_write(0x4000, 0xbfff);
-			program.install_read_bank(0x8000, 0xbfff, "bank3");
+			program.install_read_bank(0x8000, 0xbfff, m_bank3);
 		}
 		break;
 	case 6:

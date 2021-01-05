@@ -108,7 +108,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x00000000, 0x001FFFFF).bankrw(m_bank1).share(m_dram);                         /* DRAM */
+	map(0x00000000, 0x001FFFFF).bankrw(m_bank1);                                       /* DRAM */
 	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                   /* VRAM */
 	map(0x03000000, 0x030FFFFF).rom().region("bios", 0);                               /* BIOS */
 	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */

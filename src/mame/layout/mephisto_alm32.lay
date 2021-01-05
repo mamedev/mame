@@ -33,7 +33,7 @@ license:CC0
 	<element name="text_h"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
 	<element name="piece" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<rect><color alpha="0" /></rect> <!-- force unit square bounds -->
 
 		<image file="chess/wp.png" state="1"/>
 		<image file="chess/wn.png" state="2"/>
@@ -229,7 +229,7 @@ license:CC0
 
 <!-- sb ui -->
 
-	<element name="wmask1" defstate="1">
+	<element name="wmask1" defstate="0">
 		<rect state="0"><color red="0.84" green="0.75" blue="0.50" /></rect>
 	</element>
 	<element name="wmask2">

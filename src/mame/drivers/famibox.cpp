@@ -21,7 +21,7 @@ case style and cartridge/case color:  (FamicomBox = Black, FamicomStation = Gray
 Specific Hardware information
 -----------------------------
 The unit had 3 controllers - 2 standard NES controllers and a NES Zapper light
-gun.  The cartridges are shaped and appear to be idential to NES 72-pin
+gun.  The cartridges are shaped and appear to be identical to NES 72-pin
 cartridges.  Unfortunately, it was made to play only the games specifically
 released for it.  Why?
 
@@ -33,22 +33,22 @@ released for it.  Why?
 
 Here's a list of some of the games known to have come with the FamicomBox:
 1943; Baseball; Bomber Man; Devil World; Donkey Kong; Donkey Kong Jr.; Duck Hunt;
-Excite Bike; F1 Race; Fighting Golf; Golf; Gradius; Hogan?s Alley; Ice Climbers;
-Ice Hockey; Knight Rider; Makaimura: Ghosts ?n Goblins; McKids; Mah-Jong; Mario Bros.;
-Mike Tyson?s Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
-Rygar; Senjou no Ookami; Soccer League Winner?s Cup; Super Chinese 2; Super Mario Bros;
+Excite Bike; F1 Race; Fighting Golf; Golf; Gradius; Hogan's Alley; Ice Climbers;
+Ice Hockey; Knight Rider; Makaimura: Ghosts 'n Goblins; McKids; Mah-Jong; Mario Bros.;
+Mike Tyson's Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
+Rygar; Senjou no Ookami; Soccer League Winner's Cup; Super Chinese 2; Super Mario Bros;
 Tag Team Pro Wrestling; Takahashi Meijin no Boukenjima; Tennis; Twin Bee;
 Volleyball; Wild Gunman; Wrecking Crew.
 
 Here's a list of some of the games known to have come with the FamicomStation:
 1943; Baseball; Donkey Kong; Duck Hunt; F1 Race; Golf; Kame no Ongaeshi:
 Urashima Densetsu; Mah-Jong; Mario Bros.; Night Raider; Senjou no Ookami;
-Soccer League Winner?s Cup; Super Chinese 2; Super Mario Bros; Tag Team Pro Wrestling;
+Soccer League Winner's Cup; Super Chinese 2; Super Mario Bros; Tag Team Pro Wrestling;
 Takahashi Meijin no Boukenjima; Tennis; Wild Gunman; Wrecking Crew.
 
 FamicomBox menu code maintains internal database of games (rom checksums and game names
-in ASCII). When checking game cartidges, it scans roms and tries to find matching game
-in its internal database. Additionaly, games having standard Nintendo header are accepted too.
+in ASCII). When checking game cartridges, it scans roms and tries to find matching game
+in its internal database. Additionally, games having standard Nintendo header are accepted too.
 Current selection of games in driver is based on menu internal database.
 
 Notes/ToDo:
@@ -67,6 +67,8 @@ Notes/ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class famibox_state : public driver_device
 {
 public:
@@ -80,6 +82,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<n2a03_device> m_maincpu;
@@ -112,14 +118,12 @@ private:
 	uint8_t famibox_IN1_r();
 	uint8_t famibox_system_r(offs_t offset);
 	void famibox_system_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void famibox_map(address_map &map);
+	void famibox_ppu_map(address_map &map);
 };
 
 /******************************************************
@@ -388,6 +392,13 @@ void famibox_state::famibox_map(address_map &map)
 	map(0xc000, 0xffff).bankr("cpubank2");
 }
 
+void famibox_state::famibox_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("ppubank1");
+	map(0x2000, 0x3eff).rw(FUNC(famibox_state::famibox_nt_r), FUNC(famibox_state::famibox_nt_w));
+	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+}
+
 /******************************************************
 
    Inputs
@@ -493,10 +504,6 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-void famibox_state::video_start()
-{
-}
-
 void famibox_state::machine_reset()
 {
 	famicombox_bankswitch(0);
@@ -510,11 +517,7 @@ void famibox_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(famibox_state::famibox_nt_r)), write8sm_delegate(*this, FUNC(famibox_state::famibox_nt_w)));
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
-
 	famicombox_bankswitch(0);
-
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
 	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
@@ -539,6 +542,7 @@ void famibox_state::famibox(machine_config &config)
 	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
+	m_ppu->set_addrmap(0, &famibox_state::famibox_ppu_map);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -584,5 +588,8 @@ ROM_START(famibox)
 	ROM_REGION(0x6000, "empty", ROMREGION_ERASEFF)
 
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1986, famibox, 0, famibox, famibox, famibox_state, empty_init, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

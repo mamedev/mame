@@ -45,10 +45,10 @@ void mtx_state::mtx_subpage_w(uint8_t data)
 	if (m_extrom->exists())
 	{
 		if ((data * 0x2000) < m_extrom->get_rom_size())
-			membank("rommap_bank1")->configure_entry(2, m_extrom->get_rom_base() + 0x2000 * data);
+			m_rommap_bank1->configure_entry(2, m_extrom->get_rom_base() + 0x2000 * data);
 		else
-			membank("rommap_bank1")->configure_entry(2, memregion("user2")->base() + 0x4000);
-		membank("rommap_bank1")->set_entry(2);
+			m_rommap_bank1->configure_entry(2, memregion("user2")->base() + 0x4000);
+		m_rommap_bank1->set_entry(2);
 	}
 }
 
@@ -98,23 +98,23 @@ void mtx_state::bankswitch(uint8_t data)
 	if (cbm_mode)
 	{
 		/* ram based memory map */
-		program.install_readwrite_bank(0x0000, 0x3fff, "rammap_bank1");
-		program.install_readwrite_bank(0x4000, 0x7fff, "rammap_bank2");
-		program.install_readwrite_bank(0x8000, 0xbfff, "rammap_bank3");
+		program.install_readwrite_bank(0x0000, 0x3fff, m_rammap_bank1);
+		program.install_readwrite_bank(0x4000, 0x7fff, m_rammap_bank2);
+		program.install_readwrite_bank(0x8000, 0xbfff, m_rammap_bank3);
 
 		/* set ram bank, for invalid pages a nop-handler will be installed */
 		if ((ram_page == 0 && m_ram->size() > 0xc000) || (ram_page > 0 && m_ram->size() > 0x10000 + ram_page * 0xc000))
-			membank("rammap_bank1")->set_entry(ram_page);
+			m_rammap_bank1->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x0000, 0x3fff);
 		if ((ram_page == 0 && m_ram->size() > 0x8000) || (ram_page > 0 && m_ram->size() > 0x14000 + ram_page * 0xc000))
 
-			membank("rammap_bank2")->set_entry(ram_page);
+			m_rammap_bank2->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x4000, 0x7fff);
 		if ((ram_page == 0 && m_ram->size() > 0x4000) || (ram_page > 0 && m_ram->size() > 0x18000 + ram_page * 0xc000))
 
-			membank("rammap_bank3")->set_entry(ram_page);
+			m_rammap_bank3->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x8000, 0xbfff);
 	}
@@ -123,21 +123,21 @@ void mtx_state::bankswitch(uint8_t data)
 		/* rom based memory map */
 		program.install_rom(0x0000, 0x1fff, memregion("user1")->base());
 		program.install_write_handler(0x0000, 0x1fff, write8smo_delegate(*this, FUNC(mtx_state::mtx_subpage_w)));
-		program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
+		program.install_read_bank(0x2000, 0x3fff, m_rommap_bank1);
 		program.unmap_write(0x2000, 0x3fff);
-		program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");
-		program.install_readwrite_bank(0x8000, 0xbfff, "rommap_bank3");
+		program.install_readwrite_bank(0x4000, 0x7fff, m_rommap_bank2);
+		program.install_readwrite_bank(0x8000, 0xbfff, m_rommap_bank3);
 
 		/* set rom bank (switches between basic and assembler rom or cartridges) */
-		membank("rommap_bank1")->set_entry(rom_page);
+		m_rommap_bank1->set_entry(rom_page);
 
 		/* set ram bank, for invalid pages a nop-handler will be installed */
 		if ((ram_page == 0 && m_ram->size() > 0x8000) || (ram_page > 0 && m_ram->size() > 0x10000 + ram_page * 0x8000))
-			membank("rommap_bank2")->set_entry(ram_page);
+			m_rommap_bank2->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x4000, 0x7fff);
 		if ((ram_page == 0 && m_ram->size() > 0x4000) || (ram_page == 1 && m_ram->size() > 0xc000) || (ram_page > 1 && m_ram->size() > 0x14000 + ram_page * 0x8000))
-			membank("rommap_bank3")->set_entry(ram_page);
+			m_rommap_bank3->set_entry(ram_page);
 		else
 			program.nop_readwrite(0x8000, 0xbfff);
 	}
@@ -532,28 +532,28 @@ void mtx_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup banks for rom based memory map */
-	program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
-	program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");
-	program.install_readwrite_bank(0x8000, 0xbfff, "rommap_bank3");
+	program.install_read_bank(0x2000, 0x3fff, m_rommap_bank1);
+	program.install_readwrite_bank(0x4000, 0x7fff, m_rommap_bank2);
+	program.install_readwrite_bank(0x8000, 0xbfff, m_rommap_bank3);
 
-	membank("rommap_bank1")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
-	membank("rommap_bank2")->configure_entry(0, m_ram->pointer() + 0x8000);
-	membank("rommap_bank2")->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0x8000);
-	membank("rommap_bank3")->configure_entry(0, m_ram->pointer() + 0x4000);
-	membank("rommap_bank3")->configure_entry(1, m_ram->pointer() + 0xc000);
-	membank("rommap_bank3")->configure_entries(2, 14, m_ram->pointer() + 0x14000, 0x8000);
+	m_rommap_bank1->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
+	m_rommap_bank2->configure_entry(0, m_ram->pointer() + 0x8000);
+	m_rommap_bank2->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0x8000);
+	m_rommap_bank3->configure_entry(0, m_ram->pointer() + 0x4000);
+	m_rommap_bank3->configure_entry(1, m_ram->pointer() + 0xc000);
+	m_rommap_bank3->configure_entries(2, 14, m_ram->pointer() + 0x14000, 0x8000);
 
 	/* setup banks for ram based memory map */
-	program.install_readwrite_bank(0x0000, 0x3fff, "rammap_bank1");
-	program.install_readwrite_bank(0x4000, 0x7fff, "rammap_bank2");
-	program.install_readwrite_bank(0x8000, 0xbfff, "rammap_bank3");
+	program.install_readwrite_bank(0x0000, 0x3fff, m_rammap_bank1);
+	program.install_readwrite_bank(0x4000, 0x7fff, m_rammap_bank2);
+	program.install_readwrite_bank(0x8000, 0xbfff, m_rammap_bank3);
 
-	membank("rammap_bank1")->configure_entry(0, m_ram->pointer() + 0xc000);
-	membank("rammap_bank1")->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0xc000);
-	membank("rammap_bank2")->configure_entry(0, m_ram->pointer() + 0x8000);
-	membank("rammap_bank2")->configure_entries(1, 15, m_ram->pointer() + 0x14000, 0xc000);
-	membank("rammap_bank3")->configure_entry(0, m_ram->pointer() + 0x4000);
-	membank("rammap_bank3")->configure_entries(1, 15, m_ram->pointer() + 0x18000, 0xc000);
+	m_rammap_bank1->configure_entry(0, m_ram->pointer() + 0xc000);
+	m_rammap_bank1->configure_entries(1, 15, m_ram->pointer() + 0x10000, 0xc000);
+	m_rammap_bank2->configure_entry(0, m_ram->pointer() + 0x8000);
+	m_rammap_bank2->configure_entries(1, 15, m_ram->pointer() + 0x14000, 0xc000);
+	m_rammap_bank3->configure_entry(0, m_ram->pointer() + 0x4000);
+	m_rammap_bank3->configure_entries(1, 15, m_ram->pointer() + 0x18000, 0xc000);
 
 	/* install 4000h bytes common block */
 	program.install_ram(0xc000, 0xffff, m_ram->pointer());
@@ -563,13 +563,13 @@ void mtx_state::machine_reset()
 {
 	/* extension board ROMs */
 	if (m_extrom->exists())
-		membank("rommap_bank1")->configure_entry(2, m_extrom->get_rom_base());
+		m_rommap_bank1->configure_entry(2, m_extrom->get_rom_base());
 	/* keyboard ROMs */
 	if (ioport("keyboard_rom")->read())
-		membank("rommap_bank1")->configure_entry(7, memregion("keyboard_rom")->base() + (ioport("keyboard_rom")->read() - 1) * 0x2000);
+		m_rommap_bank1->configure_entry(7, memregion("keyboard_rom")->base() + (ioport("keyboard_rom")->read() - 1) * 0x2000);
 	/* rompak ROMs */
 	if (m_rompak->exists())
-		membank("rommap_bank1")->configure_entry(7, m_rompak->get_rom_base());
+		m_rommap_bank1->configure_entry(7, m_rompak->get_rom_base());
 
 	/* bank switching */
 	bankswitch(0);
