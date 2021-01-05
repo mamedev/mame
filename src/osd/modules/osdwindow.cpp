@@ -62,7 +62,7 @@ std::shared_ptr<osd_monitor_info> osd_window::monitor_from_rect(const osd_rect *
 	std::shared_ptr<osd_monitor_info> monitor;
 
 	// in window mode, find the nearest
-	if (!fullscreen())
+	if (!fullscreen() && m_monitor != nullptr)
 	{
 		if (proposed != nullptr)
 		{
