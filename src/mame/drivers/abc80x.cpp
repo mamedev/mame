@@ -971,8 +971,8 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	std::vector<uint8_t> data;
-	data.resize(quickload_size);
+	size_t quickload_size = image.length();
+	std::vector<uint8_t> data(quickload_size);
 	image.fread(&data[0], quickload_size);
 
 	uint8_t prstat = data[2];

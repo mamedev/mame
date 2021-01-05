@@ -2712,10 +2712,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size ||
-		image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 ||
+		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;

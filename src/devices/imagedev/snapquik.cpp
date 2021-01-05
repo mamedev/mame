@@ -48,7 +48,7 @@ snapshot_image_device::~snapshot_image_device()
 TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
 	/* invoke the load */
-	m_load(*this, filetype().c_str(), length());
+	m_load(*this);
 }
 
 //-------------------------------------------------

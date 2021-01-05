@@ -539,7 +539,7 @@ SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
 	unsigned char s_byte;
 
 	/* check size */
-	if (snapshot_size != 0x1001c)
+	if (image.length() != 0x1001c)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
 		image.message("Snapshot must be 65564 bytes");
@@ -591,7 +591,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) != image_init_result::PASS)
+	if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
 		return image_init_result::FAIL;
 
 	/* is this file executable? */

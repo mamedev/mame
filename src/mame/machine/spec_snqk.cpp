@@ -110,11 +110,12 @@ void spectrum_state::page_basicrom()
 
 SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 {
+	size_t snapshot_size = image.length();
 	std::vector<uint8_t> snapshot_data(snapshot_size);
 
 	image.fread(&snapshot_data[0], snapshot_size);
 
-	if (!core_stricmp(file_type, "sna"))
+	if (image.is_filetype("sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
 		{
@@ -123,7 +124,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_sna(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "sp"))
+	else if (image.is_filetype("sp"))
 	{
 		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
@@ -135,7 +136,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_sp(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "ach"))
+	else if (image.is_filetype("ach"))
 	{
 		if (snapshot_size != ACH_SIZE)
 		{
@@ -144,7 +145,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_ach(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "prg"))
+	else if (image.is_filetype("prg"))
 	{
 		if (snapshot_size != PRG_SIZE)
 		{
@@ -153,7 +154,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_prg(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "plusd"))
+	else if (image.is_filetype("plusd"))
 	{
 		if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
 		{
@@ -162,7 +163,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_plusd(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "sem"))
+	else if (image.is_filetype("sem"))
 	{
 		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' && \
@@ -176,7 +177,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_sem(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "sit"))
+	else if (image.is_filetype("sit"))
 	{
 		if (snapshot_size != SIT_SIZE)
 		{
@@ -185,7 +186,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_sit(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "zx"))
+	else if (image.is_filetype("zx"))
 	{
 		if (snapshot_size != ZX_SIZE)
 		{
@@ -194,7 +195,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_zx(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "snp"))
+	else if (image.is_filetype("snp"))
 	{
 		if (snapshot_size != SNP_SIZE)
 		{
@@ -203,7 +204,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_snp(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "snx"))
+	else if (image.is_filetype("snx"))
 	{
 		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
@@ -213,7 +214,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		}
 		setup_snx(&snapshot_data[0], snapshot_size);
 	}
-	else if (!core_stricmp(file_type, "frz"))
+	else if (image.is_filetype("frz"))
 	{
 		if (snapshot_size != FRZ_SIZE)
 		{
@@ -2417,11 +2418,12 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 
 QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 {
+	size_t quickload_size = image.length();
 	std::vector<uint8_t> quickload_data(quickload_size);
 
 	image.fread(&quickload_data[0], quickload_size);
 
-	if (!core_stricmp(file_type, "scr"))
+	if (image.is_filetype("scr"))
 	{
 		if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
 		{
@@ -2430,7 +2432,7 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 		}
 		setup_scr(&quickload_data[0], quickload_size);
 	}
-	else if (!core_stricmp(file_type, "raw"))
+	else if (image.is_filetype("raw"))
 	{
 		if (quickload_size != RAW_SIZE)
 		{
