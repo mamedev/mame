@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!--
+
+The SmartApplets (or KApps) are small applications you can download on your PC/Mac and then upload and
+install onto the AlphaSmart 3000 device using the AlphaSmartManager application (available for Windows
+and macOS) and a USB cable.
+
+For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.bin".
+
+-->
+
 <softwarelist name="alphasmart_kapps" description="AlphaSmart 3000 SmartApplets">
 
 	<software name="accreader_uk_1.3" supported="no">
