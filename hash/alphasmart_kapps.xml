@@ -1,19 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!--
-
-The SmartApplets (or KApps) are small applications you can download on your PC/Mac and then upload and
-install onto the AlphaSmart 3000 device using the AlphaSmartManager application (available for Windows
-and macOS) and a USB cable.
-
-For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.bin".
-
--->
-
 <softwarelist name="alphasmart_kapps" description="AlphaSmart 3000 SmartApplets">
 
-	<software name="accreader_uk_1.3" supported="no">
+	<software name="accreader_uk_1_3" supported="no">
 		<description>Accelerated Reader (1.3, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -27,7 +17,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="accreader_uk_1.2" cloneof="accreader_uk_1.3" supported="no">
+	<software name="accreader_uk_1_2" cloneof="accreader_uk_1_3" supported="no">
 		<description>Accelerated Reader (1.2, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -41,7 +31,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="alphaquiz_uk_3.1" supported="no">
+	<software name="alphaquiz_uk_3_1" supported="no">
 		<description>AlphaQuiz (3.1, English (UK))</description>
 		<year>2006</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -55,7 +45,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="alpwrdp_uk_3.4" supported="no">
+	<software name="alpwrdp_uk_3_4" supported="no">
 		<description>AlphaWord Plus (3.4, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -69,7 +59,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="beamer_uk_1.01" supported="no">
+	<software name="beamer_uk_1_01" supported="no">
 		<description>Beamer (1.01, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -83,7 +73,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="calc_uk_3.02" supported="no">
+	<software name="calc_uk_3_02" supported="no">
 		<description>Calculator (3.02, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -97,7 +87,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="cpanel_uk_1.07" supported="no">
+	<software name="cpanel_uk_1_07" supported="no">
 		<description>Control Panel (1.07, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -111,7 +101,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="cpanel_uk_1.04" cloneof="cpanel_uk_1.07" supported="no">
+	<software name="cpanel_uk_1_04" cloneof="cpanel_uk_1_07" supported="no">
 		<description>Control Panel (1.04, English (UK))</description>
 		<year>2009</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -125,7 +115,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="keywords_uk_3.6" supported="no">
+	<software name="keywords_uk_3_6" supported="no">
 		<description>KeyWords (3.6, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -139,7 +129,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="keywordsw_uk_4.2" supported="no">
+	<software name="keywordsw_uk_4_2" supported="no">
 		<description>KeyWords Wireless (4.2, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -153,7 +143,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="mathfacts_uk_1.3" supported="no">
+	<software name="mathfacts_uk_1_3" supported="no">
 		<description>MathFacts in a Flash RP (1.3, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -167,7 +157,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="mathfacts_uk_1.1" cloneof="mathfacts_uk_1.3" supported="no">
+	<software name="mathfacts_uk_1_1" cloneof="mathfacts_uk_1_3" supported="no">
 		<description>MathFacts in a Flash RP (1.1, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -181,7 +171,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="mathfacts_uk_1.2" supported="no">
+	<software name="mathfacts_uk_1_2" supported="no">
 		<description>MathFacts in a Flash (offline) (1.2, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -195,7 +185,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="mathfacts_uk_1.0" cloneof="mathfacts_uk_1.2" supported="no">
+	<software name="mathfacts_uk_1_0" cloneof="mathfacts_uk_1_2" supported="no">
 		<description>MathFacts in a Flash (offline) (1.0, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -209,7 +199,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="neofontlg_uk_1.0" supported="no">
+	<software name="neofontlg_uk_1_0" supported="no">
 		<description>Neo Font - Large (4 lines) (1.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -223,7 +213,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="neofontmd_uk_1.0" supported="no">
+	<software name="neofontmd_uk_1_0" supported="no">
 		<description>Neo Font - Medium (5 lines) (1.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -237,7 +227,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="neofntsm_uk_1.0" supported="no">
+	<software name="neofntsm_uk_1_0" supported="no">
 		<description>Neo Font - Small (6 lines) (1.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -251,7 +241,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="neofntvlg_uk_1.0" supported="no">
+	<software name="neofntvlg_uk_1_0" supported="no">
 		<description>Neo Font - Very Large (3 lines) (1.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -265,7 +255,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="neofntxlg_uk_1.0" supported="no">
+	<software name="neofntxlg_uk_1_0" supported="no">
 		<description>Neo Font - Extra Large (2 lines) (1.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -279,7 +269,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="responder_uk_1.2" supported="no">
+	<software name="responder_uk_1_2" supported="no">
 		<description>Responder (1.2, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -293,7 +283,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="sp_lg_us_uk_1.03" supported="no">
+	<software name="sp_lg_us_uk_1_03" supported="no">
 		<description>SpellCheck Large USA (1.03, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -307,7 +297,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="sp_lg_us_uk_1.02" cloneof="sp_lg_us_uk_1.03" supported="no">
+	<software name="sp_lg_us_uk_1_02" cloneof="sp_lg_us_uk_1_03" supported="no">
 		<description>SpellCheck Large USA (1.02, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -321,7 +311,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="sp_sm_us_uk_1.03" supported="no">
+	<software name="sp_sm_us_uk_1_03" supported="no">
 		<description>SpellCheck Small USA (1.03, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -335,7 +325,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="sp_sm_us_uk_1.02" cloneof="sp_sm_us_uk_1.03" supported="no">
+	<software name="sp_sm_us_uk_1_02" cloneof="sp_sm_us_uk_1_03" supported="no">
 		<description>SpellCheck Small USA (1.02, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -349,7 +339,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="sp_spa_uk_1.0" supported="no">
+	<software name="sp_spa_uk_1_0" supported="no">
 		<description>SpellCheck Spanish (1.0, Dutch)</description>
 		<year>2006</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -363,7 +353,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="ttsupdate_uk_1.4" supported="no">
+	<software name="ttsupdate_uk_1_4" supported="no">
 		<description>Text2Speech Updater (1.4, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -377,7 +367,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="ttsupdate_uk_1.3" cloneof="ttsupdate_uk_1.4" supported="no">
+	<software name="ttsupdate_uk_1_3" cloneof="ttsupdate_uk_1_4" supported="no">
 		<description>Text2Speech Updater (1.3, English (UK))</description>
 		<year>2010</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -391,7 +381,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="th_lg_usa_uk_1.1" supported="no">
+	<software name="th_lg_usa_uk_1_1" supported="no">
 		<description>Thesaurus Large USA (1.1, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -405,7 +395,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="th_lg_usa_uk_1.0" cloneof="th_lg_usa_uk_1.1" supported="no">
+	<software name="th_lg_usa_uk_1_0" cloneof="th_lg_usa_uk_1_1" supported="no">
 		<description>Thesaurus Large USA (1.0, English (UK))</description>
 		<year>2005</year>
 		<publisher>AlphaSmart, LLC</publisher>
@@ -419,7 +409,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="th_sm_usa_uk_1.1" supported="no">
+	<software name="th_sm_usa_uk_1_1" supported="no">
 		<description>Thesaurus Small USA (1.1, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -433,7 +423,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="th_sm_usa_uk_1.0" cloneof="th_sm_usa_uk_1.1" supported="no">
+	<software name="th_sm_usa_uk_1_0" cloneof="th_sm_usa_uk_1_1" supported="no">
 		<description>Thesaurus Small USA (1.0, English (UK))</description>
 		<year>2005</year>
 		<publisher>AlphaSmart, LLC</publisher>
@@ -447,7 +437,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="wrlstr_uk_1.1" supported="no">
+	<software name="wrlstr_uk_1_1" supported="no">
 		<description>Wireless File Transfer (1.1, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -461,7 +451,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="wrlsupdt_uk_2.0" supported="no">
+	<software name="wrlsupdt_uk_2_0" supported="no">
 		<description>Wireless Updater (2.0, English (UK))</description>
 		<year>2012</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
@@ -475,7 +465,7 @@ For each application you download a pair of files, a ".os3kapp" and a ".os3kapp.
 		</part>
 	</software>
 
-	<software name="wrlsupdt_uk_1.3" cloneof="wrlsupdt_uk_2.0" supported="no">
+	<software name="wrlsupdt_uk_1_3" cloneof="wrlsupdt_uk_2_0" supported="no">
 		<description>Wireless Updater (1.3, English (UK))</description>
 		<year>2008</year>
 		<publisher>Renaissance Learning, Inc.</publisher>
