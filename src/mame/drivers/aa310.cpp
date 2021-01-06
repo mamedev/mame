@@ -267,6 +267,48 @@ void aa310_state::peripheral5_w(offs_t offset, uint32_t data)
 		// ---x ---- Side select
 		// ---- xxxx Floppy disc select
 
+		// Debug code to display RISC OS 3 POST failures
+		const int post_debug = 0;
+		if (post_debug && BIT(data, 17))
+		{
+			static attotime last_time(0, 0);
+			static int bitpos = 0;
+
+			if (BIT(data, 16) && bitpos <= 32)
+			{
+				bool state = (machine().time() - last_time) > m_maincpu->clocks_to_attotime(2000000);
+
+				switch (32 - bitpos)
+				{
+				// Status flags
+				case  0: printf("00000001  %-4s   Self-test due to power on\n"          , state ? "On" : "Off");   break;
+				case  1: printf("00000002  %-4s   Self-test due to interface hardware\n", state ? "On" : "Off");   break;
+				case  2: printf("00000004  %-4s   Self-test due to test link\n"         , state ? "On" : "Off");   break;
+				case  3: printf("00000008  %-4s   Long memory test performed\n"         , state ? "On" : "Off");   break;
+				case  4: printf("00000010  %-4s   ARM 3 fitted\n"                       , state ? "On" : "Off");   break;
+				case  5: printf("00000020  %-4s   Long memory test disabled\n"          , state ? "On" : "Off");   break;
+				case  6: printf("00000040  %-4s   PC-style IO world detected\n"         , state ? "On" : "Off");   break;
+				case  7: printf("00000080  %-4s   VRAM detected\n"                      , state ? "On" : "Off");   break;
+
+				// Fault flags
+				case  8: printf("00000100  %-4s   CMOS RAM checksum error\n"            , state ? "Fail" : "Pass");   break;
+				case  9: printf("00000200  %-4s   ROM failed checksum test\n"           , state ? "Fail" : "Pass");   break;
+				case 10: printf("00000400  %-4s   MEMC CAM mapping failed\n"            , state ? "Fail" : "Pass");   break;
+				case 11: printf("00000800  %-4s   MEMC protection failed\n"             , state ? "Fail" : "Pass");   break;
+				case 12: printf("00001000  %-4s   IOC register test failed\n"           , state ? "Fail" : "Pass");   break;
+				case 14: printf("00004000  %-4s   VIDC Virq timing failed\n"            , state ? "Fail" : "Pass");   break;
+				case 15: printf("00008000  %-4s   VIDC Sirq timing failed\n"            , state ? "Fail" : "Pass");   break;
+				case 16: printf("00010000  %-4s   CMOS unreadable\n"                    , state ? "Fail" : "Pass");   break;
+				case 17: printf("00020000  %-4s   RAM control line failure\n"           , state ? "Fail" : "Pass");   break;
+				case 18: printf("00040000  %-4s   Long RAM test failure\n"              , state ? "Fail" : "Pass");   break;
+				}
+
+				bitpos++;
+			}
+
+			last_time = machine().time();
+		}
+
 		if (!BIT(data, 0))     m_selected_floppy = m_floppy0->get_device();
 		if (!BIT(data, 1))     m_selected_floppy = m_floppy1->get_device();
 		if (!BIT(data, 2))     m_selected_floppy = nullptr; // floppy 2
