@@ -26,7 +26,7 @@ public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_palette(*this, "palette"),
-		m_colorram(*this, "colorram", 32),
+		m_colorram(*this, "colorram", 0x80000, ENDIANNESS_BIG),
 		m_adc(*this, "adc"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
@@ -40,7 +40,7 @@ public:
 
 	bool           m_is_primrage;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_colorram;
+	memory_share_creator<uint16_t> m_colorram;
 
 	optional_device<adc0808_device> m_adc;
 

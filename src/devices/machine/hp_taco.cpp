@@ -434,7 +434,7 @@ WRITE_LINE_MEMBER(hp_taco_device::tacho_tick_w)
 				if (m_cmd_state != CMD_PH1) {
 					break;
 				}
-				// Falls through!
+				[[fallthrough]];
 
 			case CMD_WR_GAP_N_TACH:
 			case CMD_INT_N_TACH:

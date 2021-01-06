@@ -208,7 +208,7 @@ static floperr_t imd_write_indexed_sector(floppy_image_legacy *floppy, int head,
 		if (err) {
 			return err;
 		}
-		// Fall through!
+		[[fallthrough]];
 
 	case 1:
 	case 3:

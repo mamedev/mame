@@ -93,9 +93,9 @@ public:
 		m_basic(*this, "basic"),
 		m_kernal(*this, "kernal"),
 		m_charom(*this, "charom"),
-		m_buffer_ram(*this, "buffer_ram"),
-		m_extbuf_ram(*this, "extbuf_ram"),
-		m_video_ram(*this, "video_ram"),
+		m_buffer_ram(*this, "buffer_ram", 0x800, ENDIANNESS_LITTLE),
+		m_extbuf_ram(*this, "extbuf_ram", 0x800, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
 		m_pa(*this, "PA%u", 0),
 		m_pb(*this, "PB%u", 0),
 		m_lock(*this, "LOCK"),
@@ -132,9 +132,9 @@ public:
 	required_memory_region m_basic;
 	required_memory_region m_kernal;
 	required_memory_region m_charom;
-	optional_shared_ptr<uint8_t> m_buffer_ram;
-	optional_shared_ptr<uint8_t> m_extbuf_ram;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_buffer_ram;
+	memory_share_creator<uint8_t> m_extbuf_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<8> m_pa;
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
@@ -259,7 +259,7 @@ public:
 		: cbm2_state(mconfig, type, tag),
 			m_pla2(*this, PLA2_TAG),
 			m_vic(*this, MOS6569_TAG),
-			m_color_ram(*this, "color_ram"),
+			m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 			m_statvid(1),
 			m_vicdotsel(1),
 			m_vicbnksel(0x03)
@@ -267,7 +267,7 @@ public:
 
 	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 
 	DECLARE_MACHINE_START( p500 );
 	DECLARE_MACHINE_START( p500_ntsc );
@@ -2062,10 +2062,6 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 MACHINE_START_MEMBER( cbm2_state, cbm2 )
 {
-	// allocate memory
-	m_video_ram.allocate(m_video_ram_size);
-	m_buffer_ram.allocate(0x800);
-
 	// allocate timer
 	int todclk = (m_ntsc ? 60 : 50) * 2;
 
@@ -2115,9 +2111,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
-	// allocate memory
-	m_extbuf_ram.allocate(0x800);
-
 	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
 }
 
@@ -2128,9 +2121,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
-	// allocate memory
-	m_extbuf_ram.allocate(0x800);
-
 	MACHINE_START_CALL_MEMBER(cbm2_pal);
 }
 
@@ -2144,9 +2134,6 @@ MACHINE_START_MEMBER( p500_state, p500 )
 	m_video_ram_size = 0x400;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
-
-	// allocate memory
-	m_color_ram.allocate(0x400);
 
 	// state saving
 	save_item(NAME(m_statvid));

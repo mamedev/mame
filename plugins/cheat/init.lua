@@ -94,12 +94,12 @@ function cheat.startplugin()
 	local function load_cheats()
 		local filename = emu.romname()
 		local newcheats = {}
-		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
+		local file = emu.file(manager.machine.options.entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
 		if emu.softname() ~= "" then
 			if emu.softname():find(":") then
 				filename = emu.softname():gsub(":", "/")
 			else
-				for name, image in pairs(manager:machine().images) do
+				for name, image in pairs(manager.machine.images) do
 					if image:exists() and image:software_list_name() ~= "" then
 						filename = image:software_list_name() .. "/" .. emu.softname()
 					end
@@ -134,7 +134,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -142,7 +142,7 @@ function cheat.startplugin()
 		for num, val in ipairs(hotkeys) do
 			for num, cheat in pairs(cheats) do
 				if val.desc == cheat.desc then
-					cheat.hotkeys = {pressed = false, keys = manager:machine():input():seq_from_tokens(val.keys)}
+					cheat.hotkeys = {pressed = false, keys = manager.machine.input:seq_from_tokens(val.keys)}
 				end
 			end
 		end
@@ -152,7 +152,7 @@ function cheat.startplugin()
 		local hotkeys = {}
 		for num, cheat in ipairs(cheats) do
 			if cheat.hotkeys then
-				local hotkey = {desc = cheat.desc, keys = manager:machine():input():seq_to_tokens(cheat.hotkeys.keys)}
+				local hotkey = {desc = cheat.desc, keys = manager.machine.input:seq_to_tokens(cheat.hotkeys.keys)}
 				if hotkey.keys ~= "" then
 					hotkeys[#hotkeys + 1] = hotkey
 				end
@@ -160,7 +160,7 @@ function cheat.startplugin()
 		end
 		if #hotkeys > 0 then
 			local json = require("json")
-			local path = lfs.env_replace(manager:machine():options().entries.cheatpath:value():match("([^;]+)"))
+			local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
 				lfs.mkdir(path)
@@ -215,7 +215,7 @@ function cheat.startplugin()
 			return
 		end
 		if type(x) == "string" then
-			y = y * mame_manager:ui():get_line_height()
+			y = y * mame_manager.ui.line_height
 		end
 		output[#output + 1] = { type = "text", scr = screen, x = x, y = y, str = str, color = color }
 	end
@@ -278,13 +278,13 @@ function cheat.startplugin()
 					run_if(wp.cheat, wp.func)
 					-- go in case a debugger other than "none" is enabled
 					-- don't use an b/wpset action because that will supress the b/wp index
-					manager:machine():debugger().execution_state = "run"
+					manager.machine.debugger.execution_state = "run"
 				end
 			else
 				local bp = breaks[point]
 				if bp then
 					run_if(bp.cheat, bp.func)
-					manager:machine():debugger().execution_state = "run"
+					manager.machine.debugger.execution_state = "run"
 				end
 			end
 		end
@@ -295,7 +295,7 @@ function cheat.startplugin()
 			error("bpset not permitted in oneshot cheat")
 			return
 		end
-		local idx = dev:debug():bpset(addr)
+		local idx = dev.debug:bpset(addr)
 		breaks[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
@@ -308,22 +308,22 @@ function cheat.startplugin()
 			error("bad space in wpset")
 			return
 		end
-		local idx = dev.debug():wpset(space, wptype, addr, len)
+		local idx = dev.debug:wpset(space, wptype, addr, len)
 		watches[idx] = {cheat = cheat, func = func, dev = dev}
 	end
 
 	local function bwpclr(cheat)
-		if not manager:machine():debugger() then
+		if not manager.machine.debugger then
 			return
 		end
 		for num, bp in pairs(breaks) do
 			if cheat == bp.cheat then
-				bp.dev.debug():bpclr(num)
+				bp.dev.debug:bpclr(num)
 			end
 		end
 		for num, wp in pairs(watches) do
 			if cheat == wp.cheat then
-				wp.dev.debug():wpclr(num)
+				wp.dev.debug:wpclr(num)
 			end
 		end
 	end
@@ -340,7 +340,7 @@ function cheat.startplugin()
 			if entry.port:sub(1, 1) ~= ":" then
 				entry.port = ":" .. entry.port
 			end
-			local port = manager:machine():ioport().ports[entry.port]
+			local port = manager.machine.ioport.ports[entry.port]
 			if not port then
 				errout(entry.port, entry.field)
 			end
@@ -372,7 +372,7 @@ function cheat.startplugin()
 			error("input_run only allowed in one shot cheats")
 			return
 		end
-		local _, screen = next(manager:machine().screens)
+		local _, screen = next(manager.machine.screens)
 		list.begin = screen:frame_number()
 		inputs[#inputs + 1] = list
 	end
@@ -451,7 +451,7 @@ function cheat.startplugin()
 					frombcd = frombcd,
 					pairs = pairs,
 					ipairs = ipairs,
-					outputs = manager:machine():outputs(),
+					outputs = manager.machine.output,
 					time = time,
 					input_trans = input_trans,
 					input_run = function(list) input_run(cheat, list) end,
@@ -483,9 +483,9 @@ function cheat.startplugin()
 		if cheat.cpu then
 			cheat.cpudev = {}
 			for name, tag in pairs(cheat.cpu) do
-				if manager:machine():debugger() then
-					local dev = manager:machine().devices[tag]
-					if not dev or not dev:debug() then
+				if manager.machine.debugger then
+					local dev = manager.machine.devices[tag]
+					if not dev or not dev.debug then
 						cheat_error(cheat, "missing or invalid device " .. tag)
 						return
 					end
@@ -505,7 +505,7 @@ function cheat.startplugin()
 		if cheat.space then
 			for name, space in pairs(cheat.space) do
 				local cpu, mem
-				cpu = manager:machine().devices[space.tag]
+				cpu = manager.machine.devices[space.tag]
 				if not cpu then
 					cheat_error(cheat, "missing device " .. space.tag)
 					return
@@ -525,17 +525,17 @@ function cheat.startplugin()
 		end
 		if cheat.screen then
 			for name, screen in pairs(cheat.screen) do
-				local scr = manager:machine().screens[screen]
+				local scr = manager.machine.screens[screen]
 				if not scr then
 					local tag
-					tag, scr = next(manager:machine().screens) -- get any screen
+					tag, scr = next(manager.machine.screens) -- get any screen
 				end
 				cheat.cheat_env[name] = scr
 			end
 		end
 		if cheat.region then
 			for name, region in pairs(cheat.region) do
-				local mem = manager:machine():memory().regions[region]
+				local mem = manager.machine.memory.regions[region]
 				if not mem then
 					cheat_error(cheat, "missing region " .. region)
 					return
@@ -545,7 +545,7 @@ function cheat.startplugin()
 		end
 		if cheat.ram then
 			for name, tag in pairs(cheat.ram) do
-				local ram = manager:machine().devices[tag]
+				local ram = manager.machine.devices[tag]
 				if not ram then
 					cheat_error(cheat, "missing ram device " .. tag)
 					return
@@ -555,7 +555,7 @@ function cheat.startplugin()
 		end
 		if cheat.share then
 			for name, tag in pairs(cheat.share) do
-				local share = manager:machine():memory().shares[tag]
+				local share = manager.machine.memory.shares[tag]
 				if not share then
 					cheat_error(cheat, "missing share " .. share)
 					return
@@ -604,43 +604,49 @@ function cheat.startplugin()
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
+			local ioport = manager.machine.ioport
+			local input = manager.machine.input
 			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
-			menu[2] = {"---", "", "off"}
+			menu[2] = {string.format(_("Press %s to clear hotkey"), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), "", "off"}
+			menu[3] = {"---", "", "off"}
 			hotkeylist = {}
 
-			local function hkcbfunc(cheat)
-				local input = manager:machine():input()
-				manager:machine():popmessage(_("Press button for hotkey or wait to clear"))
-				manager:machine():video():frame_update(true)
-				input:seq_poll_start("switch")
+			local function hkcbfunc(cheat, event)
+				if event == "clear" then
+					cheat.hotkeys = nil
+					return
+				end
+
+				local poller = input:switch_sequence_poller()
+				manager.machine:popmessage(_("Press button for hotkey or wait to leave unchanged"))
+				manager.machine.video:frame_update()
+				poller:start()
 				local time = os.clock()
 				local clearmsg = true
-				while (not input:seq_poll()) and (input.seq_poll_modified() or (os.clock() < time + 1)) do
-					if input:seq_poll_modified() then
-						if not input:seq_poll_valid() then
-							manager:machine():popmessage(_("Invalid sequence entered"))
+				while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
+					if poller.modified then
+						if not poller.valid then
+							manager.machine:popmessage(_("Invalid sequence entered"))
 							clearmsg = false
 							break
 						end
-						manager:machine():popmessage(input:seq_name(input:seq_poll_sequence()))
-						manager:machine():video():frame_update(true)
+						manager.machine:popmessage(input:seq_name(poller.sequence))
+						manager.machine.video:frame_update()
 					end
 				end
-				if input:seq_poll_valid() then
-					cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
-				else
-					cheat.hotkeys = nil
+				if poller.modified and poller.valid then
+					cheat.hotkeys = { pressed = false, keys = poller.sequence }
 				end
 				if clearmsg then
-					manager:machine():popmessage()
+					manager.machine:popmessage()
 				end
-				manager:machine():video():frame_update(true)
+				manager.machine.video:frame_update()
 			end
 
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and manager:machine():input():seq_name(cheat.hotkeys.keys) or _("None"), ""}
-					hotkeylist[#hotkeylist + 1] = function() return hkcbfunc(cheat) end
+					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and input:seq_name(cheat.hotkeys.keys) or _("None"), ""}
+					hotkeylist[#hotkeylist + 1] = function(event) return hkcbfunc(cheat, event) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
@@ -698,14 +704,14 @@ function cheat.startplugin()
 	end
 
 	local function menu_callback(index, event)
-		manager:machine():popmessage()
+		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "select" then
-				index = index - 2
+			if event == "select" or event == "clear" then
+				index = index - 3
 				if index >= 1 and index <= #hotkeylist then
-					hotkeylist[index]()
+					hotkeylist[index](event)
 					return true
-				elseif index == #hotkeylist + 2 then
+				elseif index == #hotkeylist + 2 and event == "select" then
 					hotkeymenu = false
 					return true
 				end
@@ -740,7 +746,7 @@ function cheat.startplugin()
 		end
 		if event == "up" or event == "down" or event == "comment" then
 			if cheat.comment then
-				manager:machine():popmessage(string.format(_("Cheat Comment:\n%s"), cheat.comment))
+				manager.machine:popmessage(string.format(_("Cheat Comment:\n%s"), cheat.comment))
 			end
 		elseif event == "left" then
 			if cheat.parameter then
@@ -748,7 +754,8 @@ function cheat.startplugin()
 				return chg
 			else
 				if not cheat.is_oneshot then
-					return cheat:set_enabled(false)
+					local state, chg = cheat:set_enabled(false)
+					return chg
 				end
 				return false
 			end
@@ -773,9 +780,9 @@ function cheat.startplugin()
 					else
 						itemtext = cheat.parameter.value
 					end
-					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, itemtext))
+					manager.machine:popmessage(string.format(_("Activated: %s = %s"), cheat.desc, itemtext))
 				elseif not cheat.parameter and cheat.script.on then
-					manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
+					manager.machine:popmessage(string.format(_("Activated: %s"), cheat.desc))
 				end
 			end
 		end
@@ -797,7 +804,7 @@ function cheat.startplugin()
 		start_time = emu.time()
 		cheats = load_cheats()
 		local json = require("json")
-		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/output.json", "w")
+		local file = io.open(manager.machine.options.entries.cheatpath:value():match("([^;]+)") .. "/output.json", "w")
 		if file then
 			file:write(json.stringify(cheats, {indent = true}))
 			file:close()
@@ -806,8 +813,8 @@ function cheat.startplugin()
 			parse_cheat(cheat)
 		end
 		load_hotkeys()
-		if manager:machine():debugger() then
-			consolelog = manager:machine():debugger().consolelog
+		if manager.machine.debugger then
+			consolelog = manager.machine.debugger.consolelog
 			consolelast = 0
 		end
 	end)
@@ -827,22 +834,22 @@ function cheat.startplugin()
 				run_if(cheat, cheat.script.run)
 			end
 			if cheat.hotkeys and cheat.hotkeys.keys then
-				if manager:machine():input():seq_pressed(cheat.hotkeys.keys) then
+				if manager.machine.input:seq_pressed(cheat.hotkeys.keys) then
 					if not cheat.hotkeys.pressed then
 						if cheat.is_oneshot then
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
-							manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
+							manager.machine:popmessage(string.format(_("Activated: %s"), cheat.desc))
 						elseif not cheat.enabled then
 							cheat.enabled = true
 							run_if(cheat, cheat.script.on)
-							manager:machine():popmessage(string.format(_("Enabled: %s"), cheat.desc))
+							manager.machine:popmessage(string.format(_("Enabled: %s"), cheat.desc))
 						else
 							cheat.enabled = false
 							run_if(cheat, cheat.script.off)
 							bwpclr(cheat)
-							manager:machine():popmessage(string.format(_("Disabled: %s"), cheat.desc))
+							manager.machine:popmessage(string.format(_("Disabled: %s"), cheat.desc))
 						end
 					end
 					cheat.hotkeys.pressed = true
@@ -852,7 +859,7 @@ function cheat.startplugin()
 			end
 		end
 		for num, input in pairs(inputs) do
-			local _, screen = next(manager:machine().screens)
+			local _, screen = next(manager.machine.screens)
 			local framenum = screen:frame_number() - input.begin
 			local enttab = input.start[framenum]
 			if enttab then
@@ -889,7 +896,7 @@ function cheat.startplugin()
 			elseif draw.type == "line" then
 				draw.scr:draw_line(draw.x1, draw.y1, draw.x2, draw.y2, draw.color)
 			elseif draw.type == "box" then
-				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.bgcolor, draw.linecolor)
+				draw.scr:draw_box(draw.x1, draw.y1, draw.x2, draw.y2, draw.linecolor, draw.bgcolor)
 			end
 		end
 		output = {}
@@ -901,7 +908,7 @@ function cheat.startplugin()
 	function ce.inject(newcheat)
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
-		manager:machine():popmessage(string.format(_("%s added"), newcheat.desc))
+		manager.machine:popmessage(string.format(_("%s added"), newcheat.desc))
 	end
 
 	function ce.get(index)
@@ -916,7 +923,7 @@ function cheat.startplugin()
 			is_oneshot = cheat.is_oneshot,
 			comment = cheat.comment,
 			get_hotkeys = function() if cheat.hotkeys then return cheat.hotkeys.keys end return nil end,
-			set_hotkeys = function(seq) cheat.hotkeys = { pressed = false, keys = manager:machine():input():seq_clean(seq) } end
+			set_hotkeys = function(seq) cheat.hotkeys = { pressed = false, keys = manager.machine.input:seq_clean(seq) } end
 		}
 		if cheat.script then
 			intf.script = {}

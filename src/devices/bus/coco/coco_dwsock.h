@@ -67,6 +67,6 @@ private:
 DECLARE_DEVICE_TYPE(COCO_DWSOCK, beckerport_device)
 
 // device iterator
-typedef device_type_iterator<beckerport_device> beckerport_device_iterator;
+typedef device_type_enumerator<beckerport_device> beckerport_device_enumerator;
 
 #endif // MAME_BUS_COCO_COCO_DWSOCKH_H

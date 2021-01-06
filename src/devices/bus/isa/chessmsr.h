@@ -37,7 +37,7 @@ private:
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
-	optional_shared_ptr<u32> m_ram;
+	std::unique_ptr<u32[]> m_ram;
 
 	u8 m_ram_offset;
 	bool m_suspended;

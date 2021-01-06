@@ -117,7 +117,7 @@ void metlclsh_state::metlclsh_slave_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW");
 	map(0xc0c0, 0xc0c0).w(FUNC(metlclsh_state::metlclsh_cause_nmi2));          // cause nmi on cpu #1
 	map(0xc0c1, 0xc0c1).w(FUNC(metlclsh_state::metlclsh_ack_irq2));            // irq ack
-	map(0xd000, 0xd7ff).bankr("bank1").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
+	map(0xd000, 0xd7ff).bankr("rambank").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
 	map(0xe301, 0xe301).w(FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
 	map(0xe401, 0xe401).w(FUNC(metlclsh_state::metlclsh_rambank_w));
 	map(0xe402, 0xe403).writeonly().share("scrollx");

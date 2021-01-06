@@ -12,23 +12,19 @@
 
 #include "hash.h"
 #include "hashing.h"
+
 #include <cctype>
 
 
 namespace util {
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-char const hash_collection::HASH_CRC;
-char const hash_collection::HASH_SHA1;
-
 char const *const hash_collection::HASH_TYPES_CRC = "R";
 char const *const hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
 char const *const hash_collection::HASH_TYPES_ALL = "RS";
-
-char const hash_collection::FLAG_NO_DUMP;
-char const hash_collection::FLAG_BAD_DUMP;
 
 
 

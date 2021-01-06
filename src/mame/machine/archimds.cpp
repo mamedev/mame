@@ -249,6 +249,7 @@ void archimedes_state::archimedes_reset()
 void archimedes_state::archimedes_init()
 {
 	m_memc_pagesize = 0;
+	m_cursor_enabled = false;
 
 	m_timer[0] = timer_alloc(TIMER_IOC);
 	m_timer[1] = timer_alloc(TIMER_IOC);

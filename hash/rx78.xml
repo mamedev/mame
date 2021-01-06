@@ -2,6 +2,82 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+The Bandai RX-78 Gundam has two slots where you can plug in a ROM cart or an additional device, like a
+printer interface. The system was capable of loading software from these ROM carts, or from a cassette
+tape through audio line-in ports to use with tape recorders; these ports were present in the BS Basic,
+Animation Graphics, Creative Graphics, Japanese Word Processor and Z80 Assembler carts. The system could
+use up to two carts or devices at the same time.
+
+There were a total of 20 games released for the system, plus educational and productivity software, and peripheral
+devices. One additional game and three expansion cards were announced but never released. The official translations
+printed in the game carts or tapes are used below where available. Names in brackets are unofficial translations.
+
++========+=========+=======+=========+==============================================================================+
+| Format | Serial  | Type  | Overlay | Title                                                                        |
+|========+=========+=======+========================================================================================+
+|  N/A   | 0201001 | Other | No      | RX-78 Base Unit
+|  N/A   | 0201003 | Other | No      | Joystick Controller
+|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II]
+|  Cart  | 0201005 | Game  | Yes     | チャンピオン レーサー / Champion Racer
+|  Cart  | 0201006 | Game  | Yes     | チャレンジ ゴルフ / Challenge Golf
+|  Cart  | 0201007 | Game  | No      | エキサイト ベースボール / Excite Baseball
+|  Cart  | 0201008 | Game  | Yes     | パーフェクト マージャン / Perfect Mah-Jongg
+|  Cart  | 0201010 | Tool  | Yes     | ミュージック マスター / Music Master
+|  Cart  | 0201011 | Game  | No      | ハンバーガー ショップ / Hamburger Shop
+|  Cart  | 0201012 | Game  | Yes     | 戦え！ウルトラマン / Tatakae! Ultraman
+|  Cart  | 0201013 | Game  | No      | ザ・プロレス / The Pro Wrestling
+|  Cart  | 0201016 | Tool  | No      | RX-78 P.I/F / Printer Interface
+|  Cart  | 0201018 | Game  | Yes     | 連合艦隊 / Rengo Kantai
+|  Cart  | 0201019 | Game  | Yes     | スペースエネミー / Space Enemy
+|  Cart  | 0201020 | Tool  | Unknown | アニメーション グラフィックス / Animation Graphics
+|  Cart  | 0201023 | Game  | Yes     | エキサイト テニス / Excite Tennis
+|  Cart  | 0201024 | Game  | No      | スーパー モトクロス / Super Motocross
+|  Cart  | 0201026 | Game  | Yes     | 零戦 (ぜろせん) / Reisen (Zerosen) [Zero Fighter]
+|  Cart  | 0201027 | Game  | No (*)  | 関ヶ原 / Sekigahara
+|  Cart  | 0201028 | Game  | Unknown | キャノンボール / Cannon Ball
+|  Tape  | 0201029 | Game  | Unknown | スペース カプセル / Space Capsule
+|  Tape  | 0201030 | Tool  | Yes     | ヘルシーライフ / Healthy Life Plan
+|  Tape  | 0201033 | Tool  | Yes     | 計算演習ドリル / Keisan Ensyu Drill
+|  Tape  | 0201035 | Learn | No      | グラフィック数学 / Graphics Mathematics
+|  Tape  | 0201038 | Game  | Unknown | イエローキャブ / Yellow Cab
+|  Cart  | 02010?? | Game  | Yes     | カード・ワールド / Card World
+|  Tape  | 02010?? | Game  | Unknown | ひつじや～い [Hitsujiya~i]
+|  Cart  | 02010?? | Learn | Yes     | ABC 単語ゲーム / ABC Word Game
+|  ?     | 02010?? | Learn | Unknown | 算数つまづき [Sansu Tsuma Zuki]
+|  Cart  | 02010?? | Tool  | Yes     | BS-BASIC Version 1.0
+|  Cart  | 02010?? | Tool  | Yes     | 漢字ワープロ / Japanese Word Processor
+|  ?     | 02010?? | Tool  | Unknown | Z-80 アセンブラー (RX-78 Z-80 用アセンブラー)
+|  Cart  | 02010?? | Tool  | Unknown | クリエイティブ グラフィックス / Creative Graphics
+|  ?     | 02010?? | Tool  | Unknown | ３Ｄグラフィックス [3D Graphics]
+|  Tape  | 02010?? | Game  | Unknown | ドンジャラ [Donjara] (**)
+|  Cart  | ??????? | Tool  | Unknown | バッテリーバックアップ RAM [Battery Backup RAM] (Announced)
+|  Cart  | ??????? | Tool  | Unknown | ミュージック・インターフェイス [Music Interface] (Announced)
+|  Cart  | ??????? | Tool  | Unknown | 専用フロッピイ・ヂイスクドライブ [Floppy Disk Drive] (Announced)
+|  ?     | ??????? | Game  | Unknown | キム・キム・ダン・ダン [Kim Kim Dan Dan] (Announced)
+|========+=========+=======+========================================================================================+
+
+*  Sekigahara did not include an overlay, instead it included a reference sheet with game information.
+** Donjara, a version of Mahjong for kids, found in an auction, is completely undocumented and is not mentioned in
+   any RX-78 game lists on the internet.
+
+The Battery Backup RAM, Music Interface and Floppy Disk Drive expansion were listed as being in development (企画中) in
+a product catalog, but were apparently never released.
+
+Photos of キム・キム・ダン・ダン (Kim Kim Dan Dan) are also shown in that same catalog, but the game was never released on the
+RX-78. A version of the game was released for the Mitsubishi Multi-8.
+
+Credits:
+    Dave "Foxhack" Silva - Game names, translations, format and serial information, additional research
+
+Information sourced from:
+https://beep-cs-player.hatenadiary.org/entry/20110813/1313217856
+https://web.archive.org/web/20120303141724/http://www.game-nostalgia.net/rx78/rx78.html
+https://www.youtube.com/watch?v=hE6buZfjJjE
+https://muuseo.com/fool_guru/collection_rooms/2
+https://muuseo.com/henly/items/137
+https://aucview.aucfan.com/yahoo/q374745986/
+https://twitter.com/hiropapa00/status/680566132659503104
 -->
 <softwarelist name="rx78" description="Gundam RX-78 cartridges">
 	<software name="basic">

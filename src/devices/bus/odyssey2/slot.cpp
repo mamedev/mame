@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "odyssey2cart")
-	, m_rom(*this, "rom")
-	, m_exrom(*this, "exrom")
-	, m_voice(*this, "voice")
+	, m_rom_size(0)
+	, m_exrom_size(0)
+	, m_voice_size(0)
 {
 }
 
@@ -138,6 +138,9 @@ image_init_result o2_cart_slot_device::call_load()
 			load_software_region("rom", m_cart->m_rom);
 			load_software_region("exrom", m_cart->m_exrom);
 			load_software_region("voice", m_cart->m_voice);
+			m_cart->m_rom_size = get_software_region_length("rom");
+			m_cart->m_exrom_size = get_software_region_length("exrom");
+			m_cart->m_voice_size = get_software_region_length("voice");
 
 			m_type = o2_get_pcb_id(get_feature("slot"));
 

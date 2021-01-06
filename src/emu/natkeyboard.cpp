@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "natkeyboard.h"
 #include "emuopts.h"
+#include "unicode.h"
 
 #include <algorithm>
 #include <cstring>

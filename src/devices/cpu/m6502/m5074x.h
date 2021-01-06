@@ -21,9 +21,7 @@ class m5074x_device :  public m740_device
 
 	enum
 	{
-		M5074X_INT1_LINE = INPUT_LINE_IRQ0,
-
-		M5074X_SET_OVERFLOW = M740_SET_OVERFLOW
+		M5074X_INT1_LINE = INPUT_LINE_IRQ0
 	};
 
 	enum
@@ -31,6 +29,8 @@ class m5074x_device :  public m740_device
 		TIMER_1 = 0,
 		TIMER_2,
 		TIMER_X,
+
+		TIMER_ADC,
 
 		NUM_TIMERS
 	};
@@ -56,8 +56,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void execute_set_input(int inputnum, int state) override;
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_execute_interface overrides (TODO: /8 in M50740A/41/52/57/58 SLW mode)
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	void send_port(uint8_t offset, uint8_t data);
 	uint8_t read_port(uint8_t offset);
@@ -110,12 +114,12 @@ public:
 	enum
 	{
 		M50753_INT1_LINE = INPUT_LINE_IRQ0,
-		M50753_INT2_LINE = INPUT_LINE_IRQ1,
-
-		M5074X_SET_OVERFLOW = M740_SET_OVERFLOW
+		M50753_INT2_LINE = INPUT_LINE_IRQ1
 	};
 
 	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
+
+	auto read_in_p() { return m_in_p.bind(); }
 
 protected:
 	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -123,6 +127,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -130,13 +135,16 @@ private:
 	void m50753_map(address_map &map);
 
 	uint8_t ad_r();
+	uint8_t in_r();
 	void ad_start_w(uint8_t data);
 	uint8_t ad_control_r();
 	void ad_control_w(uint8_t data);
+	void ad_trigger_w(uint8_t data);
 	uint8_t pwm_control_r();
 	void pwm_control_w(uint8_t data);
 
 	devcb_read8::array<8> m_ad_in;
+	devcb_read8 m_in_p;
 
 	uint8_t m_ad_control;
 	bool m_pwm_enabled;

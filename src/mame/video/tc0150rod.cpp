@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(TC0150ROD, tc0150rod_device, "tc0150rod", "Taito TC0150ROD")
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0150ROD, tag, owner, clock)
-	, m_roadgfx(*this, DEVICE_SELF, 0x40000)
+	, m_roadgfx(*this, DEVICE_SELF)
 {
 }
 

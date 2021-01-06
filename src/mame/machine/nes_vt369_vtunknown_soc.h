@@ -10,35 +10,49 @@
 #include "sound/nes_apu_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_swap_op_d5_d6.h"
+#include "machine/vt1682_alu.h"
 #include "video/ppu2c0x_vt.h"
 #include "screen.h"
 #include "speaker.h"
 
-class nes_vtunknown_soc_cy_device : public nes_vt09_soc_device
+class nes_vt369_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vtunknown_soc_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 	void device_start() override;
+	void device_reset() override;
 
-	void nes_vt_cy_map(address_map& map);
+	void nes_vt369_map(address_map& map);
 
-	uint8_t vt03_41bx_r(offs_t offset);
-	void vt03_41bx_w(offs_t offset, uint8_t data);
+	uint8_t vt369_41bx_r(offs_t offset);
+	void vt369_41bx_w(offs_t offset, uint8_t data);
 
-	uint8_t vt03_413x_r(offs_t offset);
-	void vt03_413x_w(offs_t offset, uint8_t data);
+	uint8_t vt369_414f_r();
+	uint8_t vt369_415c_r();
 
-	uint8_t vt03_414f_r();
+	void vt369_48ax_w(offs_t offset, uint8_t data);
+	uint8_t vt369_48ax_r(offs_t offset);
 
-	uint8_t vt03_415c_r();
+	uint8_t vt369_6000_r(offs_t offset);
+	void vt369_6000_w(offs_t offset, uint8_t data);
 
-	void vt03_48ax_w(offs_t offset, uint8_t data);
-	uint8_t vt03_48ax_r(offs_t offset);
+	void vt369_soundcpu_control_w(offs_t offset, uint8_t data);
+	void vt369_4112_bank6000_select_w(offs_t offset, uint8_t data);
+	void vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data);
+	void vt369_relative_w(offs_t offset, uint8_t data);
 
-	uint8_t m_413x[8]; // CY only?
+private:
+	void vt369_sound_map(address_map &map);
+
+	required_device<vrt_vt1682_alu_device> m_alu;
+	required_device<cpu_device> m_soundcpu;
+	uint8_t m_relative[2];
+	std::vector<u8> m_6000_ram;
+	uint8_t m_bank6000;
+	uint8_t m_bank6000_enable;
 };
 
 class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device
@@ -54,22 +68,35 @@ protected:
 	void vt03_412c_extbank_w(uint8_t data);
 };
 
-class nes_vt369_soc_device : public nes_vt09_soc_device
+class nes_vt369_alt_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt369_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
 	void nes_vt_hh_map(address_map& map);
 
+	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
-
 };
+
+class nes_vt369_alt_swap_d5_d6_soc_device : public nes_vt369_alt_soc_device
+{
+public:
+	nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+private:
+	void encryption_4169_w(uint8_t data);
+	void nes_vt_hh_swap_map(address_map &map);
+};
+
 
 class nes_vtunknown_soc_dg_device : public nes_vt09_soc_device
 {
@@ -103,9 +130,10 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vtunknown_soc_cy_device)
+DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vt369_soc_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_BT, nes_vtunknown_soc_bt_device)
-DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_alt_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT369_SOC_SWAP, nes_vt369_alt_swap_d5_d6_soc_device)
 
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device)
 DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device)

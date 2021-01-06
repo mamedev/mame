@@ -128,7 +128,7 @@ void device_state_entry::format_from_mask()
 
 	// make up a format based on the mask
 	if (m_datamask == 0)
-		throw emu_fatalerror("%s state entry requires a nonzero mask\n", m_symbol.c_str());
+		throw emu_fatalerror("%s state entry requires a nonzero mask\n", m_symbol);
 	int width = 0;
 	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
@@ -331,7 +331,7 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 					width--;
 				}
 				// fall through to unsigned case
-
+				[[fallthrough]];
 			// u outputs as unsigned decimal
 			case 'u':
 				if (width == 0)

@@ -12,17 +12,19 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/filemngr.h"
+
 #include "ui/filesel.h"
-#include "ui/miscmenu.h"
-#include "ui/imgcntrl.h"
 #include "ui/floppycntrl.h"
+#include "ui/imgcntrl.h"
+#include "ui/miscmenu.h"
+#include "ui/ui.h"
+
 #include "softlist.h"
 
 
 namespace ui {
+
 /***************************************************************************
     FILE MANAGER
 ***************************************************************************/
@@ -59,11 +61,9 @@ menu_file_manager::~menu_file_manager()
 
 void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	const char *path;
-
 	// access the path
-	path = selected_device ? selected_device->filename() : nullptr;
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, nullptr, path);
+	std::string_view path = selected_device && selected_device->exists() ? selected_device->filename() : std::string_view();
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 
 
@@ -110,20 +110,20 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 
 	if (!m_warnings.empty())
 	{
-		item_append(m_warnings, "", FLAG_DISABLE, nullptr);
-		item_append("", "", FLAG_DISABLE, nullptr);
+		item_append(m_warnings, FLAG_DISABLE, nullptr);
+		item_append(std::string(), FLAG_DISABLE, nullptr);
 	}
 
 	// cycle through all devices for this system
 	std::unordered_set<std::string> devtags;
-	for (device_t &dev : device_iterator(machine().root_device()))
+	for (device_t &dev : device_enumerator(machine().root_device()))
 	{
 		bool tag_appended = false;
 		if (!devtags.insert(dev.tag()).second)
 			continue;
 
 		// check whether it owns an image interface
-		image_interface_iterator subiter(dev);
+		image_interface_enumerator subiter(dev);
 		if (subiter.first() != nullptr)
 		{
 			// if so, cycle through all its image interfaces
@@ -143,7 +143,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 								first_entry = false;
 							else
 								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", dev.tag()), "", 0, nullptr);
+							item_append(string_format("[root%s]", dev.tag()), 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
@@ -156,7 +156,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	if (m_warnings.empty() || m_curr_selected)
-		item_append("Reset", "", 0, (void *)1);
+		item_append("Reset", 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -170,7 +170,7 @@ void menu_file_manager::handle()
 {
 	// process the menu
 	const event *event = process(0);
-	if (event != nullptr && event->itemref != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (event && event->itemref && (event->iptkey == IPT_UI_SELECT))
 	{
 		if ((uintptr_t)event->itemref == 1)
 		{
@@ -179,18 +179,15 @@ void menu_file_manager::handle()
 		else
 		{
 			selected_device = (device_image_interface *) event->itemref;
-			if (selected_device != nullptr)
+			if (selected_device)
 			{
 				m_curr_selected = true;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
-				if (floppy_device != nullptr)
-				{
+				if (floppy_device)
 					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
-				}
 				else
-				{
 					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
-				}
+
 				// reset the existing menu
 				reset(reset_options::REMEMBER_POSITION);
 			}

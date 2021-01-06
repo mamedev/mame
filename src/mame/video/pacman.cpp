@@ -152,6 +152,8 @@ void pacman_state::init_save_state()
 	save_item(NAME(m_colortablebank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bgpriority));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_interrupt_vector));
 }
 
 
@@ -166,6 +168,7 @@ VIDEO_START_MEMBER(pacman_state,pacman)
 	m_flipscreen = 0;
 	m_bgpriority = 0;
 	m_inv_spr = 0;
+	m_interrupt_vector = 0;
 
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */

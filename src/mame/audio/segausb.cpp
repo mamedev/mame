@@ -43,7 +43,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 		m_out_latch(0),
 		m_last_p2_value(0),
 		m_program_ram(*this, "pgmram"),
-		m_work_ram(*this, "workram"),
+		m_work_ram(*this, "workram", 4*256, ENDIANNESS_LITTLE),
 		m_work_ram_bank(0),
 		m_t1_clock(0),
 		m_t1_clock_mask(0),
@@ -726,7 +726,7 @@ void usb_sound_device::usb_map(address_map &map)
 
 void usb_sound_device::usb_portmap(address_map &map)
 {
-	map(0x00, 0xff).rw(FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
+	map(0x00, 0xff).rw(FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w));
 }
 
 

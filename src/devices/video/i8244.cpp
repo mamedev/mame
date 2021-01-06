@@ -803,5 +803,4 @@ void i8244_device::sound_update()
 		m_sh_count = 0;
 		m_sh_written = false;
 	}
-
 }

@@ -110,7 +110,7 @@ void tigeroad_state::main_map(address_map &map)
 	map(0xfe4002, 0xfe4002).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xfe4004, 0xfe4005).portr("DSW");
 	map(0xfe8000, 0xfe8003).w(FUNC(tigeroad_state::scroll_w));
-	map(0xfe800e, 0xfe800f).writeonly();    // fe800e = watchdog or IRQ acknowledge
+	map(0xfe800e, 0xfe800f).nopw();    // fe800e = watchdog or IRQ acknowledge
 	map(0xfec000, 0xfec7ff).ram().w(FUNC(tigeroad_state::videoram_w)).share("videoram");
 
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");

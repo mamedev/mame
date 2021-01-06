@@ -202,7 +202,7 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x208000, 0x208fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x20a000, 0x20afff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 
-	map(0x20b000, 0x20b3ff).writeonly(); /* ? Always 0 written */
+	map(0x20b000, 0x20b3ff).nopw(); /* ? Always 0 written */
 	map(0x20c000, 0x20c7ff).ram().share("pf3_rowscroll");
 	map(0x20e000, 0x20e7ff).ram().share("pf4_rowscroll");
 

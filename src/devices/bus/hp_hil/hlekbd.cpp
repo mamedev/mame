@@ -14,7 +14,7 @@
 DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
-namespace bus { namespace hp_hil {
+namespace bus::hp_hil {
 
 namespace {
 
@@ -610,4 +610,4 @@ void hle_hp_itf_device::hil_idd()
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
 }
 
-} } // namespace bus::hp_hil
+} // namespace bus::hp_hil

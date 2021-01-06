@@ -1382,10 +1382,10 @@ inline void taito_f3_state::draw_scanlines(
 
 			switch (skip_layer_num)
 			{
-				case 0: GET_PIXMAP_POINTER(0)
-				case 1: GET_PIXMAP_POINTER(1)
-				case 2: GET_PIXMAP_POINTER(2)
-				case 3: GET_PIXMAP_POINTER(3)
+				case 0: GET_PIXMAP_POINTER(0) [[fallthrough]];
+				case 1: GET_PIXMAP_POINTER(1) [[fallthrough]];
+				case 2: GET_PIXMAP_POINTER(2) [[fallthrough]];
+				case 3: GET_PIXMAP_POINTER(3) [[fallthrough]];
 				case 4: GET_PIXMAP_POINTER(4)
 			}
 
@@ -1397,11 +1397,11 @@ inline void taito_f3_state::draw_scanlines(
 					u8 sprite_pri;
 					switch (skip_layer_num)
 					{
-						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0)
-						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1)
-						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2)
-						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3)
-						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4)
+						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0) [[fallthrough]];
+						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1) [[fallthrough]];
+						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2) [[fallthrough]];
+						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3) [[fallthrough]];
+						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4) [[fallthrough]];
 						case 5: UPDATE_PIXMAP_SP(5)
 								if (!bgcolor) { if (!(m_pval & 0xf0)) { *dsti = 0; break; } }
 								else dpix_bg(bgcolor);
@@ -1416,10 +1416,10 @@ inline void taito_f3_state::draw_scanlines(
 
 				switch (skip_layer_num)
 				{
-					case 0: CULC_PIXMAP_POINTER(0)
-					case 1: CULC_PIXMAP_POINTER(1)
-					case 2: CULC_PIXMAP_POINTER(2)
-					case 3: CULC_PIXMAP_POINTER(3)
+					case 0: CULC_PIXMAP_POINTER(0) [[fallthrough]];
+					case 1: CULC_PIXMAP_POINTER(1) [[fallthrough]];
+					case 2: CULC_PIXMAP_POINTER(2) [[fallthrough]];
+					case 3: CULC_PIXMAP_POINTER(3) [[fallthrough]];
 					case 4: CULC_PIXMAP_POINTER(4)
 				}
 			}
@@ -2552,38 +2552,38 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 						{
 							int c;
 							u8 p;
-							case 31: PSET_O NEXT_P
-							case 30: PSET_O NEXT_P
-							case 29: PSET_O NEXT_P
-							case 28: PSET_O NEXT_P
-							case 27: PSET_O NEXT_P
-							case 26: PSET_O NEXT_P
-							case 25: PSET_O NEXT_P
-							case 24: PSET_O NEXT_P
-							case 23: PSET_O NEXT_P
-							case 22: PSET_O NEXT_P
-							case 21: PSET_O NEXT_P
-							case 20: PSET_O NEXT_P
-							case 19: PSET_O NEXT_P
-							case 18: PSET_O NEXT_P
-							case 17: PSET_O NEXT_P
+							case 31: PSET_O NEXT_P [[fallthrough]];
+							case 30: PSET_O NEXT_P [[fallthrough]];
+							case 29: PSET_O NEXT_P [[fallthrough]];
+							case 28: PSET_O NEXT_P [[fallthrough]];
+							case 27: PSET_O NEXT_P [[fallthrough]];
+							case 26: PSET_O NEXT_P [[fallthrough]];
+							case 25: PSET_O NEXT_P [[fallthrough]];
+							case 24: PSET_O NEXT_P [[fallthrough]];
+							case 23: PSET_O NEXT_P [[fallthrough]];
+							case 22: PSET_O NEXT_P [[fallthrough]];
+							case 21: PSET_O NEXT_P [[fallthrough]];
+							case 20: PSET_O NEXT_P [[fallthrough]];
+							case 19: PSET_O NEXT_P [[fallthrough]];
+							case 18: PSET_O NEXT_P [[fallthrough]];
+							case 17: PSET_O NEXT_P [[fallthrough]];
 							case 16: PSET_O break;
 
-							case 15: PSET_T NEXT_P
-							case 14: PSET_T NEXT_P
-							case 13: PSET_T NEXT_P
-							case 12: PSET_T NEXT_P
-							case 11: PSET_T NEXT_P
-							case 10: PSET_T NEXT_P
-							case  9: PSET_T NEXT_P
-							case  8: PSET_T NEXT_P
-							case  7: PSET_T NEXT_P
-							case  6: PSET_T NEXT_P
-							case  5: PSET_T NEXT_P
-							case  4: PSET_T NEXT_P
-							case  3: PSET_T NEXT_P
-							case  2: PSET_T NEXT_P
-							case  1: PSET_T NEXT_P
+							case 15: PSET_T NEXT_P [[fallthrough]];
+							case 14: PSET_T NEXT_P [[fallthrough]];
+							case 13: PSET_T NEXT_P [[fallthrough]];
+							case 12: PSET_T NEXT_P [[fallthrough]];
+							case 11: PSET_T NEXT_P [[fallthrough]];
+							case 10: PSET_T NEXT_P [[fallthrough]];
+							case  9: PSET_T NEXT_P [[fallthrough]];
+							case  8: PSET_T NEXT_P [[fallthrough]];
+							case  7: PSET_T NEXT_P [[fallthrough]];
+							case  6: PSET_T NEXT_P [[fallthrough]];
+							case  5: PSET_T NEXT_P [[fallthrough]];
+							case  4: PSET_T NEXT_P [[fallthrough]];
+							case  3: PSET_T NEXT_P [[fallthrough]];
+							case  2: PSET_T NEXT_P [[fallthrough]];
+							case  1: PSET_T NEXT_P [[fallthrough]];
 							case  0: PSET_T
 						}
 

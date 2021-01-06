@@ -32,27 +32,24 @@ public:
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
-		m_nmigate(*this, "nmigate"),
-		m_spriteram(*this, "spriteram") ,
-		m_msm(*this, "msm"),
-		m_tilegen(*this, "tilegen%u", 1),
 		m_spritegen_krn(*this, "spritegen_krn"),
-		m_spritegen_mxc(*this, "spritegen_mxc"),
-		m_gfxdecode(*this, "gfxdecode"),
+		m_spriteram(*this, "spriteram") ,
 		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_mainbank(*this, "mainbank"),
+		m_nmigate(*this, "nmigate"),
+		m_tilegen(*this, "tilegen%u", 1),
+		m_spritegen_mxc(*this, "spritegen_mxc"),
 		m_videoram(*this, "videoram"),
 		m_bg_data(*this, "bg_data"),
-		m_mainbank(*this, "mainbank"),
-		m_soundbank(*this, "soundbank"),
 		m_coin_port(*this, "I8751")
 	{ }
 
 	void shackled(machine_config &config);
 	void meikyuh(machine_config &config);
 	void lastmisn(machine_config &config);
-	void csilver(machine_config &config);
 	void cobracom(machine_config &config);
 	void garyoret(machine_config &config);
 	void srdarwin(machine_config &config);
@@ -60,33 +57,68 @@ public:
 	void oscar(machine_config &config);
 	void gondo(machine_config &config);
 
-	void init_dec8();
-	void init_csilver();
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-private:
+	uint8_t i8751_h_r();
+	uint8_t i8751_l_r();
+	void dec8_i8751_w(offs_t offset, uint8_t data);
+
+	void dec8_mxc06_karn_buffer_spriteram_w(uint8_t data);
+	void dec8_sound_w(uint8_t data);
+	void main_irq_on_w(uint8_t data);
+	void main_irq_off_w(uint8_t data);
+	void main_firq_off_w(uint8_t data);
+	void sub_irq_on_w(uint8_t data);
+	void sub_irq_off_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	void dec8_bg_data_w(offs_t offset, uint8_t data);
+	uint8_t dec8_bg_data_r(offs_t offset);
+	void dec8_videoram_w(offs_t offset, uint8_t data);
+	void dec8_scroll2_w(offs_t offset, uint8_t data);
+
+	uint8_t i8751_port0_r();
+	void i8751_port0_w(uint8_t data);
+	uint8_t i8751_port1_r();
+	void i8751_port1_w(uint8_t data);
+
+	DECLARE_VIDEO_START(lastmisn);
+	uint32_t screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void set_screen_raw_params_data_east(machine_config &config);
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<i8751_device> m_mcu;
-	optional_device<input_merger_device> m_nmigate;
-	required_device<buffered_spriteram8_device> m_spriteram;
-	optional_device<msm5205_device> m_msm;
-	optional_device_array<deco_bac06_device, 2> m_tilegen;
 	optional_device<deco_karnovsprites_device> m_spritegen_krn;
-	optional_device<deco_mxc06_device> m_spritegen_mxc;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<deco_rmc3_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+
+	/* memory regions */
+	required_memory_bank m_mainbank;
+
+	// MCU communication
+	uint8_t  m_i8751_p2;
+	int      m_i8751_port0;
+	int      m_i8751_port1;
+	int      m_i8751_return;
+	int      m_i8751_value;
+
+private:
+	optional_device<input_merger_device> m_nmigate;
+	optional_device_array<deco_bac06_device, 2> m_tilegen;
+	optional_device<deco_mxc06_device> m_spritegen_mxc;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_bg_data;
-
-	/* memory regions */
-	required_memory_bank m_mainbank;
-	optional_memory_bank m_soundbank;
 
 	uint8_t *  m_pf1_data;
 	uint8_t *  m_row;
@@ -105,11 +137,6 @@ private:
 	/* misc */
 	bool     m_secclr;
 	bool     m_nmi_enable;
-	uint8_t  m_i8751_p2;
-	int      m_i8751_port0;
-	int      m_i8751_port1;
-	int      m_i8751_return;
-	int      m_i8751_value;
 	int      m_coinage_id;
 	int      m_coin1;
 	int      m_coin2;
@@ -121,52 +148,26 @@ private:
 	int      m_latch;
 	bool     m_coin_state;
 	int      m_snd;
-	int      m_msm5205next;
-	int      m_toggle;
 
 	emu_timer *m_i8751_timer;
 	emu_timer *m_m6502_timer;
 
-	void dec8_mxc06_karn_buffer_spriteram_w(uint8_t data);
-	uint8_t i8751_h_r();
-	uint8_t i8751_l_r();
 	void i8751_reset_w(uint8_t data);
 	uint8_t gondo_player_1_r(offs_t offset);
 	uint8_t gondo_player_2_r(offs_t offset);
-	void dec8_i8751_w(offs_t offset, uint8_t data);
 	void dec8_bank_w(uint8_t data);
 	void ghostb_bank_w(uint8_t data);
-	void csilver_control_w(uint8_t data);
-	void dec8_sound_w(uint8_t data);
-	void csilver_adpcm_data_w(uint8_t data);
-	void csilver_sound_bank_w(uint8_t data);
-	void main_irq_on_w(uint8_t data);
-	void main_irq_off_w(uint8_t data);
-	void main_firq_off_w(uint8_t data);
-	void sub_irq_on_w(uint8_t data);
-	void sub_irq_off_w(uint8_t data);
 	void sub_firq_off_w(uint8_t data);
-	void flip_screen_w(uint8_t data);
-	uint8_t i8751_port0_r();
-	void i8751_port0_w(uint8_t data);
-	uint8_t i8751_port1_r();
-	void i8751_port1_w(uint8_t data);
 	void gondo_mcu_to_main_w(uint8_t data);
 	void shackled_mcu_to_main_w(uint8_t data);
 	void srdarwin_mcu_to_main_w(uint8_t data);
-	void csilver_mcu_to_main_w(uint8_t data);
-	void dec8_bg_data_w(offs_t offset, uint8_t data);
-	uint8_t dec8_bg_data_r(offs_t offset);
-	void dec8_videoram_w(offs_t offset, uint8_t data);
 	void srdarwin_videoram_w(offs_t offset, uint8_t data);
-	void dec8_scroll2_w(offs_t offset, uint8_t data);
 	void srdarwin_control_w(offs_t offset, uint8_t data);
 	void lastmisn_control_w(uint8_t data);
 	void shackled_control_w(uint8_t data);
 	void lastmisn_scrollx_w(uint8_t data);
 	void lastmisn_scrolly_w(uint8_t data);
 	void gondo_scroll_w(offs_t offset, uint8_t data);
-	uint8_t csilver_adpcm_reset_r();
 	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);
@@ -177,9 +178,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_srdarwin_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(lastmisn);
 	DECLARE_VIDEO_START(shackled);
 	DECLARE_VIDEO_START(gondo);
 	DECLARE_VIDEO_START(garyoret);
@@ -188,7 +186,6 @@ private:
 	DECLARE_VIDEO_START(srdarwin);
 	DECLARE_VIDEO_START(cobracom);
 	void allocate_buffered_spriteram16();
-	uint32_t screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -204,14 +201,8 @@ private:
 	void gondo_colpri_cb(u32 &colour, u32 &pri_mask);
 	void cobracom_colpri_cb(u32 &colour, u32 &pri_mask);
 	void oscar_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
-	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
-
-	void set_screen_raw_params_data_east(machine_config &config);
 
 	void cobra_map(address_map &map);
-	void csilver_map(address_map &map);
-	void csilver_s_map(address_map &map);
-	void csilver_sub_map(address_map &map);
 	void dec8_s_map(address_map &map);
 	void garyoret_map(address_map &map);
 	void gondo_map(address_map &map);
@@ -225,12 +216,45 @@ private:
 	void shackled_sub_map(address_map &map);
 	void srdarwin_map(address_map &map);
 	void ym3526_s_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	/* ports */
 	optional_ioport m_coin_port;
+};
+
+
+class csilver_state : public dec8_state
+{
+public:
+	csilver_state(const machine_config &mconfig, device_type type, const char *tag) :
+		dec8_state(mconfig, type, tag),
+		m_msm(*this, "msm"),
+		m_soundbank(*this, "soundbank")
+	{
+	}
+
+	void csilver(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void csilver_control_w(uint8_t data);
+	void csilver_adpcm_data_w(uint8_t data);
+	void csilver_sound_bank_w(uint8_t data);
+	void csilver_mcu_to_main_w(uint8_t data);
+	uint8_t csilver_adpcm_reset_r();
+	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
+
+	void csilver_map(address_map &map);
+	void csilver_s_map(address_map &map);
+	void csilver_sub_map(address_map &map);
+
+	required_device<msm5205_device> m_msm;
+	required_memory_bank m_soundbank;
+
+	int      m_toggle;
+	int      m_msm5205next;
 };
 
 #endif // MAME_INCLUDES_DEC8_H

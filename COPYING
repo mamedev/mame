@@ -184,13 +184,13 @@ Copyright (c) 1999-2000 Ross Bencina and Phil Burk
 Copyright (c) 2001-2009 Roger B. Dannenberg
 
 pugixml - a C++ XML processing library
-Copyright (c) 2006-2016 Arseny Kapoulkine
+Copyright (c) 2006-2019 Arseny Kapoulkine
 
 RapidJSON - A fast JSON parser/generator for C++ with both SAX/DOM style API
 Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 
 Sol - a C++ library binding to Lua
-Copyright (c) 2013-2016 Rapptz and contributors
+Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
 
 tap-windows.h
 Copyright (C) 2002-2014 OpenVPN Technologies, Inc.

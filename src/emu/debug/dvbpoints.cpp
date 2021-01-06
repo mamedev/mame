@@ -122,7 +122,7 @@ void debug_view_breakpoints::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
 		m_source_list.emplace_back(
 				std::make_unique<debug_view_source>(

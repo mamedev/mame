@@ -61,7 +61,7 @@ private:
 	required_memory_region m_rom_1;
 	required_memory_region m_rom_2;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_nvram;
+	memory_share_creator<uint8_t> m_nvram;
 	uint8_t m_rom_bank;
 	uint8_t m_prom_bank;
 };

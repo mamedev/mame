@@ -27,7 +27,7 @@ public:
 	void set_tilemap_yoffs(int yoffs, int flipped_yoffs) { m_tilemap_yoffs = yoffs; m_tilemap_flipped_yoffs = flipped_yoffs; }
 
 	// memory handlers
-	u8 rom_r(offs_t offset) { return m_rom[offset & m_rom.mask()]; }
+	u8 rom_r(offs_t offset) { return m_rom[offset & (m_rom.length() - 1)]; }
 
 	// internal functions
 	u8 vregs_r(offs_t offset) { return m_vregs[offset]; }

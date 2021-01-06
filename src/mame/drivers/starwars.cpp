@@ -58,15 +58,6 @@ void starwars_state::quad_pokeyn_w(offs_t offset, uint8_t data)
 
 void starwars_state::machine_reset()
 {
-	/* ESB-specific */
-	if (m_slapstic_device.found())
-	{
-		/* reset the slapstic */
-		m_slapstic_device->slapstic_reset();
-		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
-		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
-	}
-
 	/* reset the matrix processor */
 	starwars_mproc_reset();
 }
@@ -88,47 +79,14 @@ void starwars_state::irq_ack_w(uint8_t data)
 
 /*************************************
  *
- *  ESB Slapstic handler
- *
- *************************************/
-
-void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
-{
-	int new_bank = m_slapstic_device->slapstic_tweak(space, offset);
-
-	/* update for the new bank */
-	if (new_bank != m_slapstic_current_bank)
-	{
-		m_slapstic_current_bank = new_bank;
-		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
-	}
-}
-
-
-uint8_t starwars_state::esb_slapstic_r(address_space &space, offs_t offset)
-{
-	int result = m_slapstic_base[offset];
-	esb_slapstic_tweak(space, offset);
-	return result;
-}
-
-
-void starwars_state::esb_slapstic_w(address_space &space, offs_t offset, uint8_t data)
-{
-	esb_slapstic_tweak(space, offset);
-}
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
 
 void starwars_state::main_map(address_map &map)
 {
-	map(0x0000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0);
-	map(0x3000, 0x3fff).rom();                             /* vector_rom */
+	map(0x0000, 0x2fff).ram();
+	map(0x3000, 0x3fff).rom().region("vectorrom", 0);
 	map(0x4300, 0x431f).portr("IN0");
 	map(0x4320, 0x433f).portr("IN1");
 	map(0x4340, 0x435f).portr("DSW0");
@@ -159,7 +117,7 @@ void starwars_state::main_map(address_map &map)
 void starwars_state::esb_main_map(address_map &map)
 {
 	main_map(map);
-	map(0x8000, 0x9fff).rw(FUNC(starwars_state::esb_slapstic_r), FUNC(starwars_state::esb_slapstic_w));
+	map(0x8000, 0x9fff).bankr(m_slapstic_bank);
 	map(0xa000, 0xffff).bankr("bank2");
 }
 
@@ -342,7 +300,8 @@ void starwars_state::starwars(machine_config &config)
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_STARWARS(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x0000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -370,7 +329,8 @@ void starwars_state::esb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 101, false);
+	SLAPSTIC(config, m_slapstic_device, 101);
+	m_slapstic_device->set_bank(m_slapstic_bank);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
 }
@@ -386,13 +346,15 @@ void starwars_state::esb(machine_config &config)
 
 ROM_START( starwars )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021.214.1f", 0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) ) /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
 	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
 	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
 	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136021-105.1l", 0x0000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -414,13 +376,15 @@ ROM_END
 
 ROM_START( starwars1 )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021.114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	ROM_LOAD( "136021.102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
 	ROM_LOAD( "136021.203.1jk",0xa000, 0x2000, CRC(f6da0a00) SHA1(dd53b643be856787bbc4da63e5eb132f98f623c3) ) /*  8k ROM 2 bank */
 	ROM_LOAD( "136021.104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
 	ROM_LOAD( "136021.206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136021-105.1l", 0x0000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -442,13 +406,15 @@ ROM_END
 
 ROM_START( starwarso )
 	ROM_REGION( 0x12000, "maincpu", 0 )     /* 2 64k ROM spaces */
-	ROM_LOAD( "136021-105.1l", 0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021-114.1f", 0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) ) /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	ROM_LOAD( "136021-102.1hj",0x8000, 0x2000, CRC(f725e344) SHA1(f8943b67f2ea032ab9538084756ba86f892be5ca) ) /*  8k ROM 1 bank */
 	ROM_LOAD( "136021-103.1jk",0xa000, 0x2000, CRC(3fde9ccb) SHA1(8d88fc7a28ac8f189f8aba08598732ac8c5491aa) ) /*  8k ROM 2 bank */
 	ROM_LOAD( "136021-104.1kl",0xc000, 0x2000, CRC(7e406703) SHA1(981b505d6e06d7149f8bcb3e81e4d0c790f2fc86) ) /*  8k ROM 3 bank */
 	ROM_LOAD( "136021-206.1m", 0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136021-105.1l", 0x0000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -472,11 +438,13 @@ ROM_END
 
 ROM_START( tomcatsw )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "tcavg3.1l",     0x3000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
 	ROM_LOAD( "tc6.1f",        0x6000, 0x2000, CRC(56e284ff) SHA1(a5fda9db0f6b8f7d28a4a607976fe978e62158cf) )
 	ROM_LOAD( "tc8.1hj",       0x8000, 0x2000, CRC(7b7575e3) SHA1(bdb838603ffb12195966d0ce454900253bc0f43f) )
 	ROM_LOAD( "tca.1jk",       0xa000, 0x2000, CRC(a1020331) SHA1(128745a2ec771ac818a8fbba59a08f0cf5f28e8f) )
 	ROM_LOAD( "tce.1m",        0xe000, 0x2000, CRC(4a3de8a3) SHA1(e48fc17201326358317f6b428e583ecaa3ecb881) )
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "tcavg3.1l",     0x0000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -499,7 +467,6 @@ ROM_END
 
 ROM_START( esb )
 	ROM_REGION( 0x22000, "maincpu", 0 )     /* 64k for code and a buttload for the banked ROMs */
-	ROM_LOAD( "136031-111.1l", 0x3000, 0x1000, CRC(b1f9bd12) SHA1(76f15395c9fdcd80dd241307a377031a1f44e150) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136031-101.1f", 0x6000, 0x2000, CRC(ef1e3ae5) SHA1(d228ff076faa7f9605badeee3b827adb62593e0a) )
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	/* $8000 - $9fff : slapstic page */
@@ -512,6 +479,9 @@ ROM_START( esb )
 
 	ROM_LOAD( "136031-105.3u", 0x14000, 0x4000, CRC(ea9e4dce) SHA1(9363fd5b1fce62c2306b448a7766eaf7ec97cdf5) ) /* slapstic 0, 1 */
 	ROM_LOAD( "136031-106.2u", 0x18000, 0x4000, CRC(76d07f59) SHA1(44dd018b406f95e1512ce92923c2c87f1458844f) ) /* slapstic 2, 3 */
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "136031-111.1l", 0x0000, 0x1000, CRC(b1f9bd12) SHA1(76f15395c9fdcd80dd241307a377031a1f44e150) ) /* 3000-3fff is 4k vector rom */
 
 	/* Sound ROMS */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -555,9 +525,11 @@ void starwars_state::init_esb()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	m_slapstic_device->slapstic_init();
-	m_slapstic_source = &rom[0x14000];
-	m_slapstic_base = &rom[0x08000];
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x14000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0x9fff, 0, "slapstic",
+													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); },
+													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); });
+
 
 	/* prepare the matrix processor */
 	starwars_mproc_init();
@@ -567,9 +539,6 @@ void starwars_state::init_esb()
 	membank("bank1")->set_entry(0);
 	membank("bank2")->configure_entries(0, 2, rom + 0xa000, 0x1c000 - 0xa000);
 	membank("bank2")->set_entry(0);
-
-	/* additional globals for state saving */
-	save_item(NAME(m_slapstic_current_bank));
 }
 
 

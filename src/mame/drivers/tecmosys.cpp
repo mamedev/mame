@@ -480,14 +480,14 @@ void tecmosys_state::tecmosys(machine_config &config)
 
 	ymf262_device &ymf(YMF262(config, "ymf", XTAL(14'318'181)));
 	ymf.irq_handler().set_inputline("audiocpu", 0);
-	ymf.add_route(0, "lspeaker", 1.00);
-	ymf.add_route(1, "rspeaker", 1.00);
-	ymf.add_route(2, "lspeaker", 1.00);
-	ymf.add_route(3, "rspeaker", 1.00);
+	ymf.add_route(0, "lspeaker", 0.50);
+	ymf.add_route(1, "rspeaker", 0.50);
+	ymf.add_route(2, "lspeaker", 0.50);
+	ymf.add_route(3, "rspeaker", 0.50);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 	oki.set_addrmap(0, &tecmosys_state::oki_map);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));

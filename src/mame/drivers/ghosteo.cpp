@@ -68,6 +68,9 @@ ToDo: verify QS1000 hook-up
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define NAND_LOG 0
 
 enum nand_mode_t
@@ -97,6 +100,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -107,6 +111,10 @@ public:
 	void init_touryuu();
 	void init_bballoon();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
@@ -115,6 +123,7 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
 	required_region_ptr<uint8_t> m_flash;
+	memory_bank_creator m_qs1000_bank;
 
 	int m_security_count;
 	uint32_t m_bballoon_port[20];
@@ -127,8 +136,6 @@ private:
 	void qs1000_p3_w(uint8_t data);
 
 	int m_rom_pagesize;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	uint32_t s3c2410_core_pin_r(offs_t offset);
@@ -182,7 +189,7 @@ void ghosteo_state::qs1000_p3_w(uint8_t data)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -594,8 +601,10 @@ uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+
+	m_security_count = 0;
 }
 
 void ghosteo_state::machine_reset()
@@ -709,7 +718,7 @@ Notes:
       QS1001A    - QDSP QS1001A 512k x8 MaskROM (SOP32)
 
       qs1001a.u17 was not dumped from this PCB, but is a standard sample rom found on many Eolith games
-                  see eolith.c and vegaeo.c drivers
+                  see eolith.cpp and vegaeo.cpp drivers
 */
 
 // The NAND dumps are missing the ECC data.  We calculate it on the fly, because the games require it, but really it should be dumped hence the 'BAD DUMP' flags
@@ -762,6 +771,9 @@ void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }
+
+} // Anonymous namespace
+
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
 GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )

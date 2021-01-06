@@ -109,6 +109,7 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 VIDEO_START_MEMBER(nmk16_state,macross)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<0, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = nullptr;
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
@@ -128,6 +129,7 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 VIDEO_START_MEMBER(nmk16_state,macross2)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<0, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = nullptr;
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
@@ -147,6 +149,7 @@ VIDEO_START_MEMBER(nmk16_state,gunnail)
 VIDEO_START_MEMBER(nmk16_state, bjtwin)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmk16_state::bjtwin_get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap[1] = nullptr;
 
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
@@ -405,6 +408,7 @@ VIDEO_START_MEMBER(afega_state,grdnstrm)
 {
 	// 8bpp Tilemap
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(afega_state::get_bg_tile_info_8bit)), tilemap_mapper_delegate(*this, FUNC(afega_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = nullptr;
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(afega_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);

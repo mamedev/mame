@@ -76,7 +76,7 @@
 
     Chase Bombers proto sports lots of gfx bugs;
 
-    Chase Bombers PCB has TC0360PRI but not hooked up
+    Sprites are delayed, but not yet implemented
 
     Gun calibration
     ---------------
@@ -354,7 +354,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x900000, 0x90ffff).rw(m_tc0620scc, FUNC(tc0620scc_device::ram_r), FUNC(tc0620scc_device::ram_w));        /* 6bpp tilemaps */
 	map(0x920000, 0x92000f).rw(m_tc0620scc, FUNC(tc0620scc_device::ctrl_r), FUNC(tc0620scc_device::ctrl_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xb00000, 0xb0000f).ram(); /* TC0360PRI */
+	map(0xb00000, 0xb0000f).rw(m_tc0360pri, FUNC(tc0360pri_device::read), FUNC(tc0360pri_device::write)); /* TC0360PRI */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
 	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
 	map(0xe00000, 0xe0ffff).rw(FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
@@ -616,6 +616,8 @@ void undrfire_state::cbombers(machine_config &config)
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_col_base(4096);
+
+	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

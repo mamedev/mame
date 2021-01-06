@@ -36,10 +36,25 @@ template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_units
 	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const handler_entry_read_units *src) :
+	handler_entry_read<Width, AddrShift, Endian>(src->m_space, inh::F_UNITS),
+	m_subunits(src->m_subunits)
+{
+	for(u32 i=0; i != src->m_subunits; i++) {
+		m_subunit_infos[i] = src->m_subunit_infos[i];
+		m_subunit_infos[i].m_handler = static_cast<handler_entry_write<Width, AddrShift, Endian> *>(m_subunit_infos[i].m_handler)->dup();
+	}
+}
+
 template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_units<Width, AddrShift, Endian>::~handler_entry_read_units()
 {
 	for(u32 i=0; i != m_subunits; i++)
 		m_subunit_infos[i].m_handler->unref();
+}
+
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_read<Width, AddrShift, Endian> *handler_entry_read_units<Width, AddrShift, Endian>::dup()
+{
+	return new handler_entry_read_units<Width, AddrShift, Endian>(this);
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read_units<Width, AddrShift, Endian>::enumerate_references(handler_entry::reflist &refs) const
@@ -155,10 +170,25 @@ template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_unit
 	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const handler_entry_write_units *src) :
+	handler_entry_write<Width, AddrShift, Endian>(src->m_space, inh::F_UNITS),
+	m_subunits(src->m_subunits)
+{
+	for(u32 i=0; i != src->m_subunits; i++) {
+		m_subunit_infos[i] = src->m_subunit_infos[i];
+		m_subunit_infos[i].m_handler = static_cast<handler_entry_write<Width, AddrShift, Endian> *>(m_subunit_infos[i].m_handler)->dup();
+	}
+}
+
 template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_units<Width, AddrShift, Endian>::~handler_entry_write_units()
 {
 	for(u32 i=0; i != m_subunits; i++)
 		m_subunit_infos[i].m_handler->unref();
+}
+
+template<int Width, int AddrShift, endianness_t Endian> handler_entry_write<Width, AddrShift, Endian> *handler_entry_write_units<Width, AddrShift, Endian>::dup()
+{
+	return new handler_entry_write_units<Width, AddrShift, Endian>(this);
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_units<Width, AddrShift, Endian>::enumerate_references(handler_entry::reflist &refs) const

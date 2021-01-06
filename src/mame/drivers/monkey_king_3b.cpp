@@ -111,7 +111,7 @@ private:
 void mk3b_soc_state::map(address_map &map)
 {
 	// 64MB external NOR flash
-	map(0x08000000, 0x0BFFFFFF).rom().share("norflash").region("norflash", 0x0);;
+	map(0x08000000, 0x0BFFFFFF).rom().share("norflash");
 	// unknown amount and configuration of internal RAM
 	map(0x00000000, 0x0000FFFF).ram().share("iram0");
 	// This section of RAM seems to contain the stack

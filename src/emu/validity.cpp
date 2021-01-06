@@ -14,6 +14,7 @@
 #include "emuopts.h"
 #include "romload.h"
 #include "video/rgbutil.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <type_traits>
@@ -1539,7 +1540,7 @@ void validity_checker::validate_driver(device_t &root)
 	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
 	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
 	{
-		sound_interface_iterator iter(root);
+		sound_interface_enumerator iter(root);
 		if (!iter.first())
 			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
 	}
@@ -1563,7 +1564,7 @@ void validity_checker::validate_driver(device_t &root)
 void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1869,7 +1870,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 void validity_checker::validate_inputs(device_t &root)
 {
 	// iterate over devices
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// see if this device has ports; if not continue
 		if (device.input_ports() == nullptr)
@@ -2011,7 +2012,7 @@ void validity_checker::validate_devices(machine_config &config)
 {
 	std::unordered_set<std::string> device_map;
 
-	for (device_t &device : device_iterator(config.root_device()))
+	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -2057,7 +2058,7 @@ void validity_checker::validate_devices(machine_config &config)
 						additions(card);
 				}
 
-				for (device_slot_interface &subslot : slot_interface_iterator(*card))
+				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
 				{
 					if (subslot.fixed())
 					{
@@ -2077,11 +2078,11 @@ void validity_checker::validate_devices(machine_config &config)
 					}
 				}
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 				{
 					m_current_device = &card_dev;
 					card_dev.findit(this);

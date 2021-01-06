@@ -22,7 +22,7 @@
 #include "machine/at29x.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class snug_high_speed_gpl_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -81,7 +81,7 @@ private:
 	int             m_grom_address;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device)
 

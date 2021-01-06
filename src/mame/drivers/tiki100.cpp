@@ -681,9 +681,6 @@ void tiki100_state::machine_start()
 {
 	m_leds.resolve();
 
-	/* allocate video RAM */
-	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));

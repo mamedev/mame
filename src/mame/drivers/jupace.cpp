@@ -419,7 +419,7 @@ void ace_state::ace_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).mirror(0x0400).ram().share("video_ram");
-	map(0x2800, 0x2bff).mirror(0x0400).ram().share("char_ram").region(Z80_TAG, 0xfc00);
+	map(0x2800, 0x2bff).mirror(0x0400).ram().share("char_ram");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram();
 	map(0x4000, 0xffff).ram();
 }
@@ -827,14 +827,14 @@ void ace_state::ace(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( jupace )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_LOAD( "rom-a.z1", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c) )
 	ROM_LOAD( "rom-b.z2", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3) )
 
 	ROM_REGION( 0x1000, "fdc", 0 ) // Deep Thought disc interface
 	ROM_LOAD( "dos 4.bin", 0x0000, 0x1000, CRC(04c70448) SHA1(53ddcced6ae2feafd687a3b55864726656b71412) )
 
-	ROM_REGION( 0x10000, SP0256AL2_TAG, 0 )
+	ROM_REGION( 0x800, SP0256AL2_TAG, 0 )
 	ROM_LOAD( "sp0256-al2.ic1", 0x000, 0x800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 

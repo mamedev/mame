@@ -218,7 +218,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   056879    - Konami 056879 custom IC (QFP120, @ 13E)
   MC44200FT - Motorola MC44200FT Triple 8-bit Video DAC (QFP44)
   058232    - Konami 058232 custom ceramic IC (SIP14, @ 6C)
-  SM5877    - Nippon Precision Circuits SM5877 2-channel D/A convertor (SSOP24, @32D)
+  SM5877    - Nippon Precision Circuits SM5877 2-channel D/A converter (SSOP24, @32D)
   ADM485    - Analog Devices ADM485 low power EIA RS-485 transceiver (SOIC8, @ 20C)
   ADC0834   - National Semiconductor ADC0834 8-Bit Serial I/O A/D Converter with Multiplexer
               Option (SOIC14, @ 24D)
@@ -240,7 +240,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
                 CR-587 drive dated March 1998. Note that the CR-587 will not read CDR discs ;-)
 
 
-  Auxillary Controls PCB
+  Auxiliary Controls PCB
   ----------------------
 
   GE765-PWB(B)A (C)1998 KONAMI CO. LTD.
@@ -369,6 +369,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "romload.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -504,10 +505,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
 	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
 
-	WRITE_LINE_MEMBER( h8_clk_w );
+	DECLARE_WRITE_LINE_MEMBER( h8_clk_w );
 
 	double m_pad_position[ 6 ];
 	optional_ioport m_pads;
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_reset() override;
+	virtual void driver_start() override;
 
 private:
 
@@ -522,7 +528,6 @@ private:
 	void gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gunmania_r(offs_t offset, uint16_t mem_mask = ~0);
-	DECLARE_MACHINE_RESET( konami573 );
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
 
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
@@ -553,9 +558,6 @@ private:
 	void konami573_map(address_map &map);
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void driver_start() override;
 
 	required_ioport m_analog0;
 	required_ioport m_analog1;
@@ -593,11 +595,11 @@ private:
 	uint32_t m_stage_mask;
 	struct
 	{
-		int DO;
-		int clk;
-		int shift;
-		int state;
-		int bit;
+		int DO = 0;
+		int clk = 0;
+		int shift = 0;
+		int state = 0;
+		int bit = 0;
 	} m_stage_state[ 2 ];
 
 	int m_serial_lamp_bits;
@@ -834,12 +836,13 @@ void ksys573_state::driver_start()
 
 	m_n_security_control = 0;
 	m_control = 0;
+	m_h8_index = 0;
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
 }
 
-MACHINE_RESET_MEMBER( ksys573_state,konami573 )
+void ksys573_state::machine_reset()
 {
 	update_disc();
 
@@ -2206,8 +2209,6 @@ void ksys573_state::konami573(machine_config &config)
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
-	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573)
-
 	ATA_INTERFACE(config, m_ata, 0);
 	m_ata->irq_handler().set(FUNC(ksys573_state::ata_interrupt));
 	m_ata->slot(0).option_add("cr589", CR589);
@@ -3172,15 +3173,15 @@ static INPUT_PORTS_START( gchgchmp )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER( 1 ) /* P1 UP */
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER( 1 ) /* P1 DOWN */
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER( 2 ) /* P1 BUTTON 1 */
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER( 2 ) /* P1 BUTTON 2 */
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER( 2 ) /* P1 BUTTON 3 */
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER( 2 ) /* P1 BUTTON 2 */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER( 2 ) /* P1 BUTTON 3 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER( 1 ) /* P2 LEFT */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER( 1 ) /* P2 RIGHT */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER( 1 ) /* P2 UP */
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER( 1 )/* P2 DOWN */
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON 1 */
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON 2 */
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON 3 */
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON 2 */
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER( 2 ) /* P2 BUTTON 3 */
 
 	PORT_MODIFY( "IN3" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 BUTTON4 */
@@ -5273,6 +5274,7 @@ ROM_START( strgchmp )
 	ROM_REGION( 0x002000, "m48t58", 0 )
 	ROM_LOAD( "710uaa.22h",   0x000000, 0x002000, CRC(a3e93d49) SHA1(630daa1a02320433a068eb5214f6b30acc06df76) )
 ROM_END
+
 
 GAME( 1997, sys573,    0,        konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
 

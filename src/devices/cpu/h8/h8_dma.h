@@ -109,7 +109,9 @@ public:
 	uint16_t maral_r();
 	void maral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ioara_r();
+	uint8_t ioara8_r();
 	void ioara_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ioara8_w(uint8_t data);
 	uint16_t etcra_r();
 	void etcra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t marbh_r();
@@ -117,7 +119,9 @@ public:
 	uint16_t marbl_r();
 	void marbl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ioarb_r();
+	uint8_t ioarb8_r();
 	void ioarb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ioarb8_w(uint8_t data);
 	uint16_t etcrb_r();
 	void etcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dmacr_r();

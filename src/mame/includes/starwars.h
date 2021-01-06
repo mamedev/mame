@@ -32,7 +32,8 @@ public:
 		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
 		m_novram(*this, "x2212"),
-		m_slapstic_device(*this, "slapstic")
+		m_slapstic_device(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank")
 	{ }
 
 	void starwars(machine_config &config);
@@ -54,10 +55,8 @@ private:
 	required_device<tms5220_device> m_tms;
 	required_device<x2212_device> m_novram;
 	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_memory_bank m_slapstic_bank;
 
-	uint8_t *m_slapstic_source;
-	uint8_t *m_slapstic_base;
-	uint8_t m_slapstic_current_bank;
 	int m_MPA;
 	int m_BIC;
 	uint16_t m_dvd_shift;
@@ -74,8 +73,6 @@ private:
 	int16_t m_C;
 	int32_t m_ACC;
 	void irq_ack_w(uint8_t data);
-	uint8_t esb_slapstic_r(address_space &space, offs_t offset);
-	void esb_slapstic_w(address_space &space, offs_t offset, uint8_t data);
 	void starwars_nstore_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -98,7 +95,6 @@ private:
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
-	void esb_slapstic_tweak(address_space &space, offs_t offset);
 
 	void esb_main_map(address_map &map);
 	void main_map(address_map &map);

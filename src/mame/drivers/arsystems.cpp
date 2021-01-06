@@ -66,6 +66,7 @@ public:
 	arcadia_amiga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
 		, m_bios_region(*this, "user2")
+		, m_rom_board(*this, "user3")
 	{
 	}
 
@@ -88,9 +89,13 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	void arcadia_multibios_change_game(uint16_t data);
 	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
+
+protected:
+	virtual void machine_reset() override;
+
+	void arcadia_multibios_change_game(uint16_t data);
 	void arcadia_cia_0_portb_w(uint8_t data);
 
 private:
@@ -101,9 +106,7 @@ private:
 	void argh_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
 
-	virtual void machine_reset() override;
-
-	optional_memory_region m_bios_region;
+	optional_memory_region m_bios_region, m_rom_board;
 
 	uint8_t m_coin_counter[2];
 };
@@ -119,7 +122,7 @@ private:
 void arcadia_amiga_state::arcadia_multibios_change_game(uint16_t data)
 {
 	if (data == 0)
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x97ffff, "bank2");
+		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x97ffff, m_rom_board->base());
 	else
 		m_maincpu->space(AS_PROGRAM).nop_read(0x800000, 0x97ffff);
 }
@@ -221,7 +224,7 @@ void arcadia_amiga_state::a500_mem(address_map &map)
 void arcadia_amiga_state::arcadia_map(address_map &map)
 {
 	a500_mem(map);
-	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
+	map(0x800000, 0x97ffff).rom().region("user3", 0);
 	map(0x980000, 0x9fbfff).rom().region("user2", 0);
 	map(0x9fc000, 0x9ffffd).ram().share("nvram");
 	map(0x9ffffe, 0x9fffff).w(FUNC(arcadia_amiga_state::arcadia_multibios_change_game));
@@ -231,7 +234,7 @@ void arcadia_amiga_state::arcadia_map(address_map &map)
 void arcadia_amiga_state::argh_map(address_map &map)
 {
 	a500_mem(map);
-	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
+	map(0x800000, 0x97ffff).rom().region("user3", 0);
 //  map(0x980000, 0x9fefff).rom().region("user3", 0);
 	map(0x9ff000, 0x9fffff).ram().share("nvram");
 	map(0xf00000, 0xf7ffff).rom().region("user3", 0);
@@ -468,7 +471,7 @@ ROM_END
 ROM_START( ar_dart2 )
 	ARCADIA_BIOS
 
-	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_REGION16_BE(0x180000, "user3", 0)
 	ROM_LOAD16_BYTE( "arcadia3.u10", 0x00000, 0x10000, CRC(7166c736) SHA1(9892725b4d0aac6486950f8153083ba3f6982ad8) )
 	ROM_LOAD16_BYTE( "arcadia3.u6",  0x00001, 0x10000, CRC(f226137e) SHA1(61540885ff83420f5adc1087547e0ece33383ffd) )
 	ROM_LOAD16_BYTE( "arcadia3.u11", 0x20000, 0x10000, CRC(5d9a7804) SHA1(acd8eb7fd28594e8008eb953f843a72f12782ea2) )
@@ -645,7 +648,7 @@ ROM_END
 ROM_START( ar_ninj )
 	ARCADIA_BIOS
 
-	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_REGION16_BE(0x180000, "user3", 0)
 	ROM_LOAD16_BYTE( "ninj_1h.bin", 0x00000, 0x10000, CRC(53b07b4d) SHA1(4852005adf60fe63f2da880dd32740d18fd31169) )
 	ROM_LOAD16_BYTE( "ninj_1l.bin", 0x00001, 0x10000, CRC(3337a6c1) SHA1(be9719f0cd5872b51f4c6d32fcac2638c0dedaf4) )
 	ROM_LOAD16_BYTE( "ninj_2h.bin", 0x20000, 0x10000, CRC(e28a5fa8) SHA1(150e26aea24706b72d2e6612280d5dddc527061b) )
@@ -663,7 +666,7 @@ ROM_END
 ROM_START( ar_ninj2 )
 	ARCADIA_BIOS
 
-	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_REGION16_BE(0x180000, "user3", 0)
 	ROM_LOAD16_BYTE( "arcadia5.u10", 0x00000, 0x10000, CRC(217cb8eb) SHA1(7cb1da4d5d5b5af5f42c10848c7535bdeebbcd94) )
 	ROM_LOAD16_BYTE( "arcadia5.u6",  0x00001, 0x10000, CRC(009bee8f) SHA1(ff61a0770643400ecddc70e603ca6589424b6831) )
 	ROM_LOAD16_BYTE( "arcadia5.u11", 0x20000, 0x10000, CRC(f5c84e48) SHA1(8149a225a406ffb7c9faaa48af4947c2f66f750d) )
@@ -687,7 +690,7 @@ ROM_END
 ROM_START( ar_rdwr )
 	ARCADIA_BIOS
 
-	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_REGION16_BE(0x180000, "user3", 0)
 	ROM_LOAD16_BYTE( "rdwr_1h.bin", 0x00000, 0x10000, CRC(f52cb704) SHA1(cce8c7484ae8c3a3d14b2e79a981780a277c9b1c) )
 	ROM_LOAD16_BYTE( "rdwr_1l.bin", 0x00001, 0x10000, CRC(fde0de6d) SHA1(7f62ce854a040775548c5ba3b05e6a4dcb0d7cfb) )
 	ROM_LOAD16_BYTE( "rdwr_2h.bin", 0x20000, 0x10000, CRC(8f3c1a2c) SHA1(e473e55457c04ebd597375e9936aeb0473507ed7) )
@@ -721,7 +724,7 @@ ROM_END
 ROM_START( ar_sdwr2 )
 	ARCADIA_BIOS
 
-	ROM_REGION16_BE(0x200000, "user3", 0)
+	ROM_REGION16_BE(0x180000, "user3", 0)
 	ROM_LOAD16_BYTE( "arcadia1.u10", 0x00000, 0x10000, CRC(30949f1f) SHA1(270cd449f994eda76afd5532018bad636ac4cf68) )
 	ROM_LOAD16_BYTE( "arcadia1.u6",  0x00001, 0x10000, CRC(c760d1c4) SHA1(7d311e8b192e493da9501755e096599e1e8e8d3e) )
 	ROM_LOAD16_BYTE( "arcadia1.u11", 0x20000, 0x10000, CRC(d67ba564) SHA1(2afba72a77806e3925c9ca1e13c16c442a6cfc3a) )

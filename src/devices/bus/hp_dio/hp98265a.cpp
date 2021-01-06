@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98265a_device::mb87030_scsi_adapter(device_t *device)
 {
@@ -66,7 +66,10 @@ dio16_98265a_device::dio16_98265a_device(const machine_config &mconfig, device_t
 	m_spc(*this, "scsibus:7:mb87030"),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
-	m_irq_state(false)
+	m_installed_io(false),
+	m_control(0),
+	m_irq_state(false),
+	m_dmar0(false)
 {
 }
 
@@ -292,4 +295,4 @@ WRITE_LINE_MEMBER(dio16_98265a_device::dmar0_w)
 
 }
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio

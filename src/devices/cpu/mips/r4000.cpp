@@ -30,6 +30,7 @@
 #include "debugger.h"
 #include "r4000.h"
 #include "mips3dsm.h"
+#include "unicode.h"
 
 #include "softfloat3/source/include/softfloat.h"
 
@@ -978,7 +979,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x04: // index load tag (I)
 			if (ICACHE)
 			{
@@ -989,7 +990,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x08: // index store tag (I)
 			if (ICACHE)
 			{
@@ -999,7 +1000,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x01: // index writeback invalidate (D)
 		case 0x02: // index invalidate (SI)
 		case 0x03: // index writeback invalidate (SD)
@@ -1891,6 +1892,7 @@ void r5000_device::cp1_execute(u32 const op)
 				return;
 			}
 		}
+		[[fallthrough]];
 		case 0x11: // D
 			switch (op & 0x3f)
 			{

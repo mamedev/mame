@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="leapfrog_turboextreme_cart" description="LeapFrog Turbo Extreme cartridges">
+
+	<software name="grade2" supported="no">
+		<description>Grade 2 (500-10652)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_turboextreme_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="turboextremegrade2.bin" size="0x400000" crc="0b577844" sha1="ae7902f2bb9f8d9f97d58df58d9a858ab1f3536c" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -201,7 +201,7 @@ void cabaret_state::ppi2_c_w(uint8_t data)
 void cabaret_state::cabaret_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
-	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
+	map(0x0f000, 0x0ffff).ram();
 }
 
 void cabaret_state::cabaret_portmap(address_map &map)

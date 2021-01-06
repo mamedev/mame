@@ -527,6 +527,9 @@ private:
 
 void _5clown_state::machine_start()
 {
+	// assumes it can make an address mask with m_videoram.length() - 1
+	assert(!(m_videoram.length() & (m_videoram.length() - 1)));
+
 	m_main_latch_d800 = m_snd_latch_0800 = m_snd_latch_0a02 = m_ay8910_addr = m_mux_data = 0;
 
 	save_item(NAME(m_main_latch_d800));
@@ -558,7 +561,7 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
 
 	for (int x = 0; x < x_count; x++)
 	{
-		int tile_index = (x + ma) & m_videoram.mask();
+		int tile_index = (x + ma) & (m_videoram.length() - 1);
 		int attr = m_colorram[tile_index];
 		int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
 		int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
@@ -758,18 +761,18 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().share("colorram");   /* Init'ed at $2054 */
-	map(0x2000, 0x7fff).rom();                 /* ROM space */
+	map(0x1000, 0x13ff).ram().share(m_videoram);   // Init'ed at $2042
+	map(0x1800, 0x1bff).ram().share(m_colorram);   // Init'ed at $2054
+	map(0x2000, 0x7fff).rom();                     // ROM space
 
 	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
 	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
-	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
-	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
-	map(0xd400, 0xd400).portr("SW3");    /* Second DIP Switches bank */
+	map(0xc400, 0xc400).portr("SW1");              // DIP Switches bank
+	map(0xcc00, 0xcc00).portr("SW2");              // DIP Switches bank
+	map(0xd400, 0xd400).portr("SW3");              // Second DIP Switches bank
 
-	map(0xe000, 0xffff).rom();                 /* ROM space */
+	map(0xe000, 0xffff).rom();                     // ROM space
 }
 
 /*

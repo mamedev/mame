@@ -195,6 +195,7 @@ INPUT_PORTS_END
 
 void poly_state::machine_start()
 {
+	m_dat_bank = 0;
 }
 
 

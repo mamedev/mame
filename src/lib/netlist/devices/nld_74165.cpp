@@ -26,10 +26,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	NETLIB_OBJECT(74165)
 	{
@@ -97,5 +94,4 @@ namespace netlist
 	// FIXME: Timing
 	NETLIB_DEVICE_IMPL(74165, "TTL_74165", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

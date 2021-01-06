@@ -727,6 +727,8 @@ void model1_state::r360_w(uint8_t data)
 	    ba = ingame
 	    b9 = game over
 
+	    af = throttle
+
 	    results:
 	    40 = default status
 	    41 = * (setup #1 ack)
@@ -761,6 +763,9 @@ void model1_state::r360_w(uint8_t data)
 		case 0xba:
 		case 0xb9:
 			m_r360_state = ~0x40;
+			break;
+		case 0xaf:
+			m_r360_state = ~m_throttle->read();
 			break;
 	}
 }
@@ -866,6 +871,9 @@ void model1_state::machine_reset()
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
 	copro_reset();
+
+	m_irq_status = 0;
+	m_last_irq = 0;
 
 	if (!strcmp(machine().system().name, "swa") ||
 		!strcmp(machine().system().name, "swaj"))

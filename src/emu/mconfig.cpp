@@ -51,7 +51,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	device_add("root", gamedrv.type, 0);
 
 	// intialize slot devices - make sure that any required devices have been allocated
-	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
+	for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
 	{
 		device_t &owner = slot.device();
 		const char *slot_option_name = owner.tag() + 1;
@@ -104,7 +104,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	}
 
 	// then notify all devices that their configuration is complete
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		if (!device.configured())
 			device.config_complete();
 }
@@ -272,7 +272,7 @@ std::pair<const char *, device_t *> machine_config::resolve_owner(const char *ta
 		part.assign(tag, next - tag);
 		owner = owner->subdevices().find(part);
 		if (!owner)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
+			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part, orig_tag);
 		tag = next+1;
 	}
 	assert(tag[0] != '\0');
@@ -380,7 +380,7 @@ void machine_config::remove_references(device_t &device)
 	}
 
 	// iterate over all devices and remove any references
-	for (device_t &scan : device_iterator(root_device()))
+	for (device_t &scan : device_enumerator(root_device()))
 		scan.subdevices().m_tagmap.clear();
 }
 

@@ -50,6 +50,10 @@ public:
 
 	void fdc_config(device_t *device);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device>  m_maincpu;
 	required_device<i8251_device> m_upd8251;
@@ -63,9 +67,6 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_ioport_array<12> m_kbdio;
-
-	DECLARE_MACHINE_START(mc1502);
-	DECLARE_MACHINE_RESET(mc1502);
 
 	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
 

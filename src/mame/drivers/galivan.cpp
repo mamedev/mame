@@ -1117,9 +1117,9 @@ ROM_END
 void galivan_state::youmab_extra_bank_w(uint8_t data)
 {
 	if (data == 0xff)
-		membank("bank2")->set_entry(1);
+		m_rombank->set_entry(1);
 	else if (data == 0x00)
-		membank("bank2")->set_entry(0);
+		m_rombank->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
@@ -1165,12 +1165,11 @@ void galivan_state::init_youmab()
 {
 	// TODO: move all of this to an address map instead
 	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8smo_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
-	membank("bank3")->set_base(memregion("maincpu")->base());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank2");
-	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
-	membank("bank2")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_rombank);
+	m_rombank->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
+	m_rombank->set_entry(0);
 
 	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8smo_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
 	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8smo_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..

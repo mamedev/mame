@@ -87,6 +87,7 @@ public:
 	void tsukande(machine_config &config);
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
+	void tsupenta(machine_config &config);
 
 	void ddboy_init();
 	void tsuka_init();
@@ -100,6 +101,7 @@ private:
 	void shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size);
 	void fuusenpn_nvram_init(nvram_device &nvram, void *base, size_t size);
 	void mario_nvram_init(nvram_device &nvram, void *base, size_t size);
+	void tsupenta_nvram_init(nvram_device &nvram, void *base, size_t size);
 	DECLARE_MACHINE_START(shuriboy);
 
 	uint8_t vram_r(offs_t offset);
@@ -591,6 +593,31 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0x20, "20 sec" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tsupenta )
+	PORT_INCLUDE( mario )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x18, 0x00, "Play Timer" )         PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x00, "30 sec" )
+	PORT_DIPSETTING(    0x08, "24 sec" )
+	PORT_DIPSETTING(    0x10, "18 sec" )
+	PORT_DIPSETTING(    0x18, "12 sec" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( slimekun )
+	PORT_INCLUDE( shuriboy )
+
+	// TODO DIPSW
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+INPUT_PORTS_END
+
 
 void konmedal_state::machine_start_common()
 {
@@ -863,6 +890,12 @@ void konmedal_state::mariorou(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::mario_nvram_init));
 }
 
+void konmedal_state::tsupenta(machine_config &config)
+{
+	shuriboy(config);
+	m_nvram->set_custom_handler(FUNC(konmedal_state::tsupenta_nvram_init));
+}
+
 void konmedal_state::medal_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
@@ -903,6 +936,16 @@ void konmedal_state::mario_nvram_init(nvram_device &nvram, void *base, size_t si
 	ram[0x502] = 0xff;
 	ram[0x506] = 0xaa;
 	ram[0x508] = 0x55;
+}
+
+void konmedal_state::tsupenta_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	memset(base, 0x00, size);
+	u8 *ram = (u8*)base;
+	ram[0x503] = 0xff;
+	ram[0x506] = 0x00;
+	ram[0x509] = 0xaa;
+	ram[0x550] = 0x55;
 }
 
 ROM_START( tsukande )
@@ -1045,6 +1088,26 @@ ROM_START( fuusenpn )
 	ROM_LOAD( "241a10.bin",   0x000300, 0x000100, CRC(f7e3d8ee) SHA1(89c505873c884f9e1ec0cb113a3557d3f67943b9) )
 ROM_END
 
+ROM_START( slimekun )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "gr-110-b01.13g", 0x000000, 0x010000, CRC(64e8c918) SHA1(4d07d7e62327a854caa08c5bdcdc7aa228fe6db4) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "110-b03.2h", 0x000000, 0x010000, CRC(511f5058) SHA1(a136d83b97471c477d636dc79c7fc67578f80706) )
+	ROM_LOAD32_BYTE( "110-b04.4h", 0x000001, 0x010000, CRC(7767e63a) SHA1(d9cd26f65b60116d47354a9f8b3efe1a578c73cb) )
+	ROM_LOAD32_BYTE( "110-b05.5h", 0x000002, 0x010000, CRC(2fe26231) SHA1(25e2cff1bb572ea910676fd8524bb7d5a3f36fea) )
+	ROM_LOAD32_BYTE( "110-b06.7h", 0x000003, 0x010000, CRC(bfefdec9) SHA1(654a183a5ac354e7c21a538ad0f36c12ea0426ea) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "110-b02.13c", 0x000000, 0x020000, CRC(929a2fab) SHA1(b7b97b3d8b58615ba512d602010e2fa818484a4c) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "110b07.2d", 0x000000, 0x000100, CRC(35c488a3) SHA1(79e24f83137423b37b2c9d6d2532a9492c75b6ae) )
+	ROM_LOAD( "110b08.3d", 0x000100, 0x000100, CRC(280f52d5) SHA1(535dc08c68ad39e65f43313d50bddb62ad7aed7b) )
+	ROM_LOAD( "110b09.4d", 0x000200, 0x000100, CRC(dc89dbdb) SHA1(eeabbaccab9c1f21236312a22c42c2139e6745b8) )
+	ROM_LOAD( "110a10.3e", 0x000300, 0x000100, CRC(5f539e58) SHA1(bd11037f11b0b141a53101e750ebe67f6f790ca7) )
+ROM_END
+
 ROM_START( mariorou )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "111_d01.3g.27c512", 0x000000, 0x010000, CRC(96e075c1) SHA1(ca8170e1756c7c4610680f5c5a95020ea34fd1f5) )
@@ -1065,8 +1128,31 @@ ROM_START( mariorou )
 	ROM_LOAD( "111_a10.3e.82s129", 0x000300, 0x000100, CRC(07ffc2ed) SHA1(37955d1788a86b90439233bb098c59b191056f68) )
 ROM_END
 
+ROM_START( tsupenta )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "gs_002_f01.13g", 0x000000, 0x010000, CRC(a183a08a) SHA1(9b2af3402b2f07c2cb7e87af64cc9a62589e2358) )
+
+	ROM_REGION( 0x20000, "k052109", 0 ) /* tilemaps */
+	ROM_LOAD32_BYTE( "gs_002_b03.2h", 0x000000, 0x008000, CRC(f277504f) SHA1(dc18a439d970f733e8104ab82b7a400835d87834) )
+	ROM_LOAD32_BYTE( "gs_002_b04.4h", 0x000001, 0x008000, CRC(3a3a4325) SHA1(51ee0d818adfc5aafa93b8edc346249616d98635) )
+	ROM_LOAD32_BYTE( "gs_002_b05.5h", 0x000002, 0x008000, CRC(c163811f) SHA1(f83c7f9d8f49cadb50df84cf62e8da80f4212ec6) )
+	ROM_LOAD32_BYTE( "gs_002_b06.7h", 0x000003, 0x008000, CRC(4f9532db) SHA1(8ba37638e00d4cd751580b793dbd6f04294796a2) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "gs_002_a02.13c", 0x000000, 0x010000, CRC(45bdcfaa) SHA1(6c518ea7a329481997071fe47429451c925533bd) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // am27s21apc
+	ROM_LOAD( "002a07.2d", 0x000000, 0x000100, CRC(4683a065) SHA1(ce57e539e636edce9d79f687d7a1d498f384d43c) )
+	ROM_LOAD( "002a08.3d", 0x000100, 0x000100, CRC(8361b331) SHA1(12c677c89d2234276a9f390d8a1c47758412b2bd) )
+	ROM_LOAD( "002a09.4d", 0x000200, 0x000100, CRC(ea0e8fe1) SHA1(c5d69829d696709b028c7981c7a5f9b69dc2b159) )
+	ROM_LOAD( "002a10.3e", 0x000300, 0x000100, CRC(5f539e58) SHA1(bd11037f11b0b141a53101e750ebe67f6f790ca7) )
+ROM_END
+
+
 // Konami PWB 452093A boards (TMNT tilemaps)
+GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING)
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
+GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,   ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
 

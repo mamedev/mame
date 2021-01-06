@@ -65,7 +65,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -653,4 +653,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

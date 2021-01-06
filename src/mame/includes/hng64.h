@@ -172,9 +172,9 @@ public:
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
-		m_cart(*this, "cart"),
+		m_cart(*this, "gameprg"),
 		m_sysregs(*this, "sysregs"),
-		m_rombase(*this, "rombase"),
+		m_rombase(*this, "user1"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
 		m_videoram(*this, "videoram"),
@@ -232,9 +232,9 @@ private:
 	required_device<msm6242_device> m_rtc;
 
 	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_cart;
+	required_region_ptr<uint32_t> m_cart;
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_rombase;
+	required_region_ptr<uint32_t> m_rombase;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spriteregs;
 	required_shared_ptr<uint32_t> m_videoram;
@@ -326,7 +326,7 @@ private:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	uint32_t hng64_com_r(offs_t offset);
+	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);

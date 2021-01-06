@@ -17,8 +17,15 @@ void main()
   vec3 lum = vec3(0.299,0.587,0.114);
   float bscrn = dot(pow(screen.rgb,vec3_splat(u_gamma.x)),lum);
   float bphos = dot(pow(phosphor.rgb,vec3_splat(u_gamma.x)),lum);
-  //bscrn /= pow(1.0,u_phosphor_power.x);
-  bphos /= pow(1.0+255.0*phosphor.a,u_phosphor_power.x);
 
-  gl_FragColor = ( bscrn > bphos ? vec4(screen.rgb,1.0/255.0) : vec4(phosphor.rgb,phosphor.a+1.0/255.0) );
+  // encode the upper 2 bits of the time elapsed in the lower 2 bits of b
+  float t = 1.0 + 255.0*phosphor.a + fract(phosphor.b*255.0/4.0)*1024.0;
+
+  bphos = ( t > 1023.0 ? 0.0 : bphos*pow(t,-u_phosphor_power.x) );
+
+  gl_FragColor = ( bscrn >= bphos ?
+	   vec4(screen.rg,floor(screen.b*255.0/4.0)*4.0/255.0,1.0/255.0)
+	   : vec4(phosphor.rg,
+		  (floor(phosphor.b*255.0/4.0)*4.0 + floor(t/256.0))/255.0,
+		  fract(t/256.0)*256.0/255.0 ) );
 }

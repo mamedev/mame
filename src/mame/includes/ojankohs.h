@@ -19,10 +19,20 @@ class ojankohs_state : public driver_device
 {
 public:
 	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x1000, 0x800)
+	{ }
+
+	void ojankohs(machine_config &config);
+	void ccasino(machine_config &config);
+	void ojankoc(machine_config &config);
+	void ojankoy(machine_config &config);
+
+protected:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"),
+		m_videoram(*this, "videoram", vramsize, ENDIANNESS_LITTLE),
+		m_colorram(*this, "colorram", 0x1000, ENDIANNESS_LITTLE),
+		m_paletteram(*this, "paletteram", pramsize, ENDIANNESS_LITTLE),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -37,19 +47,13 @@ public:
 		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
 	{ }
 
-	void ojankohs(machine_config &config);
-	void ccasino(machine_config &config);
-	void ojankoc(machine_config &config);
-	void ojankoy(machine_config &config);
-
-protected:
 	virtual void machine_reset() override;
 
 private:
 	/* memory pointers */
-	optional_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_colorram;
-	optional_shared_ptr<uint8_t> m_paletteram;
+	memory_share_creator<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_paletteram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap;
@@ -130,6 +134,30 @@ private:
 	void ojankohs_map(address_map &map);
 	void ojankoy_io_map(address_map &map);
 	void ojankoy_map(address_map &map);
+};
+
+class ojankoy_state : public ojankohs_state
+{
+public:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
+	{ }
+};
+
+class ccasino_state : public ojankohs_state
+{
+public:
+	ccasino_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
+	{ }
+};
+
+class ojankoc_state : public ojankohs_state
+{
+public:
+	ojankoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x8000, 0x20)
+	{ }
 };
 
 #endif // MAME_INCLUDES_OJANKOHS_H

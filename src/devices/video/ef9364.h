@@ -44,6 +44,7 @@ public:
 			nb_of_pages = nb_bitplanes;
 		}
 	}
+	void set_erase(uint8_t data) { erase_char = data; }
 
 	// device interface
 	void update_scanline(uint16_t scanline);
@@ -80,6 +81,7 @@ private:
 	uint8_t x_curs_pos;
 	uint8_t y_curs_pos;
 	uint8_t char_latch;
+	uint8_t erase_char;
 
 	uint8_t m_border[80];                     //border color
 

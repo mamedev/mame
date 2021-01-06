@@ -11,7 +11,8 @@ class romp_device : public cpu_device
 public:
 	romp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	auto out_tm() { return m_out_tm.bind(); }
+	void err_w(int state) { m_error = state; }
+	void clk_w(int state);
 
 protected:
 	enum registers : unsigned
@@ -23,16 +24,23 @@ protected:
 	enum scr : unsigned
 	{
 		COUS =  6, // counter source
-		COU =   7, // counter
-		TS  =   8, // timer status
-		MQ  =  10, // multiplier quotient
+		COU  =  7, // counter
+		TS   =  8, // timer status
+		MQ   = 10, // multiplier quotient
 		MPCS = 11, // machine/program check status
-		IRB =  12, // interrupt request buffer
-		IAR =  13, // instruction address register
-		ICS =  14, // interrupt control status
-		CS  =  15, // condition status
+		IRB  = 12, // interrupt request buffer
+		IAR  = 13, // instruction address register
+		ICS  = 14, // interrupt control status
+		CS   = 15, // condition status
 	};
 
+	enum ts_mask : u32
+	{
+		TS_E = 0x0000'0040, // enable
+		TS_I = 0x0000'0020, // interrupt status
+		TS_O = 0x0000'0010, // overflow
+		TS_P = 0x0000'0007, // timer interrupt priority
+	};
 	enum mpcs_mask : u32
 	{
 							   // reserved
@@ -120,22 +128,24 @@ private:
 	u32 ba(u16 hi, u16 lo) const { return ((u32(hi) << 16) | lo) & 0x00ff'fffeU; }
 	s32 bi(u16 hi, u16 lo) const { return s32((u32(hi) << 16 | lo) << 12) >> 11; }
 
-	void flags(u32 const op1);
+	void flags_log(u32 const op1);
 	void flags_add(u32 const op1, u32 const op2);
 	void flags_sub(u32 const op1, u32 const op2);
 
+	void set_space(u32 const ics) { space(((ics & ICS_US) ? 4 : 0) + ((ics & ICS_TM) ? 1 : 0)).cache(m_mem); }
 	void set_scr(unsigned scr, u32 data);
 
 	void interrupt_check();
 	void machine_check(u32 mcs);
-	void program_check(u32 pcs);
-	void interrupt_enter(unsigned vector, u16 svc = 0);
+	void program_check(u32 pcs, u32 iar);
+	void program_check(u32 pcs) { program_check(pcs, m_scr[IAR]); }
+	void interrupt_enter(unsigned vector, u32 iar, u16 svc = 0);
 
 	// address spaces
 	address_space_config const m_mem_config;
 	address_space_config const m_io_config;
 
-	devcb_write_line m_out_tm;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_mem;
 
 	// mame state
 	int m_icount;
@@ -144,6 +154,11 @@ private:
 	u32 m_scr[16];
 	u32 m_gpr[16];
 
+	// input line state
+	u8 m_reqi;
+	bool m_trap;
+	bool m_error;
+
 	// internal state
 	enum branch_state : unsigned
 	{
@@ -151,8 +166,10 @@ private:
 		BRANCH    = 1, // branch subject instruction active
 		DELAY     = 2, // delayed branch instruction active
 		EXCEPTION = 3,
+		WAIT      = 4,
 	}
 	m_branch_state;
+	u32 m_branch_source;
 	u32 m_branch_target;
 };
 

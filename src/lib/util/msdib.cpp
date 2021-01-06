@@ -244,7 +244,7 @@ msdib_error dib_read_bitmap_header(
 					header.core.size);
 			return msdib_error::UNSUPPORTED_FORMAT;
 		}
-		// fall through
+		[[fallthrough]];
 	case 40U:
 	case 52U:
 	case 56U:

@@ -200,7 +200,7 @@ static void update_runtime_variables(void)
    // update CPU Overclock
    if (mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL)
    {
-      device_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+      device_enumerator iter(mame_machine_manager::instance()->machine()->root_device());
       for (device_t &device : iter)
       {
          if (dynamic_cast<cpu_device *>(&device) != nullptr)
@@ -788,7 +788,7 @@ unsigned retro_get_region (void) { return RETRO_REGION_NTSC; }
 void *find_mame_bank_base(offs_t start, address_space &space)
 {
 	for ( auto &bank : mame_machine_manager::instance()->machine()->memory().banks() )
-		if ( bank.second->addrstart() == start)
+		// if ( bank.second->addrstart() == start)
 			return bank.second->base() ;
 	return NULL;
 }
@@ -808,7 +808,7 @@ void *retro_get_memory_data(unsigned type)
 	if ( type == RETRO_MEMORY_SYSTEM_RAM && mame_machine_manager::instance() != NULL &&
 			mame_machine_manager::instance()->machine() != NULL )
 	{
-		memory_interface_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+		memory_interface_enumerator iter(mame_machine_manager::instance()->machine()->root_device());
 		for (device_memory_interface &memory : iter)
 			for ( space_index = 0 ; space_index < memory.num_spaces() ; space_index++)
 				if ( memory.has_space(space_index))
@@ -837,7 +837,7 @@ size_t retro_get_memory_size(unsigned type)
 	if ( type == RETRO_MEMORY_SYSTEM_RAM && mame_machine_manager::instance() != NULL &&
 			mame_machine_manager::instance()->machine() != NULL )
 	{
-		memory_interface_iterator iter(mame_machine_manager::instance()->machine()->root_device());
+		memory_interface_enumerator iter(mame_machine_manager::instance()->machine()->root_device());
 		for (device_memory_interface &memory : iter)
 			for ( space_index = 0 ; space_index < memory.num_spaces() ; space_index++)
 				if ( memory.has_space(space_index))

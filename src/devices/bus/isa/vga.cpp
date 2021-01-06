@@ -69,7 +69,7 @@ void isa8_vga_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga", "ibm_vga");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga");
 
 	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03b0_w)));
 	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03c0_w)));

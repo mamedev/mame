@@ -31,6 +31,7 @@
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
+#include "unicode.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -556,7 +557,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 					cloneof = false;
 			}
 
-			item_append(elem.driver->type.fullname(), "", (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
+			item_append(elem.driver->type.fullname(), (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
 			curitem++;
 		}
 	}
@@ -581,7 +582,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, "", cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
+						item_append(info.longname, cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
 					}
 					else
 					{
@@ -599,12 +600,12 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), "", FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
+			item_append(_("Plugins"), FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -790,7 +791,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		enumerator.next();
 
 		// if there are software entries, show a software selection menu
-		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
 		{
 			if (!swlistdev.get_info().empty())
 			{
@@ -863,7 +864,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		enumerator.next();
 
 		// if there are software entries, show a software selection menu
-		for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
 		{
 			if (!swlistdev.get_info().empty())
 			{

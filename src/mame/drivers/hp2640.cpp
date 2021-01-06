@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:F. Ulivi
+// copyright-holders:F. Ulivi, Gavin Scott
 //
 // **********************************
 // Driver for HP2640-series terminals
@@ -14,6 +14,49 @@
 // - Keyboard
 // The "personality" in each version is in the set of cards installed in
 // the card cage (and in a few minor differences of the common elements).
+//
+// *********************************************
+// Driver for HP2641A APL terminal (Gavin Scott)
+// *********************************************
+//
+// This driver implements the HP2641A APL Terminal which
+// was used with APL\3000 on the HP 3000 Series II/III computers from 1976
+// into the 1980s. I recently got APL\3000 running under simulation so this
+// is an attempt to recreate the whole experience with the APL characters
+// on the terminal device designed for it. The HP2641A is basically a 2641
+// with a few altered ROMs (many are identical to the 2641) and one
+// additional 2K ROM for which a second CTL PCA was required that was not
+// needed in the 2641.
+//
+// This driver emulates the HP2641A model, as composed of the following cards:
+// - 02640-60123    Keyboard interface
+// - 02640-60112    Display control
+// - 02640-60088    Display timing
+// - 02640-60124    Display extended DMA
+// - 02640-60024    Display enhancement
+// - 02640-60209    CPU
+// - 02640-60192    Control storage (firmware ROMs & 256-byte SRAM)
+// - 02640-60192    Second CTL PCA with one additional 2K ROM and 256b SRAM.
+// - 02640-60065    4k DRAM (4 of these for a 16k total)
+// - 02640-60086    Asynchronous data comm
+//
+// The following table summarizes the emulated character sets. The 2641A only
+// had room for a single optional character set (line drawing here) after the
+// required 192 APL characters were accounted for.
+//
+// | Char. set | Description    | No. of chars |      ROMs | Type              |
+// |-----------+----------------+--------------+-----------+-------------------|
+// |         0 | Std ASCII set  |          128 | 1816-0612 | Alphanumeric      |
+// |           |                |              | 1816-0613 | Alphanumeric      |
+// |         1 | APL Symbols    |          128 | 1816-0984 | Alphanumeric      |
+// |           | APL UC and sym |              | 1816-0985 | Alphanumeric      |
+// |         2 | APL Overstruck |           64 | 1816-0986 | Alphanumeric      |
+// |         3 | Line drawing   |           64 | 1816-1417 | 8-bit microvector |
+//
+// *************************************
+// Driver for HP2645A terminal (F.Ulivi)
+// *************************************
+//
 // This driver emulates the HP2645A model, as composed of the following cards:
 // - 02640-60123    Keyboard interface
 // - 02640-60112    Display control
@@ -116,16 +159,32 @@ constexpr unsigned BEEP_FREQUENCY   = 650;
 constexpr unsigned BEEP_DURATION_MS = 100;
 
 // ************
-// hp2645_state
+// hp2640_base
 // ************
-class hp2645_state : public driver_device
+class hp2640_base_state : public driver_device
 {
-public:
-	hp2645_state(const machine_config &mconfig, device_type type, const char *tag);
+protected:
+	hp2640_base_state(const machine_config &mconfig, device_type type, const char *tag , uint8_t m_cg_0 , uint8_t m_cg_1 , uint8_t m_cg_2 , uint8_t m_cg_3);
 
-	void hp2645(machine_config &config);
+	void hp2640_base(machine_config &config);
 
-private:
+	// Character generator settings
+	enum : uint8_t {
+		// OR-ENABLE (0) or AND-ENABLE (1)
+		// *Ignored*
+		CHARGEN_A = 0x01,
+		// Alphanumeric (0) or Microvector (1)
+		CHARGEN_B = 0x02,
+		// 128 characters (0) or 64 characters (1)
+		CHARGEN_C = 0x04,
+		// D0 copy disabled (0) or enabled (1)
+		// *Ignored as D0 copy is always enabled*
+		CHARGEN_D = 0x08,
+		// D0 copy on UC/LC (0) or LC only (1)
+		// *Ignored, see CHARGEN_D*
+		CHARGEN_E = 0x10
+	};
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -156,8 +215,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
+	void cpu_io_map(address_map &map);
 
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -181,6 +240,8 @@ private:
 
 	// Character generators
 	required_region_ptr_array<uint8_t , 4> m_chargen;
+
+	const uint8_t m_chargen_set[ 4 ];
 
 	// Video DMA
 	struct line_buffer {
@@ -219,7 +280,7 @@ private:
 	void update_async_irq();
 };
 
-hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, const char *tag)
+hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type type, const char *tag , uint8_t m_cg_0 , uint8_t m_cg_1 , uint8_t m_cg_2 , uint8_t m_cg_3)
 	: driver_device(mconfig , type , tag),
 	  m_cpu(*this , "cpu"),
 	  m_timer_10ms(*this , "timer_10ms"),
@@ -236,11 +297,12 @@ hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, cons
 	  m_uart_clock(*this , "uart_clock"),
 	  m_beep(*this , "beep"),
 	  m_timer_beep(*this , "timer_beep"),
-	  m_chargen(*this , "chargen%u" , 0)
+	  m_chargen(*this , "chargen%u" , 0),
+	  m_chargen_set{ m_cg_0 , m_cg_1 , m_cg_2 , m_cg_3}
 {
 }
 
-void hp2645_state::machine_start()
+void hp2640_base_state::machine_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -250,7 +312,7 @@ void hp2645_state::machine_start()
 	save_item(NAME(m_datacom_irq));
 }
 
-void hp2645_state::machine_reset()
+void hp2640_base_state::machine_reset()
 {
 	m_mode_byte = 0;
 	m_timer_irq = false;
@@ -272,7 +334,7 @@ void hp2645_state::machine_reset()
 	m_beep->set_state(0);
 }
 
-IRQ_CALLBACK_MEMBER(hp2645_state::irq_callback)
+IRQ_CALLBACK_MEMBER(hp2640_base_state::irq_callback)
 {
 	uint8_t res;
 
@@ -291,7 +353,7 @@ IRQ_CALLBACK_MEMBER(hp2645_state::irq_callback)
 	return res;
 }
 
-void hp2645_state::mode_byte_w(uint8_t data)
+void hp2640_base_state::mode_byte_w(uint8_t data)
 {
 	if (BIT(m_mode_byte , 0) && !BIT(data , 0)) {
 		m_timer_10ms->reset();
@@ -306,7 +368,7 @@ void hp2645_state::mode_byte_w(uint8_t data)
 	update_irq();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_10ms_exp)
+TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_10ms_exp)
 {
 	if (BIT(m_mode_byte , 1)) {
 		m_timer_irq = true;
@@ -314,53 +376,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_10ms_exp)
 	}
 }
 
-uint8_t hp2645_state::kb_r(offs_t offset)
+uint8_t hp2640_base_state::kb_r(offs_t offset)
 {
 	ioport_value k = m_io_key[ offset / 4 ]->read();
 
 	return uint8_t(k >> (8 * (offset % 4)));
 }
 
-void hp2645_state::kb_prev_w(uint8_t data)
+void hp2640_base_state::kb_prev_w(uint8_t data)
 {
 	// This port is used to set the threshold in key sense circuit for hysteresis.
 	// We can safely ignore all writes.
 }
 
-void hp2645_state::kb_reset_w(uint8_t data)
+void hp2640_base_state::kb_reset_w(uint8_t data)
 {
 	// TODO: enabled/disable CPU reset
 }
 
-uint8_t hp2645_state::switches_ah_r()
+uint8_t hp2640_base_state::switches_ah_r()
 {
 	uint8_t res = m_io_sw_ah->read();
 	LOG("SW AH=%02x\n" , res);
 	return res;
 }
 
-uint8_t hp2645_state::switches_jr_r()
+uint8_t hp2640_base_state::switches_jr_r()
 {
 	uint8_t res = m_io_sw_jr->read();
 	LOG("SW JR=%02x\n" , res);
 	return res;
 }
 
-uint8_t hp2645_state::switches_sz_r()
+uint8_t hp2640_base_state::switches_sz_r()
 {
 	uint8_t res = m_io_sw_sz->read();
 	LOG("SW SZ=%02x\n" , res);
 	return res;
 }
 
-uint8_t hp2645_state::datacomm_sw_r()
+uint8_t hp2640_base_state::datacomm_sw_r()
 {
 	uint8_t res = m_io_comm->read();
 	LOG("COM SW=%02x\n" , res);
 	return res;
 }
 
-void hp2645_state::kb_led_w(uint8_t data)
+void hp2640_base_state::kb_led_w(uint8_t data)
 {
 	if (BIT(data , 7)) {
 		m_beep->set_state(1);
@@ -370,13 +432,13 @@ void hp2645_state::kb_led_w(uint8_t data)
 	LOG("LED = %02x\n" , data);
 }
 
-uint32_t hp2645_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp2640_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::scanline_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::scanline_timer)
 {
 	unsigned video_scanline = param;
 	if (video_scanline < VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT) {
@@ -402,14 +464,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::scanline_timer)
 	}
 }
 
-void hp2645_state::cx_w(uint8_t data)
+void hp2640_base_state::cx_w(uint8_t data)
 {
 	m_cursor_x = data & 0x7f;
 	m_cursor_blink_inh = true;
 	m_timer_cursor_blink_inh->adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
 }
 
-void hp2645_state::cy_w(uint8_t data)
+void hp2640_base_state::cy_w(uint8_t data)
 {
 	m_blanking = BIT(data , 7);
 	m_cursor_y = data & 0x1f;
@@ -434,12 +496,12 @@ void hp2645_state::cy_w(uint8_t data)
 	m_timer_cursor_blink_inh->adjust(attotime::from_msec(CURSOR_BLINK_INH_MS));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_cursor_blink_inh)
+TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_cursor_blink_inh)
 {
 	m_cursor_blink_inh = false;
 }
 
-uint8_t hp2645_state::async_status_r()
+uint8_t hp2640_base_state::async_status_r()
 {
 	uint8_t res = 0;
 
@@ -467,41 +529,41 @@ uint8_t hp2645_state::async_status_r()
 	return res;
 }
 
-void hp2645_state::async_control_w(uint8_t data)
+void hp2640_base_state::async_control_w(uint8_t data)
 {
 	update_async_control(data);
 }
 
-WRITE_LINE_MEMBER(hp2645_state::async_dav_w)
+WRITE_LINE_MEMBER(hp2640_base_state::async_dav_w)
 {
 	update_async_irq();
 }
 
-WRITE_LINE_MEMBER(hp2645_state::async_txd_w)
+WRITE_LINE_MEMBER(hp2640_base_state::async_txd_w)
 {
 	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->so_r());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_beep_exp)
+TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_beep_exp)
 {
 	m_beep->set_state(0);
 }
 
-void hp2645_state::update_irq()
+void hp2640_base_state::update_irq()
 {
 	bool state = (m_datacom_irq && !BIT(m_mode_byte , 4)) ||
 		(m_timer_irq && !BIT(m_mode_byte , 5));
 	m_cpu->set_input_line(I8085_INTR_LINE , state);
 }
 
-uint8_t hp2645_state::video_dma_get()
+uint8_t hp2640_base_state::video_dma_get()
 {
 	uint8_t b = m_cpu->space(AS_PROGRAM).read_byte(m_dma_addr | 0xc000);
 	m_dma_addr--;
 	return b;
 }
 
-void hp2645_state::video_load_buffer(bool buff_idx , unsigned& idx , uint8_t ch , bool iv , uint8_t attrs)
+void hp2640_base_state::video_load_buffer(bool buff_idx , unsigned& idx , uint8_t ch , bool iv , uint8_t attrs)
 {
 	COPY_BIT(iv, ch, 7);
 	m_buffers[ buff_idx ].m_chars[ idx ] = ch;
@@ -512,7 +574,7 @@ void hp2645_state::video_load_buffer(bool buff_idx , unsigned& idx , uint8_t ch 
 	m_row_reset = false;
 }
 
-void hp2645_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
+void hp2640_base_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
 {
 	if (m_line_done || !m_dma_on) {
 		return;
@@ -596,7 +658,7 @@ void hp2645_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
 	}
 }
 
-void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_in_row , bool buff_idx , bool cyen)
+void hp2640_base_state::video_render_buffer(unsigned video_scanline , unsigned line_in_row , bool buff_idx , bool cyen)
 {
 	if (m_blanking) {
 		m_bitmap.fill(rgb_t::black() , rectangle(0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 , video_scanline , video_scanline));
@@ -621,22 +683,29 @@ void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_i
 		BIT_CLR(ch, 7);
 		uint8_t attrs = m_buffers[ buff_idx ].m_attrs[ i ];
 		uint8_t char_set = (attrs >> 4) & 3;
+		uint8_t chargen_set = m_chargen_set[ char_set ];
 		uint16_t ch_addr = ch & 0x1f;
 		if (BIT(ch , 6)) {
 			BIT_SET(ch_addr, 5);
 		}
 		uint8_t byte;
-		if (char_set == 0 && ((ch <= 0x1f) || (ch >= 0x60))) {
-			BIT_SET(ch_addr, 6);
-		}
-		if (char_set == 0 || ch >= 0x20) {
+		if ((ch <= 0x1f || ch >= 0x60) && (chargen_set & CHARGEN_C) == 0) {
+			if (m_chargen[ char_set ].bytes() >= 0x800) {
+				// Read from LC ROM
+				byte = ~m_chargen[ char_set ][ (ch_addr << 4) + line_in_row + 0x400 ];
+			} else {
+				// LC ROM not installed
+				byte = 0;
+			}
+		} else if (ch >= 0x20) {
+			// Read from UC ROM
 			byte = ~m_chargen[ char_set ][ (ch_addr << 4) + line_in_row ];
 		} else {
 			byte = 0;
 		}
 		uint16_t pixels_e;
 		uint16_t pixels_o;
-		bool microvector = (char_set == 2) || (char_set == 3);
+		bool microvector = chargen_set & CHARGEN_B;
 
 		if (cyen && (line_in_row == 11 || line_in_row == 12) && i == m_cursor_x) {
 			pixels_e = pixels_o = cursor_blink ? ~0 : 0;
@@ -686,7 +755,7 @@ static const unsigned baud_rate_divisors[] = {
 	32      // 7: 9600 baud
 };
 
-void hp2645_state::update_async_control(uint8_t new_control)
+void hp2640_base_state::update_async_control(uint8_t new_control)
 {
 	LOG("ASYNC CT=%02x\n" , new_control);
 	uint8_t diff = m_async_control ^ new_control;
@@ -714,7 +783,7 @@ void hp2645_state::update_async_control(uint8_t new_control)
 	async_txd_w(0);
 }
 
-void hp2645_state::update_async_irq()
+void hp2640_base_state::update_async_irq()
 {
 	m_datacom_irq = m_uart->dav_r();
 	LOG("ASYNC IRQ=%d\n" , m_datacom_irq);
@@ -723,7 +792,7 @@ void hp2645_state::update_async_irq()
 
 #define IOP_MASK(x) BIT_MASK<ioport_value>((x))
 
-static INPUT_PORTS_START(hp2645)
+static INPUT_PORTS_START(hp2640_base)
 	PORT_START("KEY0")
 	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD)   PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)        // 000 CONTROL
 	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD)   PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))        // 001 ESC
@@ -939,42 +1008,42 @@ static INPUT_PORTS_START(hp2645)
 	PORT_CONFSETTING(0x80, DEF_STR(Off))
 INPUT_PORTS_END
 
-void hp2645_state::cpu_mem_map(address_map &map)
+void hp2640_base_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x57ff).rom();
 	map(0x8100, 0x8100).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x8120, 0x8120).r(FUNC(hp2645_state::async_status_r));
-	map(0x8140, 0x8140).w(FUNC(hp2645_state::async_control_w));
+	map(0x8120, 0x8120).r(FUNC(hp2640_base_state::async_status_r));
+	map(0x8140, 0x8140).w(FUNC(hp2640_base_state::async_control_w));
 	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x8300, 0x8300).w(FUNC(hp2645_state::kb_led_w));
-	map(0x8300, 0x830d).r(FUNC(hp2645_state::kb_r));
-	map(0x830e, 0x830e).r(FUNC(hp2645_state::switches_ah_r));
-	map(0x830f, 0x830f).r(FUNC(hp2645_state::datacomm_sw_r));
-	map(0x8320, 0x8320).w(FUNC(hp2645_state::kb_prev_w));
-	map(0x8380, 0x8380).rw(FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
-	map(0x83a0, 0x83a0).r(FUNC(hp2645_state::switches_sz_r));
-	map(0x8700, 0x8700).w(FUNC(hp2645_state::cx_w));
-	map(0x8720, 0x8720).w(FUNC(hp2645_state::cy_w));
+	map(0x8300, 0x8300).w(FUNC(hp2640_base_state::kb_led_w));
+	map(0x8300, 0x830d).r(FUNC(hp2640_base_state::kb_r));
+	map(0x830e, 0x830e).r(FUNC(hp2640_base_state::switches_ah_r));
+	map(0x830f, 0x830f).r(FUNC(hp2640_base_state::datacomm_sw_r));
+	map(0x8320, 0x8320).w(FUNC(hp2640_base_state::kb_prev_w));
+	map(0x8380, 0x8380).rw(FUNC(hp2640_base_state::switches_jr_r), FUNC(hp2640_base_state::kb_reset_w));
+	map(0x83a0, 0x83a0).r(FUNC(hp2640_base_state::switches_sz_r));
+	map(0x8700, 0x8700).w(FUNC(hp2640_base_state::cx_w));
+	map(0x8720, 0x8720).w(FUNC(hp2640_base_state::cy_w));
 	map(0x9100, 0x91ff).ram();
 	map(0xc000, 0xffff).ram();
 }
 
-void hp2645_state::cpu_io_map(address_map &map)
+void hp2640_base_state::cpu_io_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x00, 0xff).w(FUNC(hp2645_state::mode_byte_w));
+	map(0x00, 0xff).w(FUNC(hp2640_base_state::mode_byte_w));
 }
 
-void hp2645_state::hp2645(machine_config &config)
+void hp2640_base_state::hp2640_base(machine_config &config)
 {
 	I8080A(config, m_cpu, SYS_CLOCK / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &hp2645_state::cpu_mem_map);
-	m_cpu->set_addrmap(AS_IO, &hp2645_state::cpu_io_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp2645_state::irq_callback));
+	m_cpu->set_addrmap(AS_PROGRAM, &hp2640_base_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO, &hp2640_base_state::cpu_io_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp2640_base_state::irq_callback));
 
-	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2645_state::timer_10ms_exp));
-	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2645_state::timer_cursor_blink_inh));
+	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2640_base_state::timer_10ms_exp));
+	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2640_base_state::timer_cursor_blink_inh));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::white());
 	// Actual pixel clock is half this value: 21.06 MHz
@@ -983,8 +1052,8 @@ void hp2645_state::hp2645(machine_config &config)
 	m_screen->set_raw(VIDEO_DOT_CLOCK * 2 ,
 						   VIDEO_TOT_COLS * VIDEO_CHAR_WIDTH * 2 , 0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 ,
 						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT);
-	m_screen->set_screen_update(FUNC(hp2645_state::screen_update));
-	TIMER(config, "scantimer").configure_scanline(FUNC(hp2645_state::scanline_timer), "screen", 0, 1);
+	m_screen->set_screen_update(FUNC(hp2640_base_state::screen_update));
+	TIMER(config, "scantimer").configure_scanline(FUNC(hp2640_base_state::scanline_timer), "screen", 0, 1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	config.set_default_layout(layout_hp2640);
 
@@ -994,8 +1063,8 @@ void hp2645_state::hp2645(machine_config &config)
 	// UART (TR1602B)
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
-	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
+	m_uart->write_so_callback().set(FUNC(hp2640_base_state::async_txd_w));
+	m_uart->write_dav_callback().set(FUNC(hp2640_base_state::async_dav_w));
 	m_uart->set_auto_rdav(true);
 
 	CLOCK(config, m_uart_clock, 19200 * 16);
@@ -1005,7 +1074,101 @@ void hp2645_state::hp2645(machine_config &config)
 	// Beep
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
-	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2645_state::timer_beep_exp));
+	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2640_base_state::timer_beep_exp));
+}
+
+// ************
+// hp2641_state
+// ************
+class hp2641_state : public hp2640_base_state
+{
+public:
+	hp2641_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void hp2641(machine_config &config);
+
+protected:
+	void cpu_mem_map(address_map &map);
+};
+
+hp2641_state::hp2641_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hp2640_base_state(mconfig, type, tag, 0, 0, 0, CHARGEN_B | CHARGEN_C)
+{
+}
+
+void hp2641_state::hp2641(machine_config &config)
+{
+	hp2640_base(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp2641_state::cpu_mem_map);
+}
+
+void hp2641_state::cpu_mem_map(address_map &map)
+{
+	hp2640_base_state::cpu_mem_map(map);
+	map(0x7000, 0x77ff).rom(); // The extra APL code ROM
+	map(0x9000, 0x90ff).ram(); // 256 bytes of RAM on second CTL PCA board
+}
+
+static INPUT_PORTS_START(hp2641)
+	PORT_INCLUDE(hp2640_base)
+
+	PORT_MODIFY("KEY0")
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD)   PORT_NAME("LINE FEED") PORT_CHAR(0x0a)                      // 001 LINE FEED
+	PORT_BIT(IOP_MASK(24), IP_ACTIVE_HIGH , IPT_KEYBOARD)   PORT_NAME("APL")                                            // 030 APL
+	PORT_MODIFY("KEY3")
+	PORT_BIT(IOP_MASK(8) , IP_ACTIVE_HIGH , IPT_KEYBOARD)   PORT_NAME("BREAK")                                          // 150 BREAK
+INPUT_PORTS_END
+
+ROM_START(hp2641)
+	ROM_REGION(0x7800, "cpu", 0) // ROMs on first CTL PCA
+	ROM_LOAD("1818-0512.bin", 0x0000, 0x800, CRC(1796F4FC) SHA1(1BDEC49B3A937F9D52E143319E4EA3B42DD34FF2))
+	ROM_LOAD("1818-0287.bin", 0x0800, 0x800, CRC(717C01A6) SHA1(2BA2362B658A095126A5BFD533A0B35B0EEFC6EC))
+	ROM_LOAD("1818-0448.bin", 0x1000, 0x800, CRC(15B09E97) SHA1(7975d04fcf24490b3c16b2ac261754d2ad848017))
+	ROM_LOAD("1818-0206.bin", 0x1800, 0x800, CRC(788f8464) SHA1(94c55390801c193bb395855d3a0f186c1d1fd498))
+	ROM_LOAD("1818-0273.bin", 0x2000, 0x800, CRC(0DA3F328) SHA1(1FDD7391CBB64BAEE0D69DA147EE2AF123971A61))
+	ROM_LOAD("1818-0208.bin", 0x2800, 0x800, CRC(1eca0ff8) SHA1(630a533efe53d3643f652a5d9d6503ab7f47d4e5))
+	ROM_LOAD("1818-0209.bin", 0x3000, 0x800, CRC(82e02695) SHA1(eaa7010f4672320116a1f319f96aeb078ce79609))
+	ROM_LOAD("1818-0210.bin", 0x3800, 0x800, CRC(A1EBB6AB) SHA1(71B2BEEFF3817D9C87870983BF1653F682B15D21))
+	ROM_LOAD("1818-0426.bin", 0x4000, 0x800, CRC(9C49FB37) SHA1(15F2F236F567A6234F9DE8841FE9A6C246022127))
+	ROM_LOAD("1818-0275.bin", 0x4800, 0x800, CRC(462175D1) SHA1(DD6974876177453D420201398F88C8389CA8240D))
+	ROM_LOAD("1818-0513.bin", 0x5000, 0x800, CRC(416d1a4d) SHA1(6ce7136f36f06fc44716da1970b96a3ef29e5b13))
+	// Second CTL PCA. Is this gap in the region a problem? Not so far!
+	ROM_LOAD("1818-0276.bin", 0x7000, 0x800, CRC(D061D1B8) SHA1(91FA0541640DF6A0EB8A3DC2C7CAB0EE5967EAAE))
+
+	ROM_REGION(0x800, "chargen0", 0) // HP Roman UC and LC ROMs
+	ROM_LOAD("1816-0612.bin", 0x0000, 0x400, CRC(5d7befd6) SHA1(31357e7b8630f52698f1b6825e79c7a51ff3f245))
+	ROM_LOAD("1816-0613.bin", 0x0400, 0x400, CRC(b6bac431) SHA1(42a557ecff769425d295ebbd1b73b26ddbfd3a09))
+
+	ROM_REGION(0x800, "chargen1", 0) // APL 1 and APL 2 Character ROMs
+	ROM_LOAD("1816-0984.bin", 0x0000, 0x400, CRC(0CEAE759) SHA1(04634EE6271C69D5AC399E547A8738B8AB22EA4A))
+	ROM_LOAD("1816-0985.bin", 0x0400, 0x400, CRC(25FCC682) SHA1(E2160ACB34E972ECF59590550327EE4471982AAF))
+
+	ROM_REGION(0x400, "chargen2", 0) // APL 3 Overstruck character ROM
+	ROM_LOAD("1816-0986.bin", 0x0000, 0x400, CRC(21D68D26) SHA1(EC76FB234B97106AA2DB3BE163C75864C785C08F))
+
+	ROM_REGION(0x400, "chargen3", 0) // Line Drawing (microvector format)
+	ROM_LOAD("1816-1417.bin", 0x0000, 0x400, CRC(E91343A4) SHA1(B37BE2F3699BC8766435B5EE3775D36510DF8D1E))
+ROM_END
+
+// ************
+// hp2645_state
+// ************
+class hp2645_state : public hp2640_base_state
+{
+public:
+	hp2645_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void hp2645(machine_config &config);
+};
+
+hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hp2640_base_state(mconfig, type, tag, 0, CHARGEN_C, CHARGEN_B | CHARGEN_C, CHARGEN_B | CHARGEN_C)
+{
+}
+
+void hp2645_state::hp2645(machine_config &config)
+{
+	hp2640_base(config);
 }
 
 ROM_START(hp2645)
@@ -1022,18 +1185,19 @@ ROM_START(hp2645)
 	ROM_LOAD("1818-0212.bin", 0x4800, 0x800, CRC(50221ec0) SHA1(b3fb76da1210ed6eefec9c3fbd731970dd50f962))
 	ROM_LOAD("1818-0513.bin", 0x5000, 0x800, CRC(416d1a4d) SHA1(6ce7136f36f06fc44716da1970b96a3ef29e5b13))
 
-	ROM_REGION(0x2000, "chargen0", 0)
+	ROM_REGION(0x800, "chargen0", 0)
 	ROM_LOAD("1816-0612.bin", 0x0000, 0x400, CRC(5d7befd6) SHA1(31357e7b8630f52698f1b6825e79c7a51ff3f245))
 	ROM_LOAD("1816-0613.bin", 0x0400, 0x400, CRC(b6bac431) SHA1(42a557ecff769425d295ebbd1b73b26ddbfd3a09))
 
-	ROM_REGION(0x1000, "chargen1", 0)
+	ROM_REGION(0x400, "chargen1", 0)
 	ROM_LOAD("1816-0642.bin", 0x0000, 0x400, CRC(2b8d151d) SHA1(208ae3ec780eb8bbbe6ac39cc61141730eda7fdd))
 
-	ROM_REGION(0x1000, "chargen2", 0)
+	ROM_REGION(0x400, "chargen2", 0)
 	ROM_LOAD("1816-1417.bin", 0x0000, 0x400, CRC(e91343a4) SHA1(b37be2f3699bc8766435b5ee3775d36510df8d1e))
 
-	ROM_REGION(0x1000, "chargen3", 0)
+	ROM_REGION(0x400, "chargen3", 0)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP( 1976, hp2645, 0, 0, hp2645, hp2645, hp2645_state, empty_init, "HP", "HP 2645A", 0)
+COMP( 1976, hp2641, 0, 0, hp2641, hp2641     , hp2641_state, empty_init, "Hewlett-Packard", "HP 2641A", 0)
+COMP( 1976, hp2645, 0, 0, hp2645, hp2640_base, hp2645_state, empty_init, "Hewlett-Packard", "HP 2645A", 0)

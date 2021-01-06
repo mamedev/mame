@@ -887,7 +887,7 @@ void ngcd_state::neocd_main_map(address_map &map)
 {
 	aes_base_main_map(map);
 
-	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
+	map(0x000000, 0x1fffff).ram().share("maincpu");
 	map(0x000000, 0x00007f).r(FUNC(ngcd_state::banked_vectors_r)); // writes will fall through to area above
 
 	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::memcard_r), FUNC(ngcd_state::memcard_w));
@@ -1089,9 +1089,6 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	/* 2MB of 68K RAM */
-
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
@@ -1104,9 +1101,6 @@ ROM_START( neocdz )
 	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
-
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	/* 2MB of 68K RAM */
 
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )

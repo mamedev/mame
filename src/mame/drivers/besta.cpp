@@ -70,6 +70,7 @@ void besta_state::mpcc_reg_w(offs_t offset, uint8_t data)
 			break;
 		case 10:
 			m_terminal->write(data);
+			[[fallthrough]]; // FIXME: really?
 		default:
 			m_mpcc_regs[offset] = data;
 			break;

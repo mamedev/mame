@@ -27,12 +27,22 @@ public:
 		HIGHSHELF
 	};
 
+	struct biquad_params
+	{
+		biquad_type type;
+		double fc;
+		double q;
+		double gain;
+	};
+
 	filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// set up the filter with the specified filter parameters and return a pointer to the new device
 	filter_biquad_device& setup(biquad_type type, double fc, double q, double gain);
-	// update an existing instance with new filter parameters
-	void update_params(biquad_type type, double fc, double q, double gain);
+	filter_biquad_device& setup(biquad_params p);
+	// modify an existing instance with new filter parameters
+	void modify(biquad_type type, double fc, double q, double gain);
+	void modify(biquad_params p);
 
 	// helper setup functions to create common filters representable by biquad filters
 	// Sallen-Key low-pass
@@ -42,6 +52,8 @@ public:
 
 	// Multiple-Feedback low-pass
 	filter_biquad_device& opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2);
+	void opamp_mfb_lowpass_modify(double r1, double r2, double r3, double c1, double c2);
+	biquad_params opamp_mfb_lowpass_calc(double r1, double r2, double r3, double c1, double c2);
 
 	// Multiple-Feedback band-pass
 	filter_biquad_device& opamp_mfb_bandpass_setup(double r1, double r2, double r3, double c1, double c2);

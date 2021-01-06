@@ -14,7 +14,7 @@
 
 #define TI99_GROMPORT_TAG    "gromport"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 struct pcb_type
 {
@@ -102,7 +102,7 @@ protected:
 	bool     m_grom_selected;
 };
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
 

@@ -72,17 +72,17 @@ void deadang_state::main_map(address_map &map)
 	map(0x00000, 0x037ff).ram();
 	map(0x03800, 0x03fff).ram().share("spriteram");
 	map(0x04000, 0x04fff).ram().share("share1");
-	map(0x05000, 0x05fff).writeonly();
+	map(0x05000, 0x05fff).nopw();
 	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0x06010, 0x07fff).writeonly();
+	map(0x06010, 0x07fff).nopw();
 	map(0x08000, 0x087ff).w(FUNC(deadang_state::text_w)).share("videoram");
-	map(0x08800, 0x0bfff).writeonly();
+	map(0x08800, 0x0bfff).nopw();
 	map(0x0a000, 0x0a001).portr("P1_P2");
 	map(0x0a002, 0x0a003).portr("DSW");
 	map(0x0c000, 0x0cfff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0d000, 0x0dfff).writeonly();
+	map(0x0d000, 0x0dfff).nopw();
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
-	map(0x0e100, 0x0ffff).writeonly();
+	map(0x0e100, 0x0ffff).nopw();
 	map(0xc0000, 0xfffff).rom();
 }
 
@@ -92,16 +92,16 @@ void popnrun_state::popnrun_main_map(address_map &map)
 	map(0x03c00, 0x03dff).ram().share("spriteram");
 	map(0x03e00, 0x03fff).ram();
 	map(0x04000, 0x04fff).ram().share("share1");
-	map(0x05000, 0x05fff).writeonly();
+	map(0x05000, 0x05fff).nopw();
 	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0x06010, 0x07fff).writeonly();
+	map(0x06010, 0x07fff).nopw();
 	map(0x08000, 0x08fff).ram().w(FUNC(popnrun_state::popnrun_text_w)).share("videoram");
 	map(0x0a000, 0x0a001).portr("P1_P2");
 	map(0x0a002, 0x0a003).portr("DSW");
 	map(0x0c000, 0x0cfff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0d000, 0x0dfff).writeonly();
+	map(0x0d000, 0x0dfff).nopw();
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
-	map(0x0e100, 0x0ffff).writeonly();
+	map(0x0e100, 0x0ffff).nopw();
 	map(0xc0000, 0xfffff).rom();
 }
 
@@ -404,9 +404,18 @@ void deadang_state::deadang(machine_config &config)
 	ym2203_device &ym2(YM2203(config, "ym2", XTAL(14'318'181)/4));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	SEIBU_ADPCM(config, m_adpcm1, 8000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	SEIBU_ADPCM(config, m_adpcm1, XTAL(12'000'000)/32/48, "msm1");
+	SEIBU_ADPCM(config, m_adpcm2, XTAL(12'000'000)/32/48, "msm2");
 
-	SEIBU_ADPCM(config, m_adpcm2, 8000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	msm5205_device &msm1(MSM5205(config, "msm1", XTAL(12'000'000)/32));
+	msm1.vck_callback().set(m_adpcm1, FUNC(seibu_adpcm_device::msm_int));
+	msm1.set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	msm1.add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	msm5205_device &msm2(MSM5205(config, "msm2", XTAL(12'000'000)/32));
+	msm2.vck_callback().set(m_adpcm2, FUNC(seibu_adpcm_device::msm_int));
+	msm2.set_prescaler_selector(msm5205_device::S48_4B); /* 7.8125 kHz */
+	msm2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void popnrun_state::popnrun(machine_config &config)
@@ -428,6 +437,8 @@ void popnrun_state::popnrun(machine_config &config)
 
 	config.device_remove("ym1");
 	config.device_remove("ym2");
+	config.device_remove("msm1");
+	config.device_remove("msm2");
 	config.device_remove("adpcm1");
 	config.device_remove("adpcm2");
 

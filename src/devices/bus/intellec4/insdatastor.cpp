@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE_NS(INTELLEC4_INST_DATA_STORAGE, bus::intellec4, imm4_22_device, "intlc4_imm4_22", "Intel imm4-22 Instruction/Data Storage Module")
 
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 namespace {
 
@@ -188,4 +188,4 @@ void imm4_22_device::unmap_prom()
 	rom_space().unmap_read(offs_t(m_rom_page) << 10, (offs_t(m_rom_page) << 10) | 0x03ffU, m_rom_mirror ? 0x1000U : 0x0000U);
 }
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4

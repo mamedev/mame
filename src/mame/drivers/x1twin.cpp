@@ -4,7 +4,7 @@
 
     Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems doesn't interact at all, according to info on the net they just shares the
+    Both systems don't interact at all, according to info on the net they just share the
     same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
     TODO:
@@ -23,6 +23,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+
+namespace {
 
 class x1twin_state : public x1_state
 {
@@ -99,7 +101,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 	//anything else?
 }
 
-/* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
+/* Apparently most games don't support this (not even the Konami ones!), one that does is...177 :o */
 INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -540,11 +542,14 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these comes from x1 turbo
+	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these come from x1 turbo
 	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, BAD_DUMP CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, BAD_DUMP CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, BAD_DUMP CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
+
+} // Anonymous namespace
+
 
 COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

@@ -194,8 +194,10 @@ WRITE_LINE_MEMBER( isa8_myb3k_fdc471x_device_base::drq_w )
 	{
 	case 1:
 		m_isa->drq1_w(state);
+		[[fallthrough]]; // FIXME: really?
 	case 2:
 		m_isa->drq2_w(state);
+		[[fallthrough]]; // FIXME: really?
 	default:
 		break;
 	}

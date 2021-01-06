@@ -2093,7 +2093,7 @@ uint16_t hp9845c_state::graphic_r(offs_t offset)
 	case 2:
 		// R6: data register with DMA TC
 		m_gv_dma_en = false;
-		// Intentional fall-through
+		[[fallthrough]];
 
 	case 0:
 		// R4: data register
@@ -2785,7 +2785,7 @@ uint16_t hp9845t_state::graphic_r(offs_t offset)
 	case 2:
 		// R6: data register with DMA TC
 		m_gv_dma_en = false;
-		// Intentional fall-through
+		[[fallthrough]];
 
 	case 0:
 		// R4: data register

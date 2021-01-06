@@ -49,19 +49,19 @@ void c64_standard_cartridge_device::device_start()
 
 uint8_t c64_standard_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!roml && m_roml.bytes())
+	if (!roml && m_roml)
 	{
-		data = m_roml[offset & m_roml.mask()];
+		data = m_roml[offset];
 	}
 	else if (!romh)
 	{
-		if (m_romh.bytes())
+		if (m_romh)
 		{
-			data = m_romh[offset & m_romh.mask()];
+			data = m_romh[offset];
 		}
-		else if (m_roml.mask() == 0x3fff)
+		else if (m_roml)
 		{
-			data = m_roml[offset & m_roml.mask()];
+			data = m_roml[offset];
 		}
 	}
 

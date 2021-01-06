@@ -73,23 +73,13 @@ void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 	if (region->bytewidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width*8);
-		length = 0;
-		return nullptr;
-	}
-
-	// check the length and warn if other than specified
-	size_t const length_found = region->bytes() / width;
-	if (length != 0 && length != length_found)
-	{
-		if (required)
-			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, region->bytes(), length * width);
+			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width * 8);
 		length = 0;
 		return nullptr;
 	}
 
 	// return results
-	length = length_found;
+	length = region->bytes() / width;
 	return region->base();
 }
 
@@ -98,14 +88,14 @@ void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 //  validate_memregion - find memory region
 //-------------------------------------------------
 
-bool finder_base::validate_memregion(size_t bytes, bool required) const
+bool finder_base::validate_memregion(bool required) const
 {
 	// make sure we can resolve the full path to the region
 	size_t bytes_found = 0;
 	std::string const region_fulltag(m_base.get().subtag(m_tag));
 
 	// look for the region
-	for (device_t const &dev : device_iterator(m_base.get().mconfig().root_device()))
+	for (device_t const &dev : device_enumerator(m_base.get().mconfig().root_device()))
 	{
 		for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 		{
@@ -117,13 +107,6 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 		}
 		if (bytes_found != 0)
 			break;
-	}
-
-	// check the length and warn if other than specified
-	if ((bytes_found != 0) && (bytes != 0) && (bytes != bytes_found))
-	{
-		osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, bytes_found, bytes);
-		bytes_found = 0;
 	}
 
 	return report_missing(bytes_found != 0, "memory region", required);
@@ -144,8 +127,7 @@ void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 	// check the width and warn if not correct
 	if (width != 0 && share->bitwidth() != width)
 	{
-		if (required)
-			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
+		osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
 		return nullptr;
 	}
 
@@ -185,8 +167,7 @@ address_space *finder_base::find_addrspace(int spacenum, u8 width, bool required
 	address_space &space(memory->space(spacenum));
 	if (width != 0 && width != space.data_width())
 	{
-		if (required)
-			osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
+		osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
 		return nullptr;
 	}
 
@@ -203,7 +184,7 @@ bool finder_base::validate_addrspace(int spacenum, u8 width, bool required) cons
 {
 	// look up the device and return false if not found
 	device_t *const device(m_base.get().subdevice(m_tag));
-	if (device == nullptr)
+	if (!device)
 		return report_missing(false, "address space", required);
 
 	// check for memory interface and a configuration for the designated space
@@ -274,7 +255,7 @@ template <bool Required>
 bool memory_region_finder<Required>::findit(validity_checker *valid)
 {
 	if (valid)
-		return this->validate_memregion(0, Required);
+		return this->validate_memregion(Required);
 
 	assert(!this->m_resolved);
 	this->m_resolved = true;
@@ -362,6 +343,81 @@ bool address_space_finder<Required>::findit(validity_checker *valid)
 
 
 //**************************************************************************
+//  MEMORY BANK CREATOR
+//**************************************************************************
+
+bool memory_bank_creator::findit(validity_checker *valid)
+{
+	if (valid)
+		return true;
+
+	device_t &dev = m_base.get();
+	memory_manager &manager = dev.machine().memory();
+	std::string const tag = dev.subtag(m_tag);
+	memory_bank *const bank = manager.bank_find(tag);
+	m_target = bank ? bank : manager.bank_alloc(dev, tag);
+	return true;
+}
+
+
+void memory_bank_creator::end_configuration()
+{
+	m_target = nullptr;
+}
+
+
+
+//**************************************************************************
+//  MEMORY SHARE CREATOR
+//**************************************************************************
+
+template <typename PointerType>
+memory_share_creator<PointerType>::memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness)
+	: finder_base(base, tag)
+	, m_width(sizeof(PointerType) * 8)
+	, m_bytes(bytes)
+	, m_endianness(endianness)
+{
+}
+
+
+template <typename PointerType>
+bool memory_share_creator<PointerType>::findit(validity_checker *valid)
+{
+	if (valid)
+		return true;
+
+	device_t &dev = m_base.get();
+	memory_manager &manager = dev.machine().memory();
+	std::string const tag = dev.subtag(m_tag);
+	memory_share *const share = manager.share_find(tag);
+	if (share)
+	{
+		std::string const result = share->compare(m_width, m_bytes, m_endianness);
+		if (!result.empty())
+		{
+			osd_printf_error("%s\n", result);
+			return false;
+		}
+		m_target = share;
+	}
+	else
+	{
+		m_target = manager.share_alloc(dev, tag, m_width, m_bytes, m_endianness);
+	}
+	return true;
+}
+
+
+template <typename PointerType>
+void memory_share_creator<PointerType>::end_configuration()
+{
+	m_target = nullptr;
+}
+
+
+
+//**************************************************************************
 //  EXPLICIT TEMPLATE INSTANTIATIONS
 //**************************************************************************
 
@@ -439,3 +495,13 @@ template class shared_ptr_finder<s32, false>;
 template class shared_ptr_finder<s32, true>;
 template class shared_ptr_finder<s64, false>;
 template class shared_ptr_finder<s64, true>;
+
+template class memory_share_creator<u8>;
+template class memory_share_creator<u16>;
+template class memory_share_creator<u32>;
+template class memory_share_creator<u64>;
+
+template class memory_share_creator<s8>;
+template class memory_share_creator<s16>;
+template class memory_share_creator<s32>;
+template class memory_share_creator<s64>;

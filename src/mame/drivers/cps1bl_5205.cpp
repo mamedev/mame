@@ -1242,6 +1242,28 @@ ROM_START( sf2ceb4 ) // sf2ceeab5 in FBNeo, all ROMs but ic171 match sf2ceb2. Du
 	ROM_RELOAD(         0x10000, 0x20000 )
 ROM_END
 
+// main PCB is marked "110-09-91 CH35/1 COMP" on component side
+// sub PCB is marked "LS 938" on solder side
+ROM_START( sf2ceb5 ) // sf2ceba in FBNeo, it`s a mix between sf2ceb and sf2mdt
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "3.ic171", 0x000000, 0x80000, CRC(a2355d90) SHA1(6c9e1294c55a5a9f244f6f1ce46224c51f910bb1) )
+	ROM_LOAD16_BYTE( "5.ic171", 0x000001, 0x80000, CRC(c6f86e84) SHA1(546841fe7d423fff05a7772aa57fa3274515c32b) )
+	ROM_LOAD16_BYTE( "2.ic171", 0x100000, 0x20000, CRC(74844192) SHA1(99cd546c78cce7f632007af454d8a55eddb6b19b) )
+	ROM_LOAD16_BYTE( "4.ic171", 0x100001, 0x20000, CRC(bd98ff15) SHA1(ed902d949b0b5c5beaaea78a4b418ffa6db9e1df) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD32_WORD( "pf4-sh058.ic90", 0x000000, 0x100000, CRC(446575c7) SHA1(2bd769674fbe280d304b389daf74202cf9e4ac22) )
+	ROM_LOAD32_WORD( "pf7-sh072.ic88", 0x000002, 0x100000, CRC(fb78022e) SHA1(b8974387056dd52db96b01cc4648edc814398c7e) )
+	ROM_LOAD32_WORD( "pf5-sh036.ic91", 0x200000, 0x100000, CRC(0a6be48b) SHA1(b7e72c94d4e3eb4a6bba6608d9b9a093c8901ad9) )
+	ROM_LOAD32_WORD( "pf8-sh074.ic93", 0x200002, 0x100000, CRC(6258c7cf) SHA1(4cd7519245c0aa816934a43e6743160f715d7dc2) )
+	ROM_LOAD32_WORD( "pf6-sh071.ic86", 0x400000, 0x100000, CRC(9b5b09d7) SHA1(698a6aab41e495bd0c37a19aee16a84f04d15797) )
+	ROM_LOAD32_WORD( "pf9-sh065.ic84", 0x400002, 0x100000, CRC(9f25090e) SHA1(12ff0431ef6550db446985c8914ac7d78eec6b6d) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 ) // Sound program + samples
+	ROM_LOAD( "5.ic26", 0x00000, 0x20000, CRC(17d5ba8a) SHA1(6ff3b8860d7e1fdee3561846f645eb4d3a8965ec) )
+	ROM_RELOAD(         0x10000, 0x20000 )
+ROM_END
+
 // ************************************************************************* SF2MDT, SF2MDTA, SF2MDTB
 
 /*
@@ -1354,7 +1376,8 @@ GAME( 1992,  sf2b2,       sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,
 GAME( 1992,  sf2ceb,      sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdta,     ROT0,  "bootleg (Playmark)",  "Street Fighter II': Champion Edition (Playmark bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
 GAME( 1992,  sf2ceb2,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg",  "Street Fighter II': Champion Edition (bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
 GAME( 1992,  sf2ceb3,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg",  "Street Fighter II': Champion Edition (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
-GAME( 1992,  sf2ceb4,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg",  "Street Fighter II': Champion Edition (Playmark bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
+GAME( 1992,  sf2ceb4,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg (Playmark)",  "Street Fighter II': Champion Edition (Playmark bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
+GAME( 1992,  sf2ceb5,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdta,     ROT0,  "bootleg (Playmark)",  "Street Fighter II': Champion Edition (Playmark bootleg, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
 
 GAME( 1992,  sf2mdt,      sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdt,      ROT0,  "bootleg",  "Street Fighter II': Magic Delta Turbo (bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC
 GAME( 1992,  sf2mdta,     sf2ce,    sf2mdt,      sf2mdt,      cps1bl_5205_state,  init_sf2mdta,     ROT0,  "bootleg",  "Street Fighter II': Magic Delta Turbo (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 920313 ETC

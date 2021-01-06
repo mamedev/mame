@@ -963,6 +963,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0xd0;
 					break;
 				}
+				break;
 
 			case 0x01: //Middle row - note switches don't match pattern
 				switch (machine().rand() & 0x3)
@@ -987,6 +988,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0x90;
 					break;
 				}
+				break;
 
 			case 0x02: //Bottom row
 				switch (machine().rand() & 0x3)
@@ -1011,6 +1013,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0x30;
 					break;
 				}
+				break;
 			}
 		}
 	}

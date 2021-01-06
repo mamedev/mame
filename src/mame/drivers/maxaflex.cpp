@@ -162,7 +162,7 @@ void maxaflex_state::mcu_portb_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* AUDMUTE */
-	machine().sound().system_enable(BIT(data, 5));
+	machine().sound().system_mute(!BIT(data, 5));
 
 	/* latch for lamps */
 	if (BIT(diff, 6) && !BIT(data, 6))
@@ -285,12 +285,12 @@ INPUT_PORTS_END
 
 uint8_t maxaflex_state::pia_pa_r()
 {
-	return atari_input_disabled() ? 0xff : m_joy01.read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy01->read();
 }
 
 uint8_t maxaflex_state::pia_pb_r()
 {
-	return atari_input_disabled() ? 0xff : m_joy23.read_safe(0);
+	return atari_input_disabled() ? 0xff : m_joy23->read();
 }
 
 

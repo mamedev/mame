@@ -130,6 +130,7 @@ void atapi_cdrom_device::ExecCommand()
 				m_transfer_length = 0;
 				return;
 			}
+			[[fallthrough]];
 		default:
 			if(m_media_change)
 			{

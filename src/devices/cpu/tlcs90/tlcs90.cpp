@@ -1022,6 +1022,7 @@ void tlcs90_device::decode()
 				if (b0 == 0xfe) {
 					OPCC( LDI+b1-0x58,14,18 )   NONE( 1 )       NONE( 2 )                   return;
 				}
+				break;
 
 				case 0x60:                                                                              // ADD A,g
 				case 0x61:                                                                              // ADC A,g
@@ -1077,6 +1078,7 @@ void tlcs90_device::decode()
 				if (b0 == 0xfe) {
 					OPCC( RET,6,14 )    CC( 1, b1 - 0xd0 )      NONE( 2 )                   return;     // RET cc
 				}
+				break;
 			}   break;
 
 		case 0xff:
@@ -2776,6 +2778,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	case 0x03: // 8bit PWM
 		logerror("CPU Timer %d expired with unhandled mode %d\n", i, mode);
 		// TODO: hmm...
+		[[fallthrough]]; // FIXME: really?
 	case 0x00: // 8bit
 		m_timer_value[i]++;
 		if ( m_timer_value[i] == m_treg_8bit[i] )

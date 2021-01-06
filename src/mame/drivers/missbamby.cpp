@@ -4,16 +4,16 @@
 /*
 Skeleton driver for Cirsa "Mini Super Fruits" and clones.
 Known games on this hardware:
- __________________________________________________
- | Dumped | Game              | Manufacturer       |
- +--------+-------------------+--------------------+
- | YES    | Mini Super Fruits | Cirsa              |
- | YES    | Lucky Player      | Cirsa              |
- | YES    | Miss Bamby        | Automatics Pasqual |
- | YES    | Golden Winer      | Reben              |
- | NO     | Golden Fruits     | unknown            |
- | NO     | St.-Tropez        | unknown            |
- +-------------------------------------------------+
+ ________________________________________________________________________
+ | Dumped | Game              | Manufacturer       | Notes              |
+ +--------+-------------------+--------------------+--------------------|
+ | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
+ | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
+ | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | Golden Winer      | Reben              |                    |
+ | NO     | Golden Fruits     | unknown            |                    |
+ | NO     | St.-Tropez        | unknown            |                    |
+ +-------------------------------------------------+--------------------+
 */
 /*
 Miss Bamby - Automatics Pasqual
@@ -78,6 +78,9 @@ Golden Winner - Reben
 #include "machine/i8155.h"
 //#include "machine/nvram.h"
 #include "sound/ay8910.h"
+
+
+namespace {
 
 class missbamby_state : public driver_device
 {
@@ -170,6 +173,7 @@ void missbamby_state::gldwinner(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // guess
 }
 
+// Cirsa PCB 810601 A
 ROM_START( minisupf )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "mini_av_1.4.a", 0x0000, 0x0800, CRC(d29a6468) SHA1(9a6d25a6d5602aff226340e8b4a87aa8a55e7c51) )
@@ -180,7 +184,7 @@ ROM_START( minisupf )
 	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
 ROM_END
 
-// The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
+// Cirsa PCB 810702 A. The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
 ROM_START( luckyplr )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "lucky_player_24.a", 0x0000, 0x1000, CRC(11a3daf2) SHA1(239d2e53f05eecfcbc0cf5e037df21e3851e4d69) )
@@ -217,9 +221,11 @@ ROM_START( unkslot )
 	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
 ROM_END
 
+} // Anonymous namespace
 
-GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
+
+GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )

@@ -30,8 +30,8 @@ void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect
 				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = m_videoram[base + 2 * y + 1];
-			code = m_videoram[base + 2 * y] + ((attr & 0x0f) << 8);
+			attr = m_videoram[(base + 2 * y + 1) & 0x1fff];
+			code = m_videoram[(base + 2 * y) & 0x1fff] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
@@ -115,8 +115,8 @@ int lsasquad_state::draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &
 				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = m_videoram[base + 2 * y + 1];
-			code = m_videoram[base + 2 * y] + ((attr & 0x0f) << 8);
+			attr = m_videoram[(base + 2 * y + 1) & 0x1fff];
+			code = m_videoram[(base + 2 * y) & 0x1fff] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
 			if ((type == 0 && color != 0x0d) || (type != 0 && color == 0x0d))

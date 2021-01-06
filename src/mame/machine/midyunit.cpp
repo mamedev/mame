@@ -292,15 +292,21 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_CVSD:
-			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
+			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
 			break;
 
 		case SOUND_ADPCM:
-			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
+			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
+			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
 			break;
 
 		case SOUND_NARC:
-			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
+			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
+			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
 			break;
 
 		case SOUND_YAWDIM:

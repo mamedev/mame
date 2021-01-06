@@ -28,9 +28,7 @@ DEFINE_DEVICE_TYPE(PORTFOLIO_MEMORY_CARD_SLOT, portfolio_memory_card_slot_device
 //-------------------------------------------------
 
 device_portfolio_memory_card_slot_interface::device_portfolio_memory_card_slot_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "pofoccm"),
-	m_rom(*this, "rom"),
-	m_nvram(*this, "nvram")
+	device_interface(device, "pofoccm")
 {
 	m_slot = dynamic_cast<portfolio_memory_card_slot_device *>(device.owner());
 }

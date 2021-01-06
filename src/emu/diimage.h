@@ -164,8 +164,8 @@ public:
 	u64 length() { check_for_file(); return m_file->size(); }
 	bool is_readonly() const noexcept { return m_readonly; }
 	u32 fread(void *buffer, u32 length) { check_for_file(); return m_file->read(buffer, length); }
-	u32 fread(optional_shared_ptr<u8> &ptr, u32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
-	u32 fread(optional_shared_ptr<u8> &ptr, u32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
+	u32 fread(std::unique_ptr<u8[]> &ptr, u32 length) { ptr = std::make_unique<u8[]>(length); return fread(ptr.get(), length); }
+	u32 fread(std::unique_ptr<u8[]> &ptr, u32 length, offs_t offset) { ptr = std::make_unique<u8[]>(length); return fread(ptr.get() + offset, length - offset); }
 	u32 fwrite(const void *buffer, u32 length) { check_for_file(); return m_file->write(buffer, length); }
 	int fseek(s64 offset, int whence) { check_for_file(); return m_file->seek(offset, whence); }
 	u64 ftell() { check_for_file(); return m_file->tell(); }
@@ -174,11 +174,6 @@ public:
 	int image_feof() { check_for_file(); return m_file->eof(); }
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
-
-	const std::string &longname() const noexcept { return m_longname; }
-	const std::string &manufacturer() const noexcept { return m_manufacturer; }
-	const std::string &year() const noexcept { return m_year; }
-	u32 supported() const noexcept { return m_supported; }
 
 	const software_info *software_entry() const noexcept;
 	const software_part *part_entry() const noexcept { return m_software_part_ptr; }
@@ -191,7 +186,7 @@ public:
 	u8 *get_software_region(const char *tag);
 	u32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name) const;
-	bool load_software_region(const char *tag, optional_shared_ptr<u8> &ptr);
+	bool load_software_region(const char *tag, std::unique_ptr<u8[]> &ptr);
 
 	u32 crc();
 	util::hash_collection& hash() { return m_hash; }
@@ -301,12 +296,6 @@ private:
 	// working directory; persists across mounts
 	std::string m_working_directory;
 
-	// info read from the hash file/software list
-	std::string m_longname;
-	std::string m_manufacturer;
-	std::string m_year;
-	u32 m_supported;
-
 	// flags
 	bool m_readonly;
 	bool m_created;
@@ -331,6 +320,6 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_image_interface> image_interface_iterator;
+typedef device_interface_enumerator<device_image_interface> image_interface_enumerator;
 
 #endif  /* MAME_EMU_DIIMAGE_H */

@@ -391,6 +391,11 @@ ROM_START( cybar120 )
 	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
+ROM_START( jl2050 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
+ROM_END
+
 ROM_START( vsmaxtx2 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "tx2.bin", 0x00000, 0x400000, CRC(eddf0ca8) SHA1(b87c5c3e945d1efdcb953325425d4ddb0fded00a) )
@@ -433,6 +438,11 @@ ROM_START( vgpmini )
 	// there was a dump of a 'secure' area with this, but it was just the bottom 0x10000 bytes of the existing rom.
 ROM_END
 
+ROM_START( joypad65 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "joypad65.bin", 0x00000, 0x800000, CRC(b7f81c5f) SHA1(8579d9bc866415e0049979b7c3427d8dd0a60813) )
+ROM_END
+
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
@@ -462,9 +472,13 @@ CONS( 200?, senario25, 0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_ini
 CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, joypad65,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Joypad 65", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
+
+CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+

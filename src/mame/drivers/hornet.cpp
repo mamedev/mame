@@ -281,7 +281,7 @@
     GFX PCB:  GQ871 PWB(B)A    (C) 1999 Konami
     ------------------------------------------
 
-    There are no ROMs on the two GFX PCBs, all sockets are empty. They are loacted on the LAN PCB.
+    There are no ROMs on the two GFX PCBs, all sockets are empty. They are located on the LAN PCB.
     Prior to the game starting there is a message saying downloading data.
 
 
@@ -365,6 +365,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class hornet_state : public driver_device
 {
 public:
@@ -410,6 +412,10 @@ public:
 	void init_terabrst();
 	void init_sscope();
 	void init_sscope2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -474,9 +480,6 @@ private:
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(hornet_2board);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -784,8 +787,8 @@ void hornet_state::hornet_map(address_map &map)
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
-	map(0x7f000000, 0x7f3fffff).rom().share("share2");
-	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+	map(0x7f000000, 0x7f3fffff).rom().region("user1", 0);
+	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 void hornet_state::terabrst_map(address_map &map)
@@ -1715,6 +1718,9 @@ ROM_START(terabrsta)
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************************************************/
 

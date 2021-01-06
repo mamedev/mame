@@ -19,7 +19,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_banks(*this, "bank%d", 1U)
 	{ }
 
 	int m_intenable;
@@ -30,6 +31,7 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_memory_bank_array<8> m_banks;
 	tilemap_t *m_bg_tilemap;
 
 	void cashquiz_question_bank_high_w(uint8_t data);
@@ -48,8 +50,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void merlinmm(machine_config &config);
 	void pingpong(machine_config &config);
+	void cashquiz(machine_config &config);
 	void merlinmm_map(address_map &map);
 	void pingpong_map(address_map &map);
+	void cashquiz_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PINGPONG_H

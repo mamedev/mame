@@ -84,7 +84,7 @@ public:
 		m_vsync_prom(*this, "vsync"),
 		m_line_prom(*this, "line"),
 		m_attr_prom(*this, "attr"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_LITTLE),
 		m_motor(false),
 		m_tape_in(1),
 		m_tape_in_latch(1)
@@ -109,7 +109,7 @@ public:
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
 	required_memory_region m_attr_prom;
-	optional_shared_ptr<u8> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	enum
 	{

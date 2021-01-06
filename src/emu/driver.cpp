@@ -211,7 +211,7 @@ ioport_constructor driver_device::device_input_ports() const
 void driver_device::device_start()
 {
 	// reschedule ourselves to be last
-	for (device_t &test : device_iterator(*this))
+	for (device_t &test : device_enumerator(*this))
 		if (&test != this && !test.started())
 			throw device_missing_dependencies();
 

@@ -225,6 +225,7 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_scan_timer(*this, finder_base::DUMMY_TAG)
+	, m_rombank(*this, "rombank")
 	, m_stream(nullptr)
 {
 }
@@ -656,8 +657,8 @@ void sega_32x_device::m68k_a15100_w(address_space &space, offs_t offset, uint16_
 			m_32x_adapter_enabled = 1;
 			space.install_rom(0x0880000, 0x08fffff, machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
 
-			space.install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+			space.install_read_bank(0x0900000, 0x09fffff, m_rombank); // 'bankable' 1024kb rom bank
+			m_rombank->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 
 			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("32x_68k_bios")->base());
 
@@ -747,7 +748,7 @@ void sega_32x_device::m68k_a15104_w(offs_t offset, uint16_t data, uint16_t mem_m
 		m_32x_68k_a15104_reg = (m_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+	m_rombank->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/

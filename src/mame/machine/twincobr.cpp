@@ -75,6 +75,7 @@ void twincobr_state::twincobr_dsp_w(u16 data)
 	switch (m_main_ram_seg)
 	{
 	case 0x30000:   if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		[[fallthrough]];
 	case 0x40000:
 	case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 					mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
@@ -125,6 +126,7 @@ void twincobr_state::wardner_dsp_w(u16 data)
 	switch (m_main_ram_seg)
 	{
 	case 0x7000:    if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		[[fallthrough]];
 	case 0x8000:
 	case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 					mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));
@@ -191,7 +193,6 @@ WRITE_LINE_MEMBER(twincobr_state::int_enable_w)
 
 WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 {
-	m_dsp_on = state;
 	if (state)
 	{
 		// assert the INT line to the DSP
@@ -207,11 +208,6 @@ WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
-}
-
-void twincobr_state::device_post_load()
-{
-	dsp_int_w(m_dsp_on);
 }
 
 
@@ -259,7 +255,6 @@ void twincobr_state::machine_reset()
 void twincobr_state::driver_savestate()
 {
 	save_item(NAME(m_intenable));
-	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
 	save_item(NAME(m_dsp_bio));

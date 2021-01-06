@@ -22,8 +22,6 @@
 
 #define MASTER_CLOCK    16000000
 
-#define LOG_PORTS 0
-
 /****************************************************\
 * I/O devices                                        *
 \****************************************************/
@@ -39,72 +37,16 @@ public:
 
 	void rambo(machine_config &config);
 
-	void init_rambo();
-
 private:
-	uint8_t m_port_a;
-	uint8_t m_port_b;
-	uint8_t m_port_c;
-	uint8_t m_port_d;
-	uint8_t m_port_e;
-	uint8_t m_port_f;
-	uint8_t m_port_g;
-	uint8_t m_port_h;
-	uint8_t m_port_j;
-	uint8_t m_port_k;
-	uint8_t m_port_l;
-	required_device<avr8_device> m_maincpu;
-
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void rambo_data_map(address_map &map);
-	void rambo_io_map(address_map &map);
+
 	void rambo_prg_map(address_map &map);
+	void rambo_data_map(address_map &map);
+
+	uint8_t m_port_a;
+	required_device<avr8_device> m_maincpu;
 };
-
-void rambo_state::machine_start()
-{
-}
-
-uint8_t rambo_state::port_r(offs_t offset)
-{
-	switch( offset )
-	{
-		case AVR8_IO_PORTA:
-		{
-#if LOG_PORTS
-			printf("[%08X] Port A READ \n", m_maincpu->m_shifted_pc);
-#endif
-			return m_port_a;
-		}
-		default:
-			break;
-	}
-	return 0;
-}
-
-void rambo_state::port_w(offs_t offset, uint8_t data)
-{
-	switch( offset )
-	{
-		case AVR8_IO_PORTA:
-		{
-			if (data == m_port_a) break;
-
-#if LOG_PORTS
-			uint8_t old_port_a = m_port_a;
-			uint8_t changed = data ^ old_port_a;
-#endif
-			m_port_a = data;
-			break;
-		}
-		default:
-			break;
-	}
-}
 
 /****************************************************\
 * Address maps                                       *
@@ -120,32 +62,18 @@ void rambo_state::rambo_data_map(address_map &map)
 	map(0x0200, 0x21FF).ram();  /* ATMEGA2560 Internal SRAM */
 }
 
-void rambo_state::rambo_io_map(address_map &map)
-{
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
-}
-
 /****************************************************\
 * Machine definition                                 *
 \****************************************************/
 
-void rambo_state::init_rambo()
+void rambo_state::machine_start()
 {
+	save_item(NAME(m_port_a));
 }
 
 void rambo_state::machine_reset()
 {
 	m_port_a = 0;
-	m_port_b = 0;
-	m_port_c = 0;
-	m_port_d = 0;
-	m_port_e = 0;
-	m_port_f = 0;
-	m_port_g = 0;
-	m_port_h = 0;
-	m_port_j = 0;
-	m_port_k = 0;
-	m_port_l = 0;
 }
 
 void rambo_state::rambo(machine_config &config)
@@ -153,13 +81,13 @@ void rambo_state::rambo(machine_config &config)
 	ATMEGA2560(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rambo_state::rambo_prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &rambo_state::rambo_data_map);
-	m_maincpu->set_addrmap(AS_IO, &rambo_state::rambo_io_map);
-
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
 	m_maincpu->set_high_fuses(0xda);
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
+	m_maincpu->gpio_in<AVR8_IO_PORTA>().set([this]() { return m_port_a; });
+	m_maincpu->gpio_out<AVR8_IO_PORTA>().set([this](uint8_t data) { m_port_a = data; });
 
 	/*TODO: Add an ATMEGA32U2 for USB-Serial communications */
 	/*TODO: Emulate the AD5206 digipot */
@@ -234,4 +162,4 @@ ROM_START( metamaq2 )
 ROM_END
 
 //   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY        FULLNAME                            FLAGS
-COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, init_rambo, "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, empty_init, "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

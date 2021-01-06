@@ -1033,7 +1033,7 @@ void playmark_state::configure_oki_banks()
 	}
 }
 
-MACHINE_START_MEMBER(playmark_state,playmark)
+void playmark_state::machine_start()
 {
 	save_item(NAME(m_bgscrollx));
 	save_item(NAME(m_bgscrolly));
@@ -1054,7 +1054,7 @@ MACHINE_START_MEMBER(playmark_state,playmark)
 
 
 
-MACHINE_RESET_MEMBER(playmark_state,playmark)
+void playmark_state::machine_reset()
 {
 	m_bgscrollx = 0;
 	m_bgscrolly = 0;
@@ -1084,9 +1084,6 @@ void playmark_state::bigtwin(machine_config &config)
 	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
 	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
 	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
-
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1123,9 +1120,6 @@ void playmark_state::bigtwinb(machine_config &config)
 	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
 	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
 	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
-
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1166,9 +1160,6 @@ void playmark_state::wbeachvl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
@@ -1204,9 +1195,6 @@ void playmark_state::excelsr(machine_config &config)
 	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
 	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
 	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
-
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1245,9 +1233,6 @@ void playmark_state::hrdtimes(machine_config &config)
 	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 	m_audiocpu->set_disable();       /* Internal code is not dumped yet */
 
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
@@ -1285,9 +1270,6 @@ void playmark_state::hotmind(machine_config &config)
 	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
-
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1329,9 +1311,6 @@ void playmark_state::luckboomh(machine_config &config)
 	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
-	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

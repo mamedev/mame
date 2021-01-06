@@ -10,8 +10,8 @@
 
     GQ972 PWB(A2) 0000070609 Main board
     -----------------------------------
-        OSC 64.00MHz
-        IBM PowerPC 403GCX at 64MHz
+        OSC 66.0000MHz
+        IBM PowerPC 403GCX at 66MHz
         (2x) Konami 0000057714 (2D object processor)
         Yamaha YMZ280B (ADPCM sound chip)
         Epson RTC65271 RTC/NVRAM
@@ -160,6 +160,8 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "firebeat.lh"
 
 
+namespace {
+
 struct IBUTTON_SUBKEY
 {
 	uint8_t identifier[8];
@@ -200,6 +202,11 @@ public:
 	void init_kbm();
 	void init_ppp();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<ppc4xx_device> m_maincpu;
 	optional_device<m68000_device> m_audiocpu;
@@ -224,9 +231,6 @@ private:
 	int m_ibutton_read_subkey_ptr;
 	uint8_t m_ibutton_subkey_data[0x40];
 
-	DECLARE_MACHINE_START(firebeat);
-	DECLARE_MACHINE_RESET(firebeat);
-	DECLARE_VIDEO_START(firebeat);
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
@@ -283,7 +287,7 @@ private:
 
 
 
-VIDEO_START_MEMBER(firebeat_state,firebeat)
+void firebeat_state::video_start()
 {
 }
 
@@ -821,7 +825,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firebeat_state::spu_timer_callback)
 
 /*****************************************************************************/
 
-MACHINE_START_MEMBER(firebeat_state,firebeat)
+void firebeat_state::machine_start()
 {
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -1053,7 +1057,7 @@ WRITE_LINE_MEMBER(firebeat_state::gcu1_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-MACHINE_RESET_MEMBER(firebeat_state,firebeat)
+void firebeat_state::machine_reset()
 {
 	m_layer = 0;
 }
@@ -1065,8 +1069,8 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 
 void firebeat_state::cdrom_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 0.5);
 	device = device->subdevice("cdda");
 }
 
@@ -1078,12 +1082,9 @@ static void firebeat_ata_devices(device_slot_interface &device)
 void firebeat_state::firebeat(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);
 	m_maincpu->set_vblank_int("screen", FUNC(firebeat_state::firebeat_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
-	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	RTC65271(config, "rtc", 0);
 
@@ -1109,8 +1110,6 @@ void firebeat_state::firebeat(machine_config &config)
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
 
-	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1134,12 +1133,9 @@ void firebeat_state::firebeat(machine_config &config)
 void firebeat_state::firebeat2(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	PPC403GCX(config, m_maincpu, XTAL(66'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat2_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(firebeat_state::firebeat_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
-	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	RTC65271(config, "rtc", 0);
 
@@ -1175,8 +1171,6 @@ void firebeat_state::firebeat2(machine_config &config)
 	rscreen.set_visarea(0, 639, 0, 479);
 	rscreen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1218,8 +1212,8 @@ void firebeat_state::firebeat_spu(machine_config &config)
 	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
 
 	rf5c400_device &rf5c400(RF5C400(config, "rf5c400", XTAL(16'934'400)));
-	rf5c400.add_route(0, "lspeaker", 1.0);
-	rf5c400.add_route(1, "rspeaker", 1.0);
+	rf5c400.add_route(0, "lspeaker", 0.5);
+	rf5c400.add_route(1, "rspeaker", 0.5);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
@@ -1724,6 +1718,9 @@ ROM_START( bm3final )
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "gcc01jca02", 0, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*****************************************************************************/
 

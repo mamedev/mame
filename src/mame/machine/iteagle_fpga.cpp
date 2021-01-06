@@ -911,6 +911,7 @@ void iteagle_periph_device::ctrl_w(offs_t offset, uint32_t data, uint32_t mem_ma
 			if (ACCESSING_BITS_8_15) {
 				m_rtc_regs[m_ctrl_regs[0x70/4]&0xff] = (data>>8)&0xff;
 			}
+			break;
 		default:
 			break;
 	}

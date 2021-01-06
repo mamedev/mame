@@ -785,11 +785,12 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-VIDEO_START_MEMBER(md_base_state,megadriv)
+void md_base_state::video_start()
 {
+	// nothing?
 }
 
-MACHINE_START_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_start()
 {
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
@@ -802,7 +803,7 @@ MACHINE_START_MEMBER(md_base_state,megadriv)
 	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
-MACHINE_RESET_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_reset()
 {
 	/* default state of z80 = reset, with bus */
 	osd_printf_debug("Resetting Megadrive / Genesis\n");
@@ -908,9 +909,6 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
-
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
@@ -922,16 +920,14 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
-//  screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	screen.set_size(64*8, 620);
-	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
-	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	m_screen->set_size(64*8, 620);
+	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -973,9 +969,6 @@ void md_base_state::md_pal(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
-
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
@@ -987,16 +980,14 @@ void md_base_state::md_pal(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
-//  screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	screen.set_size(64*8, 620);
-	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
-	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
+//  m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	m_screen->set_size(64*8, 620);
+	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

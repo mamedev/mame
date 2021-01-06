@@ -19,7 +19,6 @@ public:
 	// TCU
 	void set_tclk(double clk) { m_tclk = clk; }
 	void set_tclk(const XTAL &xtal) { set_tclk(xtal.dvalue()); }
-	template <unsigned Timer> auto out_handler() { return device().subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 
 	// DMAU
@@ -139,6 +138,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hack_w) { m_dmau->hack_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(tctl2_w) { m_tcu->write_gate2(state); }
 
+	auto tout1_cb() { return m_tout1_callback.bind(); }
+	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
+
 protected:
 	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type);
 
@@ -168,7 +170,14 @@ protected:
 	void OPCN_w(u8 data);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(tout1_w);
+
+	devcb_write_line m_tout1_callback;
+
 	u8 m_OPCN;
+	bool m_tout1;
+	bool m_intp1;
+	bool m_intp2;
 };
 
 class v40_device : public v50_base_device
@@ -207,6 +216,8 @@ public:
 		}
 	}
 	DECLARE_WRITE_LINE_MEMBER(hack_w);
+
+	template <unsigned Timer> auto out_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

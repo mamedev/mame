@@ -919,7 +919,6 @@ void tandy2k_state::machine_start()
 
 	program.install_ram(0x00000, ram_size - 1, ram);
 
-	m_char_ram.allocate(0x1000);
 	m_mouse_timer = timer_alloc(MOUS_TIMER);
 	m_mcu_delay = timer_alloc(MCU_DELAY);
 

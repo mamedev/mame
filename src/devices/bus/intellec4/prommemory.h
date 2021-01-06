@@ -89,7 +89,7 @@ RAM MOD ENBL        not jumpered in on INTELLEC 4, allows PROM to overlay RAM on
 
 #include "intellec4.h"
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 class imm6_26_device : public device_t, public device_univ_card_interface, public device_image_interface
 {
@@ -119,7 +119,7 @@ private:
 	std::unique_ptr<u8 []>  m_data;
 };
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4
 
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_PROM_MEMORY, bus::intellec4, imm6_26_device)
 

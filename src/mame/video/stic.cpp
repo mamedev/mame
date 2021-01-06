@@ -1190,7 +1190,7 @@ uint16_t stic_device::read(offs_t offset)
 		case STIC_GMR:
 			m_color_stack_mode = 1;
 			//logerror("Setting color stack mode\n");
-			/*** fall through ***/
+			[[fallthrough]];
 		case STIC_DER:
 			return 0x3FFF;
 		case STIC_CSR + CSR0:
