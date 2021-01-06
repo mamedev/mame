@@ -80,15 +80,18 @@ public:
 		, m_lamp_output(*this, "lamp%u", 0U)
 	{ }
 
-	void impctawp(machine_config &config);
-	void jpmimpct(machine_config &config);
+	void impact_nonvideo(machine_config &config);
+	void impact_video(machine_config &config);
+
+protected:
+	void base(machine_config &config);
 
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	uint16_t duart_1_r(offs_t offset);
-	void duart_1_w(offs_t offset, uint16_t data);
-	uint16_t duart_2_r(offs_t offset);
-	void duart_2_w(uint16_t data);
+	uint16_t duart_1_hack_r(offs_t offset);
+	void duart_1_hack_w(offs_t offset, uint16_t data);
+	uint16_t duart_2_hack_r(offs_t offset);
+	void duart_2_hack_w(uint16_t data);
 	uint16_t unk_r();
 	void unk_w(uint16_t data);
 	uint16_t jpmio_r();
@@ -111,16 +114,16 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void set_duart_ip_hack(bool state);
+	void set_duart_1_hack_ip(bool state);
 	void save_duart_hack();
 	void reset_duart_hack();
 	DECLARE_MACHINE_START(jpmimpct);
 	DECLARE_MACHINE_RESET(jpmimpct);
 	DECLARE_VIDEO_START(jpmimpct);
-	DECLARE_MACHINE_START(impctawp);
-	DECLARE_MACHINE_RESET(impctawp);
-	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
-	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
+	DECLARE_MACHINE_START(impact_nonvideo);
+	DECLARE_MACHINE_RESET(impact_nonvideo);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
 	void common_map(address_map &map);
 	void awp68k_program_map(address_map &map);
 	void m68k_program_map(address_map &map);
