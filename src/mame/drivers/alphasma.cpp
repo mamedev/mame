@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-/***************************************************************************
+/************************************************************************************
 
         AlphaSmart Pro
 
@@ -8,9 +8,10 @@
 
     TODO:
     - ADB and PS/2
-    - charset ROM is wrong
+    - Charset ROM is wrong
+    - Properly support AlphaSmart 3000 (currently added reusing AlphaSmart 2000 code)
 
-****************************************************************************/
+*************************************************************************************/
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
@@ -19,6 +20,10 @@
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
+
+namespace
+{
 
 class alphasmart_state : public driver_device
 {
@@ -81,6 +86,7 @@ public:
 	}
 
 	void asma2k(machine_config &config);
+	void asma3k(machine_config &config);
 
 private:
 	uint8_t io_r(offs_t offset);
@@ -227,7 +233,7 @@ void asma2k_state::asma2k_mem(address_map &map)
 	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
 }
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( alphasmart )
 	PORT_START("COL.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)    PORT_CHAR(UCHAR_MAMEKEY(F1))   PORT_CHANGED_MEMBER(DEVICE_SELF, alphasmart_state, kb_irq, 0)
@@ -415,7 +421,7 @@ void alphasmart_state::machine_reset()
 
 void alphasmart_state::alphasmart(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	MC68HC11D0(config, m_maincpu, XTAL(8'000'000));  // XTAL is 8 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
 	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
@@ -430,10 +436,10 @@ void alphasmart_state::alphasmart(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("128K");
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(alphasmart_state::screen_update));
 	screen.set_size(6*40, 9*4);
 	screen.set_visarea_full();
@@ -450,10 +456,17 @@ void asma2k_state::asma2k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
 }
 
-/* ROM definition */
+void asma2k_state::asma3k(machine_config &config)
+{
+	asma2k(config);
+	SOFTWARE_LIST(config, "kapps_list").set_original("alphasmart_kapps");
+}
+
+// ROM definitions
+
 ROM_START( asmapro )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
+	ROM_LOAD( "alphasmartpro212.rom", 0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) ) // Checksum 8D24 on label
 ROM_END
 
 ROM_START( asma2k )
@@ -464,15 +477,38 @@ ROM_START( asma2k )
 	    which is integrated onto one plcc44 chip called a zpsd211r.
 	*/
 	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
-	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin", 0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
-	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin", 0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
 ROM_END
 
+/* AlphaSmart 3000 PCB:
+            ___________                                                                _____________
+           /    ::    |_______________________________________________________________/             \
+   _______/ ::  ::                              _________      _________              ________       \_____________
+  ||RS232|      ::   28F008B3                  |________|     |________| PCB REV 2.8 |_______|  BATT        | USB |
+  ||_____|      ::                 74HC574                                                    CR2032   XTAL |_____|
+  |__                  HY62U8200                       HC30M                                          A120I0E     |
+   __| SP3223ECA                                                                                                  |
+ _|_                     DragonBall EZ                                                                 PDIUSBD11D |
+|___|<-Power             MC68EZ328PU16V                                    :)                              _______|
+  |                                                                   Rise and Shout                      |
+  |                            XTAL                                   the AlphaSmart's                    |
+  |__   __      _____                     SW        HC132A             Out!!!                             |
+     | |__|    /     | HC132A     HC74A  on/off                                       ____________________|
+     |________/      |_______________________________________________________________/
+*/
+ROM_START( asma3k )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "28f008b3.u1", 0x000000, 0x100000, CRC(73a24834) SHA1(a47e6a6d286feaba4e671a6373632222113f9276) )
+ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
-COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+} // anonymous namespace
+
+//    YEAR  NAME     PARENT COMPAT MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,     0,     alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,     0,     asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2000, asma3k,  0,     0,     asma3k,     alphasmart, asma2k_state,     empty_init, "AlphaSmart, Inc.",               "AlphaSmart 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
