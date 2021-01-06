@@ -107,7 +107,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "includes/jpmimpct.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "video/awpvid.h"
 #include "screen.h"
@@ -543,7 +542,7 @@ void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
 
 void jpmimpct_state::common_map(address_map& map)
 {
-	map(0x00000000, 0x000fffff).rom();
+	map(0x00000000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
 	//map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -556,27 +555,26 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
 	map(0x00480032, 0x00480033).portr("COINS");
+
+	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+
+	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
 }
 
 void jpmimpct_state::m68k_program_map(address_map &map)
 {
 	common_map(map);
-	map(0x00100000, 0x001fffff).rom();
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::unk_r));
-	map(0x00480060, 0x00480067).rw(FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
-	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
-	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
-	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
+
 	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
 	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
 	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
-	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
+	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w)); // video duart for Touchscreen
 	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
-	map(0x00c00000, 0x00cfffff).rom();
-	map(0x00d00000, 0x00dfffff).rom();
-	map(0x00e00000, 0x00efffff).rom();
-	map(0x00f00000, 0x00ffffff).rom();
+	map(0x00c00000, 0x00ffffff).rom();
 }
 
 /*************************************
@@ -608,10 +606,8 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
 
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
-	map(0x00480060, 0x00480067).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
-	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
-	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
+
+
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
@@ -1000,51 +996,6 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
 }
 
 
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-void jpmimpct_state::jpmimpct(machine_config &config)
-{
-	M68000(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::m68k_program_map);
-
-	MC68681(config, m_duart, 4000000);
-	m_duart->irq_cb().set(FUNC(jpmimpct_state::harddriv_duart_irq_handler));
-
-	TMS34010(config, m_dsp, 40000000);
-	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
-	m_dsp->set_halt_on_reset(true);
-	m_dsp->set_pixel_clock(40000000/16);
-	m_dsp->set_pixels_per_clock(4);
-	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_state::scanline_update));
-	m_dsp->output_int().set(FUNC(jpmimpct_state::tms_irq));
-	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
-	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
-
-	config.set_maximum_quantum(attotime::from_hz(30000));
-	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
-	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_timer_event));
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
-	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
-	PALETTE(config, m_palette).set_entries(256);
-
-	SPEAKER(config, "mono").front_center();
-	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
-
-	METERS(config, m_meters, 0).set_number(5);
-}
-
-
 
 
 /*************************************
@@ -1308,11 +1259,11 @@ void jpmimpct_state::impctawp(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
-	ppi.in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
-	ppi.in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
-	ppi.out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
+	m_ppi->in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
+	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
 	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_timer_event));
 
@@ -1337,6 +1288,46 @@ void jpmimpct_state::impctawp(machine_config &config)
 	METERS(config, m_meters, 0).set_number(5);
 }
 
+
+void jpmimpct_state::jpmimpct(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::m68k_program_map);
+
+	MC68681(config, m_duart, 4000000);
+	m_duart->irq_cb().set(FUNC(jpmimpct_state::harddriv_duart_irq_handler));
+
+	I8255(config, m_ppi);
+
+	TMS34010(config, m_dsp, 40000000);
+	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
+	m_dsp->set_halt_on_reset(true);
+	m_dsp->set_pixel_clock(40000000/16);
+	m_dsp->set_pixels_per_clock(4);
+	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_state::scanline_update));
+	m_dsp->output_int().set(FUNC(jpmimpct_state::tms_irq));
+	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
+	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
+
+	config.set_maximum_quantum(attotime::from_hz(30000));
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_timer_event));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
+	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
+	PALETTE(config, m_palette).set_entries(256);
+
+	SPEAKER(config, "mono").front_center();
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
+
+	METERS(config, m_meters, 0).set_number(5);
+}
 
 /*************************************
  *
@@ -1759,6 +1750,8 @@ GAME( 1998, hngmnjpm,  0,        jpmimpct, hngmnjpm, jpmimpct_state, empty_init,
 GAME( 1998, hngmnjpmd, hngmnjpm, jpmimpct, hngmnjpm, jpmimpct_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatn,  0,        jpmimpct, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatnd, coronatn, jpmimpct, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+
+// sets below are incomplete, missing video ROMs etc.
 GAME( 199?, tqst,      0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
 GAME( 199?, snlad,     0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
 GAME( 199?, jpmreno ,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete

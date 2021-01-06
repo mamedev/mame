@@ -10,6 +10,7 @@
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "sound/upd7759.h"
 #include "emupal.h"
@@ -64,6 +65,7 @@ class jpmimpct_state : public driver_device
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
 		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
@@ -139,6 +141,7 @@ private:
 	void jpm_draw_lamps(int data, int lamp_strobe);
 	void update_irqs();
 
+	required_device<i8255_device> m_ppi;
 	required_device<mc68681_device> m_duart;
 	required_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
