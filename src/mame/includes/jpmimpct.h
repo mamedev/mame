@@ -85,12 +85,10 @@ private:
 	void duart_1_w(offs_t offset, uint16_t data);
 	uint16_t duart_2_r(offs_t offset);
 	void duart_2_w(uint16_t data);
-	uint16_t inputs1_r(offs_t offset);
 	uint16_t unk_r();
 	void unk_w(uint16_t data);
 	uint16_t jpmio_r();
 	void jpmio_w(offs_t offset, uint16_t data);
-	uint16_t inputs1awp_r(offs_t offset);
 	uint16_t optos_r();
 	uint16_t prot_1_r();
 	uint16_t prot_0_r();

@@ -412,52 +412,6 @@ void jpmimpct_state::duart_2_w(uint16_t data)
  *
  *************************************/
 
-/*
- *  0: DIP switches
- *  1: Percentage key
- *  2: Lamps + switches (J10)
- *  3: Lamps + switches (J10)
- *  4: Lamps + switches (J10)
- *      ---- ---x   Back door
- *      ---- --x-   Cash door
- *      ---- -x--   Refill key
- *  5: Lamps + switches (J9)
- *  6: Lamps + switches (J9)
- *  7: Lamps + switches (J9)
- *  8: Payslides
- *  9: Coin mechanism
- */
-
-uint16_t jpmimpct_state::inputs1_r(offs_t offset)
-{
-	uint16_t val = 0x00ff;
-
-	switch (offset)
-	{
-		case 0:
-		{
-			val = ioport("DSW")->read();
-			break;
-		}
-		case 2:
-		{
-			val = ioport("SW2")->read();
-			break;
-		}
-		case 4:
-		{
-			val = ioport("SW1")->read();
-			break;
-		}
-		case 9:
-		{
-			val = ioport("COINS")->read();
-			break;
-		}
-	}
-
-	return val;
-}
 
 
 /*************************************
@@ -592,7 +546,10 @@ void jpmimpct_state::m68k_program_map(address_map &map)
 	map(0x00100000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
-	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1_r));
+	map(0x00480020, 0x00480021).portr("DSW");
+	map(0x00480024, 0x00480025).portr("SW2");
+	map(0x00480028, 0x00480029).portr("SW1");
+	map(0x00480032, 0x00480033).portr("COINS");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::unk_r));
 	map(0x00480060, 0x00480067).rw(FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
@@ -615,12 +572,38 @@ void jpmimpct_state::m68k_program_map(address_map &map)
  *  Main CPU memory handlers
  *
  *************************************/
+
+/*
+ *  0: DIP switches
+ *  1: Percentage key
+ *  2: Lamps + switches (J10)
+ *  3: Lamps + switches (J10)
+ *  4: Lamps + switches (J10)
+ *      ---- ---x   Back door
+ *      ---- --x-   Cash door
+ *      ---- -x--   Refill key
+ *  5: Lamps + switches (J9)
+ *  6: Lamps + switches (J9)
+ *  7: Lamps + switches (J9)
+ *  8: Payslides
+ *  9: Coin mechanism
+ */
+
+
 void jpmimpct_state::awp68k_program_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom(); // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
-	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1awp_r));
+	map(0x00480020, 0x00480021).portr("DSW");
+	map(0x00480022, 0x00480023).portr("PERCENT");
+	map(0x00480024, 0x00480025).portr("KEYS");
+	map(0x00480026, 0x00480027).portr("SW2");
+	map(0x00480028, 0x00480029).portr("SW1");
+	map(0x0048002a, 0x0048002b).portr("SW3");
+	map(0x0048002c, 0x0048002d).portr("SW4");
+	map(0x0048002e, 0x0048002f).portr("SW5");
+	map(0x00480032, 0x00480033).portr("COINS");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
 	map(0x00480060, 0x00480067).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -629,23 +612,13 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
 	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
-//  map(0x004800b0, 0x004800df).r(FUNC(jpmimpct_state::prot_1_r));
-//  map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
-//  map(0x00480086, 0x006576ff).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801de, 0x006575ff).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x00657600, 0x00657601).r(FUNC(jpmimpct_state::prot_0_r));
 	map(0x00657602, 0x00ffffff).r(FUNC(jpmimpct_state::prot_1_r));
-
-//  map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
-//  map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
-//  map(0x00657602, 0x00bfffff).r(FUNC(jpmimpct_state::prot_1_r));
-//  map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
-//  map(0x00c00000, 0x00cfffff).rom();
-//  map(0x00d00000, 0x00dfffff).rom();
-//  map(0x00e00000, 0x00efffff).rom();
-//  map(0x00f00000, 0x00ffffff).rom();
 }
+
+
 
 
 /*************************************
@@ -987,78 +960,6 @@ MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
  *  I/O handlers
  *
  *************************************/
-
-/*
- *  0: DIP switches
- *  1: Percentage key
- *  2: Lamps + switches (J10)
- *  3: Lamps + switches (J10)
- *  4: Lamps + switches (J10)
- *      ---- ---x   Back door
- *      ---- --x-   Cash door
- *      ---- -x--   Refill key
- *  5: Lamps + switches (J9)
- *  6: Lamps + switches (J9)
- *  7: Lamps + switches (J9)
- *  8: Payslides
- *  9: Coin mechanism
- */
-uint16_t jpmimpct_state::inputs1awp_r(offs_t offset)
-{
-	uint16_t val = 0x00;
-
-	{
-		switch (offset)
-		{
-			case 0:
-			{
-				val = ioport("DSW")->read();
-				break;
-			}
-			case 1:
-			{
-				val = ioport("PERCENT")->read();
-				break;
-			}
-			case 2:
-			{
-				val = ioport("KEYS")->read();
-				break;
-			}
-			case 3:
-			{
-				val = ioport("SW2")->read();
-				break;
-			}
-			case 4:
-			{
-				val = ioport("SW1")->read();
-				break;
-			}
-			case 5:
-			{
-				val = (ioport("SW3")->read() );
-				break;
-			}
-			case 6:
-			{
-				val = (ioport("SW4")->read() );
-				break;
-			}
-			case 7://5
-			{
-				val = (ioport("SW5")->read() );
-				break;
-			}
-			case 9:
-			{
-				val = ioport("COINS")->read();
-				break;
-			}
-		}
-	return val & 0xff00;
-	}
-}
 
 uint16_t jpmimpct_state::optos_r()
 {
