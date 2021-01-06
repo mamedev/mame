@@ -324,8 +324,15 @@ void acorn_memc_device::page_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	// always make sure ROM mode is disconnected when this occurs
 	m_latchrom = false;
 
+	phyaddr += memc * 0x80;
+
+	// unmap all logical pages that resolve to the same physical address
+	for (int i=0; i < 0x2000; i++)
+		if (m_pages[i] == phyaddr)
+			m_pages[i] = -1;
+
 	// now go ahead and set the mapping in the page table
-	m_pages[logaddr] = phyaddr + memc * 0x80;
+	m_pages[logaddr] = phyaddr;
 	m_pages_ppl[logaddr] = BIT(data, 8, 2);
 
 	LOG("%s = MEMC_PAGE(%d): W %08x: logaddr %08x to phyaddr %08x, MEMC %d, perms %d\n", machine().describe_context(), m_pages[logaddr], data, logaddr * m_page_sizes[m_pagesize], phyaddr * m_page_sizes[m_pagesize], memc, m_pages_ppl[logaddr]);
