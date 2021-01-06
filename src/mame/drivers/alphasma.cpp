@@ -511,4 +511,4 @@ ROM_END
 //    YEAR  NAME     PARENT COMPAT MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS
 COMP( 1995, asmapro, 0,     0,     alphasmart, alphasmart, alphasmart_state, empty_init, "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1997, asma2k,  0,     0,     asma2k,     alphasmart, asma2k_state,     empty_init, "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 2000, asma3k,  0,     0,     asma3k,     alphasmart, asma2k_state,     empty_init, "AlphaSmart, Inc.",               "AlphaSmart 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2000, asma3k,  0,     0,     asma3k,     alphasmart, asma2k_state,     empty_init, "AlphaSmart, Inc.",               "AlphaSmart 3000", MACHINE_IS_SKELETON )
