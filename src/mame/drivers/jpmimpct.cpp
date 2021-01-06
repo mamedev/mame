@@ -148,7 +148,7 @@ void jpmimpct_video_state::update_irqs()
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmimpct_video_state,jpmimpct)
+void jpmimpct_video_state::machine_start()
 {
 	m_digits.resolve();
 
@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(jpmimpct_video_state,jpmimpct)
 	save_duart_hack();
 }
 
-MACHINE_RESET_MEMBER(jpmimpct_video_state,jpmimpct)
+void jpmimpct_video_state::machine_reset()
 {
 	reset_duart_hack();
 
@@ -169,14 +169,14 @@ MACHINE_RESET_MEMBER(jpmimpct_video_state,jpmimpct)
 	m_touch_cnt = 0;
 }
 
-MACHINE_START_MEMBER(jpmimpct_state,impact_nonvideo)
+void jpmimpct_state::machine_start()
 {
 	save_item(NAME(m_duart_1_irq));
 
 	save_duart_hack();
 }
 
-MACHINE_RESET_MEMBER(jpmimpct_state,impact_nonvideo)
+void jpmimpct_state::machine_reset()
 {
 	reset_duart_hack();
 
@@ -1293,9 +1293,6 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(30000));
 	S16LF01(config, m_vfd);
 
-	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impact_nonvideo)
-	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impact_nonvideo)
-
 	config.set_default_layout(layout_jpmimpct);
 
 	// are standard reels correct here? or is there a custom reel controller?
@@ -1337,16 +1334,11 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	MCFG_MACHINE_START_OVERRIDE(jpmimpct_video_state,jpmimpct)
-	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_video_state,jpmimpct)
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
 	PALETTE(config, m_palette).set_entries(256);
-
-	MCFG_VIDEO_START_OVERRIDE(jpmimpct_video_state,jpmimpct)
 }
 
 /*************************************

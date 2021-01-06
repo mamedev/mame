@@ -115,8 +115,9 @@ private:
 	void payen_a_w(uint8_t data);
 	void display_c_w(uint8_t data);
 
-	DECLARE_MACHINE_START(impact_nonvideo);
-	DECLARE_MACHINE_RESET(impact_nonvideo);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
 	void awp68k_program_map(address_map &map);
@@ -153,6 +154,10 @@ public:
 	void impact_video(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	void m68k_program_map(address_map &map);
 
 	void jpmio_video_w(offs_t offset, uint16_t data);
@@ -167,9 +172,6 @@ protected:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	DECLARE_MACHINE_START(jpmimpct);
-	DECLARE_MACHINE_RESET(jpmimpct);
-	DECLARE_VIDEO_START(jpmimpct);
 
 	struct bt477_t
 	{
