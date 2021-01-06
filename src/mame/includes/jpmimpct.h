@@ -10,6 +10,7 @@
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/mc68681.h"
 #include "sound/upd7759.h"
 #include "emupal.h"
 
@@ -63,6 +64,7 @@ class jpmimpct_state : public driver_device
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_duart(*this, "main_duart")
 		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
 		, m_vram(*this, "vram")
@@ -112,7 +114,9 @@ private:
 	DECLARE_VIDEO_START(jpmimpct);
 	DECLARE_MACHINE_START(impctawp);
 	DECLARE_MACHINE_RESET(impctawp);
+	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
+	void common_map(address_map &map);
 	void awp68k_program_map(address_map &map);
 	void m68k_program_map(address_map &map);
 	void tms_program_map(address_map &map);
@@ -135,6 +139,7 @@ private:
 	void jpm_draw_lamps(int data, int lamp_strobe);
 	void update_irqs();
 
+	required_device<mc68681_device> m_duart;
 	required_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;

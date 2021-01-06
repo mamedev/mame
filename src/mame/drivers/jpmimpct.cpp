@@ -540,12 +540,19 @@ void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
  *  Main CPU memory handlers
  *
  *************************************/
-void jpmimpct_state::m68k_program_map(address_map &map)
+
+void jpmimpct_state::common_map(address_map& map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x00100000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	//map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+}
+
+void jpmimpct_state::m68k_program_map(address_map &map)
+{
+	common_map(map);
+	map(0x00100000, 0x001fffff).rom();
 	map(0x00480020, 0x00480021).portr("DSW");
 	map(0x00480024, 0x00480025).portr("J10_0");
 	map(0x00480028, 0x00480029).portr("J10_2");
@@ -592,9 +599,7 @@ void jpmimpct_state::m68k_program_map(address_map &map)
 
 void jpmimpct_state::awp68k_program_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).rom(); // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
-	map(0x00400000, 0x00403fff).ram().share("nvram");
-	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	common_map(map);
 	map(0x00480020, 0x00480021).portr("DSW");
 	map(0x00480022, 0x00480023).portr("PERCENT");
 	map(0x00480024, 0x00480025).portr("J10_0");
@@ -815,6 +820,9 @@ void jpmimpct_state::jpmimpct(machine_config &config)
 {
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::m68k_program_map);
+
+	MC68681(config, m_duart, 4000000);
+	m_duart->irq_cb().set(FUNC(jpmimpct_state::harddriv_duart_irq_handler));
 
 	TMS34010(config, m_dsp, 40000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
@@ -1308,10 +1316,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
+WRITE_LINE_MEMBER(jpmimpct_state::harddriv_duart_irq_handler)
+{
+}
+
+
 void jpmimpct_state::impctawp(machine_config &config)
 {
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::awp68k_program_map);
+
+	MC68681(config, m_duart, 4000000);
+	m_duart->irq_cb().set(FUNC(jpmimpct_state::harddriv_duart_irq_handler));
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 	S16LF01(config, m_vfd);
