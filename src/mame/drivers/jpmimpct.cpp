@@ -132,8 +132,13 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 void jpmimpct_state::update_irqs()
 {
-	m_maincpu->set_input_line(2, m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void jpmimpct_video_state::update_irqs()
+{
+	jpmimpct_state::update_irqs();
+	m_maincpu->set_input_line(2, m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -143,7 +148,7 @@ void jpmimpct_state::update_irqs()
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
+MACHINE_START_MEMBER(jpmimpct_video_state,jpmimpct)
 {
 	m_digits.resolve();
 
@@ -155,7 +160,7 @@ MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 	save_duart_hack();
 }
 
-MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
+MACHINE_RESET_MEMBER(jpmimpct_video_state,jpmimpct)
 {
 	reset_duart_hack();
 
@@ -167,8 +172,6 @@ MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
 MACHINE_START_MEMBER(jpmimpct_state,impact_nonvideo)
 {
 	save_item(NAME(m_duart_1_irq));
-	save_item(NAME(m_touch_cnt));
-	save_item(NAME(m_touch_data));
 
 	save_duart_hack();
 }
@@ -392,7 +395,7 @@ void jpmimpct_state::set_duart_1_hack_ip(bool state)
     Communication with a touchscreen interface PCB
     is handled via UART B.
 */
-uint16_t jpmimpct_state::duart_2_hack_r(offs_t offset)
+uint16_t jpmimpct_video_state::duart_2_hack_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -433,7 +436,7 @@ uint16_t jpmimpct_state::duart_2_hack_r(offs_t offset)
 /*
     Nothing important here?
 */
-void jpmimpct_state::duart_2_hack_w(uint16_t data)
+void jpmimpct_video_state::duart_2_hack_w(uint16_t data)
 {
 }
 
@@ -505,7 +508,7 @@ uint16_t jpmimpct_state::jpmio_r()
 	return 0xffff;
 }
 
-void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
+void jpmimpct_video_state::jpmio_video_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -562,7 +565,7 @@ void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
 }
 
 
-void jpmimpct_state::jpmioawp_w(offs_t offset, uint16_t data)
+void jpmimpct_state::jpmio_nonvideo_w(offs_t offset, uint16_t data)
 {
 	int i,metno;
 	switch (offset)
@@ -709,17 +712,17 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
 }
 
-void jpmimpct_state::m68k_program_map(address_map &map)
+void jpmimpct_video_state::m68k_program_map(address_map &map)
 {
 	common_map(map);
 
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
+	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_video_state::jpmio_r), FUNC(jpmimpct_video_state::jpmio_video_w));
 
-	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
-	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
-	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
+	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_video_state::unk_w));
+	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_video_state::unk_r));
+	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_video_state::unk_r));
 
-	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_hack_r), FUNC(jpmimpct_state::duart_2_hack_w)); // video duart for Touchscreen
+	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_video_state::duart_2_hack_r), FUNC(jpmimpct_video_state::duart_2_hack_w)); // video duart for Touchscreen
 	//map(0x004801e0, 0x004801ff).rw("touch_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
@@ -732,7 +735,7 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
 
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
 
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
+	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_nonvideo_w));
 
 	// are these genuine reads, or just code going wrong prior to them happening?
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
@@ -749,13 +752,13 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
  *
  *************************************/
 
-void jpmimpct_state::tms_program_map(address_map &map)
+void jpmimpct_video_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0xf8000000).ram().share("vram");
 	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
 	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
-//  map(0x01000000, 0x0100003f).mirror(0xf87fffc0).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
-	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
+//  map(0x01000000, 0x0100003f).mirror(0xf87fffc0).rw(FUNC(jpmimpct_video_state::jpmimpct_bt477_r), FUNC(jpmimpct_video_state::jpmimpct_bt477_w));
+	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_video_state::jpmimpct_bt477_r), FUNC(jpmimpct_video_state::jpmimpct_bt477_w));
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
 }
 
@@ -1111,7 +1114,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
+WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
 {
 	m_tms_irq = state;
 	update_irqs();
@@ -1313,29 +1316,29 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 }
 
 
-void jpmimpct_state::impact_video(machine_config &config)
+void jpmimpct_video_state::impact_video(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::m68k_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::m68k_program_map);
 
 	TMS34010(config, m_dsp, 40000000);
-	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
+	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::tms_program_map);
 	m_dsp->set_halt_on_reset(true);
 	m_dsp->set_pixel_clock(40000000/16);
 	m_dsp->set_pixels_per_clock(4);
-	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_state::scanline_update));
-	m_dsp->output_int().set(FUNC(jpmimpct_state::tms_irq));
-	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
-	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
+	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_video_state::scanline_update));
+	m_dsp->output_int().set(FUNC(jpmimpct_video_state::tms_irq));
+	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_video_state::to_shiftreg));
+	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_video_state::from_shiftreg));
 
 	// Is this on all video cards? or somwhere else? currently uses a hack
 	// MC68681(config, m_touchduart, 4000000);
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
-	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_video_state,jpmimpct)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_video_state,jpmimpct)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
@@ -1343,7 +1346,7 @@ void jpmimpct_state::impact_video(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
+	MCFG_VIDEO_START_OVERRIDE(jpmimpct_video_state,jpmimpct)
 }
 
 /*************************************
@@ -1753,25 +1756,25 @@ ROM_END
  *************************************/
 
 // Touchscreen
-GAME( 1995, cluedo,    0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,   cluedo,   impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c,  cluedo,   impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,   cluedo,   impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialp,  0,        impact_video, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd, trivialp, impact_video, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo, trivialp, impact_video, trivialp, jpmimpct_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble,  0,        impact_video, scrabble, jpmimpct_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled, scrabble, impact_video, scrabble, jpmimpct_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo,    0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c,  cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialp,  0,        impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpd, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpo, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabble,  0,        impact_video, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabbled, scrabble, impact_video, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
 
 // Non Touchscreen
-GAME( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 
 // sets below are incomplete, missing video ROMs etc.
-GAME( 199?, tqst,      0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
-GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
-GAME( 199?, jpmreno ,  0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
-GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
-GAME( 199?, monspdr ,  0,        impact_video, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )
+GAME( 199?, tqst,      0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
+GAME( 199?, jpmreno ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
+GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
+GAME( 199?, monspdr ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

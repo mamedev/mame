@@ -15,94 +15,98 @@
 #include "sound/upd7759.h"
 #include "emupal.h"
 
-struct duart_t
-{
-	uint8_t MR1A, MR2A;
-	uint8_t SRA, CSRA;
-	uint8_t CRA;
-	uint8_t RBA, TBA;
-
-	uint8_t IPCR;
-	uint8_t ACR;
-	uint8_t ISR, IMR;
-
-	union
-	{
-		uint8_t CUR, CLR;
-		uint16_t CR;
-	};
-	union
-	{
-		uint8_t CTUR, CTLR;
-		uint16_t CT;
-	};
-
-	int tc;
-
-	uint8_t MR1B, MR2B;
-	uint8_t SRB, CSRB;
-	uint8_t CRB;
-	uint8_t RBB, TBB;
-
-	uint8_t IVR;
-	uint8_t IP;
-	uint8_t OP;
-	uint8_t OPR;
-	uint8_t OPCR;
-};
-
-struct bt477_t
-{
-	uint8_t address;
-	uint8_t addr_cnt;
-	uint8_t pixmask;
-	uint8_t command;
-	rgb_t color;
-};
-
 class jpmimpct_state : public driver_device
 {
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_meters(*this, "meters")
+		, m_digits(*this, "digit%u", 0U)
 		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
 		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
-		, m_vram(*this, "vram")
-		, m_maincpu(*this, "maincpu")
 		, m_upd7759(*this, "upd")
-		, m_palette(*this, "palette")
-		, m_dsp(*this, "dsp")
 		, m_reel(*this, "reel%u", 0U)
-		, m_meters(*this, "meters")
-		, m_digits(*this, "digit%u", 0U)
 		, m_lamp_output(*this, "lamp%u", 0U)
 	{ }
 
 	void impact_nonvideo(machine_config &config);
-	void impact_video(machine_config &config);
 
 protected:
 	void base(machine_config &config);
 
+	required_device<cpu_device> m_maincpu;
+	required_device<meters_device> m_meters;
+	output_finder<300> m_digits;
+
+	struct duart_t
+	{
+		uint8_t MR1A, MR2A;
+		uint8_t SRA, CSRA;
+		uint8_t CRA;
+		uint8_t RBA, TBA;
+
+		uint8_t IPCR;
+		uint8_t ACR;
+		uint8_t ISR, IMR;
+
+		union
+		{
+			uint8_t CUR, CLR;
+			uint16_t CR;
+		};
+		union
+		{
+			uint8_t CTUR, CTLR;
+			uint16_t CT;
+		};
+
+		int tc;
+
+		uint8_t MR1B, MR2B;
+		uint8_t SRB, CSRB;
+		uint8_t CRB;
+		uint8_t RBB, TBB;
+
+		uint8_t IVR;
+		uint8_t IP;
+		uint8_t OP;
+		uint8_t OPR;
+		uint8_t OPCR;
+	};
+
+
+	uint16_t jpmio_r();
+	void jpmio_nonvideo_w(offs_t offset, uint16_t data);
+
+	uint16_t unk_r();
+	void unk_w(uint16_t data);
+
+	void common_map(address_map &map);
+
+
+	int m_lamp_strobe;
+
+	uint8_t m_duart_1_irq;
+	struct duart_t m_duart_1;
+
+	void set_duart_1_hack_ip(bool state);
+	void save_duart_hack();
+	void reset_duart_hack();
+
+	void jpm_draw_lamps(int data, int lamp_strobe);
+
+	virtual void update_irqs();
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	uint16_t duart_1_hack_r(offs_t offset);
 	void duart_1_hack_w(offs_t offset, uint16_t data);
-	uint16_t duart_2_hack_r(offs_t offset);
-	void duart_2_hack_w(uint16_t data);
-	uint16_t unk_r();
-	void unk_w(uint16_t data);
-	uint16_t jpmio_r();
-	void jpmio_w(offs_t offset, uint16_t data);
 	uint16_t optos_r();
 	uint16_t prot_1_r();
 	uint16_t prot_0_r();
-	void jpmioawp_w(offs_t offset, uint16_t data);
 	uint16_t ump_r();
-	void jpmimpct_bt477_w(offs_t offset, uint16_t data);
-	uint16_t jpmimpct_bt477_r(offs_t offset);
 	void volume_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t upd7759_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -110,31 +114,13 @@ private:
 	uint8_t hopper_c_r();
 	void payen_a_w(uint8_t data);
 	void display_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
-	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
-	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void set_duart_1_hack_ip(bool state);
-	void save_duart_hack();
-	void reset_duart_hack();
-	DECLARE_MACHINE_START(jpmimpct);
-	DECLARE_MACHINE_RESET(jpmimpct);
-	DECLARE_VIDEO_START(jpmimpct);
+
 	DECLARE_MACHINE_START(impact_nonvideo);
 	DECLARE_MACHINE_RESET(impact_nonvideo);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
-	void common_map(address_map &map);
 	void awp68k_program_map(address_map &map);
-	void m68k_program_map(address_map &map);
-	void tms_program_map(address_map &map);
 
-	uint8_t m_tms_irq;
-	uint8_t m_duart_1_irq;
-	struct duart_t m_duart_1;
-	uint8_t m_touch_cnt;
-	uint8_t m_touch_data[3];
-	int m_lamp_strobe;
 	uint8_t m_Lamps[256];
 	int m_optic_pattern;
 	int m_payen;
@@ -143,21 +129,70 @@ private:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
-	struct bt477_t m_bt477;
-	void jpm_draw_lamps(int data, int lamp_strobe);
-	void update_irqs();
 
 	required_device<i8255_device> m_ppi;
 	required_device<mc68681_device> m_duart;
 	required_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
-	optional_shared_ptr<uint16_t> m_vram;
-	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
-	optional_device<palette_device> m_palette;
-	optional_device<tms34010_device> m_dsp;
 	optional_device_array<stepper_device, 6> m_reel;
-	required_device<meters_device> m_meters;
-	output_finder<300> m_digits;
 	output_finder<256> m_lamp_output;
+};
+
+class jpmimpct_video_state : public jpmimpct_state
+{
+public:
+	jpmimpct_video_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jpmimpct_state(mconfig, type, tag)
+		, m_dsp(*this, "dsp")
+		, m_palette(*this, "palette")
+		, m_vram(*this, "vram")
+	{
+	}
+
+	void impact_video(machine_config &config);
+
+protected:
+	void m68k_program_map(address_map &map);
+
+	void jpmio_video_w(offs_t offset, uint16_t data);
+
+	uint16_t duart_2_hack_r(offs_t offset);
+	void duart_2_hack_w(uint16_t data);
+
+	void tms_program_map(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+
+	DECLARE_MACHINE_START(jpmimpct);
+	DECLARE_MACHINE_RESET(jpmimpct);
+	DECLARE_VIDEO_START(jpmimpct);
+
+	struct bt477_t
+	{
+		uint8_t address;
+		uint8_t addr_cnt;
+		uint8_t pixmask;
+		uint8_t command;
+		rgb_t color;
+	};
+
+	struct bt477_t m_bt477;
+
+	void jpmimpct_bt477_w(offs_t offset, uint16_t data);
+	uint16_t jpmimpct_bt477_r(offs_t offset);
+
+	uint8_t m_touch_cnt;
+	uint8_t m_touch_data[3];
+
+	uint8_t m_tms_irq;
+
+	virtual void update_irqs() override;
+private:
+	optional_device<tms34010_device> m_dsp;
+	optional_device<palette_device> m_palette;
+	optional_shared_ptr<uint16_t> m_vram;
 };

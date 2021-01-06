@@ -29,7 +29,7 @@
  *  1 1 0    Command register
  */
 
-void jpmimpct_state::jpmimpct_bt477_w(offs_t offset, uint16_t data)
+void jpmimpct_video_state::jpmimpct_bt477_w(offs_t offset, uint16_t data)
 {
 	uint8_t val = data & 0xff;
 
@@ -75,7 +75,7 @@ void jpmimpct_state::jpmimpct_bt477_w(offs_t offset, uint16_t data)
 	}
 }
 
-uint16_t jpmimpct_state::jpmimpct_bt477_r(offs_t offset)
+uint16_t jpmimpct_video_state::jpmimpct_bt477_r(offs_t offset)
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -88,12 +88,12 @@ uint16_t jpmimpct_state::jpmimpct_bt477_r(offs_t offset)
  *
  *************************************/
 
-TMS340X0_TO_SHIFTREG_CB_MEMBER(jpmimpct_state::to_shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(jpmimpct_video_state::to_shiftreg)
 {
 	memcpy(shiftreg, &m_vram[address >> 4], 512 * sizeof(uint16_t));
 }
 
-TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_video_state::from_shiftreg)
 {
 	memcpy(&m_vram[address >> 4], shiftreg, 512 * sizeof(uint16_t));
 }
@@ -105,7 +105,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
  *
  *************************************/
 
-TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_video_state::scanline_update)
 {
 	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *const dest = &bitmap.pix(scanline);
@@ -126,7 +126,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
  *
  *************************************/
 
-VIDEO_START_MEMBER(jpmimpct_state,jpmimpct)
+VIDEO_START_MEMBER(jpmimpct_video_state,jpmimpct)
 {
 	memset(&m_bt477, 0, sizeof(m_bt477));
 
