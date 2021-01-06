@@ -49,6 +49,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_in_ca2_handler(*this),
 		m_out_a_handler(*this),
 		m_out_b_handler(*this),
+		m_ts_b_handler(*this),
 		m_ca2_handler(*this),
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
@@ -83,6 +84,7 @@ void pia6821_device::device_resolve_objects()
 	m_in_ca2_handler.resolve();
 	m_out_a_handler.resolve();
 	m_out_b_handler.resolve();
+	m_ts_b_handler.resolve();
 	m_ca2_handler.resolve();
 	m_cb2_handler.resolve();
 	m_irqa_handler.resolve_safe();
@@ -191,7 +193,9 @@ void pia6821_device::device_reset()
 	if (!m_ca2_handler.isnull())
 		m_ca2_handler(1);
 
-	// TODO: reset port B to three-state outputs
+	// reset port B to three-state outputs
+	if (!m_out_b_handler.isnull() && !m_ts_b_handler.isnull())
+		m_out_b_handler(offs_t(0), m_ts_b_handler(), 0);
 }
 
 
@@ -345,8 +349,13 @@ uint8_t pia6821_device::get_out_a_value()
 
 uint8_t pia6821_device::get_out_b_value()
 {
-	// input pins are high-impedance - we just send them as zeros for backwards compatibility
-	return m_out_b & m_ddr_b;
+	uint8_t ret = m_out_b & m_ddr_b;
+
+	// input pins are high-impedance - send them as zeros for backwards compatibility
+	if (m_ddr_b != 0xff && !m_ts_b_handler.isnull())
+		ret |= m_ts_b_handler() & ~m_ddr_b;
+
+	return ret;
 }
 
 
@@ -650,14 +659,13 @@ void pia6821_device::send_to_out_a_func(const char* message)
 
 void pia6821_device::send_to_out_b_func(const char* message)
 {
-	// input pins are high-impedance - we just send them as zeros for backwards compatibility
 	const uint8_t data = get_out_b_value();
 
 	LOG("PIA %s = %02X DDRB=%02x\n", message, data, m_ddr_b);
 
 	if (!m_out_b_handler.isnull())
 	{
-		m_out_b_handler(offs_t(0), data);
+		m_out_b_handler(offs_t(0), data, m_ddr_b);
 	}
 	else
 	{
