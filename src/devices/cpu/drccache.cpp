@@ -14,6 +14,10 @@
 #include <algorithm>
 
 
+// this improves performance of some emulated systems but doesn't work on W^X hosts
+//#define MAME_DRC_CACHE_RWX
+
+
 namespace {
 
 template <typename T, typename U> constexpr T *ALIGN_PTR_UP(T *p, U align)
@@ -59,7 +63,11 @@ drc_cache::drc_cache(size_t bytes) :
 	std::fill(std::begin(m_free), std::end(m_free), nullptr);
 	std::fill(std::begin(m_nearfree), std::end(m_nearfree), nullptr);
 
+#if defined(MAME_DRC_CACHE_RWX)
+	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE | osd::virtual_memory_allocation::EXECUTE);
+#else // defined(MAME_DRC_CACHE_RWX)
 	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+#endif // defined(MAME_DRC_CACHE_RWX)
 }
 
 
@@ -84,11 +92,7 @@ void drc_cache::flush()
 
 	// just reset the top back to the base and re-seed
 	m_top = m_base;
-	if (m_executable)
-	{
-		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-		m_executable = false;
-	}
+	codegen_init();
 }
 
 
@@ -174,11 +178,7 @@ void *drc_cache::alloc_temporary(size_t bytes)
 		return nullptr;
 
 	// otherwise, update the cache top
-	if (m_executable)
-	{
-		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-		m_executable = false;
-	}
+	codegen_init();
 	m_top = ALIGN_PTR_UP(ptr + bytes, CACHE_ALIGNMENT);
 	return ptr;
 }
@@ -209,7 +209,9 @@ void drc_cache::codegen_init()
 {
 	if (m_executable)
 	{
+#if !defined(MAME_DRC_CACHE_RWX)
 		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+#endif // !defined(MAME_DRC_CACHE_RWX)
 		m_executable = false;
 	}
 }
@@ -219,7 +221,9 @@ void drc_cache::codegen_complete()
 {
 	if (!m_executable)
 	{
+#if !defined(MAME_DRC_CACHE_RWX)
 		m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
+#endif // !defined(MAME_DRC_CACHE_RWX)
 		m_executable = true;
 	}
 }
@@ -240,11 +244,7 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 		return nullptr;
 
 	// otherwise, return a pointer to the cache top
-	if (m_executable)
-	{
-		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-		m_executable = false;
-	}
+	codegen_init();
 	m_codegen = m_top;
 	return &m_top;
 }

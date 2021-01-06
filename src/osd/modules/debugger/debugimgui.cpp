@@ -993,13 +993,12 @@ void debug_imgui::refresh_filelist()
 	{
 		int x = 0;
 		// add drives
-		const char *volume_name;
-		while((volume_name = osd_get_volume_name(x))!=nullptr)
+		for(std::string const &volume_name : osd_get_volume_names())
 		{
 			file_entry temp;
 			temp.type = file_entry_type::DRIVE;
-			temp.basename = std::string(volume_name);
-			temp.fullpath = std::string(volume_name);
+			temp.basename = volume_name;
+			temp.fullpath = volume_name;
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
