@@ -111,6 +111,9 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	void set_duart_ip_hack(bool state);
+	void save_duart_hack();
+	void reset_duart_hack();
 	DECLARE_MACHINE_START(jpmimpct);
 	DECLARE_MACHINE_RESET(jpmimpct);
 	DECLARE_VIDEO_START(jpmimpct);

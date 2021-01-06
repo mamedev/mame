@@ -152,29 +152,54 @@ MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 	save_item(NAME(m_touch_cnt));
 	save_item(NAME(m_touch_data));
 
+	save_duart_hack();
+}
+
+MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
+{
+	reset_duart_hack();
+
+	/* Reset states */
+	m_duart_1_irq = m_tms_irq = 0;
+	m_touch_cnt = 0;
+}
+
+MACHINE_START_MEMBER(jpmimpct_state,impctawp)
+{
+	save_item(NAME(m_duart_1_irq));
+	save_item(NAME(m_touch_cnt));
+	save_item(NAME(m_touch_data));
+
+	save_duart_hack();
+}
+
+MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
+{
+	reset_duart_hack();
+
+	/* Reset states */
+	m_duart_1_irq = 0;
+	m_vfd->reset();
+}
+
+void jpmimpct_state::save_duart_hack()
+{
 	/* TODO! */
 	save_item(NAME(m_duart_1.ISR));
 	save_item(NAME(m_duart_1.IMR));
 	save_item(NAME(m_duart_1.CT));
 }
 
-
-MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
+void jpmimpct_state::reset_duart_hack()
 {
 	memset(&m_duart_1, 0, sizeof(m_duart_1));
-
-	/* Reset states */
-	m_duart_1_irq = m_tms_irq = 0;
-	m_touch_cnt = 0;
-
-//  m_duart_1.IVR=0x0f;
+	//m_duart_1.IVR=0x0f;
 }
-
 
 
 /*************************************
  *
- *  MC68681 DUART 1
+ *  MC68681 DUART 1 simulation hack
  *
  *************************************/
 
@@ -351,7 +376,7 @@ void jpmimpct_state::duart_1_w(offs_t offset, uint16_t data)
 
 /*************************************
  *
- *  MC68681 DUART 2
+ *  MC68681 DUART 2 simulation hack
  *
  *************************************/
 
@@ -508,7 +533,7 @@ void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
 			else
 //          slide = 0;
 			m_meters->update(0, data >> 10);
-			m_duart_1.IP &= ~0x10;
+			set_duart_ip_hack(false);
 			break;
 		}
 
@@ -1078,32 +1103,15 @@ void jpmimpct_state::payen_a_w(uint8_t data)
 
 void jpmimpct_state::display_c_w(uint8_t data)
 {
-	//Reset 0x04, data 0x02, clock 0x01
-	m_vfd->por(data & 0x04);
-	m_vfd->data(data & 0x02);
-	m_vfd->sclk(data & 0x01);
+	if (m_vfd)
+	{
+		//Reset 0x04, data 0x02, clock 0x01
+		m_vfd->por(data & 0x04);
+		m_vfd->data(data & 0x02);
+		m_vfd->sclk(data & 0x01);
+	}
 }
 
-MACHINE_START_MEMBER(jpmimpct_state,impctawp)
-{
-	save_item(NAME(m_duart_1_irq));
-	save_item(NAME(m_touch_cnt));
-	save_item(NAME(m_touch_data));
-
-	/* TODO! */
-	save_item(NAME(m_duart_1.ISR));
-	save_item(NAME(m_duart_1.IMR));
-	save_item(NAME(m_duart_1.CT));
-}
-
-MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
-{
-	memset(&m_duart_1, 0, sizeof(m_duart_1));
-
-	/* Reset states */
-	m_duart_1_irq = 0;
-	m_vfd->reset();
-}
 /*************************************
  *
  *  I/O handlers
@@ -1123,6 +1131,14 @@ uint16_t jpmimpct_state::prot_1_r()
 uint16_t jpmimpct_state::prot_0_r()
 {
 	return 0x00;
+}
+
+void jpmimpct_state::set_duart_ip_hack(bool state)
+{
+	if (state)
+		m_duart_1.IP |= 0x10;
+	else
+		m_duart_1.IP &= ~0x10;
 }
 
 void jpmimpct_state::jpmioawp_w(offs_t offset, uint16_t data)
@@ -1195,11 +1211,11 @@ void jpmimpct_state::jpmioawp_w(offs_t offset, uint16_t data)
 
 			if(combined_meter)
 			{
-				m_duart_1.IP &= ~0x10;
+				set_duart_ip_hack(false);
 			}
 			else
 			{
-				m_duart_1.IP |= 0x10;
+				set_duart_ip_hack(true);
 			}
 			break;
 		}
@@ -1298,6 +1314,10 @@ void jpmimpct_state::jpmimpct(machine_config &config)
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::harddriv_duart_irq_handler));
 
 	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
+	m_ppi->in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
+	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
 	TMS34010(config, m_dsp, 40000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
