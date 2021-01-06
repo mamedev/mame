@@ -163,9 +163,11 @@ private:
 
 bool invalidate_instruction_cache(void const *start, std::size_t size)
 {
+#if !defined(SDLMAME_EMSCRIPTEN)
 	char const *const begin(reinterpret_cast<char const *>(start));
 	char const *const end(begin + size);
 	__builtin___clear_cache(const_cast<char *>(begin), const_cast<char *>(end));
+#endif
 	return true;
 }
 
