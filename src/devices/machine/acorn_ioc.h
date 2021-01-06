@@ -35,8 +35,8 @@ public:
 
 	void map(address_map &map);
 
-	uint8_t registers_r(offs_t offset);
-	void registers_w(offs_t offset, uint8_t data);
+	uint32_t registers_r(offs_t offset, uint32_t mem_mask = ~0);
+	void registers_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<unsigned N> uint32_t periph_r(offs_t offset, uint32_t mem_mask = ~0)                { return m_peripherals_r[N - 1](offset, mem_mask); }
 	template<unsigned N> void periph_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)     { m_peripherals_w[N - 1](offset, data, mem_mask);  }
 

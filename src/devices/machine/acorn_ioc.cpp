@@ -97,7 +97,7 @@ void acorn_ioc_device::map(address_map &map)
 	// IOA[16:18] --> B[0:2]   Peripherals select
 	// IOA[19:20] --> T[0:1]   Peripherals access timing
 	// IOA[21]    --> CS       Chip select
-	map(0x00200000, 0x0020007f).mirror(0x0018ff80).rw(FUNC(acorn_ioc_device::registers_r), FUNC(acorn_ioc_device::registers_w)).umask32(0x000000ff);
+	map(0x00200000, 0x0020007f).mirror(0x0018ff80).rw(FUNC(acorn_ioc_device::registers_r), FUNC(acorn_ioc_device::registers_w));
 	map(0x00210000, 0x0021ffff).select(0x00180000).rw(FUNC(acorn_ioc_device::periph_r<1>), FUNC(acorn_ioc_device::periph_w<1>));
 	map(0x00220000, 0x0022ffff).select(0x00180000).rw(FUNC(acorn_ioc_device::periph_r<2>), FUNC(acorn_ioc_device::periph_w<2>));
 	map(0x00230000, 0x0023ffff).select(0x00180000).rw(FUNC(acorn_ioc_device::periph_r<3>), FUNC(acorn_ioc_device::periph_w<3>));
@@ -221,7 +221,7 @@ void acorn_ioc_device::update_interrups()
 		m_fiq_w(CLEAR_LINE);
 }
 
-uint8_t acorn_ioc_device::registers_r(offs_t offset)
+uint32_t acorn_ioc_device::registers_r(offs_t offset, uint32_t mem_mask)
 {
 	LOG("%s: IOC R %02x = %02x\n", machine().describe_context(), offset, m_regs[offset]);
 
@@ -319,9 +319,14 @@ uint8_t acorn_ioc_device::registers_r(offs_t offset)
 	}
 }
 
-void acorn_ioc_device::registers_w(offs_t offset, uint8_t data)
+void acorn_ioc_device::registers_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s: IOC W %02x = %02x\n", machine().describe_context(), offset, data);
+
+	// IOC uses the data bus lines D16-D23 as inputs, this also works with byte store (STRB)
+	// because the ARM CPU repeats the byte four times across the data bus.
+	if (ACCESSING_BITS_16_31)
+		data >>= 16;
 
 	switch (offset & 0x1f)
 	{
