@@ -81,7 +81,6 @@ protected:
 
 
 	uint16_t jpmio_r();
-	void jpmio_nonvideo_w(offs_t offset, uint16_t data);
 
 	uint16_t unk_r();
 	void unk_w(uint16_t data);
@@ -119,11 +118,20 @@ private:
 	void payen_a_w(uint8_t data);
 	void display_c_w(uint8_t data);
 
+	void pwrled_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void reels_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void reels_45_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void slides_non_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void digits_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	void awp68k_program_map(address_map &map);
+	void impact_non_video_map(address_map &map);
 
 	uint8_t m_Lamps[256];
 	int m_optic_pattern;
@@ -161,10 +169,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void m68k_program_map(address_map &map);
-	void m68k_program_map_duarthack(address_map &map);
+	void impact_video_map(address_map &map);
+	void impact_video_map_duarthack(address_map &map);
 
-	void jpmio_video_w(offs_t offset, uint16_t data);
+	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t duart_2_hack_r(offs_t offset);
 	void duart_2_hack_w(uint16_t data);

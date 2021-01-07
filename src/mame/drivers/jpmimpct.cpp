@@ -509,163 +509,141 @@ uint16_t jpmimpct_state::jpmio_r()
 	return 0xffff;
 }
 
-void jpmimpct_video_state::jpmio_video_w(offs_t offset, uint16_t data)
+
+
+void jpmimpct_state::pwrled_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	switch (offset)
+	output().set_value("PWRLED",!(data&0x100));
+	output().set_value("STATLED",!(data&0x200));
+}
+
+void jpmimpct_state::reels_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (m_reel[0])
 	{
-		case 0x02:
-		{
-			//reel 1
-			break;
-		}
-		case 0x04:
-		{
-			//reel 2
-			break;
-		}
-		case 0x06:
-		{
-			if ( data & 0x10 )
-			{   // PAYEN ?
-				if ( data & 0xf )
-				{
-			//      slide = 1;
-				}
-				else
-				{
-				//  slide = 0;
-				}
-			}
-			else
-//          slide = 0;
-			m_meters->update(0, data >> 10);
-			set_duart_1_hack_ip(false);
-			break;
-		}
+		m_reel[0]->update((data >> 0) & 0x0f);
+		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+	}
 
-		case 0x08:
-		{
-			jpm_draw_lamps(data, m_lamp_strobe);
-			break;
-		}
+	if (m_reel[1])
+	{
+		m_reel[1]->update((data >> 4)& 0x0f);
+		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	}
 
-		case 0x0b:
-		{
-			m_digits[m_lamp_strobe] = data;
-			break;
-		}
-		case 0x0f:
-		{
-			if (data & 0x10)
-			{
-				m_lamp_strobe = (data +1) & 0x0f;
-			}
-			break;
-		}
+	if (m_reel[2])
+	{
+		m_reel[2]->update((data >> 8)& 0x0f);
+		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+	}
+
+	if (m_reel[3])
+	{
+		m_reel[3]->update((data >> 12)& 0x0f);
+		awp_draw_reel(machine(),"reel4", *m_reel[3]);
 	}
 }
 
-
-void jpmimpct_state::jpmio_nonvideo_w(offs_t offset, uint16_t data)
+void jpmimpct_state::reels_45_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int i,metno;
-	switch (offset)
+	if (m_reel[4])
 	{
-		case 0x00:
-		{
-			output().set_value("PWRLED",!(data&0x100));
-			output().set_value("STATLED",!(data&0x200));
-			break;
-		}
-
-
-		case 0x02:
-		{
-			m_reel[0]->update((data >> 0)& 0x0f);
-			m_reel[1]->update((data >> 4)& 0x0f);
-			m_reel[2]->update((data >> 8)& 0x0f);
-			m_reel[3]->update((data >> 12)& 0x0f);
-			awp_draw_reel(machine(),"reel1", *m_reel[0]);
-			awp_draw_reel(machine(),"reel2", *m_reel[1]);
-			awp_draw_reel(machine(),"reel3", *m_reel[2]);
-			awp_draw_reel(machine(),"reel4", *m_reel[3]);
-			break;
-		}
-		case 0x04:
-		{
-			m_reel[4]->update((data >> 0)& 0x0f);
-			m_reel[5]->update((data >> 4)& 0x0f);
-			awp_draw_reel(machine(),"reel5", *m_reel[4]);
-			awp_draw_reel(machine(),"reel6", *m_reel[5]);
-			break;
-		}
-		case 0x06:
-		{
-			//Slides
-			if ((data & 0xff)!=0x00)
-			{
-				m_slidesout=2;
-			}
-			if (((data & 0xff)==0x00) && (m_slidesout==2))
-			{
-				m_slidesout=1;
-			}
-			// Meters
-			metno=(data >>8) & 0xff;
-			{
-				switch (metno)
-				{
-					case 0x00:
-					{
-						for (i=0; i<5; i++)
-						{
-							m_meters->update(i, 0);
-						}
-						break;
-					}
-					default:
-					{
-						m_meters->update(((metno <<2) - 1), 1);
-					}
-					break;
-				}
-			}
-			int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
-			m_meters->GetActivity(2) | m_meters->GetActivity(3) |
-			m_meters->GetActivity(4);
-
-			if(combined_meter)
-			{
-				set_duart_1_hack_ip(false);
-			}
-			else
-			{
-				set_duart_1_hack_ip(true);
-			}
-			break;
-		}
-
-		case 0x08:
-		{
-			jpm_draw_lamps(data, m_lamp_strobe);
-			break;
-		}
-
-		case 0x0b:
-		{
-			m_digits[m_lamp_strobe] = data;
-			break;
-		}
-		case 0x0f:
-		{
-			if (data & 0x10)
-			{
-				m_lamp_strobe = (data & 0x0f);
-			}
-			break;
-		}
+		m_reel[4]->update((data >> 0)& 0x0f);
+		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+	}
+	if (m_reel[5])
+	{
+		m_reel[5]->update((data >> 4)& 0x0f);
+		awp_draw_reel(machine(),"reel6", *m_reel[5]);
 	}
 }
+
+void jpmimpct_state::digits_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//m_digits[m_lamp_strobe & 0xf] = data;
+}
+
+void jpmimpct_state::lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (data & 0x10)
+	{
+		m_lamp_strobe = (data + 1) & 0x0f;
+	}
+}
+
+void jpmimpct_state::slides_non_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//Slides
+	if ((data & 0xff) != 0x00)
+	{
+		m_slidesout = 2;
+	}
+	else if (((data & 0xff) == 0x00) && (m_slidesout == 2))
+	{
+		m_slidesout = 1;
+	}
+
+	// Meters
+	int metno = (data >> 8) & 0xff;
+
+	switch (metno)
+	{
+	case 0x00:
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			m_meters->update(i, 0);
+		}
+		break;
+	}
+	default:
+	{
+		m_meters->update(((metno << 2) - 1), 1);
+		break;
+	}
+	}
+
+	int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+						 m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+						 m_meters->GetActivity(4);
+
+	if (combined_meter)
+	{
+		set_duart_1_hack_ip(false);
+	}
+	else
+	{
+		set_duart_1_hack_ip(true);
+	}
+}
+
+void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if ( data & 0x10 )
+	{   // PAYEN ?
+		if ( data & 0xf )
+		{
+			//slide = 1;
+		}
+		else
+		{
+			//slide = 0;
+		}
+	}
+	else
+	{
+		//slide = 0;
+	}
+
+	m_meters->update(0, data >> 10);
+	set_duart_1_hack_ip(false);
+}
+
+void jpmimpct_state::lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//jpm_draw_lamps(data, m_lamp_strobe);
+}
+
 
 /*************************************
  *
@@ -711,13 +689,23 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
 	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
 	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
+
+	map(0x004800a0, 0x004800af).r(FUNC(jpmimpct_video_state::jpmio_r));
+
+	map(0x004800a0, 0x004800a1).w(FUNC(jpmimpct_state::pwrled_w));
+	map(0x004800a2, 0x004800a3).w(FUNC(jpmimpct_state::reels_0123_w));
+	map(0x004800a4, 0x004800a5).w(FUNC(jpmimpct_state::reels_45_w));
+	map(0x004800a6, 0x004800a7).w(FUNC(jpmimpct_state::slides_non_video_w));
+	map(0x004800a8, 0x004800a9).w(FUNC(jpmimpct_state::lamps_w));
+	map(0x004800aa, 0x004800ab).w(FUNC(jpmimpct_state::digits_w));
+	map(0x004800ae, 0x004800af).w(FUNC(jpmimpct_state::lampstrobe_w));
 }
 
-void jpmimpct_video_state::m68k_program_map(address_map &map)
+void jpmimpct_video_state::impact_video_map(address_map &map)
 {
 	common_map(map);
 
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_video_state::jpmio_r), FUNC(jpmimpct_video_state::jpmio_video_w));
+	map(0x004800a6, 0x004800a7).w(FUNC(jpmimpct_video_state::slides_video_w));
 
 	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_video_state::unk_w));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_video_state::unk_r));
@@ -730,19 +718,17 @@ void jpmimpct_video_state::m68k_program_map(address_map &map)
 	map(0x00c00000, 0x00ffffff).rom();
 }
 
-void jpmimpct_video_state::m68k_program_map_duarthack(address_map &map)
+void jpmimpct_video_state::impact_video_map_duarthack(address_map &map)
 {
-	jpmimpct_video_state::m68k_program_map(map);
+	jpmimpct_video_state::impact_video_map(map);
 	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_video_state::duart_1_hack_r), FUNC(jpmimpct_video_state::duart_1_hack_w));
 }
 
-void jpmimpct_state::awp68k_program_map(address_map &map)
+void jpmimpct_state::impact_non_video_map(address_map &map)
 {
 	common_map(map);
 
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
-
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_nonvideo_w));
 
 	// are these genuine reads, or just code going wrong prior to them happening?
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
@@ -1310,7 +1296,7 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::awp68k_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::impact_non_video_map);
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 	S16LF01(config, m_vfd);
@@ -1339,7 +1325,7 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::m68k_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::impact_video_map);
 
 	TMS34010(config, m_dsp, 40000000);
 	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::tms_program_map);
@@ -1371,7 +1357,7 @@ void jpmimpct_video_state::impact_video_duarthack(machine_config &config)
 {
 	impact_video(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::m68k_program_map_duarthack);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::impact_video_map_duarthack);
 
 	// used by the duart simulation hack
 	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_video_state::duart_1_hack_timer_event));
