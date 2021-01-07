@@ -74,6 +74,7 @@
 INPUT_PORTS_EXTERN( jpmimpct_inputs );
 
 
+
 // note: Apparently the public release of JPeMu v1.45 required the author to specifically encrypt any ROMs
 //       before they would run on the emulator, as a way of 'controlling' the users, and what they could run.
 //       These are therefore worthless garbage.
@@ -93,6 +94,70 @@ INPUT_PORTS_EXTERN( jpmimpct_inputs );
 // I believe all IMPACT roms should have a samples rom (it's the only sound output?) so any without are almost
 // certainly missing it.
 
+INPUT_PORTS_START( j6sonic ) // only runs with 10p stake and either 8 GBP Token or 10 GBP Cash
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "8 GBP Token"  ) 
+	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "0x06"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+	PORT_CONFNAME( 0xf0, 0x60, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+	PORT_CONFSETTING(    0x80, "0x80" )
+	PORT_CONFSETTING(    0x40, "0x40" )
+	PORT_CONFSETTING(    0xc0, "0xc0" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x60, "10p" )
+	PORT_CONFSETTING(    0xe0, "10p (duplicate)" )
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6sonicg ) // only runs without a key?
+	PORT_INCLUDE( j6sonic )
+
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x0f, 0x0f, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "0x09"  ) 
+	PORT_CONFSETTING(    0x08, "0x08"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "0x06"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+	PORT_CONFNAME( 0xf0, 0x60, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+	PORT_CONFSETTING(    0x80, "0x80" )
+	PORT_CONFSETTING(    0x40, "0x40" )
+	PORT_CONFSETTING(    0xc0, "0xc0" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x60, "0x60" )
+	PORT_CONFSETTING(    0xe0, "0xe0" )
+INPUT_PORTS_END
 
 ROM_START( j6fifth )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -8776,15 +8841,15 @@ GAMEL( 199?, j6snakesf,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAMEL( 199?, j6snakesg,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Snakes & Ladders (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6snakes )
 
 
-GAME(  199?, j6sonic,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6sonica,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6sonicb,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6sonicc,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6sonicd,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6sonice,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 6)", GAME_FLAGS )
-GAME(  199?, j6sonicf,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME(  199?, j6sonicg,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 8)", GAME_FLAGS )
-GAME(  199?, j6sonich,     j6sonic,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 9)", GAME_FLAGS ) // incomplete pair
+GAME(  199?, j6sonic,      0,          impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6sonica,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 2, Protocol)", GAME_FLAGS ) // Error 7.1 "Electronic Data Counter Timeout"
+GAME(  199?, j6sonicb,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6sonicc,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6sonicd,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6sonice,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6sonicf,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME(  199?, j6sonicg,     j6sonic,    impact_nonvideo, j6sonicg,jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME(  199?, j6sonich,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 9)", GAME_FLAGS ) // incomplete pair
 
 GAME(  199?, j6spcinv,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Space Invaders (Crystal) (IMPACT)", GAME_FLAGS )
 

@@ -1303,9 +1303,6 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 
 	config.set_default_layout(layout_jpmimpct);
 
-	// are standard reels correct here? or is there a custom reel controller?
-	// that needs HLE?
-
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
 	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
