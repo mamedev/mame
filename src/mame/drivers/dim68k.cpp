@@ -342,6 +342,15 @@ void dim68k_state::machine_start()
 	save_item(NAME(m_video_control));
 }
 
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 void dim68k_state::dim68k(machine_config &config)
 {
 	/* basic machine hardware */
@@ -375,10 +384,14 @@ void dim68k_state::dim68k(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &kbdport(RS232_PORT(config, "kbdport", default_rs232_devices, "keyboard"));
+	kbdport.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->a_tx_cb().set(kbdport, FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(rs232, FUNC(rs232_port_device::write_txd));
 
+	kbdport.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	// software lists
