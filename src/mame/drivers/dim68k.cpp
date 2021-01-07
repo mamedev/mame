@@ -79,10 +79,13 @@ private:
 	void dim68k_video_reset_w(u16 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+
 	void mem_map(address_map &map);
 
 	bool m_speaker_bit;
 	u8 m_video_control;
+	u8 m_fdc_irq;
 	void machine_reset() override;
 	void machine_start() override;
 
@@ -125,8 +128,22 @@ void dim68k_state::dim68k_speaker_w(u16 data)
 	m_speaker->level_w(m_speaker_bit);
 }
 
+WRITE_LINE_MEMBER(dim68k_state::fdc_irq_w)
+{
+	if (state)
+	{
+		m_fdc_irq = 0;
+	}
+	else
+	{
+		m_fdc_irq = 0x80;
+	}
+}
+
 void dim68k_state::dim68k_fdc_w(u16 data)
 {
+	m_fdc->tc_w(BIT(data, 5));
+
 	if (BIT(data, 1))
 	{
 		m_floppy[BIT(data, 0)^1]->get_device()->mon_w(true);
@@ -226,6 +243,7 @@ void dim68k_state::mem_map(address_map &map)
 	map(0xffc800, 0xffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
 	map(0xffcc00, 0xffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0xffd000, 0xffd003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
+	map(0xffd000, 0xffd000).lr8([this]() -> u8 { return m_fdc_irq; }, "free0");
 	map(0xffd004, 0xffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
 	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0xffd800, 0xffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
@@ -240,6 +258,7 @@ INPUT_PORTS_END
 void dim68k_state::machine_reset()
 {
 	m_bootview.select(0);
+	m_fdc_irq = 0;
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -344,9 +363,10 @@ void dim68k_state::dim68k(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	UPD765A(config, m_fdc, 8'000'000, true, true); // these options unknown
+	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
 	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);
 	m_crtc->set_screen("screen");
