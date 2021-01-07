@@ -126,6 +126,13 @@ INPUT_PORTS_START( j6sonic ) // only runs with 10p stake and either 8 GBP Token 
 
 	PORT_MODIFY("J9_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Collect?")
+
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
+
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6sonicg ) // only runs without a key?
