@@ -132,7 +132,8 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 void jpmimpct_state::update_irqs()
 {
-	m_maincpu->set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	if (m_duart_1_timer)
+		m_maincpu->set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void jpmimpct_video_state::update_irqs()
@@ -692,8 +693,7 @@ void jpmimpct_state::common_map(address_map& map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
-	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_hack_r), FUNC(jpmimpct_state::duart_1_hack_w));
-	//map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x00480020, 0x00480021).portr("DSW");
 	map(0x00480022, 0x00480023).portr("PERCENT");
 	map(0x00480024, 0x00480025).portr("J10_0");
@@ -727,6 +727,12 @@ void jpmimpct_video_state::m68k_program_map(address_map &map)
 	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
 	map(0x00c00000, 0x00ffffff).rom();
+}
+
+void jpmimpct_video_state::m68k_program_map_duarthack(address_map &map)
+{
+	jpmimpct_video_state::m68k_program_map(map);
+	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_video_state::duart_1_hack_r), FUNC(jpmimpct_video_state::duart_1_hack_w));
 }
 
 void jpmimpct_state::awp68k_program_map(address_map &map)
@@ -1250,7 +1256,8 @@ uint16_t jpmimpct_state::ump_r()
 WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 {
 	// triggers IRQ 5
-	//m_maincpu->set_input_line(5, state); // remove from update_irqs to use this
+	if (!m_duart_1_timer)
+		m_maincpu->set_input_line(5, state);
 	// or
 	//m_duart_1_irq = state;
 	//update_irqs();
@@ -1267,9 +1274,7 @@ void jpmimpct_state::base(machine_config &config)
 	// not currently used, hack used instead
 	MC68681(config, m_duart, MC68681_1_CLOCK);
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::duart_irq_handler));
-
-	// used by the duart simulation hack
-	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_state::duart_1_hack_timer_event));
+	// needs hookup for TEST_DEMO and the jpmio_video_w meters related stuff
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1341,6 +1346,16 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
 	PALETTE(config, m_palette).set_entries(256);
+}
+
+void jpmimpct_video_state::impact_video_duarthack(machine_config &config)
+{
+	impact_video(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::m68k_program_map_duarthack);
+
+	// used by the duart simulation hack
+	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_video_state::duart_1_hack_timer_event));
 }
 
 /*************************************
@@ -1750,10 +1765,10 @@ ROM_END
  *************************************/
 
 // Touchscreen
-GAME( 1995, cluedo,    0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c,  cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo,    0,        impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,   cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c,  cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,   cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialp,  0,        impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpd, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpo, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )

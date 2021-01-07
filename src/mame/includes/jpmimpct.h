@@ -23,9 +23,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_meters(*this, "meters")
 		, m_digits(*this, "digit%u", 0U)
+		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
-		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
 		, m_upd7759(*this, "upd")
 		, m_reel(*this, "reel%u", 0U)
@@ -40,6 +40,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<meters_device> m_meters;
 	output_finder<300> m_digits;
+	optional_device<timer_device> m_duart_1_timer;
 
 	struct duart_t
 	{
@@ -98,11 +99,13 @@ protected:
 
 	void jpm_draw_lamps(int data, int lamp_strobe);
 
+	uint16_t duart_1_hack_r(offs_t offset);
+	void duart_1_hack_w(offs_t offset, uint16_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
+
 	virtual void update_irqs();
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	uint16_t duart_1_hack_r(offs_t offset);
-	void duart_1_hack_w(offs_t offset, uint16_t data);
 	uint16_t optos_r();
 	uint16_t prot_1_r();
 	uint16_t prot_0_r();
@@ -119,7 +122,6 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
 	void awp68k_program_map(address_map &map);
 
 	uint8_t m_Lamps[256];
@@ -133,7 +135,6 @@ private:
 
 	required_device<i8255_device> m_ppi;
 	required_device<mc68681_device> m_duart;
-	optional_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
 	required_device<upd7759_device> m_upd7759;
 	optional_device_array<stepper_device, 6> m_reel;
@@ -152,6 +153,7 @@ public:
 	}
 
 	void impact_video(machine_config &config);
+	void impact_video_duarthack(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -159,6 +161,7 @@ protected:
 	virtual void video_start() override;
 
 	void m68k_program_map(address_map &map);
+	void m68k_program_map_duarthack(address_map &map);
 
 	void jpmio_video_w(offs_t offset, uint16_t data);
 
