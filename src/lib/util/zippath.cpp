@@ -78,7 +78,7 @@ bool is_7z_file(std::string const &path)
 
 bool is_zip_file(std::string const &path)
 {
-	return core_filename_ends_with(path, ".7zip");
+	return core_filename_ends_with(path, ".zip");
 }
 
 

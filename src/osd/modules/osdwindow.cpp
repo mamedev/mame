@@ -61,21 +61,12 @@ std::shared_ptr<osd_monitor_info> osd_window::monitor_from_rect(const osd_rect *
 {
 	std::shared_ptr<osd_monitor_info> monitor;
 
-	// in window mode, find the nearest
-	if (!fullscreen() && m_monitor != nullptr)
-	{
-		if (proposed != nullptr)
-		{
-			monitor = m_monitor->module().monitor_from_rect(*proposed);
-		}
-		else
-			monitor = m_monitor->module().monitor_from_window(*this);
-	}
-	else
-	{
-		// in full screen, just use the configured monitor
+	if (fullscreen() || !m_monitor) // in full screen, just use the configured monitor
 		monitor = m_monitor;
-	}
+	else if (proposed) // in window mode, find the nearest
+		monitor = m_monitor->module().monitor_from_rect(*proposed);
+	else
+		monitor = m_monitor->module().monitor_from_window(*this);
 
 	return monitor;
 }
@@ -96,7 +87,7 @@ void osd_window::create_target()
 void osd_window::set_starting_view(int index, const char *defview, const char *view)
 {
 	// choose non-auto over auto
-	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
+	if ((!*view || !strcmp(view, "auto")) && (*defview && strcmp(defview, "auto")))
 		view = defview;
 
 	// query the video system to help us pick a view
