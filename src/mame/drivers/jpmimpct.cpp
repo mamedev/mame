@@ -581,10 +581,10 @@ void jpmimpct_state::jpmio_nonvideo_w(offs_t offset, uint16_t data)
 
 		case 0x02:
 		{
-			m_reel[0]->update((data >> 0)& 0x0F);
-			m_reel[1]->update((data >> 1)& 0x0F);
-			m_reel[2]->update((data >> 2)& 0x0F);
-			m_reel[3]->update((data >> 3)& 0x0F);
+			m_reel[0]->update((data >> 0)& 0x0f);
+			m_reel[1]->update((data >> 4)& 0x0f);
+			m_reel[2]->update((data >> 8)& 0x0f);
+			m_reel[3]->update((data >> 12)& 0x0f);
 			awp_draw_reel(machine(),"reel1", *m_reel[0]);
 			awp_draw_reel(machine(),"reel2", *m_reel[1]);
 			awp_draw_reel(machine(),"reel3", *m_reel[2]);
@@ -593,8 +593,8 @@ void jpmimpct_state::jpmio_nonvideo_w(offs_t offset, uint16_t data)
 		}
 		case 0x04:
 		{
-			m_reel[4]->update((data >> 4)& 0x0F);
-			m_reel[5]->update((data >> 5)& 0x0F);
+			m_reel[4]->update((data >> 0)& 0x0f);
+			m_reel[5]->update((data >> 4)& 0x0f);
 			awp_draw_reel(machine(),"reel5", *m_reel[4]);
 			awp_draw_reel(machine(),"reel6", *m_reel[5]);
 			break;
