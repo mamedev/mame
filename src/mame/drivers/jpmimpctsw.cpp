@@ -94,9 +94,79 @@ INPUT_PORTS_EXTERN( jpmimpct_inputs );
 // I believe all IMPACT roms should have a samples rom (it's the only sound output?) so any without are almost
 // certainly missing it.
 
-INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP Token or 10 GBP Cash
+
+// for fixed Jackpot / Stake / %age games that don't have keys.
+INPUT_PORTS_START( j6nokey )
 	PORT_INCLUDE( jpmimpct_inputs )
 
+	PORT_MODIFY("J10_0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PERCENT")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_stake_5_10 )
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x70, 0x60, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00" )
+	PORT_CONFSETTING(    0x10, "0x10" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x30, "0x30" )
+	PORT_CONFSETTING(    0x40, "0x40" )
+	PORT_CONFSETTING(    0x50, "0x50" )
+	PORT_CONFSETTING(    0x60, "10p" )
+	PORT_CONFSETTING(    0x70, "5p" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_stake_20_25_30 )
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x70, 0x50, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00" )
+	PORT_CONFSETTING(    0x10, "0x10" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x30, "30p" )
+	PORT_CONFSETTING(    0x40, "25p" )
+	PORT_CONFSETTING(    0x50, "20p" )
+	PORT_CONFSETTING(    0x60, "0x60" )
+	PORT_CONFSETTING(    0x70, "0x70" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_stake_not_fitted )
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x70, 0x70, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00" )
+	PORT_CONFSETTING(    0x10, "0x10" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x30, "0x30" )
+	PORT_CONFSETTING(    0x40, "0x40" )
+	PORT_CONFSETTING(    0x50, "0x50" )
+	PORT_CONFSETTING(    0x60, "0x60" )
+	PORT_CONFSETTING(    0x70, "0x70" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_jackpot_15 ) 
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x0f, 0x06, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "0x09"  )
+	PORT_CONFSETTING(    0x08, "0x08"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "15 GBP"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_jackpot_8t_10 )
 	PORT_MODIFY("J10_0")
 	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
@@ -115,68 +185,9 @@ INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP 
 	PORT_CONFSETTING(    0x02, "0x02"  )
 	PORT_CONFSETTING(    0x01, "0x01"  )
 	PORT_CONFSETTING(    0x00, "0x00"  )
-	PORT_CONFNAME( 0x70, 0x60, "Stake Key" )
-	PORT_CONFSETTING(    0x00, "0x00" )
-	PORT_CONFSETTING(    0x10, "0x10" )
-	PORT_CONFSETTING(    0x20, "0x20" )
-	PORT_CONFSETTING(    0x30, "0x30" )
-	PORT_CONFSETTING(    0x40, "0x40" )
-	PORT_CONFSETTING(    0x50, "0x50" )
-	PORT_CONFSETTING(    0x60, "10p" )
-	PORT_CONFSETTING(    0x70, "5p" )
-	PORT_CONFNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
-
-	PORT_MODIFY("J9_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
-
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Collect?")
-
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
-
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6sonicg ) // only runs without a key?
-	PORT_INCLUDE( j6sonic )
-
-	PORT_MODIFY("J10_0")
-	PORT_CONFNAME( 0x0f, 0x0f, "Jackpot / Prize Key" )
-	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
-	PORT_CONFSETTING(    0x0e, "0x0e"  )
-	PORT_CONFSETTING(    0x0d, "0x0d"  )
-	PORT_CONFSETTING(    0x0c, "0x0c"  )
-	PORT_CONFSETTING(    0x0b, "0x0b"  )
-	PORT_CONFSETTING(    0x0a, "0x0a"  )
-	PORT_CONFSETTING(    0x09, "0x09"  ) 
-	PORT_CONFSETTING(    0x08, "0x08"  )
-	PORT_CONFSETTING(    0x07, "0x07"  )
-	PORT_CONFSETTING(    0x06, "0x06"  )
-	PORT_CONFSETTING(    0x05, "0x05"  )
-	PORT_CONFSETTING(    0x04, "0x04"  )
-	PORT_CONFSETTING(    0x03, "0x03"  )
-	PORT_CONFSETTING(    0x02, "0x02"  )
-	PORT_CONFSETTING(    0x01, "0x01"  )
-	PORT_CONFSETTING(    0x00, "0x00"  )
-	PORT_CONFNAME( 0x70, 0x70, "Stake Key" )
-	PORT_CONFSETTING(    0x00, "0x00" )
-	PORT_CONFSETTING(    0x10, "0x10" )
-	PORT_CONFSETTING(    0x20, "0x20" )
-	PORT_CONFSETTING(    0x30, "0x30" )
-	PORT_CONFSETTING(    0x40, "0x40" )
-	PORT_CONFSETTING(    0x50, "0x50" )
-	PORT_CONFSETTING(    0x60, "0x60" )
-	PORT_CONFSETTING(    0x70, "0x70" )
-	PORT_CONFNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6arcade )
-	PORT_INCLUDE( jpmimpct_inputs )
-
+INPUT_PORTS_START( j6_jackpot_5_15 )
 	PORT_MODIFY("J10_0")
 	PORT_CONFNAME( 0x0f, 0x06, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x0f, "Not fitted"  )
@@ -195,18 +206,93 @@ INPUT_PORTS_START( j6arcade )
 	PORT_CONFSETTING(    0x02, "0x02"  )
 	PORT_CONFSETTING(    0x01, "0x01"  )
 	PORT_CONFSETTING(    0x00, "0x00"  )
-	PORT_CONFNAME( 0x70, 0x50, "Stake Key" )
-	PORT_CONFSETTING(    0x00, "0x00" )
-	PORT_CONFSETTING(    0x10, "0x10" )
-	PORT_CONFSETTING(    0x20, "0x20" )
-	PORT_CONFSETTING(    0x30, "30p" )
-	PORT_CONFSETTING(    0x40, "25p" )
-	PORT_CONFSETTING(    0x50, "20p" )
-	PORT_CONFSETTING(    0x60, "0x60" )
-	PORT_CONFSETTING(    0x70, "0x70" )
-	PORT_CONFNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_jackpot_8_8t_10_15 )
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "8 GBP Cash"  )
+	PORT_CONFSETTING(    0x09, "8 GBP Token"  ) 
+	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "15 GBP"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_jackpot_not_fitted )
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x0f, 0x0f, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "0x09"  )
+	PORT_CONFSETTING(    0x08, "0x08"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "0x06"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP Token or 10 GBP Cash
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_INCLUDE( j6_jackpot_8t_10 )
+
+	PORT_INCLUDE( j6_stake_5_10 )
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Collect?")
+
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6sonicg ) // only runs without a key?
+	PORT_INCLUDE( j6sonic )
+
+	PORT_INCLUDE( j6_jackpot_not_fitted )
+	PORT_INCLUDE( j6_stake_not_fitted )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6arcade )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_INCLUDE( j6_jackpot_5_15 )
+	PORT_INCLUDE( j6_stake_20_25_30 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6acehi )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_20_25_30 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6big50 )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_INCLUDE( j6_stake_20_25_30 )
+	PORT_INCLUDE( j6_jackpot_8_8t_10_15 )
 INPUT_PORTS_END
 
 
@@ -7988,16 +8074,20 @@ ROM_END
 /* Mechanical Below */
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND|MACHINE_CLICKABLE_ARTWORK
 
+// accesses 4801e0 (2nd duart?)
 GAME(  199?, j6fifth,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "5th Dimension (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6aceclb,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 1)", GAME_FLAGS, layout_j6aceclb )
-GAMEL( 199?, j6aceclba,    j6aceclb,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 2)", GAME_FLAGS, layout_j6aceclb )
+// ERROR 5.7 COIN VERIFICATION Verification Opto
+GAMEL( 199?, j6aceclb,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 1)", GAME_FLAGS, layout_j6aceclb )
+GAMEL( 199?, j6aceclba,    j6aceclb,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 2, Protocol)", GAME_FLAGS, layout_j6aceclb )
 
-GAME(  199?, j6acehi,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Aces High (Ace) (IMPACT)", GAME_FLAGS )
+// ERROR 01 44 Non Payout 100p Cash
+GAME(  199?, j6acehi,      0,          impact_nonvideo, j6acehi, jpmimpct_state, empty_init, ROT0, "Ace", "Aces High (Ace) (IMPACT)", GAME_FLAGS )
 
+// hangs on "Initializing Reels"
 GAMEL( 199?, j6amdrm,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "American Dream (Mdm) (IMPACT)", GAME_FLAGS, layout_j6amdrm )
 
-// ERROR 01 44 Non Payout 100p Cash on the non-protocol sets
+// ERROR 01 44 
 GAMEL( 199?, j6arcade,     0,          impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadea,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
@@ -8011,17 +8101,18 @@ GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state
 GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7, Protocol)", GAME_FLAGS, layout_j6arcadee )
 
-GAMEL( 199?, j6bnkrcl,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 1)", GAME_FLAGS, layout_j6bnkrcl )
-GAMEL( 199?, j6bnkrcla,    j6bnkrcl,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 2)", GAME_FLAGS, layout_j6bnkrcl )
-GAMEL( 199?, j6bnkrclb,    j6bnkrcl,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 3)", GAME_FLAGS, layout_j6bnkrcl )
-GAMEL( 199?, j6bnkrclc,    j6bnkrcl,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V2)", GAME_FLAGS, layout_j6bnkrcl )
+// ERROR 5.7
+GAMEL( 199?, j6bnkrcl,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 1)", GAME_FLAGS, layout_j6bnkrcl )
+GAMEL( 199?, j6bnkrcla,    j6bnkrcl,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 2)", GAME_FLAGS, layout_j6bnkrcl )
+GAMEL( 199?, j6bnkrclb,    j6bnkrcl,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 3)", GAME_FLAGS, layout_j6bnkrcl )
+GAMEL( 199?, j6bnkrclc,    j6bnkrcl,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V2)", GAME_FLAGS, layout_j6bnkrcl )
 
 // all ERROR 5.5
-GAMEL( 199?, j6big50,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6big50 )
-GAMEL( 199?, j6big50a,     j6big50,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6big50 )
-GAMEL( 199?, j6big50b,     j6big50,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6big50 )
-GAMEL( 199?, j6big50c,     j6big50,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6big50 )
-GAMEL( 199?, j6big50d,     j6big50,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6big50 )
+GAMEL( 199?, j6big50,      0,          impact_nonvideo, j6big50, jpmimpct_state, empty_init, ROT0, "JPM",             "Big 50 (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6big50 )
+GAMEL( 199?, j6big50a,     j6big50,    impact_nonvideo, j6big50, jpmimpct_state, empty_init, ROT0, "JPM",             "Big 50 (JPM) (IMPACT) (set 2, Protocol)", GAME_FLAGS, layout_j6big50 )
+GAMEL( 199?, j6big50b,     j6big50,    impact_nonvideo, j6big50, jpmimpct_state, empty_init, ROT0, "JPM",             "Big 50 (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6big50 )
+GAMEL( 199?, j6big50c,     j6big50,    impact_nonvideo, j6big50, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", "Big 50 (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS, layout_j6big50 )
+GAMEL( 199?, j6big50d,     j6big50,    impact_nonvideo, j6big50, jpmimpct_state, empty_init, ROT0, "JPM",             "Big 50 (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6big50 )
 
 // all ERROR 2.9
 // the code in brackets is just what it shows at startup, not sure what it means at the moment
