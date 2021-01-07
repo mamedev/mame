@@ -822,14 +822,18 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_CONFSETTING(    0x01, "96" )
 	PORT_CONFSETTING(    0x00, "98" )
 
-	PORT_START("J10_0")
+	// some games will display 64p stake if the settings are invalid,
+	// others show error "5.5 MODE OF PLAY INVALID", or "91 00 Illegal Mode"
+	// games that don't require keys either expect them not to be fitted
+	// or will simply ignore them
+	PORT_START("J10_0") 
 	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
 	PORT_CONFSETTING(    0x0e, "0x0e"  )
 	PORT_CONFSETTING(    0x0d, "0x0d"  )
 	PORT_CONFSETTING(    0x0c, "0x0c"  )
 	PORT_CONFSETTING(    0x0b, "0x0b"  )
-	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x0a, "8 GBP Cash"  )
 	PORT_CONFSETTING(    0x09, "8 GBP Token"  ) 
 	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
 	PORT_CONFSETTING(    0x07, "5 GBP"  )
