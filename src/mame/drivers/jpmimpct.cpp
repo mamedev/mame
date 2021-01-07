@@ -706,6 +706,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
 	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+//	map(0x00480060, 0x00480067).r(FUNC(jpmimpct_state::unk_r));
 
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
 	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
@@ -763,9 +764,23 @@ void jpmimpct_video_state::tms_program_map(address_map &map)
 	map(0x00000000, 0x003fffff).mirror(0xf8000000).ram().share("vram");
 	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
 	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
-//  map(0x01000000, 0x0100003f).mirror(0xf87fffc0).rw(FUNC(jpmimpct_video_state::jpmimpct_bt477_r), FUNC(jpmimpct_video_state::jpmimpct_bt477_w));
-	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_video_state::jpmimpct_bt477_r), FUNC(jpmimpct_video_state::jpmimpct_bt477_w));
+
+//  Brooktree Bt477 RAMDAC (upper registers not supported by generic RAMDAC device, should have derived device?
+	map(0x01000000, 0x0100000f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask16(0x00ff);  //  *  0 0 0    Address register (RAM write mode)
+	map(0x01000010, 0x0100001f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask16(0x00ff);    //  *  0 0 1    Color palette RAMs
+	map(0x01000020, 0x0100002f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask16(0x00ff);   //  *  0 1 0    Pixel read mask register
+	map(0x01000030, 0x0100003f).w(m_ramdac, FUNC(ramdac_device::index_r_w)).umask16(0x00ff);//  *  0 1 0    Pixel read mask register
+//	map(0x01000040, 0x0100004f).                                                            //  *  1 0 0    Address register (overlay write mode)
+//	map(0x01000050, 0x0100005f).                                                            //  *  1 1 1    Address register (overlay read mode)
+//	map(0x01000060, 0x0100006f).                                                            //  *  1 0 1    Overlay register
+//	map(0x01000070, 0x0100007f).                                                            //  *  1 1 0    Command register
+
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
+}
+
+void jpmimpct_video_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
 
@@ -1346,6 +1361,10 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
 	PALETTE(config, m_palette).set_entries(256);
+
+	RAMDAC(config, m_ramdac, 0, m_palette); // bt477
+	m_ramdac->set_addrmap(0, &jpmimpct_video_state::ramdac_map);
+
 }
 
 void jpmimpct_video_state::impact_video_duarthack(machine_config &config)

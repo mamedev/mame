@@ -10,6 +10,7 @@
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
+#include "video/ramdac.h"
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "sound/upd7759.h"
@@ -149,6 +150,7 @@ public:
 		, m_dsp(*this, "dsp")
 		, m_palette(*this, "palette")
 		, m_vram(*this, "vram")
+		, m_ramdac(*this, "ramdac")
 	{
 	}
 
@@ -158,7 +160,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	void m68k_program_map(address_map &map);
 	void m68k_program_map_duarthack(address_map &map);
@@ -169,26 +170,12 @@ protected:
 	void duart_2_hack_w(uint16_t data);
 
 	void tms_program_map(address_map &map);
+	void ramdac_map(address_map& map);
 
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-
-
-	struct bt477_t
-	{
-		uint8_t address;
-		uint8_t addr_cnt;
-		uint8_t pixmask;
-		uint8_t command;
-		rgb_t color;
-	};
-
-	struct bt477_t m_bt477;
-
-	void jpmimpct_bt477_w(offs_t offset, uint16_t data);
-	uint16_t jpmimpct_bt477_r(offs_t offset);
 
 	uint8_t m_touch_cnt;
 	uint8_t m_touch_data[3];
@@ -200,4 +187,5 @@ private:
 	optional_device<tms34010_device> m_dsp;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_vram;
+	required_device<ramdac_device> m_ramdac;
 };
