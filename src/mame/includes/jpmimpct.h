@@ -133,7 +133,7 @@ private:
 
 	required_device<i8255_device> m_ppi;
 	required_device<mc68681_device> m_duart;
-	required_device<timer_device> m_duart_1_timer;
+	optional_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
 	required_device<upd7759_device> m_upd7759;
 	optional_device_array<stepper_device, 6> m_reel;

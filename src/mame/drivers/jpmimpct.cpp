@@ -1250,6 +1250,8 @@ uint16_t jpmimpct_state::ump_r()
 WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 {
 	// triggers IRQ 5
+	//m_maincpu->set_input_line(5, state); // remove from update_irqs to use this
+	// or
 	//m_duart_1_irq = state;
 	//update_irqs();
 }
@@ -1263,7 +1265,7 @@ void jpmimpct_state::base(machine_config &config)
 	// map set later
 
 	// not currently used, hack used instead
-	MC68681(config, m_duart, 4000000);
+	MC68681(config, m_duart, MC68681_1_CLOCK);
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::duart_irq_handler));
 
 	// used by the duart simulation hack
@@ -1330,7 +1332,7 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_video_state::from_shiftreg));
 
 	// Is this on all video cards? or somwhere else? currently uses a hack
-	// MC68681(config, m_touchduart, 4000000);
+	// MC68681(config, m_touchduart, MC68681_2_CLOCK);
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
