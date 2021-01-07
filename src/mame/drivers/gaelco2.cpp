@@ -23,6 +23,7 @@
     Cardioline Stepper     | 1997 | CG-1V 288   | 970410   | IO board ST62T15B6 MCU (not really protection)
     Bang!                  | 1998 | CG-1V 388   | 980921/1 | No
     Super Roller           | 1998 | CG-1V-218   |          | DS5002FP (by Nova Desitec)
+    Champion Pool          | 1999 | CG-1V-138   | 0005487  | DS5002FP (by Nova Desitec)
     Play 2000              | 1999 | CG-1V-149   | 990315   | DS5002FP (by Nova Desitec)
     -----------------------+------+-------------+----------+--------------------------------------------------
 
@@ -2749,7 +2750,7 @@ GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, i
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1999, chmppool,    0,         play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
 // Gym equipment
 GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
