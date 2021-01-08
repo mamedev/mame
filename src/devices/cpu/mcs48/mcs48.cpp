@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders:Dan Boris, Mirko Buffoni, Aaron Giles, Couriersud
 /***************************************************************************
 
     Intel MCS-48/UPI-41 Portable Emulator
