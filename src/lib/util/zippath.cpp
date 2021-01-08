@@ -186,31 +186,6 @@ int zippath_find_sub_path(archive_file &zipfile, std::string_view subpath, osd::
 
 
 // -------------------------------------------------
-//  parse_parent_path - parses out the parent path
-// -------------------------------------------------
-
-void parse_parent_path(std::string_view path, std::string_view::size_type *beginpos, std::string_view::size_type *endpos)
-{
-	std::string_view::size_type pos;
-
-	// skip over trailing path separators
-	pos = path.find_last_not_of(PATH_SEPARATOR);
-
-	// return endpos
-	if (endpos != nullptr)
-		*endpos = pos;
-
-	// now skip until we find a path separator
-	while ((pos != std::string_view::npos) && !is_path_separator(path[pos]))
-		pos = (pos > 0) ? pos - 1 : std::string_view::npos;
-
-	// return beginpos
-	if (beginpos != nullptr)
-		*beginpos = pos;
-}
-
-
-// -------------------------------------------------
 //  zippath_resolve - separates a ZIP path out into
 //  true path and ZIP entry components
 // -------------------------------------------------
@@ -220,12 +195,11 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 	newpath.clear();
 
 	// be conservative
-	entry_type = osd::directory::entry::entry_type::NONE;
 	zipfile.reset();
 
 	std::string apath(path);
 	std::string apath_trimmed;
-	osd::directory::entry::entry_type current_entry_type;
+	osd::directory::entry::entry_type current_entry_type = osd::directory::entry::entry_type::NONE;
 	bool went_up = false;
 	do
 	{
@@ -248,7 +222,6 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 		else
 		{
 			// if we have not found the file or directory, go up
-			current_entry_type = osd::directory::entry::entry_type::NONE;
 			went_up = true;
 			apath = zippath_parent(apath);
 		}
@@ -257,7 +230,10 @@ osd_file::error zippath_resolve(std::string_view path, osd::directory::entry::en
 
 	// if we did not find anything, then error out
 	if (current_entry_type == osd::directory::entry::entry_type::NONE)
+	{
+		entry_type = osd::directory::entry::entry_type::NONE;
 		return osd_file::error::NOT_FOUND;
+	}
 
 	// is this file a ZIP file?
 	if ((current_entry_type == osd::directory::entry::entry_type::FILE) &&
@@ -619,13 +595,17 @@ zippath_directory::~zippath_directory()
 
 std::string &zippath_parent(std::string &dst, std::string_view path)
 {
-	std::string_view::size_type pos;
-	parse_parent_path(path, &pos, nullptr);
+	// skip over trailing path separators
+	std::string_view::size_type pos = path.find_last_not_of(PATH_SEPARATOR);
+
+	// now skip until we find a path separator
+	while ((pos != std::string_view::npos) && !is_path_separator(path[pos]))
+		pos = (pos > 0) ? pos - 1 : std::string_view::npos;
 
 	if (pos != std::string_view::npos)
-		dst = path.substr(0, pos + 1);
+		dst = std::string(path, 0, pos + 1);
 	else
-		dst.clear();
+		dst = std::string();
 	return dst;
 }
 
