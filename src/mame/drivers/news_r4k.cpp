@@ -42,6 +42,30 @@
  *	- Known R4400 config differences between this driver and the physical platform:
  *		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
  *		- emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
+ *
+ *  General Emulation Status (major chips only, there are additional smaller chips including CPLDs on the boards)
+ *  CPU card:
+ *   - MIPS R4400: emulated, with the caveats above
+ *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache?): not emulated
+ *  Motherboard:
+ *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
+ *   - Main memory: partially emulated (monitor ROM cannot enumerate the emulated RAM correctly)
+ *  I/O board:
+ *   - Sony CXD8409Q Parallel Interface: not emulated
+ *   - National Semi PC8477B Floppy Controller: partially emulated (MAME only has the -A version currently)
+ *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
+ *   - Sony CXD8421Q WSC-ESCC1 serial AP-Bus interface controller: skeleton (ESCC connections, probably DMA, AP-Bus interface, etc. handled by this chip)
+ *   - 2x Sony CXD8442Q WSC-FIFO AP-Bus FIFO/interface chips: not emulated (handles AP-bus connections and probalby DMA for sound, floppy, etc.)
+ *   - National Semi DP83932B-VF SONIC Ethernet controller: not emulated
+ *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet AP-Bus interface controller: not emulated
+ *   - Sony CXD8418Q WSC-PARK3: not emulated (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
+ *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
+ *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
+ *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
+ *  DSC-39 Framebuffer/video card:
+ *   - Sony CXD8486Q XB: not emulated (most likely AP-Bus interface)
+ *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
+ *   - Brooktree Bt468KG220 RAMDAC: not emulated
  */
 
 #include "emu.h"
@@ -162,7 +186,11 @@ protected:
     template <irq4_number Number>
     void irq_w(int state) { generic_irq_w(4, Number, state); }
     void int_check();
+    #ifndef NO_MIPS3
     const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
+    #else
+    const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
+    #endif
 
     // Devices
     // MIPS R4400 CPU
@@ -229,7 +257,7 @@ protected:
 
     // APBus control (will be split into a device eventually)
     uint8_t apbus_cmd_r(offs_t offset);
-    void apbus_cmd_w(offs_t offset, uint8_t data);
+    void apbus_cmd_w(offs_t offset, uint32_t data);
 
     // Other platform hardware emulation methods
     u32 bus_error();
@@ -342,7 +370,7 @@ void news_r4k_state::machine_common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
     // Connect SPIFI3s to the buses
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16_MHz_XTAL).machine_config( // TODO: clock?
+	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config( // TODO: clock?
 		[this](device_t *device)
 		{
             /* TODO
@@ -360,7 +388,7 @@ void news_r4k_state::machine_common(machine_config &config)
 			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
             */
 		});
-        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16_MHz_XTAL).machine_config( // TODO: clock?
+        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config( // TODO: clock?
 		[this](device_t *device)
 		{
             /* TODO
@@ -394,6 +422,7 @@ void news_r4k_state::nws5000x(machine_config &config)
 void news_r4k_state::cpu_map(address_map &map)
 {
     map.unmap_value_high();
+    //map(0x4000008, 0x4ffffff).lrw32(NAME([this](offs_t offset){ bus_error(); return 0xff;}), NAME([this](uint32_t data) {bus_error();}));
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM
@@ -420,7 +449,8 @@ void news_r4k_state::cpu_map(address_map &map)
     // ESCC (serial) mapping
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff);
 
-    // TODO: ESCCF? ESCC FIFO?
+    // TODO: WSC-ESCC1 (CXD8421Q) serial controller
+    // adds extra functionality to the ESCC (and interfaces it to the APBus)
     // map(0x1e900000, 0x1e900000);
 
     // Sonic network controller
@@ -452,11 +482,20 @@ void news_r4k_state::cpu_map(address_map &map)
     // lp (printer port??)
     // map(0x1ed30000, 0x1ed30000);
 
-    // fd (floppy disk) - note that the FIFO address is here. The control register mapping is TBD
+    // fd (floppy disk) - note that the FIFO address is here.
     // map(0x1ed20000, 0x1ed20000);
-    map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff); // Floppy controller
-    // TODO: floppy aux register: 0x1ed60200
-    //map(0x1ed60200, ???);
+    // fd controller register mapping
+    // to be fully hardware accurate, these shouldn't be umasked.
+    // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
+    // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
+    // but, anything that uses these *should* just use the LSBs (famous last words)
+    map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
+    // TODO: Floppy aux registers
+    //map(0x1ed60200, 0x1ed60203).lw32(NAME([this](uint32_t data) { LOG("Write 0x%x to FDCAUX0\n", data); if(data & 0x1) m_fdc->set_floppy(nullptr);})); // TODO: is this the equivalent of eject?
+    //map(0x1ed60204, 0x1ed60207).lrw32(NAME([this](){LOG("Read from 0x4-7\n"); return 0;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0x4-7\n", data);})); // ???
+    //map(0x1ed60208, 0x1ed6020b).lrw32(NAME([this](){LOG("Read from 0x8-b\n"); return 0;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0x8-b\n", data);})); // ???
+    //map(0x1ed6020c, 0x1ed6020f).lrw32(NAME([this](){LOG("Read 0x%x from 0xc-f\n", fdaux_intr); return fdaux_intr;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0xc-f\n", data); if(data & 0x1) fdaux_intr &= ~0x1;})); // ???
+    map(0x1ed60200, 0x1ed6020f).noprw();
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -545,6 +584,7 @@ void news_r4k_state::init_common()
 {
     // map the configured ram
     m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
+    m_cpu->space(0).install_ram(0x08000000, 0x8000000 + m_ram->mask(), m_ram->pointer());
 }
 
 void news_r4k_state::init_nws5000x()
@@ -561,8 +601,11 @@ uint64_t news_r4k_state::front_panel_r(offs_t offset)
 
 void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
-    LOG(LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
-    m_led[offset] = data;
+    if(m_led[offset] != data)
+    {
+        LOG(LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
+        m_led[offset] = data;
+    }
 }
 
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
@@ -588,13 +631,13 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
     {
         value = 0x32;
     }
-    // LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+    LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
     return value;
 }
 
-void news_r4k_state::apbus_cmd_w(offs_t offset, uint8_t data)
+void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 {
-    // LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
+    LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
 uint32_t news_r4k_state::freerun_r(offs_t offset)
