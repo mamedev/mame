@@ -138,6 +138,19 @@ INPUT_PORTS_START( j6_stake_5_10_20_25_30 )
 	PORT_CONFSETTING(    0x70, "5p" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6_stake_10 )
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x70, 0x60, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00" )
+	PORT_CONFSETTING(    0x10, "0x10" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x30, "0x30" )
+	PORT_CONFSETTING(    0x40, "0x40" )
+	PORT_CONFSETTING(    0x50, "0x50" )
+	PORT_CONFSETTING(    0x60, "10p" )
+	PORT_CONFSETTING(    0x70, "0x70" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( j6_stake_5_10 )
 	PORT_MODIFY("J10_0") 
 	PORT_CONFNAME( 0x70, 0x60, "Stake Key" )
@@ -149,6 +162,19 @@ INPUT_PORTS_START( j6_stake_5_10 )
 	PORT_CONFSETTING(    0x50, "0x50" )
 	PORT_CONFSETTING(    0x60, "10p" )
 	PORT_CONFSETTING(    0x70, "5p" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_stake_20_25 )
+	PORT_MODIFY("J10_0")
+	PORT_CONFNAME( 0x70, 0x50, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "0x00" )
+	PORT_CONFSETTING(    0x10, "0x10" )
+	PORT_CONFSETTING(    0x20, "0x20" )
+	PORT_CONFSETTING(    0x30, "0x30" )
+	PORT_CONFSETTING(    0x40, "25p" )
+	PORT_CONFSETTING(    0x50, "20p" )
+	PORT_CONFSETTING(    0x60, "0x60" )
+	PORT_CONFSETTING(    0x70, "0x70" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6_stake_20_25_30 )
@@ -175,6 +201,27 @@ INPUT_PORTS_START( j6_stake_not_fitted )
 	PORT_CONFSETTING(    0x50, "0x50" )
 	PORT_CONFSETTING(    0x60, "0x60" )
 	PORT_CONFSETTING(    0x70, "0x70" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6_jackpot_5 ) 
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x0f, 0x07, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "0x09"  )
+	PORT_CONFSETTING(    0x08, "0x08"  )
+	PORT_CONFSETTING(    0x07, "5 GBP" )
+	PORT_CONFSETTING(    0x06, "0x06"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6_jackpot_15 ) 
@@ -324,6 +371,27 @@ INPUT_PORTS_START( j6_jackpot_not_fitted )
 	PORT_CONFSETTING(    0x00, "0x00"  )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6_jackpot_not_fitted_10 ) // where not fitted is valid (but then stake key has no effect)
+	PORT_MODIFY("J10_0") 
+	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
+	PORT_CONFSETTING(    0x0e, "0x0e"  )
+	PORT_CONFSETTING(    0x0d, "0x0d"  )
+	PORT_CONFSETTING(    0x0c, "0x0c"  )
+	PORT_CONFSETTING(    0x0b, "0x0b"  )
+	PORT_CONFSETTING(    0x0a, "0x0a"  )
+	PORT_CONFSETTING(    0x09, "0x09"  ) 
+	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
+	PORT_CONFSETTING(    0x07, "0x07"  )
+	PORT_CONFSETTING(    0x06, "0x06"  )
+	PORT_CONFSETTING(    0x05, "0x05"  )
+	PORT_CONFSETTING(    0x04, "0x04"  )
+	PORT_CONFSETTING(    0x03, "0x03"  )
+	PORT_CONFSETTING(    0x02, "0x02"  )
+	PORT_CONFSETTING(    0x01, "0x01"  )
+	PORT_CONFSETTING(    0x00, "0x00"  )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP Token or 10 GBP Cash
 	PORT_INCLUDE( jpmimpct_inputs )
 
@@ -393,6 +461,38 @@ INPUT_PORTS_START( j6bigcsh )
 	PORT_INCLUDE( j6_jackpot_8c_5_15 )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6bigpct )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_INCLUDE( j6_stake_20_25 )
+	PORT_INCLUDE( j6_jackpot_not_fitted_10 )
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6bigtop )
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // for the parent set these must be 'ON' to avoid a NOTE S/W ERROR
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6colcsh )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// this allows for more complex mixes, for now just use a setting that boots
+	PORT_INCLUDE( j6_jackpot_5 )
+	PORT_INCLUDE( j6_stake_10 )
+INPUT_PORTS_END
 
 
 
@@ -833,7 +933,8 @@ ROM_END
 
 #define j6bigpct_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */
+	ROM_LOAD( "bigpicture_sound", 0x000000, 0x080000, NO_DUMP )
+
 ROM_START( j6bigpct )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "big11nsk.1", 0x000000, 0x020000, CRC(fabe2c0d) SHA1(522cd19e6e947afb485e6fd81e3589a97ec5ba0b) )
@@ -2046,41 +2147,6 @@ ROM_START( j6cola )
 	j6col_sound
 ROM_END
 
-ROM_START( j6colb )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "coli-4_1.bin", 0x000000, 0x020000, CRC(599d9e54) SHA1(37159694a31701a1d505e0d41b95c7d056d57e4c) ) // aka coliseum_awp.bin
-	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
-	j6col_sound
-ROM_END
-
-ROM_START( j6colc )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "coli-4a1.bin", 0x000000, 0x020000, CRC(0b595e35) SHA1(f72d2d1d028333e954bedfc7139b37f33a85f2ff) )
-	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
-	j6col_sound
-ROM_END
-
-ROM_START( j6cold )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "coli-4n1.bin", 0x000000, 0x020000, CRC(68ab2690) SHA1(d07abd3cd19c0622a35a55eaf1e6ca34acfd0b98) )
-	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
-	j6col_sound
-ROM_END
-
-ROM_START( j6cole )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "coli-4np.bin", 0x000000, 0x020000, CRC(833572a8) SHA1(5d2a910180314bf28e186839d0e599dff5538cdd) )
-	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
-	j6col_sound
-ROM_END
-
-ROM_START( j6colf )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "coli-4p1.bin", 0x000000, 0x020000, CRC(b203ca6c) SHA1(07fddcaf9e7ea36f63873dda49507db29e0bb17a) )
-	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
-	j6col_sound
-ROM_END
-
 
 #define j6colcsh_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
@@ -2117,6 +2183,41 @@ ROM_START( j6colcshd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "coli6np1.bin", 0x000000, 0x020000, CRC(3fc81fdb) SHA1(b3edd3c4fbe9e97fbcb2f43aa8d3518c6c5058fc) )
 	ROM_LOAD16_BYTE( "coli-6_2.bin", 0x000001, 0x020000, CRC(318c2ee5) SHA1(2ca39615775d92879353505b514dab9e3e63754b) )
+	j6colcsh_sound
+ROM_END
+
+ROM_START( j6colb )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "coli-4_1.bin", 0x000000, 0x020000, CRC(599d9e54) SHA1(37159694a31701a1d505e0d41b95c7d056d57e4c) ) // aka coliseum_awp.bin
+	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
+	j6colcsh_sound
+ROM_END
+
+ROM_START( j6colc )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "coli-4a1.bin", 0x000000, 0x020000, CRC(0b595e35) SHA1(f72d2d1d028333e954bedfc7139b37f33a85f2ff) )
+	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
+	j6colcsh_sound
+ROM_END
+
+ROM_START( j6cold )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "coli-4n1.bin", 0x000000, 0x020000, CRC(68ab2690) SHA1(d07abd3cd19c0622a35a55eaf1e6ca34acfd0b98) )
+	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
+	j6colcsh_sound
+ROM_END
+
+ROM_START( j6cole )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "coli-4np.bin", 0x000000, 0x020000, CRC(833572a8) SHA1(5d2a910180314bf28e186839d0e599dff5538cdd) )
+	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
+	j6colcsh_sound
+ROM_END
+
+ROM_START( j6colf )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "coli-4p1.bin", 0x000000, 0x020000, CRC(b203ca6c) SHA1(07fddcaf9e7ea36f63873dda49507db29e0bb17a) )
+	ROM_LOAD16_BYTE( "coli-4_2.bin", 0x000001, 0x020000, CRC(7636f9f2) SHA1(80f4d47b0171b98d7a4dc632562f95a3443ee95c) )
 	j6colcsh_sound
 ROM_END
 
@@ -8177,14 +8278,7 @@ ROM_END
 // Unsorted types
 // *************************************************************************************************************
 
-GAME(  199?, j6bigpct,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6bigpcta,    j6bigpct,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6bigpctb,    j6bigpct,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 
-GAMEL( 199?, j6bigtop,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopa,    j6bigtop,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopb,    j6bigtop,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopc,    j6bigtop,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6bigtopa )
 
 GAME(  199?, j6bigwhl,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6bigwhla,    j6bigwhl,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 2)", GAME_FLAGS )
@@ -8366,22 +8460,6 @@ GAME(  199?, j6cluclbi,    j6cluclb,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAME(  199?, j6cluclbj,    j6cluclb,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME(  199?, j6cluclbk,    j6cluclb,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 12)", GAME_FLAGS )
 GAME(  199?, j6cluclbl,    j6cluclb,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 13)", GAME_FLAGS )
-
-
-GAME(  199?, j6col,        0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6cola,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6colb,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6colc,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6cold,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6cole,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 6)", GAME_FLAGS )
-GAME(  199?, j6colf,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 7)", GAME_FLAGS )
-
-// seems like the same game as some of the roms in the above, they're probably mixed up, or the same thing
-GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh )
-GAMEL( 199?, j6colcsha,    j6colcsh,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6colcsh )
-GAMEL( 199?, j6colcshb,    j6colcsh,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6colcsh )
-GAMEL( 199?, j6colcshc,    j6colcsh,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6colcsh )
-GAMEL( 199?, j6colcshd,    j6colcsh,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6colcsh )
 
 
 GAME(  199?, j6colmon,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 1)", GAME_FLAGS )
@@ -9430,6 +9508,16 @@ GAME(  199?, j6bigbnko,    j6bigbnk,   impact_nonvideo, j6bigbnk, jpmimpct_state
 GAME(  199?, j6bigbnkp,    j6bigbnk,   impact_nonvideo, j6bigbnk, jpmimpct_state, empty_init, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB4 I H09)", GAME_FLAGS )
 GAME(  199?, j6bbankr,     j6bigbnk,   impact_nonvideo, j6bigbnk, jpmimpct_state, empty_init, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB 2  T 2)", GAME_FLAGS ) // was marked as Crystal, but still shows JPM
 
+// missing sound ROM
+GAME(  199?, j6bigpct,     0,          impact_nonvideo, j6bigpct, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6bigpcta,    j6bigpct,   impact_nonvideo, j6bigpct, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 2, Protocol)", GAME_FLAGS )
+GAME(  199?, j6bigpctb,    j6bigpct,   impact_nonvideo, j6bigpct, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+
+GAMEL( 199?, j6bigtop,     0,          impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 199?, j6bigtopa,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 199?, j6bigtopb,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3, Protocol)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 199?, j6bigtopc,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6bigtopa )
+
 
 GAME(  199?, j6sonic,      0,          impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6sonica,     j6sonic,    impact_nonvideo, j6sonic, jpmimpct_state, empty_init, ROT0, "JPM", "Sonic The Hedgehog (JPM) (IMPACT) (set 2, Protocol)", GAME_FLAGS ) // Error 7.1 "Electronic Data Counter Timeout"
@@ -9462,6 +9550,19 @@ GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state
 GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7, Protocol)", GAME_FLAGS, layout_j6arcadee )
 
+// ERROR 71 00 (all protocol sets?)
+GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcsha,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcshb,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcshc,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcshd,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colb,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum Cash (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colc,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum Cash (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6cold,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum Cash (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6cole,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum Cash (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colf,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum Cash (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6colcsh )
+
+
 
 // *************************************************************************************************************
 // Mdm type games
@@ -9469,6 +9570,9 @@ GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state
 
 // hangs on "Initializing Reels"
 GAMEL( 199?, j6amdrm,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "American Dream (Mdm) (IMPACT)", GAME_FLAGS, layout_j6amdrm )
+
+GAME(  199?, j6col,        0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6cola,       j6col,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 2)", GAME_FLAGS )
 
 // *************************************************************************************************************
 // Empire type games 'No Binary Mech'
