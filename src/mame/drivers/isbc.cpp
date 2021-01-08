@@ -83,6 +83,7 @@ private:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
+	void sm1810_mem(address_map &map);
 	void sm1810_io(address_map &map);
 
 	virtual void machine_reset() override;
@@ -156,10 +157,20 @@ void isbc_state::isbc8630_io(address_map &map)
 	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
 }
 
+void isbc_state::sm1810_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xeffff).ram();
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
+
 void isbc_state::sm1810_io(address_map &map)
 {
-	isbc8630_io(map);
+	rpc86_io(map);
+	map(0x00c0, 0x00c7).w(FUNC(isbc_state::edge_intr_clear_w)).umask16(0xff00);
+	map(0x00c8, 0x00df).w(FUNC(isbc_state::status_register_w)).umask16(0xff00);
 	map(0x00ca, 0x00cb).lr8(NAME([]() { return 0x40; })).umask16(0x00ff); // it reads this without configuring the ppi
+	map(0xefe0, 0xefe0).w("isbc_215g", FUNC(isbc_215g_device::write));
 }
 
 void isbc_state::isbc86_mem(address_map &map)
@@ -525,11 +536,24 @@ void isbc_state::isbc2861(machine_config &config)
 
 void isbc_state::sm1810(machine_config &config)
 {
-	isbc8630(config);
+	rpc86(config);
 	m_maincpu->set_clock(XTAL(4'000'000)); // calibrated clock to pass self test
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::sm1810_mem);
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::sm1810_io);
 
 	m_uart8251->dtr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+	ISBC_215G(config, "isbc_215g", 0, 0xefe0, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+
+	LS259(config, m_statuslatch); // U14
+//  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
+//  m_statuslatch->q_out_cb<1>().set("pit", FUNC(pit8253_device::write_gate1));
+	m_statuslatch->q_out_cb<2>().set(FUNC(isbc_state::nmi_mask_w));
+	m_statuslatch->q_out_cb<3>().set([this] (int state) { m_override = state; }); // 1 = access onboard dual-port RAM
+	m_statuslatch->q_out_cb<4>().set(FUNC(isbc_state::bus_intr_out1_w));
+	m_statuslatch->q_out_cb<5>().set(FUNC(isbc_state::bus_intr_out2_w));
+	m_statuslatch->q_out_cb<5>().append_output("led0").invert(); // ds1
+	m_statuslatch->q_out_cb<6>().set_output("led1").invert(); // ds3
+	m_statuslatch->q_out_cb<7>().set([this] (int state) { m_megabyte_enable = !state; });
 }
 
 /* ROM definition */
