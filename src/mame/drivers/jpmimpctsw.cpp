@@ -5287,28 +5287,28 @@ ROM_END
 ROM_START( j6raclba )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "racl-fs1.bin", 0x000000, 0x020000, CRC(b361ab58) SHA1(129feeadc9f0026fa86c39f42e506027b6665dfa) )
-	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000000, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
+	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000001, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
 	j6raclb_sound
 ROM_END
 
 ROM_START( j6raclbb )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "racl-ff1.bin", 0x000000, 0x020000, CRC(77bb4848) SHA1(4900a09cf0712d87aacf4772406a4d284c6e7d9e) )
-	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000000, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
+	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000001, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
 	j6raclb_sound
 ROM_END
 
 ROM_START( j6raclbc )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "racl-fi1.bin", 0x000000, 0x020000, CRC(e1a56b39) SHA1(036850fcfd39b1194718c7bf575991514015d015) )
-	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000000, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
+	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000001, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
 	j6raclb_sound
 ROM_END
 
 ROM_START( j6raclbd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "racl-fp1.bin", 0x000000, 0x020000, CRC(58ffff60) SHA1(e68d9b8d8523732ced12eb7bfb8a749499ea01c1) )
-	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000000, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
+	ROM_LOAD16_BYTE( "racl-fs2.bin", 0x000001, 0x020000, CRC(a1ad549a) SHA1(e33184262c9e76e8fecdcec9fa274baa16ba9d67) )
 	j6raclb_sound
 ROM_END
 
@@ -5394,8 +5394,9 @@ ROM_START( j6redarwj )
 	j6redarw_sound
 ROM_END
 
-ROM_START( j6redarww )
+ROM_START( j6redarww ) 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	// invalid pairing?
 	ROM_LOAD( "redarrow.p1", 0x000000, 0x020000, CRC(e47fdd2c) SHA1(1cbce6e38cacad4c0ec617e38522ef81feaeb296) )
 	ROM_LOAD( "redarrow.p2", 0x000001, 0x020000, CRC(afccd6c4) SHA1(5cfcb7132a169ea13fc0b48fc2d34071243a9046) )
 	j6redarw_sound
@@ -6025,6 +6026,44 @@ ROM_START( j6snakesg )
 	ROM_LOAD16_BYTE( "snladv-2", 0x000000, 0x020000, CRC(64b29222) SHA1(6e17a0ee68af644ef59abcacd5d3ad2412fdfad6) )
 	j6snakes_sound
 ROM_END
+
+
+ROM_START( j6slagnb )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE(  "sal111.bin", 0x00000, 0x020000, CRC(e82a1072) SHA1(5175e39ad471f2fa9240364bf893a9f493b44f63) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6snakes_sound
+ROM_END
+
+ROM_START( j6slagnc )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE(  "sal111a.bin", 0x0000, 0x020000, CRC(baeed013) SHA1(0366f27b47bae80d3f51f66baf24e2b1faad8d57) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6snakes_sound
+ROM_END
+
+ROM_START( j6slagnd )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE(  "sal111p.bin", 0x0000, 0x020000, CRC(03b4444a) SHA1(fcd77cd44fb1e6c9094296bf21c561acb27f5ea9) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6snakes_sound
+ROM_END
+
+ROM_START( j6slagne )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE(  "salft1p1.bin", 0x0000, 0x020000, CRC(cf0540b1) SHA1(f225195c663e5b081af21e4e212d776a0bb08b7a) )
+	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x00001, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
+	j6snakes_sound
+ROM_END
+
+ROM_START( j6slagnf )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE(  "snakes+ladders-crystal-p1.bin", 0x0001, 0x020000, CRC(4f27b6c7) SHA1(cd457f4a4e7d518d4d19f6860d6e07207afff4c6) )
+	ROM_LOAD16_BYTE(  "snakes+ladders-crystal-p2.bin", 0x0000, 0x020000, CRC(3b3f5d04) SHA1(1f190296667aa599af1cc0b001be40a7b212e5d8) )
+	j6snakes_sound
+ROM_END
+
+
 
 
 #define j6sonic_sound \
@@ -8094,41 +8133,6 @@ ROM_START( j6slagna )
 	j6slagn_sound
 ROM_END
 
-ROM_START( j6slagnb )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "sal111.bin", 0x00000, 0x020000, CRC(e82a1072) SHA1(5175e39ad471f2fa9240364bf893a9f493b44f63) )
-	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
-	j6slagn_sound
-ROM_END
-
-ROM_START( j6slagnc )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "sal111a.bin", 0x0000, 0x020000, CRC(baeed013) SHA1(0366f27b47bae80d3f51f66baf24e2b1faad8d57) )
-	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
-	j6slagn_sound
-ROM_END
-
-ROM_START( j6slagnd )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "sal111p.bin", 0x0000, 0x020000, CRC(03b4444a) SHA1(fcd77cd44fb1e6c9094296bf21c561acb27f5ea9) )
-	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
-	j6slagn_sound
-ROM_END
-
-ROM_START( j6slagne )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "salft1p1.bin", 0x0000, 0x020000, CRC(cf0540b1) SHA1(f225195c663e5b081af21e4e212d776a0bb08b7a) )
-	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x00001, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
-	j6slagn_sound
-ROM_END
-
-ROM_START( j6slagnf )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "snakes+ladders-crystal-p1.bin", 0x0000, 0x020000, CRC(4f27b6c7) SHA1(cd457f4a4e7d518d4d19f6860d6e07207afff4c6) )
-	ROM_LOAD16_BYTE(  "snakes+ladders-crystal-p2.bin", 0x0001, 0x020000, CRC(3b3f5d04) SHA1(1f190296667aa599af1cc0b001be40a7b212e5d8) )
-	j6slagn_sound
-ROM_END
-
 ROM_START( j6slagng )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE(  "snla-41.bin", 0x0000, 0x020000, CRC(bb964fe0) SHA1(451dd54d9bb9e066dd650551861f3ee818f81d7c) )
@@ -8305,8 +8309,6 @@ GAME(  199?, j6pogclsa,    j6pogcls,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAME(  199?, j6pogclsb,    j6pogcls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Pot Of Gold Classic (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 
 
-GAME(  199?, j6pwrlin,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Power Lines (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6pwrlina,    j6pwrlin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Power Lines (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
 
 GAME(  199?, j6pwrspn,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 1)", GAME_FLAGS )
@@ -8453,8 +8455,12 @@ GAMEL( 199?, j6snakesd,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAMEL( 199?, j6snakese,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Snakes & Ladders (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6snakes )
 GAMEL( 199?, j6snakesf,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Snakes & Ladders (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6snakes )
 GAMEL( 199?, j6snakesg,    j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Snakes & Ladders (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6snakes )
-
-
+// these were in 'slides again' sets, but appear to be the original game
+GAMEL( 199?, j6slagnb,     j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM / Crystal", "Snakes & Ladders (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6snakes )
+GAMEL( 199?, j6slagnc,     j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM / Crystal", "Snakes & Ladders (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6snakes )
+GAMEL( 199?, j6slagnd,     j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM / Crystal", "Snakes & Ladders (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6snakes )
+GAMEL( 199?, j6slagne,     j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM / Crystal", "Snakes & Ladders (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6snakes )
+GAMEL( 199?, j6slagnf,     j6snakes,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM / Crystal", "Snakes & Ladders (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6snakes )
 
 GAME(  199?, j6spcinv,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Space Invaders (Crystal) (IMPACT)", GAME_FLAGS )
 
@@ -8792,13 +8798,8 @@ GAME(  199?, j6reelba,     j6reelb,    impact_nonvideo, jpmimpct_inputs, jpmimpc
 
 GAMEL( 199?, j6slagn,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6slagng )
 GAMEL( 199?, j6slagna,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnb,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnc,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnd,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagne,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 6)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnf,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 7)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagng,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 8)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnh,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 9)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 199?, j6slagng,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 199?, j6slagnh,     j6slagn,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6slagng )
 
 
 GAME(  199?, j6thril,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
@@ -9536,6 +9537,11 @@ GAME(  199?, j6pnxmil,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAME(  199?, j6pnxmila,    j6pnxmil,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Millennium (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6pnxmilb,    j6pnxmil,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Millennium (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6pnxmilc,    j6pnxmil,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Millennium (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+
+// some text strings?
+GAME(  199?, j6pwrlin,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Power Lines (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6pwrlina,    j6pwrlin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Power Lines (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+
 
 // *************************************************************************************************************
 // Unusual cases
