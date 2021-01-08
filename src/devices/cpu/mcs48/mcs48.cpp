@@ -92,31 +92,31 @@
     CONSTANTS
 ***************************************************************************/
 
-/* timer/counter enable bits */
+// timer/counter enable bits
 #define TIMER_ENABLED   0x01
 #define COUNTER_ENABLED 0x02
 
-/* flag bits */
+// flag bits
 #define C_FLAG          0x80
 #define A_FLAG          0x40
 #define F_FLAG          0x20
 #define B_FLAG          0x10
 
-/* status bits (UPI-41) */
+// status bits (UPI-41)
 #define STS_IBF         0x02
 #define STS_OBF         0x01
 
-/* port 2 bits (UPI-41) */
+// port 2 bits (UPI-41)
 #define P2_OBF          0x10
 #define P2_NIBF         0x20
 #define P2_DRQ          0x40
 #define P2_NDACK        0x80
 
-/* enable bits (UPI-41) */
+// enable bits (UPI-41)
 #define ENABLE_FLAGS    0x01
 #define ENABLE_DMA      0x02
 
-/* feature masks */
+// feature masks
 #define MB_FEATURE      0x01
 #define EXT_BUS_FEATURE 0x02
 #define UPI41_FEATURE   0x04
@@ -128,7 +128,7 @@
     MACROS
 ***************************************************************************/
 
-/* r0-r7 map to memory via the regptr */
+// r0-r7 map to memory via the regptr
 #define R0              m_regptr[0]
 #define R1              m_regptr[1]
 #define R2              m_regptr[2]
@@ -137,7 +137,6 @@
 #define R5              m_regptr[5]
 #define R6              m_regptr[6]
 #define R7              m_regptr[7]
-
 
 
 DEFINE_DEVICE_TYPE(I8021,   i8021_device,   "i8021",   "Intel 8021")
@@ -168,7 +167,7 @@ DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "M58715")
     ADDRESS MAPS
 ***************************************************************************/
 
-/* FIXME: the memory maps should probably support rom banking for EA */
+// FIXME: the memory maps should probably support rom banking for EA
 void mcs48_cpu_device::program_10bit(address_map &map)
 {
 	map(0x000, 0x3ff).rom();
@@ -712,12 +711,12 @@ OPHANDLER( in_a_dbb )
 {
 	burn_cycles(2);
 
-	/* acknowledge the IBF IRQ and clear the bit in STS */
+	// acknowledge the IBF IRQ and clear the bit in STS
 	if ((m_sts & STS_IBF) != 0)
 		standard_irq_callback(UPI41_INPUT_IBF);
 	m_sts &= ~STS_IBF;
 
-	/* if P2 flags are enabled, update the state of P2 */
+	// if P2 flags are enabled, update the state of P2
 	if (m_flags_enabled && (m_p2 & P2_NIBF) == 0)
 		port_w(2, m_p2 |= P2_NIBF);
 	m_a = m_dbbi;
@@ -853,11 +852,11 @@ OPHANDLER( out_dbb_a )
 {
 	burn_cycles(2);
 
-	/* copy to the DBBO and update the bit in STS */
+	// copy to the DBBO and update the bit in STS
 	m_dbbo = m_a;
 	m_sts |= STS_OBF;
 
-	/* if P2 flags are enabled, update the state of P2 */
+	// if P2 flags are enabled, update the state of P2
 	if (m_flags_enabled && (m_p2 & P2_OBF) == 0)
 		port_w(2, m_p2 |= P2_OBF);
 }
@@ -869,7 +868,7 @@ OPHANDLER( retr )
 	burn_cycles(2);
 	pull_pc_psw();
 
-	/* implicitly clear the IRQ in progress flip flop */
+	// implicitly clear the IRQ in progress flip flop
 	m_irq_in_progress = false;
 }
 
@@ -934,145 +933,145 @@ OPHANDLER( xrl_a_n )        { burn_cycles(2); m_a ^= argument_fetch(); }
 
 const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_mcs48_opcodes[256] =
 {
-	OP(nop),        OP(illegal),    OP(outl_bus_a),OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         /* 00 */
+	OP(nop),        OP(illegal),    OP(outl_bus_a),OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         // 00
 	OP(ins_a_bus),  OP(in_a_p1),    OP(in_a_p2),   OP(illegal),   OP(movd_a_p4), OP(movd_a_p5),  OP(movd_a_p6), OP(movd_a_p7),
-	OP(inc_xr0),    OP(inc_xr1),    OP(jb_0),      OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         /* 10 */
+	OP(inc_xr0),    OP(inc_xr1),    OP(jb_0),      OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         // 10
 	OP(inc_r0),     OP(inc_r1),     OP(inc_r2),    OP(inc_r3),    OP(inc_r4),    OP(inc_r5),     OP(inc_r6),    OP(inc_r7),
-	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         /* 20 */
+	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         // 20
 	OP(xch_a_r0),   OP(xch_a_r1),   OP(xch_a_r2),  OP(xch_a_r3),  OP(xch_a_r4),  OP(xch_a_r5),   OP(xch_a_r6),  OP(xch_a_r7),
-	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(jb_1),      OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         /* 30 */
+	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(jb_1),      OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         // 30
 	OP(illegal),    OP(outl_p1_a),  OP(outl_p2_a), OP(illegal),   OP(movd_p4_a), OP(movd_p5_a),  OP(movd_p6_a), OP(movd_p7_a),
-	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        /* 40 */
+	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        // 40
 	OP(orl_a_r0),   OP(orl_a_r1),   OP(orl_a_r2),  OP(orl_a_r3),  OP(orl_a_r4),  OP(orl_a_r5),   OP(orl_a_r6),  OP(orl_a_r7),
-	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(jb_2),      OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          /* 50 */
+	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(jb_2),      OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          // 50
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
-	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         /* 60 */
+	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(jb_3),      OP(illegal),   OP(call_3),    OP(ent0_clk),   OP(jf1),       OP(rr_a),          /* 70 */
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(jb_3),      OP(illegal),   OP(call_3),    OP(ent0_clk),   OP(jf1),       OP(rr_a),          // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
-	OP(movx_a_xr0), OP(movx_a_xr1), OP(illegal),   OP(ret),       OP(jmp_4),     OP(clr_f0),     OP(jni),       OP(illegal),       /* 80 */
+	OP(movx_a_xr0), OP(movx_a_xr1), OP(illegal),   OP(ret),       OP(jmp_4),     OP(clr_f0),     OP(jni),       OP(illegal),       // 80
 	OP(orl_bus_n),  OP(orl_p1_n),   OP(orl_p2_n),  OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
-	OP(movx_xr0_a), OP(movx_xr1_a), OP(jb_4),      OP(retr),      OP(call_4),    OP(cpl_f0),     OP(jnz),       OP(clr_c),         /* 90 */
+	OP(movx_xr0_a), OP(movx_xr1_a), OP(jb_4),      OP(retr),      OP(call_4),    OP(cpl_f0),     OP(jnz),       OP(clr_c),         // 90
 	OP(anl_bus_n),  OP(anl_p1_n),   OP(anl_p2_n),  OP(illegal),   OP(anld_p4_a), OP(anld_p5_a),  OP(anld_p6_a), OP(anld_p7_a),
-	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(clr_f1),     OP(illegal),   OP(cpl_c),         /* A0 */
+	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(clr_f1),     OP(illegal),   OP(cpl_c),         // A0
 	OP(mov_r0_a),   OP(mov_r1_a),   OP(mov_r2_a),  OP(mov_r3_a),  OP(mov_r4_a),  OP(mov_r5_a),   OP(mov_r6_a),  OP(mov_r7_a),
-	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(jb_5),      OP(jmpp_xa),   OP(call_5),    OP(cpl_f1),     OP(jf0),       OP(illegal),       /* B0 */
+	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(jb_5),      OP(jmpp_xa),   OP(call_5),    OP(cpl_f1),     OP(jf0),       OP(illegal),       // B0
 	OP(mov_r0_n),   OP(mov_r1_n),   OP(mov_r2_n),  OP(mov_r3_n),  OP(mov_r4_n),  OP(mov_r5_n),   OP(mov_r6_n),  OP(mov_r7_n),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(sel_rb0),    OP(jz),        OP(mov_a_psw),     /* C0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(sel_rb0),    OP(jz),        OP(mov_a_psw),     // C0
 	OP(dec_r0),     OP(dec_r1),     OP(dec_r2),    OP(dec_r3),    OP(dec_r4),    OP(dec_r5),     OP(dec_r6),    OP(dec_r7),
-	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(jb_6),      OP(xrl_a_n),   OP(call_6),    OP(sel_rb1),    OP(illegal),   OP(mov_psw_a),     /* D0 */
+	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(jb_6),      OP(xrl_a_n),   OP(call_6),    OP(sel_rb1),    OP(illegal),   OP(mov_psw_a),     // D0
 	OP(xrl_a_r0),   OP(xrl_a_r1),   OP(xrl_a_r2),  OP(xrl_a_r3),  OP(xrl_a_r4),  OP(xrl_a_r5),   OP(xrl_a_r6),  OP(xrl_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(movp3_a_xa),OP(jmp_7),     OP(sel_mb0),    OP(jnc),       OP(rl_a),          /* E0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(movp3_a_xa),OP(jmp_7),     OP(sel_mb0),    OP(jnc),       OP(rl_a),          // E0
 	OP(djnz_r0),    OP(djnz_r1),    OP(djnz_r2),   OP(djnz_r3),   OP(djnz_r4),   OP(djnz_r5),    OP(djnz_r6),   OP(djnz_r7),
-	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(jb_7),      OP(illegal),   OP(call_7),    OP(sel_mb1),    OP(jc),        OP(rlc_a),         /* F0 */
+	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(jb_7),      OP(illegal),   OP(call_7),    OP(sel_mb1),    OP(jc),        OP(rlc_a),         // F0
 	OP(mov_a_r0),   OP(mov_a_r1),   OP(mov_a_r2),  OP(mov_a_r3),  OP(mov_a_r4),  OP(mov_a_r5),   OP(mov_a_r6),  OP(mov_a_r7)
 };
 
 const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_upi41_opcodes[256] =
 {
-	OP(nop),        OP(illegal),    OP(out_dbb_a), OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         /* 00 */
+	OP(nop),        OP(illegal),    OP(out_dbb_a), OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         // 00
 	OP(illegal),    OP(in_a_p1),    OP(in_a_p2),   OP(illegal),   OP(movd_a_p4), OP(movd_a_p5),  OP(movd_a_p6), OP(movd_a_p7),
-	OP(inc_xr0),    OP(inc_xr1),    OP(jb_0),      OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         /* 10 */
+	OP(inc_xr0),    OP(inc_xr1),    OP(jb_0),      OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         // 10
 	OP(inc_r0),     OP(inc_r1),     OP(inc_r2),    OP(inc_r3),    OP(inc_r4),    OP(inc_r5),     OP(inc_r6),    OP(inc_r7),
-	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(in_a_dbb),  OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         /* 20 */
+	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(in_a_dbb),  OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         // 20
 	OP(xch_a_r0),   OP(xch_a_r1),   OP(xch_a_r2),  OP(xch_a_r3),  OP(xch_a_r4),  OP(xch_a_r5),   OP(xch_a_r6),  OP(xch_a_r7),
-	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(jb_1),      OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         /* 30 */
+	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(jb_1),      OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         // 30
 	OP(illegal),    OP(outl_p1_a),  OP(outl_p2_a), OP(illegal),   OP(movd_p4_a), OP(movd_p5_a),  OP(movd_p6_a), OP(movd_p7_a),
-	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        /* 40 */
+	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        // 40
 	OP(orl_a_r0),   OP(orl_a_r1),   OP(orl_a_r2),  OP(orl_a_r3),  OP(orl_a_r4),  OP(orl_a_r5),   OP(orl_a_r6),  OP(orl_a_r7),
-	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(jb_2),      OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          /* 50 */
+	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(jb_2),      OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          // 50
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
-	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         /* 60 */
+	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(jb_3),      OP(illegal),   OP(call_3),    OP(illegal),    OP(jf1),       OP(rr_a),          /* 70 */
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(jb_3),      OP(illegal),   OP(call_3),    OP(illegal),    OP(jf1),       OP(rr_a),          // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(clr_f0),     OP(jobf),      OP(illegal),       /* 80 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(clr_f0),     OP(jobf),      OP(illegal),       // 80
 	OP(illegal),    OP(orl_p1_n),   OP(orl_p2_n),  OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
-	OP(mov_sts_a),  OP(illegal),    OP(jb_4),      OP(retr),      OP(call_4),    OP(cpl_f0),     OP(jnz),       OP(clr_c),         /* 90 */
+	OP(mov_sts_a),  OP(illegal),    OP(jb_4),      OP(retr),      OP(call_4),    OP(cpl_f0),     OP(jnz),       OP(clr_c),         // 90
 	OP(illegal),    OP(anl_p1_n),   OP(anl_p2_n),  OP(illegal),   OP(anld_p4_a), OP(anld_p5_a),  OP(anld_p6_a), OP(anld_p7_a),
-	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(clr_f1),     OP(illegal),   OP(cpl_c),         /* A0 */
+	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(clr_f1),     OP(illegal),   OP(cpl_c),         // A0
 	OP(mov_r0_a),   OP(mov_r1_a),   OP(mov_r2_a),  OP(mov_r3_a),  OP(mov_r4_a),  OP(mov_r5_a),   OP(mov_r6_a),  OP(mov_r7_a),
-	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(jb_5),      OP(jmpp_xa),   OP(call_5),    OP(cpl_f1),     OP(jf0),       OP(illegal),       /* B0 */
+	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(jb_5),      OP(jmpp_xa),   OP(call_5),    OP(cpl_f1),     OP(jf0),       OP(illegal),       // B0
 	OP(mov_r0_n),   OP(mov_r1_n),   OP(mov_r2_n),  OP(mov_r3_n),  OP(mov_r4_n),  OP(mov_r5_n),   OP(mov_r6_n),  OP(mov_r7_n),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(sel_rb0),    OP(jz),        OP(mov_a_psw),     /* C0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(sel_rb0),    OP(jz),        OP(mov_a_psw),     // C0
 	OP(dec_r0),     OP(dec_r1),     OP(dec_r2),    OP(dec_r3),    OP(dec_r4),    OP(dec_r5),     OP(dec_r6),    OP(dec_r7),
-	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(jb_6),      OP(xrl_a_n),   OP(call_6),    OP(sel_rb1),    OP(jnibf),     OP(mov_psw_a),     /* D0 */
+	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(jb_6),      OP(xrl_a_n),   OP(call_6),    OP(sel_rb1),    OP(jnibf),     OP(mov_psw_a),     // D0
 	OP(xrl_a_r0),   OP(xrl_a_r1),   OP(xrl_a_r2),  OP(xrl_a_r3),  OP(xrl_a_r4),  OP(xrl_a_r5),   OP(xrl_a_r6),  OP(xrl_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(movp3_a_xa),OP(jmp_7),     OP(en_dma),     OP(jnc),       OP(rl_a),          /* E0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(movp3_a_xa),OP(jmp_7),     OP(en_dma),     OP(jnc),       OP(rl_a),          // E0
 	OP(djnz_r0),    OP(djnz_r1),    OP(djnz_r2),   OP(djnz_r3),   OP(djnz_r4),   OP(djnz_r5),    OP(djnz_r6),   OP(djnz_r7),
-	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(jb_7),      OP(illegal),   OP(call_7),    OP(en_flags),   OP(jc),        OP(rlc_a),         /* F0 */
+	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(jb_7),      OP(illegal),   OP(call_7),    OP(en_flags),   OP(jc),        OP(rlc_a),         // F0
 	OP(mov_a_r0),   OP(mov_a_r1),   OP(mov_a_r2),  OP(mov_a_r3),  OP(mov_a_r4),  OP(mov_a_r5),   OP(mov_a_r6),  OP(mov_a_r7)
 };
 
 const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_i8021_opcodes[256] =
 {
-	OP(nop),        OP(illegal),    OP(illegal),   OP(add_a_n),   OP(jmp_0),     OP(illegal),    OP(illegal),   OP(dec_a),         /* 00 */
+	OP(nop),        OP(illegal),    OP(illegal),   OP(add_a_n),   OP(jmp_0),     OP(illegal),    OP(illegal),   OP(dec_a),         // 00
 	OP(in_a_p0),    OP(in_a_p1),    OP(in_a_p2),   OP(illegal),   OP(movd_a_p4), OP(movd_a_p5),  OP(movd_a_p6), OP(movd_a_p7),
-	OP(inc_xr0),    OP(inc_xr1),    OP(illegal),   OP(adc_a_n),   OP(call_0),    OP(illegal),    OP(jtf),       OP(inc_a),         /* 10 */
+	OP(inc_xr0),    OP(inc_xr1),    OP(illegal),   OP(adc_a_n),   OP(call_0),    OP(illegal),    OP(jtf),       OP(inc_a),         // 10
 	OP(inc_r0),     OP(inc_r1),     OP(inc_r2),    OP(inc_r3),    OP(inc_r4),    OP(inc_r5),     OP(inc_r6),    OP(inc_r7),
-	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(illegal),    OP(illegal),   OP(clr_a),         /* 20 */
+	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(illegal),    OP(illegal),   OP(clr_a),         // 20
 	OP(xch_a_r0),   OP(xch_a_r1),   OP(xch_a_r2),  OP(xch_a_r3),  OP(xch_a_r4),  OP(xch_a_r5),   OP(xch_a_r6),  OP(xch_a_r7),
-	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(illegal),   OP(illegal),   OP(call_1),    OP(illegal),    OP(illegal),   OP(cpl_a),         /* 30 */
+	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(illegal),   OP(illegal),   OP(call_1),    OP(illegal),    OP(illegal),   OP(cpl_a),         // 30
 	OP(illegal),    OP(outl_p1_a),  OP(outl_p2_a), OP(illegal),   OP(movd_p4_a), OP(movd_p5_a),  OP(movd_p6_a), OP(movd_p7_a),
-	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        /* 40 */
+	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        // 40
 	OP(orl_a_r0),   OP(orl_a_r1),   OP(orl_a_r2),  OP(orl_a_r3),  OP(orl_a_r4),  OP(orl_a_r5),   OP(orl_a_r6),  OP(orl_a_r7),
-	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(illegal),   OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          /* 50 */
+	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(illegal),   OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          // 50
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
-	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         /* 60 */
+	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),          /* 70 */
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),          // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),       /* 80 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),       // 80
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
-	OP(outl_p0_a),  OP(illegal),    OP(illegal),   OP(illegal),   OP(call_4),    OP(illegal),    OP(jnz),       OP(clr_c),         /* 90 */
+	OP(outl_p0_a),  OP(illegal),    OP(illegal),   OP(illegal),   OP(call_4),    OP(illegal),    OP(jnz),       OP(clr_c),         // 90
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(anld_p4_a), OP(anld_p5_a),  OP(anld_p6_a), OP(anld_p7_a),
-	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(illegal),    OP(illegal),   OP(cpl_c),         /* A0 */
+	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(illegal),    OP(illegal),   OP(cpl_c),         // A0
 	OP(mov_r0_a),   OP(mov_r1_a),   OP(mov_r2_a),  OP(mov_r3_a),  OP(mov_r4_a),  OP(mov_r5_a),   OP(mov_r6_a),  OP(mov_r7_a),
-	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(illegal),   OP(jmpp_xa),   OP(call_5),    OP(illegal),    OP(illegal),   OP(illegal),       /* B0 */
+	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(illegal),   OP(jmpp_xa),   OP(call_5),    OP(illegal),    OP(illegal),   OP(illegal),       // B0
 	OP(mov_r0_n),   OP(mov_r1_n),   OP(mov_r2_n),  OP(mov_r3_n),  OP(mov_r4_n),  OP(mov_r5_n),   OP(mov_r6_n),  OP(mov_r7_n),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(illegal),    OP(jz),        OP(illegal),       /* C0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(illegal),    OP(jz),        OP(illegal),       // C0
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(illegal),   OP(illegal),    OP(illegal),   OP(illegal),
-	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(illegal),   OP(xrl_a_n),   OP(call_6),    OP(illegal),    OP(illegal),   OP(illegal),       /* D0 */
+	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(illegal),   OP(xrl_a_n),   OP(call_6),    OP(illegal),    OP(illegal),   OP(illegal),       // D0
 	OP(xrl_a_r0),   OP(xrl_a_r1),   OP(xrl_a_r2),  OP(xrl_a_r3),  OP(xrl_a_r4),  OP(xrl_a_r5),   OP(xrl_a_r6),  OP(xrl_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_7),     OP(illegal),    OP(jnc),       OP(rl_a),          /* E0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_7),     OP(illegal),    OP(jnc),       OP(rl_a),          // E0
 	OP(djnz_r0),    OP(djnz_r1),    OP(djnz_r2),   OP(djnz_r3),   OP(djnz_r4),   OP(djnz_r5),    OP(djnz_r6),   OP(djnz_r7),
-	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(illegal),   OP(illegal),   OP(call_7),    OP(illegal),    OP(jc),        OP(rlc_a),         /* F0 */
+	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(illegal),   OP(illegal),   OP(call_7),    OP(illegal),    OP(jc),        OP(rlc_a),         // F0
 	OP(mov_a_r0),   OP(mov_a_r1),   OP(mov_a_r2),  OP(mov_a_r3),  OP(mov_a_r4),  OP(mov_a_r5),   OP(mov_a_r6),  OP(mov_a_r7)
 };
 
 const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_i8022_opcodes[256] =
 {
-	OP(nop),        OP(illegal),    OP(illegal),   OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         /* 00 */
+	OP(nop),        OP(illegal),    OP(illegal),   OP(add_a_n),   OP(jmp_0),     OP(en_i),       OP(illegal),   OP(dec_a),         // 00
 	OP(in_a_p0),    OP(in_a_p1),    OP(in_a_p2),   OP(illegal),   OP(movd_a_p4), OP(movd_a_p5),  OP(movd_a_p6), OP(movd_a_p7),
-	OP(inc_xr0),    OP(inc_xr1),    OP(illegal),   OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         /* 10 */
+	OP(inc_xr0),    OP(inc_xr1),    OP(illegal),   OP(adc_a_n),   OP(call_0),    OP(dis_i),      OP(jtf),       OP(inc_a),         // 10
 	OP(inc_r0),     OP(inc_r1),     OP(inc_r2),    OP(inc_r3),    OP(inc_r4),    OP(inc_r5),     OP(inc_r6),    OP(inc_r7),
-	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         /* 20 */
+	OP(xch_a_xr0),  OP(xch_a_xr1),  OP(illegal),   OP(mov_a_n),   OP(jmp_1),     OP(en_tcnti),   OP(jnt_0),     OP(clr_a),         // 20
 	OP(xch_a_r0),   OP(xch_a_r1),   OP(xch_a_r2),  OP(xch_a_r3),  OP(xch_a_r4),  OP(xch_a_r5),   OP(xch_a_r6),  OP(xch_a_r7),
-	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(illegal),   OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         /* 30 */
+	OP(xchd_a_xr0), OP(xchd_a_xr1), OP(illegal),   OP(illegal),   OP(call_1),    OP(dis_tcnti),  OP(jt_0),      OP(cpl_a),         // 30
 	OP(illegal),    OP(outl_p1_a),  OP(outl_p2_a), OP(illegal),   OP(movd_p4_a), OP(movd_p5_a),  OP(movd_p6_a), OP(movd_p7_a),
-	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        /* 40 */
+	OP(orl_a_xr0),  OP(orl_a_xr1),  OP(mov_a_t),   OP(orl_a_n),   OP(jmp_2),     OP(strt_cnt),   OP(jnt_1),     OP(swap_a),        // 40
 	OP(orl_a_r0),   OP(orl_a_r1),   OP(orl_a_r2),  OP(orl_a_r3),  OP(orl_a_r4),  OP(orl_a_r5),   OP(orl_a_r6),  OP(orl_a_r7),
-	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(illegal),   OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          /* 50 */
+	OP(anl_a_xr0),  OP(anl_a_xr1),  OP(illegal),   OP(anl_a_n),   OP(call_2),    OP(strt_t),     OP(jt_1),      OP(da_a),          // 50
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
-	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         /* 60 */
+	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),         // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),          /* 70 */
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),          // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),       /* 80 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),       // 80
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
-	OP(outl_p0_a),  OP(illegal),    OP(illegal),   OP(retr),      OP(call_4),    OP(illegal),    OP(jnz),       OP(clr_c),         /* 90 */
+	OP(outl_p0_a),  OP(illegal),    OP(illegal),   OP(retr),      OP(call_4),    OP(illegal),    OP(jnz),       OP(clr_c),         // 90
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(anld_p4_a), OP(anld_p5_a),  OP(anld_p6_a), OP(anld_p7_a),
-	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(illegal),    OP(illegal),   OP(cpl_c),         /* A0 */
+	OP(mov_xr0_a),  OP(mov_xr1_a),  OP(illegal),   OP(movp_a_xa), OP(jmp_5),     OP(illegal),    OP(illegal),   OP(cpl_c),         // A0
 	OP(mov_r0_a),   OP(mov_r1_a),   OP(mov_r2_a),  OP(mov_r3_a),  OP(mov_r4_a),  OP(mov_r5_a),   OP(mov_r6_a),  OP(mov_r7_a),
-	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(illegal),   OP(jmpp_xa),   OP(call_5),    OP(illegal),    OP(illegal),   OP(illegal),       /* B0 */
+	OP(mov_xr0_n),  OP(mov_xr1_n),  OP(illegal),   OP(jmpp_xa),   OP(call_5),    OP(illegal),    OP(illegal),   OP(illegal),       // B0
 	OP(mov_r0_n),   OP(mov_r1_n),   OP(mov_r2_n),  OP(mov_r3_n),  OP(mov_r4_n),  OP(mov_r5_n),   OP(mov_r6_n),  OP(mov_r7_n),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(illegal),    OP(jz),        OP(illegal),       /* C0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_6),     OP(illegal),    OP(jz),        OP(illegal),       // C0
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(illegal),   OP(illegal),    OP(illegal),   OP(illegal),
-	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(illegal),   OP(xrl_a_n),   OP(call_6),    OP(illegal),    OP(illegal),   OP(illegal),       /* D0 */
+	OP(xrl_a_xr0),  OP(xrl_a_xr1),  OP(illegal),   OP(xrl_a_n),   OP(call_6),    OP(illegal),    OP(illegal),   OP(illegal),       // D0
 	OP(xrl_a_r0),   OP(xrl_a_r1),   OP(xrl_a_r2),  OP(xrl_a_r3),  OP(xrl_a_r4),  OP(xrl_a_r5),   OP(xrl_a_r6),  OP(xrl_a_r7),
-	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_7),     OP(illegal),    OP(jnc),       OP(rl_a),          /* E0 */
+	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(jmp_7),     OP(illegal),    OP(jnc),       OP(rl_a),          // E0
 	OP(djnz_r0),    OP(djnz_r1),    OP(djnz_r2),   OP(djnz_r3),   OP(djnz_r4),   OP(djnz_r5),    OP(djnz_r6),   OP(djnz_r7),
-	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(illegal),   OP(illegal),   OP(call_7),    OP(illegal),    OP(jc),        OP(rlc_a),         /* F0 */
+	OP(mov_a_xr0),  OP(mov_a_xr1),  OP(illegal),   OP(illegal),   OP(call_7),    OP(illegal),    OP(jc),        OP(rlc_a),         // F0
 	OP(mov_a_r0),   OP(mov_a_r1),   OP(mov_a_r2),  OP(mov_a_r3),  OP(mov_a_r4),  OP(mov_a_r5),   OP(mov_a_r6),  OP(mov_a_r7)
 };
 
@@ -1210,7 +1209,7 @@ void mcs48_cpu_device::device_start()
 
 void mcs48_cpu_device::device_reset()
 {
-	/* confirmed from reset description */
+	// confirmed from reset description
 	m_pc = 0;
 	m_psw = m_psw & (C_FLAG | A_FLAG);
 	update_regptr();
@@ -1232,7 +1231,7 @@ void mcs48_cpu_device::device_reset()
 	if (!m_t0_clk_func.isnull())
 		m_t0_clk_func(0);
 
-	/* confirmed from interrupt logic description */
+	// confirmed from interrupt logic description
 	m_irq_in_progress = false;
 	m_timer_overflow = false;
 
@@ -1250,11 +1249,11 @@ void mcs48_cpu_device::device_reset()
 
 void mcs48_cpu_device::check_irqs()
 {
-	/* if something is in progress, we do nothing */
+	// if something is in progress, we do nothing
 	if (m_irq_in_progress)
 		return;
 
-	/* external interrupts take priority */
+	// external interrupts take priority
 	else if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		burn_cycles(2);
@@ -1267,23 +1266,23 @@ void mcs48_cpu_device::check_irqs()
 			execute_jcc(true);
 		}
 
-		/* transfer to location 0x03 */
+		// transfer to location 0x03
 		execute_call(0x03);
 
-		/* indicate we took the external IRQ */
+		// indicate we took the external IRQ
 		standard_irq_callback(0);
 	}
 
-	/* timer overflow interrupts follow */
+	// timer overflow interrupts follow
 	else if (m_timer_overflow && m_tirq_enabled)
 	{
 		burn_cycles(2);
 		m_irq_in_progress = true;
 
-		/* transfer to location 0x07 */
+		// transfer to location 0x07
 		execute_call(0x07);
 
-		/* timer overflow flip-flop is reset once taken */
+		// timer overflow flip-flop is reset once taken
 		m_timer_overflow = false;
 	}
 }
@@ -1296,45 +1295,45 @@ void mcs48_cpu_device::check_irqs()
 
 void mcs48_cpu_device::burn_cycles(int count)
 {
-	if (count == 0)
-		return;
-
-	bool timerover = false;
-
-	/* if the timer is enabled, accumulate prescaler cycles */
-	if (m_timecount_enabled & TIMER_ENABLED)
+	if (m_timecount_enabled)
 	{
-		uint8_t oldtimer = m_timer;
-		m_prescaler += count;
-		m_timer += m_prescaler >> 5;
-		m_prescaler &= 0x1f;
-		timerover = (oldtimer != 0 && m_timer == 0);
-	}
+		bool timerover = false;
 
-	/* if the counter is enabled, poll the T1 test input once for each cycle */
-	else if (m_timecount_enabled & COUNTER_ENABLED)
-		for ( ; count > 0; count--, m_icount--)
+		// if the timer is enabled, accumulate prescaler cycles
+		if (m_timecount_enabled & TIMER_ENABLED)
 		{
-			m_t1_history = (m_t1_history << 1) | (test_r(1) & 1);
-			if ((m_t1_history & 3) == 2)
-			{
-				if (++m_timer == 0)
-					timerover = true;
-			}
+			uint8_t oldtimer = m_timer;
+			m_prescaler += count;
+			m_timer += m_prescaler >> 5;
+			m_prescaler &= 0x1f;
+			timerover = (oldtimer != 0 && m_timer == 0);
 		}
 
-	/* if timer counter was disabled, adjust icount here (otherwise count is 0) */
-	m_icount -= count;
+		// if the counter is enabled, poll the T1 test input once for each cycle
+		else if (m_timecount_enabled & COUNTER_ENABLED)
+			for ( ; count > 0; count--, m_icount--)
+			{
+				m_t1_history = (m_t1_history << 1) | (test_r(1) & 1);
+				if ((m_t1_history & 3) == 2)
+				{
+					if (++m_timer == 0)
+						timerover = true;
+				}
+			}
 
-	/* if either source caused a timer overflow, set the flags and check IRQs */
-	if (timerover)
-	{
-		m_timer_flag = true;
+		// if either source caused a timer overflow, set the flags
+		if (timerover)
+		{
+			m_timer_flag = true;
 
-		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
-		if (m_tirq_enabled)
-			m_timer_overflow = true;
+			// according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored
+			if (m_tirq_enabled)
+				m_timer_overflow = true;
+		}
 	}
+
+	// (note: if timer counter is enabled, count was already reduced to 0)
+	m_icount -= count;
 }
 
 
@@ -1377,11 +1376,11 @@ void mcs48_cpu_device::execute_run()
 
 uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
 {
-	/* if just reading the status, return it */
+	// if just reading the status, return it
 	if ((offset & 1) != 0)
 		return (m_sts & 0xf3) | (m_f1 ? 8 : 0) | ((m_psw & F_FLAG) ? 4 : 0);
 
-	/* if the output buffer was full, it gets cleared now */
+	// if the output buffer was full, it gets cleared now
 	if (m_sts & STS_OBF)
 	{
 		m_sts &= ~STS_OBF;
@@ -1399,10 +1398,10 @@ uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
 
 TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 {
-	/* data always goes to the input buffer */
+	// data always goes to the input buffer
 	m_dbbi = param & 0xff;
 
-	/* set the appropriate flags */
+	// set the appropriate flags
 	if ((m_sts & STS_IBF) == 0)
 	{
 		m_sts |= STS_IBF;
@@ -1410,7 +1409,7 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 			port_w(2, m_p2 &= ~P2_NIBF);
 	}
 
-	/* set F1 accordingly */
+	// set F1 accordingly
 	bool a0 = bool(param & 0x100);
 	m_f1 = a0;
 }

@@ -15,12 +15,11 @@
 #pragma once
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* register access indexes */
+// register access indexes
 enum
 {
 	MCS48_PC,
@@ -46,7 +45,7 @@ enum
 };
 
 
-/* I/O port access indexes */
+// I/O port access indexes
 enum
 {
 	MCS48_INPUT_IRQ = 0,
@@ -71,32 +70,32 @@ enum
 ***************************************************************************/
 
 /* Official Intel MCS-48 parts */
-DECLARE_DEVICE_TYPE(I8021, i8021_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8022, i8022_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8035, i8035_device)    /* external ROM,         64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8048, i8048_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8648, i8648_device)    /* 1k internal OTP ROM,  64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8748, i8748_device)    /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8039, i8039_device)    /* external ROM,        128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8049, i8049_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8749, i8749_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8021, i8021_device)    // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8022, i8022_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8035, i8035_device)    // external ROM,         64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8048, i8048_device)    // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8648, i8648_device)    // 1k internal OTP ROM,  64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8748, i8748_device)    // 1k internal EEPROM,   64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8039, i8039_device)    // external ROM,        128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8049, i8049_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8749, i8749_device)    // 2k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8040, i8040_device)    // external ROM,        256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8050, i8050_device)    // 4k internal ROM,     256 bytes internal RAM
 
 /* Official Intel UPI-41 parts */
-DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  /* 1k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042,   i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742,   i8742_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  /* 2k internal EEPROM,  256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   // 1k internal EEPROM,   64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  // 1k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  // 1k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042,   i8042_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742,   i8742_device)    // 2k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  // 2k internal ROM,     256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal EEPROM,  256 bytes internal RAM
 
 /* Clones */
-DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
-DECLARE_DEVICE_TYPE(N7751, n7751_device)    /* 8048 clone */
-DECLARE_DEVICE_TYPE(M58715, m58715_device)  /* 8049 clone */
+DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  // 8035 clone
+DECLARE_DEVICE_TYPE(N7751, n7751_device)    // 8048 clone
+DECLARE_DEVICE_TYPE(M58715, m58715_device)  // 8049 clone
 
 
 
@@ -215,7 +214,7 @@ protected:
 
 	int           m_icount;
 
-	/* Memory spaces */
+	// Memory spaces
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
@@ -233,14 +232,14 @@ protected:
 	static const mcs48_ophandler s_i8022_opcodes[256];
 	const mcs48_ophandler *const m_opcode_table;
 
-	/* ROM is mapped to AS_PROGRAM */
+	// ROM is mapped to AS_PROGRAM
 	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }
 
-	/* RAM is mapped to AS_DATA */
+	// RAM is mapped to AS_DATA
 	uint8_t ram_r(offs_t a)             { return m_data.read_byte(a); }
 	void    ram_w(offs_t a, uint8_t v)  { m_data.write_byte(a, v); }
 
-	/* ports are mapped to AS_IO and callbacks */
+	// ports are mapped to AS_IO and callbacks
 	uint8_t ext_r(offs_t a)             { return m_io.read_byte(a); }
 	void    ext_w(offs_t a, uint8_t v)  { m_io.write_byte(a, v); }
 	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
@@ -624,7 +623,7 @@ public:
 class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
-	/* functions for talking to the input/output buffers on the UPI41-class chips */
+	// functions for talking to the input/output buffers on the UPI41-class chips
 	uint8_t upi41_master_r(offs_t offset);
 	void upi41_master_w(offs_t offset, uint8_t data);
 
@@ -692,4 +691,4 @@ public:
 };
 
 
-#endif  // MAME_CPU_MCS48_MCS48_H
+#endif // MAME_CPU_MCS48_MCS48_H
