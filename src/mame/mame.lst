@@ -35828,6 +35828,13 @@ rt1715                          //
 rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
+@source:rtpc.cpp
+rtpc010                         // IBM RT PC Model 010
+rtpc015                         // IBM RT PC Model 015
+rtpc020                         // IBM RT PC Model 020
+rtpc025                         // IBM RT PC Model 025
+rtpc025                         // IBM RT PC Model A25
+
 @source:runaway.cpp
 qwak                            // (proto)          (c) 1982
 runaway                         // (proto)          (c) 1982
