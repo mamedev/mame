@@ -196,7 +196,7 @@ protected:
 	uint8_t       m_timer;              /* 8-bit timer */
 	uint8_t       m_prescaler;          /* 5-bit timer prescaler */
 	uint8_t       m_t1_history;         /* 8-bit history of the T1 input */
-	uint8_t       m_sts;                /* 8-bit status register (UPI-41 only, except for F1) */
+	uint8_t       m_sts;                /* 4-bit status register + OBF/IBF flags (UPI-41 only) */
 	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
 	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
