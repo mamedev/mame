@@ -180,7 +180,7 @@ void wicat_state::video_io(address_map &map)
 	map(0x0400, 0x047f).rw(m_videosram, FUNC(x2210_device::read), FUNC(x2210_device::write)).umask16(0xff00);  // XD2210  4-bit NOVRAM
 	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
 	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
-	map(0x0700, 0x0700).nopw(); // vestigial SN76496 initialization?
+	map(0x0700, 0x0701).nopw(); // vestigial SN76496 initialization?
 	map(0x0800, 0x0807).w("videoctrl", FUNC(ls259_device::write_d0)).umask16(0xffff);
 	map(0x0a00, 0x0a1f).rw(m_videodma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00); // AM9517A DMA
 	map(0x0b00, 0x0b03).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0xff00);  // i8275 CRTC
