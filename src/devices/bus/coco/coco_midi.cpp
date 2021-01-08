@@ -63,7 +63,6 @@ coco_midi_device::coco_midi_device(const machine_config &mconfig, const char *ta
 	: coco_midi_device(mconfig, COCO_MIDI, tag, owner, clock)
 {
 }
-};
 
 void coco_midi_device::device_add_mconfig(machine_config &config)
 {
@@ -93,7 +92,6 @@ WRITE_LINE_MEMBER(coco_midi_device::acia_irq_w)
 	set_line_value(line::CART, state == 0);
 }
 
-namespace {
 dragon_midi_device::dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_midi_device(mconfig, type, tag, owner, clock)
 {
@@ -103,7 +101,6 @@ dragon_midi_device::dragon_midi_device(const machine_config &mconfig, const char
 	: dragon_midi_device(mconfig, DRAGON_MIDI, tag, owner, clock)
 {
 }
-};
 
 void dragon_midi_device::device_start()
 {
@@ -111,6 +108,7 @@ void dragon_midi_device::device_start()
 			read8sm_delegate(m_acia, FUNC(acia6850_device::read)),
 			write8sm_delegate(m_acia, FUNC(acia6850_device::write)));
 }
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_MIDI, device_cococart_interface, coco_midi_device, "coco_midi", "CoCo MIDI PAK")
 DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_MIDI, device_cococart_interface, dragon_midi_device, "dragon_midi", "Dragon MIDI PAK")
