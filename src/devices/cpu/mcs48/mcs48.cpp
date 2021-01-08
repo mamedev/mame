@@ -367,6 +367,7 @@ std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 	return std::make_unique<mcs48_disassembler>((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
 }
 
+
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
@@ -520,7 +521,7 @@ void mcs48_cpu_device::execute_jcc(bool result)
 {
 	uint16_t pch = m_pc & 0xf00;
 	uint8_t offset = argument_fetch();
-	if (result != 0)
+	if (result)
 		m_pc = pch | offset;
 }
 
@@ -656,9 +657,9 @@ OPHANDLER( da_a )
 
 	if ((m_a & 0x0f) > 0x09 || (m_psw & A_FLAG))
 	{
-		m_a += 0x06;
-		if ((m_a & 0xf0) == 0x00)
+		if (m_a > 0xf9)
 			m_psw |= C_FLAG;
+		m_a += 0x06;
 	}
 	if ((m_a & 0xf0) > 0x90 || (m_psw & C_FLAG))
 	{
