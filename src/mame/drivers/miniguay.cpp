@@ -16,7 +16,7 @@
     battery backed RAM
 
     Two different PCBs were found with same components, albeit some from different producers.
-    According to pics of the machine found on the net, it has leds.
+    The machine uses light bulbs.
 */
 
 #include "emu.h"
@@ -162,7 +162,7 @@ void miniguay_state::miniguay(machine_config &config)
 
 ROM_START( miniguay )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "a21t_b-82.bin", 0x0000, 0x8000, CRC(04865da9) SHA1(78cf41d8428eb67ae40e764494ac03d45762500a) )
+	ROM_LOAD( "a21t_b-82.bin", 0x0000, 0x8000, CRC(04865da9) SHA1(78cf41d8428eb67ae40e764494ac03d45762500a) ) // Dumped from two different PCBs
 
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "pat_031_pal16r4.bin", 0x000, 0x104, NO_DUMP )
