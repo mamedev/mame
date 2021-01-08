@@ -103,8 +103,6 @@
 #define B_FLAG          0x10
 
 /* status bits (UPI-41) */
-#define STS_F1          0x08
-#define STS_F0          0x04
 #define STS_IBF         0x02
 #define STS_OBF         0x01
 
@@ -644,13 +642,13 @@ OPHANDLER( call_7 )         { burn_cycles(2); execute_call(argument_fetch() | 0x
 
 OPHANDLER( clr_a )          { burn_cycles(1); m_a = 0; }
 OPHANDLER( clr_c )          { burn_cycles(1); m_psw &= ~C_FLAG; }
-OPHANDLER( clr_f0 )         { burn_cycles(1); m_psw &= ~F_FLAG; m_sts &= ~STS_F0; }
-OPHANDLER( clr_f1 )         { burn_cycles(1); m_sts &= ~STS_F1; }
+OPHANDLER( clr_f0 )         { burn_cycles(1); m_psw &= ~F_FLAG; }
+OPHANDLER( clr_f1 )         { burn_cycles(1); m_f1 = false; }
 
 OPHANDLER( cpl_a )          { burn_cycles(1); m_a ^= 0xff; }
 OPHANDLER( cpl_c )          { burn_cycles(1); m_psw ^= C_FLAG; }
-OPHANDLER( cpl_f0 )         { burn_cycles(1); m_psw ^= F_FLAG; m_sts ^= STS_F0; }
-OPHANDLER( cpl_f1 )         { burn_cycles(1); m_sts ^= STS_F1; }
+OPHANDLER( cpl_f0 )         { burn_cycles(1); m_psw ^= F_FLAG; }
+OPHANDLER( cpl_f1 )         { burn_cycles(1); m_f1 = !m_f1; }
 
 OPHANDLER( da_a )
 {
@@ -746,7 +744,7 @@ OPHANDLER( jb_6 )           { burn_cycles(2); execute_jcc((m_a & 0x40) != 0); }
 OPHANDLER( jb_7 )           { burn_cycles(2); execute_jcc((m_a & 0x80) != 0); }
 OPHANDLER( jc )             { burn_cycles(2); execute_jcc((m_psw & C_FLAG) != 0); }
 OPHANDLER( jf0 )            { burn_cycles(2); execute_jcc((m_psw & F_FLAG) != 0); }
-OPHANDLER( jf1 )            { burn_cycles(2); execute_jcc((m_sts & STS_F1) != 0); }
+OPHANDLER( jf1 )            { burn_cycles(2); execute_jcc(m_f1); }
 OPHANDLER( jnc )            { burn_cycles(2); execute_jcc((m_psw & C_FLAG) == 0); }
 OPHANDLER( jni )            { burn_cycles(2); m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); }
 OPHANDLER( jnibf )          { burn_cycles(2); m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); }
@@ -1102,6 +1100,7 @@ void mcs48_cpu_device::device_start()
 
 	m_a = 0;
 	m_psw = 0;
+	m_f1 = false;
 	m_p1 = 0;
 	m_p2 = 0;
 	m_timer = 0;
@@ -1167,7 +1166,7 @@ void mcs48_cpu_device::device_start()
 
 		if (m_feature_mask & UPI41_FEATURE)
 		{
-			state_add(MCS48_STS,   "STS",       m_sts);
+			state_add(MCS48_STS,   "STS",       m_sts).mask(0xf3);
 			state_add(MCS48_DBBI,  "DBBI",      m_dbbi);
 			state_add(MCS48_DBBO,  "DBBO",      m_dbbo);
 		}
@@ -1180,6 +1179,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_psw));
+	save_item(NAME(m_f1));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_ea));
@@ -1213,7 +1213,8 @@ void mcs48_cpu_device::device_reset()
 	m_pc = 0;
 	m_psw = m_psw & (C_FLAG | A_FLAG);
 	update_regptr();
-	m_a11 = 0x000;
+	m_f1 = false;
+	m_a11 = 0;
 	m_dbbo = 0xff;
 	bus_w(0xff);
 	m_p1 = 0xff;
@@ -1266,8 +1267,7 @@ void mcs48_cpu_device::check_irqs()
 		}
 
 		/* transfer to location 0x03 */
-		push_pc_psw();
-		m_pc = 0x03;
+		execute_call(0x03);
 
 		/* indicate we took the external IRQ */
 		standard_irq_callback(0);
@@ -1280,8 +1280,7 @@ void mcs48_cpu_device::check_irqs()
 		m_irq_in_progress = true;
 
 		/* transfer to location 0x07 */
-		push_pc_psw();
-		m_pc = 0x07;
+		execute_call(0x07);
 
 		/* timer overflow flip-flop is reset once taken */
 		m_timer_overflow = false;
@@ -1379,7 +1378,7 @@ uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
 {
 	/* if just reading the status, return it */
 	if ((offset & 1) != 0)
-		return m_sts;
+		return (m_sts & 0xf3) | (m_f1 ? 8 : 0) | ((m_psw & F_FLAG) ? 4 : 0);
 
 	/* if the output buffer was full, it gets cleared now */
 	if (m_sts & STS_OBF)
@@ -1399,11 +1398,8 @@ uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
 
 TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 {
-	uint8_t a0 = (param >> 8) & 1;
-	uint8_t data = param;
-
 	/* data always goes to the input buffer */
-	m_dbbi = data;
+	m_dbbi = param & 0xff;
 
 	/* set the appropriate flags */
 	if ((m_sts & STS_IBF) == 0)
@@ -1414,10 +1410,8 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 	}
 
 	/* set F1 accordingly */
-	if (a0 == 0)
-		m_sts &= ~STS_F1;
-	else
-		m_sts |= STS_F1;
+	bool a0 = bool(param & 0x100);
+	m_f1 = a0;
 }
 
 void upi41_cpu_device::upi41_master_w(offs_t offset, uint8_t data)
@@ -1486,17 +1480,18 @@ void mcs48_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str = string_format("%c%c %c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c %c%c%c%c%c%c%c%c",
 				m_irq_state ? 'I':'.',
 				m_a11       ? 'M':'.',
+				m_f1        ? '1':'.',
 				m_psw & 0x80 ? 'C':'.',
 				m_psw & 0x40 ? 'A':'.',
-				m_psw & 0x20 ? 'F':'.',
+				m_psw & 0x20 ? '0':'.',
 				m_psw & 0x10 ? 'B':'.',
 				m_psw & 0x08 ? '?':'.',
-				m_psw & 0x04 ? '4':'.',
-				m_psw & 0x02 ? '2':'.',
-				m_psw & 0x01 ? '1':'.');
+				m_psw & 0x04 ? 's':'.',
+				m_psw & 0x02 ? 's':'.',
+				m_psw & 0x01 ? 's':'.');
 			break;
 	}
 }

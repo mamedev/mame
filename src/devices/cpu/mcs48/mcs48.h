@@ -188,7 +188,8 @@ protected:
 
 	uint8_t       m_a;                  /* 8-bit accumulator */
 	uint8_t *     m_regptr;             /* pointer to r0-r7 */
-	uint8_t       m_psw;                /* 8-bit psw */
+	uint8_t       m_psw;                /* 8-bit PSW */
+	bool          m_f1;                 /* F1 flag (F0 is in PSW) */
 	uint8_t       m_p1;                 /* 8-bit latched port 1 */
 	uint8_t       m_p2;                 /* 8-bit latched port 2 */
 	uint8_t       m_ea;                 /* 1-bit latched ea input */
