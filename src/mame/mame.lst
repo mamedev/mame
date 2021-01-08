@@ -1177,8 +1177,9 @@ ajuno2                          //
 mks50                           //
 
 @source:alphasma.cpp
-asma2k                          //
-asmapro                         //
+asma2k                          // (c) 1997 Intelligent Peripheral Devices
+asma3k                          // (c) 2000 AlphaSmart, Inc.
+asmapro                         // (c) 1995 Intelligent Peripheral Devices 
 
 @source:alphatan.cpp
 alphatan                        // 1981 AlphaTantel
