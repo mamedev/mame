@@ -11,13 +11,10 @@
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
  *   - https://github.com/briceonk/news-os
- *
- * Command used to build: make ARCHOPTS=-U_FORTIFY_SOURCE -j 13 SOURCES=src/mame/drivers/news_r4k.cpp REGENIE=1
  * 
  *  CPU configuration:
  *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
- *	- PRId = 0x450 (MIPS3 emulator implementation sets revision to 40 instead of 50 for R4400)
- *		- The user manual warns against using the revision field of PRId in software, so hopefully that won't cause any deltas in behavior.
+ *	- PRId = 0x450
  * 	- config register = 0x1081E4BF
  *  	[31]    CM = 0 (MC mode off)
  *  	[30:28] EC = 001 (clock frequency divided by 3)
@@ -40,8 +37,11 @@
  *  	[3]     CU = 1 (SC uses cacheable coherent update on write)
  *  	[2:0]   K0 = 7 (cache coherency algo, 7 is reserved)
  *	- Known R4400 config differences between this driver and the physical platform:
+ *      - emulated R4400 sets revision to 40 instead of 50. The user manual warns against using the revision field of PRId 
+ *        in software, so hopefully that won't cause any deltas in behavior before that can be configured.
  *		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
  *		- emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
+ *      - In general, the secondary cache isn't emulated, which might influence bits 3:0 of the config register.
  *
  *  General Emulation Status (major chips only, there are additional smaller chips including CPLDs on the boards)
  *  CPU card:
@@ -55,8 +55,8 @@
  *   - National Semi PC8477B Floppy Controller: partially emulated (MAME only has the -A version currently)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial AP-Bus interface controller: skeleton (ESCC connections, probably DMA, AP-Bus interface, etc. handled by this chip)
- *   - 2x Sony CXD8442Q WSC-FIFO AP-Bus FIFO/interface chips: not emulated (handles AP-bus connections and probalby DMA for sound, floppy, etc.)
- *   - National Semi DP83932B-VF SONIC Ethernet controller: not emulated
+ *   - 2x Sony CXD8442Q WSC-FIFO AP-Bus FIFO/interface chips: not emulated (handles AP-bus connections and probably DMA for sound, floppy, etc.)
+ *   - National Semi DP83932B-VF SONIC Ethernet controller: not emulated (also, MAME only has the -C version currently)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet AP-Bus interface controller: not emulated
  *   - Sony CXD8418Q WSC-PARK3: not emulated (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
@@ -210,8 +210,9 @@ protected:
     required_device<z80scc_device> m_escc;
     required_device_array<rs232_port_device, 2> m_serial;
 
-    // SONIC ethernet controller
-    // required_device<am7990_device> m_net;
+    // SONIC ethernet controller - a different rev, the DP83932C, is emulated in MAME
+    // so it hopefully will work with just a little modification.
+    // required_device<dp83932c_device> m_net;
     // std::unique_ptr<u16[]> m_net_ram;
 
     // National Semiconductor PC8477B floppy controller
