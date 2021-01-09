@@ -265,7 +265,6 @@ protected:
     // Constants
     const uint32_t ICACHE_SIZE = 16384;
     const uint32_t DCACHE_SIZE = 16384;
-    const uint32_t NVRAM_SIZE = 0x7f8;
     const char *MAIN_MEMORY_DEFAULT = "64M";
 };
 
@@ -389,16 +388,15 @@ void news_r4k_state::machine_common(machine_config &config)
 		});
 }
 
-void news_r4k_state::nws5000x(machine_config &config)
-{
-    machine_common(config);
-}
+void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
 
 /*
  * cpu_map
  * 
  * Assign the address map for the CPU
- * Reference: https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
+ * References:
+ *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
+ *  - MROM device table
  */
 void news_r4k_state::cpu_map(address_map &map)
 {
@@ -416,7 +414,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // map(0x1f800000, 0x1f800000); // TIMER0
     map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w)); // FREERUN
 
-    // Timekeeper NVRAM and RTC (note: MROM doesn't seem to use all of the NVRAM space)
+    // Timekeeper NVRAM and RTC
     map(0x1f880000, 0x1f881fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0x000000ff);
 
     // Interrupt ports
@@ -446,8 +444,8 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // SPIFI SCSI controllers
-    // This mapping should probably go through the DMAC3 to match the
-    // platform setup. The DMAC has to swap modes when talking to the SPIFI
+    // This mapping should probably go through the DMAC3 to match the platform setup.
+    // The DMAC has to swap modes when talking to the SPIFI.
     map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
     map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
@@ -472,10 +470,6 @@ void news_r4k_state::cpu_map(address_map &map)
     // but, anything that uses these *should* just use the LSBs (famous last words)
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
     // TODO: Floppy aux registers
-    //map(0x1ed60200, 0x1ed60203).lw32(NAME([this](uint32_t data) { LOG("Write 0x%x to FDCAUX0\n", data); if(data & 0x1) m_fdc->set_floppy(nullptr);})); // TODO: is this the equivalent of eject?
-    //map(0x1ed60204, 0x1ed60207).lrw32(NAME([this](){LOG("Read from 0x4-7\n"); return 0;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0x4-7\n", data);})); // ???
-    //map(0x1ed60208, 0x1ed6020b).lrw32(NAME([this](){LOG("Read from 0x8-b\n"); return 0;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0x8-b\n", data);})); // ???
-    //map(0x1ed6020c, 0x1ed6020f).lrw32(NAME([this](){LOG("Read 0x%x from 0xc-f\n", fdaux_intr); return fdaux_intr;}), NAME([this](uint32_t data){LOG("Write 0x%x to 0xc-f\n", data); if(data & 0x1) fdaux_intr &= ~0x1;})); // ???
     map(0x1ed60200, 0x1ed6020f).noprw();
 
     // Assign debug mappings
@@ -488,43 +482,28 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // map(0x1f520004, 0x1f520007); // WBFLUSH
     // map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
-    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK /* interrupt mask */
-    // map(0x14c00014, 0x14c00014); // APBUS_INTST /* interrupt status */
-    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A /* Bus error address */
-    // map(0x14c00034, 0x14c00034); // APBUS_CTRL /* configuration control */
-    // map(0x1400005c, 0x1400005c); // APBUS_DER_A /* DMA error address */
-    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S /* DMA error slot */
-    // map(0x14c00084, 0x14c00084); // APBUS_DMA /* unmapped DMA coherency */
-    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP /* DMA mapping RAM */
+    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK - interrupt mask
+    // map(0x14c00014, 0x14c00014); // APBUS_INTST - interrupt status
+    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A - Bus error address
+    // map(0x14c00034, 0x14c00034); // APBUS_CTRL - configuration control
+    // map(0x1400005c, 0x1400005c); // APBUS_DER_A - DMA error address
+    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
+    // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
+    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
 
-    map(0x1f4c0000, 0x1f4c0007).noprw(); // TODO: Register for something that is accessed very early in mrom flow (0xbfc0040C)
+    //map(0x1f4c0000, 0x1f4c0007).noprw(); // TODO: Register for something that is accessed very early in mrom flow (0xbfc0040C)
     map(0x1e980000, 0x1e9fffff).ram();   // is this mirrored?
     map(0x1fe00000, 0x1fffffff).ram();   // determine mirror of this RAM - it is smaller than this size
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
-            if (offset % 4 == 0 || offset % 4 == 1) { return 0x0; }
-            else if (offset % 4 == 2) { return 0x6f; }
+            if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
-            else { LOG("0x1f3e-1f3ef uh oh!\n"); return 0x0;} })); // ditto ;__;
+            else { return 0x0;} })); // ditto ;__;
     map(0x14400004, 0x14400007).lr8(NAME([this](offs_t offset) {
             if (offset < 1) { return 0x0; }
             else if (offset == 1) { return 0x3; }
             else if (offset == 2) { return 0xff; }
             else if (offset == 3) { return 0x17; }
             else { return 0x0; } }));
-    map(0x14900004, 0x14900007).lr8(NAME([this](offs_t offset) {
-            if (offset < 1) { return 0x0; }
-            else if (offset == 1) { return 0x0; }
-            else if (offset == 2) { return 0x03; }
-            else if (offset == 3) { return 0x28; }
-            else { return 0x0; } })); // DSC-39 region
-
-    // Unknown regions that mrom accesses
-    // map(0x14400008, 0x1440004f).ram(); // not sure what this is, register?
-    // map(0x1ed6020c, 0x1ed6020f).lr8(NAME([this](offs_t o) { return 0x80; }));
-    // map(0x1f4c0000, 0x1f4c0003).ram();
-    // map(0x1f4c0004, 0x1f4c0007).ram(); // 1F4C0000, 1F4C0004 - writes, APBus init?
-    // map(0x1f520008, 0x1f52000B).ram();  // waiting for AP-Bus to come up?
-    // map(0x1f52000C, 0x1f52000F).ram(); // 1F520008, 1F52000C - reads, APBus region??? Physically close to APBus WBFlush instruction
 }
 
 void news_r4k_state::machine_start()
@@ -532,21 +511,9 @@ void news_r4k_state::machine_start()
     // Init front panel LEDs
     m_led.resolve();
 
-    // m_net_ram = std::make_unique<u16[]>(65536);
-    // save_pointer(NAME(m_net_ram), 65536);
-
     save_item(NAME(m_inten));
     save_item(NAME(m_intst));
     save_item(NAME(m_int_state));
-    // TODO: save LED state?
-
-    /*
-    m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::itimer), this));
-    for (bool &int_state : m_int_state)
-        int_state = false;
-    m_lcd_enable = false;
-    m_lcd_dim = false;
-    */
 
     // Allocate freerunning clock (disabled for now)
     // m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
@@ -709,10 +676,6 @@ u32 news_r4k_state::bus_error()
 #else
     m_cpu->bus_error();
 #endif
-    /* NEWS r3k version:
-    if (!machine().side_effects_disabled())
-        irq_w<BERR>(ASSERT_LINE);
-    */
     return 0;
 }
 
@@ -754,7 +717,7 @@ static INPUT_PORTS_START(nws5000)
         PORT_DIPSETTING(0x01, "Bitmap")
     PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
         PORT_DIPSETTING(0x00, "Enable built-in bitmap")
-        PORT_DIPSETTING(0x02, "Disable inner bitmap")
+        PORT_DIPSETTING(0x02, "Disable built-in bitmap")
     PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
         PORT_DIPSETTING(0x00, "Disable Abort/Resume")
         PORT_DIPSETTING(0x04, "Enable Abort/Resume")
