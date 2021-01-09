@@ -1232,7 +1232,7 @@ bool dc42_format::supports_save() const
 	return true;
 }
 
-int dc42_format::identify(io_generic *io, uint32_t form_factor)
+int dc42_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[0x54];
 	uint64_t size = io_generic_size(io);
@@ -1276,7 +1276,7 @@ const floppy_image_format_t::desc_e dc42_format::mac_gcr[] = {
 };
 
 
-bool dc42_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t h[0x54];
 	io_generic_read(io, h, 0, 0x54);
@@ -1350,7 +1350,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 	}
 }
 
-bool dc42_format::save(io_generic *io, floppy_image *image)
+bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);

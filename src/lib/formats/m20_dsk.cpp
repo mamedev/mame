@@ -40,14 +40,14 @@ bool m20_format::supports_save() const
 	return true;
 }
 
-int m20_format::identify(io_generic *io, uint32_t form_factor)
+int m20_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	if(io_generic_size(io) == 286720)
 		return 50;
 	return 0;
 }
 
-bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool m20_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	for (int track = 0; track < 35; track++)
 		for (int head = 0; head < 2; head ++) {
@@ -76,7 +76,7 @@ bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool m20_format::save(io_generic *io, floppy_image *image)
+bool m20_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t bitstream[500000/8];
 	uint8_t sector_data[50000];

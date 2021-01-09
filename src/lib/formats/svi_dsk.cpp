@@ -29,7 +29,7 @@ const char *svi_format::extensions() const
 	return "dsk";
 }
 
-int svi_format::identify(io_generic *io, uint32_t form_factor)
+int svi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -39,7 +39,7 @@ int svi_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool svi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	int head_count;
@@ -91,7 +91,7 @@ bool svi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool svi_format::save(io_generic *io, floppy_image *image)
+bool svi_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t bitstream[500000/8];
 	uint8_t sector_data[50000];

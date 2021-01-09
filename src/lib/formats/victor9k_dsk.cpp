@@ -130,7 +130,7 @@ int victor9k_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int victor9k_format::identify(io_generic *io, uint32_t form_factor)
+int victor9k_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -248,7 +248,7 @@ void victor9k_format::build_sector_description(const format &f, uint8_t *sectdat
 	}
 }
 
-bool victor9k_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool victor9k_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -392,7 +392,7 @@ const int victor9k_format::rpm[9] =
 	252, 267, 283, 300, 321, 342, 368, 401, 417
 };
 
-bool victor9k_format::save(io_generic *io, floppy_image *image)
+bool victor9k_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const format &f = formats[0];
 

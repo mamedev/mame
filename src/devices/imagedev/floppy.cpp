@@ -307,7 +307,7 @@ void floppy_image_device::commit_image()
 	if (err != osd_file::error::NONE)
 		popmessage("Error, unable to truncate image: %d", int(err));
 
-	output_format->save(&io, image.get());
+	output_format->save(&io, variants, image.get());
 }
 
 //-------------------------------------------------
@@ -413,7 +413,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	floppy_image_format_t *best_format = nullptr;
 	for (floppy_image_format_t *format = fif_list; format; format = format->next)
 	{
-		int score = format->identify(&io, form_factor);
+		int score = format->identify(&io, form_factor, variants);
 		if(score > best) {
 			best = score;
 			best_format = format;
@@ -460,7 +460,7 @@ image_init_result floppy_image_device::call_load()
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
 	for (floppy_image_format_t *format = fif_list; format; format = format->next) {
-		int score = format->identify(&io, form_factor);
+		int score = format->identify(&io, form_factor, variants);
 		if(score > best) {
 			best = score;
 			best_format = format;
@@ -473,7 +473,7 @@ image_init_result floppy_image_device::call_load()
 	}
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
-	if (!best_format->load(&io, form_factor, image.get())) {
+	if (!best_format->load(&io, form_factor, variants, image.get())) {
 		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
 		image.reset();
 		return image_init_result::FAIL;

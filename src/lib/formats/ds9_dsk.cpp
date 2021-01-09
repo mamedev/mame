@@ -113,7 +113,7 @@ void ds9_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_c
 	track_count = head_count = sector_count = 0;
 }
 
-int ds9_format::identify(io_generic *io, uint32_t form_factor)
+int ds9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -123,7 +123,7 @@ int ds9_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool ds9_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool ds9_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);

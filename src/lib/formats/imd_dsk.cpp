@@ -409,7 +409,7 @@ void imd_format::fixnum(char *start, char *end) const
 	};
 }
 
-int imd_format::identify(io_generic *io, uint32_t form_factor)
+int imd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[4];
 
@@ -420,7 +420,7 @@ int imd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
@@ -561,7 +561,7 @@ bool can_compress(const uint8_t* buffer, uint8_t ptrn, uint64_t size)
 	return true;
 }
 
-bool imd_format::save(io_generic* io, floppy_image* image)
+bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t pos = 0;
 	io_generic_write(io, &m_comment[0], pos, m_comment.size());
