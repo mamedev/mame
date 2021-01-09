@@ -158,7 +158,7 @@ protected:
     enum irq1_number : uint32_t
     {
         KBD = 0x01,
-        SCC = 0x02,
+        ESCC = 0x02,
         AUDIO0 = 0x04,
         AUDIO1 = 0x08,
         PARALLEL = 0x20,
@@ -228,9 +228,6 @@ protected:
     required_device<spifi3_device> m_scsi1;
     required_device<nscsi_bus_device> m_scsibus0;
     required_device<nscsi_bus_device> m_scsibus1;
-
-    // DSC-39 "xb" video card
-    // required_shared_ptr<u32> m_vram;
 
     // LED control
     output_finder<6> m_led;
@@ -302,7 +299,7 @@ void news_r4k_state::machine_common(machine_config &config)
 
     // ESCC setup
     CXD8421Q(config, m_escc, 0);
-    m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
+    m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
@@ -349,42 +346,16 @@ void news_r4k_state::machine_common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:5", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
-    // Connect SPIFI3s to the buses
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config( // TODO: clock?
+    // Connect SPIFI3s to the buses 
+	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config(
 		[this](device_t *device)
 		{
-            /* TODO
-			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
-
-			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
-			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
-			adapter.port_out_cb().set(
-				[this](u8 data)
-				{
-					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
-				});
-
-			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
-			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
-            */
+            // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
 		});
-        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config( // TODO: clock?
+        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config(
 		[this](device_t *device)
 		{
-            /* TODO
-			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
-
-			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
-			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
-			adapter.port_out_cb().set(
-				[this](u8 data)
-				{
-					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
-				});
-
-			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
-			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
-            */
+            // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
 		});
 }
 
