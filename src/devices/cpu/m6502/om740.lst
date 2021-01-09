@@ -152,13 +152,34 @@ jsr_zpi
 	PC = TMP;
 	prefetch();
 
-reset740
+plp_m_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	TMP = read(SP) | (F_B);
+	inst_state_base = (TMP & F_T) ? 0x100 : 0;
+	prefetch();
+	P = TMP; // Do *not* move it before the prefetch
+
+rti_m_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	P = read(SP) | (F_B);
+	inst_state_base = (P & F_T) ? 0x100 : 0;
+	inc_SP();
+	PC = read(SP);
+	inc_SP();
+	PC = set_h(PC, read(SP));
+	prefetch();
+
+reset_m
 	P |= F_I; PC = read_arg(0xfffe);
 	PC = set_h(PC, read_arg(0xffff));
 	prefetch();
 	inst_state = -1;
 
-brk740_imp
+brk_m_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
 		read_pc_noinc();
