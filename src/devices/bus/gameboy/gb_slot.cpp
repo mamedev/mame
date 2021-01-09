@@ -17,7 +17,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "gb_slot.h"
 
@@ -222,7 +221,7 @@ static int gb_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -314,13 +313,13 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 			if (get_feature("rumble"))
 			{
-				if (!core_stricmp(get_feature("rumble"), "yes"))
+				if (!strcmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(true);
 			}
 
 			if (get_feature("rtc"))
 			{
-				if (!core_stricmp(get_feature("rtc"), "yes"))
+				if (!strcmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_timer(true);
 			}
 		}

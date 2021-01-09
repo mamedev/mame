@@ -11,6 +11,7 @@
 #include "options.h"
 
 #include "corestr.h"
+#include "osdcomm.h"
 
 #include <locale>
 #include <string>
@@ -1000,12 +1001,12 @@ void core_options::set_value(const std::string &name, std::string &&value, int p
 
 void core_options::set_value(const std::string &name, int value, int priority)
 {
-	set_value(name, string_format("%d", value), priority);
+	set_value(name, util::string_format("%d", value), priority);
 }
 
 void core_options::set_value(const std::string &name, float value, int priority)
 {
-	set_value(name, string_format("%f", value), priority);
+	set_value(name, util::string_format("%f", value), priority);
 }
 
 

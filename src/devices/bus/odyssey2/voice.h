@@ -32,6 +32,8 @@ public:
 
 	virtual void write_p1(u8 data) override { m_control = data; if (m_subslot->exists()) m_subslot->write_p1(data & 3); }
 	virtual void write_p2(u8 data) override { if (m_subslot->exists()) m_subslot->write_p2(data & ~4); }
+	virtual void bus_write(u8 data) override { if (m_subslot->exists()) m_subslot->bus_write(data); }
+	virtual u8 bus_read() override { return (m_subslot->exists()) ? m_subslot->bus_read() : 0xff; }
 
 	virtual void io_write(offs_t offset, u8 data) override;
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) override;
@@ -48,9 +50,6 @@ private:
 	required_device<sp0256_device> m_speech;
 	required_device<o2_cart_slot_device> m_subslot;
 
-	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
-
-	int m_lrq_state = 0;
 	u8 m_control = 0;
 };
 

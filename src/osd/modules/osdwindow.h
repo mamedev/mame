@@ -65,24 +65,28 @@ class osd_monitor_info;
 class osd_window : public std::enable_shared_from_this<osd_window>
 {
 public:
-	osd_window(const osd_window_config &config)
+	osd_window(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config)
 	:
 #ifdef OSD_WINDOWS
 		m_dc(nullptr), m_resize_state(0),
 #endif
+		m_target(nullptr),
 		m_primlist(nullptr),
 		m_win_config(config),
-		m_index(0),
+		m_index(index),
+		m_fullscreen(false),
 		m_prescale(1),
+		m_machine(machine),
+		m_monitor(std::move(monitor)),
 		m_renderer(nullptr),
 		m_main(nullptr)
 		{}
 
 	virtual ~osd_window() { }
 
-	virtual render_target *target() = 0;
-	virtual int fullscreen() const = 0;
-	virtual running_machine &machine() const = 0;
+	render_target *target() const { return m_target; }
+	int fullscreen() const { return m_fullscreen; }
+	running_machine &machine() const { return m_machine; }
 
 	bool has_renderer() const { return m_renderer != nullptr; }
 	osd_renderer &renderer() const { return *m_renderer; }
@@ -92,11 +96,12 @@ public:
 	}
 	void renderer_reset() { m_renderer.reset(); }
 
-	int prescale() const { return m_prescale; };
+	int index() const { return m_index; }
+	int prescale() const { return m_prescale; }
 
 	float pixel_aspect() const;
 
-	bool swap_xy()
+	bool swap_xy() const
 	{
 		bool orientation_swap_xy =
 			(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
@@ -105,21 +110,24 @@ public:
 		return orientation_swap_xy ^ rotation_swap_xy;
 	};
 
-	bool keepaspect()
+	bool keepaspect() const
 	{
-		render_target *target = this->target();
-		if (target != nullptr)
-			return target->keepaspect();
+		if (m_target != nullptr)
+			return m_target->keepaspect();
 		else
 			return false;
 	}
 
 	virtual osd_dim get_size() = 0;
 
-	virtual osd_monitor_info *monitor() const = 0;
+	osd_monitor_info *monitor() const { return m_monitor.get(); }
+	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect *proposed) const;
 
 	std::shared_ptr<osd_window> main_window() const { return m_main;    }
 	void set_main_window(std::shared_ptr<osd_window> main) { m_main = main; }
+
+	void create_target();
+	void destroy();
 
 	// Clips the pointer to the bounds of this window
 	virtual void capture_pointer() = 0;
@@ -131,22 +139,33 @@ public:
 	virtual void hide_pointer() = 0;
 
 	virtual void update() = 0;
-	virtual void destroy() = 0;
+	virtual void complete_destroy() = 0;
 
 #if defined(OSD_WINDOWS) || defined(OSD_UWP)
 	virtual bool win_has_menu() = 0;
 #endif
 
+private:
+	void set_starting_view(int index, const char *defview, const char *view);
+
+public: // TODO: make these private
 #ifdef OSD_WINDOWS
 	HDC                     m_dc;       // only used by GDI renderer!
 	int                     m_resize_state;
 #endif
+private:
+	render_target           *m_target;
+public:
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
+private:
 	int                     m_index;
 protected:
+	bool                    m_fullscreen;
 	int                     m_prescale;
 private:
+	running_machine         &m_machine;
+	std::shared_ptr<osd_monitor_info> m_monitor;
 	std::unique_ptr<osd_renderer>  m_renderer;
 	std::shared_ptr<osd_window>    m_main;
 };
@@ -157,8 +176,8 @@ class osd_window_t : public osd_window
 private:
 	TWindowHandle m_platform_window;
 public:
-	osd_window_t(const osd_window_config &config)
-		: osd_window(config),
+	osd_window_t(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config)
+		: osd_window(machine, index, std::move(monitor), config),
 		m_platform_window(nullptr)
 	{
 	}

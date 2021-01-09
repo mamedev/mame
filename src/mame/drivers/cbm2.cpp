@@ -342,12 +342,12 @@ static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 
 QUICKLOAD_LOAD_MEMBER(cbm2_state::quickload_cbmb)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
 }
 
 QUICKLOAD_LOAD_MEMBER(p500_state::quickload_p500)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
 }
 
 //**************************************************************************

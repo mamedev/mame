@@ -40,7 +40,7 @@ img_format::img_format()
 {
 }
 
-int img_format::identify(io_generic *io, uint32_t form_factor)
+int img_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -52,7 +52,7 @@ int img_format::identify(io_generic *io, uint32_t form_factor)
 	}
 }
 
-bool img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool img_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	if (size != IMG_IMAGE_SIZE) {
@@ -96,7 +96,7 @@ bool img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool img_format::save(io_generic *io, floppy_image *image)
+bool img_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	for (int cyl = 0; cyl < TRACKS; cyl++) {
 		uint8_t bitstream[ 21000 ];

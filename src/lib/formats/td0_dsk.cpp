@@ -819,7 +819,7 @@ const char *td0_format::extensions() const
 	return "td0";
 }
 
-int td0_format::identify(io_generic *io, uint32_t form_factor)
+int td0_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[7];
 
@@ -831,7 +831,7 @@ int td0_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool td0_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count = 0;
 	int head_count = 0;
@@ -1028,7 +1028,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool td0_format::save(io_generic *io, floppy_image *image)
+bool td0_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

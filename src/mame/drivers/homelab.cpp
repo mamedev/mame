@@ -601,6 +601,8 @@ void homelab2_state::machine_start()
 	m_bank1->set_entry(0);
 	m_rows = 25;
 	m_cols = 40;
+	m_nmi = 0;
+	m_spr_bit = 0;
 }
 
 void homelab3_state::machine_start()

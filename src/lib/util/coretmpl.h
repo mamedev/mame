@@ -13,8 +13,7 @@
 #pragma once
 
 #include "osdcomm.h"
-#include "osdcore.h"
-#include "corealloc.h"
+#include "vecstream.h"
 
 #include <array>
 #include <cassert>
@@ -28,6 +27,7 @@
 #include <numeric>
 #include <set>
 #include <stdexcept>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -911,6 +911,15 @@ private:
 	typename fifo::iterator m_head, m_tail;
 	bool                    m_empty;
 };
+
+
+// extract a string_view from an ovectorstream buffer
+template <typename CharT, typename Traits, typename Allocator>
+std::basic_string_view<CharT, Traits> buf_to_string_view(basic_ovectorstream<CharT, Traits, Allocator> &stream)
+{
+	// this works on the assumption that the value tellp returns is the same both before and after vec is called
+	return std::basic_string_view<CharT, Traits>(&stream.vec()[0], stream.tellp());
+}
 
 
 template <typename E>

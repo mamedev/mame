@@ -969,6 +969,14 @@ const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t varian
 	return "Unknown";
 }
 
+bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, uint32_t variant)
+{
+	for(uint32_t v : variants)
+		if(variant == v)
+			return true;
+	return false;
+}
+
 floppy_image_format_t::floppy_image_format_t()
 {
 	next = nullptr;
@@ -986,7 +994,7 @@ void floppy_image_format_t::append(floppy_image_format_t *_next)
 		next = _next;
 }
 
-bool floppy_image_format_t::save(io_generic *, floppy_image *)
+bool floppy_image_format_t::save(io_generic *, const std::vector<uint32_t> &, floppy_image *)
 {
 	return false;
 }

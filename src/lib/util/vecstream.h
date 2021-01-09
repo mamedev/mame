@@ -28,7 +28,6 @@
 #include <ostream>
 #include <streambuf>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -45,7 +44,6 @@ public:
 	typedef typename std::basic_streambuf<CharT, Traits>::off_type  off_type;
 	typedef Allocator                                               allocator_type;
 	typedef std::vector<char_type, Allocator>                       vector_type;
-	typedef std::basic_string_view<char_type>                       string_view_type;
 
 	basic_vectorbuf(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_streambuf<CharT, Traits>(), m_mode(mode), m_storage(), m_threshold(nullptr)
 	{
@@ -74,14 +72,21 @@ public:
 
 	vector_type const &vec() const
 	{
-		finalize();
+		if (m_mode & std::ios_base::out)
+		{
+			if (this->pptr() > m_threshold) m_threshold = this->pptr();
+			auto const base(this->pbase());
+			auto const end(m_threshold - base);
+			if (m_storage.size() > std::make_unsigned_t<decltype(end)>(end))
+			{
+				m_storage.resize(std::make_unsigned_t<decltype(end)>(end));
+				assert(&m_storage[0] == base);
+				auto const put_offset(this->pptr() - base);
+				const_cast<basic_vectorbuf *>(this)->setp(base, base + put_offset);
+				const_cast<basic_vectorbuf *>(this)->pbump(put_offset);
+			}
+		}
 		return m_storage;
-	}
-
-	explicit operator string_view_type() const
-	{
-		finalize();
-		return string_view_type(this->pbase(), this->pptr() - this->pbase());
 	}
 
 	void vec(const vector_type &content)
@@ -302,24 +307,6 @@ private:
 		}
 	}
 
-	void finalize() const
-	{
-		if (m_mode & std::ios_base::out)
-		{
-			if (this->pptr() > m_threshold) m_threshold = this->pptr();
-			auto const base(this->pbase());
-			auto const end(m_threshold - base);
-			if (m_storage.size() > std::make_unsigned_t<decltype(end)>(end))
-			{
-				m_storage.resize(std::make_unsigned_t<decltype(end)>(end));
-				assert(&m_storage[0] == base);
-				auto const put_offset(this->pptr() - base);
-				const_cast<basic_vectorbuf *>(this)->setp(base, base + put_offset);
-				const_cast<basic_vectorbuf *>(this)->pbump(put_offset);
-			}
-		}
-	}
-
 	std::ios_base::openmode m_mode;
 	mutable vector_type     m_storage;
 	mutable CharT           *m_threshold;
@@ -330,14 +317,12 @@ class basic_ivectorstream : public std::basic_istream<CharT, Traits>
 {
 public:
 	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::string_view_type string_view_type;
 
 	basic_ivectorstream(std::ios_base::openmode mode = std::ios_base::in) : std::basic_istream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_ivectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::in) : std::basic_istream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
 	basic_ivectorstream(vector_type &&content, std::ios_base::openmode mode = std::ios_base::in) : std::basic_istream<CharT, Traits>(&m_rdbuf), m_rdbuf(std::move(content), mode) { }
 
 	basic_vectorbuf<CharT, Traits, Allocator> *rdbuf() const { return static_cast<basic_vectorbuf<CharT, Traits, Allocator> *>(std::basic_istream<CharT, Traits>::rdbuf()); }
-	explicit operator string_view_type() const { return string_view_type(*rdbuf()); }
 	vector_type const &vec() const { return rdbuf()->vec(); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
@@ -353,7 +338,6 @@ class basic_ovectorstream : public std::basic_ostream<CharT, Traits>
 {
 public:
 	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::string_view_type string_view_type;
 
 	basic_ovectorstream(std::ios_base::openmode mode = std::ios_base::out) : std::basic_ostream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_ovectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::out) : std::basic_ostream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
@@ -362,7 +346,6 @@ public:
 	basic_vectorbuf<CharT, Traits, Allocator> *rdbuf() const { return static_cast<basic_vectorbuf<CharT, Traits, Allocator> *>(std::basic_ostream<CharT, Traits>::rdbuf()); }
 
 	vector_type const &vec() const { return rdbuf()->vec(); }
-	explicit operator string_view_type() const { return string_view_type(*rdbuf()); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
 	basic_ovectorstream &reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); return *this; }
@@ -378,7 +361,6 @@ class basic_vectorstream : public std::basic_iostream<CharT, Traits>
 {
 public:
 	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::string_view_type string_view_type;
 
 	basic_vectorstream(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_iostream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_vectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_iostream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
@@ -387,7 +369,6 @@ public:
 	basic_vectorbuf<CharT, Traits, Allocator> *rdbuf() const { return static_cast<basic_vectorbuf<CharT, Traits, Allocator> *>(std::basic_iostream<CharT, Traits>::rdbuf()); }
 
 	vector_type const &vec() const { return rdbuf()->vec(); }
-	explicit operator string_view_type() const { return string_view_type(*rdbuf()); }
 	void vec(const vector_type &content) { rdbuf()->vec(content); }
 	void vec(vector_type &&content) { rdbuf()->vec(std::move(content)); }
 	basic_vectorstream &reserve(typename vector_type::size_type size) { rdbuf()->reserve(size); return *this; }

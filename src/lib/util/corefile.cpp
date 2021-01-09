@@ -10,6 +10,8 @@
 
 #include "corefile.h"
 
+#include "coretmpl.h"
+#include "osdcore.h"
 #include "unicode.h"
 #include "vecstream.h"
 
@@ -600,7 +602,7 @@ int core_text_file::vprintf(util::format_argument_pack<std::ostream> const &args
 	m_printf_buffer.reserve(1024);
 	m_printf_buffer.seekp(0, ovectorstream::beg);
 	util::stream_format<std::ostream, std::ostream>(m_printf_buffer, args);
-	return puts(std::string_view(m_printf_buffer));
+	return puts(buf_to_string_view(m_printf_buffer));
 }
 
 

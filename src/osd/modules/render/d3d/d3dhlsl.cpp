@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "render.h"
+#include "rendlay.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"

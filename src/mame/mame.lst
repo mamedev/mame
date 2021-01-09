@@ -1177,8 +1177,11 @@ ajuno2                          //
 mks50                           //
 
 @source:alphasma.cpp
-asma2k                          //
-asmapro                         //
+asma2k                          // (c) 1997 Intelligent Peripheral Devices
+asmapro                         // (c) 1995 Intelligent Peripheral Devices 
+
+@source:alphasma3k.cpp
+asma3k                          // (c) 2000 AlphaSmart, Inc.
 
 @source:alphatan.cpp
 alphatan                        // 1981 AlphaTantel
@@ -9252,6 +9255,7 @@ tripjok                         //
 
 @source:bingoc.cpp
 bingoc                          // (c) 1989 Sega
+bingoct                         // (c) 1989 Sega
 
 @source:bingoman.cpp
 bingoman                        //
@@ -14079,18 +14083,19 @@ aligatoruna                     // (c) 1994 - Ref 940411 (unprotected)
 aligatorp                       //
 bang                            // (c) 1998 - Ref ???
 bangj                           // (c) 1999 - Ref ???
-play2000                        // (c) 1999 - Ref ???
-play2000_40i                    // (c) 1999 - Ref ???
-play2000_50i                    // (c) 1999 - Ref ???
-srollnd
+chmppool
 maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
 maniacsqs                       // (c) 1996 - Ref 960419/1
+play2000                        // (c) 1999 - Ref ???
+play2000_40i                    // (c) 1999 - Ref ???
+play2000_50i                    // (c) 1999 - Ref ???
 sltpcycl                        // (c) 1997 - Ref 970410
 sltpstep
 snowboar                        // (c) 1996 - Ref 960419/1
 snowboara                       // (c) 1996 - Ref 960419/1
+srollnd
 touchgo                         // (c) 1995 - Ref 950906
 touchgoe                        // (c) 1995 - Ref 950510-1
 touchgon                        // (c) 1995 - Ref 950906
@@ -16004,7 +16009,7 @@ hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:heromem.cpp
-heromem                         //
+heromem                         // E34 (c) 1997 Taito
 
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
@@ -16941,6 +16946,7 @@ isbc86                          //
 rpc86                           //
 isbc8605                        //
 isbc8630                        //
+sm1810                          //
 
 @source:isbc8010.cpp
 isbc8010                        //
@@ -19245,7 +19251,7 @@ drmn10m                         // 2004 - DrumMania 10th Mix (G*D40 VER. JAA)
 drmn2m                          // 1999 - DrumMania 2nd Mix (GE912 VER. JAB)
 drmn2mpu                        // 1999 - DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)
 drmn3m                          // 2000 - DrumMania 3rd Mix (G*A23 VER. JAA)
-drmn4m                          // 2000 - DrumMania 4th Mix (G*A25 VER. JAA)
+drmn4m                          // 2001 - DrumMania 4th Mix (G*A25 VER. JAA)
 drmn5m                          // 2001 - DrumMania 5th Mix (G*B05 VER. JAA)
 drmn6m                          // 2001 - DrumMania 6th Mix (G*B16 VER. JAA)
 drmn7m                          // 2002 - DrumMania 7th Mix power-up ver. (G*C07 VER. JBA)
@@ -19310,7 +19316,8 @@ mamboagga                       // 2001 - Mambo A Go-Go e-Amusement (GQA40 VER. 
 mrtlbeat                        // 2002 - Martial Beat (Martial Beat (G*B47 VER. JBA)
 pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. KAA)
 pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
-pcnfrk4m                        // 2000 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
+pcnfrk4m                        // 2001 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
+pcnfrk4mk                       // 2001 - Percussion Freaks 4rd Mix (G*A25 VER. KAA)
 pcnfrk5m                        // 2001 - Percussion Freaks 5th Mix (G*B05 VER. KAA)
 pnchmn                          // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB)
 pnchmn2                         // 2000 - Punch Mania 2: Hokuto no Ken (GQA09 JAA)
@@ -23154,6 +23161,9 @@ miniforce                       // D26 cabinet test board
 @source:miniframe.cpp
 minifram
 
+@source:miniguay.cpp
+miniguay
+
 @source:minitel_2_rpic.cpp
 minitel2                        //
 
@@ -23384,41 +23394,43 @@ zerogunaj                       // 1997.12 Zero Gunner (Japan)
 zerogunj                        // 1997.12 Zero Gunner (Japan)
 
 @source:model3.cpp
-bass                            // 1997.12 Get Bass
-bassdx                          //
+bassdx                          // 1997.12 Sega Bass Fishing Deluxe (USA)
 dayto2pe                        // 1998.12 Daytone USA 2 Power Edition
 daytona2                        // 1998.06 Daytona USA 2
-dirtdvls                        // 1998.10 Dirt Devils
-dirtdvlsa                       //
-dirtdvlsj                       //
-dirtdvlsg                       //
+dirtdvls                        // 1998.10 Dirt Devils (rev A) - Export
+dirtdvlsj                       // 1998.10 Dirt Devils (rev A) - Japan
+dirtdvlsg                       // Export Ver. G?
+dirtdvlsu                       // 1998.10 Dirt Devils (rev A) - USA
+dirtdvlsau                      // 1998.10 Dirt Devils (rev A) - Australia
 eca                             // 1999.10 Kyukyuusya Emergency Call Ambulance
 ecap                            // 1999.12 Emergency Call Ambulance - US proto or location test
 ecaj                            //
 ecau                            //
 fvipers2                        // 1998.04 Fighting Vipers 2 (rev A)
 fvipers2o                       // 1998.?? Fighting Vipers 2
-getbass                         //
+getbass                         // 1997.12 Get Bass Standard (Japan)
+getbassdx                       // 1997.12 Get Bass Deluxe (Japan)
+getbassur                       // 1997.12 Get Bass Upright (Japan)
 harley                          // 199?.?? Harley Davidson & L.A.Riders (rev B)
 harleya                         // 1997.12 Harley Davidson & L.A.Riders (rev A)
-lamachin                        // 1998.12 L.A. Machine Guns
-lemans24                        // 1997.09 Le Mans 24
+lamachin                        // 1998.12 L.A. Machine Guns (Japan)
+lemans24                        // 1997.09 Le Mans 24 (Japan)
 lostwsga                        // 1997.07 Lost World Jurassic Park
 lostwsgp                        // 1997.06 Lost World Jurassic Park (location test)
-magtruck                        // 1999.03 Magical Truck Adventure (US)
-oceanhun                        // 1998.09 Ocean Hunter
-scud                            // 1996.12 Scud Race
-scuda                           //
-scudj                           //
-scudplus                        // 1997.09 Scud Race Plus (rev A)
-scudplusa                       // 1997.09 Scud Race Plus
+magtruck                        // 1999.03 Magical Truck Adventure (Japan)
+oceanhun                        // 1998.09 Ocean Hunter (Japan)
+scud                            // 1996.12 Scud Race Twin/DX
+scudau                          // 1996.12 Scud Race Twin/DX - Australia
+scuddx                          // 1996.12 Scud Race Deluxe
+scudplus                        // 1997.09 Scud Race Plus Twin/DX (rev A)
+scudplusa                       // 1997.09 Scud Race Plus Twin/DX
 skichamp                        // 1998.01 Ski Champ
 spikeofe                        // 1999.01 Spikeout Final Edition
 spikeout                        // 1998.09 Spikeout
 srally2                         // 1998.02 Sega Rally 2 Championship
 srally2p                        // 1997.12 Sega Rally 2 (prototype, 29 Dec 1997)
+srally2dx                       //
 srally2pa                       // 1997.12 Sega Rally 2 (prototype, 8 Dec 1997)
-srally2x                        //
 swtrilgy                        // 1998.12 Star Wars Trilogy Arcade (rev A)
 swtrilgya                       // 1998.11 Star Wars Trilogy Arcade
 swtrilgyp                       // 1998.09 Star Wars Trilogy Arcade (prototype)
@@ -35819,6 +35831,13 @@ rt1715                          //
 rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
+@source:rtpc.cpp
+rtpc010                         // IBM RT PC Model 010
+rtpc015                         // IBM RT PC Model 015
+rtpc020                         // IBM RT PC Model 020
+rtpc025                         // IBM RT PC Model 025
+rtpca25                         // IBM RT PC Model A25
+
 @source:runaway.cpp
 qwak                            // (proto)          (c) 1982
 runaway                         // (proto)          (c) 1982
@@ -36427,6 +36446,10 @@ sbasketh                        // GX405 (c) 1984 (Version H, Unprotected)
 
 @source:sbc6510.cpp
 sbc6510                         //
+
+@source:sbmjb.cpp
+sbmjb                           // E41 (c) 1998 Taito
+
 
 @source:sbowling.cpp
 sbowling                        // KB  (c) 1982 Taito Corporation
@@ -37998,16 +38021,12 @@ trvhanga                        // (c) 1984 SMS MFG CORP
 snes                            // Nintendo Super Nintendo NTSC
 snespal                         // Nintendo Super Nintendo PAL
 
-@source:snesb51.cpp
-mk3snes
-snes4sl
-snes4sln
-
 @source:snesb.cpp
 denseib                         // bootleg
 denseib2                        // bootleg
 endless                         // bootleg
 endlessa                        // bootleg
+fatfurspb                       // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
@@ -38016,6 +38035,11 @@ rushbets                        // bootleg
 sblast2b                        // bootleg
 venom                           // bootleg
 wldgunsb                        // bootleg
+
+@source:snesb51.cpp
+mk3snes
+snes4sl
+snes4sln
 
 @source:snk.cpp
 alphamis                        // (c) 1985

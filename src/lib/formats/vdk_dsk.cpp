@@ -31,7 +31,7 @@ const char *vdk_format::extensions() const
 	return "vdk";
 }
 
-int vdk_format::identify(io_generic *io, uint32_t form_factor)
+int vdk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t id[2];
 	io_generic_read(io, id, 0, 2);
@@ -42,7 +42,7 @@ int vdk_format::identify(io_generic *io, uint32_t form_factor)
 		return 0;
 }
 
-bool vdk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool vdk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t header[0x100];
 	io_generic_read(io, header, 0, 0x100);
@@ -85,7 +85,7 @@ bool vdk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool vdk_format::save(io_generic *io, floppy_image *image)
+bool vdk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t bitstream[500000/8];
 	uint8_t sector_data[50000];

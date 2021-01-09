@@ -687,7 +687,7 @@ void gt_device_base::ri_xfer_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// initiate ri line draw
 	u32 address = m_ri_initial_address;
-	u32 error = m_ri_initial_error;
+	s32 error = m_ri_initial_error;
 
 	for (int i = 0; i < m_ri_stop_count; i++)
 	{
@@ -1571,7 +1571,7 @@ u32 gtdb_device::vram_r(offs_t offset, const bool linear) const
 		return gt_device_base::vram_r(offset, linear);
 }
 
-void gtdb_device::vram_w(const offs_t offset, const u32 data, const u32 mem_mask, const bool linear) const
+void gtdb_device::vram_w(const offs_t offset, const u32 data, u32 mem_mask, const bool linear) const
 {
 	if (m_control & GFX_HILITE_SEL)
 	{

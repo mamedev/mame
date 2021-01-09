@@ -11,7 +11,6 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
-#include "rendlay.h"
 #include "speaker.h"
 
 namespace {

@@ -81,7 +81,7 @@ imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t c
 	}
 
 	/* write the metadata */
-	const std::string metadata = string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
+	const std::string metadata = util::string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
 	err = (imgtoolerr_t)chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	if (rc != CHDERR_NONE)
 	{

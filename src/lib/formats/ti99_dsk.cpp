@@ -80,7 +80,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int cell_size = 0;
 	int sector_count = 0;
@@ -211,7 +211,7 @@ bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, floppy_image
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
+bool ti99_floppy_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int act_track_size = 0;
 
@@ -925,7 +925,7 @@ const char *ti99_sdf_format::extensions() const
 	return "dsk";
 }
 
-int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor)
+int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t file_size = io_generic_size(io);
 	int vote = 0;
@@ -1218,7 +1218,7 @@ const char *ti99_tdf_format::extensions() const
 /*
     Determine whether the image file can be interpreted as a track dump
 */
-int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor)
+int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int vote = 0;
 	uint8_t fulltrack[6872];

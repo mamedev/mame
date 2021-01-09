@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -123,7 +122,7 @@ static int m5_get_pcb_id(const char *slot)
 {
 	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
+		if (!strcmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
 

@@ -23,6 +23,13 @@
         - The plug-in boards
         - Emulator trap function
 
+        DUART I/O port bits:
+        INPUT:
+        bit 0 = Centronics RDY
+
+        OUTPUT:
+        all bits = Centronics data
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -32,6 +39,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -45,6 +53,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ram(*this, "ram")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
@@ -69,16 +79,21 @@ private:
 	void dim68k_video_reset_w(u16 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+
 	void mem_map(address_map &map);
 
 	bool m_speaker_bit;
 	u8 m_video_control;
+	u8 m_fdc_irq;
 	void machine_reset() override;
 	void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
@@ -113,8 +128,30 @@ void dim68k_state::dim68k_speaker_w(u16 data)
 	m_speaker->level_w(m_speaker_bit);
 }
 
+WRITE_LINE_MEMBER(dim68k_state::fdc_irq_w)
+{
+	if (state)
+	{
+		m_fdc_irq = 0;
+	}
+	else
+	{
+		m_fdc_irq = 0x80;
+	}
+}
+
 void dim68k_state::dim68k_fdc_w(u16 data)
 {
+	m_fdc->tc_w(BIT(data, 5));
+
+	if (BIT(data, 1))
+	{
+		m_floppy[BIT(data, 0)^1]->get_device()->mon_w(true);
+	}
+	else
+	{
+		m_floppy[BIT(data, 0)^1]->get_device()->mon_w(false);
+	}
 }
 
 void dim68k_state::dim68k_video_high_w(u16 data)
@@ -205,7 +242,8 @@ void dim68k_state::mem_map(address_map &map)
 	map(0xffc400, 0xffc41f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0xffc800, 0xffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
 	map(0xffcc00, 0xffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
-	map(0xffd000, 0xffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
+	map(0xffd000, 0xffd003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
+	map(0xffd000, 0xffd000).lr8([this]() -> u8 { return m_fdc_irq; }, "free0");
 	map(0xffd004, 0xffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
 	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0xffd800, 0xffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
@@ -219,9 +257,8 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	u16* ROM = &memregion("bootrom")->as_u16();
-
-	memcpy((u16*)m_ram.target(), ROM, 0x2000);
+	m_bootview.select(0);
+	m_fdc_irq = 0;
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -296,7 +333,7 @@ GFXDECODE_END
 
 static void dim68k_floppies(device_slot_interface &device)
 {
-	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
 }
 
 void dim68k_state::machine_start()
@@ -304,6 +341,15 @@ void dim68k_state::machine_start()
 	save_item(NAME(m_speaker_bit));
 	save_item(NAME(m_video_control));
 }
+
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
 
 void dim68k_state::dim68k(machine_config &config)
 {
@@ -326,9 +372,10 @@ void dim68k_state::dim68k(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, "fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);
 	m_crtc->set_screen("screen");
@@ -336,7 +383,16 @@ void dim68k_state::dim68k(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &kbdport(RS232_PORT(config, "kbdport", default_rs232_devices, "keyboard"));
+	kbdport.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->a_tx_cb().set(kbdport, FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(rs232, FUNC(rs232_port_device::write_txd));
+
+	kbdport.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");

@@ -11,8 +11,9 @@
 ***************************************************************************/
 
 #include "hash.h"
-#include "hashing.h"
+#include "corestr.h"
 
+#include <cassert>
 #include <cctype>
 
 

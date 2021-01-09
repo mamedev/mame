@@ -765,7 +765,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
 		| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
 			<< V_BIT) \
-		| (((~(rn)) < (op2)) << C_BIT) \
+		| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 		| HandleALUNZFlags(rd)) \
 		+ 4; \
 	else R15 += 4;

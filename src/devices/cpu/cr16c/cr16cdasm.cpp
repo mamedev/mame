@@ -10,14 +10,8 @@
 
 ***************************************************************************/
 
-#include "util/disasmintf.h"
+#include "emu.h"
 #include "cr16cdasm.h"
-
-#include "util/strformat.h"
-
-using osd::u32;
-using util::BIT;
-using offs_t = u32;
 
 cr16c_disassembler::cr16c_disassembler()
 	: util::disasm_interface()

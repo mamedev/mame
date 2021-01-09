@@ -408,7 +408,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* The right RAM bank must be active */
@@ -421,6 +421,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;

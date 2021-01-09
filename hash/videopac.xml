@@ -68,6 +68,24 @@ Do Videopac+/Odyssey3 versions exist?:
 - Robot City (USA)
 - Interpol (USA)
 
+Several of the prototype games were also sold as bootleg repro carts, they're assumed to have
+the same ROM contents as the original prototypes.
+
+Bootleg multigame carts:
+- 59-in-1, 72-in-1, 128-in-1, 233-in-1 (John Dondzila)
+- C7050, C7051, C7060, C7061 (René van den Enden)
+
+These romhacks would be viable for inclusion since they were exclusively sold as repro cartridges:
+- Western+: adds + graphics to gunfight
+- Munchkin+: adds + graphics to munchkin
+- Space Monster+: adds + graphics to spacemon
+- Killer Bees+: adds + graphics to bees as shown in Odyssey3 advertisements
+  (the actual O3 prototype has same + graphics as the VP+ version)
+
+René made many more romhacks (bugfixes, PAL/NTSC conversions) released for free online, see:
+https://home.kpn.nl/rene_g7400/my_collection.html (under "MODIFIED GAMES")
+As said before, these shouldn't be included in the softwarelist, but can still be loaded with -cart.
+
 ================================================================================
 
 1st-party Philips Videopac games, especially the older ones, didn't prominently
@@ -249,7 +267,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<publisher>Philips</publisher>
 		<info name="usage" value="Test 1: press all joystick inputs. Test 4: type NAGEL137. Hold UP to advance." />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_test" />
 			<dataarea name="rom" size="0x800">
 				<rom name="testcart.bin" size="0x800" crc="3fb92bf1" sha1="e5e24c7fcdacde54ea433cb024e89ac0983917b1" />
 			</dataarea>
@@ -2511,7 +2529,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="o3_45.bin" size="0x2000" crc="5bbb30c8" sha1="29d999b9e7c59d16e5e68d833f28dbc86f062d1f" />
+				<!-- baddump: modified rom, includes bugfix patch -->
+				<rom name="o3_45.bin" size="0x2000" crc="5bbb30c8" sha1="29d999b9e7c59d16e5e68d833f28dbc86f062d1f" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2646,8 +2665,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_ktaa" />
 			<feature name="b_pin" value="1" />
-			<dataarea name="rom" size="12288">
-				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" />
+			<dataarea name="rom" size="0x3000">
+				<rom name="ktaa.bin" size="0x3000" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" />
 			</dataarea>
 		</part>
 	</software>

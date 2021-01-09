@@ -89,7 +89,7 @@ void cc525dsdd_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &
 	track_count = head_count = sector_count = 0;
 }
 
-int cc525dsdd_format::identify(io_generic *io, uint32_t form_factor)
+int cc525dsdd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -99,7 +99,7 @@ int cc525dsdd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool cc525dsdd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool cc525dsdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -125,7 +125,7 @@ bool cc525dsdd_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 	return true;
 }
 
-bool cc525dsdd_format::save(io_generic *io, floppy_image *image)
+bool cc525dsdd_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

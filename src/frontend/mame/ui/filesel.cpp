@@ -413,8 +413,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 		selected_entry = &append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
 
 	// add the drives
-	int i = 0;
-	for (char const *volume_name = osd_get_volume_name(i); volume_name; volume_name = osd_get_volume_name(++i))
+	for (std::string const &volume_name : osd_get_volume_names())
 		append_entry(SELECTOR_ENTRY_TYPE_DRIVE, volume_name, volume_name);
 
 	// mark first filename entry

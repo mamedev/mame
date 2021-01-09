@@ -12,7 +12,6 @@
 
 #include <portmidi.h>
 #include "osdcore.h"
-#include "corealloc.h"
 #include "modules/osdmodule.h"
 #include "midi_module.h"
 

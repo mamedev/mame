@@ -51,7 +51,7 @@ int wd177x_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int wd177x_format::identify(io_generic *io, uint32_t form_factor)
+int wd177x_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -196,7 +196,7 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -257,7 +257,7 @@ bool wd177x_format::supports_save() const
 	return true;
 }
 
-bool wd177x_format::save(io_generic *io, floppy_image *image)
+bool wd177x_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;

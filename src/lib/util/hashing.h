@@ -12,11 +12,11 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "corestr.h"
 #include "md5.h"
 
 #include <array>
+#include <cstdint>
+#include <cstring>
 #include <functional>
 #include <string>
 #include <string_view>

@@ -13,8 +13,7 @@
 #pragma once
 
 
-#include "corestr.h"
-#include "coretmpl.h"
+#include "osdfile.h"
 #include "strformat.h"
 
 #include <cstdint>

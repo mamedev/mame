@@ -23,7 +23,7 @@ TODO:
 #include "homecomp.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_HOMECOMP, o2_homecomp_device, "o2_homecomp", "Odyssey 2 Videopac+ C7420")
+DEFINE_DEVICE_TYPE(O2_ROM_HOMECOMP, o2_homecomp_device, "o2_homecomp", "Videopac+ C7420 Cartridge")
 
 
 //-------------------------------------------------
