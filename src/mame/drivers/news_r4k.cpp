@@ -491,7 +491,6 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
 
-    //map(0x1f4c0000, 0x1f4c0007).noprw(); // TODO: Register for something that is accessed very early in mrom flow (0xbfc0040C)
     map(0x1e980000, 0x1e9fffff).ram();   // is this mirrored?
     map(0x1fe00000, 0x1fffffff).ram();   // determine mirror of this RAM - it is smaller than this size
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
