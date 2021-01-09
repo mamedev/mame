@@ -622,7 +622,7 @@ u32 emu_file::write(const void *buffer, u32 length)
 //  puts - write a line to a text file
 //-------------------------------------------------
 
-int emu_file::puts(const char *s)
+int emu_file::puts(std::string_view s)
 {
 	// write the data if we can
 	if (m_file)

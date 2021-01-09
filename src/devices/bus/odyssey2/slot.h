@@ -7,10 +7,31 @@
 
 #include "softlist_dev.h"
 
+/*
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
+Videopac / Odyssey 2 cartridge pinout:
+
+         bot. top
+    T0   1    A  I/O _WR
+    B0   2    B  GND
+    B1   3    C  GND
+    B2   4    D  5V
+    B3   5    E  I/O RD
+    B4   6    F  _PSEN
+    B5   7    G  A0
+    B6   8    H  A1
+    B7   9    J  A2
+    A10 10    K  A3
+    P14 11    L  A4
+    P11 12    M  A5
+    P10 13    N  A6
+    A11 14    P  A7
+    A9  15    R  A8
+
+A8-A11 are the same pins as P20-P23
+on Videopac+, B is used for video mixer override
+
+*/
 
 
 /* PCB */
@@ -22,6 +43,7 @@ enum
 	O2_KTAA,
 	O2_CHESS,
 	O2_HOMECOMP,
+	O2_TEST,
 	O2_VOICE
 };
 
@@ -44,6 +66,8 @@ public:
 
 	virtual void io_write(offs_t offset, u8 data) { }
 	virtual u8 io_read(offs_t offset) { return 0xff; }
+	virtual void bus_write(u8 data) { }
+	virtual u8 bus_read() { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 	virtual int b_read() { return -1; }
 
@@ -112,7 +136,9 @@ public:
 	u8 read_rom0c(offs_t offset);
 	void io_write(offs_t offset, u8 data);
 	u8 io_read(offs_t offset);
-	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
+	void bus_write(u8 data);
+	u8 bus_read();
+	DECLARE_READ_LINE_MEMBER(t0_read);
 	int b_read();
 
 	void write_p1(u8 data) { if (m_cart) m_cart->write_p1(data); }

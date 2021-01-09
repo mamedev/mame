@@ -71,7 +71,7 @@ public:
 
 	// hash manipulators
 	void reset();
-	bool add_from_string(char type, const char *buffer, int length = -1);
+	bool add_from_string(char type, std::string_view string);
 	bool remove(char type);
 
 	// CRC-specific helpers
@@ -86,7 +86,7 @@ public:
 	std::string internal_string() const;
 	std::string macro_string() const;
 	std::string attribute_string() const;
-	bool from_internal_string(const char *string);
+	bool from_internal_string(std::string_view string);
 
 	// creation
 	void begin(const char *types = nullptr);

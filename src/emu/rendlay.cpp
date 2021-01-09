@@ -52,6 +52,8 @@
     STANDARD LAYOUTS
 ***************************************************************************/
 
+#include "layout/generic.h"
+
 // screenless layouts
 #include "noscreens.lh"
 
@@ -378,7 +380,20 @@ private:
 
 	using entry_vector = std::vector<entry>;
 
-	template <typename T, typename U>
+	template <typename T>
+	void try_insert(std::string &&name, T &&value)
+	{
+		entry_vector::iterator const pos(
+				std::lower_bound(
+					m_entries.begin(),
+					m_entries.end(),
+					name,
+					[] (entry const &lhs, auto const &rhs) { return lhs.name() < rhs; }));
+		if ((m_entries.end() == pos) || (pos->name() != name))
+			m_entries.emplace(pos, std::move(name), std::forward<T>(value));
+	}
+
+	template <typename T, typename U, typename = std::enable_if_t<std::is_constructible_v<std::string, T>>>
 	void try_insert(T &&name, U &&value)
 	{
 		entry_vector::iterator const pos(
@@ -388,7 +403,7 @@ private:
 					name,
 					[] (entry const &lhs, auto const &rhs) { return lhs.name() < rhs; }));
 		if ((m_entries.end() == pos) || (pos->name() != name))
-			m_entries.emplace(pos, std::forward<T>(name), std::forward<U>(value));
+			m_entries.emplace(pos, std::string(name), std::forward<U>(value));
 	}
 
 	template <typename T, typename U>
@@ -425,33 +440,27 @@ private:
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uphysicalxaspect", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], s64(physaspect.first));
+				try_insert(util::buf_to_string_view(tmp), s64(physaspect.first));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uphysicalyaspect", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], s64(physaspect.second));
+				try_insert(util::buf_to_string_view(tmp), s64(physaspect.second));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativexaspect", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], xaspect);
+				try_insert(util::buf_to_string_view(tmp), xaspect);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativeyaspect", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], yaspect);
+				try_insert(util::buf_to_string_view(tmp), yaspect);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uwidth", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], w);
+				try_insert(util::buf_to_string_view(tmp), w);
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%uheight", i);
-				tmp.put('\0');
-				try_insert(&tmp.vec()[0], h);
+				try_insert(util::buf_to_string_view(tmp), h);
 
 				++i;
 			}
@@ -459,122 +468,108 @@ private:
 		}
 	}
 
-	entry *find_entry(char const *begin, char const *end)
+	entry *find_entry(std::string_view str)
 	{
 		cache_device_entries();
 		entry_vector::iterator const pos(
 				std::lower_bound(
 					m_entries.begin(),
 					m_entries.end(),
-					std::make_pair(begin, end - begin),
-					[] (entry const &lhs, std::pair<char const *, std::ptrdiff_t> const &rhs)
-					{ return 0 > std::strncmp(lhs.name().c_str(), rhs.first, rhs.second); }));
-		if ((m_entries.end() != pos) && (pos->name().length() == (end - begin)) && !std::strncmp(pos->name().c_str(), begin, end - begin))
+					str,
+					[] (entry const &lhs, std::string_view const &rhs) { return lhs.name() < rhs; }));
+		if ((m_entries.end() != pos) && pos->name() == str)
 			return &*pos;
 		else
-			return m_next ? m_next->find_entry(begin, end) : nullptr;
+			return m_next ? m_next->find_entry(str) : nullptr;
 	}
 
-	template <typename... T>
-	std::tuple<char const *, char const *, bool> get_variable_text(T &&... args)
+	std::pair<std::string_view, bool> get_variable_text(std::string_view str)
 	{
-		entry *const found(find_entry(std::forward<T>(args)...));
+		entry *const found(find_entry(str));
 		if (found)
 		{
-			std::string const &text(found->get_text());
-			char const *const begin(text.c_str());
-			return std::make_tuple(begin, begin + text.length(), true);
+			return std::make_pair(std::string_view(found->get_text()), true);
 		}
 		else
 		{
-			return std::make_tuple(nullptr, nullptr, false);
+			return std::make_pair(std::string_view(), false);
 		}
 	}
 
-	std::pair<char const *, char const *> expand(char const *begin, char const *end)
+	std::string_view expand(std::string_view str)
 	{
+		constexpr char variable_start_char = '~';
+		constexpr char variable_end_char = '~';
+
 		// search for candidate variable references
-		char const *start(begin);
-		char const *pos(std::find_if(start, end, is_variable_start));
-		while (pos != end)
+		std::string_view::size_type start(0);
+		for (std::string_view::size_type pos = str.find_first_of(variable_start_char); pos != std::string_view::npos; )
 		{
-			char const *const term(std::find_if(pos + 1, end, [] (char ch) { return !is_variable_char(ch); }));
-			if ((term == end) || !is_variable_end(*term))
+			auto term = std::find_if_not(str.begin() + pos + 1, str.end(), is_variable_char);
+			if ((term == str.end()) || (*term != variable_end_char))
 			{
 				// not a valid variable name - keep searching
-				pos = std::find_if(term, end, is_variable_start);
+				pos = str.find_first_of(variable_start_char, term - str.begin());
 			}
 			else
 			{
 				// looks like a variable reference - try to look it up
-				std::tuple<char const *, char const *, bool> const text(get_variable_text(pos + 1, term));
-				if (std::get<2>(text))
+				std::pair<std::string_view, bool> const text(get_variable_text(str.substr(pos + 1, term - (str.begin() + pos + 1))));
+				if (text.second)
 				{
 					// variable found
-					if (begin == start)
+					if (start == 0)
 						m_buffer.seekp(0);
-					m_buffer.write(start, pos - start);
-					m_buffer.write(std::get<0>(text), std::get<1>(text) - std::get<0>(text));
-					start = term + 1;
-					pos = std::find_if(start, end, is_variable_start);
+					m_buffer.write(&str[start], pos - start);
+					m_buffer.write(text.first.data(), text.first.length());
+					start = term - str.begin() + 1;
+					pos = str.find_first_of(variable_start_char, start);
 				}
 				else
 				{
 					// variable not found - move on
-					pos = std::find_if(pos + 1, end, is_variable_start);
+					pos = str.find_first_of(variable_start_char, pos + 1);
 				}
 			}
 		}
 
 		// short-circuit the case where no substitutions were made
-		if (start == begin)
+		if (start == 0)
 		{
-			return std::make_pair(begin, end);
+			return str;
 		}
 		else
 		{
-			m_buffer.write(start, pos - start);
-			m_buffer.put('\0');
-			std::vector<char> const &vec(m_buffer.vec());
-			if (vec.empty())
-				return std::make_pair(nullptr, nullptr);
-			else
-				return std::make_pair(&vec[0], &vec[0] + vec.size() - 1);
+			m_buffer.write(&str[start], str.length() - start);
+			return util::buf_to_string_view(m_buffer);
 		}
 	}
 
-	std::pair<char const *, char const *> expand(char const *str)
+	static constexpr unsigned hex_prefix(std::string_view s)
 	{
-		return expand(str, str + strlen(str));
+		return ((0 != s.length()) && (s[0] == '$')) ? 1U : ((2 <= s.length()) && (s[0] == '0') && ((s[1] == 'x') || (s[1] == 'X'))) ? 2U : 0U;
+	}
+	static constexpr unsigned dec_prefix(std::string_view s)
+	{
+		return ((0 != s.length()) && (s[0] == '#')) ? 1U : 0U;
 	}
 
-	int parse_int(char const *begin, char const *end, int defvalue)
+	int parse_int(std::string_view s, int defvalue)
 	{
 		std::istringstream stream;
 		stream.imbue(std::locale::classic());
 		int result;
-		if (begin[0] == '$')
+		unsigned const hexprefix = hex_prefix(s);
+		if (hexprefix)
 		{
-			stream.str(std::string(begin + 1, end));
+			stream.str(std::string(s.substr(hexprefix)));
 			unsigned uvalue;
 			stream >> std::hex >> uvalue;
 			result = int(uvalue);
-		}
-		else if ((begin[0] == '0') && ((begin[1] == 'x') || (begin[1] == 'X')))
-		{
-			stream.str(std::string(begin + 2, end));
-			unsigned uvalue;
-			stream >> std::hex >> uvalue;
-			result = int(uvalue);
-		}
-		else if (begin[0] == '#')
-		{
-			stream.str(std::string(begin + 1, end));
-			stream >> result;
 		}
 		else
 		{
-			stream.str(std::string(begin, end));
+			stream.str(std::string(s.substr(dec_prefix(s))));
 			stream >> result;
 		}
 
@@ -583,21 +578,12 @@ private:
 
 	std::string parameter_name(util::xml::data_node const &node)
 	{
-		char const *const attrib(node.get_attribute_string("name", nullptr));
+		std::string const *const attrib(node.get_attribute_string_ptr("name"));
 		if (!attrib)
 			throw layout_syntax_error("parameter lacks name attribute");
-		std::pair<char const *, char const *> const expanded(expand(attrib));
-		return std::string(expanded.first, expanded.second);
+		return std::string(expand(*attrib));
 	}
 
-	static constexpr bool is_variable_start(char ch)
-	{
-		return '~' == ch;
-	}
-	static constexpr bool is_variable_end(char ch)
-	{
-		return '~' == ch;
-	}
 	static constexpr bool is_variable_char(char ch)
 	{
 		return (('0' <= ch) && ('9' >= ch)) || (('A' <= ch) && ('Z' >= ch)) || (('a' <= ch) && ('z' >= ch)) || ('_' == ch);
@@ -658,20 +644,19 @@ public:
 		std::string name(parameter_name(node));
 		if (node.has_attribute("start") || node.has_attribute("increment") || node.has_attribute("lshift") || node.has_attribute("rshift"))
 			throw layout_syntax_error("start/increment/lshift/rshift attributes are only allowed for repeat parameters");
-		char const *const value(node.get_attribute_string("value", nullptr));
+		std::string const *const value(node.get_attribute_string_ptr("value"));
 		if (!value)
 			throw layout_syntax_error("parameter lacks value attribute");
 
 		// expand value and stash
-		std::pair<char const *, char const *> const expanded(expand(value));
-		set(std::move(name), std::string(expanded.first, expanded.second));
+		set(std::move(name), std::string(expand(*value)));
 	}
 
 	void set_repeat_parameter(util::xml::data_node const &node, bool init)
 	{
 		// two types are allowed here - static value, and start/increment/lshift/rshift
 		std::string name(parameter_name(node));
-		char const *const start(node.get_attribute_string("start", nullptr));
+		std::string const *const start(node.get_attribute_string_ptr("start"));
 		if (start)
 		{
 			// simple validity checks
@@ -685,14 +670,14 @@ public:
 			// increment is more complex - it may be an integer or a floating-point number
 			s64 intincrement(0);
 			double floatincrement(0);
-			char const *const increment(node.get_attribute_string("increment", nullptr));
+			std::string const *const increment(node.get_attribute_string_ptr("increment"));
 			if (increment)
 			{
-				std::pair<char const *, char const *> const expanded(expand(increment));
-				unsigned const hexprefix((expanded.first[0] == '$') ? 1U : ((expanded.first[0] == '0') && ((expanded.first[1] == 'x') || (expanded.first[1] == 'X'))) ? 2U : 0U);
-				unsigned const decprefix((expanded.first[0] == '#') ? 1U : 0U);
-				bool const floatchars(std::find_if(expanded.first, expanded.second, [] (char ch) { return ('.' == ch) || ('e' == ch) || ('E' == ch); }) != expanded.second);
-				std::istringstream stream(std::string(expanded.first + hexprefix + decprefix, expanded.second));
+				std::string_view const expanded(expand(*increment));
+				unsigned const hexprefix(hex_prefix(expanded));
+				unsigned const decprefix(dec_prefix(expanded));
+				bool const floatchars(expanded.find_first_of(".eE") != std::string_view::npos);
+				std::istringstream stream(std::string(expanded.substr(hexprefix + decprefix)));
 				stream.imbue(std::locale::classic());
 				if (!hexprefix && !decprefix && floatchars)
 				{
@@ -726,11 +711,10 @@ public:
 				if ((m_entries.end() != pos) && (pos->name() == name))
 					throw layout_syntax_error("generator parameters must be defined exactly once per scope");
 
-				std::pair<char const *, char const *> const expanded(expand(start));
 				if (floatincrement)
-					m_entries.emplace(pos, std::move(name), std::string(expanded.first, expanded.second), floatincrement, lshift - rshift);
+					m_entries.emplace(pos, std::move(name), std::string(expand(*start)), floatincrement, lshift - rshift);
 				else
-					m_entries.emplace(pos, std::move(name), std::string(expanded.first, expanded.second), intincrement, lshift - rshift);
+					m_entries.emplace(pos, std::move(name), std::string(expand(*start)), intincrement, lshift - rshift);
 			}
 		}
 		else if (node.has_attribute("increment") || node.has_attribute("lshift") || node.has_attribute("rshift"))
@@ -739,10 +723,9 @@ public:
 		}
 		else
 		{
-			char const *const value(node.get_attribute_string("value", nullptr));
+			std::string const *const value(node.get_attribute_string_ptr("value"));
 			if (!value)
 				throw layout_syntax_error("parameter lacks value attribute");
-			std::pair<char const *, char const *> const expanded(expand(value));
 			entry_vector::iterator const pos(
 					std::lower_bound(
 						m_entries.begin(),
@@ -750,11 +733,11 @@ public:
 						name,
 						[] (entry const &lhs, auto const &rhs) { return lhs.name() < rhs; }));
 			if ((m_entries.end() == pos) || (pos->name() != name))
-				m_entries.emplace(pos, std::move(name), std::string(expanded.first, expanded.second));
+				m_entries.emplace(pos, std::move(name), std::string(expand(*value)));
 			else if (pos->is_generator())
 				throw layout_syntax_error("generator parameters must be defined exactly once per scope");
 			else
-				pos->set(std::string(expanded.first, expanded.second));
+				pos->set(std::string(expand(*value)));
 		}
 	}
 
@@ -774,32 +757,36 @@ public:
 				m_entries.end());
 	}
 
-	char const *get_attribute_string(util::xml::data_node const &node, char const *name, char const *defvalue)
+	std::string_view get_attribute_string(util::xml::data_node const &node, char const *name, std::string_view defvalue = std::string_view())
 	{
-		char const *const attrib(node.get_attribute_string(name, nullptr));
-		return attrib ? expand(attrib).first : defvalue;
+		std::string const *const attrib(node.get_attribute_string_ptr(name));
+		return attrib ? expand(*attrib) : defvalue;
+	}
+
+	std::string get_attribute_subtag(util::xml::data_node const &node, char const *name)
+	{
+		std::string const *const attrib(node.get_attribute_string_ptr(name));
+		return attrib ? device().subtag(std::string(expand(*attrib)).c_str()) : std::string();
 	}
 
 	int get_attribute_int(util::xml::data_node const &node, const char *name, int defvalue)
 	{
-		char const *const attrib(node.get_attribute_string(name, nullptr));
+		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
 			return defvalue;
 
 		// similar to what XML nodes do
-		std::pair<char const *, char const *> const expanded(expand(attrib));
-		return parse_int(expanded.first, expanded.second, defvalue);
+		return parse_int(expand(*attrib), defvalue);
 	}
 
 	float get_attribute_float(util::xml::data_node const &node, char const *name, float defvalue)
 	{
-		char const *const attrib(node.get_attribute_string(name, nullptr));
+		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
 			return defvalue;
 
 		// similar to what XML nodes do
-		std::pair<char const *, char const *> const expanded(expand(attrib));
-		std::istringstream stream(std::string(expanded.first, expanded.second));
+		std::istringstream stream(std::string(expand(*attrib)));
 		stream.imbue(std::locale::classic());
 		float result;
 		return (stream >> result) ? result : defvalue;
@@ -807,19 +794,19 @@ public:
 
 	bool get_attribute_bool(util::xml::data_node const &node, char const *name, bool defvalue)
 	{
-		char const *const attrib(node.get_attribute_string(name, nullptr));
+		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
 			return defvalue;
 
 		// first try yes/no strings
-		std::pair<char const *, char const *> const expanded(expand(attrib));
-		if (!std::strcmp("yes", expanded.first) || !std::strcmp("true", expanded.first))
+		std::string_view const expanded(expand(*attrib));
+		if ("yes" == expanded || "true" == expanded)
 			return true;
-		if (!std::strcmp("no", expanded.first) || !std::strcmp("false", expanded.first))
+		if ("no" == expanded || "false" == expanded)
 			return false;
 
 		// fall back to integer parsing
-		return parse_int(expanded.first, expanded.second, defvalue ? 1 : 0) != 0;
+		return parse_int(expanded, defvalue ? 1 : 0) != 0;
 	}
 
 	void parse_bounds(util::xml::data_node const *node, render_bounds &result)
@@ -1327,8 +1314,8 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 		// a wild loop appears!
 		std::ostringstream path;
 		for (layout_group const *const group : seen)
-			path << ' ' << group->m_groupnode.get_attribute_string("name", nullptr);
-		path << ' ' << m_groupnode.get_attribute_string("name", nullptr);
+			path << ' ' << group->m_groupnode.get_attribute_string("name", "");
+		path << ' ' << m_groupnode.get_attribute_string("name", "");
 		throw layout_syntax_error(util::string_format("recursively nested groups %s", path.str()));
 	}
 
@@ -1429,9 +1416,9 @@ void layout_group::resolve_bounds(
 			}
 			else
 			{
-				char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
-				if (!ref)
-					throw layout_syntax_error("nested group must have ref attribute");
+				std::string const ref(env.get_attribute_string(*itemnode, "ref"));
+				if (ref.empty())
+					throw layout_syntax_error("nested group must have non-empty ref attribute");
 
 				group_map::iterator const found(groupmap.find(ref));
 				if (groupmap.end() == found)
@@ -1471,7 +1458,7 @@ void layout_group::resolve_bounds(
 		}
 		else if (!strcmp(itemnode->get_name(), "collection"))
 		{
-			if (!env.get_attribute_string(*itemnode, "name", nullptr))
+			if (!itemnode->has_attribute("name"))
 				throw layout_syntax_error("collection must have name attribute");
 			environment local(env);
 			resolve_bounds(local, *itemnode, groupmap, seen, empty, true, false, true);
@@ -1565,8 +1552,8 @@ public:
 		, m_rasterizer(env.svg_rasterizer())
 		, m_searchpath(env.search_path() ? env.search_path() : "")
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
-		, m_imagefile(env.get_attribute_string(compnode, "file", ""))
-		, m_alphafile(env.get_attribute_string(compnode, "alphafile", ""))
+		, m_imagefile(env.get_attribute_string(compnode, "file"))
+		, m_alphafile(env.get_attribute_string(compnode, "alphafile"))
 		, m_data(get_data(compnode))
 	{
 	}
@@ -2287,7 +2274,7 @@ public:
 	text_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 	{
-		m_string = env.get_attribute_string(compnode, "string", "");
+		m_string = env.get_attribute_string(compnode, "string");
 		m_textalign = env.get_attribute_int(compnode, "align", 0);
 	}
 
@@ -3009,14 +2996,14 @@ public:
 		, m_searchpath(env.search_path() ? env.search_path() : "")
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
-		std::string symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+		std::string_view symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
 		m_numstops = 0;
-		for (std::string::size_type location = symbollist.find(','); std::string::npos != location; location = symbollist.find(','))
+		for (std::string_view::size_type location = symbollist.find(','); std::string_view::npos != location; location = symbollist.find(','))
 		{
 			m_stopnames[m_numstops] = symbollist.substr(0, location);
-			symbollist.erase(0, location + 1);
+			symbollist.remove_prefix(location + 1);
 			m_numstops++;
 		}
 		m_stopnames[m_numstops++] = symbollist;
@@ -3476,7 +3463,7 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //-------------------------------------------------
 
 layout_element::component::component(environment &env, util::xml::data_node const &compnode)
-	: m_statemask(env.get_attribute_int(compnode, "statemask", env.get_attribute_string(compnode, "state", "")[0] ? ~0 : 0))
+	: m_statemask(env.get_attribute_int(compnode, "statemask", env.get_attribute_string(compnode, "state").empty() ? 0 : ~0))
 	, m_stateval(env.get_attribute_int(compnode, "state", m_statemask) & m_statemask)
 {
 	for (util::xml::data_node const *child = compnode.get_first_child(); child; child = child->get_next_sibling())
@@ -3942,7 +3929,7 @@ layout_view::layout_view(
 		group_map &groupmap)
 	: m_effaspect(1.0f)
 	, m_name(make_name(env, viewnode))
-	, m_unqualified_name(env.get_attribute_string(viewnode, "name", ""))
+	, m_unqualified_name(env.get_attribute_string(viewnode, "name"))
 	, m_defvismask(0U)
 	, m_has_art(false)
 {
@@ -4071,7 +4058,7 @@ layout_view::item *layout_view::get_item(std::string const &id)
 //  the specified screen
 //-------------------------------------------------
 
-bool layout_view::has_screen(screen_device &screen)
+bool layout_view::has_screen(screen_device const &screen) const
 {
 	return std::find_if(m_items.begin(), m_items.end(), [&screen] (auto &itm) { return itm.screen() == &screen; }) != m_items.end();
 }
@@ -4082,7 +4069,7 @@ bool layout_view::has_screen(screen_device &screen)
 //  has the given screen visble
 //-------------------------------------------------
 
-bool layout_view::has_visible_screen(screen_device &screen) const
+bool layout_view::has_visible_screen(screen_device const &screen) const
 {
 	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
@@ -4360,9 +4347,9 @@ void layout_view::add_items(
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
-			char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
-			if (!ref)
-				throw layout_syntax_error("group instantiation must have ref attribute");
+			std::string const ref(env.get_attribute_string(*itemnode, "ref"));
+			if (ref.empty())
+				throw layout_syntax_error("group instantiation must have non-empty ref attribute");
 
 			group_map::iterator const found(groupmap.find(ref));
 			if (groupmap.end() == found)
@@ -4413,9 +4400,9 @@ void layout_view::add_items(
 		}
 		else if (!strcmp(itemnode->get_name(), "collection"))
 		{
-			char const *name(env.get_attribute_string(*itemnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("collection must have name attribute");
+			std::string_view const name(env.get_attribute_string(*itemnode, "name"));
+			if (name.empty())
+				throw layout_syntax_error("collection must have non-empty name attribute");
 
 			auto const found(std::find_if(m_vistoggles.begin(), m_vistoggles.end(), [name] (auto const &x) { return x.name() == name; }));
 			if (m_vistoggles.end() != found)
@@ -4423,7 +4410,7 @@ void layout_view::add_items(
 
 			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "visible", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
 			view_environment local(env, true);
-			m_vistoggles.emplace_back(name, local.visibility_mask());
+			m_vistoggles.emplace_back(std::string(name), local.visibility_mask());
 			add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, false, true);
 		}
 		else
@@ -4441,13 +4428,13 @@ void layout_view::add_items(
 
 std::string layout_view::make_name(layout_environment &env, util::xml::data_node const &viewnode)
 {
-	char const *const name(env.get_attribute_string(viewnode, "name", nullptr));
-	if (!name || !*name)
+	std::string_view const name(env.get_attribute_string(viewnode, "name"));
+	if (name.empty())
 		throw layout_syntax_error("view must have non-empty name attribute");
 
 	if (env.is_root_device())
 	{
-		return name;
+		return std::string(name);
 	}
 	else
 	{
@@ -4476,7 +4463,7 @@ layout_view::item::item(
 		layout_group::transform const &trans,
 		render_color const &color)
 	: m_element(find_element(env, itemnode, elemmap))
-	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
+	, m_output(env.device(), std::string(env.get_attribute_string(itemnode, "name")))
 	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
 	, m_animinput_port(nullptr)
 	, m_elem_state(m_element ? m_element->default_state() : 0)
@@ -4492,14 +4479,14 @@ layout_view::item::item(
 	, m_color(make_color(env, itemnode, color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
-	, m_id(env.get_attribute_string(itemnode, "id", ""))
+	, m_id(env.get_attribute_string(itemnode, "id"))
 	, m_input_tag(make_input_tag(env, itemnode))
 	, m_animinput_tag(make_animinput_tag(env, itemnode))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
-	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
+	, m_have_output(!env.get_attribute_string(itemnode, "name").empty())
 	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
 	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
-	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
+	, m_has_clickthrough(!env.get_attribute_string(itemnode, "clickthrough").empty())
 {
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
@@ -4511,8 +4498,8 @@ layout_view::item::item(
 	{
 		if (itemnode.has_attribute("tag"))
 		{
-			char const *const tag(env.get_attribute_string(itemnode, "tag", ""));
-			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(tag));
+			std::string_view const tag(env.get_attribute_string(itemnode, "tag"));
+			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(std::string(tag).c_str()));
 			if (!m_screen)
 				throw layout_reference_error(util::string_format("invalid screen tag '%d'", tag));
 		}
@@ -4523,7 +4510,7 @@ layout_view::item::item(
 	}
 	else if (!m_element)
 	{
-		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
+		throw layout_syntax_error(util::string_format("item of type %s requires an element tag", itemnode.get_name()));
 	}
 
 	// this can be called before resolving tags, make it return something valid
@@ -4817,8 +4804,8 @@ void layout_view::item::get_interpolated_color(render_color &result) const
 
 layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
-	char const *const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element", nullptr));
-	if (!name)
+	std::string const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element"));
+	if (name.empty())
 		return nullptr;
 
 	// search the list of elements for a match, error if not found
@@ -4905,7 +4892,7 @@ std::string layout_view::item::make_animoutput_tag(view_environment &env, util::
 {
 	util::xml::data_node const *const animate(itemnode.get_child("animate"));
 	if (animate)
-		return env.get_attribute_string(*animate, "name", "");
+		return std::string(env.get_attribute_string(*animate, "name"));
 	else
 		return std::string();
 }
@@ -4930,8 +4917,7 @@ ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::
 std::string layout_view::item::make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
 	util::xml::data_node const *const animate(itemnode.get_child("animate"));
-	char const *tag(animate ? env.get_attribute_string(*animate, "inputtag", nullptr) : nullptr);
-	return tag ? env.device().subtag(tag) : std::string();
+	return animate ? env.get_attribute_subtag(*animate, "inputtag") : std::string();
 }
 
 
@@ -4941,8 +4927,7 @@ std::string layout_view::item::make_animinput_tag(view_environment &env, util::x
 
 std::string layout_view::item::make_input_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
-	char const *tag(env.get_attribute_string(itemnode, "inputtag", nullptr));
-	return tag ? env.device().subtag(tag) : std::string();
+	return env.get_attribute_subtag(itemnode, "inputtag");
 }
 
 
@@ -4953,19 +4938,19 @@ std::string layout_view::item::make_input_tag(view_environment &env, util::xml::
 int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_node const &itemnode)
 {
 	// see if there's a blend mode attribute
-	char const *const mode(env.get_attribute_string(itemnode, "blend", nullptr));
+	std::string const *const mode(itemnode.get_attribute_string_ptr("blend"));
 	if (mode)
 	{
-		if (!strcmp(mode, "none"))
+		if (*mode == "none")
 			return BLENDMODE_NONE;
-		else if (!strcmp(mode, "alpha"))
+		else if (*mode == "alpha")
 			return BLENDMODE_ALPHA;
-		else if (!strcmp(mode, "multiply"))
+		else if (*mode == "multiply")
 			return BLENDMODE_RGB_MULTIPLY;
-		else if (!strcmp(mode, "add"))
+		else if (*mode == "add")
 			return BLENDMODE_ADD;
 		else
-			throw layout_syntax_error(util::string_format("unknown blend mode %s", mode));
+			throw layout_syntax_error(util::string_format("unknown blend mode %s", *mode));
 	}
 
 	// fall back to implicit blend mode based on element type
@@ -5060,7 +5045,7 @@ layout_file::layout_file(
 			}
 			catch (layout_reference_error const &err)
 			{
-				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name", ""), err.what());
+				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name"), err.what());
 			}
 		}
 
@@ -5132,17 +5117,17 @@ void layout_file::add_elements(
 		}
 		else if (!strcmp(childnode->get_name(), "element"))
 		{
-			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("element lacks name attribute");
+			std::string_view const name(env.get_attribute_string(*childnode, "name"));
+			if (name.empty())
+				throw layout_syntax_error("element must have non-empty name attribute");
 			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
 		}
 		else if (!strcmp(childnode->get_name(), "group"))
 		{
-			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("group lacks name attribute");
+			std::string_view const name(env.get_attribute_string(*childnode, "name"));
+			if (name.empty())
+				throw layout_syntax_error("group must have non-empty name attribute");
 			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
 		}

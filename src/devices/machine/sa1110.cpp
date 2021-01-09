@@ -1618,7 +1618,10 @@ uint32_t sa1110_periphs_device::intc_r(offs_t offset, uint32_t mem_mask)
 	switch (offset)
 	{
 	case REG_ICIP:
-		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icip, mem_mask);
+		if (m_intc_regs.icip != 0x04000000)
+		{
+			LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icip, mem_mask);
+		}
 		return m_intc_regs.icip;
 	case REG_ICMR:
 		LOGMASKED(LOG_INTC, "%s: intc_r: Interrupt Controller Mask Register: %08x & %08x\n", machine().describe_context(), m_intc_regs.icmr, mem_mask);

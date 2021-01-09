@@ -169,7 +169,7 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string inistring = options.output_ini();
-		file.puts(inistring.c_str());
+		file.puts(inistring);
 		retval = 0;
 	}
 	return retval;

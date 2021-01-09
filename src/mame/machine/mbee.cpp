@@ -583,6 +583,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 	uint16_t i, j;
 	uint8_t data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
 
+	size_t quickload_size = image.length();
 	if (image.is_filetype("mwb"))
 	{
 		/* mwb files - standard basic files */
@@ -677,7 +678,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bin)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) != image_init_result::PASS)
+	if (z80bin_load_file(image, space, execute_address, start_addr, end_addr) != image_init_result::PASS)
 		return image_init_result::FAIL;
 
 	/* is this file executable? */

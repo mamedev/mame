@@ -11,8 +11,9 @@
 ***************************************************************************/
 
 #include "hash.h"
-#include "hashing.h"
+#include "corestr.h"
 
+#include <cassert>
 #include <cctype>
 
 
@@ -148,15 +149,15 @@ void hash_collection::reset()
 //  from a string
 //-------------------------------------------------
 
-bool hash_collection::add_from_string(char type, const char *buffer, int length)
+bool hash_collection::add_from_string(char type, std::string_view string)
 {
 	// handle CRCs
 	if (type == HASH_CRC)
-		return m_has_crc32 = m_crc32.from_string(buffer, length);
+		return m_has_crc32 = m_crc32.from_string(string);
 
 	// handle SHA1s
 	else if (type == HASH_SHA1)
-		return m_has_sha1 = m_sha1.from_string(buffer, length);
+		return m_has_sha1 = m_sha1.from_string(string);
 
 	return false;
 }
@@ -273,24 +274,19 @@ std::string hash_collection::attribute_string() const
 //  compact string to set of hashes and flags
 //-------------------------------------------------
 
-bool hash_collection::from_internal_string(const char *string)
+bool hash_collection::from_internal_string(std::string_view string)
 {
-	assert(string != nullptr);
-
 	// start fresh
 	reset();
 
-	// determine the end of the string
-	const char *stringend = string + strlen(string);
-	const char *ptr = string;
-
-	// loop until we hit it
+	// loop until we hit the end of the string
 	bool errors = false;
 	int skip_digits = 0;
-	while (ptr < stringend)
+	while (!string.empty())
 	{
-		char c = *ptr++;
+		char c = string[0];
 		char uc = toupper(c);
+		string.remove_prefix(1);
 
 		// non-hex alpha values specify a hash type
 		if (uc >= 'G' && uc <= 'Z')
@@ -299,13 +295,13 @@ bool hash_collection::from_internal_string(const char *string)
 			if (uc == HASH_CRC)
 			{
 				m_has_crc32 = true;
-				errors = !m_crc32.from_string(ptr, stringend - ptr);
+				errors = !m_crc32.from_string(string);
 				skip_digits = 2 * sizeof(crc32_t);
 			}
 			else if (uc == HASH_SHA1)
 			{
 				m_has_sha1 = true;
-				errors = !m_sha1.from_string(ptr, stringend - ptr);
+				errors = !m_sha1.from_string(string);
 				skip_digits = 2 * sizeof(sha1_t);
 			}
 			else

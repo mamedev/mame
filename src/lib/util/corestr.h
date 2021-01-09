@@ -13,9 +13,6 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "strformat.h"
-
 #include <string>
 
 #include <cstring>

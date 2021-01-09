@@ -171,7 +171,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 
 	// get start and end addresses
 	uint16_t start = pick_integer_le(header, 22, 2);
-	uint16_t end = start + snapshot_size - sizeof(header);
+	uint16_t end = start + image.length() - sizeof(header);
 	uint16_t size = end - start;
 
 	// write it to ram

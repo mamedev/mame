@@ -570,8 +570,7 @@ void favorite_manager::save_favorites()
 				buf << info.devicetype << '\n';
 				util::stream_format(buf, "%d\n", info.available);
 
-				buf.put('\0');
-				file.puts(&buf.vec()[0]);
+				file.puts(util::buf_to_string_view(buf));
 			}
 		}
 		file.close();

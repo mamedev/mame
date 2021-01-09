@@ -501,7 +501,7 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
 		new (fixup) label_fixup{ nullptr, curlabel, callback };
 		m_fixup_list.append(*fixup);
-		m_cache.request_oob_codegen(m_oob_callback_delegate, fixup, param);
+		m_cache.request_oob_codegen(drc_oob_delegate(m_oob_callback_delegate), fixup, param);
 	}
 
 	return curlabel->m_codeptr;

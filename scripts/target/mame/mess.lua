@@ -165,6 +165,7 @@ CPUS["GTRON"] = true
 CPUS["M88000"] = true
 CPUS["XAVIX2"] = true
 CPUS["UPD78K"] = true
+CPUS["ROMP"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -314,6 +315,7 @@ SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
 SOUNDS["RP2C33_SOUND"] = true
+SOUNDS["UDA1344"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -919,6 +921,7 @@ BUSES["PSX_PARALLEL"] = true
 BUSES["QL"] = true
 BUSES["QBUS"] = true
 BUSES["RS232"] = true
+BUSES["RTPC_KBD"] = true
 BUSES["S100"] = true
 BUSES["SAMCOUPE_DRIVE_PORT"] = true
 BUSES["SAMCOUPE_EXPANSION"] = true
@@ -1333,6 +1336,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"rockwell",
 		"roland",
 		"rolm",
+		"rtpc",
 		"sage",
 		"saitek",
 		"samcoupe",
@@ -3431,6 +3435,15 @@ files {
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "rtpc")
+files {
+	MAME_DIR .. "src/mame/drivers/rtpc.cpp",
+	MAME_DIR .. "src/mame/machine/rosetta.cpp",
+	MAME_DIR .. "src/mame/machine/rosetta.h",
+	MAME_DIR .. "src/mame/machine/rtpc_iocc.cpp",
+	MAME_DIR .. "src/mame/machine/rtpc_iocc.h",
+}
+
 createMESSProjects(_target, _subtarget, "sage")
 files {
 	MAME_DIR .. "src/mame/drivers/sage2.cpp",
@@ -4353,6 +4366,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
+	MAME_DIR .. "src/mame/drivers/alphasma3k.cpp",
 	MAME_DIR .. "src/mame/drivers/am1000.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex210.cpp",

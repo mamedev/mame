@@ -829,7 +829,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* disable rom */
@@ -837,6 +837,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	m_bank1->set_entry(m_rom_enabled);
 
 	/* load image */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;

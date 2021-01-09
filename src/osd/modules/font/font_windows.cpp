@@ -17,7 +17,6 @@
 #include "strconv.h"
 #include "unicode.h"
 #include "corestr.h"
-#include "corealloc.h"
 
 #include <cstring>
 

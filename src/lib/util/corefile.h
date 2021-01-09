@@ -13,13 +13,13 @@
 #pragma once
 
 
-#include "corestr.h"
-#include "coretmpl.h"
+#include "osdfile.h"
 #include "strformat.h"
 
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 
 
 namespace util {
@@ -111,7 +111,7 @@ public:
 	virtual std::uint32_t write(const void *buffer, std::uint32_t length) = 0;
 
 	// write a line of text to the file
-	virtual int puts(const char *s) = 0;
+	virtual int puts(std::string_view s) = 0;
 
 	// printf-style text write to a file
 	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) = 0;

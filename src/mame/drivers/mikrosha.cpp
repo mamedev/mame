@@ -47,6 +47,7 @@ void mikrosha_state::machine_reset()
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000 + m_cart->get_rom_size() - 1, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 	radio86_state::machine_reset();
+	m_mikrosha_font_page = 0;
 }
 
 /* Address maps */

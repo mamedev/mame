@@ -54,7 +54,7 @@ wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char
 {
 }
 
-constexpr int clk_div = 64;
+static constexpr int clk_div = 64;
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -80,42 +80,15 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_external_speaker));
 	save_item(NAME(m_noise_shift));
 	save_item(NAME(m_master_volume));
-
-	save_item(NAME(m_audio1.freq));
-	save_item(NAME(m_audio1.period));
-	save_item(NAME(m_audio1.pos));
-	save_item(NAME(m_audio1.vol_left));
-	save_item(NAME(m_audio1.vol_right));
-	save_item(NAME(m_audio1.on));
-	save_item(NAME(m_audio1.offset));
-	save_item(NAME(m_audio1.signal));
-
-	save_item(NAME(m_audio2.freq));
-	save_item(NAME(m_audio2.period));
-	save_item(NAME(m_audio2.pos));
-	save_item(NAME(m_audio2.vol_left));
-	save_item(NAME(m_audio2.vol_right));
-	save_item(NAME(m_audio2.on));
-	save_item(NAME(m_audio2.offset));
-	save_item(NAME(m_audio2.signal));
-
-	save_item(NAME(m_audio3.freq));
-	save_item(NAME(m_audio3.period));
-	save_item(NAME(m_audio3.pos));
-	save_item(NAME(m_audio3.vol_left));
-	save_item(NAME(m_audio3.vol_right));
-	save_item(NAME(m_audio3.on));
-	save_item(NAME(m_audio3.offset));
-	save_item(NAME(m_audio3.signal));
-
-	save_item(NAME(m_audio4.freq));
-	save_item(NAME(m_audio4.period));
-	save_item(NAME(m_audio4.pos));
-	save_item(NAME(m_audio4.vol_left));
-	save_item(NAME(m_audio4.vol_right));
-	save_item(NAME(m_audio4.on));
-	save_item(NAME(m_audio4.offset));
-	save_item(NAME(m_audio4.signal));
+	save_item(NAME(m_system_volume));
+	save_item(STRUCT_MEMBER(m_audio, freq));
+	save_item(STRUCT_MEMBER(m_audio, period));
+	save_item(STRUCT_MEMBER(m_audio, pos));
+	save_item(STRUCT_MEMBER(m_audio, vol_left));
+	save_item(STRUCT_MEMBER(m_audio, vol_right));
+	save_item(STRUCT_MEMBER(m_audio, on));
+	save_item(STRUCT_MEMBER(m_audio, offset));
+	save_item(STRUCT_MEMBER(m_audio, signal));
 }
 
 void wswan_sound_device::device_clock_changed()
@@ -134,33 +107,21 @@ void wswan_sound_device::rom_bank_updated()
 
 void wswan_sound_device::device_reset()
 {
-	m_audio1.on = 0;
-	m_audio1.signal = 0;
-	m_audio1.offset = 0;
-	m_audio1.pos = 0;
-	m_audio2.on = 0;
-	m_audio2.signal = 0;
-	m_audio2.offset = 0;
-	m_audio2.pos = 0;
-	m_audio3.on = 0;
-	m_audio3.signal = 0;
-	m_audio3.offset = 0;
-	m_audio3.pos = 0;
-	m_audio4.on = 0;
-	m_audio4.signal = 0;
-	m_audio4.offset = 0;
-	m_audio4.pos = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_audio[i].on = 0;
+		m_audio[i].signal = 0;
+		m_audio[i].offset = 0;
+		m_audio[i].pos = 0;
+	}
 	m_noise_output = 0;
 }
 
 int wswan_sound_device::fetch_sample(int channel, int offset)
 {
-	uint8_t b = read_byte(m_sample_address + ((channel & 3) << 4) + ((offset & 0x1f) >> 1));
+	u16 w = read_word(m_sample_address + ((channel & 3) << 4) + ((offset >> 1) & 0x0e));
 
-	if (offset & 1)
-		return b >> 4;
-	else
-		return b & 0xf;
+	return (w >> ((offset & 0x03) * 4)) & 0x0f;
 }
 
 //-------------------------------------------------
@@ -169,85 +130,83 @@ int wswan_sound_device::fetch_sample(int channel, int offset)
 
 void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	s32 sample, left, right;
-
 	auto &outputl = outputs[0];
 	auto &outputr = outputs[1];
 	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 	{
-		left = right = 0;
+		s32 left = 0, right = 0;
 
-		if ( m_audio1.on )
+		if (m_audio[0].on)
 		{
-			sample = m_audio1.signal;
-			m_audio1.pos += clk_div;
-			if (m_audio1.pos >= m_audio1.period)
+			s32 sample = m_audio[0].signal;
+			m_audio[0].pos += clk_div;
+			if (m_audio[0].pos >= m_audio[0].period)
 			{
-				m_audio1.pos -= m_audio1.period;
-				m_audio1.signal = fetch_sample(0, m_audio1.offset++);
+				m_audio[0].pos -= m_audio[0].period;
+				m_audio[0].signal = fetch_sample(0, m_audio[0].offset++);
 			}
-			left += m_audio1.vol_left * sample;
-			right += m_audio1.vol_right * sample;
+			left += m_audio[0].vol_left * sample;
+			right += m_audio[0].vol_right * sample;
 		}
 
-		if ( m_audio2.on )
+		if (m_audio[1].on)
 		{
-			if ( m_audio2_voice )
+			if (m_audio2_voice)
 			{
-				uint8_t voice_data = m_audio2.vol_left << 4 | m_audio2.vol_right;
+				u8 voice_data = (m_audio[1].vol_left << 4) | m_audio[1].vol_right;
 				left += voice_data * (m_master_volume & 0x0f);
 				right += voice_data * (m_master_volume & 0x0f);
 			}
 			else
 			{
-				sample = m_audio2.signal;
-				m_audio2.pos += clk_div;
-				if (m_audio2.pos >= m_audio2.period)
+				s32 sample = m_audio[1].signal;
+				m_audio[1].pos += clk_div;
+				if (m_audio[1].pos >= m_audio[1].period)
 				{
-					m_audio2.pos -= m_audio2.period;
-					m_audio2.signal = fetch_sample(1, m_audio2.offset++);
+					m_audio[1].pos -= m_audio[1].period;
+					m_audio[1].signal = fetch_sample(1, m_audio[1].offset++);
 				}
-				left += m_audio2.vol_left * sample;
-				right += m_audio2.vol_right * sample;
+				left += m_audio[1].vol_left * sample;
+				right += m_audio[1].vol_right * sample;
 			}
 		}
 
-		if ( m_audio3.on )
+		if (m_audio[2].on)
 		{
-			sample = m_audio3.signal;
-			m_audio3.pos += clk_div;
-			if (m_audio3.pos >= m_audio3.period)
+			s32 sample = m_audio[2].signal;
+			m_audio[2].pos += clk_div;
+			if (m_audio[2].pos >= m_audio[2].period)
 			{
-				m_audio3.pos -= m_audio3.period;
-				m_audio3.signal = fetch_sample(2, m_audio3.offset++);
+				m_audio[2].pos -= m_audio[2].period;
+				m_audio[2].signal = fetch_sample(2, m_audio[2].offset++);
 			}
-			if ( m_audio3_sweep && m_sweep_time )
+			if (m_audio3_sweep && m_sweep_time)
 			{
 				m_sweep_count += clk_div;
-				if ( m_sweep_count >= m_sweep_time )
+				if (m_sweep_count >= m_sweep_time)
 				{
 					m_sweep_count -= m_sweep_time;
-					m_audio3.freq += m_sweep_step;
-					m_audio3.freq &= 0x7ff;
-					m_audio3.period = 2048 - m_audio3.freq;
+					m_audio[2].freq += m_sweep_step;
+					m_audio[2].freq &= 0x7ff;
+					m_audio[2].period = 2048 - m_audio[2].freq;
 				}
 			}
-			left += m_audio3.vol_left * sample;
-			right += m_audio3.vol_right * sample;
+			left += m_audio[2].vol_left * sample;
+			right += m_audio[2].vol_right * sample;
 		}
 
-		if ( m_audio4.on )
+		if (m_audio[3].on)
 		{
-			sample = m_audio4.signal;
-			m_audio4.pos += clk_div;
-			if (m_audio4.pos >= m_audio4.period)
+			s32 sample = m_audio[3].signal;
+			m_audio[3].pos += clk_div;
+			if (m_audio[3].pos >= m_audio[3].period)
 			{
 				if (m_audio4_noise)
-					m_audio4.signal = m_noise_output ? 0xf : 0;
+					m_audio[3].signal = m_noise_output ? 0xf : 0;
 				else
-					m_audio4.signal = fetch_sample(3, m_audio4.offset++);
+					m_audio[3].signal = fetch_sample(3, m_audio[3].offset++);
 
-				m_audio4.pos -= m_audio4.period;
+				m_audio[3].pos -= m_audio[3].period;
 
 				if (m_noise_reset)
 				{
@@ -264,8 +223,8 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 					m_noise_shift = m_noise_shift << 1 | m_noise_output;
 				}
 			}
-			left += m_audio4.vol_left * sample;
-			right += m_audio4.vol_right * sample;
+			left += m_audio[3].vol_left * sample;
+			right += m_audio[3].vol_right * sample;
 		}
 
 		outputl.put_int(sampindex, left, 32768 >> 5);
@@ -274,116 +233,155 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 }
 
 
-void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
+u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 {
-	freq &= 0x7ff;  // docs say freq is 11bits and a few games (Morita Shougi, World Stadium + others) write 0x800 causing a divide by 0 crash
-	ch->freq = freq;
-	ch->period = 2048 - freq;
+	m_channel->update();
+	switch (offset) {
+		case 0x80 / 2:
+		case 0x82 / 2:
+		case 0x84 / 2:
+		case 0x86 / 2:
+			return m_audio[offset & 0x03].freq;
+		case 0x88 / 2:
+			return (m_audio[0].vol_left << 4) | m_audio[0].vol_right |
+				(m_audio[1].vol_left << 12) | (m_audio[1].vol_right << 8);
+		case 0x8a / 2:
+			return (m_audio[2].vol_left << 4) | m_audio[2].vol_right |
+				(m_audio[3].vol_left << 12) | (m_audio[3].vol_right << 8);
+		case 0x8c / 2:
+			return m_sweep_step | (((m_sweep_time / 8192) - 1) << 8);
+		case 0x8e / 2:
+			return m_noise_type | (m_noise_reset ? 0x08 : 0x00) | (m_noise_enable ? 0x10 : 0x00) |
+				((m_sample_address << 2) & 0xff00);
+		case 0x90 / 2:
+			return (m_audio[0].on ? 0x01 : 0x00) |
+				(m_audio[1].on ? 0x02 : 0x00) |
+				(m_audio[2].on ? 0x04 : 0x00) |
+				(m_audio[3].on ? 0x08 : 0x00) |
+				(m_audio2_voice ? 0x20 : 0x00) |
+				(m_audio3_sweep ? 0x40 : 0x00) |
+				(m_audio4_noise ? 0x80 : 0x00) |
+				(m_mono ? 0x0100 : 0x00) | (m_output_volume << 9) |
+				(m_external_stereo ? 0x0800 : 0x00) |
+				(m_external_speaker ? 0x00 : 0x00);	// TODO 0x80 is set when external speaker is connected
+		case 0x92 / 2:
+			return m_noise_shift;
+		case 0x94 / 2:
+			return m_master_volume;
+		case 0x9e / 2:
+			return m_system_volume;
+	}
+	return 0;
 }
 
-void wswan_sound_device::port_w(offs_t offset, uint8_t data)
+void wswan_sound_device::port_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_channel->update();
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0x80:              /* Audio 1 freq (lo) */
-			wswan_ch_set_freq(&m_audio1, (m_audio1.freq & 0xff00) | data);
+		case 0x80 / 2:              // Audio 1 freq
+		case 0x82 / 2:              // Audio 2 freq
+		case 0x84 / 2:              // Audio 3 freq
+		case 0x86 / 2:              // Audio 4 freq
+			COMBINE_DATA(&m_audio[offset & 0x03].freq);
+			m_audio[offset & 0x03].freq &= 0x7ff;
+			m_audio[offset & 0x03].period = 2048 - m_audio[offset & 0x03].freq;
 			break;
 
-		case 0x81:              /* Audio 1 freq (hi) */
-			wswan_ch_set_freq(&m_audio1, (data << 8 ) | (m_audio1.freq & 0x00ff));
+		case 0x88 / 2:
+			// Audio 1 volume
+			if (ACCESSING_BITS_0_7)
+			{
+				m_audio[0].vol_left = (data >> 4) & 0x0f;
+				m_audio[0].vol_right = data & 0x0f;
+			}
+			// Audio 2 volume
+			if (ACCESSING_BITS_8_15)
+			{
+				m_audio[1].vol_left = (data >> 12) & 0x0f;
+				m_audio[1].vol_right = (data >> 8) & 0x0f;
+			}
 			break;
 
-		case 0x82:              /* Audio 2 freq (lo) */
-			wswan_ch_set_freq(&m_audio2, (m_audio2.freq & 0xff00) | data);
+		case 0x8a / 2:
+		  // Audio 3 volume
+			if (ACCESSING_BITS_0_7)
+			{
+				m_audio[2].vol_left = (data >> 4) & 0x0f;
+				m_audio[2].vol_right = data & 0x0f;
+			}
+			// Audio 4 volume
+			if (ACCESSING_BITS_8_15)
+			{
+				m_audio[3].vol_left = (data >> 12) & 0x0f;
+				m_audio[3].vol_right = (data >> 8) & 0x0f;
+			}
 			break;
 
-		case 0x83:              /* Audio 2 freq (hi) */
-			wswan_ch_set_freq(&m_audio2, (data << 8 ) | (m_audio2.freq & 0x00ff));
+		case 0x8c / 2:
+			// Sweep step
+			if (ACCESSING_BITS_0_7)
+			{
+				m_sweep_step = (int8_t)(data & 0xff);
+			}
+			// Sweep time
+			if (ACCESSING_BITS_8_15)
+			{
+				m_sweep_time = 8192 * ((data >> 8) + 1);
+			}
 			break;
 
-		case 0x84:              /* Audio 3 freq (lo) */
-			wswan_ch_set_freq(&m_audio3, (m_audio3.freq & 0xff00) | data);
+		case 0x8e / 2:
+			// Noise control
+			if (ACCESSING_BITS_0_7)
+			{
+				m_noise_type = data & 0x07;
+				m_noise_reset = BIT(data, 3);
+				m_noise_enable = BIT(data, 4);
+			}
+			// Sample location
+			if (ACCESSING_BITS_8_15)
+			{
+				m_sample_address = (data & 0xff00) >> 2;
+			}
 			break;
 
-		case 0x85:              /* Audio 3 freq (hi) */
-			wswan_ch_set_freq(&m_audio3, (data << 8) | (m_audio3.freq & 0x00ff));
+		case 0x90 / 2:
+			// Audio control
+			if (ACCESSING_BITS_0_7)
+			{
+				m_audio[0].on = BIT(data, 0);
+				m_audio[1].on = BIT(data, 1);
+				m_audio[2].on = BIT(data, 2);
+				m_audio[3].on = BIT(data, 3);
+				m_audio2_voice = BIT(data, 5);
+				m_audio3_sweep = BIT(data, 6);
+				m_audio4_noise = BIT(data, 7);
+			}
+			// Audio output
+			if (ACCESSING_BITS_8_15)
+			{
+				m_mono = BIT(data, 8);
+				m_output_volume = ((data >> 9) & 0x03);
+				m_external_stereo = BIT(data, 11);
+				m_external_speaker = 1;
+			}
 			break;
 
-		case 0x86:              /* Audio 4 freq (lo) */
-			wswan_ch_set_freq(&m_audio4, (m_audio4.freq & 0xff00) | data);
+		case 0x92 / 2:              // Noise counter shift register
+			COMBINE_DATA(&m_noise_shift);
+			m_noise_shift &= 0x7fff;
 			break;
 
-		case 0x87:              /* Audio 4 freq (hi) */
-			wswan_ch_set_freq(&m_audio4, (data << 8) | (m_audio4.freq & 0x00ff));
+		case 0x94 / 2:              // Master volume
+			if (ACCESSING_BITS_0_7)
+				m_master_volume = data & 0xff;
 			break;
 
-		case 0x88:              /* Audio 1 volume */
-			m_audio1.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio1.vol_right = data & 0x0F;
-			break;
-
-		case 0x89:              /* Audio 2 volume */
-			m_audio2.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio2.vol_right = data & 0x0F;
-			break;
-
-		case 0x8A:              /* Audio 3 volume */
-			m_audio3.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio3.vol_right = data & 0x0F;
-			break;
-
-		case 0x8B:              /* Audio 4 volume */
-			m_audio4.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio4.vol_right = data & 0x0F;
-			break;
-
-		case 0x8C:              /* Sweep step */
-			m_sweep_step = (int8_t)data;
-			break;
-
-		case 0x8D:              /* Sweep time */
-			m_sweep_time = 8192 * (data + 1);
-			break;
-
-		case 0x8E:              /* Noise control */
-			m_noise_type = data & 0x07;
-			m_noise_reset = ( data & 0x08 ) >> 3;
-			m_noise_enable = ( data & 0x10 ) >> 4;
-			break;
-
-		case 0x8F:              /* Sample location */
-			m_sample_address = data << 6;
-			break;
-
-		case 0x90:              /* Audio control */
-			m_audio1.on = data & 0x01;
-			m_audio2.on = ( data & 0x02 ) >> 1;
-			m_audio3.on = ( data & 0x04 ) >> 2;
-			m_audio4.on = ( data & 0x08 ) >> 3;
-			m_audio2_voice = ( data & 0x20 ) >> 5;
-			m_audio3_sweep = ( data & 0x40 ) >> 6;
-			m_audio4_noise = ( data & 0x80 ) >> 7;
-			break;
-
-		case 0x91:              /* Audio output */
-			m_mono = data & 0x01;
-			m_output_volume = ( data & 0x06 ) >> 1;
-			m_external_stereo = ( data & 0x08 ) >> 3;
-			m_external_speaker = 1;
-			break;
-
-		case 0x92:              /* Noise counter shift register (lo) */
-			m_noise_shift = ( m_noise_shift & 0xFF00 ) | data;
-			break;
-
-		case 0x93:              /* Noise counter shift register (hi) */
-			m_noise_shift = ( ( data & 0x7f ) << 8 ) | ( m_noise_shift & 0x00FF );
-			break;
-
-		case 0x94:              /* Master volume */
-			m_master_volume = data;
+		case 0x9e / 2:              // WSC volume setting (0, 1, 2, 3) (TODO)
+			if (ACCESSING_BITS_0_7)
+				m_system_volume = data & 0x03;
 			break;
 	}
 }

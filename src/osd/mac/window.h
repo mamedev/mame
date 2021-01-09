@@ -44,7 +44,7 @@ public:
 	void toggle_full_screen();
 	void modify_prescale(int dir);
 	void resize(int32_t width, int32_t height);
-	void destroy() override;
+	void complete_destroy() override;
 
 	void capture_pointer() override;
 	void release_pointer() override;
@@ -57,17 +57,6 @@ public:
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
-	running_machine &machine() const override { return m_machine; }
-	osd_monitor_info *monitor() const override { return m_monitor.get(); }
-	int fullscreen() const override { return m_fullscreen; }
-
-	render_target *target() override { return m_target; }
-
-	int prescale() const { return m_prescale; }
-
-	// Pointer to next window
-	mac_window_info *   m_next;
-
 private:
 	// window handle and info
 	char                m_title[256];
@@ -79,18 +68,15 @@ private:
 
 	// rendering info
 	osd_event           m_rendered_event;
-	render_target *     m_target;
 
 	//int                 m_extra_flags;
 
 	// returns 0 on success, else 1
 	int complete_create();
-	void complete_destroy();
 
 private:
 	int wnd_extra_width();
 	int wnd_extra_height();
-	void set_starting_view(int index, const char *defview, const char *view);
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
 	osd_dim get_min_bounds(int constrain);
 	osd_dim get_max_bounds(int constrain);
@@ -98,12 +84,7 @@ private:
 	osd_dim pick_best_mode();
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
 
-	// Pointer to machine
-	running_machine &   m_machine;
-
 	// monitor info
-	std::shared_ptr<osd_monitor_info>  m_monitor;
-	int                                m_fullscreen;
 	bool                               m_mouse_captured;
 	bool                               m_mouse_hidden;
 

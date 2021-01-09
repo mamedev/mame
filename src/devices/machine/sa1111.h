@@ -28,6 +28,11 @@ public:
 	void ssp_in(uint16_t data) { ssp_rx_fifo_push(data); }
 	auto ssp_out() { return m_ssp_out.bind(); }
 
+	auto l3_addr_out() { return m_l3_addr_out.bind(); }
+	auto l3_data_out() { return m_l3_data_out.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(l3wd_in);
+
 	void map(address_map &map);
 
 protected:
@@ -197,6 +202,12 @@ protected:
 	void gpio_in(const uint32_t line, const int state);
 	void gpio_update_direction(const uint32_t block, const uint32_t old_dir);
 	void gpio_update_outputs(const uint32_t block, const uint32_t old_latch);
+
+	// interrupt lines
+	enum : uint32_t
+	{
+		INT_AUDDTS			= 40
+	};
 
 	// register contents
 	enum : uint32_t
@@ -584,6 +595,8 @@ protected:
 
 	devcb_write_line::array<24> m_gpio_out;
 	devcb_write16 m_ssp_out;
+	devcb_write8 m_l3_addr_out;
+	devcb_write8 m_l3_data_out;
 };
 
 DECLARE_DEVICE_TYPE(SA1111, sa1111_device)

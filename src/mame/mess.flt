@@ -43,6 +43,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphajuno.cpp
 alphasma.cpp
+alphasma3k.cpp
 alphatan.cpp
 alphatpc16.cpp
 alphatpx.cpp
@@ -850,6 +851,7 @@ roland_tr707.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
+rtpc.cpp
 rvoice.cpp
 rx78.cpp
 rz1.cpp

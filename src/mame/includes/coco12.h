@@ -8,11 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_COCO12_H
 #define MAME_INCLUDES_COCO12_H
 
+#pragma once
 
 #include "includes/coco.h"
 #include "machine/6883sam.h"

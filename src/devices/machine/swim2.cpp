@@ -111,12 +111,6 @@ void swim2_device::write(offs_t offset, u8 data)
 	};
 	switch(offset) {
 	case 0x3: case 0xb: {
-#if 0
-		static const char *const pname[16] = {
-			"minct", "mult", "ssl", "sss", "sll", "sls", "rpt", "csls",
-			"lsl", "lss", "lll", "lls", "late", "time0", "early", "time1"
-		};
-#endif
 		static const char *const pname[4] = {
 			"late", "time0", "early", "time1"
 		};
@@ -133,17 +127,6 @@ void swim2_device::write(offs_t offset, u8 data)
 
 	case 0x5: case 0xd:
 		m_setup = data;
-#if 0
-		logerror("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
-				 m_setup & 0x80 ? "on" : "off",
-				 m_setup & 0x40 ? "off" : "on",
-				 m_setup & 0x20 ? "ibm" : "apple",
-				 m_setup & 0x10 ? "on" : "off",
-				 m_setup & 0x08 ? "fclk/2" : "fclk",
-				 m_setup & 0x04 ? "gcr" : "mfm",
-				 m_setup & 0x02 ? "off" : "on",
-				 m_setup & 0x01 ? "hdsel" : "q3");
-#endif
 		logerror("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
 				 m_setup & 0x80 ? "on" : "off",
 				 m_setup & 0x40 ? "off" : "on",

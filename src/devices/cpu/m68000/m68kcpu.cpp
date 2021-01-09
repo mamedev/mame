@@ -1108,8 +1108,6 @@ void m68000_base_device::device_reset()
 	m68ki_clear_trace();
 	/* Interrupt mask to level 7 */
 	m_int_mask = 0x0700;
-	m_int_level = 0;
-	m_virq_state = 0;
 	/* Reset VBR */
 	m_vbr = 0;
 	/* Go to supervisor mode */

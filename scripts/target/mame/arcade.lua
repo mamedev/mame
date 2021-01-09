@@ -290,6 +290,7 @@ SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
 SOUNDS["TT5665"] = true
 --SOUNDS["RP2C33_SOUND"] = true
+--SOUNDS["UDA1344"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -2052,7 +2053,6 @@ files {
 	MAME_DIR .. "src/mame/video/thoop2.cpp",
 	MAME_DIR .. "src/mame/drivers/wrally.cpp",
 	MAME_DIR .. "src/mame/includes/wrally.h",
-	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
 	MAME_DIR .. "src/mame/drivers/blmbycar.cpp",
 	MAME_DIR .. "src/mame/includes/blmbycar.h",
@@ -4040,6 +4040,7 @@ files {
 	MAME_DIR .. "src/mame/includes/gunbustr.h",
 	MAME_DIR .. "src/mame/video/gunbustr.cpp",
 	MAME_DIR .. "src/mame/drivers/halleys.cpp",
+	MAME_DIR .. "src/mame/drivers/heromem.cpp",
 	MAME_DIR .. "src/mame/drivers/invqix.cpp",
 	MAME_DIR .. "src/mame/drivers/jollyjgr.cpp",
 	MAME_DIR .. "src/mame/drivers/ksayakyu.cpp",
@@ -4095,6 +4096,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rollrace.cpp",
 	MAME_DIR .. "src/mame/includes/rollrace.h",
 	MAME_DIR .. "src/mame/video/rollrace.cpp",
+	MAME_DIR .. "src/mame/drivers/sbmjb.cpp",
 	MAME_DIR .. "src/mame/drivers/sbowling.cpp",
 	MAME_DIR .. "src/mame/drivers/scyclone.cpp",
 	MAME_DIR .. "src/mame/drivers/slapshot.cpp",
@@ -4661,7 +4663,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/play_1.cpp",
 	MAME_DIR .. "src/mame/drivers/play_2.cpp",
 	MAME_DIR .. "src/mame/drivers/play_3.cpp",
-	MAME_DIR .. "src/mame/drivers/regama.cpp",
 	MAME_DIR .. "src/mame/drivers/rowamet.cpp",
 	MAME_DIR .. "src/mame/drivers/s11.cpp",
 	MAME_DIR .. "src/mame/includes/s11.h",
@@ -4850,6 +4851,7 @@ files {
 	MAME_DIR .. "src/mame/video/dcheese.cpp",
 	MAME_DIR .. "src/mame/drivers/dfruit.cpp",
 	MAME_DIR .. "src/mame/drivers/dgpix.cpp",
+	MAME_DIR .. "src/mame/drivers/diamondking.cpp",
 	MAME_DIR .. "src/mame/drivers/discoboy.cpp",
 	MAME_DIR .. "src/mame/drivers/dominob.cpp",
 	MAME_DIR .. "src/mame/drivers/dorachan.cpp",
@@ -4989,6 +4991,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
+	MAME_DIR .. "src/mame/drivers/miniguay.cpp",
 	MAME_DIR .. "src/mame/drivers/minivideo.cpp",
 	MAME_DIR .. "src/mame/drivers/mirax.cpp",
 	MAME_DIR .. "src/mame/drivers/missbamby.cpp",
@@ -5123,6 +5126,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tvg01.cpp",
 	MAME_DIR .. "src/mame/drivers/twinbskt.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
+	MAME_DIR .. "src/mame/drivers/ice_hhhippos.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
 	MAME_DIR .. "src/mame/drivers/unkhorse.cpp",

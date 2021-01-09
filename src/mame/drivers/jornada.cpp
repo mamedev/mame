@@ -14,6 +14,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/sa1110.h"
 #include "machine/sa1111.h"
+#include "sound/uda1344.h"
 #include "video/sed1356.h"
 #include "screen.h"
 #include "emupal.h"
@@ -40,6 +41,7 @@ public:
 		, m_companion(*this, "companion")
 		, m_eeprom_data(*this, "eeprom")
 		, m_epson(*this, "epson")
+		, m_codec(*this, "codec")
 		, m_kbd_port(*this, "KBD0")
 	{ }
 
@@ -85,6 +87,7 @@ protected:
 	required_device<sa1111_device> m_companion;
 	required_region_ptr<uint8_t> m_eeprom_data;
 	required_device<sed1356_device> m_epson;
+	required_device<uda1344_device> m_codec;
 
 	required_ioport m_kbd_port;
 
@@ -299,6 +302,11 @@ void jornada_state::jornada720(machine_config &config)
 
 	SA1111(config, m_companion);
 	m_companion->ssp_out().set(FUNC(jornada_state::eeprom_cmd_received));
+	m_companion->l3_addr_out().set(m_codec, FUNC(uda1344_device::l3_addr_w));
+	m_companion->l3_data_out().set(m_codec, FUNC(uda1344_device::l3_data_w));
+
+	UDA1344(config, m_codec);
+	m_codec->l3_ack_out().set(m_companion, FUNC(sa1111_device::l3wd_in));
 
 	SED1356(config, m_epson);
 	m_epson->set_screen("screen");

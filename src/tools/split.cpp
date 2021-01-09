@@ -149,7 +149,7 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 		splitfile->printf("hash=%s file=%s.%03d\n", computedhash.c_str(), basefilename.c_str(), partnum);
 
 		// compute the full filename for this guy
-		outfilename = string_format("%s.%03d", basename, partnum);
+		outfilename = util::string_format("%s.%03d", basename, partnum);
 
 		// create it
 		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, outfile);

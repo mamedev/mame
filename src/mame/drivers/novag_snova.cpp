@@ -5,11 +5,14 @@
 
 Novag Super Nova (model 904)
 
+The chess engine is by David Kittinger. Older versions of the program have a bug
+in the opening moves, always playing B5 after D4.
+
 Hardware notes:
 - Hitachi HD63A03YP MCU @ 16MHz (4MHz internal)
 - 32KB ROM(TC57256AD-12), 8KB RAM(CXK58648P-10L)
 - LCD with 4 digits and custom segments, no LCD chip
-- RS232 port for Novag Super System (like the one in sexpertc)
+- RJ-12 port for Novag Super System (like the one in sexpertc)
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
 TODO:
@@ -242,7 +245,7 @@ void snova_state::snova(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/3, 591/3);
+	screen.set_size(1920/4, 591/4);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
@@ -279,5 +282,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

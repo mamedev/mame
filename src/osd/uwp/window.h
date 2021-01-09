@@ -49,11 +49,6 @@ class uwp_window_info  : public osd_window_t<Platform::Agile<Windows::UI::Core::
 public:
 	uwp_window_info(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
 
-	running_machine &machine() const override { return m_machine; }
-
-	virtual render_target *target() override { return m_target; }
-	int fullscreen() const override { return m_fullscreen; }
-
 	void update() override;
 
 	virtual osd_dim get_size() override
@@ -72,9 +67,7 @@ public:
 	void show_pointer() override;
 	void hide_pointer() override;
 
-	virtual osd_monitor_info *monitor() const override { return m_monitor.get(); }
-
-	void destroy() override;
+	void complete_destroy() override;
 
 	// static
 
@@ -82,7 +75,6 @@ public:
 
 	// member variables
 
-	uwp_window_info *   m_next;
 	volatile int        m_init_state;
 
 	// window handle and info
@@ -93,14 +85,11 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
-	std::shared_ptr<osd_monitor_info>  m_monitor;
-	int                                m_fullscreen;
 	int                                m_fullscreen_safe;
 	float                              m_aspect;
 
 	// rendering info
 	std::mutex          m_render_lock;
-	render_target *     m_target;
 	unsigned            m_targetview;
 	int                 m_targetorient;
 	render_layer_config m_targetlayerconfig;
@@ -114,7 +103,6 @@ public:
 private:
 	int complete_create();
 	void draw_video_contents(bool update);
-	void set_starting_view(int index, const char *defview, const char *view);
 	int wnd_extra_width();
 	int wnd_extra_height();
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
@@ -125,13 +113,10 @@ private:
 	void maximize_window();
 	void adjust_window_position_after_major_change();
 	void set_fullscreen(int fullscreen);
-	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect* proposed) const;
 
 	static POINT        s_saved_cursor_pos;
 
 	static Windows::UI::Core::CoreCursor^ s_cursor;
-
-	running_machine &   m_machine;
 };
 
 struct osd_draw_callbacks

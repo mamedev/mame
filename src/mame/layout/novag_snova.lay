@@ -438,14 +438,14 @@ license:CC0
 		<element ref="text_2"><bounds x="1.4" y="69" width="2" height="2" /></element>
 		<element ref="text_1"><bounds x="1.4" y="79" width="2" height="2" /></element>
 
-		<element ref="text_a"><bounds x="6"  y="83.8" width="2" height="2" /></element>
-		<element ref="text_b"><bounds x="16" y="83.8" width="2" height="2" /></element>
-		<element ref="text_c"><bounds x="26" y="83.8" width="2" height="2" /></element>
-		<element ref="text_d"><bounds x="36" y="83.8" width="2" height="2" /></element>
-		<element ref="text_e"><bounds x="46" y="83.8" width="2" height="2" /></element>
-		<element ref="text_f"><bounds x="56" y="83.8" width="2" height="2" /></element>
-		<element ref="text_g"><bounds x="66" y="83.8" width="2" height="2" /></element>
-		<element ref="text_h"><bounds x="76" y="83.8" width="2" height="2" /></element>
+		<element ref="text_a"><bounds x="10" y="83.8" width="2" height="2" /></element>
+		<element ref="text_b"><bounds x="20" y="83.8" width="2" height="2" /></element>
+		<element ref="text_c"><bounds x="30" y="83.8" width="2" height="2" /></element>
+		<element ref="text_d"><bounds x="40" y="83.8" width="2" height="2" /></element>
+		<element ref="text_e"><bounds x="50" y="83.8" width="2" height="2" /></element>
+		<element ref="text_f"><bounds x="60" y="83.8" width="2" height="2" /></element>
+		<element ref="text_g"><bounds x="70" y="83.8" width="2" height="2" /></element>
+		<element ref="text_h"><bounds x="80" y="83.8" width="2" height="2" /></element>
 
 		<!-- chessboard leds -->
 		<element name="0.0" ref="led"><bounds x="1.5" y="7.25"  width="1.5" height="1.5" /></element>

@@ -540,7 +540,7 @@ license:CC0
 	<element name="text_l3"><text string="CHECK" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l4"><text string="MATE" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l5"><text string="DRAW" align="1"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l6"><text string="3RD REPET" align="1"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l6"><text string="3RD REPET" align="1"><color red="1" green="1" blue="1" /></text></element> <!-- sic -->
 	<element name="text_l7"><text string="RESIGN" align="1"><color red="1" green="1" blue="1" /></text></element>
 
 	<element name="text_r1"><text string="ENTER POSITION" align="2"><color red="1" green="1" blue="1" /></text></element>

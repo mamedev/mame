@@ -7,44 +7,44 @@
 
 template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask) const
 {
-	return m_base[((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift)];
+	return m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_read_memory<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
-	return m_base + (((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return m_base + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_memory<Width, AddrShift, Endian>::name() const
 {
-	return util::string_format("memory@%x", inh::m_address_base);
+	return util::string_format("memory@%x", this->m_address_base);
 }
 
 
 template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_memory<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask) const
 {
-	offs_t off = ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift);
+	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
 	m_base[off] = (m_base[off] & ~mem_mask) | (data & mem_mask);
 }
 
 template<> void handler_entry_write_memory<0, 0, ENDIANNESS_LITTLE>::write(offs_t offset, u8 data, u8 mem_mask) const
 {
-	m_base[(offset - inh::m_address_base) & inh::m_address_mask] = data;
+	m_base[(offset - this->m_address_base) & this->m_address_mask] = data;
 }
 
 template<> void handler_entry_write_memory<0, 0, ENDIANNESS_BIG>::write(offs_t offset, u8 data, u8 mem_mask) const
 {
-	m_base[(offset - inh::m_address_base) & inh::m_address_mask] = data;
+	m_base[(offset - this->m_address_base) & this->m_address_mask] = data;
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_write_memory<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
-	return m_base + (((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return m_base + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_memory<Width, AddrShift, Endian>::name() const
 {
-	return util::string_format("memory@%x", inh::m_address_base);
+	return util::string_format("memory@%x", this->m_address_base);
 }
 
 
@@ -53,12 +53,12 @@ template<int Width, int AddrShift, endianness_t Endian> std::string handler_entr
 
 template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask) const
 {
-	return static_cast<uX *>(m_bank.base())[((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift)];
+	return static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_read_memory_bank<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
-	return static_cast<uX *>(m_bank.base()) + (((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return static_cast<uX *>(m_bank.base()) + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_memory_bank<Width, AddrShift, Endian>::name() const
@@ -69,23 +69,23 @@ template<int Width, int AddrShift, endianness_t Endian> std::string handler_entr
 
 template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_memory_bank<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask) const
 {
-	offs_t off = ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift);
+	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
 	static_cast<uX *>(m_bank.base())[off] = (static_cast<uX *>(m_bank.base())[off] & ~mem_mask) | (data & mem_mask);
 }
 
 template<> void handler_entry_write_memory_bank<0, 0, ENDIANNESS_LITTLE>::write(offs_t offset, u8 data, u8 mem_mask) const
 {
-	static_cast<uX *>(m_bank.base())[(offset - inh::m_address_base) & inh::m_address_mask] = data;
+	static_cast<uX *>(m_bank.base())[(offset - this->m_address_base) & this->m_address_mask] = data;
 }
 
 template<> void handler_entry_write_memory_bank<0, 0, ENDIANNESS_BIG>::write(offs_t offset, u8 data, u8 mem_mask) const
 {
-	static_cast<uX *>(m_bank.base())[(offset - inh::m_address_base) & inh::m_address_mask] = data;
+	static_cast<uX *>(m_bank.base())[(offset - this->m_address_base) & this->m_address_mask] = data;
 }
 
 template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_write_memory_bank<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
-	return static_cast<uX *>(m_bank.base()) + (((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return static_cast<uX *>(m_bank.base()) + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_memory_bank<Width, AddrShift, Endian>::name() const

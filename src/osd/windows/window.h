@@ -55,10 +55,6 @@ class win_window_info  : public osd_window_t<HWND>
 public:
 	win_window_info(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
 
-	running_machine &machine() const override { return m_machine; }
-
-	virtual render_target *target() override { return m_target; }
-	int fullscreen() const override { return m_fullscreen; }
 	bool attached_mode() const { return m_attached_mode; }
 	win_window_focus focus() const;
 
@@ -89,9 +85,7 @@ public:
 	void show_pointer() override;
 	void hide_pointer() override;
 
-	virtual osd_monitor_info *monitor() const override { return m_monitor.get(); }
-
-	void destroy() override;
+	void complete_destroy() override;
 
 	// static
 
@@ -103,7 +97,6 @@ public:
 
 	// member variables
 
-	win_window_info *   m_next;
 	volatile int        m_init_state;
 
 	// window handle and info
@@ -114,14 +107,11 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
-	std::shared_ptr<osd_monitor_info>  m_monitor;
-	int                                m_fullscreen;
 	int                                m_fullscreen_safe;
 	float                              m_aspect;
 
 	// rendering info
 	std::mutex          m_render_lock;
-	render_target *     m_target;
 	unsigned            m_targetview;
 	int                 m_targetorient;
 	render_layer_config m_targetlayerconfig;
@@ -135,7 +125,6 @@ public:
 private:
 	void draw_video_contents(HDC dc, bool update);
 	int complete_create();
-	void set_starting_view(int index, const char *defview, const char *view);
 	int wnd_extra_width();
 	int wnd_extra_height();
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
@@ -146,7 +135,6 @@ private:
 	void maximize_window();
 	void adjust_window_position_after_major_change();
 	void set_fullscreen(int fullscreen);
-	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect* proposed) const;
 
 	static POINT        s_saved_cursor_pos;
 
@@ -154,7 +142,6 @@ private:
 	static Windows::UI::Core::CoreCursor^ s_cursor;
 #endif
 
-	running_machine &   m_machine;
 	bool                m_attached_mode;
 };
 

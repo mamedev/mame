@@ -1661,7 +1661,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 		actual_hashes.compute(contents.get(), length, util::hash_collection::HASH_TYPES_CRC_SHA1);
 
 		util::hash_collection expected_hashes;
-		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, sha1, strlen(sha1));
+		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, sha1);
 
 		if (actual_hashes != expected_hashes) throw rpk_exception(RPK_INVALID_FILE_REF, "SHA1 check failed");
 	}

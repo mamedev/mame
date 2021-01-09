@@ -244,30 +244,27 @@ uwp_window_info::uwp_window_info(
 	running_machine &machine,
 	int index,
 	std::shared_ptr<osd_monitor_info> monitor,
-	const osd_window_config *config) : osd_window_t(*config),
-		m_next(nullptr),
+	const osd_window_config *config) : osd_window_t(machine, index, std::move(monitor), *config),
 		m_init_state(0),
 		m_startmaximized(0),
 		m_isminimized(0),
 		m_ismaximized(0),
-		m_monitor(monitor),
-		m_fullscreen(!video_config.windowed),
 		m_fullscreen_safe(0),
 		m_aspect(0),
-		m_target(nullptr),
 		m_targetview(0),
 		m_targetorient(0),
 		m_targetvismask(0),
 		m_lastclicktime(std::chrono::system_clock::time_point::min()),
 		m_lastclickx(0),
-		m_lastclicky(0),
-		m_machine(machine)
+		m_lastclicky(0)
 {
 	memset(m_title,0,sizeof(m_title));
 	m_non_fullscreen_bounds.left = 0;
 	m_non_fullscreen_bounds.top = 0;
 	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
+
+	m_fullscreen = !video_config.windowed;
 	m_prescale = video_config.prescale;
 }
 
@@ -365,11 +362,11 @@ void uwp_window_info::create(running_machine &machine, int index, std::shared_pt
 	auto window = std::make_shared<uwp_window_info>(machine, index, monitor, config);
 
 	// set main window
-	if (window->m_index > 0)
+	if (window->index() > 0)
 	{
 		for (auto w : osd_common_t::s_window_list)
 		{
-			if (w->m_index == 0)
+			if (w->index() == 0)
 			{
 				window->set_main_window(std::static_pointer_cast<osd_window>(w));
 				break;
@@ -388,23 +385,13 @@ void uwp_window_info::create(running_machine &machine, int index, std::shared_pt
 		if (win->monitor() == monitor.get())
 			window->m_fullscreen_safe = FALSE;
 
-	// add us to the list
-	osd_common_t::s_window_list.push_back(window);
-
-	// load the layout
-	window->m_target = machine.render().target_alloc();
-
-	// set the specific view
-	windows_options &options = downcast<windows_options &>(machine.options());
-
-	const char *defview = options.view();
-	window->set_starting_view(index, defview, options.view(index));
+	window->create_target();
 
 	// remember the current values in case they change
-	window->m_targetview = window->m_target->view();
-	window->m_targetorient = window->m_target->orientation();
-	window->m_targetlayerconfig = window->m_target->layer_config();
-	window->m_targetvismask = window->m_target->visibility_mask();
+	window->m_targetview = window->target()->view();
+	window->m_targetorient = window->target()->orientation();
+	window->m_targetlayerconfig = window->target()->layer_config();
+	window->m_targetvismask = window->target()->visibility_mask();
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -413,7 +400,7 @@ void uwp_window_info::create(running_machine &machine, int index, std::shared_pt
 		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name, index);
 
 	// set the initial maximized state
-	window->m_startmaximized = options.maximize();
+	window->m_startmaximized = downcast<windows_options &>(machine.options()).maximize();
 
 	window->m_init_state = window->complete_create() ? -1 : 1;
 
@@ -422,48 +409,18 @@ void uwp_window_info::create(running_machine &machine, int index, std::shared_pt
 		fatalerror("Unable to complete window creation\n");
 }
 
-std::shared_ptr<osd_monitor_info> uwp_window_info::monitor_from_rect(const osd_rect* proposed) const
-{
-	std::shared_ptr<osd_monitor_info> monitor;
-
-	// in window mode, find the nearest
-	if (!fullscreen())
-	{
-		if (proposed != nullptr)
-		{
-			monitor = m_monitor->module().monitor_from_rect(*proposed);
-		}
-		else
-			monitor = m_monitor->module().monitor_from_window(*this);
-	}
-	else
-	{
-		// in full screen, just use the configured monitor
-		monitor = m_monitor;
-	}
-
-	return monitor;
-}
-
 //============================================================
 //  winwindow_video_window_destroy
 //  (main thread)
 //============================================================
 
-void uwp_window_info::destroy()
+void uwp_window_info::complete_destroy()
 {
 	assert(GetCurrentThreadId() == main_threadid);
-
-	// remove us from the list
-	osd_common_t::s_window_list.remove(shared_from_this());
 
 	// destroy the window
 //  if (platform_window<HWND>() != nullptr)
 	//  DestroyWindow(platform_window<HWND>());
-
-	// free the render target
-	machine().render().target_free(m_target);
-	m_target = nullptr;
 }
 
 
@@ -478,10 +435,10 @@ void uwp_window_info::update()
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// see if the target has changed significantly in window mode
-	unsigned const targetview = m_target->view();
-	int const targetorient = m_target->orientation();
-	render_layer_config const targetlayerconfig = m_target->layer_config();
-	u32 const targetvismask = m_target->visibility_mask();
+	unsigned const targetview = target()->view();
+	int const targetorient = target()->orientation();
+	render_layer_config const targetlayerconfig = target()->layer_config();
+	u32 const targetvismask = target()->visibility_mask();
 	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
 	{
 		m_targetview = targetview;
@@ -500,7 +457,7 @@ void uwp_window_info::update()
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (platform_window() != nullptr && m_target != nullptr && has_renderer())
+	if (platform_window() != nullptr && target() != nullptr && has_renderer())
 	{
 		bool got_lock = true;
 		auto clock = std::chrono::high_resolution_clock();
@@ -558,29 +515,6 @@ void uwp_window_info::draw_video_contents(bool update)
 			renderer().draw(update);
 		}
 	}
-}
-
-
-//============================================================
-//  set_starting_view
-//  (main thread)
-//============================================================
-
-void uwp_window_info::set_starting_view(int index, const char *defview, const char *view)
-{
-	int viewindex;
-
-	assert(GetCurrentThreadId() == main_threadid);
-
-	// choose non-auto over auto
-	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
-		view = defview;
-
-	// query the video system to help us pick a view
-	viewindex = target()->configured_view(view, index, video_config.numscreens);
-
-	// set the view
-	target()->set_view(viewindex);
 }
 
 
@@ -684,7 +618,7 @@ int uwp_window_info::complete_create()
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the monitor bounds
-	osd_rect monitorbounds = m_monitor->position_size();
+	osd_rect monitorbounds = monitor()->position_size();
 
 	auto coreWindow = Platform::Agile<CoreWindow>(CoreWindow::GetForCurrentThread());
 	set_platform_window(coreWindow);
@@ -747,7 +681,7 @@ osd_rect uwp_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 		return rect;
 
 	// do not constrain aspect ratio for integer scaled views
-	if (m_target->scale_mode() != SCALE_FRACTIONAL)
+	if (target()->scale_mode() != SCALE_FRACTIONAL)
 		return rect;
 
 	// get the pixel aspect ratio for the target monitor
@@ -763,21 +697,21 @@ osd_rect uwp_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_TOP:
-			m_target->compute_visible_area(10000, propheight, pixel_aspect, m_target->orientation(), propwidth, propheight);
+			target()->compute_visible_area(10000, propheight, pixel_aspect, target()->orientation(), propwidth, propheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_RIGHT:
-			m_target->compute_visible_area(propwidth, 10000, pixel_aspect, m_target->orientation(), propwidth, propheight);
+			target()->compute_visible_area(propwidth, 10000, pixel_aspect, target()->orientation(), propwidth, propheight);
 			break;
 
 		default:
-			m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), propwidth, propheight);
+			target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), propwidth, propheight);
 			break;
 	}
 
 	// get the minimum width/height for the current layout
-	m_target->compute_minimum_size(minwidth, minheight);
+	target()->compute_minimum_size(minwidth, minheight);
 
 	// clamp against the absolute minimum
 	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
@@ -810,7 +744,7 @@ osd_rect uwp_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	propheight = std::min(propheight, maxheight);
 
 	// compute the visible area based on the proposed rectangle
-	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
+	target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), viswidth, visheight);
 
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect.width();
@@ -858,7 +792,7 @@ osd_dim uwp_window_info::get_min_bounds(int constrain)
 	//assert(GetCurrentThreadId() == window_threadid);
 
 	// get the minimum target size
-	m_target->compute_minimum_size(minwidth, minheight);
+	target()->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)
@@ -871,7 +805,7 @@ osd_dim uwp_window_info::get_min_bounds(int constrain)
 	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
-	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
 	{
 		// first constrain with no height limit
 		osd_rect test1(0,0,minwidth,10000);
@@ -909,8 +843,8 @@ osd_dim uwp_window_info::get_max_bounds(int constrain)
 	//assert(GetCurrentThreadId() == window_threadid);
 
 	// compute the maximum client area
-	//m_monitor->refresh();
-	osd_rect maximum = m_monitor->usuable_position_size();
+	//monitor()->refresh();
+	osd_rect maximum = monitor()->usuable_position_size();
 
 	// clamp to the window's max
 	int tempw = maximum.width();
@@ -931,7 +865,7 @@ osd_dim uwp_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && m_target->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	return maximum.dim();
@@ -1006,7 +940,7 @@ void uwp_window_info::maximize_window()
 	osd_dim newsize = get_max_bounds(keepaspect());
 
 	// center within the work area
-	osd_rect work = m_monitor->usuable_position_size();
+	osd_rect work = monitor()->usuable_position_size();
 	osd_rect newrect = osd_rect(work.left() + (work.width() - newsize.width()) / 2,
 			work.top() + (work.height() - newsize.height()) / 2,
 			newsize);
@@ -1054,7 +988,7 @@ void uwp_window_info::adjust_window_position_after_major_change()
 				//newrect.width(), newrect.height(), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
-	if (m_index == 0)
+	if (index() == 0)
 	{
 		win_physical_width = newrect.width();
 		win_physical_height = newrect.height();

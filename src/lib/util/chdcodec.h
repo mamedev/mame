@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "coretmpl.h"
+#include <cstdint>
+#include <vector>
 
 
 #define CHDCODEC_VERIFY_COMPRESSION 0

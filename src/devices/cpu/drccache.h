@@ -7,12 +7,12 @@
     Universal dynamic recompiler cache management.
 
 ***************************************************************************/
+#ifndef MAME_CPU_DRCCACHE_H
+#define MAME_CPU_DRCCACHE_H
 
 #pragma once
 
-#ifndef __DRCCACHE_H__
-#define __DRCCACHE_H__
-
+#include "modules/lib/osdlib.h"
 
 
 //**************************************************************************
@@ -63,43 +63,47 @@ public:
 	void dealloc(void *memory, size_t bytes);
 
 	// codegen helpers
+	void codegen_init();
+	void codegen_complete();
 	drccodeptr *begin_codegen(uint32_t reserve_bytes);
 	drccodeptr end_codegen();
-	void request_oob_codegen(drc_oob_delegate callback, void *param1 = nullptr, void *param2 = nullptr);
+	void request_oob_codegen(drc_oob_delegate &&callback, void *param1 = nullptr, void *param2 = nullptr);
 
 private:
 	// largest block of code that can be generated at once
-	static const size_t CODEGEN_MAX_BYTES = 131072;
+	static constexpr size_t CODEGEN_MAX_BYTES = 131072;
 
 	// minimum alignment, in bytes (must be power of 2)
-	static const size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
+	static constexpr size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
 
 	// largest permanent allocation we allow
-	static const size_t MAX_PERMANENT_ALLOC = 1024;
+	static constexpr size_t MAX_PERMANENT_ALLOC = 1024;
 
 	// size of "near" area at the base of the cache
-	static const size_t NEAR_CACHE_SIZE = 131072;
+	static constexpr size_t NEAR_CACHE_SIZE = 131072;
+
+	osd::virtual_memory_allocation m_cache;
 
 	// core parameters
-	drccodeptr          m_near;             // pointer to the near part of the cache
-	drccodeptr          m_neartop;          // top of the near part of the cache
-	drccodeptr          m_base;             // base pointer to the compiler cache
-	drccodeptr          m_top;              // current top of cache
-	drccodeptr          m_end;              // end of cache memory
-	drccodeptr          m_codegen;          // start of generated code
-	size_t              m_size;             // size of the cache in bytes
+	drccodeptr const    m_near;             // pointer to the near part of the cache
+	drccodeptr          m_neartop;          // unallocated area of near cache
+	drccodeptr const    m_base;             // end of near cache
+	drccodeptr          m_top;              // end of temporary allocations and code
+	drccodeptr          m_limit;            // limit for temporary allocations and code (page-aligned)
+	drccodeptr          m_end;              // first allocated byte in cache
+	drccodeptr          m_codegen;          // start of current generated code block
+	size_t const        m_size;             // size of the cache in bytes
+	bool                m_executable;       // whether cached code is currently executable
 
 	// oob management
 	struct oob_handler
 	{
-		oob_handler *next() const { return m_next; }
-
-		oob_handler *   m_next;             // next handler
-		drc_oob_delegate m_callback;        // callback function
-		void *          m_param1;           // 1st pointer parameter
-		void *          m_param2;           // 2nd pointer parameter
+		drc_oob_delegate    m_callback;     // callback function
+		void *              m_param1;       // 1st pointer parameter
+		void *              m_param2;       // 2nd pointer parameter
 	};
-	simple_list<oob_handler> m_ooblist;     // list of oob handlers
+	std::list<oob_handler> m_oob_list;      // list of active oob handlers
+	std::list<oob_handler> m_oob_free;      // list of recyclable oob handlers
 
 	// free lists
 	struct free_link
@@ -110,5 +114,4 @@ private:
 	free_link *         m_nearfree[MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT];
 };
 
-
-#endif /* __DRCCACHE_H__ */
+#endif // MAME_CPU_DRCCACHE_H

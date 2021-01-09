@@ -18,6 +18,7 @@
 
 // ======================> coco_midi_device
 
+namespace {
 class coco_midi_device :
 		public device_t,
 		public device_cococart_interface
@@ -107,6 +108,7 @@ void dragon_midi_device::device_start()
 			read8sm_delegate(m_acia, FUNC(acia6850_device::read)),
 			write8sm_delegate(m_acia, FUNC(acia6850_device::write)));
 }
+} // anonymous namespace
 
-DEFINE_DEVICE_TYPE(COCO_MIDI, coco_midi_device, "coco_midi", "CoCo MIDI PAK");
-DEFINE_DEVICE_TYPE(DRAGON_MIDI, dragon_midi_device, "dragon_midi", "Dragon MIDI PAK");
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_MIDI, device_cococart_interface, coco_midi_device, "coco_midi", "CoCo MIDI PAK")
+DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_MIDI, device_cococart_interface, dragon_midi_device, "dragon_midi", "Dragon MIDI PAK")

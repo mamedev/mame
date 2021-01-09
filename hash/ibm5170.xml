@@ -14590,7 +14590,7 @@ license:CC0
 	</software>
 
 	<software name="simantwin">
-		<description>SimAnt (windows 3.x release)</description>
+		<description>SimAnt (Windows 3.x release)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -15477,6 +15477,24 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d3e6946" sha1="85e5cfdf3a5a5a71e3f21d356cc9683afdc7e8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetriscw">
+		<description>Tetris Classic (Windows 3.x release)</description>
+		<year>1992</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="developer" value="Sphere" />
+		<info name="version" value="Version 1.0 10/23/92" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="79804dc4" sha1="2ce4e7641a5d9422d79a85d300a7c0f9140ade88"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="655bda8e" sha1="2a2053439e2bec82cb0be8cd4bae8035e9cf33a7"/>
 			</dataarea>
 		</part>
 	</software>

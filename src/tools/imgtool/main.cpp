@@ -248,7 +248,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	{
 		std::string filesize_string = ent.directory
 			? "<DIR>"
-			: string_format("%u", (unsigned int) ent.filesize);
+			: util::string_format("%u", (unsigned int) ent.filesize);
 
 		if (!ent.lastmodified_time.empty())
 		{
@@ -748,7 +748,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 		const util::option_resolution::entry &entry = *iter;
 				std::stringstream description_buffer;
 
-		std::string opt_name = string_format("--%s", entry.identifier());
+		std::string opt_name = util::string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();
 
 		// is this option relevant?

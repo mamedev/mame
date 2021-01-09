@@ -640,7 +640,7 @@ void menu_export::handle()
 					// iterate through drivers and output the info
 					while (drvlist.next())
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
-					file.puts(buffer.str().c_str());
+					file.puts(buffer.str());
 					file.close();
 					machine().popmessage(_("%s.txt saved under ui folder."), filename);
 				}
@@ -728,7 +728,7 @@ void menu_machine_configure::handle()
 					if (filerr == osd_file::error::NONE)
 					{
 						std::string inistring = m_opts.output_ini();
-						file.puts(inistring.c_str());
+						file.puts(inistring);
 						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
 				}
@@ -868,7 +868,7 @@ menu_plugins_configure::~menu_plugins_configure()
 		// throw emu_fatalerror("Unable to create file plugin.ini\n");
 		return;
 	// generate the updated INI
-	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini().c_str());
+	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini());
 }
 
 //-------------------------------------------------

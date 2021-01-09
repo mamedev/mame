@@ -51,7 +51,7 @@
 
 #include "corefile.h"
 #include "corestr.h"
-#include "osdcore.h"
+#include "osdcomm.h"
 #include "strformat.h"
 
 #include <algorithm>

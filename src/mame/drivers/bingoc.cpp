@@ -4,14 +4,13 @@
 
 Bingo Circus (c) 1989 Sega
 
-A Bingo machine with a terminal for each player,maximum 8 players can play together.
+A Bingo machine with a terminal for each player, maximum 8 players can play together.
 
 preliminary driver by David Haywood & Angelo Salese
 
 TODO:
--terminal pcb(s) roms aren't dumped,so no video can be shown,a cabinet snap is here ->
- http://www.system16.com/hardware.php?id=840&page=1#2743 ,every player should have his own
- screen.
+-a cabinet snap is here -> http://www.system16.com/hardware.php?id=840&page=1#2743,
+ every player should have his own screen.
 -inconsistent (likely wrong) sound banking.
 
 ============================================================================================
@@ -27,6 +26,17 @@ SOUND : YM2151 uPD7759C
 12638.EPR   ;  /
 12639.EPR   ; SOUND PRG
 
+
+BINGO CIRCUS (TERMINAL PCB)
+(c)SEGA
+
+CPU   : MAIN Z-80 SOUND Z-80
+SOUND : 2 x ASSP 5C68A
+
+12646.ic20  ; MAIN PROGRAM
+12647.ic24  ; SOUND PRG + DATA
+12648.ic25  ;  /
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -35,12 +45,15 @@ SOUND : YM2151 uPD7759C
 #include "machine/315_5338a.h"
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
+#include "sound/rf5c68.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class bingoc_state : public driver_device
 {
@@ -52,22 +65,45 @@ public:
 		m_upd7759(*this, "upd"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	uint8_t m_x;
-	uint16_t unknown_r();
-	void main_sound_latch_w(uint8_t data);
-	void sound_play_w(uint8_t data);
+
+	void bingoc(machine_config &config);
+
+protected:
 	virtual void video_start() override;
-	uint32_t screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	//uint8_t m_x;
+	[[maybe_unused]] void main_sound_latch_w(uint8_t data);
+	void sound_play_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void bingoc(machine_config &config);
 	void main_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
 };
 
+class bingoct_state : public driver_device
+{
+public:
+	bingoct_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
+
+
+	void bingoct(machine_config &config);
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
 
 #define SOUND_TEST 0
 
@@ -75,14 +111,14 @@ void bingoc_state::video_start()
 {
 }
 
-uint32_t bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bingoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-uint16_t bingoc_state::unknown_r()
+uint32_t bingoct_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return 0xffff;
+	return 0;
 }
 
 #if SOUND_TEST
@@ -109,7 +145,7 @@ uint8_t bingoc_state::sound_test_r()
 #else
 void bingoc_state::main_sound_latch_w(uint8_t data)
 {
-	m_soundlatch->write(data&0xff);
+	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 #endif
@@ -163,6 +199,13 @@ void bingoc_state::sound_io(address_map &map)
 #endif
 }
 
+void bingoct_state::main_map(address_map &map)
+{
+}
+
+void bingoct_state::sound_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
@@ -198,7 +241,7 @@ void bingoc_state::bingoc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bingoc_state::screen_update_bingoc));
+	screen.set_screen_update(FUNC(bingoc_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x100);
@@ -216,13 +259,44 @@ void bingoc_state::bingoc(machine_config &config)
 	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void bingoct_state::bingoct(machine_config &config)
+{
+	Z80(config, m_maincpu, 32000000 / 4); // divider unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &bingoct_state::main_map);
+
+	Z80(config, m_soundcpu, 32000000 / 4); // divider unknown
+	m_soundcpu->set_addrmap(AS_PROGRAM, &bingoct_state::sound_map);
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bingoct_state::screen_update));
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette").set_entries(0x100);
+
+
+	SPEAKER(config, "lspeaker").front_left(); // might just be mono...
+	SPEAKER(config, "rspeaker").front_right();
+
+	GENERIC_LATCH_8(config, "soundlatch");
+
+	rf5c68_device &rf5c68_1(RF5C68(config, "5c68_1", 32000000 / 4));
+	rf5c68_1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	rf5c68_1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	rf5c68_device &rf5c68_2(RF5C68(config, "5c68_2", 32000000 / 4));
+	rf5c68_2.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	rf5c68_2.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
 ROM_START( bingoc )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "12636a.epr", 0x00000, 0x20000, CRC(ef8dccff) SHA1(9eb6e55e2000b252647fc748cbbeedf4f119aed7) )
 	ROM_LOAD16_BYTE( "12635a.epr", 0x00001, 0x20000, CRC(a94cd74e) SHA1(0c3e157a5ddf34f4f1a2d30b9758bf067896371c) )
-
-	ROM_REGION( 0x10000, "ter_1", 0 ) //just as a re-dump reminder,might be either one sub-board or eight of them...
-	ROM_LOAD( "terminal.rom", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "12639.epr", 0x00000, 0x10000, CRC(4307f6ba) SHA1(f568930191cd31a2112ef8d4cf5ff340826d5877) )
@@ -233,4 +307,20 @@ ROM_START( bingoc )
 	ROM_COPY( "upd",       0x20000, 0x00000, 0x20000 )
 ROM_END
 
-GAME( 1989, bingoc, 0, bingoc, bingoc, bingoc_state, empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+
+// PCB stickered 837-7151 - 2 x Z80 + 2 x ASSP (RF)5C68A for sound + NEC D71051 + NEC D71054 + various Sega customs (315-5246, 315-5330, 315-5333, ..)
+// TODO: move to different file?
+ROM_START( bingoct )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "epr-12646.ic20", 0x00000, 0x20000, CRC(c52e31a2) SHA1(901e84f3c9b65f207f7614d64e685e762b23987e) )
+
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD( "epr-12647.ic24", 0x00000, 0x20000, CRC(33198811) SHA1(6fb9db294a7f40303f22f68c3822e67cbd3560fa) )
+	ROM_LOAD( "epr-12648.ic25", 0x20000, 0x20000, CRC(a34737e5) SHA1(76feec0091afb92af8ced99af61495f28f981120) )
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME( 1989, bingoc,  0, bingoc,  bingoc, bingoc_state,  empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+GAME( 1989, bingoct, 0, bingoct, bingoc, bingoct_state, empty_init, ROT0, "Sega", "Bingo Circus (terminal)",      MACHINE_IS_SKELETON )
