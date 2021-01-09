@@ -5,7 +5,7 @@
 /*
  * Sony NEWS R4000/4400-based workstations.
  *
- * Sources/More Information:
+ * Sources and more information:
  *   - http://ozuma.o.oo7.jp/nws5000x.htm
  *   - https://katsu.watanabe.name/doc/sonynews/
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
@@ -62,7 +62,7 @@
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
  *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
- *  DSC-39 Framebuffer/video card:
+ *  DSC-39 XB Framebuffer/video card:
  *   - Sony CXD8486Q XB: not emulated (most likely AP-Bus interface)
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
@@ -80,23 +80,23 @@
 
 #include "machine/ram.h"
 #include "machine/timekpr.h"
-#include "machine/z80scc.h"
 #include "machine/dmac3.h"
 #include "machine/news_hid.h"
 #include "machine/spifi3.h"
 #include "machine/upd765.h"
+#include "machine/cxd8421q.h"
 
+// Buses
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "bus/rs232/rs232.h"
 
+// Floppy includes
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
-// MAME infra imports
+// MAME infra includes
 #include "debugger.h"
-
 #define VERBOSE 1
 #include "logmacro.h"
 
@@ -108,8 +108,7 @@ public:
           m_cpu(*this, "cpu"),
           m_ram(*this, "ram"),
           m_rtc(*this, "rtc"),
-          m_escc(*this, "escc"),
-          m_serial(*this, "serial%u", 0U),
+          m_escc(*this, "escc1"),
           m_fdc(*this, "fdc"),
           m_hid(*this, "hid"),
           m_dmac(*this, "dmac"),
@@ -206,9 +205,8 @@ protected:
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
 
-    // Zilog ESCC serial controller
-    required_device<z80scc_device> m_escc;
-    required_device_array<rs232_port_device, 2> m_serial;
+    // Sony CXD8421Q ESCC1 serial controller (includes a Zilog ESCC)
+    required_device<cxd8421q_device> m_escc;
 
     // SONIC ethernet controller - a different rev, the DP83932C, is emulated in MAME
     // so it hopefully will work with just a little modification.
@@ -303,27 +301,9 @@ void news_r4k_state::machine_common(machine_config &config)
     // Timekeeper IC
     M48T02(config, m_rtc);
 
-    // General ESCC setup
-    SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
+    // ESCC setup
+    CXD8421Q(config, m_escc, 0);
     m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<SCC>));
-
-    // ESCC channel B (mapped to serial port 0)
-    RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
-    m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsb_w));
-    m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcdb_w));
-    m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxb_w));
-    m_escc->out_rtsb_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
-    m_escc->out_txdb_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
-    m_escc->out_dtrb_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
-
-    // ESCC channel A (mapped to serial port 1)
-    RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
-    m_serial[1]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
-    m_serial[1]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
-    m_serial[1]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
-    m_escc->out_rtsa_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
-    m_escc->out_txda_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
-    m_escc->out_dtra_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
@@ -336,7 +316,7 @@ void news_r4k_state::machine_common(machine_config &config)
     // Floppy controller - National Semiconductor PC8477B
     // TODO: find out the difference between B and A - only A is emulated in MAME ATM
     // TODO: frequency? datasheet implies only 24MHz is valid. There is a 24MHz crystal on the I/O board, so this is probably right
-    //       but I need to confirm before locking it in with the XTAL macro
+    //       but it needs to be confirmed before locking it in with the XTAL macro
     PC8477A(config, m_fdc, 24'000'000, pc8477a_device::mode_t::PS2);
     /*
     TODO: how does AP-bus/FIFO chip/etc deal with interrupts?
@@ -447,12 +427,12 @@ void news_r4k_state::cpu_map(address_map &map)
     // LEDs
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
 
-    // ESCC (serial) mapping
-    map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask64(0x000000ff000000ff);
-
-    // TODO: WSC-ESCC1 (CXD8421Q) serial controller
-    // adds extra functionality to the ESCC (and interfaces it to the APBus)
-    // map(0x1e900000, 0x1e900000);
+    // WSC-ESCC1 (CXD8421Q) serial controller
+    map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>),
+                                           FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
+    map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>),
+                                           FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
+    // TODO: FIFO mapping
 
     // Sonic network controller
     // Potential references: https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD
