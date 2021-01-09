@@ -16421,4 +16421,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lslibrary">
+		<description>Library Skills: Let's Learn About The Library</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-01-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 1.woz" size="234775" crc="1825591a" sha1="f5f1b26710f87c9aba3d3fdaba5cc348d9151fe9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 2.woz" size="234775" crc="56ff0e2f" sha1="2a87f73c0b3b8a393b86b58c03cc730dc86f6cc9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 3.woz" size="234775" crc="a1a49df0" sha1="d5b2cf6ff3a64df41c09c1ec140dee3eb1d1df97"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
