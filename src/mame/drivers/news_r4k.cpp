@@ -476,6 +476,13 @@ void news_r4k_state::cpu_map(address_map &map)
     cpu_map_debug(map);
 }
 
+/*
+ * cpu_map_debug
+ *
+ * Method with temporary address map assignments. Everything in this function can be moved to the main memory
+ * map function once it is understood. This separates the "real" mapping from the hacks required to get the
+ * monitor ROM to boot.
+ */
 void news_r4k_state::cpu_map_debug(address_map &map)
 {
     // APBus region
@@ -496,13 +503,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
-            else { return 0x0;} })); // ditto ;__;
-    map(0x14400004, 0x14400007).lr8(NAME([this](offs_t offset) {
-            if (offset < 1) { return 0x0; }
-            else if (offset == 1) { return 0x3; }
-            else if (offset == 2) { return 0xff; }
-            else if (offset == 3) { return 0x17; }
-            else { return 0x0; } }));
+            else { return 0x0;} })); // monitor ROM doesn't boot without this
 }
 
 void news_r4k_state::machine_start()
