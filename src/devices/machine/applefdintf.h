@@ -82,6 +82,10 @@ public:
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, "", formats_35);
 	}
 
+	// Sync the state when something external is going to change, like
+	// the floppy side or rpm.
+	virtual void sync() = 0;
+
 protected:
 	devcb_write8 m_phases_cb, m_devsel_cb;
 	devcb_write_line m_sel35_cb, m_hdsel_cb;

@@ -923,7 +923,8 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
 	data = m_via1->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(m_via_cycles);
 
 	return (data & 0xff) | (data << 8);
 }

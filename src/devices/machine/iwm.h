@@ -32,6 +32,8 @@ public:
 	virtual void set_floppy(floppy_image_device *floppy) override;
 	virtual floppy_image_device *get_floppy() const override;
 
+	virtual void sync() override;
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -65,7 +67,6 @@ private:
 	u8 m_data, m_whd, m_mode, m_status, m_control;
 	u8 m_rsh, m_wsh;
 
-	void sync();
 	u8 control(int offset, u8 data);
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;
