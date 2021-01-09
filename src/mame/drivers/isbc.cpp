@@ -88,6 +88,8 @@ private:
 
 	virtual void machine_reset() override;
 
+	static void cfg_fdc_qd(device_t *device);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
 //  optional_device<i8274_device> m_uart8274;
@@ -341,6 +343,11 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 	// Multibus interrupt request (active high)
 }
 
+void isbc_state::cfg_fdc_qd(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("u14:0")).set_default_option("525qd");
+}
+
 void isbc_state::isbc86(machine_config &config)
 {
 	/* basic machine hardware */
@@ -542,7 +549,9 @@ void isbc_state::sm1810(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::sm1810_io);
 
 	m_uart8251->dtr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
-	ISBC_215G(config, "isbc_215g", 0, 0xefe0, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+	isbc_215g_device &isbc215(ISBC_215G(config, "isbc_215g", 0, 0xefe0, m_maincpu));
+	isbc215.irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+	isbc215.subdevice<isbx_slot_device>("sbx2")->set_option_machine_config("fdc_218a", cfg_fdc_qd);
 
 	LS259(config, m_statuslatch); // U14
 //  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
