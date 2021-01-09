@@ -67,8 +67,6 @@ public:
 	// construction/destruction
 	virtual ~floppy_image_device();
 
-	virtual void handled_variants(uint32_t *variants, int &var_count) const = 0;
-
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_format_t *get_formats() const;
 	floppy_image_format_t *get_load_format() const;
@@ -154,6 +152,7 @@ protected:
 
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
+	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
@@ -234,7 +233,6 @@ protected:
 	public: \
 		Name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 		virtual ~Name(); \
-		virtual void handled_variants(uint32_t *variants, int &var_count) const override; \
 		virtual const char *image_interface() const noexcept override { return Interface; } \
 	protected: \
 		virtual void setup_characteristics() override; \

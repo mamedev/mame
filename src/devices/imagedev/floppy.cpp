@@ -1512,12 +1512,8 @@ void floppy_3_ssdd::setup_characteristics()
 	tracks = 42;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_3_ssdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -1539,13 +1535,9 @@ void floppy_3_dsdd::setup_characteristics()
 	tracks = 42;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_3_dsdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -1567,13 +1559,9 @@ void floppy_35_ssdd::setup_characteristics()
 	tracks = 84;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_35_ssdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -1595,14 +1583,10 @@ void floppy_35_dd::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_35_dd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -1624,15 +1608,11 @@ void floppy_35_hd::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_35_hd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSHD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -1654,16 +1634,12 @@ void floppy_35_ed::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_35_ed::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSHD;
-	variants[var_count++] = floppy_image::DSED;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSHD);
+	variants.push_back(floppy_image::DSED);
 }
 
 //-------------------------------------------------
@@ -1685,12 +1661,8 @@ void floppy_525_sssd_35t::setup_characteristics()
 	tracks = 35;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_525_sssd_35t::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1712,12 +1684,8 @@ void floppy_525_sd_35t::setup_characteristics()
 	tracks = 35;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_525_sd_35t::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1739,12 +1707,8 @@ void floppy_525_sssd::setup_characteristics()
 	tracks = 42;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_525_sssd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1766,12 +1730,8 @@ void floppy_525_sd::setup_characteristics()
 	tracks = 42;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_525_sd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1793,13 +1753,9 @@ void floppy_525_ssdd::setup_characteristics()
 	tracks = 42;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_525_ssdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -1821,14 +1777,10 @@ void floppy_525_dd::setup_characteristics()
 	tracks = 42;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_525_dd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -1850,14 +1802,10 @@ void floppy_525_ssqd::setup_characteristics()
 	tracks = 84;
 	sides = 1;
 	set_rpm(300);
-}
 
-void floppy_525_ssqd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
 }
 
 //-------------------------------------------------
@@ -1879,17 +1827,13 @@ void floppy_525_qd::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
-}
 
-void floppy_525_qd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
-	variants[var_count++] = floppy_image::DSSD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSQD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
+	variants.push_back(floppy_image::DSSD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSQD);
 }
 
 //-------------------------------------------------
@@ -1911,17 +1855,13 @@ void floppy_525_hd::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(360);
-}
 
-void floppy_525_hd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSQD;
-	variants[var_count++] = floppy_image::DSHD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSQD);
+	variants.push_back(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -1944,12 +1884,8 @@ void floppy_8_sssd::setup_characteristics()
 	sides = 1;
 	motor_always_on = true;
 	set_rpm(360);
-}
 
-void floppy_8_sssd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -1972,13 +1908,9 @@ void floppy_8_dssd::setup_characteristics()
 	sides = 2;
 	motor_always_on = true;
 	set_rpm(360);
-}
 
-void floppy_8_dssd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::DSSD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::DSSD);
 }
 
 //-------------------------------------------------
@@ -2001,13 +1933,9 @@ void floppy_8_ssdd::setup_characteristics()
 	sides = 1;
 	motor_always_on = true;
 	set_rpm(360);
-}
 
-void floppy_8_ssdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2030,14 +1958,10 @@ void floppy_8_dsdd::setup_characteristics()
 	sides = 2;
 	motor_always_on = true;
 	set_rpm(360);
-}
 
-void floppy_8_dsdd::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 
@@ -2070,13 +1994,9 @@ void epson_smd_165::setup_characteristics()
 	tracks = 40;
 	sides = 2;
 	set_rpm(300);
-}
 
-void epson_smd_165::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::DSSD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::DSSD);
 }
 
 //-------------------------------------------------
@@ -2121,14 +2041,10 @@ void epson_sd_320::setup_characteristics()
 	tracks = 40;
 	sides = 2;
 	set_rpm(300);
-}
 
-void epson_sd_320::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2153,14 +2069,10 @@ void epson_sd_321::setup_characteristics()
 	tracks = 40;
 	sides = 2;
 	set_rpm(300);
-}
 
-void epson_sd_321::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2189,13 +2101,9 @@ void sony_oa_d31v::setup_characteristics()
 	sides = 1;
 	dskchg_writable = true;
 	set_rpm(600);
-}
 
-void sony_oa_d31v::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2225,14 +2133,10 @@ void sony_oa_d32w::setup_characteristics()
 	sides = 2;
 	dskchg_writable = true;
 	set_rpm(600);
-}
 
-void sony_oa_d32w::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::DSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
 }
 
 //-------------------------------------------------
@@ -2262,13 +2166,9 @@ void sony_oa_d32v::setup_characteristics()
 	sides = 1;
 	dskchg_writable = true;
 	set_rpm(600);
-}
 
-void sony_oa_d32v::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2296,12 +2196,8 @@ void teac_fd_30a::setup_characteristics()
 	tracks = 40;
 	sides = 1;
 	set_rpm(300);
-}
 
-void teac_fd_30a::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2329,14 +2225,10 @@ void teac_fd_55e::setup_characteristics()
 	tracks = 80;
 	sides = 1;
 	set_rpm(300);
-}
 
-void teac_fd_55e::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
 }
 
 //-------------------------------------------------
@@ -2364,17 +2256,13 @@ void teac_fd_55f::setup_characteristics()
 	tracks = 80;
 	sides = 2;
 	set_rpm(300);
-}
 
-void teac_fd_55f::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
-	variants[var_count++] = floppy_image::DSSD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSQD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
+	variants.push_back(floppy_image::DSSD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSQD);
 }
 
 //-------------------------------------------------
@@ -2402,17 +2290,13 @@ void teac_fd_55g::setup_characteristics()
 	tracks = 77;
 	sides = 2;
 	set_rpm(360);
-}
 
-void teac_fd_55g::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
-	variants[var_count++] = floppy_image::SSDD;
-	variants[var_count++] = floppy_image::SSQD;
-	variants[var_count++] = floppy_image::DSDD;
-	variants[var_count++] = floppy_image::DSQD;
-	variants[var_count++] = floppy_image::DSHD;
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::SSQD);
+	variants.push_back(floppy_image::DSDD);
+	variants.push_back(floppy_image::DSQD);
+	variants.push_back(floppy_image::DSHD);
 }
 
 //-------------------------------------------------
@@ -2437,12 +2321,8 @@ void alps_3255190x::setup_characteristics()
 	sides = 1;
 	set_rpm(300);
 	cyl = 34;
-}
 
-void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
 
 //-------------------------------------------------
@@ -2466,10 +2346,6 @@ void ibm_6360::setup_characteristics()
 	motor_always_on = true;
 	has_trk00_sensor = false;
 	set_rpm(360);
-}
 
-void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
-{
-	var_count = 0;
-	variants[var_count++] = floppy_image::SSSD;
+	variants.push_back(floppy_image::SSSD);
 }
