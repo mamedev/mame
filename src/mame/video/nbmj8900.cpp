@@ -23,19 +23,18 @@ uint8_t nbmj8900_state::palette_type1_r(offs_t offset)
 
 void nbmj8900_state::palette_type1_w(offs_t offset, uint8_t data)
 {
-	int r, g, b;
-
 	m_palette_ptr[offset] = data;
 
-	if (!(offset & 1)) return;
+	if (offset & 1)
+	{
+		offset &= 0x1fe;
 
-	offset &= 0x1fe;
+		int const r = (m_palette_ptr[offset + 0] >> 0) & 0x0f;
+		int const g = (m_palette_ptr[offset + 1] >> 4) & 0x0f;
+		int const b = (m_palette_ptr[offset + 1] >> 0) & 0x0f;
 
-	r = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
-	g = ((m_palette_ptr[offset + 1] & 0xf0) >> 4);
-	b = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
-
-	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	}
 }
 
 #ifdef UNUSED_FUNCTION
