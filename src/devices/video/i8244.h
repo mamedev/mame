@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:Peter Trauner, Wilbert Pol, hap
 /***************************************************************************
 
     Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip

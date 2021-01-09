@@ -15,6 +15,8 @@
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - according to the user manual, some opcodes(dis/enable timer/interrupt)
       don't increment the timer, does it affect the prescaler too?
+      Most likely, timer input (prescaler overflow or T1 edge) still occurs,
+      just that m_timer increment is delayed 1 opcode.
     - IRQ timing is hacked due to WY-100 needing to take JNI branch before servicing interrupt
 
 ****************************************************************************

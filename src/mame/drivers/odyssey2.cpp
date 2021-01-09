@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:Peter Trauner, Wilbert Pol, hap
 /*******************************************************************************
 
 Driver file to handle emulation of the Magnavox Odyssey 2 (stylized Odyssey²),
