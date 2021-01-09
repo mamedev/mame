@@ -628,7 +628,110 @@ INPUT_PORTS_START( j6hilosv )
 	PORT_INCLUDE( j6_stake_20 )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6impuls )
+	PORT_INCLUDE( jpmimpct_inputs )
 
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6jungfv )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6kungfu )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6mavrk )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6monmad )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6pog )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6potg )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6pwrspn )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6quick )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6reelmn )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	// this one doesn't alarm with bad settings, but instead shows nothing
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6richpk )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rico )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6robin )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_10 )
+	PORT_INCLUDE( j6_stake_20 )
+INPUT_PORTS_END
 
 
 ROM_START( j6fifth )
@@ -8598,131 +8701,133 @@ GAME(  199?, j6hilosvc,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state
 GAME(  199?, j6hilosvd,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // incomplete pair
 GAME(  199?, j6hilosve,    j6hilosv,   impact_nonvideo, j6hilosv, jpmimpct_state, empty_init, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 6)", GAME_FLAGS ) // incomplete pair
 
-GAMEL( 199?, j6impuls,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsa,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsb,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsc,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsd,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulse,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsf,    j6impuls,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impuls,     0,          impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulsa,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulsb,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulsc,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulsd,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulse,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 199?, j6impulsf,    j6impuls,   impact_nonvideo, j6impuls, jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6impulsc )
 
-GAMEL( 199?, j6indy,       0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indya,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyb,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyc,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyd,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indye,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyf,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyg,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyh,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyi,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyj,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6indyi )
-GAMEL( 199?, j6indyk,      j6indy,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indy,       0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indya,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyb,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyc,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyd,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indye,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyf,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyg,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyh,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyi,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyj,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6indyi )
+GAMEL( 199?, j6indyk,      j6indy,     impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6indyi )
 
-GAME(  199?, j6jungfv,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Jungle Fever (Ace) (IMPACT)", GAME_FLAGS )
+GAME(  199?, j6jungfv,     0,          impact_nonvideo, j6jungfv, jpmimpct_state, empty_init, ROT0, "Ace", "Jungle Fever (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6kungfu,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6kungfud )
+// Error 2.1
+GAMEL( 199?, j6kungfu,     0,          impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6kungfud )
 
-GAME(  199?, j6luckla,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6lucklaa,    j6luckla,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6lucklab,    j6luckla,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6luckla,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6lucklaa,    j6luckla,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6lucklab,    j6luckla,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 
-GAME(  199?, j6mavrk,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6mavrka,     j6mavrk,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6mavrkb,     j6mavrk,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6mavrkc,     j6mavrk,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6mavrkd,     j6mavrk,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6mavrk,      0,          impact_nonvideo, j6mavrk, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6mavrka,     j6mavrk,    impact_nonvideo, j6mavrk, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6mavrkb,     j6mavrk,    impact_nonvideo, j6mavrk, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6mavrkc,     j6mavrk,    impact_nonvideo, j6mavrk, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6mavrkd,     j6mavrk,    impact_nonvideo, j6mavrk, jpmimpct_state, empty_init, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 5)", GAME_FLAGS )
 
-GAME(  199?, j6monmad,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_FLAGS )
+GAME(  199?, j6monmad,     0,          impact_nonvideo, j6monmad, jpmimpct_state, empty_init, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6montlk,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlka,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkb,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkc,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkd,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlke,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkf,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkg,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkh,    j6montlk,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlk,     0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlka,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkb,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkc,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkd,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlke,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkf,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkg,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlkh,    j6montlk,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6montlkb )
 
-GAMEL( 199?, j6mono60,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60a,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60b,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60c,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60d,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60e,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60f,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60g,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60h,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60i,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60j,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60k,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60l,    j6mono60,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60,     0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60a,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60b,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60c,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60d,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60e,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60f,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60g,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60h,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60i,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60j,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60k,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60l,    j6mono60,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6mono60 )
 
-GAME(  199?, j6outlaw,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3)", GAME_FLAGS )
-GAME(  199?, j6outlawd,    j6outlaw,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3) (Protocol)", GAME_FLAGS )
-GAME(  199?, j6outlawc,    j6outlaw,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, Club?)", GAME_FLAGS )
+GAME(  199?, j6outlaw,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3)", GAME_FLAGS )
+GAME(  199?, j6outlawd,    j6outlaw,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3) (Protocol)", GAME_FLAGS )
+GAME(  199?, j6outlawc,    j6outlaw,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, Club?)", GAME_FLAGS )
 
-GAME(  199?, j6oxo,        0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6oxoa,       j6oxo,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6oxob,       j6oxo,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6oxoc,       j6oxo,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6oxod,       j6oxo,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6oxoe,       j6oxo,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6oxo,        0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6oxoa,       j6oxo,      impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6oxob,       j6oxo,      impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6oxoc,       j6oxo,      impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6oxod,       j6oxo,      impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6oxoe,       j6oxo,      impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 
-GAMEL( 199?, j6oxobin,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobina,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobinb,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobinc,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobind,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobine,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6oxobin )
-GAMEL( 199?, j6oxobinf,    j6oxobin,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobin,     0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobina,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobinb,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobinc,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobind,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobine,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6oxobin )
+GAMEL( 199?, j6oxobinf,    j6oxobin,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6oxobin )
 
-GAME(  199?, j6popoli,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6popolia,    j6popoli,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6popoli,     0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6popolia,    j6popoli,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
-GAME(  199?, j6pog,        0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 1)", GAME_FLAGS ) // has video roms, why? (misplaced? hybrid?)
-GAME(  199?, j6poga,       j6pog,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6pogb,       j6pog,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6pogc,       j6pog,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6pogd,       j6pog,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 5)", GAME_FLAGS )
+// Error 2.1
+GAME(  199?, j6pog,        0,          impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 1)", GAME_FLAGS ) // has video roms, why? (misplaced? hybrid?)
+GAME(  199?, j6poga,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6pogb,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6pogc,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6pogd,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
-GAME(  199?, j6potg,       0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6potga,      j6potg,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6potgb,      j6potg,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6potg,       0,          impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6potga,      j6potg,     impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6potgb,      j6potg,     impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
 
-GAME(  199?, j6pwrspn,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6pwrspna,    j6pwrspn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6pwrspnb,    j6pwrspn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6pwrspnc,    j6pwrspn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6pwrspnd,    j6pwrspn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6pwrspne,    j6pwrspn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6pwrspn,     0,          impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6pwrspna,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6pwrspnb,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6pwrspnc,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6pwrspnd,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6pwrspne,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 
-GAMEL( 199?, j6quick,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "RAL", "Quicksilver (RAL) (IMPACT)", GAME_FLAGS, layout_j6quick )
+GAMEL( 199?, j6quick,      0,          impact_nonvideo, j6quick, jpmimpct_state, empty_init, ROT0, "RAL", "Quicksilver (RAL) (IMPACT)", GAME_FLAGS, layout_j6quick )
 
-GAMEL( 199?, j6reelmn,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmna,    j6reelmn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnb,    j6reelmn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnc,    j6reelmn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnd,    j6reelmn,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmn,     0,          impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmna,    j6reelmn,   impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnb,    j6reelmn,   impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnc,    j6reelmn,   impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnd,    j6reelmn,   impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6reelmn )
 
-GAME(  199?, j6richpk,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Rich Pickings (Ace) (IMPACT)", GAME_FLAGS )
+GAME(  199?, j6richpk,     0,          impact_nonvideo, j6richpk, jpmimpct_state, empty_init, ROT0, "Ace", "Rich Pickings (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6rico,       0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rico )
-GAMEL( 199?, j6ricoa,      j6rico,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rico )
-GAMEL( 199?, j6ricob,      j6rico,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rico )
-GAMEL( 199?, j6ricoc,      j6rico,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rico )
-GAMEL( 199?, j6ricod,      j6rico,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rico )
-GAMEL( 199?, j6ricoe,      j6rico,     impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6rico,       0,          impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6ricoa,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6ricob,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6ricoc,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6ricod,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rico )
+GAMEL( 199?, j6ricoe,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rico )
 
-GAME(  199?, j6robin,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6robina,     j6robin,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6robinb,     j6robin,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6robinc,     j6robin,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6robin,      0,          impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6robina,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6robinb,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6robinc,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
 
 GAMEL( 199?, j6roller,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rollerd )
 GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rollerd )
