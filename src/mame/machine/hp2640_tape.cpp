@@ -241,6 +241,8 @@ void hp2640_tape_device::device_add_mconfig(machine_config &config)
 		finder->set_image_format(hti_format_t::HTI_MANCHESTER_MOD);
 		// Moving when speed is >1 ips
 		finder->set_go_threshold(MOVING_THRESHOLD);
+		// Unit name: U0/U1
+		finder->set_name(string_format("U%u" , i));
 
 		finder->hole().set([this , i](int state) { hole_w(i , state); });
 		finder->tacho_tick().set([this , i](int state) { tacho_tick_w(i , state); });

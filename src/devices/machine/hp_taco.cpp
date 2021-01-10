@@ -293,6 +293,11 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void hp_taco_device::set_name(const std::string& name)
+{
+	m_tape->set_name(name);
+}
+
 void hp_taco_device::reg_w(offs_t offset, uint16_t data)
 {
 	LOG_REG("wr R%u = %04x\n", 4 + offset , data);

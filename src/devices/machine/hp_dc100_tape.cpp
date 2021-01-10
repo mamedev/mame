@@ -84,6 +84,7 @@ hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const 
 	, m_motion_handler(*this)
 	, m_rd_bit_handler(*this)
 	, m_wr_bit_handler(*this)
+	, m_unit_name()
 	, m_image()
 	, m_image_dirty(false)
 {
@@ -128,7 +129,14 @@ std::string hp_dc100_tape_device::call_display()
 		return buffer;
 	}
 
-	char track = m_track ? 'B' : 'A';
+	if (!m_unit_name.empty()) {
+		buffer += m_unit_name;
+		buffer += " ";
+	}
+
+	if (m_image.no_of_tracks() > 1) {
+		buffer += m_track ? "B " : "A ";
+	}
 	char r_w = m_current_op == OP_WRITE || m_current_op == OP_ERASE ? 'W' : 'R';
 	char m1;
 	char m2;
@@ -143,7 +151,7 @@ std::string hp_dc100_tape_device::call_display()
 
 	int pos_in = get_approx_pos() / hti_format_t::ONE_INCH_POS;
 
-	buffer = string_format("%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
+	buffer += string_format("%c %c%c [%04d/1824]" , r_w , m1 , m2 , pos_in);
 
 	return buffer;
 }
@@ -177,6 +185,11 @@ void hp_dc100_tape_device::set_image_format(hti_format_t::image_format_t fmt)
 void hp_dc100_tape_device::set_go_threshold(double threshold)
 {
 	m_go_threshold = threshold;
+}
+
+void hp_dc100_tape_device::set_name(const std::string& name)
+{
+	m_unit_name = name;
 }
 
 void hp_dc100_tape_device::set_track_no(unsigned track)
