@@ -49,12 +49,12 @@ m95010_device::m95010_device(const machine_config &mconfig, const char *tag, dev
 }
 
 m95020_device::m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m950x0_device(mconfig, M95010, tag, owner, 0x100)
+	: m950x0_device(mconfig, M95020, tag, owner, 0x100)
 {
 }
 
 m95040_device::m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m950x0_device(mconfig, M95010, tag, owner, 0x200)
+	: m950x0_device(mconfig, M95040, tag, owner, 0x200)
 {
 }
 
