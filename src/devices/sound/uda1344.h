@@ -21,13 +21,23 @@ public:
 
 	auto l3_ack_out() { return m_l3_ack_out.bind(); }
 
+	void i2s_input_w(uint32_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	void ingest_samples(int16_t left, int16_t right);
+
+	void set_clock_divider(const uint32_t divider);
+
+	static constexpr double BASE_FREQUENCY = 44100;
+	static constexpr size_t BUFFER_SIZE = 65536;
 
 	enum : uint8_t
 	{
@@ -63,19 +73,28 @@ protected:
 		STATUS_REG_MASK		= 0x3f,
 		STATUS_SC_MASK		= 0x30,
 		STATUS_SC_BIT		= 4,
-		STATUS_IF_MASK		= 0xe0,
+		STATUS_IF_MASK		= 0x0e,
 		STATUS_IF_BIT		= 1,
 		STATUS_DC_BIT		= 0
 	};
 
 	sound_stream *m_stream;
+	std::vector<stream_buffer::sample_t> m_buffer[2];
+	uint32_t m_bufin[2];
+	uint32_t m_bufout[2];
+	stream_buffer::sample_t m_volume;
+	double m_frequency;
 
 	uint8_t m_data_transfer_mode;
 	uint8_t m_status_reg;
+	uint32_t m_clock_divider;
 	uint8_t m_volume_reg;
 	uint8_t m_equalizer_reg;
 	uint8_t m_filter_reg;
 	uint8_t m_power_reg;
+
+	bool m_dac_enable;
+	bool m_adc_enable;
 
 	devcb_write_line m_l3_ack_out;
 };

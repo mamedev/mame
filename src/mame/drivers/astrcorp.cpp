@@ -13,21 +13,22 @@ OTHER:  EEPROM, Battery
 
  512 sprites, each made of N x M tiles. Tiles are 16x16x8
 
--------------------------------------------------------------------------------------------------------------------
-Year + Game          PCB ID         CPU                Video        Chips                                   Notes
--------------------------------------------------------------------------------------------------------------------
-00  Show Hand        CHE-B50-4002A  68000              ASTRO V01    pLSI1016-60LJ, ASTRO 0001B   (28 pins)
-00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01    pLSI1016,      MDT2020AP MCU (28 pins)
-02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02    pLSI1016-60LJ
-02? Keno 21          ?              ASTRO V102?        ASTRO V05    ASTRO F02?                              not dumped
-03  Speed Drop       None           JX-1689HP          ASTRO V05    pLSI1016-60LJ
-03? Dino Dino        T-3802A        ASTRO V102PX-010?  ASTRO V05    ASTRO F02 2003-03-12                    Encrypted
-04? Stone Age        L1             ASTRO V102PX-012?  ASTRO V05x2  ASTRO F02 2004-09-04                    Encrypted
-05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06    ASTRO F02 2005-02-18                    Encrypted
-05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06    ASTRO F02 2005-09-17                    Encrypted
-05? Hacher (hack)    M1.2           ?                  ?            ASTRO F02 2005-02-18                    Encrypted
-07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07    ASTRO F01 2007-06-03                    Encrypted
--------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+Year + Game          PCB ID         CPU                Video           Chips                                   Notes
+-----------------------------------------------------------------------------------------------------------------------
+00  Show Hand        CHE-B50-4002A  68000              ASTRO V01       pLSI1016-60LJ, ASTRO 0001B   (28 pins)
+00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01       pLSI1016,      MDT2020AP MCU (28 pins)
+01  Magic Bomb       None           ASTRO V03          ASTRO V02 0022  pLSI1016                                Encrypted
+02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02       pLSI1016-60LJ
+02? Keno 21          ?              ASTRO V102?        ASTRO V05       ASTRO F02?                              not dumped
+03  Speed Drop       None           JX-1689HP          ASTRO V05       pLSI1016-60LJ
+03? Dino Dino        T-3802A        ASTRO V102PX-010?  ASTRO V05       ASTRO F02 2003-03-12                    Encrypted
+04? Stone Age        L1             ASTRO V102PX-012?  ASTRO V05x2     ASTRO F02 2004-09-04                    Encrypted
+05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06       ASTRO F02 2005-02-18                    Encrypted
+05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06       ASTRO F02 2005-09-17                    Encrypted
+05? Hacher (hack)    M1.2           ?                  ?               ASTRO F02 2005-02-18                    Encrypted
+07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07       ASTRO F01 2007-06-03                    Encrypted
+-----------------------------------------------------------------------------------------------------------------------
 
 To do:
 
@@ -909,7 +910,7 @@ ROM_START( magibomb )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ca0b693d) SHA1(27fc7db9d3f19d6dcb8756e4fc9c3839116977fe) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -921,7 +922,7 @@ ROM_START( magibomba )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ac3224ef) SHA1(810117dc89369eee0f4f5b6744cfbf0cb70ccce6) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(f7d14414) SHA1(af932df09aa970ec05cc12e590e152e7288c1f5c) )
@@ -933,7 +934,7 @@ ROM_START( magibombb )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(55ea8303) SHA1(974bc026f0b284ffad50d3e441613952db768e04) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -945,7 +946,7 @@ ROM_START( magibombc )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(3d2abaa5) SHA1(8a39abda8e52a0d8a8d0c54a45b72a7d9f624e84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -957,7 +958,7 @@ ROM_START( magibombd )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(b55bc270) SHA1(7486018b87708cf5b653c27b1ed824e441c169b7) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1A set, should be same for all, marking as bad as precaution
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -969,7 +970,7 @@ ROM_START( magibombe )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ee212839) SHA1(e6175b27f3c510e98bc85e04be2fdde6e0289dfb) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -1489,16 +1490,16 @@ GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_ini
 // Encrypted games (not working):
 
 // Simpler encryption
-GAME( 2001?, magibomb,  0,        magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
-GAME( 2002,  magibomba, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// one bad program ROM, no gfx dumps, less complex encryption
-GAME( 2002,  magibombb, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
-GAME( 2001,  magibombc, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
-GAME( 2001?, magibombe, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )// no gfx dumps, less complex encryption
+GAME( 2001?, magibomb,  0,        magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  magibomba, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM
+GAME( 2002,  magibombb, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001,  magibombc, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001?, magibombe, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
 GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, init_astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005,  magibombd, magibomb, magibomb, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // and no gfx dump
+GAME( 2005,  magibombd, magibomb, magibomb, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

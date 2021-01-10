@@ -14,8 +14,7 @@
         - Floppy formats
         - Banking
         - Graphics display (including colour and video_control options)
-        - RTC
-        - Serial keyboard (300 8/N/1)
+        - RTC (is this a thing?  the manual indicates it just uses the DUART's timers to track time)
         - Centronics printer
         - Video-high
         - Video-reset
@@ -333,7 +332,7 @@ GFXDECODE_END
 
 static void dim68k_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525hd", FLOPPY_525_HD);
 }
 
 void dim68k_state::machine_start()
@@ -373,8 +372,8 @@ void dim68k_state::dim68k(machine_config &config)
 
 	/* Devices */
 	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);

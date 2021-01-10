@@ -39,6 +39,8 @@ private:
 	std::vector<uint8_t> m_head;
 	std::vector<uint8_t> m_sector_count;
 	std::vector<uint8_t> m_ssize;
+
+	int m_trackmult;
 };
 
 extern const floppy_format_type FLOPPY_IMD_FORMAT;

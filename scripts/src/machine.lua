@@ -1723,6 +1723,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/m950x0.h,MACHINES["M950X0"] = true
+---------------------------------------------------
+
+if (MACHINES["M950X0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m950x0.cpp",
+		MAME_DIR .. "src/devices/machine/m950x0.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
 ---------------------------------------------------
 

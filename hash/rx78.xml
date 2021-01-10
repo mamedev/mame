@@ -18,7 +18,7 @@ printed in the game carts or tapes are used below where available. Names in brac
 |========+=========+=======+========================================================================================+
 |  N/A   | 0201001 | Other | No      | RX-78 Base Unit
 |  N/A   | 0201003 | Other | No      | Joystick Controller
-|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II]
+|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II] (says Mobil on the screen)
 |  Cart  | 0201005 | Game  | Yes     | チャンピオン レーサー / Champion Racer
 |  Cart  | 0201006 | Game  | Yes     | チャレンジ ゴルフ / Challenge Golf
 |  Cart  | 0201007 | Game  | No      | エキサイト ベースボール / Excite Baseball
@@ -78,6 +78,11 @@ https://muuseo.com/fool_guru/collection_rooms/2
 https://muuseo.com/henly/items/137
 https://aucview.aucfan.com/yahoo/q374745986/
 https://twitter.com/hiropapa00/status/680566132659503104
+
+The RX-78 will look for 01 at address 2000. If found, a jump is made to that address.
+If not found, it will check address 6000 in the same way. If still not found, then the monitor program is entered.
+The monitor will expect you to load a program from cassette.
+
 -->
 <softwarelist name="rx78" description="Gundam RX-78 cartridges">
 	<software name="basic">
@@ -103,5 +108,30 @@ https://twitter.com/hiropapa00/status/680566132659503104
 		</part>
 	</software>
 
+	<software name="smc">
+		<description>Super Motocross</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="smc1.bin" size="0x2000" crc="a5f1dff6" sha1="f58f1d266753cddddc44949bbab882870506a879" offset="0x4000" />
+				<rom name="smc2.bin" size="0x2000" crc="06febfde" sha1="18edde0e3af1f3b9b013348a701652d81bdddbc9" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seki">
+		<description>Sekigahara</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sekigahara.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+				<rom size="0x2000" offset="0x2000" loadflag="continue" />
+				<rom size="0x2000" offset="0x4000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

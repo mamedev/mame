@@ -66,12 +66,12 @@ protected:
 	void do_adct(uint8_t val);
 
 	// m740 opcodes
-	O(brk740_imp);
+	O(brk_m_imp);
 	O(clt_imp);
 	O(set_imp);
 	O(ldm_imz);
 	O(jsr_spg);
-	O(reset740);
+	O(reset_m);
 	O(seb_biz); O(seb_bac);
 	O(clb_biz); O(clb_bac);
 	O(bbc_bzr); O(bbc_bar);
@@ -80,6 +80,7 @@ protected:
 	O(bra_rel);
 	O(jmp_zpi);
 	O(jsr_zpi);
+	O(plp_m_imp); O(rti_m_imp);
 
 	O(adct_aba); O(adct_abx); O(adct_aby); O(adct_idx); O(adct_idy); O(adct_imm); O(adct_zpg); O(adct_zpx);
 	O(andt_aba); O(andt_abx); O(andt_aby); O(andt_imm); O(andt_idx); O(andt_idy); O(andt_zpg); O(andt_zpx);

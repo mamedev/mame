@@ -7,7 +7,10 @@
     Status:
     - Currently hard-coded for use with the Jornada 720 driver.
     - Register contents are correctly stored, logged and masked, but
-      register handling is otherwise non-present.
+      register handling is otherwise largely non-present.
+	- There is the potential for endian issues, and it will be
+	  dealt with once the Jornada 720 driver makes heavier use of
+	  BitBLT operations or other operations relevant to endianness.
 
 **********************************************************************/
 
@@ -23,13 +26,16 @@
 #define LOG_CRT_WR      (1 << 6)
 #define LOG_BITBLT_RD   (1 << 7)
 #define LOG_BITBLT_WR   (1 << 8)
-#define LOG_LUT_RD      (1 << 9)
-#define LOG_LUT_WR      (1 << 10)
-#define LOG_MPLUG_RD    (1 << 11)
-#define LOG_MPLUG_WR    (1 << 12)
-#define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_LUT_RD | LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
+#define LOG_BITBLT_OP   (1 << 9)
+#define LOG_LUT_RD      (1 << 10)
+#define LOG_LUT_WR      (1 << 11)
+#define LOG_MPLUG_RD    (1 << 12)
+#define LOG_MPLUG_WR    (1 << 13)
+#define LOG_LCD_RD_HF	(1 << 14)
+#define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_BITBLT_OP | LOG_LUT_RD \
+						| LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
 
-#define VERBOSE         (0) // (LOG_ALL)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SED1356, sed1356_device, "sed1356", "Epson SED1356")
@@ -398,8 +404,10 @@ uint8_t sed1356_device::lcd_display_height_r(offs_t offset)
 
 uint8_t sed1356_device::lcd_vblank_period_r(offs_t offset)
 {
-	LOGMASKED(LOG_LCD_RD, "%s: lcd_vblank_period_r: %02x\n", machine().describe_context(), m_lcd_vblank_period);
-	return m_lcd_vblank_period;
+	const uint8_t vblank = screen().vblank() ? (1 << LCDVBL_STATUS_BIT) : 0x00;
+	const uint8_t data = m_lcd_vblank_period | vblank;
+	LOGMASKED(LOG_LCD_RD, "%s: lcd_vblank_period_r: %02x\n", machine().describe_context(), data);
+	return data;
 }
 
 uint8_t sed1356_device::tft_fpframe_start_pos_r(offs_t offset)
@@ -1016,6 +1024,83 @@ void sed1356_device::crt_cursor_fifo_thresh_w(offs_t offset, uint8_t data)
 }
 
 
+template <bool Linear>
+void sed1356_device::bitblt_solid_fill()
+{
+	uint16_t *dst = (uint16_t*)&m_vram[m_bitblt_dst_addr >> 2];
+	if (m_bitblt_dst_addr & 2)
+		dst++;
+
+	for (uint32_t y = 0; y <= m_bitblt_height; y++)
+	{
+		for (uint32_t x = 0; x <= m_bitblt_width; x++)
+		{
+			if (Linear)
+				*dst++ = m_bitblt_fgcolor;
+			else
+				dst[x] = m_bitblt_fgcolor;
+		}
+
+		if (!Linear)
+			dst += m_bitblt_mem_offset;
+	}
+}
+
+void sed1356_device::bitblt_execute_command()
+{
+	switch (m_bitblt_op)
+	{
+	case 0:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Write BitBLT with ROP\n");
+		return;
+	case 1:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Read BitBLT\n");
+		return;
+	case 2:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT in + direction with ROP\n");
+		return;
+	case 3:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT in - direction with ROP\n");
+		return;
+	case 4:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Transparent Write BitBLT\n");
+		return;
+	case 5:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Transparent Move BitBLT in + direction\n");
+		return;
+	case 6:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Pattern Fill with ROP\n");
+		return;
+	case 7:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Pattern Fill with transparency\n");
+		return;
+	case 8:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Color Expansion\n");
+		return;
+	case 9:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Color Expansion with transparency\n");
+		return;
+	case 10:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT with Color Expansion\n");
+		return;
+	case 11:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT with Color Expansion and transparency\n");
+		return;
+	case 12:
+	{
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Solid Fill\n");
+		if (BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT))
+			bitblt_solid_fill<true>();
+		else
+			bitblt_solid_fill<false>();
+		return;
+	}
+	default:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Unsupported command type: %02x\n", m_bitblt_op);
+		return;
+	}
+}
+
 uint8_t sed1356_device::bitblt_ctrl0_r(offs_t offset)
 {
 	LOGMASKED(LOG_BITBLT_RD, "%s: bitblt_ctrl0_r: %02x\n", machine().describe_context(), m_bitblt_ctrl[0]);
@@ -1098,6 +1183,10 @@ void sed1356_device::bitblt_ctrl0_w(offs_t offset, uint8_t data)
 	LOGMASKED(LOG_BITBLT_WR, "%s: bitblt_ctrl0_w = %02x\n", machine().describe_context(), data);
 	m_bitblt_ctrl[0] &= ~BBCTRL0_WR_MASK;
 	m_bitblt_ctrl[0] |= data & BBCTRL0_WR_MASK;
+	if (BIT(data, BBCTRL0_ACTIVE_BIT))
+	{
+		bitblt_execute_command();
+	}
 }
 
 void sed1356_device::bitblt_ctrl1_w(offs_t offset, uint8_t data)
