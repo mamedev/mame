@@ -105,7 +105,6 @@
 #include "emu.h"
 #include "screen.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
@@ -226,10 +225,8 @@ protected:
 
 	void cpu_mem_map(address_map &map);
 	void cpu_io_map(address_map &map);
-	void io_bank_map(address_map &map);
 
 	required_device<i8080a_cpu_device> m_cpu;
-	required_device<address_map_bank_device> m_io_bank;
 	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;
 	required_ioport m_io_comm;
@@ -245,6 +242,7 @@ protected:
 	required_device<beep_device> m_beep;
 	required_device<timer_device> m_timer_beep;
 	required_device<hp2640_tape_device> m_tapes;
+	memory_view m_io_view;
 
 	uint8_t m_mode_byte;
 	bool m_timer_irq;
@@ -296,7 +294,6 @@ protected:
 hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type type, const char *tag , uint8_t m_cg_0 , uint8_t m_cg_1 , uint8_t m_cg_2 , uint8_t m_cg_3)
 	: driver_device(mconfig , type , tag),
 	  m_cpu(*this , "cpu"),
-	  m_io_bank(*this , "io_bank"),
 	  m_timer_10ms(*this , "timer_10ms"),
 	  m_io_key(*this , "KEY%u" , 0),
 	  m_io_comm(*this , "comm"),
@@ -312,6 +309,7 @@ hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type 
 	  m_beep(*this , "beep"),
 	  m_timer_beep(*this , "timer_beep"),
 	  m_tapes(*this , "tapes"),
+	  m_io_view(*this , "io_view"),
 	  m_chargen(*this , "chargen%u" , 0),
 	  m_chargen_set{ m_cg_0 , m_cg_1 , m_cg_2 , m_cg_3}
 {
@@ -349,7 +347,6 @@ void hp2640_base_state::machine_reset()
 	m_rs232->write_dtr(0);
 	async_txd_w(0);
 	m_beep->set_state(0);
-	m_io_bank->set_bank(0);
 }
 
 IRQ_CALLBACK_MEMBER(hp2640_base_state::irq_callback)
@@ -388,7 +385,7 @@ void hp2640_base_state::mode_byte_w(uint8_t data)
 	}
 	update_irq();
 
-	m_io_bank->set_bank(BIT(m_mode_byte , 6));
+	m_io_view.select(BIT(m_mode_byte , 6));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_10ms_exp)
@@ -1049,7 +1046,40 @@ void hp2640_base_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x57ff).rom();
-	map(0x8000, 0x8fff).m(m_io_bank, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0x8fff).view(m_io_view);
+
+	// View 0 is for normal I/O
+	// View 1 is for poll read
+	// Writing is independent of poll state
+	m_io_view[ 0 ](0x0100, 0x0100).r(m_uart, FUNC(ay51013_device::receive));
+	m_io_view[ 0 ](0x0120, 0x0120).r(FUNC(hp2640_base_state::async_status_r));
+	m_io_view[ 0 ](0x0140, 0x0140).w(FUNC(hp2640_base_state::async_control_w));
+	m_io_view[ 1 ](0x0140, 0x0140).w(FUNC(hp2640_base_state::async_control_w));
+	m_io_view[ 0 ](0x0160, 0x0160).w(m_uart, FUNC(ay51013_device::transmit));
+	m_io_view[ 1 ](0x0160, 0x0160).w(m_uart, FUNC(ay51013_device::transmit));
+	m_io_view[ 0 ](0x0300, 0x0300).w(FUNC(hp2640_base_state::kb_led_w));
+	m_io_view[ 1 ](0x0300, 0x0300).w(FUNC(hp2640_base_state::kb_led_w));
+	m_io_view[ 0 ](0x0300, 0x030d).r(FUNC(hp2640_base_state::kb_r));
+	m_io_view[ 0 ](0x030e, 0x030e).r(FUNC(hp2640_base_state::switches_ah_r));
+	m_io_view[ 0 ](0x030f, 0x030f).r(FUNC(hp2640_base_state::datacomm_sw_r));
+	m_io_view[ 0 ](0x0320, 0x0320).w(FUNC(hp2640_base_state::kb_prev_w));
+	m_io_view[ 1 ](0x0320, 0x0320).w(FUNC(hp2640_base_state::kb_prev_w));
+	m_io_view[ 0 ](0x0380, 0x0380).w(FUNC(hp2640_base_state::kb_reset_w));
+	m_io_view[ 1 ](0x0380, 0x0380).w(FUNC(hp2640_base_state::kb_reset_w));
+	m_io_view[ 0 ](0x0380, 0x0380).r(FUNC(hp2640_base_state::switches_jr_r));
+	m_io_view[ 0 ](0x03a0, 0x03a0).r(FUNC(hp2640_base_state::switches_sz_r));
+	m_io_view[ 0 ](0x0700, 0x0700).w(FUNC(hp2640_base_state::cx_w));
+	m_io_view[ 1 ](0x0700, 0x0700).w(FUNC(hp2640_base_state::cx_w));
+	m_io_view[ 0 ](0x0720, 0x0720).w(FUNC(hp2640_base_state::cy_w));
+	m_io_view[ 1 ](0x0720, 0x0720).w(FUNC(hp2640_base_state::cy_w));
+	m_io_view[ 0 ](0x0b00, 0x0b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
+	m_io_view[ 1 ](0x0b00, 0x0b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
+	m_io_view[ 0 ](0x0b00, 0x0b00).r(m_tapes, FUNC(hp2640_tape_device::status_r));
+	m_io_view[ 0 ](0x0b20, 0x0b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
+	m_io_view[ 1 ](0x0b20, 0x0b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
+	m_io_view[ 0 ](0x0b20, 0x0b20).r(m_tapes, FUNC(hp2640_tape_device::data_r));
+	m_io_view[ 1 ](0x0000, 0x0fff).r(FUNC(hp2640_base_state::poll_r));
+
 	map(0x9100, 0x91ff).ram();
 	map(0xc000, 0xffff).ram();
 }
@@ -1060,42 +1090,12 @@ void hp2640_base_state::cpu_io_map(address_map &map)
 	map(0x00, 0xff).w(FUNC(hp2640_base_state::mode_byte_w));
 }
 
-void hp2640_base_state::io_bank_map(address_map &map)
-{
-	map.unmap_value_low();
-	// Bank 0 is normal I/O
-	// Bank 1 is poll read
-	// Writing is independent of poll state
-	map(0x0100, 0x0100).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x0120, 0x0120).r(FUNC(hp2640_base_state::async_status_r));
-	map(0x0140, 0x0140).mirror(0x1000).w(FUNC(hp2640_base_state::async_control_w));
-	map(0x0160, 0x0160).mirror(0x1000).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x0300, 0x0300).mirror(0x1000).w(FUNC(hp2640_base_state::kb_led_w));
-	map(0x0300, 0x030d).r(FUNC(hp2640_base_state::kb_r));
-	map(0x030e, 0x030e).r(FUNC(hp2640_base_state::switches_ah_r));
-	map(0x030f, 0x030f).r(FUNC(hp2640_base_state::datacomm_sw_r));
-	map(0x0320, 0x0320).mirror(0x1000).w(FUNC(hp2640_base_state::kb_prev_w));
-	map(0x0380, 0x0380).mirror(0x1000).w(FUNC(hp2640_base_state::kb_reset_w));
-	map(0x0380, 0x0380).r(FUNC(hp2640_base_state::switches_jr_r));
-	map(0x03a0, 0x03a0).r(FUNC(hp2640_base_state::switches_sz_r));
-	map(0x0700, 0x0700).mirror(0x1000).w(FUNC(hp2640_base_state::cx_w));
-	map(0x0720, 0x0720).mirror(0x1000).w(FUNC(hp2640_base_state::cy_w));
-	map(0x0b00, 0x0b00).mirror(0x1000).w(m_tapes, FUNC(hp2640_tape_device::command_w));
-	map(0x0b00, 0x0b00).r(m_tapes, FUNC(hp2640_tape_device::status_r));
-	map(0x0b20, 0x0b20).mirror(0x1000).w(m_tapes, FUNC(hp2640_tape_device::data_w));
-	map(0x0b20, 0x0b20).r(m_tapes, FUNC(hp2640_tape_device::data_r));
-	map(0x1000, 0x1fff).r(FUNC(hp2640_base_state::poll_r));
-}
-
 void hp2640_base_state::hp2640_base(machine_config &config)
 {
 	I8080A(config, m_cpu, SYS_CLOCK / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp2640_base_state::cpu_mem_map);
 	m_cpu->set_addrmap(AS_IO, &hp2640_base_state::cpu_io_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp2640_base_state::irq_callback));
-
-	ADDRESS_MAP_BANK(config , m_io_bank);
-	m_io_bank->set_map(&hp2640_base_state::io_bank_map).set_options(ENDIANNESS_LITTLE , 8 , 13 , 0x1000);
 
 	TIMER(config, m_timer_10ms).configure_generic(FUNC(hp2640_base_state::timer_10ms_exp));
 	TIMER(config, m_timer_cursor_blink_inh).configure_generic(FUNC(hp2640_base_state::timer_cursor_blink_inh));

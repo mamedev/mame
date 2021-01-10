@@ -258,6 +258,26 @@ void hp2640_tape_device::device_start()
 
 	m_gap_timer = timer_alloc(GAP_TMR_ID);
 	m_cell_timer = timer_alloc(CELL_TMR_ID);
+
+	save_item(NAME(m_selected_drive));
+	save_item(NAME(m_cmd_reg));
+	save_item(NAME(m_data_rd));
+	save_item(NAME(m_data_sr));
+	save_item(NAME(m_modulus));
+	save_item(NAME(m_cell_cnt));
+	save_item(NAME(m_bit_cnt));
+	save_item(NAME(m_tach_div2));
+	save_item(NAME(m_tach_latch));
+	save_item(NAME(m_hole_latch));
+	save_item(NAME(m_byte_ready));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_bit_sync));
+	save_item(NAME(m_wr_bit));
+	save_item(NAME(m_last_rd_bit));
+	save_item(NAME(m_isf));
+	save_item(NAME(m_gap));
+	save_item(NAME(m_prev_gap));
+	save_item(NAME(m_rip));
 }
 
 void hp2640_tape_device::device_reset()
@@ -357,7 +377,7 @@ void hp2640_tape_device::motion_w(unsigned drive , int state)
 void hp2640_tape_device::rd_bit_w(unsigned drive , int state)
 {
 	if (drive == m_selected_drive) {
-		bool rd_bit = !!state;
+		bool rd_bit = state != 0;
 		bool transition = rd_bit != m_last_rd_bit;
 		m_last_rd_bit = rd_bit;
 

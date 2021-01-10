@@ -50,7 +50,7 @@ private:
 	required_device_array<hp_dc100_tape_device , 2> m_drives;
 
 	// State
-	unsigned m_selected_drive;  // U35-10
+	uint8_t m_selected_drive;   // U35-10
 	uint8_t m_cmd_reg;          // U35 & others
 	uint8_t m_data_rd;          // U32 & U33
 	uint8_t m_data_sr;          // U42 & U43
