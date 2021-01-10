@@ -493,15 +493,12 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		}
 	}
 
-	// Check if the drive is HD but we're a 40 track image.
+	// Check if the drive is QD or HD but we're a 40 track image.
 	// If so, put the image on even tracks.
-	for (auto &fmt : variants)
+	if ((has_variant(variants, floppy_image::DSQD)) ||
+		(has_variant(variants, floppy_image::DSHD)))
 	{
-		if ((maxtrack <= 39) && (fmt == floppy_image::DSHD))
-		{
-			m_trackmult = 2;
-			break;
-		}
+		m_trackmult = 2;
 	}
 
 	pos = savepos;
