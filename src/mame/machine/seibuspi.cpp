@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, hap, Nicola Salmoria
+// copyright-holders:Ville Linde, Nicola Salmoria
 
 #include "emu.h"
 #include "machine/seibuspi.h"
