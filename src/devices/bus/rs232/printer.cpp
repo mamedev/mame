@@ -8,7 +8,7 @@
     This allows capturing the byte stream to a file.
 
     Radio Shack printers differ in that the RX line is used as a
-    busing signal.
+    busy signal.
 
 **************************************************************************/
 
