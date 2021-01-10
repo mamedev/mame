@@ -7,7 +7,10 @@
     Status:
     - Currently hard-coded for use with the Jornada 720 driver.
     - Register contents are correctly stored, logged and masked, but
-      register handling is otherwise non-present.
+      register handling is otherwise largely non-present.
+	- There is the potential for endian issues, and it will be
+	  dealt with once the Jornada 720 driver makes heavier use of
+	  BitBLT operations or other operations relevant to endianness.
 
 **********************************************************************/
 

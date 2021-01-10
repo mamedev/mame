@@ -495,9 +495,9 @@ TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
 	m_audio_regs.sadtcc = (remaining - count) << 2;
 	if (!m_audio_regs.sadtcc)
 	{
-		static const uint32_t s_start_masks[2] = { (1 << SADTCS_TDSTA_BIT), (1 << SADTCS_TDSTB_BIT) };
-		static const uint32_t s_done_masks[2] = { (1 << SADTCS_TDBDA_BIT), (1 << SADTCS_TDBDB_BIT) };
-		static const uint32_t s_done_ints[2] = { INT_AUDTXA, INT_AUDTXB };
+		static constexpr uint32_t s_start_masks[2] = { (1 << SADTCS_TDSTA_BIT), (1 << SADTCS_TDSTB_BIT) };
+		static constexpr uint32_t s_done_masks[2] = { (1 << SADTCS_TDBDA_BIT), (1 << SADTCS_TDBDB_BIT) };
+		static constexpr uint32_t s_done_ints[2] = { INT_AUDTXA, INT_AUDTXB };
 		m_audio_regs.sadtcs &= ~s_start_masks[buf];
 		m_audio_regs.sadtcs |= s_done_masks[buf];
 		set_irq_line(s_done_ints[buf], 1);
@@ -554,11 +554,11 @@ void sa1111_device::audio_set_enabled(bool enabled)
 		audio_update_rx_fifo_levels();
 		audio_update_busy_flag();
 
-		uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
-		set_irq_line(INT_AUDTUR, BIT(*status, SASR_TUR_BIT));
-		set_irq_line(INT_AUDROR, BIT(*status, SASR_ROR_BIT));
-		set_irq_line(INT_AUDDTS, BIT(*status, SASR_SEND_BIT));
-		set_irq_line(INT_AUDRDD, BIT(*status, SASR_RECV_BIT	));
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		set_irq_line(INT_AUDTUR, BIT(status, SASR_TUR_BIT));
+		set_irq_line(INT_AUDROR, BIT(status, SASR_ROR_BIT));
+		set_irq_line(INT_AUDDTS, BIT(status, SASR_SEND_BIT));
+		set_irq_line(INT_AUDRDD, BIT(status, SASR_RECV_BIT));
 		set_irq_line(INT_AUDSTO, BIT(m_audio_regs.sasr1, SASR1_RSTO_BIT));
 	}
 	else
@@ -642,61 +642,61 @@ void sa1111_device::audio_start_rx_dma(const uint32_t buf)
 
 void sa1111_device::audio_update_tx_fifo_levels()
 {
-	uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
 	if (m_audio_regs.tx_fifo_count < ARRAY_LENGTH(m_audio_regs.tx_fifo))
-		*status |= (1 << SASR_TNF_BIT);
+		status |= (1 << SASR_TNF_BIT);
 	else
-		*status &= ~(1 << SASR_TNF_BIT);
+		status &= ~(1 << SASR_TNF_BIT);
 
 	const uint32_t tfl = ((m_audio_regs.tx_fifo_count == ARRAY_LENGTH(m_audio_regs.tx_fifo)) ? (m_audio_regs.tx_fifo_count - 1) : m_audio_regs.tx_fifo_count);
-	*status &= ~SASR_TFL_MASK;
-	*status |= (tfl << SASR_TFL_BIT);
+	status &= ~SASR_TFL_MASK;
+	status |= (tfl << SASR_TFL_BIT);
 
 	const uint32_t tfth = ((m_audio_regs.sacr0 & SACR0_TFTH_MASK) >> SACR0_TFTH_BIT) + 1;
 	if (tfl <= tfth)
 	{
-		*status |= (1 << SASR_TFS_BIT);
+		status |= (1 << SASR_TFS_BIT);
 		set_irq_line(INT_AUDTFS, 1);
 	}
 	else
 	{
-		*status &= ~(1 << SASR_TFS_BIT);
+		status &= ~(1 << SASR_TFS_BIT);
 		set_irq_line(INT_AUDTFS, 0);
 	}
 }
 
 void sa1111_device::audio_update_rx_fifo_levels()
 {
-	uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
 	if (m_audio_regs.rx_fifo_count != 0)
-		*status |= (1 << SASR_RNE_BIT);
+		status |= (1 << SASR_RNE_BIT);
 	else
-		*status &= ~(1 << SASR_RNE_BIT);
+		status &= ~(1 << SASR_RNE_BIT);
 
 	const uint32_t rfl = ((m_audio_regs.rx_fifo_count == ARRAY_LENGTH(m_audio_regs.rx_fifo)) ? (m_audio_regs.rx_fifo_count - 1) : m_audio_regs.rx_fifo_count);
-	*status &= ~SASR_RFL_MASK;
-	*status |= (rfl << SASR_RFL_BIT);
+	status &= ~SASR_RFL_MASK;
+	status |= (rfl << SASR_RFL_BIT);
 
 	const uint32_t rfth = ((m_audio_regs.sacr0 & SACR0_RFTH_MASK) >> SACR0_RFTH_BIT) + 1;
 	if (rfl >= rfth)
 	{
-		*status |= (1 << SASR_RFS_BIT);
+		status |= (1 << SASR_RFS_BIT);
 		set_irq_line(INT_AUDRFS, 1);
 	}
 	else
 	{
-		*status &= ~(1 << SASR_RFS_BIT);
+		status &= ~(1 << SASR_RFS_BIT);
 		set_irq_line(INT_AUDRFS, 0);
 	}
 }
 
 void sa1111_device::audio_update_busy_flag()
 {
-	uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
 	if (m_audio_regs.rx_fifo_count > 0 || m_audio_regs.tx_fifo_count > 0)
-		*status |= (1 << SASR_BSY_BIT);
+		status |= (1 << SASR_BSY_BIT);
 	else
-		*status &= ~(1 << SASR_BSY_BIT);
+		status &= ~(1 << SASR_BSY_BIT);
 }
 
 void sa1111_device::audio_tx_fifo_push(uint32_t data)
@@ -733,8 +733,8 @@ uint32_t sa1111_device::audio_tx_fifo_pop()
 	}
 	else
 	{
-		uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
-		*status |= (1 << SASR_TUR_BIT);
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		status |= (1 << SASR_TUR_BIT);
 		set_irq_line(INT_AUDTUR, 1);
 		return m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_read_idx];
 	}
@@ -751,8 +751,8 @@ void sa1111_device::audio_rx_fifo_push(uint32_t data)
 	}
 	else
 	{
-		uint32_t *status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? &m_audio_regs.sasr1 : &m_audio_regs.sasr0;
-		*status |= (1 << SASR_ROR_BIT);
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		status |= (1 << SASR_ROR_BIT);
 		set_irq_line(INT_AUDROR, 1);
 	}
 }
@@ -1075,8 +1075,8 @@ void sa1111_device::sadtcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	const uint32_t old = m_audio_regs.sadtcs;
 
-	static const uint32_t start_mask = (1 << SADTCS_TDSTA_BIT) | (1 << SADTCS_TDSTB_BIT);
-	static const uint32_t write_mask = (1 << SADTCS_TDEN_BIT) | start_mask;
+	static constexpr uint32_t start_mask = (1 << SADTCS_TDSTA_BIT) | (1 << SADTCS_TDSTB_BIT);
+	static constexpr uint32_t write_mask = (1 << SADTCS_TDEN_BIT) | start_mask;
 	m_audio_regs.sadtcs &= ~write_mask;
 	m_audio_regs.sadtcs |= data & write_mask & mem_mask;
 
@@ -1140,8 +1140,8 @@ void sa1111_device::sadrcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	const uint32_t old = m_audio_regs.sadrcs;
 
-	static const uint32_t start_mask = (1 << SADRCS_RDSTA_BIT) | (1 << SADRCS_RDSTB_BIT);
-	static const uint32_t write_mask = (1 << SADRCS_RDEN_BIT) | start_mask;
+	static constexpr uint32_t start_mask = (1 << SADRCS_RDSTA_BIT) | (1 << SADRCS_RDSTB_BIT);
+	static constexpr uint32_t write_mask = (1 << SADRCS_RDEN_BIT) | start_mask;
 	m_audio_regs.sadrcs &= ~write_mask;
 	m_audio_regs.sadrcs |= data & write_mask & mem_mask;
 
