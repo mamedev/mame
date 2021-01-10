@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Sandro Ronco
 /**********************************************************************
 
-    Acorn Archimedes keyboard HLE
+    Acorn Archimedes keyboard
 
 *********************************************************************/
 
@@ -10,6 +10,8 @@
 #define MAME_MACHINE_ARCHIMEDES_KEYB_H
 
 #pragma once
+
+#include "cpu/mcs51/mcs51.h"
 
 #include "diserial.h"
 
@@ -38,6 +40,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_serial_interface overrides
@@ -46,21 +50,25 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	void exec_command(uint8_t command);
-	void scan_keyb();
+	void tx_w(uint8_t data);
+	uint8_t mouse_r();
+	void leds_w(uint8_t data);
 
+	required_device<mcs51_cpu_device> m_mcu;
 	devcb_write_line m_kout;
-	required_ioport_array<8> m_keyboard;
-	required_ioport_array<2> m_mouse;
+	required_ioport_array<16> m_keyboard;
+	required_ioport_array<3> m_mouse;
 	output_finder<3> m_leds;
 
-	emu_timer * m_scan_timer;
-	bool        m_keyb_enable;
-	bool        m_mouse_enable;
+	emu_timer * m_mouse_timer;
+	int         m_mouse_phase;
+	int         m_mouse_xdir;
+	int         m_mouse_xref;
+	int         m_mouse_ydir;
+	int         m_mouse_yref;
 	int16_t     m_mouse_x;
 	int16_t     m_mouse_y;
-	uint16_t    m_data;
-	bool        m_states[0x80];
+	uint8_t     m_mux;
 };
 
 
