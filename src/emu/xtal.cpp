@@ -345,7 +345,7 @@ const double XTAL::known_xtals[] = {
 	 26'590'906, /* 26.590906_MHz_XTAL     Atari Jaguar NTSC */
 	 26'593'900, /* 26.5939_MHz_XTAL       Atari Jaguar PAL */
 	 26'601'712, /* 26.601712_MHz_XTAL     Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
-	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4100/I4220/I4300 */
+	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */
 	 26'686'000, /* 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
 	 26'880'000, /* 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896) */
