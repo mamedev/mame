@@ -426,7 +426,7 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
-	uint64_t pos;
+	uint64_t pos, savepos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++) {};
 	pos++;
 
@@ -444,7 +444,67 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	m_head.clear();
 	m_sector_count.clear();
 	m_ssize.clear();
+	m_trackmult = 1;
 
+	// we have to walk the whole file to find out the number of tracks
+	savepos = pos;
+	uint8_t maxtrack = 0;
+	while(pos < size)
+	{
+		pos++;   // skip mode
+		uint8_t track = img[pos++];
+		uint8_t head = img[pos++];
+		uint8_t sector_count = img[pos++];
+		uint8_t sector_size = img[pos++];
+		int actual_size = sector_size < 7 ? 128 << sector_size : 8192;
+
+		if (track > maxtrack)
+		{
+			maxtrack = track;
+		}
+
+		pos += sector_count;
+		if (head & 0x80)
+		{
+			pos += sector_count;
+		}
+		if (head & 0x40)
+		{
+			pos += sector_count;
+		}
+
+		for (int i = 0; i < sector_count; i++)
+		{
+			uint8_t stype = img[pos++];
+			if (stype == 0 || stype > 8)
+			{
+			}
+			else
+			{
+				if (stype == 2 || stype == 4 || stype == 6 || stype == 8)
+				{
+					pos++;
+				}
+				else
+				{
+					pos += actual_size;
+				}
+			}
+		}
+	}
+
+	// Check if the drive is HD but we're a 40 track image.
+	// If so, put the image on even tracks.
+	for (auto &fmt : variants)
+	{
+		if ((maxtrack <= 39) && (fmt == floppy_image::DSHD))
+		{
+			m_trackmult = 2;
+			break;
+		}
+	}
+
+	pos = savepos;
 	while(pos < size) {
 		m_mode.push_back(img[pos++]);
 		m_track.push_back(img[pos++]);
@@ -539,9 +599,9 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 		if(m_sector_count.back()) {
 			if(fm) {
-				build_pc_track_fm(m_track.back(), head, image, cell_count, m_sector_count.back(), sects, gap_3);
+				build_pc_track_fm(m_track.back()*m_trackmult, head, image, cell_count, m_sector_count.back(), sects, gap_3);
 			} else {
-				build_pc_track_mfm(m_track.back(), head, image, cell_count, m_sector_count.back(), sects, gap_3);
+				build_pc_track_mfm(m_track.back()*m_trackmult, head, image, cell_count, m_sector_count.back(), sects, gap_3);
 			}
 		}
 
@@ -599,7 +659,7 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 		uint8_t sector_data[50000];
 		desc_xs sectors[256];
 		int track_size;
-		generate_bitstream_from_track(m_track[i], head, 2000, bitstream, track_size, image);
+		generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, bitstream, track_size, image);
 		if (fm)
 			extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
 		else
