@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+
+/**************************************************************************
+
+    Simple printer emulation
+
+    This allows capturing the byte stream to a file.
+
+    Radio Shack printers differ in that the RX line is used as a
+    busing signal.
+
+**************************************************************************/
+
 #include "emu.h"
 #include "printer.h"
 
@@ -19,6 +31,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
+	m_initial_rx_state = 1;
 }
 
 void serial_printer_device::device_add_mconfig(machine_config &config)
@@ -42,7 +55,7 @@ ioport_constructor serial_printer_device::device_input_ports() const
 
 void serial_printer_device::device_start()
 {
-	m_initial_rx_state = 1;
+	save_item(NAME(m_initial_rx_state));
 }
 
 WRITE_LINE_MEMBER(serial_printer_device::update_serial)
@@ -83,11 +96,6 @@ void serial_printer_device::rcv_complete()
 radio_shack_serial_printer_device::radio_shack_serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: serial_printer_device(mconfig, RADIO_SHACK_SERIAL_PRINTER, tag, owner, clock)
 {
-}
-
-void radio_shack_serial_printer_device::device_start()
-{
-	serial_printer_device::device_start();
 	m_initial_rx_state = 0;
 }
 
