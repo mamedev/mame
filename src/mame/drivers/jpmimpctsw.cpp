@@ -9778,10 +9778,6 @@ GAME(  199?, j6jkrplse,    j6jkrpls,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAME(  199?, j6jkpldx,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Jokers Plus Deluxe (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6jkpldxa,    j6jkpldx,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Jokers Plus Deluxe (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
-// does have text strings so should display something?
-GAME(  199?, j6maxcsh,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maximus Cash (JPM) (IMPACT)", GAME_FLAGS )
-
-
 GAME(  199?, j6phxgld,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Gold (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6phxglda,    j6phxgld,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Gold (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6phxgldb,    j6phxgld,   impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Phoenix Gold (JPM) (IMPACT) (set 3)", GAME_FLAGS )
@@ -9845,3 +9841,6 @@ GAME(  199?, j6pirglda,    j6pirgld,   impact_nonvideo, jpmimpct_inputs, jpmimpc
 
 GAME(  199?, j6rager,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Alert (JPM) [German] (IMPACT)", GAME_FLAGS )
 
+// does have text strings so should display something?
+// sets stack to 40a000 which is outside normal memory range, is this in the incorrect driver?
+GAME(  199?, j6maxcsh,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Maximus Cash (JPM) (IMPACT)", GAME_FLAGS )
