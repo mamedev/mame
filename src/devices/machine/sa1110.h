@@ -46,6 +46,8 @@ public:
 
 	auto uart3_tx_out() { return m_uart3_tx_out.bind(); }
 
+	uint32_t icp_r(offs_t offset, uint32_t mem_mask = ~0);
+	void icp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
 	void uart3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t mcp_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -64,6 +66,10 @@ public:
 	void gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t intc_r(offs_t offset, uint32_t mem_mask = ~0);
 	void intc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ppc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ppc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -71,6 +77,23 @@ protected:
 	virtual void device_reset() override;
 
 	static constexpr uint32_t INTERNAL_OSC = 3686400;
+
+	TIMER_CALLBACK_MEMBER(icp_rx_callback);
+	TIMER_CALLBACK_MEMBER(icp_tx_callback);
+	TIMER_CALLBACK_MEMBER(hssp_rx_callback);
+	TIMER_CALLBACK_MEMBER(hssp_tx_callback);
+	void icp_uart_set_receiver_enabled(bool enabled);
+	void icp_uart_set_transmitter_enabled(bool enabled);
+	void icp_uart_set_receive_irq_enabled(bool enabled);
+	void icp_uart_set_transmit_irq_enabled(bool enabled);
+	uint8_t icp_uart_read_receive_fifo();
+	void icp_uart_write_transmit_fifo(uint8_t data);
+	uint16_t icp_hssp_read_receive_fifo();
+	void icp_hssp_write_transmit_fifo(uint8_t data);
+	void icp_uart_set_receiver_idle();
+	void icp_uart_begin_of_break();
+	void icp_uart_end_of_break();
+
 	DECLARE_WRITE_LINE_MEMBER(uart3_irq_callback);
 	void uart_recalculate_divisor();
 	void uart_update_eif_status();
@@ -125,9 +148,20 @@ protected:
 	void set_irq_line(uint32_t line, int state);
 	void update_interrupts();
 
+	void dma_set_control_bits(int channel, uint32_t bits);
+	void dma_clear_control_bits(int channel, uint32_t bits);
+
 	// register offsets
 	enum
 	{
+		ICP_BASE_ADDR	= 0x80030000,
+		REG_UTCR4		= (0x00000010 >> 2),
+		REG_HSCR0		= (0x00000060 >> 2),
+		REG_HSCR1		= (0x00000064 >> 2),
+		REG_HSDR		= (0x0000006c >> 2),
+		REG_HSSR0		= (0x00000074 >> 2),
+		REG_HSSR1		= (0x00000078 >> 2),
+
 		UART_BASE_ADDR  = 0x80050000,
 		REG_UTCR0       = (0x00000000 >> 2),
 		REG_UTCR1       = (0x00000004 >> 2),
@@ -196,7 +230,24 @@ protected:
 		REG_ICLR        = (0x00000008 >> 2),
 		REG_ICCR        = (0x0000000c >> 2),
 		REG_ICFP        = (0x00000010 >> 2),
-		REG_ICPR        = (0x00000020 >> 2)
+		REG_ICPR        = (0x00000020 >> 2),
+
+		PPC_BASE_ADDR	= 0x90060000,
+		REG_PPDR		= (0x00000000 >> 2),
+		REG_PPSR		= (0x00000004 >> 2),
+		REG_PPAR		= (0x00000008 >> 2),
+		REG_PSDR		= (0x0000000c >> 2),
+		REG_PPFR		= (0x00000010 >> 2),
+
+		DMA_BASE_ADDR	= 0xb0000000,
+		REG_DDAR		= (0x00000000 >> 2),
+		REG_DSSR		= (0x00000004 >> 2),
+		REG_DCSR		= (0x00000008 >> 2),
+		REG_DSR			= (0x0000000c >> 2),
+		REG_DBSA		= (0x00000010 >> 2),
+		REG_DBTA		= (0x00000014 >> 2),
+		REG_DBSB		= (0x00000018 >> 2),
+		REG_DBTB		= (0x0000001c >> 2)
 	};
 
 	// register contents
@@ -213,6 +264,9 @@ protected:
 		UTCR3_TIE_BIT   = 4,
 		UTCR3_LBM_BIT   = 5,
 
+		UTCR4_HSE_BIT	= 0,
+		UTCR4_LPM_BIT	= 1,
+
 		UTSR0_TFS_BIT   = 0,
 		UTSR0_RFS_BIT   = 1,
 		UTSR0_RID_BIT   = 2,
@@ -226,6 +280,37 @@ protected:
 		UTSR1_PRE_BIT   = 3,
 		UTSR1_FRE_BIT   = 4,
 		UTSR1_ROR_BIT   = 5,
+
+		HSCR0_ITR_BIT	= 0,
+		HSCR0_LBM_BIT	= 1,
+		HSCR0_TUS_BIT	= 2,
+		HSCR0_TXE_BIT	= 3,
+		HSCR0_RXE_BIT	= 4,
+		HSCR0_RIE_BIT	= 5,
+		HSCR0_TIE_BIT	= 6,
+		HSCR0_AME_BIT	= 7,
+
+		HSCR2_TXP_BIT	= 18,
+		HSCR2_RXP_BIT	= 19,
+
+		HSDR_EOF_BIT	= 8,
+		HSDR_CRE_BIT	= 9,
+		HSDR_ROR_BIT	= 10,
+
+		HSSR0_EIF_BIT	= 0,
+		HSSR0_TUR_BIT	= 1,
+		HSSR0_RAB_BIT	= 2,
+		HSSR0_TFS_BIT	= 3,
+		HSSR0_RFS_BIT	= 4,
+		HSSR0_FRE_BIT	= 5,
+
+		HSSR1_RSY_BIT	= 0,
+		HSSR1_TBY_BIT	= 1,
+		HSSR1_RNE_BIT	= 2,
+		HSSR1_TNF_BIT	= 3,
+		HSSR1_EOF_BIT	= 4,
+		HSSR1_CRE_BIT	= 5,
+		HSSR1_ROR_BIT	= 6,
 
 		MCCR0_ASD_BIT   = 0,
 		MCCR0_ASD_MASK  = 0x0000007f,
@@ -294,7 +379,27 @@ protected:
 		RTSR_ALE_BIT    = 2,
 		RTSR_ALE_MASK   = (1 << RTSR_ALE_BIT),
 		RTSR_HZE_BIT    = 3,
-		RTSR_HZE_MASK   = (1 << RTSR_HZE_BIT)
+		RTSR_HZE_MASK   = (1 << RTSR_HZE_BIT),
+
+		DDAR_RW_BIT		= 0,
+		DDAR_E_BIT		= 1,
+		DDAR_BS_BIT		= 2,
+		DDAR_DW_BIT		= 3,
+		DDAR_DA0_BIT	= 4,
+		DDAR_DA0_MASK	= 0x000000f0,
+		DDAR_DA8_BIT	= 8,
+		DDAR_DA8_MASK	= 0xffffff00,
+
+		DSR_RUN_BIT		= 0,
+		DSR_IE_BIT		= 1,
+		DSR_ERROR_BIT	= 2,
+		DSR_DONEA_BIT	= 3,
+		DSR_STRTA_BIT	= 4,
+		DSR_DONEB_BIT	= 5,
+		DSR_STRTB_BIT	= 6,
+		DSR_BIU_BIT		= 7,
+
+		DBT_MASK		= 0x00001fff
 	};
 
 	// interrupt bits
@@ -374,6 +479,36 @@ protected:
 		int     tx_fifo_count;
 
 		bool    rx_break_interlock;
+	};
+
+	struct hssp_regs
+	{
+		uint32_t hscr0;
+		uint32_t hscr1;
+		uint32_t hssr0;
+		uint32_t hssr1;
+
+		uint16_t rx_fifo[8];
+		int rx_fifo_read_idx;
+		int rx_fifo_write_idx;
+		int rx_fifo_count;
+		emu_timer *rx_timer;
+
+		uint16_t tx_fifo[8];
+		int tx_fifo_read_idx;
+		int tx_fifo_write_idx;
+		int tx_fifo_count;
+		emu_timer *tx_timer;
+	};
+
+	struct icp_regs
+	{
+		uart_regs uart;
+		uint32_t utcr4;
+		emu_timer *uart_rx_timer;
+		emu_timer *uart_tx_timer;
+
+		hssp_regs hssp;
 	};
 
 	struct mcp_regs
@@ -486,7 +621,27 @@ protected:
 		uint32_t icpr;
 	};
 
+	struct ppc_regs
+	{
+		uint32_t ppdr;
+		uint32_t ppsr_out;
+		uint32_t ppsr_in;
+		uint32_t ppsr;
+		uint32_t ppar;
+		uint32_t psdr;
+		uint32_t ppfr;
+	};
+
+	struct dma_regs
+	{
+		uint32_t ddar;
+		uint32_t dsr;
+		uint32_t dbs[2];
+		uint32_t dbt[2];
+	};
+
 	uart_regs       m_uart_regs;
+	icp_regs		m_icp_regs;
 	mcp_regs        m_mcp_regs;
 	ssp_regs        m_ssp_regs;
 	ostimer_regs    m_ostmr_regs;
@@ -495,8 +650,11 @@ protected:
 	uint32_t        m_rcsr;
 	gpio_regs       m_gpio_regs;
 	intc_regs       m_intc_regs;
+	ppc_regs		m_ppc_regs;
+	dma_regs		m_dma_regs[6];
+	uint8_t			m_dma_active_mask;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<sa1110_cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;
 	required_device<input_merger_device> m_mcp_irqs;
 	optional_device<ucb1200_device> m_codec;
