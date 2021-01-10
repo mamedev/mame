@@ -4405,6 +4405,37 @@ ROM_START( jolycdih )
 	ROM_LOAD( "jolycdih_nvram.bin", 0x0000, 0x0800, CRC(02b3b335) SHA1(207a1289e4298d942e4806adf8ffb87e0b9b4e58) )
 ROM_END
 
+/*
+  ZABAVNI KARTI (ЗАБАВНИ КАРТИ)
+  Bulgarian Jolly Card clone in cyrillic.
+
+  ЗАБАВНИ КАРТИ means "Fun cards" / "Cards for fun".
+  
+  Encrypted GFX. Same style as blue TAB board.
+
+  This is a timed game. You coin for an amount of playing time.
+  Once the time counter ends, all earned credits/bonus dissapear.
+
+  It seems an amusement version.
+
+*/
+ROM_START( jolycdcy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "256.bin", 0x8000, 0x8000, CRC(b7600b68) SHA1(04a532d3d1daa0ab43a2b7345ea0e86b8701f649) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(df434aa7) SHA1(e154868304f37a982d030de0989716ab9e27298d) )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(140546c5) SHA1(4dce119cd1a149eda6f546c0656de8fb8baef83b) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // Default NVRAM
+	ROM_LOAD( "jolycdcy_nvram.bin", 0x0000, 0x0800, CRC(4c96ea57) SHA1(f7115866e9df8d031f23971b900119902406c020) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
+
+
 ROM_START( sjcd2kx3 )   // Super Joly 2000 3x
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
@@ -8412,6 +8443,7 @@ GAMEL( 199?, jolycdit,   jollycrd, cuoreuno, jolycdit,  funworld_state, init_tab
 GAMEL( 1990, jolycdib,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdic,   jollycrd, cuoreuno, jolycdic,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdii,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Jolly Card (Italian, encrypted bootleg, set 3)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
+GAMEL( 1993, jolycdcy,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Zabavni Karti (cyrillic, Bulgarian, encrypted)",  0,                       layout_jollycrd )
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,    pool10,   cuoreuno, cuoreuno,  funworld_state, init_dino4,    ROT0, "C.M.C.",            "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
