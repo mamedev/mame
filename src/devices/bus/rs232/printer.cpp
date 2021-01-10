@@ -87,6 +87,7 @@ radio_shack_serial_printer_device::radio_shack_serial_printer_device(const machi
 
 void radio_shack_serial_printer_device::device_start()
 {
+	serial_printer_device::device_start();
 	m_initial_rx_state = 0;
 }
 
