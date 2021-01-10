@@ -352,6 +352,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/adc083x.h"
 #include "machine/bankdev.h"
 #include "machine/ds2401.h"
+#include "machine/jvshost.h"
 #include "machine/linflash.h"
 #include "machine/k573cass.h"
 #include "machine/k573dio.h"
@@ -374,6 +375,90 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #define VERBOSE_LEVEL ( 0 )
 
 #define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+
+// #define JVS_DEBUG
+
+/*
+ * Class declaration for jvs_master
+ */
+
+DECLARE_DEVICE_TYPE(JVS_MASTER, jvs_master)
+
+class jvs_master : public jvs_host
+{
+public:
+	// construction/destruction
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void send_packet(uint8_t *data, int length);
+	int received_packet(uint8_t *buffer);
+
+	DECLARE_READ_LINE_MEMBER( jvs_sense_r );
+
+private:
+	int output_buffer_size = 0;
+};
+
+DEFINE_DEVICE_TYPE(JVS_MASTER, jvs_master, "jvs_master", "JVS MASTER")
+
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: jvs_host(mconfig, JVS_MASTER, tag, owner, clock)
+{
+	output_buffer_size = 0;
+}
+
+READ_LINE_MEMBER( jvs_master::jvs_sense_r )
+{
+	return !get_address_set_line();
+}
+
+int jvs_master::received_packet(uint8_t *buffer)
+{
+	if (jvs_sense_r()) {
+		// The game will send the command twice to reset, but the command
+		// shouldn't return any data or else a "JVS SUBS RESET ERROR" appears
+		return 0;
+	}
+
+	uint32_t length;
+	const uint8_t *data;
+
+	get_raw_reply(data, length);
+
+	if (length > 0) {
+		// The games don't unescape the data in memory even.
+		// This causes issues any time 0xe0 or 0xd0 shows up in
+		// the original response data and were escaped.
+		// Sending an unescaped "encoded" packet works perfectly
+		// in-game.
+		uint8_t checksum = 0;
+		for (int i = 0; i < length; i++) {
+			checksum += data[i];
+		}
+
+		buffer[0] = 0xe0;
+		memcpy(buffer + 1, data, length);
+		buffer[length+1] = checksum;
+		buffer[length+2] = 0;
+		length += 2;
+
+		commit_encoded();
+	}
+
+	return (int)length;
+}
+
+void jvs_master::send_packet(uint8_t *data, int length)
+{
+	while (length > 0)
+	{
+		push(*data);
+		data++;
+		length--;
+	}
+
+	commit_raw();
+}
+
 
 class ksys573_state : public driver_device
 {
@@ -404,7 +489,8 @@ public:
 		m_encoder(*this, "ENCODER"),
 		m_gunmania_id(*this, "gunmania_id"),
 		m_duart(*this, "mb89371"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_jvs_master(*this, "jvs_master")
 	{ }
 
 	void drmn9m(machine_config &config);
@@ -422,6 +508,7 @@ public:
 	void ddrsbm(machine_config &config);
 	void ddr3mp(machine_config &config);
 	void dsftkd(machine_config &config);
+	void dsfdct(machine_config &config);
 	void dsfdcta(machine_config &config);
 	void mamboagga(machine_config &config);
 	void gunmania(machine_config &config);
@@ -433,7 +520,9 @@ public:
 	void animechmp(machine_config &config);
 	void salarymc(machine_config &config);
 	void gbbchmp(machine_config &config);
+	void ddr2mc2(machine_config &config);
 	void ddr2ml(machine_config &config);
+	void ddrbocd(machine_config &config);
 	void konami573(machine_config &config);
 	void drmn2m(machine_config &config);
 	void gtrfrk3m(machine_config &config);
@@ -448,6 +537,7 @@ public:
 	void konami573x(machine_config &config);
 	void ddrusa(machine_config &config);
 	void dsem(machine_config &config);
+	void dsem2(machine_config &config);
 	void dmx(machine_config &config);
 	void drmn(machine_config &config);
 	void k573d(machine_config &config);
@@ -507,6 +597,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( h8_clk_w );
 
+	DECLARE_READ_LINE_MEMBER( jvs_rx_r );
+
 	double m_pad_position[ 6 ];
 	optional_ioport m_pads;
 
@@ -516,6 +608,12 @@ protected:
 	virtual void driver_start() override;
 
 private:
+	bool jvs_is_valid_packet();
+
+	void jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t jvs_input_r(offs_t offset, uint16_t mem_mask = ~0);
+
+	uint16_t port_in2_jvs_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	uint16_t control_r(offs_t offset, uint16_t mem_mask = ~0);
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -620,6 +718,11 @@ private:
 	int m_tank_shutter_position;
 	int m_cable_holder_release;
 
+	int m_jvs_input_idx_r, m_jvs_input_idx_w;
+	int m_jvs_output_idx_w, m_jvs_output_len_w;
+	uint8_t m_jvs_input_buffer[512];
+	uint8_t m_jvs_output_buffer[512];
+
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_flashbank;
@@ -634,6 +737,8 @@ private:
 	optional_device<ds2401_device> m_gunmania_id;
 	optional_device<mb89371_device> m_duart;
 	output_finder<2> m_lamps;
+
+	required_device<jvs_master> m_jvs_master;
 };
 
 void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -654,7 +759,7 @@ void ksys573_state::konami573_map(address_map &map)
 	map(0x1f000000, 0x1f3fffff).m(m_flashbank, FUNC(address_map_bank_device::amap16));
 	map(0x1f400000, 0x1f400003).portr("IN0").portw("OUT0");
 	map(0x1f400004, 0x1f400007).portr("IN1");
-	map(0x1f400008, 0x1f40000b).portr("IN2");
+	map(0x1f400008, 0x1f40000b).r(FUNC(ksys573_state::port_in2_jvs_r));
 	map(0x1f40000c, 0x1f40000f).portr("IN3");
 	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x1f500000, 0x1f500001).rw(FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
@@ -662,6 +767,7 @@ void ksys573_state::konami573_map(address_map &map)
 	map(0x1f5c0000, 0x1f5c0003).nopw();                // watchdog?
 	map(0x1f600000, 0x1f600003).portw("LAMPS");
 	map(0x1f620000, 0x1f623fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f680001).rw(FUNC(ksys573_state::jvs_input_r), FUNC(ksys573_state::jvs_input_w));
 	map(0x1f6a0000, 0x1f6a0001).rw(FUNC(ksys573_state::security_r), FUNC(ksys573_state::security_w));
 }
 
@@ -708,6 +814,108 @@ void ksys573_state::gbbchmp_map(address_map& map)
 	konami573_map(map);
 	// The game waits until transmit is ready, but the chip may not actually be present.
 	map(0x1f640000, 0x1f640007).rw(m_duart, FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+}
+
+bool ksys573_state::jvs_is_valid_packet()
+{
+    if (m_jvs_input_idx_w < 5) {
+		// A valid packet will have at the very least
+		//  - sync (0xe0)
+		//  - node number (non-zero)
+		//  - size
+		//  - at least 1 byte in the request message
+		//  - checksum
+		return false;
+    }
+
+	if (m_jvs_input_buffer[0] != 0xe0  || m_jvs_input_buffer[1] == 0x00) {
+		return false;
+	}
+
+    int command_size = m_jvs_input_buffer[2] + 3;
+    if (m_jvs_input_idx_w < command_size) {
+		return false;
+    }
+
+    uint8_t checksum = 0;
+    for (int i = 1; i < command_size - 1; i++) {
+		checksum += m_jvs_input_buffer[i];
+    }
+
+    return checksum == m_jvs_input_buffer[command_size - 1];
+}
+
+void ksys573_state::jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+    m_jvs_input_buffer[m_jvs_input_idx_w++] = data & 0xff;
+    m_jvs_input_buffer[m_jvs_input_idx_w++] = data >> 8;
+
+	if (m_jvs_input_buffer[0] != 0xe0) {
+		m_jvs_input_idx_w = 0;
+	}
+
+    if (jvs_is_valid_packet()) {
+#ifdef JVS_DEBUG
+		printf("jvs_input_w( %08x, %08x, %02x %02x )\n", offset, mem_mask, data & 0xff, data >> 8 );
+
+		for (int i = 0; i < m_jvs_input_idx_w; i++) {
+			printf("%02x ", m_jvs_input_buffer[i]);
+		}
+
+		printf("\n");
+#endif
+
+		int command_size = m_jvs_input_buffer[2] + 3;
+		m_jvs_master->send_packet(m_jvs_input_buffer + 1, command_size - 2); // jvshost doesn't actually check the checksum, so don't send it
+
+		m_jvs_input_idx_w = 0;
+		m_jvs_input_idx_r = 0;
+
+		m_jvs_input_buffer[0] = 0;
+    }
+}
+
+uint16_t ksys573_state::jvs_input_r(offs_t offset, uint16_t mem_mask)
+{
+    uint16_t data = m_jvs_input_buffer[m_jvs_input_idx_r++];
+    data |= m_jvs_input_buffer[m_jvs_input_idx_r++] << 8;
+
+    return data;
+}
+
+uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
+{
+	if (offset == 0) {
+		// 0x1f400008-0x1f400009 are for inputs
+		return ioport("IN2")->read();
+	}
+
+    if (m_jvs_output_len_w <= 0) {
+		return 0;
+    }
+
+    uint16_t data = m_jvs_output_buffer[m_jvs_output_idx_w] | (m_jvs_output_buffer[m_jvs_output_idx_w+1] << 8);
+    m_jvs_output_idx_w += 2;
+
+    if (m_jvs_output_idx_w >= m_jvs_output_len_w) {
+		m_jvs_output_idx_w = 0;
+		m_jvs_output_len_w = 0;
+    }
+
+#ifdef JVS_DEBUG
+    printf("m_jvs_output_r %08x %08x | %02x %02x | %02x\n", offset, mem_mask, data & 0xff, data >> 8, m_jvs_output_idx_w);
+#endif
+
+    return data;
+}
+
+READ_LINE_MEMBER( ksys573_state::jvs_rx_r )
+{
+	if (m_jvs_output_len_w <= 0) {
+		m_jvs_output_len_w = m_jvs_master->received_packet(m_jvs_output_buffer);
+	}
+
+	return m_jvs_output_len_w > 0;
 }
 
 uint16_t ksys573_state::control_r(offs_t offset, uint16_t mem_mask)
@@ -834,10 +1042,6 @@ void ksys573_state::driver_start()
 	m_available_cdroms[ 0 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom0"));
 	m_available_cdroms[ 1 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom1"));
 
-	m_n_security_control = 0;
-	m_control = 0;
-	m_h8_index = 0;
-
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
 }
@@ -846,52 +1050,21 @@ void ksys573_state::machine_reset()
 {
 	update_disc();
 
+	m_n_security_control = 0;
+	m_control = 0;
+
 	m_h8_index = 0;
 	m_h8_clk = 0;
+
+	m_jvs_input_idx_r = m_jvs_input_idx_w = 0;
+	m_jvs_output_idx_w = m_jvs_output_len_w = 0;
+	memset(m_jvs_input_buffer, 0, 512);
+	memset(m_jvs_output_buffer, 0, 512);
 }
 
 WRITE_LINE_MEMBER(ksys573_state::sys573_vblank)
 {
 	update_disc();
-
-	/// TODO: emulate the memory controller board
-	if( strcmp( machine().system().name, "ddr2ml" ) == 0 )
-	{
-		/* patch out security-plate error */
-
-		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
-
-		/* install cd */
-
-		/* 801e1540: jal $801e1f7c */
-		if( p_n_psxram[ 0x1e1540 / 4 ] == 0x0c0787df )
-		{
-			/* 801e1540: j $801e1560 */
-			p_n_psxram[ 0x1e1540 / 4 ] = 0x08078558;
-		}
-
-		/* flash */
-
-		/* 8001f850: jal $80031fd8 */
-		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c7f6 )
-		{
-			/* 8001f850: j $8001f888 */
-			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
-		}
-	}
-	else if( strcmp( machine().system().name, "ddr2mla" ) == 0 )
-	{
-		/* patch out security-plate error */
-
-		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
-
-		/* 8001f850: jal $8003221c */
-		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
-		{
-			/* 8001f850: j $8001f888 */
-			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
-		}
-	}
 }
 
 // H8 check at startup (JVS related)
@@ -2250,6 +2423,8 @@ void ksys573_state::konami573(machine_config &config)
 
 	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
+
+	JVS_MASTER(config, "jvs_master", 0);
 }
 
 // Variants with additional digital sound board
@@ -2354,11 +2529,26 @@ void ksys573_state::ddr(machine_config &config)
 	cassx(config);
 }
 
+void ksys573_state::ddr2mc2(machine_config &config)
+{
+	k573a(config);
+	cassx(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+}
+
 void ksys573_state::ddr2ml(machine_config &config)
 {
 	k573a(config);
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0);
+	pccard1_16mb(config);
+	cassx(config);
 
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+}
+
+void ksys573_state::ddrbocd(machine_config &config)
+{
+	k573a(config);
 	pccard1_16mb(config);
 	cassx(config);
 }
@@ -2370,6 +2560,8 @@ void ksys573_state::ddr3m(machine_config &config)
 
 	pccard2_32mb(config);
 	cassyyi(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 void ksys573_state::ddr3mp(machine_config &config)
@@ -2379,6 +2571,8 @@ void ksys573_state::ddr3mp(machine_config &config)
 
 	pccard2_32mb(config);
 	cassxzi(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 void ksys573_state::ddrusa(machine_config &config)
@@ -2396,9 +2590,20 @@ void ksys573_state::ddr5m(machine_config &config)
 
 	pccard2_32mb(config);
 	casszi(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 // Dancing Stage
+
+void ksys573_state::dsfdct(machine_config &config)
+{
+	k573d(config);
+	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::ddr_output_callback));
+
+	pccard2_32mb(config);
+	cassyyi(config);
+}
 
 void ksys573_state::dsfdcta(machine_config &config)
 {
@@ -2427,6 +2632,15 @@ void ksys573_state::dsem(machine_config &config)
 	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::ddr_output_callback));
 
 	cassxi(config);
+}
+
+void ksys573_state::dsem2(machine_config &config)
+{
+	k573d(config);
+	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::ddr_output_callback));
+
+	pccard2_32mb(config);
+	casszi(config);
 }
 
 // Dance Dance Revolution Solo
@@ -2463,6 +2677,8 @@ void ksys573_state::ddr4ms(machine_config &config)
 
 	pccard2_32mb(config);
 	cassxzi(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 // DrumMania
@@ -2524,6 +2740,9 @@ void ksys573_state::gtrfrk2m(machine_config &config)
 	k573a(config);
 	cassyi(config);
 	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
+
+	// For Guitar Freaks 2nd Mix Link Ver 1 (memory cards) and Link Ver 2 (memory cards + controllers)
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 void ksys573_state::gtrfrk3m(machine_config &config)
@@ -2531,6 +2750,8 @@ void ksys573_state::gtrfrk3m(machine_config &config)
 	k573d(config);
 	cassxzi(config);
 	pccard1_16mb(config);
+
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
 }
 
 void ksys573_state::gtrfrk5m(machine_config &config)
@@ -2693,7 +2914,6 @@ void ksys573_state::mamboagga(machine_config &config)
 	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
 
-
 static INPUT_PORTS_START( konami573 )
 	PORT_START( "IN0" )
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2734,9 +2954,9 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, do_read )
 //  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_secflash_sda )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "jvs_master", jvs_master, jvs_sense_r )
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, jvs_rx_r )
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // JVS-related
 //  PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2763,7 +2983,6 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, write_line_zs01_sda )
 
 	PORT_START( "IN2" )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
@@ -5329,9 +5548,9 @@ GAME( 1999, fbaitmca,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_ini
 GAME( 1999, ddr2m,     sys573,   ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2ml,    ddr2m,    ddr2ml,     ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2mla,   ddr2m,    ddr2ml,     ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddrbocd,   ddr2m,    ddr2ml,     ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddrbocd,   ddr2m,    ddrbocd,    ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ddr2mc,    ddr2m,    ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddr2mc2,   ddr2m,    ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddr2mc2,   ddr2m,    ddr2mc2,    ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrk2m,  sys573,   gtrfrk2m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, dsftkd,    sys573,   dsftkd,     ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, cr589fw,   sys573,   konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "CD-ROM Drive Updater 2.0 (700B04)", MACHINE_IMPERFECT_SOUND )
@@ -5345,7 +5564,7 @@ GAME( 1999, ddrs2k,    sys573,   ddrs2k,     ddrsolo,   ksys573_state, empty_ini
 GAME( 1999, ddrs2kj,   ddrs2k,   ddrs2k,     ddrsolo,   ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.2 */
 GAME( 1999, hypbbc2p,  sys573,   hypbbc2p,   hypbbc2p,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, hypbbc2pk, hypbbc2p, hypbbc2p,   hypbbc2p,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, dsfdct,    sys573,   ddr3m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, dsfdct,    sys573,   dsfdct,     ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, dsfdcta,   dsfdct,   dsfdcta,    ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, pcnfrk2m,  sys573,   drmn2m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 2nd Mix (GE912 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 1999, drmn2m,    pcnfrk2m, drmn2m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.5 */
@@ -5396,12 +5615,12 @@ GAME( 2001, gtrfrk7m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_ini
 GAME( 2001, ddrmax,    sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, ddrmax2,   sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, mrtlbeat,  sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Martial Beat (G*B47 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, gbbchmp,   sys573,   gbbchmp,    hyperbbc,  ksys573_state, init_serlamp, ROT0,  "Konami", "Great Bishi Bashi Champ (GBA48 VER. JAB)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gbbchmp,   sys573,   gbbchmp,    hyperbbc,  ksys573_state, init_serlamp,  ROT0,  "Konami", "Great Bishi Bashi Champ (GBA48 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, drmn7m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 7th Mix power-up ver. (G*C07 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, drmn7ma,   drmn7m,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 7th Mix (G*C07 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, gtrfrk8m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 8th Mix power-up ver. (G*C08 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, gtrfrk8ma, gtrfrk8m, gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 8th Mix (G*C08 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2002, dsem2,     sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2002, dsem2,     sys573,   dsem2,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2002, ddrextrm,  sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, drmn8m,    sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 8th Mix (G*C07 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtrfrk9m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 9th Mix (G*C39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */

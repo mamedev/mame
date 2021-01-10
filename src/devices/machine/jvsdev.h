@@ -37,6 +37,7 @@ protected:
 	virtual bool analogs(uint8_t *&buf, uint8_t count);
 	virtual bool swoutputs(uint8_t count, const uint8_t *vals);
 	virtual bool swoutputs(uint8_t id, uint8_t val);
+	virtual int device_handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer);
 
 	required_device<jvs_host> host;
 

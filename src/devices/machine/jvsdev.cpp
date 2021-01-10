@@ -82,10 +82,23 @@ void jvs_device::message(uint8_t dest, const uint8_t *send_buffer, uint32_t send
 		next_device->message(dest, send_buffer, send_size, recv_buffer, recv_size);
 }
 
+int jvs_device::device_handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)
+{
+	// Override this function to provide device-specific JVS message handling.
+	// If -1 is returned then the base message handler will be used.
+	return -1;
+}
+
 int jvs_device::handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)
 {
+	int device_ret;
 	uint32_t old_reset_counter = jvs_reset_counter;
 	jvs_reset_counter = 0;
+
+	device_ret = device_handle_message(send_buffer, send_size, recv_buffer);
+	if (device_ret != -1) {
+		return device_ret;
+	}
 
 	switch(send_buffer[0]) {
 	case 0xf0:
