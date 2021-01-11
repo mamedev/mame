@@ -48,7 +48,7 @@ Notes:
 
 k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jvs_device(mconfig, KONAMI_573_MEMORY_CARD_READER, tag, owner, clock),
-	m_ports{{*this, "port1"}, {*this, "port2"}}
+	m_ports(*this, "port%u", 0U)
 {
 	m_ram = std::make_unique<uint8_t[]>(RAM_SIZE);
 }

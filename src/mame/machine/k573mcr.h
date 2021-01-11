@@ -67,7 +67,7 @@ private:
 	uint16_t m_status;
 	bool m_is_memcard_initialized;
 
-	required_device<psx_controller_port_device> m_ports[2];
+	required_device_array<psx_controller_port_device, 2> m_ports;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_MEMORY_CARD_READER, k573mcr_device)
