@@ -974,6 +974,9 @@ ROM_START( magibombe )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46p.u6", 0x00, 0x80, CRC(037f5f07) SHA1(d82145ebb94681841ec0c41724ef93857f50d8f0) ) // TODO: // once the emulation works, verify if it needs resetting to the factory settings
 ROM_END
 
 /***************************************************************************
