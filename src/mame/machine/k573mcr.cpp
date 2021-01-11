@@ -66,7 +66,7 @@ void k573mcr_device::device_reset()
 {
 	jvs_device::device_reset();
 
-	memset(m_ram.get(), 0, RAM_SIZE);
+	std::fill_n(m_ram.get(), RAM_SIZE, 0);
 	m_is_memcard_initialized = false;
 	m_status = 0;
 }
