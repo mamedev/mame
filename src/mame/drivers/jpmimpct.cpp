@@ -1267,7 +1267,6 @@ void jpmimpct_state::base(machine_config &config)
 	// not currently used, hack used instead
 	MC68681(config, m_duart, MC68681_1_CLOCK);
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::duart_irq_handler));
-	m_duart->a_tx_cb().set(m_datalogger, FUNC(bacta_datalogger_device::write_txd));
 	// needs hookup for TEST_DEMO and the jpmio_video_w meters related stuff
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1284,8 +1283,10 @@ void jpmimpct_state::base(machine_config &config)
 
 	METERS(config, m_meters, 0).set_number(5);
 
+	// TODO: only add this to the sets that need it connected
+	m_duart->a_tx_cb().set(m_datalogger, FUNC(bacta_datalogger_device::write_txd));
 	BACTA_DATALOGGER(config, m_datalogger, 0);
-
+	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 
 void jpmimpct_state::impact_nonvideo(machine_config &config)
