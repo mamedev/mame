@@ -2042,7 +2042,7 @@ double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 	int pads = state->m_pads->read();
 	for( int i = 0; i < 6; i++ )
 	{
-		if( ( pads & ( 1 << i ) ) != 0 )
+		if( BIT( pads, i ) )
 		{
 			pad_position[ i ] = 5;
 		}

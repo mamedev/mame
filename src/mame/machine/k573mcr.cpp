@@ -111,7 +111,7 @@ uint8_t k573mcr_device::controller_port_send_byte(uint32_t port_no, uint8_t data
 
 	for (int i = 0; i < 8; i++) {
 		port->clock_w(0);
-		port->tx_w(!!(data & (1 << i)));
+		port->tx_w(BIT(data, i));
 		port->clock_w(1);
 		output |= port->rx_r() << i;
 	}
@@ -371,7 +371,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 				int memcard_addr = ((send_buffer[2] << 8) | send_buffer[3]) & 0x7fff;
 				int ram_addr = (send_buffer[4] << 16) | (send_buffer[5] << 8) | send_buffer[6];
 				int block_count = (send_buffer[7] << 8) | send_buffer[8];
-				bool is_ejected = !(ioport("META")->read() & (1 << memcard_port)); // Forcefully ejected using hotkey
+				bool is_ejected = BIT(ioport("META")->read(), memcard_port); // Forcefully ejected using hotkey
 
 				if (!is_ejected && memcard_read(memcard_port, 0, nullptr)) {
 					// Check if card is inserted
@@ -404,7 +404,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 				int memcard_port = send_buffer[5] >> 7;
 				int memcard_addr = ((send_buffer[5] << 8) | send_buffer[6]) & 0x7fff;
 				int block_count = (send_buffer[7] << 8) | send_buffer[8];
-				bool is_ejected = !(ioport("META")->read() & (1 << memcard_port)); // Forcefully ejected using hotkey
+				bool is_ejected = BIT(ioport("META")->read(), memcard_port); // Forcefully ejected using hotkey
 
 				if (!is_ejected && memcard_read(memcard_port, 0, nullptr)) {
 					// Check if card is inserted
@@ -476,8 +476,8 @@ const tiny_rom_entry *k573mcr_device::device_rom_region() const
 
 INPUT_PORTS_START( k573mcr_meta_controls )
 	PORT_START("META")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_TOGGLE PORT_NAME("Insert/Eject Memory Card 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_TOGGLE PORT_NAME("Insert/Eject Memory Card 2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_TOGGLE PORT_NAME("Insert/Eject Memory Card 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2) PORT_TOGGLE PORT_NAME("Insert/Eject Memory Card 2")
 INPUT_PORTS_END
 
 ioport_constructor k573mcr_device::device_input_ports() const
