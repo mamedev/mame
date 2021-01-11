@@ -4061,6 +4061,8 @@ sc2dels6                        //
 sc2dels7                        //
 sc2dels8                        //
 sc2dels9                        //
+sc2dels10                       //
+sc2dels11                       //
 sc2delsd                        //
 sc2delsm                        // (Mazooma set)
 sc2delsm1                       //
@@ -5902,6 +5904,7 @@ sc4himif                        //
 sc4himig                        //
 sc4himih                        //
 sc4himii                        //
+sc4hrolr                        // High Roller (Bellfruit)
 sc4hiss                         // Hissing Quid (Qps)
 sc4hissa                        //
 sc4hissb                        //
@@ -20527,6 +20530,7 @@ m1dkong91na                     //
 m1dkong91np                     //
 m1dkong91p                      //
 m1dkonga                        //
+m1dkonga2                       //
 m1dkongp                        //
 m1dm4ev                         // Diamonds Are Forever Club (Maygay)
 m1dm4ev11                       //
@@ -21193,6 +21197,7 @@ m1simpsd                        //
 m1simpse                        //
 m1simpsf                        //
 m1simpsg                        //
+m1simpsh                        //
 m1sirich                        // Strike It Rich
 m1siricha                       //
 m1sirichb                       //
@@ -21201,6 +21206,7 @@ m1sixspn                        // Six Spinner (Maygay)
 m1spid                          // Spiderman (Maygay)
 m1spida                         //
 m1spidb                         //
+m1sprint                        //
 m1sprnov                        // Super Nova (Maygay)
 m1sptlgt                        // Spotlight (Maygay)
 m1sptlgta                       //
