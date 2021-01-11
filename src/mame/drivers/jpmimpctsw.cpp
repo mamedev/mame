@@ -1170,6 +1170,21 @@ INPUT_PORTS_START( j6ra )
 	PORT_INCLUDE( j6_stake_25 )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6rh6 )
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( j6rhchil )
 	PORT_INCLUDE( jpmimpct_inputs )
 
@@ -10048,13 +10063,13 @@ GAMEL( 199?, j6redarwi,    j6redarw,   impact_nonvideo, j6redarw, jpmimpct_state
 GAMEL( 199?, j6redarwj,    j6redarw,   impact_nonvideo, j6redarw, jpmimpct_state, empty_init, ROT0, "JPM", "Red Arrow (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6redarwf )
 GAMEL( 199?, j6redarww,    j6redarw,   impact_nonvideo, j6redarw, jpmimpct_state, empty_init, ROT0, "Whitbread / JPM", "Red Arrow (Whitbread / JPM) (IMPACT)", GAME_FLAGS, layout_j6redarwf )
 
-// no valid setting, always 91 00?
-GAME( 2002, j6rh6,        0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 2002, j6rh6a,       j6rh6,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 2002, j6rh6b,       j6rh6,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 2002, j6rh6c,       j6rh6,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 2002, j6rh6d,       j6rh6,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 2002, j6rh6e,       j6rh6,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+// parent still always gives 91 00? (invalid mode) others boot with the first 3 DSWs turned on
+GAME( 2002, j6rh6,        0,          impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2002, j6rh6a,       j6rh6,      impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2002, j6rh6b,       j6rh6,      impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 2002, j6rh6c,       j6rh6,      impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 2002, j6rh6d,       j6rh6,      impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 2002, j6rh6e,       j6rh6,      impact_nonvideo, j6rh6, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot 6 (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 
 GAMEL( 199?, j6rhchil,     0,          impact_nonvideo, j6rhchil, jpmimpct_state, empty_init, ROT0, "Ace", "Red Hot Chili Stepper (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rhchil )
 GAMEL( 199?, j6rhchila,    j6rhchil,   impact_nonvideo, j6rhchil, jpmimpct_state, empty_init, ROT0, "Ace", "Red Hot Chili Stepper (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rhchil )
