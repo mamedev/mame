@@ -42,7 +42,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_video_state::scanline_update)
 	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t const pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = m_palette->pen(pixels & 0xff);
-		dest[x + 1] = m_palette->pen(pixels >> 8);
+		dest[x + 0] = m_ramdac->palette_lookup(pixels & 0xff);
+		dest[x + 1] = m_ramdac->palette_lookup(pixels >> 8);
 	}
 }

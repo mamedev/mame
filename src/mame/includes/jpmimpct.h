@@ -10,7 +10,7 @@
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
-#include "video/ramdac.h"
+#include "video/bt47x.h"
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "sound/upd7759.h"
@@ -156,7 +156,6 @@ public:
 	jpmimpct_video_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jpmimpct_state(mconfig, type, tag)
 		, m_dsp(*this, "dsp")
-		, m_palette(*this, "palette")
 		, m_vram(*this, "vram")
 		, m_ramdac(*this, "ramdac")
 	{
@@ -178,7 +177,6 @@ protected:
 	void duart_2_hack_w(uint16_t data);
 
 	void tms_program_map(address_map &map);
-	void ramdac_map(address_map& map);
 
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
@@ -193,7 +191,6 @@ protected:
 	virtual void update_irqs() override;
 private:
 	optional_device<tms34010_device> m_dsp;
-	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_vram;
-	required_device<ramdac_device> m_ramdac;
+	required_device<bt477_device> m_ramdac;
 };
