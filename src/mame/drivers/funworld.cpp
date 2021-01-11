@@ -4491,6 +4491,9 @@ ROM_START( jolycdcy )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "peel18cv8.bin", 0x0000, 0x0155, CRC(fc51ef45) SHA1(a06916ccb65d7d3b9fd03f5de042c848d13478bb) )
 ROM_END
 
 
