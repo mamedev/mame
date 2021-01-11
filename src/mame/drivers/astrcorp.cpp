@@ -34,8 +34,6 @@ TODO:
 
 - Find source of level 2 interrupt
 - Decrypt newer games
-- understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...).
-  Also, weirdly enough, there's an unused 6x PAL XTAL according to notes, but VSync = 58,85 Hz?
 
 *************************************************************************************************************/
 
@@ -592,6 +590,10 @@ void astrocorp_state::skilldrp(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	/* video hardware */
+	/*
+		understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...).
+		Also, weirdly enough, there's an unused 6x PAL XTAL according to notes, but VSync = 58,85 Hz?
+	*/
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58.846);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
