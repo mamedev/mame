@@ -2543,8 +2543,7 @@ Newer releases don't follow this numbering scheme anymore.
 			<feature name="slot" value="o2_rom" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
-				<!-- baddump: modified rom, includes bugfix patch -->
-				<rom name="o3_45.bin" size="0x2000" crc="5bbb30c8" sha1="29d999b9e7c59d16e5e68d833f28dbc86f062d1f" status="baddump" />
+				<rom name="o3_45.bin" size="0x2000" crc="5987097e" sha1="654bd7460bc31f48f9c29c21d3e10fcb86b8db61" />
 			</dataarea>
 		</part>
 	</software>
