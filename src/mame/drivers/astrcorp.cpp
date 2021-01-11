@@ -114,20 +114,19 @@ private:
 
 	// video-related
 	bitmap_ind16 m_bitmap;
-	uint16_t     m_screen_enable;
+	uint8_t      m_screen_enable;
 	uint16_t     m_draw_sprites;
 
 	output_finder<7> m_lamps;
 
-	void astrocorp_draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void astrocorp_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_w(uint8_t data);
 	void showhand_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void skilldrp_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void astrocorp_screen_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t astrocorp_unk_r();
-	void astrocorp_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void skilldrp_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_enable_w(uint8_t data);
+	uint16_t unk_r();
+	void oki_bank_w(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -219,7 +218,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-uint32_t astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t astrocorp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_screen_enable & 1)
 		copybitmap(bitmap, m_bitmap, 0,0,0,0, cliprect);
@@ -234,7 +233,7 @@ uint32_t astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_
                                 Memory Maps
 ***************************************************************************/
 
-void astrocorp_state::astrocorp_draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_draw_sprites;
 	uint16_t now = COMBINE_DATA(&m_draw_sprites);
@@ -243,30 +242,15 @@ void astrocorp_state::astrocorp_draw_sprites_w(offs_t offset, uint16_t data, uin
 		draw_sprites(m_bitmap, m_screen->visible_area());
 }
 
-void astrocorp_state::astrocorp_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::eeprom_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		ioport("EEPROMOUT")->write(data, 0xff);
-	}
+	ioport("EEPROMOUT")->write(data, 0xff);
 }
 
-void astrocorp_state::astrocorp_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::oki_bank_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_oki->set_rom_bank((data >> 8) & 1);
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", m_maincpu->pc(), data);
-	}
-}
-
-void astrocorp_state::skilldrp_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki->set_rom_bank(data & 1);
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", m_maincpu->pc(), data);
-	}
+	m_oki->set_rom_bank(data & 1);
+//  logerror("CPU #0 PC %06X: OKI bank %02X\n", m_maincpu->pc(), data);
 }
 
 void astrocorp_state::showhand_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -331,15 +315,15 @@ void astrocorp_state::skilldrp_outputs_w(offs_t offset, uint16_t data, uint16_t 
 //  popmessage("%04X",data);
 }
 
-void astrocorp_state::astrocorp_screen_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::screen_enable_w(uint8_t data)
 {
-	COMBINE_DATA(&m_screen_enable);
-//  popmessage("%04X",data);
+	m_screen_enable = data;
+//  popmessage("%02X",data);
 	if (m_screen_enable & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n", m_maincpu->pc(), m_screen_enable);
+		logerror("CPU #0 PC %06X: screen enable = %02X\n", m_maincpu->pc(), m_screen_enable);
 }
 
-uint16_t astrocorp_state::astrocorp_unk_r()
+uint16_t astrocorp_state::unk_r()
 {
 	return 0xffff;  // bit 3?
 }
@@ -349,16 +333,16 @@ void astrocorp_state::showhand_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x050000, 0x050fff).ram().share("spriteram");
-	map(0x052000, 0x052001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x052000, 0x052001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x054000, 0x054001).portr("INPUTS");
-	map(0x058000, 0x058001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x058001, 0x058001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x05a000, 0x05a001).w(FUNC(astrocorp_state::showhand_outputs_w));
 	map(0x05e000, 0x05e001).portr("EEPROMIN");
 	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x070000, 0x073fff).ram().share("nvram"); // battery
-	map(0x080000, 0x080001).w(FUNC(astrocorp_state::astrocorp_sound_bank_w));
-	map(0x0a0000, 0x0a0001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x0d0000, 0x0d0001).r(FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x080000, 0x080000).w(FUNC(astrocorp_state::oki_bank_w));
+	map(0x0a0001, 0x0a0001).w(FUNC(astrocorp_state::screen_enable_w));
+	map(0x0d0000, 0x0d0001).r(FUNC(astrocorp_state::unk_r));
 	map(0x0d0000, 0x0d0000).w(m_oki, FUNC(okim6295_device::write));
 }
 
@@ -366,48 +350,50 @@ void astrocorp_state::showhanc_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x070000, 0x070001).w(FUNC(astrocorp_state::astrocorp_sound_bank_w));
+	map(0x070000, 0x070000).w(FUNC(astrocorp_state::oki_bank_w));
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x082000, 0x082001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x082000, 0x082001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x084000, 0x084001).portr("INPUTS");
-	map(0x088000, 0x088001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x088001, 0x088001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x08a000, 0x08a001).w(FUNC(astrocorp_state::showhand_outputs_w));
 	map(0x08e000, 0x08e001).portr("EEPROMIN");
 	map(0x090000, 0x093fff).ram().share("nvram"); // battery
-	map(0x0a0000, 0x0a0001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x0e0000, 0x0e0001).r(FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x0a0001, 0x0a0001).w(FUNC(astrocorp_state::screen_enable_w));
+	map(0x0e0000, 0x0e0001).r(FUNC(astrocorp_state::unk_r));
 	map(0x0e0000, 0x0e0000).w(m_oki, FUNC(okim6295_device::write));
 }
 
+// unknown read at 0x202000, 0x20a000, 0x400000
 void astrocorp_state::skilldrp_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x200fff).ram().share("spriteram");
-	map(0x202000, 0x202001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x202000, 0x202001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x204000, 0x204001).portr("INPUTS");
-	map(0x208000, 0x208001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x208001, 0x208001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x20a000, 0x20a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x20e000, 0x20e001).portr("EEPROMIN");
 	map(0x380000, 0x3801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x400001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x400001, 0x400001).w(FUNC(astrocorp_state::screen_enable_w));
 	map(0x500000, 0x507fff).ram().share("nvram"); // battery
-	map(0x580000, 0x580001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x580001, 0x580001).w(FUNC(astrocorp_state::oki_bank_w));
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
+// unknown read at 0x500000
 void astrocorp_state::speeddrp_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x280000, 0x283fff).ram().share("nvram"); // battery
 	map(0x380000, 0x380fff).ram().share("spriteram");
-	map(0x382000, 0x382001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x382000, 0x382001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x384000, 0x384001).portr("INPUTS");
-	map(0x388000, 0x388001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x388001, 0x388001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x38a000, 0x38a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x38e000, 0x38e001).portr("EEPROMIN");
 	map(0x480000, 0x4801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x500001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	map(0x580000, 0x580001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x500001, 0x500001).w(FUNC(astrocorp_state::screen_enable_w));
+	map(0x580001, 0x580001).w(FUNC(astrocorp_state::oki_bank_w));
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -416,16 +402,16 @@ void astrocorp_state::magibomb_map(address_map &map) // TODO: check everything, 
 	map(0x000000, 0x01ffff).rom();
 	map(0x050000, 0x053fff).ram().share("nvram"); // battery
 	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x062000, 0x062001).w(FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x062000, 0x062001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x064000, 0x064001).portr("INPUTS");
-	map(0x068000, 0x068001).w(FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x06e000, 0x06e001).portr("EEPROMIN");
 	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	// tbd
-	//map(0xX00000, 0xX00001).w(FUNC(astrocorp_state::astrocorp_screen_enable_w));
-	//map(0xX80000, 0xX80001).w(FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	//map(0xX00001, 0xX00001).w(FUNC(astrocorp_state::screen_enable_w));
+	//map(0xX80001, 0xX80001).w(FUNC(astrocorp_state::oki_bank_w));
 	//map(0xX00001, 0xX00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -442,7 +428,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON3   )   PORT_NAME("Look / Small")
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )   // settings
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM   )   // coin sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM    )   // coin sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON4   )   PORT_NAME("Hold1")  // HOLD1 in test mode
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1   )   PORT_NAME("Select")
@@ -450,7 +436,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   // key in
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM   )   // coin sensor
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM    )   // coin sensor
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -459,7 +445,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( showhanc )
@@ -477,7 +463,7 @@ static INPUT_PORTS_START( showhanc )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4   )   PORT_NAME("Hold2")  // HOLD2 in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")  // HOLD4 in test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM   )   // must be 0 for inputs to work
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM    )   // must be 0 for inputs to work
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   PORT_IMPULSE(1) // key in (shows an error)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
@@ -488,7 +474,7 @@ static INPUT_PORTS_START( showhanc )
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skilldrp )
@@ -498,16 +484,16 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_GAMBLE_TAKE   )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START3        )   PORT_NAME("Select / Double")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START1        )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER         )   PORT_CODE(KEYCODE_T) PORT_NAME("Ticket Out")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )   PORT_NAME("Bet")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // ticket sw
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // ticket sw
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sw
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sw
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "EEPROMIN" )
@@ -517,26 +503,15 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 /***************************************************************************
                                 Graphics Layout
 ***************************************************************************/
 
-static const gfx_layout layout_16x16x8 =
-{
-	16, 16,
-	RGN_FRAC(1, 1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,16*8) },
-	16*16*8
-};
-
 static GFXDECODE_START( gfx_astrocorp )
-	GFXDECODE_ENTRY("sprites", 0, layout_16x16x8, 0, 1)
+	GFXDECODE_ENTRY("sprites", 0, gfx_16x16x8_raw, 0, 1)
 GFXDECODE_END
 
 
@@ -552,7 +527,7 @@ void astrocorp_state::machine_start()
 	m_lamps.resolve();
 }
 
-
+#if 0
 /*
 TODO: understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...). Also, weirdly enough, there's an unused
 6x PAL XTAL according to notes, but VSync = 58,85 Hz?
@@ -564,6 +539,7 @@ TODO: understand if later hardware uses different parameters (XTAL is almost sur
 #define ASTROCORP_VTOTAL 261
 #define ASTROCORP_VBEND 0
 #define ASTROCORP_VBSTART 240
+#endif
 
 void astrocorp_state::showhand(machine_config &config)
 {
@@ -582,8 +558,8 @@ void astrocorp_state::showhand(machine_config &config)
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 //  m_screen->set_size(320, 240);
 //  m_screen->set_visarea_full();
-	m_screen->set_raw(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,320,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART);
-	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update_astrocorp));
+	m_screen->set_raw(XTAL(26'601'712) / 4, 433, 0, 320, 261, 0, 240); // ~15.354KHz Hsync, ~58.846Hz Vsync
+	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
@@ -633,8 +609,8 @@ void astrocorp_state::skilldrp(machine_config &config)
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 //  m_screen->set_size(0x200, 0x100);
 //  m_screen->set_visarea(0, 0x200-1, 0, 0xf0-1);
-	m_screen->set_raw(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,512,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART);
-	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update_astrocorp));
+	m_screen->set_raw(XTAL(24'000'000) / 2, 781, 0, 512, 261, 0, 240); // similar refresh rate as 320x240 resolution hardware?
+	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
