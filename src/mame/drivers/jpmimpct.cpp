@@ -1674,17 +1674,20 @@ ROM_START( coronatnd )
 	ROM_LOAD( "cs-sound.bin", 0x000000, 0x80000, CRC(96ea4e9f) SHA1(a5443d893f38f3e279f2eb9f4500547e7b8efa37) )
 ROM_END
 
-ROM_START( tqst ) // this looks like a video game.. but probably incomplete
+ROM_START( tqst )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prom1n.bin",0x000000, 0x080000, CRC(a9cacb88) SHA1(2cc565e8083926acab8c8b14ad90bd50f7597038) )
 	ROM_LOAD16_BYTE( "prom2.bin", 0x000001, 0x080000, CRC(a665e72e) SHA1(76440ae69f61eac1c6fe59dae295826a145bc940) )
-	ROM_LOAD16_BYTE( "u16.bin",   0x100000, 0x080000, CRC(ae9b6829) SHA1(2c8ed5060d751bca0af54305164512fae8ff88e9) )
-	ROM_LOAD16_BYTE( "u17.bin",   0x100001, 0x080000, CRC(7786340d) SHA1(96ded0af403fa3f0e7604f9ae0952036b3652665) )
 
 	ROM_REGION( 0x1000000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "prom1p.bin", 0x0000, 0x080000, CRC(c13b499b) SHA1(e8389568e5bec6462e02b69949691b14e29d7d8e) )
 
 	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	/* 0x000000 - 0x0fffff empty, or missing? */
+	ROM_LOAD16_BYTE( "u16.bin",   0x100000, 0x080000, CRC(ae9b6829) SHA1(2c8ed5060d751bca0af54305164512fae8ff88e9) )
+	ROM_RELOAD(0x000000, 0x080000)
+	ROM_LOAD16_BYTE( "u17.bin",   0x100001, 0x080000, CRC(7786340d) SHA1(96ded0af403fa3f0e7604f9ae0952036b3652665) )
+	ROM_RELOAD(0x000001, 0x080000)
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "025rs1-0.bin", 0x0000, 0x080000, CRC(c4dbff24) SHA1(2e4d1d1905b9cd8254989d1653beb6756664839e) )
@@ -1772,7 +1775,7 @@ GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, e
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 
 // sets below are incomplete, missing video ROMs etc.
-GAME( 199?, tqst,      0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, tqst,      0,        impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // possibly complete
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
 GAME( 199?, jpmreno ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
 GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
