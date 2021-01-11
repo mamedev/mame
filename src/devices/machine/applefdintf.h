@@ -76,7 +76,7 @@ public:
 	//   3.5
 	static void floppies_35(device_slot_interface &device);
 	template<typename T> static void add_35(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35", formats_35);
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35);
 	}
 	template<typename T> static void add_35_nc(machine_config &config, T &floppy) {
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, "", formats_35);

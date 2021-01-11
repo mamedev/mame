@@ -68,12 +68,9 @@ void swim2_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy == floppy)
 		return;
 
-	if(m_floppy)
-		m_floppy->mon_w(true);
 	m_floppy = floppy;
-	if(m_mode & 0x80)
-		m_floppy->mon_w(false);
 	update_phases();
+	m_hdsel_cb((m_mode >> 5) & 1);
 }
 
 floppy_image_device *swim2_device::get_floppy() const
@@ -107,14 +104,13 @@ void swim2_device::flush_write(u64 when)
 
 void swim2_device::show_mode() const
 {
-	logerror("mode%s %s hdsel=%c %c%s %c%c%s\n",
+	logerror("mode%s hdsel=%c %c%s %c%c%s\n",
 			 m_mode & 0x80 ? " motoron" : "",
-			 m_mode & 0x40 ? "ism" : "iwm",
 			 m_mode & 0x20 ? '1' : '0',
 			 m_mode & 0x10 ? 'w' : 'r',
 			 m_mode & 0x08 ? " action" : "",
-			 m_mode & 0x04 ? 'a' : '-',
-			 m_mode & 0x02 ? 'b' : '-',
+			 m_mode & 0x04 ? 'b' : '-',
+			 m_mode & 0x02 ? 'a' : '-',
 			 m_mode & 0x01 ? " clear" : "");
 
 }
@@ -246,7 +242,7 @@ void swim2_device::write(offs_t offset, u8 data)
 
 	case 5: // setup
 		m_setup = data;
-		m_sel35_cb(m_setup & 0x02);
+		m_sel35_cb((m_setup >> 1) & 1);
 		logerror("setup write=%s %s test=%s %s %s 3.5=%s %s\n",
 				 m_setup & 0x40 ? "gcr" : "mfm",
 				 m_setup & 0x20 ? "ibm" : "apple",
@@ -276,6 +272,11 @@ void swim2_device::write(offs_t offset, u8 data)
 
 	if(m_mode & 0x01)
 		fifo_clear();
+
+	if((m_mode ^ prev_mode) & 0x06)
+		m_devsel_cb(m_mode & 0x80 ? (m_mode >> 1) & 3 : 0);
+	if((m_mode ^ prev_mode) & 0x20)
+		m_hdsel_cb((m_mode >> 5) & 1);
 
 	if((m_mode & 0x18) == 0x18 && ((prev_mode & 0x18) != 0x18)) {
 		// Entering write mode
@@ -353,7 +354,7 @@ void swim2_device::sync()
 	// We count in half-cycles but only toggle write on full cycles
 
 	u32 cycles = (next_sync - m_last_sync) << 1;
-	//	logerror("ACTIVE %s %d-%d (%d)\n", m_mode & 0x10 ? "write" : "read", m_last_sync, next_sync, cycles);
+	logerror("ACTIVE %s %d-%d (%d)\n", m_mode & 0x10 ? "write" : "read", m_last_sync, next_sync, cycles);
 
 	while(cycles) {
 		//		logerror("half cycles avail %d needed %d\n", cycles, m_half_cycles_before_change);

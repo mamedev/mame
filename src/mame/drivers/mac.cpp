@@ -751,8 +751,10 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 		break;
 	}
 
-	m_fdc->phases_cb().set([this](u8 data) { logerror("fdc phases = %x\n", data);});
-	m_fdc->sel35_cb().set([this](int data) { logerror("fdc sel35 = %d\n", data);});
+	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
+	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+	m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
 
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
