@@ -61,11 +61,11 @@ private:
 	output_finder<3> m_leds;
 
 	emu_timer * m_mouse_timer;
-	int         m_mouse_phase;
-	int         m_mouse_xdir;
-	int         m_mouse_xref;
-	int         m_mouse_ydir;
-	int         m_mouse_yref;
+	uint8_t     m_mouse_phase;
+	uint8_t     m_mouse_xdir;
+	uint8_t     m_mouse_xref;
+	uint8_t     m_mouse_ydir;
+	uint8_t     m_mouse_yref;
 	int16_t     m_mouse_x;
 	int16_t     m_mouse_y;
 	uint8_t     m_mux;
