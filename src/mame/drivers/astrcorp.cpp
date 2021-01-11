@@ -30,10 +30,12 @@ Year + Game          PCB ID         CPU                Video           Chips    
 07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07       ASTRO F01 2007-06-03                    Encrypted
 -----------------------------------------------------------------------------------------------------------------------
 
-To do:
+TODO:
 
 - Find source of level 2 interrupt
 - Decrypt newer games
+- understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...).
+  Also, weirdly enough, there's an unused 6x PAL XTAL according to notes, but VSync = 58,85 Hz?
 
 *************************************************************************************************************/
 
@@ -526,20 +528,6 @@ void astrocorp_state::machine_start()
 {
 	m_lamps.resolve();
 }
-
-#if 0
-/*
-TODO: understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...). Also, weirdly enough, there's an unused
-6x PAL XTAL according to notes, but VSync = 58,85 Hz?
-*/
-#define ASTROCORP_PIXEL_CLOCK XTAL(20'000'000)/2
-#define ASTROCORP_HTOTAL 651
-#define ASTROCORP_HBEND 0
-//#define ASTROCORP_HBSTART 320
-#define ASTROCORP_VTOTAL 261
-#define ASTROCORP_VBEND 0
-#define ASTROCORP_VBSTART 240
-#endif
 
 void astrocorp_state::showhand(machine_config &config)
 {
