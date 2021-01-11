@@ -1178,7 +1178,7 @@ mks50                           //
 
 @source:alphasma.cpp
 asma2k                          // (c) 1997 Intelligent Peripheral Devices
-asmapro                         // (c) 1995 Intelligent Peripheral Devices 
+asmapro                         // (c) 1995 Intelligent Peripheral Devices
 
 @source:alphasma3k.cpp
 asma3k                          // (c) 2000 AlphaSmart, Inc.
@@ -19123,12 +19123,13 @@ konin                           //
 buttobi
 ddboy
 ddboya
-shuriboy
 fuusenpn
-tsukande
 mariorou
-tsupenta
+shuriboy
 slimekun
+tsukande
+tsupenta
+tsururin
 
 @source:konmedal68k.cpp
 dobouchn
