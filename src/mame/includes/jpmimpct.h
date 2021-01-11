@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "sound/upd7759.h"
+#include "machine/bacta_datalogger.h"
 #include "emupal.h"
 
 class jpmimpct_state : public driver_device
@@ -23,6 +24,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_meters(*this, "meters")
+		, m_datalogger(*this, "datalogger")
 		, m_digits(*this, "digit%u", 0U)
 		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_ppi(*this, "ppi8255")
@@ -40,6 +42,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<meters_device> m_meters;
+	required_device<bacta_datalogger_device> m_datalogger;
 	output_finder<300> m_digits;
 	optional_device<timer_device> m_duart_1_timer;
 
