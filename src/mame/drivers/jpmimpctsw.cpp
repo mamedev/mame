@@ -1385,6 +1385,45 @@ INPUT_PORTS_START( j6shoot )
 	PORT_INCLUDE( j6_stake_25 )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6bucks )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6scarlt )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6cshrd )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_25 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rh6cl )
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 ROM_START( j6fifth )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -9682,18 +9721,15 @@ GAMEL( 199?, j6cold,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state
 GAMEL( 199?, j6cole,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colf,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6colcsh )
 
-// no obvious config to boot, always ERROR 91 00, invalid mode
-GAME(  199?, j6bucks,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Bucks Fizz (Ace) (IMPACT)", GAME_FLAGS )
+GAME(  199?, j6bucks,      0,          impact_nonvideo, j6bucks, jpmimpct_state, empty_init, ROT0, "Ace", "Bucks Fizz (Ace) (IMPACT)", GAME_FLAGS )
 
-// no obvious config to boot, always ERROR 91 00, invalid mode
-GAME(  199?, j6scarlt,     0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Captain Scarlet (Ace) (IMPACT)", GAME_FLAGS )
+GAME(  199?, j6scarlt,     0,          impact_nonvideo, j6scarlt, jpmimpct_state, empty_init, ROT0, "Ace", "Captain Scarlet (Ace) (IMPACT)", GAME_FLAGS )
 
-// no obvious config to boot, always ERROR 91 00, invalid mode
-GAME(  199?, j6cshrd,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6cshrda,     j6cshrd,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6cshrdb,     j6cshrd,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6cshrdc,     j6cshrd,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6cshrdd,     j6cshrd,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6cshrd,      0,          impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6cshrda,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6cshrdb,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6cshrdc,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6cshrdd,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
 GAME(  199?, j6cshtwr,     0,          impact_nonvideo, j6cshtwr, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Towers (JPM) (IMPACT)", GAME_FLAGS )
 
@@ -10026,12 +10062,11 @@ GAMEL( 199?, j6rhchilb,    j6rhchil,   impact_nonvideo, j6rhchil, jpmimpct_state
 GAMEL( 199?, j6rhchilc,    j6rhchil,   impact_nonvideo, j6rhchil, jpmimpct_state, empty_init, ROT0, "Ace", "Red Hot Chili Stepper (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rhchil )
 GAMEL( 199?, j6rhchild,    j6rhchil,   impact_nonvideo, j6rhchil, jpmimpct_state, empty_init, ROT0, "Ace", "Red Hot Chili Stepper (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rhchil )
 
-// no valid setting, always 91 00?
-GAMEL( 199?, j6rh6cl,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rh6cld )
-GAMEL( 199?, j6rh6cla,     j6rh6cl,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rh6cld )
-GAMEL( 199?, j6rh6clb,     j6rh6cl,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rh6cld )
-GAMEL( 199?, j6rh6clc,     j6rh6cl,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rh6cld )
-GAMEL( 199?, j6rh6cld,     j6rh6cl,    impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rh6cld )
+GAMEL( 199?, j6rh6cl,      0,          impact_nonvideo, j6rh6cl, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rh6cld )
+GAMEL( 199?, j6rh6cla,     j6rh6cl,    impact_nonvideo, j6rh6cl, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rh6cld )
+GAMEL( 199?, j6rh6clb,     j6rh6cl,    impact_nonvideo, j6rh6cl, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rh6cld )
+GAMEL( 199?, j6rh6clc,     j6rh6cl,    impact_nonvideo, j6rh6cl, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rh6cld )
+GAMEL( 199?, j6rh6cld,     j6rh6cl,    impact_nonvideo, j6rh6cl, jpmimpct_state, empty_init, ROT0, "JPM", "Red Hot Six Club (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rh6cld )
 
 GAME(  199?, j6reelth,     0,          impact_nonvideo, j6reelth, jpmimpct_state, empty_init, ROT0, "Ace", "Reel Thing (Ace) (IMPACT) set 1)", GAME_FLAGS )
 GAME(  199?, j6reeltha,    j6reelth,   impact_nonvideo, j6reelth, jpmimpct_state, empty_init, ROT0, "Ace", "Reel Thing (Ace) (IMPACT) set 2)", GAME_FLAGS )
