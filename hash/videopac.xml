@@ -5,7 +5,7 @@ license:CC0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
 This list does not include ROM hacks, but those can still be loaded with -cart.
-WIP beta homebrews are also not included.
+Emulator-only or WIP beta homebrews are also not included.
 
 TODO:
 - add first release date were applicable
@@ -18,8 +18,7 @@ TODO:
 - add serials for radiola and jopacs
 
 Undumped (or dumped but not public):
-- Spaans          (spanish to dutch translator)
-- Crazy Horses
+- G7400 service test cartridge
 - misc. homebrew cartridges
 
 Protos:
@@ -27,12 +26,14 @@ Protos:
 - Catburglar      youtube.com/watch?v=DDsWDFxy0oE
 - Himalaya        youtube.com/watch?v=L_lvOs6EnA4
 - Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+- Spaans (spanish to dutch translator)
+- Melrep
+- Crazy Horses
 
 http://www.ozyr.com/rene/PICS/protos.jpg
 - Back Gammon
 - Freedom Fighters
 - K.C.'s Crazy Chase
-- Handicap I (?)
 - Frogger
 - Robot City
 - Requins (Shark Hunter?)
@@ -59,28 +60,27 @@ http://www.ozyr.com/rene/PICS/protos.jpg
 http://www.ozyr.com/rene/PICS/odyssey3_set.jpg
 There is an Odyssey³ Command Center Voice Module, could be differences to released Odyssey² version.
 
-Europe:
-- Melrep
-- G7400 service test cartridge
-
 Do Videopac+/Odyssey3 versions exist?:
 - Syracuse (France)
 - Robot City (USA)
 - Interpol (USA)
 
-Several of the prototype games were also sold as bootleg repro carts, they're assumed to have
+Several of the prototype games were also sold as bootleg* repro carts, they're assumed to have
 the same ROM contents as the original prototypes.
+*: Actually, a few of them sought and received permission to sell from the original programmer.
 
 Bootleg multigame carts:
 - 59-in-1, 72-in-1, 128-in-1, 233-in-1 (John Dondzila)
 - C7050, C7051, C7060, C7061 (René van den Enden)
 
-These romhacks would be viable for inclusion since they were exclusively sold as repro cartridges:
-- Western+: adds + graphics to gunfight
-- Munchkin+: adds + graphics to munchkin
-- Space Monster+: adds + graphics to spacemon
+These romhacks are viable for inclusion since they were initially sold as repro cartridges:
+- Baseball+ (PAL conversion of O3 game)
+- Flash Point (PAL conversion of O3 game)
 - Killer Bees+: adds + graphics to bees as shown in Odyssey3 advertisements
   (the actual O3 prototype has same + graphics as the VP+ version)
+- Munchkin+: adds + graphics to munchkin
+- Space Monster+: adds + graphics to spacemon
+- Western+: adds + graphics to gunfight
 
 René made many more romhacks (bugfixes, PAL/NTSC conversions) released for free online, see:
 https://home.kpn.nl/rene_g7400/my_collection.html (under "MODIFIED GAMES")
@@ -164,6 +164,10 @@ C7420‡:homecomp - Home Computer Module
 Official VP+ upgaded versions (simply adds a background picture):
 3rcsocptpl, cosmicpl, stonepl, satellitpl, freedompl, pickaxepl
 
+Numbers 61-71 are repro* cartridges sold by various homebrew publishers, not official Philips serials.
+*: excluding #66 which is an original homebrew game
+Newer releases don't follow this numbering scheme anymore.
+
 -->
 
 <softwarelist name="videopac" description="Philips Videopac / Odyssey 2 cartridges">
@@ -198,7 +202,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="linguaduc"><!-- not a consumer product, communication aid for the handicapped -->
+	<software name="linguaduc">
+		<!-- not a consumer product, communication aid for the handicapped -->
 		<description>Linguaduc (Europe, prototype)</description>
 		<year>198?</year>
 		<publisher>Carba</publisher>
@@ -249,7 +254,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="soundtool"><!-- not a consumer product, developer sound tool -->
+	<software name="soundtool">
+		<!-- not a consumer product, developer sound tool -->
 		<description>Sound Tool (Europe)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -261,7 +267,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="testcart"><!-- not a consumer product, factory test rom -->
+	<software name="testcart">
+		<!-- not a consumer product, factory test rom -->
 		<description>Service Test Cartridge (Europe)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -576,7 +583,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="battle" cloneof="airbattl">
+	<software name="barao" cloneof="airbattl">
 		<description>Barão Vermelho! (Brazil)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -588,26 +595,26 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="baron" cloneof="airbattl">
-		<description>Red Baron (Europe, prototype, set 1)</description>
+	<software name="airbattlp" cloneof="airbattl">
+		<description>Air Battle (Europe, prototype, set 1)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="pr_red-baron.bin" size="0x2000" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" />
+				<rom name="pr_airbattle.bin" size="0x2000" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="barona" cloneof="airbattl">
-		<description>Red Baron (Europe, prototype, set 2)</description>
+	<software name="airbattlpa" cloneof="airbattl">
+		<description>Air Battle (Europe, prototype, set 2)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="pr_red-baron_alt.bin" size="0x2000" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" />
+				<rom name="pr_airbattle_alt.bin" size="0x2000" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,7 +844,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="conquest"><!-- board game -->
+	<software name="conquest">
+		<!-- board game -->
 		<description>Conquest of the World (Europe, US)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
@@ -1289,7 +1297,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="o2_47_pr.bin" size="0x1000" crc="f308018d" sha1="15880a92e42258776801fdae4239f3e529662913" />
+				<rom name="pr_killerbees.bin" size="0x1000" crc="f308018d" sha1="15880a92e42258776801fdae4239f3e529662913" />
 			</dataarea>
 		</part>
 	</software>
@@ -1302,7 +1310,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
-				<rom name="o2_47_pr_alt.bin" size="0x1000" crc="9bec21c2" sha1="5f38cdc587091cb149364d20d508e800c860d82d" />
+				<rom name="pr_killerbees_alt.bin" size="0x1000" crc="9bec21c2" sha1="5f38cdc587091cb149364d20d508e800c860d82d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1372,10 +1380,11 @@ Official VP+ upgaded versions (simply adds a background picture):
 	</software>
 
 	<software name="martian">
+		<!-- first prototype found was named "Jake" -->
 		<description>Martian Threat (Europe, prototype, set 1)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jake Dowding?" /><!-- first prototype found was named "Jake" -->
+		<info name="programmer" value="Jake Dowding?" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -1398,7 +1407,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 	</software>
 
 	<software name="2missprg">
-		<description>Missão Impossível/Viagem Programada (Brazil)</description><!-- limited release -->
+		<!-- limited release -->
+		<description>Missão Impossível/Viagem Programada (Brazil)</description>
 		<year>198?</year>
 		<publisher>Ectron Eletrônica Ltda.</publisher>
 		<info name="usage" value="Press 1 for Missão Impossível, press 2 for Viagem Programada" />
@@ -1521,8 +1531,9 @@ Official VP+ upgaded versions (simply adds a background picture):
 	</software>
 
 	<software name="pinball">
+		<!-- re-released at Classic Games Expo (2004 in Philadelphia) with Ralph Baer's autograph (as he was the designer) -->
 		<description>Pinball! (US, prototype)</description>
-		<year>1979</year><!-- re-released at Classic Games Expo (2004 in Philadelphia) with Ralph Baer's autograph (as he was the designer)  -->
+		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Don McGuiness" />
 		<part name="cart" interface="odyssey_cart">
@@ -1929,7 +1940,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="sherlock"><!-- board game -->
+	<software name="sherlock">
+		<!-- board game (game rules are a mystery) -->
 		<description>The Adventures of Sherlock Holmes (US, prototype)</description>
 		<year>198?</year>
 		<publisher>Magnavox</publisher>
@@ -1991,7 +2003,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="quest"><!-- board game -->
+	<software name="quest">
+		<!-- board game -->
 		<description>The Quest for the Rings (Europe, US)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
@@ -2005,7 +2018,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="laquete" cloneof="quest"><!-- board game -->
+	<software name="laquete" cloneof="quest">
+		<!-- board game -->
 		<description>La Quête des Anneux (France)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
@@ -2459,7 +2473,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 	</software>
 
 	<software name="homecomp" supported="partial">
-		<description>Home Computer Module (Europe)</description><!-- aka Basic -->
+		<description>Home Computer Module (Europe)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="C7420" />
@@ -2732,6 +2746,26 @@ Official VP+ upgaded versions (simply adds a background picture):
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
 				<rom name="new_route66.bin" size="0x800" crc="abe9b016" sha1="21f0210ec8c25a37cc728aba195bad9cad904061" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- Hacks, not minor patches released for free online, but ones that were sold on cartridge -->
+
+	<software name="flashpp" cloneof="flashp">
+		<!-- Odyssey 3 prototype modified for PAL and some other changes, also sold by CCC as Videopac 63+ -->
+		<description>Flash Point (PAL conversion)</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="hack (René van den Enden)" />
+		<info name="serial" value="63" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pal_flashpoint.bin" size="0x2000" crc="06861a9c" sha1="6810ccc1508244216860271417a866618a731ae2" />
 			</dataarea>
 		</part>
 	</software>
