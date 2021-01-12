@@ -24,11 +24,6 @@
         * DUART emulation is very simplistic, in progress.
         * Digital volume control is not emulated.
 
-        * During the attract mode of Cluedo, just after the camera flash,
-        the camera colours go screwy and proceeding text is printed behind
-        the camera. Is it a TMS34010 emulation flaw or original game code bug?
-        For now, the MACHINE_IMPERFECT_GRAPHICS flag remains.
-
     Mechanical games note:
 
     Anything writing to 4800a0 within the first few instructions is guessed
