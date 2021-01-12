@@ -40,8 +40,7 @@ protected:
 	virtual uint8_t command_format_version() override;
 	virtual uint8_t jvs_standard_version() override;
 	virtual uint8_t comm_method_version() override;
-
-	virtual int device_handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer) override;
+	virtual int handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer) override;
 
 private:
 	enum {

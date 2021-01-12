@@ -200,7 +200,7 @@ bool k573mcr_device::memcard_write(uint32_t port_no, uint16_t block_addr, uint8_
 	return controller_port_send_byte(port_no, 0) == 'G';
 }
 
-int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)
+int k573mcr_device::handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)
 {
 	// Notes:
 	// 80678::E0:01:06:70:02:01:C0:00:3A: <- Command from game (E0:01:...)
@@ -226,7 +226,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 			// access to test such a thing.
 			// Reset immediately to hack around that error.
 			device_reset();
-			return -1;
+			break;
 
 		case 0x14:
 			// Function list returns nothing on
@@ -461,7 +461,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 	}
 
 	// Command not recognized, pass it off to the base message handler
-	return -1;
+	return jvs_device::handle_message(send_buffer, send_size, recv_buffer);
 }
 
 ROM_START( k573mcr )
