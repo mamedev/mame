@@ -25,6 +25,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_meters(*this, "meters")
 		, m_datalogger(*this, "datalogger")
+		, m_testdemo(*this, "TEST_DEMO")
 		, m_digits(*this, "digit%u", 0U)
 		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
@@ -42,6 +43,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<meters_device> m_meters;
 	required_device<bacta_datalogger_device> m_datalogger;
+	required_ioport m_testdemo;
 	output_finder<300> m_digits;
 
 	uint16_t jpmio_r();
@@ -57,7 +59,7 @@ protected:
 
 	void jpm_draw_lamps(int data, int lamp_strobe);
 
-	uint16_t duart_regd_input_port_hack_r(offs_t offset);
+	TIMER_DEVICE_CALLBACK_MEMBER(duart_set_ip5);
 
 	virtual void update_irqs();
 private:
@@ -118,14 +120,12 @@ public:
 	}
 
 	void impact_video(machine_config &config);
-	void impact_video_duarthack(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void impact_video_map(address_map &map);
-	void impact_video_map_duarthack(address_map &map);
 
 	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

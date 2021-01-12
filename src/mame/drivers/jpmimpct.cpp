@@ -201,12 +201,6 @@ void jpmimpct_state::machine_reset()
  *  TxDB/TxDB: Data retrieval unit
  */
 
-uint16_t jpmimpct_state::duart_regd_input_port_hack_r(offs_t offset)
-{
-	return ioport("TEST_DEMO")->read();
-}
-
-
 void jpmimpct_state::set_duart_1_hack_ip(bool state)
 {
 // TODO restore this with real duart
@@ -548,18 +542,12 @@ void jpmimpct_video_state::impact_video_map(address_map &map)
 	map(0x00c00000, 0x00ffffff).rom();
 }
 
-void jpmimpct_video_state::impact_video_map_duarthack(address_map &map)
-{
-	jpmimpct_video_state::impact_video_map(map);
-	map(0x0048001a, 0x0048001b).r(FUNC(jpmimpct_video_state::duart_regd_input_port_hack_r));
-}
-
 void jpmimpct_state::impact_non_video_map(address_map &map)
 {
 	common_map(map);
 
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
-
+	
 	// are these genuine reads, or just code going wrong prior to them happening?
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
@@ -1069,6 +1057,13 @@ uint16_t jpmimpct_state::ump_r()
 }
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_set_ip5)
+{
+	auto state = m_testdemo->read() ? 1 : 0;
+	m_duart->ip5_w(state);
+}
+
+
 
 /*************************************
  *
@@ -1093,7 +1088,8 @@ void jpmimpct_state::base(machine_config &config)
 	// not currently used, hack used instead
 	MC68681(config, m_duart, MC68681_1_CLOCK);
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::duart_irq_handler));
-	// needs hookup for TEST_DEMO and the jpmio_video_w meters related stuff
+
+	TIMER(config, "ip5wtimer").configure_periodic(FUNC(jpmimpct_state::duart_set_ip5), attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1167,13 +1163,6 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
 	BT477(config, m_ramdac, 40000000); // clock unknown
-}
-
-void jpmimpct_video_state::impact_video_duarthack(machine_config &config)
-{
-	impact_video(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::impact_video_map_duarthack);
 }
 
 /*************************************
@@ -1586,10 +1575,10 @@ ROM_END
  *************************************/
 
 // Touchscreen
-GAME( 1995, cluedo,    0,        impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,   cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c,  cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,   cluedo,   impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo,    0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c,  cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialp,  0,        impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpd, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpo, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
@@ -1603,7 +1592,7 @@ GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, e
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 
 // sets below are incomplete, missing video ROMs etc.
-GAME( 199?, tqst,      0,        impact_video_duarthack, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // possibly complete
+GAME( 199?, tqst,      0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // possibly complete
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
 GAME( 199?, jpmreno ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
 GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
