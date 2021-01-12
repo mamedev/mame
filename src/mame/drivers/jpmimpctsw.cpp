@@ -1439,6 +1439,23 @@ INPUT_PORTS_START( j6rh6cl )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6roller )
+	PORT_INCLUDE( j6nokey_withperc )
+
+	PORT_INCLUDE( j6_jackpot_8t_10 )
+
+	PORT_INCLUDE( j6_stake_5_10 )
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Collect?")
+
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
+INPUT_PORTS_END
+
 
 ROM_START( j6fifth )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -9530,23 +9547,23 @@ GAME(  199?, j6robina,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state,
 GAME(  199?, j6robinb,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6robinc,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
 
-GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 15)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 16)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6nokey_withperc, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 17)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 15)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 16)", GAME_FLAGS, layout_j6rollerd )
+GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 17)", GAME_FLAGS, layout_j6rollerd )
 
 GAME(  199?, j6rcclub,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6rccluba,    j6rcclub,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
