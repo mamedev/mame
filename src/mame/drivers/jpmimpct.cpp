@@ -938,6 +938,27 @@ static INPUT_PORTS_START( trivialp )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tqst )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("COINS") // TODO: check coinage
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("J10_0")
+	// TODO: is 0x01 used to anything (collect or similar?)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 / Blue") // also used to start a game
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button 4 / Red") // also used to start a game
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( scrabble )
 	PORT_INCLUDE( common )
 
@@ -1540,11 +1561,9 @@ ROM_START( tqst )
 	ROM_LOAD16_BYTE( "prom1p.bin", 0x0000, 0x080000, CRC(c13b499b) SHA1(e8389568e5bec6462e02b69949691b14e29d7d8e) )
 
 	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
-	/* 0x000000 - 0x0fffff empty, or missing? */
+	/* 0x000000 - 0x0fffff empty? */
 	ROM_LOAD16_BYTE( "u16.bin",   0x100000, 0x080000, CRC(ae9b6829) SHA1(2c8ed5060d751bca0af54305164512fae8ff88e9) )
-	ROM_RELOAD(0x000000, 0x080000)
 	ROM_LOAD16_BYTE( "u17.bin",   0x100001, 0x080000, CRC(7786340d) SHA1(96ded0af403fa3f0e7604f9ae0952036b3652665) )
-	ROM_RELOAD(0x000001, 0x080000)
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "025rs1-0.bin", 0x0000, 0x080000, CRC(c4dbff24) SHA1(2e4d1d1905b9cd8254989d1653beb6756664839e) )
@@ -1625,14 +1644,13 @@ GAME( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_st
 GAME( 1997, scrabble,  0,        impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scrabbled, scrabble, impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
 
-// probably Touchscreen, but it doesn't respond
-GAME( 199?, tqst,      0,        impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // probably complete
-
 // Non Touchscreen
 GAME( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+// This acts a bit like a touchscreen game, is there an unmapped Dipswitch to enable touch support, or a different software revision?
+GAME( 199?, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // probably complete
 
 // sets below are incomplete, missing video ROMs etc.
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
