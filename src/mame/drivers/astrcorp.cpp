@@ -612,7 +612,7 @@ void astrocorp_state::speeddrp(machine_config &config)
 void astrocorp_state::magibomb(machine_config &config)
 {
 	skilldrp(config);
-	M68000(config, m_maincpu, XTAL(80'000'000) / 5); // XTAL verified, TODO: unknown divider
+	m_maincpu->set_clock(XTAL(80'000'000) / 5); // XTAL verified, TODO: unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::magibomb_map);
 
 	// TODO: video timing uses also 80 MHz XTAL
