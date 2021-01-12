@@ -1832,7 +1832,7 @@ ROM_START( sc4hrolr ) // uses RTC on romcard
 	ROM_LOAD16_BYTE( "highroller13_lo.bin", 0x00001, 0x080000, CRC(b479cd74) SHA1(c41b156ef2fd46e8658d036ee4d8c4056d0061d2) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
-	ROM_LOAD( "b3a_highroller.bin", 0x0000, 0x080000, CRC(38ce5435) SHA1(e159420e7929fa048f3b2393f761eeed2e1cf3b7) )
+	ROM_LOAD( "b3a_highroller.bin", 0x0000, 0x100000, CRC(38ce5435) SHA1(e159420e7929fa048f3b2393f761eeed2e1cf3b7) )
 
     ROM_REGION( 0x100000, "gals", 0 )
 	ROM_LOAD( "75585129.ic1.bin", 0x0000, 0x000117, CRC(2454bb33) SHA1(610cde14caef3f2d02f0076b924e015077c3832b) ) /* protected gal16v8 on romcard */
