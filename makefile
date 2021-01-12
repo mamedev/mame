@@ -353,9 +353,9 @@ WINDRES  := $(MINGW32)/bin/windres
 endif
 else
 ifeq ($(ARCHITECTURE),_x64)
-WINDRES  := $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
+WINDRES  ?= $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
 else
-WINDRES  := $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
+WINDRES  ?= $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
 endif
 endif
 

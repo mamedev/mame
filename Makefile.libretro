@@ -57,18 +57,6 @@ endif
 
 ###########################################################################
 #
-#   LIBRETRO PLATFORM-SPECIFIC CONFIGURATION
-#
-#   Settings needed to get MAME to build everywhere we build it
-#
-###########################################################################
-
-ifeq (,$(findstring x86,$(LIBRETRO_CPU)))
-	FORCE_DRC_C_BACKEND = 1
-endif
-
-###########################################################################
-#
 #   BUILD FLAGS
 #
 ###########################################################################
@@ -93,7 +81,7 @@ endif
 
 PLATFLAGS =
 
-ifeq ($(platform),win)
+ifneq ($(findstring win,$(platform)),)
 	ifeq ($(MSYSTEM),MINGW64)
 		MINGW64 ?= /mingw64
 		PLATFLAGS += MINGW64="$(MINGW64)"
@@ -101,7 +89,15 @@ ifeq ($(platform),win)
 		MINGW32 ?= /mingw32
 		PLATFLAGS += MINGW32="$(MINGW32)"
 	endif
+	CC  ?= cc
+	CXX ?= cxx
+	AR  ?= ar
+	PLATFLAGS += TARGETOS="windows" OVERRIDE_CC="$(CC)" OVERRIDE_CXX="$(CXX)" "AR=$(AR)"
+	ifneq ($(WINDRES),)
+		PLATFLAGS += WINDRES="$(WINDRES)"
+	endif
 endif
+
 ifeq ($(platform),android-arm)
 	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
 	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
@@ -126,8 +122,9 @@ ifeq ($(platform),android-arm64)
 	LIBRETRO_CPU :=
 	ARCH :=
 	LIBRETRO_OS :=
-	PTR64 := 
+	PTR64 :=
 endif
+
 ifeq ($(platform),osx)
   PLATFLAGS += DONT_USE_NETWORK=1
 endif
@@ -169,6 +166,10 @@ endif
 #
 ###########################################################################
 
+# MAKEFILE is set by libretro gitlab-ci, but it confuses GENIE. So, unset it.
+# undefine <var> is not supported on make 3.81 (used by macosx).
+MAKEFILE :=
+
 all: build
 
 build:
@@ -179,18 +180,5 @@ vs2015:
 
 clean:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
-
-download_github_%:
-	@rm -f mame_libretro.zip
-	@echo "Cheking latest release for tag $*"
-	@curl -s -S -L -O -z mame_libretro* '$(GITHUB_REPO)/releases/download/$*/mame_libretro.zip'
-	@if [ -f mame_libretro.zip ]; then \
-		echo "Extracting"; \
-		unzip -qqo mame_libretro.zip; \
-		rm -f mame_libretro.zip; \
-		touch mame_libretro*; \
-	else \
-		echo "Up to date";\
-	fi
 
 .PHONY: all build clean vs2015

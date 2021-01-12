@@ -1,0 +1,155 @@
+# DESCRIPTION: GitLab CI/CD for libRetro (NOT FOR GitLab-proper)
+
+# Core definitions
+.core-defs:
+  variables:
+    MAKEFILE: Makefile.libretro
+    CORENAME: mame
+
+# Core definitions
+include:
+  # Windows 64-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/windows-x64-mingw.yml'
+    
+  # # Windows 32-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/windows-i686-mingw.yml'
+
+  # Linux 64-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/linux-x64.yml'
+
+  # # MacOS 64-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/osx-x64.yml'
+
+  # # Android
+  # - project: 'tcamargo/ci-templates'
+  #   file: '/android-make.yml'
+
+  # # Nintendo 3DS
+  # - project: 'libretro-infrastructure/ci-templates'
+  #   file: '/ctr-static.yml'
+    
+  # # Nintendo WiiU
+  # - project: 'libretro-infrastructure/ci-templates'
+  #   file: '/wiiu-static.yml'
+
+  # # Nintendo Switch
+  # - project: 'libretro-infrastructure/ci-templates'
+  #   file: '/libnx-static.yml'
+
+  # # PlayStation Vita
+  # - project: 'libretro-infrastructure/ci-templates'
+  #   file: '/vita-static.yml'
+
+# Stages for building
+stages:
+  - build-prepare
+  - build-shared
+  - build-static
+
+# Cache
+# Need to set a proper key in each job
+cache: &global_cache
+  untracked: true
+  paths:
+    - build/
+
+# Windows 64-bit
+libretro-build-windows-x64:
+  extends:
+    - .libretro-windows-x64-mingw-make-default
+    - .core-defs
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-windows-x64"
+  artifacts:
+    expire_in: 1 day
+
+# # Windows 32-bit
+# libretro-build-windows-i686:
+#   extends:
+#     - .libretro-windows-i686-mingw-make-default
+#     - .core-defs
+
+Linux 64-bit
+libretro-build-linux-x64:
+  extends:
+    - .libretro-linux-x64-make-default
+    - .core-defs
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-linux-x64"
+  artifacts:
+    expire_in: 1 day
+    
+# MacOS 64-bit
+libretro-build-osx-x64:
+  extends:
+    - .libretro-osx-x64-make-default
+    - .core-defs
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-osx-x64"
+  artifacts:
+    expire_in: 1 day
+
+# # Android ARMv7a
+# android-armeabi-v7a:
+#   extends:
+#     - .libretro-android-make-armeabi-v7a:
+#     - .core-defs
+#   cache:
+#     <<: *global_cache
+#     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a"
+#   artifacts:
+#     expire_in: 1 day
+
+# # Android ARMv8a
+# android-arm64-v8a:
+#   extends:
+#     - .libretro-android-make-arm64-v8a
+#     - .core-defs
+#   cache:
+#     <<: *global_cache
+#     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a"
+#   artifacts:
+#     expire_in: 1 day
+
+# # Android 64-bit x86
+# android-x86_64:
+#   extends:
+#     - .libretro-android-jni-x86_64
+#     - .core-defs
+    
+# # Android 32-bit x86
+# android-x86:
+#   extends:
+#     - .libretro-android-jni-x86
+#     - .core-defs
+
+# # Nintendo 3DS
+# libretro-build-ctr:
+#   extends:
+#     - .libretro-ctr-static-retroarch-master
+#     - .core-defs
+    
+# # Nintendo WiiU
+# libretro-build-wiiu:
+#   extends:
+#     - .libretro-wiiu-static-retroarch-master
+#     - .core-defs
+
+# # Nintendo Switch
+# libretro-build-libnx-aarch64:
+#   extends:
+#     - .libretro-libnx-static-retroarch-master
+#     - .core-defs
+
+# # PlayStation Vita
+# libretro-build-vita:
+#   extends:
+#     - .libretro-vita-static-retroarch-master
+#     - .core-defs
