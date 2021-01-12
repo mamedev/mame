@@ -540,10 +540,6 @@ void astrocorp_state::showhand(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58.846);    // measured on pcb
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-//  m_screen->set_size(320, 240);
-//  m_screen->set_visarea_full();
 	m_screen->set_raw(XTAL(26'601'712) / 4, 433, 0, 320, 261, 0, 240); // ~15.354KHz Hsync, ~58.846Hz Vsync
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -590,13 +586,10 @@ void astrocorp_state::skilldrp(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	/* video hardware */
-	// TODO: understand if later hardware uses different parameters
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58.846);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-//  m_screen->set_size(0x200, 0x100);
-//  m_screen->set_visarea(0, 0x200-1, 0, 0xf0-1);
-	m_screen->set_raw(XTAL(24'000'000) / 2, 781, 0, 512, 261, 0, 240); // similar refresh rate as 320x240 resolution hardware?
+	// TODO: verify H/VSync & pixel clock for this type of HW
+	// (most likely different to compensate for the higher HRes) 
+	m_screen->set_raw(XTAL(24'000'000) / 2, 781, 0, 512, 261, 0, 240);
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -621,6 +614,9 @@ void astrocorp_state::magibomb(machine_config &config)
 	skilldrp(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::magibomb_map);
 }
+
+// TODO: stoneage machine_config
+// (Has 120MHz XTAL + VGA connector ...)
 
 /***************************************************************************
                                 ROMs Loading
