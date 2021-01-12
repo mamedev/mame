@@ -74,7 +74,7 @@ libretro-build-windows-x64:
 #     - .libretro-windows-i686-mingw-make-default
 #     - .core-defs
 
-Linux 64-bit
+# Linux 64-bit
 libretro-build-linux-x64:
   extends:
     - .libretro-linux-x64-make-default
