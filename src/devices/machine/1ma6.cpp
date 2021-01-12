@@ -341,7 +341,7 @@ void hp_1ma6_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);
-	m_tape->set_bits_per_word(16);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp_1ma6_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp_1ma6_device::hole_w));
