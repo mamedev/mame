@@ -1993,6 +1993,11 @@ static INPUT_PORTS_START( sf2rb )
 	PORT_DIPSETTING(    0x20, "Progressive 6" )
 	PORT_DIPSETTING(    0x10, "Progressive 7" )
 	PORT_DIPSETTING(    0x00, "Progressive 8" )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "Projectile Path" )                   PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, "Homing" )
+	PORT_DIPSETTING(    0x00, "Zigzag" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2hack )
