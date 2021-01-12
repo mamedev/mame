@@ -132,8 +132,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 void jpmimpct_state::update_irqs()
 {
-	if (m_duart_1_timer)
-		m_maincpu->set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void jpmimpct_video_state::update_irqs()
@@ -154,52 +152,26 @@ void jpmimpct_video_state::machine_start()
 	m_digits.resolve();
 
 	save_item(NAME(m_tms_irq));
-	save_item(NAME(m_duart_1_irq));
 	save_item(NAME(m_touch_cnt));
 	save_item(NAME(m_touch_data));
-
-	save_duart_hack();
 }
 
 void jpmimpct_video_state::machine_reset()
 {
-	reset_duart_hack();
-
 	/* Reset states */
-	m_duart_1_irq = m_tms_irq = 0;
+	m_tms_irq = 0;
 	m_touch_cnt = 0;
 }
 
 void jpmimpct_state::machine_start()
 {
-	save_item(NAME(m_duart_1_irq));
-
-	save_duart_hack();
 }
 
 void jpmimpct_state::machine_reset()
 {
-	reset_duart_hack();
-
 	/* Reset states */
-	m_duart_1_irq = 0;
 	m_vfd->reset();
 }
-
-void jpmimpct_state::save_duart_hack()
-{
-	/* TODO! */
-	save_item(NAME(m_duart_1.ISR));
-	save_item(NAME(m_duart_1.IMR));
-	save_item(NAME(m_duart_1.CT));
-}
-
-void jpmimpct_state::reset_duart_hack()
-{
-	memset(&m_duart_1, 0, sizeof(m_duart_1));
-	//m_duart_1.IVR=0x0f;
-}
-
 
 /*************************************
  *
@@ -229,161 +201,19 @@ void jpmimpct_state::reset_duart_hack()
  *  TxDB/TxDB: Data retrieval unit
  */
 
-TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_hack_timer_event)
+uint16_t jpmimpct_state::duart_regd_input_port_hack_r(offs_t offset)
 {
-	m_duart_1.tc = 0;
-	m_duart_1.ISR |= 0x08;
-
-	m_duart_1_irq = 1;
-	update_irqs();
+	return ioport("TEST_DEMO")->read();
 }
 
-uint16_t jpmimpct_state::duart_1_hack_r(offs_t offset)
-{
-	struct duart_t &duart_1 = m_duart_1;
-	uint16_t val = 0xffff;
-	switch (offset)
-	{
-		case 0x1:
-		{
-			/* RxDA ready */
-			val = 0x04;
-			break;
-		}
-		case 0x2:
-		{
-			val = 0x00;
-			break;
-		}
-		case 0x3:
-		{
-			val = duart_1.RBA;
-			duart_1.ISR &= ~0x02;
-			duart_1.SRA &= ~0x03;
-			break;
-		}
-		case 0x4:
-		{
-			val = duart_1.IPCR;
-			duart_1.ISR &= ~0x80;
-			break;
-		}
-		case 0x5:
-		{
-			val = duart_1.ISR;
-			break;
-		}
-		case 0x9:
-		{
-			/* RxDB ready */
-			val = 0x04;
-			break;
-		}
-		case 0xd:
-		{
-			val = ioport("TEST_DEMO")->read();
-			break;
-		}
-		case 0xe:
-		{
-			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			m_duart_1_timer->adjust(rate, 0, rate);
-			break;
-		}
-		case 0xf:
-		{
-			m_duart_1_irq = 0;
-			update_irqs();
-			duart_1.ISR |= ~0x8;
-			break;
-		}
-	}
-
-	return val;
-}
-
-void jpmimpct_state::duart_1_hack_w(offs_t offset, uint16_t data)
-{
-	struct duart_t &duart_1 = m_duart_1;
-	//int old_val;
-	switch (offset)
-	{
-		case 0x1:
-		{
-			duart_1.CSRA = data;
-			break;
-		}
-		case 0x3:
-		{
-			//osd_printf_debug("%c", data);
-			break;
-		}
-		case 0x4:
-		{
-			duart_1.ACR = data;
-
-			/* Only handle counter mode, XTAL divide by 16 */
-			if (((data >> 4) & 7) != 0x7)
-			{
-				logerror("DUART 1: Unhandled counter mode: %x\n", data);
-			}
-			break;
-		}
-		case 0x5:
-		{
-			duart_1.IMR = data;
-			break;
-		}
-		case 0x6:
-		{
-			duart_1.CTUR = data;
-			break;
-		}
-		case 0x7:
-		{
-			duart_1.CTLR = data;
-			break;
-		}
-		case 0xb:
-		{
-			//osd_printf_debug("%c",data);
-			break;
-		}
-		case 0xc:
-		{
-			duart_1.IVR = data;
-			break;
-		}
-		case 0xd:
-		{
-			duart_1.OPCR = data;
-			break;
-		}
-		case 0xe:
-		{
-			//old_val = duart_1.OPR;
-			duart_1.OPR = duart_1.OPR | data;
-			duart_1.OP = ~duart_1.OPR;
-			/* Output port bit set */
-			break;
-		}
-		case 0xf:
-		{
-			//old_val = duart_1.OPR;
-			duart_1.OPR = duart_1.OPR &~data;
-			duart_1.OP = ~duart_1.OPR;
-			/* Output port bit reset */
-			break;
-		}
-	}
-}
 
 void jpmimpct_state::set_duart_1_hack_ip(bool state)
 {
-	if (state)
-		m_duart_1.IP |= 0x10;
-	else
-		m_duart_1.IP &= ~0x10;
+// TODO restore this with real duart
+//	if (state)
+//		m_duart_1.IP |= 0x10;
+//	else
+//		m_duart_1.IP &= ~0x10;
 }
 
 /*************************************
@@ -721,7 +551,7 @@ void jpmimpct_video_state::impact_video_map(address_map &map)
 void jpmimpct_video_state::impact_video_map_duarthack(address_map &map)
 {
 	jpmimpct_video_state::impact_video_map(map);
-	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_video_state::duart_1_hack_r), FUNC(jpmimpct_video_state::duart_1_hack_w));
+	map(0x0048001a, 0x0048001b).r(FUNC(jpmimpct_video_state::duart_regd_input_port_hack_r));
 }
 
 void jpmimpct_state::impact_non_video_map(address_map &map)
@@ -1249,11 +1079,7 @@ uint16_t jpmimpct_state::ump_r()
 WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 {
 	// triggers IRQ 5
-	if (!m_duart_1_timer)
-		m_maincpu->set_input_line(5, state);
-	// or
-	//m_duart_1_irq = state;
-	//update_irqs();
+	m_maincpu->set_input_line(5, state);
 }
 
 // Note 68k is on a sub-card, as is the UPD, so these things can change
@@ -1348,9 +1174,6 @@ void jpmimpct_video_state::impact_video_duarthack(machine_config &config)
 	impact_video(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::impact_video_map_duarthack);
-
-	// used by the duart simulation hack
-	TIMER(config, m_duart_1_timer).configure_generic(FUNC(jpmimpct_video_state::duart_1_hack_timer_event));
 }
 
 /*************************************

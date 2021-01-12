@@ -26,7 +26,6 @@ public:
 		, m_meters(*this, "meters")
 		, m_datalogger(*this, "datalogger")
 		, m_digits(*this, "digit%u", 0U)
-		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
 		, m_vfd(*this, "vfd")
@@ -44,44 +43,6 @@ protected:
 	required_device<meters_device> m_meters;
 	required_device<bacta_datalogger_device> m_datalogger;
 	output_finder<300> m_digits;
-	optional_device<timer_device> m_duart_1_timer;
-
-	struct duart_t
-	{
-		uint8_t MR1A, MR2A;
-		uint8_t SRA, CSRA;
-		uint8_t CRA;
-		uint8_t RBA, TBA;
-
-		uint8_t IPCR;
-		uint8_t ACR;
-		uint8_t ISR, IMR;
-
-		union
-		{
-			uint8_t CUR, CLR;
-			uint16_t CR;
-		};
-		union
-		{
-			uint8_t CTUR, CTLR;
-			uint16_t CT;
-		};
-
-		int tc;
-
-		uint8_t MR1B, MR2B;
-		uint8_t SRB, CSRB;
-		uint8_t CRB;
-		uint8_t RBB, TBB;
-
-		uint8_t IVR;
-		uint8_t IP;
-		uint8_t OP;
-		uint8_t OPR;
-		uint8_t OPCR;
-	};
-
 
 	uint16_t jpmio_r();
 
@@ -90,21 +51,13 @@ protected:
 
 	void common_map(address_map &map);
 
-
 	int m_lamp_strobe;
 
-	uint8_t m_duart_1_irq;
-	struct duart_t m_duart_1;
-
 	void set_duart_1_hack_ip(bool state);
-	void save_duart_hack();
-	void reset_duart_hack();
 
 	void jpm_draw_lamps(int data, int lamp_strobe);
 
-	uint16_t duart_1_hack_r(offs_t offset);
-	void duart_1_hack_w(offs_t offset, uint16_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_hack_timer_event);
+	uint16_t duart_regd_input_port_hack_r(offs_t offset);
 
 	virtual void update_irqs();
 private:
@@ -175,6 +128,7 @@ protected:
 	void impact_video_map_duarthack(address_map &map);
 
 	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 
 	uint16_t duart_2_hack_r(offs_t offset);
 	void duart_2_hack_w(uint16_t data);
