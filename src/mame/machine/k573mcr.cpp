@@ -48,7 +48,8 @@ Notes:
 
 k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jvs_device(mconfig, KONAMI_573_MEMORY_CARD_READER, tag, owner, clock),
-	m_ports(*this, "port%u", 0U)
+	m_ports(*this, "port%u", 0U),
+	m_meta(*this, "META")
 {
 	m_ram = std::make_unique<uint8_t[]>(RAM_SIZE);
 }
@@ -371,7 +372,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 				int memcard_addr = ((send_buffer[2] << 8) | send_buffer[3]) & 0x7fff;
 				int ram_addr = (send_buffer[4] << 16) | (send_buffer[5] << 8) | send_buffer[6];
 				int block_count = (send_buffer[7] << 8) | send_buffer[8];
-				bool is_ejected = BIT(ioport("META")->read(), memcard_port); // Forcefully ejected using hotkey
+				bool is_ejected = BIT(m_meta->read(), memcard_port); // Forcefully ejected using hotkey
 
 				if (!is_ejected && memcard_read(memcard_port, 0, nullptr)) {
 					// Check if card is inserted
@@ -404,7 +405,7 @@ int k573mcr_device::device_handle_message(const uint8_t *send_buffer, uint32_t s
 				int memcard_port = send_buffer[5] >> 7;
 				int memcard_addr = ((send_buffer[5] << 8) | send_buffer[6]) & 0x7fff;
 				int block_count = (send_buffer[7] << 8) | send_buffer[8];
-				bool is_ejected = BIT(ioport("META")->read(), memcard_port); // Forcefully ejected using hotkey
+				bool is_ejected = BIT(m_meta->read(), memcard_port); // Forcefully ejected using hotkey
 
 				if (!is_ejected && memcard_read(memcard_port, 0, nullptr)) {
 					// Check if card is inserted

@@ -490,6 +490,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_flashbank(*this, "flashbank"),
+		m_in2(*this, "IN2"),
 		m_out1(*this, "OUT1"),
 		m_out2(*this, "OUT2"),
 		m_cd(*this, "CD"),
@@ -736,6 +737,7 @@ private:
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_flashbank;
+	required_ioport m_in2;
 	required_ioport m_out1;
 	required_ioport m_out2;
 	required_ioport m_cd;
@@ -879,7 +881,7 @@ uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0) {
 		// 0x1f400008-0x1f400009 are for inputs
-		return ioport("IN2")->read();
+		return m_in2->read();
 	}
 
     if (m_jvs_output_len_w <= 0) {
