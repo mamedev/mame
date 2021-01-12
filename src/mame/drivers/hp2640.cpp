@@ -1053,31 +1053,31 @@ void hp2640_base_state::cpu_mem_map(address_map &map)
 	// Writing is independent of poll state
 	m_io_view[ 0 ](0x0100, 0x0100).r(m_uart, FUNC(ay51013_device::receive));
 	m_io_view[ 0 ](0x0120, 0x0120).r(FUNC(hp2640_base_state::async_status_r));
-	m_io_view[ 0 ](0x0140, 0x0140).w(FUNC(hp2640_base_state::async_control_w));
-	m_io_view[ 1 ](0x0140, 0x0140).w(FUNC(hp2640_base_state::async_control_w));
-	m_io_view[ 0 ](0x0160, 0x0160).w(m_uart, FUNC(ay51013_device::transmit));
-	m_io_view[ 1 ](0x0160, 0x0160).w(m_uart, FUNC(ay51013_device::transmit));
-	m_io_view[ 0 ](0x0300, 0x0300).w(FUNC(hp2640_base_state::kb_led_w));
-	m_io_view[ 1 ](0x0300, 0x0300).w(FUNC(hp2640_base_state::kb_led_w));
+
+	map(0x8140, 0x8140).w(FUNC(hp2640_base_state::async_control_w));
+	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x8300, 0x8300).w(FUNC(hp2640_base_state::kb_led_w));
+
 	m_io_view[ 0 ](0x0300, 0x030d).r(FUNC(hp2640_base_state::kb_r));
 	m_io_view[ 0 ](0x030e, 0x030e).r(FUNC(hp2640_base_state::switches_ah_r));
 	m_io_view[ 0 ](0x030f, 0x030f).r(FUNC(hp2640_base_state::datacomm_sw_r));
-	m_io_view[ 0 ](0x0320, 0x0320).w(FUNC(hp2640_base_state::kb_prev_w));
-	m_io_view[ 1 ](0x0320, 0x0320).w(FUNC(hp2640_base_state::kb_prev_w));
-	m_io_view[ 0 ](0x0380, 0x0380).w(FUNC(hp2640_base_state::kb_reset_w));
-	m_io_view[ 1 ](0x0380, 0x0380).w(FUNC(hp2640_base_state::kb_reset_w));
+
+	map(0x8320, 0x8320).w(FUNC(hp2640_base_state::kb_prev_w));
+	map(0x8380, 0x8380).w(FUNC(hp2640_base_state::kb_reset_w));
+
 	m_io_view[ 0 ](0x0380, 0x0380).r(FUNC(hp2640_base_state::switches_jr_r));
 	m_io_view[ 0 ](0x03a0, 0x03a0).r(FUNC(hp2640_base_state::switches_sz_r));
-	m_io_view[ 0 ](0x0700, 0x0700).w(FUNC(hp2640_base_state::cx_w));
-	m_io_view[ 1 ](0x0700, 0x0700).w(FUNC(hp2640_base_state::cx_w));
-	m_io_view[ 0 ](0x0720, 0x0720).w(FUNC(hp2640_base_state::cy_w));
-	m_io_view[ 1 ](0x0720, 0x0720).w(FUNC(hp2640_base_state::cy_w));
-	m_io_view[ 0 ](0x0b00, 0x0b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
-	m_io_view[ 1 ](0x0b00, 0x0b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
+
+	map(0x8700, 0x8700).w(FUNC(hp2640_base_state::cx_w));
+	map(0x8720, 0x8720).w(FUNC(hp2640_base_state::cy_w));
+	map(0x8b00, 0x8b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
+
 	m_io_view[ 0 ](0x0b00, 0x0b00).r(m_tapes, FUNC(hp2640_tape_device::status_r));
-	m_io_view[ 0 ](0x0b20, 0x0b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
-	m_io_view[ 1 ](0x0b20, 0x0b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
+
+	map(0x8b20, 0x8b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
+
 	m_io_view[ 0 ](0x0b20, 0x0b20).r(m_tapes, FUNC(hp2640_tape_device::data_r));
+
 	m_io_view[ 1 ](0x0000, 0x0fff).r(FUNC(hp2640_base_state::poll_r));
 
 	map(0x9100, 0x91ff).ram();
