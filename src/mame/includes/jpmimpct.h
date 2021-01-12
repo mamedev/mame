@@ -14,8 +14,44 @@
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "sound/upd7759.h"
+#include "diserial.h"
 #include "machine/bacta_datalogger.h"
 #include "emupal.h"
+
+
+
+
+class jpmtouch_device : public device_t,
+	public device_serial_interface
+{
+public:
+	jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto rxd_handler() { return m_rxd_handler.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_rxd_handler(state); }
+
+	void touched(uint8_t x, uint8_t y);
+
+protected:
+	jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+
+private:
+	void tx_queue();
+
+	devcb_write_line m_rxd_handler;
+	int8_t m_sending;
+	uint8_t m_touch_data[3];
+	uint8_t m_sendpos;
+};
+
+DECLARE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device)
 
 class jpmimpct_state : public driver_device
 {
@@ -113,13 +149,20 @@ class jpmimpct_video_state : public jpmimpct_state
 public:
 	jpmimpct_video_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jpmimpct_state(mconfig, type, tag)
+		, m_vidduart(*this, "vid_duart")
+		, m_touch(*this, "touch")
 		, m_dsp(*this, "dsp")
 		, m_vram(*this, "vram")
 		, m_ramdac(*this, "ramdac")
+		, m_touchx(*this, "TOUCH_X")
+		, m_touchy(*this, "TOUCH_Y")
 	{
 	}
 
 	void impact_video(machine_config &config);
+	void impact_video_touch(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(touch_port_changed);
 
 protected:
 	virtual void machine_start() override;
@@ -129,25 +172,23 @@ protected:
 
 	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-
-	uint16_t duart_2_hack_r(offs_t offset);
-	void duart_2_hack_w(uint16_t data);
-
 	void tms_program_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-
-	uint8_t m_touch_cnt;
-	uint8_t m_touch_data[3];
-
 	uint8_t m_tms_irq;
 
 	virtual void update_irqs() override;
+
+protected:
+	required_device<mc68681_device> m_vidduart;
+	optional_device<jpmtouch_device> m_touch;
 private:
 	optional_device<tms34010_device> m_dsp;
 	optional_shared_ptr<uint16_t> m_vram;
 	required_device<bt477_device> m_ramdac;
+	optional_ioport m_touchx;
+	optional_ioport m_touchy;
 };

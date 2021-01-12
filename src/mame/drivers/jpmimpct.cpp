@@ -109,6 +109,96 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 #include "jpmimpct.lh"
 
+
+DEFINE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device, "jpmtouch", "JPM Touchscreen")
+
+jpmtouch_device::jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	jpmtouch_device(mconfig, JPM_TOUCHSCREEN, tag, owner, clock)
+{
+}
+
+jpmtouch_device::jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, JPM_TOUCHSCREEN, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_rxd_handler(*this),
+	m_sending(-1)
+{
+}
+
+void jpmtouch_device::device_start()
+{
+	m_rxd_handler.resolve_safe();
+
+	save_item(NAME(m_touch_data));
+	save_item(NAME(m_sendpos));
+	save_item(NAME(m_sending));
+}
+
+void jpmtouch_device::device_reset()
+{
+	int startbits = 1;
+	int databits = 8;
+	parity_t parity = device_serial_interface::PARITY_NONE;
+	stop_bits_t stopbits =  device_serial_interface::STOP_BITS_1;
+
+	set_data_frame(startbits, databits, parity, stopbits);
+
+	set_tra_rate(9600);
+	set_rcv_rate(9600);
+
+	output_rxd(1);
+}
+
+void jpmtouch_device::tx_queue()
+{
+	if (is_transmit_register_empty())
+	{
+		if (m_sending != -1)
+		{
+			set_tra_rate(9600);
+			uint8_t senddata = m_touch_data[m_sendpos];
+			transmit_register_setup(senddata);
+		}
+	}
+}
+
+void jpmtouch_device::tra_callback()
+{
+	output_rxd(transmit_register_get_data_bit());
+}
+
+void jpmtouch_device::tra_complete()
+{
+	if (m_sendpos == 2)
+	{
+		// Shut down transmitter until there's a character
+		m_sending = -1;
+		set_tra_rate(attotime::never);
+		tx_queue();
+	}
+	else
+	{
+		m_sendpos++;
+		tx_queue();
+	}
+}
+
+void jpmtouch_device::touched(uint8_t x, uint8_t y)
+{
+	if (m_sending == -1)
+	{
+		m_sending = 1;
+
+		m_touch_data[0] = 0x2a;
+		m_touch_data[1] = 0x7 - (y >> 5) + 0x30;
+		m_touch_data[2] = (x >> 5) + 0x30;
+		m_sendpos = 0;
+
+		tx_queue();
+	}
+}
+
+
 /*************************************
  *
  *  MC68681 DUART (TODO)
@@ -147,15 +237,12 @@ void jpmimpct_video_state::machine_start()
 	m_digits.resolve();
 
 	save_item(NAME(m_tms_irq));
-	save_item(NAME(m_touch_cnt));
-	save_item(NAME(m_touch_data));
 }
 
 void jpmimpct_video_state::machine_reset()
 {
 	/* Reset states */
 	m_tms_irq = 0;
-	m_touch_cnt = 0;
 }
 
 void jpmimpct_state::machine_start()
@@ -204,64 +291,6 @@ void jpmimpct_state::set_duart_1_hack_ip(bool state)
 //	else
 //		m_duart_1.IP &= ~0x10;
 }
-
-/*************************************
- *
- *  MC68681 DUART 2 simulation hack
- *
- *************************************/
-
-/*
-    Communication with a touchscreen interface PCB
-    is handled via UART B.
-*/
-uint16_t jpmimpct_video_state::duart_2_hack_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0x9:
-		{
-			if (m_touch_cnt == 0)
-			{
-				if ( ioport("TOUCH")->read() & 0x1 )
-				{
-					m_touch_data[0] = 0x2a;
-					m_touch_data[1] = 0x7 - (ioport("TOUCH_Y")->read() >> 5) + 0x30;
-					m_touch_data[2] = (ioport("TOUCH_X")->read() >> 5) + 0x30;
-
-					/* Return RXRDY */
-					return 0x1;
-				}
-				return 0;
-			}
-			else
-			{
-				return 1;
-			}
-		}
-		case 0xb:
-		{
-			uint16_t val = m_touch_data[m_touch_cnt];
-
-			if (m_touch_cnt++ == 3)
-				m_touch_cnt = 0;
-
-			return val;
-		}
-		default:
-			return 0;
-	}
-}
-
-/*
-    Nothing important here?
-*/
-void jpmimpct_video_state::duart_2_hack_w(uint16_t data)
-{
-}
-
-
-
 
 /*************************************
  *
@@ -530,8 +559,8 @@ void jpmimpct_video_state::impact_video_map(address_map &map)
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_video_state::unk_r));
 	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_video_state::unk_r));
 
-	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_video_state::duart_2_hack_r), FUNC(jpmimpct_video_state::duart_2_hack_w)); // video duart for Touchscreen
-	//map(0x004801e0, 0x004801ff).rw("touch_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x004801e0, 0x004801ff).rw(m_vidduart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+
 	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
 	map(0x00c00000, 0x00ffffff).rom();
@@ -572,6 +601,26 @@ void jpmimpct_video_state::tms_program_map(address_map &map)
  *  Input definitions
  *
  *************************************/
+
+INPUT_CHANGED_MEMBER(jpmimpct_video_state::touch_port_changed)
+{
+	if (newval)
+	{
+		if (m_touch && m_touchx && m_touchy)
+			m_touch->touched(m_touchx->read(), m_touchy->read());
+	}
+}
+
+static INPUT_PORTS_START( touchscreen )
+	PORT_START("TOUCH")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_video_state, touch_port_changed, 0)
+
+	PORT_START("TOUCH_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+
+	PORT_START("TOUCH_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+INPUT_PORTS_END
 
 INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_START("DSW")
@@ -806,17 +855,6 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME( "Back Door" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE PORT_NAME( "Cash Door" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_TOGGLE PORT_NAME( "Refill Key" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( touchscreen )
-	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME( "Touch screen" ) // anything other than IMPULSE(1) causes Scrabble to hang
-
-	PORT_START("TOUCH_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
-
-	PORT_START("TOUCH_Y")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hngmnjpm )
@@ -1080,7 +1118,6 @@ void jpmimpct_state::base(machine_config &config)
 	M68000(config, m_maincpu, 8000000);
 	// map set later
 
-	// not currently used, hack used instead
 	MC68681(config, m_duart, MC68681_1_CLOCK);
 	m_duart->irq_cb().set(FUNC(jpmimpct_state::duart_irq_handler));
 
@@ -1149,7 +1186,7 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_video_state::from_shiftreg));
 
 	// Is this on all video cards? or somwhere else? currently uses a hack
-	// MC68681(config, m_touchduart, MC68681_2_CLOCK);
+	MC68681(config, m_vidduart, MC68681_2_CLOCK);
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
@@ -1158,6 +1195,14 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
 	BT477(config, m_ramdac, 40000000); // clock unknown
+}
+
+void jpmimpct_video_state::impact_video_touch(machine_config &config)
+{
+	impact_video(config);
+
+	JPM_TOUCHSCREEN(config, m_touch, MC68681_2_CLOCK);
+	m_touch->rxd_handler().set(m_vidduart, FUNC(mc68681_device::rx_b_w));
 }
 
 /*************************************
@@ -1570,15 +1615,18 @@ ROM_END
  *************************************/
 
 // Touchscreen
-GAME( 1995, cluedo,    0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c,  cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,   cluedo,   impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialp,  0,        impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo, trivialp, impact_video, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble,  0,        impact_video, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled, scrabble, impact_video, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo,    0,        impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c,  cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialp,  0,        impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpd, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabble,  0,        impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabbled, scrabble, impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+
+// probably Touchscreen, but it doesn't respond
+GAME( 199?, tqst,      0,        impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // probably complete
 
 // Non Touchscreen
 GAME( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
@@ -1587,7 +1635,6 @@ GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, e
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 
 // sets below are incomplete, missing video ROMs etc.
-GAME( 199?, tqst,      0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // possibly complete
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
 GAME( 199?, jpmreno ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
 GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
