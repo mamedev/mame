@@ -390,8 +390,6 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
 #define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
-// #define JVS_DEBUG
-
 /*
  * Class declaration for sys573_jvs_host
  */
