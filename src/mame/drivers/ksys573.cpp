@@ -371,8 +371,22 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_GENERAL  (1 << 0)
+#define LOG_CDROM    (1 << 1)
+#define LOG_CONTROL  (1 << 2)
+#define LOG_SECURITY (1 << 3)
+#define LOG_JVS      (1 << 4)
+#define LOG_IOBOARD  (1 << 5)
+// #define VERBOSE      (LOG_GENERAL | LOG_CDROM | LOG_CONTROL | LOG_SECURITY | LOG_JVS | LOG_IOBOARD)
+// #define LOG_OUTPUT_STREAM std::cout
 
-#define VERBOSE_LEVEL ( 0 )
+#include "logmacro.h"
+
+#define LOGCDROM(...)    LOGMASKED(LOG_CDROM, __VA_ARGS__)
+#define LOGCONTROL(...)  LOGMASKED(LOG_CONTROL, __VA_ARGS__)
+#define LOGSECURITY(...) LOGMASKED(LOG_SECURITY, __VA_ARGS__)
+#define LOGJVS(...)      LOGMASKED(LOG_JVS, __VA_ARGS__)
+#define LOGIOBOARD(...)  LOGMASKED(LOG_IOBOARD, __VA_ARGS__)
 
 #define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
@@ -659,7 +673,6 @@ private:
 	required_ioport m_analog2;
 	required_ioport m_analog3;
 
-	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void update_disc();
 	void gx700pwbf_output( int offset, uint8_t data );
 	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data ) );
@@ -737,19 +750,6 @@ private:
 
 	required_device<jvs_master> m_jvs_master;
 };
-
-void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
 
 void ksys573_state::konami573_map(address_map &map)
 {
@@ -852,15 +852,10 @@ void ksys573_state::jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
     if (jvs_is_valid_packet()) {
-#ifdef JVS_DEBUG
-		printf("jvs_input_w( %08x, %08x, %02x %02x )\n", offset, mem_mask, data & 0xff, data >> 8 );
-
-		for (int i = 0; i < m_jvs_input_idx_w; i++) {
-			printf("%02x ", m_jvs_input_buffer[i]);
-		}
-
-		printf("\n");
-#endif
+		LOGJVS("jvs_input_w( %08x, %08x, %02x %02x )\n", offset, mem_mask, data & 0xff, data >> 8 );
+		for (int i = 0; i < m_jvs_input_idx_w; i++)
+			LOGJVS("%02x ", m_jvs_input_buffer[i]);
+		LOGJVS("\n");
 
 		int command_size = m_jvs_input_buffer[2] + 3;
 		m_jvs_master->send_packet(m_jvs_input_buffer + 1, command_size - 2); // jvshost doesn't actually check the checksum, so don't send it
@@ -899,9 +894,7 @@ uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
 		m_jvs_output_len_w = 0;
     }
 
-#ifdef JVS_DEBUG
-    printf("m_jvs_output_r %08x %08x | %02x %02x | %02x\n", offset, mem_mask, data & 0xff, data >> 8, m_jvs_output_idx_w);
-#endif
+    LOGJVS("m_jvs_output_r %08x %08x | %02x %02x | %02x\n", offset, mem_mask, data & 0xff, data >> 8, m_jvs_output_idx_w);
 
     return data;
 }
@@ -917,7 +910,7 @@ READ_LINE_MEMBER( ksys573_state::jvs_rx_r )
 
 uint16_t ksys573_state::control_r(offs_t offset, uint16_t mem_mask)
 {
-	verboselog( 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
+	LOGCONTROL( "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
 	return m_control;
 }
@@ -926,7 +919,7 @@ void ksys573_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_control );
 
-	verboselog( 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	LOGCONTROL( "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	m_out2->write( data, mem_mask );
 
@@ -970,7 +963,7 @@ void ksys573_state::atapi_reset_w(uint16_t data)
 
 void ksys573_state::cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size )
 {
-	verboselog( 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
+	LOGCDROM( "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  osd_printf_debug( "DMA read: address %08x size %08x\n", n_address, n_size );
 }
 
@@ -978,7 +971,7 @@ void ksys573_state::cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t 
 {
 	m_p_n_psxram = ram;
 
-	verboselog( 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
+	LOGCDROM( "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  osd_printf_debug( "DMA write: address %08x size %08x\n", n_address, n_size );
 
 	m_atapi_xferbase = n_address;
@@ -991,7 +984,7 @@ void ksys573_state::security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_n_security_control );
 
-	verboselog( 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	LOGSECURITY( "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	m_out1->write( data, mem_mask );
 }
@@ -999,7 +992,7 @@ void ksys573_state::security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t ksys573_state::security_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_n_security_control;
-	verboselog( 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	LOGSECURITY( "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -1123,11 +1116,11 @@ uint16_t ksys573_state::ge765pwbba_r(offs_t offset, uint16_t mem_mask)
 		return m_upd4701->read_y(offset & 1);
 
 	default:
-		verboselog( 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
+		LOGIOBOARD( "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_r( %08x, %08x )\n", offset, mem_mask );
+	LOGIOBOARD( "ge765pwbba_r( %08x, %08x )\n", offset, mem_mask );
 	return 0;
 }
 
@@ -1152,11 +1145,11 @@ void ksys573_state::ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		break;
 
 	default:
-		verboselog( 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
+		LOGIOBOARD( "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	LOGIOBOARD( "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 }
 
 /*
@@ -1193,7 +1186,7 @@ uint16_t ksys573_state::gx700pwbf_io_r(offs_t offset, uint16_t mem_mask)
 		break;
 	}
 
-	verboselog( 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	LOGIOBOARD( "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
@@ -1219,7 +1212,7 @@ void ksys573_state::gx700pwbf_output( int offset, uint8_t data )
 
 void ksys573_state::gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog( 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	LOGIOBOARD( "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1324,7 +1317,7 @@ void ksys573_state::gn845pwbb_clk_w( int offset, int data )
 		}
 	}
 
-	verboselog( 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk,
+	LOGIOBOARD( "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk,
 		m_stage_state[ offset ].state, m_stage_state[ offset ].DO, m_stage_state[ offset ].shift, m_stage_state[ offset ].bit, m_stage_mask );
 }
 
@@ -1777,7 +1770,7 @@ WRITE_LINE_MEMBER( ksys573_state::animechmp_lamp_clock )
 		{
 			if( ( m_serial_lamp_shift & ~0xfff ) != 0 )
 			{
-				verboselog( 0, "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xfff );
+				LOG( "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xfff );
 			}
 
 			output().set_value( "player 1 red", ( m_serial_lamp_shift >> 11 ) & 1 );
@@ -1841,7 +1834,7 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clock )
 		{
 			if( ( m_serial_lamp_shift & ~0xe38 ) != 0 )
 			{
-				verboselog( 0, "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xe38 );
+				LOG( "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xe38 );
 			}
 
 			output().set_value( "player 1 red", ( m_serial_lamp_shift >> 11 ) & 1 );
@@ -2298,7 +2291,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	}
 
-	verboselog( 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
+	LOGIOBOARD( "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
 READ_LINE_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
@@ -2336,7 +2329,7 @@ uint16_t ksys573_state::gunmania_r(offs_t offset, uint16_t mem_mask)
 		break;
 	}
 
-	verboselog( 2, "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
+	LOGIOBOARD( "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
