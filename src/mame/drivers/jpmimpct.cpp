@@ -952,11 +952,14 @@ static INPUT_PORTS_START( tqst )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("J10_0")
-	// TODO: is 0x01 used to anything (collect or similar?)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // TODO: is 0x01 used for anything?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 / Blue") // also used to start a game
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button 4 / Red") // also used to start a game
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Collect" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scrabble )
@@ -1557,8 +1560,19 @@ ROM_START( tqst )
 	ROM_LOAD16_BYTE( "prom1n.bin",0x000000, 0x080000, CRC(a9cacb88) SHA1(2cc565e8083926acab8c8b14ad90bd50f7597038) )
 	ROM_LOAD16_BYTE( "prom2.bin", 0x000001, 0x080000, CRC(a665e72e) SHA1(76440ae69f61eac1c6fe59dae295826a145bc940) )
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "prom1p.bin", 0x0000, 0x080000, CRC(c13b499b) SHA1(e8389568e5bec6462e02b69949691b14e29d7d8e) )
+	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	/* 0x000000 - 0x0fffff empty? */
+	ROM_LOAD16_BYTE( "u16.bin",   0x100000, 0x080000, CRC(ae9b6829) SHA1(2c8ed5060d751bca0af54305164512fae8ff88e9) )
+	ROM_LOAD16_BYTE( "u17.bin",   0x100001, 0x080000, CRC(7786340d) SHA1(96ded0af403fa3f0e7604f9ae0952036b3652665) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "025rs1-0.bin", 0x0000, 0x080000, CRC(c4dbff24) SHA1(2e4d1d1905b9cd8254989d1653beb6756664839e) )
+ROM_END
+
+ROM_START( tqstp )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "prom1p.bin", 0x000000, 0x080000, CRC(c13b499b) SHA1(e8389568e5bec6462e02b69949691b14e29d7d8e) )
+	ROM_LOAD16_BYTE( "prom2.bin", 0x000001, 0x080000, CRC(a665e72e) SHA1(76440ae69f61eac1c6fe59dae295826a145bc940) )
 
 	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
 	/* 0x000000 - 0x0fffff empty? */
@@ -1650,7 +1664,8 @@ GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, e
 GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 // This acts a bit like a touchscreen game, is there an unmapped Dipswitch to enable touch support, or a different software revision?
-GAME( 199?, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_NOT_WORKING) // probably complete
+GAME( 199?, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, tqstp,     tqst,     impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest (Protocol)"  , MACHINE_SUPPORTS_SAVE)
 
 // sets below are incomplete, missing video ROMs etc.
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
