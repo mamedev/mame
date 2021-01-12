@@ -19,6 +19,7 @@ Year  Game                        Manufacturer
 1995  Dual Games (proto)          Labtronix Technologies
 1995  The Hermit                  Dugamex
 1997  Deuces Wild 2               <unknown>
+1997  Surprise 5                  Cadillac Jack
 1998  Funny Fruit                 Cadillac Jack
 1998  Triple Play                 Cadillac Jack
 1998  Texas Reels                 Cadillac Jack
@@ -43,6 +44,7 @@ To Do:
 - steaser: sound uses an OkiM6295 (controlled by the sub MCU), check if it can be simulated;
 - deucesw2: colour cycling effect on attract mode is ugly (background should be blue, it's instead a MAME-esque
   palette), protection?
+- surpr5: stuck at 'need slot adjustment wait for attendant' message
 
 *****************************************************************************************************************/
 
@@ -58,6 +60,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class blitz68k_state : public driver_device
 {
@@ -91,6 +95,7 @@ public:
 	void init_megadble();
 	void init_maxidbl();
 	void init_cj3play();
+	void init_surpr5();
 	void init_texasrls();
 	void init_megadblj();
 	void init_hermit();
@@ -2384,6 +2389,30 @@ ROM_START( texasrls ) // CJ-8L REV-D, same PCB as cjffruit
 	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( surpr5 ) // CJ-8L REV-D, same PCB as cjffruit and texasrls
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "a u65 -  eb58  v1.19a.bin", 0x00000, 0x80000, CRC(cbafd7a5) SHA1(8edb228f661a7865799d4bab07ca96eb315e4017) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "68hc705.u30", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "d u68 - a7c8.bin", 0x000000, 0x80000, CRC(3e0ecd76) SHA1(51b5e0073ac11d80dce22269da0cb95f8c3bd554) )
+	ROM_LOAD16_BYTE( "c u75 - cc62.bin", 0x000001, 0x80000, CRC(575f36b9) SHA1(65f2b3e94230aae4a1efafc019a3beab8d995573) )
+	ROM_LOAD16_BYTE( "f u51 - 8313.bin", 0x100000, 0x80000, CRC(afc5e0ae) SHA1(c03c76b399c58ab0d60a996c57b4b4ab8d5a0f4d) )
+	ROM_LOAD16_BYTE( "e u61 - ba9b.bin", 0x100001, 0x80000, CRC(09975df2) SHA1(8bf4e5b82fdc491bf4d5d19b779dd05680a8095d) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "g u50 - aa22.bin", 0x00000, 0x80000, CRC(b17bc88c) SHA1(50d9f28b5fce31efd5fb23959e83570d766911d9) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 /*************************************************************************************************************
 
 Deuces Wild 2 - American Heritage (Ver. 2.02F)
@@ -2898,164 +2927,176 @@ ROM_END
 
 void blitz68k_state::init_bankrob()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xb5e0/2] = 0x6028;
+	rom[0xb5e0/2] = 0x6028;
 
 	// crtc
-	ROM[0x81d0/2] = 0x4e71;
-	ROM[0x81d8/2] = 0x4e71;
+	rom[0x81d0/2] = 0x4e71;
+	rom[0x81d8/2] = 0x4e71;
 
 	// loop
-	ROM[0x1d4d4/2] = 0x4e71;
+	rom[0x1d4d4/2] = 0x4e71;
 }
 
 void blitz68k_state::init_bankroba()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0x11e4e/2] = 0x6028;
+	rom[0x11e4e/2] = 0x6028;
 
 	// crtc
-	ROM[0xf640/2] = 0x4e71;
-	ROM[0xf648/2] = 0x4e71;
+	rom[0xf640/2] = 0x4e71;
+	rom[0xf648/2] = 0x4e71;
 
 	// loop
-	ROM[0x178ec/2] = 0x4e71;
+	rom[0x178ec/2] = 0x4e71;
 }
 
 void blitz68k_state::init_bankrobb()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// loop
-	ROM[0x1dae/2] = 0x4e71;
+	rom[0x1dae/2] = 0x4e71;
 
-	ROM[0xf912/2] = 0x67ee;
+	rom[0xf912/2] = 0x67ee;
 }
 
 void blitz68k_state::init_cj3play()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0x7064/2] = 0x6028;
-	ROM[0xa0d2/2] = 0x6024;
+	rom[0x7064/2] = 0x6028;
+	rom[0xa0d2/2] = 0x6024;
 
 	// loop
-	ROM[0x2773c/2] = 0x4e71;
-//  ROM[0x3491a/2] = 0x4e71;
+	rom[0x2773c/2] = 0x4e71;
+//  rom[0x3491a/2] = 0x4e71;
 
 	// ERROR CHECKSUM ROM PROGRAM
-	ROM[0x20ab0/2] = 0x6050;
+	rom[0x20ab0/2] = 0x6050;
 }
 
 void blitz68k_state::init_cjffruit()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xf564/2] = 0x6028;
+	rom[0xf564/2] = 0x6028;
 
 	// ERROR CHECKSUM ROM PROGRAM
-	ROM[0x1e7b8/2] = 0x6050;
+	rom[0x1e7b8/2] = 0x6050;
 }
 
 void blitz68k_state::init_texasrls()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0x11f3a/2] = 0x6028; // TODO: the dump is available, hook up the MCU properly (it would give sound to the driver, too).
+	rom[0x11f3a/2] = 0x6028; // TODO: the dump is available, hook up the MCU properly (it would give sound to the driver, too).
 
 	// ERROR CHECKSUM ROM PROGRAM
-	ROM[0x211bc/2] = 0x6050;
+	rom[0x211bc/2] = 0x6050;
+}
+
+void blitz68k_state::init_surpr5()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0x105ce/2] = 0x6028;
+
+	// ERROR CHECKSUM ROM PROGRAM
+	rom[0x1fd56/2] = 0x6054;
 }
 
 void blitz68k_state::init_deucesw2()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0x8fe4/2] = 0x6020;
+	rom[0x8fe4/2] = 0x6020;
 
 	// ERROR CHECKSUM ROM PROGRAM
-	ROM[0x12f70/2] = 0x6054;
+	rom[0x12f70/2] = 0x6054;
 }
 
 void blitz68k_state::init_dualgame()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xa518/2] = 0x6024;
+	rom[0xa518/2] = 0x6024;
 
-	ROM[0x1739a/2] = 0x4e71;
-	ROM[0x1739c/2] = 0x4e71;
+	rom[0x1739a/2] = 0x4e71;
+	rom[0x1739c/2] = 0x4e71;
 }
 
 void blitz68k_state::init_hermit()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xdeba/2] = 0x602e;
+	rom[0xdeba/2] = 0x602e;
 
 	// ROM: BAD
-	ROM[0xdd78/2] = 0x4e71;
+	rom[0xdd78/2] = 0x4e71;
 
 	// loop
-	ROM[0x15508/2] = 0x4e71;
+	rom[0x15508/2] = 0x4e71;
 
 	// crtc
-	ROM[0x3238/2] = 0x4e75;
+	rom[0x3238/2] = 0x4e75;
 }
 
 void blitz68k_state::init_maxidbl()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xb384/2] = 0x6036;
+	rom[0xb384/2] = 0x6036;
 
 	// loop
-	ROM[0x17ca/2] = 0x4e71;
+	rom[0x17ca/2] = 0x4e71;
 }
 
 void blitz68k_state::init_megadblj()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xe21c/2] = 0x6040;
+	rom[0xe21c/2] = 0x6040;
 
 	// loop
-	ROM[0x19d4/2] = 0x4e71;
+	rom[0x19d4/2] = 0x4e71;
 }
 
 void blitz68k_state::init_megadble()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// WRONG C8 #1
-	ROM[0xcfc2/2] = 0x4e71;
+	rom[0xcfc2/2] = 0x4e71;
 
 	// C8 #2 NOT RESPONDING
-	ROM[0x1d40/2] = 0x4e71;
+	rom[0x1d40/2] = 0x4e71;
 }
 
 void blitz68k_state::init_megastrp()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// skip loops until the MCUs are dumped and the hardware better understood
-	ROM[0x1678/2] = 0x4e71;
+	rom[0x1678/2] = 0x4e71;
 
-	ROM[0x10c80/2] = 0x4e71;
+	rom[0x10c80/2] = 0x4e71;
 }
 
+} // Anonymous namespace
 
 
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
@@ -3070,6 +3111,7 @@ GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init, 
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
 GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
+GAME( 1997,  surpr5,   0,       cjffruit, cjffruit, blitz68k_state, init_surpr5,   ROT0, "Cadillac Jack",                  "Surprise 5 (Ver. 1.19)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 25TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
 GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
