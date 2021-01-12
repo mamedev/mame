@@ -48,7 +48,7 @@ Notes:
 
 k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	jvs_device(mconfig, KONAMI_573_MEMORY_CARD_READER, tag, owner, clock),
-	m_ports(*this, "port%u", 0U),
+	m_controllers(*this, "controllers"),
 	m_meta(*this, "META")
 {
 	m_ram = std::make_unique<uint8_t[]>(RAM_SIZE);
@@ -61,6 +61,9 @@ void k573mcr_device::device_start()
 	save_pointer(NAME(m_ram), RAM_SIZE);
 	save_item(NAME(m_is_memcard_initialized));
 	save_item(NAME(m_status));
+	save_item(NAME(m_psx_clock));
+	save_item(NAME(m_psx_rx_data));
+	save_item(NAME(m_psx_rx_bit));
 }
 
 void k573mcr_device::device_reset()
@@ -70,6 +73,9 @@ void k573mcr_device::device_reset()
 	std::fill_n(m_ram.get(), RAM_SIZE, 0);
 	m_is_memcard_initialized = false;
 	m_status = 0;
+	m_psx_clock = false;
+	m_psx_rx_data = 0;
+	m_psx_rx_bit = 0;
 }
 
 void k573mcr_device::device_add_mconfig(machine_config &config)
@@ -81,8 +87,10 @@ void k573mcr_device::device_add_mconfig(machine_config &config)
 	// a controller through the slots menu.
 	// The memory card ports are still usable even without a controller
 	// enabled which is the main reason for using the PSX controller ports.
-	PSX_CONTROLLER_PORT(config, m_ports[0], psx_controllers, nullptr);
-	PSX_CONTROLLER_PORT(config, m_ports[1], psx_controllers, nullptr);
+	PSXCONTROLLERPORTS(config, m_controllers, 0);
+	m_controllers->rxd().set(FUNC(k573mcr_device::write_rxd));
+	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, nullptr);
+	PSX_CONTROLLER_PORT(config, "port2", psx_controllers, nullptr);
 }
 
 const char *k573mcr_device::device_id()
@@ -105,99 +113,109 @@ uint8_t k573mcr_device::comm_method_version()
 	return 0x10;
 }
 
-uint8_t k573mcr_device::controller_port_send_byte(uint32_t port_no, uint8_t data)
+WRITE_LINE_MEMBER(k573mcr_device::write_rxd)
 {
-	auto port = m_ports[port_no];
-	uint8_t output = 0;
+	if (m_psx_clock) {
+		if (m_psx_rx_bit == 0) {
+			m_psx_rx_data = 0;
+		}
 
+		m_psx_rx_data |= state << m_psx_rx_bit;
+		m_psx_rx_bit = (m_psx_rx_bit + 1) % 8;
+	}
+}
+
+void k573mcr_device::controller_set_port(uint32_t port_no)
+{
+	m_controllers->write_dtr(!!port_no);
+	m_controllers->write_dtr(!port_no);
+}
+
+uint8_t k573mcr_device::controller_port_send_byte(uint8_t data)
+{
 	for (int i = 0; i < 8; i++) {
-		port->clock_w(0);
-		port->tx_w(BIT(data, i));
-		port->clock_w(1);
-		output |= port->rx_r() << i;
+		m_controllers->write_sck(m_psx_clock);
+		m_psx_clock = !m_psx_clock;
+		m_controllers->write_txd(BIT(data, i));
+		m_controllers->write_sck(m_psx_clock);
+		m_psx_clock = !m_psx_clock;
 	}
 
-	return output;
+	return m_psx_rx_data;
 }
 
 bool k573mcr_device::pad_read(uint32_t port_no, uint8_t *output)
 {
-	m_ports[port_no]->sel_w(1);
-	m_ports[port_no]->sel_w(0);
-
-	controller_port_send_byte(port_no, 0x01);
-	uint8_t a = controller_port_send_byte(port_no, 'B');
-	uint8_t b = controller_port_send_byte(port_no, 0);
-	*output++ = controller_port_send_byte(port_no, 0);
-	*output++ = controller_port_send_byte(port_no, 0);
+	controller_set_port(port_no);
+	controller_port_send_byte(0x01);
+	uint8_t a = controller_port_send_byte('B');
+	uint8_t b = controller_port_send_byte(0);
+	*output++ = controller_port_send_byte(0);
+	*output++ = controller_port_send_byte(0);
 
 	return a == 0x41 && b == 0x5a;
 }
 
 bool k573mcr_device::memcard_read(uint32_t port_no, uint16_t block_addr, uint8_t *output)
 {
-	m_ports[port_no]->sel_w(1);
-	m_ports[port_no]->sel_w(0);
+	controller_set_port(port_no);
+	controller_port_send_byte(0x81);
 
-	controller_port_send_byte(port_no, 0x81);
-
-	if (controller_port_send_byte(port_no, 'R') == 0xff) { // state_command, Request read
+	if (controller_port_send_byte('R') == 0xff) { // state_command, Request read
 		return false;
 	}
 
-	controller_port_send_byte(port_no, 0); // state_command -> state_cmdack
-	controller_port_send_byte(port_no, 0); // state_cmdack -> state_wait
-	controller_port_send_byte(port_no, block_addr >> 8); // state_wait -> state_addr_hi
-	controller_port_send_byte(port_no, block_addr & 0xff); // state_addr_hi -> state_addr_lo
+	controller_port_send_byte(0); // state_command -> state_cmdack
+	controller_port_send_byte(0); // state_cmdack -> state_wait
+	controller_port_send_byte(block_addr >> 8); // state_wait -> state_addr_hi
+	controller_port_send_byte(block_addr & 0xff); // state_addr_hi -> state_addr_lo
 
-	if (controller_port_send_byte(port_no, 0) != 0x5c) {  // state_addr_lo -> state_read
+	if (controller_port_send_byte(0) != 0x5c) {  // state_addr_lo -> state_read
 		// If the command wasn't correct then it transitions to state_illegal at this point
 		return false;
 	}
 
-	controller_port_send_byte(port_no, 0); // Skip 0x5d
-	controller_port_send_byte(port_no, 0); // Skip addr hi
-	controller_port_send_byte(port_no, 0); // Skip addr lo
+	controller_port_send_byte(0); // Skip 0x5d
+	controller_port_send_byte(0); // Skip addr hi
+	controller_port_send_byte(0); // Skip addr lo
 
 	for (int i = 0; i < MEMCARD_BLOCK_SIZE; i++) {
-		auto c = controller_port_send_byte(port_no, 0);
+		auto c = controller_port_send_byte(0);
 		if (output != nullptr) {
 			*output++ = c;
 		}
 	}
 
-	controller_port_send_byte(port_no, 0);
+	controller_port_send_byte(0);
 
-	return controller_port_send_byte(port_no, 0) == 'G';
+	return controller_port_send_byte(0) == 'G';
 }
 
 bool k573mcr_device::memcard_write(uint32_t port_no, uint16_t block_addr, uint8_t *input)
 {
-	m_ports[port_no]->sel_w(1);
-	m_ports[port_no]->sel_w(0);
+	controller_set_port(port_no);
+	controller_port_send_byte(0x81);
 
-	controller_port_send_byte(port_no, 0x81);
-
-	if (controller_port_send_byte(port_no, 'W') == 0xff) { // state_command, Request write
+	if (controller_port_send_byte('W') == 0xff) { // state_command, Request write
 		return false;
 	}
 
-	controller_port_send_byte(port_no, 0); // state_command -> state_cmdack
-	controller_port_send_byte(port_no, 0); // state_cmdack -> state_wait
-	controller_port_send_byte(port_no, block_addr >> 8); // state_wait -> state_addr_hi
-	controller_port_send_byte(port_no, block_addr & 0xff); // state_addr_hi -> state_addr_lo
+	controller_port_send_byte(0); // state_command -> state_cmdack
+	controller_port_send_byte(0); // state_cmdack -> state_wait
+	controller_port_send_byte(block_addr >> 8); // state_wait -> state_addr_hi
+	controller_port_send_byte(block_addr & 0xff); // state_addr_hi -> state_addr_lo
 
 	uint8_t checksum = (block_addr >> 8) ^ (block_addr & 0xff);
 	for (int i = 0; i < MEMCARD_BLOCK_SIZE; i++) {
-		controller_port_send_byte(port_no, input[i]); // state_read
+		controller_port_send_byte(input[i]); // state_read
 		checksum ^= input[i];
 	}
 
-	controller_port_send_byte(port_no, checksum);
-	controller_port_send_byte(port_no, 0);
-	controller_port_send_byte(port_no, 0);
+	controller_port_send_byte(checksum);
+	controller_port_send_byte(0);
+	controller_port_send_byte(0);
 
-	return controller_port_send_byte(port_no, 0) == 'G';
+	return controller_port_send_byte(0) == 'G';
 }
 
 int k573mcr_device::handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)

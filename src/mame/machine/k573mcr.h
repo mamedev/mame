@@ -11,6 +11,7 @@
 
 #include "bus/psx/ctlrport.h"
 #include "machine/jvsdev.h"
+#include "machine/timer.h"
 
 class k573mcr_device : public jvs_device
 {
@@ -25,6 +26,8 @@ public:
 	k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 
 protected:
 	template <uint8_t First> void set_port_tags() { }
@@ -57,7 +60,8 @@ private:
 		MEMCARD_BLOCK_SIZE = 128
 	};
 
-	uint8_t controller_port_send_byte(uint32_t port, uint8_t data);
+	void controller_set_port(uint32_t port_no);
+	uint8_t controller_port_send_byte(uint8_t data);
 	bool pad_read(uint32_t port_no, uint8_t *output);
 	bool memcard_read(uint32_t port_no, uint16_t block_addr, uint8_t *output);
 	bool memcard_write(uint32_t port_no, uint16_t block_addr, uint8_t *input);
@@ -65,8 +69,10 @@ private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint16_t m_status;
 	bool m_is_memcard_initialized;
+	uint8_t m_psx_rx_data, m_psx_rx_bit;
+	bool m_psx_clock;
 
-	required_device_array<psx_controller_port_device, 2> m_ports;
+	required_device<psxcontrollerports_device> m_controllers;
 	required_ioport m_meta;
 };
 
