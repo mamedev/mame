@@ -9335,12 +9335,14 @@ GAMEL( 199?, j6casczj,     j6cascz,    impact_nonvideo, j6cascz, jpmimpct_state,
 GAMEL( 199?, j6casczk,     j6cascz,    impact_nonvideo, j6cascz, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6cascze )
 GAMEL( 199?, j6casczl,     j6cascz,    impact_nonvideo, j6cascz, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6cascze )
 GAMEL( 199?, j6casczm,     j6cascz,    impact_nonvideo, j6cascz, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6cascze )
+
 // all of these identify as Casino Crazy and have the same text strings as above? however they do spin 6 reels instead, while the above spin 4
-GAMEL( 199?, j6reelmn,     0,           impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (Casino Crazy) (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmna,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (Casino Crazy) (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnb,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (Casino Crazy) (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnc,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (Casino Crazy) (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6reelmn )
-GAMEL( 199?, j6reelmnd,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (Casino Crazy) (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6reelmn )
+// the VFD is not visible in the artwork for these, so was the game simply built on top of Casino Crazy without removing the VFD messages?
+GAMEL( 199?, j6reelmn,     0,           impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmna,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnb,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnc,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6reelmn )
+GAMEL( 199?, j6reelmnd,    j6reelmn,    impact_nonvideo, j6reelmn, jpmimpct_state, empty_init, ROT0, "JPM", "Reel Money (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6reelmn )
 
 GAME(  199?, j6casclb,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6casclba,    j6casclb,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
