@@ -102,6 +102,7 @@ public:
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
 	void tsupenta(machine_config &config);
+	void tsururin(machine_config &config);
 
 	void ddboy_init();
 	void tsuka_init();
@@ -628,8 +629,8 @@ static INPUT_PORTS_START( slimekun )
 	PORT_INCLUDE( shuriboy )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f,  DEF_STR (Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // TODO: verify when game works. 1 coin 0 plays in test mode (???)
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -645,8 +646,8 @@ static INPUT_PORTS_START( slimekun )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR (Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
@@ -692,13 +693,29 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tsururin )
 	PORT_INCLUDE( shuriboy )
 
-	// PORT_MODIFY("IN1") // TODO: verify when game works. Test mode test all bits but doesn't show what they do
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // works as start, too
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	// 0x80 upd busy_r
 
-	// PORT_MODIFY("IN2") // TODO: verify when game works. Test mode test all bits but doesn't show what they do
+	PORT_MODIFY("IN2")
+	// 0x01 service coin
+	// 0x02 service switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	// 0x10 hopper line_r
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f,  DEF_STR (Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // TODO: verify when game works. 1 coin 0 plays in test mode (???)
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -714,8 +731,8 @@ static INPUT_PORTS_START( tsururin )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR (Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // TODO: verify when game works. 1 coin 0 plays in test mode (???)
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
@@ -1031,6 +1048,12 @@ void konmedal_state::tsupenta(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::tsupenta_nvram_init));
 }
 
+void konmedal_state::tsururin(machine_config &config)
+{
+	shuriboy(config);
+	NVRAM(config.replace(), m_nvram, nvram_device::DEFAULT_ALL_0);
+}
+
 void konmedal_state::medal_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
@@ -1307,8 +1330,8 @@ ROM_END
 
 
 // Konami PWB 451847A and PWB 452093A boards (TMNT tilemaps)
-GAME( 1990, tsururin, 0,     tsupenta, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING) // resets after start up test. Does it need a custom nvram init?
-GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING)
+GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // resets after start up test. Seems to be an IRQ problem
+GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
 GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,   ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
