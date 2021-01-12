@@ -55,6 +55,8 @@ void swim2_device::device_reset()
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
+	m_flux_write_start = 0;
+	m_flux_write_count = 0;
 
 	m_last_sync = machine().time().as_ticks(clock());
 }
@@ -80,6 +82,9 @@ floppy_image_device *swim2_device::get_floppy() const
 
 void swim2_device::flush_write(u64 when)
 {
+	if(!m_flux_write_start)
+		return;
+
 	if(!when)
 		when = m_last_sync;
 
@@ -88,14 +93,13 @@ void swim2_device::flush_write(u64 when)
 			m_flux_write_count--;
 		attotime start = cycles_to_time(m_flux_write_start);
 		attotime end = cycles_to_time(when);
+		logerror("wbuf start %s\n", start.to_string());
 		std::vector<attotime> fluxes(m_flux_write_count);
-		u32 i = 0;
-		if(m_flux_write_count && m_flux_write[0] == m_flux_write_start)
-			i++;
-		while(i != m_flux_write_count) {
+		for(u32 i=0; i != m_flux_write_count; i++) {
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
-			i++;
+			logerror("wbuf flux  %s\n", fluxes[i].to_string());
 		}
+		logerror("wbuf end   %s\n", end.to_string());
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
 	}
 	m_flux_write_count = 0;
@@ -172,23 +176,24 @@ u8 swim2_device::read(offs_t offset)
 				h |= 0x02;
 		}
 		// addata on 4
-		if(m_floppy && !m_floppy->wpt_r())
+		if(!m_floppy || m_floppy->wpt_r())
 			h |= 0x08;
 		if(m_error)
 			h |= 0x20;
 		if(m_mode & 0x10) {
 			// write
 			if(m_fifo_pos == 0)
-				h |= 0x40;
+				h |= 0xc0;
+			else if(m_fifo_pos == 1)
+				h |= 0x80;
 		} else {
 			// read
 			if(m_fifo_pos == 2)
-				h |= 0x40;
+				h |= 0xc0;
+			else if(m_fifo_pos == 1)
+				h |= 0x80;
 		}
-
-		if(!m_error && m_fifo_pos == 1)
-			h |= 0x80;
-		logerror("handshake %02x\n", h);
+		//		logerror("handshake %02x\n", h);
 		return h;
 	}
 
@@ -209,6 +214,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		"data", "mark", "crc", "param", "phases", "setup", "mode0", "mode1",
 		"?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
 	};
+
 	switch(offset & 7) {
 	case 0:
 		if(fifo_push(data) && !m_error)
@@ -281,14 +287,37 @@ void swim2_device::write(offs_t offset, u8 data)
 	if((m_mode & 0x18) == 0x18 && ((prev_mode & 0x18) != 0x18)) {
 		// Entering write mode
 		m_current_bit = 0;
-		logerror("%s write start\n", machine().time().to_string());
-		machine().debug_break();
+		logerror("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x40 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+		m_flux_write_start = m_last_sync;
+		m_flux_write_count = 0;
+
 	} else if((prev_mode & 0x18) == 0x18 && (m_mode & 0x18) != 0x18) {
 		// Exiting write mode
 		flush_write();
+		m_flux_write_start = 0;
 		m_current_bit = 0xff;
 		m_half_cycles_before_change = 0;
 		logerror("%s write end\n", machine().time().to_string());
+	}
+
+	if((m_mode & 0x18) == 0x08 && ((prev_mode & 0x18) != 0x08)) {
+		// Entering read mode
+		m_current_bit = 0;
+		m_sr = 0;
+		logerror("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x04 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+
+		m_pll.reset(machine().time());
+		static const int cycles_per_cell[4] = { 16, 31, 31, 63 };
+
+		m_pll.set_clock(attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()));
+		logerror("PLL read clock %s\n", attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()).to_string());
+
+	} else if((prev_mode & 0x18) == 0x08 && (m_mode & 0x18) != 0x08) {
+		// Exiting read mode
+		flush_write();
+		m_current_bit = 0xff;
+		m_half_cycles_before_change = 0;
+		logerror("%s read end\n", machine().time().to_string());
 	}
 }
 
@@ -351,29 +380,26 @@ void swim2_device::sync()
 		return;
 	}
 
-	// We count in half-cycles but only toggle write on full cycles
+	logerror("ACTIVE %s %d-%d\n", m_mode & 0x10 ? "write" : "read", m_last_sync, next_sync);
 
-	u32 cycles = (next_sync - m_last_sync) << 1;
-	logerror("ACTIVE %s %d-%d (%d)\n", m_mode & 0x10 ? "write" : "read", m_last_sync, next_sync, cycles);
+	if(m_mode & 0x10) {
+		// We count in half-cycles but only toggle write on full cycles
+		u32 cycles = (next_sync - m_last_sync) << 1;
 
-	while(cycles) {
-		//		logerror("half cycles avail %d needed %d\n", cycles, m_half_cycles_before_change);
-		if(m_half_cycles_before_change) {
-			if(cycles >= m_half_cycles_before_change) {
-				cycles -= m_half_cycles_before_change;
-				m_half_cycles_before_change = 0;
-			} else {
-				m_half_cycles_before_change -= cycles;
-				cycles = 0;
-				break;
+		// Write mode
+		while(cycles) {
+			//		logerror("half cycles avail %d needed %d\n", cycles, m_half_cycles_before_change);
+			if(m_half_cycles_before_change) {
+				if(cycles >= m_half_cycles_before_change) {
+					cycles -= m_half_cycles_before_change;
+					m_half_cycles_before_change = 0;
+				} else {
+					m_half_cycles_before_change -= cycles;
+					cycles = 0;
+					break;
+				}
 			}
-		}
-
-		if(m_flux_write_count > 32)
-			flush_write(next_sync - (cycles >> 1));
-
-		if(m_mode & 0x10) {
-			// Write mode
+			
 
 			if(m_tss_output & 0xc) {
 				logerror("SR %03x.%d TSS %c%c\n", m_sr, m_current_bit, m_tss_output & 8 ? m_tss_output & 2 ? '1' : '0' : '.', m_tss_output & 4 ? m_tss_output & 1 ? '1' : '0' : '.');
@@ -386,6 +412,8 @@ void swim2_device::sync()
 					m_tss_output = 0;
 				}
 				if(bit) {
+					if(m_flux_write_count == 32)
+						flush_write(next_sync - (cycles >> 1));
 					m_flux_write[m_flux_write_count ++] = next_sync - (cycles >> 1);
 					m_half_cycles_before_change = 63;
 				} else
@@ -400,6 +428,8 @@ void swim2_device::sync()
 
 			if(m_current_bit == 0) {
 				u16 r = fifo_pop();
+				if(m_setup & 0x40)
+					logerror("DATAW %02x\n", r);
 				logerror("fifo pop %03x\n", r);
 				if(r == 0xffff && !m_error) {
 					m_error |= 0x01;
@@ -428,10 +458,39 @@ void swim2_device::sync()
 				else
 					m_tss_output = tss[m_tss_sr & 3];
 			}
+
 			continue;
-		} else {
-			cycles = 0;
 		}
+	} else {
+		attotime limit = machine().time();
+		if(m_setup & 0x04) {
+			// GCR mode
+			for(;;) {
+				attotime when;
+				int bit = m_pll.get_next_bit(when, m_floppy, limit);
+				if(bit == -1)
+					break;
+				m_sr = ((m_sr << 1) | bit) & 0xff;
+				logerror("%s: bit %d, sr=%02x\n", when.to_string(), bit, m_sr);
+				if(m_sr & 0x80) {
+					static u8 m1, m2, m3;
+					m1 = m2;
+					m2 = m3;
+					m3 = m_sr;
+					logerror("DATAR %02x\n", m_sr);
+					if(m1 == 0xd5 && m2 == 0xaa && m3 == 0xad)
+						machine().debug_break();
+					logerror("read byte %02x\n", m_sr);
+					if(fifo_push(m_sr) && !m_error)
+						m_error |= 0x01;
+					m_sr = 0;
+				}
+			}
+		} else {
+			// MFM mode
+		}
+
 	}
+
 	m_last_sync = next_sync;
 }

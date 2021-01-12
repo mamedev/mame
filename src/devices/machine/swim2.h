@@ -11,6 +11,7 @@
 #pragma once
 
 #include "applefdintf.h"
+#include "fdc_pll.h"
 
 
 //**************************************************************************
@@ -53,9 +54,11 @@ private:
 	
 	u64 m_last_sync;
 	u64 m_flux_write_start;
-	std::array<u64, 36> m_flux_write;
+	std::array<u64, 32> m_flux_write;
 	u32 m_flux_write_count;
-	
+
+	fdc_pll_t m_pll;
+
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;
 	

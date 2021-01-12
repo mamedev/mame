@@ -1135,7 +1135,7 @@ void mac_state::machine_reset()
 	// Egret currently needs more dramatic VIA slowdowns.  Need to determine what's realistic.
 	if (ADB_IS_EGRET)
 	{
-		m_via_cycles *= 35;
+		m_via_cycles *= 2;
 	}
 
 	// default to 32-bit mode on LC
