@@ -30,7 +30,7 @@ Notes:
 
 - ilpag: at start-up a "initialize request" pops up. Press Service Mode and the Service switch, and
   reset with F3 for doing it.
-- cjffruit: at start-up a "need coin adjustment" pops up. Press menu, go to page 1 with start, move to
+- cjffruit, surpr5, texasrls: at start-up a "need coin adjustment" pops up. Press menu, go to page 1 with start, move to
   "price coin #1" with big, and set it with small, then exit with menu.
 - "I/O TEST" is available among the statistics pages.
 - ilpag: based on pSOS+ S68000 V1.2.3 (Integrated Systems).
@@ -44,7 +44,8 @@ To Do:
 - steaser: sound uses an OkiM6295 (controlled by the sub MCU), check if it can be simulated;
 - deucesw2: colour cycling effect on attract mode is ugly (background should be blue, it's instead a MAME-esque
   palette), protection?
-- surpr5: stuck at 'need slot adjustment wait for attendant' message
+- cjffruit, surpr5, texasrls: they freeze on the double up side and when winning a bonus
+- texasrls: MCU is dumped, hook it up, get sound working and get rid of ROM patches
 
 *****************************************************************************************************************/
 
