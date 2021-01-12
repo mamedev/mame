@@ -1801,6 +1801,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<description>Spider-Man (Europe, prototype, set 1)</description>
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Jan van Nuland" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -1813,6 +1814,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<description>Spider-Man (Europe, prototype, set 2)</description>
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Jan van Nuland" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">

@@ -117,11 +117,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void set_default_params();
+	inline bool is_ntsc() { return m_vtotal == 263; }
 
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors(offs_t offset);
 	bool invalid_register(offs_t offset, bool rw);
+
+	void draw_char(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	/* timers */
 	static constexpr device_timer_id TIMER_VBLANK_START = 0;
@@ -153,6 +156,7 @@ protected:
 
 	vdc_t m_vdc;
 	u8 m_collision_map[0x200];
+	u8 m_priority_map[0x200];
 
 	u8 m_x_beam_pos = 0;
 	u8 m_y_beam_pos = 0;

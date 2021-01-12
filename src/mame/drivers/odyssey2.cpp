@@ -22,7 +22,7 @@ Videopac consoles:
 - Radiola Jet 25 (France)
 - Siera Videopac Computer G7000 (France)
 - Schneider Videopac 7000 (Germany)
-- Philips Videopac G7200 (Europe, Videopac with built-in screen)
+- Philips Videopac G7200 (Europe, Videopac with built-in B/W screen)
 - Philips Videojeu N60 (France)
 
 Videopac+ consoles:
@@ -56,10 +56,13 @@ TODO:
   and writes to the ptr/color registers, but does not increment the Y regs
 - screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
-- 824x on the real console, overlapping characters on eachother will cause
-  glitches (it is used to an advantage in some as-of-yet undumped homebrews)
-- 8244(NTSC) is not supposed to show characters near the upper border, but
-  hiding them will cause bugs in some Euro games
+- 824x on the real console, overlapping major system characters with eachother
+  (including transparent pixels) will cause glitches and instability, it can even
+  overwrite the VDC color and pointer registers
+  * gunfight: accidental usage, sometimes causes 1-frame glitches near bullet
+  * powerlrd: occurs at pink mountain on the right, it's not 1:1 identical on MAME
+  * several homebrews by Rafael: precisely placed overlap to force character
+    color to change to white, see for example Piggyback Planet and Mean Santa
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct. The 8245 is put into slave mode at vblank, timing signals and
   vblank IRQ are taken over during it (the Videopac pcb even has extra TTL to
@@ -89,6 +92,8 @@ TODO:
 
 BTANB:
 - a lot of PAL games have problems on NTSC (the other way around, not so much)
+  * most-common cause is due to shorter vblank, less time to prepare frame
+  * characters are not rendered near upper border on 8244 (eg. tutank, chezmxme)
 - g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
   placed lower on odyssey3
 - Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine

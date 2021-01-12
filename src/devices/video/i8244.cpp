@@ -136,7 +136,9 @@ void i8244_device::device_start()
 	save_pointer(NAME(m_vdc.reg), 0x100);
 
 	memset(m_collision_map, 0, sizeof(m_collision_map));
+	memset(m_priority_map, 0, sizeof(m_priority_map));
 	save_item(NAME(m_collision_map));
+	save_item(NAME(m_priority_map));
 
 	save_item(NAME(m_x_beam_pos));
 	save_item(NAME(m_y_beam_pos));
@@ -448,7 +450,7 @@ void i8244_device::write_cx(int x, bool cx)
 	{
 		u8 colx = m_collision_map[x] & 0x3f;
 
-		// Check if we collide with an already drawn source object
+		// check if we collide with an already drawn source object
 		if (colx)
 		{
 			// external overlap interrupt
@@ -461,7 +463,7 @@ void i8244_device::write_cx(int x, bool cx)
 			if (colx & m_vdc.s.collision)
 				m_collision_status |= 0x40;
 		}
-		// Check if an already drawn object would collide with us
+		// check if an already drawn object would collide with us
 		if (m_vdc.s.collision & 0x40)
 		{
 			m_collision_status |= colx;
@@ -470,17 +472,56 @@ void i8244_device::write_cx(int x, bool cx)
 }
 
 
+void i8244_device::draw_char(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int px = x; px < x + 2; px++)
+	{
+		if (cliprect.contains(px, y))
+		{
+			u8 colx = m_collision_map[px];
+
+			// check collision with self
+			if (index < m_priority_map[px])
+			{
+				m_control_status |= 0x80;
+
+				// TODO: much more complex on actual console (weird glitches happen)
+				if (colx & 0x80)
+					continue;
+			}
+			else
+				m_priority_map[px] = index;
+
+			if (pixel)
+			{
+				// check if we collide with an already drawn source object
+				if (m_vdc.s.collision & colx)
+					m_collision_status |= 0x80;
+
+				// check if an already drawn object would collide with us
+				if (m_vdc.s.collision & 0x80)
+					m_collision_status |= colx;
+
+				m_collision_map[px] |= 0x80;
+				bitmap.pix(y, px) = color;
+			}
+		}
+	}
+}
+
+
 u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* Draw background color */
+	// draw background color
 	bitmap.fill(bitswap<3>(m_vdc.s.color,3,4,5), cliprect);
 
 	for (int scanline = cliprect.min_y; scanline <= cliprect.max_y; scanline++)
 	{
-		/* Clear collision map */
+		// clear collision maps
 		memset(m_collision_map, 0, sizeof(m_collision_map));
+		memset(m_priority_map, 0, sizeof(m_priority_map));
 
-		/* Display grid if enabled */
+		// display grid if enabled
 		if (m_vdc.s.control & 0x08)
 		{
 			u16 color = bitswap<4>(m_vdc.s.color,6,0,1,2);
@@ -490,7 +531,7 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			int height = 24;
 			int w = (m_vdc.s.control & 0x80) ? width : 2;
 
-			/* Draw horizontal part of the grid */
+			// draw horizontal part of the grid
 			for (int y = 0; y < 9; y++)
 			{
 				if (y_grid_offset + y * height <= scanline && scanline < y_grid_offset + y * height + 3)
@@ -517,7 +558,7 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				}
 			}
 
-			/* Draw dots part of the grid */
+			// draw dots part of the grid
 			if (m_vdc.s.control & 0x40)
 			{
 				for (int y = 0; y < 9; y++)
@@ -544,7 +585,7 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				}
 			}
 
-			/* Draw vertical part of the grid */
+			// draw vertical part of the grid
 			for (int j = 1, y = 0; y < 8; y++, j <<= 1)
 			{
 				if (y_grid_offset + y * height <= scanline && scanline < y_grid_offset + (y + 1) * height)
@@ -572,17 +613,19 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			}
 		}
 
-		/* Display objects if enabled */
+		// display objects if enabled
 		if (m_vdc.s.control & 0x20 && scanline <= 242)
 		{
-			/* Quad objects */
+			// quad objects
 			for (int i = ARRAY_LENGTH(m_vdc.s.quad) - 1; i >= 0; i--)
 			{
 				int y = m_vdc.s.quad[i].single[0].y;
+				if (is_ntsc() && y < 0xe)
+					continue;
 
-				// Character height is always determined by the height of the 4th character
-				int height = 8 - (((y >> 1) + m_vdc.s.quad[i].single[3].ptr) & 7);
-				if (height == 1) height = 8;
+				// character height is always determined by the height of the 4th character
+				int height = 7 - (((y >> 1) + m_vdc.s.quad[i].single[3].ptr) & 7);
+				if (height == 0) height = 8;
 
 				if (y <= scanline && scanline < y + height * 2)
 				{
@@ -590,92 +633,37 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 					for (int j = 0; j < ARRAY_LENGTH(m_vdc.s.quad[0].single); j++, x += 16)
 					{
-						u16 color = 8 + ((m_vdc.s.quad[i].single[j].color >> 1) & 0x07);
 						int offset = (m_vdc.s.quad[i].single[j].ptr | ((m_vdc.s.quad[i].single[j].color & 0x01) << 8)) + (y >> 1) + ((scanline - y) >> 1);
-						u8 chr = m_charset[offset & 0x1ff];
 
-						for (u8 m = 0x80; m > 0; m >>= 1, x += 2)
-						{
-							if (chr & m)
-							{
-								for (int px = x; px < x + 2; px++)
-								{
-									if (cliprect.contains(px, scanline))
-									{
-										// Check collision with self
-										u8 colx = m_collision_map[px];
-										if (colx & 0x80)
-										{
-											colx &= ~0x80;
-											m_control_status |= 0x80;
-										}
-
-										// Check if we collide with an already drawn source object
-										if (m_vdc.s.collision & colx)
-											m_collision_status |= 0x80;
-
-										// Check if an already drawn object would collide with us
-										if (m_vdc.s.collision & 0x80)
-											m_collision_status |= colx;
-
-										m_collision_map[px] |= 0x80;
-										bitmap.pix(scanline, px) = color;
-									}
-								}
-							}
-						}
+						u16 color = 8 + ((m_vdc.s.quad[i].single[j].color >> 1) & 0x07);
+						for (int cx = 0; cx < 8; cx++, x += 2)
+							draw_char(4 * j + 16 * i + 0x40, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
 					}
 				}
 			}
 
-			/* Regular foreground objects */
+			// regular foreground objects
 			for (int i = ARRAY_LENGTH(m_vdc.s.foreground) - 1; i >= 0; i--)
 			{
 				int y = m_vdc.s.foreground[i].y;
-				int height = 8 - (((y >> 1) + m_vdc.s.foreground[i].ptr) & 7);
-				if (height == 1) height = 8;
+				if (is_ntsc() && y < 0xe)
+					continue;
+
+				int height = 7 - (((y >> 1) + m_vdc.s.foreground[i].ptr) & 7);
+				if (height == 0) height = 8;
 
 				if (y <= scanline && scanline < y + height * 2)
 				{
-					u16 color = 8 + ((m_vdc.s.foreground[i].color >> 1) & 0x07);
 					int offset = (m_vdc.s.foreground[i].ptr | ((m_vdc.s.foreground[i].color & 0x01) << 8)) + (y >> 1) + ((scanline - y) >> 1);
-					u8 chr = m_charset[offset & 0x1ff];
+
 					int x = (m_vdc.s.foreground[i].x + 5) * 2;
-
-					for (u8 m = 0x80; m > 0; m >>= 1, x += 2)
-					{
-						if (chr & m)
-						{
-							for (int px = x; px < x + 2; px++)
-							{
-								if (cliprect.contains(px, scanline))
-								{
-									// Check collision with self
-									u8 colx = m_collision_map[px];
-									if (colx & 0x80)
-									{
-										colx &= ~0x80;
-										m_control_status |= 0x80;
-									}
-
-									// Check if we collide with an already drawn source object
-									if (m_vdc.s.collision & colx)
-										m_collision_status |= 0x80;
-
-									// Check if an already drawn object would collide with us
-									if (m_vdc.s.collision & 0x80)
-										m_collision_status |= colx;
-
-									m_collision_map[px] |= 0x80;
-									bitmap.pix(scanline, px) = color;
-								}
-							}
-						}
-					}
+					u16 color = 8 + ((m_vdc.s.foreground[i].color >> 1) & 0x07);
+					for (int cx = 0; cx < 8; cx++, x += 2)
+						draw_char(4 * i + 0x10, x, scanline, BIT(m_charset[offset & 0x1ff], cx ^ 7), color, bitmap, cliprect);
 				}
 			}
 
-			/* Sprites */
+			// sprites
 			for (int i = ARRAY_LENGTH(m_vdc.s.sprites) - 1; i >= 0; i--)
 			{
 				int y = m_vdc.s.sprites[i].y;
@@ -692,13 +680,13 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 					switch (m_vdc.s.sprites[i].color & 0x03)
 					{
-						case 1:    // Xg attribute set
+						case 1: // Xg attribute set
 							x_shift = 1;
 							break;
-						case 2:    // S attribute set
+						case 2: // S attribute set
 							x_shift = (((scanline - y) / zoom_px) & 0x01) ^ 0x01;
 							break;
-						case 3:    // Xg and S attributes set
+						case 3: // Xg and S attributes set
 							x_shift = ((scanline - y) / zoom_px) & 0x01;
 							break;
 						default:
@@ -717,11 +705,11 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 								{
 									u8 mask = 1 << i;
 
-									// Check if we collide with an already drawn source object
+									// check if we collide with an already drawn source object
 									if (m_vdc.s.collision & m_collision_map[px])
 										m_collision_status |= mask;
 
-									// Check if an already drawn object would collide with us
+									// check if an already drawn object would collide with us
 									if (m_vdc.s.collision & mask)
 										m_collision_status |= m_collision_map[px];
 
