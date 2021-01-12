@@ -93,11 +93,15 @@ protected:
 
 	void set_duart_1_hack_ip(bool state);
 
-	void jpm_draw_lamps(int data, int lamp_strobe);
+	void jpm_draw_lamps(uint16_t data, int lamp_strobe);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_set_ip5);
 
 	virtual void update_irqs();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	uint16_t optos_r();
@@ -121,8 +125,6 @@ private:
 	void lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	void impact_non_video_map(address_map &map);

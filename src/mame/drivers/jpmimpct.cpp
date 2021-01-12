@@ -234,19 +234,23 @@ void jpmimpct_video_state::update_irqs()
 
 void jpmimpct_video_state::machine_start()
 {
-	m_digits.resolve();
+	jpmimpct_state::machine_start();
 
 	save_item(NAME(m_tms_irq));
 }
 
 void jpmimpct_video_state::machine_reset()
 {
+	jpmimpct_state::machine_reset();
+
 	/* Reset states */
 	m_tms_irq = 0;
 }
 
 void jpmimpct_state::machine_start()
 {
+	m_digits.resolve();
+	m_lamp_output.resolve();
 }
 
 void jpmimpct_state::machine_reset()
@@ -341,16 +345,6 @@ void jpmimpct_state::unk_w(uint16_t data)
 {
 }
 
-void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
-{
-	int i;
-	for (i=0; i<16; i++)
-	{
-		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		m_lamp_output[(16*lamp_strobe)+i] = m_Lamps[(16*lamp_strobe)+i];
-		data = data >> 1;
-	}
-}
 
 uint16_t jpmimpct_state::jpmio_r()
 {
@@ -406,9 +400,25 @@ void jpmimpct_state::reels_45_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
+void jpmimpct_state::jpm_draw_lamps(uint16_t data, int lamp_strobe)
+{
+	int i;
+	for (i=0; i<16; i++)
+	{
+		m_Lamps[(16*(m_lamp_strobe & 0xf))+i] = data & 1;
+		m_lamp_output[(16*(lamp_strobe & 0xf))+i] = m_Lamps[(16*(lamp_strobe & 0xf))+i];
+		data = data >> 1;
+	}
+}
+
+void jpmimpct_state::lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	jpm_draw_lamps(data, m_lamp_strobe);
+}
+
 void jpmimpct_state::digits_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//m_digits[m_lamp_strobe & 0xf] = data;
+	m_digits[m_lamp_strobe & 0xf] = data;
 }
 
 void jpmimpct_state::lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -487,10 +497,7 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
 	set_duart_1_hack_ip(false);
 }
 
-void jpmimpct_state::lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	//jpm_draw_lamps(data, m_lamp_strobe);
-}
+
 
 
 /*************************************
