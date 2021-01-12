@@ -6712,8 +6712,7 @@ ROM_END
 
 #define j6roller_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rcoastersoundalt.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) /* very different - not for base or club, maybe classic or wrong game? */ \
-	ROM_LOAD( "rocosnd.bin", 0x000000, 0x080000, CRC(60236e81) SHA1(9546c92d8a42d911e5b462c598a0b42987c0ba03) ) /* ok for base game */
+	ROM_LOAD( "rocosnd.bin", 0x000000, 0x080000, CRC(60236e81) SHA1(9546c92d8a42d911e5b462c598a0b42987c0ba03) )
 
 // this is the same as rocosnd.bin but with 0x77b50 as 0xf6 in the middle of an 0xff fill area, assume it to be bad
 //ROM_LOAD( "rcstrsnd.bin", 0x000000, 0x080000, CRC(b0753c1d) SHA1(b111ca10c01ee2089cbc613ad91235d429272ab8) )
