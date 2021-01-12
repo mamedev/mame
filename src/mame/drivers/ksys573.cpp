@@ -393,16 +393,16 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 // #define JVS_DEBUG
 
 /*
- * Class declaration for jvs_master
+ * Class declaration for sys573_jvs_host
  */
 
-DECLARE_DEVICE_TYPE(JVS_MASTER, jvs_master)
+DECLARE_DEVICE_TYPE(SYS573_JVS_HOST, sys573_jvs_host)
 
-class jvs_master : public jvs_host
+class sys573_jvs_host : public jvs_host
 {
 public:
 	// construction/destruction
-	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sys573_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void send_packet(uint8_t *data, int length);
 	int received_packet(uint8_t *buffer);
 
@@ -412,20 +412,20 @@ private:
 	int output_buffer_size = 0;
 };
 
-DEFINE_DEVICE_TYPE(JVS_MASTER, jvs_master, "jvs_master", "JVS MASTER")
+DEFINE_DEVICE_TYPE(SYS573_JVS_HOST, sys573_jvs_host, "sys573_jvs_host", "JVS Host (System 573)")
 
-jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, JVS_MASTER, tag, owner, clock)
+sys573_jvs_host::sys573_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: jvs_host(mconfig, SYS573_JVS_HOST, tag, owner, clock)
 {
 	output_buffer_size = 0;
 }
 
-READ_LINE_MEMBER( jvs_master::jvs_sense_r )
+READ_LINE_MEMBER( sys573_jvs_host::jvs_sense_r )
 {
 	return !get_address_set_line();
 }
 
-int jvs_master::received_packet(uint8_t *buffer)
+int sys573_jvs_host::received_packet(uint8_t *buffer)
 {
 	if (jvs_sense_r()) {
 		// The game will send the command twice to reset, but the command
@@ -458,7 +458,7 @@ int jvs_master::received_packet(uint8_t *buffer)
 	return (int)length;
 }
 
-void jvs_master::send_packet(uint8_t *data, int length)
+void sys573_jvs_host::send_packet(uint8_t *data, int length)
 {
 	while (length > 0)
 	{
@@ -501,7 +501,7 @@ public:
 		m_gunmania_id(*this, "gunmania_id"),
 		m_duart(*this, "mb89371"),
 		m_lamps(*this, "lamp%u", 0U),
-		m_jvs_master(*this, "jvs_master")
+		m_sys573_jvs_host(*this, "sys573_jvs_host")
 	{ }
 
 	void drmn9m(machine_config &config);
@@ -748,7 +748,7 @@ private:
 	optional_device<mb89371_device> m_duart;
 	output_finder<2> m_lamps;
 
-	required_device<jvs_master> m_jvs_master;
+	required_device<sys573_jvs_host> m_sys573_jvs_host;
 };
 
 void ksys573_state::konami573_map(address_map &map)
@@ -858,7 +858,7 @@ void ksys573_state::jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		LOGJVS("\n");
 
 		int command_size = m_jvs_input_buffer[2] + 3;
-		m_jvs_master->send_packet(m_jvs_input_buffer + 1, command_size - 2); // jvshost doesn't actually check the checksum, so don't send it
+		m_sys573_jvs_host->send_packet(m_jvs_input_buffer + 1, command_size - 2); // jvshost doesn't actually check the checksum, so don't send it
 
 		m_jvs_input_idx_w = 0;
 		m_jvs_input_idx_r = 0;
@@ -902,7 +902,7 @@ uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
 READ_LINE_MEMBER( ksys573_state::jvs_rx_r )
 {
 	if (m_jvs_output_len_w <= 0) {
-		m_jvs_output_len_w = m_jvs_master->received_packet(m_jvs_output_buffer);
+		m_jvs_output_len_w = m_sys573_jvs_host->received_packet(m_jvs_output_buffer);
 	}
 
 	return m_jvs_output_len_w > 0;
@@ -2415,7 +2415,7 @@ void ksys573_state::konami573(machine_config &config)
 	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 
-	JVS_MASTER(config, "jvs_master", 0);
+	SYS573_JVS_HOST(config, "sys573_jvs_host", 0);
 }
 
 // Variants with additional digital sound board
@@ -2525,7 +2525,7 @@ void ksys573_state::ddr2mc2(machine_config &config)
 	k573a(config);
 	cassx(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::ddr2ml(machine_config &config)
@@ -2534,7 +2534,7 @@ void ksys573_state::ddr2ml(machine_config &config)
 	pccard1_16mb(config);
 	cassx(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::ddrbocd(machine_config &config)
@@ -2552,7 +2552,7 @@ void ksys573_state::ddr3m(machine_config &config)
 	pccard2_32mb(config);
 	cassyyi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::ddr3mp(machine_config &config)
@@ -2563,7 +2563,7 @@ void ksys573_state::ddr3mp(machine_config &config)
 	pccard2_32mb(config);
 	cassxzi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::ddrusa(machine_config &config)
@@ -2582,7 +2582,7 @@ void ksys573_state::ddr5m(machine_config &config)
 	pccard2_32mb(config);
 	casszi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 // Dancing Stage
@@ -2669,7 +2669,7 @@ void ksys573_state::ddr4ms(machine_config &config)
 	pccard2_32mb(config);
 	cassxzi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 // DrumMania
@@ -2733,7 +2733,7 @@ void ksys573_state::gtrfrk2m(machine_config &config)
 	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
 
 	// For Guitar Freaks 2nd Mix Link Ver 1 (memory cards) and Link Ver 2 (memory cards + controllers)
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::gtrfrk3m(machine_config &config)
@@ -2742,7 +2742,7 @@ void ksys573_state::gtrfrk3m(machine_config &config)
 	cassxzi(config);
 	pccard1_16mb(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "jvs_master");
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, "sys573_jvs_host");
 }
 
 void ksys573_state::gtrfrk5m(machine_config &config)
@@ -2945,7 +2945,7 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, do_read )
 //  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_secflash_sda )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "jvs_master", jvs_master, jvs_sense_r )
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "sys573_jvs_host", sys573_jvs_host, jvs_sense_r )
 	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, jvs_rx_r )
 	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // JVS-related
 //  PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
