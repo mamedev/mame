@@ -1174,11 +1174,12 @@ sstingry                        // (c) 1986 Alpha Denshi Co.
 @source:alphajuno.cpp
 ajuno1                          //
 ajuno2                          //
+hs80                            //
 mks50                           //
 
 @source:alphasma.cpp
 asma2k                          // (c) 1997 Intelligent Peripheral Devices
-asmapro                         // (c) 1995 Intelligent Peripheral Devices 
+asmapro                         // (c) 1995 Intelligent Peripheral Devices
 
 @source:alphasma3k.cpp
 asma3k                          // (c) 2000 AlphaSmart, Inc.
@@ -4061,6 +4062,8 @@ sc2dels6                        //
 sc2dels7                        //
 sc2dels8                        //
 sc2dels9                        //
+sc2dels10                       //
+sc2dels11                       //
 sc2delsd                        //
 sc2delsm                        // (Mazooma set)
 sc2delsm1                       //
@@ -5902,6 +5905,7 @@ sc4himif                        //
 sc4himig                        //
 sc4himih                        //
 sc4himii                        //
+sc4hrolr                        // High Roller (Bellfruit)
 sc4hiss                         // Hissing Quid (Qps)
 sc4hissa                        //
 sc4hissb                        //
@@ -10400,6 +10404,7 @@ cit101xl                        //
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
+tabe22                          //
 vp122                           //
 
 @source:cit1500.cpp
@@ -19123,12 +19128,13 @@ konin                           //
 buttobi
 ddboy
 ddboya
-shuriboy
 fuusenpn
-tsukande
 mariorou
-tsupenta
+shuriboy
 slimekun
+tsukande
+tsupenta
+tsururin
 
 @source:konmedal68k.cpp
 dobouchn
@@ -20526,6 +20532,7 @@ m1dkong91na                     //
 m1dkong91np                     //
 m1dkong91p                      //
 m1dkonga                        //
+m1dkonga2                       //
 m1dkongp                        //
 m1dm4ev                         // Diamonds Are Forever Club (Maygay)
 m1dm4ev11                       //
@@ -21192,6 +21199,7 @@ m1simpsd                        //
 m1simpse                        //
 m1simpsf                        //
 m1simpsg                        //
+m1simpsh                        //
 m1sirich                        // Strike It Rich
 m1siricha                       //
 m1sirichb                       //
@@ -21200,6 +21208,7 @@ m1sixspn                        // Six Spinner (Maygay)
 m1spid                          // Spiderman (Maygay)
 m1spida                         //
 m1spidb                         //
+m1sprint                        //
 m1sprnov                        // Super Nova (Maygay)
 m1sptlgt                        // Spotlight (Maygay)
 m1sptlgta                       //
