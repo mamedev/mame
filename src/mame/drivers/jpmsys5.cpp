@@ -309,29 +309,27 @@ void jpmsys5_state::unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t jpmsys5_state::reellamps_0123_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: reellamps_0123_r %04x\n", machine().describe_context(), mem_mask);
-	return 0xffff;
+	return m_reellamps_0123;
 }
 
 void jpmsys5_state::reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: reellamps_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_reellamps_0123);
 }
 
 uint16_t jpmsys5_state::reellamps_4567_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: reellamps_4567_r %04x\n", machine().describe_context(), mem_mask);
-	return 0xffff;
+	return m_reellamps_5678;
 }
 
 void jpmsys5_state::reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: reellamps_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_reellamps_5678);
 }
 
-uint16_t jpmsys5_state::unk_r()
-{
-	return 0xffff;
-}
 
 // This mux_r / mux_w area seems to be a buffer for the strobing
 // are inputs actually only read into this area during strobing, just as the lamps values are only pulled
@@ -344,7 +342,7 @@ void jpmsys5_state::mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t jpmsys5_state::mux_r(offs_t offset, uint16_t mem_mask)
 {
-	//logerror("mux_r %04x %04x\n", offset<<1, mem_mask);
+	logerror("%s: mux_r offset: %04x mask: %04x\n", machine().describe_context(), offset<<1, mem_mask);
 
 	if ((offset == 0x80/2) && m_dsw)
 		return m_dsw->read();
@@ -442,8 +440,8 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x048002, 0x048003).r(FUNC(jpmsys5_state::unk_48002_r));
 	map(0x048004, 0x048005).r(FUNC(jpmsys5_state::coins_r));
 	map(0x048006, 0x048007).rw(FUNC(jpmsys5_state::unk_48006_r), FUNC(jpmsys5_state::unk_48006_w));
-	map(0x048008, 0x048009).w(FUNC(jpmsys5_state::reel_0123_w));
-	map(0x04800a, 0x04800b).w(FUNC(jpmsys5_state::reel_4567_w));
+	map(0x048008, 0x048009).nopr().w(FUNC(jpmsys5_state::reel_0123_w)); // only reads are dummy clr opcode reads?
+	map(0x04800a, 0x04800b).nopr().w(FUNC(jpmsys5_state::reel_4567_w));
 	map(0x04800c, 0x04800d).rw(FUNC(jpmsys5_state::reellamps_0123_r), FUNC(jpmsys5_state::reellamps_0123_w));
 	map(0x04800e, 0x04800f).rw(FUNC(jpmsys5_state::reellamps_4567_r), FUNC(jpmsys5_state::reellamps_4567_w));
 
@@ -848,6 +846,7 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 
 void jpmsys5_state::reels(machine_config &config)
 {
+	// probably incorrect reel types, but they do seem to only require 2 bits to write?
 	REEL(config, m_reel[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[0]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<0>));
 	REEL(config, m_reel[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2);

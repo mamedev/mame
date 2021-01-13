@@ -108,7 +108,9 @@ private:
 	uint16_t reellamps_4567_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t unk_r();
+	uint16_t m_reellamps_0123;
+	uint16_t m_reellamps_5678;
+
 	void mux_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mux_r(offs_t offset, uint16_t mem_mask = ~0);
 
