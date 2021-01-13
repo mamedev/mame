@@ -127,8 +127,9 @@ private:
 	void screen_enable_w(uint8_t data);
 	uint16_t unk_r();
 	void oki_bank_w(uint8_t data);
+	uint16_t video_flags_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline_cb);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void showhanc_map(address_map &map);
@@ -136,7 +137,7 @@ private:
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
 
-	void magibomb_base_map(address_map &map);
+	void magibomb_base_map(address_map &map, u32 base_offs);
 	void magibomb_map(address_map &map);
 	void magibombb_map(address_map &map);	
 
@@ -413,13 +414,28 @@ void astrocorp_state::speeddrp_map(address_map &map)
 // - tight loops at 0x1fb2, bypass by jumping to 0x1fb6, otherwise works on an initialized nvram/eeprom, 
 //   presumably wants an operator input code?
 
-void astrocorp_state::magibomb_base_map(address_map &map)
+uint16_t astrocorp_state::video_flags_r()
+{
+	// bit 0: vblank, bit 3: sprite busy flag?
+	
+	return m_screen->vblank();
+}
+
+void astrocorp_state::magibomb_base_map(address_map &map, u32 base_offs)
 {
 	map(0x000000, 0x01ffff).rom();
 //	map(0x040000, 0x07ffff) in client
+	map(0x040000+base_offs, 0x043fff+base_offs).ram().share("nvram");
+	map(0x050000+base_offs, 0x050fff+base_offs).ram().share("spriteram");
+	map(0x052000+base_offs, 0x052001+base_offs).w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x054000+base_offs, 0x054001+base_offs).portr("INPUTS");
+	map(0x058001+base_offs, 0x058001+base_offs).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x05a000+base_offs, 0x05a001+base_offs).w(FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x05e000+base_offs, 0x05e001+base_offs).portr("EEPROMIN");
+	
 	map(0x080001, 0x080001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x090001, 0x090001).w(FUNC(astrocorp_state::oki_bank_w));
-	map(0x0a0000, 0x0a0001).nopr(); // bit 0: vblank? bit 3: sprite busy flag?
+	map(0x0a0000, 0x0a0001).r(FUNC(astrocorp_state::video_flags_r));
 	map(0x0a0000, 0x0a0000).w(FUNC(astrocorp_state::screen_enable_w));
 
 	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -429,26 +445,12 @@ void astrocorp_state::magibomb_base_map(address_map &map)
 
 void astrocorp_state::magibomb_map(address_map &map)
 {
-	magibomb_base_map(map);
-	map(0x040000, 0x043fff).ram().share("nvram");
-	map(0x050000, 0x050fff).ram().share("spriteram");
-	map(0x052000, 0x052001).w(FUNC(astrocorp_state::draw_sprites_w));
-	map(0x054000, 0x054001).portr("INPUTS");
-	map(0x058001, 0x058001).w(FUNC(astrocorp_state::eeprom_w));
-	map(0x05a000, 0x05a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
-	map(0x05e000, 0x05e001).portr("EEPROMIN");
+	magibomb_base_map(map, 0x00000);
 }
 
 void astrocorp_state::magibombb_map(address_map &map)
 {
-	magibomb_base_map(map);
-	map(0x050000, 0x053fff).ram().share("nvram");
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x062000, 0x062001).w(FUNC(astrocorp_state::draw_sprites_w));
-	map(0x064000, 0x064001).portr("INPUTS");
-	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
-	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
-	map(0x06e000, 0x06e001).portr("EEPROMIN");
+	magibomb_base_map(map, 0x10000);
 }
 
 /***************************************************************************
@@ -608,7 +610,7 @@ void astrocorp_state::showhanc(machine_config &config)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline_cb)
 {
 	int scanline = param;
 
@@ -624,7 +626,7 @@ void astrocorp_state::skilldrp(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2); // JX-1689F1028N GRX586.V5
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::skilldrp_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(astrocorp_state::skilldrp_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(astrocorp_state::skilldrp_scanline_cb), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
