@@ -220,6 +220,7 @@ uint16_t jpmsys5_state::unk_4800c_r(offs_t offset, uint16_t mem_mask)
 uint16_t jpmsys5_state::reel_optos_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: reel_optos_r %04x\n", machine().describe_context(), mem_mask);
+//	return m_optic_pattern^0xff;
 	return m_optic_pattern;
 }
 
@@ -228,30 +229,30 @@ void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	logerror("%s: reel_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 
 	// only writes 0/1/2/3 to each reel?
-
-	uint8_t remap[4] = { 10, 6, 9, 5 };
+	if (data & 0xcccc)
+		popmessage("reel_0123_w upper bits set", data & 0xcccc);
 
 	if (m_reel[0])
 	{
-		m_reel[0]->update(remap[(data >> 0) & 0x03]);
+		m_reel[0]->update((data >> 0) & 0x03);
 		awp_draw_reel(machine(),"reel1", *m_reel[0]);
 	}
 
 	if (m_reel[1])
 	{
-		m_reel[1]->update(remap[(data >> 4)& 0x03]);
+		m_reel[1]->update((data >> 4)& 0x03);
 		awp_draw_reel(machine(),"reel2", *m_reel[1]);
 	}
 
 	if (m_reel[2])
 	{
-		m_reel[2]->update(remap[(data >> 8)& 0x03]);
+		m_reel[2]->update((data >> 8)& 0x03);
 		awp_draw_reel(machine(),"reel3", *m_reel[2]);
 	}
 
 	if (m_reel[3])
 	{
-		m_reel[3]->update(remap[(data >> 12)& 0x03]);
+		m_reel[3]->update((data >> 12)& 0x03);
 		awp_draw_reel(machine(),"reel4", *m_reel[3]);
 	}
 }
@@ -260,27 +261,28 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: reel_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-	uint8_t remap[4] = { 10, 6, 9, 5 };
+	if (data & 0xcccc)
+		popmessage("reel_4567_w upper bits set", data & 0xcccc);
 
 	if (m_reel[4])
 	{
-		m_reel[4]->update(remap[(data >> 0)& 0x03]);
+		m_reel[4]->update((data >> 0)& 0x03);
 		awp_draw_reel(machine(),"reel5", *m_reel[4]);
 	}
 	if (m_reel[5])
 	{
-		m_reel[5]->update(remap[(data >> 4)& 0x03]);
+		m_reel[5]->update((data >> 4)& 0x03);
 		awp_draw_reel(machine(),"reel6", *m_reel[5]);
 	}
 #if 0
 	if (m_reel[6])
 	{
-		m_reel[6]->update(remap(data >> 0)& 0x03]);
+		m_reel[6]->update(data >> 0)& 0x03);
 		awp_draw_reel(machine(),"reel6", *m_reel[6]);
 	}
 	if (m_reel[7])
 	{
-		m_reel[7]->update(remap[(data >> 4)& 0x03]);
+		m_reel[7]->update((data >> 4)& 0x03);
 		awp_draw_reel(machine(),"reel7", *m_reel[7]);
 	}
 #endif
@@ -820,17 +822,17 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 
 void jpmsys5_state::reels(machine_config &config)
 {
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[0]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[1]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[2], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[2]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[3]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[4], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[4]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	REEL(config, m_reel[5], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[5]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<5>));
 }
 
