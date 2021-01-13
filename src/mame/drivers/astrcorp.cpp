@@ -135,7 +135,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(astoneage_scanline_cb);
 
-	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void showhanc_map(address_map &map);
 	void showhand_map(address_map &map);
@@ -160,7 +160,7 @@ public:
 	void init_magibomb();
 
 protected:
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+//	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
 	uint16_t video_flags_r();
@@ -187,20 +187,20 @@ void astrocorp_state::video_start()
 
     Offset:    Bits:                  Value:
 
-    0          f--- ---- ---- ----    Show This Sprite
+    0          f--- ---- ---- ----    End flag (if 0 then stop processing)
                -e-- ---- ---- ----    ? set to 0
                --dc ba9- ---- ----    ignored?
                ---- ---8 7654 3210    X
 
     1                                 Code
 
-    2          fedc ba98 ---- ----    ignored?
+    2          fedc ba-- ---- ----    ignored?
+	           ---- --9- ---- ----    flip Y
+	           ---- ---8 ---- ----    flip X
                ---- ---- 7654 3210    Y
 
     3          fedc ba98 ---- ----    X Size
                ---- ---- 7654 3210    Y Size
-
-    If the first two words are zero, the sprite list ends
 
 ***************************************************************************/
 
@@ -219,56 +219,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		int dimx    = (attr >> 8) & 0xff;
 		int dimy    = (attr >> 0) & 0xff;
 
-		if (!sx && !code)
-			return;
-
-		if (!(sx & 0x8000))
-			continue;
-
-		sx &= 0x01ff;
-		sy &= 0x00ff;
-
-		for (int y = 0 ; y < dimy ; y++)
-		{
-			for (int x = 0 ; x < dimx ; x++)
-			{
-				for (int ywrap = 0 ; ywrap <= 0x100 ; ywrap += 0x100)
-				{
-					for (int xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
-					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-								code, 0,
-								0, 0,
-								sx + x * 16 - xwrap, sy + y * 16 - ywrap, 0xff);
-					}
-				}
-				code++;
-			}
-		}
-	}
-}
-
-// TODO: override only changed/added bits, or just merge if this really works the same in earlier HW
-void magibomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint16_t *source = m_spriteram;
-	uint16_t *finish = m_spriteram + m_spriteram.bytes() / 2;
-
-	for ( ; source < finish; source += 8 / 2 )
-	{
-		int sx      = source[ 0x0/2 ];
-		int code    = source[ 0x2/2 ];
-		int sy      = source[ 0x4/2 ];
-		int attr    = source[ 0x6/2 ];
-
-		int dimx    = (attr >> 8) & 0xff;
-		int dimy    = (attr >> 0) & 0xff;
-
-		if (!sx && !code)
-			return;
-
-		// unlike earlier HW this is more of a end flag?
-		// TODO: verify
+		// end flag, particularly needed by magibomb
 		if (!(sx & 0x8000))
 			return;
 
@@ -661,6 +612,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
+// TODO: move to ROM loading
 static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
 
 
