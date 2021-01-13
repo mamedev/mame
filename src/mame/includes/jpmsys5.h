@@ -39,7 +39,8 @@ public:
 		m_direct_port(*this, "DIRECT"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
-		m_sys5leds(*this, "sys5led%u", 0U)
+		m_sys5leds(*this, "sys5led%u", 0U),
+		m_reel(*this, "reel%u", 0U)
 	{ }
 
 	void jpmsys5(machine_config &config);
@@ -64,6 +65,7 @@ protected:
 	void jpmsys5_common(machine_config &config);
 	void ymsound(machine_config &config);
 	void saasound(machine_config &config);
+	void reels(machine_config &config);
 
 	void jpm_upd7759_w(offs_t offset, uint16_t data);
 	uint16_t jpm_upd7759_r();
@@ -88,17 +90,23 @@ protected:
 	void m68000_ym_map(address_map &map);
 
 private:
-	uint16_t coins_r(offs_t offset);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N))); else m_optic_pattern &= ~(1 << ((7-N))); }
+
+	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t unk_48006_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t unk_4800c_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	void reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
+	void unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unk_4800c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t unk_r();
 	void mux_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mux_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	uint16_t mux_awp_r(offs_t offset);
 	void sys5_draw_lamps();
 
 
@@ -109,10 +117,12 @@ private:
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 	output_finder<16 * 16> m_lamps;
 	output_finder<16 * 8> m_sys5leds;
+	optional_device_array<stepper_device, 8> m_reel;
 
 	int m_lamp_strobe;
 	int m_mpxclk;
 	uint16_t m_muxram[0x100];
+	uint16_t m_optic_pattern;
 	int m_chop;
 	uint8_t m_a0_data_out;
 	uint8_t m_a1_data_out;
