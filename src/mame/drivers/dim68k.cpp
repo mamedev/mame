@@ -286,14 +286,14 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 		if (m_video_control & 0x80)
 		{
 			gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-			*p++ = palette[BIT(gfx, 7)];
-			*p++ = palette[BIT(gfx, 6)];
-			*p++ = palette[BIT(gfx, 5)];
-			*p++ = palette[BIT(gfx, 4)];
-			*p++ = palette[BIT(gfx, 3)];
-			*p++ = palette[BIT(gfx, 2)];
-			*p++ = palette[BIT(gfx, 1)];
-			if (dot8) *p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[BIT(gfx, 7)*15];
+			*p++ = palette[BIT(gfx, 6)*15];
+			*p++ = palette[BIT(gfx, 5)*15];
+			*p++ = palette[BIT(gfx, 4)*15];
+			*p++ = palette[BIT(gfx, 3)*15];
+			*p++ = palette[BIT(gfx, 2)*15];
+			*p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 1)*15];
 		}
 		else
 		{
@@ -315,14 +315,14 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 		if (m_video_control & 0x80)
 		{
 			gfx = m_p_chargen[(chr << 4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-			*p++ = palette[BIT(gfx, 7)];
-			*p++ = palette[BIT(gfx, 6)];
-			*p++ = palette[BIT(gfx, 5)];
-			*p++ = palette[BIT(gfx, 4)];
-			*p++ = palette[BIT(gfx, 3)];
-			*p++ = palette[BIT(gfx, 2)];
-			*p++ = palette[BIT(gfx, 1)];
-			if (dot8) *p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[BIT(gfx, 7)*15];
+			*p++ = palette[BIT(gfx, 6)*15];
+			*p++ = palette[BIT(gfx, 5)*15];
+			*p++ = palette[BIT(gfx, 4)*15];
+			*p++ = palette[BIT(gfx, 3)*15];
+			*p++ = palette[BIT(gfx, 2)*15];
+			*p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 1)*15];
 		}
 		else
 		{
