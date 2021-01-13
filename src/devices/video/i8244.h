@@ -124,7 +124,10 @@ protected:
 	offs_t fix_register_mirrors(offs_t offset);
 	bool invalid_register(offs_t offset, bool rw);
 
-	void draw_char(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	/* timers */
 	static constexpr device_timer_id TIMER_VBLANK_START = 0;
