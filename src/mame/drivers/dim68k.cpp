@@ -10,9 +10,7 @@
         of the emulated systems, or you create any other format you wished.
 
         TODO:
-        - Floppy controller hookup and boot CP/M 68K
-        - Floppy formats
-        - Banking
+        - HLE serial keyboard
         - Graphics display (including colour and video_control options)
         - RTC (is this a thing?  the manual indicates it just uses the DUART's timers to track time)
         - Centronics printer
@@ -167,7 +165,7 @@ void dim68k_state::dim68k_video_control_w(u16 data)
    D2 0 = Screen On; 1 = Off [emulated]
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
- */
+*/
 	unsigned dots = (data & 0x40) ? 7 : 8;
 	m_crtc->set_hpixels_per_column(dots);
 	m_video_control = data;
@@ -285,30 +283,58 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 		xx++;
 
 		chr = chr16>>8;
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		if (dot8) *p++ = palette[BIT(gfx, 1)];
+		if (m_video_control & 0x80)
+		{
+			gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			if (dot8) *p++ = palette[BIT(gfx, 1)];
+		}
+		else
+		{
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			if (dot8) *p++ = palette[chr & 0xf];
+		}
 
 		inv = 0;
 		if (xx == cursor_x) inv=0xff;
 		xx++;
 
 		chr = chr16;
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		if (dot8) *p++ = palette[BIT(gfx, 1)];
+		if (m_video_control & 0x80)
+		{
+			gfx = m_p_chargen[(chr << 4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			if (dot8) *p++ = palette[BIT(gfx, 1)];
+		}
+		else
+		{
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			if (dot8) *p++ = palette[chr & 0xf];
+		}
 	}
 }
 
@@ -332,7 +358,7 @@ GFXDECODE_END
 
 static void dim68k_floppies(device_slot_interface &device)
 {
-	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 void dim68k_state::machine_start()
@@ -363,7 +389,7 @@ void dim68k_state::dim68k(machine_config &config)
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 250-1);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette).set_entries(16);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
@@ -372,8 +398,8 @@ void dim68k_state::dim68k(machine_config &config)
 
 	/* Devices */
 	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);
@@ -428,6 +454,7 @@ ROM_START( dim68k )
 	ROM_REGION16_BE( 0x2000, "bootrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "mc103e.bin", 0x0001, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
 	ROM_LOAD16_BYTE( "mc104.bin",  0x0000, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
+	ROM_FILL(0x11dd, 1, 0x0d)   // TEMP: patch keyboard table so return is return
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
