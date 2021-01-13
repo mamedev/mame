@@ -106,7 +106,7 @@ public:
     news_r4k_state(machine_config const &mconfig, device_type type, char const *tag)
         : driver_device(mconfig, type, tag),
           m_cpu(*this, "cpu"),
-          m_ram(*this, "ram"),
+          //m_ram(*this, "ram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
           m_fdc(*this, "fdc"),
@@ -200,7 +200,7 @@ protected:
 #endif
 
     // Main memory
-    required_device<ram_device> m_ram;
+    //required_device<ram_device> m_ram;
 
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
@@ -291,8 +291,8 @@ void news_r4k_state::machine_common(machine_config &config)
     m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 
     // Main memory
-    RAM(config, m_ram);
-    m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
+    //RAM(config, m_ram);
+    //m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
     // Timekeeper IC
     M48T02(config, m_rtc);
@@ -372,7 +372,6 @@ void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); 
 void news_r4k_state::cpu_map(address_map &map)
 {
     map.unmap_value_high();
-    //map(0x4000008, 0x4ffffff).lrw32(NAME([this](offs_t offset){ bus_error(); return 0xff;}), NAME([this](uint32_t data) {bus_error();}));
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM
@@ -392,6 +391,9 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f4e0000, 0x1f4e0017).w(FUNC(news_r4k_state::intclr_w));                                // Clear
     map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w)); // Enable
     map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));                                 // Status
+
+    // Port to shut off system (write a 0 to this)
+    // map(0x1fc40000, 0x1fc40003)
 
     // LEDs
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
@@ -456,6 +458,14 @@ void news_r4k_state::cpu_map(address_map &map)
  */
 void news_r4k_state::cpu_map_debug(address_map &map)
 {
+    // After playing around with the memory enumeration, I found a combo (below) that will get the MROM to enumerate
+    // memory. But, it fails memtest because it expects memory in regions that break the memory enumeration.
+    // Either this is almost but not quite there in terms of mapping, or there is something I am seriously missing
+    // (external memory mapping controller, etc.).
+    map(0x0, 0x01ffffff).ram();
+    map(0x3f00000, 0x3ffffff).ram();
+    map(0x7f00000, 0x7ffffff).ram();
+
     // APBus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // map(0x1f520004, 0x1f520007); // WBFLUSH
@@ -501,9 +511,10 @@ void news_r4k_state::machine_reset()
 
 void news_r4k_state::init_common()
 {
-    // map the configured ram
-    m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
-    m_cpu->space(0).install_ram(0x08000000, 0x8000000 + m_ram->mask(), m_ram->pointer());
+    // map the configured ram (temporarily not using this)
+    //m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
+    //m_cpu->space(0).install_ram(0x03f00000, 0x3f00000 + m_ram->mask(), m_ram->pointer());
+    //m_cpu->space(0).install_ram(0x07f00000, 0x7f00000 + m_ram->mask(), m_ram->pointer());
 }
 
 void news_r4k_state::init_nws5000x()
