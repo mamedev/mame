@@ -1881,10 +1881,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanamai )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "1 free credit" )
+	PORT_DIPNAME( 0x01, 0x01, "Start with 2 credits" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "2 free credits" )	// if 0x01 and 0x02 are both On: 4 free credits
+	PORT_DIPNAME( 0x02, 0x02, "Start with 3 credits" )	// if 0x01 and 0x02 are both On: Start with 5 credits
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -1910,7 +1910,7 @@ static INPUT_PORTS_START( hanamai )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "960 points" )
+	PORT_DIPNAME( 0x02, 0x02, "Start rounds with 960 points" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Reveal P2 cards" )
