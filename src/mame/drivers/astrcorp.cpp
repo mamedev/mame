@@ -72,6 +72,7 @@ public:
 	void speeddrp(machine_config &config);
 	void showhanc(machine_config &config);
 	void magibomb(machine_config &config);
+	void magibombb(machine_config &config);
 
 	void init_astoneag();
 	void init_magibomb();
@@ -130,11 +131,14 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void magibomb_map(address_map &map);
 	void showhanc_map(address_map &map);
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
+
+	void magibomb_base_map(address_map &map);
+	void magibomb_map(address_map &map);
+	void magibombb_map(address_map &map);	
 
 	void decrypt_rom(const decryption_info &table);
 };
@@ -192,11 +196,15 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		if (!sx && !code)
 			return;
 
+		// TODO: end flag in magibomb?
 		if (!(sx & 0x8000))
 			continue;
 
 		sx &= 0x01ff;
 		sy &= 0x00ff;
+		
+		// sy & 0x100: invert X draw direction (star in magibomb game select)
+		// sy & 0x200: used by reels in magibomb, unknown purpose
 
 		for (int y = 0 ; y < dimy ; y++)
 		{
@@ -397,22 +405,50 @@ void astrocorp_state::speeddrp_map(address_map &map)
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void astrocorp_state::magibomb_map(address_map &map) // TODO: check everything, the ranges are currently supposed correct for magibombb
+// PC refers to magibomb:
+// - 0x22a4 reads to $a0101a, resets if 0
+// - 0x8ba if $a10001 & 0xf != 0 it writes "SEGA" to $a14000 (wtf?)
+// - all lv 1-7 irqs writes a vector to D1 then resets program flow, 
+//   is it expecting to NOT use irqs at all and actually using it for remote control?
+// - tight loops at 0x1fb2, bypass by jumping to 0x1fb6, otherwise works on an initialized nvram/eeprom, 
+//   presumably wants an operator input code?
+
+void astrocorp_state::magibomb_base_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x050000, 0x053fff).ram().share("nvram"); // battery
+//	map(0x040000, 0x07ffff) in client
+	map(0x080001, 0x080001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x090001, 0x090001).w(FUNC(astrocorp_state::oki_bank_w));
+	map(0x0a0000, 0x0a0001).nopr(); // bit 0: vblank? bit 3: sprite busy flag?
+	map(0x0a0000, 0x0a0000).w(FUNC(astrocorp_state::screen_enable_w));
+
+	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa005ff).ram(); // unknown
+	map(0xa0101a, 0xa0101b).r(FUNC(astrocorp_state::unk_r));
+}
+
+void astrocorp_state::magibomb_map(address_map &map)
+{
+	magibomb_base_map(map);
+	map(0x040000, 0x043fff).ram().share("nvram");
+	map(0x050000, 0x050fff).ram().share("spriteram");
+	map(0x052000, 0x052001).w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x054000, 0x054001).portr("INPUTS");
+	map(0x058001, 0x058001).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x05a000, 0x05a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x05e000, 0x05e001).portr("EEPROMIN");
+}
+
+void astrocorp_state::magibombb_map(address_map &map)
+{
+	magibomb_base_map(map);
+	map(0x050000, 0x053fff).ram().share("nvram");
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x062000, 0x062001).w(FUNC(astrocorp_state::draw_sprites_w));
 	map(0x064000, 0x064001).portr("INPUTS");
 	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
 	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::skilldrp_outputs_w));
 	map(0x06e000, 0x06e001).portr("EEPROMIN");
-	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-
-	// tbd
-	//map(0xX00001, 0xX00001).w(FUNC(astrocorp_state::screen_enable_w));
-	//map(0xX80001, 0xX80001).w(FUNC(astrocorp_state::oki_bank_w));
-	//map(0xX00001, 0xX00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 /***************************************************************************
@@ -504,6 +540,17 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magibomb )
+	PORT_INCLUDE( skilldrp )
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 )   PORT_NAME("Stop3 / Take Score")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 )   PORT_NAME("Stop1 / Double Up")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER      )   PORT_NAME("Reserve SW") // unknown purpose
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Big")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2 )   PORT_NAME("Stop2 / Small")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -612,10 +659,19 @@ void astrocorp_state::speeddrp(machine_config &config)
 void astrocorp_state::magibomb(machine_config &config)
 {
 	skilldrp(config);
-	m_maincpu->set_clock(XTAL(80'000'000) / 5); // XTAL verified, TODO: unknown divider
+//	m_maincpu->set_clock(XTAL(80'000'000) / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::magibomb_map);
+	config.device_remove("scantimer");
 
-	// TODO: video timing uses also 80 MHz XTAL
+	m_screen->set_raw(XTAL(26'601'712) / 4, 433, 0, 320, 261, 0, 240);
+
+	// TODO: 80 MHz XTAL for VGA-like pixel clock?
+}
+
+void astrocorp_state::magibombb(machine_config &config)
+{
+	magibomb(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::magibombb_map);
 }
 
 // TODO: stoneage machine_config
@@ -1455,11 +1511,11 @@ GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_ini
 // Encrypted games (not working):
 
 // Simpler encryption
-GAME( 2001?, magibomb,  0,        magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2002,  magibomba, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM
-GAME( 2002,  magibombb, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2001,  magibombc, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2001?, magibombe, magibomb, magibomb, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001?, magibomb,  0,        magibomb, magibomb, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  magibomba, magibomb, magibomb, magibomb, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM
+GAME( 2002,  magibombb, magibomb, magibombb,magibomb, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001,  magibombc, magibomb, magibomb, magibomb, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001?, magibombe, magibomb, magibomb, magibomb, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
 GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
