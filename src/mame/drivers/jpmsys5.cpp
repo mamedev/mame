@@ -274,27 +274,27 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (m_reel[4])
 	{
-		m_reel[4]->update((data >> 0)& 0x03);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->update((data >> 0) & 0x03);
+		awp_draw_reel(machine(), "reel5", *m_reel[4]);
 	}
 	if (m_reel[5])
 	{
-		m_reel[5]->update((data >> 4)& 0x03);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel[5]->update((data >> 4) & 0x03);
+		awp_draw_reel(machine(), "reel6", *m_reel[5]);
 	}
 #if 0
 	if (m_reel[6])
 	{
-		m_reel[6]->update(data >> 8)& 0x03);
-		awp_draw_reel(machine(),"reel6", *m_reel[6]);
+		m_reel[6]->update(data >> 8) & 0x03);
+		awp_draw_reel(machine(), "reel6", *m_reel[6]);
 	}
 	if (m_reel[7])
 	{
-		m_reel[7]->update((data >> 12)& 0x03);
-		awp_draw_reel(machine(),"reel7", *m_reel[7]);
+		m_reel[7]->update((data >> 12) & 0x03);
+		awp_draw_reel(machine(), "reel7", *m_reel[7]);
 	}
 #endif
-]
+}
 
 void jpmsys5_state::unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
