@@ -122,7 +122,7 @@ private:
 	// video-related
 	bitmap_ind16 m_bitmap;
 	uint8_t      m_screen_enable;
-	uint16_t     m_draw_sprites;
+	uint16_t     m_sprite_dma;
 
 	output_finder<7> m_lamps;
 
@@ -169,7 +169,7 @@ void astrocorp_state::video_start()
 
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_screen_enable));
-	save_item(NAME(m_draw_sprites));
+	save_item(NAME(m_sprite_dma));
 }
 
 /***************************************************************************
@@ -307,8 +307,8 @@ uint32_t astrocorp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 void astrocorp_state::draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t old = m_draw_sprites;
-	uint16_t now = COMBINE_DATA(&m_draw_sprites);
+	uint16_t old = m_sprite_dma;
+	uint16_t now = COMBINE_DATA(&m_sprite_dma);
 
 	if (!old && now)
 		draw_sprites(m_bitmap, m_screen->visible_area());
@@ -487,7 +487,7 @@ uint16_t magibomb_state::video_flags_r()
 void magibomb_state::magibomb_base_map(address_map &map, u32 base_offs)
 {
 	map(0x000000, 0x01ffff).rom();
-//	map(0x040000, 0x07ffff) in client
+//	map(0x040000, 0x07ffff) in client (later HW maps these ones at 0x50000-0x6ffff instead of 0x40000-0x5ffff)
 	map(0x040000+base_offs, 0x043fff+base_offs).ram().share("nvram");
 	map(0x050000+base_offs, 0x050fff+base_offs).ram().share("spriteram");
 	map(0x052000+base_offs, 0x052001+base_offs).w(FUNC(magibomb_state::draw_sprites_w));
