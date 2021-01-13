@@ -206,6 +206,18 @@ uint16_t jpmsys5_state::coins_r(offs_t offset, uint16_t mem_mask)
 	return ioport("COINS")->read() << 8;
 }
 
+uint16_t jpmsys5_state::unk_48000_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: unk_48000_r %04x\n", machine().describe_context(), mem_mask);
+	return 0xffff;
+}
+
+uint16_t jpmsys5_state::unk_48002_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: unk_48002_r %04x\n", machine().describe_context(), mem_mask);
+	return 0xffff;
+}
+
 uint16_t jpmsys5_state::unk_48006_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: unk_48006_r %04x\n", machine().describe_context(), mem_mask);
@@ -272,12 +284,12 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 #if 0
 	if (m_reel[6])
 	{
-		m_reel[6]->update(data >> 0)& 0x03);
+		m_reel[6]->update(data >> 8)& 0x03);
 		awp_draw_reel(machine(),"reel6", *m_reel[6]);
 	}
 	if (m_reel[7])
 	{
-		m_reel[7]->update((data >> 4)& 0x03);
+		m_reel[7]->update((data >> 12)& 0x03);
 		awp_draw_reel(machine(),"reel7", *m_reel[7]);
 	}
 #endif
@@ -425,8 +437,8 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0460c0, 0x0460c1).nopw();
 
-	map(0x048000, 0x048001).w(FUNC(jpmsys5_state::unk_48000_w));
-
+	map(0x048000, 0x048001).rw(FUNC(jpmsys5_state::unk_48000_r), FUNC(jpmsys5_state::unk_48000_w));
+	map(0x048002, 0x048003).r(FUNC(jpmsys5_state::unk_48002_r));
 	map(0x048004, 0x048005).r(FUNC(jpmsys5_state::coins_r));
 	map(0x048006, 0x048007).rw(FUNC(jpmsys5_state::unk_48006_r), FUNC(jpmsys5_state::unk_48006_w));
 	map(0x048008, 0x048009).w(FUNC(jpmsys5_state::reel_0123_w));

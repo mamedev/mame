@@ -94,6 +94,8 @@ private:
 
 	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t unk_48000_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t unk_48002_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t unk_48006_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	void reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
