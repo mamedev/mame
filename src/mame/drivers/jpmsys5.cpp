@@ -84,7 +84,7 @@ void jpmsys5v_state::sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_
 	int col;
 
 	if (func == 0 || func == 2)
-		col = offset  & 0xff;
+		col = offset & 0xff;
 	else
 	{
 		col = (offset << 1);
@@ -108,7 +108,7 @@ uint16_t jpmsys5v_state::sys5_tms34061_r(offs_t offset, uint16_t mem_mask)
 	int col;
 
 	if (func == 0 || func == 2)
-		col = offset  & 0xff;
+		col = offset & 0xff;
 	else
 	{
 		col = (offset << 1);
@@ -163,12 +163,12 @@ uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rg
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t const *const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
+		uint8_t const* const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff) * 2 + 256 * y];
+		uint32_t* dest = &bitmap.pix(y, cliprect.min_x);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x +=2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint8_t const pen = src[(x-cliprect.min_x)>>1];
+			uint8_t const pen = src[(x - cliprect.min_x) >> 1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen((pen >> 4) & 0xf);
@@ -183,11 +183,11 @@ void jpmsys5_state::sys5_draw_lamps()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_lamps   [(m_lamp_strobe << 4) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 0], i);
-		m_lamps   [(m_lamp_strobe << 4) | i | 8] = BIT(m_muxram[(m_lamp_strobe << 2) | 1], i);
+		m_lamps[(m_lamp_strobe << 4) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 0], i);
+		m_lamps[(m_lamp_strobe << 4) | i | 8] = BIT(m_muxram[(m_lamp_strobe << 2) | 1], i);
 	}
 
-	m_sys5leds[m_lamp_strobe]     = m_muxram[(m_lamp_strobe << 2) | 2];
+	m_sys5leds[m_lamp_strobe] = m_muxram[(m_lamp_strobe << 2) | 2];
 }
 
 /****************************************
@@ -243,25 +243,25 @@ void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_reel[0])
 	{
 		m_reel[0]->update((data >> 0) & 0x03);
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+		awp_draw_reel(machine(), "reel1", *m_reel[0]);
 	}
 
 	if (m_reel[1])
 	{
-		m_reel[1]->update((data >> 4)& 0x03);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+		m_reel[1]->update((data >> 4) & 0x03);
+		awp_draw_reel(machine(), "reel2", *m_reel[1]);
 	}
 
 	if (m_reel[2])
 	{
-		m_reel[2]->update((data >> 8)& 0x03);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+		m_reel[2]->update((data >> 8) & 0x03);
+		awp_draw_reel(machine(), "reel3", *m_reel[2]);
 	}
 
 	if (m_reel[3])
 	{
-		m_reel[3]->update((data >> 12)& 0x03);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
+		m_reel[3]->update((data >> 12) & 0x03);
+		awp_draw_reel(machine(), "reel4", *m_reel[3]);
 	}
 }
 
@@ -294,7 +294,7 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		awp_draw_reel(machine(),"reel7", *m_reel[7]);
 	}
 #endif
-}
+]
 
 void jpmsys5_state::unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
