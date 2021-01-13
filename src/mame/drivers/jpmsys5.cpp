@@ -584,13 +584,11 @@ void jpmsys5v_state::machine_reset()
  *
  *************************************/
 
-void jpmsys5v_state::jpmsys5v(machine_config &config)
+void jpmsys5_state::jpmsys5_common(machine_config& config)
 {
 	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5v_state::m68000_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
 	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
 
 	ACIA6850(config, m_acia6850[0], 0);
@@ -600,11 +598,11 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
+	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5_state::a1_tx_w));
 	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
 
 	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
+	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
 	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
@@ -618,9 +616,47 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	S16LF01(config, m_vfd);
 
-	S16LF01(config, m_vfd); //for debug ports
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
+	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
+	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
+	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
+	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
+	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
+	/* 6840 PTM */
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
+	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
+	config.set_default_layout(layout_jpmsys5);
+}
+
+void jpmsys5_state::ymsound(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	ym2413_device &ym2413(YM2413(config, "ym2413", 4000000)); /* Unconfirmed */
+	ym2413.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+void jpmsys5_state::saasound(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	SAA1099(config, "saa", 4000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void jpmsys5v_state::tmsvideo(machine_config &config)
+{
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254);
 	screen.set_screen_update(FUNC(jpmsys5v_state::screen_update_jpmsys5v));
@@ -631,28 +667,43 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	m_tms34061->int_callback().set(FUNC(jpmsys5v_state::generate_tms34061_interrupt));
 
 	PALETTE(config, "palette").set_entries(16);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	/* Earlier revisions use an SAA1099, but no video card games seem to (?) */
-	YM2413(config, "ym2413", 4000000).add_route(ALL_OUTPUTS, "mono", 1.00); /* Unconfirmed */
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5v_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5v_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5v_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5v_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5v_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5v_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5v_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
 }
+
+void jpmsys5v_state::jpmsys5v(machine_config &config)
+{
+	jpmsys5_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5v_state::m68000_map);
+
+	ymsound(config);
+
+	tmsvideo(config);
+}
+
+// later (incompatible with earlier revision) motherboards used a YM2413
+void jpmsys5_state::jpmsys5_ym(machine_config &config)
+{
+	jpmsys5_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
+
+	METERS(config, m_meters, 0).set_number(8);
+
+	ymsound(config);
+}
+
+// the first rev PCB used an SAA1099
+void jpmsys5_state::jpmsys5(machine_config &config)
+{
+	jpmsys5_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
+
+	METERS(config, m_meters, 0).set_number(8);
+
+	saasound(config);
+}
+
 
 uint16_t jpmsys5_state::mux_awp_r(offs_t offset)
 {
@@ -807,138 +858,6 @@ void jpmsys5_state::machine_reset()
 
 /*************************************
  *
- *  Machine driver
- *
- *************************************/
-
-// later (incompatible with earlier revision) motherboards used a YM2413
-void jpmsys5_state::jpmsys5_ym(machine_config &config)
-{
-	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
-
-	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
-
-	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
-	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
-
-	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
-
-	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
-	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
-
-	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
-	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
-
-	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
-	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	S16LF01(config, m_vfd);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	/* Earlier revisions use an SAA1099 */
-	ym2413_device &ym2413(YM2413(config, "ym2413", 4000000)); /* Unconfirmed */
-	ym2413.add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
-
-	METERS(config, m_meters, 0).set_number(8);
-}
-
-// the first rev PCB used an SAA1099
-void jpmsys5_state::jpmsys5(machine_config &config)
-{
-	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
-
-	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
-
-	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
-	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
-
-	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
-
-	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
-	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
-
-	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
-	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
-
-	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
-	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	S16LF01(config, m_vfd);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	SAA1099(config, "saa", 4000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
-
-	METERS(config, m_meters, 0).set_number(8);
-}
-
-/*************************************
- *
  *  ROM definition(s)
  *
  *************************************/
@@ -1080,6 +999,8 @@ ROM_START( cashcade )
 	ROM_LOAD16_BYTE( "cashcade_2_2.bin", 0x000001, 0x010000, CRC(8ce8cd66) SHA1(4eb00af6a0260496950d04fdcc1d3d976868ce3e) )
 	ROM_LOAD16_BYTE( "cashcade_2_3.bin", 0x020000, 0x010000, CRC(a4caddd1) SHA1(074e4aa870c3d28c2f120936ef6928c3b5e14301) )
 	ROM_LOAD16_BYTE( "cashcade_2_4.bin", 0x020001, 0x010000, CRC(b0f595e8) SHA1(5ca12839b87d092504d8b7cc579b8f1b2406cea1) )
+
+	// likely missing a disk? or something with the questions on
 ROM_END
 
 
@@ -1090,7 +1011,9 @@ GAME( 1994, monopoly4,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_
 GAME( 1994, monopoly3,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 3) (SYSTEM5 VIDEO)",   0 )
 GAME( 1995, monoplcl,     monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5) (SYSTEM5 VIDEO)", 0 )
 GAME( 1995, monoplcld,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5, Protocol) (SYSTEM5 VIDEO)", 0 )
+
 GAME( 1995, monopldx,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6) (SYSTEM5 VIDEO)",  0 )
 GAME( 1995, monopldxd,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6, Protocol) (SYSTEM5 VIDEO)", 0 )
 GAME( 1995, monopldx1,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 1) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING ) // no questions?
+
 GAME( 199?, cashcade,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?

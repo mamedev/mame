@@ -53,6 +53,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void jpmsys5_common(machine_config &config);
+	void ymsound(machine_config &config);
+	void saasound(machine_config &config);
+
 	void jpm_upd7759_w(offs_t offset, uint16_t data);
 	uint16_t jpm_upd7759_r();
 
@@ -111,6 +115,8 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void tmsvideo(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	void sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
