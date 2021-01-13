@@ -90,18 +90,21 @@ protected:
 	void m68000_ym_map(address_map &map);
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((N)^4)); else m_optic_pattern &= ~(1 << ((N)^4)); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << (7-N)); else m_optic_pattern &= ~(1 << (7-N)); }
 
 	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t unk_48006_r(offs_t offset, uint16_t mem_mask = ~0);
-	uint16_t unk_4800c_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	void reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void unk_4800c_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t reellamps_0123_r(offs_t offset, uint16_t mem_mask = ~0);
+	void reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t reellamps_4567_r(offs_t offset, uint16_t mem_mask = ~0);
+	void reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t unk_r();
 	void mux_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

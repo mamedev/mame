@@ -212,11 +212,6 @@ uint16_t jpmsys5_state::unk_48006_r(offs_t offset, uint16_t mem_mask)
 	return 0xffff;
 }
 
-uint16_t jpmsys5_state::unk_4800c_r(offs_t offset, uint16_t mem_mask)
-{
-	logerror("%s: unk_4800c_r %04x\n", machine().describe_context(), mem_mask);
-	return 0xffff;
-}
 
 uint16_t jpmsys5_state::reel_optos_r(offs_t offset, uint16_t mem_mask)
 {
@@ -298,9 +293,26 @@ void jpmsys5_state::unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	logerror("%s: unk_48006_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
-void jpmsys5_state::unk_4800c_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint16_t jpmsys5_state::reellamps_0123_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: unk_4800c_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	logerror("%s: reellamps_0123_r %04x\n", machine().describe_context(), mem_mask);
+	return 0xffff;
+}
+
+void jpmsys5_state::reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+uint16_t jpmsys5_state::reellamps_4567_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_4567_r %04x\n", machine().describe_context(), mem_mask);
+	return 0xffff;
+}
+
+void jpmsys5_state::reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 uint16_t jpmsys5_state::unk_r()
@@ -419,7 +431,8 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x048006, 0x048007).rw(FUNC(jpmsys5_state::unk_48006_r), FUNC(jpmsys5_state::unk_48006_w));
 	map(0x048008, 0x048009).w(FUNC(jpmsys5_state::reel_0123_w));
 	map(0x04800a, 0x04800b).w(FUNC(jpmsys5_state::reel_4567_w));
-	map(0x04800c, 0x04800d).rw(FUNC(jpmsys5_state::unk_4800c_r), FUNC(jpmsys5_state::unk_4800c_w));
+	map(0x04800c, 0x04800d).rw(FUNC(jpmsys5_state::reellamps_0123_r), FUNC(jpmsys5_state::reellamps_0123_w));
+	map(0x04800e, 0x04800f).rw(FUNC(jpmsys5_state::reellamps_4567_r), FUNC(jpmsys5_state::reellamps_4567_w));
 
 	// 48010 - 4801f = some I/O device?
 	map(0x048012, 0x048013).r(FUNC(jpmsys5_state::reel_optos_r));
@@ -922,13 +935,13 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Direct 0x08" ) // These are the % key, at least for popeye?
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Direct 0x10" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Direct 0x20" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
