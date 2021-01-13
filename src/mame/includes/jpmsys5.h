@@ -28,6 +28,14 @@ public:
 		m_acia6850(*this, "acia6850_%u", 0U),
 		m_vfd(*this, "vfd"),
 		m_upd7759(*this, "upd7759"),
+		m_dsw(*this, "DSW"),
+		m_dsw2(*this, "DSW2"),
+		m_rotary(*this, "ROTARY"),
+		m_strobe0(*this, "STROBE0"),
+		m_strobe1(*this, "STROBE1"),
+		m_strobe2(*this, "STROBE2"),
+		m_strobe3(*this, "STROBE3"),
+		m_strobe4(*this, "STROBE4"),
 		m_direct_port(*this, "DIRECT"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -65,18 +73,34 @@ protected:
 	optional_device<s16lf01_device> m_vfd;
 	required_device<upd7759_device> m_upd7759;
 
+	optional_ioport m_dsw;
+	optional_ioport m_dsw2;
+	optional_ioport m_rotary;
+	optional_ioport m_strobe0;
+	optional_ioport m_strobe1;
+	optional_ioport m_strobe2;
+	optional_ioport m_strobe3;
+	optional_ioport m_strobe4;
+
 	void jpm_sys5_common_map(address_map &map);
+
+protected:
+	void m68000_ym_map(address_map &map);
 
 private:
 	uint16_t coins_r(offs_t offset);
-	void coins_w(uint16_t data);
+
+	void reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+
 	uint16_t unk_r();
-	void mux_w(offs_t offset, uint16_t data);
-	uint16_t mux_r(offs_t offset);
+	void mux_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mux_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	uint16_t mux_awp_r(offs_t offset);
-	uint16_t coins_awp_r(offs_t offset);
 	void sys5_draw_lamps();
+
 
 	void m68000_awp_map(address_map &map);
 	void m68000_awp_map_saa(address_map &map);
@@ -88,7 +112,7 @@ private:
 
 	int m_lamp_strobe;
 	int m_mpxclk;
-	int m_muxram[255];
+	uint16_t m_muxram[0x100];
 	int m_chop;
 	uint8_t m_a0_data_out;
 	uint8_t m_a1_data_out;

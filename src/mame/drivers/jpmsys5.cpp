@@ -202,34 +202,67 @@ void jpmsys5v_state::rombank_w(uint16_t data)
 
 uint16_t jpmsys5_state::coins_r(offs_t offset)
 {
-	if (offset == 2)
-		return ioport("COINS")->read() << 8;
-	else
-		return 0xffff;
+	return ioport("COINS")->read() << 8;
 }
 
-void jpmsys5_state::coins_w(uint16_t data)
+void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* TODO */
+	//logerror("reel_0123_w %04x %04x\n", data, mem_mask);
 }
+
+void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//logerror("reel_4567_w %04x %04x\n", data, mem_mask);
+}
+
 
 uint16_t jpmsys5_state::unk_r()
 {
 	return 0xffff;
 }
 
-void jpmsys5_state::mux_w(offs_t offset, uint16_t data)
+// This mux_r / mux_w area seems to be a buffer for the strobing
+// are inputs actually only read into this area during strobing, just as the lamps values are only pulled
+// to go to the lamps during strobing?
+
+void jpmsys5_state::mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_muxram[offset]=data;
+	COMBINE_DATA(&m_muxram[offset]);
 }
 
-uint16_t jpmsys5_state::mux_r(offs_t offset)
+uint16_t jpmsys5_state::mux_r(offs_t offset, uint16_t mem_mask)
 {
-	if (offset == 0x81/2)
-		return ioport("DSW")->read();
+	//logerror("mux_r %04x %04x\n", offset<<1, mem_mask);
+
+	if ((offset == 0x80/2) && m_dsw)
+		return m_dsw->read();
+
+	if ((offset == 0x82/2) && m_dsw2)
+		return m_dsw2->read();
+
+	if ((offset == 0x84/2) && m_rotary)
+		return m_rotary->read();
+
+	if ((offset == 0x86/2) && m_strobe0)
+		return m_strobe0->read();
+
+	if ((offset == 0x88/2) && m_strobe1)
+		return m_strobe1->read();
+
+	if ((offset == 0x8a/2) && m_strobe2)
+		return m_strobe2->read();
+
+	if ((offset == 0x8c/2) && m_strobe3)
+		return m_strobe3->read();
+
+	if ((offset == 0x8e/2) && m_strobe4)
+		return m_strobe4->read();
 
 	return 0xffff;
 }
+
+
+
 
 void jpmsys5_state::jpm_upd7759_w(offs_t offset, uint16_t data)
 {
@@ -288,15 +321,23 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x046080, 0x046083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0460c0, 0x0460c1).nopw();
-	map(0x048000, 0x04801f).rw(FUNC(jpmsys5_state::coins_r), FUNC(jpmsys5_state::coins_w));
+	map(0x048004, 0x048005).r(FUNC(jpmsys5_state::coins_r));
+	map(0x048008, 0x048009).w(FUNC(jpmsys5_state::reel_0123_w));
+	map(0x04800a, 0x04800b).w(FUNC(jpmsys5_state::reel_4567_w));
+
 	map(0x04c000, 0x04c0ff).r(FUNC(jpmsys5_state::mux_r)).w(FUNC(jpmsys5_state::mux_w));
 }
 
-void jpmsys5_state::m68000_awp_map(address_map &map)
+void jpmsys5_state::m68000_ym_map(address_map &map)
 {
 	jpm_sys5_common_map(map);
 	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w));
+}
+
+void jpmsys5_state::m68000_awp_map(address_map &map)
+{
+	m68000_ym_map(map);
 }
 
 void jpmsys5_state::m68000_awp_map_saa(address_map &map)
@@ -308,12 +349,12 @@ void jpmsys5_state::m68000_awp_map_saa(address_map &map)
 
 void jpmsys5v_state::m68000_map(address_map &map)
 {
-	jpm_sys5_common_map(map);
+	m68000_ym_map(map);
+
 	map(0x01fffe, 0x01ffff).w(FUNC(jpmsys5v_state::rombank_w)); // extra on video system (rom board?) (although regular games do write here?)
 	map(0x020000, 0x03ffff).bankr("bank1"); // extra on video system (rom board?)
-	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
+
 	map(0x0460e0, 0x0460e5).w(FUNC(jpmsys5v_state::ramdac_w));  // extra on video system (rom board?)
-	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5v_state::jpm_upd7759_r), FUNC(jpmsys5v_state::jpm_upd7759_w));
 	map(0x800000, 0xcfffff).rw(FUNC(jpmsys5v_state::sys5_tms34061_r), FUNC(jpmsys5v_state::sys5_tms34061_w)); // extra on video system (rom board?)
 }
 
@@ -703,38 +744,6 @@ void jpmsys5_state::jpmsys5(machine_config &config)
 
 	saasound(config);
 }
-
-
-uint16_t jpmsys5_state::mux_awp_r(offs_t offset)
-{
-	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
-
-	if ((offset >0x7f) && (offset <0x8f))
-	{
-		return ioport(portnames[( (offset - 0x80) >>1)])->read();
-	}
-	else
-	{
-		return 0xffff;
-	}
-}
-
-uint16_t jpmsys5_state::coins_awp_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 2:
-		{
-			return ioport("COINS")->read() << 8;
-		}
-		default:
-		{
-			logerror("coins read offset: %x",offset);
-			return 0xffff;
-		}
-	}
-}
-
 
 /*************************************
  *
