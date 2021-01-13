@@ -4,7 +4,7 @@
 license:CC0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
-This list does not include ROM hacks, but those can still be loaded with -cart.
+ROM hacks are not included(exceptions aside), but those can still be loaded with -cart.
 Emulator-only or WIP beta homebrews are also not included.
 
 TODO:
@@ -53,7 +53,6 @@ Undumped Odyssey³/G7400 prototypes:
 http://www.ozyr.com/rene/PICS/protos.jpg
 - Pick Axe Pete
 - Modem Program
-- Requins [Shark Hunter]
 - monsternet dedicated g7400 840209 [Norseman]
 - 58+ Air Battle
 
@@ -75,12 +74,17 @@ Bootleg multigame carts:
 
 These romhacks are viable for inclusion since they were initially sold as repro cartridges:
 - Baseball+ (PAL conversion of O3 game)
-- Flash Point (PAL conversion of O3 game)
 - Killer Bees+: adds + graphics to bees as shown in Odyssey3 advertisements
   (the actual O3 prototype has same + graphics as the VP+ version)
 - Munchkin+: adds + graphics to munchkin
 - Space Monster+: adds + graphics to spacemon
 - Western+: adds + graphics to gunfight
+
+See softwarelist below for ones already added.
+
+I don't think it's worth adding romhacks here that were initially made for free, and much
+later sold by a homebrew publisher. For example René's NTSC conversion hacks from 2003 were
+sold by 2600 Connection in 2016.
 
 René made many more romhacks (bugfixes, PAL/NTSC conversions) released for free online, see:
 https://home.kpn.nl/rene_g7400/my_collection.html (under "MODIFIED GAMES")
@@ -2738,6 +2742,20 @@ Newer releases don't follow this numbering scheme anymore.
 		</part>
 	</software>
 
+	<software name="rash">
+		<!-- 256 bytes Videopac demo, 6th place(out of 9) in Chaos Constructions 2016 Tiny Intro compo -->
+		<description>Rash</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Frog" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x800">
+				<rom name="rash.bin" size="0x800" crc="79adab3c" sha1="e04c817c112f3617c657fcb6c79d8f66b13ce158" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="route66">
 		<description>Route 66</description>
 		<year>2007</year>
@@ -2755,8 +2773,8 @@ Newer releases don't follow this numbering scheme anymore.
 
 <!-- Hacks, not minor patches released for free online, but ones that were sold on cartridge -->
 
-	<software name="flashpp" cloneof="flashp">
-		<!-- Odyssey 3 prototype modified for PAL and some other changes, also sold by CCC as Videopac 63+ -->
+	<software name="flashph" cloneof="flashp">
+		<!-- Odyssey 3 prototype modified for PAL and some other changes, sold by Classic Consoles Center as Videopac 63+ -->
 		<description>Flash Point (PAL conversion)</description>
 		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
