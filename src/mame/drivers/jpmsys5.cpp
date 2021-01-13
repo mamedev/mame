@@ -206,16 +206,17 @@ uint16_t jpmsys5_state::coins_r(offs_t offset, uint16_t mem_mask)
 	return ioport("COINS")->read() << 8;
 }
 
+// these are read as a dword, masked with 0x77777777 and compared to 0x76543210
 uint16_t jpmsys5_state::unk_48000_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: unk_48000_r %04x\n", machine().describe_context(), mem_mask);
-	return 0xffff;
+	return 0x7654;
 }
 
 uint16_t jpmsys5_state::unk_48002_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: unk_48002_r %04x\n", machine().describe_context(), mem_mask);
-	return 0xffff;
+	return 0x3210;
 }
 
 uint16_t jpmsys5_state::unk_48006_r(offs_t offset, uint16_t mem_mask)
