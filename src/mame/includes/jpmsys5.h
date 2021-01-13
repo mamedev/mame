@@ -39,7 +39,7 @@ public:
 		m_direct_port(*this, "DIRECT"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
-		m_sys5leds(*this, "sys5led%u", 0U),
+		m_sys5leds(*this, "digit%u", 0U),
 		m_reel(*this, "reel%u", 0U)
 	{ }
 
@@ -90,7 +90,7 @@ protected:
 	void m68000_ym_map(address_map &map);
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N))); else m_optic_pattern &= ~(1 << ((7-N))); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((N)^4)); else m_optic_pattern &= ~(1 << ((N)^4)); }
 
 	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -116,7 +116,7 @@ private:
 	required_ioport m_direct_port;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 	output_finder<16 * 16> m_lamps;
-	output_finder<16 * 8> m_sys5leds;
+	output_finder<16> m_sys5leds;
 	optional_device_array<stepper_device, 8> m_reel;
 
 	int m_lamp_strobe;

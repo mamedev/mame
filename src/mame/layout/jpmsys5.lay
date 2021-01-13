@@ -30,6 +30,12 @@ license:CC0
 	</led16segsc>
 	</element>
 
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
 	<view name="AWP Simulated Video (No Artwork)">
 		<element name="vfd0" ref="vfd0" state="0">
 			<bounds x="10" y="200" width="9" height="17"/>
@@ -866,6 +872,58 @@ license:CC0
 		<element name="lamp255" ref="matrixlamp" state="0">
 			<bounds x="120" y="120" width="7" height="7"/>
 		</element>
+
+		<element name="digit0" ref="digit">
+			<bounds x="10" y="140" width="14" height="26" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="26" y="140" width="14" height="26" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="42" y="140" width="14" height="26" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="58" y="140" width="14" height="26" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="74" y="140" width="14" height="26" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="90" y="140" width="14" height="26" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="106" y="140" width="14" height="26" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds x="122" y="140" width="14" height="26" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="138" y="140" width="14" height="26" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="154" y="140" width="14" height="26" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="170" y="140" width="14" height="26" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="186" y="140" width="14" height="26" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="202" y="140" width="14" height="26" />
+		</element>
+		<element name="digit31" ref="digit">
+			<bounds x="218" y="140" width="14" height="26" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="234" y="140" width="14" height="26" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="250" y="140" width="14" height="26" />
+		</element>
+
+
+
 	</view>
 	<view name="VFD Display Output Only">
 		<element name="vfd0" ref="vfd0" state="0">

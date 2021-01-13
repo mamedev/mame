@@ -185,8 +185,9 @@ void jpmsys5_state::sys5_draw_lamps()
 	{
 		m_lamps   [(m_lamp_strobe << 4) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 0], i);
 		m_lamps   [(m_lamp_strobe << 4) | i | 8] = BIT(m_muxram[(m_lamp_strobe << 2) | 1], i);
-		m_sys5leds[(m_lamp_strobe << 3) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 2], i);
 	}
+
+	m_sys5leds[m_lamp_strobe]     = m_muxram[(m_lamp_strobe << 2) | 2];
 }
 
 /****************************************
@@ -220,7 +221,6 @@ uint16_t jpmsys5_state::unk_4800c_r(offs_t offset, uint16_t mem_mask)
 uint16_t jpmsys5_state::reel_optos_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: reel_optos_r %04x\n", machine().describe_context(), mem_mask);
-//	return m_optic_pattern^0xff;
 	return m_optic_pattern;
 }
 
