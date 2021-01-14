@@ -52,7 +52,7 @@ private:
 	void reg_write(uint32_t adr, uint32_t val);
 
 	void fill_buffer();
-	void append_buffer(std::vector<write_stream_view> &outputs);
+	void append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount);
 
 	devcb_read16 cb_sample;
 

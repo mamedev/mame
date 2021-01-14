@@ -422,23 +422,24 @@ void mas3507d_device::fill_buffer()
 	decoded_frame_count++;
 }
 
-void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs)
+void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
 {
-	int scount = outputs[0].samples();
+	int s1 = scount - pos;
 	int bytes_per_sample = mp3_info.channels > 2 ? 2 : mp3_info.channels; // More than 2 channels is unsupported here
 
-	if (scount > sample_count) {
-		scount = sample_count;
+	if (s1 > sample_count) {
+		s1 = sample_count;
 	}
 
 	playback_status = PLAYBACK_STATE_DEMAND_BUFFER;
 
-	for (int i = 0; i < scount; i++) {
-		outputs[0].put_int(i, samples[samples_idx * bytes_per_sample], 32768);
-		outputs[1].put_int(i, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
+	for (int i = 0; i < s1; i++) {
+		outputs[0].put_int(pos, samples[samples_idx * bytes_per_sample], 32768);
+		outputs[1].put_int(pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
 
 		samples_idx++;
 		decoded_samples++;
+		pos++;
 
 		if (samples_idx >= sample_count) {
 			sample_count = 0;
@@ -469,18 +470,23 @@ void mas3507d_device::start_playback()
 
 void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	if (is_started && sample_count == 0) {
-		fill_buffer();
-	}
+	int csamples = outputs[0].samples();
+	int pos = 0;
 
-	if (!is_started || sample_count <= 0) {
-		playback_status = PLAYBACK_STATE_IDLE;
-		decoded_frame_count = 0;
-		decoded_samples = 0;
-		outputs[0].fill(0);
-		outputs[1].fill(0);
-		return;
-	}
+	while (pos < csamples) {
+		if (is_started && sample_count == 0) {
+			fill_buffer();
+		}
 
-	append_buffer(outputs);
+		if (!is_started || sample_count <= 0) {
+			playback_status = PLAYBACK_STATE_IDLE;
+			decoded_frame_count = 0;
+			decoded_samples = 0;
+			outputs[0].fill(0, pos);
+			outputs[1].fill(0, pos);
+			return;
+		}
+
+		append_buffer(outputs, pos, csamples);
+	}
 }
