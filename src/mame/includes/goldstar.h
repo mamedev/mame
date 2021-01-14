@@ -238,6 +238,7 @@ public:
 	void init_flaming7();
 	void init_flam7_tw();
 	void init_luckylad();
+	void init_nd8lines();
 	void init_super972();
 	void init_wcat3();
 
@@ -256,6 +257,7 @@ public:
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
 	void luckylad(machine_config &config);
+	void nd8lines(machine_config &config);
 	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
@@ -275,6 +277,8 @@ private:
 	uint8_t m_vidreg;
 
 	int m_tile_bank;
+
+	void nd8lines_map(address_map &map);
 };
 
 
