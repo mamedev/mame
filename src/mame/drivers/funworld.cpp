@@ -125,11 +125,12 @@
   * Gratis Poker (V.204, set 2),                                   Mega Soft,          1995.
   * Gkoulit (encrypted GFX),                                       JK Amusement,       1995.
   * Reflex Cards (English, serial protected),                      TAB Austria,        1999.
+  * Club Card (ver. 1.1 English),                                  Impera / Mega Tech, 199?.
   * Royal Card (stealth with NES multigame),                       bootleg,            1991.
   * Royal Card (stealth with MSX multigame),                       bootleg,            1991.
 
 
-  Supported games: 109
+  Supported games: 110
 
 
 *****************************************************************************************
@@ -893,6 +894,21 @@ void funworld_state::magicrd2_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
+void funworld_state::clubcard_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xffff).rom();
+}
+
 void funworld_state::cuoreuno_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
@@ -1423,7 +1439,7 @@ static INPUT_PORTS_START( jolycdcy )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Double")				// СТАРТ / ДУБЛИРАНЕ
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble")		// СТОП 5 / ПОЛОВИН ХАЗАРТ
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Turnover (Oborot)")			// ОБОРОТ (turnover)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Setup (Nastroica)")			// НАСТРОЙКА (setup)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Setup (Nastroyka)")			// НАСТРОЙКА (setup)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Big")				// СТОП 4 / ГОЛЯМА
 
 	PORT_START("IN1")
@@ -3389,6 +3405,16 @@ void funworld_state::gratispk(machine_config &config)
 }
 
 
+void funworld_state::clubcard(machine_config &config)
+{
+//	fw1stpal(config);  // 'alla Royal Card. Card deck wrong colors.
+	fw2ndpal(config);  // proper colors.
+
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); // 2 MHz.
+	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::clubcard_map);
+}
+
+
 uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 {
 	// address-based data bitswap; 4 address bits are involved, but only
@@ -4751,6 +4777,25 @@ ROM_START( bonuscrda )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "bonuscrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(9af1ac12) SHA1(2b9770eeca081b8c744ba1250bb99569816d7a85) )
+ROM_END
+
+
+/*
+  Club Card (ver 1.1, English)
+  Impera / Mega Tech Salzburg
+
+  VRAM at 4000/5000
+*/
+ROM_START( clubcard )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu_256.bin", 0x8000, 0x8000, CRC(4b028c4d) SHA1(28ba4abc36d6adcb4299bb9a35f5f0d7572db656) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "c1.bin", 0x0000, 0x8000, CRC(09012966) SHA1(5b70c760bc06c054943f18057375d2743758416f) )
+	ROM_LOAD( "c2.bin", 0x8000, 0x8000, CRC(ed9a680a) SHA1(d63c49e9689f3d49818cf207761eb3430254e2cb) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "bprom.bin",    0x0000, 0x0200, BAD_DUMP CRC(e92f74e0) SHA1(dfc4a9d140d21b990f769c10802c4d2c33dd4132) )    // borrowed from gratispk
 ROM_END
 
 
@@ -8622,16 +8667,17 @@ GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funworld_state, empty_in
 GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",             0,                       layout_novoplay )
-GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",       "Joker Card (Inter Games)",                     0 )
-GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A7-11 game 1",               MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A7-11 game 2",               MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A0-1 game",                  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, jokcrdep,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "Joker Card / Multi Card (Epoxy brick CPU)",    MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 199?, gratispk,   0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, set 1)",                  0,                       layout_jollycrd )
-GAMEL( 199?, gratispka,  gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, set 2)",                  0,                       layout_jollycrd )
-GAMEL( 1995, nkoulit,    royalcrd, royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",      "Gkoulit (encrypted GFX)",                      0,                       layout_jollycrd )
-GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empty_init,   ROT0, "TAB Austria",       "Reflex Cards (English, serial protected)",     0,                       layout_jollycrd )
+GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic",  "Novo Play Multi Card / Club Card",            0,                       layout_novoplay )
+GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",        "Joker Card (Inter Games)",                    0 )
+GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A0-1 game",                 MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "Joker Card / Multi Card (Epoxy brick CPU)",   MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 199?, gratispk,   0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",          "Gratis Poker (V.204, set 1)",                 0,                       layout_jollycrd )
+GAMEL( 199?, gratispka,  gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",          "Gratis Poker (V.204, set 2)",                 0,                       layout_jollycrd )
+GAMEL( 1995, nkoulit,    royalcrd, royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",       "Gkoulit (encrypted GFX)",                     0,                       layout_jollycrd )
+GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empty_init,   ROT0, "TAB Austria",        "Reflex Cards (English, serial protected)",    0,                       layout_jollycrd )
+GAMEL( 199?, clubcard,   0,        clubcard,   bonuscrd,  funworld_state,   empty_init,   ROT0, "Impera / Mega Tech", "Club Card (ver. 1.1 English)",                MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
