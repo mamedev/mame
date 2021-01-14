@@ -5,7 +5,7 @@ NOWERROR ?= 1
 CONFIG ?= libretro"
 NO_USE_MIDI ?= 1
 NO_USE_PORTAUDIO ?= 1
-PTR64 ?= 1 
+PTR64 ?= 1
 TARGET ?= mame
 # OS ?= linux
 # TARGETOS ?= linux
@@ -23,6 +23,7 @@ GITHUB_REPO ?= https://github.com/libretro/mame/
 
 UNAME_S = $(shell uname -s)
 UNAME_M = $(shell uname -m)
+
 ifeq ($(platform),)
 	platform = unix
 	ifeq ($(UNAME_S),)
@@ -35,6 +36,8 @@ ifeq ($(platform),)
 		platform = osx
 	else ifneq ($(findstring win,$(UNAME_S)),)
 		platform = win
+	else ifneq ($(UNAME_M), "i686")
+		platform = linux32
 	endif
 endif
 ifeq ($(ARCH),)
@@ -85,9 +88,12 @@ ifneq ($(findstring win,$(platform)),)
 	ifeq ($(MSYSTEM),MINGW64)
 		MINGW64 ?= /mingw64
 		PLATFLAGS += MINGW64="$(MINGW64)"
+		LIBRETRO_CPU="x86_64"
 	else ifeq ($(MSYSTEM),MINGW32)
 		MINGW32 ?= /mingw32
 		PLATFLAGS += MINGW32="$(MINGW32)"
+		LIBRETRO_CPU="x86"
+		PTR64=0
 	endif
 	CC  ?= cc
 	CXX ?= cxx
@@ -123,6 +129,10 @@ ifeq ($(platform),android-arm64)
 	ARCH :=
 	LIBRETRO_OS :=
 	PTR64 :=
+endif
+
+ifeq ($(platform),linux32)
+	PTR64 := 0
 endif
 
 ifeq ($(platform),osx)
