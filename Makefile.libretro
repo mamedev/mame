@@ -58,6 +58,10 @@ ifeq ($(LIBRETRO_CPU),)
 	endif
 endif
 
+ifeq ($(ARCH),x86)
+	PTR64 := 0
+endif
+
 ###########################################################################
 #
 #   BUILD FLAGS
