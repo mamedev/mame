@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -896,7 +896,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 
 	bx::printf(
 		  "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2020 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bimg#license-bsd-2-clause\n\n"
 		, BIMG_TEXTUREC_VERSION_MAJOR
 		, BIMG_TEXTUREC_VERSION_MINOR
