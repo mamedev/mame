@@ -206,6 +206,14 @@ uint16_t jpmsys5_state::coins_r(offs_t offset, uint16_t mem_mask)
 	return ioport("COINS")->read() << 8;
 }
 
+uint16_t jpmsys5_state::unknown_port_r(offs_t offset, uint16_t mem_mask)
+{
+	if (m_unknown_port)
+		return m_unknown_port->read();
+
+	return 0xffff;
+}
+
 // these are read as a dword, masked with 0x77777777 and compared to 0x76543210
 uint16_t jpmsys5_state::unk_48000_r(offs_t offset, uint16_t mem_mask)
 {
@@ -225,6 +233,10 @@ uint16_t jpmsys5_state::unk_48006_r(offs_t offset, uint16_t mem_mask)
 	return 0xffff;
 }
 
+uint16_t jpmsys5_state::unk_r(offs_t offset, uint16_t mem_mask)
+{
+	return machine().rand();
+}
 
 uint16_t jpmsys5_state::reel_optos_r(offs_t offset, uint16_t mem_mask)
 {
@@ -430,10 +442,11 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x046060, 0x046067).rw("6821pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
 	map(0x046080, 0x046083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 
-	map(0x046084, 0x046085).nopr();
-	map(0x046088, 0x046089).nopr();
+	map(0x046084, 0x046085).r(FUNC(jpmsys5_state::unknown_port_r));
+//	map(0x04608c, 0x04608f).r(FUNC(jpmsys5_state::unk_r));
 
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	
 	map(0x0460c0, 0x0460c1).nopw();
 
 	map(0x048000, 0x048001).rw(FUNC(jpmsys5_state::unk_48000_r), FUNC(jpmsys5_state::unk_48000_w));
@@ -791,7 +804,7 @@ void jpmsys5_state::jpmsys5_common(machine_config& config)
 	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
 	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000/4)); // with this at 1mhz the non-video games run at a ridiculous speed
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
@@ -947,7 +960,7 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, "Direct 0x08" ) // These are the % key, at least for popeye?
+	PORT_DIPNAME( 0x08, 0x00, "Direct 0x08" ) // These are the % key, at least for popeye?
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Direct 0x10" )
@@ -985,6 +998,57 @@ INPUT_PORTS_START( popeye )
 
 	PORT_START("STROBE5")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("UNKNOWN_PORT")
+	PORT_DIPNAME( 0x0001, 0x0000, "Unknown 0x0001" ) // if this and 0x0008 are on then j5popeye boots, what is it? something opto related?
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Unknown 0x0002" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 0x0004" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "Unknown 0x0008" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 0x0010" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 0x0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 0x0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 0x0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 0x0100" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Unknown 0x0200" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Unknown 0x0400" )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Unknown 0x0800" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 0x1000" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Unknown 0x2000" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 0x4000" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 0x8000" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 /*************************************

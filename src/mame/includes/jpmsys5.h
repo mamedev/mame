@@ -36,6 +36,7 @@ public:
 		m_strobe2(*this, "STROBE2"),
 		m_strobe3(*this, "STROBE3"),
 		m_strobe4(*this, "STROBE4"),
+		m_unknown_port(*this, "UNKNOWN_PORT"),
 		m_direct_port(*this, "DIRECT"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -83,6 +84,7 @@ protected:
 	optional_ioport m_strobe2;
 	optional_ioport m_strobe3;
 	optional_ioport m_strobe4;
+	optional_ioport m_unknown_port;
 
 	void jpm_sys5_common_map(address_map &map);
 
@@ -91,6 +93,8 @@ protected:
 
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
+
+	uint16_t unknown_port_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -102,6 +106,8 @@ private:
 	void reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t unk_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	uint16_t reellamps_0123_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
