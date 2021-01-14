@@ -2750,17 +2750,6 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-static const gfx_layout layout_053936 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
 static const gfx_layout layout_053936_16 =
 {
 	16,16,
@@ -2773,7 +2762,7 @@ static const gfx_layout layout_053936_16 =
 };
 
 static GFXDECODE_START( gfx_blzntrnd )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,    0x0, 0x10 ) // [0] 053936 Tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw,    0x0, 0x10 ) // [0] 053936 Tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gstrik2 )
@@ -2895,7 +2884,7 @@ void metro_state::msgogo(machine_config &config)
 	/* video hardware */
 	i4220_config(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
-	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
+	m_vdp2->set_tmap_xoffsets(2,2,2);
 
 	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq)); // timing is off, shaking sprites in intro
 
@@ -2984,7 +2973,7 @@ void metro_state::daitorid(machine_config &config)
 	/* video hardware */
 	i4220_config(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
+	m_vdp2->set_tmap_xoffsets(2,2,2);
 
 	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
@@ -3474,7 +3463,7 @@ void metro_state::gstrik2(machine_config &config)
 
 	m_k053936->set_offsets(-77, -19);
 
-	m_vdp2->set_tmap_xoffsets(0,-8,0);
+	m_vdp2->set_tmap_xoffsets(0,8,0);
 
 	// HUM-003 PCB Configuration : Mono output only
 	config.device_remove("lspeaker");

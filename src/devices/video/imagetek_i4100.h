@@ -116,6 +116,8 @@ protected:
 	u16 m_rombank;
 	size_t m_gfxrom_size;
 	bool m_crtc_unlock;
+	u16 m_crtc_horz;
+	u16 m_crtc_vert;
 	u16 m_sprite_count;
 	u16 m_sprite_priority;
 	u16 m_sprite_xoffset,m_sprite_yoffset;
