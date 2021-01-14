@@ -46,7 +46,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	current_rate = 44100;
-	stream = stream_alloc(0, 2, current_rate, STREAM_SYNCHRONOUS);
+	stream = stream_alloc(0, 2, current_rate);
 	cb_sample.resolve();
 
 	save_item(NAME(mp3data));

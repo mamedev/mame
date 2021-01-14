@@ -31,6 +31,8 @@ public:
 	uint32_t get_samples() const { return decoded_samples; }
 	uint32_t get_status() const { return playback_status; }
 
+	void update_stream() { stream->update(); }
+
 	void reset_playback();
 	void start_playback();
 

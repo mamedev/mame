@@ -83,6 +83,7 @@ uint32_t k573fpga_device::get_counter() {
 	counter_previous = counter_current;
 
 	if(is_timer_active) {
+		mas3507d->update_stream();
 		counter_current = mas3507d->get_samples();
 	}
 
