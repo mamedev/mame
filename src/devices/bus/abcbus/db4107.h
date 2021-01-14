@@ -2,17 +2,18 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Databoard 4112-23 floppy disk controller emulation
+    DataBoard 4107 Winchester interface emulation
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_DATABOARD_4112_23_H
-#define MAME_BUS_ABCBUS_DATABOARD_4112_23_H
+#ifndef MAME_BUS_ABCBUS_DATABOARD_4107_H
+#define MAME_BUS_ABCBUS_DATABOARD_4107_H
 
 #pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80dma.h"
 
 
 
@@ -20,14 +21,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc_databoard_4112_23_device
+// ======================> databoard_4107_device
 
-class abc_databoard_4112_23_device :  public device_t,
-							 public device_abcbus_card_interface
+class databoard_4107_device : public device_t,
+						      public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	abc_databoard_4112_23_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	databoard_4107_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -48,16 +49,17 @@ protected:
 	virtual void abcbus_c3(uint8_t data) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80dma_device> m_dma;
 
 	bool m_cs;
 
-	void databoard_4112_23_io(address_map &map);
-	void databoard_4112_23_mem(address_map &map);
+	void databoard_4107_io(address_map &map);
+	void databoard_4107_mem(address_map &map);
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(DATABOARD_4112_23, abc_databoard_4112_23_device)
+DECLARE_DEVICE_TYPE(DATABOARD_4107, databoard_4107_device)
 
-#endif // MAME_BUS_ABCBUS_DATABOARD_4112_23_H
+#endif // MAME_BUS_ABCBUS_DATABOARD_4107_H
