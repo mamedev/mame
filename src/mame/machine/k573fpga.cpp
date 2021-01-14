@@ -55,14 +55,14 @@ void k573fpga_device::device_reset()
 	is_stream_active = false;
 	is_timer_active = false;
 
-	counter_current = counter_previous = 0;
+	counter_current = counter_previous = counter_offset = 0;
 
 	mas3507d->reset_playback();
 	last_playback_status = get_mpeg_ctrl();
 }
 
 void k573fpga_device::reset_counter() {
-	counter_current = counter_previous = 0;
+	counter_current = counter_previous = counter_offset = 0;
 	status_update();
 }
 
@@ -72,8 +72,7 @@ void k573fpga_device::status_update() {
 	last_playback_status = cur_playback_status;
 
 	if(!is_timer_active) {
-		counter_previous = 0;
-		counter_current = 0;
+		counter_current = counter_previous = counter_offset = 0;
 	}
 }
 
@@ -84,7 +83,7 @@ uint32_t k573fpga_device::get_counter() {
 
 	if(is_timer_active) {
 		mas3507d->update_stream();
-		counter_current = mas3507d->get_samples();
+		counter_current = mas3507d->get_samples() - counter_offset;
 	}
 
 	return counter_current;
@@ -171,6 +170,15 @@ void k573fpga_device::set_mpeg_ctrl(uint16_t data)
 
 		if (!mas3507d->is_started) {
 			mas3507d->start_playback();
+			mas3507d->update_stream();
+
+			// Audio should be buffered by this point.
+			// The assumption is that the number of samples actually played can be
+			// calculated by subtracting the base sample count when the song was started
+			// from the current sample count when the counter register is read.
+			// Otherwise, the sample count will always be ahead by the number of samples
+			// that were in the buffered frames.
+			counter_offset = mas3507d->get_samples();
 		}
 	}
 }

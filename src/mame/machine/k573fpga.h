@@ -75,7 +75,7 @@ private:
 	bool use_ddrsbm_fpga;
 
 	bool is_stream_active, is_timer_active;
-	uint32_t counter_previous;
+	uint32_t counter_previous, counter_offset;
 	int32_t counter_current;
 	uint32_t last_playback_status;
 };
