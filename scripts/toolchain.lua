@@ -207,7 +207,11 @@ function toolchain(_buildDir, _subDir)
 				premake.gcc.cc   = "@gcc -V 4.2"
 				premake.gcc.cxx  = "@g++-4.2"
 			end
-			premake.gcc.ar  = "ar"
+			if _OPTIONS["AR"]~=nil then
+					premake.gcc.ar = _OPTIONS["AR"]
+				else
+					premake.gcc.ar  = "ar"
+			end
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
 
@@ -737,6 +741,18 @@ function toolchain(_buildDir, _subDir)
 	configuration { "linux-gcc", "x64", "Debug" }
 		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Debug")
 
+	configuration { "linux-gcc", "arm64" }
+		objdir (_buildDir .. "linux_gcc" .. "/obj")
+		buildoptions {
+			"",
+		}
+
+	configuration { "linux-gcc", "arm64", "Release" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/arm64/Release")
+
+	configuration { "linux-gcc", "arm64", "Debug" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/arm64/Debug")
+
 	configuration { "linux-clang", "x32" }
 		objdir (_buildDir .. "linux_clang" .. "/obj")
 		buildoptions {
@@ -860,8 +876,12 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*" }
 		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"])
+			if not _OPTIONS["NO_USE_BGFX_KHRONOS"] then
+			includedirs {
+				MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+			}
+		end
 		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			"$(ANDROID_NDK_ROOT)/sysroot/usr/include",
@@ -1124,10 +1144,17 @@ function strip()
 		}
 
 	configuration { "linux-* or rpi" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) strip -s \"$(TARGET)\""
-		}
+		if _OPTIONS['STRIP']~=nil then
+			postbuildcommands {
+				"$(SILENT) echo Stripping symbols.",
+				"$(SILENT) " .. _OPTIONS['STRIP'] .. " -s \"$(TARGET)\""
+			}
+		else
+			postbuildcommands {
+				"$(SILENT) echo Stripping symbols.",
+				"$(SILENT) strip -s \"$(TARGET)\""
+			}
+		end
 
 	configuration { "mingw*", "x64" }
 		postbuildcommands {

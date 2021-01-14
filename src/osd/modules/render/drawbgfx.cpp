@@ -169,7 +169,11 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 	}
 
 #   if BX_PLATFORM_LINUX || BX_PLATFORM_BSD || BX_PLATFORM_RPI
+#ifdef SDLMAME_NO_X11
+	return nullptr;
+#else
 	return (void*)wmi.info.x11.window;
+#endif
 #   elif BX_PLATFORM_OSX
 	return wmi.info.cocoa.window;
 #   elif BX_PLATFORM_WINDOWS
