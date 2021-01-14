@@ -18,113 +18,118 @@
 
   Games running on this hardware:
 
-  * Jolly Card (German, set 1),                                 TAB Austria,        1985.
-  * Jolly Card (German, set 2),                                 TAB Austria,        1985.
-  * Jolly Card (3x3 deal),                                      TAB Austria,        1985.
-  * Jolly Card Professional 2.0 (MZS Tech),                     MZS Tech,           1993.
-  * Jolly Card Professional 2.0 (Spale Soft),                   Spale Soft,         2000.
-  * Jolly Card (Evona Electronic),                              Evona Electronic    1998.
-  * Jolly Card (Croatian, set 1),                               TAB Austria,        1985.
-  * Jolly Card (Croatian, set 2),                               Soft Design,        1993.
-  * Super Joly 2000 - 3x,                                       M.P.                1985.
-  * Jolly Card (German, Fun World, bootleg),                    Inter Games,        1986.
-  * Jolly Card (Spanish, blue TAB board, encrypted),            TAB Austria,        1992.
-  * Jolly Card (Italian, different colors, set 1),              bootleg,            1990.
-  * Jolly Card (Italian, different colors, set 2),              bootleg,            1990.
-  * Jolly Card (Italian, bootleg, set 1),                       bootleg,            1990.
-  * Jolly Card (Italian, bootleg, set 2),                       bootleg,            1993.
-  * Jolly Card (Italian, bootleg, set 3),                       bootleg,            1990.
-  * Bonus Card (German),                                        Fun World,          1986.
-  * Bonus Card (German, ATG Electronic hack),                   Fun World,          1986.
-  * Big Deal (Hungarian, set 1),                                Fun World,          1986.
-  * Big Deal (Hungarian, set 2),                                Fun World,          1986.
-  * Cuore 1 (Italian),                                          C.M.C.,             1996.
-  * Elephant Family (Italian, new),                             C.M.C.,             1997.
-  * Elephant Family (Italian, old),                             C.M.C.,             1996.
-  * Pool 10 (Italian, set 1),                                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 2),                                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 3),                                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 4),                                   C.M.C.,             1997.
-  * Pool 10 (Italian, set 5),                                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 6),                                   C.M.C.,             1996.
-  * Pool 10 (Italian, set 7),                                   C.M.C.,             1997.
-  * Pool 10 (Italian, set 8),                                   C.M.C.,             1997.
-  * Pool 10 (Italian, set 9),                                   bootleg (R.B.),     1996.
-  * New Biliard 98 (Pool 10 hack),                              bootleg,            1998.
-  * Royal (Pool 10 hack),                                       unknown,            2001.
-  * Tortuga Family (Italian),                                   C.M.C.,             1997.
-  * Pot Game (Italian),                                         C.M.C.,             1996.
-  * Bottle 10 (Italian, set 1),                                 C.M.C.,             1996.
-  * Bottle 10 (Italian, set 2),                                 C.M.C.,             1996.
-  * Luna Park (set 1, dual program),                            unknown,            1998.
-  * Luna Park (set 2, dual program),                            unknown,            1998.
-  * Luna Park (set 3),                                          unknown,            1998.
-  * Crystal Colours (CMC hardware),                             J.C.D. srl,         1998.
-  * Royal Card (German, set 1),                                 TAB Austria,        1991.
-  * Royal Card (German, set 2),                                 TAB Austria,        1991.
-  * Royal Card (German/Polish, set 3),                          TAB Austria,        1991.
-  * Royal Card (German, set 4),                                 TAB Austria,        1991.
-  * Royal Card (German, set 5),                                 TAB Austria,        1991.
-  * Royal Card (German, set 6),                                 TAB Austria,        1991.
-  * Royal Card (German, set 7, CMC C1030 HW),                   bootleg,            1991.
-  * Royal Card (German, set 8),                                 TAB Austria,        1991.
-  * Royal Card (French),                                        TAB Austria,        1991.
-  * Royal Card Professional 2.0,                                Digital Dreams,     1993.
-  * Royal Card / Royal Jackpot (with a third draw)(encrypted),  TAB / Video Klein,  1991
-  * Witch Royal (Export version 2.1),                           Video Klein,        199?.
-  * Lucky Lady (3x3 deal),                                      TAB Austria,        1991.
-  * Lucky Lady (4x1 aces),                                      TAB Austria,        1991.
-  * Magic Card II (Bulgarian),                                  Impera,             1996.
-  * Magic Card II (Nov, Yugoslavian),                           Impera,             1996.
-  * Magic Card II (green TAB or Impera board),                  Impera,             1996.
-  * Magic Card II (blue TAB board, encrypted),                  Impera,             1996.
-  * Royal Vegas Joker Card (Slow deal),                         Fun World,          1993.
-  * Royal Vegas Joker Card (Fast deal),                         Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, english gfx),            Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, Mile),                   Mile,               1993.
-  * Jolly Joker (original, interleaved GFX).                    Impera,             199?.
-  * Jolly Joker (original, different encoded GFX).              Impera,             199?.
-  * Jolly Joker (Solid State module in suicide board).          Impera,             199?.
-  * Jolly Joker (98bet, set 1).                                 Impera,             199?.
-  * Jolly Joker (98bet, set 2).                                 Impera,             199?.
-  * Jolly Joker (40bet, higher paytable),                       Impera,             1985.
-  * Jolly Joker (40bet, lower paytable),                        Impera,             1985.
-  * Jolly Joker (Apple Time),                                   Apple Time,         199?.
-  * Multi Win (Ver.0167, encrypted),                            Fun World,          1992.
-  * Power Card (Ver 0263, encrypted),                           Fun World,          1993.
-  * Mega Card (Ver.0210, encrypted),                            Fun World,          1993.
-  * Joker Card 300 (Ver.A267BC, encrypted),                     Amatic Trading,     1993.
-  * Royal Card (Evona, Polish, encrypted),                      Evona Electronic,   1991.
-  * Saloon (French, encrypted),                                 unknown,            199?.
-  * Nevada (French, encrypted),                                 unknown,            199?.
-  * Jolly Card (Italian, blue TAB board, encrypted),            bootleg,            199?.
-  * Jolly Card (Italian, encrypted bootleg, set 1),             bootleg,            1990.
-  * Jolly Card (Italian, encrypted bootleg, set 2),             bootleg,            1993.
-  * Jolly Card (Italian, encrypted bootleg, set 3),             bootleg,            1993.
-  * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
-  * Royal Card (Italian, Dino 4 hardware, encrypted),           unknown,            1998.
-  * China Town (Ver 1B, Dino4 HW),                              unknown,            1998.
-  * Royal Card (Italian, Dino 4 hardware, encrypted),           TAB Austria,        1998.
-  * Mongolfier New (Italian),                                   unknown,            199?.
-  * Soccer New (Italian),                                       unknown,            199?.
-  * Fun World Quiz (German),                                    Fun World,          198?.
-  * Fun World Quiz (German, 12-11-1990),                        Fun World,          1990.
-  * Fun World Quiz (German, 27-04-1990),                        Fun World,          1990.
-  * Novo Play Multi Card / Club Card,                           Admiral/Novomatic,  1986.
-  * Joker Card (Inter Games),                                   Inter Games,        1991.
-  * Unknown Fun World A7-11 game 1,                             Fun World,          1985.
-  * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
-  * Unknown Fun World A0-1 game,                                Fun World,          1991.
-  * Joker Card / Multi Card (Epoxy brick CPU),                  Fun World,          1991.
-  * Gratis Poker (V.204, set 1),                                Mega Soft,          1995.
-  * Gratis Poker (V.204, set 2),                                Mega Soft,          1995.
-  * Gkoulit (encrypted GFX),                                    JK Amusement,       1995.
-  * Reflex Cards (English, serial protected),                   TAB Austria,        1999.
-  * Royal Card (stealth with NES multigame),                    bootleg,            1991.
-  * Royal Card (stealth with MSX multigame),                    bootleg,            1991.
+  * Jolly Card (German, set 1),                                    TAB Austria,        1985.
+  * Jolly Card (German, set 2),                                    TAB Austria,        1985.
+  * Jolly Card (3x3 deal),                                         TAB Austria,        1985.
+  * Jolly Card Professional 2.0 (MZS Tech),                        MZS Tech,           1993.
+  * Jolly Card Professional 2.0 (Spale Soft),                      Spale Soft,         2000.
+  * Jolly Card (Evona Electronic),                                 Evona Electronic    1998.
+  * Jolly Card (Croatian, set 1),                                  TAB Austria,        1985.
+  * Jolly Card (Croatian, set 2),                                  Soft Design,        1993.
+  * Super Joly 2000 - 3x,                                          M.P.                1985.
+  * Jolly Card (German, Fun World, bootleg),                       Inter Games,        1986.
+  * Jolly Card (Spanish, blue TAB board, encrypted),               TAB Austria,        1992.
+  * Jolly Card (Italian, different colors, set 1),                 bootleg,            1990.
+  * Jolly Card (Italian, different colors, set 2),                 bootleg,            1990.
+  * Jolly Card (Italian, bootleg, set 1),                          bootleg,            1990.
+  * Jolly Card (Italian, bootleg, set 2),                          bootleg,            1993.
+  * Jolly Card (Italian, bootleg, set 3),                          bootleg,            1990.
+  * Bonus Card (German),                                           Fun World,          1986.
+  * Bonus Card (German, ATG Electronic hack),                      Fun World,          1986.
+  * Big Deal (Hungarian, set 1),                                   Fun World,          1986.
+  * Big Deal (Hungarian, set 2),                                   Fun World,          1986.
+  * Cuore 1 (Italian, set 1),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 2),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 3),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 4),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 5),                                      C.M.C.,             1996.
+  * Elephant Family (Italian, new),                                C.M.C.,             1997.
+  * Elephant Family (Italian, old),                                C.M.C.,             1996.
+  * Pool 10 (Italian, set 1),                                      C.M.C.,             1996.
+  * Pool 10 (Italian, set 2),                                      C.M.C.,             1996.
+  * Pool 10 (Italian, set 3),                                      C.M.C.,             1996.
+  * Pool 10 (Italian, set 4),                                      C.M.C.,             1997.
+  * Pool 10 (Italian, set 5),                                      C.M.C.,             1996.
+  * Pool 10 (Italian, set 6),                                      C.M.C.,             1996.
+  * Pool 10 (Italian, set 7),                                      C.M.C.,             1997.
+  * Pool 10 (Italian, set 8),                                      C.M.C.,             1997.
+  * Pool 10 (Italian, set 9),                                      bootleg (R.B.),     1996.
+  * Pool 10 (Italian, set 10),                                     C.M.C.,             1997.
+  * New Biliard 98 (Pool 10 hack),                                 bootleg,            1998.
+  * Royal (Pool 10 hack),                                          unknown,            2001.
+  * Tortuga Family (Italian),                                      C.M.C.,             1997.
+  * Pot Game (Italian),                                            C.M.C.,             1996.
+  * Bottle 10 (Italian, set 1),                                    C.M.C.,             1996.
+  * Bottle 10 (Italian, set 2),                                    C.M.C.,             1996.
+  * Luna Park (set 1, dual program),                               unknown,            1998.
+  * Luna Park (set 2, dual program),                               unknown,            1998.
+  * Luna Park (set 3),                                             unknown,            1998.
+  * Crystal Colours (CMC hardware),                                J.C.D. srl,         1998.
+  * Royal Card (German, set 1),                                    TAB Austria,        1991.
+  * Royal Card (German, set 2),                                    TAB Austria,        1991.
+  * Royal Card (German/Polish, set 3),                             TAB Austria,        1991.
+  * Royal Card (German, set 4),                                    TAB Austria,        1991.
+  * Royal Card (German, set 5),                                    TAB Austria,        1991.
+  * Royal Card (German, set 6),                                    TAB Austria,        1991.
+  * Royal Card (German, set 7, CMC C1030 HW),                      bootleg,            1991.
+  * Royal Card (German, set 8),                                    TAB Austria,        1991.
+  * Royal Card (French),                                           TAB Austria,        1991.
+  * Royal Card v2.0 Professional,                                  Digital Dreams,     1993.
+  * Royal Card / Royal Jackpot (with a third draw)(encrypted),     TAB / Video Klein,  1991
+  * Witch Royal (Export version 2.1),                              Video Klein,        199?.
+  * Lucky Lady (3x3 deal),                                         TAB Austria,        1991.
+  * Lucky Lady (4x1 aces),                                         TAB Austria,        1991.
+  * Magic Card II (Bulgarian),                                     Impera,             1996.
+  * Magic Card II (Nov, Yugoslavian),                              Impera,             1996.
+  * Magic Card II (green TAB or Impera board),                     Impera,             1996.
+  * Magic Card II (blue TAB board, encrypted),                     Impera,             1996.
+  * Royal Vegas Joker Card (Slow deal),                            Fun World,          1993.
+  * Royal Vegas Joker Card (Fast deal),                            Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, english gfx),               Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, Mile),                      Mile,               1993.
+  * Jolly Joker (98bet, set 1).                                    Impera,             199?.
+  * Jolly Joker (98bet, set 2).                                    Impera,             199?.
+  * Jolly Joker (40bet, higher paytable),                          Impera,             1985.
+  * Jolly Joker (40bet, lower paytable),                           Impera,             1985.
+  * Jolly Joker (Apple Time),                                      Apple Time,         199?.
+  * Jolly Joker (original program, interleaved GFX, Impera logo),  Impera,             199?.
+  * Jolly Joker (original program, interleaved GFX, no logo),      Impera,             199?.
+  * Jolly Joker (Solid State module in suicide board).             Impera,             199?.
+  * Multi Win (Ver.0167, encrypted),                               Fun World,          1992.
+  * Power Card (Ver 0263, encrypted),                              Fun World,          1993.
+  * Mega Card (Ver.0210, encrypted),                               Fun World,          1993.
+  * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,     1993.
+  * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,   1991.
+  * Saloon (French, encrypted),                                    unknown,            199?.
+  * Nevada (French, encrypted),                                    unknown,            199?.
+  * Jolly Card (Italian, blue TAB board, encrypted),               bootleg,            199?.
+  * Jolly Card (Italian, encrypted bootleg, set 1),                bootleg,            1990.
+  * Jolly Card (Italian, encrypted bootleg, set 2),                bootleg,            1993.
+  * Jolly Card (Italian, encrypted bootleg, set 3),                bootleg,            1993.
+  * Zabavni Karti (cyrillic, Bulgarian, encrypted),                bootleg,            1993.
+  * Pool 10 (Italian, Dino 4 hardware, encrypted),                 C.M.C.,             1997.
+  * Royal Card (Italian, Dino 4 hardware, encrypted),              unknown,            1998.
+  * China Town (Ver 1B, Dino4 HW),                                 unknown,            1998.
+  * Mongolfier New (Italian),                                      unknown,            199?.
+  * Soccer New (Italian),                                          unknown,            199?.
+  * Fun World Quiz (German),                                       Fun World,          198?.
+  * Fun World Quiz (German, 12-11-1990),                           Fun World,          1990.
+  * Fun World Quiz (German, 27-04-1990),                           Fun World,          1990.
+  * Novo Play Multi Card / Club Card,                              Admiral/Novomatic,  1986.
+  * Joker Card (Inter Games),                                      Inter Games,        1991.
+  * Unknown Fun World A7-11 game 1,                                Fun World,          1985.
+  * Unknown Fun World A7-11 game 2,                                Fun World,          1985.
+  * Unknown Fun World A0-1 game,                                   Fun World,          1991.
+  * Joker Card / Multi Card (Epoxy brick CPU),                     Fun World,          1991.
+  * Gratis Poker (V.204, set 1),                                   Mega Soft,          1995.
+  * Gratis Poker (V.204, set 2),                                   Mega Soft,          1995.
+  * Gkoulit (encrypted GFX),                                       JK Amusement,       1995.
+  * Reflex Cards (English, serial protected),                      TAB Austria,        1999.
+  * Royal Card (stealth with NES multigame),                       bootleg,            1991.
+  * Royal Card (stealth with MSX multigame),                       bootleg,            1991.
 
 
-  Supported games: 104
+  Supported games: 109
 
 
 *****************************************************************************************
@@ -574,6 +579,97 @@
 
   The game does some odd things, due to a possible bug in the
   decryption scheme. (see the TO DO list).
+
+
+  * Zabavni Karti (ЗАБАВНИ КАРТИ)
+    (cyrillic, Bulgarian, encrypted)
+
+  This is a Bulgarian Jolly Card pseudo-clone, with cyrillic charset.
+  ЗАБАВНИ КАРТИ means "Fun cards" / "Cards for fun".
+  
+  The game has encrypted GFX. Same style as blue TAB board.
+
+  This is a timed game. You coin for an amount of playing time.
+  Once the time counter ends, all earned credits/bonus dissapear.
+
+  It looks like an amusement version.
+
+  ---------------------------------------------------------------------
+
+  To initialize the NVRAM you must...
+
+  1) Press SETUP (НАСТРОЙКА) (key 0)
+  2) Keep pressed CANCEL (ИЗЧИСТВАНЕ) button (key N)
+  3) Press the following STOP (СТОП) buttons (keys Z-X-C-V-B) sequence:
+
+     1 - 5 - 4 - 3 - 4 - 2
+
+    (you will see the initialization message)
+
+  4) Release the CANCEL (ИЗЧИСТВАНЕ) button (key N)
+
+  ---------------------------------------------------------------------
+
+  To configure the game...
+
+  1) Press SETUP (НАСТРОЙКА) (key 0)
+
+     You'll see the following counters and menu:
+
+     КАРЕ С ЖОКЕР      0    (five of a kind)
+	 КЕНТ ФЛЕШ РОЯЛ    0    (royal flush)
+	 КЕНТ ФЛЕШ         0    (straight flush)
+	 КАРЕ              0    (poker)
+	 ФУЛ               0    (full house)
+	 ФЛЕШ              0    (flush)
+	 КЕНТА             0    (straight)
+	 ТРОЙКА            0    (three of a kind)
+	 2 ДВОЙКИ          0    (two pairs)
+	 ГОЛЯМА ДВОЙКИ     0    (high pair)
+
+
+	 ВРЕМЕ:  Натиснете бутон Стоп3
+	 TIME:   Press the Stop3 button
+
+					Изиграно време, мин. :  00
+					Played time, min.    :  00
+
+					Платено време, мин.  :  00
+					Paid time, min.      :  00
+
+
+	 НАСТРОЙКА:  Натиснете бутони Стоп2 и Стоп4
+	 SETUP:      Press the Stop2 and Stop4 buttons
+
+					Бутон Стоп1 -- Време за една игра, мин.  (1-99, 5 by default)
+					Stop1 Button -- Time for one game, min.  (1-99, 5 by default)
+
+					Бутон Стоп2 -- Залог  (1-99, 10 by default)
+					Stop2 button - Bet    (1-99, 10 by default)
+
+					Бутон Стоп3 -- Ниво на трудност      (0-3, 2 by default)
+					Stop3 button -- Level of difficulty  (0-3, 2 by default)
+
+					ИЗХОД:  Натиснете бутон Старт
+					EXIT:   Press the Start button
+
+
+	 НУЛИРАНЕ:  Стоп1 нулира часовника
+	 RESET:     Stop1 resets the clock
+
+	 ИЗЧИСТВАНЕ:  Натиснете 2 с. бутон Изчистване
+	 CLEAR:       Press the Clear button for 2 seconds
+
+	 ИЗХОД:  Натиснете бутон Старт
+	 EXIT:   Press the Start button
+
+  ---------------------------------------------------------------------
+
+  You can enter the test mode activating the 'TEST MODE' DIP switch.
+  (only will work if you have some adquired time)
+
+  For AUTOHOLD (АВТОСТОП) function, set the 'AUTO HOLD' DIP switch ON,
+  then toggle ON/OFF the function pressing CANCEL (ИЗЧИСТВАНЕ) button (key N).
 
 
 *****************************************************************************************
@@ -1327,7 +1423,7 @@ static INPUT_PORTS_START( jolycdcy )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Double")				// СТАРТ / ДУБЛИРАНЕ
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble")		// СТОП 5 / ПОЛОВИН ХАЗАРТ
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Turnover (Oborot)")			// ОБОРОТ (turnover)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Setup (Nastroica)")			// НАСТРОИКА (setup)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Setup (Nastroica)")			// НАСТРОЙКА (setup)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Big")				// СТОП 4 / ГОЛЯМА
 
 	PORT_START("IN1")
@@ -4464,9 +4560,10 @@ ROM_START( jolycdih )
 	ROM_LOAD( "jolycdih_nvram.bin", 0x0000, 0x0800, CRC(02b3b335) SHA1(207a1289e4298d942e4806adf8ffb87e0b9b4e58) )
 ROM_END
 
-/*
+/**********************************************************************
+
   ZABAVNI KARTI (ЗАБАВНИ КАРТИ)
-  Bulgarian Jolly Card clone in cyrillic.
+  Bulgarian Jolly Card clone with cyrillic charset.
 
   ЗАБАВНИ КАРТИ means "Fun cards" / "Cards for fun".
   
@@ -4475,9 +4572,13 @@ ROM_END
   This is a timed game. You coin for an amount of playing time.
   Once the time counter ends, all earned credits/bonus dissapear.
 
-  It seems an amusement version.
+  It looks like an amusement version.
 
-*/
+  To see more technical notes and setup instructions, see above
+  the section 'NOTES BY GAME/SET'.
+
+**********************************************************************/
+
 ROM_START( jolycdcy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "256.bin", 0x8000, 0x8000, CRC(b7600b68) SHA1(04a532d3d1daa0ab43a2b7345ea0e86b8701f649) )
@@ -4495,7 +4596,6 @@ ROM_START( jolycdcy )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "peel18cv8.bin", 0x0000, 0x0155, CRC(fc51ef45) SHA1(a06916ccb65d7d3b9fd03f5de042c848d13478bb) )
 ROM_END
-
 
 
 ROM_START( sjcd2kx3 )   // Super Joly 2000 3x
