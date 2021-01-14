@@ -27,6 +27,24 @@
         OUTPUT:
         all bits = Centronics data
 
+		Colors (from COLORDEM.BAS)
+		0 = black
+		1 = dark blue
+		2 = red
+		3 = magenta
+		4 = brown
+		5 = grey
+		6 = orange
+		7 = pink
+		8 = dark aqua
+		9 = blue
+		A = grey 2
+		B = light blue
+		C = green
+		D = aqua
+		E = yellow
+		F = white
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -62,6 +80,7 @@ public:
 	void dim68k(machine_config &config);
 
 private:
+	void dim68k_palette(palette_device &palette);
 	u16 dim68k_fdc_r();
 	u16 dim68k_game_switches_r();
 	u16 dim68k_speaker_r();
@@ -96,6 +115,26 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<scn2681_device> m_duart;
 	memory_view m_bootview;
+};
+
+void dim68k_state::dim68k_palette(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0x40, 0x1c, 0xf7)); /* Dark Blue */
+	palette.set_pen_color(2, rgb_t(0xa7, 0x0b, 0x40)); /* Dark Red */
+	palette.set_pen_color(3, rgb_t(0xe6, 0x28, 0xff)); /* Purple */
+	palette.set_pen_color(4, rgb_t(0x40, 0x63, 0x00)); /* Brown */
+	palette.set_pen_color(5, rgb_t(0x80, 0x80, 0x80)); /* Dark Gray */
+	palette.set_pen_color(6, rgb_t(0xe6, 0x6f, 0x00)); /* Orange */
+	palette.set_pen_color(7, rgb_t(0xff, 0x8b, 0xbf)); /* Pink */
+	palette.set_pen_color(8, rgb_t(0x00, 0x74, 0x40)); /* Dark Green */
+	palette.set_pen_color(9, rgb_t(0x19, 0x90, 0xff)); /* Medium Blue */
+	palette.set_pen_color(10, rgb_t(0x80, 0x80, 0x80)); /* Light Grey */
+	palette.set_pen_color(11, rgb_t(0xbf, 0x9c, 0xff)); /* Light Blue */
+	palette.set_pen_color(12, rgb_t(0x19, 0xd7, 0x00)); /* Light Green */
+	palette.set_pen_color(13, rgb_t(0x58, 0xf4, 0xbf)); /* Aquamarine */
+	palette.set_pen_color(14, rgb_t(0xbf, 0xe3, 0x08)); /* Yellow */
+	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));	 /* White */
 };
 
 u16 dim68k_state::dim68k_fdc_r()
@@ -293,7 +332,7 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 			*p++ = palette[BIT(gfx, 3)*15];
 			*p++ = palette[BIT(gfx, 2)*15];
 			*p++ = palette[BIT(gfx, 1)*15];
-			if (dot8) *p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 0)*15];
 		}
 		else
 		{
@@ -322,7 +361,7 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 			*p++ = palette[BIT(gfx, 3)*15];
 			*p++ = palette[BIT(gfx, 2)*15];
 			*p++ = palette[BIT(gfx, 1)*15];
-			if (dot8) *p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 0)*15];
 		}
 		else
 		{
@@ -389,7 +428,7 @@ void dim68k_state::dim68k(machine_config &config)
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 250-1);
-	PALETTE(config, m_palette).set_entries(16);
+	PALETTE(config, m_palette, FUNC(dim68k_state::dim68k_palette), 16);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
