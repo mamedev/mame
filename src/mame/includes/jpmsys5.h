@@ -90,7 +90,7 @@ protected:
 	void m68000_ym_map(address_map &map);
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << (7-N)); else m_optic_pattern &= ~(1 << (7-N)); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << ((7-N)^3)); else m_optic_pattern &= ~(1 << ((7-N)^3)); }
 
 	uint16_t coins_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t reel_optos_r(offs_t offset, uint16_t mem_mask = ~0);
