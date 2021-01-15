@@ -949,7 +949,8 @@ void huc6270_device::write16(offs_t offset, u16 data, u16 mem_mask)
 					break;
 
 				case RCR:       /* raster compare register */
-					m_rcr = COMBINE_DATA(&m_rcr) & 0x3ff;
+					COMBINE_DATA(&m_rcr);
+					m_rcr &= 0x3ff;
 //printf("%s: RCR set to %03x\n", machine().describe_context().c_str(), m_rcr);
 //                  if (m_raster_count == m_rcr && m_cr & 0x04)
 //                  {
@@ -959,11 +960,13 @@ void huc6270_device::write16(offs_t offset, u16 data, u16 mem_mask)
 					break;
 
 				case BXR:       /* background x-scroll register */
-					m_bxr = COMBINE_DATA(&m_bxr) & 0x3ff;
+					COMBINE_DATA(&m_bxr);
+					m_bxr &= 0x3ff;
 					break;
 
 				case BYR:       /* background y-scroll register */
-					m_byr = COMBINE_DATA(&m_byr) & 0x1ff;
+					COMBINE_DATA(&m_byr)
+					m_byr &= 0x1ff;
 					m_byr_latched = m_byr;
 					break;
 
