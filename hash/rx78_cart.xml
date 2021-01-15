@@ -84,7 +84,7 @@ If not found, it will check address 6000 in the same way. If still not found, th
 The monitor will expect you to load a program from cassette.
 
 -->
-<softwarelist name="rx78" description="Gundam RX-78 cartridges">
+<softwarelist name="rx78_cart" description="Gundam RX-78 cartridges">
 	<software name="basic">
 		<description>BS-BASIC 1.0</description>
 		<year>1983</year>
@@ -208,16 +208,4 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="graphmaths">
-		<description>Graphics Mathematics</description>
-		<year>1983</year>
-		<publisher>Bandai</publisher>
-		<info name="usage" value="MON then L then GRM. After loading, RUN" />
-		<sharedfeat name="requirement" value="basic"/>
-		<part name="cass" interface="rx78_cass">
-			<dataarea name="cass" size="0x23ca2c">
-				<rom name="graphmaths.wav" size="0x23ca2c" crc="e4411028" sha1="b03a855fe527c8a181b1c6e3d8daee6d637a97cc"/>
-			</dataarea>
-		</part>
-	</software>
 </softwarelist>

@@ -501,8 +501,8 @@ void rx78_state::rx78(machine_config &config)
 	m_cass->set_interface("rx78_cass");
 
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
-	SOFTWARE_LIST(config, "cass_list").set_original("rx78");
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("rx78_cass");
 }
 
 /* ROM definition */
