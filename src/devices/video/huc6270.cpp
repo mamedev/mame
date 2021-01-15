@@ -965,7 +965,7 @@ void huc6270_device::write16(offs_t offset, u16 data, u16 mem_mask)
 					break;
 
 				case BYR:       /* background y-scroll register */
-					COMBINE_DATA(&m_byr)
+					COMBINE_DATA(&m_byr);
 					m_byr &= 0x1ff;
 					m_byr_latched = m_byr;
 					break;
