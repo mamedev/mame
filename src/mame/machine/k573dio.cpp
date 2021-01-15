@@ -141,8 +141,6 @@ void k573dio_device::device_start()
 	save_item(NAME(crypto_key1));
 
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
-	k573fpga->add_route(0, ":lspeaker", 1.0);
-	k573fpga->add_route(1, ":rspeaker", 1.0);
 }
 
 void k573dio_device::device_reset()
@@ -168,6 +166,9 @@ void k573dio_device::device_add_mconfig(machine_config &config)
 {
 	KONAMI_573_DIGITAL_FPGA(config, k573fpga);
 	DS2401(config, digital_id);
+
+	k573fpga->add_route(0, ":lspeaker", 1.0);
+	k573fpga->add_route(1, ":rspeaker", 1.0);
 }
 
 void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
