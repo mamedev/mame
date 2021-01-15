@@ -36,7 +36,7 @@ bool adf_format::supports_save() const
 	return true;
 }
 
-int adf_format::identify(io_generic *io, uint32_t form_factor)
+int adf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	if ((size == 901120) || (size == 912384) || (size == 1802240))
@@ -46,7 +46,7 @@ int adf_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool adf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool adf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	desc_s sectors[22];
 	uint8_t sectdata[512*22];
@@ -127,7 +127,7 @@ uint32_t adf_format::checksum(const uint8_t *trackbuf, int track_size, int pos, 
 	return check & 0x55555555;
 }
 
-bool adf_format::save(io_generic *io, floppy_image *image)
+bool adf_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t sectdata[512*22];
 	uint8_t trackbuf[300000/8];

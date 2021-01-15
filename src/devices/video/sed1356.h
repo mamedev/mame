@@ -170,6 +170,8 @@ protected:
 	void crt_cursor_color1_red_w(offs_t offset, uint8_t data);
 	void crt_cursor_fifo_thresh_w(offs_t offset, uint8_t data);
 
+	template <bool Linear> void bitblt_solid_fill();
+	void bitblt_execute_command();
 	uint8_t bitblt_ctrl0_r(offs_t offset);
 	uint8_t bitblt_ctrl1_r(offs_t offset);
 	uint8_t bitblt_rop_code_r(offs_t offset);

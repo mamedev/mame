@@ -214,9 +214,9 @@ private:
 
 QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
 {
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size || image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 || image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;

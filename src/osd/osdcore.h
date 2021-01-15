@@ -342,27 +342,6 @@ void osd_work_item_release(osd_work_item *item);
     MISCELLANEOUS INTERFACES
 ***************************************************************************/
 
-/// \brief Allocate memory that can contain executable code
-///
-/// Allocated memory must be both writable and executable.  Allocated
-/// memory must be freed by calling #osd_free_executable passing the
-/// same size.
-/// \param [in] size Number of bytes to allocate.
-/// \return Pointer to allocated memory, or nullptr if allocation
-///   failed.
-/// \sa osd_free_executable
-void *osd_alloc_executable(size_t size);
-
-
-/// \brief Free memory allocated by osd_alloc_executable
-///
-/// \param [in] ptr Pointer returned by #osd_alloc_executable.
-/// \param [in] size Number of bytes originally requested.  Must match
-///   the value passed to #osd_alloc_executable.
-/// \sa osd_alloc_executable
-void osd_free_executable(void *ptr, size_t size);
-
-
 /// \brief Break into host debugger if attached
 ///
 /// This function is called when a fatal error occurs.  If a debugger is

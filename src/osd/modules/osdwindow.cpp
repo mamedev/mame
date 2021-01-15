@@ -56,3 +56,56 @@ std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_
 			return nullptr;
 	}
 }
+
+std::shared_ptr<osd_monitor_info> osd_window::monitor_from_rect(const osd_rect *proposed) const
+{
+	std::shared_ptr<osd_monitor_info> monitor;
+
+	if (fullscreen() || !m_monitor) // in full screen, just use the configured monitor
+		monitor = m_monitor;
+	else if (proposed) // in window mode, find the nearest
+		monitor = m_monitor->module().monitor_from_rect(*proposed);
+	else
+		monitor = m_monitor->module().monitor_from_window(*this);
+
+	return monitor;
+}
+
+void osd_window::create_target()
+{
+	// add us to the list
+	osd_common_t::s_window_list.push_back(shared_from_this());
+
+	// load the layout
+	m_target = m_machine.render().target_alloc();
+
+	// set the specific view
+	osd_options &options = downcast<osd_options &>(m_machine.options());
+	set_starting_view(m_index, options.view(), options.view(m_index));
+}
+
+void osd_window::set_starting_view(int index, const char *defview, const char *view)
+{
+	// choose non-auto over auto
+	if ((!*view || !strcmp(view, "auto")) && (*defview && strcmp(defview, "auto")))
+		view = defview;
+
+	// query the video system to help us pick a view
+	int viewindex = m_target->configured_view(view, index, video_config.numscreens);
+
+	// set the view
+	m_target->set_view(viewindex);
+}
+
+void osd_window::destroy()
+{
+	// remove us from the list
+	osd_common_t::s_window_list.remove(shared_from_this());
+
+	// free the textures etc
+	complete_destroy();
+
+	// free the render target, after the textures!
+	m_machine.render().target_free(m_target);
+	m_target = nullptr;
+}

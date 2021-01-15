@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="abc1600" description="Luxor ABC 1600 diskettes">
+<softwarelist name="abc1600_flop" description="Luxor ABC 1600 diskettes">
 
 	<software name="abcenix">
 		<description>ABCenix 5.12</description>

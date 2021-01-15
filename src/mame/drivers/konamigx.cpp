@@ -106,8 +106,9 @@
 #include "sound/k054539.h"
 //#include "machine/k056230.h"
 #include "sound/k056800.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 // TODO: check on PCB
@@ -2749,7 +2750,7 @@ ROM_START( dragoona )
 	ROM_LOAD( "dragoona.nv", 0x0000, 0x080, CRC(7980ad2b) SHA1(dccaab02d23edbd81ae13441fbac0dbd7112c258) )
 ROM_END
 
-/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC */
+/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC, confirmed on at least two separate ROM sets */
 ROM_START( soccerss )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )

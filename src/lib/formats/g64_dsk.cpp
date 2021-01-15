@@ -27,7 +27,7 @@ const uint32_t g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-int g64_format::identify(io_generic *io, uint32_t form_factor)
+int g64_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[8];
 
@@ -38,7 +38,7 @@ int g64_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool g64_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
@@ -109,7 +109,7 @@ int g64_format::generate_bitstream(int track, int head, int speed_zone, uint8_t 
 	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
 }
 
-bool g64_format::save(io_generic *io, floppy_image *image)
+bool g64_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);

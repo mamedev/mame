@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 
 /***************************************************************************
@@ -312,9 +313,15 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path);
 
 /// \brief Retrieves the volume name.
 ///
-/// \param [in] idx Order number of volume.
-/// \return Pointer to volume name.
-const char *osd_get_volume_name(int idx);
+/// \param [in] idx Index number of volume.
+/// \return Volume name or empty string of out of range.
+std::string osd_get_volume_name(int idx);
+
+
+/// \brief Retrieves volume names.
+///
+/// \return Names of all mounted volumes.
+std::vector<std::string> osd_get_volume_names();
 
 
 #endif // MAME_OSD_OSDFILE_H

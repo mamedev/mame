@@ -30,7 +30,7 @@ const char *pc98fdi_format::extensions() const
 	return "fdi";
 }
 
-int pc98fdi_format::identify(io_generic *io, uint32_t form_factor)
+int pc98fdi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	uint8_t h[32];
@@ -48,7 +48,7 @@ int pc98fdi_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool pc98fdi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool pc98fdi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t h[32];
 

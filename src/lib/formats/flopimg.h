@@ -233,9 +233,10 @@ public:
 	  @param io buffer containing the image data.
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
+	  @param variants the variants from floppy_image the drive can handle
 	  @return 1 if image valid, 0 otherwise.
 	*/
-	virtual int identify(io_generic *io, uint32_t form_factor) = 0;
+	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) = 0;
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
@@ -243,19 +244,21 @@ public:
 	  @param io source buffer containing the image data.
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
+	  @param variants the variants from floppy_image the drive can handle
 	  @param image output buffer for data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) = 0;
+	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MESS internal
 	  floppy representation to the appropriate format on disk.
 	  @param io output buffer for the data in the on-disk format.
+	  @param variants the variants from floppy_image the drive can handle
 	  @param image source buffer containing data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool save(io_generic *io, floppy_image *image);
+	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image);
 
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;
@@ -365,6 +368,14 @@ protected:
 		SECTOR_LOOP_END,        //!< End of the per-sector loop
 		SECTOR_INTERLEAVE_SKEW  //!< Defines interleave and skew for sector counting
 	};
+
+
+	/*! @brief Test if a variant is present in the variant vector
+	    @param variants the variant vector
+        @param variant the variant to test
+        @result true if variant is in variants
+	*/
+	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 
 	//! Sector data description
 	struct desc_s

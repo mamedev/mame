@@ -451,6 +451,9 @@ void hp9845_base_state::machine_start()
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
+	m_t15->set_name("T15");
+	m_t14->set_name("T14");
+
 	// setup RAM dynamically for -ramsize
 	// 0K..64K
 	setup_ram_block(0 , 0);

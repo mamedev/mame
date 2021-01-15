@@ -20,6 +20,7 @@
 
 
 namespace {
+
 class std_osd_file : public osd_file
 {
 public:
@@ -245,8 +246,19 @@ bool osd_is_absolute_path(std::string const &path)
 //  osd_get_volume_name
 //============================================================
 
-const char *osd_get_volume_name(int idx)
+std::string osd_get_volume_name(int idx)
 {
 	// we don't expose volumes
-	return nullptr;
+	return std::string();
+}
+
+
+//============================================================
+//  osd_get_volume_names
+//============================================================
+
+std::vector<std::string> osd_get_volume_names()
+{
+	// we don't expose volumes
+	return std::vector<std::string>();
 }

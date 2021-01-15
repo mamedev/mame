@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "audio/bu3905.h"
+#include "audio/sa16.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8251.h"
@@ -33,6 +34,7 @@ public:
 		, m_io(*this, "io")
 		, m_usart(*this, "usart")
 		, m_lcdc(*this, "lcdc")
+		, m_sampler(*this, "sampler")
 	{
 	}
 
@@ -60,6 +62,7 @@ protected:
 	required_device<mb62h195_device> m_io;
 	required_device<i8251_device> m_usart;
 	required_device<hd44780_device> m_lcdc;
+	required_device<sa16_base_device> m_sampler;
 };
 
 class roland_s220_state : public roland_s10_state
@@ -168,7 +171,7 @@ void roland_s10_state::mks100_ext_map(address_map &map)
 	map(0x9000, 0x90ff).mirror(0xf00).w(FUNC(roland_s10_state::led_data_w));
 	map(0xa000, 0xa0ff).mirror(0xf00).rw(FUNC(roland_s10_state::sw_scan_r), FUNC(roland_s10_state::sw_scan_w));
 	map(0xc000, 0xc000).mirror(0xfff).w(FUNC(roland_s10_state::led_latch_w));
-	//map(0xe000, 0xffff).rw("wave", FUNC(rf5c36_device::read), FUNC(rf5c36_device::write));
+	map(0xe000, 0xffff).rw(m_sampler, FUNC(rf5c36_device::read), FUNC(rf5c36_device::write));
 }
 
 void roland_s10_state::s10_ext_map(address_map &map)
@@ -188,7 +191,7 @@ void roland_s220_state::s220_ext_map(address_map &map)
 	map(0x9000, 0x90ff).mirror(0xf00).w(FUNC(roland_s220_state::vca_cv_w));
 	map(0xa000, 0xa0ff).mirror(0xf00).rw(FUNC(roland_s220_state::sw_scan_r), FUNC(roland_s220_state::sw_scan_w));
 	map(0xc000, 0xc000).mirror(0xfff).w(FUNC(roland_s220_state::led_latch2_w));
-	//map(0xe000, 0xffff).rw("wave", FUNC(rf5c36_device::read), FUNC(rf5c36_device::write));
+	map(0xe000, 0xffff).rw(m_sampler, FUNC(rf5c36_device::read), FUNC(rf5c36_device::write));
 }
 
 
@@ -247,7 +250,8 @@ void roland_s10_state::s10(machine_config &config)
 
 	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
-	//RF5C36(config, "wave", 26.88_MHz_XTAL);
+	RF5C36(config, m_sampler, 26.88_MHz_XTAL);
+	m_sampler->int_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
 }
 
 void roland_s10_state::mks100(machine_config &config)
@@ -283,6 +287,8 @@ void roland_s220_state::s220(machine_config &config)
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s220_state::lcd_pixel_update));
 
 	BU3905(config, m_outctrl);
+
+	m_sampler->sh_callback().set(m_outctrl, FUNC(bu3905_device::axi_w));
 }
 
 

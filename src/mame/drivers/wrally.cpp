@@ -126,6 +126,7 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 #include "emu.h"
 #include "includes/wrally.h"
+#include "includes/gaelcrpt.h"
 
 #include "machine/gaelco_ds5002fp.h"
 
@@ -136,6 +137,98 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 #include "screen.h"
 #include "speaker.h"
+
+
+
+void wrally_state::machine_start()
+{
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+
+	save_item(NAME(m_analog_ports));
+}
+
+/***************************************************************************
+
+    World Rally memory handlers
+
+***************************************************************************/
+
+void wrally_state::shareram_w(offs_t offset, uint8_t data)
+{
+	// why isn't there address map functionality for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+uint8_t wrally_state::shareram_r(offs_t offset)
+{
+	// why isn't there address map functionality for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+void wrally_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
+	COMBINE_DATA(&m_videoram[offset]);
+
+	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+}
+
+WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
+{
+	flip_screen_set(state);
+}
+
+void wrally_state::okim6295_bankswitch_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+// the following methods have been pilfered from gaelco2.cpp (wrally2). They seem to work fine for wrally, too
+template <int N>
+READ_LINE_MEMBER(wrally_state::analog_bit_r)
+{
+	return (m_analog_ports[N] >> 7) & 0x01;
+}
+
+WRITE_LINE_MEMBER(wrally_state::adc_clk)
+{
+	// a zero/one combo is written here to clock the next analog port bit
+	if (!state)
+	{
+		m_analog_ports[0] <<= 1;
+		m_analog_ports[1] <<= 1;
+	}
+}
+
+WRITE_LINE_MEMBER(wrally_state::adc_en)
+{
+	// a zero is written here to read the analog ports, and a one is written when finished
+	if (!state)
+	{
+		m_analog_ports[0] = m_analog[0]->read();
+		m_analog_ports[1] = m_analog[1]->read();
+	}
+}
 
 
 void wrally_state::mcu_hostmem_map(address_map &map)
@@ -160,9 +253,10 @@ void wrally_state::wrally_map(address_map &map)
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                         // OKI6295 bankswitch
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status/data register
+	map(0x70006a, 0x70006b).nopr();
+	map(0x70007a, 0x70007b).nopr();
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                              // Work RAM (shared with DS5002FP)
 }
-
 
 
 void wrally_state::oki_map(address_map &map)
@@ -170,6 +264,7 @@ void wrally_state::oki_map(address_map &map)
 	map(0x00000, 0x2ffff).rom();
 	map(0x30000, 0x3ffff).bankr("okibank");
 }
+
 
 static INPUT_PORTS_START( wrally )
 	PORT_START("DSW")
@@ -219,31 +314,39 @@ static INPUT_PORTS_START( wrally )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Gear Shift") PORT_TOGGLE PORT_REVERSE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("WHEEL")
-	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT) PORT_REVERSE
+	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT) PORT_REVERSE PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0000)
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANALOG0")   // pot wheel player 1
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P1 Pot Wheel") PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0010)
+
+	PORT_START("ANALOG1")   // pot wheel player 2
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Pot Wheel") PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0010)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Go to test mode NOW
-	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(wrally_state, analog_bit_r<0>)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(wrally_state, analog_bit_r<1>)
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout wrally_tilelayout16 =
@@ -296,8 +399,8 @@ void wrally_state::wrally(machine_config &config)
 	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
 	m_outlatch->q_out_cb<4>().set_nop();                                // Sound muting
 	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    // Flip screen
-	m_outlatch->q_out_cb<6>().set_nop();                                // ???
-	m_outlatch->q_out_cb<7>().set_nop();                                // ???
+	m_outlatch->q_out_cb<6>().set(FUNC(wrally_state::adc_en));  // ENA/D, for pot wheel
+	m_outlatch->q_out_cb<7>().set(FUNC(wrally_state::adc_clk)); // CKA/D,      "
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

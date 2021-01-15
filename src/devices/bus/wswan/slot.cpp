@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -128,7 +127,7 @@ static int ws_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -188,7 +187,7 @@ image_init_result ws_cart_slot_device::call_load()
 
 			if (get_feature("rtc"))
 			{
-				if (!core_stricmp(get_feature("rtc"), "yes"))
+				if (!strcmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_rtc(true);
 			}
 		}

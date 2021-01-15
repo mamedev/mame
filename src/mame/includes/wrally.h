@@ -25,11 +25,18 @@ public:
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
 		m_shareram(*this, "shareram"),
+		m_analog(*this, "ANALOG%u", 0U),
 		m_tilemap{ nullptr, nullptr }
 	{
 	}
 
 	void wrally(machine_config &config);
+
+	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	uint8_t shareram_r(offs_t offset);
@@ -42,12 +49,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 
+	DECLARE_WRITE_LINE_MEMBER(adc_clk);
+	DECLARE_WRITE_LINE_MEMBER(adc_en);
+
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void mcu_hostmem_map(address_map &map);
 	void oki_map(address_map &map);
 	void wrally_map(address_map &map);
@@ -64,7 +72,10 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_shareram;
 
+	required_ioport_array<2> m_analog;
+
 	tilemap_t *m_tilemap[2];
+	uint8_t m_analog_ports[2];
 };
 
 #endif // MAME_INCLUDES_WRALLY_H

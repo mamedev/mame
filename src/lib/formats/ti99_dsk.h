@@ -23,8 +23,8 @@ class ti99_floppy_format : public floppy_image_format_t
 {
 public:
 	bool supports_save() const override { return true; }
-	bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
-	bool save(io_generic *io, floppy_image *image) override;
+	bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
 protected:
 	int decode_bitstream(const uint8_t *bitstream, uint8_t *trackdata, int *sector, int cell_count, int encoding, uint8_t gapbytes, int track_size);
@@ -54,7 +54,7 @@ protected:
 class ti99_sdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, uint32_t form_factor) override;
+	int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	const char *name() const override;
 	const char *description() const override;
 	const char *extensions() const override;
@@ -93,7 +93,7 @@ extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
 class ti99_tdf_format : public ti99_floppy_format
 {
 public:
-	int identify(io_generic *io, uint32_t form_factor) override;
+	int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	const char *name() const override;
 	const char *description() const override;
 	const char *extensions() const override;

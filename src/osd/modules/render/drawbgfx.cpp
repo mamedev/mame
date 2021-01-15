@@ -234,9 +234,9 @@ int renderer_bgfx::create()
 	// create renderer
 	std::shared_ptr<osd_window> win = assert_window();
 	osd_dim wdim = win->get_size();
-	m_width[win->m_index] = wdim.width();
-	m_height[win->m_index] = wdim.height();
-	if (win->m_index == 0)
+	m_width[win->index()] = wdim.width();
+	m_height[win->index()] = wdim.height();
+	if (win->index() == 0)
 	{
 		if (!s_window_set)
 		{
@@ -303,7 +303,7 @@ int renderer_bgfx::create()
 			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
 		}
 		bgfx::init(init);
-		bgfx::reset(m_width[win->m_index], m_height[win->m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		bgfx::reset(m_width[win->index()], m_height[win->index()], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(m_options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
@@ -315,18 +315,18 @@ int renderer_bgfx::create()
 	m_shaders = new shader_manager(m_options);
 	m_effects = new effect_manager(m_options, *m_shaders);
 
-	if (win->m_index != 0)
+	if (win->index() != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), m_width[win->index()], m_height[win->index()]);
 #elif defined(OSD_UWP)
-		m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), m_width[win->index()], m_height[win->index()]);
 #elif defined(OSD_MAC)
-		m_framebuffer = m_targets->create_backbuffer(GetOSWindow(std::static_pointer_cast<mac_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(GetOSWindow(std::static_pointer_cast<mac_window_info>(win)->platform_window()), m_width[win->index()], m_height[win->index()]);
 #else
-		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), m_width[win->index()], m_height[win->index()]);
 #endif
-		bgfx::touch(win->m_index);
+		bgfx::touch(win->index());
 
 		if (m_ortho_view) {
 			m_ortho_view->set_backbuffer(m_framebuffer);
@@ -350,7 +350,7 @@ int renderer_bgfx::create()
 		fatalerror("BGFX: Unable to load required shaders. Please check and reinstall the %s folder\n", m_options.bgfx_path());
 	}
 
-	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
+	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->index(), *this);
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
@@ -372,7 +372,7 @@ void renderer_bgfx::record()
 {
 	std::shared_ptr<osd_window> win = assert_window();
 
-	if (win->m_index > 0)
+	if (win->index() > 0)
 	{
 		return;
 	}
@@ -840,7 +840,7 @@ int renderer_bgfx::draw(int update)
 {
 	std::shared_ptr<osd_window> win = assert_window();
 
-	int window_index = win->m_index;
+	int window_index = win->index();
 
 	m_seen_views.clear();
 	if (m_ortho_view) {
@@ -972,7 +972,7 @@ void renderer_bgfx::update_recording()
 void renderer_bgfx::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
 	std::shared_ptr<osd_window> win = assert_window();
-	if (m_avi_writer != nullptr && m_avi_writer->recording() && win->m_index == 0)
+	if (m_avi_writer != nullptr && m_avi_writer->recording() && win->index() == 0)
 	{
 		m_avi_writer->audio_frame(buffer, samples_this_frame);
 	}
@@ -982,7 +982,7 @@ bool renderer_bgfx::update_dimensions()
 {
 	std::shared_ptr<osd_window> win = assert_window();
 
-	const uint32_t window_index = win->m_index;
+	const uint32_t window_index = win->index();
 	const uint32_t width = m_width[window_index];
 	const uint32_t height = m_height[window_index];
 

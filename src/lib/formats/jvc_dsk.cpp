@@ -168,13 +168,13 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(io_generic *io, uint32_t form_factor)
+int jvc_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
 }
 
-bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool jvc_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 
@@ -223,7 +223,7 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool jvc_format::save(io_generic *io, floppy_image *image)
+bool jvc_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t bitstream[500000/8];
 	uint8_t sector_data[50000];

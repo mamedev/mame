@@ -78,7 +78,7 @@ hpi_format::hpi_format()
 	(void)HPI_RED_IMAGE_SIZE;
 }
 
-int hpi_format::identify(io_generic *io, uint32_t form_factor)
+int hpi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -142,7 +142,7 @@ bool hpi_format::geometry_from_size(uint64_t image_size , unsigned& heads , unsi
 	}
 }
 
-bool hpi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool hpi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	unsigned heads;
 	unsigned cylinders;
@@ -191,7 +191,7 @@ bool hpi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool hpi_format::save(io_generic *io, floppy_image *image)
+bool hpi_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks;
 	int heads;

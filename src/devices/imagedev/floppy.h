@@ -67,8 +67,6 @@ public:
 	// construction/destruction
 	virtual ~floppy_image_device();
 
-	virtual void handled_variants(uint32_t *variants, int &var_count) const = 0;
-
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_format_t *get_formats() const;
 	floppy_image_format_t *get_load_format() const;
@@ -105,7 +103,7 @@ public:
 	void set_ready(bool state);
 	double get_pos();
 
-	bool wpt_r() { return wpt; }
+	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
 	int idx_r() { return idx; }
@@ -113,7 +111,7 @@ public:
 	bool ss_r() { return ss; }
 	bool twosid_r();
 
-	void seek_phase_w(int phases);
+	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
 	void ss_w(int state) { if (sides > 1) ss = state; }
@@ -154,6 +152,7 @@ protected:
 
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
+	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
@@ -234,7 +233,6 @@ protected:
 	public: \
 		Name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 		virtual ~Name(); \
-		virtual void handled_variants(uint32_t *variants, int &var_count) const override; \
 		virtual const char *image_interface() const noexcept override { return Interface; } \
 	protected: \
 		virtual void setup_characteristics() override; \
@@ -274,6 +272,44 @@ DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
 
 DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
+
+class mac_floppy_device : public floppy_image_device {
+public:
+	virtual ~mac_floppy_device() = default;
+
+	virtual bool wpt_r() override;
+	virtual void seek_phase_w(int phases) override;
+	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
+
+protected:
+	u8 m_reg;
+	bool m_strb;
+
+	mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+class mfd51w_device : public mac_floppy_device {
+public:
+	mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~mfd51w_device() = default;
+protected:
+	virtual void setup_characteristics() override;
+};
+
+class mfd75w_device : public mac_floppy_device {
+public:
+	mfd75w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~mfd75w_device() = default;
+
+protected:
+	virtual void setup_characteristics() override;
+};
+
+DECLARE_DEVICE_TYPE(MFD51W, mfd51w_device)
+DECLARE_DEVICE_TYPE(MFD75W, mfd75w_device)
 
 
 /*

@@ -117,6 +117,7 @@ Sound processor - 6502
 #include "emupal.h"
 #include "speaker.h"
 
+namespace {
 
 class deco_ld_state : public driver_device
 {
@@ -143,6 +144,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -159,11 +163,12 @@ private:
 	required_shared_ptr<uint8_t> m_attr1;
 
 	int m_nmimask;
+
 	uint8_t acia_status_hack_r();
 	uint8_t sound_status_r();
 	void decold_sound_cmd_w(uint8_t data);
-	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] void nmimask_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 	void rblaster_map(address_map &map);
@@ -294,12 +299,10 @@ void deco_ld_state::rblaster_map(address_map &map)
 
 /* sound arrangement is practically identical to Zero Target. */
 
-#ifdef UNUSED_FUNCTION
 void deco_ld_state::nmimask_w(uint8_t data)
 {
 	m_nmimask = data & 0x80;
 }
-#endif
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
@@ -654,6 +657,7 @@ ROM_START( cobraa )
 	ROM_LOAD( "vd0-t.f6",         0x0000, 0x00020, CRC(78449942) SHA1(584e25f7bffccd943c4db1edf05552f7989e08a4) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )

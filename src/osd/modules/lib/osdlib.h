@@ -16,6 +16,7 @@
 #ifndef __OSDLIB__
 #define __OSDLIB__
 
+#include <initializer_list>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -58,6 +59,90 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 -----------------------------------------------------------------------------*/
 std::string osd_get_clipboard_text(void);
 
+namespace osd {
+
+bool invalidate_instruction_cache(void const *start, std::size_t size);
+
+
+class virtual_memory_allocation
+{
+public:
+	enum : unsigned
+	{
+		NONE = 0x00,
+		READ = 0x01,
+		WRITE = 0x02,
+		EXECUTE = 0x04,
+		READ_WRITE = READ | WRITE,
+		READ_EXECUTE = READ | EXECUTE
+	};
+
+	virtual_memory_allocation(virtual_memory_allocation const &) = delete;
+	virtual_memory_allocation &operator=(virtual_memory_allocation const &) = delete;
+
+	virtual_memory_allocation() { }
+	virtual_memory_allocation(std::initializer_list<std::size_t> blocks)
+	{
+		m_memory = do_alloc(blocks, m_size, m_page_size);
+	}
+	virtual_memory_allocation(virtual_memory_allocation &&that) : m_memory(that.m_memory), m_size(that.m_size), m_page_size(that.m_page_size)
+	{
+		that.m_memory = nullptr;
+		that.m_size = that.m_page_size = 0U;
+	}
+	~virtual_memory_allocation()
+	{
+		if (m_memory)
+			do_free(m_memory, m_size);
+	}
+
+	explicit operator bool() const { return bool(m_memory); }
+	void *get() { return m_memory; }
+	std::size_t size() const { return m_size; }
+	std::size_t page_size() const { return m_page_size; }
+
+	bool set_access(std::size_t start, std::size_t size, unsigned access)
+	{
+		if ((start % m_page_size) || (size % m_page_size) || (start > m_size) || ((m_size - start) < size))
+			return false;
+		else
+			return do_set_access(reinterpret_cast<std::uint8_t *>(m_memory) + start, size, access);
+	}
+
+	virtual_memory_allocation &operator=(std::nullptr_t)
+	{
+		if (m_memory)
+			do_free(m_memory, m_size);
+		m_memory = nullptr;
+		m_size = m_page_size = 0U;
+		return *this;
+	}
+
+	virtual_memory_allocation &operator=(virtual_memory_allocation &&that)
+	{
+		if (&that != this)
+		{
+			if (m_memory)
+				do_free(m_memory, m_size);
+			m_memory = that.m_memory;
+			m_size = that.m_size;
+			m_page_size = that.m_page_size;
+			that.m_memory = nullptr;
+			that.m_size = that.m_page_size = 0U;
+		}
+		return *this;
+	}
+
+private:
+	static void *do_alloc(std::initializer_list<std::size_t> blocks, std::size_t &size, std::size_t &page_size);
+	static void do_free(void *start, std::size_t size);
+	static bool do_set_access(void *start, std::size_t size, unsigned access);
+
+	void *m_memory = nullptr;
+	std::size_t m_size = 0U, m_page_size = 0U;
+};
+
+
 /*-----------------------------------------------------------------------------
     dynamic_module: load functions from optional shared libraries
 
@@ -69,7 +154,6 @@ std::string osd_get_clipboard_text(void);
           revisions of a same library)
 -----------------------------------------------------------------------------*/
 
-namespace osd {
 class dynamic_module
 {
 public:
@@ -80,7 +164,7 @@ public:
 	virtual ~dynamic_module() { };
 
 	template <typename T>
-	typename std::enable_if<std::is_pointer<T>::value, T>::type bind(char const *symbol)
+	typename std::enable_if_t<std::is_pointer_v<T>, T> bind(char const *symbol)
 	{
 		return reinterpret_cast<T>(get_symbol_address(symbol));
 	}

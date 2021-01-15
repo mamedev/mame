@@ -43,9 +43,9 @@ public:
 	auto readca2_handler() { return m_in_ca2_handler.bind(); }
 	auto readcb1_handler() { return m_in_cb1_handler.bind(); }
 
-	// TODO: CONVERT THESE TO WRITE LINE
 	auto writepa_handler() { return m_out_a_handler.bind(); }
 	auto writepb_handler() { return m_out_b_handler.bind(); }
+	auto tspb_handler() { return m_ts_b_handler.bind(); }
 
 	auto ca2_handler() { return m_ca2_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
@@ -163,6 +163,7 @@ private:
 	devcb_read_line m_in_ca2_handler;
 	devcb_write8 m_out_a_handler;
 	devcb_write8 m_out_b_handler;
+	devcb_read8 m_ts_b_handler;
 	devcb_write_line m_ca2_handler;
 	devcb_write_line m_cb2_handler;
 	devcb_write_line m_irqa_handler;

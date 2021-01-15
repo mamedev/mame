@@ -76,11 +76,15 @@ public:
 	//   3.5
 	static void floppies_35(device_slot_interface &device);
 	template<typename T> static void add_35(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35", formats_35);
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35);
 	}
 	template<typename T> static void add_35_nc(machine_config &config, T &floppy) {
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, "", formats_35);
 	}
+
+	// Sync the state when something external is going to change, like
+	// the floppy side or rpm.
+	virtual void sync() = 0;
 
 protected:
 	devcb_write8 m_phases_cb, m_devsel_cb;

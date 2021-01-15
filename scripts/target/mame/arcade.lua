@@ -301,6 +301,7 @@ VIDEOS["SEGA315_5313"] = true
 --VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
 VIDEOS["BT45X"] = true
+VIDEOS["BT47X"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
 VIDEOS["CESBLIT"] = true
@@ -394,6 +395,8 @@ VIDEOS["VRENDER0"] = true
 -- specify available machine cores
 --------------------------------------------------
 
+MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["AKIKO"] = true
 MACHINES["ALPHA_8921"] = true
@@ -558,6 +561,7 @@ MACHINES["MC68901"] = true
 MACHINES["MCCS1850"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
+--MACHINES["M950X0"] = true
 MACHINES["MCF5206E"] = true
 MACHINES["METERS"] = true
 MACHINES["MICROTOUCH"] = true
@@ -795,7 +799,7 @@ BUSES["PC_JOY"] = true
 BUSES["PC_KBD"] = true
 --BUSES["PET"] = true
 --BUSES["PLUS4"] = true
---BUSES["PSX_CONTROLLER"] = true
+BUSES["PSX_CONTROLLER"] = true
 --BUSES["QL"] = true
 BUSES["RS232"] = true
 --BUSES["S100"] = true
@@ -2053,7 +2057,6 @@ files {
 	MAME_DIR .. "src/mame/video/thoop2.cpp",
 	MAME_DIR .. "src/mame/drivers/wrally.cpp",
 	MAME_DIR .. "src/mame/includes/wrally.h",
-	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
 	MAME_DIR .. "src/mame/drivers/blmbycar.cpp",
 	MAME_DIR .. "src/mame/includes/blmbycar.h",
@@ -4097,6 +4100,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rollrace.cpp",
 	MAME_DIR .. "src/mame/includes/rollrace.h",
 	MAME_DIR .. "src/mame/video/rollrace.cpp",
+	MAME_DIR .. "src/mame/drivers/sbmjb.cpp",
 	MAME_DIR .. "src/mame/drivers/sbowling.cpp",
 	MAME_DIR .. "src/mame/drivers/scyclone.cpp",
 	MAME_DIR .. "src/mame/drivers/slapshot.cpp",
@@ -4991,6 +4995,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
+	MAME_DIR .. "src/mame/drivers/miniguay.cpp",
 	MAME_DIR .. "src/mame/drivers/minivideo.cpp",
 	MAME_DIR .. "src/mame/drivers/mirax.cpp",
 	MAME_DIR .. "src/mame/drivers/missbamby.cpp",

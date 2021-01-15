@@ -3043,11 +3043,11 @@ void r4000_base_device::cp1_execute(u32 const op)
 			// TODO: MIPS3 only
 			switch (op & 0x3f)
 			{
-			case 0x02a00020: // CVT.S.L
+			case 0x20: // CVT.S.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f32(s64(m_f[FSREG])).v);
 				break;
-			case 0x02a00021: // CVT.D.L
+			case 0x21: // CVT.D.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f64(s64(m_f[FSREG])).v);
 				break;
