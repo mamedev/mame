@@ -427,7 +427,7 @@ void rtpc_state::crrb_w(u8 data)
 	//  6   reserved
 	//  7   reserved
 
-	if (BIT(data, 0))
+	if (m_scc && BIT(data, 0))
 		m_scc->reset();
 	// TODO: rs232 if
 	m_mcu->set_input_line(INPUT_LINE_RESET, !BIT(data, 2));
