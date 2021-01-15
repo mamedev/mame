@@ -156,7 +156,7 @@ void k573dio_device::device_reset()
 	ram_read_adr = 0;
 	crypto_key1 = 0;
 
-	std::fill_n(output_data, sizeof(output_data), 0);
+	std::fill(std::begin(output_data), std::end(output_data), 0);
 }
 
 ROM_START( k573dio )
