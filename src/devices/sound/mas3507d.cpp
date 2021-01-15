@@ -38,7 +38,8 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, cb_sample(*this)
-	, i2c_bus_state(), i2c_bus_address(), i2c_subdest(), i2c_command(), i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
+	, i2c_bus_state(IDLE), i2c_bus_address(UNKNOWN), i2c_subdest(UNDEFINED), i2c_command(CMD_BAD)
+	, i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
 	, i2c_bus_curbit(0), i2c_bus_curval(0), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
 {
 }
@@ -51,6 +52,10 @@ void mas3507d_device::device_start()
 
 	save_item(NAME(mp3data));
 	save_item(NAME(samples));
+	save_item(NAME(i2c_bus_state));
+	save_item(NAME(i2c_bus_address));
+	save_item(NAME(i2c_subdest));
+	save_item(NAME(i2c_command));
 	save_item(NAME(i2c_scli));
 	save_item(NAME(i2c_sclo));
 	save_item(NAME(i2c_sdai));
