@@ -13353,6 +13353,9 @@ eva24                           //
 @source:evmbug.cpp
 evmbug                          //
 
+@source:ews4800.cpp
+ews4800_310                     // NEC EWS4800/310
+
 @source:excali64.cpp
 excali64                        //
 
