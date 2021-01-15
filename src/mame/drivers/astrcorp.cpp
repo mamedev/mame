@@ -92,26 +92,26 @@ protected:
 	optional_device<ticket_dispenser_device> m_ticket;
 
 	// memory pointers
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_spriteram;
 
-	void draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void eeprom_w(uint8_t data);
-	void showhand_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void skilldrp_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void screen_enable_w(uint8_t data);
-	uint16_t unk_r();
-	void oki_bank_w(uint8_t data);
-	uint8_t      m_screen_enable;
+	void draw_sprites_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void eeprom_w(u8 data);
+	void showhand_outputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void skilldrp_outputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void screen_enable_w(u8 data);
+	u16 unk_r();
+	void oki_bank_w(u8 data);
+	u8      m_screen_enable;
 
 private:
 
 	// video-related
 	bitmap_ind16 m_bitmap;
-	uint16_t     m_sprite_dma;
+	u16     m_sprite_dma;
 
 	output_finder<7> m_lamps;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline_cb);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -134,7 +134,7 @@ public:
 	void init_magibomb();
 
 private:
-	uint16_t video_flags_r();
+	u16 video_flags_r();
 	void magibomb_base_map(address_map &map, u32 base_offs);
 	void magibomb_map(address_map &map);
 	void magibombb_map(address_map &map);
@@ -149,16 +149,19 @@ public:
 	{ }
 
 	void astoneage(machine_config &config);
+	void magibombd(machine_config &config);
 	void init_astoneage();
+	void init_magibombd();
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<ramdac_device> m_ramdac;
+	optional_device<ramdac_device> m_ramdac;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(astoneage_scanline_cb);
 	void astoneage_map(address_map &map);
+	void magibombd_map(address_map &map);
 	void ramdac_map(address_map &map);
 
 	struct decryption_info {
@@ -177,6 +180,7 @@ private:
 	};
 
 	static const decryption_info astoneag_table;
+	static const decryption_info magibombd_table;
 	void decrypt_rom(const decryption_info &table);
 };
 
@@ -206,8 +210,8 @@ void astrocorp_state::video_start()
     1                                 Code
 
     2          fedc ba-- ---- ----    ignored?
-	           ---- --9- ---- ----    flip Y
-	           ---- ---8 ---- ----    flip X
+               ---- --9- ---- ----    flip Y
+               ---- ---8 ---- ----    flip X
                ---- ---- 7654 3210    Y
 
     3          fedc ba98 ---- ----    X Size
@@ -217,8 +221,8 @@ void astrocorp_state::video_start()
 
 void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *source = m_spriteram;
-	uint16_t *finish = m_spriteram + m_spriteram.bytes() / 2;
+	u16 *source = m_spriteram;
+	u16 *finish = m_spriteram + m_spriteram.bytes() / 2;
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
@@ -262,7 +266,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-uint32_t astrocorp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 astrocorp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_screen_enable & 1)
 		copybitmap(bitmap, m_bitmap, 0,0,0,0, cliprect);
@@ -277,27 +281,27 @@ uint32_t astrocorp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
                                 Memory Maps
 ***************************************************************************/
 
-void astrocorp_state::draw_sprites_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::draw_sprites_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t old = m_sprite_dma;
-	uint16_t now = COMBINE_DATA(&m_sprite_dma);
+	u16 old = m_sprite_dma;
+	u16 now = COMBINE_DATA(&m_sprite_dma);
 
 	if (!old && now)
 		draw_sprites(m_bitmap, m_screen->visible_area());
 }
 
-void astrocorp_state::eeprom_w(uint8_t data)
+void astrocorp_state::eeprom_w(u8 data)
 {
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
 
-void astrocorp_state::oki_bank_w(uint8_t data)
+void astrocorp_state::oki_bank_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 //  logerror("CPU #0 PC %06X: OKI bank %02X\n", m_maincpu->pc(), data);
 }
 
-void astrocorp_state::showhand_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::showhand_outputs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -317,7 +321,7 @@ void astrocorp_state::showhand_outputs_w(offs_t offset, uint16_t data, uint16_t 
 //  popmessage("%04X",data);
 }
 
-void astrocorp_state::skilldrp_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void astrocorp_state::skilldrp_outputs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// key in          (0001)
 	// coin in         (0002)
@@ -359,7 +363,7 @@ void astrocorp_state::skilldrp_outputs_w(offs_t offset, uint16_t data, uint16_t 
 //  popmessage("%04X",data);
 }
 
-void astrocorp_state::screen_enable_w(uint8_t data)
+void astrocorp_state::screen_enable_w(u8 data)
 {
 	m_screen_enable = data;
 //  popmessage("%02X",data);
@@ -367,7 +371,7 @@ void astrocorp_state::screen_enable_w(uint8_t data)
 		logerror("CPU #0 PC %06X: screen enable = %02X\n", m_maincpu->pc(), m_screen_enable);
 }
 
-uint16_t astrocorp_state::unk_r()
+u16 astrocorp_state::unk_r()
 {
 	return 0xffff;  // bit 3?
 }
@@ -444,22 +448,22 @@ void astrocorp_state::speeddrp_map(address_map &map)
 // PC refers to magibomb:
 // - 0x22a4 reads to $a0101a, resets if 0
 // - 0x8ba if $a10001 & 0xf != 0 it writes "SEGA" to $a14000 (wtf?)
-// - all lv 1-7 irqs writes a vector to D1 then resets program flow, 
+// - all lv 1-7 irqs writes a vector to D1 then resets program flow,
 //   is it expecting to NOT use irqs at all and actually using it for remote control?
-// - tight loops at 0x1fb2, bypass by jumping to 0x1fb6, otherwise works on an initialized nvram/eeprom, 
+// - tight loops at 0x1fb2, bypass by jumping to 0x1fb6, otherwise works on an initialized nvram/eeprom,
 //   presumably wants an operator input code?
 
-uint16_t magibomb_state::video_flags_r()
+u16 magibomb_state::video_flags_r()
 {
 	// bit 0: vblank? bit 3: sprite busy flag?
-	
+
 	return m_screen->vblank() ^ 1;
 }
 
 void magibomb_state::magibomb_base_map(address_map &map, u32 base_offs)
 {
 	map(0x000000, 0x01ffff).rom();
-//	map(0x040000, 0x07ffff) in client (later HW maps these ones at 0x50000-0x6ffff instead of 0x40000-0x5ffff)
+//  map(0x040000, 0x07ffff) in client (later HW maps these ones at 0x50000-0x6ffff instead of 0x40000-0x5ffff)
 	map(0x040000+base_offs, 0x043fff+base_offs).ram().share("nvram");
 	map(0x050000+base_offs, 0x050fff+base_offs).ram().share("spriteram");
 	map(0x052000+base_offs, 0x052001+base_offs).w(FUNC(magibomb_state::draw_sprites_w));
@@ -467,7 +471,7 @@ void magibomb_state::magibomb_base_map(address_map &map, u32 base_offs)
 	map(0x058001+base_offs, 0x058001+base_offs).w(FUNC(magibomb_state::eeprom_w));
 	map(0x05a000+base_offs, 0x05a001+base_offs).w(FUNC(magibomb_state::skilldrp_outputs_w));
 	map(0x05e000+base_offs, 0x05e001+base_offs).portr("EEPROMIN");
-	
+
 	map(0x080001, 0x080001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x090001, 0x090001).w(FUNC(magibomb_state::oki_bank_w));
 	map(0x0a0000, 0x0a0001).r(FUNC(magibomb_state::video_flags_r));
@@ -501,13 +505,29 @@ void astoneage_state::astoneage_map(address_map &map)
 	map(0xd00000, 0xd00000).w(m_ramdac, FUNC(ramdac_device::index_w));
 	map(0xd00002, 0xd00002).w(m_ramdac, FUNC(ramdac_device::pal_w));
 	map(0xd00004, 0xd00004).w(m_ramdac, FUNC(ramdac_device::mask_w));
-//	map(0x480000, 0x4801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+//  map(0x480000, 0x4801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	// unknown location
-//	map(0x500001, 0x500001).w(FUNC(astoneage_state::screen_enable_w));
+//  map(0x500001, 0x500001).w(FUNC(astoneage_state::screen_enable_w));
 	map(0x580001, 0x580001).w(FUNC(astoneage_state::oki_bank_w));
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
+void astoneage_state::magibombd_map(address_map &map) // seems to use old style palette instead of ramdac
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000);
+	map(0xc80000, 0xc83fff).ram().share("nvram"); // battery
+	map(0xa80000, 0xa80fff).ram().share("spriteram");
+	map(0xa82000, 0xa82001).w(FUNC(astoneage_state::draw_sprites_w));
+	map(0xa84000, 0xa84001).portr("INPUTS");
+	map(0xa88001, 0xa88001).w(FUNC(astoneage_state::eeprom_w));
+	map(0xa8a000, 0xa8a001).w(FUNC(astoneage_state::skilldrp_outputs_w));
+	map(0xa8e000, 0xa8e001).portr("EEPROMIN");
+	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	// unknown location
+//  map(0x500001, 0x500001).w(FUNC(astoneage_state::screen_enable_w));
+	map(0x580001, 0x580001).w(FUNC(astoneage_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 /***************************************************************************
                                 Input Ports
@@ -602,7 +622,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( magibomb )
 	PORT_INCLUDE( skilldrp )
-	
+
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 )   PORT_NAME("Stop3 / Take Score")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 )   PORT_NAME("Stop1 / Double Up")
@@ -625,7 +645,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 // TODO: move to ROM loading
-static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
+static const u16 showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
 
 
 void astrocorp_state::machine_start()
@@ -694,7 +714,7 @@ void astrocorp_state::skilldrp(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: verify H/VSync & pixel clock for this type of HW
-	// (most likely different to compensate for the higher HRes) 
+	// (most likely different to compensate for the higher HRes)
 	m_screen->set_raw(XTAL(24'000'000) / 2, 781, 0, 512, 261, 0, 240);
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -718,7 +738,7 @@ void astrocorp_state::speeddrp(machine_config &config)
 void magibomb_state::magibomb(machine_config &config)
 {
 	skilldrp(config);
-//	m_maincpu->set_clock(XTAL(80'000'000) / 5);
+//  m_maincpu->set_clock(XTAL(80'000'000) / 5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &magibomb_state::magibomb_map);
 	config.device_remove("scantimer");
 
@@ -763,16 +783,24 @@ void astoneage_state::astoneage(machine_config &config)
 {
 	skilldrp(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astoneage_state::astoneage_map);
-	config.device_remove("scantimer");
-	TIMER(config, "scantimer").configure_scanline(FUNC(astoneage_state::astoneage_scanline_cb), "screen", 0, 1);
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(astoneage_state::astoneage_scanline_cb), "screen", 0, 1);
 
-	config.device_remove("palette");
-	PALETTE(config, m_palette).set_entries(256);
+	PALETTE(config.replace(), m_palette).set_entries(256);
 	RAMDAC(config, m_ramdac, 0, m_palette);
 	m_ramdac->set_addrmap(0, &astoneage_state::ramdac_map);
 
 	// TODO: Has 120MHz XTAL + VGA connector ...
 	// TODO: gfxdecode ROMs are interleaved and bumped compared to other games in the HW, at least 16x32
+}
+
+void astoneage_state::magibombd(machine_config &config)
+{
+	astoneage(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &astoneage_state::magibombd_map);
+
+	PALETTE(config.replace(), m_palette).set_format(palette_device::BGR_565, 0x100);
+	config.device_remove("ramdac");
 }
 
 /***************************************************************************
@@ -875,7 +903,7 @@ Skill Drop Georgia
 
 "Sep 13 2002 09:17:54" in code rom and AAI276832 on sticker.
 
-No specific PCB model or numer....
+No specific PCB model or number....
 
  Astro V02 0022 160pin PQFP ("ASTRO02" silkscreened under chip)
  JX-1689F1028N GRC586.V5 (68K core, has direct connection to program roms)
@@ -946,7 +974,7 @@ Speed Drop
 
 "16:01:26 Sep 3 2003" in code
 
-No specific PCB model or numer, same as used for Skill Drop but with newer video chip
+No specific PCB model or number, same as used for Skill Drop but with newer video chip
 
  Astro V05 0206 160pin PQFP ("ASTRO02" silkscreened under chip)
  JX-1689HP TA5265188 (68K core, has direct connection to program roms)
@@ -1032,7 +1060,7 @@ ROM_START( magibomb )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, BAD_DUMP CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) )
 ROM_END
@@ -1062,7 +1090,7 @@ ROM_START( magibombb )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, BAD_DUMP CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) )
 ROM_END
@@ -1077,13 +1105,13 @@ ROM_START( magibombc )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c46.u6", 0x00, 0x80, BAD_DUMP CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) )
 ROM_END
 
 ROM_START( magibombd )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom1", 0x00000, 0x10000, CRC(91883755) SHA1(bc6dd5cac352f169beac790825e86a2ecb45af05) )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(b55bc270) SHA1(7486018b87708cf5b653c27b1ed824e441c169b7) )
 
@@ -1468,7 +1496,7 @@ ROM_END
 void astrocorp_state::init_showhand()
 {
 #if 0
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	u16 *rom = (u16*)memregion("maincpu")->base();
 
 	rom[0x0a1a/2] = 0x6000; // hopper jam
 
@@ -1484,7 +1512,7 @@ void astrocorp_state::init_showhand()
 void astrocorp_state::init_showhanc()
 {
 #if 0
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	u16 *rom = (u16*)memregion("maincpu")->base();
 
 	rom[0x14d4/2] = 0x4e71; // enable full test mode
 	rom[0x14d6/2] = 0x4e71; // ""
@@ -1541,12 +1569,6 @@ void astoneage_state::decrypt_rom(const decryption_info &table)
 			(BIT(i, table.bits[4]) <<  8);
 		rom[dest >> 1] = tmp[i >> 1];
 	}
-
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	rom[0x004/2] = 0x0000;
-	rom[0x006/2] = 0x0440;
-	// notice that ROM is sum16 checked at PC=2870, must be equal to 0x0000
 }
 
 const astoneage_state::decryption_info astoneage_state::astoneag_table = {
@@ -1584,6 +1606,56 @@ const astoneage_state::decryption_info astoneage_state::astoneag_table = {
 void astoneage_state::init_astoneage()
 {
 	decrypt_rom(astoneag_table);
+
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x004/2] = 0x0000;
+	rom[0x006/2] = 0x0440;
+	// notice that ROM is sum16 checked at PC=2870, must be equal to 0x0000
+}
+
+const astoneage_state::decryption_info astoneage_state::magibombd_table = {
+	{
+		{
+			{ 8, 11, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 11, 10 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		},
+	},
+	{ 12, 9, 8, 10, 11 }  // TODO
+};
+
+void astoneage_state::init_magibombd()
+{
+	decrypt_rom(magibombd_table);
+
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x004/2] = 0x0000;
+	rom[0x006/2] = 0x0446;
 }
 
 void magibomb_state::init_magibomb()
@@ -1622,26 +1694,26 @@ void magibomb_state::init_magibomb()
 } // Anonymous namespace
 
 
-GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, init_showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2000,  showhand,  0,        showhand,  showhand, astrocorp_state, init_showhand,  ROT0, "Astro Corp.",        "Show Hand (Italy)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc,  showhanc, astrocorp_state, init_showhanc,  ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",             MACHINE_SUPPORTS_SAVE )
 
 // Encrypted games (not working):
 
 // Simpler encryption
-GAME( 2001?, magibomb,  0,        magibomb, magibomb, magibomb_state,  init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2002,  magibomba, magibomb, magibomb, magibomb, magibomb_state,  init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM
-GAME( 2002,  magibombb, magibomb, magibombb,magibomb, magibomb_state,  init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2001,  magibombc, magibomb, magibombb,magibomb, magibomb_state,  init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2001?, magibombe, magibomb, magibombb,magibomb, magibomb_state,  init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001?, magibomb,  0,        magibomb,  magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. L3.5S)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  magibomba, magibomb, magibomb,  magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4, 04/19/02)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM
+GAME( 2002,  magibombb, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.5A, 07/10/02)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001,  magibombc, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. AB4.2, 11/10/01)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001?, magibombe, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
-GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2004?, astoneag,  0,        astoneage,skilldrp, astoneage_state, init_astoneage,ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005,  magibombd, magibomb, magibomb, skilldrp, magibomb_state,  empty_init,    ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, zoo,       0,        showhand, showhand, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2007?, westvent,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003?, dinodino,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004?, astoneag,  0,        astoneage, skilldrp, astoneage_state, init_astoneage, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005,  magibombd, magibomb, magibombd, skilldrp, astoneage_state, init_magibombd, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005?, winbingo,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005?, winbingoa, winbingo, skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005?, hacher,    winbingo, skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005?, zoo,       0,        showhand,  showhand, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2007?, westvent,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
