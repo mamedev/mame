@@ -322,6 +322,9 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
 endif
+ifeq ($(firstword $(filter powerpc64,$(UNAME))),powerpc64)
+ARCHITECTURE := _x64
+endif
 ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
 ARCHITECTURE := _x64
 endif
@@ -402,6 +405,13 @@ ifndef FORCE_DRC_C_BACKEND
 endif
 endif
 
+# powerpc has inline assembly support but no DRC
+ifeq ($(findstring powerpc,$(UNAME)),powerpc)
+ifndef FORCE_DRC_C_BACKEND
+    FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
 # ARM / ARM64
 ifeq ($(findstring arm,$(UNAME)),arm)
 ifndef FORCE_DRC_C_BACKEND
@@ -427,6 +437,14 @@ ifneq (,$(findstring s390x,$(UNAME)))
 BIGENDIAN := 1
 endif
 endif # BIGENDIAN
+# FreeBSD
+ifneq (,$(findstring powerpc,$(UNAME)))
+ifneq (,$(findstring powerpc64le,$(UNAME)))
+BIGENDIAN := 0
+else
+BIGENDIAN := 1
+endif
+endif
 
 ifndef PYTHON_EXECUTABLE
 PYTHON := python
