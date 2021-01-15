@@ -1607,7 +1607,6 @@ void bosco_state::bosco(machine_config &config)
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
 	n54xx.set_basenote(NODE_01);
-	n54xx.set_irq_duration(attotime::from_usec(200));
 
 	namco_06xx_device &n06xx_0(NAMCO_06XX(config, "06xx_0", MASTER_CLOCK/6/64));
 	n06xx_0.set_maincpu(m_maincpu);
