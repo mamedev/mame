@@ -70,11 +70,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	memory_share_creator<uint16_t> ram;
 	required_device<k573fpga_device> k573fpga;
 	required_device<ds2401_device> digital_id;
 	devcb_write8 output_cb;
 
-	std::unique_ptr<uint16_t[]> ram;
 	uint32_t ram_adr, ram_read_adr;
 	uint8_t output_data[8];
 

@@ -122,6 +122,7 @@ void k573dio_device::amap(address_map &map)
 
 k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KONAMI_573_DIGITAL_IO_BOARD, tag, owner, clock),
+	ram(*this, "ram", 0x2000000, ENDIANNESS_LITTLE),
 	k573fpga(*this, "k573fpga"),
 	digital_id(*this, "digital_id"),
 	output_cb(*this),
@@ -133,19 +134,13 @@ void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
 
-	const int ram_size = 0x2000000/2;
-	ram = std::make_unique<uint16_t[]>(ram_size);
-
-	save_pointer(NAME(ram), ram_size);
 	save_item(NAME(ram_adr));
 	save_item(NAME(ram_read_adr));
 	save_item(NAME(output_data));
 	save_item(NAME(is_ddrsbm_fpga));
 	save_item(NAME(crypto_key1));
 
-	k573fpga->set_ram(ram.get());
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
-
 	k573fpga->add_route(0, ":lspeaker", 1.0);
 	k573fpga->add_route(1, ":rspeaker", 1.0);
 }

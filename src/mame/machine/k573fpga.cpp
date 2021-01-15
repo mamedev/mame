@@ -13,6 +13,7 @@
 
 k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_573_DIGITAL_FPGA, tag, owner, clock),
+	ram(*this, ":k573dio:ram"),
 	mas3507d(*this, "mpeg"),
 	use_ddrsbm_fpga(false)
 {

@@ -19,7 +19,6 @@ public:
 
 	void set_ddrsbm_fpga(bool flag) { use_ddrsbm_fpga = flag; }
 
-	void set_ram(uint16_t *v) { ram = v; }
 	uint16_t get_decrypted();
 
 	void set_crypto_key1(uint16_t v) { crypto_key1 = v; }
@@ -66,9 +65,8 @@ private:
 		PLAYBACK_STATE_DEMAND_BUFFER = 0xd000 // Playing, demand pin = 1?
 	};
 
+	required_shared_ptr<uint16_t> ram;
 	required_device<mas3507d_device> mas3507d;
-
-	uint16_t *ram;
 
 	uint16_t crypto_key1, crypto_key2;
 	uint8_t crypto_key3;
