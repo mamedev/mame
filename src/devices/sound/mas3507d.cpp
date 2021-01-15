@@ -20,7 +20,7 @@
 #define LOG_REGISTER (1 << 3)
 #define LOG_CONFIG   (1 << 4)
 #define LOG_OTHER    (1 << 5)
-#define VERBOSE      (LOG_GENERAL | LOG_READ | LOG_WRITE | LOG_REGISTER | LOG_CONFIG | LOG_OTHER)
+// #define VERBOSE      (LOG_GENERAL | LOG_READ | LOG_WRITE | LOG_REGISTER | LOG_CONFIG | LOG_OTHER)
 // #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"

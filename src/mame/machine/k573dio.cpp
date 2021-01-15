@@ -7,7 +7,7 @@
 #define LOG_FPGA       (1 << 1)
 #define LOG_MP3        (1 << 2)
 #define LOG_UNKNOWNREG (1 << 3)
-#define VERBOSE        (LOG_GENERAL | LOG_FPGA | LOG_MP3 | LOG_UNKNOWNREG)
+// #define VERBOSE        (LOG_GENERAL | LOG_FPGA | LOG_MP3 | LOG_UNKNOWNREG)
 // #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
