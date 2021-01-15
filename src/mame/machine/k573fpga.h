@@ -15,6 +15,8 @@ class k573fpga_device : public device_t
 public:
 	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
+
 	void set_ddrsbm_fpga(bool flag) { use_ddrsbm_fpga = flag; }
 
 	void set_ram(uint16_t *v) { ram = v; }

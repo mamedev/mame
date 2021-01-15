@@ -145,6 +145,9 @@ void k573dio_device::device_start()
 
 	k573fpga->set_ram(ram.get());
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
+
+	k573fpga->add_route(0, ":lspeaker", 1.0);
+	k573fpga->add_route(1, ":rspeaker", 1.0);
 }
 
 void k573dio_device::device_reset()

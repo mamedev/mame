@@ -22,8 +22,6 @@ void k573fpga_device::device_add_mconfig(machine_config &config)
 {
 	MAS3507D(config, mas3507d);
 	mas3507d->sample_cb().set(*this, FUNC(k573fpga_device::get_decrypted));
-	mas3507d->add_route(0, ":lspeaker", 1.0);
-	mas3507d->add_route(1, ":rspeaker", 1.0);
 }
 
 void k573fpga_device::device_start()
