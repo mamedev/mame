@@ -149,7 +149,7 @@ void ews4800_state::ews4800_310(machine_config &config)
 
 	// scsi host adapter (NCR53C96)
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C94).clock(24_MHz_XTAL).machine_config(
-		[this](device_t *device)
+		[](device_t *device)
 		{
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
