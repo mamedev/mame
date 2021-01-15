@@ -85,19 +85,19 @@ void mas3507d_device::device_start()
 	save_item(NAME(playback_status));
 
 	// This should be removed in the future if/when native MP3 decoding is implemented in MAME
-	save_item(STRUCT_MEMBER(mp3_dec, mdct_overlap));
-	save_item(STRUCT_MEMBER(mp3_dec, qmf_state));
-	save_item(STRUCT_MEMBER(mp3_dec, reserv));
-	save_item(STRUCT_MEMBER(mp3_dec, free_format_bytes));
-	save_item(STRUCT_MEMBER(mp3_dec, header));
-	save_item(STRUCT_MEMBER(mp3_dec, reserv_buf));
+	save_item(NAME(mp3_dec.mdct_overlap));
+	save_item(NAME(mp3_dec.qmf_state));
+	save_item(NAME(mp3_dec.reserv));
+	save_item(NAME(mp3_dec.free_format_bytes));
+	save_item(NAME(mp3_dec.header));
+	save_item(NAME(mp3_dec.reserv_buf));
 
-	save_item(STRUCT_MEMBER(mp3_info, frame_bytes));
-	save_item(STRUCT_MEMBER(mp3_info, frame_offset));
-	save_item(STRUCT_MEMBER(mp3_info, channels));
-	save_item(STRUCT_MEMBER(mp3_info, hz));
-	save_item(STRUCT_MEMBER(mp3_info, layer));
-	save_item(STRUCT_MEMBER(mp3_info, bitrate_kbps));
+	save_item(NAME(mp3_info.frame_bytes));
+	save_item(NAME(mp3_info.frame_offset));
+	save_item(NAME(mp3_info.channels));
+	save_item(NAME(mp3_info.hz));
+	save_item(NAME(mp3_info.layer));
+	save_item(NAME(mp3_info.bitrate_kbps));
 }
 
 void mas3507d_device::device_reset()
