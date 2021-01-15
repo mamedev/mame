@@ -67,15 +67,15 @@ private:
 		CMD_CONTROL_WRITE = 0x6a
 	};
 
-	enum { IDLE = 0, STARTED, NAK, ACK, ACK2 };
-	enum { UNKNOWN = 0, VALIDATED, WRONG };
-	enum { UNDEFINED = 0, CONTROL, DATA_READ, DATA_WRITE, BAD };
-	enum { CMD_BAD = 0, CMD_RUN, CMD_READ_CTRL, CMD_WRITE_REG, CMD_WRITE_MEM, CMD_READ_REG, CMD_READ_MEM };
+	enum i2c_bus_state_t : uint8_t { IDLE = 0, STARTED, NAK, ACK, ACK2 };
+	enum i2c_bus_address_t : uint8_t { UNKNOWN = 0, VALIDATED, WRONG };
+	enum i2c_subdest_t : uint8_t { UNDEFINED = 0, CONTROL, DATA_READ, DATA_WRITE, BAD };
+	enum i2c_command_t : uint8_t { CMD_BAD = 0, CMD_RUN, CMD_READ_CTRL, CMD_WRITE_REG, CMD_WRITE_MEM, CMD_READ_REG, CMD_READ_MEM };
 
-	uint8_t i2c_bus_state;
-	uint8_t i2c_bus_address;
-	uint8_t i2c_subdest;
-	uint8_t i2c_command;
+	i2c_bus_state_t i2c_bus_state;
+	i2c_bus_address_t i2c_bus_address;
+	i2c_subdest_t i2c_subdest;
+	i2c_command_t i2c_command;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;
