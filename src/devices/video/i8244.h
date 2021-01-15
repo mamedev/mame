@@ -36,8 +36,6 @@
 */
 
 
-// ======================> i8244_device
-
 class i8244_device :  public device_t
 					, public device_sound_interface
 					, public device_video_interface
