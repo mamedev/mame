@@ -165,10 +165,11 @@ const tiny_rom_entry *k573dio_device::device_rom_region() const
 void k573dio_device::device_add_mconfig(machine_config &config)
 {
 	KONAMI_573_DIGITAL_FPGA(config, k573fpga);
-	DS2401(config, digital_id);
-
+	k573fpga->set_ram(ram);
 	k573fpga->add_route(0, ":lspeaker", 1.0);
 	k573fpga->add_route(1, ":rspeaker", 1.0);
+
+	DS2401(config, digital_id);
 }
 
 void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
