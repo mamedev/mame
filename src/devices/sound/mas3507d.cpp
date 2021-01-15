@@ -106,9 +106,9 @@ void mas3507d_device::i2c_scl_w(bool line)
 			if(i2c_sdai)
 				i2c_bus_curval |= 1 << i2c_bus_curbit;
 
-			if (i2c_subdest == DATA_READ) {
+			if(i2c_subdest == DATA_READ)
 				i2c_sdao = BIT(i2c_sdao_data, i2c_bus_curbit + (i2c_bytecount * 8));
-			} else {
+			else {
 				i2c_sdao_data = 0;
 				i2c_sdao = false;
 			}
@@ -183,11 +183,10 @@ int mas3507d_device::i2c_sda_r()
 
 bool mas3507d_device::i2c_device_got_address(uint8_t address)
 {
-	if (address == CMD_DEV_READ) {
+	if(address == CMD_DEV_READ)
 		i2c_subdest = DATA_READ;
-	} else {
+	else
 		i2c_subdest = UNDEFINED;
-	}
 
 	return (address & 0xfe) == CMD_DEV_WRITE;
 }
@@ -334,9 +333,8 @@ int gain_to_db(double val) {
 }
 
 float gain_to_percentage(int val) {
-	if (val == 0) {
+	if(val == 0)
 		return 0; // Special case for muting it seems
-	}
 
 	double db = gain_to_db(val);
 
@@ -353,7 +351,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		gain_ll = gain_to_percentage(val);
 		LOGCONFIG("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_ll);
 
-		if (!is_muted) {
+		if(!is_muted) {
 			set_output_gain(0, gain_ll);
 		}
 		break;
@@ -367,7 +365,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		gain_rr = gain_to_percentage(val);
 		LOGCONFIG("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_rr);
 
-		if (!is_muted) {
+		if(!is_muted) {
 			set_output_gain(1, gain_rr);
 		}
 		break;
@@ -412,9 +410,8 @@ void mas3507d_device::fill_buffer()
 	samples_idx = 0;
 	playback_status = PLAYBACK_STATE_BUFFER_FULL;
 
-	if(sample_count == 0) {
+	if(sample_count == 0)
 		return;
-	}
 
 	std::copy(mp3data.begin() + mp3_info.frame_bytes, mp3data.end(), mp3data.begin());
 	mp3data_count -= mp3_info.frame_bytes;
@@ -432,13 +429,12 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 	int s1 = scount - pos;
 	int bytes_per_sample = mp3_info.channels > 2 ? 2 : mp3_info.channels; // More than 2 channels is unsupported here
 
-	if (s1 > sample_count) {
+	if(s1 > sample_count)
 		s1 = sample_count;
-	}
 
 	playback_status = PLAYBACK_STATE_DEMAND_BUFFER;
 
-	for (int i = 0; i < s1; i++) {
+	for(int i = 0; i < s1; i++) {
 		outputs[0].put_int(pos, samples[samples_idx * bytes_per_sample], 32768);
 		outputs[1].put_int(pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
 
@@ -446,7 +442,7 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 		decoded_samples++;
 		pos++;
 
-		if (samples_idx >= sample_count) {
+		if(samples_idx >= sample_count) {
 			sample_count = 0;
 			return;
 		}
@@ -478,12 +474,11 @@ void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read
 	int csamples = outputs[0].samples();
 	int pos = 0;
 
-	while (pos < csamples) {
-		if (is_started && sample_count == 0) {
+	while(pos < csamples) {
+		if(is_started && sample_count == 0)
 			fill_buffer();
-		}
 
-		if (!is_started || sample_count <= 0) {
+		if(!is_started || sample_count <= 0) {
 			playback_status = PLAYBACK_STATE_IDLE;
 			decoded_frame_count = 0;
 			decoded_samples = 0;

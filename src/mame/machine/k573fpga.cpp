@@ -70,9 +70,8 @@ void k573fpga_device::status_update() {
 	is_timer_active = is_streaming() || ((cur_playback_status == last_playback_status && last_playback_status > PLAYBACK_STATE_IDLE) || cur_playback_status > last_playback_status);
 	last_playback_status = cur_playback_status;
 
-	if(!is_timer_active) {
+	if(!is_timer_active)
 		counter_current = counter_previous = counter_offset = 0;
-	}
 }
 
 uint32_t k573fpga_device::get_counter() {
@@ -167,7 +166,7 @@ void k573fpga_device::set_mpeg_ctrl(uint16_t data)
 
 		reset_counter();
 
-		if (!mas3507d->is_started) {
+		if(!mas3507d->is_started) {
 			mas3507d->start_playback();
 			mas3507d->update_stream();
 
