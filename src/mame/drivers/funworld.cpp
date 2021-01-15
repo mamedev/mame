@@ -4856,8 +4856,11 @@ ROM_START( clubcard )
 	ROM_LOAD( "c1.bin", 0x0000, 0x8000, CRC(09012966) SHA1(5b70c760bc06c054943f18057375d2743758416f) )
 	ROM_LOAD( "c2.bin", 0x8000, 0x8000, CRC(ed9a680a) SHA1(d63c49e9689f3d49818cf207761eb3430254e2cb) )
 
+	ROM_REGION( 0x0800, "nvram", 0 )    // pre-initialized NVRAM
+	ROM_LOAD( "clubcard_nvram.bin", 0x0000, 0x0800, CRC(974cb47b) SHA1(da9218210847ce73887355afa56d0ccfd45e5d94) )
+
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "bprom.bin",    0x0000, 0x0200, BAD_DUMP CRC(e92f74e0) SHA1(dfc4a9d140d21b990f769c10802c4d2c33dd4132) )    // borrowed from gratispk
+	ROM_LOAD( "bprom.bin",    0x0000, 0x0200, BAD_DUMP CRC(e92f74e0) SHA1(dfc4a9d140d21b990f769c10802c4d2c33dd4132) )  // borrowed from gratispk
 ROM_END
 
 
