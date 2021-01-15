@@ -27,7 +27,8 @@
 #define LOG_INTC        (1 << 16)
 #define LOG_PPC			(1 << 17)
 #define LOG_DMA			(1 << 18)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_ICP | LOG_UART3 | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC | LOG_PPC | LOG_DMA)
+#define LOG_UDC			(1 << 19)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_ICP | LOG_UART3 | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC | LOG_PPC | LOG_DMA | LOG_UDC)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -45,6 +46,109 @@ sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, cons
 	, m_ssp_out(*this)
 	, m_uart3_tx_out(*this)
 {
+}
+
+/*
+
+  Intel SA-1110 UDC - USB Device Controller
+
+  pg. 235 to 258 Intel StrongARM SA-1110 Microprocessor Developer's Manual
+
+*/
+
+uint32_t sa1110_periphs_device::udc_r(offs_t offset, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_UDCCR:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Control Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udccr, mem_mask);
+		return m_udc_regs.udccr;
+	case REG_UDCAR:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Address Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udcar, mem_mask);
+		return m_udc_regs.udcar;
+	case REG_UDCOMP:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC OUT Max Packet Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udcomp, mem_mask);
+		return m_udc_regs.udcomp;
+	case REG_UDCIMP:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC IN Max Packet Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udcimp, mem_mask);
+		return m_udc_regs.udcimp;
+	case REG_UDCCS0:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Endpoint 0 Control/Status Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udccs0, mem_mask);
+		return m_udc_regs.udccs0;
+	case REG_UDCCS1:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Endpoint 1 (OUT) Control/Status Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udccs1, mem_mask);
+		return m_udc_regs.udccs1;
+	case REG_UDCCS2:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Endpoint 2 (IN) Control/Status Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udccs2, mem_mask);
+		return m_udc_regs.udccs2;
+	case REG_UDCD0:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Endpoint 0 Data Register: %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case REG_UDCWC:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Endpoint 0 Write Count Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udcwc, mem_mask);
+		return m_udc_regs.udcwc;
+	case REG_UDCDR:
+		//const uint32_t data = udc_rx_fifo_pop();
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Data Register: %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case REG_UDCSR:
+		LOGMASKED(LOG_UDC, "%s: udc_r: UDC Status/Interrupt Register: %08x & %08x\n", machine().describe_context(), m_udc_regs.udcsr, mem_mask);
+		return m_udc_regs.udcsr;
+	default:
+		LOGMASKED(LOG_UDC | LOG_UNKNOWN, "%s: udc_r: Unknown address: %08x & %08x\n", machine().describe_context(), UDC_BASE_ADDR | (offset << 2), mem_mask);
+		return 0;
+	}
+}
+
+void sa1110_periphs_device::udc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+	case REG_UDCCR:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Control Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udccr);
+		break;
+	case REG_UDCAR:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Address Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udcar);
+		break;
+	case REG_UDCOMP:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC OUT Max Packet Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udcomp);
+		break;
+	case REG_UDCIMP:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC IN Max Packet Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udcimp);
+		break;
+	case REG_UDCCS0:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Endpoint 0 Control/Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udccs0);
+		break;
+	case REG_UDCCS1:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Endpoint 1 (OUT) Control/Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udccs1);
+		break;
+	case REG_UDCCS2:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Endpoint 2 (IN) Control/Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udccs2);
+		break;
+	case REG_UDCD0:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Endpoint 0 Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case REG_UDCWC:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Endpoint 0 Write Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_udc_regs.udcwc);
+		break;
+	case REG_UDCDR:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		return;
+	case REG_UDCSR:
+		LOGMASKED(LOG_UDC, "%s: udc_w: UDC Status/Interrupt Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_UDC | LOG_UNKNOWN, "%s: udc_w: Unknown address: %08x = %08x & %08x\n", machine().describe_context(), UDC_BASE_ADDR | (offset << 2), data, mem_mask);
+		break;
+	}
 }
 
 /*
@@ -2193,6 +2297,16 @@ void sa1110_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 void sa1110_periphs_device::device_start()
 {
+	save_item(NAME(m_udc_regs.udccr));
+	save_item(NAME(m_udc_regs.udcar));
+	save_item(NAME(m_udc_regs.udcomp));
+	save_item(NAME(m_udc_regs.udcimp));
+	save_item(NAME(m_udc_regs.udccs0));
+	save_item(NAME(m_udc_regs.udccs1));
+	save_item(NAME(m_udc_regs.udccs2));
+	save_item(NAME(m_udc_regs.udcwc));
+	save_item(NAME(m_udc_regs.udcsr));
+
 	save_item(NAME(m_icp_regs.uart.utcr));
 	save_item(NAME(m_icp_regs.uart.utsr0));
 	save_item(NAME(m_icp_regs.uart.utsr1));
@@ -2339,6 +2453,16 @@ void sa1110_periphs_device::device_start()
 
 void sa1110_periphs_device::device_reset()
 {
+	m_udc_regs.udccr = (1 << UDCCR_SUSM_BIT) | (1 << UDCCR_UDD_BIT);
+	m_udc_regs.udcar = 0;
+	m_udc_regs.udcomp = 8;
+	m_udc_regs.udcimp = 8;
+	m_udc_regs.udccs0 = 0;
+	m_udc_regs.udccs1 = 0;
+	m_udc_regs.udccs2 = 0;
+	m_udc_regs.udcwc = 0;
+	m_udc_regs.udcsr = 0;
+
 	// init ICP
 	memset(m_icp_regs.uart.utcr, 0, sizeof(uint32_t) * 4);
 	m_icp_regs.uart.utsr0 = 0;

@@ -1046,22 +1046,174 @@ void sed1356_device::bitblt_solid_fill()
 	}
 }
 
+uint16_t sed1356_device::bitblt_rop(const uint8_t rop, const uint16_t s, const uint16_t d)
+{
+	switch (rop & 0x0f)
+	{
+	case 0:
+		return 0;
+	case 1:
+		return ~(s | d);
+	case 2:
+		return ~s & d;
+	case 3:
+		return ~s;
+	case 4:
+		return s | ~d;
+	case 5:
+		return ~d;
+	case 6:
+		return s ^d;
+	case 7:
+		return ~s | ~d;
+	case 8:
+		return s & d;
+	case 9:
+		return ~(s ^ d);
+	case 10:
+		return d;
+	case 11:
+		return ~s | d;
+	case 12:
+		return s;
+	case 13:
+		return s | ~d;
+	case 14:
+		return s | d;
+	case 15:
+		return 0xffff;
+	}
+	return 0;
+}
+
+void sed1356_device::bitblt_async_advance(uint32_t &addr)
+{
+	m_bitblt_x++;
+	if (m_bitblt_x > m_bitblt_width)
+	{
+		m_bitblt_x = 0;
+		m_bitblt_y++;
+		if (!BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT))
+		{
+			addr -= (m_bitblt_width << 1);
+			addr += (m_bitblt_mem_offset << 1);
+		}
+		if (m_bitblt_y > m_bitblt_height)
+		{
+			m_bitblt_ctrl[0] &= ~(1 << BBCTRL0_ACTIVE_BIT);
+			m_bitblt_ctrl[0] &= ~(1 << BBCTRL0_ANY_BIT);
+		}
+	}
+	else
+	{
+		addr += 2;
+	}
+}
+
+void sed1356_device::bitblt_write_continue(const uint16_t s)
+{
+	uint16_t *dstp = (uint16_t*)&m_vram[m_bitblt_curr_dst_addr >> 2];
+	if (m_bitblt_curr_dst_addr & 2)
+		dstp++;
+
+	*dstp = bitblt_rop(m_bitblt_rop, s, *dstp);
+
+	bitblt_async_advance(m_bitblt_curr_dst_addr);
+}
+
+void sed1356_device::bitblt_write()
+{
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ACTIVE_BIT);
+	m_bitblt_x = 0;
+	m_bitblt_y = 0;
+	m_bitblt_curr_dst_addr = m_bitblt_dst_addr;
+}
+
+uint16_t sed1356_device::bitblt_read_continue()
+{
+	const uint16_t *srcp = (uint16_t*)&m_vram[m_bitblt_curr_src_addr >> 2];
+	if (m_bitblt_curr_src_addr & 2)
+		srcp++;
+
+	const uint16_t data = *srcp;
+
+	bitblt_async_advance(m_bitblt_curr_src_addr);
+
+	return data;
+}
+
+void sed1356_device::bitblt_read()
+{
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ACTIVE_BIT);
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ANY_BIT);
+	m_bitblt_x = 0;
+	m_bitblt_y = 0;
+	m_bitblt_curr_src_addr = m_bitblt_src_addr;
+}
+
+template <bool SrcLinear, bool DstLinear>
+void sed1356_device::bitblt_move_negative()
+{
+	uint16_t *srcp = (uint16_t*)&m_vram[m_bitblt_src_addr >> 2];
+	if (m_bitblt_src_addr & 2)
+		srcp++;
+
+	uint16_t *dstp = (uint16_t*)&m_vram[m_bitblt_dst_addr >> 2];
+	if (m_bitblt_dst_addr & 2)
+		dstp++;
+
+	for (int32_t y = (int32_t)m_bitblt_height; y >= 0; y--)
+	{
+		for (int32_t x = (int32_t)m_bitblt_width; x >= 0; x--)
+		{
+			const uint16_t s = (SrcLinear ? *srcp : srcp[x]);
+			const uint16_t d = (DstLinear ? *dstp : dstp[x]);
+
+			*dstp = bitblt_rop(m_bitblt_rop, s, d);
+
+			if (SrcLinear)
+				srcp++;
+			if (DstLinear)
+				dstp++;
+		}
+
+		if (!SrcLinear)
+			srcp += m_bitblt_mem_offset;
+		if (!DstLinear)
+			dstp += m_bitblt_mem_offset;
+	}
+}
+
 void sed1356_device::bitblt_execute_command()
 {
 	switch (m_bitblt_op)
 	{
 	case 0:
-		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Write BitBLT with ROP\n");
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Write BitBLT with ROP\n");
+		bitblt_write();
 		return;
 	case 1:
-		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Read BitBLT\n");
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Read BitBLT\n");
+		bitblt_read();
 		return;
 	case 2:
 		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT in + direction with ROP\n");
 		return;
 	case 3:
-		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT in - direction with ROP\n");
+	{
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Move BitBLT in - direction with ROP\n");
+		const bool srclin = BIT(m_bitblt_ctrl[0], BBCTRL0_SRCLIN_BIT);
+		const bool dstlin = BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT);
+		if (srclin && dstlin)
+			bitblt_move_negative<true, true>();
+		else if (srclin)
+			bitblt_move_negative<true, false>();
+		else if (dstlin)
+			bitblt_move_negative<false, true>();
+		else
+			bitblt_move_negative<false, false>();
 		return;
+	}
 	case 4:
 		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Transparent Write BitBLT\n");
 		return;
@@ -1432,15 +1584,34 @@ void sed1356_device::mplug_data_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t sed1356_device::bitblt_data_r(offs_t offset)
+uint16_t sed1356_device::bitblt_data_r(offs_t offset)
 {
-	LOGMASKED(LOG_BITBLT_RD, "%s: (not implemented) bitblt_data_r[%06x]: %02x\n", machine().describe_context(), 0x100000 + offset, 0);
-	return 0;
+	uint16_t data = 0;
+	if (BIT(m_bitblt_ctrl[0], BBCTRL0_ACTIVE_BIT) && m_bitblt_op == 1)
+	{
+		data = bitblt_read_continue();
+	}
+
+	LOGMASKED(LOG_BITBLT_RD, "%s: bitblt_data_r[%06x]: %04x\n", machine().describe_context(), 0x100000 + (offset << 1), data);
+	return data;
 }
 
-void sed1356_device::bitblt_data_w(offs_t offset, uint8_t data)
+void sed1356_device::bitblt_data_w(offs_t offset, uint16_t data)
 {
-	LOGMASKED(LOG_BITBLT_WR, "%s: (not implemented) bitblt_data_w[%06x]: %02x\n", machine().describe_context(), 0x100000 + offset, data);
+	LOGMASKED(LOG_BITBLT_WR, "%s: bitblt_data_w[%06x]: %04x\n", machine().describe_context(), 0x100000 + (offset << 1), data);
+	if (BIT(m_bitblt_ctrl[0], BBCTRL0_ACTIVE_BIT))
+	{
+		switch (m_bitblt_op)
+		{
+		case 0: // Write BitBLT with ROP
+			bitblt_write_continue(data);
+			return;
+		case 4: // Transparent Write BitBLT
+			return;
+		default:
+			return;
+		}
+	}
 }
 
 void sed1356_device::device_start()

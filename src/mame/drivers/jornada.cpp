@@ -119,7 +119,9 @@ protected:
 		MCU_KBD_SEND_COUNT,
 		MCU_KBD_SEND_CODES,
 
-		MCU_TOUCH_SEND_DATA
+		MCU_TOUCH_SEND_DATA,
+
+		MCU_BATTERY_SEND_DATA
 	};
 
 	// devices
@@ -146,6 +148,8 @@ protected:
 	uint8_t m_mcu_touch_data[2][8];
 	uint8_t m_mcu_touch_count[2];
 	uint8_t m_mcu_touch_idx[2];
+	uint8_t m_mcu_battery_data[3];
+	uint8_t m_mcu_battery_idx;
 };
 
 void jornada_state::main_map(address_map &map)
@@ -155,6 +159,7 @@ void jornada_state::main_map(address_map &map)
 	map(0x40000000, 0x40001fff).m(m_companion, FUNC(sa1111_device::map));
 	map(0x48000000, 0x481fffff).m(m_epson, FUNC(sed1356_device::map));
 	map(0x48200000, 0x4827ffff).m(m_epson, FUNC(sed1356_device::vram_map));
+	map(0x80000000, 0x80000033).rw(m_sa_periphs, FUNC(sa1110_periphs_device::udc_r), FUNC(sa1110_periphs_device::udc_w));
 	map(0x80030000, 0x8003007b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::icp_r), FUNC(sa1110_periphs_device::icp_w));
 	map(0x80050000, 0x80050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::uart3_r), FUNC(sa1110_periphs_device::uart3_w));
 	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
@@ -174,7 +179,9 @@ void jornada_state::main_map(address_map &map)
 
 void jornada_state::device_reset_after_children()
 {
-	m_sa_periphs->gpio_in<9>(1);
+	m_sa_periphs->gpio_in<4>(0); // Flag as plugged into AC power
+	m_sa_periphs->gpio_in<9>(1); // Pen input is active-high
+	m_sa_periphs->gpio_in<26>(0); // Flag as charging
 }
 
 void jornada_state::mcu_assemble_touch_data()
@@ -214,6 +221,14 @@ void jornada_state::mcu_byte_received(uint16_t data)
 			m_mcu_state = MCU_TOUCH_SEND_DATA;
 			m_mcu_touch_send_idx = 1 - m_mcu_touch_send_idx;
 			break;
+		case 0xc0:
+			LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_IDLE: GetBatteryData, entering BATTERY_SEND_DATA state\n");
+			m_mcu_state = MCU_BATTERY_SEND_DATA;
+			m_mcu_battery_idx = 0;
+			m_mcu_battery_data[0] = 0xff; // LSB of main battery level
+			m_mcu_battery_data[1] = 0xff; // LSB of backup battery level
+			m_mcu_battery_data[2] = 0x0f; // MSBs of both battery levels (backup in 3:2, main in 1:0)
+			break;
 		default:
 			LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_IDLE: Unknown (%02x), ignoring and sending TxDummy response\n", value);
 			break;
@@ -230,6 +245,29 @@ void jornada_state::mcu_byte_received(uint16_t data)
 		else
 		{
 			LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_KBD_SEND_COUNT: Unknown (%02x), sending ErrorCode response and returning to IDLE state\n", value);
+			response = 0;
+		}
+		break;
+
+	case MCU_BATTERY_SEND_DATA:
+		if (value == MCU_TXDUMMY || value == MCU_TXDUMMY2)
+		{
+			response = m_mcu_battery_data[m_mcu_battery_idx];
+			m_mcu_battery_idx++;
+			if (m_mcu_battery_idx < 3)
+			{
+				LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_BATTERY_SEND_DATA: TxDummy, sending battery data %02x with %d remaining\n", response, 3 - m_mcu_battery_idx);
+			}
+			else
+			{
+				LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_BATTERY_SEND_DATA: TxDummy, sending battery data %02x and returning to IDLE state\n", response);
+				m_mcu_state = MCU_IDLE;
+				m_mcu_battery_idx = 0;
+			}
+		}
+		else
+		{
+			LOGMASKED(LOG_MCU, "mcu_byte_received in MCU_BATTERY_SEND_DATA: Unknown (%02x), sending ErrorCode response and returning to IDLE state\n", value);
 			response = 0;
 		}
 		break;
@@ -392,6 +430,8 @@ void jornada_state::machine_start()
 	save_item(NAME(m_mcu_touch_data));
 	save_item(NAME(m_mcu_touch_count));
 	save_item(NAME(m_mcu_touch_idx));
+	save_item(NAME(m_mcu_battery_data));
+	save_item(NAME(m_mcu_battery_idx));
 }
 
 void jornada_state::machine_reset()
@@ -409,6 +449,9 @@ void jornada_state::machine_reset()
 	memset(m_mcu_touch_data[1], 0, 8);
 	memset(m_mcu_touch_count, 0, 2);
 	memset(m_mcu_touch_idx, 0, 2);
+
+	memset(m_mcu_battery_data, 0, 3);
+	m_mcu_battery_idx = 0;
 }
 
 void jornada_state::jornada720(machine_config &config)
