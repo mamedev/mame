@@ -10407,7 +10407,6 @@ cit101xl                        //
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
-tabe22                          //
 vp122                           //
 
 @source:cit1500.cpp
@@ -39464,6 +39463,9 @@ tetrisbl                        // (c) 1988 (but bootleg)
 tturfbl                         // (c) 1989 (Datsu bootleg)
 wb3bbl                          // bootleg
 wb3bble                         // bootleg
+
+@source:tabe22.cpp
+tabe22                          // (c) Tab Products
 
 @source:tagteam.cpp
 bigprowr                        // TA-0007 (c) 1983
