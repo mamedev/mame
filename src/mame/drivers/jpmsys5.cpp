@@ -208,10 +208,7 @@ uint16_t jpmsys5_state::coins_r(offs_t offset, uint16_t mem_mask)
 
 uint16_t jpmsys5_state::unknown_port_r(offs_t offset, uint16_t mem_mask)
 {
-	if (m_unknown_port)
-		return m_unknown_port->read();
-
-	return 0xffff;
+	return m_unknown_port.read_safe(0xffff);
 }
 
 // these are read as a dword, masked with 0x77777777 and compared to 0x76543210
@@ -362,30 +359,18 @@ uint16_t jpmsys5_state::mux_r(offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: mux_r offset: %04x mask: %04x\n", machine().describe_context(), offset<<1, mem_mask);
 
-	if ((offset == 0x80/2) && m_dsw)
-		return m_dsw->read();
-
-	if ((offset == 0x82/2) && m_dsw2)
-		return m_dsw2->read();
-
-	if ((offset == 0x84/2) && m_rotary)
-		return m_rotary->read();
-
-	if ((offset == 0x86/2) && m_strobe0)
-		return m_strobe0->read();
-
-	if ((offset == 0x88/2) && m_strobe1)
-		return m_strobe1->read();
-
-	if ((offset == 0x8a/2) && m_strobe2)
-		return m_strobe2->read();
-
-	if ((offset == 0x8c/2) && m_strobe3)
-		return m_strobe3->read();
-
-	if ((offset == 0x8e/2) && m_strobe4)
-		return m_strobe4->read();
-
+	switch (offset)
+	{
+	case 0x80 / 2: return m_dsw.read_safe(0xffff);
+	case 0x82 / 2: return m_dsw2.read_safe(0xffff);
+	case 0x84 / 2: return m_rotary.read_safe(0xffff);
+	case 0x86 / 2: return m_strobe0.read_safe(0xffff);
+	case 0x88 / 2: return m_strobe1.read_safe(0xffff);
+	case 0x8a / 2: return m_strobe2.read_safe(0xffff);
+	case 0x8c / 2: return m_strobe3.read_safe(0xffff);
+	case 0x8e / 2: return m_strobe4.read_safe(0xffff);
+	default: return 0xffff;
+	}
 	return 0xffff;
 }
 
