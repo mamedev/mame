@@ -55,7 +55,9 @@
 #include "j6rh6cld.lh"
 #include "j6reelmn.lh"
 #include "j6rico.lh"
-#include "j6rollerd.lh"
+#include "j6roller8.lh"
+#include "j6roller10.lh"
+#include "j6roller15.lh"
 #include "j6snakes.lh"
 #include "j6slagng.lh"
 #include "j6stards.lh"
@@ -1448,12 +1450,12 @@ INPUT_PORTS_START( j6roller )
 
 	PORT_MODIFY("J9_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
-
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Collect?")
-
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Lo")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 INPUT_PORTS_END
 
 
@@ -6716,125 +6718,126 @@ ROM_END
 
 // this is the same as rocosnd.bin but with 0x77b50 as 0xf6 in the middle of an 0xff fill area, assume it to be bad
 //ROM_LOAD( "rcstrsnd.bin", 0x000000, 0x080000, CRC(b0753c1d) SHA1(b111ca10c01ee2089cbc613ad91235d429272ab8) )
-
 ROM_START( j6roller )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "7368.bin", 0x000000, 0x020000, CRC(6fe1365b) SHA1(50271888ccd4395938721f2026ecfefd342c5209) )
-	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollera )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "7370.bin", 0x000000, 0x020000, CRC(847f6263) SHA1(b072b54ccea0a37cd4aa027bb869dd82db389360) )
-	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerb )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "7371.bin", 0x000000, 0x020000, CRC(3d25f63a) SHA1(b37ef0c4c2cd8c948407a8767636b1a6115a1d94) )
-	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerc )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "7372.bin", 0x000000, 0x020000, CRC(63ac986a) SHA1(2b4f7f59179ea9a239986c7a87e229a506ca006e) )
-	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "9460.bin", 0x000000, 0x020000, CRC(28d13bcb) SHA1(1103b06830cbcd25e856b99beb307f69f0fee6fd) )
 	ROM_LOAD16_BYTE( "9461.bin", 0x000001, 0x020000, CRC(b7515266) SHA1(d0b4d9b1dbc968f289e04398e81b585e71e3b358) )
 	j6roller_sound
 ROM_END
 
-ROM_START( j6rollere )
+ROM_START( j6rollera )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "9462.bin", 0x000000, 0x020000, CRC(c34f6ff3) SHA1(fd93acc1b0f985b3fa4b822791a6c3864d8d8ad0) )
 	ROM_LOAD16_BYTE( "9461.bin", 0x000001, 0x020000, CRC(b7515266) SHA1(d0b4d9b1dbc968f289e04398e81b585e71e3b358) )
 	j6roller_sound
 ROM_END
 
-ROM_START( j6rollerf )
+ROM_START( j6rollerb )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "9463.bin", 0x000000, 0x020000, CRC(7a15fbaa) SHA1(37fd6ddce0d2262df5ba32b90cf0fe664f9c7de1) )
 	ROM_LOAD16_BYTE( "9461.bin", 0x000001, 0x020000, CRC(b7515266) SHA1(d0b4d9b1dbc968f289e04398e81b585e71e3b358) )
 	j6roller_sound
 ROM_END
 
-ROM_START( j6rollerg )
+ROM_START( j6rollerc )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "9464.bin", 0x000000, 0x020000, CRC(4abc4a43) SHA1(85b6379c356d02ba3ab2e7bd4bbc628d95f0b750) )
 	ROM_LOAD16_BYTE( "9461.bin", 0x000001, 0x020000, CRC(b7515266) SHA1(d0b4d9b1dbc968f289e04398e81b585e71e3b358) )
 	j6roller_sound
 ROM_END
 
-ROM_START( j6rollerh )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "rc.p1.bin", 0x000000, 0x020000, CRC(075a5c93) SHA1(ea1c6dac0af35d25c58fe8ca8e442a364cdb92e7) )
-	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rolleri )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "8137.bin", 0x000000, 0x020000, CRC(ecc408ab) SHA1(12608c8645f02ea7d2d368907fd36be90ea5da56) )
-	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerj )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "8138.bin", 0x000000, 0x020000, CRC(559e9cf2) SHA1(b93c69fed10b61a1b8d9988f69ac8a980b1ec57c) )
-	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "8139.bin", 0x000000, 0x020000, CRC(65372d1b) SHA1(e4aa2350989b889e70785f368d834f422928d225) )
-	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerl )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "rc10v8-1.bin", 0x000001, 0x020000, CRC(8d0fac13) SHA1(44d9dbb5f9ea10068b5ffea972ee0e11ad3b6275) )
-	ROM_LOAD16_BYTE( "rc10v8-2.bin", 0x000000, 0x020000, CRC(3c032987) SHA1(4fff2dd84c22ad10306d7712340857b5703b8f1b) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollerm )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "rc82.1p1", 0x000000, 0x020000, CRC(368f1887) SHA1(7b2523ab746fc46931895ca1eb81e7d5d9a1c864) )
-	ROM_LOAD16_BYTE( "rc82.1p2", 0x000001, 0x020000, CRC(dc0f8c62) SHA1(3a4b1bd698c4e14c8c794b3bfb5fa9bc631475cc) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollern )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "rc82.1ac", 0x000000, 0x020000, CRC(3ac2b6b6) SHA1(ea71c6acf5cd6cbacdc55df6897b0dc6560e92fe) )
-	ROM_LOAD16_BYTE( "rc82.1p2", 0x000001, 0x020000, CRC(dc0f8c62) SHA1(3a4b1bd698c4e14c8c794b3bfb5fa9bc631475cc) )
-	j6roller_sound
-ROM_END
-
-ROM_START( j6rollero )
+ROM_START( j6rollerd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "roco15p1.bin", 0x000000, 0x020000, CRC(ef1104f6) SHA1(5f61e4d22f17f761280eb8e932792d211d9928d3) )
 	ROM_LOAD16_BYTE( "roco15p2.bin", 0x000001, 0x020000, CRC(9b3d316d) SHA1(6b66e458cd53c1527c2b295e898ead83720a7d99) )
 	j6roller_sound
 ROM_END
 
-ROM_START( j6rollerp )
+ROM_START( j6rollere )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "rc10v8-1.bin", 0x000001, 0x020000, CRC(8d0fac13) SHA1(44d9dbb5f9ea10068b5ffea972ee0e11ad3b6275) )
+	ROM_LOAD16_BYTE( "rc10v8-2.bin", 0x000000, 0x020000, CRC(3c032987) SHA1(4fff2dd84c22ad10306d7712340857b5703b8f1b) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerf )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "rc.p1.bin", 0x000000, 0x020000, CRC(075a5c93) SHA1(ea1c6dac0af35d25c58fe8ca8e442a364cdb92e7) )
+	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerg )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "8137.bin", 0x000000, 0x020000, CRC(ecc408ab) SHA1(12608c8645f02ea7d2d368907fd36be90ea5da56) )
+	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerh )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "8138.bin", 0x000000, 0x020000, CRC(559e9cf2) SHA1(b93c69fed10b61a1b8d9988f69ac8a980b1ec57c) )
+	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rolleri )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "8139.bin", 0x000000, 0x020000, CRC(65372d1b) SHA1(e4aa2350989b889e70785f368d834f422928d225) )
+	ROM_LOAD16_BYTE( "rc.p2.bin", 0x000001, 0x020000, CRC(48cbbc99) SHA1(8bbb445d0e1defcac44d5637006d974aa268b8bf) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerj )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "rollercoaster10_p1.bin", 0x000000, 0x020000, CRC(566a3d2c) SHA1(410e6ef59a3af9751e59b539affde95c8d94ba31) )
 	ROM_LOAD16_BYTE( "rollercoaster10_p2.bin", 0x000001, 0x020000, CRC(4ea94876) SHA1(52be24fa61431ecf3f1a206ddfb5b5a52fc9ad0a) )
 	j6roller_sound
 ROM_END
+
+ROM_START( j6rollerk )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "7368.bin", 0x000000, 0x020000, CRC(6fe1365b) SHA1(50271888ccd4395938721f2026ecfefd342c5209) )
+	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerl )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "7370.bin", 0x000000, 0x020000, CRC(847f6263) SHA1(b072b54ccea0a37cd4aa027bb869dd82db389360) )
+	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerm )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "7371.bin", 0x000000, 0x020000, CRC(3d25f63a) SHA1(b37ef0c4c2cd8c948407a8767636b1a6115a1d94) )
+	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollern )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "7372.bin", 0x000000, 0x020000, CRC(63ac986a) SHA1(2b4f7f59179ea9a239986c7a87e229a506ca006e) )
+	ROM_LOAD16_BYTE( "7369.bin", 0x000001, 0x020000, CRC(8ab98caa) SHA1(c9bb582917b4a6be477d592d6cbd28b5f7552a26) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollero )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "rc82.1p1", 0x000000, 0x020000, CRC(368f1887) SHA1(7b2523ab746fc46931895ca1eb81e7d5d9a1c864) )
+	ROM_LOAD16_BYTE( "rc82.1p2", 0x000001, 0x020000, CRC(dc0f8c62) SHA1(3a4b1bd698c4e14c8c794b3bfb5fa9bc631475cc) )
+	j6roller_sound
+ROM_END
+
+ROM_START( j6rollerp )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "rc82.1ac", 0x000000, 0x020000, CRC(3ac2b6b6) SHA1(ea71c6acf5cd6cbacdc55df6897b0dc6560e92fe) )
+	ROM_LOAD16_BYTE( "rc82.1p2", 0x000001, 0x020000, CRC(dc0f8c62) SHA1(3a4b1bd698c4e14c8c794b3bfb5fa9bc631475cc) )
+	j6roller_sound
+ROM_END
+
+
 
 #define j6rccls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
@@ -9230,6 +9233,7 @@ ROM_END
 /* Mechanical Below */
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND|MACHINE_CLICKABLE_ARTWORK
 
+#define GAME_FLAGS_WORKING MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
 
 // *************************************************************************************************************
 // JPM + others games with old 'error log' style codes for errors
@@ -9548,23 +9552,24 @@ GAME(  199?, j6robina,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state,
 GAME(  199?, j6robinb,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6robinc,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
 
-GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 15)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 16)", GAME_FLAGS, layout_j6rollerd )
-GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster (JPM) (IMPACT) (set 17)", GAME_FLAGS, layout_j6rollerd )
+
+GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11P C30, 30p Stake, £15 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 AC30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C29, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC10 C20, 20p Stake, £10 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller10 )
+GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9P L26, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 AL26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £10 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller10 )
+GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC5 L14, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4P L15, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 AL15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 I L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 I L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
 
 GAME(  199?, j6rcclub,     0,          impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6rccluba,    j6rcclub,   impact_nonvideo, j6nokey, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
