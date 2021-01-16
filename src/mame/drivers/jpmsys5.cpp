@@ -853,7 +853,6 @@ void jpmsys5_state::reels(machine_config &config)
 	// probably incorrect reel types, but they do seem to only require 2 bits to write?
 	// forcing 200 steps keeps j5fair main reels aligned, so probably needs a type
 	// with the same write patterns as MPU3_48STEP_REEL, but with 200 steps defining?
-	// the 4th reel on j5fair should be different?
 	REEL(config, m_reel[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[0]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<0>));
 	REEL(config, m_reel[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
