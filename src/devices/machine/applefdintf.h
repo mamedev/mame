@@ -63,14 +63,14 @@ public:
 		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525_13);
 	}
 	template<typename T> static void add_525_13_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, "", formats_525_13);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525_13);
 	}
 
 	template<typename T> static void add_525(machine_config &config, T &floppy) {
 		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525);
 	}
 	template<typename T> static void add_525_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, "", formats_525);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525);
 	}
 
 	//   3.5
@@ -79,7 +79,7 @@ public:
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35);
 	}
 	template<typename T> static void add_35_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_35, "", formats_35);
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, nullptr, formats_35);
 	}
 
 	// Sync the state when something external is going to change, like
