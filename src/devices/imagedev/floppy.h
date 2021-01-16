@@ -186,7 +186,8 @@ protected:
 
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
-	int floppy_ratio_1; // rpm/300*1000
+	/* angular speed, where a full circle is 2e8 */
+	double angular_speed;
 
 	attotime revolution_start_time, rev_time;
 	uint32_t revolution_count;
