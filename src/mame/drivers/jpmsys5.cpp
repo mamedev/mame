@@ -328,6 +328,9 @@ void jpmsys5_state::reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	logerror("%s: reellamps_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_reellamps_0123);
+
+	for (int i = 0; i < 16; i++)
+		m_reellamp_out[i] = (m_reellamps_0123 >> (15 - i)) & 1;
 }
 
 uint16_t jpmsys5_state::reellamps_4567_r(offs_t offset, uint16_t mem_mask)
@@ -340,6 +343,9 @@ void jpmsys5_state::reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	logerror("%s: reellamps_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_reellamps_5678);
+
+	for (int i = 0; i < 16; i++)
+		m_reellamp_out[i+16] = (m_reellamps_5678 >> (15 - i)) & 1;
 }
 
 
@@ -1061,6 +1067,7 @@ void jpmsys5_state::machine_start()
 {
 	m_lamps.resolve();
 	m_sys5leds.resolve();
+	m_reellamp_out.resolve();
 
 	m_lamp_strobe = 0;
 }

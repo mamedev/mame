@@ -41,6 +41,7 @@ public:
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_sys5leds(*this, "digit%u", 0U),
+		m_reellamp_out(*this, "reellamp%u", 0U),
 		m_reel(*this, "reel%u", 0U)
 	{ }
 
@@ -130,6 +131,7 @@ private:
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 	output_finder<16 * 16> m_lamps;
 	output_finder<16> m_sys5leds;
+	output_finder<32> m_reellamp_out;
 	optional_device_array<stepper_device, 8> m_reel;
 
 	int m_lamp_strobe;
