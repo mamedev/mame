@@ -1316,6 +1316,12 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 					pos_tag += 12;
 				}
 				io_generic_read(io, data+12, pos_data, 512);
+				for(int kk0 = 0; kk0 != 512; kk0 += 16) {
+					printf("%02d %d %2d %03x:", track, head, i, kk0);
+					for(int kk1 = 0; kk1 != 16; kk1++)
+						printf(" %02x", data[12+kk0+kk1]);
+					printf("\n");
+				}
 				pos_data += 512;
 				si = (si + 2) % ns;
 				if(si == 0)

@@ -87,6 +87,7 @@ public:
 	{
 		m_rom_size = 0;
 		m_rom_ptr = nullptr;
+		m_cur_floppy = nullptr;
 	}
 
 	void add_scsi(machine_config &config, bool cdrom = false);
@@ -396,7 +397,14 @@ private:
 
 	emu_timer *m_scanline_timer;
 
+	floppy_image_device *m_cur_floppy;
+
 	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
+
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macsonora);

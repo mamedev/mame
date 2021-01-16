@@ -504,14 +504,16 @@ TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
 		m_audio_regs.sadtcs ^= (1 << SADTCS_TBIU_BIT);
 		m_audio_regs.sadta = m_audio_regs.sadts[1 - buf];
 		m_audio_regs.sadtcc = m_audio_regs.sadtc[1 - buf];
+		if (!BIT(m_audio_regs.sadtcs, s_start_masks[1 - buf]))
+		{
+			m_audio_regs.tx_dma_timer->adjust(attotime::never);
+		}
 	}
 }
 
 TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_callback)
 {
-	const uint32_t data = audio_tx_fifo_pop();
-	LOGMASKED(LOG_AUDIO_DMA, "audio_tx_callback: obtained data %08x, passing to codec\n", data);
-	m_i2s_out(data);
+	m_i2s_out(audio_tx_fifo_pop());
 }
 
 void sa1111_device::audio_update_mode()
@@ -588,6 +590,11 @@ void sa1111_device::audio_set_tx_dma_enabled(bool enabled)
 	{
 		m_audio_regs.tx_timer->adjust(attotime::never);
 		m_audio_regs.tx_dma_timer->adjust(attotime::never);
+
+		set_irq_line(INT_AUDTXA, 0);
+		set_irq_line(INT_AUDTXB, 0);
+		set_irq_line(INT_AUDTFS, 0);
+		set_irq_line(INT_AUDTUR, 0);
 	}
 }
 
@@ -608,6 +615,11 @@ void sa1111_device::audio_set_rx_dma_enabled(bool enabled)
 	{
 		m_audio_regs.rx_timer->adjust(attotime::never);
 		m_audio_regs.rx_dma_timer->adjust(attotime::never);
+
+		set_irq_line(INT_AUDRXA, 0);
+		set_irq_line(INT_AUDRXB, 0);
+		set_irq_line(INT_AUDRFS, 0);
+		set_irq_line(INT_AUDROR, 0);
 	}
 }
 
@@ -621,7 +633,7 @@ void sa1111_device::audio_start_tx_dma(const uint32_t buf)
 
 	const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 	const uint32_t pll_clock = clock() * 39;
-	attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
+	attotime clock_period = attotime::from_ticks(divisor * 128, pll_clock);
 	m_audio_regs.tx_dma_timer->adjust(clock_period, 0, clock_period);
 
 	LOGMASKED(LOG_AUDIO_DMA, "audio_start_tx_dma, setting start address to %08x, Tx clock to %d / %d\n", m_audio_regs.sadta, pll_clock, divisor);

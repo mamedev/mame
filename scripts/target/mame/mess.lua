@@ -453,6 +453,8 @@ MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
 MACHINES["AAKARTDEV"] = true
 MACHINES["ACIA6850"] = true
+MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
@@ -1364,6 +1366,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"swtpc",
 		"synertek",
 		"ta",
+		"tab",
 		"tandberg",
 		"tangerin",
 		"tasc",
@@ -1616,6 +1619,8 @@ files {
 createMESSProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/drivers/aa310.cpp",
+	MAME_DIR .. "src/mame/machine/archimedes_keyb.cpp",
+	MAME_DIR .. "src/mame/machine/archimedes_keyb.h",
 	MAME_DIR .. "src/mame/drivers/accomm.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys1.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys.cpp",
@@ -2601,6 +2606,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp2100.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
 	MAME_DIR .. "src/mame/drivers/hp700.cpp",
+	MAME_DIR .. "src/mame/machine/hp2640_tape.cpp",
+	MAME_DIR .. "src/mame/machine/hp2640_tape.h",
 	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
 	MAME_DIR .. "src/mame/drivers/hp95lx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9825.cpp",
@@ -3015,6 +3022,7 @@ files {
 createMESSProjects(_target, _subtarget, "nec")
 files {
 	MAME_DIR .. "src/mame/drivers/apc.cpp",
+	MAME_DIR .. "src/mame/drivers/ews4800.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
 	MAME_DIR .. "src/mame/drivers/pce.cpp",
 	MAME_DIR .. "src/mame/includes/pce.h",
@@ -3415,6 +3423,8 @@ files {
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
 	MAME_DIR .. "src/mame/audio/mb63h114.cpp",
 	MAME_DIR .. "src/mame/audio/mb63h114.h",
+	MAME_DIR .. "src/mame/audio/sa16.cpp",
+	MAME_DIR .. "src/mame/audio/sa16.h",
 	MAME_DIR .. "src/mame/machine/mb62h195.cpp",
 	MAME_DIR .. "src/mame/machine/mb62h195.h",
 	MAME_DIR .. "src/mame/machine/mb63h149.cpp",
@@ -3788,6 +3798,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/alphatpx.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatpc16.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatro.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "tab")
+files {
+	MAME_DIR .. "src/mame/drivers/tabe22.cpp",
+	MAME_DIR .. "src/mame/machine/e22_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/e22_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "tandberg")

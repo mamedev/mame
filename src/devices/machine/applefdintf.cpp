@@ -31,7 +31,9 @@ void applefdintf_device::floppies_525(device_slot_interface &device)
 
 void applefdintf_device::floppies_35(device_slot_interface &device)
 {
-	device.option_add("35", FLOPPY_35_HD);
+	device.option_add("35sd", OAD34V);
+	device.option_add("35dd", MFD51W);
+	device.option_add("35hd", MFD75W);
 }
 
 applefdintf_device::applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

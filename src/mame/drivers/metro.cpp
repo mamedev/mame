@@ -2750,17 +2750,6 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-static const gfx_layout layout_053936 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
 static const gfx_layout layout_053936_16 =
 {
 	16,16,
@@ -2773,7 +2762,7 @@ static const gfx_layout layout_053936_16 =
 };
 
 static GFXDECODE_START( gfx_blzntrnd )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,    0x0, 0x10 ) // [0] 053936 Tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw,    0x0, 0x10 ) // [0] 053936 Tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gstrik2 )
@@ -2802,7 +2791,7 @@ void metro_state::machine_start()
 
 void metro_state::i4100_config(machine_config &config)
 {
-	I4100(config, m_vdp, 26.666_MHz_XTAL);
+	I4100(config, m_vdp, 24_MHz_XTAL);
 	m_vdp->set_vblank_irq_level(0);
 	m_vdp->set_blit_irq_level(2);
 
@@ -2870,6 +2859,7 @@ void metro_state::i4220_config_304x224(machine_config &config)
 void metro_state::i4300_config_384x224(machine_config &config)
 {
 	i4300_config(config);
+	m_vdp3->set_clock(32_MHz_XTAL);
 
 	m_screen->set_size(384, 240);
 	m_screen->set_visarea(0, 384-1, 0, 224-1);
@@ -2894,7 +2884,7 @@ void metro_state::msgogo(machine_config &config)
 	/* video hardware */
 	i4220_config(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
-	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
+	m_vdp2->set_tmap_xoffsets(2,2,2);
 
 	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq)); // timing is off, shaking sprites in intro
 
@@ -2983,7 +2973,7 @@ void metro_state::daitorid(machine_config &config)
 	/* video hardware */
 	i4220_config(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
+	m_vdp2->set_tmap_xoffsets(2,2,2);
 
 	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
@@ -3196,7 +3186,7 @@ void metro_state::dokyusp(machine_config &config)
 void metro_state::gakusai(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
+	M68000(config, m_maincpu, 26.666_MHz_XTAL/2); // OSCs are 26.6660MHz & 3.579545MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
 
@@ -3223,30 +3213,8 @@ void metro_state::gakusai(machine_config &config)
 
 void metro_state::gakusai2(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
+	gakusai(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai2_map);
-	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &metro_state::cpu_space_map);
-
-	EEPROM_93C46_16BIT(config, "eeprom");
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	/* video hardware */
-	i4300_config_320x240(config);
-	m_vdp3->irq_cb().set(FUNC(metro_state::ipl_w));
-	m_vdp3->set_blit_irq_level(3);
-
-	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.00);
 }
 
 void metro_state::pangpoms(machine_config &config)
@@ -3495,7 +3463,7 @@ void metro_state::gstrik2(machine_config &config)
 
 	m_k053936->set_offsets(-77, -19);
 
-	m_vdp2->set_tmap_xoffsets(0,-8,0);
+	m_vdp2->set_tmap_xoffsets(0,8,0);
 
 	// HUM-003 PCB Configuration : Mono output only
 	config.device_remove("lspeaker");

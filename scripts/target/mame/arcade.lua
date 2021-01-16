@@ -301,6 +301,7 @@ VIDEOS["SEGA315_5313"] = true
 --VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
 VIDEOS["BT45X"] = true
+VIDEOS["BT47X"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
 VIDEOS["CESBLIT"] = true
@@ -394,6 +395,8 @@ VIDEOS["VRENDER0"] = true
 -- specify available machine cores
 --------------------------------------------------
 
+MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["AKIKO"] = true
 MACHINES["ALPHA_8921"] = true
@@ -796,7 +799,7 @@ BUSES["PC_JOY"] = true
 BUSES["PC_KBD"] = true
 --BUSES["PET"] = true
 --BUSES["PLUS4"] = true
---BUSES["PSX_CONTROLLER"] = true
+BUSES["PSX_CONTROLLER"] = true
 --BUSES["QL"] = true
 BUSES["RS232"] = true
 --BUSES["S100"] = true

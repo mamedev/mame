@@ -498,7 +498,10 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	if ((has_variant(variants, floppy_image::DSQD)) ||
 		(has_variant(variants, floppy_image::DSHD)))
 	{
-		m_trackmult = 2;
+		if (maxtrack <= 39)
+		{
+			m_trackmult = 2;
+		}
 	}
 
 	pos = savepos;

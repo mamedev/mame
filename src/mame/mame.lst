@@ -310,6 +310,7 @@ abc80                           //
 @source:abc80x.cpp
 abc800c                         //
 abc800m                         //
+dtc                             //
 abc802                          //
 abc806                          //
 
@@ -1174,11 +1175,12 @@ sstingry                        // (c) 1986 Alpha Denshi Co.
 @source:alphajuno.cpp
 ajuno1                          //
 ajuno2                          //
+hs80                            //
 mks50                           //
 
 @source:alphasma.cpp
 asma2k                          // (c) 1997 Intelligent Peripheral Devices
-asmapro                         // (c) 1995 Intelligent Peripheral Devices 
+asmapro                         // (c) 1995 Intelligent Peripheral Devices
 
 @source:alphasma3k.cpp
 asma3k                          // (c) 2000 AlphaSmart, Inc.
@@ -4061,6 +4063,8 @@ sc2dels6                        //
 sc2dels7                        //
 sc2dels8                        //
 sc2dels9                        //
+sc2dels10                       //
+sc2dels11                       //
 sc2delsd                        //
 sc2delsm                        // (Mazooma set)
 sc2delsm1                       //
@@ -5902,6 +5906,7 @@ sc4himif                        //
 sc4himig                        //
 sc4himih                        //
 sc4himii                        //
+sc4hrolr                        // High Roller (Bellfruit)
 sc4hiss                         // Hissing Quid (Qps)
 sc4hissa                        //
 sc4hissb                        //
@@ -9324,6 +9329,7 @@ bankroba                        // (c) 1993 Entertainment Technology Corp.
 bankrobb                        // (c) 1993 Blitz Systems Inc.
 cj3play                         // (c) 1998 Cadillac Jack
 cjffruit                        // (c) 1998 Cadillac Jack
+cjplus                          // (c) 1999 Cadillac Jack
 deucesw2                        // (c) 1997
 dualgame                        // (c) 1995 Labtronix Technologies
 hermit                          // (c) 1995 Dugamex
@@ -9333,6 +9339,7 @@ megadble                        // (c) 1990 Blitz Systems Inc.
 megadblj                        // (c) 1990 Blitz Systems Inc.
 megastrp                        // (c) 1992 Blitz Systems Inc.
 poker52                         // (c) 1993 Blitz Systems Inc. ?
+surpr5                          // (c) 1997 Cadillac Jack
 steaser                         // (c) 1993 unknown
 texasrls                        // (c) 1998 Cadillac Jack
 
@@ -12230,6 +12237,7 @@ bm2ndmix                        // GX853 (c) 1998 (Japan)
 bm2ndmxa                        // GX853 (c) 1998 (Japan)
 bm3rdmix                        // GX853 (c) 1998 (Japan)
 bm4thmix                        // GX847 (c) 1999 (Japan)
+bs4thmix                        // GX847 (c) 1999 (Korea)
 bm5thmix                        // GX981 (c) 1999 (Japan)
 bm6thmix                        // GXA21 (c) 2001 (Japan)
 bm7thmix                        // GXB07 (c) 2001 (Japan)
@@ -13345,6 +13353,9 @@ eva24                           //
 @source:evmbug.cpp
 evmbug                          //
 
+@source:ews4800.cpp
+ews4800_310                     // NEC EWS4800/310
+
 @source:excali64.cpp
 excali64                        //
 
@@ -13942,6 +13953,7 @@ bonuscrda                       // (c) 1986 Fun World
 bottl10b                        // (c) 1996 C.M.C.
 bottle10                        // (c) 1996 C.M.C.
 chinatow                        // 1998 unknown
+clubcard                        // (c) 199? Impera / Mega Tech
 crystal                         // (c) 1998 J.C.D. srl
 cuoreuno                        // (c) 1996 C.M.C.
 cuoreunoa                       // (c) 1996 C.M.C.
@@ -13963,6 +13975,7 @@ jolyc980                        // (c) 2000 Spale-Soft
 jolyccra                        // (c) 1985 TAB-Austria
 jolyccrb                        // (c) 1993 Soft Design
 jolycdab                        // (c) 1986 Inter Games
+jolycdcy                        // 1993 bootleg
 jolycdev                        // (c) 1998 TAB/Evona
 jolycdib                        // 1990 bootleg
 jolycdic                        // 1993 bootleg
@@ -15424,6 +15437,7 @@ nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
 nfma                            // bootleg
 noved                           // bootleg
+nd8lines                        // bootleg
 ns8lines                        // unknown
 ns8linew                        // unknown
 ns8linewa                       // unknown
@@ -17357,11 +17371,11 @@ monspdr                         // Money Spider (Ace)
 scrabble                        // (c) 1997
 scrabbled                       // (c) 1997
 snlad                           // (c) 199?
-tqst                            // (c) ACE?
+tqst                            // (c) Ace
+tqstp                           // (c) Ace
 trivialp                        // (c) 1996
 trivialpd                       // (c) 1996
 trivialpo                       // (c) 1996
-jpmreno
 
 @source:jpmimpctsw.cpp
 j6aceclb                        // Ace Of Clubs (Crystal)
@@ -19122,12 +19136,13 @@ konin                           //
 buttobi
 ddboy
 ddboya
-shuriboy
 fuusenpn
-tsukande
 mariorou
-tsupenta
+shuriboy
 slimekun
+tsukande
+tsupenta
+tsururin
 
 @source:konmedal68k.cpp
 dobouchn
@@ -20525,6 +20540,7 @@ m1dkong91na                     //
 m1dkong91np                     //
 m1dkong91p                      //
 m1dkonga                        //
+m1dkonga2                       //
 m1dkongp                        //
 m1dm4ev                         // Diamonds Are Forever Club (Maygay)
 m1dm4ev11                       //
@@ -21191,6 +21207,7 @@ m1simpsd                        //
 m1simpse                        //
 m1simpsf                        //
 m1simpsg                        //
+m1simpsh                        //
 m1sirich                        // Strike It Rich
 m1siricha                       //
 m1sirichb                       //
@@ -21199,6 +21216,7 @@ m1sixspn                        // Six Spinner (Maygay)
 m1spid                          // Spiderman (Maygay)
 m1spida                         //
 m1spidb                         //
+m1sprint                        //
 m1sprnov                        // Super Nova (Maygay)
 m1sptlgt                        // Spotlight (Maygay)
 m1sptlgta                       //
@@ -35364,6 +35382,7 @@ r9751                           // ROLM 9751 phone system
 
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
+rabbitj                         // (c) 1997 Electronic Arts
 rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:radio86.cpp
@@ -39444,6 +39463,9 @@ tetrisbl                        // (c) 1988 (but bootleg)
 tturfbl                         // (c) 1989 (Datsu bootleg)
 wb3bbl                          // bootleg
 wb3bble                         // bootleg
+
+@source:tabe22.cpp
+tabe22                          // (c) Tab Products
 
 @source:tagteam.cpp
 bigprowr                        // TA-0007 (c) 1983

@@ -103,7 +103,7 @@ public:
 	void set_ready(bool state);
 	double get_pos();
 
-	bool wpt_r() { return wpt; }
+	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
 	int idx_r() { return idx; }
@@ -111,10 +111,10 @@ public:
 	bool ss_r() { return ss; }
 	bool twosid_r();
 
-	void seek_phase_w(int phases);
+	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
-	void ss_w(int state) { if (sides > 1) ss = state; }
+	void ss_w(int state) { actual_ss = state; if (sides > 1) ss = state; }
 	void inuse_w(int state) { }
 	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 	void ds_w(int state) { ds = state; check_led(); }
@@ -146,6 +146,7 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
+	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
 
 	void init_floppy_load(bool write_supported);
@@ -173,7 +174,7 @@ protected:
 	int stp;  /* step */
 	int wtg;  /* write gate */
 	int mon;  /* motor on */
-	int ss; /* side select */
+	int ss, actual_ss; /* side select (forced to 0 if single-sided drive / actual value) */
 	int ds; /* drive select */
 
 	/* state of output lines */
@@ -272,6 +273,67 @@ DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
 
 DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
+
+class mac_floppy_device : public floppy_image_device {
+public:
+	virtual ~mac_floppy_device() = default;
+
+	virtual bool wpt_r() override;
+	virtual void seek_phase_w(int phases) override;
+	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
+
+protected:
+	u8 m_reg;
+	bool m_strb;
+	bool m_mfm, m_has_mfm;
+	bool m_rd1;
+
+	mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void track_changed() override;
+
+	virtual bool is_2m() const = 0;
+};
+
+// 400K GCR
+class oa_d34v_device : public mac_floppy_device {
+public:
+	oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~oa_d34v_device() = default;
+protected:
+	virtual void setup_characteristics() override;
+
+	virtual bool is_2m() const override;
+};
+
+// 400/800K GCR (e.g. dual-sided)
+class mfd51w_device : public mac_floppy_device {
+public:
+	mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~mfd51w_device() = default;
+protected:
+	virtual void setup_characteristics() override;
+
+	virtual bool is_2m() const override;
+};
+
+// 400/800K GCR + 1.44 MFM (Superdrive)
+class mfd75w_device : public mac_floppy_device {
+public:
+	mfd75w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~mfd75w_device() = default;
+
+protected:
+	virtual void setup_characteristics() override;
+
+	virtual bool is_2m() const override;
+};
+
+DECLARE_DEVICE_TYPE(OAD34V, oa_d34v_device)
+DECLARE_DEVICE_TYPE(MFD51W, mfd51w_device)
+DECLARE_DEVICE_TYPE(MFD75W, mfd75w_device)
 
 
 /*

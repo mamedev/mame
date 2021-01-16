@@ -434,7 +434,7 @@ void mcs48_cpu_device::pull_pc_psw()
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
 	m_psw = ((m_pc >> 8) & 0xf0) | sp;
-	m_pc &= 0xfff;
+	m_pc &= (m_irq_in_progress) ? 0x7ff : 0xfff;
 	update_regptr();
 }
 
@@ -449,7 +449,7 @@ void mcs48_cpu_device::pull_pc()
 	uint8_t sp = (m_psw - 1) & 0x07;
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
-	m_pc &= 0xfff;
+	m_pc &= (m_irq_in_progress) ? 0x7ff : 0xfff;
 	m_psw = (m_psw & 0xf0) | sp;
 }
 
@@ -868,10 +868,10 @@ OPHANDLER( ret )            { burn_cycles(2); pull_pc(); }
 OPHANDLER( retr )
 {
 	burn_cycles(2);
-	pull_pc_psw();
 
 	// implicitly clear the IRQ in progress flip flop
 	m_irq_in_progress = false;
+	pull_pc_psw();
 }
 
 OPHANDLER( rl_a )           { burn_cycles(1); m_a = (m_a << 1) | (m_a >> 7); }

@@ -923,7 +923,8 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
 	data = m_via1->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(m_via_cycles);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1134,7 +1135,7 @@ void mac_state::machine_reset()
 	// Egret currently needs more dramatic VIA slowdowns.  Need to determine what's realistic.
 	if (ADB_IS_EGRET)
 	{
-		m_via_cycles *= 35;
+		m_via_cycles *= 2;
 	}
 
 	// default to 32-bit mode on LC
@@ -2455,4 +2456,52 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	logerror("mac_trace_trap: %s at 0x%08x: %s\n",cpu_name_local, addr, buf);
 }
+#endif
+
+#if !NEW_SWIM
+void mac_state::phases_w(u8)
+{
+}
+
+void mac_state::sel35_w(int)
+{
+}
+
+void mac_state::devsel_w(u8)
+{
+}
+
+void mac_state::hdsel_w(int)
+{
+}
+#else
+
+void mac_state::phases_w(uint8_t phases)
+{
+	if(m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void mac_state::sel35_w(int sel35)
+{
+	logerror("fdc mac sel35 %d\n", sel35);
+}
+
+void mac_state::devsel_w(uint8_t devsel)
+{
+	if(devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if(devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+	m_fdc->set_floppy(m_cur_floppy);
+}
+
+void mac_state::hdsel_w(int hdsel)
+{
+	if(m_cur_floppy)
+		m_cur_floppy->ss_w(hdsel);
+}
+
 #endif

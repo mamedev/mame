@@ -46,6 +46,8 @@ public:
 
 	auto uart3_tx_out() { return m_uart3_tx_out.bind(); }
 
+	uint32_t udc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void udc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t icp_r(offs_t offset, uint32_t mem_mask = ~0);
 	void icp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t uart3_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -154,6 +156,19 @@ protected:
 	// register offsets
 	enum
 	{
+		UDC_BASE_ADDR	= 0x80000000,
+		REG_UDCCR		= (0x00000000 >> 2),
+		REG_UDCAR		= (0x00000004 >> 2),
+		REG_UDCOMP		= (0x00000008 >> 2),
+		REG_UDCIMP		= (0x0000000c >> 2),
+		REG_UDCCS0		= (0x00000010 >> 2),
+		REG_UDCCS1		= (0x00000014 >> 2),
+		REG_UDCCS2		= (0x00000018 >> 2),
+		REG_UDCD0		= (0x0000001c >> 2),
+		REG_UDCWC		= (0x00000020 >> 2),
+		REG_UDCDR		= (0x00000028 >> 2),
+		REG_UDCSR		= (0x00000030 >> 2),
+
 		ICP_BASE_ADDR	= 0x80030000,
 		REG_UTCR4		= (0x00000010 >> 2),
 		REG_HSCR0		= (0x00000060 >> 2),
@@ -253,6 +268,53 @@ protected:
 	// register contents
 	enum : uint32_t
 	{
+		UDCCR_UDD_BIT		= 0,
+		UDCCR_UDA_BIT		= 1,
+		UDCCR_RESM_BIT		= 2,
+		UDCCR_EIM_BIT		= 3,
+		UDCCR_RIM_BIT		= 4,
+		UDCCR_TIM_BIT		= 5,
+		UDCCR_SUSM_BIT		= 6,
+		UDCCR_WRITE_MASK	= 0x7d,
+
+		UDCAR_WRITE_MASK	= 0x7f,
+
+		UDCOMP_WRITE_MASK	= 0xff,
+
+		UDCIMP_WRITE_MASK	= 0xff,
+
+		UDCCS0_OPR_BIT		= 0,
+		UDCCS0_IPR_BIT		= 1,
+		UDCCS0_SST_BIT		= 2,
+		UDCCS0_FST_BIT		= 3,
+		UDCCS0_DE_BIT		= 4,
+		UDCCS0_SE_BIT		= 5,
+		UDCCS0_SO_BIT		= 6,
+		UDCCS0_SSE_BIT		= 7,
+
+		UDCCS1_RFS_BIT		= 0,
+		UDCCS1_RPC_BIT		= 1,
+		UDCCS1_RPE_BIT		= 2,
+		UDCCS1_SST_BIT		= 3,
+		UDCCS1_FST_BIT		= 4,
+		UDCCS1_RNE_BIT		= 5,
+
+		UDCCS2_TFS_BIT		= 0,
+		UDCCS2_TPC_BIT		= 1,
+		UDCCS2_TPE_BIT		= 2,
+		UDCCS2_TUR_BIT		= 3,
+		UDCCS2_SST_BIT		= 4,
+		UDCCS2_FST_BIT		= 5,
+
+		UDCWC_WRITE_MASK	= 0x0f,
+
+		UDCSR_EIR_BIT		= 0,
+		UDCSR_RIR_BIT		= 1,
+		UDCSR_TIR_BIT		= 2,
+		UDCSR_SUSIR_BIT		= 3,
+		UDCSR_RESIR_BIT		= 4,
+		UDCSR_RSTIR_BIT		= 5,
+
 		UART3_FIFO_PRE  = 8,
 		UART3_FIFO_FRE  = 9,
 		UART3_FIFO_ROR  = 10,
@@ -462,6 +524,19 @@ protected:
 		MCP_TELECOM_OVERRUN     = 7
 	};
 
+	struct udc_regs
+	{
+		uint32_t udccr;
+		uint32_t udcar;
+		uint32_t udcomp;
+		uint32_t udcimp;
+		uint32_t udccs0;
+		uint32_t udccs1;
+		uint32_t udccs2;
+		uint32_t udcwc;
+		uint32_t udcsr;
+	};
+
 	struct uart_regs
 	{
 		uint32_t utcr[4];
@@ -640,6 +715,7 @@ protected:
 		uint32_t dbt[2];
 	};
 
+	udc_regs		m_udc_regs;
 	uart_regs       m_uart_regs;
 	icp_regs		m_icp_regs;
 	mcp_regs        m_mcp_regs;

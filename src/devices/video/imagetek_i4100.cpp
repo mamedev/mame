@@ -358,6 +358,8 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_crtc_unlock));
+	save_item(NAME(m_crtc_horz));
+	save_item(NAME(m_crtc_vert));
 	save_item(NAME(m_sprite_count));
 	save_item(NAME(m_sprite_priority));
 	save_item(NAME(m_sprite_color_code));
@@ -724,6 +726,7 @@ void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t m
 {
 	if (m_crtc_unlock == true)
 	{
+		COMBINE_DATA(&m_crtc_horz);
 		//logerror("%s CRTC horizontal %04x %04x\n",this->tag(),data,mem_mask);
 	}
 }
@@ -732,6 +735,7 @@ void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t m
 {
 	if (m_crtc_unlock == true)
 	{
+		COMBINE_DATA(&m_crtc_vert);
 		//logerror("%s CRTC vertical %04x %04x\n",this->tag(),data,mem_mask);
 	}
 }

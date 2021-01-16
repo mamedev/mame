@@ -273,6 +273,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
+	map(0xf3, 0xf3).nopw();    // Basic constantly writes 0x82 and 0xC2 here
 	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
@@ -497,9 +498,11 @@ void rx78_state::rx78(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("rx78_cass");
 
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("rx78_cass");
 }
 
 /* ROM definition */
