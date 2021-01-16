@@ -769,7 +769,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -787,7 +787,7 @@ void odyssey2_state::videopac(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
@@ -842,7 +842,7 @@ void vpp_state::g7400(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -869,7 +869,7 @@ void vpp_state::odyssey3(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	m_ef934x->set_clock(7.15909_MHz_XTAL / 2);
 	m_ef934x->set_offsets(15, 15);

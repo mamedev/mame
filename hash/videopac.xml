@@ -96,13 +96,13 @@ As said before, these shouldn't be included in the softwarelist, but can still b
 have the game title on either the box or the cartridge, but simply "Videopac X"
 where X is the game number.
 
-1:  3rcsocpt - Race/Spin-Out/Cryptogram
-2:  3prspclg - Pairs/Space Rendezvous/Logic
+1:  3rcsocpt - Race / Spin-Out / Cryptogram
+2:  3prspclg - Pairs / Space Rendezvous / Logic
 3:  football - American Football
-4:  2aswbat  - Air-Sea War/Battle
+4:  2aswbat  - Air-Sea War / Battle
 5:  blackjck - Blackjack
-6:  2bwlbskt - Ten Pin Bowling/Basketball
-7:  2mthecho - Mathematician/Echo
+6:  2bwlbskt - Ten Pin Bowling / Basketball
+7:  2mthecho - Mathematician / Echo
 8:  baseball - Baseball
 9:  compprog - Computer Programmer
 10: golf     - Golf
@@ -111,10 +111,10 @@ where X is the game number.
 13: psmaths  - Playschool Maths
 14: gunfight - Gunfighter
 15: samurai  - Samurai
-16: 2dpthmrk - Depth Charge/Marksman
+16: 2dpthmrk - Depth Charge / Marksman
 17: chinese  - Chinese Logic
 18: laser    - Laser War
-19: 2bllcrss - Catch the Ball/Noughts and Crosses
+19: 2bllcrss - Catch the Ball / Noughts and Crosses
 20: stone    - Stone Sling
 21: pharaohs - Secret of the Pharaohs
 22: spacemon - Space Monster
@@ -127,11 +127,11 @@ where X is the game number.
 29: dambust  - Dam Buster
 30: battlef  - Battlefield
 31: musician - Musician
-32: 2lbsprmd - A Labyrinth Game/Supermind
+32: 2lbsprmd - A Labyrinth Game / Supermind
 33: acrobat/acrobata - Jumping Acrobats
 34: satellit - Satellite Attack
 35: billiard - Electronic Billiards
-36: 2hckyscr - Electronic Ice Hockey/Electronic Soccer
+36: 2hckyscr - Electronic Ice Hockey / Electronic Soccer
 37: monkey   - Monkeyshines
 38: munchkin - Munchkin
 39: freedom  - Freedom Fighters
@@ -172,6 +172,66 @@ Numbers 61-71 are repro* cartridges sold by various homebrew publishers, not off
 *: excluding #66 which is an original homebrew game
 Newer releases don't follow this numbering scheme anymore.
 
+================================================================================
+
+1st-party (USA) Magnavox Odyssey² games index:
+
+AJ9400: 3rcsocpt - Speedway! / Spin-Out! / Crypto-Logic!
+AJ9401: blackjck - Las Vegas Blackjack!
+AJ9402: football - Football!
+AJ9403: 2aswbat  - Armored Encounter! / Sub Chase!
+AJ9404: 2bwlbskt - Bowling! / Basketball!
+AJ9405: 2mthecho - Math-A-Magic! / Echo!
+AJ9406: compintr - Computer Intro!
+AJ9407: 3mkrbzlg - Matchmaker! / Buzzword! / Logix!
+AJ9408: baseball - Baseball!
+AJ9409: -        - unknown, not released
+AJ9410: compgolf - Computer Golf!
+AJ9411: cosmicu  - Cosmic Conflict!
+AJ9412: moneyrun - Take the Money and Run!
+AK9413: psmaths  - I've Got Your Number!
+AK9414: invaders - Invaders from Hyperspace!
+AK9415: flipper  - Thunderball!
+AK9416: showdown - Showdown in 2100 A.D.
+AK9417: battlef  - War of Nerves!
+AK9418: ski      - Alpine Skiing!
+AK9419: 2wrldrsc - Out of this World! / Helicopter Rescue!
+AK9420: 2hckyscr - Hockey! / Soccer!
+AK9421: dynasty  - Dynasty!
+AA9422: volley   - Volleyball!
+AA9423: tablefb  - Electronic Table Soccer!
+AA9424: billiard - Pocket Billiards!
+AA9425: baskgame - Pachinko!
+AA9426: lasvegas - Casino Slot Machine!
+AA9427: dambust  - Blockout! / Breakdown!
+AA9428: spacemon - Alien Invaders - Plus!
+AB9429: quest    - The Quest for the Rings
+AB9430: ufo      - UFO!
+AB9431: conquest - Conquest of the World
+AB9432: monkey   - Monkeyshines!
+AC9433: keyboard - Keyboard Creations!
+AC9434: gtwallst - The Great Wall Street Fortune Hunt
+AC9435: kcmunch  - K.C. Munchkin!
+AC9436: freedom  - Freedom Fighters!
+AC9437: pickaxe  - Pick Axe Pete!
+AC9438: sidspell - Sid the Spellbinder!
+AC9439: nimble   - Nimble Numbers Ned!
+AC9440: typetell - Type & Tell!
+AC9441: smither  - Smithereens!
+AC9442: crazyc   - K.C.'s Krazy Chase!
+AC9443: ptbarnum - P.T. Barnum's Acrobats!
+AC9444: -        - Four in a Row, not released
+AC9445: timelord - Attack of the Timelord!
+AC9446: turtlesu - Turtles!
+AC9447: bees     - Killer Bees!
+AC9448: powerlrd - Power Lords
+
+Not counting homebrews, The Voice (voice) works with games AC9438 to AC9447.
+
+2nd character is obviously release year.
+Anything AC+low serial number, eg. AC9403 or AC9429 are rereleases, these can also be
+distinguished by the changed copyright from Magnavox to N.A.P. (North American Philips)
+
 -->
 
 <softwarelist name="videopac" description="Philips Videopac / Odyssey 2 cartridges">
@@ -194,10 +254,10 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="compintr" cloneof="compprog">
-		<description>Computer Intro (US)</description>
+		<description>Computer Intro! (US)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
-		<info name="serial" value="AC9406" />
+		<info name="serial" value="AJ9406" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -318,11 +378,11 @@ Newer releases don't follow this numbering scheme anymore.
 <!-- Educational -->
 
 	<software name="2mthecho">
-		<description>Mathematician/Echo (Europe, US)</description>
+		<description>Mathematician / Echo (Europe, US)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Math-a-Magic!/Echo!" />
-		<info name="usage" value="Press 1 for Mathematician/Math-a-Magic, press 2 for Echo" />
+		<info name="alt_title" value="Math-A-Magic! / Echo!" />
+		<info name="usage" value="Press 1 for Mathematician / Math-A-Magic, press 2 for Echo" />
 		<info name="serial" value="7 (Europe) ~ AJ9405 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -333,7 +393,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2mthechf" cloneof="2mthecho">
-		<description>Mathématicien/Echo (France)</description>
+		<description>Mathématicien / Echo (France)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Press 1 for Mathématicien, press 2 for Echo" />
@@ -388,8 +448,8 @@ Newer releases don't follow this numbering scheme anymore.
 		<description>Playschool Maths (Europe, US)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="I've Got Your Number" />
-		<info name="serial" value="13 (Europe) ~ AC9413 (US)" />
+		<info name="alt_title" value="I've Got Your Number!" />
+		<info name="serial" value="13 (Europe) ~ AK9413 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -399,7 +459,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="sidspell">
-		<description>Sid the Spellbinder (US)</description>
+		<description>Sid the Spellbinder! (US)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Sam Overton" />
@@ -481,7 +541,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2lbsprmd">
-		<description>A Labyrinth Game/Supermind (Europe)</description>
+		<description>A Labyrinth Game / Supermind (Europe)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="32" />
@@ -494,11 +554,11 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2aswbat">
-		<description>Air-Sea War/Battle (Europe, US)</description>
+		<description>Air-Sea War / Battle (Europe, US)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Armored Encounter!/Sub Chase!" />
-		<info name="usage" value="Press A for Armored Encounter/Air-Sea War, press 1 for Sub Chase/Battle" />
+		<info name="alt_title" value="Armored Encounter! / Sub Chase!" />
+		<info name="usage" value="Press A for Armored Encounter / Air-Sea War, press 1 for Sub Chase / Battle" />
 		<info name="serial" value="4 (Europe) ~ AJ9403 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -731,7 +791,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2bllcrss">
-		<description>Catch the Ball/Noughts and Crosses (Europe)</description>
+		<description>Catch the Ball / Noughts and Crosses (Europe)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Catch the Ball, press 7 for Noughts and Crosses" />
@@ -745,7 +805,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2mlajogo" cloneof="2bllcrss">
-		<description>O Malabarista!/Jogo da Velha! (Brazil)</description>
+		<description>O Malabarista! / Jogo da Velha! (Brazil)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for O Malabarista, press 7 for Jogo da Velha" />
@@ -934,8 +994,8 @@ Newer releases don't follow this numbering scheme anymore.
 		<description>Dam Buster (Europe, US)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Blockout!/Breakdown!" />
-		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
+		<info name="alt_title" value="Blockout! / Breakdown!" />
+		<info name="usage" value="Press 0 then 1 for Blockout / Dam Buster, press 0 then 2 for Breakdown" />
 		<info name="serial" value="29 (Europe) ~ AA9427 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -971,7 +1031,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2dpthmrk">
-		<description>Depth Charge/Marksman (Europe)</description>
+		<description>Depth Charge / Marksman (Europe)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
@@ -985,7 +1045,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2bmbalvo" cloneof="2dpthmrk">
-		<description>Bombardeio Submarino!/Tiro ao Alvo! (Brazil)</description>
+		<description>Bombardeio Submarino! / Tiro ao Alvo! (Brazil)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
@@ -1015,7 +1075,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Pocket Billiards!" />
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="35 (Europe) ~ AC9424 (US)" />
+		<info name="serial" value="35 (Europe) ~ AA9424 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1038,10 +1098,10 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2hckyscr">
-		<description>Electronic Ice Hockey/Electronic Soccer (Europe, US)</description>
+		<description>Electronic Ice Hockey / Electronic Soccer (Europe, US)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Hockey!/Soccer!" />
+		<info name="alt_title" value="Hockey! / Soccer!" />
 		<info name="usage" value="Move joystick when game is on screen." />
 		<info name="serial" value="36 (Europe) ~ AK9420 (US)" />
 		<part name="cart" interface="odyssey_cart">
@@ -1053,7 +1113,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2fblhcky" cloneof="2hckyscr">
-		<description>Football Electronique/Hockey Electronique (France)</description>
+		<description>Football Electronique / Hockey Electronique (France)</description>
 		<year>1981</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Move joystick when game is on screen." />
@@ -1069,7 +1129,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<description>Electronic Table Football (Europe, US)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Electronic Table Soccer" />
+		<info name="alt_title" value="Electronic Table Soccer!" />
 		<info name="serial" value="27 (Europe) ~ AA9423 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -1412,7 +1472,7 @@ Newer releases don't follow this numbering scheme anymore.
 
 	<software name="2missprg">
 		<!-- limited release -->
-		<description>Missão Impossível/Viagem Programada (Brazil)</description>
+		<description>Missão Impossível / Viagem Programada (Brazil)</description>
 		<year>198?</year>
 		<publisher>Ectron Eletrônica Ltda.</publisher>
 		<info name="usage" value="Press 1 for Missão Impossível, press 2 for Viagem Programada" />
@@ -1467,11 +1527,11 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2wrldrsc">
-		<description>Out of this World!/Helicopter Rescue! (US)</description>
+		<description>Out of this World! / Helicopter Rescue! (US)</description>
 		<year>1979</year>
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Press 3 for Out of this World, press 1 for Helicopter Rescue" />
-		<info name="serial" value="AC9419" />
+		<info name="serial" value="AK9419" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1481,7 +1541,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="3prspclg">
-		<description>Pairs/Space Rendezvous/Logic (Europe)</description>
+		<description>Pairs / Space Rendezvous / Logic (Europe)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
@@ -1495,7 +1555,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="3mkrbzlg" cloneof="3prspclg">
-		<description>Matchmaker!/Buzzword!/Logix! (US)</description>
+		<description>Matchmaker! / Buzzword! / Logix! (US)</description>
 		<year>1978</year>
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
@@ -1601,6 +1661,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="powerlrda" cloneof="powerlrd">
+		<!-- could also be a romhack, or prototype of official PAL version, not sure -->
 		<description>Power Lords (US, set 2)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -1628,12 +1689,12 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="3rcsocpt">
-		<description>Race/Spin-Out/Cryptogram (Europe, US)</description>
+		<description>Race / Spin-Out / Cryptogram (Europe, US)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Speedway/Spin-Out/Crypto-logic" />
-		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
-		<info name="serial" value="1 (Europe) ~ AC9400 (US)" /><!-- also AJ9400 -->
+		<info name="alt_title" value="Speedway! / Spin-Out! / Crypto-Logic!" />
+		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-Out, press 4 for 15-lap Spin-Out, press 5 for Cryptogram/Crypto-Logic" />
+		<info name="serial" value="1 (Europe) ~ AJ9400 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1643,7 +1704,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="3csaucpt" cloneof="3rcsocpt">
-		<description>Course de Voitures/Autodrome/Cryptogramme (France)</description>
+		<description>Course de Voitures / Autodrome / Cryptogramme (France)</description>
 		<year>1978</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
@@ -2015,7 +2076,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="42 (Europe) ~ AC9429 (US)" />
+		<info name="serial" value="42 (Europe) ~ AB9429 (US)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -2039,10 +2100,10 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2bwlbskt">
-		<description>Ten Pin Bowling/Basketball (Europe, US)</description>
+		<description>Ten Pin Bowling / Basketball (Europe, US)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="alt_title" value="Bowling!/Basketball!" />
+		<info name="alt_title" value="Bowling! / Basketball!" />
 		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
 		<info name="serial" value="6 (Europe) ~ AJ9404 (US)" />
 		<part name="cart" interface="odyssey_cart">
@@ -2054,7 +2115,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2qllbskt" cloneof="2bwlbskt">
-		<description>Jeu de Quilles/Basketball (France)</description>
+		<description>Jeu de Quilles / Basketball (France)</description>
 		<year>1978</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
@@ -2082,7 +2143,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="turtlesu" cloneof="turtles">
-		<description>Turtles (US)</description>
+		<description>Turtles! (US)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Jim Butler" />
@@ -2142,7 +2203,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="2bwlbsktpl" cloneof="2bwlbskt">
-		<description>Ten Pin Bowling/Basketball (Europe, plus, prototype)</description>
+		<description>Ten Pin Bowling / Basketball (Europe, plus, prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2396,7 +2457,7 @@ Newer releases don't follow this numbering scheme anymore.
 	</software>
 
 	<software name="3rcsocptpl" cloneof="3rcsocpt">
-		<description>Race/Spin-out/Cryptogram (Europe, plus)</description>
+		<description>Race / Spin-Out / Cryptogram (Europe, plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
