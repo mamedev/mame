@@ -23,6 +23,7 @@ Year  Game                        Manufacturer
 1998  Funny Fruit                 Cadillac Jack
 1998  Triple Play                 Cadillac Jack
 1998  Texas Reels                 Cadillac Jack
+1999  New! Cherry Plus            Cadillac Jack
 199?  Il Pagliaccio               <unknown>
 ----------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ Notes:
 
 - ilpag: at start-up a "initialize request" pops up. Press Service Mode and the Service switch, and
   reset with F3 for doing it.
-- cj3play, cjffruit, surpr5, texasrls: at start-up a "need coin adjustment" pops up. Press menu, go to page 1 with start,
+- all Cadillac Jack sets: at start-up a "need coin adjustment" pops up. Press menu, go to page 1 with start,
   move to "price coin #1" with big, and set it with small, then exit with menu.
 - "I/O TEST" is available among the statistics pages.
 - ilpag: based on pSOS+ S68000 V1.2.3 (Integrated Systems).
@@ -44,7 +45,7 @@ To Do:
 - steaser: sound uses an OkiM6295 (controlled by the sub MCU), check if it can be simulated;
 - deucesw2: colour cycling effect on attract mode is ugly (background should be blue, it's instead a MAME-esque
   palette), protection?
-- cj3play, cjffruit, surpr5, texasrls: they freeze on the double up side and when winning a bonus
+- all Cadillac Jack sets: they freeze on the double up side and when winning a bonus
 - texasrls: MCU is dumped, hook it up, get sound working and get rid of ROM patches
 
 *****************************************************************************************************************/
@@ -102,6 +103,7 @@ public:
 	void init_bankroba();
 	void init_bankrobb();
 	void init_cjffruit();
+	void init_cjplus();
 	void init_deucesw2();
 	void init_megadble();
 	void init_maxidbl();
@@ -2458,6 +2460,30 @@ ROM_START( surpr5 ) // CJ-8L REV-D, same PCB as cjffruit and texasrls
 	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( cjplus )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "a.u65", 0x00000, 0x80000, CRC(7a98f02d) SHA1(60f6b6ae91f9be7ebff84b7f55d04045931bdb4e) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "68hc705.u30", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 )
+	ROM_LOAD16_BYTE( "d.u68", 0x000000, 0x80000, CRC(69eb63df) SHA1(facf4afae32985f12d43bac9b1f24ac4b338cc42) )
+	ROM_LOAD16_BYTE( "c.u75", 0x000001, 0x80000, CRC(c37c5a91) SHA1(46589906b7461d31165f205cb2895a7eab2edd31) )
+	ROM_LOAD16_BYTE( "f.u51", 0x100000, 0x80000, CRC(b4067269) SHA1(7ed9e6c5eabb633f9ae6a37da7fb150c93751800) )
+	ROM_LOAD16_BYTE( "e.u61", 0x100001, 0x80000, CRC(2e194941) SHA1(584e8fb873dd8a00d84b09d562889251837164a1) )
+
+	ROM_REGION( 0x40000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "g.u50", 0x00000, 0x40000, CRC(ecd19989) SHA1(44fa91537d7d97be845621870ecaec7396a4396e) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 /*************************************************************************************************************
 
 Deuces Wild 2 - American Heritage (Ver. 2.02F)
@@ -3059,6 +3085,18 @@ void blitz68k_state::init_surpr5()
 	rom[0x1fd56/2] = 0x6054;
 }
 
+void blitz68k_state::init_cjplus()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0x7116/2] = 0x6028;
+	rom[0xa086/2] = 0x6024;
+
+	// ERROR CHECKSUM ROM PROGRAM
+	rom[0x20868/2] = 0x6050;
+}
+
 void blitz68k_state::init_deucesw2()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -3160,4 +3198,5 @@ GAME( 1997,  surpr5,   0,       cjffruit, surpr5,   blitz68k_state, init_surpr5,
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
 GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
+GAME( 1999,  cjplus,   0,       cjffruit, cjffruit, blitz68k_state, init_cjplus,   ROT0, "Cadillac Jack",                  "New! Cherry Plus (Ver. 3.10)",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999, named CJ PLUS (SPECIAL) in strings
 GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

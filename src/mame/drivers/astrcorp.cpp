@@ -1644,7 +1644,7 @@ const astoneage_state::decryption_info astoneage_state::magibombd_table = {
 			}
 		},
 	},
-	{ 12, 9, 8, 10, 11 }  // TODO
+	{ 12, 9, 8, 10, 11 }
 };
 
 void astoneage_state::init_magibombd()
