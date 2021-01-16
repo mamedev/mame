@@ -1633,7 +1633,7 @@ Newer releases don't follow this numbering scheme anymore.
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Speedway/Spin-Out/Crypto-logic" />
 		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
-		<info name="serial" value="1 (Europe) ~ AC9400 (US)" />
+		<info name="serial" value="1 (Europe) ~ AC9400 (US)" /><!-- also AJ9400 -->
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">

@@ -67,9 +67,11 @@ TODO:
   be correct. The 8245 is put into slave mode at vblank, timing signals and
   vblank IRQ are taken over during it (the Videopac pcb even has extra TTL to
   catch the I/O read from 0xA1 to acknowledge the IRQ)
-- ppp(the tetris game) does not work properly on PAL, it does look like PAL/NTSC
-  detection is working, see internal RAM $3D d7. So maybe it is due to inaccurate
-  PAL video timing. The game does mid-scanline video updates.
+  * ppp(the tetris game) does not work properly on PAL, it does look like
+    PAL/NTSC detection is working, see internal RAM $3D d7. So maybe it is due
+    to inaccurate PAL video timing. The game does mid-scanline video updates.
+  * gtwallst turns the display on too soon, the middle scroller is partially
+    visible when it's not supposed to (also a bit glitchy on NTSC but not as bad)
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
