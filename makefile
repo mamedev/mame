@@ -362,33 +362,6 @@ WINDRES  := $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
 endif
 endif
 
-ifeq ($(findstring arm,$(UNAME)),arm)
-ARCHITECTURE :=
-ifndef NOASM
-	NOASM := 1
-endif
-endif
-
-ifeq ($(findstring aarch64,$(UNAME)),aarch64)
-ARCHITECTURE :=
-ifndef NOASM
-	NOASM := 1
-endif
-endif
-
-ifeq ($(findstring s390x,$(UNAME)),s390x)
-ifndef NOASM
-	NOASM := 1
-endif
-endif
-
-ifeq ($(findstring riscv64,$(UNAME)),riscv64)
-ARCHITECTURE :=
-ifndef NOASM
-	NOASM := 1
-endif
-endif
-
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
 TARGETOS := asmjs
@@ -398,22 +371,37 @@ ifndef NOASM
 endif
 endif
 
-# ppc has inline assembly support but no DRC
 ifeq ($(findstring ppc,$(UNAME)),ppc)
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
 endif
 
-# powerpc has inline assembly support but no DRC
 ifeq ($(findstring powerpc,$(UNAME)),powerpc)
 ifndef FORCE_DRC_C_BACKEND
-    FORCE_DRC_C_BACKEND := 1
+	FORCE_DRC_C_BACKEND := 1
 endif
 endif
 
-# ARM / ARM64
 ifeq ($(findstring arm,$(UNAME)),arm)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+ifeq ($(findstring aarch64,$(UNAME)),aarch64)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+ifeq ($(findstring s390x,$(UNAME)),s390x)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+ifeq ($(findstring riscv64,$(UNAME)),riscv64)
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
