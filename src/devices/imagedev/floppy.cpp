@@ -288,7 +288,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
-	angular_speed = rpm/300.0*2e8;
+	angular_speed = rpm/60.0*2e8;
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
@@ -2560,7 +2560,7 @@ void mac_floppy_device::track_changed()
 	else if(cyl <= 63)
 		new_rpm = 525;
 	else
-		new_rpm = 590; 
+		new_rpm = 590;
 
 	if(rpm != new_rpm)
 		set_rpm(new_rpm);
