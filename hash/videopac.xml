@@ -904,33 +904,6 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
-	<software name="frogger">
-		<description>Frogger (Europe)</description>
-		<year>1983</year>
-		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Uses the 2nd joystick" />
-		<info name="programmer" value="Peter Inser" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="0x2000">
-				<rom name="pb_frogger.bin" size="0x2000" crc="d0bc4ee6" sha1="0beda7b36259b3be84d34206a77a35cd3f04892f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="froggerb" cloneof="frogger">
-		<description>Frogger (Brazil)</description>
-		<year>1983</year>
-		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Uses the 2nd joystick" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="0x2000">
-				<rom name="br_frogger.bin" size="0x2000" crc="a57d84f3" sha1="bedb714c88b9aa7a02da9ebcde12446ec8350d18" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="golf">
 		<description>Golf (Europe)</description>
 		<year>1980</year>
@@ -1853,6 +1826,33 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="jo_jft_d03.bin" size="0x2000" crc="248bf33e" sha1="5c86921225b93d87bfd63bc13dd22dddab4e8826" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger (Europe)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="programmer" value="Peter Inser" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pb_frogger.bin" size="0x2000" crc="d0bc4ee6" sha1="0beda7b36259b3be84d34206a77a35cd3f04892f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggerb" cloneof="frogger">
+		<description>Frogger (Brazil)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="br_frogger.bin" size="0x2000" crc="a57d84f3" sha1="bedb714c88b9aa7a02da9ebcde12446ec8350d18" />
 			</dataarea>
 		</part>
 	</software>
