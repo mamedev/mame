@@ -204,7 +204,7 @@ _recip_approx(float value)
     multiply and return the full 128 bit result
 -------------------------------------------------*/
 
-#ifdef __ppc64__
+#if defined(__ppc64__)
 #define mul_64x64 _mul_64x64
 inline int64_t ATTR_FORCE_INLINE
 _mul_64x64(int64_t a, int64_t b, int64_t &hi)
@@ -221,7 +221,7 @@ _mul_64x64(int64_t a, int64_t b, int64_t &hi)
     bit multiply and return the full 128 bit result
 -------------------------------------------------*/
 
-#ifdef __ppc64__
+#if defined(__ppc64__)
 #define mulu_64x64 _mulu_64x64
 inline uint64_t ATTR_FORCE_INLINE
 _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
