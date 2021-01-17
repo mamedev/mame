@@ -53,7 +53,7 @@
 
 #define RUN_ADB_MICRO (0)
 #define LOG_ADB (0)
-#define NEW_IWM (0)
+#define NEW_IWM (1)
 
 #include "screen.h"
 #include "softlist.h"
