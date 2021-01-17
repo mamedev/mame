@@ -106,7 +106,7 @@ public:
     news_r4k_state(machine_config const &mconfig, device_type type, char const *tag)
         : driver_device(mconfig, type, tag),
           m_cpu(*this, "cpu"),
-          //m_ram(*this, "ram"),
+          m_ram(*this, "ram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
           m_fdc(*this, "fdc"),
@@ -200,7 +200,7 @@ protected:
 #endif
 
     // Main memory
-    //required_device<ram_device> m_ram;
+    required_device<ram_device> m_ram;
 
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
@@ -263,6 +263,11 @@ protected:
     const uint32_t ICACHE_SIZE = 16384;
     const uint32_t DCACHE_SIZE = 16384;
     const char *MAIN_MEMORY_DEFAULT = "64M";
+
+    // RAM debug
+    bool map_shift = false;
+    uint8_t debug_ram_r(offs_t offset);
+    void debug_ram_w(offs_t offset, uint8_t data);
 };
 
 FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
@@ -291,8 +296,8 @@ void news_r4k_state::machine_common(machine_config &config)
     m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 
     // Main memory
-    //RAM(config, m_ram);
-    //m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
+    RAM(config, m_ram);
+    m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
     // Timekeeper IC
     M48T02(config, m_rtc);
@@ -458,13 +463,23 @@ void news_r4k_state::cpu_map(address_map &map)
  */
 void news_r4k_state::cpu_map_debug(address_map &map)
 {
-    // After playing around with the memory enumeration, I found a combo (below) that will get the MROM to enumerate
-    // memory. But, it fails memtest because it expects memory in regions that break the memory enumeration.
-    // Either this is almost but not quite there in terms of mapping, or there is something I am seriously missing
-    // (external memory mapping controller, etc.).
-    map(0x0, 0x01ffffff).ram();
-    map(0x3f00000, 0x3ffffff).ram();
-    map(0x7f00000, 0x7ffffff).ram();
+    // After spending some quality time with the monitor ROM in the debugger, I did find a horrible hack that
+    // gets the MROM to both enumerate 64MB of memory and pass memtest, by only enabling 0x2000000-0x3ffffff
+    // after a certain point in the boot process. While this seems to kinda work???????, there are still issues
+    // (like `ss -r` not showing the register values if it is dumping them to memory before printing them perhaps)
+    // that might be related. I also still don't know if there is actually some magic going on with the memory map,
+    // or if I am just not smart enough to figure out the "real" mapping that would make everything just work.
+    // At least it is progress :)
+    map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
+    map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { LOG("yo\n"); return 0x3ff17; }));
+    map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
+        if (data == 0x10001) {
+            LOG("Enabling map shift!\n");
+            map_shift = true;
+        } else {
+            LOG("Disabling map shift!\n");
+            map_shift = false;
+        } }));
 
     // APBus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
@@ -485,6 +500,29 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
             else { return 0x0;} })); // monitor ROM doesn't boot without this
+}
+
+uint8_t news_r4k_state::debug_ram_r(offs_t offset) {
+    uint8_t result = 0xff;
+    if ( (offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff )|| (!map_shift && offset >=0x7f00000) )
+    {
+        result = m_ram->read(offset);
+    }
+    else
+    {
+        LOG("Unmapped RAM read attempted at offset 0x%x\n", offset);
+    }
+    return result;
+}
+void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data) {
+    if( (offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff )|| (!map_shift && offset >=0x7f00000) )
+    {
+        m_ram->write(offset, data);
+    }
+    else
+    {
+        LOG("Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
+    }
 }
 
 void news_r4k_state::machine_start()
