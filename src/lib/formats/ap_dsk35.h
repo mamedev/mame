@@ -40,6 +40,7 @@ public:
 
 private:
 	static const desc_e mac_gcr[];
+	static const int cell_count[5];
 
 	uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);

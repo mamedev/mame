@@ -1208,6 +1208,9 @@ LEGACY_FLOPPY_OPTIONS_END
 
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+
+const int dc42_format::cell_count[5] = { 76950, 70672, 64244, 57739, 51387 };
+
 dc42_format::dc42_format() : floppy_image_format_t()
 {
 }
@@ -1316,12 +1319,6 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 					pos_tag += 12;
 				}
 				io_generic_read(io, data+12, pos_data, 512);
-				for(int kk0 = 0; kk0 != 512; kk0 += 16) {
-					printf("%02d %d %2d %03x:", track, head, i, kk0);
-					for(int kk1 = 0; kk1 != 16; kk1++)
-						printf(" %02x", data[12+kk0+kk1]);
-					printf("\n");
-				}
 				pos_data += 512;
 				si = (si + 2) % ns;
 				if(si == 0)
@@ -1395,9 +1392,9 @@ bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, fl
 			uint8_t sectdata[(512+12)*12];
 			memset(sectdata, 0, sizeof(sectdata));
 			int nsect = 12-(track/16);
-			uint8_t buf[13000];
+			uint8_t buf[20000];
 			int ts;
-			generate_bitstream_from_track(track, head, 200000000/(6208*nsect), buf, ts, image);
+			generate_bitstream_from_track(track, head, 200000000 / cell_count[track/16], buf, ts, image);
 			int pos = 0;
 			int wrap = 0;
 			int hb = 0;
