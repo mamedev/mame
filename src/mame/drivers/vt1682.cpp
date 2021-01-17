@@ -6261,7 +6261,7 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 // has 21.477 Mhz XTAL
 CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
 
-// actually has 129 games then repeats
+// fewer than 268 games, there are repeats
 CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
