@@ -2422,7 +2422,7 @@ bool mac_floppy_device::wpt_r()
 	// actual_ss may have changed after the phases were set
 	m_reg = (m_reg & 7) | (actual_ss ? 8 : 0);
 
-	if(m_reg != 4 && m_reg != 12)
+	if(m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13)
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
@@ -2433,8 +2433,9 @@ bool mac_floppy_device::wpt_r()
 	case 0x2: // Is the motor on?
 		return mon;
 
-	case 0x4: // Used when reading data, result ignored
-		return false;
+	case 0x4:
+	case 0xc: // Index pulse, probably only on the superdrive though
+		return !m_has_mfm ? false : !image || mon ? true : idx;
 
 	case 0x5: // Is it a superdrive (supports 1.4M MFM) ?
 		return m_has_mfm;
@@ -2453,9 +2454,6 @@ bool mac_floppy_device::wpt_r()
 
 	case 0xa: // Not on track 0?
 		return cyl != 0;
-
-	case 0xc: // Another identification bit
-		return m_rd1;
 
 	case 0xd: // Is the current mode GCR or MFM?
 		return m_mfm;
@@ -2588,9 +2586,7 @@ bool oa_d34v_device::is_2m() const
 
 mfd51w_device::mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, MFD51W, tag, owner, clock)
 {
-	m_has_mfm = true;
 }
-
 void mfd51w_device::setup_characteristics()
 {
 	form_factor = floppy_image::FF_35;
@@ -2626,5 +2622,5 @@ void mfd75w_device::setup_characteristics()
 
 bool mfd75w_device::is_2m() const
 {
-	return true;
+	return false;
 }

@@ -287,7 +287,6 @@ protected:
 	u8 m_reg;
 	bool m_strb;
 	bool m_mfm, m_has_mfm;
-	bool m_rd1;
 
 	mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
