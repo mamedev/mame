@@ -978,6 +978,15 @@ INPUT_PORTS_START( j6cas5 )
 	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6cas5e )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_10 )
+	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+INPUT_PORTS_END
+
 INPUT_PORTS_START( j6cheque )
 	PORT_INCLUDE( jpmimpct_inputs )
 
@@ -10192,17 +10201,17 @@ GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state
 GAMEL( 199?, j6arcadec,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
 GAMEL( 199?, j6arcaded,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadee,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeg,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeh,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
-GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee ) 
-GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcadeg,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcadeh,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
+GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee ) 
+GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee )
 
 GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colcsha,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colcshb,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colcshc,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6colcsh )
-GAMEL( 199?, j6colcshd,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcshd,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6colcsh ) // gives error 71 00 even with datapak attached?
 GAMEL( 199?, j6colb,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colc,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6cold,       j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6colcsh )
@@ -10216,7 +10225,7 @@ GAME(  199?, j6scarlt,     0,          impact_nonvideo, j6scarlt, jpmimpct_state
 GAME(  199?, j6cshrd,      0,          impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6cshrda,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6cshrdb,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6cshrdc,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6cshrdc,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
 GAME(  199?, j6cshrdd,     j6cshrd,    impact_nonvideo, j6cshrd, jpmimpct_state, empty_init, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
 GAME(  199?, j6cshtwr,     0,          impact_nonvideo, j6cshtwr, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Towers (JPM) (IMPACT)", GAME_FLAGS )
@@ -10225,7 +10234,7 @@ GAME(  199?, j6cshvgs,     0,          impact_nonvideo, j6cshvgs, jpmimpct_state
 GAME(  199?, j6cshvgsa,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6cshvgsb,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6cshvgsc,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6cshvgsd,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6cshvgsd,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // gives error 71 00 even with datapak attached?
 GAME(  199?, j6cshvgse,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 GAME(  199?, j6cshvgsf,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 7)", GAME_FLAGS )
 GAME(  199?, j6cshvgsg,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 8)", GAME_FLAGS )
@@ -10233,7 +10242,7 @@ GAME(  199?, j6cshvgsh,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state
 GAME(  199?, j6cshvgsi,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 10)", GAME_FLAGS )
 GAME(  199?, j6cshvgsj,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME(  199?, j6cshvgsk,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 12)", GAME_FLAGS )
-GAME(  199?, j6cshvgsl,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 13)", GAME_FLAGS )
+GAME(  199?, j6cshvgsl,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 13)", GAME_FLAGS ) // gives error 71 00 even with datapak attached?
 GAME(  199?, j6cshvgsm,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 14)", GAME_FLAGS )
 GAME(  199?, j6cshvgsn,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 15)", GAME_FLAGS )
 GAME(  199?, j6cshvgso,    j6cshvgs,   impact_nonvideo, j6cshvgs, jpmimpct_state, empty_init, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 16)", GAME_FLAGS )
@@ -10246,13 +10255,13 @@ GAME(  199?, j6cas5a,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, 
 GAME(  199?, j6cas5b,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6cas5c,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 4)", GAME_FLAGS )
 GAME(  199?, j6cas5d,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6cas5e,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6cas5e,      j6cas5,     impact_nonvideo, j6cas5e,jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 GAME(  199?, j6cas5f,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME(  199?, j6cas5g,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME(  199?, j6cas5g,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 8, Whitbread)", GAME_FLAGS )
 GAME(  199?, j6cas5h,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 9)", GAME_FLAGS )
-GAME(  199?, j6cas5i,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 10)", GAME_FLAGS )
+GAME(  199?, j6cas5i,      j6cas5,     impact_nonvideo, j6cas5e,jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 10)", GAME_FLAGS )
 GAME(  199?, j6cas5j,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 11)", GAME_FLAGS )
-GAME(  199?, j6cas5k,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 12)", GAME_FLAGS )
+GAME(  199?, j6cas5k,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 12, Whitbread)", GAME_FLAGS )
 GAME(  199?, j6cas5l,      j6cas5,     impact_nonvideo, j6cas5, jpmimpct_state, empty_init, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 13)", GAME_FLAGS )
 
 GAME(  199?, j6cccla,      0,          impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 1)", GAME_FLAGS )
@@ -10262,31 +10271,32 @@ GAME(  199?, j6ccclac,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state,
 GAME(  199?, j6ccclad,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 5)", GAME_FLAGS )
 GAME(  199?, j6ccclae,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 GAME(  199?, j6ccclaf,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME(  199?, j6ccclag,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME(  199?, j6ccclag,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 8)", GAME_FLAGS ) // ERROR 91 01
 GAME(  199?, j6ccclah,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 9)", GAME_FLAGS )
 GAME(  199?, j6ccclai,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 10)", GAME_FLAGS )
 GAME(  199?, j6ccclaj,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME(  199?, j6ccclak,     j6cccla,    impact_nonvideo, j6cccla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic (JPM) (IMPACT) (set 12)", GAME_FLAGS )
 
+// is this the same as the above? both identify as 'Club'
 GAMEL( 199?, j6cascla,     0,          impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclaa,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclab,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclac,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclad,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6casclaf )
+GAMEL( 199?, j6casclad,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6casclaf ) // ERROR 91 01 Control Pointer Omitted
 GAMEL( 199?, j6casclae,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclaf,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclag,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclah,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6casclaf )
+GAMEL( 199?, j6casclag,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6casclaf ) // ERROR 91 01
+GAMEL( 199?, j6casclah,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6casclaf ) // ERROR 91 01
 GAMEL( 199?, j6casclai,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclaj,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclak,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclal,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclam,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6casclaf )
+GAMEL( 199?, j6casclam,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 14)", GAME_FLAGS, layout_j6casclaf ) // ERROR 91 01
 GAMEL( 199?, j6casclan,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 15)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclao,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 16)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclap,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 17)", GAME_FLAGS, layout_j6casclaf )
+GAMEL( 199?, j6casclao,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 16)", GAME_FLAGS, layout_j6casclaf ) // ERROR 16 00 Note Acceptor Fault
+GAMEL( 199?, j6casclap,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 17)", GAME_FLAGS, layout_j6casclaf ) // ERROR 16 00 
 GAMEL( 199?, j6casclaq,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 18)", GAME_FLAGS, layout_j6casclaf )
-GAMEL( 199?, j6casclar,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 19)", GAME_FLAGS, layout_j6casclaf )
+GAMEL( 199?, j6casclar,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 19)", GAME_FLAGS, layout_j6casclaf ) // ERROR 91 01
 GAMEL( 199?, j6casclas,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 20)", GAME_FLAGS, layout_j6casclaf )
 GAMEL( 199?, j6casclat,    j6cascla,   impact_nonvideo, j6cascla, jpmimpct_state, empty_init, ROT0, "JPM", "Casino Crazy Classic Club (JPM) (IMPACT) (set 21)", GAME_FLAGS, layout_j6casclaf )
 
@@ -10296,27 +10306,27 @@ GAME(  199?, j6cluclb,     0,          impact_nonvideo, j6cluclb, jpmimpct_state
 GAME(  199?, j6cluclba,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6cluclbb,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6cluclbc,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6cluclbd,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6cluclbd,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // ERROR 16 00
 GAME(  199?, j6cluclbe,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 6)", GAME_FLAGS )
-GAME(  199?, j6cluclbf,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME(  199?, j6cluclbf,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 7)", GAME_FLAGS ) // ERROR 16 00
 GAME(  199?, j6cluclbg,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 8)", GAME_FLAGS )
-GAME(  199?, j6cluclbh,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+GAME(  199?, j6cluclbh,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 9)", GAME_FLAGS ) // ERROR 16 00
 GAME(  199?, j6cluclbi,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 10)", GAME_FLAGS )
 GAME(  199?, j6cluclbj,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME(  199?, j6cluclbk,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 12)", GAME_FLAGS )
 GAME(  199?, j6cluclbl,    j6cluclb,   impact_nonvideo, j6cluclb, jpmimpct_state, empty_init, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 13)", GAME_FLAGS )
 
-GAME(  199?, j6colmon,     0,          impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6colmon,     0,          impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 1, Whitbread)", GAME_FLAGS )
 GAME(  199?, j6colmona,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6colmonb,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6colmonc,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 4)", GAME_FLAGS )
 GAME(  199?, j6colmond,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6colmone,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6colmone,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 6, Whitbread)", GAME_FLAGS )
 GAME(  199?, j6colmonf,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 7)", GAME_FLAGS )
 GAME(  199?, j6colmong,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 8)", GAME_FLAGS )
 GAME(  199?, j6colmonh,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 9)", GAME_FLAGS )
 GAME(  199?, j6colmoni,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 10)", GAME_FLAGS )
-GAME(  199?, j6colmonj,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME(  199?, j6colmonj,    j6colmon,   impact_nonvideo, j6colmon, jpmimpct_state, empty_init, ROT0, "JPM", "Colour Of Money (JPM) (IMPACT) (set 11)", GAME_FLAGS ) // ERROR 71 00 (dataport) first boot, ok after reset?
 
 
 GAMEL( 199?, j6crack,      0,          impact_nonvideo, j6crack, jpmimpct_state, empty_init, ROT0, "JPM", "Cracker (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6crack )
