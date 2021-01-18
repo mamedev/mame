@@ -9846,12 +9846,12 @@ GAMEL( 199?, j6indyk,      j6indy,     impact_nonvideo, j6indy, jpmimpct_state, 
 
 GAME(  199?, j6jungfv,     0,          impact_nonvideo, j6jungfv, jpmimpct_state, empty_init, ROT0, "Ace", "Jungle Fever (Ace) (IMPACT)", GAME_FLAGS )
 
-// Error 2.1
-GAMEL( 199?, j6kungfu,     0,          impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6kungfud )
+
+GAMEL( 199?, j6kungfu,     0,          impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6kungfud )
 
 GAME(  199?, j6luckla,     0,          impact_nonvideo, j6luckla, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6lucklaa,    j6luckla,   impact_nonvideo, j6luckla, jpmimpct_state, empty_init, ROT0, "Crystal / JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 2)", GAME_FLAGS )

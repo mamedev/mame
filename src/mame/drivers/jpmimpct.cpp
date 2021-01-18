@@ -1147,7 +1147,7 @@ void jpmimpct_state::base(machine_config &config)
 	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 
-void jpmimpct_state::impact_nonvideo(machine_config &config)
+void jpmimpct_state::impact_nonvideo_base(machine_config & config)
 {
 	base(config);
 
@@ -1157,6 +1157,11 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 	S16LF01(config, m_vfd);
 
 	config.set_default_layout(layout_jpmimpct);
+}
+
+void jpmimpct_state::impact_nonvideo(machine_config &config)
+{
+	impact_nonvideo_base(config);
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
@@ -1169,6 +1174,26 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
 	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
+}
+
+void jpmimpct_state::impact_nonvideo_altreels(machine_config &config)
+{
+	impact_nonvideo_base(config);
+
+	// TODO: This is probably incorrect, but j6kungfu startup checks are looking
+	// for different reel types than the other games
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[1]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[2]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[3]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
 	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 }
 

@@ -73,10 +73,13 @@ public:
 	{ }
 
 	void impact_nonvideo(machine_config &config);
+	void impact_nonvideo_altreels(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 
 protected:
+	void impact_nonvideo_base(machine_config &config);
+
 	void base(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
