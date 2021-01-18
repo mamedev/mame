@@ -485,6 +485,17 @@ INPUT_PORTS_START( j6_start_ex_co_3nud_cancel )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6_start_ex_co_4nud_cancel )
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 4/Lo")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Hi")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+INPUT_PORTS_END
+
 INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP Token or 10 GBP Cash
 	PORT_INCLUDE( jpmimpct_inputs )
 
@@ -1617,7 +1628,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( j6aceclb )
 	PORT_INCLUDE( j6nokey )
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_INCLUDE( j6_start_ex_co_4nud_cancel )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bnkrcl )
