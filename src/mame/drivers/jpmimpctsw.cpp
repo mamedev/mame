@@ -9357,7 +9357,7 @@ ROM_END
 
 ROM_START( j6potgb )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE(  "fxd_p.p1", 0x0001, 0x020000, CRC(faa38fda) SHA1(437c1a34a044d2d4e17d1e94e145f3733d15bcf0) )
+	ROM_LOAD16_BYTE(  "fxd_p.p1", 0x0000, 0x020000, CRC(faa38fda) SHA1(437c1a34a044d2d4e17d1e94e145f3733d15bcf0) )
 	ROM_LOAD16_BYTE(  "fxd.p2", 0x00001, 0x020000, CRC(c31eea57) SHA1(9b2a5cccbc7254c9a6b51f7ba5cc43c06578ed6e) )
 	j6potg_sound
 ROM_END
@@ -9846,7 +9846,6 @@ GAMEL( 199?, j6indyk,      j6indy,     impact_nonvideo, j6indy, jpmimpct_state, 
 
 GAME(  199?, j6jungfv,     0,          impact_nonvideo, j6jungfv, jpmimpct_state, empty_init, ROT0, "Ace", "Jungle Fever (Ace) (IMPACT)", GAME_FLAGS )
 
-
 GAMEL( 199?, j6kungfu,     0,          impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
 GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
 GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
@@ -9911,16 +9910,15 @@ GAMEL( 199?, j6oxobinf,    j6oxobin,   impact_nonvideo, j6oxobin, jpmimpct_state
 GAME(  199?, j6popoli,     0,          impact_nonvideo, j6popoli, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6popolia,    j6popoli,   impact_nonvideo, j6popoli, jpmimpct_state, empty_init, ROT0, "JPM", "Popeye & Olive (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
-// Error 2.1
-GAME(  199?, j6pog,        0,          impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 1)", GAME_FLAGS ) // has video roms, why? (misplaced? hybrid?)
-GAME(  199?, j6poga,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6pogb,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6pogc,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6pogd,       j6pog,      impact_nonvideo, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 5)", GAME_FLAGS )
-
-GAME(  199?, j6potg,       0,          impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6potga,      j6potg,     impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6potgb,      j6potg,     impact_nonvideo, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6pog,        0,          impact_nonvideo_altreels, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 1)", GAME_FLAGS ) // has video roms, why? (misplaced? hybrid?)
+GAME(  199?, j6poga,       j6pog,      impact_nonvideo_altreels, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6pogb,       j6pog,      impact_nonvideo_altreels, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6pogc,       j6pog,      impact_nonvideo_altreels, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6pogd,       j6pog,      impact_nonvideo_altreels, j6pog, jpmimpct_state, empty_init, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 5)", GAME_FLAGS )
+// same as above but with Crystal text
+GAME(  199?, j6potg,       j6pog,      impact_nonvideo_altreels, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6potga,      j6pog,      impact_nonvideo_altreels, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6potgb,      j6pog,      impact_nonvideo_altreels, j6potg, jpmimpct_state, empty_init, ROT0, "Crystal", "Pot Of Gold (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
 
 GAME(  199?, j6pwrspn,     0,          impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6pwrspna,    j6pwrspn,   impact_nonvideo, j6pwrspn, jpmimpct_state, empty_init, ROT0, "JPM", "Powerspin (JPM) (IMPACT) (set 2)", GAME_FLAGS )
