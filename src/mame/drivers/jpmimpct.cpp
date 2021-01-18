@@ -861,7 +861,7 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("unk30")
-	PORT_DIPNAME( 0x01, 0x01, "unk30: 0")
+	PORT_DIPNAME( 0x01, 0x00, "unk30: 0 (Payout related)")  // must be ON or you get an IOU message in j6roller instead of payout
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "unk30: 1")
