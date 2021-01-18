@@ -113,6 +113,9 @@ public:
 	void write_cb1(int state);
 	void write_cb2(int state);
 
+	uint8_t read_pa() const;
+	uint8_t read_pb() const;
+
 protected:
 	// construction/destruction
 	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

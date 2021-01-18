@@ -576,6 +576,11 @@ void via6522_device::output_pa()
 	m_out_a_handler(pa);
 }
 
+uint8_t via6522_device::read_pa() const
+{
+	return (m_out_a & m_ddr_a) | ~m_ddr_a;
+}
+
 uint8_t via6522_device::input_pb()
 {
 	uint8_t pb = m_in_b & ~m_ddr_b;
@@ -602,6 +607,16 @@ void via6522_device::output_pb()
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
 
 	m_out_b_handler(pb);
+}
+
+uint8_t via6522_device::read_pb() const
+{
+	uint8_t pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
+
+	if (T1_SET_PB7(m_acr))
+		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
+
+	return pb;
 }
 
 /*-------------------------------------------------
