@@ -260,11 +260,6 @@ void jpmimpct_state::machine_reset()
 		m_vfd->reset();
 }
 
-/*************************************
- *
- *  MC68681 DUART 1 simulation hack
- *
- *************************************/
 
 /*
  *  IP0: MC1489P U7 pin 8
@@ -288,14 +283,7 @@ void jpmimpct_state::machine_reset()
  *  TxDB/TxDB: Data retrieval unit
  */
 
-void jpmimpct_state::set_duart_1_hack_ip(bool state)
-{
-// TODO restore this with real duart
-//	if (state)
-//		m_duart_1.IP |= 0x10;
-//	else
-//		m_duart_1.IP &= ~0x10;
-}
+
 
 /*************************************
  *
@@ -468,11 +456,11 @@ void jpmimpct_state::slides_non_video_w(offs_t offset, uint16_t data, uint16_t m
 
 	if (combined_meter)
 	{
-		set_duart_1_hack_ip(false);
+		m_duart->ip4_w(1);
 	}
 	else
 	{
-		set_duart_1_hack_ip(true);
+		m_duart->ip4_w(0);
 	}
 }
 
@@ -999,7 +987,7 @@ WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
 uint8_t jpmimpct_state::hopper_b_r()
 {
 	int retval;
-	// B0 = 100p Hopper Out Verif
+	// B0 = 100p Hopper Opto
 	// B1 = Hopper High
 	// B2 = Hopper Low
 	// B3 = 20p Hopper Opto
@@ -1017,6 +1005,13 @@ uint8_t jpmimpct_state::hopper_b_r()
 		{
 			retval &= ~0x08;
 		}
+	}
+	else
+	{
+		// if payout is inhibited these must be 0, no coin detected? otherwise many sets will give 5.7 error
+		// when they test the hoppers
+		retval &= ~0x01;
+		retval &= ~0x08;
 	}
 
 	return retval;
@@ -1063,9 +1058,11 @@ void jpmimpct_state::payen_a_w(uint8_t data)
 {
 	m_motor[0] = (data & 0x01);
 	m_payen = (data & 0x10);
-	m_slidesout = (data & 0x10);
 	m_motor[1] = (data & 0x40);
-	m_hopinhibit = (data & 0x80);
+	m_hopinhibit = (data & 0x80); // prevents coin out
+
+	// same bit as m_payen?
+	m_slidesout = (data & 0x10);
 }
 
 void jpmimpct_state::display_c_w(uint8_t data)
