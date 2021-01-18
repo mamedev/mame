@@ -1887,6 +1887,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "aviion")
+files {
+	MAME_DIR .. "src/mame/drivers/aviion88k.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "bally")
 files {
 	MAME_DIR .. "src/mame/drivers/astrohome.cpp",

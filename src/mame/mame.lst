@@ -3117,6 +3117,9 @@ avigo_es                        // 1997 Avigo (Spanish)
 avigo_fr                        // 1997 Avigo (French)
 avigo_it                        // 1997 Avigo (Italian)
 
+@source:aviion88k.cpp
+aviion_4600                     // Data General AViiON 4600
+
 @source:avrmax.cpp
 avrmax
 avrmaxg
