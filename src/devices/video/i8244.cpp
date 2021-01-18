@@ -11,7 +11,7 @@ Features summary:
 - major system (predefined 8*7 objects, 12 single + 4 quads)
 - minor system (4 user-defined 8*8 sprites)
 - collision detection between all layers
-- 1-bit sound
+- 1-bit sound from rotating shift register
 
 See Odyssey 2 driver file for known problems.
 
