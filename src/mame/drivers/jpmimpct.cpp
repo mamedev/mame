@@ -524,6 +524,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x0048002a, 0x0048002b).portr("J9_0");
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
+	map(0x00480030, 0x00480031).portr("unk30");
 	map(0x00480032, 0x00480033).r(FUNC(jpmimpct_state::coins_r));
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
@@ -543,6 +544,11 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x004800a8, 0x004800a9).w(FUNC(jpmimpct_state::lamps_w));
 	map(0x004800aa, 0x004800ab).w(FUNC(jpmimpct_state::digits_w));
 	map(0x004800ae, 0x004800af).w(FUNC(jpmimpct_state::lampstrobe_w));
+
+	// many later sets, eg. Roller Coaster Classic will no accept coins, and run too fast depending
+	// on what gets read here, what is it?
+	map(0x004801d8, 0x004801d9).r(FUNC(jpmimpct_video_state::unk_r));
+	map(0x004801da, 0x004801db).r(FUNC(jpmimpct_video_state::unk_r));
 }
 
 void jpmimpct_video_state::impact_video_map(address_map &map)
@@ -842,6 +848,32 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "J9_2: 7")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("unk30")
+	PORT_DIPNAME( 0x01, 0x01, "unk30: 0")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "unk30: 1")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "unk30: 2")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "unk30: 3")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "unk30: 4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "unk30: 5")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "unk30: 6")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "unk30: 7")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
