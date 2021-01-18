@@ -1579,6 +1579,16 @@ INPUT_PORTS_START( j6r2rum )
 	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6r2rumc )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_25 )
+	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+INPUT_PORTS_END
+
+
 INPUT_PORTS_START( j6slagn )
 	PORT_INCLUDE( jpmimpct_inputs )
 
@@ -1831,6 +1841,24 @@ INPUT_PORTS_END
 INPUT_PORTS_START( j6tbrdcl )
 	PORT_INCLUDE( j6nokey )
 	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6tbrdclg )
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6vivrkc )
@@ -10358,6 +10386,10 @@ GAMEL( 199?, j6crackg,     j6crack,    impact_nonvideo, j6crack, jpmimpct_state,
 GAMEL( 199?, j6crackh,     j6crack,    impact_nonvideo, j6crack, jpmimpct_state, empty_init, ROT0, "JPM", "Cracker (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6crack )
 GAMEL( 199?, j6cracki,     j6crack,    impact_nonvideo, j6crack, jpmimpct_state, empty_init, ROT0, "JPM", "Cracker (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6crack )
 GAMEL( 199?, j6crackj,     j6crack,    impact_nonvideo, j6crack, jpmimpct_state, empty_init, ROT0, "JPM", "Cracker (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6crack )
+GAME(  199?, j6crakr,      j6crack,    impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6crakra,     j6crack,    impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6crakrb,     j6crack,    impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+
 
 
 GAME(  199?, j6crzclb,     0,          impact_nonvideo, j6crzclb, jpmimpct_state, empty_init, ROT0, "JPM", "Crazy Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
@@ -10636,13 +10668,13 @@ GAME(  199?, j6tbrdcl,     0,          impact_nonvideo, j6tbrdcl, jpmimpct_state
 GAME(  199?, j6tbrdcla,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6tbrdclb,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6tbrdclc,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6tbrdcld,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6tbrdcld,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 5)", GAME_FLAGS ) // ERROR 71 00
 GAME(  199?, j6tbrdcle,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 GAME(  199?, j6tbrdclf,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME(  199?, j6tbrdclg,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME(  199?, j6tbrdclg,    j6tbrdcl,   impact_nonvideo, j6tbrdclg,jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 8)", GAME_FLAGS )
 GAME(  199?, j6tbrdclh,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 9)", GAME_FLAGS )
 GAME(  199?, j6tbrdcli,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 10)", GAME_FLAGS )
-GAME(  199?, j6tbrdclj,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME(  199?, j6tbrdclj,    j6tbrdcl,   impact_nonvideo, j6tbrdclg,jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME(  199?, j6tbrdclk,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 12)", GAME_FLAGS )
 GAME(  199?, j6tbrdcll,    j6tbrdcl,   impact_nonvideo, j6tbrdcl, jpmimpct_state, empty_init, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 13)", GAME_FLAGS )
 
@@ -10652,7 +10684,7 @@ GAMEL( 199?, j6tombb,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, 
 GAMEL( 199?, j6tombc,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6tombc )
 GAMEL( 199?, j6tombd,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6tombc )
 GAMEL( 199?, j6tombe,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6tombc )
-GAMEL( 199?, j6tombf,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6tombc )
+GAMEL( 199?, j6tombf,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6tombc ) // ERROR 71 00
 GAMEL( 199?, j6tombg,      j6tomb,     impact_nonvideo, j6tomb, jpmimpct_state, empty_init, ROT0, "JPM", "Tomb Raider (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6tombc )
 
 GAMEL( 199?, j6topflg,     0,          impact_nonvideo, j6topflg, jpmimpct_state, empty_init, ROT0, "Ace", "Top Flight (Ace) (IMPACT)", GAME_FLAGS, layout_j6topflg )
@@ -10672,21 +10704,21 @@ GAMEL( 199?, j6twstj,      j6twst,     impact_nonvideo, j6twst, jpmimpct_state, 
 GAME(  199?, j6pompay,     0,          impact_nonvideo, j6pompay, jpmimpct_state, empty_init, ROT0, "Ace", "Up Pompay (Ace) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6pompaya,    j6pompay,   impact_nonvideo, j6pompay, jpmimpct_state, empty_init, ROT0, "Ace", "Up Pompay (Ace) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6pompayb,    j6pompay,   impact_nonvideo, j6pompay, jpmimpct_state, empty_init, ROT0, "Ace", "Up Pompay (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6pompayc,    j6pompay,   impact_nonvideo, j6pompay, jpmimpct_state, empty_init, ROT0, "Ace", "Up Pompay (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6pompayc,    j6pompay,   impact_nonvideo, j6pompay, jpmimpct_state, empty_init, ROT0, "Ace", "Up Pompay (Ace) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
 
 GAMEL( 199?, j6vindal,     0,          impact_nonvideo, j6vindal, jpmimpct_state, empty_init, ROT0, "JPM", "Vindaloot (JPM) (IMPACT)", GAME_FLAGS, layout_j6vindal )
 
 GAMEL( 199?, j6vivark,     0,          impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarka,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6vivark )
-GAMEL( 199?, j6vivarkb,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6vivark )
+GAMEL( 199?, j6vivarkb,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6vivark ) // ERROR 71 00
 GAMEL( 199?, j6vivarkc,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6vivark )
-GAMEL( 199?, j6vivarkd,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6vivark )
+GAMEL( 199?, j6vivarkd,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 5, Whitbread)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarke,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarkf,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarkg,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarkh,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6vivark )
 GAMEL( 199?, j6vivarki,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6vivark )
-GAMEL( 199?, j6vivarkj,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6vivark )
+GAMEL( 199?, j6vivarkj,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6vivark ) // ERROR 71 00
 GAMEL( 199?, j6vivarkk,    j6vivark,   impact_nonvideo, j6vivark, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6vivark )
 
 GAME(  199?, j6vivrkc,     0,          impact_nonvideo, j6vivrkc, jpmimpct_state, empty_init, ROT0, "JPM", "The Flintstones in Viva Rock Vegas (Club) (JPM) (IMPACT) (set 1)", GAME_FLAGS )
@@ -10708,27 +10740,23 @@ GAMEL( 199?, j6ewndgb,     j6ewn,      impact_nonvideo, j6ewn, jpmimpct_state, e
 GAMEL( 199?, j6btbw,       0,          impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6btbwd )
 GAMEL( 199?, j6btbwa,      j6btbw,     impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6btbwd )
 GAMEL( 199?, j6btbwb,      j6btbw,     impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6btbwd )
-GAMEL( 199?, j6btbwc,      j6btbw,     impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6btbwd )
+GAMEL( 199?, j6btbwc,      j6btbw,     impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6btbwd ) // ERROR 71 00
 GAMEL( 199?, j6btbwd,      j6btbw,     impact_nonvideo, j6btbw, jpmimpct_state, empty_init, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6btbwd )
 
-GAMEL( 199?, j6cpal,       0,          impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 199?, j6cpala,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6cpal ) // marked as ACE
-GAMEL( 1998, j6cpalb,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 1998, j6cpalc,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 1998, j6cpald,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 1998, j6cpale,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 6)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 1998, j6cpalf,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 7)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 1998, j6cpalg,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 8)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 199?, j6cpal,       0,          impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Ace", "Caesars Palace (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 199?, j6cpala,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Ace", "Caesars Palace (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpalb,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Ace", "Caesars Palace (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpalc,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Ace", "Caesars Palace (Ace) (IMPACT) (set 4, Whitbread)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpald,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Crystal", "Caesars Palace (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpale,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Crystal", "Caesars Palace (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpalf,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Crystal", "Caesars Palace (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1998, j6cpalg,      j6cpal,     impact_nonvideo, j6cpal, jpmimpct_state, empty_init, ROT0, "Ace", "Caesars Palace (Ace) (IMPACT) (set 5)", GAME_FLAGS, layout_j6cpal )
 
 GAME(  199?, j6colic,      0,          impact_nonvideo, j6colic, jpmimpct_state, empty_init, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6colica,     j6colic,    impact_nonvideo, j6colic, jpmimpct_state, empty_init, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6colicb,     j6colic,    impact_nonvideo, j6colic, jpmimpct_state, empty_init, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6colicc,     j6colic,    impact_nonvideo, j6colic, jpmimpct_state, empty_init, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
 GAME(  199?, j6colicd,     j6colic,    impact_nonvideo, j6colic, jpmimpct_state, empty_init, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
-
-GAME(  199?, j6crakr,      0,          impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6crakra,     j6crakr,    impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6crakrb,     j6crakr,    impact_nonvideo, j6crakr, jpmimpct_state, empty_init, ROT0, "Crystal", "Cracker (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
 
 GAME(  199?, j6easy,       0,          impact_nonvideo, j6easy, jpmimpct_state, empty_init, ROT0, "Crystal", "Easy Money (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6easya,      j6easy,     impact_nonvideo, j6easy, jpmimpct_state, empty_init, ROT0, "Crystal", "Easy Money (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
@@ -10740,9 +10768,9 @@ GAME(  199?, j6hdca,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpc
 GAME(  199?, j6hdcb,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
 GAME(  199?, j6hdcc,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
 GAME(  199?, j6hdcd,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6hdce,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
-GAME(  199?, j6hdcf,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 7)", GAME_FLAGS )
-GAME(  199?, j6hdcg,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 8)", GAME_FLAGS )
+GAME(  199?, j6hdce,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 6)", GAME_FLAGS ) // Shows nothing, but code is valid?
+GAME(  199?, j6hdcf,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 7)", GAME_FLAGS ) // Shows nothing, but code is valid?
+GAME(  199?, j6hdcg,       j6hdc,      impact_nonvideo, jpmimpct_inputs, jpmimpct_state, empty_init, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT) (set 8)", GAME_FLAGS ) // Shows nothing, but code is valid?
 
 GAME(  199?, j6kapang,     0,          impact_nonvideo, j6kapang, jpmimpct_state, empty_init, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6kapanga,    j6kapang,   impact_nonvideo, j6kapang, jpmimpct_state, empty_init, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
@@ -10773,9 +10801,9 @@ GAME(  199?, j6ramesef,    j6ramese,   impact_nonvideo, j6ramese, jpmimpct_state
 GAME(  199?, j6r2rum,      0,          impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6r2ruma,     j6r2rum,    impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6r2rumb,     j6r2rum,    impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6r2rumc,     j6r2rum,    impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
-GAME(  199?, j6r2rumd,     j6r2rum,    impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
-GAME(  199?, j6r2rume,     j6r2rum,    impact_nonvideo, j6r2rum, jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
+GAME(  199?, j6r2rumc,     j6r2rum,    impact_nonvideo, j6r2rumc,jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6r2rumd,     j6r2rum,    impact_nonvideo, j6r2rumc,jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6r2rume,     j6r2rum,    impact_nonvideo, j6r2rumc,jpmimpct_state, empty_init, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
 
 GAMEL( 199?, j6slagn,      0,          impact_nonvideo, j6slagn, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6slagng )
 GAMEL( 199?, j6slagna,     j6slagn,    impact_nonvideo, j6slagn, jpmimpct_state, empty_init, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6slagng )
