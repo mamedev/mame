@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett
+// copyright-holders:Philip Bennett, David Haywood
 // thanks-to:Tony Friery
 /***************************************************************************
 
@@ -20,8 +20,6 @@
         * Snakes and Ladders
 
     Known issues:
-        * I/O documentation for lamps, reels, meters etc is possibly incorrect.
-        * DUART emulation is very simplistic, in progress.
         * Digital volume control is not emulated.
 
     Mechanical games note:
@@ -258,6 +256,8 @@ void jpmimpct_state::machine_reset()
 	/* Reset states */
 	if (m_vfd)
 		m_vfd->reset();
+
+	m_coinstate = 0xffff;
 }
 
 
@@ -483,7 +483,7 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
 	}
 
 	m_meters->update(0, data >> 10);
-	set_duart_1_hack_ip(false);
+	//set_duart_1_hack_ip(false);
 }
 
 
@@ -524,7 +524,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x0048002a, 0x0048002b).portr("J9_0");
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
-	map(0x00480032, 0x00480033).portr("COINS");
+	map(0x00480032, 0x00480033).r(FUNC(jpmimpct_state::coins_r));
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
 	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -617,6 +617,28 @@ static INPUT_PORTS_START( touchscreen )
 	PORT_START("TOUCH_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
+
+INPUT_PORTS_START( jpmimpct_coins )
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME( "Coin: 1 pound" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME( "Coin: 50p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME( "Coin: 20p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME( "Coin: 10p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME( "Token: 20" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME( "Coin: 5p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 5)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(jpmimpct_state::coin_changed)
+{
+	if (newval)
+	{
+		logerror("coin inserted %d\n", param+1);
+		m_coinstate &= ~(1 << param);
+		m_cointimer[param]->adjust(attotime::from_msec(40));
+	}
+}
 
 INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_START("DSW")
@@ -826,30 +848,13 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( jpmimpct_coins )
+
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hngmnjpm )
 	PORT_INCLUDE( jpmimpct_inputs )
-
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
@@ -860,16 +865,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coronatn )
 	PORT_INCLUDE( jpmimpct_inputs )
-
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Ask Ken" )
@@ -886,10 +881,6 @@ static INPUT_PORTS_START( cluedo )
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -905,10 +896,6 @@ static INPUT_PORTS_START( trivialp )
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -923,10 +910,6 @@ static INPUT_PORTS_START( tqst )
 	PORT_INCLUDE( jpmimpct_inputs )
 
 	PORT_MODIFY("COINS") // TODO: check coinage
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -949,12 +932,7 @@ static INPUT_PORTS_START( scrabble )
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1103,6 +1081,11 @@ uint16_t jpmimpct_state::ump_r()
 	return 0xff;//0xffff;
 }
 
+uint16_t jpmimpct_state::coins_r()
+{
+	return m_coinstate;
+}
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_set_ip5)
 {
@@ -1123,6 +1106,7 @@ WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 	// triggers IRQ 5
 	m_maincpu->set_input_line(5, state);
 }
+
 
 // Note 68k is on a sub-card, as is the UPD, so these things can change
 // TODO: work out exactly which components are on each card and full list of motherboard components
@@ -1145,6 +1129,12 @@ void jpmimpct_state::base(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
 	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
+	TIMER(config, "cointimer0").configure_generic(FUNC(jpmimpct_state::coinoff<0>));
+	TIMER(config, "cointimer1").configure_generic(FUNC(jpmimpct_state::coinoff<1>));
+	TIMER(config, "cointimer2").configure_generic(FUNC(jpmimpct_state::coinoff<2>));
+	TIMER(config, "cointimer3").configure_generic(FUNC(jpmimpct_state::coinoff<3>));
+	TIMER(config, "cointimer4").configure_generic(FUNC(jpmimpct_state::coinoff<4>));
+	TIMER(config, "cointimer5").configure_generic(FUNC(jpmimpct_state::coinoff<5>));
 
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
