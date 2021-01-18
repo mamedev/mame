@@ -148,7 +148,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_16_31) {
-				// Viewport configurations discovered in game code: 640x480, 512x384, 800x600, 640x384, 640x480
+				// Viewport configurations discovered in game code: 640x480, 512x384, 800x600, 640x384
 				m_display_width = (data >> 16) & 0xffff;
 			}
 			break;
