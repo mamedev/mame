@@ -1448,8 +1448,20 @@ INPUT_PORTS_START( j6ewn )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+
+	PORT_MODIFY("J10_2")
+	// these 2 default to door keys otherwise
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Nudge Down")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge Up")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gamble")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
 INPUT_PORTS_END
+
 
 INPUT_PORTS_START( j6btbw )
 	PORT_INCLUDE( j6nokey )
