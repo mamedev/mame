@@ -2008,12 +2008,8 @@ ROM_START( j6arcadee )
 	j6arcade_sound
 ROM_END
 
-ROM_START( j6arcadef )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "arca10_1.bin", 0x000000, 0x020000, CRC(4c632e9e) SHA1(1e76e26941b164ba3a51c1c3caaa3b4d384a90d3) )
-	ROM_LOAD16_BYTE( "arcadia.p2",   0x000001, 0x020000, CRC(1533ea6f) SHA1(0dff53bcee961781312eb108cd705664f772ce1d) ) //differs by 2 bytes from arca10_2.bin, one is probably bad (or hacked)
-	j6arcade_sound
-ROM_END
+// this differs by 2 bytes from arca10_2.bin, and fails checksum test
+//ROM_LOAD16_BYTE( "arcadia.p2",   0x000001, 0x020000, CRC(1533ea6f) SHA1(0dff53bcee961781312eb108cd705664f772ce1d) )
 
 ROM_START( j6arcadeg )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -10193,14 +10189,13 @@ GAME(  199?, j6acehi,      0,          impact_nonvideo, j6acehi, jpmimpct_state,
 GAMEL( 199?, j6arcade,     0,          impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadea,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadec,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcadec,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
 GAMEL( 199?, j6arcaded,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadee,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadef,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadeg,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3, Protocol)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadeh,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
+GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee ) 
 GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7, Protocol)", GAME_FLAGS, layout_j6arcadee )
 
 GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh )
