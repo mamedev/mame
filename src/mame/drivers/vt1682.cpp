@@ -688,6 +688,7 @@ public:
 
 	void unk1682_init();
 	void njp60in1_init();
+	void pgs268_init();
 
 protected:
 	uint8_t uio_porta_r();
@@ -5689,14 +5690,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( njp60in1 )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exsprt48 )
@@ -5960,7 +5961,7 @@ void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 	vt_vt1682_ntscbase(config);
 	vt_vt1682_common(config);
 
-	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_PAL); // no opcode bitswap
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // no opcode bitswap
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_lxts3_state::vt_vt1682_map);
 
 	m_leftdac->reset_routes();
@@ -6051,7 +6052,17 @@ void vt1682_lxts3_state::njp60in1_init()
 	ROM[0x7ff46] = 0xea;
 }
 
-// the VT1682 can have 0x1000 bytes of internal ROM, but none of the software dumped makes use of it.
+void vt1682_lxts3_state::pgs268_init()
+{
+	regular_init();
+
+	uint8_t* ROM = memregion("mainrom")->base();
+	// patch out the first JSR again
+	ROM[0x7ff65] = 0xea;
+	ROM[0x7ff65] = 0xea;
+	ROM[0x7ff66] = 0xea;
+}
+
 
 ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
@@ -6130,22 +6141,29 @@ ROM_START( unk1682 )
 	ROM_LOAD( "101in1.internal.rom", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "vt1682_101in1.bin", 0x00000, 0x0800000, CRC(82879200) SHA1(c1977d1733f8849326286102c0755629d0406ec4) )
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_LOAD( "vt1682_101in1.bin", 0x00000, 0x2000000, CRC(82879200) SHA1(c1977d1733f8849326286102c0755629d0406ec4) )
 
-	// also has a 24c02N SEEPROM, no accesses noted (maybe accessed from 'internal ROM' code?)
+	// also has a 24c02n SEEPROM, no accesses noted (maybe accessed from 'internal ROM' code?)
+	// note, this could be mismatched, it came from a VT1682-896 20120410 PCB with ROM already removed
+	ROM_REGION( 0x100, "seeprom", 0 )
+	ROM_LOAD( "24c02.u2", 0x00000, 0x100, CRC(ee89332c) SHA1(aaa90b6bb47a60e44a98795c4e1ee0c64408ec92) )
 ROM_END
 
+
 ROM_START( njp60in1 )
-	ROM_REGION( 0x2000000, "mainrom", 0 ) // the 6Mbyte - 7Mbyte region of the ROM is missing, causing Extreme Power Soccer to fail
-	ROM_LOAD( "60-in-1.bin", 0x00000, 0x0800000, CRC(7b2ee951) SHA1(fc7c214704908b85676efc64a21930483d24a457) )
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "60-in-1.bin", 0x00000, 0x2000000, CRC(7b2ee951) SHA1(fc7c214704908b85676efc64a21930483d24a457) )
 
 	// also has a 24c02n SEEPROM, seems to access it on startup (security check?)
+ROM_END
+
+ROM_START( pgs268 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "4000-256a.u7", 0x00000, 0x2000000, CRC(4af648a8) SHA1(c60677ac0a31814bad4aeb80b2605dc7e767a3f6) )
+
+	// 24c02 SEEPROM, seems to access it on startup (security check?)
+	ROM_REGION( 0x100, "seeprom", 0 )
+	ROM_LOAD( "24c02.bin", 0x00000, 0x100, CRC(db0e3f75) SHA1(23328dcff6f46f1ec0297752a654d43e2650b2e4) )
 ROM_END
 
 
@@ -6242,6 +6260,9 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 // manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
 // has 21.477 Mhz XTAL
 CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+
+// fewer than 268 games, there are repeats
+CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
