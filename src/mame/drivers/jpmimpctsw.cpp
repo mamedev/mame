@@ -9689,7 +9689,6 @@ GAMEL( 199?, j6bigtopa,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state
 GAMEL( 199?, j6bigtopb,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3, Protocol)", GAME_FLAGS, layout_j6bigtopa )
 GAMEL( 199?, j6bigtopc,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6bigtopa )
 
-// some of these show nothing
 GAME(  199?, j6bigwhl,     0,          impact_nonvideo, j6bigwhl, jpmimpct_state, empty_init, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6bigwhla,    j6bigwhl,   impact_nonvideo, j6bigwhl, jpmimpct_state, empty_init, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 2, Protocol)", GAME_FLAGS )
 GAME(  199?, j6bigwhlb,    j6bigwhl,   impact_nonvideo, j6bigwhl, jpmimpct_state, empty_init, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 3)", GAME_FLAGS )
@@ -9938,10 +9937,10 @@ GAMEL( 199?, j6ricoc,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, 
 GAMEL( 199?, j6ricod,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6rico )
 GAMEL( 199?, j6ricoe,      j6rico,     impact_nonvideo, j6rico, jpmimpct_state, empty_init, ROT0, "JPM", "Ricochet (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6rico )
 
-GAME(  199?, j6robin,      0,          impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6robina,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6robinb,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6robinc,     j6robin,    impact_nonvideo, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME(  199?, j6robin,      0,          impact_nonvideo_altreels, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6robina,     j6robin,    impact_nonvideo_altreels, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6robinb,     j6robin,    impact_nonvideo_altreels, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6robinc,     j6robin,    impact_nonvideo_altreels, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
 
 
 GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
@@ -10127,10 +10126,8 @@ GAME(  199?, j6tutti,      0,          impact_nonvideo, jpmimpct_inputs, jpmimpc
 // these include some of the 'Classic' reissues 
 // *************************************************************************************************************
 
-// ERROR 01 44 Non Payout 100p Cash
 GAME(  199?, j6acehi,      0,          impact_nonvideo, j6acehi, jpmimpct_state, empty_init, ROT0, "Ace", "Aces High (Ace) (IMPACT)", GAME_FLAGS )
 
-// ERROR 01 44 
 GAMEL( 199?, j6arcade,     0,          impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadea,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
 GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
