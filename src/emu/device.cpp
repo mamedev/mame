@@ -437,7 +437,7 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 	else
 	{
 		u32 remainder;
-		u32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
+		u32 quotient = divu_64x32_rem(numclocks, m_clock, remainder);
 		return attotime(quotient, u64(remainder) * u64(m_attoseconds_per_clock));
 	}
 }

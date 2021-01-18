@@ -10069,24 +10069,30 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="xtermin" supported="no">
+	<software name="xtermin">
 		<description>X-Terminator v2.1 for Game Gear (USA, Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="xterminator" />
 			<dataarea name="rom" size="8192">
 				<rom name="x-terminator v2.1.bin" size="8192" crc="0f448220" sha1="b6664c21a99a96392fe79237d326e96ac0bdd52a"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="xterminj" cloneof="xtermin" supported="no">
+	<software name="xterminj" cloneof="xtermin">
 		<description>X-Terminator v2.1J for Game Gear (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="xterminator" />
 			<dataarea name="rom" size="8192">
 				<rom name="x-terminator v2.1j.bin" size="8192" crc="e498090d" sha1="ee2123cc2addd9e48d3f4dc909334504c5b330ab"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>

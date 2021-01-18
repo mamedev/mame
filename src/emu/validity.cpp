@@ -475,13 +475,13 @@ void validity_checker::validate_inlines()
 	if (resultu32 != expectedu32)
 		osd_printf_error("Error testing divu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
-	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
+	resulti32 = div_64x32_rem(testi64a, testi32a, remainder);
 	expectedi32 = testi64a / s64(testi32a);
 	expremainder = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32 || remainder != expremainder)
 		osd_printf_error("Error testing div_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", s64(testi64a), s32(testi32a), resulti32, remainder, expectedi32, expremainder);
 
-	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
+	resultu32 = divu_64x32_rem(testu64a, testu32a, uremainder);
 	expectedu32 = testu64a / u64(testu32a);
 	expuremainder = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32 || uremainder != expuremainder)

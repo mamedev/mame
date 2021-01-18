@@ -94,6 +94,7 @@ private:
 	drccodeptr          m_codegen;          // start of current generated code block
 	size_t const        m_size;             // size of the cache in bytes
 	bool                m_executable;       // whether cached code is currently executable
+	bool                m_rwx;              // whether pages can be simultaneously writable and executable
 
 	// oob management
 	struct oob_handler

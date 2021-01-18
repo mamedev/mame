@@ -2,15 +2,15 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    eigccppc.h
+    eigccarm.h
 
-    PowerPC (32 and 64-bit) inline implementations for GCC compilers. This
-    code is automatically included if appropriate by eminline.h.
+    ARM/AArch64 inline implementations for GCC compilers. This code is
+    automatically included if appropriate by eminline.h.
 
 ***************************************************************************/
 
-#ifndef MAME_OSD_EIGCCPPC_H
-#define MAME_OSD_EIGCCPPC_H
+#ifndef MAME_OSD_EIGCCARM_H
+#define MAME_OSD_EIGCCARM_H
 
 
 /***************************************************************************
@@ -59,7 +59,7 @@
     result to 32 bits
 -------------------------------------------------*/
 
-#if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
+#if !defined(__aarch64__)
 #define mul_32x32_shift _mul_32x32_shift
 inline int32_t ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
@@ -67,12 +67,11 @@ _mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
 	uint32_t l, h;
 
 	__asm__ (
-		" mullw   %[l], %[val1], %[val2] \n"
-		" mulhw   %[h], %[val1], %[val2] \n"
-		: [l]    "=&r" (l)
-		, [h]    "=r"  (h)
-		: [val1] "%r"  (val1)
-		, [val2] "r"   (val2)
+		" smull  %[l], %[h], %[val1], %[val2] \n"
+		: [l]      "=r" (l)
+		, [h]      "=r" (h)
+		: [val1]   "%r" (val1)
+		, [val2]   "r"  (val2)
 	);
 
 	// Valid for (0 <= shift <= 31)
@@ -88,7 +87,7 @@ _mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
     result to 32 bits
 -------------------------------------------------*/
 
-#if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
+#if !defined(__aarch64__)
 #define mulu_32x32_shift _mulu_32x32_shift
 inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
@@ -96,12 +95,11 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
 	uint32_t l, h;
 
 	__asm__ (
-		" mullw   %[l], %[val1], %[val2] \n"
-		" mulhwu  %[h], %[val1], %[val2] \n"
-		: [l]    "=&r" (l)
-		, [h]    "=r"  (h)
-		: [val1] "%r"  (val1)
-		, [val2] "r"   (val2)
+		" umull  %[l], %[h], %[val1], %[val2] \n"
+		: [l]      "=r" (l)
+		, [h]      "=r" (h)
+		: [val1]   "%r" (val1)
+		, [val2]   "r"  (val2)
 	);
 
 	// Valid for (0 <= shift <= 31)
@@ -183,6 +181,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     point reciprocal
 -------------------------------------------------*/
 
+#if defined(__aarch64__)
 #define recip_approx _recip_approx
 inline float ATTR_CONST ATTR_FORCE_INLINE
 _recip_approx(float value)
@@ -190,13 +189,14 @@ _recip_approx(float value)
 	float result;
 
 	__asm__ (
-		" fres  %[result], %[value] \n"
-		: [result] "=f" (result)
-		: [value]  "f"  (value)
+		" frecpe  %s[result], %s[value] \n"
+		: [result] "=w" (result)
+		: [value]  "w"  (value)
 	);
 
 	return result;
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -204,7 +204,7 @@ _recip_approx(float value)
     multiply and return the full 128 bit result
 -------------------------------------------------*/
 
-#if defined(__ppc64__)
+#if defined(__aarch64__)
 #define mul_64x64 _mul_64x64
 inline int64_t ATTR_FORCE_INLINE
 _mul_64x64(int64_t a, int64_t b, int64_t &hi)
@@ -221,7 +221,7 @@ _mul_64x64(int64_t a, int64_t b, int64_t &hi)
     bit multiply and return the full 128 bit result
 -------------------------------------------------*/
 
-#if defined(__ppc64__)
+#if defined(__aarch64__)
 #define mulu_64x64 _mulu_64x64
 inline uint64_t ATTR_FORCE_INLINE
 _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
@@ -243,6 +243,7 @@ _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
     leading zero bits in a 32-bit value
 -------------------------------------------------*/
 
+#if defined(__aarch64__)
 #define count_leading_zeros _count_leading_zeros
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_zeros(uint32_t value)
@@ -250,7 +251,7 @@ _count_leading_zeros(uint32_t value)
 	uint32_t result;
 
 	__asm__ (
-		" cntlzw  %[result], %[value] \n"
+		" clz  %w[result], %w[value] \n"
 		: [result] "=r" (result)
 		: [value]  "r"  (value)
 	);
@@ -264,6 +265,7 @@ _count_leading_zeros(uint32_t value)
     leading one bits in a 32-bit value
 -------------------------------------------------*/
 
+#if defined(__aarch64__)
 #define count_leading_ones _count_leading_ones
 inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_ones(uint32_t value)
@@ -271,12 +273,13 @@ _count_leading_ones(uint32_t value)
 	uint32_t result;
 
 	__asm__ (
-		" cntlzw  %[result], %[value] \n"
+		" clz  %w[result], %w[value] \n"
 		: [result] "=r" (result)
 		: [value]  "r"  (~value)
 	);
 
 	return result;
 }
+#endif
 
-#endif // MAME_OSD_EIGCCPPC_H
+#endif // MAME_OSD_EIGCCARM_H

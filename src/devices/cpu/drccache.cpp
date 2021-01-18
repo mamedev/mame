@@ -14,10 +14,6 @@
 #include <algorithm>
 
 
-// this improves performance of some emulated systems but doesn't work on W^X hosts
-//#define MAME_DRC_CACHE_RWX
-
-
 namespace {
 
 template <typename T, typename U> constexpr T *ALIGN_PTR_UP(T *p, U align)
@@ -52,7 +48,8 @@ drc_cache::drc_cache(size_t bytes) :
 	m_end(m_limit),
 	m_codegen(nullptr),
 	m_size(m_cache.size()),
-	m_executable(false)
+	m_executable(false),
+	m_rwx(false)
 {
 	// alignment and page size must be powers of two, cache must be page-aligned
 	assert(!(CACHE_ALIGNMENT & (CACHE_ALIGNMENT - 1)));
@@ -63,11 +60,24 @@ drc_cache::drc_cache(size_t bytes) :
 	std::fill(std::begin(m_free), std::end(m_free), nullptr);
 	std::fill(std::begin(m_nearfree), std::end(m_nearfree), nullptr);
 
-#if defined(MAME_DRC_CACHE_RWX)
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE | osd::virtual_memory_allocation::EXECUTE);
-#else // defined(MAME_DRC_CACHE_RWX)
-	m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-#endif // defined(MAME_DRC_CACHE_RWX)
+	if (!m_cache)
+	{
+		throw emu_fatalerror("drc_cache: Error allocating virtual memory");
+	}
+	else if (!m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE))
+	{
+		throw emu_fatalerror("drc_cache: Error marking cache read/write");
+	}
+	else if (m_cache.set_access(m_base - m_near, m_end - m_base, osd::virtual_memory_allocation::READ_WRITE | osd::virtual_memory_allocation::EXECUTE))
+	{
+		osd_printf_verbose("drc_cache: RWX pages supported\n");
+		m_rwx = true;
+	}
+	else
+	{
+		osd_printf_verbose("drc_cache: Using W^X mode\n");
+		m_rwx = false;
+	}
 }
 
 
@@ -209,9 +219,8 @@ void drc_cache::codegen_init()
 {
 	if (m_executable)
 	{
-#if !defined(MAME_DRC_CACHE_RWX)
-		m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-#endif // !defined(MAME_DRC_CACHE_RWX)
+		if (!m_rwx)
+			m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
 		m_executable = false;
 	}
 }
@@ -221,9 +230,8 @@ void drc_cache::codegen_complete()
 {
 	if (!m_executable)
 	{
-#if !defined(MAME_DRC_CACHE_RWX)
-		m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
-#endif // !defined(MAME_DRC_CACHE_RWX)
+		if (!m_rwx)
+			m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
 		m_executable = true;
 	}
 }
