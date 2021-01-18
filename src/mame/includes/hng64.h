@@ -62,8 +62,8 @@ struct polygon
 	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
-	int visible;                // Polygon visibility in scene
-	int flatShade;              // Flat shaded polygon, no texture, no lighting
+	bool visible;                // Polygon visibility in scene
+	bool flatShade;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex;             // Which texture to draw from (0x00-0x0f)
 	uint8_t texType;              // How to index into the texture

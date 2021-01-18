@@ -537,10 +537,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
 
 			// Flat shaded polygon, no texture, no lighting
-			if (!(chunkOffset[1] & 0x8000))
-				currentPoly.flatShade = 1;
+			if (chunkOffset[1] & 0x8000)
+				currentPoly.flatShade = false;
 			else
-				currentPoly.flatShade = 0;
+				currentPoly.flatShade = true;
 
 			// PALETTE
 			currentPoly.palOffset = 0;
@@ -619,7 +619,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
 					currentPoly.vert[m].normal[3] = 0.0f;
 
-					if ( currentPoly.flatShade )
+					if (currentPoly.flatShade)
 						currentPoly.vert[m].colorIndex = chunkOffset[7 + (9*m)] >> 5;
 				}
 
@@ -652,7 +652,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].texCoords[2] = 0.0f;
 					currentPoly.vert[m].texCoords[3] = 1.0f;
 
-					if ( currentPoly.flatShade )
+					if (currentPoly.flatShade)
 						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
@@ -769,7 +769,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				break;
 			}
 
-			currentPoly.visible = 1;
+			currentPoly.visible = true;
 
 			// Backup the last polygon (for triangle fans [strips?])
 			memcpy(&lastPoly, &currentPoly, sizeof(polygon));
@@ -839,15 +839,15 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
 			if (backfaceCullResult < 0.0f)
-				currentPoly.visible = 1;
+				currentPoly.visible = true;
 			else
-				currentPoly.visible = 0;
+				currentPoly.visible = false;
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
-				currentPoly.visible = 0;
+				currentPoly.visible = false;
 			}
 
 
