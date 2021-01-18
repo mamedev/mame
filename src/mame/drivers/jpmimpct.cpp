@@ -525,7 +525,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
 	map(0x00480030, 0x00480031).portr("unk30");
-	map(0x00480032, 0x00480033).r(FUNC(jpmimpct_state::coins_r));
+	map(0x00480032, 0x00480033).portr("COIN_SENSE");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
 	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -625,6 +625,17 @@ static INPUT_PORTS_START( touchscreen )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jpmimpct_coins )
+
+	PORT_START("COIN_SENSE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<2>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<3>)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<4>)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<5>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME( "Coin: 1 pound" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME( "Coin: 50p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 1)
@@ -632,8 +643,6 @@ INPUT_PORTS_START( jpmimpct_coins )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME( "Coin: 10p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME( "Token: 20" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 4)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME( "Coin: 5p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 5)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(jpmimpct_state::coin_changed)
@@ -1112,12 +1121,6 @@ uint16_t jpmimpct_state::ump_r()
 {
 	return 0xff;//0xffff;
 }
-
-uint16_t jpmimpct_state::coins_r()
-{
-	return m_coinstate;
-}
-
 
 TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_set_ip5)
 {
