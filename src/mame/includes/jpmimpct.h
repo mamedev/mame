@@ -63,6 +63,7 @@ public:
 		, m_datalogger(*this, "datalogger")
 		, m_testdemo(*this, "TEST_DEMO")
 		, m_digits(*this, "digit%u", 0U)
+		, m_cointimer(*this, "cointimer%u", 0U)
 		, m_ppi(*this, "ppi8255")
 		, m_duart(*this, "main_duart")
 		, m_vfd(*this, "vfd")
@@ -72,8 +73,14 @@ public:
 	{ }
 
 	void impact_nonvideo(machine_config &config);
+	void impact_nonvideo_altreels(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
+	template <unsigned N> DECLARE_READ_LINE_MEMBER( coinsense_r ) {	return (m_coinstate >> N) & 1; }
 
 protected:
+	void impact_nonvideo_base(machine_config &config);
+
 	void base(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
@@ -104,6 +111,9 @@ protected:
 
 private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> TIMER_DEVICE_CALLBACK_MEMBER(coinoff) { m_coinstate |= (1 << N); logerror("coin state lowered %d\n", N+1); }
+
+
 	uint16_t optos_r();
 	uint16_t prot_1_r();
 	uint16_t prot_0_r();
@@ -136,6 +146,8 @@ private:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
+	uint16_t m_coinstate;
+	required_device_array<timer_device, 6> m_cointimer;
 
 	required_device<i8255_device> m_ppi;
 	required_device<mc68681_device> m_duart;
