@@ -1788,7 +1788,7 @@ const astoneage_state::decryption_info astoneage_state::dinodino_table = {
 			}
 		},
 	},
-	{ 12, 9, 8, 10, 11, 7, 2, 6, 3, 5, 4 } // 3, 4, 5, 6 ok
+	{ 12, 9, 8, 10, 11, 7, 2, 6, 3, 5, 4 }
 };
 
 void astoneage_state::init_dinodino()
