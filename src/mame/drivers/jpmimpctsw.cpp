@@ -16,6 +16,7 @@
    Reel Money (built on top of Casino Crazy)
    Reel Bingo Classic Club (built on top of Give us a Break Club)
    Wild King Club (slightly corrupt VFD display, placeholder strings)
+
 */
 
 #include "emu.h"
@@ -517,16 +518,6 @@ INPUT_PORTS_START( j6_start_ex_co_3nud_cancel )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6_start_ex_co_4nud_cancel )
-	PORT_MODIFY("J9_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 4/Lo")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Hi")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
-INPUT_PORTS_END
 
 INPUT_PORTS_START( j6sonic ) // only runs with 5p or 10p stake and either 8 GBP Token or 10 GBP Cash
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -1785,12 +1776,48 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( j6aceclb )
 	PORT_INCLUDE( j6nokey )
-	PORT_INCLUDE( j6_start_ex_co_4nud_cancel )
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 4/Lo")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Hi")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	// 80 unused on this game?
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Knockouts")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Super Spins")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Features")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Nudges")
+
+	//PORT_MODIFY("J9_2")
+	// J9_2: 2 HOPPER DUMP SWITCH
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bnkrcl )
 	PORT_INCLUDE( j6nokey )
-	PORT_INCLUDE( j6_start_ex_co_4nud_cancel ) // not verified
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 4/Lo")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Hi")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) // lights up 2 lamps in service mode
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) // light up 1 lamp each, probably similar to j6aceclb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 )
+
+	//PORT_MODIFY("J9_2")
+	// J9_2: 2 HOPPER DUMP SWITCH
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bnza )
@@ -10212,10 +10239,6 @@ GAMEL( 199?, j6stardsa,    j6stards,   impact_nonvideo, j6stards, jpmimpct_state
 GAMEL( 199?, j6stardsb,    j6stards,   impact_nonvideo, j6stards, jpmimpct_state, empty_init, ROT0, "JPM", "Stardust (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6stards )
 GAMEL( 199?, j6stardsc,    j6stards,   impact_nonvideo, j6stards, jpmimpct_state, empty_init, ROT0, "JPM", "Stardust (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS, layout_j6stards )
 
-// resets repeatedly
-GAME(  199?, j6start,      0,          impact_nonvideo, j6start, jpmimpct_state, empty_init, ROT0, "JPM", "Starturn (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6starta,     j6start,    impact_nonvideo, j6start, jpmimpct_state, empty_init, ROT0, "JPM", "Starturn (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-
 GAME(  199?, j6strk10,     0,          impact_nonvideo, j6strk10, jpmimpct_state, empty_init, ROT0, "Ace", "Strike 10 (Ace) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6strk10a,    j6strk10,   impact_nonvideo, j6strk10, jpmimpct_state, empty_init, ROT0, "Ace", "Strike 10 (Ace) (IMPACT) (set 2)", GAME_FLAGS )
 GAME(  199?, j6strk10b,    j6strk10,   impact_nonvideo, j6strk10, jpmimpct_state, empty_init, ROT0, "Ace", "Strike 10 (Ace) (IMPACT) (set 3)", GAME_FLAGS )
@@ -11073,6 +11096,11 @@ GAME(  199?, j6pirgld,     0,          impact_nonvideo, jpmimpct_non_video_input
 GAME(  199?, j6pirglda,    j6pirgld,   impact_nonvideo, jpmimpct_non_video_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Pirates Gold (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
 GAME(  199?, j6rager,      0,          impact_nonvideo, jpmimpct_non_video_inputs, jpmimpct_state, empty_init, ROT0, "JPM", "Red Alert (JPM) [German] (IMPACT)", GAME_FLAGS )
+
+// resets repeatedly, appears to access a 2nd Duart, has a 'Crane' feature (so probably failing for that reason?)
+// demo sequence has 'Showcase Ltd' possibly Showcase Cinema related?
+GAME(  199?, j6start,      0,          impact_nonvideo, j6start, jpmimpct_state, empty_init, ROT0, "Showcase Ltd", "Starturn (JPM / Showcase) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6starta,     j6start,    impact_nonvideo, j6start, jpmimpct_state, empty_init, ROT0, "Showcase Ltd", "Starturn (JPM / Showcase) (IMPACT) (set 2)", GAME_FLAGS )
 
 // does have text strings so should display something?
 // sets stack to 40a000 which is outside normal memory range, is this in the incorrect driver?
