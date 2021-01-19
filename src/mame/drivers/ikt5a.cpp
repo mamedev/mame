@@ -12,6 +12,7 @@
 //#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ikt5a_state : public driver_device
@@ -117,6 +118,7 @@ u8 ikt5a_state::p1_r()
 
 void ikt5a_state::p1_w(u8 data)
 {
+	// TODO: P1.1 is keyboard-related
 }
 
 u8 ikt5a_state::p3_r()
@@ -137,6 +139,21 @@ void ikt5a_state::ext_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 }
 
+static const gfx_layout ikt5a_charlayout =
+{
+	8, 14,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 15*8, 4*8, 12*8, 2*8, 10*8, 6*8, 14*8, 1*8, 9*8, 5*8, 13*8, 3*8, 11*8, 7*8 },
+	16*8
+};
+
+static GFXDECODE_START(gfx_ikt5a)
+	GFXDECODE_ENTRY("chargen", 0x0000, ikt5a_charlayout, 0, 1)
+GFXDECODE_END
+
 void ikt5a_state::ikt5a(machine_config &config)
 {
 	I80C51(config, m_maincpu, 15_MHz_XTAL / 2); // PCB 80C51BH-2 (clock uncertain)
@@ -156,6 +173,9 @@ void ikt5a_state::ikt5a(machine_config &config)
 	screen.set_raw(15_MHz_XTAL, 800, 0, 640, 375, 0, 350); // timings guessed
 	screen.set_screen_update(FUNC(ikt5a_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, MCS51_INT0_LINE);
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ikt5a);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 }
 
 static INPUT_PORTS_START(ikt5a)
