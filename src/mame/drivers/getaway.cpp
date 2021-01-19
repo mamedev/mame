@@ -127,18 +127,20 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
 		// start gfx rom->vram transfer?
-		u16 src = (m_regs[6] << 8 | m_regs[5]) & 0x1fff;
-		u8 bytes = m_regs[8];
+		u16 src = m_regs[6] << 8 | m_regs[5];
+		//u8 smask = src >> 13;
+		src &= 0x1fff;
 
 		u16 dest = m_regs[4] << 8 | m_regs[3];
 		u8 dmask = dest >> 13;
 		dest &= 0x1fff;
 
+		u8 bytes = m_regs[8];
+
 		for (int count = 0; count < bytes; count++)
 		{
 			for (int i = 0; i < 3; i++)
-				if (BIT(dmask, i))
-					m_vram[i * 0x2000 + dest] = m_gfxrom[src];
+				m_vram[i * 0x2000 + dest] = BIT(dmask, i) ? m_gfxrom[src] : 0;
 
 			src = (src + 1) & 0x1fff;
 			dest = (dest + 1) & 0x1fff;
