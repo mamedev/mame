@@ -64,14 +64,14 @@ void diskiing_device::device_add_mconfig(machine_config &config)
 {
 	DISKII_FDC(config, m_wozfdc, 1021800*2);
 	for (auto &floppy : m_floppy)
-		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", diskiing_device::floppy_formats);
+		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", diskiing_device::floppy_formats).enable_sound(true);
 }
 
 void a2bus_diskiing13_device::device_add_mconfig(machine_config &config)
 {
 	DISKII_FDC(config, m_wozfdc, 1021800*2);
 	for (auto &floppy : m_floppy)
-		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", a2bus_diskiing13_device::floppy_formats);
+		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", a2bus_diskiing13_device::floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------
