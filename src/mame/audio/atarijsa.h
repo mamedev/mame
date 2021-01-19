@@ -169,6 +169,9 @@ public:
 	// construction/destruction
 	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration
+	void set_inverted_coins() { m_inverted_coins = true; } // for Xybots
+
 	// read/write handlers
 	uint8_t rdio_r();
 	void wrio_w(uint8_t data);
@@ -196,6 +199,9 @@ protected:
 	// internal state
 	double              m_pokey_volume;
 	double              m_tms5220_volume;
+
+private:
+	bool m_inverted_coins;
 };
 
 
