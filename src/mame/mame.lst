@@ -15008,6 +15008,9 @@ pcmda                           // 1987 PC with MDA
 pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
 pcv20                           // 198? PC-XT with V20 CPU
 
+@source:getaway.cpp
+getaway
+
 @source:ggconnie.cpp
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
