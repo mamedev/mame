@@ -162,15 +162,20 @@ uint8_t namco_06xx_device::data_r(offs_t offset)
 
 void namco_06xx_device::data_w(offs_t offset, uint8_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_06xx_device::write_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_06xx_device::write_sync )
+{
 	if (BIT(m_control, 4))
 	{
 		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
 		return;
 	}
-	if (BIT(m_control, 0)) m_write[0](0, data);
-	if (BIT(m_control, 1)) m_write[1](0, data);
-	if (BIT(m_control, 2)) m_write[2](0, data);
-	if (BIT(m_control, 3)) m_write[3](0, data);
+	if (BIT(m_control, 0)) m_write[0](0, param);
+	if (BIT(m_control, 1)) m_write[1](0, param);
+	if (BIT(m_control, 2)) m_write[2](0, param);
+	if (BIT(m_control, 3)) m_write[3](0, param);
 }
 
 
@@ -181,7 +186,12 @@ uint8_t namco_06xx_device::ctrl_r()
 
 void namco_06xx_device::ctrl_w(uint8_t data)
 {
-	m_control = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_06xx_device::ctrl_w_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
+{
+	m_control = param;
 
 	// The upper 3 control bits are the clock divider.
 	if ((m_control & 0xe0) == 0)
