@@ -89,6 +89,19 @@ void getaway_state::machine_start()
 
 uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = 0; x < 32; x++)
+		{
+			u8 r = m_vram[0x0000 | (x << 8 | y)];
+			u8 g = m_vram[0x2000 | (x << 8 | y)];
+			u8 b = m_vram[0x4000 | (x << 8 | y)];
+
+			for (int i = 0; i < 8; i++)
+				bitmap.pix(y, x << 3 | (i ^ 7)) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+		}
+	}
+
 	return 0;
 }
 
@@ -114,6 +127,22 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
 		// start gfx rom->vram transfer?
+		u16 src = (m_regs[6] << 8 | m_regs[5]) & 0x1fff;
+		u8 bytes = m_regs[8];
+
+		u16 dest = m_regs[4] << 8 | m_regs[3];
+		u8 dmask = dest >> 13;
+		dest &= 0x1fff;
+
+		for (int count = 0; count < bytes; count++)
+		{
+			for (int i = 0; i < 3; i++)
+				if (BIT(dmask, i))
+					m_vram[i * 0x2000 + dest] = m_gfxrom[src];
+
+			src = (src + 1) & 0x1fff;
+			dest = (dest + 1) & 0x1fff;
+		}
 	}
 
 	m_regs[n] = data;
