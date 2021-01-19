@@ -16,6 +16,8 @@
 #include "cpu/z80/z80.h"
 
 
+namespace {
+
 class extrema_state : public driver_device
 {
 public:
@@ -25,6 +27,8 @@ public:
 	{ }
 
 	void extrema(machine_config &config);
+
+	void init_bloto();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -37,7 +41,8 @@ private:
 
 void extrema_state::extrema_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xe000, 0xefff).ram();
 }
 
 
@@ -166,10 +171,31 @@ ROM_START( extrmti )
 ROM_END
 
 
+void extrema_state::init_bloto() // gives good strings for 0x00000-0x0ffff, needs to be checked for 0x10000-0x1ffff. Seem to be 4 0x8000 programs
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x20000; i++)
+	{
+		switch (i & 0x01)
+		{
+			case 0x00: rom[i] ^= 0x20; break;
+			case 0x01: rom[i] ^= 0xe3; break;
+		}
+
+		if (i & 0x02)  rom[i] ^= 0x20;
+		if (i & 0x04)  rom[i] ^= 0x10;
+		if (i & 0x10)  rom[i] ^= 0x08;
+		if (i & 0x100) rom[i] ^= 0x04;
+	}
+}
+
+} // Anonymous namespace
+
 
 GAME( 200?, maski,    0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Maski Show (Russia) (Extrema)",      MACHINE_IS_SKELETON )
 GAME( 200?, adults,   0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Adults Only (Russia) (Extrema)",     MACHINE_IS_SKELETON )
-GAME( 200?, bloto,    0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)",      MACHINE_IS_SKELETON )
+GAME( 200?, bloto,    0,          extrema, extrema, extrema_state, init_bloto, ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)",      MACHINE_IS_SKELETON )
 GAME( 200?, blpearl,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Black Pearl (Russia) (Extrema)",     MACHINE_IS_SKELETON )
 GAME( 200?, grancan,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Grand Canyon (Russia) (Extrema)",    MACHINE_IS_SKELETON )
 GAME( 200?, luckshel, 0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Lucky Shell (Russia) (Extrema)",     MACHINE_IS_SKELETON )
