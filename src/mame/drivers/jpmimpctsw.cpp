@@ -569,7 +569,18 @@ INPUT_PORTS_START( j6big50 )
 	PORT_INCLUDE( j6_stake_20_25_30 )
 	PORT_INCLUDE( j6_jackpot_8_8t_10_15 )
 
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Low")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("High")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Collect")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bigbuk )
@@ -578,13 +589,32 @@ INPUT_PORTS_START( j6bigbuk )
 	PORT_INCLUDE( j6_stake_5_10_20_25 )
 	PORT_INCLUDE( j6_jackpot_8_8t )
 
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Lo")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/Hi/Exchange Number") // flashes a different lamp for Exchange Number, but same button?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bigbnk )
 	PORT_INCLUDE( j6nokey_withperc )
 
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J9_0") // same inputs as j6big50?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Low")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("High")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Collect")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bigcsh )
@@ -1741,12 +1771,23 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bnkrcl )
 	PORT_INCLUDE( j6nokey )
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_INCLUDE( j6_start_ex_co_4nud_cancel ) // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bnza )
 	PORT_INCLUDE( j6nokey_withperc )
-	PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("TNT")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Bullet")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3/Low")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2/High")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel/Collect") // 2 buttons, one input?
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cpclb )
@@ -9836,6 +9877,7 @@ GAME(  199?, j6bigpct,     0,          impact_nonvideo, j6bigpct, jpmimpct_state
 GAME(  199?, j6bigpcta,    j6bigpct,   impact_nonvideo, j6bigpct, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 2, Protocol)", GAME_FLAGS )
 GAME(  199?, j6bigpctb,    j6bigpct,   impact_nonvideo, j6bigpct, jpmimpct_state, empty_init, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 
+// doesn't coin up (notes?) 4 reels
 GAMEL( 199?, j6bigtop,     0,          impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6bigtopa )
 GAMEL( 199?, j6bigtopa,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6bigtopa )
 GAMEL( 199?, j6bigtopb,    j6bigtop,   impact_nonvideo, j6bigtop, jpmimpct_state, empty_init, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3, Protocol)", GAME_FLAGS, layout_j6bigtopa )
