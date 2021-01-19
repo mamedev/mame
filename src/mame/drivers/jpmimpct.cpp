@@ -815,9 +815,13 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J10_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_W) PORT_TOGGLE // not always, probably shouldn't be defined here
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE // always?
+	PORT_DIPNAME( 0x02, 0x02, "J10_2: 1")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "J10_2: 2")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "J10_2: 3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -893,9 +897,16 @@ INPUT_PORTS_START( jpmimpct_inputs )
 
 INPUT_PORTS_END
 
+INPUT_PORTS_START( jpmimpct_video_inputs )
+	PORT_INCLUDE( jpmimpct_inputs )
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_W) PORT_TOGGLE // not always, probably shouldn't be defined here
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( hngmnjpm )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
@@ -905,7 +916,7 @@ static INPUT_PORTS_START( hngmnjpm )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coronatn )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Ask Ken" )
@@ -917,7 +928,7 @@ static INPUT_PORTS_START( coronatn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cluedo )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
@@ -932,7 +943,7 @@ static INPUT_PORTS_START( cluedo )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trivialp )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
@@ -948,7 +959,7 @@ static INPUT_PORTS_START( trivialp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tqst )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("COINS") // TODO: check coinage
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -968,7 +979,7 @@ static INPUT_PORTS_START( tqst )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scrabble )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
