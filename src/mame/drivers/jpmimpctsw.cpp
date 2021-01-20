@@ -1979,7 +1979,6 @@ INPUT_PORTS_START( j6pogcls )
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_25 )
 	// PORT_INCLUDE( TODO: )  // not verified
-	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6quantm )
