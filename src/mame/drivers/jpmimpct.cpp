@@ -524,7 +524,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x0048002a, 0x0048002b).portr("J9_0");
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
-	map(0x00480030, 0x00480031).portr("unk30");
+	map(0x00480030, 0x00480031).portr("PAYCOIN_LEVEL");
 	map(0x00480032, 0x00480033).portr("COIN_SENSE");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
@@ -864,37 +864,36 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("unk30")
-	PORT_DIPNAME( 0x01, 0x00, "unk30: 0x01 (Payout related)")  // must be ON or you get an IOU message in j6roller instead of payout
+	PORT_START("PAYCOIN_LEVEL") // maybe only for certain types of payout mechanism?
+	PORT_DIPNAME( 0x01, 0x00, "PAYCOIN_LEVEL: 0x01 (20p cash low)")  // this must be ON or you get an IOU message in j6roller instead of payout, just high being set isn't enough
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "unk30: 0x02")
+	PORT_DIPNAME( 0x02, 0x00, "PAYCOIN_LEVEL: 0x02 (token f low)")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "unk30: 0x04")
+	PORT_DIPNAME( 0x04, 0x00, "PAYCOIN_LEVEL: 0x04 (token b low)")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "unk30: 0x08")
+	PORT_DIPNAME( 0x08, 0x00, "PAYCOIN_LEVEL: 0x08 (100p cash low)")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "unk30: 0x10")
+	PORT_DIPNAME( 0x10, 0x00, "PAYCOIN_LEVEL: 0x10 (token b full)")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "unk30: 0x20")
+	PORT_DIPNAME( 0x20, 0x00, "PAYCOIN_LEVEL: 0x20") // nothing on j6roller
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "unk30: 0x40")
+	PORT_DIPNAME( 0x40, 0x00, "PAYCOIN_LEVEL: 0x40 (20p cash full)")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "unk30: 0x80")
+	PORT_DIPNAME( 0x80, 0x00, "PAYCOIN_LEVEL: 0x80 (100p cash full)")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+		
 	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 
 	PORT_INCLUDE( jpmimpct_coins )
-
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jpmimpct_video_inputs )
