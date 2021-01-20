@@ -993,8 +993,11 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx-x64" }
 		targetdir (path.join(_buildDir, "osx-x64/bin"))
 		objdir (path.join(_buildDir, "osx-x64/obj"))
+		linkoptions {
+			"-arch x86_64",
+		}
 		buildoptions {
-			"-m64",
+			"-arch x86_64",
 			"-msse2",
 			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
@@ -1002,6 +1005,9 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx-arm64" }
 		targetdir (path.join(_buildDir, "osx-arm64/bin"))
 		objdir (path.join(_buildDir, "osx-arm64/obj"))
+		linkoptions {
+			"-arch arm64",
+		}
 		buildoptions {
 			"-arch arm64",
 			"-Wno-error=unused-command-line-argument",
