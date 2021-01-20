@@ -705,7 +705,7 @@ INPUT_PORTS_START( j6bigcsh ) // Empire, non-standard?
 
 	PORT_INCLUDE( j6_stake_5_10_20_25_30 )
 	PORT_INCLUDE( j6_jackpot_8c_5_15 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bigpct )
@@ -957,7 +957,24 @@ INPUT_PORTS_START( j6frc10 )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J10_2") // 2 sets of higher / lower buttons for different parts of the machine
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Higher Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Higher Left")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Higher Right")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Lower Left")
+
+	PORT_MODIFY("J9_0") // exchange / cancel guessed
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON13 ) // unknown, responds in switch test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6fbcrz )
@@ -967,7 +984,21 @@ INPUT_PORTS_START( j6fbcrz )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Exchange Number")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Go For Goal")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) // unknown, responds in switch test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6guab )
@@ -977,7 +1008,26 @@ INPUT_PORTS_START( j6guab )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J10_2") // these might be incorrect, layout doesn't seem 100%
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Feature")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Cash")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Bonus")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Knock Out")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Strikes")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Nudges")
+		
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("unknown") // responds in test, but no obvious button? not really mapped?
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON15 ) // unknown, responds in switch test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gogold )
@@ -987,7 +1037,23 @@ INPUT_PORTS_START( j6gogold )
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Top Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Top Button 4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Top Button 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Top Button 3")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Cash / Token Sw") // this is named in service mode, is it the same for all games with an input here?
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hapyhr )
@@ -997,7 +1063,7 @@ INPUT_PORTS_START( j6hapyhr )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hilosv )
@@ -1007,7 +1073,7 @@ INPUT_PORTS_START( j6hilosv )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6impuls )
@@ -1017,7 +1083,7 @@ INPUT_PORTS_START( j6impuls )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6impulsa )
@@ -1027,7 +1093,7 @@ INPUT_PORTS_START( j6impulsa )
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6jungfv )
@@ -1037,7 +1103,7 @@ INPUT_PORTS_START( j6jungfv )
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6kungfu )
@@ -1046,7 +1112,7 @@ INPUT_PORTS_START( j6kungfu )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6mavrk )
@@ -1055,7 +1121,7 @@ INPUT_PORTS_START( j6mavrk )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6monmad )
@@ -1064,7 +1130,7 @@ INPUT_PORTS_START( j6monmad )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pog )
@@ -1073,7 +1139,7 @@ INPUT_PORTS_START( j6pog )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6potg )
@@ -1082,7 +1148,7 @@ INPUT_PORTS_START( j6potg )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pwrspn )
@@ -1091,7 +1157,7 @@ INPUT_PORTS_START( j6pwrspn )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6quick )
@@ -1100,7 +1166,7 @@ INPUT_PORTS_START( j6quick )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6reelmn )
@@ -1110,7 +1176,7 @@ INPUT_PORTS_START( j6reelmn )
 	// this one doesn't alarm with bad settings, but instead shows nothing
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6richpk )
@@ -1119,7 +1185,7 @@ INPUT_PORTS_START( j6richpk )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rico )
@@ -1128,7 +1194,7 @@ INPUT_PORTS_START( j6rico )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6robin )
@@ -1137,7 +1203,7 @@ INPUT_PORTS_START( j6robin )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6sidewd )
@@ -1146,7 +1212,7 @@ INPUT_PORTS_START( j6sidewd )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6snakes )
@@ -1155,7 +1221,7 @@ INPUT_PORTS_START( j6snakes )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6stards )
@@ -1164,7 +1230,7 @@ INPUT_PORTS_START( j6stards )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6strk10 )
@@ -1173,7 +1239,7 @@ INPUT_PORTS_START( j6strk10 )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6roof )
@@ -1182,7 +1248,7 @@ INPUT_PORTS_START( j6roof )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6wildw )
@@ -1191,7 +1257,7 @@ INPUT_PORTS_START( j6wildw )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6wizard )
@@ -1200,7 +1266,7 @@ INPUT_PORTS_START( j6wizard )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hikar )
@@ -1209,7 +1275,7 @@ INPUT_PORTS_START( j6hikar )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6slvgst )
@@ -1218,7 +1284,7 @@ INPUT_PORTS_START( j6slvgst )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6impls )
@@ -1227,7 +1293,7 @@ INPUT_PORTS_START( j6impls )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6thril )
@@ -1236,7 +1302,7 @@ INPUT_PORTS_START( j6thril )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cshtwr )
@@ -1245,7 +1311,7 @@ INPUT_PORTS_START( j6cshtwr )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cshvgs )
@@ -1254,7 +1320,7 @@ INPUT_PORTS_START( j6cshvgs )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cas5 )
@@ -1263,7 +1329,7 @@ INPUT_PORTS_START( j6cas5 )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cas5e )
@@ -1272,7 +1338,7 @@ INPUT_PORTS_START( j6cas5e )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cheque )
@@ -1281,7 +1347,7 @@ INPUT_PORTS_START( j6cheque )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6colmon )
@@ -1290,7 +1356,7 @@ INPUT_PORTS_START( j6colmon )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6crack )
@@ -1299,7 +1365,7 @@ INPUT_PORTS_START( j6crack )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6dmngz )
@@ -1308,7 +1374,7 @@ INPUT_PORTS_START( j6dmngz )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6dyfl )
@@ -1317,7 +1383,7 @@ INPUT_PORTS_START( j6dyfl )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6euphor )
@@ -1326,7 +1392,7 @@ INPUT_PORTS_START( j6euphor )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6euphorf )
@@ -1335,7 +1401,7 @@ INPUT_PORTS_START( j6euphorf )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6fireck )
@@ -1344,7 +1410,7 @@ INPUT_PORTS_START( j6fireck )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6firbl )
@@ -1353,7 +1419,7 @@ INPUT_PORTS_START( j6firbl )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6firblb )
@@ -1362,7 +1428,7 @@ INPUT_PORTS_START( j6firblb )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6fiveln )
@@ -1371,7 +1437,7 @@ INPUT_PORTS_START( j6fiveln )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hifly )
@@ -1380,7 +1446,7 @@ INPUT_PORTS_START( j6hifly )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6impact )
@@ -1389,7 +1455,7 @@ INPUT_PORTS_START( j6impact )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hirol )
@@ -1398,7 +1464,7 @@ INPUT_PORTS_START( j6hirol )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6redarw )
@@ -1407,7 +1473,7 @@ INPUT_PORTS_START( j6redarw )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 ) // doesn't care?
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rccls )
@@ -1416,7 +1482,7 @@ INPUT_PORTS_START( j6rccls )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6firclb )
@@ -1430,7 +1496,7 @@ INPUT_PORTS_START( j6firclb )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6crzclb )
@@ -1444,7 +1510,7 @@ INPUT_PORTS_START( j6crzclb )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cluclb )
@@ -1461,7 +1527,7 @@ INPUT_PORTS_START( j6cluclb )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6framft )
@@ -1475,7 +1541,7 @@ INPUT_PORTS_START( j6framft )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6frtmch )
@@ -1484,7 +1550,7 @@ INPUT_PORTS_START( j6frtmch )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gforce )
@@ -1493,7 +1559,7 @@ INPUT_PORTS_START( j6gforce )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gforcea )
@@ -1502,7 +1568,7 @@ INPUT_PORTS_START( j6gforcea )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gidogh )
@@ -1511,7 +1577,7 @@ INPUT_PORTS_START( j6gidogh )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6goldgl )
@@ -1520,7 +1586,7 @@ INPUT_PORTS_START( j6goldgl )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hiphop )
@@ -1529,7 +1595,7 @@ INPUT_PORTS_START( j6hiphop )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hotsht )
@@ -1538,7 +1604,7 @@ INPUT_PORTS_START( j6hotsht )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6showtm )
@@ -1547,7 +1613,7 @@ INPUT_PORTS_START( j6showtm )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6showtmb )
@@ -1556,7 +1622,7 @@ INPUT_PORTS_START( j6showtmb )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6maxod )
@@ -1565,7 +1631,7 @@ INPUT_PORTS_START( j6maxod )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6megbck )
@@ -1574,7 +1640,7 @@ INPUT_PORTS_START( j6megbck )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pinwzd )
@@ -1583,7 +1649,7 @@ INPUT_PORTS_START( j6pinwzd )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pogcls )
@@ -1592,8 +1658,8 @@ INPUT_PORTS_START( j6pogcls )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6quantm )
@@ -1602,7 +1668,7 @@ INPUT_PORTS_START( j6quantm )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6ra )
@@ -1611,7 +1677,7 @@ INPUT_PORTS_START( j6ra )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rh6 )
@@ -1628,7 +1694,7 @@ INPUT_PORTS_START( j6rh6 )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rhchil )
@@ -1637,7 +1703,7 @@ INPUT_PORTS_START( j6rhchil )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6reelth )
@@ -1646,7 +1712,7 @@ INPUT_PORTS_START( j6reelth )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6spcinv )
@@ -1655,7 +1721,7 @@ INPUT_PORTS_START( j6spcinv )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6supbrk )
@@ -1664,7 +1730,7 @@ INPUT_PORTS_START( j6supbrk )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6swpdrp )
@@ -1673,7 +1739,7 @@ INPUT_PORTS_START( j6swpdrp )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bags )
@@ -1682,7 +1748,7 @@ INPUT_PORTS_START( j6bags )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tbirds )
@@ -1691,7 +1757,7 @@ INPUT_PORTS_START( j6tbirds )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tbirdsk )
@@ -1700,7 +1766,7 @@ INPUT_PORTS_START( j6tbirdsk )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tomb )
@@ -1709,7 +1775,7 @@ INPUT_PORTS_START( j6tomb )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6topflg )
@@ -1718,7 +1784,7 @@ INPUT_PORTS_START( j6topflg )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6twst )
@@ -1727,7 +1793,7 @@ INPUT_PORTS_START( j6twst )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pompay )
@@ -1736,7 +1802,7 @@ INPUT_PORTS_START( j6pompay )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6vindal )
@@ -1745,7 +1811,7 @@ INPUT_PORTS_START( j6vindal )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6vivark )
@@ -1754,7 +1820,7 @@ INPUT_PORTS_START( j6vivark )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6knight )
@@ -1763,7 +1829,7 @@ INPUT_PORTS_START( j6knight )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6ewn )
@@ -1800,7 +1866,7 @@ INPUT_PORTS_START( j6btbw )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cpal )
@@ -1809,7 +1875,7 @@ INPUT_PORTS_START( j6cpal )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6colic )
@@ -1818,7 +1884,7 @@ INPUT_PORTS_START( j6colic )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6crakr )
@@ -1827,7 +1893,7 @@ INPUT_PORTS_START( j6crakr )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6easy )
@@ -1836,7 +1902,7 @@ INPUT_PORTS_START( j6easy )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6kapang )
@@ -1845,7 +1911,7 @@ INPUT_PORTS_START( j6kapang )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pinfvr )
@@ -1854,7 +1920,7 @@ INPUT_PORTS_START( j6pinfvr )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6r2rum )
@@ -1863,7 +1929,7 @@ INPUT_PORTS_START( j6r2rum )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6r2rumc )
@@ -1872,7 +1938,7 @@ INPUT_PORTS_START( j6r2rumc )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 
@@ -1882,7 +1948,7 @@ INPUT_PORTS_START( j6slagn )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tqust )
@@ -1891,7 +1957,7 @@ INPUT_PORTS_START( j6tqust )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6shoot )
@@ -1900,7 +1966,7 @@ INPUT_PORTS_START( j6shoot )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6bucks )
@@ -1909,7 +1975,7 @@ INPUT_PORTS_START( j6bucks )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6scarlt )
@@ -1918,7 +1984,7 @@ INPUT_PORTS_START( j6scarlt )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cshrd )
@@ -1927,7 +1993,7 @@ INPUT_PORTS_START( j6cshrd )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rh6cl )
@@ -1944,15 +2010,11 @@ INPUT_PORTS_START( j6rh6cl )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6roller )
-	PORT_INCLUDE( j6nokey_withperc )
-
-	PORT_INCLUDE( j6_jackpot_8t_10 )
-
-	PORT_INCLUDE( j6_stake_5_10 )
+	PORT_INCLUDE( j6nokey_withperc ) // stake is always set by dipswitches instead, jackpot hardcoded
 
 	PORT_MODIFY("J9_0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
@@ -1963,18 +2025,47 @@ INPUT_PORTS_START( j6roller )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6roller15 )
+	PORT_INCLUDE( j6roller )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Stake")
+	PORT_DIPSETTING(    0x00, "25p" )
+	PORT_DIPSETTING(    0x01, "20p" )
+	PORT_DIPSETTING(    0x02, "25p (duplicate)" )
+	PORT_DIPSETTING(    0x03, "30p" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6roller10 )
+	PORT_INCLUDE( j6roller )
+
+	// stake is always 20p?
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6roller8 )
+	PORT_INCLUDE( j6roller )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Stake")
+	PORT_DIPSETTING(    0x00, "25p" )
+	PORT_DIPSETTING(    0x01, "5p" )
+	PORT_DIPSETTING(    0x02, "10p" )
+	PORT_DIPSETTING(    0x03, "20p" )
+INPUT_PORTS_END
+
+
 INPUT_PORTS_START( j6cdivr )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6grc )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6aceclb )
@@ -2038,137 +2129,137 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cpclb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6casclb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6filth )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6fivalv )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6guabcl )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6reelb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6indy )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6luckla )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6montlk )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6mono60 )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6outlaw )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6oxo )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6oxobin )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6popoli )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6rcclub )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6royfls )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6start )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6untch )
 	PORT_INCLUDE( j6nokey_withperc )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6wldkng )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cccla )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6h5clb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cascla )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gldclb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hirlcl )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6magcir )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6raclb )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tbrdcl )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6tbrdclg )
@@ -2185,13 +2276,13 @@ INPUT_PORTS_START( j6tbrdclg )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6vivrkc )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6lucklo )
@@ -2200,7 +2291,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( j6ramese )
 	PORT_INCLUDE( j6nokey )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 
@@ -2280,7 +2371,7 @@ INPUT_PORTS_START( j6papa )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6wthing )
@@ -2289,7 +2380,7 @@ INPUT_PORTS_START( j6wthing )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_10 )
-	// PORT_INCLUDE( j6_start_ex_co_3nud_cancel ) // not verified
+	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
 
@@ -10383,23 +10474,23 @@ GAME(  199?, j6robinb,     j6robin,    impact_nonvideo_altreels, j6robin, jpmimp
 GAME(  199?, j6robinc,     j6robin,    impact_nonvideo_altreels, j6robin, jpmimpct_state, empty_init, ROT0, "Ace", "Robin Hood (Ace) (IMPACT) (set 4)", GAME_FLAGS )
 
 
-GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
-GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11P C30, 30p Stake, £15 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller15 )
-GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 AC30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
-GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller15 )
-GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C29, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
-GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC10 C20, 20p Stake, £10 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller10 )
-GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9P L26, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 AL26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £10 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller10 )
-GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC5 L14, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4P L15, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 AL15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 I L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
-GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6roller, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 I L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6roller,     0,          impact_nonvideo, j6roller15, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollera,    j6roller,   impact_nonvideo, j6roller15, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11P C30, 30p Stake, £15 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerb,    j6roller,   impact_nonvideo, j6roller15, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 AC30, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerc,    j6roller,   impact_nonvideo, j6roller15, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC11 C30, 30p Stake, £15 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollerd,    j6roller,   impact_nonvideo, j6roller15, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC11 C29, 30p Stake, £15 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller15 )
+GAMEL( 199?, j6rollere,    j6roller,   impact_nonvideo, j6roller10, jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC10 C20, 20p Stake, £10 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller10 )
+GAMEL( 199?, j6rollerf,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerg,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9P L26, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerh,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC9 AL26, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rolleri,    j6roller,   impact_nonvideo, j6roller10, jpmimpct_state, empty_init, ROT0, "JPM / Whitbread", u8"Roller Coaster (JPM) (IMPACT) (RC9 L26, 20p Stake, £10 Jackpot, Whitbread)", GAME_FLAGS_WORKING, layout_j6roller10 )
+GAMEL( 199?, j6rollerj,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC5 L14, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerk,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerl,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4P L15, 20p Stake, £8 Jackpot, Protocol)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerm,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 AL15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollern,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC4 I L15, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollero,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
+GAMEL( 199?, j6rollerp,    j6roller,   impact_nonvideo, j6roller8,  jpmimpct_state, empty_init, ROT0, "JPM", u8"Roller Coaster (JPM) (IMPACT) (RC2 I L07, 20p Stake, £8 Jackpot)", GAME_FLAGS_WORKING, layout_j6roller8 )
 
 GAME(  199?, j6rcclub,     0,          impact_nonvideo, j6rcclub, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6rccluba,    j6rcclub,   impact_nonvideo, j6rcclub, jpmimpct_state, empty_init, ROT0, "JPM", "Roller Coaster Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
