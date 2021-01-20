@@ -32,7 +32,6 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 #include "emu.h"
 #include "includes/cosmic.h"
 
-#include "cpu/tms9900/tms9980a.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -812,9 +811,7 @@ void cosmic_state::cosmic(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_raw(Z80_MASTER_CLOCK/2, 44*8, 0*8, 32*8, 32*8+6, 4*8, 28*8);
 	m_screen->set_palette(m_palette);
 }
 
