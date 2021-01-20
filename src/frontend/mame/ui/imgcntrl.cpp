@@ -20,6 +20,7 @@
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "image.h"
 #include "softlist_dev.h"
 #include "zippath.h"
 
@@ -61,11 +62,18 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		if (m_image.exists())
 		{
 			m_current_file.assign(m_image.filename());
-			util::zippath_parent(m_current_directory, m_current_file);
+			m_current_directory = util::zippath_parent(m_current_file);
 		}
 		else
 		{
 			m_current_directory = m_image.working_directory();
+
+			// check to see if we've never initialized the working directory
+			if (m_current_directory.empty())
+			{
+				m_current_directory = machine().image().setup_working_directory();
+				m_image.set_working_directory(m_current_directory);
+			}
 		}
 
 		// check to see if the path exists; if not then set to current directory

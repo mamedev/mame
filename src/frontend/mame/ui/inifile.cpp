@@ -13,6 +13,7 @@
 
 #include "ui/moptions.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
 

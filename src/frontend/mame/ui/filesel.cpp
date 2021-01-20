@@ -19,6 +19,7 @@
 
 #include "imagedev/floppy.h"
 
+#include "corestr.h"
 #include "zippath.h"
 
 #include <cstring>

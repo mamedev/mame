@@ -18,6 +18,8 @@
 #include "cpu/m68000/m68000.h"
 #include "debugger.h"
 
+#include "corestr.h"
+
 #include <cstdio>
 #include <algorithm>
 

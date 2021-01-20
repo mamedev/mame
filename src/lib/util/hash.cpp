@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "hash.h"
-#include "corestr.h"
 
 #include <cassert>
 #include <cctype>
@@ -45,7 +44,7 @@ hash_collection::hash_collection()
 }
 
 
-hash_collection::hash_collection(const char *string)
+hash_collection::hash_collection(std::string_view string)
 	: m_has_crc32(false),
 		m_has_sha1(false),
 		m_creator(nullptr)
@@ -237,7 +236,13 @@ std::string hash_collection::macro_string() const
 		buffer.append("NO_DUMP ");
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("BAD_DUMP ");
-	strtrimspace(buffer);
+
+	// remove trailing space
+	if (!buffer.empty())
+	{
+		assert(buffer.back() == ' ');
+		buffer = buffer.substr(0, buffer.length() - 1);
+	}
 	return buffer;
 }
 
@@ -264,7 +269,10 @@ std::string hash_collection::attribute_string() const
 		buffer.append("status=\"nodump\"");
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("status=\"baddump\"");
-	strtrimspace(buffer);
+
+	// remove trailing space
+	if (!buffer.empty() && buffer.back() == ' ')
+		buffer = buffer.substr(0, buffer.length() - 1);
 	return buffer;
 }
 

@@ -719,7 +719,11 @@ static inline std::string gba_chip_string( uint32_t chip )
 	if (chip & GBA_CHIP_FLASH_512) str += "FLASH_512 ";
 	if (chip & GBA_CHIP_SRAM) str += "SRAM ";
 	if (chip & GBA_CHIP_RTC) str += "RTC ";
-	strtrimspace(str);
+	if (!str.empty())
+	{
+		assert(str.back() == ' ');
+		str = str.substr(0, str.length() - 1);
+	}
 	return str;
 }
 

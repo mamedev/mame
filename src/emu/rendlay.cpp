@@ -149,6 +149,16 @@ private:
 			, m_text(std::move(t))
 			, m_text_valid(true)
 		{ }
+		entry(std::string &&name, std::string_view t)
+			: m_name(std::move(name))
+			, m_text(t)
+			, m_text_valid(true)
+		{ }
+		entry(std::string &&name, const char *t)
+			: m_name(std::move(name))
+			, m_text(t)
+			, m_text_valid(true)
+		{ }
 		entry(std::string &&name, s64 i)
 			: m_name(std::move(name))
 			, m_int(i)
@@ -766,7 +776,7 @@ public:
 	std::string get_attribute_subtag(util::xml::data_node const &node, char const *name)
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
-		return attrib ? device().subtag(std::string(expand(*attrib)).c_str()) : std::string();
+		return attrib ? device().subtag(expand(*attrib)) : std::string();
 	}
 
 	int get_attribute_int(util::xml::data_node const &node, const char *name, int defvalue)
@@ -4499,7 +4509,7 @@ layout_view::item::item(
 		if (itemnode.has_attribute("tag"))
 		{
 			std::string_view const tag(env.get_attribute_string(itemnode, "tag"));
-			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(std::string(tag).c_str()));
+			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(tag));
 			if (!m_screen)
 				throw layout_reference_error(util::string_format("invalid screen tag '%d'", tag));
 		}
