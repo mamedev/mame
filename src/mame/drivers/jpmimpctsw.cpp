@@ -1118,9 +1118,34 @@ INPUT_PORTS_START( j6impuls )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Step")
 
 	PORT_MODIFY("J9_2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8 ) // PORT_NAME("Hopper Dump SW")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) // PORT_NAME("Cash / Token Sw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) // PORT_NAME("Cash / Token Sw")
 INPUT_PORTS_END
+
+INPUT_PORTS_START( j6impls )
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_15 )
+	PORT_INCLUDE( j6_stake_20 )
+
+	PORT_MODIFY("J10_2") // maps to a different place
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Step")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) // PORT_NAME("Hopper Dump SW")
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) // PORT_NAME("Cash / Token Sw")
+INPUT_PORTS_END
+
 
 INPUT_PORTS_START( j6impulsa )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -1680,14 +1705,7 @@ INPUT_PORTS_START( j6slvgst )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) // PORT_NAME("Cash / Token Sw")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6impls )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_15 )
-	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
 
 INPUT_PORTS_START( j6thril )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -1695,7 +1713,18 @@ INPUT_PORTS_START( j6thril )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_10 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) // PORT_NAME("Cash / Token Sw")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cshtwr )
@@ -1704,7 +1733,25 @@ INPUT_PORTS_START( j6cshtwr )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Take Feature 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Take Feature 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Take Feature 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Higher")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Lower")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) // PORT_NAME("Hopper Dump SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON13 ) // PORT_NAME("Cash / Token Sw")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6cshvgs )
@@ -10750,6 +10797,9 @@ GAMEL( 199?, j6impulsd,    j6impuls,   impact_nonvideo, j6impulsa,jpmimpct_state
 GAMEL( 199?, j6impulse,    j6impuls,   impact_nonvideo, j6impulsa,jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6impulsc )
 GAMEL( 199?, j6impulsf,    j6impuls,   impact_nonvideo, j6impulsa,jpmimpct_state, empty_init, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 7, Whitbread)", GAME_FLAGS, layout_j6impulsc )
 
+// not the same layout or button mapping as the above, but same attract strings?
+GAME(  199?, j6impls,      0,          impact_nonvideo, j6impls, jpmimpct_state, empty_init, ROT0, "Crystal", "Impulse (Crystal) (IMPACT)", GAME_FLAGS )
+
 GAMEL( 199?, j6indy,       0,          impact_nonvideo, j6indy, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6indyi )
 GAMEL( 199?, j6indya,      j6indy,     impact_nonvideo, j6indy, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6indyi )
 GAMEL( 199?, j6indyb,      j6indy,     impact_nonvideo, j6indy, jpmimpct_state, empty_init, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6indyi )
@@ -10992,8 +11042,6 @@ GAME(  199?, j6cdivr,      0,          impact_nonvideo, j6cdivr, jpmimpct_state,
 // needs to be reset one to boot
 GAME(  199?, j6grc,        0,          impact_nonvideo, j6grc, jpmimpct_state, empty_init, ROT0, "Crystal", "Gold Rush Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6grca,       j6grc,      impact_nonvideo, j6grc, jpmimpct_state, empty_init, ROT0, "Crystal", "Gold Rush Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-
-GAME(  199?, j6impls,      0,          impact_nonvideo, j6impls, jpmimpct_state, empty_init, ROT0, "Crystal", "Impulse (Crystal) (IMPACT)", GAME_FLAGS )
 
 GAME(  199?, j6thril,      0,          impact_nonvideo, j6thril, jpmimpct_state, empty_init, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6thrila,     j6thril,    impact_nonvideo, j6thril, jpmimpct_state, empty_init, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
