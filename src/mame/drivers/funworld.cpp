@@ -659,7 +659,7 @@
 	 RESET:     Stop1 resets the clock
 
 	 ИЗЧИСТВАНЕ:  Натиснете 2 с. бутон Изчистване
-	 CLEAR:       Press the Clear button for 2 seconds
+	 CLEAR:       Press the Cancel button for 2 seconds
 
 	 ИЗХОД:  Натиснете бутон Старт
 	 EXIT:   Press the Start button
@@ -1433,18 +1433,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdcy )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Running / Credits")			// НАВЪРТАНЕ
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop 1")						// СТОП 1
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Autostop / Take")	// ИЗЧИСТВАНЕ / АВТОСТОП / КАЧВАНЕ
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Double")				// СТАРТ / ДУБЛИРАНЕ
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble")		// СТОП 5 / ПОЛОВИН ХАЗАРТ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Turnover (Oborot)")			// ОБОРОТ (turnover)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Setup (Nastroyka)")			// НАСТРОЙКА (setup)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Big")				// СТОП 4 / ГОЛЯМА
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME(u8"Running / Credits (Навъртане)")                               // НАВЪРТАНЕ
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME(u8"Stop 1 (Стоп 1)")                                             // СТОП 1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME(u8"Cancel (Изчистване) / Autostop (Автостоп) / Take (Качване)")  // ИЗЧИСТВАНЕ / АВТОСТОП / КАЧВАНЕ
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME(u8"Start (Старт) / Double (Дублиране)")	                       // СТАРТ / ДУБЛИРАНЕ
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME(u8"Stop 5 (Стоп 5) / Half Gamble (Половин Хазарт)")		       // СТОП 5 / ПОЛОВИН ХАЗАРТ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME(u8"Turnover (Оборот)")                                           // ОБОРОТ (turnover)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME(u8"Setup (Настройка)")                                           // НАСТРОЙКА (setup)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME(u8"Stop 4 (Стоп 4) / Big (Голяма)")                              // СТОП 4 / ГОЛЯМА
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop 2 / Small")				// СТОП 2 / МАЛКА
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop 3")						// СТОП 3
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME(u8"Stop 2 (Стоп 2) / Small (Малка)")                             // СТОП 2 / МАЛКА
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME(u8"Stop 3 (Стоп 3)")                                             // СТОП 3
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("test 1") PORT_CODE(KEYCODE_A)	// present on the test mode, but erased
