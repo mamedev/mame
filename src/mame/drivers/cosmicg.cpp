@@ -196,7 +196,7 @@ MC6845_UPDATE_ROW(cosmicg_state::draw_scanline)
 		while (x_count-- != 0)
 		{
 			u16 offs = (~ma & 0x001f) | (~ra & 1) << 5 | (~ma & 0x0fe0) << 1;
-			u8 data = (offs >= m_videoram.length()) ? 0 : m_videoram[offs];
+			u8 data = m_videoram[offs];
 			u8 color = colors[(~offs & 0x1e00) >> 5 | (~offs & 0x001e) >> 1] >> 4;
 			for (int n = 8; n != 0; n--)
 			{
@@ -211,7 +211,7 @@ MC6845_UPDATE_ROW(cosmicg_state::draw_scanline)
 		while (x_count-- != 0)
 		{
 			u16 offs = (ma & 0x001f) | (ra & 1) << 5 | (ma & 0x0fe0) << 1;
-			u8 data = (offs >= m_videoram.length()) ? 0 : m_videoram[offs];
+			u8 data = m_videoram[offs];
 			u8 color = colors[(offs & 0x1e00) >> 5 | (offs & 0x001e) >> 1] & 0x0f;
 			for (int n = 8; n != 0; n--)
 			{
@@ -322,6 +322,10 @@ static const char *const cosmicg_sample_names[] =
 
 void cosmicg_state::machine_start()
 {
+	m_sound_enabled = 0;
+	m_march_select = 0;
+	m_gun_die_select = 0;
+
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
 	save_item(NAME(m_gun_die_select));
@@ -422,10 +426,6 @@ void cosmicg_state::init_cosmicg()
 
 		rom[offs] = normal;
 	}
-
-	m_sound_enabled = 0;
-	m_march_select = 0;
-	m_gun_die_select = 0;
 }
 
 

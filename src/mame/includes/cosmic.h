@@ -26,6 +26,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_sound_enabled(0),
 		m_in_ports(*this, "IN%u", 0),
 		m_dsw(*this, "DSW"),
 		m_maincpu(*this, "maincpu"),
@@ -71,8 +72,6 @@ private:
 
 	/* sound-related */
 	int            m_sound_enabled;
-	int            m_march_select;
-	int            m_gun_die_select;
 	int            m_dive_bomb_b_select;
 
 	/* misc */

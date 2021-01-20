@@ -4,7 +4,6 @@
 
 Universal board numbers (found on the schematics)
 
-Cosmic Guerilla - 7907A
 Cosmic Alien    - 7910
 Magical Spot    - 8013
 Magical Spot II - 8013
@@ -792,8 +791,6 @@ static const char *const panic_sample_names[] =
 void cosmic_state::machine_start()
 {
 	save_item(NAME(m_sound_enabled));
-	save_item(NAME(m_march_select));
-	save_item(NAME(m_gun_die_select));
 	save_item(NAME(m_dive_bomb_b_select));
 
 	save_item(NAME(m_background_enable));
