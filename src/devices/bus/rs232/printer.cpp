@@ -24,6 +24,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
+	m_initial_rx_state(1),
 	m_printer(*this, "printer"),
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
 	m_rs232_startbits(*this, "RS232_STARTBITS"),
@@ -31,7 +32,6 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
-	m_initial_rx_state = 1;
 }
 
 void serial_printer_device::device_add_mconfig(machine_config &config)
