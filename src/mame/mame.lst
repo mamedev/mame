@@ -13486,15 +13486,20 @@ exterm                          // (c) 1989 Premier Technology - a Gottlieb game
 
 @source:extrema.cpp
 adults                          // Adults Only (Russia)
+adultsa                         //
 bloto                           // Blits Loto (Russia)
+blotoa                          //
 blpearl                         // Black Pearl (Russia)
 exsafar                         // Safari (Russia)
 extrmth                         // Treasure Hunt (Russia)
+extrmtha                        //
 extrmti                         // Treasure Island (Russia)
 grancan                         // Grand Canyon (Russia)
 luckshel                        // Lucky Shell (Russia)
+luckshela                       //
 maski                           // Maski Show (Russia)
 strlink                         // Strong Link (Russia)
+strlinka                        //
 
 @source:exzisus.cpp
 exzisus                         // B12 (c) 1987 Taito Corporation (Japan)
