@@ -40,9 +40,7 @@ private:
 	emu_timer *m_nmi_timer;
 	uint8_t m_control;
 	bool m_next_timer_state;
-	bool m_nmi_stretch;
-	bool m_rw_stretch;
-	bool m_rw_change;
+	bool m_read_stretch;
 
 	required_device<cpu_device> m_nmicpu;
 
