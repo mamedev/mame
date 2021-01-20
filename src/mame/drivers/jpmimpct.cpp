@@ -511,25 +511,58 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
  *  9: Coin mechanism
  */
 
+
+
+/*
+   Some Input Switch numbers according to test modes
+ 
+   DSW 0x01 = Switch 0
+   DSW 0x02 = 1
+   DSW 0x04 = 1
+   DSW 0x08 = 1
+   DSW 0x10 = 1
+   DSW 0x20 = 1
+   DSW 0x40 = 1
+   DSW 0x80 = 1
+
+   PIA_PORTB: 0x01 = 136
+   PIA_PORTB: 0x02 = Switch 137
+   PIA_PORTB: 0x04 = 138
+   PIA_PORTB: 0x08 = 139
+   PIA_PORTB: 0x10 = 140
+   PIA_PORTB: 0x20 = 141
+   PIA_PORTB: 0x40 = 142
+   PIA_PORTB: 0x80 = 143
+
+   PIA_PORTC: 0x01 = 144
+   PIA_PORTC: 0x02 = 145
+   PIA_PORTC: 0x04 = 146
+   PIA_PORTC: 0x08 = 147
+   PIA_PORTC: 0x10 = 148
+   PIA_PORTC: 0x20 = Switch 149
+   PIA_PORTC: 0x40 = 150
+   PIA_PORTC: 0x80 = 151
+*/
+
+
 void jpmimpct_state::common_map(address_map& map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x00480020, 0x00480021).portr("DSW");
+	map(0x00480020, 0x00480021).portr("DSW");      // DSW 0x01 = Switch 0
 	map(0x00480022, 0x00480023).portr("PERCENT");
 	map(0x00480024, 0x00480025).portr("J10_0");
 	map(0x00480026, 0x00480027).portr("J10_1");
-	map(0x00480028, 0x00480029).portr("J10_2");
-	map(0x0048002a, 0x0048002b).portr("J9_0");
+	map(0x00480028, 0x00480029).portr("J10_2");   // J10_2: 0x01 = Switch 32
+	map(0x0048002a, 0x0048002b).portr("J9_0");    // JP9_0: 0x01 = Switch 40
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
 	map(0x00480030, 0x00480031).portr("PAYCOIN_LEVEL");
 	map(0x00480032, 0x00480033).portr("COIN_SENSE");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
-	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-//	map(0x00480060, 0x00480067).r(FUNC(jpmimpct_state::unk_r));
+	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); 
 
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
 	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
