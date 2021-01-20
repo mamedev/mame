@@ -915,6 +915,26 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("PIA_PORTC")
+	PORT_DIPNAME( 0x01, 0x00, "PIA_PORTC: 0x01")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "PIA_PORTC: 0x02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "PIA_PORTC: 0x04")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "PIA_PORTC: 0x08")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_4_r)
+	PORT_DIPNAME( 0x20, 0x20, "Top Up Switch 0x20")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_6_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_7_r)
+
 	PORT_INCLUDE( jpmimpct_coins )
 INPUT_PORTS_END
 
@@ -1087,42 +1107,57 @@ READ_LINE_MEMBER( jpmimpct_state::hopper_b_3_r )
 
 
 
-uint8_t jpmimpct_state::hopper_c_r()
-{
-	int retval;
-	// C0-C2 = Alpha
-	// C3
-	// C4 = 20p Hopper Detect
-	// C5 = Hopper Top-Up
-	// C6 = 100p Hopper Detect
-	// C7 = Payout Verif (Slides)
-
-	retval=0xf0; //1111 0000
+// C0-C2 = Alpha (output)
+// C3
+// C4 = 20p Hopper Detect
+// C5 = Hopper Top-Up
+// C6 = 100p Hopper Detect
+// C7 = Payout Verif (Slides)
 
 //    if (StatBtns & 0x20) // Top Up switch
 //    retval &= ~0x20;
 
-	// Which hoppers are present
-	if (m_hopper[0])
-	{
-		retval &= ~0x40;
-	}
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_4_r)
+{
+	uint8_t retval = 0x01;
+
 	if (m_hopper[1])
 	{
-		retval &= ~0x10;
+		retval &= ~0x01;
 	}
+
+	return retval;
+}
+
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_6_r)
+{
+	uint8_t retval = 0x01;
+
+	if (m_hopper[0])
+	{
+		retval &= ~0x01;
+	}
+
+	return retval;
+}
+
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_7_r)
+{
+	uint8_t retval = 0x01;
 
 	if (!m_hopinhibit)
 	{
 		if ((m_slidesout==1) && ((m_hopper[2]==0)))
 		{
 			m_slidesout=0;
-			retval &= ~0x80;
+			retval &= ~0x01;
 		}
 	}
 
 	return retval;
 }
+
+
 
 void jpmimpct_state::payen_a_w(uint8_t data)
 {
@@ -1212,7 +1247,7 @@ void jpmimpct_state::base(machine_config &config)
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
 	m_ppi->in_pb_callback().set_ioport("PIA_PORTB");
-	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	m_ppi->in_pc_callback().set_ioport("PIA_PORTC");
 	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
 	TIMER(config, "cointimer0").configure_generic(FUNC(jpmimpct_state::coinoff<0>));

@@ -80,6 +80,9 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(hopper_b_0_r);
 	DECLARE_READ_LINE_MEMBER(hopper_b_3_r);
+	DECLARE_READ_LINE_MEMBER(hopper_c_4_r);
+	DECLARE_READ_LINE_MEMBER(hopper_c_6_r);
+	DECLARE_READ_LINE_MEMBER(hopper_c_7_r);
 
 protected:
 	void impact_nonvideo_base(machine_config &config);

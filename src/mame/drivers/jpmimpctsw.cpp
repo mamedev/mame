@@ -1226,7 +1226,7 @@ INPUT_PORTS_START( j6mavrk )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) // PORT_NAME("Cash / Token Sw")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6monmad ) // where is the 'take nudges' button?!
+INPUT_PORTS_START( j6monmad ) // where is the 'take nudges' button?! it even checks bits in PIA ports in the switch check, but it isn't there
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
