@@ -10698,8 +10698,6 @@ cosmica                         // 7910-AII (c) [1979]
 cosmica1                        // 7910-A (c) [1979]
 cosmica2                        // 7910 (c) 1979
 cosmica3                        // 7910-AII (c) [1979]
-cosmicg                         // 7907 (c) 1979
-cosmicgi                        // bootleg (Inder)
 devzone                         // 8022 (c) [1980]
 devzone2                        // 8022 (c) [1980]
 magspot                         // ???? (c) [1980]
@@ -10711,6 +10709,10 @@ panic2                          // 8015 (c) 1980
 panic3                          // 8015 (c) 1980
 panicger                        // 8015 (c) 1980
 panich                          // 8015 (c) 1980
+
+@source:cosmicg.cpp
+cosmicg                         // 7907 (c) 1979
+cosmicgi                        // bootleg (Inder)
 
 @source:cosmicos.cpp
 cosmicos                        //

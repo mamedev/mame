@@ -4450,6 +4450,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cosmic.cpp",
 	MAME_DIR .. "src/mame/includes/cosmic.h",
 	MAME_DIR .. "src/mame/video/cosmic.cpp",
+	MAME_DIR .. "src/mame/drivers/cosmicg.cpp",
 	MAME_DIR .. "src/mame/drivers/docastle.cpp",
 	MAME_DIR .. "src/mame/includes/docastle.h",
 	MAME_DIR .. "src/mame/machine/docastle.cpp",
