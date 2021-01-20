@@ -79,6 +79,7 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 
 #include <cstring>
@@ -951,7 +952,7 @@ void cheat_entry::menu_text(std::string &description, std::string &state, uint32
 		// some cheat entries are just text for display
 		if (!description.empty())
 		{
-			strtrimspace(description);
+			description = strtrimspace(description);
 			if (description.empty())
 				description = MENU_SEPARATOR_ITEM;
 		}

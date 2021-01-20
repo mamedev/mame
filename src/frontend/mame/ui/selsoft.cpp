@@ -17,6 +17,7 @@
 #include "ui/selector.h"
 
 #include "audit.h"
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "mame.h"

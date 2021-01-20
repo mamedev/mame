@@ -14,6 +14,7 @@
 #include "debugvw.h"
 #include "textbuf.h"
 #include "debugger.h"
+#include "corestr.h"
 #include <cctype>
 #include <fstream>
 
@@ -517,7 +518,7 @@ void debugger_console::process_source_file()
 			buf.resize(pos);
 
 		// strip whitespace
-		strtrimrightspace(buf);
+		buf = strtrimrightspace(buf);
 
 		// execute the command
 		if (!buf.empty())

@@ -25,6 +25,7 @@
 #include "mame.h"
 #include "mameopts.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendfont.h"

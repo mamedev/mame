@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "inputdev.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 
 
@@ -328,13 +329,10 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 //  substring search
 //-------------------------------------------------
 
-bool input_device::match_device_id(const char *deviceid)
+bool input_device::match_device_id(const char *deviceid) const
 {
-	std::string deviceidupper(deviceid);
-	std::string idupper(m_id);
-
-	strmakeupper(deviceidupper);
-	strmakeupper(idupper);
+	std::string deviceidupper(strmakeupper(deviceid));
+	std::string idupper(strmakeupper(m_id));
 
 	return std::string::npos == idupper.find(deviceidupper) ? false : true;
 }

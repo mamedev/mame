@@ -70,8 +70,8 @@ private:
 	// internal helpers
 	template <typename T, typename U> void apply_action(const std::vector<std::string> &args, T &&drvact, U &&devact);
 	template <typename T> void apply_device_action(const std::vector<std::string> &args, T &&action);
-	void execute_commands(const char *exename);
-	void display_help(const char *exename);
+	void execute_commands(std::string_view exename);
+	void display_help(std::string_view exename);
 	void output_single_softlist(std::ostream &out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, const std::vector<std::string> &args);
 	static const info_command_struct *find_command(const std::string &s);

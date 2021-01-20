@@ -22,6 +22,7 @@
 #include "screen.h"
 #include "uiinput.h"
 
+#include "corestr.h"
 #include "coreutil.h"
 #include "osdepend.h"
 #include "xmlfile.h"
@@ -503,14 +504,13 @@ device_debug::device_debug(device_t &device)
 		}
 
 		// add all registers into it
-		std::string tempstr;
 		for (const auto &entry : m_state->state_entries())
 		{
 			// TODO: floating point registers
 			if (!entry->is_float())
 			{
 				using namespace std::placeholders;
-				strmakelower(tempstr.assign(entry->symbol()));
+				std::string tempstr(strmakelower(entry->symbol()));
 				m_symtable->add(
 						tempstr.c_str(),
 						std::bind(&device_state_entry::value, entry.get()),

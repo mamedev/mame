@@ -14,6 +14,8 @@
 #include "softlist_dev.h"
 #include "hashfile.h"
 
+#include "corestr.h"
+
 #include <stack>
 
 
@@ -488,7 +490,7 @@ void emu_options::set_system_name(std::string &&new_system_name)
 	{
 		// if so, first extract the base name (the reason for this is drag-and-drop on Windows; a side
 		// effect is a command line like 'mame pacman.foo' will work correctly, but so be it)
-		std::string new_system_base_name = core_filename_extract_base(m_attempted_system_name, true);
+		std::string new_system_base_name(core_filename_extract_base(m_attempted_system_name, true));
 
 		// perform the lookup (and error if it cannot be found)
 		int index = driver_list::find(new_system_base_name.c_str());
@@ -506,17 +508,6 @@ void emu_options::set_system_name(std::string &&new_system_name)
 		if (m_support == option_support::FULL)
 			update_slot_and_image_options();
 	}
-}
-
-
-//-------------------------------------------------
-//  set_system_name - called to set the system
-//  name; will adjust slot/image options as appropriate
-//-------------------------------------------------
-
-void emu_options::set_system_name(const std::string &new_system_name)
-{
-	set_system_name(std::string(new_system_name));
 }
 
 
@@ -1139,7 +1130,7 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 
 	// we need to do some elementary parsing here
 	const char *bios_arg = ",bios=";
-	const size_t pos = text.find(bios_arg);
+	const std::string::size_type pos = text.find(bios_arg);
 	if (pos != std::string::npos)
 	{
 		m_specified = true;
@@ -1164,9 +1155,31 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 //  slot_option::specify
 //-------------------------------------------------
 
-void slot_option::specify(const std::string &text, bool peg_priority)
+void slot_option::specify(std::string_view text, bool peg_priority)
 {
-	specify(std::string(text), peg_priority);
+	// record the old value; we may need to trigger an update
+	const std::string old_value = value();
+
+	// we need to do some elementary parsing here
+	const char *bios_arg = ",bios=";
+	const std::string_view::size_type pos = text.find(bios_arg);
+	if (pos != std::string_view::npos)
+	{
+		m_specified = true;
+		m_specified_value = text.substr(0, pos);
+		m_specified_bios = text.substr(pos + strlen(bios_arg));
+	}
+	else
+	{
+		m_specified = true;
+		m_specified_value = text;
+		m_specified_bios = "";
+	}
+
+	conditionally_peg_priority(m_entry, peg_priority);
+
+	// we may have changed
+	possibly_changed(old_value);
 }
 
 
@@ -1248,7 +1261,7 @@ image_option::image_option(emu_options &host, const std::string &canonical_insta
 //  image_option::specify
 //-------------------------------------------------
 
-void image_option::specify(const std::string &value, bool peg_priority)
+void image_option::specify(std::string_view value, bool peg_priority)
 {
 	if (value != m_value)
 	{
