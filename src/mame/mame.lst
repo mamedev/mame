@@ -13485,20 +13485,33 @@ wexpressb3                      // bootleg
 exterm                          // (c) 1989 Premier Technology - a Gottlieb game
 
 @source:extrema.cpp
-adults                          // Adults Only (Russia)
+adults                          // Adults Only (Ukraine)
 adultsa                         //
-bloto                           // Blits Loto (Russia)
+bloto                           // Blits Loto (Ukraine)
 blotoa                          //
-blpearl                         // Black Pearl (Russia)
-exsafar                         // Safari (Russia)
-extrmth                         // Treasure Hunt (Russia)
+blpearl                         // Black Pearl (Ukraine)
+blpearla                        //
+blpearlb                        //
+blpearlc                        //
+blpearld                        //
+exsafar                         // Safari (Ukraine)
+exsafara                        //
+exsafarb                        //
+exsafarc                        //
+extrmth                         // Treasure Hunt (Ukraine)
 extrmtha                        //
-extrmti                         // Treasure Island (Russia)
-grancan                         // Grand Canyon (Russia)
-luckshel                        // Lucky Shell (Russia)
+extrmti                         // Treasure Island (Ukraine)
+grancan                         // Grand Canyon (Ukraine)
+grancana                        //
+grancanb                        //
+grancanc                        //
+luckshel                        // Lucky Shell (Ukraine)
 luckshela                       //
-maski                           // Maski Show (Russia)
-strlink                         // Strong Link (Russia)
+maski                           // Maski Show (Ukraine)
+maskia                          //
+maskib                          //
+maskic                          //
+strlink                         // Strong Link (Ukraine)
 strlinka                        //
 
 @source:exzisus.cpp

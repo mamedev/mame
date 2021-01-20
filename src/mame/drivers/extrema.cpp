@@ -15,13 +15,13 @@
   TODO:
   driver level: everything, just a skeleton for now;
   maski: convert image to CHD;
-  blpearl, grancan, exsafar, maski: need decryption and splitting of the alternate versions;
-  adults, bloto, extrmth, extrmti, luckshel, strlink and clones: verify if decryption is complete.
+  all games: verify if decryption is complete;
 
   Some notes on the encryption:
   Every game needs a base XOR. Depending on single address bits other XORs are applied.
   In all decrypted games the sum of the address bits dependent XORs is always 0xff.
   It doesn't appear the encryption utilizes data or address line bitswaps.
+  All versions of the same game appear to use the same encryption.
 */
 
 #include "emu.h"
@@ -42,9 +42,13 @@ public:
 
 	void init_adults();
 	void init_bloto();
+	void init_blpearl();
+	void init_exsafar();
 	void init_extrmth();
 	void init_extrmti();
+	void init_grancan();
 	void init_luckshel();
+	void init_maski();
 	void init_strlink();
 
 private:
@@ -79,22 +83,36 @@ void extrema_state::extrema(machine_config &config)
 }
 
 
+#define MISSING_DISK \
+	DISK_REGION( "ata:0:hdd:image" ) \
+	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP )
+
 ROM_START( maski )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "maskishow_sys_v.42.05.bin", 0x0000, 0x068000, CRC(211e6e34) SHA1(e7b5b2724de2c93c1a61bbb09646204d3e33d975) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) // alt revisions - split later
-	ROM_LOAD( "maskishow_sys_v.42.11.bin", 0x0000, 0x068000, CRC(e21b817c) SHA1(2f951c37e617d3b5bc127735069d0e13f27e002a) )
-	ROM_LOAD( "maski show_sys_v43.07.bin", 0x0000, 0x070000, CRC(4f4b6b05) SHA1(e1b46bf4f40e5ba92d53b9efee426a9700597537) )
 	ROM_LOAD( "maski show_sys_v43.09.bin", 0x0000, 0x070000, CRC(d0862569) SHA1(e5eb8fcf60ed02d5c9090841e1f859d431ff1138) )
+ROM_END
+
+ROM_START( maskia )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "maski show_sys_v43.07.bin", 0x0000, 0x070000, CRC(4f4b6b05) SHA1(e1b46bf4f40e5ba92d53b9efee426a9700597537) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( maskib )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "maskishow_sys_v.42.11.bin", 0x0000, 0x068000, CRC(e21b817c) SHA1(2f951c37e617d3b5bc127735069d0e13f27e002a) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( maskic )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "maskishow_sys_v.42.05.bin", 0x0000, 0x068000, CRC(211e6e34) SHA1(e7b5b2724de2c93c1a61bbb09646204d3e33d975) )
 
 	ROM_REGION( 0x2000000, "drive", 0 ) // HDD? (if so convert to CHD)
 	ROM_LOAD( "maski show 42.05.whx", 0x0000, 0x18bd8dd, CRC(e4c6b921) SHA1(c1349a5d5b6ca457696fbeef7027e75a96f91c37) )
 ROM_END
-
-#define MISSING_DISK \
-	DISK_REGION( "ata:0:hdd:image" ) \
-	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP )
 
 ROM_START( adults )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -126,23 +144,63 @@ ROM_END
 
 ROM_START( blpearl )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "blpearl_sys_42.01.bin", 0x0000, 0x058000, CRC(6e3b3eda) SHA1(7cda7dd7ed487c8fe80967934fe444c80c368768) )
-	ROM_REGION( 0x100000, "altrevs", 0 ) // alt revisions - split later
-	ROM_LOAD( "blpearl_sys_42.03.bin", 0x0000, 0x058000, CRC(758bde12) SHA1(adfc4193edc6e0b71b16b20083a9b0635862ef8a) )
 	ROM_LOAD( "blpearl_sys_45.02.bin", 0x0000, 0x058000, CRC(00e9b39d) SHA1(d2bd7175fef041106b50f52ce71361ccd127ce6c) )
-	ROM_LOAD( "black pearl_v43.04.bin", 0x0000, 0x058000, CRC(e7c20ff5) SHA1(ef6b63cfe8f1f3a50942f397c5c15e0640e39942) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( blpearla )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "black pearl_v43.07.bin", 0x0000, 0x058000, CRC(6d839184) SHA1(94586b29b35e443c120524ff91cf353c221f30ee) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( blpearlb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "black pearl_v43.04.bin", 0x0000, 0x058000, CRC(e7c20ff5) SHA1(ef6b63cfe8f1f3a50942f397c5c15e0640e39942) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( blpearlc )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "blpearl_sys_42.03.bin", 0x0000, 0x058000, CRC(758bde12) SHA1(adfc4193edc6e0b71b16b20083a9b0635862ef8a) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( blpearld )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "blpearl_sys_42.01.bin", 0x0000, 0x058000, CRC(6e3b3eda) SHA1(7cda7dd7ed487c8fe80967934fe444c80c368768) )
 
 	MISSING_DISK
 ROM_END
 
 ROM_START( grancan )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "grand canyon_sys_43.05.bin", 0x0000, 0x068000, CRC(bdf5426b) SHA1(3f7853482c12dd96f7ab67aac8799fdbcf2757b9) )
-	ROM_REGION( 0x100000, "altrevs", 0 ) // alt revisions - split later
 	ROM_LOAD( "grand canyon_sys_43.09.bin", 0x0000, 0x068000, CRC(9d27dc85) SHA1(5dce3ab40399a32b2cb7f07fa3d0cc621f3287d9) )
-	ROM_LOAD( "grcanyon_sys_42.06.bin", 0x0000, 0x068000, CRC(6591e970) SHA1(69d8d8bb074b9a30593072f13e8ab6e0722e2aa3) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( grancana )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "grand canyon_sys_43.05.bin", 0x0000, 0x068000, CRC(bdf5426b) SHA1(3f7853482c12dd96f7ab67aac8799fdbcf2757b9) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( grancanb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "grcanyon_sys_42.13.bin", 0x0000, 0x068000, CRC(46f4562d) SHA1(01d3d1d3f0d1c3d5bf8f3c87da81ab5ba8356322) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( grancanc )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "grcanyon_sys_42.06.bin", 0x0000, 0x068000, CRC(6591e970) SHA1(69d8d8bb074b9a30593072f13e8ab6e0722e2aa3) )
 
 	MISSING_DISK
 ROM_END
@@ -163,11 +221,28 @@ ROM_END
 
 ROM_START( exsafar )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "safari_sys_v.42.04.bin", 0x0000, 0x070000, CRC(c4fbcd52) SHA1(0e40194909cd9dad49a597df2f2d793c72535544) )
-	ROM_REGION( 0x100000, "altrevs", 0 ) // alt revisions - split later
-	ROM_LOAD( "safari_sys_v.42.07.bin", 0x0000, 0x070000, CRC(d4d02370) SHA1(69ca8d074fc2a7a64012cb3db6c82e91ae8ed56f) )
-	ROM_LOAD( "safari_sys_v43.08.bin", 0x0000, 0x070000, CRC(2a35ab64) SHA1(288624f9bedc57f5229f3d88677b0f2bf141c857) )
 	ROM_LOAD( "safari_sys_v43.14.bin", 0x0000, 0x070000, CRC(61def527) SHA1(4b60f8c2c5845ece23244f41d5a71d6c6093b19c) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( exsafara )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "safari_sys_v43.08.bin", 0x0000, 0x070000, CRC(2a35ab64) SHA1(288624f9bedc57f5229f3d88677b0f2bf141c857) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( exsafarb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "safari_sys_v.42.07.bin", 0x0000, 0x070000, CRC(d4d02370) SHA1(69ca8d074fc2a7a64012cb3db6c82e91ae8ed56f) )
+
+	MISSING_DISK
+ROM_END
+
+ROM_START( exsafarc )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "safari_sys_v.42.04.bin", 0x0000, 0x070000, CRC(c4fbcd52) SHA1(0e40194909cd9dad49a597df2f2d793c72535544) )
 
 	MISSING_DISK
 ROM_END
@@ -238,6 +313,38 @@ void extrema_state::init_bloto()
 	}
 }
 
+void extrema_state::init_blpearl()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x58000; i++)
+	{
+		rom[i] ^= 0xb5;
+		if (BIT(i, 5))  rom[i] ^= 0x01;
+		if (BIT(i, 6))  rom[i] ^= 0x48;
+		if (BIT(i, 10)) rom[i] ^= 0x02;
+		if (BIT(i, 11)) rom[i] ^= 0x90;
+		if (BIT(i, 13)) rom[i] ^= 0x24;
+	}
+}
+
+void extrema_state::init_exsafar()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x70000; i++)
+	{
+		rom[i] ^= 0x41;
+		if (BIT(i, 0))  rom[i] ^= 0x06;
+		if (BIT(i, 1))  rom[i] ^= 0x01;
+		if (BIT(i, 2))  rom[i] ^= 0x80;
+		if (BIT(i, 4))  rom[i] ^= 0x10;
+		if (BIT(i, 5))  rom[i] ^= 0x40;
+		if (BIT(i, 8))  rom[i] ^= 0x08;
+		if (BIT(i, 10)) rom[i] ^= 0x20;
+	}
+}
+
 void extrema_state::init_extrmth()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -272,6 +379,21 @@ void extrema_state::init_extrmti()
 	}
 }
 
+void extrema_state::init_grancan()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x68000; i++)
+	{
+		rom[i] ^= 0x25;
+		if (BIT(i, 2))  rom[i] ^= 0x12;
+		if (BIT(i, 4))  rom[i] ^= 0x48;
+		if (BIT(i, 5))  rom[i] ^= 0x01;
+		if (BIT(i, 9))  rom[i] ^= 0x24;
+		if (BIT(i, 10)) rom[i] ^= 0x80;
+	}
+}
+
 void extrema_state::init_luckshel()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -285,6 +407,21 @@ void extrema_state::init_luckshel()
 		if (BIT(i, 6))  rom[i] ^= 0x04;
 		if (BIT(i, 8))  rom[i] ^= 0x01;
 		if (BIT(i, 12)) rom[i] ^= 0x02;
+	}
+}
+
+void extrema_state::init_maski()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x70000; i++)
+	{
+		rom[i] ^= 0xb6;
+		if (BIT(i, 5))  rom[i] ^= 0x20;
+		if (BIT(i, 6))  rom[i] ^= 0x09;
+		if (BIT(i, 10)) rom[i] ^= 0x40;
+		if (BIT(i, 11)) rom[i] ^= 0x12;
+		if (BIT(i, 13)) rom[i] ^= 0x84;
 	}
 }
 
@@ -307,16 +444,29 @@ void extrema_state::init_strlink()
 } // Anonymous namespace
 
 
-GAME( 200?, maski,     0,        extrema, extrema, extrema_state, empty_init,    ROT0, "Extrema", "Maski Show (Ukraina)",                         MACHINE_IS_SKELETON )
+GAME( 2003, maski,     0,        extrema, extrema, extrema_state, init_maski,    ROT0, "Extrema", "Maski Show (Ukraina V. 43.10)",                MACHINE_IS_SKELETON )
+GAME( 2003, maskia,    maski,    extrema, extrema, extrema_state, init_maski,    ROT0, "Extrema", "Maski Show (Ukraina V. 43.07)",                MACHINE_IS_SKELETON )
+GAME( 2003, maskib,    maski,    extrema, extrema, extrema_state, init_maski,    ROT0, "Extrema", "Maski Show (Ukraina V. 42.11)",                MACHINE_IS_SKELETON )
+GAME( 2003, maskic,    maski,    extrema, extrema, extrema_state, init_maski,    ROT0, "Extrema", "Maski Show (Ukraina V. 42.05)",                MACHINE_IS_SKELETON )
 GAME( 2003, adults,    0,        extrema, extrema, extrema_state, init_adults,   ROT0, "Extrema", "Adults Only (Ukraina, V. 43.23)",              MACHINE_IS_SKELETON )
 GAME( 2003, adultsa,   adults,   extrema, extrema, extrema_state, init_adults,   ROT0, "Extrema", "Adults Only (Ukraina, V. 43.17)",              MACHINE_IS_SKELETON )
 GAME( 200?, bloto,     0,        extrema, extrema, extrema_state, init_bloto,    ROT0, "Extrema", "Blits Loto (Ukraina, V. 30.16)",               MACHINE_IS_SKELETON )
 GAME( 200?, blotoa,    bloto,    extrema, extrema, extrema_state, init_bloto,    ROT0, "Extrema", "Blits Loto (Ukraina, V. 30.08)",               MACHINE_IS_SKELETON )
-GAME( 200?, blpearl,   0,        extrema, extrema, extrema_state, empty_init,    ROT0, "Extrema", "Black Pearl (Ukraina)",                        MACHINE_IS_SKELETON )
-GAME( 200?, grancan,   0,        extrema, extrema, extrema_state, empty_init,    ROT0, "Extrema", "Grand Canyon (Ukraina)",                       MACHINE_IS_SKELETON )
+GAME( 2003, blpearl,   0,        extrema, extrema, extrema_state, init_blpearl,  ROT0, "Extrema", "Black Pearl (Ukraina, V. 45.02)",              MACHINE_IS_SKELETON )
+GAME( 2003, blpearla,  blpearl,  extrema, extrema, extrema_state, init_blpearl,  ROT0, "Extrema", "Black Pearl (Ukraina, V. 43.07)",              MACHINE_IS_SKELETON )
+GAME( 2003, blpearlb,  blpearl,  extrema, extrema, extrema_state, init_blpearl,  ROT0, "Extrema", "Black Pearl (Ukraina, V. 43.04)",              MACHINE_IS_SKELETON )
+GAME( 2003, blpearlc,  blpearl,  extrema, extrema, extrema_state, init_blpearl,  ROT0, "Extrema", "Black Pearl (Ukraina, V. 42.03)",              MACHINE_IS_SKELETON )
+GAME( 2003, blpearld,  blpearl,  extrema, extrema, extrema_state, init_blpearl,  ROT0, "Extrema", "Black Pearl (Ukraina, V. 42.01)",              MACHINE_IS_SKELETON )
+GAME( 2003, grancan,   0,        extrema, extrema, extrema_state, init_grancan,  ROT0, "Extrema", "Grand Canyon (Ukraina, V.43.09)",              MACHINE_IS_SKELETON )
+GAME( 2003, grancana,  grancan,  extrema, extrema, extrema_state, init_grancan,  ROT0, "Extrema", "Grand Canyon (Ukraina, V.43.05)",              MACHINE_IS_SKELETON )
+GAME( 2003, grancanb,  grancan,  extrema, extrema, extrema_state, init_grancan,  ROT0, "Extrema", "Grand Canyon (Ukraina, V.42.13)",              MACHINE_IS_SKELETON )
+GAME( 2003, grancanc,  grancan,  extrema, extrema, extrema_state, init_grancan,  ROT0, "Extrema", "Grand Canyon (Ukraina, V.42.06)",              MACHINE_IS_SKELETON )
 GAME( 2003, luckshel,  0,        extrema, extrema, extrema_state, init_luckshel, ROT0, "Extrema", "Lucky Shell (Ukraina, V. 42.25)",              MACHINE_IS_SKELETON )
 GAME( 2003, luckshela, luckshel, extrema, extrema, extrema_state, init_luckshel, ROT0, "Extrema", "Lucky Shell (Ukraina, V. 42.10)",              MACHINE_IS_SKELETON )
-GAME( 200?, exsafar,   0,        extrema, extrema, extrema_state, empty_init,    ROT0, "Extrema", "Safari (Extrema, Ukraina)",                    MACHINE_IS_SKELETON )
+GAME( 2003, exsafar,   0,        extrema, extrema, extrema_state, init_exsafar,  ROT0, "Extrema", "Safari (Extrema, Ukraina, V. 43.14)",          MACHINE_IS_SKELETON )
+GAME( 2003, exsafara,  exsafar,  extrema, extrema, extrema_state, init_exsafar,  ROT0, "Extrema", "Safari (Extrema, Ukraina, V. 43.08)",          MACHINE_IS_SKELETON )
+GAME( 2003, exsafarb,  exsafar,  extrema, extrema, extrema_state, init_exsafar,  ROT0, "Extrema", "Safari (Extrema, Ukraina, V. 42.07)",          MACHINE_IS_SKELETON )
+GAME( 2003, exsafarc,  exsafar,  extrema, extrema, extrema_state, init_exsafar,  ROT0, "Extrema", "Safari (Extrema, Ukraina, V. 42.04)",          MACHINE_IS_SKELETON )
 GAME( 2004, strlink,   0,        extrema, extrema, extrema_state, init_strlink,  ROT0, "Extrema", "Strong Link (Ukraina, V. 43.48)",              MACHINE_IS_SKELETON )
 GAME( 2004, strlinka,  strlink,  extrema, extrema, extrema_state, init_strlink,  ROT0, "Extrema", "Strong Link (Ukraina, V. 43.45)",              MACHINE_IS_SKELETON )
 GAME( 200?, extrmth,   0,        extrema, extrema, extrema_state, init_extrmth,  ROT0, "Extrema", "Treasure Hunt (Extrema, Ukraina, V. 34.03)",   MACHINE_IS_SKELETON ) // other string has it as 3.4.03
