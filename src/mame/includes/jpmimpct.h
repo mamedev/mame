@@ -78,6 +78,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	template <unsigned N> DECLARE_READ_LINE_MEMBER( coinsense_r ) {	return (m_coinstate >> N) & 1; }
 
+	DECLARE_READ_LINE_MEMBER(hopper_b_0_r);
+	DECLARE_READ_LINE_MEMBER(hopper_b_3_r);
+
 protected:
 	void impact_nonvideo_base(machine_config &config);
 
@@ -121,7 +124,6 @@ private:
 	void volume_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t upd7759_r(offs_t offset, uint16_t mem_mask = ~0);
-	uint8_t hopper_b_r();
 	uint8_t hopper_c_r();
 	void payen_a_w(uint8_t data);
 	void display_c_w(uint8_t data);

@@ -893,6 +893,28 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 
+	PORT_START("PIA_PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_0_r)
+	PORT_DIPNAME( 0x02, 0x00, "PIA_PORTB: 0x02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "PIA_PORTB: 0x04")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_3_r)
+	PORT_DIPNAME( 0x10, 0x10, "PIA_PORTB: 0x10")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "PIA_PORTB: 0x20")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "PIA_PORTB: 0x40")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "PIA_PORTB: 0x80")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_INCLUDE( jpmimpct_coins )
 INPUT_PORTS_END
 
@@ -1013,16 +1035,16 @@ WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
  *
  *************************************/
 
-uint8_t jpmimpct_state::hopper_b_r()
-{
-	int retval;
-	// B0 = 100p Hopper Opto
-	// B1 = Hopper High
-	// B2 = Hopper Low
-	// B3 = 20p Hopper Opto
+// THIS COULD BE INCORRECT
 
-	// Always return hoppers full
-	retval=0xed; // 1110 1101
+// B0 = 100p Hopper Opto
+// B1 = Hopper High
+// B2 = Hopper Low
+// B3 = 20p Hopper Opto
+
+READ_LINE_MEMBER( jpmimpct_state::hopper_b_0_r )
+{
+	uint8_t retval = 0x01;
 
 	if (!m_hopinhibit)//if inhibited, we don't change these flags
 	{
@@ -1030,9 +1052,26 @@ uint8_t jpmimpct_state::hopper_b_r()
 		{//100p
 			retval &= ~0x01;
 		}
+	}
+	else
+	{
+		// if payout is inhibited these must be 0, no coin detected? otherwise many sets will give 5.7 error
+		// when they test the hoppers
+		retval &= ~0x01;
+	}
+
+	return retval;
+}
+
+READ_LINE_MEMBER( jpmimpct_state::hopper_b_3_r )
+{
+	uint8_t retval = 0x01;
+
+	if (!m_hopinhibit)//if inhibited, we don't change these flags
+	{
 		if (((m_hopper[1] && m_motor[1]) || (m_hopper[2] && m_slidesout))) //&& ((m_hopflag2 & 0x20)==0x20))
 		{
-			retval &= ~0x08;
+			retval &= ~0x01;
 		}
 	}
 	else
@@ -1040,11 +1079,13 @@ uint8_t jpmimpct_state::hopper_b_r()
 		// if payout is inhibited these must be 0, no coin detected? otherwise many sets will give 5.7 error
 		// when they test the hoppers
 		retval &= ~0x01;
-		retval &= ~0x08;
 	}
 
 	return retval;
 }
+
+
+
 
 uint8_t jpmimpct_state::hopper_c_r()
 {
@@ -1170,7 +1211,7 @@ void jpmimpct_state::base(machine_config &config)
 
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
-	m_ppi->in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
+	m_ppi->in_pb_callback().set_ioport("PIA_PORTB");
 	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
 	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
