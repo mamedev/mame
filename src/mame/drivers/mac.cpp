@@ -787,7 +787,7 @@ void mac_state::add_scsi(machine_config &config, bool cdrom)
 
 void mac_state::add_via1_adb(machine_config &config, bool macii)
 {
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	if (macii)
 		m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
@@ -801,7 +801,7 @@ void mac_state::add_via1_adb(machine_config &config, bool macii)
 
 void mac_state::add_via2(machine_config &config)
 {
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a));
@@ -932,7 +932,7 @@ void mac_state::maciifx(machine_config &config)
 	add_base_devices(config, true, 1);
 	add_scsi(config);
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));

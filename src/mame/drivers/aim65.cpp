@@ -253,7 +253,7 @@ void aim65_state::aim65(machine_config &config)
 	m_riot->pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
 	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	VIA6522(config, m_via0, AIM65_CLOCK);
+	MOS6522(config, m_via0, AIM65_CLOCK);
 	m_via0->readpb_handler().set([this] () { return aim65_state::z32_pb_r(); });
 	m_via0->writepa_handler().set([this] (u8 data) { aim65_state::z32_pa_w(data); });
 	m_via0->writepb_handler().set([this] (u8 data) { aim65_state::z32_pb_w(data); });
@@ -266,7 +266,7 @@ void aim65_state::aim65(machine_config &config)
 	m_via0->cb2_handler().set([this] (bool state) { aim65_state::z32_cb2_w(state); });
 	m_via0->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	VIA6522(config, m_via1, AIM65_CLOCK);
+	MOS6522(config, m_via1, AIM65_CLOCK);
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia, 0);

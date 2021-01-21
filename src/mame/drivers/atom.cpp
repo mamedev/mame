@@ -5,7 +5,7 @@ Acorn Atom:
 
 Memory map.
 
-CPU: 65C02
+CPU: 6502
         0000-00ff Zero page
         0100-01ff Stack
         0200-1fff RAM (expansion)
@@ -726,7 +726,7 @@ void atom_state::atom_common(machine_config &config)
 	clock_device &cass_clock(CLOCK(config, "cass_clock", X2/16/13/8));
 	cass_clock.signal_handler().set(FUNC(atom_state::cassette_output_tick));  // 2403.846Hz
 
-	VIA6522(config, m_via, X2/4);
+	MOS6522(config, m_via, X2/4);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via->irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);

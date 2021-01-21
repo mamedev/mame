@@ -933,7 +933,7 @@ void accomm_state::accomm(machine_config &config)
 	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
 
 	/* via */
-	VIA6522(config, m_via, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);

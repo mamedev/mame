@@ -941,7 +941,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
-	VIA6522(config, m_via, 1000000);
+	MOS6522(config, m_via, 1000000);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a));
@@ -1009,10 +1009,13 @@ void mac128_state::macse(machine_config &config)
 	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
 
+	R65NC22(config.replace(), m_via, 1000000);
+	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));
 	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b_se));
 	m_via->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
 	/* internal ram */
 	m_ram->set_default_size("4M");

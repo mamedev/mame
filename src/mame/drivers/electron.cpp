@@ -330,7 +330,7 @@ void electronsp_state::electronsp(machine_config &config)
 	m_romi[1]->set_device_load(FUNC(electronsp_state::rom2_load));
 
 	/* via */
-	VIA6522(config, m_via, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));

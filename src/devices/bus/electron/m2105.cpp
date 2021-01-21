@@ -65,7 +65,7 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K");
 
 	/* system via */
-	VIA6522(config, m_via6522_0, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via6522_0, DERIVED_CLOCK(1, 16));
 	//m_via6522_0->readpa_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_porta));
 	m_via6522_0->readpb_handler().set(m_tms, FUNC(tms5220_device::status_r));
 	//m_via6522_0->writepa_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_porta));
@@ -73,7 +73,7 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	m_via6522_0->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* user via */
-	VIA6522(config, m_via6522_1, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via6522_1, DERIVED_CLOCK(1, 16));
 	m_via6522_1->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
