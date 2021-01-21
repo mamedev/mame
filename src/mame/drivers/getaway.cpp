@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Angelo Salese
 /******************************************************************************
 
 Universal Get A Way
@@ -15,7 +15,7 @@ TODO:
 - roms have a lot of empty contents, but it's probably ok
 - dipswitches and game inputs (reads from I/O, but don't know which is which yet),
   PCB has 12 dipswitches, game has a steering wheel and shifter
-- video emulation, it looks like a custom blitter
+- some unknowns in the video emulation;
 - video timing is unknown, pixel clock XTAL is 10.816MHz
 - sound emulation
 - lamps and 7segs
@@ -73,18 +73,18 @@ private:
 
 	u8 m_regs[0x10];
 	u8 m_vram[0x6000];
-	u8 m_tvram[0x6000];
+	u8 m_score_vram[0x6000];
 };
 
 void getaway_state::machine_start()
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_vram, 0, sizeof(m_vram));
-	memset(m_tvram, 0, sizeof(m_tvram));
+	memset(m_score_vram, 0, sizeof(m_score_vram));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_vram));
-	save_item(NAME(m_tvram));
+	save_item(NAME(m_score_vram));
 }
 
 
@@ -95,6 +95,9 @@ void getaway_state::machine_start()
 
 uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// apparently score overlay covers only the rightmost 3 columns
+	const int x_overlay = 29*8;
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
@@ -106,10 +109,13 @@ uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix(y, x + i) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+			
+			if (x < x_overlay)
+				continue;
 
-			r = m_tvram[0x0000 | (xi << 8 | y)];
-			g = m_tvram[0x2000 | (xi << 8 | y)];
-			b = m_tvram[0x4000 | (xi << 8 | y)];
+			r = m_score_vram[0x0000 | (xi << 8 | y)];
+			g = m_score_vram[0x2000 | (xi << 8 | y)];
+			b = m_score_vram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -135,8 +141,41 @@ WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
 }
 
-//#include "debugger.h"
-
+// [0x00]
+// x--- ---- coin counter or coin SFX (more likely former?)
+// -??? ???? outputs? sounds?
+// [0x01]
+// x--- ---- blitter trigger (0->1)
+// -x-- ---- fill mode (1) / RMW (0)
+// --?- ---- 1 on press start screen (unknown meaning)
+// ---- x--- destination VRAM select, (1) normal VRAM (0) score VRAM
+// ---- --?? unknown, (11) mostly, flips with (10) when starting from the right lane.
+// [0x02]
+// ???? ????
+// [0x03]
+// yyyy yyyy y destination offset
+// [0x04]
+// xxxx xxxx x destination offset
+// [0x05]
+// ssss ssss source GFX ROM lower address
+// [0x06]
+// ccc- ---- color mask
+// ---S SSSS source GFX ROM upper address
+// [0x07]
+// ???w wwww transfer width, in 8 pixel units
+//           Notice that 0xff is set on POST, either full clear or NOP
+// [0x08]
+// hhhh hhhh transfer height, in scanline units
+// [0x09]
+// ---- ---? 1 triggered when explosion occurs
+// [0x0a]
+// x--- ---- sound engine enable? (0)
+// ---x ---- sound filter?
+// ---- xxxx sound engine SFX strength?
+// [0x0b]
+// ???? ???? (game writes 0x30)
+// [0x0c]
+// ---- ---? (game writes 1)
 void getaway_state::io_w(offs_t offset, u8 data)
 {
 	u8 n = offset >> 3;
@@ -144,62 +183,50 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	u8 mask = 1 << bit;
 	data = (m_regs[n] & ~mask) | ((data & 1) ? mask : 0);
 	
-	// [0x0a]
-	// x--- ---- sound engine enable? (0)
-	// ---x ---- sound filter?
-	// ---- xxxx sound engine SFX strength?
-//	popmessage("%02x %02x %02x", m_regs[0], m_regs[1], m_regs[2]);
-//	popmessage("%02x %02x %02x %02x\n", m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
+	//popmessage("%02x %02x %02x|%02x %02x %02x %02x", m_regs[0], m_regs[1] & 0x37, m_regs[2], m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
 
+	// start gfx rom->vram transfer
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
-		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
 		// several valid entries are drawn with color=0 cfr. tyres
 		// flyer shows them as white so definitely xor-ed
+		// TODO: may be applied at palette init time instead + score layer colors doesn't match flyer.
 		u8 color_mask = (src >> 13) ^ 7;
 		src &= 0x1fff;
 		src <<= 3;
 
-		// TODO: this can select through the full range
-		// iiii ifff
-//		u16 dest = m_regs[4] << 8 | m_regs[3];
 		u16 x = m_regs[4];
 		u16 y = m_regs[3];
-//		u8 dmask = dest >> 13;
-		//dest &= 0x1fff;
 
 		u8 height = m_regs[8];
-		// 0xff set on POST
 		u8 width = m_regs[7] & 0x1f;
 
 		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
-		// 0x0b sprites, 0x03 score, 0x20 used on press start screen (unknown meaning)
-		// TODO: bit 3 is more likely a switch between RMW vs. regular replace
-		u8 *vram = (m_regs[1] & 0x08) ? m_vram : m_tvram;
-//		if (m_regs[7] & 0xe0)
-		//if (m_regs[1] & 0x08)
-//		if (width == 1)
-//			printf("%04x %02x %04x %02x\n",src,color_mask,m_regs[4] << 8 | m_regs[3], height);
-		//	printf("|src=%04x dst=%04x|h:%02x w:%02x| sm:%02x dm:%02x|%02x %02x\n", src, dest, height, width, smask, dmask, (m_regs[7] & 0xe0) >> 5, m_regs[1]);
-//		printf("%02x\n", m_regs[7]);
-//		machine().debug_break();
+		const bool layer_bank = BIT(m_regs[1], 3);
+		u8 *vram = (layer_bank) ? m_vram : m_score_vram;
 		
 		for (int count = 0; count < width; count ++)
 		{
 			for (int yi = 0; yi < height; yi++)
 			{
-				//u16 x_ptr = dest;
 				for (int xi = 0; xi < 8; xi++)
 				{
-					u16 dest = (((xi + x) >> 3) & 0x1f) << 8;
+					u16 x_offs = xi + x;
+					u16 dest = ((x_offs >> 3) & 0x1f) << 8;
 					dest += (yi + y) & 0xff;
-					u8 pen_mask = 1 << ((x+xi) & 7);
+					u8 pen_mask = 1 << (x_offs & 7);
 					
 					if (fill_mode)
 					{
 						for (int i = 0; i < 3; i++)
-							vram[i * 0x2000 + dest] &= ~pen_mask;
+						{
+							// reversed for score VRAM?
+							if (layer_bank)
+								vram[i * 0x2000 + dest] &= ~pen_mask;
+							else
+								vram[i * 0x2000 + dest] |= pen_mask;
+						}
 					}
 					else
 					{
@@ -429,4 +456,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
