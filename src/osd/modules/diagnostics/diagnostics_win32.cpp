@@ -531,7 +531,7 @@ bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::s
 				chptr++;
 
 			// extract the symbol name
-			symbol.assign(strtrimspace(chptr)));
+			symbol.assign(strtrimspace(chptr));
 			return (symbol.length() > 0);
 		}
 	}
