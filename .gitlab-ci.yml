@@ -69,8 +69,6 @@ libretro-build-windows-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-windows-x64"
-  artifacts:
-    expire_in: 1 day
 
 # Windows 32-bit
 libretro-build-windows-i686:
@@ -80,8 +78,6 @@ libretro-build-windows-i686:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-windows-i686"
-  artifacts:
-    expire_in: 1 day
 
 # Linux 64-bit
 libretro-build-linux-x64:
@@ -91,8 +87,6 @@ libretro-build-linux-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-linux-x64"
-  artifacts:
-    expire_in: 1 day
 
 # Linux 32-bit
 libretro-build-linux-i686:
@@ -102,8 +96,6 @@ libretro-build-linux-i686:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-linux-i686"
-  artifacts:
-    expire_in: 1 day
     
 # MacOS 64-bit
 libretro-build-osx-x64:
@@ -113,8 +105,6 @@ libretro-build-osx-x64:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
-  artifacts:
-    expire_in: 1 day
 
 # Android ARMv7a
 android-armeabi-v7a:
@@ -128,8 +118,6 @@ android-armeabi-v7a:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a"
-  artifacts:
-    expire_in: 1 day
 
 # Android ARMv8a
 android-arm64-v8a:
@@ -143,14 +131,19 @@ android-arm64-v8a:
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a"
-  artifacts:
-    expire_in: 1 day
 
-# # Android 64-bit x86
-# android-x86_64:
-#   extends:
-#     - .libretro-android-jni-x86_64
-#     - .core-defs
+# Android 64-bit x86
+android-x86_64:
+  extends:
+    - .libretro-android-make-x86_64
+    - .core-defs
+  variables:
+    TARGET:    mame
+    SUBTARGET: arcade
+    CORENAME: mamearcade
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-android-x86_64"
     
 # # Android 32-bit x86
 # android-x86:
