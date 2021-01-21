@@ -97,24 +97,25 @@ uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
 		{
-			u8 r = m_vram[0x0000 | (x << 8 | y)];
-			u8 g = m_vram[0x2000 | (x << 8 | y)];
-			u8 b = m_vram[0x4000 | (x << 8 | y)];
+			u16 xi = x >> 3;
+			u8 r = m_vram[0x0000 | (xi << 8 | y)];
+			u8 g = m_vram[0x2000 | (xi << 8 | y)];
+			u8 b = m_vram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x << 3 | (i ^ 7)) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+				bitmap.pix(y, x + i) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
 
-			r = m_tvram[0x0000 | (x << 8 | y)];
-			g = m_tvram[0x2000 | (x << 8 | y)];
-			b = m_tvram[0x4000 | (x << 8 | y)];
+			r = m_tvram[0x0000 | (xi << 8 | y)];
+			g = m_tvram[0x2000 | (xi << 8 | y)];
+			b = m_tvram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
 			{
 				u8 pix_data = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
 				if (pix_data != 0)
-					bitmap.pix(y, x << 3 | (i ^ 7)) = pix_data;
+					bitmap.pix(y, x + i) = pix_data;
 			}
 		}
 	}
@@ -158,12 +159,15 @@ void getaway_state::io_w(offs_t offset, u8 data)
 		// flyer shows them as white so definitely xor-ed
 		u8 color_mask = (src >> 13) ^ 7;
 		src &= 0x1fff;
+		src <<= 3;
 
 		// TODO: this can select through the full range
 		// iiii ifff
-		u16 dest = m_regs[4] << 8 | m_regs[3];
+//		u16 dest = m_regs[4] << 8 | m_regs[3];
+		u16 x = m_regs[4];
+		u16 y = m_regs[3];
 //		u8 dmask = dest >> 13;
-		dest &= 0x1fff;
+		//dest &= 0x1fff;
 
 		u8 height = m_regs[8];
 		// 0xff set on POST
@@ -181,30 +185,43 @@ void getaway_state::io_w(offs_t offset, u8 data)
 //		printf("%02x\n", m_regs[7]);
 //		machine().debug_break();
 		
-		for (int x = 0; x < width; x++)
+		for (int count = 0; count < width; count ++)
 		{
-			u16 x_ptr = dest;
-			for (int y = 0; y < height; y++)
+			for (int yi = 0; yi < height; yi++)
 			{
-				if (fill_mode)
+				//u16 x_ptr = dest;
+				for (int xi = 0; xi < 8; xi++)
 				{
-					for (int i = 0; i < 3; i++)
-						vram[i * 0x2000 + dest] = 0;
-				}
-				else
-				{
-					u8 src_data = m_gfxrom[src];
+					u16 dest = (((xi + x) >> 3) & 0x1f) << 8;
+					dest += (yi + y) & 0xff;
+					u8 pen_mask = 1 << ((x+xi) & 7);
+					
+					if (fill_mode)
+					{
+						for (int i = 0; i < 3; i++)
+							vram[i * 0x2000 + dest] &= ~pen_mask;
+					}
+					else
+					{
+						u8 src_data = (m_gfxrom[src >> 3] >> ((7-src) & 7)) & 1;
 
-					for (int i = 0; i < 3; i++)
-						if (BIT(color_mask, i))
-							vram[i * 0x2000 + dest] = src_data;
+						for (int i = 0; i < 3; i++)
+							if (BIT(color_mask, i))
+							{
+								u16 out_bank = i * 0x2000 + dest;
+								if (src_data)
+									vram[out_bank] |= pen_mask;
+								else
+									vram[out_bank] &= ~pen_mask;
+							}
+					}
+					
+					src = (src + 1) & 0xffff;
 				}
-				
-				src = (src + 1) & 0x1fff;
-				dest = (dest + 1) & 0x1fff;
 			}
-			dest = x_ptr - 0x100;
-			dest &= 0x1fff;
+
+			x -= 8;
+			x &= 0xff;
 		}
 	}
 
