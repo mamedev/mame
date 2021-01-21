@@ -3,7 +3,7 @@
 
 /*
 
- CPUs
+CPUs
 QTY     Type    clock   position    function
 1x  MC68HC000FN10       u3  16/32-bit Microprocessor - main
 1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
@@ -33,17 +33,24 @@ Notes
 
 PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
+TODO:
+- currently stops after passing SRAM text;
+- driver is skeleton-ish, video emulation is at the bare minimum to see what's going on;
+- decryption is probably incomplete.
 */
-
 
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
 
 class jungleyo_state : public driver_device
 {
@@ -52,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_fg_videoram(*this, "fg_videoram")
 	{ }
 
 	void jungleyo(machine_config &config);
@@ -63,31 +71,122 @@ protected:
 
 private:
 	// video-related
-	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void fg_videoram_w(offs_t offset, uint16_t data);
 
-	void jungleyo_map(address_map &map);
+	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+
+	tilemap_t *m_fg_tilemap;
 };
+
+
+TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
+{
+	uint16_t code = m_fg_videoram[tile_index];
+	tileinfo.set(1, code, 0, 0);
+}
+
+void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_fg_videoram[offset / 2] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
 
 void jungleyo_state::video_start()
 {
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+
 	return 0;
 }
 
 
-void jungleyo_state::jungleyo_map(address_map &map)
+void jungleyo_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0xa00000, 0xa00fff).ram();
+	map(0xb00000, 0xb0ffff).ram();
+	map(0xb10000, 0xb1ffff).ram();
+	map(0xb20000, 0xb2ffff).ram();
+	map(0xb80000, 0xb81fff).ram();
+	map(0xb90000, 0xb91fff).ram().share(m_fg_videoram).w(FUNC(jungleyo_state::fg_videoram_w));
+	map(0xba0000, 0xba1fff).ram();
+	map(0xff0000, 0xff7fff).ram();
+	map(0xff8000, 0xffffff).ram().share("nvram");
 }
 
+
 static INPUT_PORTS_START( jungleyo )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
 INPUT_PORTS_END
+
 
 static const gfx_layout jungleyo_layout =
 {
@@ -114,7 +213,6 @@ static const gfx_layout jungleyo16_layout =
 	8*64*4
 };
 
-
 static GFXDECODE_START( gfx_jungleyo )
 	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 2  )
@@ -125,8 +223,10 @@ GFXDECODE_END
 void jungleyo_state::jungleyo(machine_config &config)
 {
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jungleyo_state::jungleyo_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jungleyo_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jungleyo_state::irq1_line_hold));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jungleyo);
 
@@ -135,7 +235,7 @@ void jungleyo_state::jungleyo(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(jungleyo_state::screen_update_jungleyo));
+	screen.set_screen_update(FUNC(jungleyo_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
@@ -154,7 +254,7 @@ ROM_START( jungleyo )
 	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00000, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
 	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00001, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
 
-	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )
 
 	ROM_REGION( 0x80000, "reelgfx", 0 )
@@ -175,6 +275,12 @@ void jungleyo_state::init_jungleyo() // TODO: just a start, gives correct (?) st
 	for (int i = 0x00000; i < 0x40000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5); // TODO: possibly the bitswap and XOR are applied per byte and not per word, verify when more is discovered
 
+	// hack these until better understood (still wrong values)
+	src[0x000/2] = 0x0000;
+	src[0x002/2] = 0x0000;
+	src[0x004/2] = 0x0000;
+	src[0x006/2] = 0x01fa;
+
 	/*char filename[256];
 	sprintf(filename,"p_decrypted_%s", machine().system().name);
 	FILE *fp = fopen(filename, "w+b");
@@ -185,5 +291,7 @@ void jungleyo_state::init_jungleyo() // TODO: just a start, gives correct (?) st
 	}*/
 }
 
+} // Anonymous namespace
 
-GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
+
+GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
