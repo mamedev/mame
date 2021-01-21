@@ -38,11 +38,12 @@ class getaway_state : public driver_device
 {
 public:
 	getaway_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxrom(*this, "gfx"),
-		m_screen(*this, "screen"),
-		m_inputs(*this, "IN.%u", 0)
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxrom(*this, "gfx")
+		, m_screen(*this, "screen")
+		, m_inputs(*this, "IN.%u", 0)
+		, m_dsw(*this, "DSW.%u", 0)
 	{ }
 
 	// machine configs
@@ -57,6 +58,7 @@ private:
 	required_region_ptr<u8> m_gfxrom;
 	required_device<screen_device> m_screen;
 	required_ioport_array<1> m_inputs;
+	required_ioport_array<2> m_dsw;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -65,6 +67,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void io_w(offs_t offset, u8 data);
+	template <int i> u8 dsw_r(offs_t offset);
 	u8 coin_r(offs_t offset);
 	u8 busy_r();
 
@@ -183,6 +186,10 @@ u8 getaway_state::busy_r()
 	return 0;
 }
 
+template <int i> u8 getaway_state::dsw_r(offs_t offset)
+{
+	return BIT(m_dsw[i]->read(), offset);
+}
 
 
 /******************************************************************************
@@ -200,6 +207,8 @@ void getaway_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
+	map(0x1a, 0x1f).r(FUNC(getaway_state::dsw_r<1>));
+	map(0x22, 0x2f).r(FUNC(getaway_state::dsw_r<0>));
 	map(0x32, 0x35).r(FUNC(getaway_state::coin_r));
 	map(0x36, 0x37).r(FUNC(getaway_state::busy_r));
 }
@@ -212,8 +221,54 @@ void getaway_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( getaway )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1 )
+	
+	// dips are two banks, a regular 8 banks one
+	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
+
+	// "D1S-8"?
+	PORT_START("DSW.0")
+	// TODO: defaults for these two, assume they have different quotas?
+	PORT_DIPNAME( 0x07, 0x02, "Extended Play" )
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x01, "2000" )
+	PORT_DIPSETTING(    0x02, "3000" )
+	PORT_DIPSETTING(    0x03, "4000" )
+	PORT_DIPSETTING(    0x04, "5000" )
+	PORT_DIPSETTING(    0x05, "6000" )
+	PORT_DIPSETTING(    0x06, "7000" )
+	PORT_DIPSETTING(    0x07, "8000" )
+	PORT_DIPNAME( 0x38, 0x28, "Extra Play" )
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x08, "2000" )
+	PORT_DIPSETTING(    0x10, "3000" )
+	PORT_DIPSETTING(    0x18, "4000" )
+	PORT_DIPSETTING(    0x20, "5000" )
+	PORT_DIPSETTING(    0x28, "6000" )
+	PORT_DIPSETTING(    0x30, "7000" )
+	PORT_DIPSETTING(    0x38, "8000" )
+	PORT_DIPNAME( 0x40, 0x00, "Language" )
+	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPSETTING(    0x40, "Japanese" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	// "DNS04"?
+	PORT_START("DSW.1")
+	// credit display is shown if both extended plays are on "None"
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit (again)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
