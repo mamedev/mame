@@ -5702,7 +5702,7 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 
 
 ROM_START( vandyke )
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "vdk-1.16",  0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "vdk-2.15",  0x00001, 0x20000, CRC(9d741cc2) SHA1(2d101044fba5fc5b7d63869a0a053c42fdc2598b) )
 
@@ -5723,15 +5723,17 @@ ROM_START( vandyke )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-02.126",     0x000000, 0x080000, CRC(b2103274) SHA1(6bbdc912393607cd5306be946327c5ea0178c7a6) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-03.165",     0x000000, 0x080000, CRC(631776d3) SHA1(ffd76e5b03130252c55eaa6ae7edfee5632dae73) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "ic100.bpr", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )   // V-sync hw (unused)
 	ROM_LOAD( "ic101.bpr", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )   // H-sync hw (unused)
 ROM_END
 
 ROM_START( vandykejal )
-	ROM_REGION( 0x40000, "maincpu", 0 )  // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "vdk-1.16",   0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "jaleco2.15", 0x00001, 0x20000, CRC(170e4d2e) SHA1(6009d19d30e345fea93e039d165061e2b20ff058) )
 
@@ -5752,15 +5754,17 @@ ROM_START( vandykejal )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-02.126",     0x000000, 0x080000, CRC(b2103274) SHA1(6bbdc912393607cd5306be946327c5ea0178c7a6) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-03.165",     0x000000, 0x080000, CRC(631776d3) SHA1(ffd76e5b03130252c55eaa6ae7edfee5632dae73) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "ic100.bpr", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )   // V-sync hw (unused)
 	ROM_LOAD( "ic101.bpr", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )   // H-sync hw (unused)
 ROM_END
 
 ROM_START( vandykejal2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "vdk-even.16",  0x00000, 0x20000, CRC(cde05a84) SHA1(dab5981d7dad9abe86cfe011da8ca0b11d484a3f) ) // Hand written labels, dated 2/12
 	ROM_LOAD16_BYTE( "vdk-odd.15",   0x00001, 0x20000, CRC(0f6fea40) SHA1(3acbe72c251d51b028d8c66274263a2b39b042ea) )
 
@@ -5781,15 +5785,17 @@ ROM_START( vandykejal2 )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-02.126",     0x000000, 0x080000, CRC(b2103274) SHA1(6bbdc912393607cd5306be946327c5ea0178c7a6) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "vdk-03.165",     0x000000, 0x080000, CRC(631776d3) SHA1(ffd76e5b03130252c55eaa6ae7edfee5632dae73) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "ic100.bpr", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )   // V-sync hw (unused)
 	ROM_LOAD( "ic101.bpr", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )   // H-sync hw (unused)
 ROM_END
 
 ROM_START( vandykeb )
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2.bin",  0x00000, 0x20000, CRC(9c269702) SHA1(831ff9d499aa94d85f62b8613477a95f00f62b34) )
 	ROM_LOAD16_BYTE( "1.bin",  0x00001, 0x20000, CRC(dd6303a1) SHA1(3c225ff1696adc1af05b1b36d8cf1f220181861c) )
 
@@ -5906,8 +5912,10 @@ ROM_START( mustang )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90058-5",    0x00000, 0x80000, CRC(c60c883e) SHA1(8a01950cad820b2e781ec81cd12737829edc4f19) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90058-6",    0x00000, 0x80000, CRC(233c1776) SHA1(7010a2f914611698a65bf4f22bc1753a9ed26277) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "10.bpr",    0x00000, 0x100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // unknown
 	ROM_LOAD( "90058-11",  0x00100, 0x100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) ) // unknown
@@ -5933,8 +5941,10 @@ ROM_START( mustangs )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90058-5",    0x00000, 0x80000, CRC(c60c883e) SHA1(8a01950cad820b2e781ec81cd12737829edc4f19) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90058-6",    0x00000, 0x80000, CRC(233c1776) SHA1(7010a2f914611698a65bf4f22bc1753a9ed26277) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "90058-10",  0x00000, 0x100, CRC(de156d99) SHA1(07b70deca74e23bab7c13e5e9aee32d0dbb06509) ) // unknown
 	ROM_LOAD( "90058-11",  0x00100, 0x100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) ) // unknown
@@ -6017,8 +6027,10 @@ ROM_START( acrobatm )
 
 	ROM_REGION( 0x80000, "oki1", 0 )    // OKIM6295 samples
 	ROM_LOAD( "05_ic54.bin",    0x00000, 0x80000, CRC(3b8c2b0e) SHA1(72491da32512823540b67dc5027f21c74af08c7d) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x80000, "oki2", 0 )    // OKIM6295 samples
 	ROM_LOAD( "06_ic53.bin",    0x00000, 0x80000, CRC(c1517cd4) SHA1(5a91ddc608c7a6fbdd9f93e503d39eac02ef04a4) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "10_ic81.bin",    0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // unknown
 	ROM_LOAD( "11_ic80.bin",    0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // unknown
@@ -6097,8 +6109,10 @@ ROM_START( bioship )
 
 	ROM_REGION(0x80000, "oki1", 0 ) // Oki sample data
 	ROM_LOAD( "sbs-g_04.ic139",    0x00000, 0x80000, CRC(7c74cc4e) SHA1(92097b372eacabdb9e8e261b0bc4223821ff9273) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION(0x80000, "oki2", 0 ) // Oki sample data
 	ROM_LOAD( "sbs-g_05.ic160",    0x00000, 0x80000, CRC(f0a782e3) SHA1(d572226b8e597f1c34d246cb284e047a6e2d9290) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "82s135.ic94", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) ) // V-sync hw (unused)
 	ROM_LOAD( "82s129.ic69", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) ) // H-sync hw (unused)
@@ -6131,8 +6145,10 @@ ROM_START( sbsgomo )
 
 	ROM_REGION(0x80000, "oki1", 0 ) // Oki sample data
 	ROM_LOAD( "sbs-g_04.ic139",    0x00000, 0x80000, CRC(7c74cc4e) SHA1(92097b372eacabdb9e8e261b0bc4223821ff9273) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION(0x80000, "oki2", 0 ) // Oki sample data
 	ROM_LOAD( "sbs-g_05.ic160",    0x00000, 0x80000, CRC(f0a782e3) SHA1(d572226b8e597f1c34d246cb284e047a6e2d9290) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "82s135.ic94", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) ) // V-sync hw (unused)
 	ROM_LOAD( "82s129.ic69", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) ) // H-sync hw (unused)
@@ -6140,7 +6156,7 @@ ROM_START( sbsgomo )
 ROM_END
 
 ROM_START( blkheart )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "blkhrt.7",  0x00000, 0x20000, CRC(5bd248c0) SHA1(0649f4f8682404aeb3fc80643fcabc2d7836bb23) )
 	ROM_LOAD16_BYTE( "blkhrt.6",  0x00001, 0x20000, CRC(6449e50d) SHA1(d8cd126d921c95478346da96c20da01212395d77) )
 
@@ -6158,15 +6174,17 @@ ROM_START( blkheart )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90068-2.bin", 0x00000, 0x80000, CRC(3a583184) SHA1(9226f1ea7725e4b48bb055d1c17389cf960d75f8) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90068-1.bin", 0x00000, 0x80000, CRC(e7af69d2) SHA1(da050880e186954bcf0e0adf00750dd5a371551b) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )  // unknown
 	ROM_LOAD( "10.bpr",     0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // unknown
 ROM_END
 
 ROM_START( blkheartj )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "7.bin",  0x00000, 0x20000, CRC(e0a5c667) SHA1(3ef39b2dc1f7ffdddf586f0b3080ecd1f362ec37) )
 	ROM_LOAD16_BYTE( "6.bin",  0x00001, 0x20000, CRC(7cce45e8) SHA1(72491e30d1f9be2eede21fdde5a7484d4f65cfbf) )
 
@@ -6184,8 +6202,10 @@ ROM_START( blkheartj )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90068-2.bin", 0x00000, 0x80000, CRC(3a583184) SHA1(9226f1ea7725e4b48bb055d1c17389cf960d75f8) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "90068-1.bin", 0x00000, 0x80000, CRC(e7af69d2) SHA1(da050880e186954bcf0e0adf00750dd5a371551b) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )  // unknown
 	ROM_LOAD( "10.bpr",     0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // unknown
@@ -6210,8 +6230,10 @@ ROM_START( tdragon )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91070.3",     0x00000, 0x80000, CRC(ae6875a8) SHA1(bfdb350b3d3fce2bead1ac60875beafe427765ed) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91070.2",     0x00000, 0x80000, CRC(ecfea43e) SHA1(d664dfa6698fec8e602523bdae16068f1ff6547b) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "91070.9",  0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )    // unknown
 	ROM_LOAD( "91070.10", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )    // unknown
@@ -6236,8 +6258,10 @@ ROM_START( tdragon1 )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91070.3",     0x00000, 0x80000, CRC(ae6875a8) SHA1(bfdb350b3d3fce2bead1ac60875beafe427765ed) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91070.2",     0x00000, 0x80000, CRC(ecfea43e) SHA1(d664dfa6698fec8e602523bdae16068f1ff6547b) ) // 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "91070.9",  0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )    // unknown
 	ROM_LOAD( "91070.10", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )    // unknown
@@ -6319,7 +6343,7 @@ XTALs 8MHz (for 68000/Z80/M6295), 12MHz (for FPGAs)
 */
 
 ROM_START( airattck )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "ue10.bin",     0x000000, 0x20000, CRC(71deb9d8) SHA1(21da5a68a13c9017d787e88f7b293f263fbc6b20) )
 	ROM_LOAD16_BYTE( "uc10.bin",     0x000001, 0x20000, CRC(1837d4ba) SHA1(8dd5636a3a75c5d25d8850381e566a150ddc8ef1) )
 
@@ -6347,7 +6371,7 @@ ROM_START( airattck )
 ROM_END
 
 ROM_START( airattcka )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "6.uc10",     0x000000, 0x20000, CRC(3572baf0) SHA1(0a2fe3be16d95896dc757ef231b3708093fc7ffa) )
 	ROM_LOAD16_BYTE( "5.ue10",     0x000001, 0x20000, CRC(6589c005) SHA1(350a7b8685cacde6b72c10458c33962c5a45a255) )
 
@@ -6516,7 +6540,7 @@ ROM_START( strahljbl ) // N0 892 PCB, this bootleg uses SEIBU sound system
 ROM_END
 
 ROM_START( hachamf )
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
@@ -6535,13 +6559,14 @@ ROM_START( hachamf )
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91076-2.46",   0x00000, 0x80000, CRC(3f1e67f2) SHA1(413e78587d8a043a0eb94447313ba1b3c5b35be5) ) // 1st & 2nd half identical, needs verifying
 	// 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91076-3.45",   0x00000, 0x80000, CRC(b25ed93b) SHA1(d7bc686bbccf982f40420a11158aa8e5dd4207c5) ) // 1st & 2nd half identical, needs verifying
 	// 0x20000 - 0x80000 banked
 ROM_END
 
 ROM_START( hachamfa) // reportedly a Korean PCB / version
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "7.ic93",  0x00000, 0x20000, CRC(f437e52b) SHA1(061a75a7a9734034d1c499fc0bc2d8a61bb26da4) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.ic94",  0x00001, 0x20000, CRC(60d340d0) SHA1(3c6f862901b403d6ddf58823af7d6e3f67573788) )
 
@@ -6560,13 +6585,14 @@ ROM_START( hachamfa) // reportedly a Korean PCB / version
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91076-2.46",   0x00000, 0x80000, CRC(3f1e67f2) SHA1(413e78587d8a043a0eb94447313ba1b3c5b35be5) ) // 1st & 2nd half identical, needs verifying
 	// 0x20000 - 0x80000 banked
+
 	ROM_REGION( 0x080000, "oki2", 0 )   // OKIM6295 samples
 	ROM_LOAD( "91076-3.45",   0x00000, 0x80000, CRC(b25ed93b) SHA1(d7bc686bbccf982f40420a11158aa8e5dd4207c5) ) // 1st & 2nd half identical, needs verifying
 	// 0x20000 - 0x80000 banked
 ROM_END
 
 ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bootleg?
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "8.bin",  0x00000, 0x20000, CRC(14845b65) SHA1(5cafd07a8a6f5ccbb36de7a90571f8b33ecf273e) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "7.bin",  0x00001, 0x20000, CRC(069ca579) SHA1(0db4c3c41e17fca613d11de89b388a4af206ec6b) )
 
@@ -6592,7 +6618,7 @@ ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bo
 ROM_END
 
 ROM_START( hachamfp ) // Protoype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "kf-68-pe-b.ic7",  0x00000, 0x20000, CRC(b98a525e) SHA1(161c3b3360068e606e4d4104cc172b9736a52eeb) ) // Label says "KF 9/25 II 68 PE B"
 	ROM_LOAD16_BYTE( "kf-68-po-b.ic6",  0x00001, 0x20000, CRC(b62ad179) SHA1(60a66fb9eb3fc792d172e1f4507a806ac2ad4217) ) // Label says "KF 9/25 II 68 PO B"
 
@@ -6622,7 +6648,7 @@ ROM_START( hachamfp ) // Protoype Location Test Release; Hand-written labels wit
 ROM_END
 
 ROM_START( macross )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "921a03",        0x00000, 0x80000, CRC(33318d55) SHA1(c99f85e09bd334dc8ce138b08cbed2331b0d67dd) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // sound program (unknown CPU)
@@ -6718,7 +6744,7 @@ Notes:
 */
 
 ROM_START( gunnail )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "3e.u131",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
 	ROM_LOAD16_BYTE( "3o.u133",  0x00001, 0x40000, CRC(f114e89c) SHA1(a12f5278167f446bb5277e87289c41b5aa365c86) )
 
@@ -6747,7 +6773,7 @@ ROM_START( gunnail )
 ROM_END
 
 ROM_START( gunnailp )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "3.u132",  0x00000, 0x80000, CRC(93570f03) SHA1(54fb203b5bfceb0ac86627bff3e67863f460fe73) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     // Code for NMK004 CPU
@@ -6776,7 +6802,7 @@ ROM_END
 
 // bootleg board labeled 'GT ELEKTRONIK 16.04.93' with only 1 OKI and no NMK custom chips. Only sprites and bgtile ROMs are identical to the original.
 ROM_START( gunnailb )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "27c020.6d",  0x00000, 0x40000, CRC(b9566c46) SHA1(dcecec0d401cdf8054b4b7a5dedee62332d92002) )
 	ROM_LOAD16_BYTE( "27c020.6e",  0x00001, 0x40000, CRC(6ba7c54d) SHA1(3932b96d2f1f541f8679524de3bb8867aded9f83) )
 
@@ -6797,10 +6823,10 @@ ROM_START( gunnailb )
 ROM_END
 
 ROM_START( macross2 ) // Title screen shows Kanji characters & Macross II
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "mcrs2j.3",      0x00000, 0x80000, CRC(36a618fe) SHA1(56fdb2bcb4a39888cfbaf9692d66335524a6ac0c) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6825,10 +6851,10 @@ ROM_START( macross2 ) // Title screen shows Kanji characters & Macross II
 ROM_END
 
 ROM_START( macross2k ) // Title screen only shows Macross II, no Kanji.  Suspected Korean version - Language dip still used for Stage info screens
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "1.3",      0x00000, 0x80000, CRC(1506fcfc) SHA1(638ccc90effde3be20ab9b4da3a0d75af2577e51) ) // non descript ROM label "1"
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6853,10 +6879,10 @@ ROM_START( macross2k ) // Title screen only shows Macross II, no Kanji.  Suspect
 ROM_END
 
 ROM_START( macross2g )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "3.u11",      0x00000, 0x80000, CRC(151f9d39) SHA1(d0454627f019c60615cc8bd11e6cbec1f885cf13) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6881,10 +6907,10 @@ ROM_START( macross2g )
 ROM_END
 
 ROM_START( tdragon2 )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "6.rom",      0x00000, 0x80000, CRC(ca348caf) SHA1(7c5b0b92560baf413591230e061d2d57b25deafe) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6940,10 +6966,10 @@ ROM_START( tdragon3h )
 ROM_END
 
 ROM_START( tdragon2a )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "6.bin",      0x00000, 0x80000, CRC(310d6bca) SHA1(f46ad1d13cf5014aef1f0e8862b369ab31c22866) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6968,10 +6994,10 @@ ROM_START( tdragon2a )
 ROM_END
 
 ROM_START( bigbang )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "eprom.3",      0x00000, 0x80000, CRC(28e5957a) SHA1(fe4f870a9c2235cc02b4e036a2a4116f071d59ad) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) // banked
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7058,7 +7084,7 @@ AWA94099-ROME
 */
 
 ROM_START( arcadian )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "arcadia.3",      0x00000, 0x80000, CRC(8b46d609) SHA1(793870d74c9d7d04c53d898610c682b2dc90d0af) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        // tmp90c841
@@ -7090,7 +7116,7 @@ ROM_START( arcadian )
 ROM_END
 
 ROM_START( raphero )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "3",      0x00000, 0x80000, CRC(3257bfbd) SHA1(12ba7bbbf811c9a574a7751979edaaf1f33b0764) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        // tmp90c841
@@ -7122,7 +7148,7 @@ ROM_START( raphero )
 ROM_END
 
 ROM_START( rapheroa )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "rhp94099.3",      0x00000, 0x80000, CRC(ec9b4f05) SHA1(e5bd797620dc449fd78b41d87e9ba5a764eb8b44) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        // tmp90c841
@@ -7154,7 +7180,7 @@ ROM_START( rapheroa )
 ROM_END
 
 ROM_START( sabotenb )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "ic76.sb1",  0x00000, 0x40000, CRC(b2b0b2cf) SHA1(219f1cefdb107d8404f4f8bfa0700fd3218d9320) )
 	ROM_LOAD16_BYTE( "ic75.sb2",  0x00001, 0x40000, CRC(367e87b7) SHA1(c950041529b5117686e4bb1ae77db82fe758c1d0) )
 
@@ -7175,7 +7201,7 @@ ROM_START( sabotenb )
 ROM_END
 
 ROM_START( sabotenba )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "sb1.76",  0x00000, 0x40000, CRC(df6f65e2) SHA1(6ad9e9f13539310646895c5e7992c6546e75684b) )
 	ROM_LOAD16_BYTE( "sb2.75",  0x00001, 0x40000, CRC(0d2c1ab8) SHA1(abb43a8c5398195c0ad48d8d772ef47635bf25c2) )
 
@@ -7196,7 +7222,7 @@ ROM_START( sabotenba )
 ROM_END
 
 ROM_START( cactus )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "02.bin",  0x00000, 0x40000, CRC(15b2ff2f) SHA1(432cfd58daa0fdbe62157b36ca73eb9af6ce91e9) ) // PCB is marked 'Cactus', actual game has no title screen
 	ROM_LOAD16_BYTE( "01.bin",  0x00001, 0x40000, CRC(5b8ba46a) SHA1(617e414fda1bd3e9f391676d312b0cdd4700adee) )
 
@@ -7219,7 +7245,7 @@ ROM_START( cactus )
 ROM_END
 
 ROM_START( bjtwin )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "93087-1.bin",  0x00000, 0x20000, CRC(93c84e2d) SHA1(ad0755cabfef78e7e689856379d6f8c88a9b27c1) )
 	ROM_LOAD16_BYTE( "93087-2.bin",  0x00001, 0x20000, CRC(30ff678a) SHA1(aa3ce4905e448e371e254545ef9ed7edb00b1cc3) )
 
@@ -7244,7 +7270,7 @@ ROM_START( bjtwin )
 ROM_END
 
 ROM_START( bjtwina )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "93087.1",  0x00000, 0x20000, CRC(c82b3d8e) SHA1(74435ba7842f1be9968006894cfa5eef05c47395) )
 	ROM_LOAD16_BYTE( "93087.2",  0x00001, 0x20000, CRC(9be1ec47) SHA1(bf37d9254a7bbdf49b006971886ed9845d72e4b3) )
 
@@ -7270,7 +7296,7 @@ ROM_END
 
 
 ROM_START( bjtwinp )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "ic76",  0x00000, 0x20000, CRC(c2847f0d) SHA1(2659e642586fcd199928d3f10ec300a1f13f2e3b) )
 	ROM_LOAD16_BYTE( "ic75",  0x00001, 0x20000, CRC(dd8fdfce) SHA1(8b2da3b97acd07783b68ee270ae678dab6e538ec) )
 
@@ -7297,7 +7323,7 @@ ROM_END
 
 
 ROM_START( bjtwinpa )
-	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68000 code
 	ROM_LOAD16_BYTE( "ic76.bin",  0x00000, 0x20000, CRC(81106d1e) SHA1(81c195173cf859f6266c160ee94ac4734edef085) )
 	ROM_LOAD16_BYTE( "ic75.bin",  0x00001, 0x20000, CRC(7c99b97f) SHA1(36e34b7a5bb876b7bbee46ace7acc03faeee211e) )
 
@@ -7323,7 +7349,7 @@ ROM_START( bjtwinpa )
 ROM_END
 
 ROM_START( nouryoku )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "ic76.1",  0x00000, 0x40000, CRC(26075988) SHA1(c3d0eef0417be3f78008c026915fd7e2fd589563) )
 	ROM_LOAD16_BYTE( "ic75.2",  0x00001, 0x40000, CRC(75ab82cd) SHA1(fb828f87eebbe9d61766535efc18de9dfded110c) )
 
@@ -7344,7 +7370,7 @@ ROM_START( nouryoku )
 ROM_END
 
 ROM_START( nouryokup )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "ic76.1",  0x00000, 0x40000, CRC(26075988) SHA1(c3d0eef0417be3f78008c026915fd7e2fd589563) )
 	ROM_LOAD16_BYTE( "ic75.2",  0x00001, 0x40000, CRC(75ab82cd) SHA1(fb828f87eebbe9d61766535efc18de9dfded110c) )
 
@@ -7374,7 +7400,7 @@ ROM_START( nouryokup )
 ROM_END
 
 ROM_START( manybloc )
-	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 Code
+	ROM_REGION( 0x200000, "maincpu", 0 )        // 68000 code
 	ROM_LOAD16_BYTE( "1-u33.bin",  0x00001, 0x20000, CRC(07473154) SHA1(e67f637e74dfe5f1be558f963c0b3225254afe33) )
 	ROM_LOAD16_BYTE( "2-u35.bin",  0x00000, 0x20000, CRC(04acd8c1) SHA1(3ef329e8d25565c7f7166f12137f4df5a057022f) )
 
@@ -7456,11 +7482,11 @@ Parts:
 ***************************************************************************/
 
 ROM_START( stagger1 ) // Japan only, with later (c) year of 1998
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(8555929b) SHA1(b405d81c2a45191111b1a4458ac6b5c0a129b8f1) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(5b0b63ac) SHA1(239f793b6845a88d1630da790a2762da730a450d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7517,11 +7543,11 @@ void afega_state::init_redhawk()
 }
 
 ROM_START( redhawk ) // U.S.A., Canada & South America, (c) 1997
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(3ef5f326) SHA1(e89c7c24a05886a14995d7c399958dc00ad35d63) )
 	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(9b3a10ef) SHA1(d03480329b23474e5a9e42a75b09d2140eed4443) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7539,11 +7565,11 @@ ROM_START( redhawk ) // U.S.A., Canada & South America, (c) 1997
 ROM_END
 
 ROM_START( redhawke ) // Excellent Co., Ldt license (no code scramble), (c) 1997
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "rhawk2.bin", 0x000000, 0x020000, CRC(6d2e23b4) SHA1(54579d460844e022ab61f32bfec28f00f2d27140) )
 	ROM_LOAD16_BYTE( "rhawk3.bin", 0x000001, 0x020000, CRC(5e0d6188) SHA1(c6ce8a3adf940893fcb6281348fdb0cdd65fe654) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7566,11 +7592,11 @@ void afega_state::init_redhawki()
 }
 
 ROM_START( redhawki )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x020000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
 	ROM_LOAD16_BYTE( "rhit-3.bin", 0x000001, 0x020000, CRC(37dbb3c2) SHA1(d1f8258f357b885d38f87d288f98046dbd7d56aa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7588,25 +7614,25 @@ ROM_START( redhawki )
 ROM_END
 
 ROM_START( redhawks )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
-	ROM_LOAD16_BYTE( "2.hex", 0x000000, 0x020000, CRC(8b427ef8) SHA1(ba615b1a5ed9c1a97bb0b6d121a0d752d138adee) )
-	ROM_LOAD16_BYTE( "3.hex", 0x000001, 0x020000, CRC(117e3813) SHA1(415b115a96f139094b5927637c5ec8438cc9bd44) )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(8b427ef8) SHA1(ba615b1a5ed9c1a97bb0b6d121a0d752d138adee) )
+	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(117e3813) SHA1(415b115a96f139094b5927637c5ec8438cc9bd44) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "1.hex", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
-	ROM_LOAD16_BYTE( "6.hex", 0x000001, 0x080000, CRC(aa6564e6) SHA1(f8335cddc0bb0674e86ccaca079ca828ed7a6790) )
-	ROM_LOAD16_BYTE( "7.hex", 0x000000, 0x080000, CRC(5c5b5fa1) SHA1(41946d763f9d72a6322a2f7e3c54a9f6114afe01) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x080000, CRC(aa6564e6) SHA1(f8335cddc0bb0674e86ccaca079ca828ed7a6790) )
+	ROM_LOAD16_BYTE( "7.bin", 0x000000, 0x080000, CRC(5c5b5fa1) SHA1(41946d763f9d72a6322a2f7e3c54a9f6114afe01) )
 
 	ROM_REGION( 0x080000, "bgtile", 0 )   // Layer 0, 16x16x8
-	ROM_LOAD( "4.hex", 0x000000, 0x080000, CRC(03a8d952) SHA1(44252f90e21d6f3841bcdcdac0aba318f94e33b0) )
+	ROM_LOAD( "4.bin", 0x000000, 0x080000, CRC(03a8d952) SHA1(44252f90e21d6f3841bcdcdac0aba318f94e33b0) )
 
 	ROM_REGION( 0x00100, "fgtile", ROMREGION_ERASEFF )    // Layer 1, 8x8x4
 	// Unused
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
-	ROM_LOAD( "5.hex", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
 void afega_state::init_redhawkg()
@@ -7615,11 +7641,11 @@ void afega_state::init_redhawkg()
 }
 
 ROM_START( redhawkg ) // original Afega PCB with Delta Coin sticker
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(ccd459eb) SHA1(677b03f1e3973f0e1f09272d336c2dd9da8f843c) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(483802fd) SHA1(4ec2b15bc89c12806dab78ae30f5fe24e26d46eb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7637,11 +7663,11 @@ ROM_START( redhawkg ) // original Afega PCB with Delta Coin sticker
 ROM_END
 
 ROM_START( redhawkb )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "rhb-1.bin", 0x000000, 0x020000, CRC(e733ea07) SHA1(b1ffeda633d5e701f0e97c79930a54d7b89a85c5) )
 	ROM_LOAD16_BYTE( "rhb-2.bin", 0x000001, 0x020000, CRC(f9fa5684) SHA1(057ea3eebbaa1a208a72beef21b9368df7032ce1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7658,11 +7684,11 @@ ROM_START( redhawkb )
 ROM_END
 
 ROM_START( redhawkk )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(8c02e81d) SHA1(e79b0369adfe4111d7596df5270c1db8e3618ce5) )
 	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(ab3597ee) SHA1(e9a2e085fa24cb2f500600b84ce2fe3924cf0827) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7752,11 +7778,11 @@ void afega_state::init_grdnstrm()
 }
 
 ROM_START( grdnstrm )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega4.u112", 0x000000, 0x040000, CRC(2244713a) SHA1(41ae66a38931c12462ecae53e1e44c3420d0d235) )
 	ROM_LOAD16_BYTE( "afega5.u107", 0x000001, 0x040000, CRC(5815c806) SHA1(f6b7809b2e3b29b89289ecc994909434fe34e10d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // mask ROM (read as 27C020)
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7774,11 +7800,11 @@ ROM_START( grdnstrm )
 ROM_END
 
 ROM_START( grdnstrmk )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "gst-04.u112", 0x000000, 0x040000, CRC(922c931a) SHA1(1d1511033c8c424535a73f5c5bf58560a8b1842e) )
 	ROM_LOAD16_BYTE( "gst-05.u107", 0x000001, 0x040000, CRC(d22ca2dc) SHA1(fa21c8ec804570d64f4b167b7f65fd5811435e46) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7796,11 +7822,11 @@ ROM_START( grdnstrmk )
 ROM_END
 
 ROM_START( grdnstrmj )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega_3.u112", 0x000000, 0x040000, CRC(e51a35fb) SHA1(acb733d0e5c9c54477d0475a64f53d68a84218c6) )
 	ROM_LOAD16_BYTE( "afega_4.u107", 0x000001, 0x040000, CRC(cb10aa54) SHA1(bb0cb837b5651df4ff8f215854353631a39b730c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7818,11 +7844,11 @@ ROM_START( grdnstrmj )
 ROM_END
 
 ROM_START( grdnstrmv ) // Apples Industries license - Vertical version
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega2.u112", 0x000000, 0x040000, CRC(16d41050) SHA1(79b6621dccb286e5adf60c40690083a37746a4f9) )
 	ROM_LOAD16_BYTE( "afega3.u107", 0x000001, 0x040000, CRC(05920a99) SHA1(ee77da303d6b766c529c426a836777827ac31676) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // mask ROM (read as 27C020)
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7845,11 +7871,11 @@ void afega_state::init_grdnstrmg()
 }
 
 ROM_START( grdnstrmg ) // Germany
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "gs5_c1.uc1", 0x000001, 0x040000, CRC(c0263e4a) SHA1(8cae60bd59730aaba215f825016a780eced3a12d) )
 	ROM_LOAD16_BYTE( "gs6_c2.uc9", 0x000000, 0x040000, CRC(ea363e4d) SHA1(2958dcddc409a11006beb52485975689182f3677) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "gs1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) //
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7879,11 +7905,11 @@ void afega_state::init_grdnstrmau()
 }
 
 ROM_START( grdnstrmau )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "uc9_27c020.10", 0x000000, 0x040000, CRC(548932b4) SHA1(c90c7e769235d12b07b24deac436202c650cf3e8) )
 	ROM_LOAD16_BYTE( "uc1_27c020.9",  0x000001, 0x040000, CRC(269e2fbc) SHA1(17c3511a44f044927c23f2e5bb8e75c29e3fbcc2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "uc14_27c512.8", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7907,11 +7933,11 @@ ROM_END
 
 // 紅狐戰機 II (Hóng Hú Zhànjī II)
 ROM_START( redfoxwp2 )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "u112", 0x000000, 0x040000, CRC(3f31600b) SHA1(6c56e36178effb60ec27dfcd205393e2cfac4ed6) ) // No label
 	ROM_LOAD16_BYTE( "u107", 0x000001, 0x040000, CRC(daa44ab4) SHA1(7edaf8c7383dd31250478aeebc3247c525c75fef) ) // No label
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "u92", 0x00000, 0x10000, CRC(864b55c2) SHA1(43475b05e35549ad301c3d4a25d4f4f0bcbe3f2c) ) // Winbond W27E512-12 with no label
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4
@@ -7935,11 +7961,11 @@ void afega_state::init_redfoxwp2a()
 
 // 紅狐戰機 II (Hóng Hú Zhànjī II)
 ROM_START( redfoxwp2a )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega_4.u112", 0x000000, 0x040000, CRC(e6e6682a) SHA1(1a70ca3881b4ecc6d329814ff1fdafce16550ca2) )
 	ROM_LOAD16_BYTE( "afega_5.u107", 0x000001, 0x040000, CRC(2faa2ed6) SHA1(c6ca3ca0cff85379007a44648c6de87864095c2e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega_1.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   // Sprites, 16x16x4 // not dumped, it is correct?
@@ -7976,11 +8002,11 @@ The pcb might be missing an EPROM in a socket
 ****************************************************************************/
 
 ROM_START( popspops )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega4.u112", 0x000000, 0x040000, CRC(db191762) SHA1(901fdc20374473127d694513d4291e29e65eafe8) )
 	ROM_LOAD16_BYTE( "afega5.u107", 0x000001, 0x040000, CRC(17e0c48b) SHA1(833c61c4b3ee293b0bcddfa86dfa9c1014375115) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "afega1.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )   // Sprites, 16x16x4
@@ -8014,11 +8040,11 @@ Dumped by Corrado Tomaselli
 ****************************************************************************/
 
 ROM_START( mangchi )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega9.u112", 0x00000, 0x40000, CRC(0b1517a5) SHA1(50e307641759bb2a35aff56ef9598364740803a0) )
 	ROM_LOAD16_BYTE( "afega10.u107", 0x00001, 0x40000, CRC(b1d0f33d) SHA1(68b5be3f7911f7299566c5bf5801e90099433613) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "sound.u92", 0x00000, 0x10000, CRC(bec4f9aa) SHA1(18fb2ee06892983c117a62b70cd72a98f60a08b6) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8087,11 +8113,11 @@ void afega_state::init_bubl2000()
 }
 
 ROM_START( bubl2000 )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "rom10.112", 0x00000, 0x20000, CRC(87f960d7) SHA1(d22fe1740217ac20963bd9003245850598ccecf2) ) // Has dipswitch control for Demo Sounds
 	ROM_LOAD16_BYTE( "rom11.107", 0x00001, 0x20000, CRC(b386041a) SHA1(cac36e22a39b5be0c5cd54dce5c912ff811edb28) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "rom01.92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
 	ROM_REGION( 0x080000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8114,11 +8140,11 @@ ROM_START( bubl2000 )
 ROM_END
 
 ROM_START( bubl2000a )
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "b-2000_n_v1.2.112", 0x00000, 0x20000, CRC(da28624b) SHA1(01447f32bd4d3588ec5458cb9996d49808883e1c) ) // Has no Demo Sounds??  Earlier version??
 	ROM_LOAD16_BYTE( "b-2000_n_v1.2.107", 0x00001, 0x20000, CRC(c766c1fb) SHA1(54b54021d05a3b41afe954bc3763e809a5eb3b55) ) // Tuning sticker shows production was 11/98
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "rom01.92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
 	ROM_REGION( 0x080000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8209,11 +8235,11 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hotbubl ) // Korean release - Nude images of women for backgrounds
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "c1.uc1",  0x00001, 0x40000, CRC(7bb240e9) SHA1(99048fa275182c3da3bfb0dedd790f4b5858bd92) )
 	ROM_LOAD16_BYTE( "c2.uc9",  0x00000, 0x40000, CRC(7917b95d) SHA1(0344bae9c373c5943e7693720e5e531bc2e0d7ee) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8237,11 +8263,11 @@ ROM_START( hotbubl ) // Korean release - Nude images of women for backgrounds
 ROM_END
 
 ROM_START( hotbubla ) // Korean release - Nude images replaced with pictures of satellite dishes
-	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) )
 	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8265,11 +8291,11 @@ ROM_START( hotbubla ) // Korean release - Nude images replaced with pictures of 
 ROM_END
 
 ROM_START( dolmen ) // Original source of the caveman concept for Bubble 2000 / Hot Bubble, much earlier and completely different hardware
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega8.uj3", 0x00000, 0x20000, CRC(f1b73e4c) SHA1(fe5bbd1e91d1a81744c373effbd96adbbc896133) )
 	ROM_LOAD16_BYTE( "afega7.uj2", 0x00001, 0x20000, CRC(c91bda0b) SHA1(8c09e3020e72e8ab2ca3a3dad708d64f9bf75a4f) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 Code
+	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 code
 	ROM_LOAD( "afega1.su6", 0x0000, 0x8000, CRC(166b53cb) SHA1(44864d1518205bdc445dc95e5825924f73d334b2) )   // 1111xxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
@@ -8332,11 +8358,11 @@ Notes:
 ***************************************************************************/
 
 ROM_START( firehawk )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 Code
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "fhawk_p1.u59", 0x00001, 0x80000, CRC(d6d71a50) SHA1(e947720a0600d049b7ea9486442e1ba5582536c2) )
 	ROM_LOAD16_BYTE( "fhawk_p2.u60", 0x00000, 0x80000, CRC(9f35d245) SHA1(5a22146f16bff7db924550970ed2a3048bc3edab) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 code
 	ROM_LOAD( "fhawk_s1.u40", 0x00000, 0x20000, CRC(c6609c39) SHA1(fe9b5f6c3ab42c48cb493fecb1181901efabdb58) )
 
 	ROM_REGION( 0x200000, "sprites",0 ) // Sprites, 16x16x4
@@ -8357,11 +8383,11 @@ ROM_START( firehawk )
 ROM_END
 
 ROM_START( firehawkv )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 Code
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "fire_hawk_cn1.u53", 0x00001, 0x80000, CRC(c09db3ec) SHA1(5beab9f837d8821fea1ceeac1be01c2c3ceaabf2) )
 	ROM_LOAD16_BYTE( "fire_hawk_cn2.u59", 0x00000, 0x80000, CRC(68b0737c) SHA1(d8eac5b0f4023556f39ffb187f6d75270a5b782f) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 code
 	ROM_LOAD( "fhawk_s1.u38", 0x00000, 0x20000, CRC(c6609c39) SHA1(fe9b5f6c3ab42c48cb493fecb1181901efabdb58) )
 
 	ROM_REGION( 0x400000, "sprites",0 ) // Sprites, 16x16x4
@@ -8437,11 +8463,11 @@ void afega_state::init_spec2k()
 }
 
 ROM_START( spec2kh )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "yonatech5.u124", 0x00000, 0x40000, CRC(72ab5c05) SHA1(182a811982b89b8cda0677547ef0625c274f5c6b) )
 	ROM_LOAD16_BYTE( "yonatech6.u120", 0x00001, 0x40000, CRC(7e44bd9c) SHA1(da59685be14a09ec037743fcec34fb293f7d588d) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 code
 	ROM_LOAD( "yonatech1.u103", 0x00000, 0x10000, CRC(ef5acda7) SHA1(e55b36a1598ecbbbad984997d61599dfa3958f60) )
 
 	ROM_REGION( 0x200000, "sprites",0 ) // Sprites, 16x16x4
@@ -8462,11 +8488,11 @@ ROM_START( spec2kh )
 ROM_END
 
 ROM_START( spec2k )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "u124", 0x00000, 0x40000, CRC(dbd6f65d) SHA1(0fad9836689fcbee60904ccad59a2a5be09f3139) )
 	ROM_LOAD16_BYTE( "u120", 0x00001, 0x40000, CRC(be53e243) SHA1(38144b90a35ba144921824a0c4f133339e07f9a1) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 Code
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80 code
 	ROM_LOAD( "u103", 0x00000, 0x10000, CRC(f4e4fb10) SHA1(d19953d37e31fc753b50f0047d5be16f1f2daf09) )
 
 	ROM_REGION( 0x200000, "sprites",0 ) // Sprites, 16x16x4
@@ -8508,11 +8534,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( twinactn )
-	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 Code
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "afega.uj13", 0x00000, 0x20000, CRC(9187701d) SHA1(1da8d1e3969f60c7b0521cd22c723cb51619df9d) )
 	ROM_LOAD16_BYTE( "afega.uj12", 0x00001, 0x20000, CRC(fe8cff9c) SHA1(a1a04deff9e2cb54c69601898cf4e5133c2bc437) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 Code
+	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 code
 	ROM_LOAD( "afega.su6", 0x0000, 0x8000, CRC(3a52dc88) SHA1(87941987d34d93df6df9ff33ccfbd1f5d4a39c51) )   // 1111xxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
