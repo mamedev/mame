@@ -8,9 +8,13 @@ Driver by Angelo Salese & Robbbert.
 
 TODO:
 - implement printer;
-- Colours are incorrect? Not really sure until we can get more carts
 - Implement 2nd cart slot
 - Keyboard works in all scenarios, but it is a guess.
+- Colours are incorrect. Need more carts to help construct a proper solution.
+ -- m_pal_reg and m_pri_mask can have unemulated bits used by games, what are these bits for?
+ -- the colours are verified correct for all games in the software lists, except:
+   -- chlgolf - it's almost correct, just a few minor things in the background. Perfectly playable.
+   -- cracer - this game has a lot of issues, including incorrect behaviour. It's still playable though.
 
 Notes:
 - BS-BASIC v1.0 notes:
@@ -23,7 +27,7 @@ Notes:
      btanb. After that, scrolling works correctly.
   -- Need a real machine to confirm these problems, but if true, one can only wonder how such
      obvious issues made it out the door.
-- To stop a cmt load, press STOP + SHIFT keys
+- To stop a cmt load, press STOP + SHIFT keys (this combination is the BREAK key).
 
 For a list of all known software and devices for the system, please see hash/rx78.xml.
 
@@ -130,7 +134,7 @@ u8 rx78_state::cass_r()
 
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 color;
+	u8 color[2];
 	bool pen[3];
 	const u8 borderx = 32, bordery = 20;
 
@@ -139,7 +143,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	u16 count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
 
 	u8 pri_mask = m_pri_mask;
-	if (m_pal_reg[6])
+	if (BIT(m_pri_mask, 7))
 		pri_mask &= m_pal_reg[6]; // this gives blue sky in Challenge Golf - colours to be checked on carts as they are dumped
 
 	for(u8 y=0; y<184; y++)
@@ -153,18 +157,19 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				pen[1] = BIT(m_pri_mask, 4) ? BIT(m_vram[count + 0x8000], i) : 0;
 				pen[2] = BIT(m_pri_mask, 5) ? BIT(m_vram[count + 0xa000], i) : 0;
 
-				color = pen[0] | (pen[1] << 1) | (pen[2] << 2);
-				if (color)
-					bitmap.pix(y+bordery, x+i+borderx) = color | 8;
+				color[1] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
 
 				/* fg color */
 				pen[0] = BIT(pri_mask, 0) ? BIT(m_vram[count + 0x0000], i) : 0;
 				pen[1] = BIT(pri_mask, 1) ? BIT(m_vram[count + 0x2000], i) : 0;
 				pen[2] = BIT(pri_mask, 2) ? BIT(m_vram[count + 0x4000], i) : 0;
 
-				color = pen[0] | (pen[1] << 1) | (pen[2] << 2);
-				if (color)
-					bitmap.pix(y+bordery, x+i+borderx) = color;
+				color[0] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
+
+				if (color[1])
+					bitmap.pix(y+bordery, x+i+borderx) = color[1] | 8;
+				if (color[0])
+					bitmap.pix(y+bordery, x+i+borderx) = color[0];
 			}
 			count++;
 		}
@@ -225,18 +230,29 @@ void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
 	m_pal_reg[offset] = data;
 
-	for(u8 i = 0; i < 16; i++)
+	if (offset < 6)
 	{
-		u8 res = (BIT(i, 0) ? m_pal_reg[0 + (BIT(i, 3) ? 3 : 0)] : 0)
-				|(BIT(i, 1) ? m_pal_reg[1 + (BIT(i, 3) ? 3 : 0)] : 0)
-				|(BIT(i, 2) ? m_pal_reg[2 + (BIT(i, 3) ? 3 : 0)] : 0);
+		for(u8 i = 0; i < 16; i++)
+		{
+			data =   (BIT(i, 0) ? m_pal_reg[0 + (BIT(i, 3) ? 3 : 0)] : 0)
+					|(BIT(i, 1) ? m_pal_reg[1 + (BIT(i, 3) ? 3 : 0)] : 0)
+					|(BIT(i, 2) ? m_pal_reg[2 + (BIT(i, 3) ? 3 : 0)] : 0);
 
-		u8 r = (res & 0x11) == 0x11 ? 0xff : ((res & 0x11) == 0x01 ? 0x7f : 0);
-		u8 g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0);
-		u8 b = (res & 0x44) == 0x44 ? 0xff : ((res & 0x44) == 0x04 ? 0x7f : 0);
+			u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
+			u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
+			u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
 
-		m_palette->set_pen_color(i, rgb_t(r,g,b));
+			m_palette->set_pen_color(i, rgb_t(r,g,b));
+		}
 	}
+
+	if (m_pal_reg[6] == 3)  // seki
+		for (u8 i = 5; i <8; i++)
+			m_palette->set_pen_color(i, m_palette->pen_color(i-4));
+	else
+	if (m_pal_reg[6] == 15)  // theprowr
+		for (u8 i = 11; i <16; i+=2)
+			m_palette->set_pen_color(i, m_palette->pen_color(9));
 }
 
 void rx78_state::vdp_bg_reg_w(u8 data)

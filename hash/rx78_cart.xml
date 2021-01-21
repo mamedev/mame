@@ -121,11 +121,11 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="cracer">
+	<software name="cracer" supported="partial"><!-- various bugs -->
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Space to start; Ctrl to accelerate; Left-Right to move" />
+		<info name="usage" value="PgUp = 1 or \ = 2. Space to start; Ctrl to accelerate; Left-Right to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="championracer.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
@@ -137,7 +137,7 @@ The monitor will expect you to load a program from cassette.
 		<description>Mobile Suit Gundam</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Alt to Start and Fire; Left-Right to move" />
+		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="gundam.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
