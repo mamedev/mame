@@ -154,12 +154,13 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	{
 		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
-		// used a lot, bitplane bank? fractional x offset?
-		//u8 smask = src >> 13;
+		u8 color_mask = src >> 13;
 		src &= 0x1fff;
 
+		// TODO: this can select through the full range
+		// iiii ifff
 		u16 dest = m_regs[4] << 8 | m_regs[3];
-		u8 dmask = dest >> 13;
+//		u8 dmask = dest >> 13;
 		dest &= 0x1fff;
 
 		u8 height = m_regs[8];
@@ -168,6 +169,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 
 		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
 		// 0x0b sprites, 0x03 score, 0x20 used on press start button (unknown meaning)
+		// TODO: bit 3 is more likely a switch between RMW vs. regular replace
 		u8 *vram = (m_regs[1] & 0x08) ? m_vram : m_tvram;
 //		if (m_regs[7] & 0xe0)
 		//if (m_regs[1] & 0x08)
@@ -182,7 +184,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 			{
 				u8 src_data = fill_mode ? 0 : m_gfxrom[src];
 				for (int i = 0; i < 3; i++)
-					vram[i * 0x2000 + dest] = BIT(dmask, i) ? src_data : 0;
+					vram[i * 0x2000 + dest] = BIT(color_mask, i) ? src_data : 0;
 
 				src = (src + 1) & 0x1fff;
 				dest = (dest + 1) & 0x1fff;
