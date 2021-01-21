@@ -114,7 +114,7 @@ android-armeabi-v7a:
   variables:
     TARGET:    mame
     SUBTARGET: arcade
-    CORENAME: mamearcade
+    CORENAME:  mamearcade
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a"
@@ -127,7 +127,7 @@ android-arm64-v8a:
   variables:
     TARGET:    mame
     SUBTARGET: arcade
-    CORENAME: mamearcade
+    CORENAME:  mamearcade
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a"
@@ -140,7 +140,7 @@ android-x86_64:
   variables:
     TARGET:    mame
     SUBTARGET: arcade
-    CORENAME: mamearcade
+    CORENAME:  mamearcade
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-android-x86_64"
