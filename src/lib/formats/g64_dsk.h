@@ -47,7 +47,7 @@ protected:
 
 	static const uint32_t c1541_cell_size[];
 
-	int generate_bitstream(int track, int head, int speed_zone, uint8_t *trackbuf, int &track_size, floppy_image *image);
+	int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image);
 };
 
 extern const floppy_format_type FLOPPY_G64_FORMAT;

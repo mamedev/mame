@@ -415,25 +415,20 @@ bool victor9k_format::save(io_generic *io, const std::vector<uint32_t> &variants
 
 void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract the sectors
-	generate_bitstream_from_track(track, head, cell_size[speed_zone[head][track]], bitstream, track_size, image);
-	extract_sectors_from_bitstream_victor_gcr5(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+	auto bitstream = generate_bitstream_from_track(track, head, cell_size[speed_zone[head][track]], image);
+	auto sectors = extract_sectors_from_bitstream_victor_gcr5(bitstream);
 
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		desc_xs &xs = sectors[ds.sector_id];
-		if(!xs.data)
+		const auto &data = sectors[ds.sector_id];
+		if(data.empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(xs.size < ds.size) {
-			memcpy((void *)ds.data, xs.data, xs.size);
-			memset((uint8_t *)ds.data + xs.size, 0, xs.size - ds.size);
+		else if(data.size() < ds.size) {
+			memcpy((void *)ds.data, data.data(), data.size());
+			memset((uint8_t *)ds.data + data.size(), 0, data.size() - ds.size);
 		} else
-			memcpy((void *)ds.data, xs.data, ds.size);
+			memcpy((void *)ds.data, data.data(), ds.size);
 	}
 }
 

@@ -574,36 +574,6 @@ int a2_16sect_format::identify(io_generic *io, uint32_t form_factor, const std::
 		return 0;
 }
 
-// following is placeholder, is completely wrong.
-const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
-		{ SECTOR_LOOP_START, 0, -1 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aa96, 24 },
-		{   CRC_MACHEAD_START, 0 },
-		{     TRACK_ID_GCR6 },
-		{     SECTOR_ID_GCR6 },
-		{     TRACK_HEAD_ID_GCR6 },
-		{     SECTOR_INFO_GCR6 },
-		{   CRC_END, 0 },
-		{   CRC, 0 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aaad, 24 },
-		{   SECTOR_ID_GCR6 },
-		{   SECTOR_DATA_MAC, -1 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff, 8 },
-		{ SECTOR_LOOP_END },
-		{ END },
-};
-
 bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
@@ -747,14 +717,14 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	return true;
 }
 
-uint8_t a2_16sect_format::gb(const uint8_t *buf, int ts, int &pos, int &wrap)
+uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 {
 		uint8_t v = 0;
 		int w1 = wrap;
 		while(wrap != w1+2 && !(v & 0x80)) {
-				v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
+				v = (v << 1) | buf[pos];
 				pos++;
-				if(pos == ts) {
+				if(pos == buf.size()) {
 						pos = 0;
 						wrap++;
 				}
@@ -806,12 +776,10 @@ bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variant
 				uint8_t sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;
-				uint8_t buf[10000]; // normal is 51090 cells, e.g. 6387 bytes, add 50% and round up for denser than normal disks
-				int ts;
 				#ifdef VERBOSE_SAVE
 				fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
 				#endif
-				generate_bitstream_from_track(track, head, 3915, buf, ts, image);
+				auto buf = generate_bitstream_from_track(track, head, 3915, image);
 				#ifdef VERBOSE_SAVE
 				fprintf(stderr,"done.\n");
 				#endif
@@ -820,7 +788,7 @@ bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variant
 				int hb = 0;
 				int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 				for(;;) {
-						uint8_t v = gb(buf, ts, pos, wrap);
+						uint8_t v = gb(buf, pos, wrap);
 						if(v == 0xff)               {
 								hb = 1;
 							}
@@ -840,7 +808,7 @@ bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variant
 						if(hb == 4) {
 								uint8_t h[11];
 								for(auto & elem : h)
-										elem = gb(buf, ts, pos, wrap);
+										elem = gb(buf, pos, wrap);
 								//uint8_t v2 = gcr6bw_tb[h[2]];
 								uint8_t vl = gcr4_decode(h[0],h[1]);
 								uint8_t tr = gcr4_decode(h[2],h[3]);
@@ -863,7 +831,7 @@ bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variant
 										int owrap = wrap;
 										hb = 0;
 										for(int i=0; i<20 && hb != 4; i++) {
-												v = gb(buf, ts, pos, wrap);
+												v = gb(buf, pos, wrap);
 												if(v == 0xff)
 														hb = 1;
 												else if(hb == 1 && v == 0xd5)
@@ -893,17 +861,17 @@ bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variant
 
 												// first read in sector and decode to 6bit form
 												for(int i=0; i<0x156; i++) {
-														data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
+														data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ^ c;
 														c = data[i];
 												//  printf("%02x ", c);
 												//  if (((i&0xf)+1)==0x10) printf("\n");
 												}
 												// read the checksum byte
-												data[0x156] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+												data[0x156] = gcr6bw_tb[gb(buf,pos,wrap)];
 												// now read the postamble bytes
 												for(int i=0; i<3; i++) {
 														dpost <<= 8;
-														dpost |= gb(buf, ts, pos, wrap);
+														dpost |= gb(buf, pos, wrap);
 												}
 												// next combine in the upper 2 bits of each byte
 												uint8_t bit_swap[4] = { 0, 2, 1, 3 };
@@ -1053,37 +1021,6 @@ int a2_rwts18_format::identify(io_generic *io, uint32_t form_factor, const std::
 		return size == expected_size;
 }
 
-// following is placeholder, is completely wrong.
-const floppy_image_format_t::desc_e a2_rwts18_format::mac_gcr[] = {
-		{ SECTOR_LOOP_START, 0, -1 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aa96, 24 },
-		{   CRC_MACHEAD_START, 0 },
-		{     TRACK_ID_GCR6 },
-		{     SECTOR_ID_GCR6 },
-		{     TRACK_HEAD_ID_GCR6 },
-		{     SECTOR_INFO_GCR6 },
-		{   CRC_END, 0 },
-		{   CRC, 0 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aaad, 24 },
-		{   SECTOR_ID_GCR6 },
-		{   SECTOR_DATA_MAC, -1 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff, 8 },
-		{ SECTOR_LOOP_END },
-		{ END },
-};
-
-
 bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 /*      TODO: rewrite me properly
@@ -1114,14 +1051,14 @@ bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, const std::vec
 		return false; // I hope that throws an error...
 }
 
-uint8_t a2_rwts18_format::gb(const uint8_t *buf, int ts, int &pos, int &wrap)
+uint8_t a2_rwts18_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 {
 		uint8_t v = 0;
 		int w1 = wrap;
 		while(wrap != w1+2 && !(v & 0x80)) {
-				v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
+				v = (v << 1) | buf[pos];
 				pos++;
-				if(pos == ts) {
+				if(pos == buf.size()) {
 						pos = 0;
 						wrap++;
 				}
@@ -1172,18 +1109,16 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 		uint8_t sectdata[(768)*6];
 		memset(sectdata, 0, sizeof(sectdata));
 		int nsect = 18;
-		uint8_t buf[130000]; // originally 13000, multiread dfi disks need larger
-		int ts;
 //fprintf(stderr,"DEBUG: a2_rwts18_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
 		//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
-		generate_bitstream_from_track(0, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
+		auto buf = generate_bitstream_from_track(0, head, 200000000/((3004*nsect*6)/2), image); // 3104 needs tweaking
 //fprintf(stderr,"done.\n");
 		int pos = 0;
 		int wrap = 0;
 		int hb = 0;
 		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 		for(;;) {
-				uint8_t v = gb(buf, ts, pos, wrap);
+				uint8_t v = gb(buf, pos, wrap);
 				if(v == 0xff)
 						hb = 1;
 				else if(hb == 1 && v == 0xd5)
@@ -1200,7 +1135,7 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 				if(hb == 4) {
 						uint8_t h[11];
 						for(auto & elem : h)
-								elem = gb(buf, ts, pos, wrap);
+								elem = gb(buf, pos, wrap);
 						//uint8_t v2 = gcr6bw_tb[h[2]];
 						uint8_t vl = gcr4_decode(h[0],h[1]);
 						uint8_t tr = gcr4_decode(h[2],h[3]);
@@ -1221,7 +1156,7 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 								int owrap = wrap;
 								hb = 0;
 								for(int i=0; i<20 && hb != 4; i++) {
-										v = gb(buf, ts, pos, wrap);
+										v = gb(buf, pos, wrap);
 										if(v == 0xff)
 												hb = 1;
 										else if(hb == 1 && v == 0xd5)
@@ -1256,17 +1191,17 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 										uint8_t c = 0;
 										// first read in sector and decode to 6bit form
 										for(int i=0; i<0x156; i++) {
-												data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
+												data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ^ c;
 												c = data[i];
 										//  printf("%02x ", c);
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
 										// read the checksum byte
-										data[0x156] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+										data[0x156] = gcr6bw_tb[gb(buf,pos,wrap)];
 										// now read the postamble bytes
 										for(int i=0; i<3; i++) {
 												dpost <<= 8;
-												dpost |= gb(buf, ts, pos, wrap);
+												dpost |= gb(buf, pos, wrap);
 										}
 										// next combine in the upper 2 bits of each byte
 										uint8_t bit_swap[4] = { 0, 2, 1, 3 };
@@ -1336,18 +1271,16 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 				uint8_t sectdata[(768)*6];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 18;
-				uint8_t buf[130000]; // originally 13000, multiread dfi disks need larger
-				int ts;
 //fprintf(stderr,"DEBUG: a2_rwts18_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
 				//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
-				generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
+				auto buf = generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), image); // 3104 needs tweaking
 //fprintf(stderr,"done.\n");
 				int oldpos = 0; // DEBUG
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
 				for(;;) {
-						uint8_t v = gb(buf, ts, pos, wrap);
+						uint8_t v = gb(buf, pos, wrap);
 						if((v == 0xff) || (v == 0x9a)) // note 0x9a varies per title! this is an LFSR? generated value intended to throw off copiers, and only appears after the track splice (before sector 5)
 								hb = 1;
 						else if(hb == 1 && v == 0xd5)
@@ -1363,7 +1296,7 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 								uint8_t h[7];
 								// grab exactly 7 bytes: should be Track, Sector, Checksum, AA, FF and FF and the Br0derbund Title ID
 								for(auto & elem : h)
-										elem = gb(buf, ts, pos, wrap);
+										elem = gb(buf, pos, wrap);
 								uint8_t tr = gcr6bw_tb[h[0]];
 								uint8_t se = gcr6bw_tb[h[1]];
 								uint8_t chk = gcr6bw_tb[h[2]];
@@ -1390,7 +1323,7 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 										//dest = sectdata+(768)*se;
 										// now read in the sector and decode to 6bit form
 										for(int i=0; i<0x400; i++) {
-											data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+											data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ;//^ c;
 											c ^= data[i];
 											/*if (((i&0x3)+1)==0x04) {
 											    printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
@@ -1404,18 +1337,18 @@ bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variant
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
 										// read the checksum byte (checksum is calced by xoring all data together)
-										data[0x400] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+										data[0x400] = gcr6bw_tb[gb(buf,pos,wrap)];
 										// now read the postamble bytes
 										for(int i=0; i<4; i++) {
 												dpost <<= 8;
-												dpost |= gb(buf, ts, pos, wrap);
+												dpost |= gb(buf, pos, wrap);
 										}
 
 										/*if (se == 0) // dump some debug data to help find the lfsr before sector 5
 										{
 										    printf("Data Postamble was 0x%08x\n", dpost);
 										    for(int i=0; i<0x400; i++) {
-										        data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+										        data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ;//^ c;
 										        c ^= data[i];
 										  printf("%02x ", data[i]);
 										  if (((i&0xf)+1)==0x10) printf("\n");
