@@ -10,13 +10,14 @@ PWB353261A
 1 053246A
 1 053247A
 1 054539
-1 ??? not readable in the pics
+1 053252
 3 8-dip banks
-3 XTALs (18.43200MHz near the 054539, other 2 not readable)
+3 XTALs (1 21.05300MHz and 2 18.43200MHz)
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/k053252.h"
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "emupal.h"
@@ -133,12 +134,14 @@ GFXDECODE_END
 void kpontoon_state::kpontoon(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 10'000'000); // clock unverified
+	Z80(config, m_maincpu, 21'053'000 / 4); // clock unverified
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpontoon_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 10'000'000)); // clock unverified
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(18.432_MHz_XTAL) / 4)); // clock unverified
 	audiocpu.set_addrmap(AS_PROGRAM, &kpontoon_state::sound_map);
 	audiocpu.set_disable();
+
+	K053252(config, "k053252", 21'053'000 / 4); // clock unverified
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
