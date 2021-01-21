@@ -170,11 +170,13 @@ void getaway_state::io_w(offs_t offset, u8 data)
 		u8 width = m_regs[7] & 0x1f;
 
 		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
-		// 0x0b sprites, 0x03 score, 0x20 used on press start button (unknown meaning)
+		// 0x0b sprites, 0x03 score, 0x20 used on press start screen (unknown meaning)
 		// TODO: bit 3 is more likely a switch between RMW vs. regular replace
 		u8 *vram = (m_regs[1] & 0x08) ? m_vram : m_tvram;
 //		if (m_regs[7] & 0xe0)
 		//if (m_regs[1] & 0x08)
+//		if (width == 1)
+//			printf("%04x %02x %04x %02x\n",src,color_mask,m_regs[4] << 8 | m_regs[3], height);
 		//	printf("|src=%04x dst=%04x|h:%02x w:%02x| sm:%02x dm:%02x|%02x %02x\n", src, dest, height, width, smask, dmask, (m_regs[7] & 0xe0) >> 5, m_regs[1]);
 //		printf("%02x\n", m_regs[7]);
 //		machine().debug_break();
@@ -184,10 +186,20 @@ void getaway_state::io_w(offs_t offset, u8 data)
 			u16 x_ptr = dest;
 			for (int y = 0; y < height; y++)
 			{
-				u8 src_data = fill_mode ? 0 : m_gfxrom[src];
-				for (int i = 0; i < 3; i++)
-					vram[i * 0x2000 + dest] = BIT(color_mask, i) ? src_data : 0;
+				if (fill_mode)
+				{
+					for (int i = 0; i < 3; i++)
+						vram[i * 0x2000 + dest] = 0;
+				}
+				else
+				{
+					u8 src_data = m_gfxrom[src];
 
+					for (int i = 0; i < 3; i++)
+						if (BIT(color_mask, i))
+							vram[i * 0x2000 + dest] = src_data;
+				}
+				
 				src = (src + 1) & 0x1fff;
 				dest = (dest + 1) & 0x1fff;
 			}
