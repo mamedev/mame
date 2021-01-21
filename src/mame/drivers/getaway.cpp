@@ -316,7 +316,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_START("IN.2")
 	// steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f where bit 7 on goes to left dir.
 	// TODO: better input type/defaults
-	PORT_BIT( 0xff, 0, IPT_AD_STICK_X ) PORT_MINMAX(0x80, 0x7f) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) // PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0, IPT_AD_STICK_X ) PORT_MINMAX(0x80, 0x7f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) // PORT_CENTERDELTA(0)
 
 	// dips are two banks, a regular 8 banks one
 	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
