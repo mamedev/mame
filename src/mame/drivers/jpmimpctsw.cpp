@@ -3342,9 +3342,7 @@ INPUT_PORTS_START( j6col ) // might use % key, errors when changed from previous
 
 	PORT_MODIFY("J10_0") // the inputs connect where the jackpot / stake key would usually go!
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Spin Reels
-	PORT_DIPNAME( 0x02, 0x02, "J10_0: 1")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Exhcange")
 	PORT_DIPNAME( 0x04, 0x04, "J10_0: 2")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3370,9 +3368,10 @@ INPUT_PORTS_START( j6col ) // might use % key, errors when changed from previous
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 
 	PORT_MODIFY("J10_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 3")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel / Collect")
 INPUT_PORTS_END
 
 //
