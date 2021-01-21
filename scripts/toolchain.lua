@@ -933,7 +933,7 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/",
+				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber,
 				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/crtbegin_so.o",
 				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/crtend_so.o",
 				"-target armv7-linux-androideabi" .. androidPlatformNumber,
@@ -958,7 +958,7 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
-				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/",
+				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber,
 				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/crtbegin_so.o",
 				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/crtend_so.o",
 				"-target aarch64-linux-android" .. androidPlatformNumber,
@@ -990,21 +990,24 @@ function toolchain(_buildDir, _subDir)
 	configuration { "android-x64" }
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
+			"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/x86_64-linux-android/" .. androidPlatformNumber,
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X64)",
-			"-target x86_64-none-linux-android",
+			"-target x86_64-linux-android" .. androidPlatformNumber,
+		}
+		links {
+			"gcc",
 		}
 		linkoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X64)",
-			"-target x86_64-none-linux-android",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64/crtend_so.o",
+			"-target x86_64-linux-android" .. androidPlatformNumber,
+			"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/x86_64-linux-android/" .. androidPlatformNumber,
+			"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/x86_64-linux-android/" .. androidPlatformNumber .. "/crtbegin_so.o",
+			"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/x86_64-linux-android/" .. androidPlatformNumber .. "/crtend_so.o",
+			"-target x86_64-linux-android" .. androidPlatformNumber,
 		}
 
 	configuration { "asmjs" }
