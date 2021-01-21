@@ -2250,15 +2250,6 @@ INPUT_PORTS_START( j6pinwzd )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6pogcls )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_5 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6quantm )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
@@ -2277,32 +2268,6 @@ INPUT_PORTS_START( j6ra )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6rh6 )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6rhchil )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6reelth )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
@@ -2312,29 +2277,11 @@ INPUT_PORTS_START( j6reelth )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6spcinv )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6supbrk )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6swpdrp )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
@@ -2357,42 +2304,6 @@ INPUT_PORTS_START( j6tbirds )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6tbirdsk )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6tomb )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6topflg )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6twst )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6pompay )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
@@ -2402,29 +2313,13 @@ INPUT_PORTS_START( j6pompay )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6vindal )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
 
 INPUT_PORTS_START( j6vivark )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6knight )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
@@ -2448,47 +2343,11 @@ INPUT_PORTS_START( j6ewn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Nudge 1")
 INPUT_PORTS_END
 
-
-INPUT_PORTS_START( j6btbw )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6cpal )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6colic )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6crakr )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
@@ -2499,24 +2358,6 @@ INPUT_PORTS_START( j6easy )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6kapang )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6pinfvr )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
@@ -2557,56 +2398,12 @@ INPUT_PORTS_START( j6tqust )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6shoot )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6bucks )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6scarlt )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
 INPUT_PORTS_START( j6cshrd )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6rh6cl )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
@@ -2980,6 +2777,9 @@ INPUT_PORTS_START( j6wthing )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
+//
+// The following games won't enter test mode properly, why? different method? or similar to previous input issues?
+//
 
 INPUT_PORTS_START( j6colcsh ) // can't get to input test?
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -3150,6 +2950,210 @@ INPUT_PORTS_START( j6hiphop ) // can't get to input test?
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
 
+INPUT_PORTS_START( j6pogcls ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_5 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rh6 ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rhchil ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6spcinv ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6swpdrp ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6tbirdsk ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6tomb ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6topflg ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6twst ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6vindal ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6knight ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6btbw ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( j6colic ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6crakr ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6kapang ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6pinfvr ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6shoot ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6bucks ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6scarlt ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rh6cl ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
 
 
 ROM_START( j6fifth )
