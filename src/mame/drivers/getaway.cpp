@@ -57,7 +57,7 @@ private:
 	required_device<tms9900_device> m_maincpu;
 	required_region_ptr<u8> m_gfxrom;
 	required_device<screen_device> m_screen;
-	required_ioport_array<1> m_inputs;
+	required_ioport_array<3> m_inputs;
 	required_ioport_array<2> m_dsw;
 
 	void main_map(address_map &map);
@@ -68,20 +68,23 @@ private:
 
 	void io_w(offs_t offset, u8 data);
 	template <int i> u8 dsw_r(offs_t offset);
-	u8 coin_r(offs_t offset);
+	template <int i> u8 input_r(offs_t offset);
 	u8 busy_r();
 
 	u8 m_regs[0x10];
 	u8 m_vram[0x6000];
+	u8 m_tvram[0x6000];
 };
 
 void getaway_state::machine_start()
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_vram, 0, sizeof(m_vram));
+	memset(m_tvram, 0, sizeof(m_tvram));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_vram));
+	save_item(NAME(m_tvram));
 }
 
 
@@ -102,6 +105,17 @@ uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix(y, x << 3 | (i ^ 7)) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+
+			r = m_tvram[0x0000 | (x << 8 | y)];
+			g = m_tvram[0x2000 | (x << 8 | y)];
+			b = m_tvram[0x4000 | (x << 8 | y)];
+
+			for (int i = 0; i < 8; i++)
+			{
+				u8 pix_data = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+				if (pix_data != 0)
+					bitmap.pix(y, x << 3 | (i ^ 7)) = pix_data;
+			}
 		}
 	}
 
@@ -128,17 +142,20 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	u8 bit = offset & 7;
 	u8 mask = 1 << bit;
 	data = (m_regs[n] & ~mask) | ((data & 1) ? mask : 0);
-
-	//popmessage("%02x %02x %02x %02x\n", m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
+	
+	// [0x0a]
+	// x--- ---- sound engine enable? (0)
+	// ---x ---- sound filter?
+	// ---- xxxx sound engine SFX strength?
+//	popmessage("%02x %02x %02x", m_regs[0], m_regs[1], m_regs[2]);
+//	popmessage("%02x %02x %02x %02x\n", m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
 
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
 		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
-		// layer related? 
-		// score deffo goes into a different one,
-		// while gameplay scrolls out ...
-		u8 smask = src >> 13;
+		// used a lot, bitplane bank? fractional x offset?
+		//u8 smask = src >> 13;
 		src &= 0x1fff;
 
 		u16 dest = m_regs[4] << 8 | m_regs[3];
@@ -148,10 +165,13 @@ void getaway_state::io_w(offs_t offset, u8 data)
 		u8 height = m_regs[8];
 		// 0xff set on POST
 		u8 width = m_regs[7] & 0x1f;
-		
+
+		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
+		// 0x0b sprites, 0x03 score, 0x20 used on press start button (unknown meaning)
+		u8 *vram = (m_regs[1] & 0x08) ? m_vram : m_tvram;
 //		if (m_regs[7] & 0xe0)
-		//if (smask == 0)
-		//	printf("|src=%04x dst=%04x|h:%02x w:%02x| sm:%02x dm:%02x|%02x\n", src, dest, height, width, smask, dmask, (m_regs[7] & 0xe0) >> 5);
+		//if (m_regs[1] & 0x08)
+		//	printf("|src=%04x dst=%04x|h:%02x w:%02x| sm:%02x dm:%02x|%02x %02x\n", src, dest, height, width, smask, dmask, (m_regs[7] & 0xe0) >> 5, m_regs[1]);
 //		printf("%02x\n", m_regs[7]);
 //		machine().debug_break();
 		
@@ -160,9 +180,9 @@ void getaway_state::io_w(offs_t offset, u8 data)
 			u16 x_ptr = dest;
 			for (int y = 0; y < height; y++)
 			{
-				u8 src_data = smask != 0 ? m_gfxrom[src] : 0;
+				u8 src_data = fill_mode ? 0 : m_gfxrom[src];
 				for (int i = 0; i < 3; i++)
-					m_vram[i * 0x2000 + dest] = BIT(dmask, i) ? src_data : 0;
+					vram[i * 0x2000 + dest] = BIT(dmask, i) ? src_data : 0;
 
 				src = (src + 1) & 0x1fff;
 				dest = (dest + 1) & 0x1fff;
@@ -175,9 +195,9 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	m_regs[n] = data;
 }
 
-u8 getaway_state::coin_r(offs_t offset)
+template <int i> u8 getaway_state::input_r(offs_t offset)
 {
-	return BIT(m_inputs[0]->read(), offset);
+	return BIT(m_inputs[i]->read(), offset);
 }
 
 u8 getaway_state::busy_r()
@@ -207,9 +227,11 @@ void getaway_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
-	map(0x1a, 0x1f).r(FUNC(getaway_state::dsw_r<1>));
+	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // shifter
+	map(0x0a, 0x19).r(FUNC(getaway_state::input_r<2>)); // steering wheel
+	map(0x1a, 0x21).r(FUNC(getaway_state::dsw_r<1>));
 	map(0x22, 0x2f).r(FUNC(getaway_state::dsw_r<0>));
-	map(0x32, 0x35).r(FUNC(getaway_state::coin_r));
+	map(0x32, 0x35).r(FUNC(getaway_state::input_r<0>)); // coin + start
 	map(0x36, 0x37).r(FUNC(getaway_state::busy_r));
 }
 
@@ -223,6 +245,53 @@ static INPUT_PORTS_START( getaway )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN.1")
+	// TODO: positional/pedal, covers the full 0-0x1f range
+	// (is all of it actually allowed?)
+	PORT_DIPNAME( 0x01, 0x00, "Shifter" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+
+	PORT_START("IN.2")
+	// TODO: steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f?
+	// (bit 7 -> left)
+	PORT_DIPNAME( 0x01, 0x00, "SYSB" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	
 	// dips are two banks, a regular 8 banks one
 	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
