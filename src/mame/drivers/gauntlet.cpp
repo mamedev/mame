@@ -1665,7 +1665,7 @@ void gauntlet_state::common_init(int vindctr2)
 
 
 	// Out-of-range access on alternate 1
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x4fed0, 0x4fed3, 0x000000, "slapstic",
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x4fed0, 0x4fed7, 0x000000, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x56e54, 0x56e57, 0x000000, "slapstic",
