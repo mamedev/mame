@@ -258,7 +258,6 @@ uwp_window_info::uwp_window_info(
 		m_lastclickx(0),
 		m_lastclicky(0)
 {
-	memset(m_title,0,sizeof(m_title));
 	m_non_fullscreen_bounds.left = 0;
 	m_non_fullscreen_bounds.top = 0;
 	m_non_fullscreen_bounds.right  = 0;
@@ -392,12 +391,6 @@ void uwp_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_targetorient = window->target()->orientation();
 	window->m_targetlayerconfig = window->target()->layer_config();
 	window->m_targetvismask = window->target()->visibility_mask();
-
-	// make the window title
-	if (video_config.numscreens == 1)
-		sprintf(window->m_title, "%s: %s [%s]", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name);
-	else
-		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name, index);
 
 	// set the initial maximized state
 	window->m_startmaximized = downcast<windows_options &>(machine.options()).maximize();

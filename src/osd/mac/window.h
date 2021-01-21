@@ -59,7 +59,6 @@ public:
 
 private:
 	// window handle and info
-	char                m_title[256];
 	int                 m_startmaximized;
 
 	// dimensions

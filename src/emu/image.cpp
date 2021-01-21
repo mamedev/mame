@@ -270,13 +270,13 @@ void image_manager::postdevice_init()
 
 bool image_manager::try_change_working_directory(std::string &working_directory, const std::string &subdir)
 {
-	const osd::directory::entry *entry;
 	bool success = false;
-	bool done = false;
 
 	auto directory = osd::directory::open(working_directory);
 	if (directory)
 	{
+		const osd::directory::entry *entry;
+		bool done = false;
 		while (!done && (entry = directory->read()) != nullptr)
 		{
 			if (!core_stricmp(subdir.c_str(), entry->name))

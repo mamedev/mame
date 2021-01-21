@@ -22,6 +22,35 @@
 #include "render/drawsdl.h"
 #endif
 
+osd_window::osd_window(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config) :
+#ifdef OSD_WINDOWS
+	m_dc(nullptr), m_resize_state(0),
+#endif
+	m_target(nullptr),
+	m_primlist(nullptr),
+	m_win_config(config),
+	m_index(index),
+	m_fullscreen(false),
+	m_prescale(1),
+	m_machine(machine),
+	m_monitor(std::move(monitor)),
+	m_renderer(nullptr),
+	m_main(nullptr),
+	m_title(
+			util::string_format(
+				(video_config.numscreens > 1)
+					? "%1$s: %2$s [%3$s] - Screen %4$d (%5$s%6$sP%7$d)"
+					: "%1$s: %2$s [%3$s] (%5$s%6$sP%7$d)",
+					emulator_info::get_appname(),
+					machine.system().type.fullname(),
+					machine.system().name,
+					index,
+					(sizeof(int) == sizeof(void *)) ? "I" : "",
+					(sizeof(long) == sizeof(void *)) ? "L" : (sizeof(long long) == sizeof(void *)) ? "LL" : "",
+					sizeof(void *) * 8))
+{
+}
+
 float osd_window::pixel_aspect() const
 {
 	return monitor()->pixel_aspect();

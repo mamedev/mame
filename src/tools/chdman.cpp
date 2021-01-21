@@ -1318,14 +1318,15 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 				size = 2352;
 				break;
 		}
-		bool needquote = filename.find(' ') != std::string::npos;
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename.c_str(), needquote?"\"":"", discoffs);
+		const bool needquote = filename.find(' ') != std::string::npos;
+		const char *const quotestr = needquote ? "\"" : "";
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, quotestr, filename, quotestr, discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
 		// first track specifies the file
 		if (tracknum == 0)
-			file.printf("FILE \"%s\" BINARY\n", filename.c_str());
+			file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
 		std::string tempstr;
@@ -1404,9 +1405,9 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 
 		// all tracks but the first one have a file offset
 		if (tracknum > 0)
-			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename.c_str(), uint32_t(discoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(discoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 		else
-			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename.c_str(), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 
 		// tracks with pregaps get a START marker too
 		if (info.pregap > 0)
