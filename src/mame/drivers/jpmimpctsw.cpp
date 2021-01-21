@@ -1984,7 +1984,21 @@ INPUT_PORTS_START( j6impact )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Step Down")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Swop")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hirol )
@@ -1993,7 +2007,20 @@ INPUT_PORTS_START( j6hirol )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Collect Feature")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stake")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6redarw )
@@ -2002,85 +2029,30 @@ INPUT_PORTS_START( j6redarw )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 ) // doesn't care?
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Hi Left")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Lo Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Hi Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Lo Right")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Stake")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Press For Streak")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Exchange For Cash")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Exchange For Feature")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6rccls )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_5 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6firclb )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6crzclb )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6cluclb )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6framft )
-	PORT_INCLUDE( j6nokey )
-
-	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
-	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6frtmch )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_5 )
-	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gforce )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -2088,7 +2060,18 @@ INPUT_PORTS_START( j6gforce )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_5 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("H2") // tested, but doesn't exist?
+
+	PORT_MODIFY("J9_1")
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("H3") // tested, but doesn't exist?
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6gforcea )
@@ -2097,35 +2080,21 @@ INPUT_PORTS_START( j6gforcea )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_20 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("H2") // tested, but doesn't exist?
+
+	PORT_MODIFY("J9_1")
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("H3") // tested, but doesn't exist?
 INPUT_PORTS_END
 
-INPUT_PORTS_START( j6gidogh )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
 
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6goldgl )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
-
-INPUT_PORTS_START( j6hiphop )
-	PORT_INCLUDE( jpmimpct_non_video_inputs )
-
-	// TODO: more possibilities than this, this just allows it to boot
-	PORT_INCLUDE( j6_jackpot_25 )
-	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
-INPUT_PORTS_END
 
 INPUT_PORTS_START( j6hotsht )
 	PORT_INCLUDE( jpmimpct_non_video_inputs )
@@ -2133,7 +2102,28 @@ INPUT_PORTS_START( j6hotsht )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Spin Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Collect Feature")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Swop Trail")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Hi Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Lo Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Hi Button 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Lo Button 2")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6showtm )
@@ -2142,7 +2132,26 @@ INPUT_PORTS_START( j6showtm )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_25 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Nudge Exchange")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Collect Feature")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Spin Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Nudge Hi")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Nudge Lo")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cash Hi")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cash Lo")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6showtmb )
@@ -2151,7 +2160,26 @@ INPUT_PORTS_START( j6showtmb )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Nudge Exchange")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Collect Feature")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Auto Nudge")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Spin Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Nudge Hi")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Nudge Lo")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cash Hi")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cash Lo")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6maxod )
@@ -2160,7 +2188,31 @@ INPUT_PORTS_START( j6maxod )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Blue Hi")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Yellow Hi")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Green Hi")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Blue Lo")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Yellow Lo")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Green Lo")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Blue Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Yellow Take")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Green Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Learner")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6megbck )
@@ -2169,7 +2221,24 @@ INPUT_PORTS_START( j6megbck )
 	// TODO: more possibilities than this, this just allows it to boot
 	PORT_INCLUDE( j6_jackpot_15 )
 	PORT_INCLUDE( j6_stake_25 )
-	// PORT_INCLUDE( TODO: )  // not verified
+
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Features")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Feature Knockouts")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Knockouts")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Cash Knockouts")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cash")
+
+	PORT_MODIFY("J9_0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("J9_2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Hopper Dump SW")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( j6pinwzd )
@@ -2974,6 +3043,114 @@ INPUT_PORTS_START( j6fireck ) // can't get to input test?
 	PORT_INCLUDE( j6_stake_10 )
 	// PORT_INCLUDE( TODO: )  // not verified
 INPUT_PORTS_END
+
+INPUT_PORTS_START( j6rccls ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_5 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( j6firclb ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6crzclb ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6cluclb ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first three need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW 2 (must be ON)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( j6framft ) // can't get to input test?
+	PORT_INCLUDE( j6nokey )
+
+	PORT_MODIFY("DSW") // first two need to be on to avoid error 91 00 (invalid mode) rather than the usual key ones
+	PORT_DIPNAME( 0x01, 0x00, "DSW 0 (must be ON)")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW 1 (must be ON)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6frtmch ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_5 )
+	PORT_INCLUDE( j6_stake_20 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6gidogh ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6goldgl ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+INPUT_PORTS_START( j6hiphop ) // can't get to input test?
+	PORT_INCLUDE( jpmimpct_non_video_inputs )
+
+	// TODO: more possibilities than this, this just allows it to boot
+	PORT_INCLUDE( j6_jackpot_25 )
+	PORT_INCLUDE( j6_stake_25 )
+	// PORT_INCLUDE( TODO: )  // not verified
+INPUT_PORTS_END
+
+
 
 ROM_START( j6fifth )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -11457,11 +11634,11 @@ GAMEL( 199?, j6ffce,       j6framft,   impact_nonvideo, j6framft, jpmimpct_state
 
 GAME(  199?, j6frtmch,     0,          impact_nonvideo, j6frtmch, jpmimpct_state, empty_init, ROT0, "JPM", "The Fruit Machine (JPM) (IMPACT)", GAME_FLAGS )
 
-GAME(  199?, j6gforce,     0,          impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME(  199?, j6gforcea,    j6gforce,   impact_nonvideo, j6gforcea,jpmimpct_state, empty_init, ROT0, "JPM", "G Force (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME(  199?, j6gforceb,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME(  199?, j6gforcec,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
-GAME(  199?, j6gforced,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME(  199?, j6gforce,     0,          impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force Roller Coaster (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME(  199?, j6gforcea,    j6gforce,   impact_nonvideo, j6gforcea,jpmimpct_state, empty_init, ROT0, "JPM", "G Force Roller Coaster (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME(  199?, j6gforceb,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force Roller Coaster (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME(  199?, j6gforcec,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force Roller Coaster (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS )
+GAME(  199?, j6gforced,    j6gforce,   impact_nonvideo, j6gforce, jpmimpct_state, empty_init, ROT0, "JPM", "G Force Roller Coaster (JPM) (IMPACT) (set 5)", GAME_FLAGS )
 
 GAMEL( 199?, j6gidogh,     0,          impact_nonvideo, j6gidogh, jpmimpct_state, empty_init, ROT0, "Ace", "G.I. Dough (Ace) (IMPACT)", GAME_FLAGS, layout_j6gidogh )
 
