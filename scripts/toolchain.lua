@@ -101,6 +101,7 @@ function toolchain(_buildDir, _subDir)
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
 		androidPlatform = "android-24"
 	end
+	androidPlatformNumber = androidPlatform:sub(9)
 
 	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
@@ -913,15 +914,13 @@ function toolchain(_buildDir, _subDir)
 	configuration { "android-arm" }
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber,
 			}
 			includedirs {
-				--  LIBRETRO: don't mess with NDK includir order
-				-- "$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"-target armv7-none-linux-androideabi",
+				"-target armv7-linux-androideabi" .. androidPlatformNumber,
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
 				"-mfpu=vfpv3-d16",
@@ -934,10 +933,10 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
-				"-target armv7-none-linux-androideabi",
+				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/crtbegin_so.o",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/arm-linux-androideabi/" .. androidPlatformNumber .. "/crtend_so.o",
+				"-target armv7-linux-androideabi" .. androidPlatformNumber,
 				"-march=armv7-a",
 				"-mthumb",
 			}
@@ -945,15 +944,13 @@ function toolchain(_buildDir, _subDir)
 	configuration { "android-arm64" }
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber,
 			}
 			includedirs {
-				--  LIBRETRO: don't mess with NDK includir order
-				-- "$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
-				"-target aarch64-none-linux-android",
+				"-target aarch64-linux-android" .. androidPlatformNumber,
 				"-march=armv8-a",
 			}
 			links {
@@ -961,10 +958,10 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
-				"-target aarch64-none-linux-android",
+				"--sysroot=$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/crtbegin_so.o",
+				"$(ANDROID_NDK_LLVM)/sysroot/usr/lib/aarch64-linux-android/" .. androidPlatformNumber .. "/crtend_so.o",
+				"-target aarch64-linux-android" .. androidPlatformNumber,
 				"-march=armv8-a",
 			}
 
