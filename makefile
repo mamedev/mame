@@ -1301,7 +1301,7 @@ endif
 #-------------------------------------------------
 # android-arm
 #-------------------------------------------------
-## BEGIN libretro
+
 ifdef RETRO
 ##RETRO HACK no sdl for libretro android
 $(PROJECTDIR)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
@@ -1325,8 +1325,8 @@ endif
 android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm config=$(CONFIG)
-endif
-## END libretro
+endif # ifdef RETRO
+
 #-------------------------------------------------
 # android-arm64
 #-------------------------------------------------
@@ -1374,6 +1374,18 @@ android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Make
 # android-x64
 #-------------------------------------------------
 
+ifdef RETRO
+$(PROJECTDIR)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef ANDROID_NDK_X64
+	$(error ANDROID_NDK_X64 is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
+
+.PHONY: android-x64
+android-x64: android-ndk generate $(PROJECTDIR)/$(MAKETYPE)-android-x64/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-android-x64 config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-android-x64 config=$(CONFIG)
+else
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
@@ -1384,7 +1396,7 @@ endif
 android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64 config=$(CONFIG)
-
+endif # ifdef RETRO
 #-------------------------------------------------
 # asmjs / Emscripten
 #-------------------------------------------------
