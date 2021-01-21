@@ -154,7 +154,9 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	{
 		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
-		u8 color_mask = src >> 13;
+		// several valid entries are drawn with color=0 cfr. tyres
+		// flyer shows them as white so definitely xor-ed
+		u8 color_mask = (src >> 13) ^ 7;
 		src &= 0x1fff;
 
 		// TODO: this can select through the full range
@@ -365,7 +367,7 @@ void getaway_state::getaway(machine_config &config)
 	m_screen->set_screen_update(FUNC(getaway_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(getaway_state::vblank_irq));
 	m_screen->set_palette("palette");
-	PALETTE(config, "palette", palette_device::RGB_3BIT);
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	// TODO
