@@ -39,9 +39,10 @@ osd_window::osd_window(running_machine &machine, int index, std::shared_ptr<osd_
 	m_title(
 			util::string_format(
 				(video_config.numscreens > 1)
-					? "%1$s: %2$s [%3$s] - Screen %4$d (%5$s%6$sP%7$d)"
-					: "%1$s: %2$s [%3$s] (%5$s%6$sP%7$d)",
+					? "%3$s [%4$s] screen %5$d - %1$s %2$s (%6$s%7$sP%8$d)"
+					: "%3$s [%4$s] - %1$s %2$s (%6$s%7$sP%8$d)",
 					emulator_info::get_appname(),
+					emulator_info::get_bare_build_version(),
 					machine.system().type.fullname(),
 					machine.system().name,
 					index,
