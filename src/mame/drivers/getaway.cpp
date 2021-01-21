@@ -16,6 +16,8 @@ TODO:
 - dipswitches and game inputs (reads from I/O, but don't know which is which yet),
   PCB has 12 dipswitches, game has a steering wheel and shifter
 - some unknowns in the video emulation;
+- screen sides presumably needs overlay;
+- score overlay has wrong colors;
 - video timing is unknown, pixel clock XTAL is 10.816MHz
 - sound emulation
 - lamps and 7segs
@@ -309,50 +311,13 @@ static INPUT_PORTS_START( getaway )
 	PORT_START("IN.1")
 	// TODO: positional/pedal, covers the full 0-0x1f range
 	// (is all of it actually allowed?)
-	PORT_DIPNAME( 0x01, 0x00, "Shifter" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
 
 	PORT_START("IN.2")
-	// TODO: steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f?
-	// (bit 7 -> left)
-	PORT_DIPNAME( 0x01, 0x00, "SYSB" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+	// steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f where bit 7 on goes to left dir.
+	// TODO: better input type/defaults
+	PORT_BIT( 0xff, 0, IPT_AD_STICK_X ) PORT_MINMAX(0x80, 0x7f) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) // PORT_CENTERDELTA(0)
+
 	// dips are two banks, a regular 8 banks one
 	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
 
@@ -426,10 +391,8 @@ void getaway_state::getaway(machine_config &config)
 	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
-	// TODO
+	// TODO: discrete
 }
-
-
 
 /******************************************************************************
     ROM Definitions
