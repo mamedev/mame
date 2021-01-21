@@ -117,6 +117,8 @@ WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
 }
 
+//#include "debugger.h"
+
 void getaway_state::io_w(offs_t offset, u8 data)
 {
 	u8 n = offset >> 3;
@@ -124,26 +126,46 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	u8 mask = 1 << bit;
 	data = (m_regs[n] & ~mask) | ((data & 1) ? mask : 0);
 
+	//popmessage("%02x %02x %02x %02x\n", m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
+
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
 		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
-		//u8 smask = src >> 13;
+		// layer related? 
+		// score deffo goes into a different one,
+		// while gameplay scrolls out ...
+		u8 smask = src >> 13;
 		src &= 0x1fff;
 
 		u16 dest = m_regs[4] << 8 | m_regs[3];
 		u8 dmask = dest >> 13;
 		dest &= 0x1fff;
 
-		u8 bytes = m_regs[8];
-
-		for (int count = 0; count < bytes; count++)
+		u8 height = m_regs[8];
+		// 0xff set on POST
+		u8 width = m_regs[7] & 0x1f;
+		
+//		if (m_regs[7] & 0xe0)
+		//if (smask == 0)
+		//	printf("|src=%04x dst=%04x|h:%02x w:%02x| sm:%02x dm:%02x|%02x\n", src, dest, height, width, smask, dmask, (m_regs[7] & 0xe0) >> 5);
+//		printf("%02x\n", m_regs[7]);
+//		machine().debug_break();
+		
+		for (int x = 0; x < width; x++)
 		{
-			for (int i = 0; i < 3; i++)
-				m_vram[i * 0x2000 + dest] = BIT(dmask, i) ? m_gfxrom[src] : 0;
+			u16 x_ptr = dest;
+			for (int y = 0; y < height; y++)
+			{
+				u8 src_data = smask != 0 ? m_gfxrom[src] : 0;
+				for (int i = 0; i < 3; i++)
+					m_vram[i * 0x2000 + dest] = BIT(dmask, i) ? src_data : 0;
 
-			src = (src + 1) & 0x1fff;
-			dest = (dest + 1) & 0x1fff;
+				src = (src + 1) & 0x1fff;
+				dest = (dest + 1) & 0x1fff;
+			}
+			dest = x_ptr - 0x100;
+			dest &= 0x1fff;
 		}
 	}
 
