@@ -1132,10 +1132,16 @@ void mac_state::machine_reset()
 			fatalerror("mac: unknown clock\n");
 	}
 
-	// Egret currently needs more dramatic VIA slowdowns.  Need to determine what's realistic.
+	// Egret currently needs a larger VIA slowdown
 	if (ADB_IS_EGRET)
 	{
 		m_via_cycles *= 2;
+	}
+
+	// And a little more for Cuda.
+	if (ADB_IS_CUDA)
+	{
+		m_via_cycles *= 3;
 	}
 
 	// default to 32-bit mode on LC
