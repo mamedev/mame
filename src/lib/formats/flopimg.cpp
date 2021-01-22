@@ -2912,12 +2912,14 @@ void floppy_image_format_t::build_mac_track_gcr(int track, int head, floppy_imag
 			uint16_t sumb = cb + vb + (suma >> 8);
 			cb = sumb;
 			vb = vb ^ ca;
-			cc = cc + vc + (sumb >> 8);
+			if(i != 174)
+				cc = cc + vc + (sumb >> 8);
 			vc = vc ^ cb;
 
 			uint32_t nb = i != 174 ? 32 : 24;
 			raw_w(buffer, nb, gcr6_encode(va, vb, vc) >> (32-nb));
 		}
+
 		raw_w(buffer, 32, gcr6_encode(ca, cb, cc));
 		raw_w(buffer, 32, 0xdeaaffff);
 	}
@@ -3026,15 +3028,13 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 			cb = sumb;
 			vc = vc ^ cb;
 
-			if(i == 174)
-				vc = 0;
-
-			cc = cc + vc + (sumb >> 8);
-
 			sdata[3*i] = va;
 			sdata[3*i+1] = vb;
-			if(i != 174)
+
+			if(i != 174) {
+				cc = cc + vc + (sumb >> 8);
 				sdata[3*i+2] = vc;
+			}
 		}
 		for(auto &e : h) {
 			e = nib[pos];
