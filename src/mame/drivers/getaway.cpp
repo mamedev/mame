@@ -12,15 +12,18 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- sketchy steering wheel emulation, doesn't work properly with regular analog
-  field, somehow working with digital;
-- is the gas throttle min/max correct or should "LOW" be more than 0?
+- is the gas throttle min/max correct or should "LOW" be more than 0?;
+- unknown dipswitches, and verify factory defaults;
 - several unknowns in the video emulation:
   - score layer is a simplification hack, it is unknown how it should really
     cope RMW-wise against main layer. It also has wrong colors (different color
-	base or overlay artwork, with extra bit output for taking priority?);
-  - screen sides presumably needs an overlay artwork (red trees?) or more
-    more likely an inverted green bit (which would also turn the trees yellow);
+	base or overlay artwork, with extra bit output for taking priority?).
+    The score background color should change from white(or is it cyan?) to red
+    after Extended Play, the score digits themselves should always be black;
+  - According to flyers, screen sides should have a green background color,
+    it can't be an artwork overlay since it only occurs when the trees are
+    on screen. However, the German flyer contains a cabinet photo and there
+    is no green background. Other flyers could be hand-drawn pictures?;
   - do we need to offset X by 1 char-wise? Fills starts from 0x1f;
   - video timing is unknown, pixel clock XTAL is 10.816MHz;
   - blitter busy flag;
@@ -285,15 +288,15 @@ void getaway_state::io_w(offs_t offset, u8 data)
 	}
 }
 
-template <unsigned N> u8 getaway_state::input_r(offs_t offset)
-{
-	return BIT(m_inputs[N]->read(), offset);
-}
-
 u8 getaway_state::busy_r()
 {
 	// TODO: blitter busy?
 	return 0;
+}
+
+template <unsigned N> u8 getaway_state::input_r(offs_t offset)
+{
+	return BIT(m_inputs[N]->read(), offset);
 }
 
 template <unsigned N> u8 getaway_state::dsw_r(offs_t offset)
@@ -332,27 +335,22 @@ void getaway_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( getaway )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN.1")
 	// TODO: positional/pedal, covers the full 0-0x1f range
 	// (is all of it actually allowed?)
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
 
 	PORT_START("IN.2")
 	// steering wheel, signed byte, absolute values larger than 8 ignored
 	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(getaway_state, read_wheel)
 
 	PORT_START("WHEEL")
-	// TODO: check sensitivity and key delta
-	PORT_BIT( 0xff, 0x08, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(25) // PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0x08, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
-	// dips are two banks, a regular 8 banks one
-	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
-
-	// "D1S-8"?
-	PORT_START("DSW.0")
+	PORT_START("DSW.0") // DTS-8 dipswitch @ location k6
 	// TODO: defaults for these two, assume they have different quotas?
 	PORT_DIPNAME( 0x07, 0x02, "Extended Play" )
 	PORT_DIPSETTING(    0x00, "None" )
@@ -379,8 +377,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	// "DNS04"?
-	PORT_START("DSW.1")
+	PORT_START("DSW.1") // DNS04 dipswitch @ location m7
 	// credit display is shown if both extended plays are on "None"
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -449,5 +446,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY      FULLNAME     FLAGS
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
