@@ -2,41 +2,46 @@
 // copyright-holders:David Haywood
 
 /*
-
 CPUs
-QTY     Type    clock   position    function
-1x  MC68HC000FN10       u3  16/32-bit Microprocessor - main
-1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x  HA17358         u101    Dual Operational Amplifier - sound
-1x  TDA2003         u104    Audio Amplifier - sound
-1x  oscillator  24.000MHz   osc1
-ROMs
-QTY     Type    position    status
-2x  M27C1001    2,3     dumped
-1x  M27C2001    1   dumped
-3x  M27C4001    4,5,6   dumped
-RAMs
-QTY     Type    position
-11x     LH52B256-10PLL  u16a,u17a,u27,u28,u29,u30,u39,u40,u74,u75,u76
-PLDs
-QTY     Type    position    status
-1x  ATF20V8B-15PC   u37     read protected
-2x  A40MX04-F-PL84  u83,u86     read protected
-Others
+QTY  Type           clock      position  function
+1x   MC68HC000FN10             u3        16/32-bit Microprocessor - main
+1x   u6295                     u98       4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x   HA17358                   u101      Dual Operational Amplifier - sound
+1x   TDA2003                   u104      Audio Amplifier - sound
+1x   oscillator     24.000MHz  osc1
 
+ROMs
+QTY  Type      position  status
+2x   M27C1001  2,3       dumped
+1x   M27C2001  1         dumped
+3x   M27C4001  4,5,6     dumped
+
+RAMs
+QTY  Type            position
+11x  LH52B256-10PLL  u16a,u17a,u27,u28,u29,u30,u39,u40,u74,u75,u76
+
+PLDs
+QTY  Type            position  status
+1x   ATF20V8B-15PC   u37       read protected
+2x   A40MX04-F-PL84  u83,u86   read protected
+
+Others
 1x 28x2 JAMMA edge connector
 1x pushbutton (SW1)
 1x trimmer (volume) (VR1)
 4x 8x2 switches DIP (SW1,SW2,SW3,SW4)
 1x battery 3.6V (BT1)
-Notes
 
+Notes
 PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
 TODO:
-- currently stops after passing SRAM text;
 - driver is skeleton-ish, video emulation is at the bare minimum to see what's going on;
-- decryption is probably incomplete.
+- with a clean NVRAM MAME needs to be soft reset after init or it won't work;
+- decryption is believed complete, but there something strange with the first bytes of the ROM;
+- system setting screen show the following settings that doesn't seem to be affected by dips:
+  Min. Bet (always 1), Credit X Ticket Mode (always Cencel (sic)), Max. 10 Mode (always Max. 10);
+- sound doesn't seem to work 100% correctly (i.e. coin sound only seem to work from 3rd coin on).
 */
 
 
@@ -113,7 +118,10 @@ uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void jungleyo_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
-	map(0xa00000, 0xa00fff).ram();
+	map(0xa00310, 0xa00311).portr("IN0");
+	map(0xa0032a, 0xa0032b).portr("DSW12");
+	map(0xa0032c, 0xa0032d).portr("DSW34");
+	map(0xa00689, 0xa00689).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb00000, 0xb0ffff).ram();
 	map(0xb10000, 0xb1ffff).ram();
 	map(0xb20000, 0xb2ffff).ram();
@@ -127,64 +135,97 @@ void jungleyo_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( jungleyo )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / 2 Double Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("Stop4 / Take")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop2 / Double Up")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop1 / Big")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop3 / Small")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // bookkeeping
+	PORT_SERVICE( 0x100, IP_ACTIVE_LOW ) // if active high at boot the game shows the input test, if switched to input high after boot it shows system settings
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // 'key down' in input test. Are they the same thing?
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Ticket Sw.")
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DSW12")
+	PORT_DIPNAME( 0x0007, 0x0007, "Main Game Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(      0x0007, "98%" )
+	PORT_DIPSETTING(      0x0003, "96%" )
+	PORT_DIPSETTING(      0x0005, "94%" )
+	PORT_DIPSETTING(      0x0001, "92%" )
+	PORT_DIPSETTING(      0x0006, "90%" )
+	PORT_DIPSETTING(      0x0002, "88%" )
+	PORT_DIPSETTING(      0x0004, "86%" )
+	PORT_DIPSETTING(      0x0000, "84%" )
+	PORT_DIPNAME( 0x0018, 0x0018, "Max. Credits Bet" ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(      0x0018, "10" )
+	PORT_DIPSETTING(      0x0008, "15" )
+	PORT_DIPSETTING(      0x0010, "18" )
+	PORT_DIPSETTING(      0x0000, "20" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Max. Points Bet" ) PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPSETTING(      0x0060, "10" )
+	PORT_DIPSETTING(      0x0020, "15" )
+	PORT_DIPSETTING(      0x0040, "18" )
+	PORT_DIPSETTING(      0x0000, "20" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Bill Time" ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0080, "Anytime" )
+	PORT_DIPSETTING(      0x0000, "Zero" )
+	PORT_DIPNAME( 0x0700, 0x0700, "Coin In" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(      0x0700, "1" )
+	PORT_DIPSETTING(      0x0300, "2" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0100, "10" )
+	PORT_DIPSETTING(      0x0600, "20" )
+	PORT_DIPSETTING(      0x0200, "25" )
+	PORT_DIPSETTING(      0x0400, "50" )
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSW2:4" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "DSW2:5" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "DSW2:6" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DSW2:7" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSW2:8" ) // no effect in system settings
 
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
-
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
-
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
-
-	PORT_START("DSW4")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
+	PORT_START("DSW34")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "DSW3:1" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "DSW3:2" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "DSW3:3" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "DSW3:4" ) // no effect in system settings
+	PORT_DIPNAME( 0x0030, 0x0030, "Game Limit" ) PORT_DIPLOCATION("DSW3:5,6")
+	PORT_DIPSETTING(      0x0030, "10000" )
+	PORT_DIPSETTING(      0x0010, "30000" )
+	PORT_DIPSETTING(      0x0020, "60000" )
+	PORT_DIPSETTING(      0x0000, "100000" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Credit Limit" ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0040, "5000" )
+	PORT_DIPSETTING(      0x0000, "10000" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Fever Min. Bet" ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, "10" )
+	PORT_DIPSETTING(      0x0000, "20" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Yes ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Skill Mode" ) PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Double Up Rate" ) PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(      0x0400, "92%" )
+	PORT_DIPSETTING(      0x0000, "96%" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Double Up Game" ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Yes ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Reel Speed" ) PORT_DIPLOCATION("DSW4:5") // misspellt 'Rell'
+	PORT_DIPSETTING(      0x1000, "Slow" )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Take Score Speed" ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(      0x2000, "Slow" )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DSW4:7" ) // no effect in system settings
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSW4:8" ) // no effect in system settings
 INPUT_PORTS_END
 
 
@@ -224,7 +265,7 @@ void jungleyo_state::jungleyo(machine_config &config)
 {
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jungleyo_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(jungleyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(jungleyo_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -268,30 +309,30 @@ ROM_START( jungleyo )
 ROM_END
 
 
-void jungleyo_state::init_jungleyo() // TODO: just a start, gives correct (?) strings at 0x2000-0x2fff, 0x7000-0x9000 and 0xc000-0xd000 ranges. From 0x10000 onwards needs something different
+void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decrypt correctly
 {
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
-	for (int i = 0x00000; i < 0x40000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5); // TODO: possibly the bitswap and XOR are applied per byte and not per word, verify when more is discovered
+	for (int i = 0x00000; i < 0x10000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5);
+
+	for (int i = 0x10000 / 2; i < 0x20000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xff00, 11, 13, 10, 8, 15, 9, 14, 12, 0, 7, 4, 1, 5, 3, 6, 2);
+
+	for (int i = 0x20000 / 2; i < 0x30000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 14, 8, 12, 15, 10, 13, 11, 9, 3, 5, 2, 6, 4, 0, 1, 7);
+
+	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xffff, 13, 15, 8, 9, 12, 11, 10, 14, 1, 3, 7, 5, 2, 6, 0, 4);
 
 	// hack these until better understood (still wrong values)
-	src[0x000/2] = 0x0000;
-	src[0x002/2] = 0x0000;
-	src[0x004/2] = 0x0000;
-	src[0x006/2] = 0x01fa;
-
-	/*char filename[256];
-	sprintf(filename,"p_decrypted_%s", machine().system().name);
-	FILE *fp = fopen(filename, "w+b");
-	if (fp)
-	{
-	    fwrite(src, 0x40000, 1, fp);
-	    fclose(fp);
-	}*/
+	src[0x000 / 2] = 0x0000;
+	src[0x002 / 2] = 0x0000;
+	src[0x004 / 2] = 0x0000;
+	src[0x006 / 2] = 0x01fa;
 }
 
 } // Anonymous namespace
 
 
-GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
+GAME( 2001, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
