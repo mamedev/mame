@@ -4,6 +4,8 @@
 
 Universal Get A Way
 
+Top-down arcade racing game inspired from Taito (Super) Speed Race.
+
 Hardware notes:
 - PCB label: UNIVERSAL 7812
 - TMS9900 @ 3MHz
@@ -12,7 +14,9 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- is the gas throttle min/max correct or should "LOW" be more than 0?;
+- is accelerator min/max correct or should lowest be more than 0 like sspeedr?;
+- flyer mentions a gear shifter. Then I'd expect it at 0x30/0x31, but the game
+  never reads from there;
 - unknown dipswitches, and verify factory defaults;
 - several unknowns in the video emulation:
   - score layer is a simplification hack, it is unknown how it should really
@@ -319,7 +323,7 @@ void getaway_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
-	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // shifter
+	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // accelerator
 	map(0x0a, 0x19).r(FUNC(getaway_state::input_r<2>)); // steering wheel
 	map(0x1a, 0x21).r(FUNC(getaway_state::dsw_r<1>));
 	map(0x22, 0x2f).r(FUNC(getaway_state::dsw_r<0>));
@@ -339,8 +343,6 @@ static INPUT_PORTS_START( getaway )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN.1")
-	// TODO: positional/pedal, covers the full 0-0x1f range
-	// (is all of it actually allowed?)
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
 
 	PORT_START("IN.2")
@@ -447,4 +449,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY      FULLNAME     FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
