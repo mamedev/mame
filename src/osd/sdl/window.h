@@ -33,7 +33,7 @@ class SDL_DM_Wrapper;
 
 typedef uintptr_t HashT;
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, [[maybe_unused]] int threadid)
+#define OSDWORK_CALLBACK(name)  void *name(void *param, int threadid)
 
 class sdl_window_info : public osd_window_t<SDL_Window*>
 {

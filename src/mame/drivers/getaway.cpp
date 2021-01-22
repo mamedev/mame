@@ -47,17 +47,21 @@ namespace {
 class getaway_state : public driver_device
 {
 public:
-	getaway_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	getaway_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gfxrom(*this, "gfx")
 		, m_screen(*this, "screen")
 		, m_inputs(*this, "IN.%u", 0)
 		, m_dsw(*this, "DSW.%u", 0)
+		, m_wheel(*this, "WHEEL")
 	{ }
 
 	// machine configs
 	void getaway(machine_config &config);
+
+	// input functions
+	ioport_value read_wheel() { return (m_wheel->read() - 0x08) & 0xff; }
 
 protected:
 	virtual void machine_start() override;
@@ -69,6 +73,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport_array<3> m_inputs;
 	required_ioport_array<2> m_dsw;
+	required_ioport m_wheel;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -336,9 +341,12 @@ static INPUT_PORTS_START( getaway )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
 
 	PORT_START("IN.2")
-	// steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f where bit 7 on goes to left dir.
-	// TODO: better input type/defaults
-	PORT_BIT( 0xff, 0, IPT_AD_STICK_X ) PORT_MINMAX(0x80, 0x7f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) // PORT_CENTERDELTA(0)
+	// steering wheel, signed byte, absolute values larger than 8 ignored
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(getaway_state, read_wheel)
+
+	PORT_START("WHEEL")
+	// TODO: check sensitivity and key delta
+	PORT_BIT( 0xff, 0x08, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(25) // PORT_CENTERDELTA(0)
 
 	// dips are two banks, a regular 8 banks one
 	// and a tiny 4. They are labeled, hard to read from the provided pic :=(

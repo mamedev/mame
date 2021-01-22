@@ -26,8 +26,8 @@ protected:
 	virtual void device_start() override;
 
 private:
-	void reg_w([[maybe_unused]] uint8_t reg, uint8_t data);
-	uint8_t reg_r([[maybe_unused]] uint8_t reg);
+	void reg_w(uint8_t reg, uint8_t data);
+	uint8_t reg_r(uint8_t reg);
 
 	unsigned char m_rf5c296_reg;
 	required_device<pccard_slot_device> m_pccard;

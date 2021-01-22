@@ -333,8 +333,8 @@ protected:
 
 	virtual void machine_start() override;
 
-	u8 orbite_scattered_colorram_r([[maybe_unused]] address_space &space, [[maybe_unused]] offs_t offset, [[maybe_unused]] u8 mem_mask = 0xff);
-	void orbite_scattered_colorram_w([[maybe_unused]] address_space &space, [[maybe_unused]] offs_t offset, [[maybe_unused]] u8 data, [[maybe_unused]] u8 mem_mask = 0xff);
+	u8 orbite_scattered_colorram_r(address_space &space, offs_t offset, u8 mem_mask = 0xff);
+	void orbite_scattered_colorram_w(address_space &space, offs_t offset, u8 data, u8 mem_mask = 0xff);
 
 private:
 	void orbite_io_map(address_map &map);

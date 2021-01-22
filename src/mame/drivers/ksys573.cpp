@@ -674,7 +674,7 @@ private:
 
 	void update_disc();
 	void gx700pwbf_output( int offset, uint8_t data );
-	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( [[maybe_unused]] offs_t offset, [[maybe_unused]] uint8_t data ) );
+	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( offs_t offset, uint8_t data ) );
 	void gn845pwbb_do_w( int offset, int data );
 	void gn845pwbb_clk_w( int offset, int data );
 
@@ -697,7 +697,7 @@ private:
 	int m_h8_clk;
 
 	uint8_t m_gx700pwbf_output_data[ 4 ];
-	void ( ksys573_state::*m_gx700pwfbf_output_callback )( [[maybe_unused]] offs_t offset, [[maybe_unused]] uint8_t data );
+	void ( ksys573_state::*m_gx700pwfbf_output_callback )( offs_t offset, uint8_t data );
 
 	uint32_t m_stage_mask;
 	struct
@@ -1238,7 +1238,7 @@ void ksys573_state::gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	}
 }
 
-void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( [[maybe_unused]] offs_t offset, [[maybe_unused]] uint8_t data ) )
+void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( offs_t offset, uint8_t data ) )
 {
 	std::fill_n( m_gx700pwbf_output_data, sizeof( m_gx700pwbf_output_data ), 0);
 
