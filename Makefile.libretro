@@ -134,7 +134,7 @@ ifeq ($(platform),android-arm64)
 	LIBRETRO_OS :=
 	PTR64 :=
 endif
-ifeq ($(platform),android-x64)
+ifeq ($(platform),android-x86_64)
 	ANDROID_NDK_LLVM  ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
 	ANDROID_NDK_X64 ?= /opt/ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64
 	ANDROID_NDK_ROOT  ?= /opt/ndk
