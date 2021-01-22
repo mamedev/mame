@@ -12,21 +12,24 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- sketchy steering wheel emulation, doesn't work properly with regular analog 
-  field, somehow working with digital:
+- sketchy steering wheel emulation, doesn't work properly with regular analog
+  field, somehow working with digital;
+- is the gas throttle min/max correct or should "LOW" be more than 0?
 - several unknowns in the video emulation:
-  - score layer is a simplification hack, it is unknown how it should really 
+  - score layer is a simplification hack, it is unknown how it should really
     cope RMW-wise against main layer. It also has wrong colors (different color
 	base or overlay artwork, with extra bit output for taking priority?);
-  - screen sides presumably needs an overlay artwork (red trees?);
+  - screen sides presumably needs an overlay artwork (red trees?) or more
+    more likely an inverted green bit (which would also turn the trees yellow);
   - do we need to offset X by 1 char-wise? Fills starts from 0x1f;
   - video timing is unknown, pixel clock XTAL is 10.816MHz;
   - blitter busy flag;
   - miscellanea, cfr. in documentation;
 - sound emulation;
-- lamps and 7segs;
+- lamps;
+- 7seg panel for highscores? (you can see it on deluxe cab, but I don't see any
+  I/O writes that look like 7seg data);
 - undumped proms?
- 
 
 ******************************************************************************/
 
@@ -74,8 +77,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void io_w(offs_t offset, u8 data);
-	template <int i> u8 dsw_r(offs_t offset);
-	template <int i> u8 input_r(offs_t offset);
+	template <unsigned N> u8 dsw_r(offs_t offset);
+	template <unsigned N> u8 input_r(offs_t offset);
 	u8 busy_r();
 
 	u8 m_regs[0x10];
@@ -116,7 +119,7 @@ uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix(y, x + i) = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
-			
+
 			if (x < x_overlay)
 				continue;
 
@@ -148,52 +151,69 @@ WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
 }
 
-// [0x00]
-// x--- ---- coin counter or coin SFX (more likely former?)
-// -??? ???? outputs? sounds?
-// [0x01]
-// x--- ---- blitter trigger (0->1)
-// -x-- ---- fill mode (1) / RMW (0)
-// --?- ---- 1 on press start screen (lamp or blitter related)
-// ---- x--- destination VRAM select, (1) normal VRAM (0) score VRAM
-// ---- --?? unknown, (11) mostly, flips with (10) when starting from the right lane.
-// [0x02]
-// ???? ????
-// [0x03]
-// yyyy yyyy y destination offset
-// [0x04]
-// xxxx xxxx x destination offset
-// [0x05]
-// ssss ssss source GFX ROM lower address
-// [0x06]
-// ccc- ---- color mask
-// ---S SSSS source GFX ROM upper address
-// [0x07]
-// ???w wwww transfer width, in 8 pixel units
-//           Notice that 0xff is set on POST, either full clear or NOP
-// [0x08]
-// hhhh hhhh transfer height, in scanline units
-// [0x09]
-// ---- ---? 1 triggered when explosion occurs
-// [0x0a]
-// x--- ---- sound engine enable? (0)
-// ---x ---- sound filter?
-// ---- xxxx sound engine SFX strength?
-// [0x0b]
-// ???? ???? (game writes 0x30)
-// [0x0c]
-// ---- ---? (game writes 1)
 void getaway_state::io_w(offs_t offset, u8 data)
 {
+	// writes 1 bit at a time
 	u8 n = offset >> 3;
-	u8 bit = offset & 7;
-	u8 mask = 1 << bit;
-	data = (m_regs[n] & ~mask) | ((data & 1) ? mask : 0);
-	
+	u8 prev = m_regs[n];
+	u8 iomask = 1 << (offset & 7);
+	m_regs[n] = (m_regs[n] & ~iomask) | ((data & 1) ? iomask : 0);
+
+	/*
+	[0x00]
+	x--- ---- coin counter or coin SFX (more likely former?)
+	---- x--- coin lockout?
+	-??? -??? outputs? sounds?
+
+	[0x01]
+	x--- ---- blitter trigger (0->1)
+	-x-- ---- fill mode (1) / RMW (0)
+	--?- ---- 1 on press start screen (lamp or blitter related)
+	---- x--- destination VRAM select, (1) normal VRAM (0) score VRAM
+	---- --?? unknown, (11) mostly, flips with (10) when starting from the right lane.
+
+	[0x02]
+	???? ????
+
+	[0x03]
+	yyyy yyyy y destination offset
+
+	[0x04]
+	xxxx xxxx x destination offset
+
+	[0x05]
+	ssss ssss source GFX ROM lower address
+
+	[0x06]
+	ccc- ---- color mask
+	---S SSSS source GFX ROM upper address
+
+	[0x07]
+	???w wwww transfer width, in 8 pixel units
+			Notice that 0xff is set on POST, either full clear or NOP
+
+	[0x08]
+	hhhh hhhh transfer height, in scanline units
+
+	[0x09]
+	---- ---? 1 triggered when explosion occurs
+
+	[0x0a]
+	x--- ---- sound engine enable? (0)
+	---x ---- sound filter?
+	---- xxxx sound engine SFX strength?
+
+	[0x0b]
+	???? ???? (game writes 0x30)
+
+	[0x0c]
+	---- ---? (game writes 1)
+	*/
+
 	//popmessage("%02x %02x %02x|%02x %02x %02x %02x", m_regs[0], m_regs[1] & 0x37, m_regs[2], m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
 
 	// start gfx rom->vram transfer
-	if (n == 1 && ~m_regs[n] & data & 0x80)
+	if (n == 1 && ~prev & m_regs[1] & 0x80)
 	{
 		u16 src = m_regs[6] << 8 | m_regs[5];
 		// several valid entries are drawn with color=0 cfr. tyres
@@ -212,7 +232,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
 		const bool layer_bank = BIT(m_regs[1], 3);
 		u8 *vram = (layer_bank) ? m_vram : m_score_vram;
-		
+
 		for (int count = 0; count < width; count ++)
 		{
 			for (int yi = 0; yi < height; yi++)
@@ -223,7 +243,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 					u16 dest = ((x_offs >> 3) & 0x1f) << 8;
 					dest += (yi + y) & 0xff;
 					u8 pen_mask = 1 << (x_offs & 7);
-					
+
 					if (fill_mode)
 					{
 						for (int i = 0; i < 3; i++)
@@ -249,7 +269,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 									vram[out_bank] &= ~pen_mask;
 							}
 					}
-					
+
 					src = (src + 1) & 0xffff;
 				}
 			}
@@ -258,13 +278,11 @@ void getaway_state::io_w(offs_t offset, u8 data)
 			x &= 0xff;
 		}
 	}
-
-	m_regs[n] = data;
 }
 
-template <int i> u8 getaway_state::input_r(offs_t offset)
+template <unsigned N> u8 getaway_state::input_r(offs_t offset)
 {
-	return BIT(m_inputs[i]->read(), offset);
+	return BIT(m_inputs[N]->read(), offset);
 }
 
 u8 getaway_state::busy_r()
@@ -273,9 +291,9 @@ u8 getaway_state::busy_r()
 	return 0;
 }
 
-template <int i> u8 getaway_state::dsw_r(offs_t offset)
+template <unsigned N> u8 getaway_state::dsw_r(offs_t offset)
 {
-	return BIT(m_dsw[i]->read(), offset);
+	return BIT(m_dsw[N]->read(), offset);
 }
 
 
@@ -292,7 +310,6 @@ void getaway_state::main_map(address_map &map)
 void getaway_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map.unmap_value_high();
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
 	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // shifter
 	map(0x0a, 0x19).r(FUNC(getaway_state::input_r<2>)); // steering wheel
@@ -353,7 +370,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+
 	// "DNS04"?
 	PORT_START("DSW.1")
 	// credit display is shown if both extended plays are on "None"
@@ -397,6 +414,8 @@ void getaway_state::getaway(machine_config &config)
 	/* sound hardware */
 	// TODO: discrete
 }
+
+
 
 /******************************************************************************
     ROM Definitions
