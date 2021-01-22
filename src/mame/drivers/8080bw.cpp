@@ -3892,13 +3892,13 @@ void cane_state::cane_unknown_port0_w(u8 data)
 
 ***********************************************************************************************************************************/
 
-u8 orbite_state::orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)
+u8 orbite_state::orbite_scattered_colorram_r([[maybe_unused]] address_space &space, [[maybe_unused]] offs_t offset, [[maybe_unused]] u8 mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
 
-void orbite_state::orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask)
+void orbite_state::orbite_scattered_colorram_w([[maybe_unused]] address_space &space, [[maybe_unused]] offs_t offset, [[maybe_unused]] u8 data, [[maybe_unused]] u8 mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }

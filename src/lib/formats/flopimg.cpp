@@ -2487,8 +2487,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	// Then extract the sectors
 	for(int i=0; i<idblk_count; i++) {
 		uint32_t pos = idblk[i];
-		ATTR_UNUSED uint8_t track = sbyte_mfm_r(bitstream, pos);
-		ATTR_UNUSED uint8_t head = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t track = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t head = sbyte_mfm_r(bitstream, pos);
 		uint8_t sector = sbyte_mfm_r(bitstream, pos);
 		uint8_t size = sbyte_mfm_r(bitstream, pos);
 
@@ -2610,8 +2610,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	// Then extract the sectors
 	for(uint32_t i=0; i<idblk_count; i++) {
 		uint32_t pos = idblk[i];
-		ATTR_UNUSED uint8_t track = sbyte_mfm_r(bitstream, pos);
-		ATTR_UNUSED uint8_t head = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t track = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t head = sbyte_mfm_r(bitstream, pos);
 		uint8_t sector = sbyte_mfm_r(bitstream, pos);
 		uint8_t size = sbyte_mfm_r(bitstream, pos);
 		if(size >= 8)
@@ -3100,7 +3100,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	// Then extract the sectors
 	for(int i=0; i<hblk_count; i++) {
 		uint32_t pos = hblk[i];
-		ATTR_UNUSED uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
+		[[maybe_unused]] uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
 		uint8_t crc = sbyte_gcr5_r(bitstream, pos);
 		uint8_t sector = sbyte_gcr5_r(bitstream, pos);
 		uint8_t track = sbyte_gcr5_r(bitstream, pos);
@@ -3182,8 +3182,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	// Then extract the sectors
 	for(int i=0; i<hblk_count; i++) {
 		uint32_t pos = hblk[i];
-		ATTR_UNUSED uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
-		ATTR_UNUSED uint8_t track = sbyte_gcr5_r(bitstream, pos);
+		[[maybe_unused]] uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
+		[[maybe_unused]] uint8_t track = sbyte_gcr5_r(bitstream, pos);
 		uint8_t sector = sbyte_gcr5_r(bitstream, pos);
 
 		pos = dblk[i];

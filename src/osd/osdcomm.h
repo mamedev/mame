@@ -33,7 +33,6 @@
 
 /* Some optimizations/warnings cleanups for GCC */
 #if defined(__GNUC__)
-#define ATTR_UNUSED             __attribute__((__unused__))
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
 #define ATTR_CONST              __attribute__((const))
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
@@ -43,7 +42,6 @@
 #define EXPECTED(exp)           __builtin_expect(!!(exp), 1)
 #define RESTRICT                __restrict__
 #else
-#define ATTR_UNUSED
 #define ATTR_PRINTF(x,y)
 #define ATTR_CONST
 #define ATTR_FORCE_INLINE       __forceinline

@@ -28,7 +28,7 @@ class render_target;
 
 typedef uintptr_t HashT;
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
+#define OSDWORK_CALLBACK(name)  void *name(void *param, [[maybe_unused]] int threadid)
 
 class mac_window_info : public osd_window_t<void *>
 {
