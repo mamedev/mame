@@ -15,6 +15,8 @@ TODO:
  -- the colours are verified correct for all games in the software lists, except:
    -- chlgolf - it's almost correct, just a few minor things in the background. Perfectly playable.
    -- cracer - this game has a lot of issues, including incorrect behaviour. It's still playable though.
+- RAM handling can't be right: PCB has 30KB shared RAM (manual also says this in the technical specs),
+  but MAME allocates much more
 
 Notes:
 - BS-BASIC v1.0 notes:
