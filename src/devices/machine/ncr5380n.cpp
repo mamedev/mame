@@ -187,6 +187,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 				m_state = IDLE;
 				m_state_timer->enable(false);
 
+				set_drq(true);
 				set_irq(true);
 			}
 		}
