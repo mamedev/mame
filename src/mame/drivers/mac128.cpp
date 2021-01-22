@@ -52,7 +52,7 @@ Control B:
 02   select WR2
 00   int vector = 0
 03   select WR3
-c0   8 data bits, Rx disabled
+oc0   8 data bits, Rx disabled
 0f   select WR15, external interrupt status/control
 08   enable 08
 00   select WR0
@@ -80,6 +80,22 @@ c0   8 data bits, Rx disabled
 09   select WR9
 0a   enable MIE / NV
 
+VIA notes:
+
+Original 128K Macs use Synertek SYP6522 VIAs. Synertek's AN5 (March 1982)
+claims that their VIAs have a difference in shift register behavior
+compared to those from other manufacturers. However, this particular
+difference is not relevant to the Mac hardware, and later 512K Macs
+switched away from SYP6522 (Apple part number 338-6522-A) to either
+Rockwell R6522AP (R6522-66) or VTI VL6522-02PC. R6522AP is the most
+common VIA on the Mac Plus.
+
+Apple continued sourcing VIAs from the same two manufacturers for the
+Mac SE, though their ADB-era VIAs are newer CMOS models with a fix for the
+shift register's CB1 input synchronizer which Apple may have specifically
+requested. The new Rockwell version (R65NC22) is only labeled with Apple
+part number 338-6523 (later Macs use a PLCC version which Apple numbered
+338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
 ****************************************************************************/
 
