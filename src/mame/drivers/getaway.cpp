@@ -12,16 +12,21 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- roms have a lot of empty contents, but it's probably ok
-- dipswitches and game inputs (reads from I/O, but don't know which is which yet),
-  PCB has 12 dipswitches, game has a steering wheel and shifter
-- some unknowns in the video emulation;
-- screen sides presumably needs overlay;
-- score overlay has wrong colors;
-- video timing is unknown, pixel clock XTAL is 10.816MHz
-- sound emulation
-- lamps and 7segs
+- sketchy steering wheel emulation, doesn't work properly with regular analog 
+  field, somehow working with digital:
+- several unknowns in the video emulation:
+  - score layer is a simplification hack, it is unknown how it should really 
+    cope RMW-wise against main layer. It also has wrong colors (different color
+	base or overlay artwork, with extra bit output for taking priority?);
+  - screen sides presumably needs an overlay artwork (red trees?);
+  - do we need to offset X by 1 char-wise? Fills starts from 0x1f;
+  - video timing is unknown, pixel clock XTAL is 10.816MHz;
+  - blitter busy flag;
+  - miscellanea, cfr. in documentation;
+- sound emulation;
+- lamps and 7segs;
 - undumped proms?
+ 
 
 ******************************************************************************/
 
@@ -105,23 +110,23 @@ uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
 		{
 			u16 xi = x >> 3;
-			u8 r = m_vram[0x0000 | (xi << 8 | y)];
+			u8 b = m_vram[0x0000 | (xi << 8 | y)];
 			u8 g = m_vram[0x2000 | (xi << 8 | y)];
-			u8 b = m_vram[0x4000 | (xi << 8 | y)];
+			u8 r = m_vram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x + i) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+				bitmap.pix(y, x + i) = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
 			
 			if (x < x_overlay)
 				continue;
 
-			r = m_score_vram[0x0000 | (xi << 8 | y)];
+			b = m_score_vram[0x0000 | (xi << 8 | y)];
 			g = m_score_vram[0x2000 | (xi << 8 | y)];
-			b = m_score_vram[0x4000 | (xi << 8 | y)];
+			r = m_score_vram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
 			{
-				u8 pix_data = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+				u8 pix_data = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
 				if (pix_data != 0)
 					bitmap.pix(y, x + i) = pix_data;
 			}
@@ -149,7 +154,7 @@ WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 // [0x01]
 // x--- ---- blitter trigger (0->1)
 // -x-- ---- fill mode (1) / RMW (0)
-// --?- ---- 1 on press start screen (unknown meaning)
+// --?- ---- 1 on press start screen (lamp or blitter related)
 // ---- x--- destination VRAM select, (1) normal VRAM (0) score VRAM
 // ---- --?? unknown, (11) mostly, flips with (10) when starting from the right lane.
 // [0x02]
@@ -264,7 +269,7 @@ template <int i> u8 getaway_state::input_r(offs_t offset)
 
 u8 getaway_state::busy_r()
 {
-	// blitter busy?
+	// TODO: blitter busy?
 	return 0;
 }
 
@@ -383,8 +388,7 @@ void getaway_state::getaway(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
-	//m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
-	m_screen->set_visarea_full();
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(getaway_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(getaway_state::vblank_irq));
 	m_screen->set_palette("palette");
@@ -419,4 +423,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
