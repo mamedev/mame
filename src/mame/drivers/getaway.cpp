@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Angelo Salese
 /******************************************************************************
 
 Universal Get A Way
@@ -12,14 +12,21 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- roms have a lot of empty contents, but it's probably ok
-- dipswitches and game inputs (reads from I/O, but don't know which is which yet),
-  PCB has 12 dipswitches, game has a steering wheel and shifter
-- video emulation, it looks like a custom blitter
-- video timing is unknown, pixel clock XTAL is 10.816MHz
-- sound emulation
-- lamps and 7segs
+- sketchy steering wheel emulation, doesn't work properly with regular analog 
+  field, somehow working with digital:
+- several unknowns in the video emulation:
+  - score layer is a simplification hack, it is unknown how it should really 
+    cope RMW-wise against main layer. It also has wrong colors (different color
+	base or overlay artwork, with extra bit output for taking priority?);
+  - screen sides presumably needs an overlay artwork (red trees?);
+  - do we need to offset X by 1 char-wise? Fills starts from 0x1f;
+  - video timing is unknown, pixel clock XTAL is 10.816MHz;
+  - blitter busy flag;
+  - miscellanea, cfr. in documentation;
+- sound emulation;
+- lamps and 7segs;
 - undumped proms?
+ 
 
 ******************************************************************************/
 
@@ -38,11 +45,12 @@ class getaway_state : public driver_device
 {
 public:
 	getaway_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxrom(*this, "gfx"),
-		m_screen(*this, "screen"),
-		m_inputs(*this, "IN.%u", 0)
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxrom(*this, "gfx")
+		, m_screen(*this, "screen")
+		, m_inputs(*this, "IN.%u", 0)
+		, m_dsw(*this, "DSW.%u", 0)
 	{ }
 
 	// machine configs
@@ -56,7 +64,8 @@ private:
 	required_device<tms9900_device> m_maincpu;
 	required_region_ptr<u8> m_gfxrom;
 	required_device<screen_device> m_screen;
-	required_ioport_array<1> m_inputs;
+	required_ioport_array<3> m_inputs;
+	required_ioport_array<2> m_dsw;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -65,20 +74,24 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void io_w(offs_t offset, u8 data);
-	u8 coin_r(offs_t offset);
+	template <int i> u8 dsw_r(offs_t offset);
+	template <int i> u8 input_r(offs_t offset);
 	u8 busy_r();
 
 	u8 m_regs[0x10];
 	u8 m_vram[0x6000];
+	u8 m_score_vram[0x6000];
 };
 
 void getaway_state::machine_start()
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_vram, 0, sizeof(m_vram));
+	memset(m_score_vram, 0, sizeof(m_score_vram));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_vram));
+	save_item(NAME(m_score_vram));
 }
 
 
@@ -89,16 +102,34 @@ void getaway_state::machine_start()
 
 uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// apparently score overlay covers only the rightmost 3 columns
+	const int x_overlay = 29*8;
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x+=8)
 		{
-			u8 r = m_vram[0x0000 | (x << 8 | y)];
-			u8 g = m_vram[0x2000 | (x << 8 | y)];
-			u8 b = m_vram[0x4000 | (x << 8 | y)];
+			u16 xi = x >> 3;
+			u8 b = m_vram[0x0000 | (xi << 8 | y)];
+			u8 g = m_vram[0x2000 | (xi << 8 | y)];
+			u8 r = m_vram[0x4000 | (xi << 8 | y)];
 
 			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x << 3 | (i ^ 7)) = BIT(b, i) << 2 | BIT(g, i) << 1 | BIT(r, i);
+				bitmap.pix(y, x + i) = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
+			
+			if (x < x_overlay)
+				continue;
+
+			b = m_score_vram[0x0000 | (xi << 8 | y)];
+			g = m_score_vram[0x2000 | (xi << 8 | y)];
+			r = m_score_vram[0x4000 | (xi << 8 | y)];
+
+			for (int i = 0; i < 8; i++)
+			{
+				u8 pix_data = BIT(r, i) << 2 | BIT(g, i) << 1 | BIT(b, i);
+				if (pix_data != 0)
+					bitmap.pix(y, x + i) = pix_data;
+			}
 		}
 	}
 
@@ -117,50 +148,135 @@ WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
 }
 
+// [0x00]
+// x--- ---- coin counter or coin SFX (more likely former?)
+// -??? ???? outputs? sounds?
+// [0x01]
+// x--- ---- blitter trigger (0->1)
+// -x-- ---- fill mode (1) / RMW (0)
+// --?- ---- 1 on press start screen (lamp or blitter related)
+// ---- x--- destination VRAM select, (1) normal VRAM (0) score VRAM
+// ---- --?? unknown, (11) mostly, flips with (10) when starting from the right lane.
+// [0x02]
+// ???? ????
+// [0x03]
+// yyyy yyyy y destination offset
+// [0x04]
+// xxxx xxxx x destination offset
+// [0x05]
+// ssss ssss source GFX ROM lower address
+// [0x06]
+// ccc- ---- color mask
+// ---S SSSS source GFX ROM upper address
+// [0x07]
+// ???w wwww transfer width, in 8 pixel units
+//           Notice that 0xff is set on POST, either full clear or NOP
+// [0x08]
+// hhhh hhhh transfer height, in scanline units
+// [0x09]
+// ---- ---? 1 triggered when explosion occurs
+// [0x0a]
+// x--- ---- sound engine enable? (0)
+// ---x ---- sound filter?
+// ---- xxxx sound engine SFX strength?
+// [0x0b]
+// ???? ???? (game writes 0x30)
+// [0x0c]
+// ---- ---? (game writes 1)
 void getaway_state::io_w(offs_t offset, u8 data)
 {
 	u8 n = offset >> 3;
 	u8 bit = offset & 7;
 	u8 mask = 1 << bit;
 	data = (m_regs[n] & ~mask) | ((data & 1) ? mask : 0);
+	
+	//popmessage("%02x %02x %02x|%02x %02x %02x %02x", m_regs[0], m_regs[1] & 0x37, m_regs[2], m_regs[9], m_regs[0xa], m_regs[0xb], m_regs[0x0c]);
 
+	// start gfx rom->vram transfer
 	if (n == 1 && ~m_regs[n] & data & 0x80)
 	{
-		// start gfx rom->vram transfer?
 		u16 src = m_regs[6] << 8 | m_regs[5];
-		//u8 smask = src >> 13;
+		// several valid entries are drawn with color=0 cfr. tyres
+		// flyer shows them as white so definitely xor-ed
+		// TODO: may be applied at palette init time instead + score layer colors doesn't match flyer.
+		u8 color_mask = (src >> 13) ^ 7;
 		src &= 0x1fff;
+		src <<= 3;
 
-		u16 dest = m_regs[4] << 8 | m_regs[3];
-		u8 dmask = dest >> 13;
-		dest &= 0x1fff;
+		u16 x = m_regs[4];
+		u16 y = m_regs[3];
 
-		u8 bytes = m_regs[8];
+		u8 height = m_regs[8];
+		u8 width = m_regs[7] & 0x1f;
 
-		for (int count = 0; count < bytes; count++)
+		const bool fill_mode = (m_regs[1] & 0x40) == 0x40;
+		const bool layer_bank = BIT(m_regs[1], 3);
+		u8 *vram = (layer_bank) ? m_vram : m_score_vram;
+		
+		for (int count = 0; count < width; count ++)
 		{
-			for (int i = 0; i < 3; i++)
-				m_vram[i * 0x2000 + dest] = BIT(dmask, i) ? m_gfxrom[src] : 0;
+			for (int yi = 0; yi < height; yi++)
+			{
+				for (int xi = 0; xi < 8; xi++)
+				{
+					u16 x_offs = xi + x;
+					u16 dest = ((x_offs >> 3) & 0x1f) << 8;
+					dest += (yi + y) & 0xff;
+					u8 pen_mask = 1 << (x_offs & 7);
+					
+					if (fill_mode)
+					{
+						for (int i = 0; i < 3; i++)
+						{
+							// reversed for score VRAM?
+							if (layer_bank)
+								vram[i * 0x2000 + dest] &= ~pen_mask;
+							else
+								vram[i * 0x2000 + dest] |= pen_mask;
+						}
+					}
+					else
+					{
+						u8 src_data = (m_gfxrom[src >> 3] >> ((7-src) & 7)) & 1;
 
-			src = (src + 1) & 0x1fff;
-			dest = (dest + 1) & 0x1fff;
+						for (int i = 0; i < 3; i++)
+							if (BIT(color_mask, i))
+							{
+								u16 out_bank = i * 0x2000 + dest;
+								if (src_data)
+									vram[out_bank] |= pen_mask;
+								else
+									vram[out_bank] &= ~pen_mask;
+							}
+					}
+					
+					src = (src + 1) & 0xffff;
+				}
+			}
+
+			x -= 8;
+			x &= 0xff;
 		}
 	}
 
 	m_regs[n] = data;
 }
 
-u8 getaway_state::coin_r(offs_t offset)
+template <int i> u8 getaway_state::input_r(offs_t offset)
 {
-	return BIT(m_inputs[0]->read(), offset);
+	return BIT(m_inputs[i]->read(), offset);
 }
 
 u8 getaway_state::busy_r()
 {
-	// blitter busy?
+	// TODO: blitter busy?
 	return 0;
 }
 
+template <int i> u8 getaway_state::dsw_r(offs_t offset)
+{
+	return BIT(m_dsw[i]->read(), offset);
+}
 
 
 /******************************************************************************
@@ -178,7 +294,11 @@ void getaway_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0xff).w(FUNC(getaway_state::io_w));
-	map(0x32, 0x35).r(FUNC(getaway_state::coin_r));
+	map(0x00, 0x09).r(FUNC(getaway_state::input_r<1>)); // shifter
+	map(0x0a, 0x19).r(FUNC(getaway_state::input_r<2>)); // steering wheel
+	map(0x1a, 0x21).r(FUNC(getaway_state::dsw_r<1>));
+	map(0x22, 0x2f).r(FUNC(getaway_state::dsw_r<0>));
+	map(0x32, 0x35).r(FUNC(getaway_state::input_r<0>)); // coin + start
 	map(0x36, 0x37).r(FUNC(getaway_state::busy_r));
 }
 
@@ -190,8 +310,64 @@ void getaway_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( getaway )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN.1")
+	// TODO: positional/pedal, covers the full 0-0x1f range
+	// (is all of it actually allowed?)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(10) PORT_KEYDELTA(15)
+
+	PORT_START("IN.2")
+	// steering wheel, 0x00 is neutral, range seems to be 0xe0-0x1f where bit 7 on goes to left dir.
+	// TODO: better input type/defaults
+	PORT_BIT( 0xff, 0, IPT_AD_STICK_X ) PORT_MINMAX(0x80, 0x7f) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) // PORT_CENTERDELTA(0)
+
+	// dips are two banks, a regular 8 banks one
+	// and a tiny 4. They are labeled, hard to read from the provided pic :=(
+
+	// "D1S-8"?
+	PORT_START("DSW.0")
+	// TODO: defaults for these two, assume they have different quotas?
+	PORT_DIPNAME( 0x07, 0x02, "Extended Play" )
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x01, "2000" )
+	PORT_DIPSETTING(    0x02, "3000" )
+	PORT_DIPSETTING(    0x03, "4000" )
+	PORT_DIPSETTING(    0x04, "5000" )
+	PORT_DIPSETTING(    0x05, "6000" )
+	PORT_DIPSETTING(    0x06, "7000" )
+	PORT_DIPSETTING(    0x07, "8000" )
+	PORT_DIPNAME( 0x38, 0x28, "Extra Play" )
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x08, "2000" )
+	PORT_DIPSETTING(    0x10, "3000" )
+	PORT_DIPSETTING(    0x18, "4000" )
+	PORT_DIPSETTING(    0x20, "5000" )
+	PORT_DIPSETTING(    0x28, "6000" )
+	PORT_DIPSETTING(    0x30, "7000" )
+	PORT_DIPSETTING(    0x38, "8000" )
+	PORT_DIPNAME( 0x40, 0x00, "Language" )
+	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPSETTING(    0x40, "Japanese" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	// "DNS04"?
+	PORT_START("DSW.1")
+	// credit display is shown if both extended plays are on "None"
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit (again)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -212,18 +388,15 @@ void getaway_state::getaway(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
-	//m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
-	m_screen->set_visarea_full();
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(getaway_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(getaway_state::vblank_irq));
 	m_screen->set_palette("palette");
-	PALETTE(config, "palette", palette_device::RGB_3BIT);
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
-	// TODO
+	// TODO: discrete
 }
-
-
 
 /******************************************************************************
     ROM Definitions
@@ -250,4 +423,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
