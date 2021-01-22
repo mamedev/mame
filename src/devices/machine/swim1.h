@@ -62,13 +62,18 @@ private:
 	u32 m_flux_write_count;
 	u64 m_last_sync;
 	double m_iwm_q3_fclk_ratio, m_iwm_fclk_q3_ratio;
-	u32 m_q3_clock;
+	[[maybe_unused]] u32 m_q3_clock;
 
 	u8 m_ism_param[16];
-	u8 m_ism_mode, m_ism_setup, m_ism_error, m_ism_param_idx, m_ism_fifo_pos, m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
-	u16 m_ism_fifo[2], m_ism_sr;
-	u16 m_ism_crc, m_ism_mfm_sync_counter;
-	u32 m_ism_half_cycles_before_change;
+	u8 m_ism_mode, m_ism_setup;
+	[[maybe_unused]] u8 m_ism_error;
+	u8 m_ism_param_idx, m_ism_fifo_pos;
+	[[maybe_unused]] u8 m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
+	u16 m_ism_fifo[2];
+	[[maybe_unused]] u16 m_ism_sr;
+	u16 m_ism_crc;
+	[[maybe_unused]] u16 m_ism_mfm_sync_counter;
+	[[maybe_unused]] u32 m_ism_half_cycles_before_change;
 
 	u64 m_iwm_next_state_change, m_iwm_sync_update, m_iwm_async_update;
 	int m_iwm_active, m_iwm_rw, m_iwm_rw_state;
