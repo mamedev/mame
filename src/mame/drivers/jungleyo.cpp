@@ -37,11 +37,11 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
 TODO:
 - driver is skeleton-ish, video emulation is at the bare minimum to see what's going on;
-- with a clean NVRAM MAME needs to be soft reset after init or it won't work;
-- decryption is believed complete, but there something strange with the first bytes of the ROM;
-- system setting screen show the following settings that doesn't seem to be affected by dips:
+- with a clean NVRAM MAME needs to be soft reset after init or it will stop with '1111 exception' error;
+- decryption is believed complete, but there's something strange with the first bytes of the ROM;
+- system setting screen show the following settings that don't seem to be affected by dips:
   Min. Bet (always 1), Credit X Ticket Mode (always Cencel (sic)), Max. 10 Mode (always Max. 10);
-- sound doesn't seem to work 100% correctly (i.e. coin sound only seem to work from 3rd coin on).
+- sound doesn't seem to work 100% correctly (i.e. coin sound only seems to work from 3rd coin on).
 */
 
 
@@ -64,6 +64,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_bg_videoram(*this, "bg_videoram")
 		, m_fg_videoram(*this, "fg_videoram")
 	{ }
 
@@ -77,23 +78,39 @@ protected:
 private:
 	// video-related
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void bg_videoram_w(offs_t offset, uint16_t data);
 	void fg_videoram_w(offs_t offset, uint16_t data);
 
 	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
+	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 };
 
 
+TILE_GET_INFO_MEMBER(jungleyo_state::get_bg_tile_info)
+{
+	uint16_t code = m_bg_videoram[tile_index];
+	tileinfo.set(1, code, 0, 0);
+}
+
 TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
 {
 	uint16_t code = m_fg_videoram[tile_index];
-	tileinfo.set(1, code, 0, 0);
+	tileinfo.set(2, code, 0, 0);
+}
+
+void jungleyo_state::bg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_bg_videoram[offset / 2] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
@@ -104,12 +121,15 @@ void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
 
 void jungleyo_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -125,8 +145,8 @@ void jungleyo_state::main_map(address_map &map)
 	map(0xb00000, 0xb0ffff).ram();
 	map(0xb10000, 0xb1ffff).ram();
 	map(0xb20000, 0xb2ffff).ram();
-	map(0xb80000, 0xb81fff).ram();
-	map(0xb90000, 0xb91fff).ram().share(m_fg_videoram).w(FUNC(jungleyo_state::fg_videoram_w));
+	map(0xb80000, 0xb81fff).ram().share(m_fg_videoram).w(FUNC(jungleyo_state::fg_videoram_w));
+	map(0xb90000, 0xb91fff).ram().share(m_bg_videoram).w(FUNC(jungleyo_state::bg_videoram_w));
 	map(0xba0000, 0xba1fff).ram();
 	map(0xff0000, 0xff7fff).ram();
 	map(0xff8000, 0xffffff).ram().share("nvram");
