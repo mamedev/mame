@@ -1928,6 +1928,32 @@ ROM_START( sonikfig )
 	ROM_LOAD16_BYTE( "8__am27c100.u58", 0x40001, 0x20000, CRC(b02ed0ce) SHA1(ec8ab64210a1b10cdba5ee179e46fc8d6a1a67b6) )
 ROM_END
 
+/*
+PCB marked 'ROLLA REV. 1' and 'CTE 001 94V-0 0205'
+
+1 Winbond W77E58P on a small sub board (beefed up 8052 with undumped internal EPROM)
+1 ispLSI 1016E
+1 JFC 95101 (AY8910 compatible)
+4 8-dip banks
+1 24.00 MHz XTAL (on the daughterboard)
+*/
+
+ROM_START( rolla )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "545a", 0x0000, 0x8000, NO_DUMP ) // internal flash EPROM, security bit set
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "4w s1.u29", 0x00000, 0x20000, CRC(8b02800e) SHA1(22ae265e8d0bca403be4b4a82b43c526d9407dcf) )
+	ROM_LOAD16_BYTE( "4w s2.u31", 0x00001, 0x20000, CRC(efa631ca) SHA1(c924277c64fc20e0d841be8fd1e2a4718dd229f1) )
+	ROM_LOAD16_BYTE( "4w s3.u33", 0x40000, 0x20000, CRC(8fdc2d33) SHA1(61cc36caf52487ac863dbec1c40f3ef93e57a505) )
+	ROM_LOAD16_BYTE( "4w s4.u35", 0x40001, 0x20000, CRC(9e86abfa) SHA1(fe7e8222051810fd5e0a584967764d71d99bf8fe) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "4w g1.u52", 0x00000, 0x20000, CRC(88036f9e) SHA1(fa93bce2c6eccf70ee23fdd320ee56dcdb6d99e3) )
+	ROM_LOAD16_BYTE( "4w g2.u54", 0x00001, 0x20000, CRC(0142ba31) SHA1(e9aed07f112f68fb598bbc841666d5516479b06c) )
+	ROM_LOAD16_BYTE( "4w g3.u56", 0x40000, 0x20000, CRC(4324d5c0) SHA1(9c57385eda6a069e455b8cd9fb45db90f1966ecf) )
+	ROM_LOAD16_BYTE( "4w g4.u58", 0x40001, 0x20000, CRC(1cce85f1) SHA1(f35709b29a13917fe3c69240b4ab03aa6bdc3a3b) )
+ROM_END
 
 /**********************************
 *           Driver Init           *
@@ -2020,3 +2046,4 @@ GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "<unknown>",            "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
