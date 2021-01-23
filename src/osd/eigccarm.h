@@ -258,7 +258,7 @@ _count_leading_zeros(uint32_t value)
 
 	return result;
 }
-
+#endif
 
 /*-------------------------------------------------
     count_leading_ones - return the number of
