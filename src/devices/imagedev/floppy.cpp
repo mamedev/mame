@@ -2428,6 +2428,9 @@ bool mac_floppy_device::wpt_r()
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
+	case 0x0: // Step direction
+		return dir;
+
 	case 0x1: // Step signal
 		// We don't do the delay
 		return true;
