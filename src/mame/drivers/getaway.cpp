@@ -350,7 +350,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(getaway_state, read_wheel)
 
 	PORT_START("WHEEL")
-	PORT_BIT( 0xff, 0x08, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x08, IPT_PADDLE ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
 	PORT_START("DSW.0") // DTS-8 dipswitch @ location k6
 	// TODO: defaults for these two, assume they have different quotas?
