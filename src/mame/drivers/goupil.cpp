@@ -537,12 +537,12 @@ void goupil_base_state::base(machine_config &config)
 	ACIA6850(config, m_acia, 0);
 
 	// TODO: Is this specific to the G1?
-	VIA6522(config, m_via_video, CPU_CLOCK / 4);
+	MOS6522(config, m_via_video, CPU_CLOCK / 4);
 
-	VIA6522(config, m_via_keyb, CPU_CLOCK / 4);
+	MOS6522(config, m_via_keyb, CPU_CLOCK / 4);
 	m_via_keyb->irq_handler().set_inputline(m_maincpu, M6808_IRQ_LINE);
 
-	VIA6522(config, m_via_modem, CPU_CLOCK / 4);
+	MOS6522(config, m_via_modem, CPU_CLOCK / 4);
 	m_via_modem->irq_handler().set_inputline(m_maincpu, M6808_IRQ_LINE);
 
 	/* Floppy */

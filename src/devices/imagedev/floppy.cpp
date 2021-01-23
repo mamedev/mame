@@ -195,7 +195,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
-		floppy_ratio_1(0),
+		angular_speed(0),
 		revolution_count(0),
 		cyl(0),
 		subcyl(0),
@@ -288,7 +288,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
-	floppy_ratio_1 = int(1000.0f*rpm/300.0f+0.5f);
+	angular_speed = rpm/60.0*2e8;
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
@@ -364,7 +364,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(dskchg));
 	save_item(NAME(ready));
 	save_item(NAME(rpm));
-	save_item(NAME(floppy_ratio_1));
+	save_item(NAME(angular_speed));
 	save_item(NAME(revolution_start_time));
 	save_item(NAME(rev_time));
 	save_item(NAME(revolution_count));
@@ -626,12 +626,12 @@ void floppy_image_device::index_resync()
 		revolution_start_time += rev_time;
 		revolution_count++;
 	}
-	int position = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	int position = int(delta.as_double()*angular_speed + 0.5);
 
 	int new_idx = position < 20000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_nsec((2000000*1000)/floppy_ratio_1);
+		attotime index_up_time = attotime::from_double(20000/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else
 		index_timer->adjust(rev_time - delta);
@@ -759,8 +759,10 @@ void floppy_image_device::seek_phase_w(int phases)
 
 	cache_clear();
 
-	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("track %d.%d\n", cyl, subcyl);
+	if(next_pos != cur_pos) {
+		if (TRACE_STEP) logerror("track %d.%d\n", cyl, subcyl);
+		if (m_make_sound) m_sound_out->step(subcyl);
+	}
 
 	/* Update disk detection if applicable */
 	if (exists() && !dskchg_writable)
@@ -813,7 +815,7 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 		base -= rev_time;
 	}
 
-	uint32_t res = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	uint32_t res = uint32_t(delta.as_double()*angular_speed+0.5);
 	if (res >= 200000000) {
 		// Due to rounding errors in the previous operation,
 		// 'res' sometimes overflows 2E+8
@@ -830,7 +832,7 @@ bool floppy_image_device::test_track_last_entry_warps(const std::vector<uint32_t
 
 attotime floppy_image_device::position_to_time(const attotime &base, int position) const
 {
-	return base + attotime::from_nsec((int64_t(position)*2000/floppy_ratio_1+1)/2);
+	return base + attotime::from_double(position/angular_speed);
 }
 
 void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base)
@@ -952,6 +954,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	if(!image || mon)
 		return;
 	image_dirty = true;
+	cache_clear();
 
 	attotime base;
 	int start_pos = find_position(base, start);
@@ -2421,7 +2424,7 @@ bool mac_floppy_device::wpt_r()
 	// actual_ss may have changed after the phases were set
 	m_reg = (m_reg & 7) | (actual_ss ? 8 : 0);
 
-	if(m_reg != 4 && m_reg != 12)
+	if(m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13)
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
@@ -2432,8 +2435,9 @@ bool mac_floppy_device::wpt_r()
 	case 0x2: // Is the motor on?
 		return mon;
 
-	case 0x4: // Used when reading data, result ignored
-		return false;
+	case 0x4:
+	case 0xc: // Index pulse, probably only on the superdrive though
+		return !m_has_mfm ? false : !image || mon ? true : idx;
 
 	case 0x5: // Is it a superdrive (supports 1.4M MFM) ?
 		return m_has_mfm;
@@ -2452,9 +2456,6 @@ bool mac_floppy_device::wpt_r()
 
 	case 0xa: // Not on track 0?
 		return cyl != 0;
-
-	case 0xc: // Another identification bit
-		return m_rd1;
 
 	case 0xd: // Is the current mode GCR or MFM?
 		return m_mfm;
@@ -2519,7 +2520,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0x7: // Start eject
 			logerror("cmd start eject\n");
-			call_unload();
+			unload();
 			break;
 
 		case 0x9: // MFM mode on
@@ -2559,7 +2560,7 @@ void mac_floppy_device::track_changed()
 	else if(cyl <= 63)
 		new_rpm = 525;
 	else
-		new_rpm = 590; 
+		new_rpm = 590;
 
 	if(rpm != new_rpm)
 		set_rpm(new_rpm);
@@ -2587,9 +2588,7 @@ bool oa_d34v_device::is_2m() const
 
 mfd51w_device::mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, MFD51W, tag, owner, clock)
 {
-	m_has_mfm = true;
 }
-
 void mfd51w_device::setup_characteristics()
 {
 	form_factor = floppy_image::FF_35;
@@ -2625,5 +2624,5 @@ void mfd75w_device::setup_characteristics()
 
 bool mfd75w_device::is_2m() const
 {
-	return true;
+	return false;
 }

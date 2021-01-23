@@ -13,15 +13,24 @@
 
 DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock, bool disable_mon) :
 	applefdintf_device(mconfig, IWM, tag, owner, clock),
 	m_floppy(nullptr),
-	m_q3_clock(q3_clock)
+	m_q3_clock(q3_clock),
+	m_disable_mon(disable_mon)
 {
-	if (q3_clock != 0)
-		m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
-	if (clock != 0)
-		m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
+	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
+	m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
+}
+
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	applefdintf_device(mconfig, IWM, tag, owner, clock),
+	m_floppy(nullptr),
+	m_q3_clock(0),
+	m_disable_mon(false)
+{
+	m_q3_fclk_ratio = 0;
+	m_fclk_q3_ratio = 0;
 }
 
 u64 iwm_device::q3_to_fclk(u64 cycles) const
@@ -84,8 +93,10 @@ void iwm_device::device_timer(emu_timer &, device_timer_id, int, void *)
 {
 	if(m_active == MODE_DELAY) {
 		m_active = MODE_IDLE;
-		if(m_floppy)
+		if(m_floppy && !m_disable_mon)
 			m_floppy->mon_w(true);
+		if(m_disable_mon)
+			m_devsel_cb(0);
 		m_status &= ~0x20;
 	}
 }
@@ -97,10 +108,10 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
-	if(m_floppy)
+	if(m_floppy && !m_disable_mon)
 		m_floppy->mon_w(true);
 	m_floppy = floppy;
-	if(m_active)
+	if(m_floppy && !m_disable_mon)
 		m_floppy->mon_w(false);
 	update_phases();
 }
@@ -162,16 +173,10 @@ u8 iwm_device::control(int offset, u8 data)
 	if(changed & 0x10) {
 		if(m_control & 0x10) {
 			m_active = MODE_ACTIVE;
-			if(m_floppy)
-				m_floppy->mon_w(false);
 			m_status |= 0x20;
 		} else {
 			if(m_mode & 0x04) {
 				m_active = MODE_IDLE;
-				if(m_floppy) {
-					m_floppy->mon_w(true);
-					m_floppy->seek_phase_w(0);
-				}
 				m_status &= ~0x20;
 			} else {
 				m_active = MODE_DELAY;
@@ -244,7 +249,7 @@ u8 iwm_device::control(int offset, u8 data)
 
 	switch(m_control & 0xc0) {
 	case 0x00: return m_active ? m_data : 0xff;
-	case 0x40: return m_status;
+	case 0x40: return (m_status & 0x7f) | (!m_floppy || m_floppy->wpt_r() ? 0x80 : 0);;
 	case 0x80: return m_whd;
 	case 0xc0: if(offset & 1) { if(m_active) data_w(data); else mode_w(data); } return 0xff;
 	}

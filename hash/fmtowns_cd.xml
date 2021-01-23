@@ -5910,7 +5910,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1995</year>
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="serial" value="MTC-1126"/>
-		<info name="alt_title" value="エンゲージ・エランス　～魅惑の使徒たち～" />
+		<info name="alt_title" value="エンゲージ・エランズ　～魅惑の使徒たち～" />
 		<info name="release" value="199504xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5930,7 +5930,7 @@ User/save disks that can be created from the game itself are not included.
 		<description>Engage Errands II - Hikari o Ninau Mono</description>
 		<year>1995</year>
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
-		<info name="alt_title" value="エンゲージ・エランスⅡ　～光輝を担うもの～" /> <!-- ひかり is written in furigana above 光輝 -->
+		<info name="alt_title" value="エンゲージ・エランズⅡ　～光輝を担うもの～" /> <!-- ひかり is written in furigana above 光輝 -->
 		<info name="release" value="199505xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">

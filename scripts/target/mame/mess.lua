@@ -1178,6 +1178,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"atari",
 		"att",
 		"ave",
+		"aviion",
 		"bally",
 		"bandai",
 		"banctec",
@@ -1885,6 +1886,11 @@ files {
 createMESSProjects(_target, _subtarget, "ave")
 files {
 	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "aviion")
+files {
+	MAME_DIR .. "src/mame/drivers/aviion88k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bally")

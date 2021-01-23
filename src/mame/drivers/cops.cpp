@@ -915,7 +915,7 @@ void cops_state::base(machine_config &config)
 	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* via */
-	via6522_device &via1(VIA6522(config, "via6522_1", MAIN_CLOCK/2));
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/2));
 	via1.irq_handler().set(FUNC(cops_state::via1_irq));
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
@@ -934,10 +934,10 @@ void cops_state::cops(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
-	via6522_device &via2(VIA6522(config, "via6522_2", MAIN_CLOCK/2));
+	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/2));
 	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-	via6522_device &via3(VIA6522(config, "via6522_3", MAIN_CLOCK/2));
+	via6522_device &via3(MOS6522(config, "via6522_3", MAIN_CLOCK/2));
 	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
 	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
 	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));

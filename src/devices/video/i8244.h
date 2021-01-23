@@ -120,7 +120,6 @@ protected:
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors(offs_t offset);
-	bool invalid_register(offs_t offset, bool rw);
 
 	void draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);

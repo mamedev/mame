@@ -551,7 +551,7 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels */
-	clip.min_x = std::max(clip.min_x, (!m_flipscreen_x) * (16 + hoffset) * m_x_scale);
+	clip.min_x = std::max(clip.min_x, (!m_flipscreen_x) * (m_leftspriteclip + hoffset) * m_x_scale);
 	clip.max_x = std::min(clip.max_x, (256 - m_flipscreen_x * (16 + hoffset)) * m_x_scale - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */

@@ -164,7 +164,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 			if (core_filename_ends_with(entry->name, ".sta"))
 			{
 				// get the file name of the entry
-				std::string file_name = core_filename_extract_base(entry->name, true);
+				std::string file_name(core_filename_extract_base(entry->name, true));
 
 				// try translating it
 				std::string visible_name = get_visible_name(file_name);

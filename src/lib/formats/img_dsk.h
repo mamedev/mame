@@ -46,8 +46,8 @@ private:
 	void write_gap(std::vector<uint32_t> &buffer , unsigned size_00 , unsigned size_ff);
 	void write_sector(std::vector<uint32_t> &buffer , uint8_t track_no , uint8_t sect_no , const uint8_t *sect_data);
 	void fill_with_gap4(std::vector<uint32_t> &buffer);
-	std::vector<uint8_t> get_next_id_n_block(const uint8_t *bitstream , int bitstream_size , int& pos , int& start_pos);
-	bool get_next_sector(const uint8_t *bitstream , int bitstream_size , int& pos , unsigned& track , unsigned& sector , uint8_t *sector_data);
+	std::vector<uint8_t> get_next_id_n_block(const std::vector<bool> &bitstream , int& pos , int& start_pos);
+	bool get_next_sector(const std::vector<bool> &bitstream , int& pos , unsigned& track , unsigned& sector , uint8_t *sector_data);
 };
 
 extern const floppy_format_type FLOPPY_IMG_FORMAT;

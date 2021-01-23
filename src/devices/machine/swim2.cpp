@@ -33,6 +33,11 @@ void swim2_device::device_start()
 	save_item(NAME(m_current_bit));
 	save_item(NAME(m_tss_sr));
 	save_item(NAME(m_tss_output));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_mfm_sync_counter));
+	save_item(NAME(m_flux_write_start));
+	save_item(NAME(m_flux_write));
+	save_item(NAME(m_flux_write_count));
 }
 
 void swim2_device::device_reset()
@@ -52,11 +57,14 @@ void swim2_device::device_reset()
 	m_current_bit = 0;
 	m_tss_sr = 0;
 	m_tss_output = 0;
+	m_sr = 0;
+	m_mfm_sync_counter = 0;
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
 	m_flux_write_start = 0;
 	m_flux_write_count = 0;
+	std::fill(m_flux_write.begin(), m_flux_write.end(), 0);
 
 	m_last_sync = machine().time().as_ticks(clock());
 }
@@ -93,13 +101,9 @@ void swim2_device::flush_write(u64 when)
 			m_flux_write_count--;
 		attotime start = cycles_to_time(m_flux_write_start);
 		attotime end = cycles_to_time(when);
-		logerror("wbuf start %s\n", start.to_string());
 		std::vector<attotime> fluxes(m_flux_write_count);
-		for(u32 i=0; i != m_flux_write_count; i++) {
+		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
-			logerror("wbuf flux  %s\n", fluxes[i].to_string());
-		}
-		logerror("wbuf end   %s\n", end.to_string());
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
 	}
 	m_flux_write_count = 0;
@@ -124,7 +128,6 @@ u8 swim2_device::read(offs_t offset)
 	sync();
 
 	static const char *const names[] = {
-		"?0", "?1", "?2", "?3", "?4", "?5", "?6", "?7",
 		"data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
 	};
 	switch(offset & 7) {
@@ -172,10 +175,10 @@ u8 swim2_device::read(offs_t offset)
 		if(m_fifo_pos > 0) {
 			if(m_fifo[m_fifo_pos - 1] & M_MARK)
 				h |= 0x01;
-			if(m_fifo[m_fifo_pos - 1] & M_CRC0)
+			if(!(m_fifo[m_fifo_pos - 1] & M_CRC0))
 				h |= 0x02;
 		}
-		// addata on 4
+		// rddata on 4
 		if(!m_floppy || m_floppy->wpt_r())
 			h |= 0x08;
 		if(m_error)
@@ -193,12 +196,11 @@ u8 swim2_device::read(offs_t offset)
 			else if(m_fifo_pos == 1)
 				h |= 0x80;
 		}
-		//		logerror("handshake %02x\n", h);
 		return h;
 	}
 
 	default:
-		logerror("read %s\n", names[offset & 15]);
+		logerror("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;
@@ -212,7 +214,6 @@ void swim2_device::write(offs_t offset, u8 data)
 
 	static const char *const names[] = {
 		"data", "mark", "crc", "param", "phases", "setup", "mode0", "mode1",
-		"?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
 	};
 
 	switch(offset & 7) {
@@ -272,7 +273,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		break;
 
 	default:
-		logerror("write %s, %02x\n", names[offset], data);
+		logerror("write %s, %02x\n", names[offset & 7], data);
 		break;
 	}
 
@@ -304,6 +305,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		// Entering read mode
 		m_current_bit = 0;
 		m_sr = 0;
+		m_mfm_sync_counter = 0;
 		logerror("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x04 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
 
 		m_pll.reset(machine().time());
@@ -321,6 +323,20 @@ void swim2_device::write(offs_t offset, u8 data)
 	}
 }
 
+void swim2_device::crc_clear()
+{
+	m_crc = 0xcdb4;
+}
+
+void swim2_device::crc_update(int bit)
+{
+	if((m_crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+		m_crc = (m_crc << 1) ^ 0x1021;
+	else
+		m_crc = m_crc << 1;
+
+}
+
 u64 swim2_device::time_to_cycles(const attotime &tm) const
 {
 	return tm.as_ticks(clock());
@@ -334,13 +350,11 @@ attotime swim2_device::cycles_to_time(u64 cycles) const
 void swim2_device::fifo_clear()
 {
 	m_fifo_pos = 0;
-	// must clear the crc to the appropriate r/w-dependant value.  No idea yet which it is, but I have my suspicions.
-	m_crc = 0x1234;
+	crc_clear();
 }
 
 bool swim2_device::fifo_push(u16 data)
 {
-	logerror("fifo push %03x\n", data);
 	if(m_fifo_pos == 2)
 		return true;
 	m_fifo[m_fifo_pos ++] = data;
@@ -357,21 +371,6 @@ u16 swim2_device::fifo_pop()
 	return r;
 }
 
-// cell times
-// 1 us:           31.32
-// 1.5us:          47.32
-// 2us:    31.16   63.32
-// 3us:    47.16   94.32
-// 4us:    63.16  125.32
-// 6us:    94.16  188.32
-
-// time1 = 31, time0 = 16 for clock /1 mfm
-// time1 = 
-
-// 32 mfm, t1=63, t0=31
-// 16 mfm, t1=31.5, t0=15.5
-// 16 gcr, t1=31.5, t0=31.5
-
 void swim2_device::sync()
 {
 	u64 next_sync = time_to_cycles(machine().time());
@@ -380,15 +379,12 @@ void swim2_device::sync()
 		return;
 	}
 
-	logerror("ACTIVE %s %d-%d\n", m_mode & 0x10 ? "write" : "read", m_last_sync, next_sync);
-
 	if(m_mode & 0x10) {
 		// We count in half-cycles but only toggle write on full cycles
 		u32 cycles = (next_sync - m_last_sync) << 1;
 
 		// Write mode
 		while(cycles) {
-			//		logerror("half cycles avail %d needed %d\n", cycles, m_half_cycles_before_change);
 			if(m_half_cycles_before_change) {
 				if(cycles >= m_half_cycles_before_change) {
 					cycles -= m_half_cycles_before_change;
@@ -398,11 +394,9 @@ void swim2_device::sync()
 					cycles = 0;
 					break;
 				}
-			}
-			
+			}			
 
 			if(m_tss_output & 0xc) {
-				logerror("SR %03x.%d TSS %c%c\n", m_sr, m_current_bit, m_tss_output & 8 ? m_tss_output & 2 ? '1' : '0' : '.', m_tss_output & 4 ? m_tss_output & 1 ? '1' : '0' : '.');
 				bool bit;
 				if(m_tss_output & 8) {
 					bit = (m_tss_output >> 1) & 1;
@@ -412,7 +406,7 @@ void swim2_device::sync()
 					m_tss_output = 0;
 				}
 				if(bit) {
-					if(m_flux_write_count == 32)
+					if(m_flux_write_count == m_flux_write.size())
 						flush_write(next_sync - (cycles >> 1));
 					m_flux_write[m_flux_write_count ++] = next_sync - (cycles >> 1);
 					m_half_cycles_before_change = 63;
@@ -420,40 +414,44 @@ void swim2_device::sync()
 					m_half_cycles_before_change = m_setup & 0x40 ? 63 : 31;
 				if(m_setup & 8)
 					m_half_cycles_before_change <<= 1;
-				logerror("T%d, %d half cycles\n", bit, m_half_cycles_before_change);
 				continue;
 			}
 			if(m_current_bit == 0xff)
 				fatalerror("Sequence break on write\n");
 
 			if(m_current_bit == 0) {
-				u16 r = fifo_pop();
-				if(m_setup & 0x40)
-					logerror("DATAW %02x\n", r);
-				logerror("fifo pop %03x\n", r);
-				if(r == 0xffff && !m_error) {
-					m_error |= 0x01;
-					flush_write();
-					m_current_bit = 0xff;
-					m_half_cycles_before_change = 0;
-					m_mode &= ~8;
-					logerror("write end on underrun\n");
-					break;
+				if(m_sr & M_CRC)
+					m_sr = m_crc >> 8;
+				else {
+					u16 r = fifo_pop();
+					if(r == 0xffff && !m_error) {
+						m_error |= 0x01;
+						flush_write();
+						m_current_bit = 0xff;
+						m_half_cycles_before_change = 0;
+						m_mode &= ~8;
+						logerror("write end on underrun\n");
+						break;
+					}
+					if(r & M_CRC)
+						m_sr = M_CRC | (m_crc >> 8);
+					else
+						m_sr = r & (M_MARK | M_CRC | 0xff);
 				}
-				if(r & M_CRC) {
-					fatalerror("crc alpha\n");
-				}
-				m_sr = r & (M_MARK | M_CRC | 0xff);
 				m_current_bit = 8;
+				if(m_sr & M_MARK)
+					crc_clear();
 			}
 			m_current_bit --;
 			bool bit = (m_sr >> m_current_bit) & 1;
+			if(!(m_sr & M_MARK))
+				crc_update(bit);
 			m_tss_sr = (m_tss_sr << 1) | bit;
 			if(m_setup & 0x40)
 				m_tss_output = 4 | bit;
 			else {
 				static const u8 tss[4] = { 5, 0xd, 4, 5 };
-				if((m_sr & M_MARK) && (m_tss_sr == 8))
+				if((m_sr & M_MARK) && ((m_tss_sr & 0xf) == 8))
 					m_tss_output = 0xc;
 				else
 					m_tss_output = tss[m_tss_sr & 3];
@@ -471,16 +469,7 @@ void swim2_device::sync()
 				if(bit == -1)
 					break;
 				m_sr = ((m_sr << 1) | bit) & 0xff;
-				logerror("%s: bit %d, sr=%02x\n", when.to_string(), bit, m_sr);
 				if(m_sr & 0x80) {
-					static u8 m1, m2, m3;
-					m1 = m2;
-					m2 = m3;
-					m3 = m_sr;
-					logerror("DATAR %02x\n", m_sr);
-					if(m1 == 0xd5 && m2 == 0xaa && m3 == 0xad)
-						machine().debug_break();
-					logerror("read byte %02x\n", m_sr);
 					if(fifo_push(m_sr) && !m_error)
 						m_error |= 0x01;
 					m_sr = 0;
@@ -488,8 +477,56 @@ void swim2_device::sync()
 			}
 		} else {
 			// MFM mode
-		}
+			for(;;) {
+				static u16 xinf = 0xffff;
+				attotime when;
+				int bit = m_pll.get_next_bit(when, m_floppy, limit);
+				if(bit == -1)
+					break;
+				xinf = (xinf << 1) | bit;
+				if(m_mfm_sync_counter < 64) {
+					if(bit != (m_mfm_sync_counter & 1))
+						m_mfm_sync_counter ++;
+					else
+						m_mfm_sync_counter = 0;
+				} else {
+					if(m_mfm_sync_counter == 64 && bit)
+						m_mfm_sync_counter --;
+					else {
+						if(m_mfm_sync_counter == 65 || m_mfm_sync_counter == 81) {
+							m_tss_sr = 0xff;
+							m_sr = 0;
+						}
+						if(m_mfm_sync_counter & 1) {
+							m_sr |= bit << (((96 - m_mfm_sync_counter) >> 1) & 7);
+							crc_update(bit);
+						}
+						m_tss_sr = (m_tss_sr << 1) | bit;
+						if((m_tss_sr & 0xf) == 1 && !(m_mfm_sync_counter & 1))
+							m_sr |= M_MARK;
 
+						m_mfm_sync_counter ++;
+						if(m_mfm_sync_counter == 80) {
+							if(!(m_sr & M_MARK))
+								m_mfm_sync_counter = 0;
+							else {
+								crc_clear();
+								if(fifo_push(m_sr) && !m_error)
+									m_error |= 0x01;
+							}
+						} else if(m_mfm_sync_counter == 96) {
+							m_mfm_sync_counter -= 16;
+							if(m_sr & M_MARK)
+								crc_clear();
+							else if(!m_crc)
+								m_sr |= M_CRC0;
+							if(fifo_push(m_sr) && !m_error)
+								m_error |= 0x01;
+						}
+					}
+				}
+			}				
+		}
 	}
 
 	m_last_sync = next_sync;

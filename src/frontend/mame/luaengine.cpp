@@ -26,6 +26,8 @@
 #include "softlist.h"
 #include "uiinput.h"
 
+#include "corestr.h"
+
 #include <cstring>
 #include <thread>
 
@@ -882,7 +884,7 @@ void lua_engine::initialize()
 				}));
 	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open));
+	file_type.set("open", static_cast<osd_file::error (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
@@ -1375,8 +1377,8 @@ void lua_engine::initialize()
 	device_type["memshare"] = &device_t::memshare;
 	device_type["membank"] = &device_t::membank;
 	device_type["ioport"] = &device_t::ioport;
-	device_type["subdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::subdevice);
-	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(char const *) const>(&device_t::siblingdevice);
+	device_type["subdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice);
+	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice);
 	device_type["parameter"] = &device_t::parameter;
 	device_type["tag"] = sol::property(&device_t::tag);
 	device_type["basetag"] = sol::property(&device_t::basetag);
@@ -1582,9 +1584,9 @@ void lua_engine::initialize()
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
-	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::load_software);
+	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
 	image_type["unload"] = &device_image_interface::unload;
-	image_type["create"] = static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::create);
+	image_type["create"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::create);
 	image_type["display"] = &device_image_interface::call_display;
 	image_type["is_readable"] = sol::property(&device_image_interface::is_readable);
 	image_type["is_writeable"] = sol::property(&device_image_interface::is_writeable);
@@ -1818,13 +1820,13 @@ void lua_engine::initialize()
 	output_type["set_indexed_value"] =
 		[] (output_manager &o, char const *basename, int index, int value)
 		{
-			o.set_value(util::string_format("%s%d", basename, index).c_str(), value);
+			o.set_value(util::string_format("%s%d", basename, index), value);
 		};
 	output_type["get_value"] = &output_manager::get_value;
 	output_type["get_indexed_value"] =
 		[] (output_manager &o, char const *basename, int index)
 		{
-			return o.get_value(util::string_format("%s%d", basename, index).c_str());
+			return o.get_value(util::string_format("%s%d", basename, index));
 		};
 	output_type["name_to_id"] = &output_manager::name_to_id;
 	output_type["id_to_name"] = &output_manager::id_to_name;

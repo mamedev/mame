@@ -102,7 +102,7 @@ public:
 		media_type type() const { return m_type; }
 		audit_status status() const { return m_status; }
 		audit_substatus substatus() const { return m_substatus; }
-		const char *name() const { return m_name; }
+		const std::string &name() const { return m_name; }
 		uint64_t expected_length() const { return m_explength; }
 		uint64_t actual_length() const { return m_length; }
 		const util::hash_collection &expected_hashes() const { return m_exphashes; }
@@ -138,7 +138,7 @@ public:
 		media_type                      m_type;             // type of item that was audited
 		audit_status                    m_status;           // status of audit on this item
 		audit_substatus                 m_substatus;        // finer-detail status
-		const char *                    m_name;             // name of item
+		std::string                     m_name;             // name of item
 		uint64_t                        m_explength;        // expected length of item
 		uint64_t                        m_length;           // actual length of item
 		util::hash_collection           m_exphashes;        // expected hash data

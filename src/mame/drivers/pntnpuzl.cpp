@@ -360,7 +360,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	VIA6522(config, m_via, 12_MHz_XTAL / 10);
+	MOS6522(config, m_via, 12_MHz_XTAL / 10);
 	m_via->readpa_handler().set_ioport("IN2");
 	m_via->readpb_handler().set_ioport("IN1");
 	m_via->writepb_handler().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(4);

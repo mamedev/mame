@@ -655,34 +655,32 @@ bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 		bool fm = m_mode[i]< 3;
 
-		uint8_t bitstream[500000 / 8];
-		uint8_t sector_data[50000];
-		desc_xs sectors[256];
-		int track_size;
-		generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, bitstream, track_size, image);
+		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, image);
+		std::vector<std::vector<uint8_t>> sectors;
+
 		if (fm)
-			extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 		else
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 		uint8_t sdata[8192];
 		for (int j = 0; j < m_sector_count[i]; j++) {
 
-			desc_xs& xs = sectors[m_snum[i][j]];
+			const auto &data = sectors[m_snum[i][j]];
 
 			uint8_t mode;
-			if (!xs.data)
+			if (data.empty())
 			{
 				mode = 0;
 				io_generic_write(io, &mode, pos++, 1);
 				continue;
 			}
-			else if (xs.size < actual_size) {
-				memcpy((void*)sdata, xs.data, xs.size);
-				memset((uint8_t*)sdata + xs.size, 0, xs.size - actual_size);
+			else if (data.size() < actual_size) {
+				memcpy((void*)sdata, data.data(), data.size());
+				memset((uint8_t*)sdata + data.size(), 0, data.size() - actual_size);
 			}
 			else
-				memcpy((void*)sdata, xs.data, actual_size);
+				memcpy((void*)sdata, data.data(), actual_size);
 
 			if (can_compress(sdata, sdata[0], actual_size))
 			{

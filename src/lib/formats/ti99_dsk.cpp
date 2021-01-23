@@ -213,9 +213,6 @@ bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, const std::v
 */
 bool ti99_floppy_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int act_track_size = 0;
-
-	uint8_t bitstream[500000/8];
 	uint8_t sectordata[9216];   // max size (36*256)
 
 	int cellsizes[] = { 2000, 4000, 1000, 2000 };
@@ -246,13 +243,10 @@ bool ti99_floppy_format::save(io_generic *io, const std::vector<uint32_t> &varia
 		for (int track = 0; track < track_count; track++)
 		{
 			// Retrieve the cells from the flux sequence. This also delivers the actual track size.
-			generate_bitstream_from_track(track, head, cell_size, bitstream, act_track_size, image);
-
-			// Maybe the track has become longer due to moving splices
-			if (act_track_size > 200000000/cell_size) act_track_size = 200000000/cell_size;
+			auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 
 			LOGMASKED(LOG_DETAIL, "[ti99_dsk] Getting sectors from track %d, head %d\n", track, head);
-			seccount = get_sectors(bitstream, act_track_size, encoding, track, head, expected_sectors, sectordata, sector);
+			seccount = get_sectors(bitstream, encoding, track, head, expected_sectors, sectordata, sector);
 			LOGMASKED(LOG_DETAIL, "[ti99_dsk] Seccount = %d\n", seccount);
 
 			// We may have more sectors in MFM (18). This is OK in track 0; otherwise we need to restart the process.
@@ -564,14 +558,13 @@ enum
     The sectors are assumed to have a length of 256 byte, and their sequence
     is stored in the secnumber array.
 */
-int ti99_floppy_format::get_sectors(const uint8_t *bitstream, int cell_count, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber)
+int ti99_floppy_format::get_sectors(const std::vector<bool> &bitstream, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber)
 {
 	int bitpos = 0;
 	int lastpos = 0;
 	int spos = 0;
 	int seccount = 0;
 	uint16_t shift_reg = 0;
-	int bytepos = 0;
 	uint8_t databyte = 0;
 	uint8_t curbyte = 0;
 	int rep = 0;
@@ -584,12 +577,10 @@ int ti99_floppy_format::get_sectors(const uint8_t *bitstream, int cell_count, in
 	int first = (encoding==floppy_image::MFM)? A1IDAM1 : FMIDAM;
 	int state = first;
 
-	while (bitpos < cell_count)
+	while (bitpos < bitstream.size())
 	{
 		LOGMASKED(LOG_SHIFT, "[ti99_dsk] shift = %04x\n", shift_reg);
-		shift_reg = (shift_reg << 1) & 0xffff;
-		if ((bitpos & 0x07)==0) curbyte = bitstream[bytepos++];
-		if ((curbyte & 0x80) != 0) shift_reg |= 1;
+		shift_reg = (shift_reg << 1) | bitstream[bitpos];
 
 		if (((bitpos - lastpos) & 1)==0)
 		{

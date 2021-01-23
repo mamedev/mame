@@ -738,23 +738,24 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 #if NEW_SWIM
 	switch (woz_version) {
 	case 0:
-		IWM(config, m_fdc, C7M, 1021800*2);
+		IWM(config, m_fdc, C7M, 1021800*2, true);
 		break;
 	case 1:
-		SWIM1(config, m_fdc, C15M);
+		SWIM1(config, m_fdc, C15M, 1021800*2);
 		break;
 	case 2:
 		SWIM2(config, m_fdc, C15M);
+		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
 		break;
 	case 3:
 		SWIM3(config, m_fdc, C15M);
+		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
 		break;
 	}
 
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
-	m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
 
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
@@ -787,7 +788,7 @@ void mac_state::add_scsi(machine_config &config, bool cdrom)
 
 void mac_state::add_via1_adb(machine_config &config, bool macii)
 {
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	if (macii)
 		m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
@@ -801,7 +802,7 @@ void mac_state::add_via1_adb(machine_config &config, bool macii)
 
 void mac_state::add_via2(machine_config &config)
 {
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a));
@@ -932,7 +933,7 @@ void mac_state::maciifx(machine_config &config)
 	add_base_devices(config, true, 1);
 	add_scsi(config);
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));

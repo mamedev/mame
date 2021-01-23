@@ -11,7 +11,7 @@ Features summary:
 - major system (predefined 8*7 objects, 12 single + 4 quads)
 - minor system (4 user-defined 8*8 sprites)
 - collision detection between all layers
-- 1-bit sound
+- 1-bit sound from rotating shift register
 
 See Odyssey 2 driver file for known problems.
 
@@ -231,80 +231,11 @@ offs_t i8244_device::fix_register_mirrors(offs_t offset)
 }
 
 
-bool i8244_device::invalid_register(offs_t offset, bool rw)
-{
-	// object x/y/attr registers are not accessible when display is enabled
-	// (sprite shape registers still are)
-	if (offset < 0x80 && m_vdc.s.control & 0x20)
-		return true;
-
-	// grid registers are not accessible when grid is enabled
-	if (offset >= 0xc0 && m_vdc.s.control & 0x08)
-		return true;
-
-	bool invalid = false;
-
-	u8 n = offset & 0xf;
-
-	// these registers are always inaccessible
-	switch (offset & 0xf0)
-	{
-		case 0x00:
-			invalid = ((n & 0x3) == 0x3);
-
-			// write-only
-			if (!invalid && rw)
-				invalid = ((n & 0x3) == 0x2);
-
-			break;
-
-		case 0xa0:
-			invalid = (n == 0x6 || n >= 0xb);
-
-			if (!invalid)
-			{
-				// write-only
-				if (rw)
-					invalid = (n == 0x3 || n == 0x7 || n == 0x8 || n == 0x9);
-
-				// read-only
-				else
-					invalid = (n == 0x1 || n == 0x4 || n == 0x5);
-			}
-
-			break;
-
-		case 0xc0: case 0xd0:
-			invalid = (n >= 0x9);
-			break;
-
-		case 0xe0:
-			invalid = (n >= 0xa);
-			break;
-
-		case 0xf0:
-			invalid = true;
-			break;
-
-		default:
-			break;
-	}
-
-	return invalid;
-}
-
-
 u8 i8244_device::read(offs_t offset)
 {
 	u8 data;
 
 	offset = fix_register_mirrors(offset);
-
-	if (machine().side_effects_disabled())
-		return m_vdc.reg[offset];
-
-	if (invalid_register(offset, true))
-		return 0;
 
 	// update screen before accessing video status registers
 	if (offset == 0xa1 || offset == 0xa2)
@@ -323,15 +254,19 @@ u8 i8244_device::read(offs_t offset)
 			// position strobe status
 			data |= m_vdc.s.control & 0x02;
 
-			m_irq_func(CLEAR_LINE);
-			m_control_status &= ~0xcc;
+			if (!machine().side_effects_disabled())
+			{
+				m_irq_func(CLEAR_LINE);
+				m_control_status &= ~0xcc;
+			}
 
 			break;
 		}
 
 		case 0xa2:
 			data = m_collision_status;
-			m_collision_status = 0;
+			if (!machine().side_effects_disabled())
+				m_collision_status = 0;
 			break;
 
 		case 0xa4:
@@ -342,8 +277,24 @@ u8 i8244_device::read(offs_t offset)
 			data = (m_vdc.s.control & 0x02) ? get_x_beam() : m_x_beam_pos;
 			break;
 
+		case 0x02: case 0x06: case 0x0a: case 0x0e:
+		case 0xa3: case 0xa7: case 0xa8: case 0xa9:
+			// write-only registers
+			data = 0;
+			break;
+
 		default:
 			data = m_vdc.reg[offset];
+
+			// object x/y/attr registers are not accessible when display is enabled
+			// (sprite shape registers still are)
+			if (offset < 0x80 && m_vdc.s.control & 0x20)
+				data = 0;
+
+			// grid registers are not accessible when grid is enabled
+			else if (offset >= 0xc0 && m_vdc.s.control & 0x08)
+				data = 0;
+
 			break;
 	}
 
@@ -355,11 +306,18 @@ void i8244_device::write(offs_t offset, u8 data)
 {
 	offset = fix_register_mirrors(offset);
 
-	if (invalid_register(offset, false))
+	// object x/y/attr registers are not accessible when display is enabled
+	// (sprite shape registers still are)
+	if (offset < 0x80 && m_vdc.s.control & 0x20)
+		return;
+
+	// grid registers are not accessible when grid is enabled
+	// grid registers >= 0xf0 are unmapped
+	if ((offset >= 0xc0 && m_vdc.s.control & 0x08) || offset >= 0xf0)
 		return;
 
 	// update screen before accessing video registers
-	if (offset >= 0x80 && offset < 0xa4)
+	if ((offset <= 0xa0 || offset == 0xa2 || offset == 0xa3) && data != m_vdc.reg[offset])
 		screen().update_now();
 
 	// color registers d4-d7 are not connected
@@ -394,6 +352,18 @@ void i8244_device::write(offs_t offset, u8 data)
 			m_stream->update();
 			data &= ~0x40;
 			break;
+
+		case 0xa1: case 0xa4: case 0xa5:
+			// read-only registers
+			return;
+
+		case 0x03: case 0x07: case 0x0b: case 0x0f:
+		case 0xa6: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+		case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+		case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+		case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+			// unused registers
+			return;
 
 		default:
 			break;

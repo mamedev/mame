@@ -29,7 +29,7 @@
 
 static void writeusage(std::wostream &output, bool write_word_usage, const struct command *c, char *argv[])
 {
-	std::string cmdname = core_filename_extract_base(argv[0]);
+	std::string cmdname(core_filename_extract_base(argv[0]));
 
 	util::stream_format(output,
 		L"%s %s %s %s\n",
@@ -873,7 +873,7 @@ int main(int argc, char *argv[])
 	int result;
 	const struct command *c;
 	const char *sample_format = "coco_jvc_rsdos";
-	std::string cmdname = core_filename_extract_base(argv[0]);
+	std::string cmdname(core_filename_extract_base(argv[0]));
 
 #ifdef _WIN32
 	_setmode(_fileno(stdout), _O_U8TEXT);

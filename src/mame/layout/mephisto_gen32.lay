@@ -35,54 +35,54 @@ license:CC0
 	<element name="piece" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
 
-		<image file="chess/wp.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/wb.png" state="3"/>
-		<image file="chess/wr.png" state="4"/>
-		<image file="chess/wq.png" state="5"/>
-		<image file="chess/wk.png" state="6"/>
+		<image file="chess/wp.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/wb.svg" state="3"/>
+		<image file="chess/wr.svg" state="4"/>
+		<image file="chess/wq.svg" state="5"/>
+		<image file="chess/wk.svg" state="6"/>
 
-		<image file="chess/bp.png" state="7"/>
-		<image file="chess/bn.png" state="8"/>
-		<image file="chess/bb.png" state="9"/>
-		<image file="chess/br.png" state="10"/>
-		<image file="chess/bq.png" state="11"/>
-		<image file="chess/bk.png" state="12"/>
+		<image file="chess/bp.svg" state="7"/>
+		<image file="chess/bn.svg" state="8"/>
+		<image file="chess/bb.svg" state="9"/>
+		<image file="chess/br.svg" state="10"/>
+		<image file="chess/bq.svg" state="11"/>
+		<image file="chess/bk.svg" state="12"/>
 
-		<image file="chess/wp.png" state="13"/>
+		<image file="chess/wp.svg" state="13"/>
 		<text string="J" state="13">
 			<color red="0" green="0" blue="0" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
-		<image file="chess/bp.png" state="14"/>
+		<image file="chess/bp.svg" state="14"/>
 		<text string="J" state="14">
 			<color red="1" green="1" blue="1" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
 		<!-- selected pieces -->
-		<image file="chess/wp.png" state="15"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="16"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="17"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="18"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="19"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="20"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="15"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="16"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="17"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="18"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="19"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="20"><color alpha="0.5" /></image>
 
-		<image file="chess/bp.png" state="21"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="22"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="23"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="24"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="25"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="26"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="21"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="22"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="23"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="24"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="25"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="26"><color alpha="0.5" /></image>
 
-		<image file="chess/wp.png" state="27"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="27"><color alpha="0.5" /></image>
 		<text string="J" state="27">
 			<color red="0.3" green="0.3" blue="0.2" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
-		<image file="chess/bp.png" state="28"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="28"><color alpha="0.5" /></image>
 		<text string="J" state="28">
 			<color red="0.7" green="0.7" blue="0.6" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />

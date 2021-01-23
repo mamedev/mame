@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "natkeyboard.h"
+
+#include "corestr.h"
 #include "emuopts.h"
 #include "unicode.h"
 

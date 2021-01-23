@@ -1751,7 +1751,7 @@ void itech32_state::base_devices(machine_config &config)
 
 void itech32_state::via(machine_config &config)
 {
-	VIA6522(config, m_via, SOUND_CLOCK/8);
+	MOS6522(config, m_via, SOUND_CLOCK/8);
 	m_via->writepb_handler().set(FUNC(itech32_state::pia_portb_out));
 	m_via->irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }

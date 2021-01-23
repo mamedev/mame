@@ -53,7 +53,7 @@ public:
 private:
 	static const desc_e mac_gcr[];
 
-	uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+	uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 
 	bool m_prodos_order;
@@ -80,7 +80,7 @@ public:
 private:
 	static const desc_e mac_gcr[];
 
-	uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+	uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 };
 

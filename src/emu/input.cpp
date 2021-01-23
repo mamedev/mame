@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "inputdev.h"
 
+#include "corestr.h"
+
 
 
 //**************************************************************************
@@ -46,10 +48,10 @@ const input_seq input_seq::empty_seq;
 // simple class to match codes to strings
 struct code_string_table
 {
-	u32 operator[](const char *string) const
+	u32 operator[](std::string_view string) const
 	{
 		for (const code_string_table *current = this; current->m_code != ~0; current++)
-			if (strcmp(current->m_string, string) == 0)
+			if (current->m_string == string)
 				return current->m_code;
 		return ~0;
 	}
@@ -818,8 +820,7 @@ std::string input_manager::code_name(input_code code) const
 		str.append(" ").append(modifier);
 
 	// delete any leading spaces
-	strtrimspace(str);
-	return str;
+	return std::string(strtrimspace(str));
 }
 
 
@@ -887,7 +888,7 @@ input_code input_manager::code_from_token(const char *_token)
 
 	// first token should be the devclass
 	int curtok = 0;
-	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++].c_str()]);
+	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++]]);
 	if (devclass == ~input_device_class(0))
 		return INPUT_CODE_INVALID;
 
@@ -902,7 +903,7 @@ input_code input_manager::code_from_token(const char *_token)
 		return INPUT_CODE_INVALID;
 
 	// next token is the item ID
-	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok].c_str()]);
+	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok]]);
 	bool standard = (itemid != ~input_item_id(0));
 
 	// if we're a standard code, default the itemclass based on it
@@ -940,7 +941,7 @@ input_code input_manager::code_from_token(const char *_token)
 	input_item_modifier modifier = ITEM_MODIFIER_NONE;
 	if (curtok < numtokens)
 	{
-		modifier = input_item_modifier((*modifier_token_table)[token[curtok].c_str()]);
+		modifier = input_item_modifier((*modifier_token_table)[token[curtok]]);
 		if (modifier != ~input_item_modifier(0))
 			curtok++;
 		else
@@ -950,7 +951,7 @@ input_code input_manager::code_from_token(const char *_token)
 	// if we have another token, it is the item class
 	if (curtok < numtokens)
 	{
-		u32 temp = (*itemclass_token_table)[token[curtok].c_str()];
+		u32 temp = (*itemclass_token_table)[token[curtok]];
 		if (temp != ~0)
 		{
 			curtok++;
@@ -1340,7 +1341,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 			return false;
 
 		// first token should be the devclass
-		input_device_class devclass = input_device_class((*devclass_token_table)[strmakeupper(token[0]).c_str()]);
+		input_device_class devclass = input_device_class((*devclass_token_table)[strmakeupper(token[0])]);
 		if (devclass == ~input_device_class(0))
 			return false;
 

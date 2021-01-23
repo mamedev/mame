@@ -12650,6 +12650,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="legrobin">
+		<description>The Legend of Robin Hood - Conquests of the Longbow</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Version 1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 1 of 6] [Startup Disk].img" size="1474560" crc="22712412" sha1="8c573870c0efc6845a3761b82c097e79496fde54"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 2 of 6] [Disk 1].img" size="1474560" crc="57337937" sha1="e51c277bfa67ba573f9eb55a4a65f0df698d48c5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 3 of 6] [Disk 2].img" size="1474560" crc="940de1f7" sha1="40f8cba02f34f7bfd4db13c2a260752efb9079a9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 4 of 6] [Disk 3].img" size="1474560" crc="bdae0fad" sha1="a6ba296f67451bab0d3c3289147f48363249f5b5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 5 of 6] [Disk 4].img" size="1474560" crc="0f9dafef" sha1="84e3c150203e1b63c9db35a95e058eb993de9c1a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Conquests of the Longbow [Sierra] [1991] [3.5HD] [Disk 6 of 6] [Disk 5].img" size="1474560" crc="ba73fa6d" sha1="253ec783b28fca01d6850a97fcea8ecfe8609095"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="legvalor">
 		<description>Legends of Valour</description>
 		<year>1992</year>
@@ -13911,6 +13949,86 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="430f267d" sha1="56fb78a071ee464fa8d578a8f991da262b9e9ded"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pirates">
+		<description>Pirates! Gold (Euro)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="29c00a1b" sha1="56a6230698c25f502ad7f6d21b83c995fe188f64"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="f1b60f1e" sha1="443485ec9ebf31cb251441065ac12936c0ca592f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="cf0e73f9" sha1="8393d6842814ae9a7f8575c709bdffcfc91c3f3a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="aaa2c74b" sha1="719db1f09df71ab95830c4b3bad95328535e4193"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="70947807" sha1="8199e9a2a417063a317b77cbe2b95cabc56466c1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="de06c8fb" sha1="d1bbd5d62a1416d0e4d31180cb819fd3e99df29d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Diferences between [pirates] / [piratesa] -->
+	<!-- Installation File Date: 1993-09-39 / 1993-07-15 -->
+	<!-- Multi-Language Readme File: English;French;German / English -->
+	<!-- Readme.txt File: include "GAME PLAY" chapter / doesn't include "GAME PLAY" chapter -->
+	<!-- Hardware Configuration Setup: include Sound Speech / doesn't Sound Speech -->
+	<!-- Installation Process - 256 colors to 16 color convertion: include 430 files / include 415 files -->
+	<software name="piratesa" cloneof="pirates">
+		<description>Pirates! Gold (older)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="5dfc56da" sha1="ea70d72ff26a9e01220ee6c20f696cf7412f1574"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="1263cdfd" sha1="de7ccb00734a05bd114185231872e3bc10169745"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="11d7b33c" sha1="3b75c656b3cd0c6801ccf98070cc0a835cab90ae"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="971d974f" sha1="44e0b1fb99e32abe0d96f73dead9525a95885972"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="108eba26" sha1="84156a450cd09f361b3701328a959301d9d65d31"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Pirates Gold (older) [MicroProse] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="500f54aa" sha1="599afe9e37b7894f30da7cd47328b08496fec207"/>
 			</dataarea>
 		</part>
 	</software>

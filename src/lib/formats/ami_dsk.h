@@ -29,8 +29,8 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	static uint32_t g32(const uint8_t *trackbuf, int track_size, int pos);
-	static uint32_t checksum(const uint8_t *trackbuf, int track_size, int pos, int long_count);
+	static uint32_t g32(const std::vector<bool> &bitsteam, uint32_t pos);
+	static uint32_t checksum(const std::vector<bool> &bitsteam, uint32_t pos, int long_count);
 };
 
 extern const floppy_format_type FLOPPY_ADF_FORMAT;

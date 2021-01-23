@@ -236,8 +236,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		fprintf(stderr, "Fatal error: corrupt or incomplete split file at line:\n%s\n", buffer);
 		goto cleanup;
 	}
-	outfilename.assign(buffer + 10);
-	strtrimspace(outfilename);
+	outfilename.assign(strtrimspace(buffer + 10));
 
 	// compute the base path
 	basepath.assign(filename);
@@ -295,8 +294,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 			goto cleanup;
 		}
 		expectedhash.assign(buffer + 5, SHA1_DIGEST_SIZE * 2);
-		infilename.assign(buffer + 5 + SHA1_DIGEST_SIZE * 2 + 6);
-		strtrimspace(infilename);
+		infilename.assign(strtrimspace(buffer + 5 + SHA1_DIGEST_SIZE * 2 + 6));
 
 		printf("  Reading file '%s'...", infilename.c_str());
 

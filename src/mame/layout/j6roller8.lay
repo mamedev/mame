@@ -2689,22 +2689,22 @@
 		<element ref="reel_background">
 			<bounds x="249" y="412" width="80" height="190"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_0" state="0">
 			<bounds x="249.0000" y="412.0000" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_1" state="0">
 			<bounds x="252.3333" y="414.6389" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_2" state="0">
 			<bounds x="255.6667" y="417.2778" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_3" state="0">
 			<bounds x="259.0000" y="419.9167" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_4" state="0">
 			<bounds x="262.3333" y="422.5555" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp0" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp2" ref="reel_lamp_layer_5" state="0">
 			<bounds x="265.6667" y="425.1945" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="lamp1" ref="reel_lamp_layer_0" state="0">
@@ -2725,22 +2725,22 @@
 		<element name="lamp1" ref="reel_lamp_layer_5" state="0">
 			<bounds x="265.6667" y="488.5278" width="46.6667" height="36.9444"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_0" state="0">
 			<bounds x="249.0000" y="538.6667" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_1" state="0">
 			<bounds x="252.3333" y="541.3056" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_2" state="0">
 			<bounds x="255.6667" y="543.9445" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_3" state="0">
 			<bounds x="259.0000" y="546.5834" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_4" state="0">
 			<bounds x="262.3333" y="549.2222" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp2" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_5" state="0">
 			<bounds x="265.6667" y="551.8611" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="sreel1" ref="reel0" state="0">
@@ -2749,22 +2749,22 @@
 		<element ref="reel_background">
 			<bounds x="331" y="412" width="80" height="190"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_0" state="0">
 			<bounds x="331.0000" y="412.0000" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_1" state="0">
 			<bounds x="334.3333" y="414.6389" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_2" state="0">
 			<bounds x="337.6667" y="417.2778" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_3" state="0">
 			<bounds x="341.0000" y="419.9167" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_4" state="0">
 			<bounds x="344.3333" y="422.5555" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp3" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp5" ref="reel_lamp_layer_5" state="0">
 			<bounds x="347.6667" y="425.1945" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="lamp4" ref="reel_lamp_layer_0" state="0">
@@ -2785,22 +2785,22 @@
 		<element name="lamp4" ref="reel_lamp_layer_5" state="0">
 			<bounds x="347.6667" y="488.5278" width="46.6667" height="36.9444"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_0" state="0">
 			<bounds x="331.0000" y="538.6667" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_1" state="0">
 			<bounds x="334.3333" y="541.3056" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_2" state="0">
 			<bounds x="337.6667" y="543.9445" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_3" state="0">
 			<bounds x="341.0000" y="546.5834" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_4" state="0">
 			<bounds x="344.3333" y="549.2222" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp5" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp3" ref="reel_lamp_layer_5" state="0">
 			<bounds x="347.6667" y="551.8611" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="sreel2" ref="reel1" state="0">
@@ -2809,22 +2809,22 @@
 		<element ref="reel_background">
 			<bounds x="413" y="412" width="80" height="190"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_0" state="0">
 			<bounds x="413.0000" y="412.0000" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_1" state="0">
 			<bounds x="416.3333" y="414.6389" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_2" state="0">
 			<bounds x="419.6667" y="417.2778" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_3" state="0">
 			<bounds x="423.0000" y="419.9167" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_4" state="0">
 			<bounds x="426.3333" y="422.5555" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp16" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp18" ref="reel_lamp_layer_5" state="0">
 			<bounds x="429.6667" y="425.1945" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="lamp17" ref="reel_lamp_layer_0" state="0">
@@ -2845,22 +2845,22 @@
 		<element name="lamp17" ref="reel_lamp_layer_5" state="0">
 			<bounds x="429.6667" y="488.5278" width="46.6667" height="36.9444"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_0" state="0">
 			<bounds x="413.0000" y="538.6667" width="80.0000" height="63.3333"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_1" state="0">
 			<bounds x="416.3333" y="541.3056" width="73.3333" height="58.0556"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_2" state="0">
 			<bounds x="419.6667" y="543.9445" width="66.6667" height="52.7778"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_3" state="0">
 			<bounds x="423.0000" y="546.5834" width="60.0000" height="47.5000"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_4" state="0">
 			<bounds x="426.3333" y="549.2222" width="53.3333" height="42.2222"/>
 		</element>
-		<element name="lamp18" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp16" ref="reel_lamp_layer_5" state="0">
 			<bounds x="429.6667" y="551.8611" width="46.6667" height="36.9444"/>
 		</element>
 		<element name="sreel3" ref="reel2" state="0">

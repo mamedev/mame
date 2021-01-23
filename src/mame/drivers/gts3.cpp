@@ -296,7 +296,7 @@ void gts3_state::gts3(machine_config &config)
 
 	genpin_audio(config);
 
-	VIA6522(config, m_u4, XTAL(4'000'000) / 2);
+	R65C22(config, m_u4, XTAL(4'000'000) / 2);
 	m_u4->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
 	m_u4->readpa_handler().set(FUNC(gts3_state::u4a_r));
 	m_u4->readpb_handler().set(FUNC(gts3_state::u4b_r));
@@ -304,7 +304,7 @@ void gts3_state::gts3(machine_config &config)
 	//m_u4->ca2_handler().set(FUNC(gts3_state::u4ca2_w));
 	m_u4->cb2_handler().set(FUNC(gts3_state::nmi_w));
 
-	VIA6522(config, m_u5, XTAL(4'000'000) / 2);
+	R65C22(config, m_u5, XTAL(4'000'000) / 2);
 	m_u5->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
 	//m_u5->readpa_handler().set(FUNC(gts3_state::u5a_r));
 	//m_u5->readpb_handler().set(FUNC(gts3_state::u5b_r));

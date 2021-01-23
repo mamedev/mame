@@ -148,7 +148,7 @@ public:
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	u32 openflags() const { return m_openflags; }
-	util::hash_collection &hashes(const char *types);
+	util::hash_collection &hashes(std::string_view types);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
@@ -156,8 +156,12 @@ public:
 	void set_restrict_to_mediapath(int rtmp) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
-	osd_file::error open(const std::string &name);
-	osd_file::error open(const std::string &name, u32 crc);
+	osd_file::error open(std::string &&name);
+	osd_file::error open(std::string &&name, u32 crc);
+	osd_file::error open(std::string_view name) { return open(std::string(name)); }
+	osd_file::error open(std::string_view name, u32 crc) { return open(std::string(name), crc); }
+	osd_file::error open(const char *name) { return open(std::string(name)); }
+	osd_file::error open(const char *name, u32 crc) { return open(std::string(name), crc); }
 	osd_file::error open_next();
 	osd_file::error open_ram(const void *data, u32 length);
 	void close();

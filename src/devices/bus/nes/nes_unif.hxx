@@ -11,6 +11,7 @@
 
 ****************************************************************************************/
 
+#include "corestr.h"
 
 /* Set to generate prg & chr files when the cart is loaded */
 #define SPLIT_PRG   0

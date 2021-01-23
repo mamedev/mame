@@ -32,10 +32,13 @@ Year + Game          PCB ID         CPU                Video           Chips    
 
 TODO:
 
-- Find source of level 2 interrupt (sprite DMA end?)
-- Decrypt newer games;
+- Find source of level 2 interrupt (sprite DMA end?);
 - magibomb: fix timings;
-- astoneag: finish program ROM decryption;
+- astoneag, magibombd: currently stop with 'ROM error'. The first few hundred bytes don't decrypt correctly,
+  it is suspected there's a ROM overlay provided by the protection device;
+- winbingo and clones, zulu: these should be at the same state of the two above, but don't show anything on screen;
+- magibomba, westvent: need a redump of one of the program ROMs;
+- dinodino: decryption should be on par with the others but code jumps early into the weeds after RTE.
 
 *************************************************************************************************************/
 
@@ -151,7 +154,10 @@ public:
 	void astoneage(machine_config &config);
 	void magibombd(machine_config &config);
 	void init_astoneage();
+	void init_dinodino();
 	void init_magibombd();
+	void init_winbingo();
+	void init_zulu();
 
 protected:
 	virtual void machine_start() override;
@@ -175,12 +181,15 @@ private:
 				u8 xor_mask;
 			} entries[8];
 		} rom[2];
-		// Global address bitswap (src -> dest, bits 12-8 only)
-		u8 bits[5];
+		// Global address bitswap (src -> dest, some sets use bits 12-8 only, while others 12-2)
+		u8 bits[11];
 	};
 
 	static const decryption_info astoneag_table;
+	static const decryption_info dinodino_table;
 	static const decryption_info magibombd_table;
+	static const decryption_info winbingo_table;
+	static const decryption_info zulu_table;
 	void decrypt_rom(const decryption_info &table);
 };
 
@@ -1362,10 +1371,10 @@ J1 is an 2 pin connector, unknown purpose
 
 ***************************************************************************/
 
-ROM_START( zoo )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "zoo_zo.02.d.u25", 0x00000, 0x10000, CRC(8566aa21) SHA1(319192e2074f3bdda6001d8e9a4b97e98826d7ce) )
-	ROM_LOAD16_BYTE( "zoo_zo.02.d.u26", 0x00001, 0x10000, CRC(1a3be45a) SHA1(877be4c9e8d5e7c4644e7bcb9a6729443ed772a4) )
+ROM_START( zulu )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "zoo_zo.02.d.u26", 0x00000, 0x10000, CRC(1a3be45a) SHA1(877be4c9e8d5e7c4644e7bcb9a6729443ed772a4) )
+	ROM_LOAD16_BYTE( "zoo_zo.02.d.u25", 0x00001, 0x10000, CRC(8566aa21) SHA1(319192e2074f3bdda6001d8e9a4b97e98826d7ce) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, CRC(f5cfd915) SHA1(ec869b47d0762102509dcfc1349d94340037fad5) )
@@ -1561,12 +1570,18 @@ void astoneage_state::decrypt_rom(const decryption_info &table)
 	// scrambling
 	for(u32 i = 0; i != size; i += 2) {
 		u32 dest =
-			(i & 0xffffe0ff) |
-			(BIT(i, table.bits[0]) << 12) |
-			(BIT(i, table.bits[1]) << 11) |
-			(BIT(i, table.bits[2]) << 10) |
-			(BIT(i, table.bits[3]) <<  9) |
-			(BIT(i, table.bits[4]) <<  8);
+			(i & 0xffffe003) |
+			(BIT(i, table.bits[0])  << 12) |
+			(BIT(i, table.bits[1])  << 11) |
+			(BIT(i, table.bits[2])  << 10) |
+			(BIT(i, table.bits[3])  <<  9) |
+			(BIT(i, table.bits[4])  <<  8) |
+			(BIT(i, table.bits[5])  <<  7) |
+			(BIT(i, table.bits[6])  <<  6) |
+			(BIT(i, table.bits[7])  <<  5) |
+			(BIT(i, table.bits[8])  <<  4) |
+			(BIT(i, table.bits[9])  <<  3) |
+			(BIT(i, table.bits[10]) <<  2);
 		rom[dest >> 1] = tmp[i >> 1];
 	}
 }
@@ -1600,7 +1615,7 @@ const astoneage_state::decryption_info astoneage_state::astoneag_table = {
 			}
 		},
 	},
-	{ 12, 9, 11, 8, 10 }
+	{ 12, 9, 11, 8, 10, 7, 6, 5, 4, 3, 2 }
 };
 
 void astoneage_state::init_astoneage()
@@ -1644,12 +1659,141 @@ const astoneage_state::decryption_info astoneage_state::magibombd_table = {
 			}
 		},
 	},
-	{ 12, 9, 8, 10, 11 }
+	{ 12, 9, 8, 10, 11, 7, 6, 5, 4, 3, 2 }
 };
 
 void astoneage_state::init_magibombd()
 {
 	decrypt_rom(magibombd_table);
+
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x004/2] = 0x0000;
+	rom[0x006/2] = 0x0446;
+}
+
+const astoneage_state::decryption_info astoneage_state::winbingo_table = {
+	{
+		{
+			{ 8, 11, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 11, 10 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		},
+	},
+	{ 12, 9, 8, 10, 11, 7, 5, 3, 6, 2, 4 }
+};
+
+void astoneage_state::init_winbingo()
+{
+	decrypt_rom(winbingo_table);
+
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x004/2] = 0x0000;
+	rom[0x006/2] = 0x0400;
+}
+
+const astoneage_state::decryption_info astoneage_state::zulu_table = {
+	{
+		{
+			{ 8, 9, 10 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 9, 11 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		},
+	},
+	{ 12, 10, 8, 11, 9, 7, 5, 3, 6, 2, 4 }
+};
+
+void astoneage_state::init_zulu()
+{
+	decrypt_rom(zulu_table);
+
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x004/2] = 0x0000;
+	rom[0x006/2] = 0x0400;
+}
+
+const astoneage_state::decryption_info astoneage_state::dinodino_table = {
+	{
+		{
+			{ 8, 11, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 11, 10 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		},
+	},
+	{ 12, 9, 8, 10, 11, 7, 2, 6, 3, 5, 4 }
+};
+
+void astoneage_state::init_dinodino()
+{
+	decrypt_rom(dinodino_table);
 
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
@@ -1709,11 +1853,11 @@ GAME( 2001,  magibombc, magibomb, magibombb, magibomb, magibomb_state,  init_mag
 GAME( 2001?, magibombe, magibomb, magibombb, magibomb, magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",        "Magic Bomb (Ver. A3.1A)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Heavier encryption
-GAME( 2003?, dinodino,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Dino Dino",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2004?, astoneag,  0,        astoneage, skilldrp, astoneage_state, init_astoneage, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005,  dinodino,  0,        magibombd, skilldrp, astoneage_state, init_dinodino,  ROT0, "Astro Corp.",        "Dino Dino (Ver. A1.1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 13/01.2005 10:59
+GAME( 2005,  astoneag,  0,        astoneage, skilldrp, astoneage_state, init_astoneage, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 2005/02/21
 GAME( 2005,  magibombd, magibomb, magibombd, skilldrp, astoneage_state, init_magibombd, ROT0, "Astro Corp.",        "Magic Bomb (Ver. AA.72D, 14/11/05)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, winbingo,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, winbingoa, winbingo, skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, hacher,    winbingo, skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2005?, zoo,       0,        showhand,  showhand, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006,  winbingo,  0,        magibombd, skilldrp, astoneage_state, init_winbingo,  ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 15:47:48 Feb 23 2006
+GAME( 2006,  winbingoa, winbingo, magibombd, skilldrp, astoneage_state, init_winbingo,  ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 11:02:07 May 11 2006
+GAME( 2005,  hacher,    winbingo, magibombd, skilldrp, astoneage_state, init_winbingo,  ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 14:25:46 Mar 10 2005
+GAME( 2004,  zulu,      0,        magibombd, skilldrp, astoneage_state, init_zulu,      ROT0, "Astro Corp.",        "Zulu (Ver. ZO.02.D)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 10:53:44 Aug 27 2004
 GAME( 2007?, westvent,  0,        skilldrp,  skilldrp, astrocorp_state, empty_init,     ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

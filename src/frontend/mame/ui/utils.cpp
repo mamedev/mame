@@ -22,6 +22,8 @@
 #include "romload.h"
 #include "softlist.h"
 
+#include "corestr.h"
+
 #include <atomic>
 #include <bitset>
 #include <condition_variable>
@@ -1584,8 +1586,7 @@ void software_filter_data::finalise()
 
 std::string software_filter_data::extract_region(std::string const &longname)
 {
-	std::string fullname(longname);
-	strmakelower(fullname);
+	std::string fullname(strmakelower(longname));
 	std::string::size_type const found(fullname.find('('));
 	if (found != std::string::npos)
 	{

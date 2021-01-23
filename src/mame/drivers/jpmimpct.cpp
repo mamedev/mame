@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett
+// copyright-holders:Philip Bennett, David Haywood
 // thanks-to:Tony Friery
 /***************************************************************************
 
@@ -20,8 +20,6 @@
         * Snakes and Ladders
 
     Known issues:
-        * I/O documentation for lamps, reels, meters etc is possibly incorrect.
-        * DUART emulation is very simplistic, in progress.
         * Digital volume control is not emulated.
 
     Mechanical games note:
@@ -258,13 +256,10 @@ void jpmimpct_state::machine_reset()
 	/* Reset states */
 	if (m_vfd)
 		m_vfd->reset();
+
+	m_coinstate = 0xffff;
 }
 
-/*************************************
- *
- *  MC68681 DUART 1 simulation hack
- *
- *************************************/
 
 /*
  *  IP0: MC1489P U7 pin 8
@@ -288,14 +283,7 @@ void jpmimpct_state::machine_reset()
  *  TxDB/TxDB: Data retrieval unit
  */
 
-void jpmimpct_state::set_duart_1_hack_ip(bool state)
-{
-// TODO restore this with real duart
-//	if (state)
-//		m_duart_1.IP |= 0x10;
-//	else
-//		m_duart_1.IP &= ~0x10;
-}
+
 
 /*************************************
  *
@@ -468,11 +456,11 @@ void jpmimpct_state::slides_non_video_w(offs_t offset, uint16_t data, uint16_t m
 
 	if (combined_meter)
 	{
-		set_duart_1_hack_ip(false);
+		m_duart->ip4_w(1);
 	}
 	else
 	{
-		set_duart_1_hack_ip(true);
+		m_duart->ip4_w(0);
 	}
 }
 
@@ -495,7 +483,7 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
 	}
 
 	m_meters->update(0, data >> 10);
-	set_duart_1_hack_ip(false);
+	//set_duart_1_hack_ip(false);
 }
 
 
@@ -523,24 +511,58 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
  *  9: Coin mechanism
  */
 
+
+
+/*
+   Some Input Switch numbers according to test modes
+ 
+   DSW 0x01 = Switch 0
+   DSW 0x02 = 1
+   DSW 0x04 = 1
+   DSW 0x08 = 1
+   DSW 0x10 = 1
+   DSW 0x20 = 1
+   DSW 0x40 = 1
+   DSW 0x80 = 1
+
+   PIA_PORTB: 0x01 = 136
+   PIA_PORTB: 0x02 = Switch 137
+   PIA_PORTB: 0x04 = 138
+   PIA_PORTB: 0x08 = 139
+   PIA_PORTB: 0x10 = 140
+   PIA_PORTB: 0x20 = 141
+   PIA_PORTB: 0x40 = 142
+   PIA_PORTB: 0x80 = 143
+
+   PIA_PORTC: 0x01 = 144
+   PIA_PORTC: 0x02 = 145
+   PIA_PORTC: 0x04 = 146
+   PIA_PORTC: 0x08 = 147
+   PIA_PORTC: 0x10 = 148
+   PIA_PORTC: 0x20 = Switch 149
+   PIA_PORTC: 0x40 = 150
+   PIA_PORTC: 0x80 = 151
+*/
+
+
 void jpmimpct_state::common_map(address_map& map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
 	map(0x00480000, 0x0048001f).rw("main_duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x00480020, 0x00480021).portr("DSW");
+	map(0x00480020, 0x00480021).portr("DSW");      // DSW 0x01 = Switch 0
 	map(0x00480022, 0x00480023).portr("PERCENT");
 	map(0x00480024, 0x00480025).portr("J10_0");
 	map(0x00480026, 0x00480027).portr("J10_1");
-	map(0x00480028, 0x00480029).portr("J10_2");
-	map(0x0048002a, 0x0048002b).portr("J9_0");
+	map(0x00480028, 0x00480029).portr("J10_2");   // J10_2: 0x01 = Switch 32
+	map(0x0048002a, 0x0048002b).portr("J9_0");    // JP9_0: 0x01 = Switch 40
 	map(0x0048002c, 0x0048002d).portr("J9_1");
 	map(0x0048002e, 0x0048002f).portr("J9_2");
-	map(0x00480032, 0x00480033).portr("COINS");
+	map(0x00480030, 0x00480031).portr("PAYCOIN_LEVEL");
+	map(0x00480032, 0x00480033).portr("COIN_SENSE");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
-	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-//	map(0x00480060, 0x00480067).r(FUNC(jpmimpct_state::unk_r));
+	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); 
 
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
 	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
@@ -555,6 +577,11 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x004800a8, 0x004800a9).w(FUNC(jpmimpct_state::lamps_w));
 	map(0x004800aa, 0x004800ab).w(FUNC(jpmimpct_state::digits_w));
 	map(0x004800ae, 0x004800af).w(FUNC(jpmimpct_state::lampstrobe_w));
+
+	// many later sets, eg. Roller Coaster Classic will no accept coins, and run too fast depending
+	// on what gets read here, what is it?
+	map(0x004801d8, 0x004801d9).r(FUNC(jpmimpct_video_state::unk_r));
+	map(0x004801da, 0x004801db).r(FUNC(jpmimpct_video_state::unk_r));
 }
 
 void jpmimpct_video_state::impact_video_map(address_map &map)
@@ -630,30 +657,61 @@ static INPUT_PORTS_START( touchscreen )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( jpmimpct_coins )
+
+	PORT_START("COIN_SENSE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<2>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<3>)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<4>)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<5>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME( "Coin: 1 pound" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME( "Coin: 50p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME( "Coin: 20p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME( "Coin: 10p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME( "Token: 20" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME( "Coin: 5p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 5)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(jpmimpct_state::coin_changed)
+{
+	if (newval)
+	{
+		logerror("coin inserted %d\n", param+1);
+		m_coinstate &= ~(1 << param);
+		m_cointimer[param]->adjust(attotime::from_msec(40));
+	}
+}
+
 INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "DSW 0")
+	PORT_DIPNAME( 0x01, 0x01, "DSW 0x01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW 1")
+	PORT_DIPNAME( 0x02, 0x02, "DSW 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW 2")
+	PORT_DIPNAME( 0x04, 0x04, "DSW 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW 3")
+	PORT_DIPNAME( 0x08, 0x08, "DSW 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW 4")
+	PORT_DIPNAME( 0x10, 0x10, "DSW 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW 5")
+	PORT_DIPNAME( 0x20, 0x20, "DSW 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW 6")
+	PORT_DIPNAME( 0x40, 0x40, "DSW 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW 7")
+	PORT_DIPNAME( 0x80, 0x80, "DSW 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -712,156 +770,217 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_CONFSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("J9_0")
-	PORT_DIPNAME( 0x01, 0x01, "J9_0: 0")
+	PORT_DIPNAME( 0x01, 0x01, "J9_0: 0x01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "J9_0: 1")
+	PORT_DIPNAME( 0x02, 0x02, "J9_0: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "J9_0: 2")
+	PORT_DIPNAME( 0x04, 0x04, "J9_0: 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "J9_0: 3")
+	PORT_DIPNAME( 0x08, 0x08, "J9_0: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "J9_0: 4")
+	PORT_DIPNAME( 0x10, 0x10, "J9_0: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "J9_0: 5")
+	PORT_DIPNAME( 0x20, 0x20, "J9_0: 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "J9_0: 6")
+	PORT_DIPNAME( 0x40, 0x40, "J9_0: 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "J9_0: 7")
+	PORT_DIPNAME( 0x80, 0x80, "J9_0: 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J9_1")
-	PORT_DIPNAME( 0x01, 0x01, "J9_1: 0")
+	PORT_DIPNAME( 0x01, 0x01, "J9_1: 0x01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "J9_1: 1")
+	PORT_DIPNAME( 0x02, 0x02, "J9_1: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "J9_1: 2")
+	PORT_DIPNAME( 0x04, 0x04, "J9_1: 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "J9_1: 3")
+	PORT_DIPNAME( 0x08, 0x08, "J9_1: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "J9_1: 4")
+	PORT_DIPNAME( 0x10, 0x10, "J9_1: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "J9_1: 5")
+	PORT_DIPNAME( 0x20, 0x20, "J9_1: 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "J9_1: 6")
+	PORT_DIPNAME( 0x40, 0x40, "J9_1: 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "J9_1: 7")
+	PORT_DIPNAME( 0x80, 0x80, "J9_1: 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J10_1")
-	PORT_DIPNAME( 0x01, 0x01, "J10_1: 0")
+	PORT_DIPNAME( 0x01, 0x01, "J10_1: 0x01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "J10_1: 1")
+	PORT_DIPNAME( 0x02, 0x02, "J10_1: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "J10_1: 2")
+	PORT_DIPNAME( 0x04, 0x04, "J10_1: 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "J10_1: 3")
+	PORT_DIPNAME( 0x08, 0x08, "J10_1: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "J10_1: 4")
+	PORT_DIPNAME( 0x10, 0x10, "J10_1: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "J10_1: 5")
+	PORT_DIPNAME( 0x20, 0x20, "J10_1: 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "J10_1: 6")
+	PORT_DIPNAME( 0x40, 0x40, "J10_1: 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "J10_1: 7")
+	PORT_DIPNAME( 0x80, 0x80, "J10_1: 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J10_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, "J10_2: 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE // always?
+	PORT_DIPNAME( 0x02, 0x02, "J10_2: 0x02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "J10_2: 0x04")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "J10_2: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "J10_2: 4")
+	PORT_DIPNAME( 0x10, 0x10, "J10_2: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "J10_2: 5")
+	PORT_DIPNAME( 0x20, 0x20, "J10_2: 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "J10_2: 6")
+	PORT_DIPNAME( 0x40, 0x40, "J10_2: 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "J10_2: 7")
+	PORT_DIPNAME( 0x80, 0x80, "J10_2: 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J9_2")
-	PORT_DIPNAME( 0x01, 0x01, "J9_2: 0")
+	PORT_DIPNAME( 0x01, 0x01, "J9_2: 0x01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "J9_2: 1")
+	PORT_DIPNAME( 0x02, 0x02, "J9_2: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "J9_2: 2")
+	PORT_DIPNAME( 0x04, 0x04, "J9_2: 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "J9_2: 3")
+	PORT_DIPNAME( 0x08, 0x08, "J9_2: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "J9_2: 4")
+	PORT_DIPNAME( 0x10, 0x10, "J9_2: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "J9_2: 5")
+	PORT_DIPNAME( 0x20, 0x20, "J9_2: 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "J9_2: 6")
+	PORT_DIPNAME( 0x40, 0x40, "J9_2: 0x40")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "J9_2: 7")
+	PORT_DIPNAME( 0x80, 0x80, "J9_2: 0x80")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("PAYCOIN_LEVEL") // maybe only for certain types of payout mechanism?
+	PORT_DIPNAME( 0x01, 0x00, "PAYCOIN_LEVEL: 0x01 (20p cash low)")  // this must be ON or you get an IOU message in j6roller instead of payout, just high being set isn't enough
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "PAYCOIN_LEVEL: 0x02 (token f low)")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "PAYCOIN_LEVEL: 0x04 (token b low)")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "PAYCOIN_LEVEL: 0x08 (100p cash low)")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "PAYCOIN_LEVEL: 0x10 (token b full)")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "PAYCOIN_LEVEL: 0x20") // nothing on j6roller
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "PAYCOIN_LEVEL: 0x40 (20p cash full)")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "PAYCOIN_LEVEL: 0x80 (100p cash full)")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+		
 	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("PIA_PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_0_r)
+	PORT_DIPNAME( 0x02, 0x00, "PIA_PORTB: 0x02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "PIA_PORTB: 0x04")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_3_r)
+	PORT_DIPNAME( 0x10, 0x10, "PIA_PORTB: 0x10")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "PIA_PORTB: 0x20")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "PIA_PORTB: 0x40")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "PIA_PORTB: 0x80")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA_PORTC")
+	PORT_DIPNAME( 0x01, 0x00, "PIA_PORTC: 0x01")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "PIA_PORTC: 0x02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "PIA_PORTC: 0x04")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "PIA_PORTC: 0x08")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_4_r)
+	PORT_DIPNAME( 0x20, 0x20, "Top Up Switch 0x20")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_6_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_7_r)
+
+	PORT_INCLUDE( jpmimpct_coins )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( hngmnjpm )
+INPUT_PORTS_START( jpmimpct_video_inputs )
 	PORT_INCLUDE( jpmimpct_inputs )
 
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("J10_2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_W) PORT_TOGGLE // not always, probably shouldn't be defined here
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hngmnjpm )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
@@ -871,17 +990,7 @@ static INPUT_PORTS_START( hngmnjpm )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coronatn )
-	PORT_INCLUDE( jpmimpct_inputs )
-
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(2) PORT_NAME( "Token: 20" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("J10_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Ask Ken" )
@@ -893,15 +1002,11 @@ static INPUT_PORTS_START( coronatn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cluedo )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -912,15 +1017,11 @@ static INPUT_PORTS_START( cluedo )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trivialp )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -932,13 +1033,9 @@ static INPUT_PORTS_START( trivialp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tqst )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_MODIFY("COINS") // TODO: check coinage
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -956,17 +1053,12 @@ static INPUT_PORTS_START( tqst )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scrabble )
-	PORT_INCLUDE( jpmimpct_inputs )
+	PORT_INCLUDE( jpmimpct_video_inputs )
 
 	PORT_INCLUDE( touchscreen )
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 1 pound" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 50p" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 20p" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 10p" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(2) PORT_NAME( "Coin: 5p" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -996,16 +1088,16 @@ WRITE_LINE_MEMBER(jpmimpct_video_state::tms_irq)
  *
  *************************************/
 
-uint8_t jpmimpct_state::hopper_b_r()
-{
-	int retval;
-	// B0 = 100p Hopper Out Verif
-	// B1 = Hopper High
-	// B2 = Hopper Low
-	// B3 = 20p Hopper Opto
+// THIS COULD BE INCORRECT
 
-	// Always return hoppers full
-	retval=0xed; // 1110 1101
+// B0 = 100p Hopper Opto
+// B1 = Hopper High
+// B2 = Hopper Low
+// B3 = 20p Hopper Opto
+
+READ_LINE_MEMBER( jpmimpct_state::hopper_b_0_r )
+{
+	uint8_t retval = 0x01;
 
 	if (!m_hopinhibit)//if inhibited, we don't change these flags
 	{
@@ -1013,59 +1105,102 @@ uint8_t jpmimpct_state::hopper_b_r()
 		{//100p
 			retval &= ~0x01;
 		}
-		if (((m_hopper[1] && m_motor[1]) || (m_hopper[2] && m_slidesout))) //&& ((m_hopflag2 & 0x20)==0x20))
-		{
-			retval &= ~0x08;
-		}
+	}
+	else
+	{
+		// if payout is inhibited these must be 0, no coin detected? otherwise many sets will give 5.7 error
+		// when they test the hoppers
+		retval &= ~0x01;
 	}
 
 	return retval;
 }
 
-uint8_t jpmimpct_state::hopper_c_r()
+READ_LINE_MEMBER( jpmimpct_state::hopper_b_3_r )
 {
-	int retval;
-	// C0-C2 = Alpha
-	// C3
-	// C4 = 20p Hopper Detect
-	// C5 = Hopper Top-Up
-	// C6 = 100p Hopper Detect
-	// C7 = Payout Verif (Slides)
+	uint8_t retval = 0x01;
 
-	retval=0xf0; //1111 0000
+	if (!m_hopinhibit)//if inhibited, we don't change these flags
+	{
+		if (((m_hopper[1] && m_motor[1]) || (m_hopper[2] && m_slidesout))) //&& ((m_hopflag2 & 0x20)==0x20))
+		{
+			retval &= ~0x01;
+		}
+	}
+	else
+	{
+		// if payout is inhibited these must be 0, no coin detected? otherwise many sets will give 5.7 error
+		// when they test the hoppers
+		retval &= ~0x01;
+	}
+
+	return retval;
+}
+
+
+
+
+// C0-C2 = Alpha (output)
+// C3
+// C4 = 20p Hopper Detect
+// C5 = Hopper Top-Up
+// C6 = 100p Hopper Detect
+// C7 = Payout Verif (Slides)
 
 //    if (StatBtns & 0x20) // Top Up switch
 //    retval &= ~0x20;
 
-	// Which hoppers are present
-	if (m_hopper[0])
-	{
-		retval &= ~0x40;
-	}
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_4_r)
+{
+	uint8_t retval = 0x01;
+
 	if (m_hopper[1])
 	{
-		retval &= ~0x10;
+		retval &= ~0x01;
 	}
+
+	return retval;
+}
+
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_6_r)
+{
+	uint8_t retval = 0x01;
+
+	if (m_hopper[0])
+	{
+		retval &= ~0x01;
+	}
+
+	return retval;
+}
+
+READ_LINE_MEMBER(jpmimpct_state::hopper_c_7_r)
+{
+	uint8_t retval = 0x01;
 
 	if (!m_hopinhibit)
 	{
 		if ((m_slidesout==1) && ((m_hopper[2]==0)))
 		{
 			m_slidesout=0;
-			retval &= ~0x80;
+			retval &= ~0x01;
 		}
 	}
 
 	return retval;
 }
 
+
+
 void jpmimpct_state::payen_a_w(uint8_t data)
 {
 	m_motor[0] = (data & 0x01);
 	m_payen = (data & 0x10);
-	m_slidesout = (data & 0x10);
 	m_motor[1] = (data & 0x40);
-	m_hopinhibit = (data & 0x80);
+	m_hopinhibit = (data & 0x80); // prevents coin out
+
+	// same bit as m_payen?
+	m_slidesout = (data & 0x10);
 }
 
 void jpmimpct_state::display_c_w(uint8_t data)
@@ -1106,7 +1241,6 @@ uint16_t jpmimpct_state::ump_r()
 	return 0xff;//0xffff;
 }
 
-
 TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_set_ip5)
 {
 	auto state = m_testdemo->read() ? 1 : 0;
@@ -1127,6 +1261,7 @@ WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 	m_maincpu->set_input_line(5, state);
 }
 
+
 // Note 68k is on a sub-card, as is the UPD, so these things can change
 // TODO: work out exactly which components are on each card and full list of motherboard components
 
@@ -1144,10 +1279,16 @@ void jpmimpct_state::base(machine_config &config)
 
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
-	m_ppi->in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
-	m_ppi->in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	m_ppi->in_pb_callback().set_ioport("PIA_PORTB");
+	m_ppi->in_pc_callback().set_ioport("PIA_PORTC");
 	m_ppi->out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
+	TIMER(config, "cointimer0").configure_generic(FUNC(jpmimpct_state::coinoff<0>));
+	TIMER(config, "cointimer1").configure_generic(FUNC(jpmimpct_state::coinoff<1>));
+	TIMER(config, "cointimer2").configure_generic(FUNC(jpmimpct_state::coinoff<2>));
+	TIMER(config, "cointimer3").configure_generic(FUNC(jpmimpct_state::coinoff<3>));
+	TIMER(config, "cointimer4").configure_generic(FUNC(jpmimpct_state::coinoff<4>));
+	TIMER(config, "cointimer5").configure_generic(FUNC(jpmimpct_state::coinoff<5>));
 
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1160,7 +1301,7 @@ void jpmimpct_state::base(machine_config &config)
 	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 
-void jpmimpct_state::impact_nonvideo(machine_config &config)
+void jpmimpct_state::impact_nonvideo_base(machine_config & config)
 {
 	base(config);
 
@@ -1170,6 +1311,11 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 	S16LF01(config, m_vfd);
 
 	config.set_default_layout(layout_jpmimpct);
+}
+
+void jpmimpct_state::impact_nonvideo(machine_config &config)
+{
+	impact_nonvideo_base(config);
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
@@ -1182,6 +1328,26 @@ void jpmimpct_state::impact_nonvideo(machine_config &config)
 	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
 	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
+}
+
+void jpmimpct_state::impact_nonvideo_altreels(machine_config &config)
+{
+	impact_nonvideo_base(config);
+
+	// TODO: This is probably incorrect, but j6kungfu startup checks are looking
+	// for different reel types than the other games
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[1]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[2]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[3]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
+	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 4, 12, 0x00, 2);
 	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 }
 
