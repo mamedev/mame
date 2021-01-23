@@ -200,7 +200,6 @@ public:
 	void firebeat2(machine_config &config);
 	void firebeat(machine_config &config);
 
-	void firebeat_spu_base(machine_config &config);
 	void firebeat_spu(machine_config &config);
 	void firebeat_spu_bm3(machine_config &config);
 
@@ -241,6 +240,8 @@ private:
 	uint32_t m_spu_ata_dma;
 	int m_spu_ata_dmarq;
 	uint32_t m_wave_bank;
+
+	void firebeat_spu_base(machine_config &config);
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
