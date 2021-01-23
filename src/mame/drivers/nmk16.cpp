@@ -7633,6 +7633,14 @@ ROM_START( redhawks )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+
+	ROM_REGION( 0x300, "proms", 0 )    // Bipolar PROMs, not dumped
+	ROM_LOAD( "n82s147an.bin", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s129n.bin",  0x200, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x26e, "plds", 0 )    // PLDs, not dumped
+	ROM_LOAD( "gal16v8d.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8b.bin", 0x117, 0x157, NO_DUMP )
 ROM_END
 
 void afega_state::init_redhawkg()
