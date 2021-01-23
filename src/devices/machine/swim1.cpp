@@ -11,20 +11,9 @@
 
 DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak Integrated Machine) version 1 floppy controller")
 
-swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
-	applefdintf_device(mconfig, SWIM1, tag, owner, clock),
-	m_q3_clock(q3_clock)
-{
-	m_iwm_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.125
-	m_iwm_fclk_q3_ratio = double(q3_clock)/double(clock); // ~8
-}
-
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	applefdintf_device(mconfig, SWIM1, tag, owner, clock),
-	m_q3_clock(0)
+	applefdintf_device(mconfig, SWIM1, tag, owner, clock)
 {
-	m_iwm_q3_fclk_ratio = 0;
-	m_iwm_fclk_q3_ratio = 0;
 }
 
 void swim1_device::device_start()
@@ -414,16 +403,6 @@ attotime swim1_device::cycles_to_time(u64 cycles) const
 	return attotime::from_ticks(cycles, clock());
 }
 
-u64 swim1_device::iwm_q3_to_fclk(u64 cycles) const
-{
-	return u64(m_iwm_q3_fclk_ratio * double(cycles) + 0.5);
-}
-
-u64 swim1_device::iwm_fclk_to_q3(u64 cycles) const
-{
-	return u64(m_iwm_fclk_q3_ratio * double(cycles) + 0.5);
-}
-
 void swim1_device::ism_fifo_clear()
 {
 	m_ism_fifo_pos = 0;
@@ -500,11 +479,6 @@ u64 swim1_device::iwm_window_size() const
 u64 swim1_device::iwm_read_register_update_delay() const
 {
 	return m_iwm_mode & 0x08 ? 4 : 8;
-}
-
-u64 swim1_device::iwm_write_sync_half_window_size() const
-{
-	return m_iwm_mode & 0x08 ? 2 : 4;
 }
 
 void swim1_device::iwm_sync()
@@ -602,7 +576,7 @@ void swim1_device::iwm_sync()
 			case S_IDLE:
 				m_iwm_wsh = m_iwm_data;
 				m_iwm_rw_state = SW_WINDOW_MIDDLE;
-				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
+				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
 				m_flux_write_count = 0;
 				break;
 
@@ -610,14 +584,14 @@ void swim1_device::iwm_sync()
 				if(m_iwm_wsh & 0x80)
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_iwm_wsh <<= 1;
-				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
+				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
 
 				m_iwm_rw_state = SW_WINDOW_END;
 				break;
 			case SW_WINDOW_END:
 				if(m_flux_write_count == m_flux_write.size())
 					flush_write();
-				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
+				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
 				m_iwm_rw_state = SW_WINDOW_MIDDLE;
 				break;
 			}
