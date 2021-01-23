@@ -2424,6 +2424,12 @@ Core Per-Window Options
     specific window.  The **-view** parameter applies to all windows.  The
     window-specific options override values from the all windows option.
 
+    Note that view settings saved in the configuration file for the machine take
+    precedence over the initial view settings.  If you change the selected views
+    in the Video Options menu, this will be saved in the configuration file for
+    the machine and take precedence over any initial views specified in INI
+    files or on the command line.
+
     Example:
         .. code-block:: bash
 
