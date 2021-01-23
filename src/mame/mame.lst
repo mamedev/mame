@@ -35776,6 +35776,9 @@ tr909                           //
 u20                             //
 u220                            //
 
+@source:rolla.cpp
+rolla                           //
+
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
 rollergj                        // GX999 (c) 1991 (Japan)
