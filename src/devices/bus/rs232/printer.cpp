@@ -55,7 +55,6 @@ ioport_constructor serial_printer_device::device_input_ports() const
 
 void serial_printer_device::device_start()
 {
-	save_item(NAME(m_initial_rx_state));
 }
 
 WRITE_LINE_MEMBER(serial_printer_device::update_serial)
