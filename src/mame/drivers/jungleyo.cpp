@@ -37,9 +37,9 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
 TODO:
 - driver is skeleton-ish, video emulation is at the bare minimum to see what's going on;
-- with a clean NVRAM MAME needs to be soft reset after init or it will stop with '1111 exception' error;
+- with a clean NVRAM MAME needs to be soft reset after init or the game will stop with '1111 exception' error;
 - decryption is believed complete, but there's something strange with the first bytes of the ROM;
-- system setting screen show the following settings that don't seem to be affected by dips:
+- system setting screen shows the following settings that don't seem to be affected by dips:
   Min. Bet (always 1), Credit X Ticket Mode (always Cencel (sic)), Max. 10 Mode (always Max. 10);
 - sound doesn't seem to work 100% correctly (i.e. coin sound only seems to work from 3rd coin on).
 */
