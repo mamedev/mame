@@ -93,6 +93,8 @@ void swim1_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy == floppy)
 		return;
 
+	sync();
+
 	m_floppy = floppy;
 	update_phases();
 	if(m_ism_mode & 0x40)
@@ -284,8 +286,8 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 			if(m_iwm_mode & 0x04) {
 				m_iwm_active = MODE_IDLE;
 				m_iwm_status &= ~0x20;
-				m_devsel_cb(0);
 			} else {
+				m_devsel_cb(m_iwm_control & 0x20 ? 2 : 1);
 				m_iwm_active = MODE_DELAY;
 				m_timer->adjust(cycles_to_time(8388608));
 			}
