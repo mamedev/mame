@@ -111,7 +111,7 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy && !m_disable_mon)
 		m_floppy->mon_w(true);
 	m_floppy = floppy;
-	if(m_active && !m_disable_mon)
+	if(m_floppy && !m_disable_mon)
 		m_floppy->mon_w(false);
 	update_phases();
 }
@@ -168,21 +168,15 @@ u8 iwm_device::control(int offset, u8 data)
 	changed ^= m_control | (m_phases & 0xf);
 
 	if(changed & 0x20)
-		m_devsel_cb(m_disable_mon && !(m_control & 0x10) ? 0 : m_control & 0x20 ? 2 : 1);
+		m_devsel_cb(m_control & 0x20 ? 2 : 1);
 
 	if(changed & 0x10) {
 		if(m_control & 0x10) {
 			m_active = MODE_ACTIVE;
-			if(m_floppy && !m_disable_mon)
-				m_floppy->mon_w(false);
 			m_status |= 0x20;
 		} else {
 			if(m_mode & 0x04) {
 				m_active = MODE_IDLE;
-				if(m_floppy && !m_disable_mon) {
-					m_floppy->mon_w(true);
-					m_floppy->seek_phase_w(0);
-				}
 				m_status &= ~0x20;
 			} else {
 				m_active = MODE_DELAY;

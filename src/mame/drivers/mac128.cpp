@@ -905,6 +905,8 @@ void mac128_state::devsel_w(uint8_t devsel)
 		m_cur_floppy = m_floppy[0]->get_device();
 	else if (devsel == 2)
 		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
 
 	m_iwm->set_floppy(m_cur_floppy);
 	if (m_cur_floppy)
