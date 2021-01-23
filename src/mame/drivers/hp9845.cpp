@@ -3641,11 +3641,14 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 void hp9845_base_state::hp9845_base(machine_config &config)
 {
 	HP_5061_3001(config , m_lpu , 5700000);
+	// Clock scaling takes into account the slowdown caused by DRAM refresh
+	m_lpu->set_clock_scale(0.93);
 	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_lpu->set_9845_boot_mode(true);
 	m_lpu->set_rw_cycles(6 , 6);
 	m_lpu->set_relative_mode(true);
 	HP_5061_3001(config , m_ppu , 5700000);
+	m_ppu->set_clock_scale(0.93);
 	m_ppu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_ppu->set_addrmap(AS_IO , &hp9845_base_state::ppu_io_map);
 	m_ppu->set_9845_boot_mode(true);

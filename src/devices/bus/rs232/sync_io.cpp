@@ -6,6 +6,26 @@
 
     Synchronous I/O on RS232 port
 
+    This device provides a bitbanger-based interface to a synchronous
+    RS232 port.
+    It has the following functions:
+    - Provides Tx and/or Rx clock to RS232 port; clocks can be
+      individually turned off when not needed (e.g. Tx clock can
+      disabled when receiving in half-duplex mode)
+    - In the tx direction, it gathers bits from TxD,
+      packs them into bytes LSB to MSB, then sends them out to
+      bitbanger
+    - In the rx direction, it extracts bytes from bitbanger
+      and serializes them to RxD, LSB to MSB.
+    - Supports both full-duplex and half-duplex modes
+    - Generates CTS signal
+
+    There's no kind of synchronization to any higher-level framing:
+    bits are just clocked in/out of the port, packed/unpacked into
+    bytes and exchanged with bitbanger.
+    There's also no automatic stuffing of idle line characters, this
+    function is to be implemented externally if needed.
+
 *********************************************************************/
 
 #include "emu.h"
@@ -14,8 +34,8 @@
 // Debugging
 
 #include "logmacro.h"
-#undef VERBOSE
-#define VERBOSE LOG_GENERAL
+//#undef VERBOSE
+//#define VERBOSE LOG_GENERAL
 
 // Bit manipulation
 namespace {
@@ -110,6 +130,7 @@ void sync_io_device::device_reset()
 
 	update_serial(0);
 
+	m_clk = false;
 	m_rx_byte = 0xff;
 	m_rx_counter = 0;
 	m_tx_counter = 0;
