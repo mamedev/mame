@@ -3,7 +3,7 @@ $input v_color0, v_texcoord0
 #include "common.sh"
 
 SAMPLER2D(s_screen, 0);
-SAMPLER2D(s_motionblur, 0);
+SAMPLER2D(s_motionblur, 1);
 
 uniform vec4 u_persistence;
 
