@@ -14,7 +14,6 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- is accelerator min/max correct or should lowest be more than 0 like sspeedr?;
 - flyer mentions a gear shifter. Then I'd expect it at 0x30/0x31, but the game
   never reads from there;
 - unknown dipswitches, and verify factory defaults;
