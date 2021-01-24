@@ -275,7 +275,7 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 
 /*
 FLOPPY_FORMATS_MEMBER(rtpc_state::floppy_formats)
-	FLOPPY_PC_FORMAT
+    FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 */
 

@@ -145,9 +145,9 @@ void kingpin_state::kingpin_io_map(address_map &map)
 	map(0x20, 0x21).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x30, 0x30).w(FUNC(kingpin_state::output1_w));
 	map(0x40, 0x40).w(FUNC(kingpin_state::output2_w));
-//	map(0x50, 0x50)
+//  map(0x50, 0x50)
 	map(0x60, 0x60).w(FUNC(kingpin_state::sound_nmi_w));
-//	map(0x70, 0x70)
+//  map(0x70, 0x70)
 }
 
 void kingpin_state::kingpin_sound_map(address_map &map)

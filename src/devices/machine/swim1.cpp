@@ -160,7 +160,7 @@ u8 swim1_device::ism_read(offs_t offset)
 		return m_ism_mode;
 
 	default:
-		//		logerror("read %s\n", names[offset & 7]);
+		//      logerror("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;

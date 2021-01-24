@@ -260,6 +260,7 @@ _count_leading_zeros(uint32_t value)
 }
 #endif
 
+
 /*-------------------------------------------------
     count_leading_ones - return the number of
     leading one bits in a 32-bit value

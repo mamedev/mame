@@ -4,9 +4,9 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_color0
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR 3D Shader - pass2  *******
-   
+
   Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy

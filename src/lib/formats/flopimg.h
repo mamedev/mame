@@ -372,8 +372,8 @@ protected:
 
 	/*! @brief Test if a variant is present in the variant vector
 	    @param variants the variant vector
-        @param variant the variant to test
-        @result true if variant is in variants
+	    @param variant the variant to test
+	    @result true if variant is in variants
 	*/
 	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 
