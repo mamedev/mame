@@ -14,7 +14,7 @@
 ***************************************************************************
 
 The Next Space:
- Mainboard A8004-1 
+ Mainboard A8004-1
   MC68000P10 @ 9MHz
   Z80A @ 4MHz
   YM3812 @ 4MHz + YM3014 DAC
@@ -24,7 +24,7 @@ The Next Space:
   Custom SNK I/O chip x 2
  Many PCBs feature a A8004-2 daughtercard with 4 smaller mask ROMs, labeled
   NS 5, NS 6, NS 7 & NS 8 instead of the single larger mask ROM
-  
+
 ***************************************************************************
 
 Paddle Mania
@@ -432,6 +432,7 @@ void thenextspace_state::tnextspc(machine_config &config)
  *
  */
 
+// Several bootleg boards with identical ROMs but no Alpha MCU have been found.
 ROM_START( paddlema )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "padlem.6g",  0x00000, 0x10000, CRC(c227a6e8) SHA1(9c98be6e82a0dd76fd5b786601456b060407c57f) )
@@ -465,7 +466,8 @@ ROM_START( paddlema )
 	ROM_LOAD( "padlem.16j",      0x0400,  0x0400,  CRC(8da58e2c) SHA1(6012715a2d3ba4cf8bc5a8250e7f28cb59913092) ) // Clut high nibble
 
 	ROM_REGION( 0x8000, "color_proms", 0 )
-	ROM_LOAD( "padlem.18n",      0x0000,  0x8000,  CRC(06506200) SHA1(d43337e5611cb0d3432942539ccf04bff2bdd345) ) // Colour lookup
+	ROM_LOAD( "padlem.18n",      0x0000,  0x8000, CRC(488df971) SHA1(fe1436ddc63ffb37fcc9e57aeb923c8c96fd6ac3) ) // Colour lookup
+	// The dump with the following hashes has a bad bit 3 at 0x7de6: CRC(06506200) SHA1(d43337e5611cb0d3432942539ccf04bff2bdd345)
 ROM_END
 
 ROM_START( tnextspc )
