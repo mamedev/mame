@@ -6,7 +6,7 @@ Funworld Photo Play motherboard 6WEV (used on games like Photo Play Smart, Photo
 Motherboard 6WEV0:
 
 CPU: Intel CELERON FV524RX366 128 SL36C
-RAM: From 64MB to 256MB
+RAM: 64MB
 PCB: Intel FW82801AA, IT8888F PCI-to-ISA Bridge, CMI8738 audio, 
 I/O: Winbond W83977, Winbond W83627HF
 BIOS: Intel N82802AB
