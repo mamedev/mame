@@ -238,7 +238,8 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		env_step = channel->env_step;
 		env_rstep = env_step * channel->env_scale;
 
-		if (start == end) {
+		if (start == end)
+		{
 			// This occurs in pop'n music when trying to play a non-existent sample on the sound test menu
 			continue;
 		}
@@ -374,7 +375,8 @@ uint16_t rf5c400_device::rf5c400_r(offs_t offset, uint16_t mem_mask)
 				m_stream->update();
 
 				rf5c400_channel* channel = &m_channels[m_req_channel];
-				if (channel->env_phase == PHASE_NONE) {
+				if (channel->env_phase == PHASE_NONE)
+				{
 					return 0;
 				}
 
