@@ -832,6 +832,8 @@ std::string input_manager::code_to_token(input_code code) const
 {
 	// determine the devclass part
 	const char *devclass = (*devclass_token_table)[code.device_class()];
+	if (devclass == nullptr)
+		return "INVALID";
 
 	// determine the devindex part; keyboard 0 doesn't show an index
 	std::string devindex = string_format("%d", code.device_index() + 1);
@@ -858,7 +860,7 @@ std::string input_manager::code_to_token(input_code code) const
 		str.append("_").append(devcode);
 	if (modifier != nullptr)
 		str.append("_").append(modifier);
-	if (itemclass[0] != 0)
+	if (itemclass != nullptr && itemclass[0] != 0)
 		str.append("_").append(itemclass);
 	return str;
 }
