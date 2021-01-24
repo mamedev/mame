@@ -1,12 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+
+/**************************************************************************
+
+    Simple printer emulation
+
+    This allows capturing the byte stream to a file.
+
+    Radio Shack printers differ in that the RX line is used as a
+    busy signal.
+
+**************************************************************************/
+
 #include "emu.h"
 #include "printer.h"
 
 serial_printer_device::serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERIAL_PRINTER, tag, owner, clock),
+	: serial_printer_device(mconfig, SERIAL_PRINTER, tag, owner, clock)
+{
+}
+
+serial_printer_device::serial_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
+	m_initial_rx_state(1),
 	m_printer(*this, "printer"),
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
 	m_rs232_startbits(*this, "RS232_STARTBITS"),
@@ -52,7 +70,7 @@ WRITE_LINE_MEMBER(serial_printer_device::update_serial)
 	set_rcv_rate(rxbaud);
 
 	// TODO: make this configurable
-	output_rxd(1);
+	output_rxd(m_initial_rx_state);
 	output_dcd(0);
 	output_dsr(0);
 	output_cts(0);
@@ -74,4 +92,11 @@ void serial_printer_device::rcv_complete()
 	m_printer->output(get_received_char());
 }
 
+radio_shack_serial_printer_device::radio_shack_serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: serial_printer_device(mconfig, RADIO_SHACK_SERIAL_PRINTER, tag, owner, clock)
+{
+	m_initial_rx_state = 0;
+}
+
 DEFINE_DEVICE_TYPE(SERIAL_PRINTER, serial_printer_device, "serial_printer", "Serial Printer")
+DEFINE_DEVICE_TYPE(RADIO_SHACK_SERIAL_PRINTER, radio_shack_serial_printer_device, "rs_serial_printer", "Radio Shack Serial Printer")

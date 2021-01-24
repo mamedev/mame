@@ -21,12 +21,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
+	serial_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void rcv_complete() override;
+	int m_initial_rx_state;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(printer_online);
@@ -40,6 +42,13 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
+class radio_shack_serial_printer_device : public serial_printer_device
+{
+public:
+	radio_shack_serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(SERIAL_PRINTER, serial_printer_device)
+DECLARE_DEVICE_TYPE(RADIO_SHACK_SERIAL_PRINTER, radio_shack_serial_printer_device)
 
 #endif // MAME_BUS_RS232_PRINTER_H
