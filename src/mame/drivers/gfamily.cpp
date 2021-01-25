@@ -101,7 +101,7 @@ void gfamily_state::gfamily(machine_config &config)
 
 ROM_START( gmfamily )
 	ROM_REGION(0x80000, "bios", 0)
-	ROM_LOAD("686_amibios_ay36_8897.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("686_amibios_ay36_8897.bin", 0x00000, 0x80000, CRC(e04c5750) SHA1(240ca6b270bdebf129e4ce43e79275aa067b6ada) )
 
 	// PICs and MCUs from the I/O board, all of them protected
 	ROM_REGION(0x10000, "unsorted", 0)
