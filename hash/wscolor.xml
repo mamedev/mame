@@ -1195,9 +1195,11 @@ See the wswan software list for the full game list.
 		<publisher>Qute</publisher>
 		<info name="release" value="20040205"/>
 		<part name="cart" interface="wswan_cart">
+			<!-- no markings on pcb
 			<feature name="pcb" value="no label" />
-			<feature name="uX" value="BANDAI 2003" /><!-- no markings on pcb -->
+			<feature name="uX" value="BANDAI 2003" />
 			<feature name="uX" value="CS18LV40963DCR70 SRAM" />
+			-->
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152" width="16" endianness="little">
