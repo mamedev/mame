@@ -932,7 +932,7 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 		return cache_end_time;
 
 	// Put a flux transition in the middle of a 4us interval with a 50% probability
-	int interval_index = (from_when - cache_weak_start).as_ticks(250000);
+	int64_t interval_index = (from_when - cache_weak_start).as_ticks(250000);
 	if(interval_index < 0)
 		interval_index = 0;
 	attotime weak_time = cache_weak_start + attotime::from_ticks(interval_index*2+1, 500000);
