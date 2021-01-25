@@ -925,7 +925,7 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	if(from_when < cache_start_time || (!cache_end_time.is_never() && from_when >= cache_end_time))
+	if(from_when < cache_start_time || cache_start_time.is_zero() || (!cache_end_time.is_never() && from_when >= cache_end_time))
 		cache_fill(from_when);
 
 	if(!cache_weak)
