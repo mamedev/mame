@@ -15031,6 +15031,9 @@ pcv20                           // 198? PC-XT with V20 CPU
 @source:getaway.cpp
 getaway
 
+@source:gfamily.cpp
+gmfamily                        //
+
 @source:ggconnie.cpp
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
