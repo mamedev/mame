@@ -1736,17 +1736,17 @@ license:CC0
 		<manufacturer>Ascii</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
-	<hash crc32="96b7faca" name="Harryfox MSX Special">
+	<hash crc32="96b7faca" name="Hurryfox MSX Special">
 		<year>1986</year>
 		<manufacturer>Micro Cabin</manufacturer>
 		<extrainfo>8</extrainfo>
 	</hash>
-	<hash crc32="a0d363d3" name="Harryfox Yki No Maou (hacked)">
+	<hash crc32="a0d363d3" name="Hurryfox Yuki No Maou (hacked)">
 		<manufacturer>Micro Cabin</manufacturer>
 		<year>1985</year>
 		<extrainfo>5</extrainfo>
 	</hash>
-	<hash crc32="c7fe3ee1" name="Harryfox Yuki No Maou">
+	<hash crc32="c7fe3ee1" name="Hurryfox Yuki No Maou">
 		<year>1985</year>
 		<manufacturer>Micro Cabin</manufacturer>
 		<status> Not Playable</status>

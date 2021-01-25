@@ -23831,7 +23831,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="は～りぃふぉっくす" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
-				<rom name="harryfox.d88" size="1086448" crc="ed7067e1" sha1="682c5d9b2b4f7e84d7fc40582c80b15f8ff4b92d" offset="0" />
+				<rom name="hurryfox.d88" size="1086448" crc="ed7067e1" sha1="682c5d9b2b4f7e84d7fc40582c80b15f8ff4b92d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
