@@ -17,6 +17,8 @@
 #include "sound/okim6295.h"
 #include "audio/taitosnd.h"
 
+namespace {
+
 class gokidetor_state : public driver_device
 {
 public:
@@ -262,12 +264,12 @@ ROM_START( gokidetor )
 	ROM_LOAD( "ic87", 0, 0x40000, CRC(adb9fd16) SHA1(59aae5ac26cae30b961b30e17fd494094aa7aa15) )
 
 	ROM_REGION( 0x8000, "pals", 0 ) // unprotected
-	ROM_LOAD( "d33-01.pal16l8a.ic20.jed", 0x0000, 0xb01, CRC(7d614a54) SHA1(e79b6ac99f46ff69ea0565e89d6807667c9e0547) )
-	ROM_LOAD( "d33-02.pal16l8b.ic62.jed", 0x1000, 0xb01, CRC(6653423f) SHA1(ac93acccf649b97a3252aedf398310be90fe5d2d) )
-	ROM_LOAD( "d33-03.pal16l8a.ic70.jed", 0x2000, 0xb01, CRC(abfd9a01) SHA1(c76cc16842231c2f688ddd46a17f3a6df92a9580) )
-	ROM_LOAD( "d33-04.pal16l8b.ic81.jed", 0x3000, 0xb01, CRC(bf17aa05) SHA1(0cbbb2ee49c31e94ed7ea3a25f85e3d33c6b68fb) )
-	ROM_LOAD( "d33-05.pal16l8b.ic93.jed", 0x4000, 0xb01, CRC(2df9105e) SHA1(d28fc48588727e4bd3ec2377b383160329c261c3) )
-	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
+	ROM_LOAD( "d33-01.pal16l8a.ic20", 0x0000, 0x104, CRC(6d6a8601) SHA1(b3e343358f8f9334b0befefef80f2a0b53ae0cc7) )
+	ROM_LOAD( "d33-02.pal16l8b.ic62", 0x1000, 0x104, CRC(1e2d2e73) SHA1(3cbb95f26daed685ac8ad3d324e2c10ff444378a) )
+	ROM_LOAD( "d33-03.pal16l8a.ic70", 0x2000, 0x104, CRC(f18b8ad0) SHA1(eabaccd50e72520c5fd91fb27cbd88962e8e82c2) )
+	ROM_LOAD( "d33-04.pal16l8b.ic81", 0x3000, 0x104, CRC(b5690dd6) SHA1(0118d272b2c66e3faade1f4f7328167697fd0649) )
+	ROM_LOAD( "d33-05.pal16l8b.ic93", 0x4000, 0x104, CRC(81b5ce19) SHA1(7602c8aa22ea3b3a64633ce9b55a45cfd20167cb) )
+	ROM_LOAD( "d33-06.pal20l8b.ic44", 0x5000, 0x144, CRC(bf4eeb17) SHA1(d78f65eacf1c7893f87b9fe8be0e5e1b28af7c7a) )
 ROM_END
 
 ROM_START( gokidetor2 )
@@ -281,14 +283,16 @@ ROM_START( gokidetor2 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "ic87.rom", 0, 0x40000, CRC(adb9fd16) SHA1(59aae5ac26cae30b961b30e17fd494094aa7aa15) )
 
-	ROM_REGION( 0x8000, "pals", 0 ) // unprotected
-	ROM_LOAD( "d33-01.pal16l8a.ic20.jed", 0x0000, 0xb01, CRC(7d614a54) SHA1(e79b6ac99f46ff69ea0565e89d6807667c9e0547) ) // PALs missing for this board, using the one from the parent.
-	ROM_LOAD( "d33-02.pal16l8b.ic62.jed", 0x1000, 0xb01, CRC(6653423f) SHA1(ac93acccf649b97a3252aedf398310be90fe5d2d) )
-	ROM_LOAD( "d33-03.pal16l8a.ic70.jed", 0x2000, 0xb01, CRC(abfd9a01) SHA1(c76cc16842231c2f688ddd46a17f3a6df92a9580) )
-	ROM_LOAD( "d33-04.pal16l8b.ic81.jed", 0x3000, 0xb01, CRC(bf17aa05) SHA1(0cbbb2ee49c31e94ed7ea3a25f85e3d33c6b68fb) )
-	ROM_LOAD( "d33-05.pal16l8b.ic93.jed", 0x4000, 0xb01, CRC(2df9105e) SHA1(d28fc48588727e4bd3ec2377b383160329c261c3) )
-	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
+	ROM_REGION( 0x8000, "pals", 0 ) // PALs missing for this board, using the ones from the parent.
+	ROM_LOAD( "d33-01.pal16l8a.ic20", 0x0000, 0x104, CRC(6d6a8601) SHA1(b3e343358f8f9334b0befefef80f2a0b53ae0cc7) )
+	ROM_LOAD( "d33-02.pal16l8b.ic62", 0x1000, 0x104, CRC(1e2d2e73) SHA1(3cbb95f26daed685ac8ad3d324e2c10ff444378a) )
+	ROM_LOAD( "d33-03.pal16l8a.ic70", 0x2000, 0x104, CRC(f18b8ad0) SHA1(eabaccd50e72520c5fd91fb27cbd88962e8e82c2) )
+	ROM_LOAD( "d33-04.pal16l8b.ic81", 0x3000, 0x104, CRC(b5690dd6) SHA1(0118d272b2c66e3faade1f4f7328167697fd0649) )
+	ROM_LOAD( "d33-05.pal16l8b.ic93", 0x4000, 0x104, CRC(81b5ce19) SHA1(7602c8aa22ea3b3a64633ce9b55a45cfd20167cb) )
+	ROM_LOAD( "d33-06.pal20l8b.ic44", 0x5000, 0x144, CRC(bf4eeb17) SHA1(d78f65eacf1c7893f87b9fe8be0e5e1b28af7c7a) )
 ROM_END
+
+} // Anonymous namespace
 
 GAME( 1992, gokidetor,          0, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1992, gokidetor2, gokidetor, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
