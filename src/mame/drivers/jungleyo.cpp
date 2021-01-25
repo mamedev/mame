@@ -54,6 +54,14 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+// configurable logging
+#define LOG_OUTPUTS (1U << 1)
+
+// #define VERBOSE (2)
+
+#include "logmacro.h"
+
+#define LOGOUTPUTS(...) LOGMASKED(LOG_OUTPUTS, __VA_ARGS__)
 
 namespace {
 
@@ -76,6 +84,8 @@ protected:
 	virtual void video_start() override;
 
 private:
+	void output_w(uint16_t data);
+
 	// video-related
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -93,6 +103,32 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 };
+
+
+void jungleyo_state::output_w(uint16_t data)
+{
+	// bit 15  ?
+	// bit 14  coin counter?
+	// bit 13  ?
+	// bit 12  ?
+	// bit 11  ?
+	// bit 10  ?
+	// bit 09  ?
+	// bit 08  ?
+	// bit 07  ?
+	// bit 06  ?
+	// bit 05  ?
+	// bit 04  ?
+	// bit 03  ?
+	// bit 02  ?
+	// bit 01  start lamp?
+	// bit 00  bet lamp?
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 14));
+
+	if (data & 0xbfff)
+		LOGOUTPUTS("%s output_w: %04x\n", machine().describe_context(), data);
+}
 
 
 TILE_GET_INFO_MEMBER(jungleyo_state::get_bg_tile_info)
@@ -141,7 +177,16 @@ void jungleyo_state::main_map(address_map &map)
 	map(0xa00310, 0xa00311).portr("IN0");
 	map(0xa0032a, 0xa0032b).portr("DSW12");
 	map(0xa0032c, 0xa0032d).portr("DSW34");
-	map(0xa00689, 0xa00689).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa00336, 0xa00337).w(FUNC(jungleyo_state::output_w)); // outputs? observed values: lots
+	map(0xa00689, 0xa00689).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // TODO: something's definitely wrong here, lots of errors in the log
+	//map(0xa0068a, 0xa0068b).nopw(); // observed values: 0x0101
+	//map(0xa0082e, 0xa0082f).nopw(); // observed values: 0x0000, 0x4000, 0x5900 (double up),
+	//map(0xa00830, 0xa00831).nopw(); // observed values: 0x0000 and 0x0007
+	//map(0xa00832, 0xa00833).nopw(); // tilemap priority ? observed values: 0x0000 and 0x0001
+	//map(0xa00aaa, 0xa00aab).nopw(); // observed values: 0x0000, this is written continuously
+	//map(0xa00d58, 0xa00d59).nopw(); // observed values: 0x0004
+	//map(0xa00e9a, 0xa00e9b).nopw(); // observed values: 0x0005
+	//map(0xa00fc6, 0xa00fc7).nopw(); // observed values: 0x0006
 	map(0xb00000, 0xb0ffff).ram();
 	map(0xb10000, 0xb1ffff).ram();
 	map(0xb20000, 0xb2ffff).ram();
