@@ -7,7 +7,7 @@ Motherboard 6WEV0:
 
 CPU: Intel CELERON FV524RX366 128 SL36C
 RAM: 64MB
-PCB: Intel FW82801AA, IT8888F PCI-to-ISA Bridge, CMI8738 audio, 
+PCB: Intel FW82801AA, IT8888F PCI-to-ISA Bridge, CMI8738 audio
 I/O: Winbond W83977, Winbond W83627HF
 BIOS: Intel N82802AB
 Dongle: Parallel port + keyboard DIN (uses both ports) with just a Parallax SX28AC/DP-G MCU or a combo of Ubicom SX28AC/DP MCU + 93C46LN SEEPROM
