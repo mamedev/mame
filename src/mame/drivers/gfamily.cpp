@@ -15,9 +15,9 @@ PC with Chinese Windows 2000 Pro and several emulators, including:
 PC motherboard plus an additional PCB for JAMMA, inputs and basic config.
 
 PC board:
-CPU: Intel Celeron 1,7GHz / 128kb / 400MHz SL6SC
+CPU: Intel Celeron 1.7GHz / 128kb / 400MHz SL6SC
 RAM: 256MB-DDR400
-PCB: 04/082006-SiS-651-6A6IXRMAC-00, Realtec ALC655 audio, Realtec RTL8201BL Ethernet (25.000 MHz xtal), Winbond W83194BG-648 (14.31818 xtal)
+PCB: 04/082006-SiS-651-6A6IXRMAC-00, Realtec ALC655 audio, Realtec RTL8201BL Ethernet (25.000 MHz xtal), Winbond W83194BG-648 (14.31818 MHz xtal)
 BIOS: 686 AMIBIOS (c) 2006 AY36 8897
 
 I/O board:
@@ -81,7 +81,7 @@ void gfamily_state::machine_reset()
 void gfamily_state::gfamily(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 1700000000); // Actually an Intel Celeron SL6SC 1,7GHz
+	PENTIUM4(config, m_maincpu, 1'700'000'000); // Actually an Intel Celeron SL6SC 1.7GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &gfamily_state::gfamily_map);
 
 	// Video hardware
