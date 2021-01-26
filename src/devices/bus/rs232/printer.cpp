@@ -27,7 +27,6 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 	m_initial_rx_state(1),
 	m_printer(*this, "printer"),
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
-	m_rs232_startbits(*this, "RS232_STARTBITS"),
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS")
@@ -42,7 +41,6 @@ void serial_printer_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START(serial_printer)
 	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)
-	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_printer_device, update_serial)
 	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_printer_device, update_serial)
 	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_printer_device, update_serial)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_printer_device, update_serial)
@@ -59,7 +57,7 @@ void serial_printer_device::device_start()
 
 WRITE_LINE_MEMBER(serial_printer_device::update_serial)
 {
-	int startbits = convert_startbits(m_rs232_startbits->read());
+	int startbits = 1;
 	int databits = convert_databits(m_rs232_databits->read());
 	parity_t parity = convert_parity(m_rs232_parity->read());
 	stop_bits_t stopbits = convert_stopbits(m_rs232_stopbits->read());
