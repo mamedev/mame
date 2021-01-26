@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(jungleyo_state::get_bg_tile_info)
 {
 	u16 code = m_bg_videoram[tile_index*2+1];
 	u16 color = m_bg_videoram[tile_index*2];
-	tileinfo.set(1, code, (color & 0x1f) | 0x20, 0);
+	tileinfo.set(1, code, color & 0x1f, 0);
 }
 
 TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
@@ -159,7 +159,10 @@ template <int layer_num> TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info
 	u16 code = m_reel_vram[layer_num][tile_index*2+1];
 	// colscroll is on upper 8 bits of this (handled in update)
 	u16 color = m_reel_vram[layer_num][tile_index*2];
-	tileinfo.set(0, code, (color & 0x1f) | 0x40, 0);
+	// TODO: confirm if bit 6 is really connected here
+	// upper palette bank is initialized with black at POST and never ever touched again,
+	// not enough to pinpoint one way or another ...
+	tileinfo.set(0, code, color & 0x3f, 0);
 }
 
 void jungleyo_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -431,9 +434,9 @@ static const gfx_layout jungleyo16_layout =
 };
 
 static GFXDECODE_START( gfx_jungleyo )
-	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 0x80  )
-	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 0x80  )
-	GFXDECODE_ENTRY( "gfx3", 0, jungleyo_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x4000, 0x40  )
+	GFXDECODE_ENTRY( "gfx2",    0, jungleyo_layout,     0x2000, 0x20  )
+	GFXDECODE_ENTRY( "gfx3",    0, jungleyo_layout,     0x0000, 0x20  )
 GFXDECODE_END
 
 
