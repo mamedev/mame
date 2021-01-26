@@ -2076,6 +2076,8 @@ PCB marked 'ROLLA REV. 1' and 'CTE 001 94V-0 0205'
 1 JFC 95101 (AY8910 compatible)
 4 8-dip banks
 1 24.00 MHz XTAL (on the daughterboard)
+
+Has Random Games in GFX, possibly pointing to superb2k (same producer) also using a 8052 derived CPU under the epoxy block
 */
 
 ROM_START( rolla )
@@ -2111,6 +2113,24 @@ ROM_START( score5 )
 	ROM_LOAD16_BYTE( "6_am27c100.u54", 0x00001, 0x20000, CRC(59631eaf) SHA1(a7f8dfc6737e6db6be8311e054f1e07b65792a93) )
 	ROM_LOAD16_BYTE( "7_am27c100.u56", 0x40000, 0x20000, CRC(801881a4) SHA1(fe0914db7d178c6d689682cb6e2af4ba782eaf8e) )
 	ROM_LOAD16_BYTE( "8_am27c100.u58", 0x40001, 0x20000, CRC(db20c424) SHA1(537c3b4dfb532473955042a58d204aebf60e950e) )
+ROM_END
+
+// this runs on a Rolla PCB with an unverified CPU enclosed in an epoxy block. GFX ROMs are half sized if compared to all the other supported sets.
+ROM_START( superb2k )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v5.u9", 0x00000, 0x10000, CRC(dbbc3062) SHA1(fd020571a610ea60ef207fd709e737506bf9300a) ) // ROM was outside the epoxy block
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x10000, CRC(b876a2a4) SHA1(e52020b71cf8e98f8d5f5caf98ec3bb2a0cd09f8) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x10000, CRC(ab994cab) SHA1(7f50534a4c875049c8e80ec734ff4c5343f40d96) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x10000, CRC(bbe554d4) SHA1(18b59b25d59f94a06ed59908b7d03f1adda8d90e) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x10000, CRC(bbef9385) SHA1(f8aa5787ef6c510617c847a231c7e4cf59d7003f) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x10000, CRC(b0bb947a) SHA1(6822dd82b9be72b47ecaa412de4e070b372be170) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x10000, CRC(065aa631) SHA1(ae5e8a952bd0a6b052ab7636240e0ebc495f09aa) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x10000, CRC(b9121b69) SHA1(9a46444a63977d45392c6513550d132e5d2da365) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x10000, CRC(0a7023aa) SHA1(2efdb4ad2acd90fff39144e08b012e39b571a682) )
 ROM_END
 
 /**********************************
@@ -2204,5 +2224,6 @@ GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "<unknown>",            "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
+GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
+GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
