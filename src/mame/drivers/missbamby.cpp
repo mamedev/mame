@@ -11,8 +11,10 @@ Known games on this hardware:
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
  | YES    | Golden Winner     | Reben              |                    |
- | YES    | Golden Fruits     | unknown            | 4 dipsw, battery   |
- | NO     | St.-Tropez        | unknown            |                    |
+ | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
+ | NO     | St.-Tropez        | Video Game         |                    |
+ | NO     | Cocktails         | Video Game         |                    |
+ | NO     | Gold Mini II      | Video Game         |                    |
  +-------------------------------------------------+--------------------+
 */
 /*
@@ -259,7 +261,7 @@ ROM_END
 GAME( 1981, minisupf, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, goldfrts, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "<unknown>",          "Golden Fruits",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, goldfrts, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",                         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1985, trebol,   0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",                                MACHINE_IS_SKELETON_MECHANICAL )
