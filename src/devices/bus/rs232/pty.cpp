@@ -16,7 +16,6 @@ pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, co
 	device_pty_interface(mconfig, *this),
 	m_rs232_txbaud(*this, "RS232_TXBAUD"),
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
-	m_rs232_startbits(*this, "RS232_STARTBITS"),
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS"),
@@ -28,7 +27,7 @@ pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, co
 
 WRITE_LINE_MEMBER(pseudo_terminal_device::update_serial)
 {
-	int startbits = convert_startbits(m_rs232_startbits->read());
+	int startbits = 1;
 	int databits = convert_databits(m_rs232_databits->read());
 	parity_t parity = convert_parity(m_rs232_parity->read());
 	stop_bits_t stopbits = convert_stopbits(m_rs232_stopbits->read());
@@ -52,7 +51,6 @@ WRITE_LINE_MEMBER(pseudo_terminal_device::update_serial)
 static INPUT_PORTS_START(pseudo_terminal)
 	PORT_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", pseudo_terminal_device, update_serial)
 	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", pseudo_terminal_device, update_serial)
-	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", pseudo_terminal_device, update_serial)
 	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", pseudo_terminal_device, update_serial)
 	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", pseudo_terminal_device, update_serial)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", pseudo_terminal_device, update_serial)

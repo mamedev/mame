@@ -15031,6 +15031,9 @@ pcv20                           // 198? PC-XT with V20 CPU
 @source:getaway.cpp
 getaway
 
+@source:gfamily.cpp
+gmfamily                        //
+
 @source:ggconnie.cpp
 fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
@@ -36580,6 +36583,7 @@ knockoutb                       // bootleg
 knockoutc                       //
 mariner                         // (c) 1981 Amenip
 mars                            // (c) 1981 Artic
+marsarf                         // bootleg (Arfyc)
 mrkougar                        // (c) 1984 ATW
 mrkougar2                       // (c) 1984 ATW
 mrkougb                         // bootleg
@@ -37968,6 +37972,7 @@ score5                          // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
 sstar97                         // (c) 199? Bordun International
+superb2k                        // Random Games
 tigerslt                        // Bootleg?
 
 @source:skyraid.cpp

@@ -291,6 +291,12 @@ void debugview_info::add_items_to_context_menu(HMENU menu)
 }
 
 
+void debugview_info::update_context_menu(HMENU menu)
+{
+	EnableMenuItem(menu, ID_CONTEXT_PASTE, MF_BYCOMMAND | (IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED));
+}
+
+
 void debugview_info::handle_context_menu(unsigned command)
 {
 	switch (command)
@@ -709,6 +715,7 @@ bool debugview_info::process_context_menu(int x, int y)
 	}
 
 	// show the context menu
+	update_context_menu(m_contextmenu);
 	BOOL const command(TrackPopupMenu(
 				m_contextmenu,
 				(GetSystemMetrics(SM_MENUDROPALIGNMENT) ? TPM_RIGHTALIGN : TPM_LEFTALIGN) | TPM_LEFTBUTTON | TPM_NONOTIFY | TPM_RETURNCMD,
@@ -855,15 +862,29 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 	// mouse click
 	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
 		{
 			debug_view_xy topleft = m_view->visible_position();
 			debug_view_xy newpos;
 			newpos.x = topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width();
 			newpos.y = topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height();
-			m_view->process_click(DCK_LEFT_CLICK, newpos);
+			m_view->process_click((message == WM_LBUTTONDOWN) ? DCK_LEFT_CLICK : DCK_MIDDLE_CLICK, newpos);
 			SetFocus(m_wnd);
 			break;
 		}
+
+	// right click
+	case WM_RBUTTONDOWN:
+		if (m_view->cursor_supported())
+		{
+			debug_view_xy topleft = m_view->visible_position();
+			debug_view_xy newpos;
+			newpos.x = topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width();
+			newpos.y = topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height();
+			m_view->set_cursor_position(newpos);
+			m_view->set_cursor_visible(true);
+		}
+		return DefWindowProc(m_wnd, message, wparam, lparam);
 
 	// horizontal scroll
 	case WM_HSCROLL:

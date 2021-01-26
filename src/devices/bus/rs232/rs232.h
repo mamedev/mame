@@ -23,16 +23,33 @@
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
 
+#define RS232_BAUD_50 (0x0e)
+#define RS232_BAUD_75 (0x0f)
+#define RS232_BAUD_134_5 (0x10)
+#define RS232_BAUD_200 (0x11)
+#define RS232_BAUD_1800 (0x12)
+#define RS232_BAUD_2000 (0x13)
+#define RS232_BAUD_3600 (0x14)
+#define RS232_BAUD_7200 (0x15)
+
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFSETTING( RS232_BAUD_50, "50") \
+	PORT_CONFSETTING( RS232_BAUD_75, "75") \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
+	PORT_CONFSETTING( RS232_BAUD_134_5, "134.5") \
 	PORT_CONFSETTING( RS232_BAUD_150, "150") \
+	PORT_CONFSETTING( RS232_BAUD_200, "200") \
 	PORT_CONFSETTING( RS232_BAUD_300, "300") \
 	PORT_CONFSETTING( RS232_BAUD_600, "600") \
 	PORT_CONFSETTING( RS232_BAUD_1200, "1200") \
+	PORT_CONFSETTING( RS232_BAUD_1800, "1800") \
+	PORT_CONFSETTING( RS232_BAUD_2000, "2000") \
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
+	PORT_CONFSETTING( RS232_BAUD_3600, "3600") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
+	PORT_CONFSETTING( RS232_BAUD_7200, "7200") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
@@ -40,15 +57,6 @@
 	PORT_CONFSETTING( RS232_BAUD_38400, "38400") \
 	PORT_CONFSETTING( RS232_BAUD_57600, "57600") \
 	PORT_CONFSETTING( RS232_BAUD_115200, "115200")
-
-#define RS232_STARTBITS_0 (0x00)
-#define RS232_STARTBITS_1 (0x01)
-
-#define PORT_RS232_STARTBITS(_tag, _default_startbits, _description, _class, _write_line) \
-	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_startbits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
-	PORT_CONFSETTING( RS232_STARTBITS_0, "0") \
-	PORT_CONFSETTING( RS232_STARTBITS_1, "1")
 
 #define RS232_DATABITS_5 (0x00)
 #define RS232_DATABITS_6 (0x01)
@@ -209,21 +217,19 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200
+			115200,
+
+			50,
+			75,
+			134, // -0.37% error
+			200,
+			1800,
+			2000,
+			3600,
+			7200
 		};
 
 		return values[baud];
-	}
-
-	static int convert_startbits(uint8_t startbits)
-	{
-		static const int values[] =
-		{
-			0,
-			1
-		};
-
-		return values[startbits];
 	}
 
 	static int convert_databits(uint8_t databits)
