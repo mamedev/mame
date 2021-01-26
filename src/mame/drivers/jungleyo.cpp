@@ -74,6 +74,9 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_bg_videoram(*this, "bg_videoram")
 		, m_fg_videoram(*this, "fg_videoram")
+		, m_reel_vram(*this, "reel_vram")
+		, m_palette(*this, "palette")
+		, m_paletteram(*this, "paletteram", 0x18000, ENDIANNESS_BIG)
 	{ }
 
 	void jungleyo(machine_config &config);
@@ -90,20 +93,113 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	void bg_videoram_w(offs_t offset, uint16_t data);
 	void fg_videoram_w(offs_t offset, uint16_t data);
+	void reel_vram_w(offs_t offset, uint16_t data);
 
 	void main_map(address_map &map);
+	u8 palette_ram_r(offs_t offset);
+	void palette_ram_w(offs_t offset, u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_reel_vram;
+	required_device<palette_device> m_palette;
+	memory_share_creator<u8> m_paletteram;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_reel_tilemap;
 };
 
+
+TILE_GET_INFO_MEMBER(jungleyo_state::get_bg_tile_info)
+{
+	u16 code = m_bg_videoram[tile_index*2+1];
+	u16 color = m_bg_videoram[tile_index*2];
+	tileinfo.set(1, code, (color & 0x1f) | 0x20, 0);
+}
+
+TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
+{
+	u16 code = m_fg_videoram[tile_index*2+1];
+	u16 color = m_fg_videoram[tile_index*2];
+	tileinfo.set(2, code, color & 0x1f, 0);
+}
+
+TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info)
+{
+	u16 code = m_reel_vram[tile_index*2+1];
+	// colscroll for upper 8 bits
+	u16 color = m_reel_vram[tile_index*2];
+	// TODO: bit 4 seems disabled during gameplay
+	tileinfo.set(0, code, (color & 0x1f) | 0x40, 0);
+}
+
+void jungleyo_state::bg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void jungleyo_state::reel_vram_w(offs_t offset, uint16_t data)
+{
+	m_reel_vram[offset] = data;
+	m_reel_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void jungleyo_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_reel_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	// TODO: colscroll setup (do we need to separate by 3 layers?)
+//	m_reel_tilemap->set_scroll_cols(2048);
+}
+
+uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+//	for (int i=0;i<2048;i++)
+	{
+		//u16 scroll = m_reel_vram[i*2] >> 8;
+		//m_reel_tilemap->set_scrolly(i, 0xe0);
+	}
+	
+	// TODO: priority setting, cfr. gameplay vs. test mode
+	m_reel_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+u8 jungleyo_state::palette_ram_r(offs_t offset)
+{
+	return m_paletteram[offset];
+}
+
+void jungleyo_state::palette_ram_w(offs_t offset, u8 data)
+{
+	m_paletteram[offset] = data;
+	const u32 pal_offs = offset & 0x7fff;
+	const int b = (m_paletteram[pal_offs | 0x00000] & 0xff);
+	const int g = (m_paletteram[pal_offs | 0x08000] & 0xff);
+	const int r = (m_paletteram[pal_offs | 0x10000] & 0xff);
+
+	m_palette->set_pen_color(pal_offs, rgb_t(r, g, b));
+}
 
 void jungleyo_state::output_w(uint16_t data)
 {
@@ -131,46 +227,6 @@ void jungleyo_state::output_w(uint16_t data)
 }
 
 
-TILE_GET_INFO_MEMBER(jungleyo_state::get_bg_tile_info)
-{
-	uint16_t code = m_bg_videoram[tile_index];
-	tileinfo.set(1, code, 0, 0);
-}
-
-TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
-{
-	uint16_t code = m_fg_videoram[tile_index];
-	tileinfo.set(2, code, 0, 0);
-}
-
-void jungleyo_state::bg_videoram_w(offs_t offset, uint16_t data)
-{
-	m_bg_videoram[offset / 2] = data;
-	m_bg_tilemap->mark_tile_dirty(offset / 2);
-}
-
-void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
-{
-	m_fg_videoram[offset / 2] = data;
-	m_fg_tilemap->mark_tile_dirty(offset / 2);
-}
-
-void jungleyo_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-}
-
-uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
-
-
 void jungleyo_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
@@ -187,12 +243,10 @@ void jungleyo_state::main_map(address_map &map)
 	//map(0xa00d58, 0xa00d59).nopw(); // observed values: 0x0004
 	//map(0xa00e9a, 0xa00e9b).nopw(); // observed values: 0x0005
 	//map(0xa00fc6, 0xa00fc7).nopw(); // observed values: 0x0006
-	map(0xb00000, 0xb0ffff).ram();
-	map(0xb10000, 0xb1ffff).ram();
-	map(0xb20000, 0xb2ffff).ram();
+	map(0xb00000, 0xb2ffff).rw(FUNC(jungleyo_state::palette_ram_r), FUNC(jungleyo_state::palette_ram_w)).umask16(0x00ff);
 	map(0xb80000, 0xb81fff).ram().share(m_fg_videoram).w(FUNC(jungleyo_state::fg_videoram_w));
 	map(0xb90000, 0xb91fff).ram().share(m_bg_videoram).w(FUNC(jungleyo_state::bg_videoram_w));
-	map(0xba0000, 0xba1fff).ram();
+	map(0xba0000, 0xba1fff).ram().share(m_reel_vram).w(FUNC(jungleyo_state::reel_vram_w));
 	map(0xff0000, 0xff7fff).ram();
 	map(0xff8000, 0xffffff).ram().share("nvram");
 }
@@ -299,9 +353,9 @@ static const gfx_layout jungleyo_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
 	8*64
 };
 
@@ -310,19 +364,16 @@ static const gfx_layout jungleyo16_layout =
 	8,32,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
-		16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-		24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP32(0,8*8) },
 	8*64*4
 };
 
 static GFXDECODE_START( gfx_jungleyo )
-	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "gfx3", 0, jungleyo_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( "gfx3", 0, jungleyo_layout,   0x0, 0x80  )
 GFXDECODE_END
 
 
@@ -334,7 +385,7 @@ void jungleyo_state::jungleyo(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_jungleyo);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jungleyo);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -342,9 +393,9 @@ void jungleyo_state::jungleyo(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(jungleyo_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -394,7 +445,7 @@ void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decr
 	src[0x000 / 2] = 0x0000;
 	src[0x002 / 2] = 0x0000;
 	src[0x004 / 2] = 0x0000;
-	src[0x006 / 2] = 0x01fa;
+	src[0x006 / 2] = 0x01f8; // reset opcode
 }
 
 } // Anonymous namespace
