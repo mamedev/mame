@@ -10,7 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
- | YES    | Golden Winer      | Reben              |                    |
+ | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | unknown            | 4 dipsw, battery   |
  | NO     | St.-Tropez        | unknown            |                    |
  +-------------------------------------------------+--------------------+
