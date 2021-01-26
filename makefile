@@ -371,6 +371,14 @@ ifndef NOASM
 endif
 endif
 
+ifeq ($(findstring arm,$(UNAME)),arm)
+ARCHITECTURE :=
+endif
+
+ifeq ($(findstring aarch64,$(UNAME)),aarch64)
+ARCHITECTURE :=
+endif
+
 ifeq ($(findstring ppc,$(UNAME)),ppc)
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
