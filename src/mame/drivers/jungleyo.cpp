@@ -1,7 +1,27 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Angelo Salese
+/******************************************************************************
 
-/*
+	Jungle (c) 2001 Yonshi
+
+	TODO:
+	- with a clean NVRAM MAME needs to be soft reset after init or the game 
+	    will trip a '1111 exception' (caused by invalid opcode executed at
+	    0x102, incomplete decryption most likely);
+	- Likewise anything in the 0x100-0x1f7 range doesn't seem valid at all;
+	- system setting screen shows the following settings that don't seem to be
+	    affected by dips:
+	  * Min. Bet (always 1), 
+	  * Credit X Ticket Mode (always Cencel (sic)), 
+	  * Max. 10 Mode (always Max. 10);
+	- sound doesn't seem to work 100% correctly (i.e. coin sound only seems 
+	    to work from 3rd coin on, lots of invalid sample msgs in error.log).
+	    fwiw there's no extra OKI bank in the ROM, must be either invalid 
+		decryption or fancy OKI status readback;
+    - output, lamps, ticket dispenser;
+
+===============================================================================
+
 CPUs
 QTY  Type           clock      position  function
 1x   MC68HC000FN10             u3        16/32-bit Microprocessor - main
@@ -35,14 +55,7 @@ Others
 Notes
 PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
-TODO:
-- driver is skeleton-ish, video emulation is at the bare minimum to see what's going on;
-- with a clean NVRAM MAME needs to be soft reset after init or the game will stop with '1111 exception' error;
-- decryption is believed complete, but there's something strange with the first bytes of the ROM;
-- system setting screen shows the following settings that don't seem to be affected by dips:
-  Min. Bet (always 1), Credit X Ticket Mode (always Cencel (sic)), Max. 10 Mode (always Max. 10);
-- sound doesn't seem to work 100% correctly (i.e. coin sound only seems to work from 3rd coin on).
-*/
+*******************************************************************************/
 
 
 #include "emu.h"
@@ -74,7 +87,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_bg_videoram(*this, "bg_videoram")
 		, m_fg_videoram(*this, "fg_videoram")
-		, m_reel_vram(*this, "reel_vram")
+		, m_reel_vram(*this, "reel_vram%u", 1U)
 		, m_palette(*this, "palette")
 		, m_paletteram(*this, "paletteram", 0x18000, ENDIANNESS_BIG)
 	{ }
@@ -93,26 +106,31 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_tile_info);
-	void bg_videoram_w(offs_t offset, uint16_t data);
-	void fg_videoram_w(offs_t offset, uint16_t data);
-	void reel_vram_w(offs_t offset, uint16_t data);
+	template <int layer_num> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <int layer_num> void reel_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void main_map(address_map &map);
+
 	u8 palette_ram_r(offs_t offset);
 	void palette_ram_w(offs_t offset, u8 data);
+	void layer_enable_w(u8 data);
+	void video_priority_w(u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
-	required_shared_ptr<uint16_t> m_reel_vram;
+	required_shared_ptr_array<u16, 3> m_reel_vram;
 	required_device<palette_device> m_palette;
 	memory_share_creator<u8> m_paletteram;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel_tilemap;
+	tilemap_t *m_reel_tilemap[3];
+	u8 m_layer_enable;
+	u8 m_video_priority;
 };
 
 
@@ -130,57 +148,74 @@ TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
 	tileinfo.set(2, code, color & 0x1f, 0);
 }
 
-TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info)
+template <int layer_num> TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info)
 {
-	u16 code = m_reel_vram[tile_index*2+1];
-	// colscroll for upper 8 bits
-	u16 color = m_reel_vram[tile_index*2];
-	// TODO: bit 4 seems disabled during gameplay
+	u16 code = m_reel_vram[layer_num][tile_index*2+1];
+	// colscroll is on upper 8 bits of this (handled in update)
+	u16 color = m_reel_vram[layer_num][tile_index*2];
 	tileinfo.set(0, code, (color & 0x1f) | 0x40, 0);
 }
 
-void jungleyo_state::bg_videoram_w(offs_t offset, uint16_t data)
+void jungleyo_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_bg_videoram[offset] = data;
+	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void jungleyo_state::fg_videoram_w(offs_t offset, uint16_t data)
+void jungleyo_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_fg_videoram[offset] = data;
+	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void jungleyo_state::reel_vram_w(offs_t offset, uint16_t data)
+template <int layer_num> void jungleyo_state::reel_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_reel_vram[offset] = data;
-	m_reel_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_reel_vram[layer_num][offset]);
+	m_reel_tilemap[layer_num]->mark_tile_dirty(offset / 2);
 }
 
 void jungleyo_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_reel_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 32);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jungleyo_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);
-	// TODO: colscroll setup (do we need to separate by 3 layers?)
-//	m_reel_tilemap->set_scroll_cols(2048);
+	for (int i = 0;i < 3; i++)
+	{
+		m_reel_tilemap[i]->set_scroll_cols(64);
+		m_reel_tilemap[i]->set_transparent_pen(0xff);
+	}
 }
 
 uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	for (int i=0;i<2048;i++)
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	
+	if (m_layer_enable == 0)
+		return 0;
+
+	for (int layer_num = 0; layer_num < 3; layer_num++)
 	{
-		//u16 scroll = m_reel_vram[i*2] >> 8;
-		//m_reel_tilemap->set_scrolly(i, 0xe0);
+		for (int i=0;i<64;i++)
+		{
+			u16 scroll = m_reel_vram[layer_num][i*2] >> 8;
+			m_reel_tilemap[layer_num]->set_scrolly(i, scroll);
+		}
+		
+		m_reel_tilemap[layer_num]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	
-	// TODO: priority setting, cfr. gameplay vs. test mode
-	m_reel_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if ((m_video_priority & 1) == 0)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	if ((m_video_priority & 1) == 1)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -192,6 +227,7 @@ u8 jungleyo_state::palette_ram_r(offs_t offset)
 
 void jungleyo_state::palette_ram_w(offs_t offset, u8 data)
 {
+	// RGB888 separated by 
 	m_paletteram[offset] = data;
 	const u32 pal_offs = offset & 0x7fff;
 	const int b = (m_paletteram[pal_offs | 0x00000] & 0xff);
@@ -226,6 +262,20 @@ void jungleyo_state::output_w(uint16_t data)
 		LOGOUTPUTS("%s output_w: %04x\n", machine().describe_context(), data);
 }
 
+void jungleyo_state::layer_enable_w(u8 data)
+{
+	m_layer_enable = data & 7;
+	// TODO: we just know that 7 enables and 0 disables all 3 layers, how the composition works is tbd
+	if (((m_layer_enable != 7) && (m_layer_enable != 0)) || data & 0xf8)
+		popmessage("layer enable %02x contact MAMEdev", data);
+}
+
+void jungleyo_state::video_priority_w(u8 data)
+{
+	m_video_priority = data & 1;
+	if (data & 0xfe)
+		popmessage("video priority %02x contact MAMEdev", data & 0xfe);
+}
 
 void jungleyo_state::main_map(address_map &map)
 {
@@ -234,19 +284,23 @@ void jungleyo_state::main_map(address_map &map)
 	map(0xa0032a, 0xa0032b).portr("DSW12");
 	map(0xa0032c, 0xa0032d).portr("DSW34");
 	map(0xa00336, 0xa00337).w(FUNC(jungleyo_state::output_w)); // outputs? observed values: lots
-	map(0xa00689, 0xa00689).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // TODO: something's definitely wrong here, lots of errors in the log
+	map(0xa00689, 0xa00689).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//map(0xa0068a, 0xa0068b).nopw(); // observed values: 0x0101
 	//map(0xa0082e, 0xa0082f).nopw(); // observed values: 0x0000, 0x4000, 0x5900 (double up),
-	//map(0xa00830, 0xa00831).nopw(); // observed values: 0x0000 and 0x0007
-	//map(0xa00832, 0xa00833).nopw(); // tilemap priority ? observed values: 0x0000 and 0x0001
-	//map(0xa00aaa, 0xa00aab).nopw(); // observed values: 0x0000, this is written continuously
+	map(0xa00831, 0xa00831).w(FUNC(jungleyo_state::layer_enable_w));
+	map(0xa00833, 0xa00833).w(FUNC(jungleyo_state::video_priority_w));
+	map(0xa00aaa, 0xa00aab).nopw(); // irq ack or watchdog (written at start of vblank irq)
 	//map(0xa00d58, 0xa00d59).nopw(); // observed values: 0x0004
 	//map(0xa00e9a, 0xa00e9b).nopw(); // observed values: 0x0005
 	//map(0xa00fc6, 0xa00fc7).nopw(); // observed values: 0x0006
 	map(0xb00000, 0xb2ffff).rw(FUNC(jungleyo_state::palette_ram_r), FUNC(jungleyo_state::palette_ram_w)).umask16(0x00ff);
 	map(0xb80000, 0xb81fff).ram().share(m_fg_videoram).w(FUNC(jungleyo_state::fg_videoram_w));
 	map(0xb90000, 0xb91fff).ram().share(m_bg_videoram).w(FUNC(jungleyo_state::bg_videoram_w));
-	map(0xba0000, 0xba1fff).ram().share(m_reel_vram).w(FUNC(jungleyo_state::reel_vram_w));
+	map(0xba0000, 0xba07ff).ram().share(m_reel_vram[0]).w(FUNC(jungleyo_state::reel_vram_w<0>));
+	map(0xba0800, 0xba0fff).ram().share(m_reel_vram[1]).w(FUNC(jungleyo_state::reel_vram_w<1>));
+	map(0xba1000, 0xba17ff).ram().share(m_reel_vram[2]).w(FUNC(jungleyo_state::reel_vram_w<2>));
+	map(0xba1800, 0xba1fff).ram(); // supposedly the 4th reel VRAM bank, inited at POST only and prolly just tied to NOP instead
+
 	map(0xff0000, 0xff7fff).ram();
 	map(0xff8000, 0xffffff).ram().share("nvram");
 }
@@ -391,7 +445,7 @@ void jungleyo_state::jungleyo(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(jungleyo_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -451,4 +505,4 @@ void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decr
 } // Anonymous namespace
 
 
-GAME( 2001, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
+GAME( 2001, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (Italy VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
