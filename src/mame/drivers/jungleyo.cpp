@@ -9,6 +9,9 @@
 	    will trip a '1111 exception' (caused by invalid opcode executed at
 	    0x102, incomplete decryption most likely);
 	- Likewise anything in the 0x100-0x1f7 range doesn't seem valid at all;
+	- game sometimes expects 1+ coins even if player has available points
+	  (and freezing with "COIN" text blinking), very unlikely to be intended
+	  behaviour?
 	- system setting screen shows the following settings that don't seem to be
 	    affected by dips:
 	  * Min. Bet (always 1), 
@@ -17,8 +20,11 @@
 	- sound doesn't seem to work 100% correctly (i.e. coin sound only seems 
 	    to work from 3rd coin on, lots of invalid sample msgs in error.log).
 	    fwiw there's no extra OKI bank in the ROM, must be either invalid 
-		decryption or fancy OKI status readback;
-    - output, lamps, ticket dispenser;
+		decryption or fancy OKI status readback instead. 
+        Latter may be confirmed by video display stalling at the end of a
+		normal round, OSD coin counter gets updated after the BGM completes
+		playback.
+    - outputs (lamps & ticket dispenser at very least);
 
 ===============================================================================
 
@@ -227,7 +233,7 @@ u8 jungleyo_state::palette_ram_r(offs_t offset)
 
 void jungleyo_state::palette_ram_w(offs_t offset, u8 data)
 {
-	// RGB888 separated by 
+	// RGB888 in three separate banks
 	m_paletteram[offset] = data;
 	const u32 pal_offs = offset & 0x7fff;
 	const int b = (m_paletteram[pal_offs | 0x00000] & 0xff);
@@ -265,7 +271,7 @@ void jungleyo_state::output_w(uint16_t data)
 void jungleyo_state::layer_enable_w(u8 data)
 {
 	m_layer_enable = data & 7;
-	// TODO: we just know that 7 enables and 0 disables all 3 layers, how the composition works is tbd
+	// TODO: we just know that 7 enables and 0 disables all 3 layers, how the composition works out internally is MIA
 	if (((m_layer_enable != 7) && (m_layer_enable != 0)) || data & 0xf8)
 		popmessage("layer enable %02x contact MAMEdev", data);
 }
@@ -478,8 +484,7 @@ ROM_START( jungleyo )
 	ROM_LOAD( "jungle_rom6.u60", 0x000000, 0x80000, CRC(caab8eb2) SHA1(472ca9f396d7c01a1bd03485581cfae677a3b365) )
 ROM_END
 
-
-void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decrypt correctly
+void jungleyo_state::init_jungleyo()
 {
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
@@ -495,6 +500,7 @@ void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decr
 	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0xffff, 13, 15, 8, 9, 12, 11, 10, 14, 1, 3, 7, 5, 2, 6, 0, 4);
 
+	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)
 	src[0x000 / 2] = 0x0000;
 	src[0x002 / 2] = 0x0000;
@@ -505,4 +511,5 @@ void jungleyo_state::init_jungleyo() // TODO: the first bytes don't seem to decr
 } // Anonymous namespace
 
 
-GAME( 2001, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (Italy VI3.02)", MACHINE_IS_SKELETON ) // version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
+// version 3.02 built on 2001/02/09, there's copyright both for Yonshi and Global in strings
+GAME( 2001, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, init_jungleyo, ROT0, "Yonshi", "Jungle (Italy VI3.02)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
