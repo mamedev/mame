@@ -1145,30 +1145,6 @@ void firebeat_state::machine_reset()
 	m_spu_ata_dma = 0;
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
-
-	// Modify the underlying CD-ROM device's identify buffer to return Ultra DMA mode
-	// This is a workaround for issues with the ATAPI CD-ROM code that causes stack
-	// overflows with non-Ultra DMAs
-	if (!m_spuata) {
-		return;
-	}
-
-	ata_slot_device *spuata = m_spuata->subdevice<ata_slot_device>("0");
-	if (spuata == nullptr) {
-		return;
-	}
-
-	atapi_cdrom_device *spucdrom = spuata->subdevice<atapi_cdrom_device>("cdrom");
-	if (spucdrom == nullptr) {
-		return;
-	}
-
-	uint16_t *identify_device = spucdrom->identify_device_buffer();
-	if (identify_device == nullptr) {
-		return;
-	}
-
-	identify_device[88] = 0x0102;
 }
 
 WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
@@ -1181,6 +1157,11 @@ void firebeat_state::cdrom_config(device_t *device)
 	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 0.5);
 	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 0.5);
 	device = device->subdevice("cdda");
+}
+
+static void dvdrom_config(device_t *device)
+{
+	downcast<atapi_cdrom_device &>(*device).set_ultra_dma_mode(0x0102);
 }
 
 static void firebeat_ata_devices(device_slot_interface &device)
@@ -1334,6 +1315,7 @@ void firebeat_state::firebeat_spu(machine_config &config)
 	firebeat_spu_base(config);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
+	m_spuata->slot(0).set_option_machine_config("cdrom", dvdrom_config);
 	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_state::spu_ata_dmarq));
 }
