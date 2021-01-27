@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DEBUG_QT_WINDOW_QT_H__
-#define __DEBUG_QT_WINDOW_QT_H__
-
-#include <QtWidgets/QMainWindow>
+#ifndef MAME_DEBUGGER_QT_WINDOWQT_H
+#define MAME_DEBUGGER_QT_WINDOWQT_H
 
 #include "config.h"
 #include "debugger.h"
+
+#include <QtWidgets/QMainWindow>
 
 
 //============================================================
@@ -17,7 +17,7 @@ class WindowQt : public QMainWindow
 	Q_OBJECT
 
 public:
-	WindowQt(running_machine* machine, QWidget* parent=nullptr);
+	WindowQt(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~WindowQt();
 
 	// The interface to an all-window refresh
@@ -51,7 +51,7 @@ protected slots:
 
 
 protected:
-	running_machine* m_machine;
+	running_machine &m_machine;
 
 	static bool s_refreshAll;
 	static bool s_hideAll;
@@ -89,11 +89,11 @@ public:
 	QPoint m_size;
 	QPoint m_position;
 
-	virtual void buildFromQWidget(QWidget* widget);
-	virtual void applyToQWidget(QWidget* widget);
+	virtual void buildFromQWidget(QWidget *widget);
+	virtual void applyToQWidget(QWidget *widget);
 	virtual void addToXmlDataNode(util::xml::data_node &node) const;
 	virtual void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 
-#endif
+#endif // MAME_DEBUGGER_QT_WINDOWQT_H
