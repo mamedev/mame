@@ -31,6 +31,8 @@
 
 #include "emu.h"
 #include "express.h"
+
+#include "corestr.h"
 #include <cctype>
 
 
@@ -543,9 +545,7 @@ void symbol_table::write_memory(address_space &space, offs_t address, u64 data, 
 device_t *symbol_table::expression_get_device(const char *tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-	std::string fullname(tag);
-	strmakelower(fullname);
-	return m_machine.root_device().subdevice(fullname.c_str());
+	return m_machine.root_device().subdevice(strmakelower(tag));
 }
 
 

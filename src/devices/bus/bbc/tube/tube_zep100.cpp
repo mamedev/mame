@@ -105,7 +105,7 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_zep100_device::tube_zep100_mem);
 	m_z80->set_addrmap(AS_IO, &bbc_tube_zep100_device::tube_zep100_io);
 
-	VIA6522(config, m_via, 4_MHz_XTAL / 2);
+	MOS6522(config, m_via, 4_MHz_XTAL / 2);
 	m_via->writepb_handler().set(FUNC(bbc_tube_zep100_device::via_pb_w));
 	m_via->cb2_handler().set(m_ppi, FUNC(i8255_device::pc2_w));
 	m_via->ca2_handler().set(m_ppi, FUNC(i8255_device::pc6_w));

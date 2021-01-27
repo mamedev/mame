@@ -5,7 +5,6 @@ license:CC0
 
   Undumped games
 
-  - Game de check! Koutsuu Anzen
   - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
   BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
   - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
@@ -49,6 +48,18 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="20 em 1 (brazil).bin" size="262144" crc="f0f35c22" sha1="2012763dc08dedc68af8538698bd66618212785d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dgunner">
+		<description>3D Gunner (prototype)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="3d gunner (prototype).bin" size="32768" crc="56dcb2d4" sha1="2f66b626416902a4b0a81c682c9c40579f32e7be" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,6 +153,19 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="Action Fighter (TW).sms" size="131072" crc="8418f438" sha1="4f514dc568466f6b0424086edeb3fa0014f9c887" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Note from the dumper: The dump could seem bad because CRC in the header is wrong, it's normal because the ROM must be seen as two
+	     banks of 16KB (selected with A14, controlled by the PAL in the Action Replay -->
+	<software name="ar" supported="no">
+		<description>Action Replay (v. 1.02)</description>
+		<year>1993</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ms_ar_rom.bin" size="32768" crc="7d731851" sha1="d222c556b8a993879de222d095e08c2376f0b7cc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -286,6 +310,17 @@ license:CC0
 			<feature name="ic1" value="MPR-12408" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-12408.ic1" size="131072" crc="013c0a94" sha1="2d0a581da1c787b1407fb1cfefd0571e37899978" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alexhitwp" cloneof="alexhitw">
+		<description>Alex Kidd - High-Tech World (prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="alex kidd high tech world (prototype).bin" size="131072" crc="2d7fabb2" sha1="98a0d2aa3221dde30e0883760e4b6a62f2271bc5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1114,6 +1149,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bombraidp" cloneof="bombraid">
+		<description>Battle Wings (Bomber Raid, prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="ボンバーレイド" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="battle wings (prototye).bin" size="262144" crc="fae0ade7" sha1="99fef1cca416df8586d3aaf76d147e86e69dbdad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bnzabros">
 		<description>Bonanza Bros. (Euro, Bra)</description>
 		<year>1991</year>
@@ -1725,6 +1772,17 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="cyborg hunter (usa, europe).bin" size="131072" crc="908e7524" sha1="b6131585cb944d7fae69ad609802a1b5d51b442f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyborghp" cloneof="cyborgh">
+		<description>Cyborg Hunter (prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="cyborg hunter (prototype).bin" size="131072" crc="691211a1" sha1="6e1259bf0d8888d63d5033a0fafd53592b5697e2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2717,6 +2775,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gamcheck">
+		<description>Game de Check! Koutsuu Anzen (Jpn, prototype)</description>
+		<year>1987</year>
+		<publisher>Tokio Marine</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="game de check koutsuu anzen (jpn, prototype).bin" size="262144" crc="9afab511" sha1="72353c77efa078e88483858201f5bdf832f5c01c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robocop">
 		<description>Gangcheol RoboCop (Kor)</description>
 		<year>1992</year>
@@ -3226,6 +3295,17 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="hang-on (europe).bin" size="32768" crc="071b045e" sha1="e601257f6477b85eb0b25a5b6d46ebc070d8a05a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangonp" cloneof="hangon">
+		<description>Hang-On (prototype)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on (prototype).bin" size="32768" crc="649f29e8" sha1="817d7bba41f0619342127d562f848045b9ddd7ea" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4217,7 +4297,7 @@ license:CC0
 	<!-- Notes: 3D glasses support -->
 	<software name="missil3d">
 		<description>Missile Defense 3-D (Euro, USA, Bra)</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8001, 023.230"/>
 		<sharedfeat name="ctrl1_default" value="lphaser" />
@@ -4227,6 +4307,20 @@ license:CC0
 			<feature name="ic1" value="MPR-10844 W29" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-10844 w29.ic1" size="131072" crc="fbe5cfbb" sha1="86242fcc8b9f93cdad2241f40c3eebbf4c9ff213" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: 3D glasses support -->
+	<software name="missil3dp" cloneof="missil3d">
+		<description>Missile Defense 3-D (prototype)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="ctrl1_default" value="lphaser" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<!-- 2 (eep)rom chips on pcb -->
+				<rom name="missile-3d (prototype).bin" size="131072" crc="43def05d" sha1="0275f34127af816779a332becd692b8a6dbeefb7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4651,6 +4745,17 @@ license:CC0
 			<feature name="ic1" value="MPR-12130" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-12130.ic1" size="262144" crc="d6f43dda" sha1="93c3fbe23848556fc6a737db1b5182537db5961d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outrun3dp" cloneof="outrun3d">
+		<description>Out Run 3-D (prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="out run 3d (prototype).bin" size="262144" crc="4e684ec0" sha1="9b52818e8c1bd31cfbe1d7107d572049207a705f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6002,6 +6107,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="solomonp" cloneof="solomon">
+		<description>Solomon no Kagi - Oujo Rihita no Namida (prototype)</description>
+		<year>1988</year>
+		<publisher>Salio</publisher>
+		<info name="alt_title" value="ソロモンの鍵 -王女リヒタの涙-" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<!-- cartridge contains 2 eproms, labels on the chips: 6301 CHR and 6302 P-->
+				<rom name="solomon no kagi - oujo rihita no namida (prototype).bin" size="131072" crc="92dc4cd6" sha1="4587743e156bddf59e268f89bc08a9450eabe5ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonic">
 		<description>Sonic The Hedgehog (Euro, USA, Bra)</description>
 		<year>1991</year>
@@ -6631,6 +6749,17 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super off road (europe).bin" size="131072" crc="54f68c2a" sha1="804cd74bbcf452613f6c3a722be1c94338499813" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superoffp" cloneof="superoff">
+		<description>Super Off Road (prototype)</description>
+		<year>1992</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super off road (prototype).bin" size="131072" crc="ce8d6846" sha1="f8267cc15123bc5cfec53298e403232da373822b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -121,12 +121,6 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* 256H */
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* Xybots uses a swapped version */
-// todo:
-//  PORT_MODIFY("jsa:JSAI")
-//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -214,6 +208,7 @@ void xybots_state::xybots(machine_config &config)
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
+	m_jsa->set_inverted_coins();
 	m_jsa->add_route(0, "rspeaker", 1.0);
 	m_jsa->add_route(1, "lspeaker", 1.0);
 	config.device_remove("jsa:pokey");

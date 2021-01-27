@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+The Bandai RX-78 Gundam has two slots where you can plug in a ROM cart or an additional device, like a
+printer interface. The system was capable of loading software from these ROM carts, or from a cassette
+tape through audio line-in ports to use with tape recorders; these ports were present in the BS Basic,
+Animation Graphics, Creative Graphics, Japanese Word Processor and Z80 Assembler carts. The system could
+use up to two carts or devices at the same time.
+
+There were a total of 20 games released for the system, plus educational and productivity software, and peripheral
+devices. One additional game and three expansion cards were announced but never released. The official translations
+printed in the game carts or tapes are used below where available. Names in brackets are unofficial translations.
+
++========+=========+=======+=========+==============================================================================+
+| Format | Serial  | Type  | Overlay | Title                                                                        |
+|========+=========+=======+========================================================================================+
+|  N/A   | 0201001 | Other | No      | RX-78 Base Unit
+|  N/A   | 0201003 | Other | No      | Joystick Controller
+|  Cart  | 0201004 | Game  | Yes     | Mobile Suit ガンダム ルナ・ツーの戦い  [Mobile Suit Gundam: Battle of Luna II] (says Mobil on the screen)
+|  Cart  | 0201005 | Game  | Yes     | チャンピオン レーサー / Champion Racer
+|  Cart  | 0201006 | Game  | Yes     | チャレンジ ゴルフ / Challenge Golf
+|  Cart  | 0201007 | Game  | No      | エキサイト ベースボール / Excite Baseball
+|  Cart  | 0201008 | Game  | Yes     | パーフェクト マージャン / Perfect Mah-Jongg
+|  Cart  | 0201010 | Tool  | Yes     | ミュージック マスター / Music Master
+|  Cart  | 0201011 | Game  | No      | ハンバーガー ショップ / Hamburger Shop
+|  Cart  | 0201012 | Game  | Yes     | 戦え！ウルトラマン / Tatakae! Ultraman
+|  Cart  | 0201013 | Game  | No      | ザ・プロレス / The Pro Wrestling
+|  Cart  | 0201016 | Tool  | No      | RX-78 P.I/F / Printer Interface
+|  Cart  | 0201018 | Game  | Yes     | 連合艦隊 / Rengo Kantai
+|  Cart  | 0201019 | Game  | Yes     | スペースエネミー / Space Enemy
+|  Cart  | 0201020 | Tool  | Unknown | アニメーション グラフィックス / Animation Graphics
+|  Cart  | 0201023 | Game  | Yes     | エキサイト テニス / Excite Tennis
+|  Cart  | 0201024 | Game  | No      | スーパー モトクロス / Super Motocross
+|  Cart  | 0201026 | Game  | Yes     | 零戦 (ぜろせん) / Reisen (Zerosen) [Zero Fighter]
+|  Cart  | 0201027 | Game  | No (*)  | 関ヶ原 / Sekigahara
+|  Cart  | 0201028 | Game  | Unknown | キャノンボール / Cannon Ball
+|  Tape  | 0201029 | Game  | Unknown | スペース カプセル / Space Capsule
+|  Tape  | 0201030 | Tool  | Yes     | ヘルシーライフ / Healthy Life Plan
+|  Tape  | 0201033 | Tool  | Yes     | 計算演習ドリル / Keisan Ensyu Drill
+|  Tape  | 0201035 | Learn | No      | グラフィック数学 / Graphics Mathematics
+|  Tape  | 0201038 | Game  | Unknown | イエローキャブ / Yellow Cab
+|  Tape  | 0201041 | Game  | Unknown | ドンジャラ [Donjara] (**)
+|  Cart  | 02010?? | Game  | Yes     | カード・ワールド / Card World
+|  Tape  | 02010?? | Game  | Unknown | ひつじや～い [Hitsujiya~i]
+|  Cart  | 02010?? | Learn | Yes     | ABC 単語ゲーム / ABC Word Game
+|  ?     | 02010?? | Learn | Unknown | 算数つまづき [Sansu Tsuma Zuki]
+|  Cart  | 02010?? | Tool  | Yes     | BS-BASIC Version 1.0
+|  Cart  | 02010?? | Tool  | Yes     | 漢字ワープロ / Japanese Word Processor
+|  ?     | 02010?? | Tool  | Unknown | Z-80 アセンブラー (RX-78 Z-80 用アセンブラー)
+|  Cart  | 02010?? | Tool  | Unknown | クリエイティブ グラフィックス / Creative Graphics
+|  ?     | 02010?? | Tool  | Unknown | ３Ｄグラフィックス [3D Graphics]
+|  Cart  | ??????? | Tool  | Unknown | バッテリーバックアップ RAM [Battery Backup RAM] (Announced)
+|  Cart  | ??????? | Tool  | Unknown | ミュージック・インターフェイス [Music Interface] (Announced)
+|  Cart  | ??????? | Tool  | Unknown | 専用フロッピイ・ヂイスクドライブ [Floppy Disk Drive] (Announced)
+|  ?     | ??????? | Game  | Unknown | キム・キム・ダン・ダン [Kim Kim Dan Dan] (Announced)
+|========+=========+=======+========================================================================================+
+
+*  Sekigahara did not include an overlay, instead it included a reference sheet with game information.
+** Donjara, a version of Mahjong for kids, found in an auction, is completely undocumented and is not mentioned in
+   any RX-78 game lists on the internet.
+
+The Battery Backup RAM, Music Interface and Floppy Disk Drive expansion were listed as being in development (企画中) in
+a product catalog, but were apparently never released.
+
+Photos of キム・キム・ダン・ダン (Kim Kim Dan Dan) are also shown in that same catalog, but the game was never released on the
+RX-78. A version of the game was released for the Mitsubishi Multi-8.
+
+Credits:
+    Dave "Foxhack" Silva - Game names, translations, format and serial information, additional research
+
+Information sourced from:
+https://beep-cs-player.hatenadiary.org/entry/20110813/1313217856
+https://web.archive.org/web/20120303141724/http://www.game-nostalgia.net/rx78/rx78.html
+https://www.youtube.com/watch?v=hE6buZfjJjE
+https://muuseo.com/fool_guru/collection_rooms/2
+https://muuseo.com/henly/items/137
+https://aucview.aucfan.com/yahoo/q374745986/
+https://twitter.com/hiropapa00/status/680566132659503104
+
+The RX-78 will look for 01 at address 2000. If found, a jump is made to that address.
+If not found, it will check address 6000 in the same way. If still not found, then the monitor program is entered.
+The monitor will expect you to load a program from cassette.
+
+-->
+<softwarelist name="rx78_cart" description="Gundam RX-78 cartridges">
+	<software name="basic">
+		<description>BS-BASIC 1.0</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bs-basic.bin" size="16384" crc="e52b383f" sha1="6ebbff7eb718822cad3c1216882df5d9f2d3a03f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burger">
+		<description>Burger Shop</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Z and X to start and move; Space to pick up and put down" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="burgershop.bin" size="16384" crc="b5a5ffc5" sha1="3b5fb0e670dce635d5220c0ffcae69da7c55049b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chlgolf">
+		<description>Challenge Golf</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to rotate view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ChallengeGolf.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracer" supported="partial"><!-- various bugs -->
+		<description>Champion Racer</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="PgUp = 1 or \ = 2. Space to start; Ctrl to accelerate; Left-Right to move" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="championracer.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gundam">
+		<description>Mobile Suit Gundam</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="gundam.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmahjongg">
+		<description>Perfect Mah-jongg</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Home = Yes; Backspace = No;Q4 = - or 9; Q5 = \ or pgDn or PgUp; Space to start" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="perfectmahjongg.bin" size="16384" crc="98335879" sha1="b696bb189e3b812fcbd7b2ab798f6e28c76c0fe0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seki">
+		<description>Sekigahara</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Wait for small beep. Press Space. Press G." />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sekigahara.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+				<rom size="0x2000" offset="0x2000" loadflag="continue" />
+				<rom size="0x2000" offset="0x4000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smc">
+		<description>Super Motocross</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Press Enter. Answer questions. Press Space to begin. Arrows to drive" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="smc1.bin" size="0x2000" crc="a5f1dff6" sha1="f58f1d266753cddddc44949bbab882870506a879" offset="0x4000" />
+				<rom name="smc2.bin" size="0x2000" crc="06febfde" sha1="18edde0e3af1f3b9b013348a701652d81bdddbc9" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theprowr">
+		<description>The Prowrestling</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Ctrl to attack; Arrows to move" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="prowrestling.bin" size="16384" crc="1f1b1b35" sha1="b1efe7cbfb70455d86ff0da1fb3f242593a40ffd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultraman">
+		<description>Ultraman</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ultraman.bin" size="16384" crc="0ba54dfb" sha1="5ba7eb4779d5c362e4751102b31d8e0083e06310" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

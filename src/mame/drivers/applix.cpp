@@ -917,7 +917,7 @@ void applix_state::applix(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border));
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
 
-	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	MOS6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync

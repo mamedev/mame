@@ -52,6 +52,8 @@ struct polyVert
 	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
 
 	float light[3];         // The intensity of the illumination at this point
+
+	uint16_t colorIndex;    // Flat shaded polygons, no texture, no lighting
 };
 
 struct polygon
@@ -60,7 +62,8 @@ struct polygon
 	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
-	int visible;                // Polygon visibility in scene
+	bool visible;                // Polygon visibility in scene
+	bool flatShade;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex;             // Which texture to draw from (0x00-0x0f)
 	uint8_t texType;              // How to index into the texture
@@ -116,7 +119,8 @@ public:
 	hng64_poly_renderer(hng64_state& state);
 
 	void drawShaded(polygon *p);
-	void render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }

@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
+#include <cstring>
 
 #include <arpa/inet.h>
 #include <netdb.h>

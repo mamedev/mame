@@ -40,7 +40,7 @@ Miss Bamby - Automatics Pasqual
 |__|   _______           ___________________  |D  | | 3.6V    | |
 |__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| LM311N      |
+|__|                                  8 dips->|S__| LM311N      |
    |____________________________________________________________|
 
 Golden Winner - Reben
@@ -67,7 +67,7 @@ Golden Winner - Reben
 |__|   _______           ___________________  |D  |             |
 |__|   |LM380N|          |    AY-3-8910     | |I  |             |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| CA311E      |
+|__|                                  8 dips->|S__| CA311E      |
    |____________________________________________________________|
 */
 
@@ -136,6 +136,18 @@ static INPUT_PORTS_START( missbamby )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+INPUT_PORTS_END
+
+// 4 dipswitches on Cirsa 810601 A PCB
+static INPUT_PORTS_START( c_810601a )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
 INPUT_PORTS_END
 
 
@@ -221,11 +233,21 @@ ROM_START( unkslot )
 	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
 ROM_END
 
+// PINBALL
+// CPU:   1 x I8085A
+// IO:    1 x I8155
+// Sound: 1 x AY8910
+ROM_START( trebol )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "m69.bin", 0x0000, 0x2000, CRC(8fb8cd39) SHA1(4ed505d06b489ce83316fdaa39f7ce128011fb4b) )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, minisupf, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, trebol,   0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",                                MACHINE_IS_SKELETON_MECHANICAL )

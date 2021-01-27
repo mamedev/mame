@@ -7,7 +7,10 @@
     Status:
     - Currently hard-coded for use with the Jornada 720 driver.
     - Register contents are correctly stored, logged and masked, but
-      register handling is otherwise non-present.
+      register handling is otherwise largely non-present.
+    - There is the potential for endian issues, and it will be
+      dealt with once the Jornada 720 driver makes heavier use of
+      BitBLT operations or other operations relevant to endianness.
 
 **********************************************************************/
 
@@ -23,13 +26,16 @@
 #define LOG_CRT_WR      (1 << 6)
 #define LOG_BITBLT_RD   (1 << 7)
 #define LOG_BITBLT_WR   (1 << 8)
-#define LOG_LUT_RD      (1 << 9)
-#define LOG_LUT_WR      (1 << 10)
-#define LOG_MPLUG_RD    (1 << 11)
-#define LOG_MPLUG_WR    (1 << 12)
-#define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_LUT_RD | LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
+#define LOG_BITBLT_OP   (1 << 9)
+#define LOG_LUT_RD      (1 << 10)
+#define LOG_LUT_WR      (1 << 11)
+#define LOG_MPLUG_RD    (1 << 12)
+#define LOG_MPLUG_WR    (1 << 13)
+#define LOG_LCD_RD_HF   (1 << 14)
+#define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_BITBLT_OP | LOG_LUT_RD \
+						| LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
 
-#define VERBOSE         (0) // (LOG_ALL)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SED1356, sed1356_device, "sed1356", "Epson SED1356")
@@ -398,8 +404,10 @@ uint8_t sed1356_device::lcd_display_height_r(offs_t offset)
 
 uint8_t sed1356_device::lcd_vblank_period_r(offs_t offset)
 {
-	LOGMASKED(LOG_LCD_RD, "%s: lcd_vblank_period_r: %02x\n", machine().describe_context(), m_lcd_vblank_period);
-	return m_lcd_vblank_period;
+	const uint8_t vblank = screen().vblank() ? (1 << LCDVBL_STATUS_BIT) : 0x00;
+	const uint8_t data = m_lcd_vblank_period | vblank;
+	LOGMASKED(LOG_LCD_RD, "%s: lcd_vblank_period_r: %02x\n", machine().describe_context(), data);
+	return data;
 }
 
 uint8_t sed1356_device::tft_fpframe_start_pos_r(offs_t offset)
@@ -1016,6 +1024,235 @@ void sed1356_device::crt_cursor_fifo_thresh_w(offs_t offset, uint8_t data)
 }
 
 
+template <bool Linear>
+void sed1356_device::bitblt_solid_fill()
+{
+	uint16_t *dst = (uint16_t*)&m_vram[m_bitblt_dst_addr >> 2];
+	if (m_bitblt_dst_addr & 2)
+		dst++;
+
+	for (uint32_t y = 0; y <= m_bitblt_height; y++)
+	{
+		for (uint32_t x = 0; x <= m_bitblt_width; x++)
+		{
+			if (Linear)
+				*dst++ = m_bitblt_fgcolor;
+			else
+				dst[x] = m_bitblt_fgcolor;
+		}
+
+		if (!Linear)
+			dst += m_bitblt_mem_offset;
+	}
+}
+
+uint16_t sed1356_device::bitblt_rop(const uint8_t rop, const uint16_t s, const uint16_t d)
+{
+	switch (rop & 0x0f)
+	{
+	case 0:
+		return 0;
+	case 1:
+		return ~(s | d);
+	case 2:
+		return ~s & d;
+	case 3:
+		return ~s;
+	case 4:
+		return s | ~d;
+	case 5:
+		return ~d;
+	case 6:
+		return s ^d;
+	case 7:
+		return ~s | ~d;
+	case 8:
+		return s & d;
+	case 9:
+		return ~(s ^ d);
+	case 10:
+		return d;
+	case 11:
+		return ~s | d;
+	case 12:
+		return s;
+	case 13:
+		return s | ~d;
+	case 14:
+		return s | d;
+	case 15:
+		return 0xffff;
+	}
+	return 0;
+}
+
+void sed1356_device::bitblt_async_advance(uint32_t &addr)
+{
+	m_bitblt_x++;
+	if (m_bitblt_x > m_bitblt_width)
+	{
+		m_bitblt_x = 0;
+		m_bitblt_y++;
+		if (!BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT))
+		{
+			addr -= (m_bitblt_width << 1);
+			addr += (m_bitblt_mem_offset << 1);
+		}
+		if (m_bitblt_y > m_bitblt_height)
+		{
+			m_bitblt_ctrl[0] &= ~(1 << BBCTRL0_ACTIVE_BIT);
+			m_bitblt_ctrl[0] &= ~(1 << BBCTRL0_ANY_BIT);
+		}
+	}
+	else
+	{
+		addr += 2;
+	}
+}
+
+void sed1356_device::bitblt_write_continue(const uint16_t s)
+{
+	uint16_t *dstp = (uint16_t*)&m_vram[m_bitblt_curr_dst_addr >> 2];
+	if (m_bitblt_curr_dst_addr & 2)
+		dstp++;
+
+	*dstp = bitblt_rop(m_bitblt_rop, s, *dstp);
+
+	bitblt_async_advance(m_bitblt_curr_dst_addr);
+}
+
+void sed1356_device::bitblt_write()
+{
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ACTIVE_BIT);
+	m_bitblt_x = 0;
+	m_bitblt_y = 0;
+	m_bitblt_curr_dst_addr = m_bitblt_dst_addr;
+}
+
+uint16_t sed1356_device::bitblt_read_continue()
+{
+	const uint16_t *srcp = (uint16_t*)&m_vram[m_bitblt_curr_src_addr >> 2];
+	if (m_bitblt_curr_src_addr & 2)
+		srcp++;
+
+	const uint16_t data = *srcp;
+
+	bitblt_async_advance(m_bitblt_curr_src_addr);
+
+	return data;
+}
+
+void sed1356_device::bitblt_read()
+{
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ACTIVE_BIT);
+	m_bitblt_ctrl[0] |= (1 << BBCTRL0_ANY_BIT);
+	m_bitblt_x = 0;
+	m_bitblt_y = 0;
+	m_bitblt_curr_src_addr = m_bitblt_src_addr;
+}
+
+template <bool SrcLinear, bool DstLinear>
+void sed1356_device::bitblt_move_negative()
+{
+	uint16_t *srcp = (uint16_t*)&m_vram[m_bitblt_src_addr >> 2];
+	if (m_bitblt_src_addr & 2)
+		srcp++;
+
+	uint16_t *dstp = (uint16_t*)&m_vram[m_bitblt_dst_addr >> 2];
+	if (m_bitblt_dst_addr & 2)
+		dstp++;
+
+	for (int32_t y = (int32_t)m_bitblt_height; y >= 0; y--)
+	{
+		for (int32_t x = (int32_t)m_bitblt_width; x >= 0; x--)
+		{
+			const uint16_t s = (SrcLinear ? *srcp : srcp[x]);
+			const uint16_t d = (DstLinear ? *dstp : dstp[x]);
+
+			*dstp = bitblt_rop(m_bitblt_rop, s, d);
+
+			if (SrcLinear)
+				srcp++;
+			if (DstLinear)
+				dstp++;
+		}
+
+		if (!SrcLinear)
+			srcp += m_bitblt_mem_offset;
+		if (!DstLinear)
+			dstp += m_bitblt_mem_offset;
+	}
+}
+
+void sed1356_device::bitblt_execute_command()
+{
+	switch (m_bitblt_op)
+	{
+	case 0:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Write BitBLT with ROP\n");
+		bitblt_write();
+		return;
+	case 1:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Read BitBLT\n");
+		bitblt_read();
+		return;
+	case 2:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT in + direction with ROP\n");
+		return;
+	case 3:
+	{
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Move BitBLT in - direction with ROP\n");
+		const bool srclin = BIT(m_bitblt_ctrl[0], BBCTRL0_SRCLIN_BIT);
+		const bool dstlin = BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT);
+		if (srclin && dstlin)
+			bitblt_move_negative<true, true>();
+		else if (srclin)
+			bitblt_move_negative<true, false>();
+		else if (dstlin)
+			bitblt_move_negative<false, true>();
+		else
+			bitblt_move_negative<false, false>();
+		return;
+	}
+	case 4:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Transparent Write BitBLT\n");
+		return;
+	case 5:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Transparent Move BitBLT in + direction\n");
+		return;
+	case 6:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Pattern Fill with ROP\n");
+		return;
+	case 7:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Pattern Fill with transparency\n");
+		return;
+	case 8:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Color Expansion\n");
+		return;
+	case 9:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Color Expansion with transparency\n");
+		return;
+	case 10:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT with Color Expansion\n");
+		return;
+	case 11:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Command not yet implemented: Move BitBLT with Color Expansion and transparency\n");
+		return;
+	case 12:
+	{
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Solid Fill\n");
+		if (BIT(m_bitblt_ctrl[0], BBCTRL0_DSTLIN_BIT))
+			bitblt_solid_fill<true>();
+		else
+			bitblt_solid_fill<false>();
+		return;
+	}
+	default:
+		LOGMASKED(LOG_BITBLT_OP, "bitblt: Unsupported command type: %02x\n", m_bitblt_op);
+		return;
+	}
+}
+
 uint8_t sed1356_device::bitblt_ctrl0_r(offs_t offset)
 {
 	LOGMASKED(LOG_BITBLT_RD, "%s: bitblt_ctrl0_r: %02x\n", machine().describe_context(), m_bitblt_ctrl[0]);
@@ -1098,6 +1335,10 @@ void sed1356_device::bitblt_ctrl0_w(offs_t offset, uint8_t data)
 	LOGMASKED(LOG_BITBLT_WR, "%s: bitblt_ctrl0_w = %02x\n", machine().describe_context(), data);
 	m_bitblt_ctrl[0] &= ~BBCTRL0_WR_MASK;
 	m_bitblt_ctrl[0] |= data & BBCTRL0_WR_MASK;
+	if (BIT(data, BBCTRL0_ACTIVE_BIT))
+	{
+		bitblt_execute_command();
+	}
 }
 
 void sed1356_device::bitblt_ctrl1_w(offs_t offset, uint8_t data)
@@ -1343,15 +1584,34 @@ void sed1356_device::mplug_data_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t sed1356_device::bitblt_data_r(offs_t offset)
+uint16_t sed1356_device::bitblt_data_r(offs_t offset)
 {
-	LOGMASKED(LOG_BITBLT_RD, "%s: (not implemented) bitblt_data_r[%06x]: %02x\n", machine().describe_context(), 0x100000 + offset, 0);
-	return 0;
+	uint16_t data = 0;
+	if (BIT(m_bitblt_ctrl[0], BBCTRL0_ACTIVE_BIT) && m_bitblt_op == 1)
+	{
+		data = bitblt_read_continue();
+	}
+
+	LOGMASKED(LOG_BITBLT_RD, "%s: bitblt_data_r[%06x]: %04x\n", machine().describe_context(), 0x100000 + (offset << 1), data);
+	return data;
 }
 
-void sed1356_device::bitblt_data_w(offs_t offset, uint8_t data)
+void sed1356_device::bitblt_data_w(offs_t offset, uint16_t data)
 {
-	LOGMASKED(LOG_BITBLT_WR, "%s: (not implemented) bitblt_data_w[%06x]: %02x\n", machine().describe_context(), 0x100000 + offset, data);
+	LOGMASKED(LOG_BITBLT_WR, "%s: bitblt_data_w[%06x]: %04x\n", machine().describe_context(), 0x100000 + (offset << 1), data);
+	if (BIT(m_bitblt_ctrl[0], BBCTRL0_ACTIVE_BIT))
+	{
+		switch (m_bitblt_op)
+		{
+		case 0: // Write BitBLT with ROP
+			bitblt_write_continue(data);
+			return;
+		case 4: // Transparent Write BitBLT
+			return;
+		default:
+			return;
+		}
+	}
 }
 
 void sed1356_device::device_start()

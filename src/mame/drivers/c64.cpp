@@ -423,7 +423,7 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c64_state::quickload_c64)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 

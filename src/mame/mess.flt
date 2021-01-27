@@ -43,6 +43,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphajuno.cpp
 alphasma.cpp
+alphasma3k.cpp
 alphatan.cpp
 alphatpc16.cpp
 alphatpx.cpp
@@ -99,6 +100,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+aviion88k.cpp
 avrmax.cpp
 ax20.cpp
 b16.cpp
@@ -286,6 +288,7 @@ eurocom2.cpp
 europc.cpp
 eva.cpp
 evmbug.cpp
+ews4800.cpp
 excali64.cpp
 exelv.cpp
 exorciser.cpp
@@ -850,6 +853,7 @@ roland_tr707.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
+rtpc.cpp
 rvoice.cpp
 rx78.cpp
 rz1.cpp
@@ -982,6 +986,7 @@ sys2900.cpp
 sys9002.cpp
 systec.cpp
 systel1.cpp
+tabe22.cpp
 talkingbb.cpp
 talkingfb.cpp
 tamag1.cpp

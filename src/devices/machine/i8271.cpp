@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "i8271.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -386,18 +389,16 @@ void i8271_device::live_run(attotime limit)
 		case SEARCH_ADDRESS_MARK_HEADER:
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
-					cur_live.bit_counter);
-#endif
+			LOG("%s: shift = %04x data=%02x c=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
+				(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+				(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+				(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+				(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+				(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+				(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+				(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+				(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+				cur_live.bit_counter);
 
 			if(cur_live.shift_reg == 0xf57e) {
 				cur_live.crc = 0xef21;
@@ -414,8 +415,7 @@ void i8271_device::live_run(attotime limit)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
 
-			if(0)
-				fprintf(stderr, "%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			LOG("%s: slot=%d data=%02x crc=%04x\n", cur_live.tm.to_string(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(cur_live.fi->main_state == READ_ID) {
 				if(!set_output(cur_live.data_reg)) {
@@ -433,18 +433,16 @@ void i8271_device::live_run(attotime limit)
 		case SEARCH_ADDRESS_MARK_DATA:
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
-					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
-#endif
+			LOG("%s: shift = %04x data=%02x c=%d.%x\n", cur_live.tm.to_string(), cur_live.shift_reg,
+				(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+				(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+				(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+				(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+				(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+				(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+				(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+				(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+				cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
 
 			if(cur_live.bit_counter > 23*16) {
 				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
@@ -686,7 +684,7 @@ void i8271_device::live_run(attotime limit)
 			break;
 
 		default:
-			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
+			logerror("%s: Unknown live state %d\n", cur_live.tm.to_string(), cur_live.state);
 			return;
 		}
 	}
@@ -914,8 +912,8 @@ void i8271_device::start_command(int cmd)
 		break;
 
 	default:
-		fprintf(stderr, "start command %d\n", cmd);
-		exit(1);
+		logerror("start command %d\n", cmd);
+		break;
 	}
 }
 
@@ -1209,7 +1207,7 @@ void i8271_device::read_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			logerror("%s: read sector unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -1336,7 +1334,7 @@ void i8271_device::write_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			logerror("%s: write sector unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -1433,7 +1431,7 @@ void i8271_device::format_track_continue(floppy_info &fi)
 			return;
 
 		default:
-			logerror("%s: format track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			logerror("%s: format track unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -1537,28 +1535,15 @@ void i8271_device::read_id_continue(floppy_info &fi)
 			return;
 
 		default:
-			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			logerror("%s: read id unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
 }
 
-std::string i8271_device::tts(attotime t)
+std::string i8271_device::ttsn() const
 {
-	char buf[256];
-	const char *sign = "";
-	if(t.seconds() < 0) {
-		t = attotime::zero-t;
-		sign = "-";
-	}
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
-	return buf;
-}
-
-std::string i8271_device::ttsn()
-{
-	return tts(machine().time());
+	return machine().time().to_string();
 }
 
 void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1629,7 +1614,7 @@ void i8271_device::index_callback(floppy_image_device *floppy, int state)
 			break;
 
 		default:
-			logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			logerror("%s: Index pulse on unknown sub-state %d\n", ttsn(), fi.sub_state);
 			break;
 		}
 
@@ -1674,7 +1659,7 @@ void i8271_device::general_continue(floppy_info &fi)
 		break;
 
 	default:
-		logerror("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), fi.main_state);
+		logerror("%s: general_continue on unknown main-state %d\n", ttsn(), fi.main_state);
 		break;
 	}
 }

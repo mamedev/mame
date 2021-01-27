@@ -6,7 +6,7 @@ Thomson EF9340 + EF9341 teletext graphics, this device is a combination of chips
 
 Minimal components:
 - Thomson EF9340 "VIN"
-- Thomson EF9341 "GEN"
+- Thomson EF9341 "GEN" (CPU connects to this one)
 - 2*1KB RAM, A for attributes, B for character codes
 
 There's also an optional extended character memory, it can be RAM or ROM.
@@ -18,6 +18,7 @@ TODO:
 - internal display timing (on g7400, most of it is done externally)
 - window boxing
 - Y zoom
+- RES(restart) pin
 
 ***************************************************************************/
 
@@ -61,7 +62,7 @@ void ef9340_1_device::device_start()
 	m_write_exram.resolve_safe();
 	m_read_exram.resolve_safe(0xff);
 
-	// Let the screen create our temporary bitmap with the screen's dimensions
+	// let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
@@ -169,30 +170,30 @@ void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 			m_ef9341.busy = true;
 			switch (m_ef9341.TB & 0xe0)
 			{
-			case 0x00:  /* Begin row */
-				m_ef9340.X = 0;
-				m_ef9340.Y = m_ef9341.TA & 0x1f;
-				break;
-			case 0x20:  /* Load Y */
-				m_ef9340.Y = m_ef9341.TA & 0x1f;
-				break;
-			case 0x40:  /* Load X */
-				m_ef9340.X = m_ef9341.TA & 0x3f;
-				break;
-			case 0x60:  /* INC C */
-				ef9340_inc_c();
-				break;
-			case 0x80:  /* Load M */
-				m_ef9340.M = m_ef9341.TA;
-				break;
-			case 0xa0:  /* Load R */
-				m_ef9340.R = m_ef9341.TA;
-				break;
-			case 0xc0:  /* Load Y0 */
-				m_ef9340.Y0 = m_ef9341.TA & 0x3f;
-				break;
-			case 0xe0:  /* Not interpreted */
-				break;
+				case 0x00: // begin row
+					m_ef9340.X = 0;
+					m_ef9340.Y = m_ef9341.TA & 0x1f;
+					break;
+				case 0x20: // load Y
+					m_ef9340.Y = m_ef9341.TA & 0x1f;
+					break;
+				case 0x40: // load X
+					m_ef9340.X = m_ef9341.TA & 0x3f;
+					break;
+				case 0x60: // increment C
+					ef9340_inc_c();
+					break;
+				case 0x80: // load M
+					m_ef9340.M = m_ef9341.TA;
+					break;
+				case 0xa0: // load R
+					m_ef9340.R = m_ef9341.TA;
+					break;
+				case 0xc0: // load Y0
+					m_ef9340.Y0 = m_ef9341.TA & 0x3f;
+					break;
+				case 0xe0: // not interpreted
+					break;
 			}
 			m_ef9341.busy = false;
 		}
@@ -211,32 +212,32 @@ void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 			m_ef9341.busy = true;
 			switch (m_ef9340.M & 0xe0)
 			{
-				case 0x00:  /* Write */
+				case 0x00: // write
 					m_ram_a[addr] = m_ef9341.TA;
 					m_ram_b[addr] = m_ef9341.TB;
 					ef9340_inc_c();
 					break;
 
-				case 0x40:  /* Write without increment */
+				case 0x40: // write without increment
 					m_ram_a[addr] = m_ef9341.TA;
 					m_ram_b[addr] = m_ef9341.TB;
 					break;
 
-				case 0x80:  /* Write slice */
-					{
-						u8 a = m_ram_a[addr];
-						u8 b = m_ram_b[addr];
-						u8 slice = m_ef9340.M & 0x0f;
+				case 0x80: // write slice
+				{
+					u8 a = m_ram_a[addr];
+					u8 b = m_ram_b[addr];
+					u8 slice = m_ef9340.M & 0x0f;
 
-						if (b >= 0xa0)
-							m_write_exram(a << 12 | b << 4 | slice, m_ef9341.TA);
+					if (b >= 0xa0)
+						m_write_exram(a << 12 | b << 4 | slice, m_ef9341.TA);
 
-						// Increment slice number
-						m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
-					}
+					// increment slice number
+					m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
 					break;
+				}
 
-				default:    /* Illegal or Read command */
+				default: // illegal or read command
 					break;
 			}
 			m_ef9341.busy = false;
@@ -276,37 +277,37 @@ u8 ef9340_1_device::ef9341_read(u8 command, u8 b)
 			m_ef9341.busy = true;
 			switch (m_ef9340.M & 0xe0)
 			{
-				case 0x20:  /* Read */
+				case 0x20: // read
 					m_ef9341.TA = m_ram_a[addr];
 					m_ef9341.TB = m_ram_b[addr];
 					ef9340_inc_c();
 					break;
 
-				case 0x60:  /* Read without increment */
+				case 0x60: // read without increment
 					m_ef9341.TA = m_ram_a[addr];
 					m_ef9341.TB = m_ram_b[addr];
 					break;
 
-				case 0xa0:  /* Read slice */
-					{
-						u8 a = m_ram_a[addr];
-						u8 b = m_ram_b[addr];
-						u8 slice = m_ef9340.M & 0x0f;
+				case 0xa0: // read slice
+				{
+					u8 a = m_ram_a[addr];
+					u8 b = m_ram_b[addr];
+					u8 slice = m_ef9340.M & 0x0f;
 
-						m_ef9341.TA = 0xff;
-						m_ef9341.TB = 0xff;
+					m_ef9341.TA = 0xff;
+					m_ef9341.TB = 0xff;
 
-						if (b >= 0xa0)
-							m_ef9341.TA = m_read_exram(a << 12 | b << 4 | slice);
-						else if (b < 0x80 && slice < 10)
-							m_ef9341.TA = m_charset[(((a & 0x80) | (b & 0x7f)) * 10) + slice];
+					if (b >= 0xa0)
+						m_ef9341.TA = m_read_exram(a << 12 | b << 4 | slice);
+					else if (b < 0x80 && slice < 10)
+						m_ef9341.TA = m_charset[(((a & 0x80) | (b & 0x7f)) * 10) + slice];
 
-						// Increment slice number
-						m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
-					}
+					// increment slice number
+					m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
 					break;
+				}
 
-				default:    /* Illegal or Write command */
+				default: // illegal or write command
 					break;
 			}
 			m_ef9341.busy = false;
@@ -346,15 +347,15 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 
 		if (vpos < 10)
 		{
-			// Service row
+			// service row
 			if (m_ef9340.R & 0x08)
 			{
-				// Service row is enabled
+				// service row is enabled
 				y_row = 31;
 			}
 			else
 			{
-				// Service row is disabled
+				// service row is disabled
 				for (int i = 0; i < 40 * 8; i++)
 					m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 8;
 				return;
@@ -362,7 +363,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		}
 		else
 		{
-			// Displaying regular row
+			// displaying regular row
 			y_row = ((m_ef9340.Y0 & 0x1f) + (vpos - 10) / 10) % 24;
 		}
 

@@ -37,7 +37,7 @@ const char *sdf_format::extensions() const
 }
 
 
-int sdf_format::identify(io_generic *io, uint32_t form_factor)
+int sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[HEADER_SIZE];
 
@@ -74,7 +74,7 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 }
 
 
-bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool sdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t header[HEADER_SIZE];
 	std::vector<uint8_t> track_data(TOTAL_TRACK_SIZE);
@@ -181,7 +181,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool sdf_format::save(io_generic *io, floppy_image *image)
+bool sdf_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

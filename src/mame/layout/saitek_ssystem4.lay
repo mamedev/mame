@@ -76,12 +76,12 @@ license:CC0
 	<element name="text_l16"><text string="CE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_l17"><text string="NEW GAME"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
-	<element name="text_pp"><image file="chess/wp.png"><color alpha="0.85" /></image></element>
-	<element name="text_pn"><image file="chess/wn.png"><color alpha="0.85" /></image></element>
-	<element name="text_pb"><image file="chess/wb.png"><color alpha="0.85" /></image></element>
-	<element name="text_pr"><image file="chess/wr.png"><color alpha="0.85" /></image></element>
-	<element name="text_pq"><image file="chess/wq.png"><color alpha="0.85" /></image></element>
-	<element name="text_pk"><image file="chess/wk.png"><color alpha="0.85" /></image></element>
+	<element name="text_pp"><image file="chess/wp.svg"><color alpha="0.85" /></image></element>
+	<element name="text_pn"><image file="chess/wn.svg"><color alpha="0.85" /></image></element>
+	<element name="text_pb"><image file="chess/wb.svg"><color alpha="0.85" /></image></element>
+	<element name="text_pr"><image file="chess/wr.svg"><color alpha="0.85" /></image></element>
+	<element name="text_pq"><image file="chess/wq.svg"><color alpha="0.85" /></image></element>
+	<element name="text_pk"><image file="chess/wk.svg"><color alpha="0.85" /></image></element>
 
 
 <!-- build screen -->

@@ -528,7 +528,7 @@ void macportable_state::macprtb(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macportable_state::set_scc_interrupt));
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macportable_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macportable_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macportable_state::mac_via_out_a));

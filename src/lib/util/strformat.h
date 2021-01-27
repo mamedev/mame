@@ -1775,8 +1775,6 @@ using detail::make_format_argument_pack;
 
 } // namespace util
 
-using util::string_format;
-
 
 //**************************************************************************
 //  EXTERNAL TEMPLATE INSTANTIATIONS

@@ -159,7 +159,7 @@ const char *pc_format::extensions() const
 	return "dsk,ima,img,ufi,360";
 }
 
-int pc_format::identify(io_generic *io, uint32_t form_factor)
+int pc_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -178,7 +178,7 @@ int pc_format::identify(io_generic *io, uint32_t form_factor)
 		file_footer_skip_bytes = 0x400;
 	}
 
-	return upd765_format::identify(io, form_factor);
+	return upd765_format::identify(io, form_factor, variants);
 }
 
 const pc_format::format pc_format::formats[] = {

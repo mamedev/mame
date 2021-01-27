@@ -1076,7 +1076,7 @@ void mdallas_state::write_l(u8 data)
 void mdallas_state::write_d(u8 data)
 {
 	// D: select digit, input mux high
-	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 3);
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
 	m_d = data & 0xf;
 	update_display();
 }

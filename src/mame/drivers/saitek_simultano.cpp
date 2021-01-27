@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Achim
+// thanks-to:Achim, bataais
 /***************************************************************************
 
 Saitek Simultano, it is related to Saitek Stratos, see saitek_stratos.cpp
 But it's not similar enough to be a subdriver of it.
 
-Two versions are known: "B" from 1988, and "C" from 1989.
+Two versions are known: "B" from 1988/1989, and "C" from 1989.
 
 Hardware notes:
 - WDC W65C02P @ 5MHz
@@ -347,6 +347,15 @@ void simultano_state::simultano(machine_config &config)
 
 ROM_START( simultano )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("y01h_c12_u3.u3",  0x0000, 0x8000, CRC(e7f8bae4) SHA1(82d8c6879e031b9909dd63bff692055f32236f9c) )
+	ROM_LOAD("by01h_c13_u4.u4", 0x8000, 0x8000, CRC(4f5557bc) SHA1(2fd4b1791cec4e6e33b1da644edb603ed8c9cd2e) )
+
+	ROM_REGION( 795951, "screen", 0 )
+	ROM_LOAD("simultano.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
+ROM_END
+
+ROM_START( simultanoa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("y01h_c12e_u3.u3",  0x0000, 0x8000, CRC(d583fdb4) SHA1(4be242691215ab1635a5d672441d339596f719c6) ) // AMI 27256
 	ROM_LOAD("by01h_c13b_u4.u4", 0x8000, 0x8000, CRC(c607b421) SHA1(b0c784b570dfd1fcbe3da68bcfbae2dae2957a74) ) // "
 
@@ -362,5 +371,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, simultano, 0,       0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1989, simultano,  0,         0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, simultanoa, simultano, 0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

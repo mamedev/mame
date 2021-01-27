@@ -233,9 +233,10 @@ public:
 	  @param io buffer containing the image data.
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
+	  @param variants the variants from floppy_image the drive can handle
 	  @return 1 if image valid, 0 otherwise.
 	*/
-	virtual int identify(io_generic *io, uint32_t form_factor) = 0;
+	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) = 0;
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
@@ -243,19 +244,21 @@ public:
 	  @param io source buffer containing the image data.
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
+	  @param variants the variants from floppy_image the drive can handle
 	  @param image output buffer for data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) = 0;
+	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
 	  The save function writes back an image from the MESS internal
 	  floppy representation to the appropriate format on disk.
 	  @param io output buffer for the data in the on-disk format.
+	  @param variants the variants from floppy_image the drive can handle
 	  @param image source buffer containing data in MESS internal format.
 	  @return true on success, false otherwise.
 	*/
-	virtual bool save(io_generic *io, floppy_image *image);
+	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image);
 
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;
@@ -365,6 +368,14 @@ protected:
 		SECTOR_LOOP_END,        //!< End of the per-sector loop
 		SECTOR_INTERLEAVE_SKEW  //!< Defines interleave and skew for sector counting
 	};
+
+
+	/*! @brief Test if a variant is present in the variant vector
+	    @param variants the variant vector
+	    @param variant the variant to test
+	    @result true if variant is in variants
+	*/
+	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 
 	//! Sector data description
 	struct desc_s
@@ -493,16 +504,8 @@ protected:
 	 @endverbatim
 	 */
 
-	void generate_bitstream_from_track(int track, int head, int cell_size, uint8_t *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
-
-	//! Defines a standard sector for extracting.
-	struct desc_xs
-	{
-		int track,  //!< Track for this sector
-			head,   //!< Head for this sector
-			size;   //!< Size of this sector
-		const uint8_t *data; //!< Data within this sector
-	};
+	std::vector<bool> generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack = 0);
+	std::vector<uint8_t> generate_nibbles_from_bitstream(const std::vector<bool> &bitstream);
 
 	struct desc_pc_sector
 	{
@@ -513,30 +516,37 @@ protected:
 		bool bad_crc;
 	};
 
+	struct desc_gcr_sector
+	{
+		uint8_t track, head, sector, info;
+		uint8_t *tag;
+		uint8_t *data;
+	};
+
 	int calc_default_pc_gap3_size(uint32_t form_factor, int sector_size);
 	void build_wd_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2);
 	void build_wd_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
 	void build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
 	void build_pc_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
-
+	void build_mac_track_gcr(int track, int head, floppy_image *image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
-	//! Sectors must point to an array of 256 desc_xs.
-
-	//! An existing sector is recognizable by having ->data non-null.
-	//! Sector data is written in sectdata up to sectdata_size bytes.
-
-	//! The ones implemented here are the ones used by multiple
-	//! systems.
+	//! Returns a vector of the vector contents, indexed by the sector id.  Missing sectors have size zero.
 
 	//! PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K.
-	void extract_sectors_from_bitstream_mfm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
+	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_mfm_pc(const std::vector<bool> &bitstream);
+
 	//! PC-type sectors with FM encoding
-	void extract_sectors_from_bitstream_fm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
+	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream);
+
 	//! Commodore type sectors with GCR5 encoding
-	void extract_sectors_from_bitstream_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size, int head, int tracks);
+	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_gcr5(const std::vector<bool> &bitstream, int head, int tracks);
+
 	//! Victor 9000 type sectors with GCR5 encoding
-	void extract_sectors_from_bitstream_victor_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size);
+	std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
+
+	//! Mac type sectors with GCR6 encoding
+	std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, floppy_image *image);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
@@ -589,8 +599,8 @@ protected:
 	//! GCR6 decode
 	void gcr6_decode(uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3, uint8_t &va, uint8_t &vb, uint8_t &vc);
 
-	uint8_t sbyte_mfm_r(const uint8_t *bitstream, int &pos, int track_size);
-	uint8_t sbyte_gcr5_r(const uint8_t *bitstream, int &pos, int track_size);
+	uint8_t sbyte_mfm_r(const std::vector<bool> &bitstream, uint32_t &pos);
+	uint8_t sbyte_gcr5_r(const std::vector<bool> &bitstream, uint32_t &pos);
 
 	//! Max number of excess tracks to be discarded from disk image to fit floppy drive
 	enum { DUMP_THRESHOLD = 2 };
@@ -624,8 +634,7 @@ private:
 	void fixup_crcs(std::vector<uint32_t> &buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs) const;
 
-	int sbit_r(const uint8_t *bitstream, int pos);
-	int sbit_rp(const uint8_t *bitstream, int &pos, int track_size);
+	int sbit_rp(const std::vector<bool> &bitstream, uint32_t &pos);
 
 	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };

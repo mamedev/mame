@@ -25,6 +25,7 @@
 #include "mame.h"
 
 #include "audit.h"
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendutil.h"
@@ -1320,8 +1321,7 @@ bool menu_select_game::load_available_machines()
 	std::unordered_set<std::string> available;
 	while (file.gets(rbuf, MAX_CHAR_INFO))
 	{
-		readbuf = rbuf;
-		strtrimspace(readbuf);
+		readbuf = strtrimspace(rbuf);
 
 		if (readbuf.empty() || ('#' == readbuf[0])) // ignore empty lines and line comments
 			;

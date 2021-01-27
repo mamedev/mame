@@ -471,7 +471,7 @@ void c2040_device::add_common_devices(machine_config &config)
 	M6504(config, m_fdccpu, XTAL(16'000'000)/16);
 	m_fdccpu->set_addrmap(AS_PROGRAM, &c2040_device::c2040_fdc_mem);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpa_handler().set(m_fdc, FUNC(c2040_fdc_device::read));
 	m_via->writepb_handler().set(FUNC(c2040_device::via_pb_w));
 	m_via->ca2_handler().set(m_fdc, FUNC(c2040_fdc_device::mode_sel_w));

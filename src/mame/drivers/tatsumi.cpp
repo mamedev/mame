@@ -1467,7 +1467,7 @@ ROM_START( bigfight )
 	ROM_COPY("slave_rom",       0x000000, 0x080000, 0x080000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
+	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // == bf36b.ic91
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
 	/* Filled in by both regions below */
@@ -1485,15 +1485,77 @@ ROM_START( bigfight )
 	ROM_LOAD32_BYTE( "rom14.ic51",  0x000003, 0x80000, CRC(77430bc9) SHA1(0b1fd54ace84a9fb5b44d5600de8089a20bcbd47) )
 
 	ROM_REGION( 0x20000, "cw_tileclut", 0 )
-	ROM_LOAD( "rom21.ic128",   0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
+	ROM_LOAD( "rom21.ic128",   0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) ) // == bf27.ic128
 
 	ROM_REGION( 0x60000, "tilerom", 0 )
-	ROM_LOAD( "rom24.ic73",   0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) )
-	ROM_LOAD( "rom23.ic72",   0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) )
-	ROM_LOAD( "rom22.ic71",   0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) )
+	ROM_LOAD( "rom24.ic73",   0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) ) // == bf30.ic73
+	ROM_LOAD( "rom23.ic72",   0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) ) // == bf29.ic72
+	ROM_LOAD( "rom22.ic71",   0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) ) // == bf28.ic71
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
-	ROM_LOAD( "rom15.ic39",   0x000000, 0x40000, CRC(58d136e8) SHA1(4aa063c4b9b057cba4655ecbe44a87c8c411e3aa) )
+	ROM_LOAD( "rom15.ic39",   0x000000, 0x40000, CRC(58d136e8) SHA1(4aa063c4b9b057cba4655ecbe44a87c8c411e3aa) ) // == bf24.ic39 + bf25.ic40
+ROM_END
+
+ROM_START( bigfightj ) // ABA-011 main board + ABA-012 daughter board
+	ROM_REGION16_BE( 0x200000, "master_rom", 0 ) /* 68000 main cpu */
+	ROM_LOAD16_BYTE( "bfj16f.ic77", 0x000000, 0x20000, CRC(9141a488) SHA1(f8b64d2ef6fcea7922f88ed75977f764e98e679b) ) // rev F
+	ROM_LOAD16_BYTE( "bf18f.ic98",  0x000001, 0x20000, CRC(f23a4935) SHA1(513f2b3a83a0a7c183b2ff20b652279a5bee8863) ) // rev F
+	ROM_COPY("master_rom",          0x000000, 0x040000, 0x040000 )
+	ROM_COPY("master_rom",          0x000000, 0x080000, 0x040000 )
+	ROM_COPY("master_rom",          0x000000, 0x0c0000, 0x040000 )
+	ROM_LOAD16_BYTE( "bf17e.ic78",  0x100000, 0x20000, CRC(5e5d023d) SHA1(04f59458f15c95ad152b1b99f885f31ccb26ac40) ) // rev E
+	ROM_LOAD16_BYTE( "bf19e.ic99",  0x100001, 0x20000, CRC(5329e151) SHA1(a7ce98d80379f56808291c42852b1f7173966ed7) ) // rev E
+	ROM_COPY("master_rom",          0x100000, 0x140000, 0x040000 )
+	ROM_COPY("master_rom",          0x100000, 0x180000, 0x040000 )
+	ROM_COPY("master_rom",          0x100000, 0x1c0000, 0x040000 )
+
+	ROM_REGION16_BE( 0x100000, "slave_rom", 0 ) /* 68000 sub cpu */
+	ROM_LOAD16_BYTE( "bf20.ic100",  0x000000, 0x20000, CRC(5bd44e11) SHA1(a7acb6d9f40c4b6d54bf131a2e192c16ec22b1af) )
+	ROM_LOAD16_BYTE( "bf22.ic102",  0x000001, 0x20000, CRC(e52c29ab) SHA1(2b3aa55a2eeec5cf73666e1d85f65679961472e0) )
+	ROM_COPY("slave_rom",           0x000000, 0x040000, 0x040000 )
+	ROM_LOAD16_BYTE( "bf21d.ic101", 0x080000, 0x20000, CRC(c4c2f969) SHA1(69f453d51951c02f12f3a40ac925b48430e3f314) ) // rev D
+	ROM_LOAD16_BYTE( "bf23d.ic103", 0x080001, 0x20000, CRC(c05ae1fe) SHA1(219ddc08d4b8416fb2a9f2cb14ac9c4b4421dadd) ) // rev D
+	ROM_COPY("slave_rom",           0x080000, 0x0c0000, 0x040000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "bf36b.ic91", 0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) ) // rev B
+
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
+	/* Filled in by both regions below */
+
+	ROM_REGION( 0x200000, "sprites_l", 0 )
+	ROM_LOAD32_BYTE( "bf00d.ic26", 0x000000, 0x40000, CRC(f506d508) SHA1(86255631ac139f1b5c0f5d6e54a0858625497a1e) ) // all rev D
+	ROM_LOAD32_BYTE( "bf08d.ic45", 0x000001, 0x40000, CRC(4bf948b9) SHA1(c65b95c454d04c7e4a0cf426ac2d45ddc5e8885e) )
+	ROM_LOAD32_BYTE( "bf02d.ic28", 0x000002, 0x40000, CRC(af30acf7) SHA1(8f4778b33abb18b113d5d27c0e957d633557c988) )
+	ROM_LOAD32_BYTE( "bf10d.ic47", 0x000003, 0x40000, CRC(ffddb7f8) SHA1(505c082adaf71bd2aa15d78d3e8968cbd1f2cc0c) )
+	ROM_LOAD32_BYTE( "bf01d.ic27", 0x100000, 0x20000, CRC(ec3f5f17) SHA1(436f176155af8fc3212507448df6852a76289bef) )
+	ROM_LOAD32_BYTE( "bf09d.ic46", 0x100001, 0x20000, CRC(284837ed) SHA1(b1c130b45ff0f22985962240c47b7b01df6ac636) )
+	ROM_LOAD32_BYTE( "bf03d.ic29", 0x100002, 0x20000, CRC(2ba0398e) SHA1(ec9a29b661b18980c07a446afc89becb1ebddd57) )
+	ROM_LOAD32_BYTE( "bf11d.ic48", 0x100003, 0x20000, CRC(3f2fa72f) SHA1(4b4821b6933ea753e092f11d80bcc7698f85ccf2) )
+	ROM_COPY("sprites_l",          0x100000, 0x180000, 0x080000 )
+
+	ROM_REGION( 0x200000, "sprites_h", 0)
+	ROM_LOAD32_BYTE( "bf04d.ic30", 0x000000, 0x40000, CRC(6203d320) SHA1(d58225d8a362971a0eb63c94abc1e8c76198fd2a) ) // all rev D
+	ROM_LOAD32_BYTE( "bf12d.ic49", 0x000001, 0x40000, CRC(d261dfa7) SHA1(e787901112780e9770300999722fc80aa1d7ab18) )
+	ROM_LOAD32_BYTE( "bf06d.ic32", 0x000002, 0x40000, CRC(be187c3c) SHA1(46383eb40c0caeb1bc636630a4d849aa2d1a12d2) )
+	ROM_LOAD32_BYTE( "bf14d.ic51", 0x000003, 0x40000, CRC(60f2ab3d) SHA1(babaef6348133b5fe34f9e044732467d8775cc3d) )
+	ROM_LOAD32_BYTE( "bf05d.ic31", 0x100000, 0x20000, CRC(2229acbc) SHA1(3031fbb7b730a6d51f08d0021c5d6e91cdbdd56d) )
+	ROM_LOAD32_BYTE( "bf13d.ic50", 0x100001, 0x20000, CRC(1e46cd79) SHA1(c81c96b287a6cc91d3ab4dd8043153814560be3d) )
+	ROM_LOAD32_BYTE( "bf07d.ic33", 0x100002, 0x20000, CRC(4940b0bb) SHA1(762f21055921093349ca09c35ef516bde6330aa8) )
+	ROM_LOAD32_BYTE( "bf15d.ic52", 0x100003, 0x20000, CRC(dab0c80a) SHA1(a172937c9599acbd77dcac02ea7e43f576d66d8c) )
+	ROM_COPY("sprites_h",          0x100000, 0x180000, 0x080000 )
+
+	ROM_REGION( 0x20000, "cw_tileclut", 0 )
+	ROM_LOAD( "bf27.ic128", 0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
+
+	ROM_REGION( 0x60000, "tilerom", 0 )
+	ROM_LOAD( "bf30.ic73", 0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) )
+	ROM_LOAD( "bf29.ic72", 0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) )
+	ROM_LOAD( "bf28.ic71", 0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "bf24.ic39", 0x000000, 0x20000, CRC(9db80c8a) SHA1(9ce64713758ebab559a0cacc7f7501e5a1a0133a) )
+	ROM_LOAD( "bf25.ic40", 0x020000, 0x20000, CRC(630154c4) SHA1(05902371b62a11c13f2582faa591945c037c6311) )
 ROM_END
 
 /***************************************************************************/
@@ -1595,3 +1657,4 @@ GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, cyclwarr_state, init_cyclw
 GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev B & A CPU code
 GAME( 1991, cyclwarrb, cyclwarr, cyclwarr,  cyclwarb, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Original version with no Rev roms
 GAME( 1992, bigfight,  0,        bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, bigfightj, bigfight, bigfight,  bigfight, cyclwarr_state, init_cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean (Japan, rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev D through F CPU codes

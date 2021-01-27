@@ -23,10 +23,10 @@
 // was used with APL\3000 on the HP 3000 Series II/III computers from 1976
 // into the 1980s. I recently got APL\3000 running under simulation so this
 // is an attempt to recreate the whole experience with the APL characters
-// on the terminal device designed for it. The HP2641A is basically a 2641
-// with a few altered ROMs (many are identical to the 2641) and one
+// on the terminal device designed for it. The HP2641A is basically a 2645
+// with a few altered ROMs (many are identical to the 2645) and one
 // additional 2K ROM for which a second CTL PCA was required that was not
-// needed in the 2641.
+// needed in the 2645.
 //
 // This driver emulates the HP2641A model, as composed of the following cards:
 // - 02640-60123    Keyboard interface
@@ -39,6 +39,8 @@
 // - 02640-60192    Second CTL PCA with one additional 2K ROM and 256b SRAM.
 // - 02640-60065    4k DRAM (4 of these for a 16k total)
 // - 02640-60086    Asynchronous data comm
+// - 02640-60137    CTU interface
+// - 02640-60032    Read/write PCA
 //
 // The following table summarizes the emulated character sets. The 2641A only
 // had room for a single optional character set (line drawing here) after the
@@ -67,6 +69,8 @@
 // - 02640-60192    Control storage (firmware ROMs & 256-byte SRAM)
 // - 02640-60065    4k DRAM (4 of these for a 16k total)
 // - 02640-60086    Asynchronous data comm
+// - 02640-60137    CTU interface
+// - 02640-60032    Read/write PCA
 //
 // The following table summarizes the emulated character sets.
 //
@@ -97,7 +101,6 @@
 // - LEDs are not output.
 // - RESET key is not implemented.
 // - A few TODOs here & there.
-// - DC100 data cassettes are not emulated.
 
 #include "emu.h"
 #include "screen.h"
@@ -106,6 +109,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
+#include "machine/hp2640_tape.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -215,6 +219,10 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
+	DECLARE_WRITE_LINE_MEMBER(tape_irq_w);
+
+	uint8_t poll_r();
+
 	void cpu_mem_map(address_map &map);
 	void cpu_io_map(address_map &map);
 
@@ -233,10 +241,13 @@ protected:
 	required_device<clock_device> m_uart_clock;
 	required_device<beep_device> m_beep;
 	required_device<timer_device> m_timer_beep;
+	required_device<hp2640_tape_device> m_tapes;
+	memory_view m_io_view;
 
 	uint8_t m_mode_byte;
 	bool m_timer_irq;
 	bool m_datacom_irq;
+	bool m_tape_irq;
 
 	// Character generators
 	required_region_ptr_array<uint8_t , 4> m_chargen;
@@ -297,6 +308,8 @@ hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type 
 	  m_uart_clock(*this , "uart_clock"),
 	  m_beep(*this , "beep"),
 	  m_timer_beep(*this , "timer_beep"),
+	  m_tapes(*this , "tapes"),
+	  m_io_view(*this , "io_view"),
 	  m_chargen(*this , "chargen%u" , 0),
 	  m_chargen_set{ m_cg_0 , m_cg_1 , m_cg_2 , m_cg_3}
 {
@@ -310,6 +323,7 @@ void hp2640_base_state::machine_start()
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_timer_irq));
 	save_item(NAME(m_datacom_irq));
+	save_item(NAME(m_tape_irq));
 }
 
 void hp2640_base_state::machine_reset()
@@ -317,6 +331,7 @@ void hp2640_base_state::machine_reset()
 	m_mode_byte = 0;
 	m_timer_irq = false;
 	m_datacom_irq = false;
+	m_tape_irq = false;
 	m_timer_10ms->reset();
 	update_irq();
 	m_blanking = true;
@@ -339,7 +354,10 @@ IRQ_CALLBACK_MEMBER(hp2640_base_state::irq_callback)
 	uint8_t res;
 
 	// Encode interrupts in restart instruction (in order of decreasing priority)
-	if (m_datacom_irq && !BIT(m_mode_byte , 4)) {
+	if (m_tape_irq) {
+		// RST 5
+		res = 0xef;
+	} else if (m_datacom_irq && !BIT(m_mode_byte , 4)) {
 		// RST 4
 		res = 0xe7;
 	} else if (m_timer_irq && !BIT(m_mode_byte , 5)) {
@@ -366,6 +384,8 @@ void hp2640_base_state::mode_byte_w(uint8_t data)
 		m_timer_irq = false;
 	}
 	update_irq();
+
+	m_io_view.select(BIT(m_mode_byte , 6));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_10ms_exp)
@@ -549,9 +569,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2640_base_state::timer_beep_exp)
 	m_beep->set_state(0);
 }
 
+WRITE_LINE_MEMBER(hp2640_base_state::tape_irq_w)
+{
+	m_tape_irq = state;
+	update_irq();
+}
+
+uint8_t hp2640_base_state::poll_r()
+{
+	uint8_t res = m_tapes->poll_r();
+	LOG("POLL %02x\n" , res);
+	return res;
+}
+
 void hp2640_base_state::update_irq()
 {
-	bool state = (m_datacom_irq && !BIT(m_mode_byte , 4)) ||
+	bool state = m_tape_irq ||
+		(m_datacom_irq && !BIT(m_mode_byte , 4)) ||
 		(m_timer_irq && !BIT(m_mode_byte , 5));
 	m_cpu->set_input_line(I8085_INTR_LINE , state);
 }
@@ -1012,19 +1046,40 @@ void hp2640_base_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x57ff).rom();
-	map(0x8100, 0x8100).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x8120, 0x8120).r(FUNC(hp2640_base_state::async_status_r));
+	map(0x8000, 0x8fff).view(m_io_view);
+
+	// View 0 is for normal I/O
+	// View 1 is for poll read
+	// Writing is independent of poll state
+	m_io_view[ 0 ](0x0100, 0x0100).r(m_uart, FUNC(ay51013_device::receive));
+	m_io_view[ 0 ](0x0120, 0x0120).r(FUNC(hp2640_base_state::async_status_r));
+
 	map(0x8140, 0x8140).w(FUNC(hp2640_base_state::async_control_w));
 	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
 	map(0x8300, 0x8300).w(FUNC(hp2640_base_state::kb_led_w));
-	map(0x8300, 0x830d).r(FUNC(hp2640_base_state::kb_r));
-	map(0x830e, 0x830e).r(FUNC(hp2640_base_state::switches_ah_r));
-	map(0x830f, 0x830f).r(FUNC(hp2640_base_state::datacomm_sw_r));
+
+	m_io_view[ 0 ](0x0300, 0x030d).r(FUNC(hp2640_base_state::kb_r));
+	m_io_view[ 0 ](0x030e, 0x030e).r(FUNC(hp2640_base_state::switches_ah_r));
+	m_io_view[ 0 ](0x030f, 0x030f).r(FUNC(hp2640_base_state::datacomm_sw_r));
+
 	map(0x8320, 0x8320).w(FUNC(hp2640_base_state::kb_prev_w));
-	map(0x8380, 0x8380).rw(FUNC(hp2640_base_state::switches_jr_r), FUNC(hp2640_base_state::kb_reset_w));
-	map(0x83a0, 0x83a0).r(FUNC(hp2640_base_state::switches_sz_r));
+	map(0x8380, 0x8380).w(FUNC(hp2640_base_state::kb_reset_w));
+
+	m_io_view[ 0 ](0x0380, 0x0380).r(FUNC(hp2640_base_state::switches_jr_r));
+	m_io_view[ 0 ](0x03a0, 0x03a0).r(FUNC(hp2640_base_state::switches_sz_r));
+
 	map(0x8700, 0x8700).w(FUNC(hp2640_base_state::cx_w));
 	map(0x8720, 0x8720).w(FUNC(hp2640_base_state::cy_w));
+	map(0x8b00, 0x8b00).w(m_tapes, FUNC(hp2640_tape_device::command_w));
+
+	m_io_view[ 0 ](0x0b00, 0x0b00).r(m_tapes, FUNC(hp2640_tape_device::status_r));
+
+	map(0x8b20, 0x8b20).w(m_tapes, FUNC(hp2640_tape_device::data_w));
+
+	m_io_view[ 0 ](0x0b20, 0x0b20).r(m_tapes, FUNC(hp2640_tape_device::data_r));
+
+	m_io_view[ 1 ](0x0000, 0x0fff).r(FUNC(hp2640_base_state::poll_r));
+
 	map(0x9100, 0x91ff).ram();
 	map(0xc000, 0xffff).ram();
 }
@@ -1075,6 +1130,10 @@ void hp2640_base_state::hp2640_base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
 	TIMER(config, m_timer_beep).configure_generic(FUNC(hp2640_base_state::timer_beep_exp));
+
+	// Tape drives
+	HP2640_TAPE(config , m_tapes , SYS_CLOCK);
+	m_tapes->irq().set(FUNC(hp2640_base_state::tape_irq_w));
 }
 
 // ************

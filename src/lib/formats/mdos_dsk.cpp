@@ -72,7 +72,7 @@ const char *mdos_format::extensions() const
 	return "dsk";
 }
 
-int mdos_format::identify(io_generic *io, uint32_t form_factor)
+int mdos_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 

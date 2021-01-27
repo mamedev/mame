@@ -22,15 +22,18 @@ class iwm_device: public applefdintf_device
 {
 public:
 	// construction/destruction
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock = 0);
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock) :
-		iwm_device(mconfig, tag, owner, clock, q3_clock.value()) {}
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock, bool disable_mon = false);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock, bool disable_mon = false) :
+		iwm_device(mconfig, tag, owner, clock, q3_clock.value(), disable_mon) {}
 
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
 
 	virtual void set_floppy(floppy_image_device *floppy) override;
 	virtual floppy_image_device *get_floppy() const override;
+
+	virtual void sync() override;
 
 protected:
 	virtual void device_start() override;
@@ -64,8 +67,8 @@ private:
 	int m_active, m_rw, m_rw_state;
 	u8 m_data, m_whd, m_mode, m_status, m_control;
 	u8 m_rsh, m_wsh;
+	bool m_disable_mon;
 
-	void sync();
 	u8 control(int offset, u8 data);
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;

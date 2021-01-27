@@ -794,7 +794,7 @@ void screen_device::device_start()
 		if (!m_svg_region)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
 		m_svg = std::make_unique<svg_renderer>(m_svg_region);
-		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
+		machine().output().set_global_notifier(svg_renderer::output_notifier, m_svg.get());
 
 		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
 		// just render at the size/aspect ratio supplied by the driver

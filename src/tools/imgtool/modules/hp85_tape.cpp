@@ -145,7 +145,7 @@ typedef struct {
 tape_image_85::tape_image_85(void)
 	: dirty(false)
 {
-	image.set_bits_per_word(16);
+	image.set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 }
 
 void tape_image_85::format_img(void)

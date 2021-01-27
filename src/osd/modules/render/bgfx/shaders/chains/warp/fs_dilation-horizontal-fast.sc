@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_color0
 
 /*
    Hyllian's dilation-horizontal-fast Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

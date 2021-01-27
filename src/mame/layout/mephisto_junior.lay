@@ -110,12 +110,12 @@ license:CC0
 	<element name="text_b8"><text string="8" align="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_b9"><text string="9" align="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 
-	<element name="text_p1"><image file="chess/wk.png"><color alpha="0.9" /></image></element>
-	<element name="text_p2"><image file="chess/wq.png"><color alpha="0.9" /></image></element>
-	<element name="text_p3"><image file="chess/wr.png"><color alpha="0.9" /></image></element>
-	<element name="text_p4"><image file="chess/wb.png"><color alpha="0.9" /></image></element>
-	<element name="text_p5"><image file="chess/wn.png"><color alpha="0.9" /></image></element>
-	<element name="text_p6"><image file="chess/wp.png"><color alpha="0.9" /></image></element>
+	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.9" /></image></element>
 
 	<group name="buttons">
 		<bounds x="0" y="5" width="18.7" height="18.7" />

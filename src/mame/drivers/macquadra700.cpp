@@ -944,7 +944,7 @@ void macquadra_state::macqd700(machine_config &config)
 	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macquadra_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macquadra_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macquadra_state::mac_via_out_a));
@@ -952,7 +952,7 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macquadra_state::mac_via_irq));
 	m_via1->cb2_handler().set(FUNC(macquadra_state::via_cb2_w));
 
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macquadra_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(macquadra_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(macquadra_state::mac_via2_out_a));

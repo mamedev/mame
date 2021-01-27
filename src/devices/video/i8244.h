@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:Peter Trauner, Wilbert Pol, hap
 /***************************************************************************
 
     Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
@@ -14,12 +14,27 @@
 #include "emupal.h"
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+// pinout reference
 
+/*
+            ___   ___
+    CLK  1 |*  \_/   | 28 Vcc
+  _INTR  2 |         | 27 SND
+    STB  3 |         | 26 ALE
+     BG  4 |         | 25 D0
+    CSY  5 |         | 24 D1
+    M/S  6 |         | 23 D2
+    HBL  7 |  P8244  | 22 D3
+    VBL  8 |  P8245  | 21 D4
+     CX  9 |         | 20 B
+      L 10 |         | 19 G
+    _CS 11 |         | 18 R
+    _WR 12 |         | 17 D5
+    _RD 13 |         | 16 D6
+    Vss 14 |_________| 15 D7
 
-// ======================> i8244_device
+*/
+
 
 class i8244_device :  public device_t
 					, public device_sound_interface
@@ -100,11 +115,16 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void set_default_params();
+	inline bool is_ntsc() { return m_vtotal == 263; }
 
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors(offs_t offset);
-	bool invalid_register(offs_t offset, bool rw);
+
+	void draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	/* timers */
 	static constexpr device_timer_id TIMER_VBLANK_START = 0;
@@ -136,6 +156,7 @@ protected:
 
 	vdc_t m_vdc;
 	u8 m_collision_map[0x200];
+	u8 m_priority_map[0x200];
 
 	u8 m_x_beam_pos = 0;
 	u8 m_y_beam_pos = 0;

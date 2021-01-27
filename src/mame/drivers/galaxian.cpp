@@ -1924,6 +1924,24 @@ void galaxian_state::theend_map(address_map &map)
 	map(0x8000, 0xffff).rw(FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
 }
 
+void namenayo_state::namenayo_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x5000, 0x6fff).rom();
+	map(0xc800, 0xc8ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0xd800, 0xd800).w(FUNC(namenayo_state::namenayo_unk_d800_w)); // some kind of split position for bg colour maybe?
+	map(0xe000, 0xe01f).ram().w(FUNC(namenayo_state::namenayo_extattr_w)).share("extattrram");
+	map(0xe801, 0xe801).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xe806, 0xe806).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xe807, 0xe807).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xf900, 0xf903).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfa00, 0xfa03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
+
 void galaxian_state::froggervd_map(address_map &map)
 {
 	theend_map(map);
@@ -5309,6 +5327,54 @@ static INPUT_PORTS_START( scramble )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
+// Input mapping confirmed from instruction sheet, Up is Jump, Down is release item, A is accelerate
+// There is a single bank of 6 dipswitches
+static INPUT_PORTS_START( namenayo )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x01, "20,000" )
+	PORT_DIPSETTING(    0x02, "10,000" )
+	PORT_DIPSETTING(    0x03, "30,000" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x08, "A 1/1 B 1/2" )
+	PORT_DIPSETTING(    0x00, "A 1/3 B 2/1" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) // is this checked?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // is this checked?
+
+	PORT_START("IN3")   /* need for some PPI accesses */
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( jungsub ) // TODO: are there more dip-switches?
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -6770,7 +6836,13 @@ static GFXDECODE_START(gfx_gmgalax)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 16, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-/* separate character and sprite ROMs */
+// separate color PROMs
+static GFXDECODE_START(gfx_namenayo)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 32, 8, GALAXIAN_XSCALE,1)
+GFXDECODE_END
+
+// separate character and sprite ROMs
 static GFXDECODE_START(gfx_pacmanbl)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
@@ -7356,6 +7428,18 @@ void galaxian_state::ozon1(machine_config &config)
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
+
+void namenayo_state::namenayo(machine_config &config)
+{
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &namenayo_state::namenayo_map);
+	m_palette->set_entries(64);
+
+	/* video hardware */
+	m_gfxdecode->set_info(gfx_namenayo);
+}
 
 // TODO: should be derived from theend, re-sort machine configs later
 void galaxian_state::scramble(machine_config &config)
@@ -8846,6 +8930,12 @@ void galaxian_state::init_mimonkey()
 	}
 
 	init_mimonkeyb();
+}
+
+void namenayo_state::init_namenayo()
+{
+	/* video extensions */
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::namenayo_draw_background, &namenayo_state::namenayo_extend_tile_info, &namenayo_state::namenayo_extend_sprite_info);
 }
 
 /*************************************
@@ -13108,6 +13198,27 @@ ROM_START( takeoff )
 	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
 ROM_END
 
+ROM_START( namenayo )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "1.2d.2763", 0x0000, 0x2000, CRC(9830b4be) SHA1(541e59e892fbe46df24b68ab3cafea8a09f59f47) )
+	ROM_LOAD( "2.2f.2763", 0x2000, 0x2000, CRC(cfaeb2de) SHA1(76c0019bf7815b056332d634ee1daec2e29407df) )
+	ROM_LOAD( "4.2j.2763", 0x6000, 0x1000, CRC(4c3e8d42) SHA1(da7a77744953fcc3c3f1c03e86f5c6e589ddd545) ) // Scene 6
+	ROM_CONTINUE(0x5000,0x1000) // Scene 4,5
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s1.5c.2732", 0x0000, 0x1000, CRC(31d4ebc1) SHA1(2f217daecb46228002b3981892b9cfe9ded6908b) )
+	ROM_LOAD( "s2.5d.2732", 0x1000, 0x1000, CRC(5e170ba9) SHA1(6d786ac701ef8dd5e74f727e0805479dfb68866f) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "5.7d.2763", 0x0000, 0x2000, CRC(97245ee5) SHA1(59a375e074028685fc35f4b03761c7abe1ecce23) )
+	ROM_LOAD( "6.7f.2763", 0x2000, 0x2000, CRC(7185c167) SHA1(dcd810d67eba8f4719968efbab08376fcb3ba10f) )
+	ROM_LOAD( "7.7h.2763", 0x4000, 0x2000, CRC(942ca3c2) SHA1(6dac46e860fcf90f98cf9a7dd9a9a02ff1730935) )
+	ROM_LOAD( "8.7j.2763", 0x6000, 0x2000, CRC(68b5b6bb) SHA1(e46e71c231d109db2bd51046d156b6b539efe403) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "10g.82s123", 0x00, 0x20, CRC(d8e44fa5) SHA1(1add9adc7ee4df01139e8647c060a0d0cd5c1b1e) )
+	ROM_LOAD( "10h.82s123", 0x20, 0x20, CRC(1095e850) SHA1(ad38197df2e0512f94c140146add5f7081343f84) )
+ROM_END
 
 ROM_START( scramble )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -14962,3 +15073,6 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+
+// single player reference: https://www.nicovideo.jp/watch/sm16782405
+GAME( 1982, namenayo,    0,        namenayo,   namenayo,   namenayo_state, init_namenayo,   ROT0,   "Cat's", "Namennayo (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "osdcore.h"
 #include "palette.h"
 
 #include <algorithm>

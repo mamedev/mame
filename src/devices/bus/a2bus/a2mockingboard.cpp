@@ -40,12 +40,12 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "S
 
 void a2bus_ayboard_device::add_common_devices(machine_config &config)
 {
-	VIA6522(config, m_via1, 1022727);
+	MOS6522(config, m_via1, 1022727);
 	m_via1->writepa_handler().set(FUNC(a2bus_ayboard_device::via1_out_a));
 	m_via1->writepb_handler().set(FUNC(a2bus_ayboard_device::via1_out_b));
 	m_via1->irq_handler().set(FUNC(a2bus_ayboard_device::via1_irq_w));
 
-	VIA6522(config, m_via2, 1022727);
+	MOS6522(config, m_via2, 1022727);
 	m_via2->writepa_handler().set(FUNC(a2bus_ayboard_device::via2_out_a));
 	m_via2->writepb_handler().set(FUNC(a2bus_ayboard_device::via2_out_b));
 	m_via2->irq_handler().set(FUNC(a2bus_ayboard_device::via2_irq_w));

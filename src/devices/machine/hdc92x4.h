@@ -156,11 +156,8 @@ protected:
 	void wait_time(emu_timer *tm, const attotime &delay, int param);
 	void wait_line(int line, line_state level, int substate, bool stopwrite);
 
-	// Converts attotime to a string
-	std::string tts(const attotime &t);
-
 	// Current time
-	std::string ttsn();
+	std::string ttsn() const;
 
 	// Utility routine to set or reset bits
 	void set_bits(uint8_t& byte, int mask, bool set);

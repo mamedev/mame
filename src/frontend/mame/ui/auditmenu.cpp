@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 
 #include "audit.h"
+#include "corestr.h"
 #include "drivenum.h"
 
 #include <numeric>

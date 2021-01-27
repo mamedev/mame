@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HEUN_H
+#define MAME_EMU_EMUMEM_HEUN_H
+
+#pragma once
 
 // handler_entry_read_unmapped/handler_entry_write_unmapped
 
@@ -9,7 +13,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
 	handler_entry_read_unmapped(address_space *space) : handler_entry_read<Width, AddrShift, Endian>(space, 0) {}
 	~handler_entry_read_unmapped() = default;
@@ -23,7 +26,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_writ
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
 	handler_entry_write_unmapped(address_space *space) : handler_entry_write<Width, AddrShift, Endian>(space, 0) {}
 	~handler_entry_write_unmapped() = default;
@@ -43,7 +45,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
 	handler_entry_read_nop(address_space *space) : handler_entry_read<Width, AddrShift, Endian>(space, 0) {}
 	~handler_entry_read_nop() = default;
@@ -57,7 +58,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_writ
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
 	handler_entry_write_nop(address_space *space) : handler_entry_write<Width, AddrShift, Endian>(space, 0) {}
 	~handler_entry_write_nop() = default;
@@ -66,3 +66,5 @@ public:
 
 	std::string name() const override;
 };
+
+#endif // MAME_EMU_EMUMEM_HEUN_H

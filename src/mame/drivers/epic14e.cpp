@@ -206,7 +206,7 @@ void epic14e_state::epic14e(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	VIA6522(config, m_via, 17.01_MHz_XTAL / 9); // SY6522A
+	MOS6522(config, m_via, 17.01_MHz_XTAL / 9); // SY6522A
 	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	I8748(config, "keybmcu", 4608000).set_disable();

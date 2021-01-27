@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 // the disassemblers assume they're in MAME and emu.h is a PCH, so we minimally pander to them
+#include "coretmpl.h"
 #include "disasmintf.h"
 
 using offs_t = osd::u32;

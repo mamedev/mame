@@ -320,7 +320,7 @@ void pc_keyboard_device::device_start()
 
 	memset(m_make, 0, sizeof(m_make));
 
-	machine().ioport().natkeyboard().configure(
+	machine().natkeyboard().configure(
 		ioport_queue_chars_delegate(&pc_keyboard_device::queue_chars, this),
 		ioport_accept_char_delegate(&pc_keyboard_device::accept_char, this),
 		ioport_charqueue_empty_delegate(&pc_keyboard_device::charqueue_empty, this));
