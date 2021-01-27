@@ -99,6 +99,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_palette_ram(*this, "palette", 0x1000, ENDIANNESS_LITTLE),
 		m_lamps(*this, "lamp%u", 0U) { }
 
 	void init_luckgrln();
@@ -119,12 +120,12 @@ private:
 	required_device<hd647180x_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	memory_share_creator<uint8_t> m_palette_ram;
 	output_finder<12> m_lamps;
 
 	uint8_t m_nmi_enable;
 	tilemap_t *m_reel_tilemap[4];
-	int m_palette_count;
-	uint8_t m_palette_ram[0x10000];
+	uint16_t m_palette_index;
 
 	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
 	template<uint8_t Reel> void reel_attr_w(offs_t offset, uint8_t data);
@@ -199,8 +200,7 @@ void luckgrln_state::video_start()
 		m_reel_tilemap[i]->set_transparent_pen(0);
 	}
 
-	save_item(NAME(m_palette_count));
-	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_palette_index));
 }
 
 uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -356,33 +356,18 @@ void luckgrln_state::output_w(uint8_t data)
 
 void luckgrln_state::palette_offset_low_w(uint8_t data)
 {
-	m_palette_count = data<<1;
-}
-void luckgrln_state::palette_offset_high_w(uint8_t data)
-{
-	m_palette_count = m_palette_count | data<<9;
+	m_palette_index = (m_palette_index & 0x0e00) | (data << 1);
 }
 
+void luckgrln_state::palette_offset_high_w(uint8_t data)
+{
+	m_palette_index = (data << 9) | (m_palette_index & 0x01fe);
+}
 
 void luckgrln_state::palette_w(uint8_t data)
 {
-	m_palette_ram[m_palette_count] = data;
-
-
-	{
-		int offs = m_palette_count&~0x1;
-		uint16_t dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
-
-		int r = (dat >> 0) & 0x1f;
-		int g = (dat >> 5) & 0x1f;
-		int b = (dat >> 10) & 0x1f;
-
-		m_palette->set_pen_color(offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
-
-	}
-
-	m_palette_count++;
-
+	m_palette->write8(m_palette_index, data);
+	m_palette_index = (m_palette_index + 1) & 0x0fff;
 }
 
 /* Analyzing the lamps, the game should have a 12-buttons control layout */
@@ -883,7 +868,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 	screen.set_screen_update(FUNC(luckgrln_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
-	PALETTE(config, m_palette).set_entries(0x8000);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	SPEAKER(config, "mono").front_center();
 }
