@@ -2644,8 +2644,44 @@ static void do_extract_cd(parameters_map &params)
 			// GDROM .cue/.bin embeds pregap in output file
 			if (mode == MODE_GDROM_CUEBIN && (trackinfo.pregap > 0) && (trackinfo.pgdatasize > 0))
 			{
-				outputoffs += trackinfo.pregap * trackinfo.pgdatasize;
-				trackinfo.frames -= trackinfo.pregap;
+				if ((tracknum == toc.numtrks-1) && (gdrom_identify_pattern(&toc) >= GDROM_TYPE_III))
+				{
+					// special case, 75 frames actual-zeroes, 150 frames data-zeroes with PQ and sync
+					outputoffs += 75 * trackinfo.pgdatasize;
+					trackinfo.frames -= 225;
+					discoffs += 225;
+
+					uint8_t buffer[2352];
+					static const uint8_t syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
+					uint32_t physframeofs = trackinfo.physframeofs;
+
+					for (int frame=0; frame < 150; frame++)
+					{
+						uint32_t msf = lba_to_msf(physframeofs);
+						memcpy(&buffer[0], syncbytes, 12);
+						buffer[12] = msf>>16;
+						buffer[13] = msf>>8;
+						buffer[14] = msf&0xff;
+						buffer[15] = 1; // mode_1
+						memset(&buffer[16], 0, 2048);
+						edc_generate(&buffer[0]);
+						ecc_generate(&buffer[0]);
+
+						output_bin_file->seek(outputoffs, SEEK_SET);
+						uint32_t byteswritten = output_bin_file->write(&buffer[0], 2352);
+						if (byteswritten != 2352)
+							report_error(1, "Error writing pregap-frame %d to file (%s): %s\n", frame, output_file_str->second->c_str(), chd_file::error_string(CHDERR_WRITE_ERROR));
+
+						outputoffs += 2352;
+						physframeofs++;
+					}
+				}
+				else
+				{
+					// normal case, pregap contains actual-zeroes
+					outputoffs += trackinfo.pregap * trackinfo.pgdatasize;
+					trackinfo.frames -= trackinfo.pregap;
+				}
 			}
 
 			// now read and output the actual data

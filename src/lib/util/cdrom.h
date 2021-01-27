@@ -163,6 +163,9 @@ bool ecc_verify(const uint8_t *sector);
 void ecc_generate(uint8_t *sector);
 void ecc_clear(uint8_t *sector);
 
+// EDC utilities
+void edc_generate(uint8_t *sector);
+
 
 
 /***************************************************************************
