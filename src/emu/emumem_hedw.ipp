@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HEDW_IPP
+#define MAME_EMU_EMUMEM_HEDW_IPP
 
-#include "emu.h"
+#pragma once
+
 #include "emumem_mud.h"
 #include "emumem_hea.h"
 #include "emumem_heu.h"
@@ -138,7 +141,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::range_cut_before(offs_t address, int start)
 {
-	while(--start >= 0) {
+	while(--start >= 0 && m_u_dispatch[start]) {
 		if(int(LowBits) > -AddrShift && m_u_dispatch[start]->is_dispatch()) {
 			static_cast<handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian> *>(m_u_dispatch[start])->range_cut_before(address);
 			break;
@@ -151,7 +154,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 
 template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::range_cut_after(offs_t address, int start)
 {
-	while(++start < COUNT) {
+	while(++start < COUNT && m_u_dispatch[start]) {
 		if(int(LowBits) > -AddrShift && m_u_dispatch[start]->is_dispatch()) {
 			static_cast<handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian> *>(m_u_dispatch[start])->range_cut_after(address);
 			break;
@@ -168,7 +171,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_nomirror(start, end, ostart, oend, handler);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_nomirror(start, end, ostart, oend, handler);
@@ -235,7 +238,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_mirror(start, end, ostart, oend, mirror, handler);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mirror(start, end, ostart, oend, mirror, handler);
@@ -287,7 +290,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		if(original)
 			replacement = new handler_entry_write_units<Width, AddrShift, Endian>(descriptor, ukey, static_cast<handler_entry_write_units<Width, AddrShift, Endian> *>(original));
 		else
-			replacement = new handler_entry_write_units<Width, AddrShift, Endian>(descriptor, ukey, inh::m_space);
+			replacement = new handler_entry_write_units<Width, AddrShift, Endian>(descriptor, ukey, this->m_space);
 
 		mappings.emplace_back(mapping{ original, replacement, ukey });
 	} else
@@ -302,7 +305,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_mismatched_nomirror(start, end, ostart, oend, descriptor, rkey, mappings);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mismatched_nomirror(start, end, ostart, oend, descriptor, rkey, mappings);
@@ -374,7 +377,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_mismatched_mirror(start, end, ostart, oend, mirror, descriptor, mappings);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_mismatched_mirror(start, end, ostart, oend, mirror, descriptor, mappings);
@@ -433,7 +436,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_passthrough_nomirror(start, end, ostart, oend, handler, mappings);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_passthrough_nomirror(start, end, ostart, oend, handler, mappings);
@@ -493,7 +496,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	if(cur->is_dispatch())
 		cur->populate_passthrough_mirror(start, end, ostart, oend, mirror, handler, mappings);
 	else {
-		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(handler_entry::m_space, m_u_ranges[entry], cur);
+		auto subdispatch = new handler_entry_write_dispatch<LowBits, Width, AddrShift, Endian>(this->m_space, m_u_ranges[entry], cur);
 		cur->unref();
 		m_u_dispatch[entry] = subdispatch;
 		subdispatch->populate_passthrough_mirror(start, end, ostart, oend, mirror, handler, mappings);
@@ -615,10 +618,11 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		m_u_ranges = m_ranges_array[i].data();
 		m_u_dispatch = m_dispatch_array[i].data();
 
-		for(u32 entry = 0; entry != COUNT; entry++) {
-			m_u_dispatch[entry] = m_dispatch_array[0][entry]->dup();
-			m_u_ranges[entry] = m_ranges_array[0][entry];
-		}
+		for(u32 entry = 0; entry != COUNT; entry++)
+			if(m_dispatch_array[0][entry]) {
+				m_u_dispatch[entry] = m_dispatch_array[0][entry]->dup();
+				m_u_ranges[entry] = m_ranges_array[0][entry];
+			}
 
 	} else {
 		m_u_ranges = m_ranges_array[i].data();
@@ -635,3 +639,5 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> handler_en
 
 	return new handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>(this);
 }
+
+#endif // MAME_EMU_EMUMEM_HEDW_IPP

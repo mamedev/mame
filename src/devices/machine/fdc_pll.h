@@ -29,8 +29,6 @@ public:
 	void start_writing(const attotime &tm);
 	void commit(floppy_image_device *floppy, const attotime &tm);
 	void stop_writing(floppy_image_device *floppy, const attotime &tm);
-
-	std::string tts(attotime tm);
 };
 
 #endif // MAME_MACHINE_FDC_PLL_H

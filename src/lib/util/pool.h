@@ -13,7 +13,8 @@
 
 #pragma once
 
-#include "osdcore.h"
+#include <cstddef>
+#include <cstdint>
 
 
 /***************************************************************************

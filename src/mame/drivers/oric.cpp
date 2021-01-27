@@ -845,7 +845,7 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* via */
-	VIA6522(config, m_via, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via, 12_MHz_XTAL / 12);
 	m_via->writepa_handler().set(FUNC(oric_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(oric_state::via_b_w));
 	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
@@ -881,7 +881,7 @@ void telestrat_state::telstrat(machine_config &config)
 	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
 	/* via */
-	VIA6522(config, m_via2, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via2, 12_MHz_XTAL / 12);
 	m_via2->writepa_handler().set(FUNC(telestrat_state::via2_a_w));
 	m_via2->writepb_handler().set(FUNC(telestrat_state::via2_b_w));
 	m_via2->ca2_handler().set(FUNC(telestrat_state::via2_ca2_w));

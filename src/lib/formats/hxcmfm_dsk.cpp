@@ -57,7 +57,7 @@ bool mfm_format::supports_save() const
 	return true;
 }
 
-int mfm_format::identify(io_generic *io, uint32_t form_factor)
+int mfm_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[7];
 
@@ -68,7 +68,7 @@ int mfm_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool mfm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool mfm_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
@@ -109,7 +109,7 @@ bool mfm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool mfm_format::save(io_generic *io, floppy_image *image)
+bool mfm_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	// TODO: HD support
 	MFMIMG header;
@@ -129,25 +129,25 @@ bool mfm_format::save(io_generic *io, floppy_image *image)
 	int tpos = sizeof(MFMIMG);
 	int dpos = tpos + track_count*head_count*sizeof(MFMTRACKIMG);
 
-	uint8_t trackbuf[150000/8];
-
 	for(int track=0; track < track_count; track++) {
 		for(int side=0; side < head_count; side++) {
-			int track_size;
-			generate_bitstream_from_track(track, side, 2000, trackbuf, track_size, image);
-			track_size = (track_size+7)/8;
+			auto trackbuf = generate_bitstream_from_track(track, side, 2000, image);
+			std::vector<uint8_t> packed((trackbuf.size() + 7) >> 3, 0);
+			for(uint32_t i = 0; i != trackbuf.size(); i++)
+				if(trackbuf[i])
+					packed[i >> 3] |= 0x80 >> (i & 7);
 
 			MFMTRACKIMG trackdesc;
 			trackdesc.track_number = track;
 			trackdesc.side_number = side;
-			trackdesc.mfmtracksize = track_size;
+			trackdesc.mfmtracksize = packed.size();
 			trackdesc.mfmtrackoffset = dpos;
 
 			io_generic_write(io, &trackdesc, tpos, sizeof(MFMTRACKIMG));
-			io_generic_write(io, trackbuf, dpos, track_size);
+			io_generic_write(io, packed.data(), dpos, packed.size());
 
 			tpos += sizeof(MFMTRACKIMG);
-			dpos += track_size;
+			dpos += packed.size();
 		}
 	}
 

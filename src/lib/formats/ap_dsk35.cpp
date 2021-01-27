@@ -1208,6 +1208,7 @@ LEGACY_FLOPPY_OPTIONS_END
 
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+
 dc42_format::dc42_format() : floppy_image_format_t()
 {
 }
@@ -1232,7 +1233,7 @@ bool dc42_format::supports_save() const
 	return true;
 }
 
-int dc42_format::identify(io_generic *io, uint32_t form_factor)
+int dc42_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[0x54];
 	uint64_t size = io_generic_size(io);
@@ -1246,37 +1247,7 @@ int dc42_format::identify(io_generic *io, uint32_t form_factor)
 	return size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0 ? 100 : 0;
 }
 
-const floppy_image_format_t::desc_e dc42_format::mac_gcr[] = {
-	{ SECTOR_LOOP_START, 0, -1 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xd5aa96, 24 },
-	{   CRC_MACHEAD_START, 0 },
-	{     TRACK_ID_GCR6 },
-	{     SECTOR_ID_GCR6 },
-	{     TRACK_HEAD_ID_GCR6 },
-	{     SECTOR_INFO_GCR6 },
-	{   CRC_END, 0 },
-	{   CRC, 0 },
-	{   RAWBITS, 0xdeaaff, 24 },
-	{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-	{   RAWBITS, 0xd5aaad, 24 },
-	{   SECTOR_ID_GCR6 },
-	{   SECTOR_DATA_MAC, -1 },
-	{   RAWBITS, 0xdeaaff, 24 },
-	{   RAWBITS, 0xff, 8 },
-	{ SECTOR_LOOP_END },
-	{ END },
-};
-
-
-bool dc42_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t h[0x54];
 	io_generic_read(io, h, 0, 0x54);
@@ -1294,7 +1265,7 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, floppy_image *image
 	uint8_t sector_data[(512+12)*12];
 	memset(sector_data, 0, sizeof(sector_data));
 
-	desc_s sectors[12];
+	desc_gcr_sector sectors[12];
 
 	int pos_data = 0x54;
 	int pos_tag = 0x54+dsize;
@@ -1307,39 +1278,27 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, floppy_image *image
 			int si = 0;
 			for(int i=0; i<ns; i++) {
 				uint8_t *data = sector_data + (512+12)*i;
-				sectors[si].data = data;
-				sectors[si].size = 512+12;
-				sectors[si].sector_id = i;
-				sectors[si].sector_info = format;
+				sectors[si].track = track;
+				sectors[si].head = head;
+				sectors[si].sector = i;
+				sectors[si].info = format;
 				if(tsize) {
 					io_generic_read(io, data, pos_tag, 12);
+					sectors[si].tag = data;
 					pos_tag += 12;
-				}
+				} else
+					sectors[si].tag = nullptr;
+				sectors[si].data = data+12;
 				io_generic_read(io, data+12, pos_data, 512);
 				pos_data += 512;
 				si = (si + 2) % ns;
 				if(si == 0)
 					si++;
 			}
-			generate_track(mac_gcr, track, head, sectors, ns, 6208*ns, image);
+			build_mac_track_gcr(track, head, image, sectors);
 		}
 	}
 	return true;
-}
-
-uint8_t dc42_format::gb(const uint8_t *buf, int ts, int &pos, int &wrap)
-{
-	uint8_t v = 0;
-	int w1 = wrap;
-	while(wrap != w1+2 && !(v & 0x80)) {
-		v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
-		pos++;
-		if(pos == ts) {
-			pos = 0;
-			wrap++;
-		}
-	}
-	return v;
 }
 
 void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
@@ -1350,7 +1309,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 	}
 }
 
-bool dc42_format::save(io_generic *io, floppy_image *image)
+bool dc42_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);
@@ -1386,102 +1345,17 @@ bool dc42_format::save(io_generic *io, floppy_image *image)
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < g_heads; head++) {
-			uint8_t sectdata[(512+12)*12];
-			memset(sectdata, 0, sizeof(sectdata));
-			int nsect = 12-(track/16);
-			uint8_t buf[13000];
-			int ts;
-			generate_bitstream_from_track(track, head, 200000000/(6208*nsect), buf, ts, image);
-			int pos = 0;
-			int wrap = 0;
-			int hb = 0;
-			for(;;) {
-				uint8_t v = gb(buf, ts, pos, wrap);
-				if(v == 0xff)
-					hb = 1;
-				else if(hb == 1 && v == 0xd5)
-					hb = 2;
-				else if(hb == 2 && v == 0xaa)
-					hb = 3;
-				else if(hb == 3 && v == 0x96)
-					hb = 4;
-				else
-					hb = 0;
-
-				if(hb == 4) {
-					uint8_t h[7];
-					for(auto & elem : h)
-						elem = gb(buf, ts, pos, wrap);
-					uint8_t v2 = gcr6bw_tb[h[2]];
-					uint8_t v3 = gcr6bw_tb[h[3]];
-					uint8_t tr = gcr6bw_tb[h[0]] | (v2 & 1 ? 0x40 : 0x00);
-					uint8_t se = gcr6bw_tb[h[1]];
-					uint8_t si = v2 & 0x20 ? 1 : 0;
-					//                  uint8_t ds = v3 & 0x20 ? 1 : 0;
-					//                  uint8_t fmt = v3 & 0x1f;
-					uint8_t c1 = (tr^se^v2^v3) & 0x3f;
-					uint8_t chk = gcr6bw_tb[h[4]];
-					if(chk == c1 && tr == track && si == head && se < nsect) {
-						int opos = pos;
-						int owrap = wrap;
-						hb = 0;
-						for(int i=0; i<20 && hb != 4; i++) {
-							v = gb(buf, ts, pos, wrap);
-							if(v == 0xff)
-								hb = 1;
-							else if(hb == 1 && v == 0xd5)
-								hb = 2;
-							else if(hb == 2 && v == 0xaa)
-								hb = 3;
-							else if(hb == 3 && v == 0xad)
-								hb = 4;
-							else
-								hb = 0;
-						}
-						if(hb == 4) {
-							uint8_t *dest = sectdata+(512+12)*se;
-							gb(buf, ts, pos, wrap); // Ignore the sector byte
-							uint8_t ca = 0, cb = 0, cc = 0;
-							for(int i=0; i<522/3+1; i++) {
-								uint8_t e0 = gb(buf, ts, pos, wrap);
-								uint8_t e1 = gb(buf, ts, pos, wrap);
-								uint8_t e2 = gb(buf, ts, pos, wrap);
-								uint8_t e3 = i == 522/3 ? 0x96 : gb(buf, ts, pos, wrap);
-								uint8_t va, vb, vc;
-								gcr6_decode(e0, e1, e2, e3, va, vb, vc);
-								cc = (cc << 1) | (cc >> 7);
-								va = va ^ cc;
-								int suma = ca + va + (cc & 1);
-								ca = suma;
-								vb = vb ^ ca;
-								int sumb = cb + vb + (suma >> 8);
-								cb = sumb;
-								vc = vc ^ cb;
-								cc = cc + vc + (sumb >> 8);
-								*dest++ = va;
-								*dest++ = vb;
-								if(i != 522/3)
-									*dest++ = vc;
-							}
-						} else {
-							pos = opos;
-							wrap = owrap;
-						}
-					}
-					hb = 0;
-				}
-				if(wrap)
-					break;
-			}
-			for(int i=0; i<nsect; i++) {
-				uint8_t *data = sectdata + (512+12)*i;
-				io_generic_write(io, data, pos_tag, 12);
-				io_generic_write(io, data+12, pos_data, 512);
+			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
+			for(unsigned int i=0; i < sectors.size(); i++) {
+				auto &sdata = sectors[i];
+				sdata.resize(512+12);
+				io_generic_write(io, &sdata[0], pos_tag, 12);
+				io_generic_write(io, &sdata[12], pos_data, 512);
 				pos_tag += 12;
 				pos_data += 512;
 				if(track || head || i)
-					update_chk(data, 12, tchk);
-				update_chk(data+12, 512, dchk);
+					update_chk(&sdata[0], 12, tchk);
+				update_chk(&sdata[12], 512, dchk);
 			}
 		}
 	}
@@ -1500,3 +1374,100 @@ bool dc42_format::save(io_generic *io, floppy_image *image)
 }
 
 const floppy_format_type FLOPPY_DC42_FORMAT = &floppy_image_format_creator<dc42_format>;
+
+
+apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
+{
+}
+
+const char *apple_gcr_format::name() const
+{
+	return "apple_gcr";
+}
+
+const char *apple_gcr_format::description() const
+{
+	return "Apple GCR 400/800K raw sector image";
+}
+
+const char *apple_gcr_format::extensions() const
+{
+	return "img";
+}
+
+bool apple_gcr_format::supports_save() const
+{
+	return true;
+}
+
+int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	uint64_t size = io_generic_size(io);
+	if(size == 409600 || size == 819200)
+		return 50;
+	return 0;
+}
+
+bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	desc_gcr_sector sectors[12];
+	uint8_t sdata[512*12];
+
+	int pos_data = 0;
+
+	uint64_t size = io_generic_size(io);
+	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
+
+	if(!head_count)
+		return false;
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < head_count; head++) {
+			int ns = 12 - (track/16);
+			io_generic_read(io, sdata, pos_data, 512*ns);
+			pos_data += 512*ns;
+
+			int si = 0;
+			for(int i=0; i<ns; i++) {
+				sectors[si].track = track;
+				sectors[si].head = head;
+				sectors[si].sector = si;
+				sectors[si].info = head_count == 2 ? 0x22 : 0x02;
+				sectors[si].tag = nullptr;
+				sectors[si].data = sdata + 512*si;
+				si = (si + 2) % ns;
+				if(si == 0)
+					si++;
+			}
+			build_mac_track_gcr(track, head, image, sectors);
+		}
+	}
+	return true;
+}
+
+bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	int g_tracks, g_heads;
+	image->get_actual_geometry(g_tracks, g_heads);
+
+	if(g_heads == 0)
+		g_heads = 1;
+
+	int pos_data = 0;
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < g_heads; head++) {
+			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
+			for(unsigned int i=0; i < sectors.size(); i++) {
+				auto &sdata = sectors[i];
+				sdata.resize(512+12);
+				io_generic_write(io, &sdata[12], pos_data, 512);
+				pos_data += 512;
+			}
+		}
+	}
+
+	return true;
+}
+
+const floppy_format_type FLOPPY_APPLE_GCR_FORMAT = &floppy_image_format_creator<apple_gcr_format>;

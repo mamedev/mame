@@ -605,7 +605,7 @@ private:
 		{
 			auto const target(m_delegate.finder_target());
 			if (target.second && !target.first.subdevice(target.second))
-				osd_printf_error("Read callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
+				osd_printf_error("Read callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
 		}
 
 		template <typename T>
@@ -668,9 +668,9 @@ private:
 		{
 			assert(this->m_consumed);
 			this->built();
-			ioport_port *const ioport(m_devbase.ioport(m_tag.c_str()));
+			ioport_port *const ioport(m_devbase.ioport(m_tag));
 			if (!ioport)
-				throw emu_fatalerror("Read callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag.c_str(), m_devbase.tag(), m_devbase.name());
+				throw emu_fatalerror("Read callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag, m_devbase.tag(), m_devbase.name());
 			chain(
 					[&port = *ioport, exor = this->exor(), mask = this->mask()] (offs_t offset, input_mask_t mem_mask)
 					{ return (port.read() ^ exor) & mask; });
@@ -1282,7 +1282,7 @@ private:
 			{
 				auto const target(m_delegate.finder_target());
 				if (target.second && !target.first.subdevice(target.second))
-					osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
+					osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
 			}
 
 			auto build()
@@ -1348,7 +1348,7 @@ private:
 		{
 			auto const target(m_delegate.finder_target());
 			if (target.second && !target.first.subdevice(target.second))
-				osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
+				osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second), m_delegate.name());
 		}
 
 		auto build()
@@ -1707,9 +1707,9 @@ private:
 			{
 				assert(this->m_consumed);
 				this->built();
-				ioport_port *const ioport(m_devbase.ioport(m_tag.c_str()));
+				ioport_port *const ioport(m_devbase.ioport(m_tag));
 				if (!ioport)
-					throw emu_fatalerror("Write callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag.c_str(), m_devbase.tag(), m_devbase.name());
+					throw emu_fatalerror("Write callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag, m_devbase.tag(), m_devbase.name());
 				return
 						[&port = *ioport] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ port.write(data); };
@@ -1765,9 +1765,9 @@ private:
 		{
 			assert(this->m_consumed);
 			this->built();
-			ioport_port *const ioport(m_devbase.ioport(m_tag.c_str()));
+			ioport_port *const ioport(m_devbase.ioport(m_tag));
 			if (!ioport)
-				throw emu_fatalerror("Write callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag.c_str(), m_devbase.tag(), m_devbase.name());
+				throw emu_fatalerror("Write callback bound to non-existent I/O port %s of device %s (%s)\n", m_tag, m_devbase.tag(), m_devbase.name());
 			return
 					[&port = *ioport, exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ port.write((data ^ exor) & mask); };
@@ -1807,9 +1807,9 @@ private:
 			{
 				assert(this->m_consumed);
 				this->built();
-				memory_bank *const bank(m_devbase.membank(m_tag.c_str()));
+				memory_bank *const bank(m_devbase.membank(m_tag));
 				if (!bank)
-					throw emu_fatalerror("Write callback bound to non-existent memory bank %s of device %s (%s)\n", m_tag.c_str(), m_devbase.tag(), m_devbase.name());
+					throw emu_fatalerror("Write callback bound to non-existent memory bank %s of device %s (%s)\n", m_tag, m_devbase.tag(), m_devbase.name());
 				return
 						[&membank = *bank] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ membank.set_entry(data); };
@@ -1865,9 +1865,9 @@ private:
 		{
 			assert(this->m_consumed);
 			this->built();
-			memory_bank *const bank(m_devbase.membank(m_tag.c_str()));
+			memory_bank *const bank(m_devbase.membank(m_tag));
 			if (!bank)
-				throw emu_fatalerror("Write callback bound to non-existent memory bank %s of device %s (%s)\n", m_tag.c_str(), m_devbase.tag(), m_devbase.name());
+				throw emu_fatalerror("Write callback bound to non-existent memory bank %s of device %s (%s)\n", m_tag, m_devbase.tag(), m_devbase.name());
 			return
 					[&membank = *bank, exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ membank.set_entry((data ^ exor) & mask); };
@@ -1908,7 +1908,7 @@ private:
 				assert(this->m_consumed);
 				this->built();
 				return
-						[&item = m_devbase.machine().output().find_or_create_item(m_tag.c_str(), 0)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+						[&item = m_devbase.machine().output().find_or_create_item(m_tag, 0)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ item.set(data); };
 			}
 
@@ -1963,7 +1963,7 @@ private:
 			assert(this->m_consumed);
 			this->built();
 			return
-					[&item = m_devbase.machine().output().find_or_create_item(m_tag.c_str(), 0), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+					[&item = m_devbase.machine().output().find_or_create_item(m_tag, 0), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ item.set((data ^ exor) & mask); };
 		}
 	};

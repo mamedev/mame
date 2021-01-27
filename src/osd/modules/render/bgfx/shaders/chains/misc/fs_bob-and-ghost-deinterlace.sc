@@ -7,7 +7,7 @@ $input v_color0, v_texcoord0
    Bob-and-ghost Deinterlacing
    Author: hunterk
    License: Public domain
-   
+
    Note: This shader is designed to work with the typical interlaced output from an emulator, which displays both even and odd fields twice.
    As such, it is inappropriate for general video use unless the video has already been similarly woven beforehand.
 */
@@ -30,7 +30,7 @@ void main()
 	float y;
 
 	// assume anything with a vertical resolution greater than 400 lines is interlaced
-	if (u_tex_size0.y > 400.0) 
+	if (u_tex_size0.y > 400.0)
 	{
 		y = u_tex_size0.y * v_texcoord0.y;// FIXME + IN.frame_count;
 		res = pow(vec4(texture2D(s0, v_texcoord0 + vec2(0.0, one_pixel.y))), exponent);
@@ -50,6 +50,6 @@ void main()
 	{
 		res = vec4(pow(texture2D(s0, v_texcoord0), exponent));
 	}
-	
+
 	gl_FragColor = vec4(pow((res + color) / 2.0, inv_exponent));
 }

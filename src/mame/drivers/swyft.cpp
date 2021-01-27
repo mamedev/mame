@@ -768,7 +768,7 @@ void swyft_state::swyft(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
 	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));
 
-	via6522_device &via0(VIA6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via6522_device &via0(MOS6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
 	via0.readpa_handler().set(FUNC(swyft_state::via0_pa_r));
 	via0.readpb_handler().set(FUNC(swyft_state::via0_pb_r));
 	via0.writepa_handler().set(FUNC(swyft_state::via0_pa_w));
@@ -778,7 +778,7 @@ void swyft_state::swyft(machine_config &config)
 	via0.cb2_handler().set(FUNC(swyft_state::via0_cb2_w));
 	via0.irq_handler().set("viairq", FUNC(input_merger_device::in_w<0>));
 
-	via6522_device &via1(VIA6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via6522_device &via1(MOS6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
 	via1.readpa_handler().set(FUNC(swyft_state::via1_pa_r));
 	via1.readpb_handler().set(FUNC(swyft_state::via1_pb_r));
 	via1.writepa_handler().set(FUNC(swyft_state::via1_pa_w));

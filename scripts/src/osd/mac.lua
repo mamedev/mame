@@ -156,6 +156,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
+		MAME_DIR .. "src/osd/osdfile.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",

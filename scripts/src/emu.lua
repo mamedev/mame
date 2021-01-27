@@ -254,6 +254,7 @@ files {
 	MAME_DIR .. "src/emu/debug/textbuf.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
 	MAME_DIR .. "src/emu/drivers/xtal.h",
+	MAME_DIR .. "src/emu/layout/generic.h",
 	MAME_DIR .. "src/emu/video/generic.cpp",
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.cpp",

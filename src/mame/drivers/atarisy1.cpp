@@ -584,6 +584,13 @@ static INPUT_PORTS_START( indytemc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("F60000")    // F60000
+	PORT_BIT(0xfd00, IP_ACTIVE_LOW, IPT_UNUSED) // HACK: splitting IPT_UNUSED in indytemp using PORT_CONFNAME seems broken
+
+	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Flip_Screen ) ) // P103-21
+	PORT_CONFSETTING(      0x0200, DEF_STR( On ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 
@@ -714,7 +721,7 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
+	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
 	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
 	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
@@ -892,7 +899,7 @@ void atarisy1_state::roadb110(machine_config &config)
 	ROM_LOAD16_BYTE_BIOS(1, "136032.106.l12", 0x00001, 0x04000, CRC(76ee86c4) SHA1(cbcd424510435a04e9041967a13781fd19b0f2c4) ) \
 	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )                                                                             \
 	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
-	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) )
+	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
 
 #define MOTHERBOARD_ALPHA                                                                                              \
 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
@@ -2492,8 +2499,12 @@ void atarisy1_state::init_slapstic()
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
-	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range marble madness actually needs
+	// Some states of the slapstic seems trigger on the whole address space, but that slows things down too much and this point.
+	// limit to the ranges marble madness and peterpak actually need
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x2ff5a, 0x2ff5b, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x101d4, 0x101d9, 0, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
@@ -2560,7 +2571,7 @@ GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indyt
 GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL)
 
 GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )

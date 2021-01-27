@@ -30,7 +30,7 @@ menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &c
 
 void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 {
-	natural_keyboard &natkbd(machine().ioport().natkeyboard());
+	natural_keyboard &natkbd(machine().natkeyboard());
 
 	if (natkbd.can_post())
 	{
@@ -69,7 +69,7 @@ void menu_keyboard_mode::handle()
 	event const *const menu_event(process(0));
 	if (menu_event && uintptr_t(menu_event->itemref))
 	{
-		natural_keyboard &natkbd(machine().ioport().natkeyboard());
+		natural_keyboard &natkbd(machine().natkeyboard());
 		uintptr_t const ref(uintptr_t(menu_event->itemref));
 		bool const left(IPT_UI_LEFT == menu_event->iptkey);
 		bool const right(IPT_UI_RIGHT == menu_event->iptkey);

@@ -5,6 +5,17 @@
  konmedal.cpp: Konami Z80 based medal games
  Driver by R. Belmont, MetalliC
 
+Konami PWB 451847A boards
+ Tsururin Kun (つるりんくん) (GR901)
+
+ Main CPU:  Z80
+ Sound: uPD7759C
+
+ Konami Custom chips:
+ K052109 (tilemaps)
+ K051962 (tilemaps)
+ K051649 (sound)
+
 Konami PWB 452093A boards
 
  Mario Roulette
@@ -64,6 +75,9 @@ Konami PWB 402218 boards
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class konmedal_state : public driver_device
 {
 public:
@@ -88,6 +102,7 @@ public:
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
 	void tsupenta(machine_config &config);
+	void tsururin(machine_config &config);
 
 	void ddboy_init();
 	void tsuka_init();
@@ -95,6 +110,12 @@ public:
 	void shuri_init();
 	void mario_init();
 	void fuusen_init();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	void konmedal_palette(palette_device &palette) const;
 	void medal_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -133,9 +154,6 @@ private:
 	void medal_main(address_map &map);
 	void shuriboy_main(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void machine_start_common();
 
 	required_device<cpu_device> m_maincpu;
@@ -610,7 +628,61 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( slimekun )
 	PORT_INCLUDE( shuriboy )
 
-	// TODO DIPSW
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Rate of Win" )   PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "05%" )
+	PORT_DIPSETTING(    0x06, "10%" )
+	PORT_DIPSETTING(    0x05, "15%" )
+	PORT_DIPSETTING(    0x04, "20%" )
+	PORT_DIPSETTING(    0x03, "25%" )
+	PORT_DIPSETTING(    0x02, "30%" )
+	PORT_DIPSETTING(    0x01, "35%" )
+	PORT_DIPSETTING(    0x00, "40%" )
+	PORT_DIPNAME( 0x08, 0x08, "Play Timer" )   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "10 sec" )
+	PORT_DIPSETTING(    0x00, "8 sec" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5") // named 'Damage' in test screen
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") // no description in test screen
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -618,6 +690,86 @@ static INPUT_PORTS_START( slimekun )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tsururin )
+	PORT_INCLUDE( shuriboy )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // works as start, too
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	// 0x80 upd busy_r
+
+	PORT_MODIFY("IN2")
+	// 0x01 service coin
+	// 0x02 service switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	// 0x10 hopper line_r
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) // seems to lock out coins, only service1 works
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1") // named 'Retire' in test screen
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2") // no description in test screen
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Rate of Win" )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "20%" )
+	PORT_DIPSETTING(    0x04, "30%" )
+	PORT_DIPSETTING(    0x08, "40%" )
+	PORT_DIPSETTING(    0x0c, "50%" )
+	PORT_DIPNAME( 0x30, 0x30, "Play Timer" )   PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "30 sec" )
+	PORT_DIPSETTING(    0x20, "37 sec" )
+	PORT_DIPSETTING(    0x10, "45 sec" )
+	PORT_DIPSETTING(    0x00, "52 sec" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Service_Mode ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 void konmedal_state::machine_start_common()
 {
@@ -896,6 +1048,12 @@ void konmedal_state::tsupenta(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::tsupenta_nvram_init));
 }
 
+void konmedal_state::tsururin(machine_config &config)
+{
+	shuriboy(config);
+	NVRAM(config.replace(), m_nvram, nvram_device::DEFAULT_ALL_0);
+}
+
 void konmedal_state::medal_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
@@ -1148,9 +1306,32 @@ ROM_START( tsupenta )
 	ROM_LOAD( "002a10.3e", 0x000300, 0x000100, CRC(5f539e58) SHA1(bd11037f11b0b141a53101e750ebe67f6f790ca7) )
 ROM_END
 
+ROM_START( tsururin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "901e01.e6", 0x000000, 0x010000, CRC(f8e931ad) SHA1(5ec604a6d1a6e5b7308133b1c3295909764c32b5) )
 
-// Konami PWB 452093A boards (TMNT tilemaps)
-GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING)
+	ROM_REGION( 0x20000, "k052109", 0 ) // tilemaps
+	ROM_LOAD32_BYTE( "901c03.j4", 0x00000, 0x08000, CRC(a6e6ecf9) SHA1(3e8ab015f536c5ea6e37dace9d6536a5f1e1bef0) )
+	ROM_LOAD32_BYTE( "901c04.j6", 0x00001, 0x08000, CRC(2511bbb8) SHA1(05826fdf2dc80132c1fc3fcdbbeabd824aa4ecf7) )
+	ROM_LOAD32_BYTE( "901c05.j8", 0x00002, 0x08000, CRC(c52b7906) SHA1(4373ca9d5dae65176c7ece5b442ba865f4acd73a) )
+	ROM_LOAD32_BYTE( "901c06.j9", 0x00003, 0x08000, CRC(5092009e) SHA1(1d12d52b73c402aa71a0ed659b3e05c736fc8e37) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "901c02.j16", 0x000000, 0x010000, CRC(3dd33d80) SHA1(6dad858bbea285b9693bd3a80788c0ff59efb3bf) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "901c07.a3", 0x000000, 0x000100, CRC(446cbb60) SHA1(4d0028dadb6a75e6c2f864bbd3cdc807423ff8e7) )
+	ROM_LOAD( "901c08.c3", 0x000100, 0x000100, CRC(132ea3a8) SHA1(7fa4438b578ed050006f1bc2a6cbb3aca5338c49) )
+	ROM_LOAD( "901c09.c4", 0x000200, 0x000100, CRC(855e23b1) SHA1(02e2ba80accfe3b1f2ed4ed66b92d37c97182ee4) )
+	ROM_LOAD( "901c10.d3", 0x000300, 0x000100, CRC(5f539e58) SHA1(bd11037f11b0b141a53101e750ebe67f6f790ca7) ) // same as slimekun and tsupenta
+ROM_END
+
+} // Anonymous namespace
+
+
+// Konami PWB 451847A and PWB 452093A boards (TMNT tilemaps)
+GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // resets after start up test. Seems to be an IRQ problem
+GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
 GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,   ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
 GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)

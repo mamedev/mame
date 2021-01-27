@@ -22,6 +22,8 @@
 #include "romload.h"
 #include "softlist.h"
 
+#include "corestr.h"
+
 #include <atomic>
 #include <bitset>
 #include <condition_variable>
@@ -124,7 +126,7 @@ public:
 
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
-		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()).c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()));
 	}
 
 	virtual typename Base::type get_type() const override { return Type; }
@@ -203,7 +205,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "").c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
 	}
 
 protected:
@@ -247,7 +249,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		auto const tail(std::find_if(std::begin(m_filters), std::end(m_filters), [] (typename Base::ptr const &flt) { return !flt; }));
-		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)).c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)));
 		for (auto it = std::begin(m_filters); tail != it; ++it)
 			(*it)->save_ini(file, indent + 1);
 	}
@@ -883,7 +885,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "").c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
 	}
 
 	virtual bool apply(ui_system_info const &system) const override
@@ -1584,8 +1586,7 @@ void software_filter_data::finalise()
 
 std::string software_filter_data::extract_region(std::string const &longname)
 {
-	std::string fullname(longname);
-	strmakelower(fullname);
+	std::string fullname(strmakelower(longname));
 	std::string::size_type const found(fullname.find('('));
 	if (found != std::string::npos)
 	{

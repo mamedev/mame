@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include "osdcore.h"
 #include "ioprocs.h"
 #include "corefile.h"
 

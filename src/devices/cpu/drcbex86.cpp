@@ -803,6 +803,7 @@ void drcbe_x86::reset()
 int drcbe_x86::execute(code_handle &entry)
 {
 	// call our entry point which will jump to the destination
+	m_cache.codegen_complete();
 	return (*m_entry)((x86code *)entry.codeptr());
 }
 

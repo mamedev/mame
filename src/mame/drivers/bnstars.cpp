@@ -94,7 +94,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "cpu/v60/v60.h"
 #include "machine/jalcrpt.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 #include "tilemap.h"
 

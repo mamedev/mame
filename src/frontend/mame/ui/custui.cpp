@@ -16,6 +16,7 @@
 #include "ui/selector.h"
 #include "ui/utils.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "osdepend.h"

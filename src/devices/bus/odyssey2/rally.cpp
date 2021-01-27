@@ -19,7 +19,7 @@ Used in:
 #include "emu.h"
 #include "rally.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Odyssey 2 Videopac+ 60")
+DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Videopac+ 60 Cartridge")
 
 
 //-------------------------------------------------
@@ -39,8 +39,7 @@ void o2_rally_device::device_start()
 
 void o2_rally_device::cart_init()
 {
-	u32 size = m_rom_size;
-	if (size & (size - 1) || size < 0x800)
+	if (m_rom_size & (m_rom_size - 1) || m_rom_size < 0x800)
 		fatalerror("o2_rally_device: ROM size must be 2^x\n");
 }
 

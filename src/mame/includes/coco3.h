@@ -8,11 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_COCO3_H
 #define MAME_INCLUDES_COCO3_H
 
+#pragma once
 
 #include "includes/coco12.h"
 #include "video/gime.h"

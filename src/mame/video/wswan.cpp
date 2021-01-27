@@ -8,9 +8,8 @@
  Wilbert Pol
 
  TODO:
-   - remove the redundant parts of m_regs
    - split the Color VDP from the Mono VDP
-     - Add support for WSC high/low contrast (register 14, bit 1)
+   - Add support for WSC high/low contrast (register 14, bit 1)
 
  ***************************************************************************/
 
@@ -21,12 +20,13 @@
 DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")
 
 
-wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_set_irq_cb(*this)
 	, m_snd_dma_cb(*this)
 	, m_vdp_type(VDP_TYPE_WSWAN)
+	, m_icons_cb(*this)
 {
 }
 
@@ -72,7 +72,6 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_layer_fg_scroll_x));
 	save_item(NAME(m_layer_fg_scroll_y));
 	save_item(NAME(m_lcd_control));
-	save_item(NAME(m_icons));
 	save_item(NAME(m_color_mode));
 	save_item(NAME(m_colors_16));
 	save_item(NAME(m_tile_packed));
@@ -92,7 +91,7 @@ void wswan_video_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_timer = timer_alloc(TIMER_SCANLINE);
-	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
+	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
 
 	// bind callbacks
 	m_set_irq_cb.resolve();
@@ -100,41 +99,21 @@ void wswan_video_device::device_start()
 
 	if (m_vdp_type == VDP_TYPE_WSC)
 	{
-		m_vram.resize(0x10000);
-		memset(&m_vram[0], 0, 0x10000);
-		m_palette_vram = &m_vram[0xfe00];
+		m_vram.resize(WSC_VRAM_SIZE);
+		m_palette_vram = &m_vram[WSC_VRAM_PALETTE];
 	}
 	else
 	{
-		m_vram.resize(0x4000);
-		memset(&m_vram[0], 0, 0x4000);
+		m_vram.resize(WS_VRAM_SIZE);
 		m_palette_vram = &m_vram[0];
 	}
 
-	common_save();
-}
+	std::fill(std::begin(m_vram), std::end(m_vram), 0);
 
-// This is a copy of ws_portram_init
-// TODO: remove unneeded parts!
-static const uint8_t vdp_regs_init[256] =
-{
-	0x00, 0x00, 0x00/*?*/, 0xbb, 0x00, 0x00, 0x00, 0x26, 0xfe, 0xde, 0xf9, 0xfb, 0xdb, 0xd7, 0x7f, 0xf5,
-	0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x9e, 0x9b, 0x00, 0x00, 0x00, 0x00, 0x99, 0xfd, 0xb7, 0xdf,
-	0x30, 0x57, 0x75, 0x76, 0x15, 0x73, 0x70/*77?*/, 0x77, 0x20, 0x75, 0x50, 0x36, 0x70, 0x67, 0x50, 0x77,
-	0x57, 0x54, 0x75, 0x77, 0x75, 0x17, 0x37, 0x73, 0x50, 0x57, 0x60, 0x77, 0x70, 0x77, 0x10, 0x73,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
-	0x87, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x4f, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0xdb, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x42, 0x00, 0x83, 0x00,
-	0x2f, 0x3f, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1,
-	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1,
-	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1,
-	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1
-};
+	common_save();
+
+	m_icons_cb.resolve();
+}
 
 
 void wswan_video_device::device_reset()
@@ -145,7 +124,7 @@ void wswan_video_device::device_reset()
 	m_window_sprites_enable = 0;
 	m_window_fg_mode = 0;
 	m_bg_control = 0;
-	m_current_line = 145;  // Randomly chosen, beginning of VBlank period to give cart some time to boot up
+	m_current_line = 0;
 	m_line_compare = 0;
 	m_sprite_table_address = 0;
 	m_sprite_first = 0;
@@ -166,8 +145,7 @@ void wswan_video_device::device_reset()
 	m_layer_bg_scroll_y = 0;
 	m_layer_fg_scroll_x = 0;
 	m_layer_fg_scroll_y = 0;
-	m_lcd_control = 0x01;
-	m_icons = 0;
+	m_lcd_control = 0;
 	m_color_mode = 0;
 	m_colors_16 = 0;
 	m_tile_packed = 0;
@@ -178,13 +156,12 @@ void wswan_video_device::device_reset()
 	m_timer_vblank_enable = 0;
 	m_timer_vblank_mode = 0;
 	m_timer_vblank_reload = 0;
-	m_timer_vblank_count = 0;      /* Vertical blank timer counter value */
+	m_timer_vblank_count = 0;
 
-	memset(m_sprite_table_buffer, 0, sizeof(m_sprite_table_buffer));
-	memset(m_main_palette, 0, sizeof(m_main_palette));
-	memcpy(m_regs, vdp_regs_init, 256);
-	for (int i = 0; i < 0x20; i++)
-		m_palette_port[i] = m_regs[i + 0x20];
+	std::fill(std::begin(m_sprite_table_buffer), std::end(m_sprite_table_buffer), 0);
+	std::fill(std::begin(m_main_palette), std::end(m_main_palette), 0);
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	std::fill(std::begin(m_palette_port), std::end(m_palette_port), 0);
 
 	setup_palettes();
 }
@@ -207,33 +184,38 @@ void wswan_video_device::setup_palettes()
 	{
 		for (int i = 0; i < 16; i++)
 			for (int j = 0; j < 16; j++)
-				m_pal[i][j] = ((m_palette_vram[(i << 5) + j * 2 + 1] << 8) | m_palette_vram[(i << 5) + j * 2]) & 0x0fff;
+				m_pal[i][j] = m_palette_vram[(i << 4) + j] & 0x0fff;
 	}
 	else
 	{
 		for (int  i = 0; i < 16; i++)
 		{
-			m_pal[i][0] = (m_palette_port[(i << 1)] >> 0) & 0x07;
-			m_pal[i][1] = (m_palette_port[(i << 1)] >> 4) & 0x07;
-			m_pal[i][2] = (m_palette_port[(i << 1) + 1] >> 0) & 0x07;
-			m_pal[i][3] = (m_palette_port[(i << 1) + 1] >> 4) & 0x07;
+			m_pal[i][0] = (m_palette_port[i] >> 0) & 0x07;
+			m_pal[i][1] = (m_palette_port[i] >> 4) & 0x07;
+			m_pal[i][2] = (m_palette_port[i] >> 8) & 0x07;
+			m_pal[i][3] = (m_palette_port[i] >> 12) & 0x07;
 		}
 	}
 }
 
+
+inline u16 wswan_video_device::swap_bytes(u16 word) {
+	return (word << 8) | (word >> 8);
+}
+
+
 void wswan_video_device::draw_background()
 {
-	uint16_t map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 3);
-	uint8_t start_column = (m_layer_bg_scroll_x >> 3);
+	const u16 map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 2);
+	const u8 start_column = (m_layer_bg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int x_offset, tile_line, tile_address;
-		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
-						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
-		int tile_number = tile_data & 0x01ff;
-		int tile_palette = (tile_data >> 9) & 0x0f;
+		u32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x_offset, tile_line;
+		const u16 tile_data =  m_vram[map_addr + ((start_column + column) & 0x1f)];
+		const u16 tile_number = tile_data & 0x01ff;
+		const u16 tile_palette = (tile_data >> 9) & 0x0f;
 
 		tile_line = (m_current_line + m_layer_bg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
@@ -241,30 +223,30 @@ void wswan_video_device::draw_background()
 
 		if (m_colors_16)
 		{
-			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
+			const u16 tile_address = ((tile_data & 0x2000) ? 0x4000 : 0x2000) + (tile_number * 16) + (tile_line << 1);
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
+				plane0 = (swap_bytes(m_vram[tile_address]) << 16) | swap_bytes(m_vram[tile_address + 1]);
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
-				plane2 = m_vram[tile_address + 2] << 2;
-				plane3 = m_vram[tile_address + 3] << 3;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
+				plane2 = (m_vram[tile_address + 1] & 0xff) << 2;
+				plane3 = (m_vram[tile_address + 1] & 0xff00) >> 5;
 			}
 		}
 		else
 		{
-			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
+			const u16 tile_address = 0x1000 + (tile_number * 8) + tile_line;
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
+				plane0 = m_vram[tile_address];
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -306,13 +288,7 @@ void wswan_video_device::draw_background()
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-						{
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						}
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -332,17 +308,16 @@ void wswan_video_device::draw_background()
 
 void wswan_video_device::draw_foreground_0()
 {
-	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
+	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int x_offset, tile_line, tile_address;
-		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
-						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
-		int tile_number = tile_data & 0x01ff;
-		int tile_palette = (tile_data >> 9) & 0x0f;
+		u32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x_offset, tile_line;
+		const u16 tile_data = m_vram[map_addr + ((start_column + column) & 0x1f)];
+		const u16 tile_number = tile_data & 0x01ff;
+		const u16 tile_palette = (tile_data >> 9) & 0x0f;
 
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
@@ -350,30 +325,30 @@ void wswan_video_device::draw_foreground_0()
 
 		if (m_colors_16)
 		{
-			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
+			const u16 tile_address = ((tile_data & 0x2000) ? 0x4000 : 0x2000) + (tile_number * 16) + (tile_line << 1);
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
+				plane0 = (swap_bytes(m_vram[tile_address]) << 16) | swap_bytes(m_vram[tile_address + 1]);
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
-				plane2 = m_vram[tile_address + 2] << 2;
-				plane3 = m_vram[tile_address + 3] << 3;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
+				plane2 = (m_vram[tile_address + 1] & 0xff) << 2;
+				plane3 = (m_vram[tile_address + 1] & 0xff00) >> 5;
 			}
 		}
 		else
 		{
-			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
+			const u16 tile_address = 0x1000 + (tile_number * 8) + tile_line;
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
+				plane0 = m_vram[tile_address];
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -415,12 +390,7 @@ void wswan_video_device::draw_foreground_0()
 				{
 					if (col)
 					{
-//                      if (m_color_mode) {
 						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-//                      } else {
-//                          /* Hmmmm, what should we do here... Is this correct?? */
-//                          m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-//                      }
 					}
 				}
 				else
@@ -440,17 +410,16 @@ void wswan_video_device::draw_foreground_0()
 
 void wswan_video_device::draw_foreground_2()
 {
-	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
+	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int x_offset, tile_line, tile_address;
-		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
-						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
-		int tile_number = tile_data & 0x01ff;
-		int tile_palette = (tile_data >> 9) & 0x0f;
+		u32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x_offset, tile_line;
+		const u16 tile_data =  m_vram[map_addr + ((start_column + column) & 0x1f)];
+		const u16 tile_number = tile_data & 0x01ff;
+		const u16 tile_palette = (tile_data >> 9) & 0x0f;
 
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
@@ -459,30 +428,30 @@ void wswan_video_device::draw_foreground_2()
 
 		if (m_colors_16)
 		{
-			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
+			const u16 tile_address = ((tile_data & 0x2000) ? 0x4000 : 0x2000) + (tile_number * 16) + (tile_line << 1);
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
+				plane0 = (swap_bytes(m_vram[tile_address]) << 16) | swap_bytes(m_vram[tile_address + 1]);
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
-				plane2 = m_vram[tile_address + 2] << 2;
-				plane3 = m_vram[tile_address + 3] << 3;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
+				plane2 = (m_vram[tile_address + 1] & 0xff) << 2;
+				plane3 = (m_vram[tile_address + 1] & 0xff00) >> 5;
 			}
 		}
 		else
 		{
-			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
+			const u16 tile_address = 0x1000 + (tile_number * 8) + tile_line;
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
+				plane0 = m_vram[tile_address];
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -518,17 +487,13 @@ void wswan_video_device::draw_foreground_2()
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset < m_window_fg_right && x_offset < WSWAN_X_PIXELS)
+			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset <= m_window_fg_right && x_offset < WSWAN_X_PIXELS)
 			{
 				if (m_colors_16)
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -548,17 +513,16 @@ void wswan_video_device::draw_foreground_2()
 
 void wswan_video_device::draw_foreground_3()
 {
-	uint16_t map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
-	uint8_t start_column = (m_layer_fg_scroll_x >> 3);
+	const u16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 2);
+	const u8 start_column = (m_layer_fg_scroll_x >> 3);
 
 	for (int column = 0; column < 29; column++)
 	{
-		uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int x_offset, tile_line, tile_address;
-		int tile_data =  (m_vram[map_addr + (((start_column + column) & 0x1f) << 1) + 1] << 8)
-						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
-		int tile_number = tile_data & 0x01ff;
-		int tile_palette = (tile_data >> 9) & 0x0f;
+		u32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x_offset, tile_line;
+		const u16 tile_data =  m_vram[map_addr + ((start_column + column) & 0x1f)];
+		const u16 tile_number = tile_data & 0x01ff;
+		const u16 tile_palette = (tile_data >> 9) & 0x0f;
 
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
@@ -566,30 +530,30 @@ void wswan_video_device::draw_foreground_3()
 
 		if (m_colors_16)
 		{
-			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
+			const u16 tile_address = ((tile_data & 0x2000) ? 0x4000 : 0x2000) + (tile_number * 16) + (tile_line << 1);
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
+				plane0 = (swap_bytes(m_vram[tile_address]) << 16) | swap_bytes(m_vram[tile_address + 1]);
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
-				plane2 = m_vram[tile_address + 2] << 2;
-				plane3 = m_vram[tile_address + 3] << 3;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
+				plane2 = (m_vram[tile_address + 1] & 0xff) << 2;
+				plane3 = (m_vram[tile_address + 1] & 0xff00) >> 5;
 			}
 		}
 		else
 		{
-			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
+			const u16 tile_address = 0x1000 + (tile_number * 8) + tile_line;
 			if (m_tile_packed)
 			{
-				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
+				plane0 = m_vram[tile_address];
 			}
 			else
 			{
-				plane0 = m_vram[tile_address + 0];
-				plane1 = m_vram[tile_address + 1] << 1;
+				plane0 = m_vram[tile_address] & 0xff;
+				plane1 = (m_vram[tile_address] & 0xff00) >> 7;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -625,17 +589,13 @@ void wswan_video_device::draw_foreground_3()
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset >= m_window_fg_right && x_offset < WSWAN_X_PIXELS))
+			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset > m_window_fg_right && x_offset < WSWAN_X_PIXELS))
 			{
 				if (m_colors_16)
 				{
 					if (col)
 					{
-						if (m_color_mode)
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else
-							/* Hmmmm, what should we do here... Is this correct?? */
-							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+						m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
 				}
 				else
@@ -660,17 +620,17 @@ void wswan_video_device::handle_sprites(int mask)
 
 	for (int i = m_sprite_first + m_sprite_count - 1; i >= m_sprite_first; i--)
 	{
-		uint16_t tile_data = (m_sprite_table_buffer[i * 4 + 1] << 8) | m_sprite_table_buffer[i * 4];
-		uint8_t y = m_sprite_table_buffer[ i * 4 + 2 ];
-		uint8_t x = m_sprite_table_buffer[ i * 4 + 3 ];
+		const u16 tile_data = m_sprite_table_buffer[i * 2];
+		const u8 y = m_sprite_table_buffer[(i * 2) + 1] & 0xff;
+		const u8 x = m_sprite_table_buffer[(i * 2) + 1] >> 8;
 		int tile_line = (m_current_line - y) & 0xff;
 
 		if ((tile_line >= 0) && (tile_line < 8) && ((tile_data & 0x2000) == mask))
 		{
-			uint32_t plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-			int x_offset, tile_address;
-			int tile_number = tile_data & 0x01ff;
-			int tile_palette = 8 + ((tile_data >> 9) & 0x07);
+			u32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+			int x_offset;
+			const int tile_number = tile_data & 0x01ff;
+			const int tile_palette = 8 + ((tile_data >> 9) & 0x07);
 			int check_clip = 0;
 
 			if (tile_data & 0x8000)
@@ -678,30 +638,30 @@ void wswan_video_device::handle_sprites(int mask)
 
 			if (m_colors_16)
 			{
-				tile_address = 0x4000 + (tile_number * 32) + (tile_line << 2);
+				const u16 tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
 				if (m_tile_packed)
 				{
-					plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
+					plane0 = (swap_bytes(m_vram[tile_address]) << 16) | swap_bytes(m_vram[tile_address + 1]);
 				}
 				else
 				{
-					plane0 = m_vram[tile_address + 0];
-					plane1 = m_vram[tile_address + 1] << 1;
-					plane2 = m_vram[tile_address + 2] << 2;
-					plane3 = m_vram[tile_address + 3] << 3;
+					plane0 = m_vram[tile_address] & 0xff;
+					plane1 = (m_vram[tile_address] & 0xff00) >> 7;
+					plane2 = (m_vram[tile_address + 1] & 0xff) << 2;
+					plane3 = (m_vram[tile_address + 1] & 0xff00) >> 5;
 				}
 			}
 			else
 			{
-				tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
+				const u16 tile_address = 0x1000 + (tile_number * 8) + tile_line;
 				if (m_tile_packed)
 				{
-					plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
+					plane0 = m_vram[tile_address];
 				}
 				else
 				{
-					plane0 = m_vram[tile_address + 0];
-					plane1 = m_vram[tile_address + 1] << 1;
+					plane0 = m_vram[tile_address] & 0xff;
+					plane1 = (m_vram[tile_address] & 0xff00) >> 7;
 					plane2 = 0;
 					plane3 = 0;
 				}
@@ -774,11 +734,7 @@ void wswan_video_device::handle_sprites(int mask)
 					{
 						if (col)
 						{
-							if (m_color_mode)
-								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
-							else
-								/* Hmmmm, what should we do here... Is this correct?? */
-								m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
+							m_bitmap.pix(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
 					}
 					else
@@ -855,297 +811,307 @@ void wswan_video_device::refresh_scanline()
 
 
 
-uint32_t wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 
-uint8_t wswan_video_device::reg_r(offs_t offset)
+u16 wswan_video_device::reg_r(offs_t offset, u16 mem_mask)
 {
-	uint8_t value = m_regs[offset];
-
-	if (offset >= 0x20 && offset < 0x40)
-		return m_palette_port[offset & 0x1f];
+	u16 value = m_regs[offset & 0x7f];
 
 	switch (offset)
 	{
-		case 0x01:
-			value = m_bg_control;
-			break;
-		case 0x02:
-			value = m_current_line;
-			break;
-		case 0x14:
-			value = m_lcd_control;
-			break;
-		case 0xa8:
-			value = m_timer_hblank_count & 0xff;
-			break;
-		case 0xa9:
-			value = m_timer_hblank_count >> 8;
-			break;
-		case 0xaa:
-			value = m_timer_vblank_count & 0xff;
-			break;
-		case 0xab:
-			value = m_timer_vblank_count >> 8;
-			break;
+		case 0x02 / 2:
+			return (value & 0xff00) | m_current_line;
+		case 0xa8 / 2:
+			return m_timer_hblank_count;
+		case 0xaa / 2:
+			return m_timer_vblank_count;
 	}
 
 	return value;
 }
 
 
-void wswan_video_device::reg_w(offs_t offset, uint8_t data)
+void wswan_video_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset >= 0x20 && offset < 0x40)
-	{
-		// 0x20-0x3f tile/sprite palette settings
-		// even offs
-		//   Bit 0-3 - Palette (offs & 0x1f)/2 index 0
-		//   Bit 4-7 - Palette (offs & 0x1f)/2 index 1
-		// odd offs
-		//   Bit 0-3 - Palette (offs & 0x1f)/2 index 2
-		//   Bit 4-7 - Palette (offs & 0x1f)/2 index 3
-		m_palette_port[offset & 0x1f] = data;
-		return;
-	}
-
 	switch (offset)
 	{
-		case 0x00:  // Display control
-					// Bit 0   - Background layer enable
-					// Bit 1   - Foreground layer enable
-					// Bit 2   - Sprites enable
-					// Bit 3   - Sprite window enable
-					// Bit 4-5 - Foreground window configuration
-					//      00 - Foreground layer is displayed inside and outside foreground window area
-					//      01 - Unknown
-					//      10 - Foreground layer is displayed only inside foreground window area
-					//      11 - Foreground layer is displayed outside foreground window area
-					// Bit 6-7 - Unknown
-			m_layer_bg_enable = data & 0x1;
-			m_layer_fg_enable = (data & 0x2) >> 1;
-			m_sprites_enable = (data & 0x4) >> 2;
-			m_window_sprites_enable = (data & 0x8) >> 3;
-			m_window_fg_mode = (data & 0x30) >> 4;
-			break;
-		case 0x01:  // Background colour
-					// In 16 colour mode:
-					//   Bit 0-3 - Palette index
-					//   Bit 4-7 - Palette number
-					// Otherwise:
-					//   Bit 0-2 - Main palette index
-					//   Bit 3-7 - Unknown
-			m_bg_control = data;
-			break;
-		case 0x02:  // Current scanline (Most likely read-only)
-			logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
-			// Returning so we don't overwrite the value here, not that it really matters
-			return;
-		case 0x03:  // Line compare
-			m_line_compare = data;
-			logerror("Write to line compare: %d\n", data);
-			break;
-		case 0x04:  // Sprite table base address
-					// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
-					// Bit 6-7 - Unknown
-			m_sprite_table_address = (data & 0x3f) << 9;
-			break;
-		case 0x05:  // First sprite number (the one we start drawing with)
-			m_sprite_first_latch = data;
-			if (data) logerror("non-zero first sprite %d\n", data);
-			break;
-		case 0x06:  // Number of sprites to draw
-			m_sprite_count_latch = data;
-			break;
-		case 0x07:  // Background/Foreground table base addresses
-					// Bit 0-2 - Determine background table base address 00xxx000 00000000
-					// Bit 3   - Unknown
-					// Bit 4-6 - Determine foreground table base address 00xxx000 00000000
-					// Bit 7   - Unknown
-			m_layer_bg_address = (data & 0x7) << 11;
-			m_layer_fg_address = (data & 0x70) << 7;
-			break;
-		case 0x08:  // Left coordinate of foreground window
-			m_window_fg_left = data;
-			break;
-		case 0x09:  // Top coordinate of foreground window
-			m_window_fg_top = data;
-			break;
-		case 0x0a:  // Right coordinate of foreground window
-			m_window_fg_right = data;
-			break;
-		case 0x0b:  // Bottom coordinate of foreground window
-			m_window_fg_bottom = data;
-			break;
-		case 0x0c:  // Left coordinate of sprite window
-			m_window_sprites_left = data;
-			break;
-		case 0x0d:  // Top coordinate of sprite window
-			m_window_sprites_top = data;
-			break;
-		case 0x0e:  // Right coordinate of sprite window
-			m_window_sprites_right = data;
-			break;
-		case 0x0f:  // Bottom coordinate of sprite window
-			m_window_sprites_bottom = data;
-			break;
-		case 0x10:  // Background layer X scroll
-			m_layer_bg_scroll_x = data;
-			break;
-		case 0x11:  // Background layer Y scroll
-			m_layer_bg_scroll_y = data;
-			break;
-		case 0x12:  // Foreground layer X scroll
-			m_layer_fg_scroll_x = data;
-			break;
-		case 0x13:  // Foreground layer Y scroll
-			m_layer_fg_scroll_y = data;
-			break;
-		case 0x14:  // LCD control
-					// Bit 0   - LCD enable
-					// Bit 1   - WSC only, brightness low/high
-					// Bit 2-7 - Unknown
-			m_lcd_control = data;
-			break;
-		case 0x15:  // LCD icons
-					// Bit 0   - LCD sleep icon enable
-					// Bit 1   - Vertical position icon enable
-					// Bit 2   - Horizontal position icon enable
-					// Bit 3   - Dot 1 icon enable
-					// Bit 4   - Dot 2 icon enable
-					// Bit 5   - Dot 3 icon enable
-					// Bit 6-7 - Unknown
-			m_icons = data; /* ummmmm */
-			break;
-		case 0x1c:  // Palette colors 0 and 1
-					// Bit 0-3 - Gray tone setting for main palette index 0
-					// Bit 4-7 - Gray tone setting for main palette index 1
-			if (m_vdp_type == VDP_TYPE_WSC)
+		case 0x00 / 2:
+			// Display control
+			// Bit 0   - Background layer enable
+			// Bit 1   - Foreground layer enable
+			// Bit 2   - Sprites enable
+			// Bit 3   - Sprite window enable
+			// Bit 4-5 - Foreground window configuration
+			//      00 - Foreground layer is displayed inside and outside foreground window area
+			//      01 - Unknown
+			//      10 - Foreground layer is displayed only inside foreground window area
+			//      11 - Foreground layer is displayed outside foreground window area
+			// Bit 6-7 - Unknown
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[0] = (i << 8) | (i << 4) | i;
-				m_main_palette[1] = (j << 8) | (j << 4) | j;
+				m_layer_bg_enable = data & 0x1;
+				m_layer_fg_enable = (data & 0x2) >> 1;
+				m_sprites_enable = (data & 0x4) >> 2;
+				m_window_sprites_enable = (data & 0x8) >> 3;
+				m_window_fg_mode = (data & 0x30) >> 4;
 			}
-			else
+			// Background colour
+			// In 16 colour mode:
+			//   Bit 0-3 - Palette index
+			//   Bit 4-7 - Palette number
+			// Otherwise:
+			//   Bit 0-2 - Main palette index
+			//   Bit 3-7 - Unknown
+			if (ACCESSING_BITS_8_15)
+				m_bg_control = data >> 8;
+			break;
+		case 0x02 / 2:
+			// Current scanline (read-only)
+			if (ACCESSING_BITS_0_7)
+				logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
+			// Line compare
+			if (ACCESSING_BITS_8_15)
+				m_line_compare = data >> 8;
+			break;
+		case 0x04 / 2:
+			// Sprite table base address
+			// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
+			// Bit 6-7 - Unknown
+			if (ACCESSING_BITS_0_7)
 			{
-				m_main_palette[0] = data & 0x0f;
-				m_main_palette[1] = (data & 0xf0) >> 4;
+				if (m_vdp_type == VDP_TYPE_WSC && !m_color_mode)
+					m_sprite_table_address = (data & 0x3f) << 8;
+				else
+					m_sprite_table_address = (data & 0x1f) << 8;
+			}
+			// First sprite number (the one we start drawing with)
+			if (ACCESSING_BITS_8_15)
+				m_sprite_first_latch = data >> 8;
+			break;
+		case 0x06 / 2:
+			// Number of sprites to draw
+			if (ACCESSING_BITS_0_7)
+				m_sprite_count_latch = data & 0xff;
+			// Background/Foreground table base addresses
+			// Bit 8-10  - Determine background table base address 00xxx000 00000000 (in bytes)
+			// Bit 11    - Unknown
+			// Bit 12-14 - Determine foreground table base address 00xxx000 00000000 (in bytes)
+			// Bit 15    - Unknown
+			if (ACCESSING_BITS_8_15)
+			{
+				m_layer_bg_address = (data & 0x0700) << 2;
+				m_layer_fg_address = (data & 0x7000) >> 2;
 			}
 			break;
-		case 0x1d:  // Palette colors 2 and 3
-					// Bit 0-3 - Gray tone setting for main palette index 2
-					// Bit 4-7 - Gray tone setting for main palette index 3
-			if (m_vdp_type == VDP_TYPE_WSC)
+		case 0x08 / 2:
+			// Left coordinate of foreground window
+			if (ACCESSING_BITS_0_7)
+				m_window_fg_left = data & 0xff;
+			// Top coordinate of foreground window
+			if (ACCESSING_BITS_8_15)
+				m_window_fg_top = data >> 8;
+			break;
+		case 0x0a / 2:
+			// Right coordinate of foreground window
+			if (ACCESSING_BITS_0_7)
+				m_window_fg_right = data & 0xff;
+			// Bottom coordinate of foreground window
+			if (ACCESSING_BITS_8_15)
+				m_window_fg_bottom = data >> 8;
+			break;
+		case 0x0c / 2:
+			// Left coordinate of sprite window
+			if (ACCESSING_BITS_0_7)
+				m_window_sprites_left = data & 0xff;
+			// Top coordinate of sprite window
+			if (ACCESSING_BITS_8_15)
+				m_window_sprites_top = data >> 8;
+			break;
+		case 0x0e / 2:
+			// Right coordinate of sprite window
+			if (ACCESSING_BITS_0_7)
+				m_window_sprites_right = data & 0xff;
+			// Bottom coordinate of sprite window
+			if (ACCESSING_BITS_8_15)
+				m_window_sprites_bottom = data >> 8;
+			break;
+		case 0x10 / 2:
+			// Background layer X scroll
+			if (ACCESSING_BITS_0_7)
+				m_layer_bg_scroll_x = data & 0xff;
+			// Background layer Y scroll
+			if (ACCESSING_BITS_8_15)
+				m_layer_bg_scroll_y = data >> 8;
+			break;
+		case 0x12 / 2:
+			// Foreground layer X scroll
+			if (ACCESSING_BITS_0_7)
+				m_layer_fg_scroll_x = data & 0xff;
+			// Foreground layer Y scroll
+			if (ACCESSING_BITS_8_15)
+				m_layer_fg_scroll_y = data >> 8;
+			break;
+		case 0x14 / 2:
+			// LCD control
+			// Bit 0   - LCD enable
+			// Bit 1   - WSC only, brightness low/high
+			// Bit 2-7 - Unknown
+			if (ACCESSING_BITS_0_7)
+				m_lcd_control = data & 0xff;
+			// LCD icons
+			// Bit 8     - LCD sleep icon enable
+			// Bit 9     - Vertical position icon enable
+			// Bit 10    - Horizontal position icon enable
+			// Bit 11    - Dot 1 icon enable
+			// Bit 12    - Dot 2 icon enable
+			// Bit 13    - Dot 3 icon enable
+			// Bit 14-15 - Unknown
+			if (ACCESSING_BITS_8_15)
+				m_icons_cb(data >> 8);
+			break;
+		case 0x1c / 2:
+			// Palette colors 0 and 1
+			// Bit 0-3 - Gray tone setting for main palette index 0
+			// Bit 4-7 - Gray tone setting for main palette index 1
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[2] = (i << 8) | (i << 4) | i;
-				m_main_palette[3] = (j << 8) | (j << 4) | j;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - (data & 0x0f);
+					int j = 15 - ((data >> 4) & 0x0f);
+					m_main_palette[0] = (i << 8) | (i << 4) | i;
+					m_main_palette[1] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[0] = data & 0x0f;
+					m_main_palette[1] = (data >> 4) & 0x0f;
+				}
 			}
-			else
+			// Palette colors 2 and 3
+			// Bit  8-11 - Gray tone setting for main palette index 2
+			// Bit 12-15 - Gray tone setting for main palette index 3
+			if (ACCESSING_BITS_8_15)
 			{
-				m_main_palette[2] = data & 0x0f;
-				m_main_palette[3] = (data & 0xf0) >> 4;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - ((data >> 8) & 0x0f);
+					int j = 15 - ((data >> 12) & 0x0f);
+					m_main_palette[2] = (i << 8) | (i << 4) | i;
+					m_main_palette[3] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[2] = (data >> 8) & 0x0f;
+					m_main_palette[3] = (data >> 12) & 0x0f;
+				}
 			}
 			break;
-		case 0x1e:  // Palette colors 4 and 5
-					// Bit 0-3 - Gray tone setting for main palette index 4
-					// Bit 4-7 - Gray tone setting for main palette index 5
-			if (m_vdp_type == VDP_TYPE_WSC)
+		case 0x1e / 2:
+			// Palette colors 4 and 5
+			// Bit 0-3 - Gray tone setting for main palette index 4
+			// Bit 4-7 - Gray tone setting for main palette index 5
+			if (ACCESSING_BITS_0_7)
 			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[4] = (i << 8) | (i << 4) | i;
-				m_main_palette[5] = (j << 8) | (j << 4) | j;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - (data & 0x0f);
+					int j = 15 - ((data >> 4) & 0x0f);
+					m_main_palette[4] = (i << 8) | (i << 4) | i;
+					m_main_palette[5] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[4] = data & 0x0f;
+					m_main_palette[5] = (data >> 4) & 0x0f;
+				}
 			}
-			else
+			// Palette colors 6 and 7
+			// Bit 0-3 - Gray tone setting for main palette index 6
+			// Bit 4-7 - Gray tone setting for main palette index 7
+			if (ACCESSING_BITS_8_15)
 			{
-				m_main_palette[4] = data & 0x0f;
-				m_main_palette[5] = (data & 0xf0) >> 4;
-			}
-			break;
-		case 0x1f:  // Palette colors 6 and 7
-					// Bit 0-3 - Gray tone setting for main palette index 6
-					// Bit 4-7 - Gray tone setting for main palette index 7
-			if (m_vdp_type == VDP_TYPE_WSC)
-			{
-				int i = 15 - (data & 0x0f);
-				int j = 15 - ((data & 0xf0) >> 4);
-				m_main_palette[6] = (i << 8) | (i << 4) | i;
-				m_main_palette[7] = (j << 8) | (j << 4) | j;
-			}
-			else
-			{
-				m_main_palette[6] = data & 0x0f;
-				m_main_palette[7] = (data & 0xf0) >> 4;
-			}
-			break;
-		case 0x60:  // Video mode
-					// Bit 0-4 - Unknown
-					// Bit 5   - Packed mode 0 = not packed mode, 1 = packed mode
-					// Bit 6   - 4/16 colour mode select: 0 = 4 colour mode, 1 = 16 colour mode
-					// Bit 7   - monochrome/colour mode select: 0 = monochrome mode, 1 = colour mode
-			/*
-			 * 111  - packed, 16 color, use 4000/8000, color
-			 * 110  - not packed, 16 color, use 4000/8000, color
-			 * 101  - packed, 4 color, use 2000, color
-			 * 100  - not packed, 4 color, use 2000, color
-			 * 011  - packed, 16 color, use 4000/8000, monochrome
-			 * 010  - not packed, 16 color , use 4000/8000, monochrome
-			 * 001  - packed, 4 color, use 2000, monochrome
-			 * 000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
-			 */
-			if (m_vdp_type == VDP_TYPE_WSC)
-			{
-				m_color_mode = data & 0x80;
-				m_colors_16 = data & 0x40;
-				m_tile_packed = data & 0x20;
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					int i = 15 - ((data >> 8) & 0x0f);
+					int j = 15 - ((data >> 12) & 0x0f);
+					m_main_palette[6] = (i << 8) | (i << 4) | i;
+					m_main_palette[7] = (j << 8) | (j << 4) | j;
+				}
+				else
+				{
+					m_main_palette[6] = (data >> 8) & 0x0f;
+					m_main_palette[7] = (data >> 12) & 0x0f;
+				}
 			}
 			break;
-		case 0xa2:  // Timer control
-					// Bit 0   - HBlank Timer enable
-					// Bit 1   - HBlank Timer mode: 0 = one shot, 1 = auto reset
-					// Bit 2   - VBlank Timer(1/75s) enable
-					// Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
-					// Bit 4-7 - Unknown
-			m_timer_hblank_enable = BIT(data, 0);
-			m_timer_hblank_mode =   BIT(data, 1);
-			m_timer_vblank_enable = BIT(data, 2);
-			m_timer_vblank_mode =   BIT(data, 3);
+		case 0x20 / 2: case 0x22 / 2: case 0x24 / 2: case 0x26 / 2:
+		case 0x28 / 2: case 0x2a / 2: case 0x2c / 2: case 0x2e / 2:
+		case 0x30 / 2: case 0x32 / 2: case 0x34 / 2: case 0x36 / 2:
+		case 0x38 / 2: case 0x3a / 2: case 0x3c / 2: case 0x3e / 2:
+			// 0x20-0x3f tile/sprite palette settings
+			//   Bit  0- 3 - Palette (offs & 0x1f)/2 index 0
+			//   Bit  4- 7 - Palette (offs & 0x1f)/2 index 1
+			//   Bit  8-11 - Palette (offs & 0x1f)/2 index 2
+			//   Bit 12-15 - Palette (offs & 0x1f)/2 index 3
+			data &= 0x7777;
+			COMBINE_DATA(&m_palette_port[offset & 0x0f]);
 			break;
-		case 0xa4:  // HBlank timer frequency reload value (bits 0-7)
-			m_timer_hblank_reload &= 0xff00;
-			m_timer_hblank_reload += data;
+		case 0x60 / 2:
+			// Video mode
+			// Bit 0-4 - Unknown
+			// Bit 5   - Packed mode 0 = not packed mode, 1 = packed mode
+			// Bit 6   - 4/16 colour mode select: 0 = 4 colour mode, 1 = 16 colour mode
+			// Bit 7   - monochrome/colour mode select: 0 = monochrome mode, 1 = colour mode
+			//    111  - packed, 16 color, use 4000/8000, color
+			//    110  - not packed, 16 color, use 4000/8000, color
+			//    101  - packed, 4 color, use 2000, color
+			//    100  - not packed, 4 color, use 2000, color
+			//    011  - packed, 16 color, use 4000/8000, monochrome
+			//    010  - not packed, 16 color , use 4000/8000, monochrome
+			//    001  - packed, 4 color, use 2000, monochrome
+			//    000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
+			if (ACCESSING_BITS_0_7)
+			{
+				if (m_vdp_type == VDP_TYPE_WSC)
+				{
+					m_color_mode = data & 0x80;
+					m_colors_16 = data & 0x40;
+					m_tile_packed = data & 0x20;
+				}
+			}
+			break;
+		case 0xa2 / 2:
+			// Timer control
+			// Bit 0   - HBlank Timer enable
+			// Bit 1   - HBlank Timer mode: 0 = one shot, 1 = auto reset
+			// Bit 2   - VBlank Timer(1/75s) enable
+			// Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
+			// Bit 4-7 - Unknown
+			if (ACCESSING_BITS_0_7)
+			{
+				m_timer_hblank_enable = BIT(data, 0);
+				m_timer_hblank_mode =   BIT(data, 1);
+				m_timer_vblank_enable = BIT(data, 2);
+				m_timer_vblank_mode =   BIT(data, 3);
+			}
+			break;
+		case 0xa4 / 2:  // HBlank timer frequency reload value
+			COMBINE_DATA(&m_timer_hblank_reload);
 			m_timer_hblank_count = m_timer_hblank_reload;
 			break;
-		case 0xa5:  // HBlank timer frequency reload value (bits 8-15)
-			m_timer_hblank_reload &= 0xff;
-			m_timer_hblank_reload += data << 8;
-			m_timer_hblank_count = m_timer_hblank_reload;
-			break;
-		case 0xa6:  // VBlank timer frequency reload value (bits 0-7)
-			m_timer_vblank_reload &= 0xff00;
-			m_timer_vblank_reload += data;
+		case 0xa6 / 2:  // VBlank timer frequency reload value
+			COMBINE_DATA(&m_timer_vblank_reload);
 			m_timer_vblank_count = m_timer_vblank_reload;
-			break;
-		case 0xa7:  // VBlank timer frequency reload value (bits 8-15)
-			m_timer_vblank_reload &= 0xff;
-			m_timer_vblank_reload += data << 8;
-			m_timer_vblank_count = m_timer_vblank_reload;
-			break;
-		case 0xa8:  // HBlank counter (bits 0-7)
-		case 0xa9:  // HBlank counter (bits 8-15)
-		case 0xaa:  // VBlank counter (bits 0-7)
-		case 0xab:  // VBlank counter (bits 8-15)
 			break;
 	}
 
-	m_regs[offset] = data;
+	COMBINE_DATA(&m_regs[offset & 0x7f]);
 }
 
 
@@ -1158,7 +1124,6 @@ void wswan_video_device::scanline_interrupt()
 	if (m_timer_hblank_enable && m_timer_hblank_reload != 0)
 	{
 		m_timer_hblank_count--;
-		logerror("timer_hblank_count: %X\n", m_timer_hblank_count);
 		if (m_timer_hblank_count == 0)
 		{
 			if (m_timer_hblank_mode)
@@ -1166,7 +1131,6 @@ void wswan_video_device::scanline_interrupt()
 			else
 				m_timer_hblank_reload = 0;
 
-			logerror( "triggering hbltmr interrupt\n" );
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}
@@ -1174,12 +1138,10 @@ void wswan_video_device::scanline_interrupt()
 	// Handle Sound DMA
 	m_snd_dma_cb();
 
-//  m_current_line = (m_current_line + 1) % 159;
-
 	if (m_current_line == 144) // buffer sprite table
 	{
 		memcpy(m_sprite_table_buffer, &m_vram[m_sprite_table_address], 512);
-		m_sprite_first = m_sprite_first_latch; // always zero?
+		m_sprite_first = m_sprite_first_latch;
 		m_sprite_count = m_sprite_count_latch;
 	}
 
@@ -1190,7 +1152,6 @@ void wswan_video_device::scanline_interrupt()
 		if (m_timer_vblank_enable && m_timer_vblank_reload != 0)
 		{
 			m_timer_vblank_count--;
-			logerror("timer_vblank_count: %X\n", m_timer_vblank_count);
 			if (m_timer_vblank_count == 0)
 			{
 				if (m_timer_vblank_mode)
@@ -1198,13 +1159,10 @@ void wswan_video_device::scanline_interrupt()
 				else
 					m_timer_vblank_reload = 0;
 
-				logerror("triggering vbltmr interrupt\n");
 				m_set_irq_cb(WSWAN_VIDEO_IFLAG_VBLTMR);
 			}
 		}
 	}
-
-//  m_current_line = (m_current_line + 1) % 159;
 
 	if (m_current_line == m_line_compare)
 		m_set_irq_cb(WSWAN_VIDEO_IFLAG_LCMP);
@@ -1213,12 +1171,13 @@ void wswan_video_device::scanline_interrupt()
 }
 
 
-uint8_t wswan_video_device::vram_r(offs_t offset)
+u16 wswan_video_device::vram_r(offs_t offset, u16 mem_mask)
 {
 	return m_vram[offset];
 }
 
-void wswan_video_device::vram_w(offs_t offset, uint8_t data)
+
+void wswan_video_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_vram[offset] = data;
+	COMBINE_DATA(&m_vram[offset]);
 }

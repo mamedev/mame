@@ -2712,10 +2712,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size ||
-		image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 ||
+		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;
@@ -3383,10 +3383,6 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
-	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 	map(vgmplay_device::A_VSU_VUE_0, vgmplay_device::A_VSU_VUE_0 + 0x5ff).w(m_vsu_vue[0], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_VSU_VUE_1, vgmplay_device::A_VSU_VUE_1 + 0x5ff).w(m_vsu_vue[1], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_SAA1099_0, vgmplay_device::A_SAA1099_0 + 1).w(m_saa1099[0], FUNC(saa1099_device::write));
@@ -3407,6 +3403,10 @@ void vgmplay_state::soundchips16le_map(address_map &map)
 	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::pwm_w));
 	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
 	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
+	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
+	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 }
 
 void vgmplay_state::soundchips16be_map(address_map &map)

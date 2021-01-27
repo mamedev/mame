@@ -3257,16 +3257,14 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 /* load snapshot */
 SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
-	std::vector<uint8_t> snapshot;
-
 	/* get file size */
-	if (snapshot_size < 8)
+	if (image.length() < 8)
 		return image_init_result::FAIL;
 
-	snapshot.resize(snapshot_size);
+	std::vector<uint8_t> snapshot(image.length());
 
 	/* read whole file */
-	image.fread(&snapshot[0], snapshot_size);
+	image.fread(&snapshot[0], image.length());
 
 	if (memcmp(&snapshot[0], "MV - SNA", 8))
 	{

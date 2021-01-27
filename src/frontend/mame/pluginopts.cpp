@@ -165,7 +165,7 @@ void plugin_options::parse_ini_file(util::core_file &inifile)
 
 	// and reflect these options back
 	for (plugin &p : m_plugins)
-		p.m_start = opts.bool_value(p.m_name.c_str());
+		p.m_start = opts.bool_value(p.m_name);
 }
 
 

@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <memory>
 
 // standard windows headers
 #include <windows.h>
@@ -31,6 +32,7 @@
 
 
 namespace {
+
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -399,16 +401,19 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 
 osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 {
-	// convert the path to TCHARs
-	osd::text::tstring t_path = osd::text::to_tstring(path);
+	// get the length of the full path
+	std::wstring const w_path(osd::text::to_wstring(path));
+	DWORD const length(GetFullPathNameW(w_path.c_str(), 0, nullptr, nullptr));
+	if (!length)
+		return win_error_to_file_error(GetLastError());
 
-	// canonicalize the path
-	TCHAR buffer[MAX_PATH];
-	if (!GetFullPathName(t_path.c_str(), ARRAY_LENGTH(buffer), buffer, nullptr))
+	// allocate a buffer and get the canonical path
+	std::unique_ptr<wchar_t []> buffer(std::make_unique<wchar_t []>(length));
+	if (!GetFullPathNameW(w_path.c_str(), length, buffer.get(), nullptr))
 		return win_error_to_file_error(GetLastError());
 
 	// convert the result back to UTF-8
-	osd::text::from_tstring(dst, buffer);
+	osd::text::from_wstring(dst, buffer.get());
 	return osd_file::error::NONE;
 }
 
@@ -420,8 +425,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 bool osd_is_absolute_path(std::string const &path)
 {
-	osd::text::tstring t_path = osd::text::to_tstring(path);
-	return !PathIsRelative(t_path.c_str());
+	return !PathIsRelativeW(osd::text::to_wstring(path).c_str());
 }
 
 
@@ -430,20 +434,57 @@ bool osd_is_absolute_path(std::string const &path)
 //  osd_get_volume_name
 //============================================================
 
-const char *osd_get_volume_name(int idx)
+std::string osd_get_volume_name(int idx)
 {
-	static char szBuffer[128];
-	const char *p;
+	std::vector<wchar_t> buffer;
+	DWORD length(GetLogicalDriveStringsW(0, nullptr));
+	while (length && (buffer.size() < (length + 1)))
+	{
+		buffer.clear();
+		buffer.resize(length + 1);
+		length = GetLogicalDriveStringsW(length, &buffer[0]);
+	}
+	if (!length)
+		return std::string();
 
-	GetLogicalDriveStringsA(ARRAY_LENGTH(szBuffer), szBuffer);
-
-	p = szBuffer;
-	while(idx--) {
-		p += strlen(p) + 1;
-		if (!*p) return nullptr;
+	wchar_t const *p(&buffer[0]);
+	while (idx-- && *p)
+	{
+		while (*p++) { }
 	}
 
-	return p;
+	std::string result;
+	osd::text::from_wstring(result, p);
+	return result;
+}
+
+
+//============================================================
+//  osd_get_volume_names
+//============================================================
+
+std::vector<std::string> osd_get_volume_names()
+{
+	std::vector<std::string> result;
+	std::vector<wchar_t> buffer;
+	DWORD length(GetLogicalDriveStringsW(0, nullptr));
+	while (length && (buffer.size() < (length + 1)))
+	{
+		buffer.clear();
+		buffer.resize(length + 1);
+		length = GetLogicalDriveStringsW(length, &buffer[0]);
+	}
+	if (!length)
+		return result;
+
+	wchar_t const *p(&buffer[0]);
+	std::wstring vol;
+	while (*p)
+	{
+		osd::text::from_wstring(result.emplace_back(), p);
+		while (*p++) { }
+	}
+	return result;
 }
 
 

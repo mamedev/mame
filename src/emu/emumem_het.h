@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HET_H
+#define MAME_EMU_EMUMEM_HET_H
+
+#pragma once
 
 // handler_entry_read_tap/handler_entry_write_tap
 
@@ -9,7 +13,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read_passthrough<Width, AddrShift, Endian>;
 
 	handler_entry_read_tap(address_space *space, memory_passthrough_handler &mph, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap) : handler_entry_read_passthrough<Width, AddrShift, Endian>(space, mph), m_name(name), m_tap(std::move(tap)) {}
 	~handler_entry_read_tap() = default;
@@ -31,7 +34,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_writ
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write_passthrough<Width, AddrShift, Endian>;
 
 	handler_entry_write_tap(address_space *space, memory_passthrough_handler &mph, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap) : handler_entry_write_passthrough<Width, AddrShift, Endian>(space, mph), m_name(name), m_tap(std::move(tap)) {}
 	~handler_entry_write_tap() = default;
@@ -48,3 +50,5 @@ protected:
 
 	handler_entry_write_tap(address_space *space, memory_passthrough_handler &mph, handler_entry_write<Width, AddrShift, Endian> *next, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap) : handler_entry_write_passthrough<Width, AddrShift, Endian>(space, mph, next), m_name(name), m_tap(tap) {}
 };
+
+#endif // MAME_EMU_EMUMEM_HET_H

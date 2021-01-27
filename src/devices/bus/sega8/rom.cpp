@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(SEGA8_ROM_HICOM,        sega8_hicom_device,        "sega8_hic
 DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device,       "sega8_korean",      "SMS Korean Carts")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device,    "sega8_korean_nb",   "SMS Korean No-Bank Mapper Carts")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device,       "sega8_seojin",      "SMS Seo Jin Multi-cart")
+DEFINE_DEVICE_TYPE(SEGA8_ROM_X_TERMINATOR, sega8_x_terminator_device, "sega8_x_terminator", "GG X-Terminator")
 
 // Specific SC-3000 cart types
 DEFINE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device,    "sega8_multicart",   "SC-3000 MkII Multicart Cart")
@@ -1134,4 +1135,148 @@ void sega8_megacart_device::write_io(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xe0) == 0xe0)
 		m_block = (data & 0x1f) | (data & 0xc0) >> 1;
+}
+
+
+/*-------------------------------------------------
+
+GG X-Terminator
+
+The cartridge has a switch to choose NORMAL or ACTION mode
+and a RESET button.
+
+The X-Terminator has logic to switch between the X-Terminator's
+ROM and game ROM when $0038 is read.
+When starting up the X-Terminator's ROM is active. In NORMAL
+mode any read of $38 switches to game ROM. In ACTION mode any
+read of $38 switches between game ROM and X-Terminator ROM (this
+allows the X-Terminator to inject cheat codes during IRQs).
+
+While running a game the RESET button is used to get back
+into the X-Terminator to search for cheat codes.
+
+ -------------------------------------------------*/
+
+sega8_x_terminator_device::sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_rom_device(mconfig, SEGA8_ROM_X_TERMINATOR, tag, owner, clock)
+	, m_subslot(*this, "subslot")
+	, m_switch(*this, "SWITCH")
+	, m_reset(*this, "RESET")
+	, m_active(true)
+{
+}
+
+static INPUT_PORTS_START( x_terminator )
+	PORT_START("SWITCH")
+	PORT_DIPNAME( 0x01, 0x00, "NORMAL/ACTION" )
+	PORT_DIPSETTING( 0x00, "NORMAL" )
+	PORT_DIPSETTING( 0x01, "ACTION" )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Reset")
+INPUT_PORTS_END
+
+ioport_constructor sega8_x_terminator_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( x_terminator );
+}
+
+void sega8_x_terminator_device::device_add_mconfig(machine_config &config)
+{
+	GAMEGEAR_CART_SLOT(config, "subslot", gg_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
+}
+
+void sega8_x_terminator_device::device_start()
+{
+	save_item(NAME(m_active));
+}
+
+void sega8_x_terminator_device::device_reset()
+{
+	m_active = true;
+}
+
+uint8_t sega8_x_terminator_device::read_cart(offs_t offset)
+{
+	if (offset == 0x38 && !machine().side_effects_disabled())
+	{
+		if (BIT(m_switch->read(), 0))
+		{
+			// ACTION
+			m_active = !m_active;
+		}
+		else if (!BIT(m_reset->read(), 0))
+		{
+			// RESET button pressed
+			m_active = true;
+		}
+		else
+		{
+			// NORMAL
+			m_active = false;
+		}
+	}
+	if (m_active)
+	{
+		// RAM at 0x2000-0x3fff
+		if (offset >= 0x2000 && offset < 0x4000)
+			return m_ram[offset & 0x1fff];
+
+		// Check RESET button
+		if (offset == 0x0007)
+			return m_reset->read();
+
+		return m_rom[offset % m_rom_size];
+	}
+	else
+	{
+		// Pass-through to inserted game cartridge
+		return m_subslot->read_cart(offset);
+	}
+}
+
+void sega8_x_terminator_device::write_cart(offs_t offset, uint8_t data)
+{
+	if (m_active)
+	{
+		// RAM at 0x2000-0x23fff
+		if (offset >= 0x2000 && offset < 0x4000)
+			m_ram[offset & 0x1fff] = data;
+	}
+	else
+	{
+		// Pass-through to inserted game cartridge
+		m_subslot->write_cart(offset, data);
+	}
+}
+
+void sega8_x_terminator_device::write_mapper(offs_t offset, uint8_t data)
+{
+	// Pass-through to inserted game cartridge
+	m_subslot->write_mapper(offset, data);
+}
+
+uint8_t sega8_x_terminator_device::read_ram(offs_t offset)
+{
+	// Pass-through to inserted game cartridge
+	return m_subslot->read_ram(offset);
+}
+
+void sega8_x_terminator_device::write_ram(offs_t offset, uint8_t data)
+{
+	// Pass-through to inserted game cartridge
+	m_subslot->write_ram(offset, data);
+}
+
+uint8_t sega8_x_terminator_device::read_io(offs_t offset)
+{
+	// Pass-through to inserted game cartridge
+	return m_subslot->read_io(offset);
+}
+
+void sega8_x_terminator_device::write_io(offs_t offset, uint8_t data)
+{
+	// Pass-through to inserted game cartridge
+	m_subslot->write_io(offset, data);
 }

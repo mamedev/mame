@@ -13,13 +13,13 @@
 #pragma once
 
 
-#include "corestr.h"
-#include "coretmpl.h"
+#include "osdfile.h"
 #include "strformat.h"
 
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 
 
 namespace util {
@@ -111,7 +111,7 @@ public:
 	virtual std::uint32_t write(const void *buffer, std::uint32_t length) = 0;
 
 	// write a line of text to the file
-	virtual int puts(const char *s) = 0;
+	virtual int puts(std::string_view s) = 0;
 
 	// printf-style text write to a file
 	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) = 0;
@@ -157,13 +157,13 @@ constexpr bool is_directory_separator(char c)
 /* ----- filename utilities ----- */
 
 // extract the base part of a filename (remove extensions and paths)
-std::string core_filename_extract_base(const std::string &name, bool strip_extension = false);
+std::string_view core_filename_extract_base(std::string_view name, bool strip_extension = false);
 
 // extracts the file extension from a filename
-std::string core_filename_extract_extension(const std::string &filename, bool strip_period = false);
+std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period = false);
 
 // true if the given filename ends with a particular extension
-bool core_filename_ends_with(const std::string &filename, const std::string &extension);
+bool core_filename_ends_with(std::string_view filename, std::string_view extension);
 
 
 #endif // MAME_LIB_UTIL_COREFILE_H

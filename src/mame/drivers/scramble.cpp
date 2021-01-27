@@ -1812,7 +1812,7 @@ ROM_START( troopy )
 	ROM_LOAD( "ic5e.bin", 0x2000, 0x1000, CRC(a0396cc8) SHA1(c8266b58b144a4bc564f3a2503d5b953c0ba6ca7) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
+	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, BAD_DUMP CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
 	ROM_LOAD( "ic5f_neu.bin",      0x0800, 0x0800, CRC(cbbfefc2) SHA1(2378949275b8d3fc69551b00d9b2c654b91fd780) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -2048,7 +2048,7 @@ GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkouga
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad GFX ROM
 
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",      MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino

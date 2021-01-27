@@ -18,6 +18,8 @@
 #include "emuopts.h"
 #include "mame.h"
 
+#include "corestr.h"
+
 
 namespace ui {
 static int ADDING = 1;
@@ -384,13 +386,12 @@ void menu_add_change_folder::handle()
 void menu_add_change_folder::populate(float &customtop, float &custombottom)
 {
 	// open a path
-	const char *volume_name = nullptr;
 	file_enumerator path(m_current_path.c_str());
 	const osd::directory::entry *dirent;
 	int folders_count = 0;
 
 	// add the drives
-	for (int i = 0; (volume_name = osd_get_volume_name(i)) != nullptr; ++i)
+	for (std::string const &volume_name : osd_get_volume_names())
 		item_append(volume_name, "[DRIVE]", 0, (void *)(uintptr_t)++folders_count);
 
 	// add the directories

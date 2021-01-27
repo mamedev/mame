@@ -12,6 +12,7 @@
 #include "spu.h"
 #include "spureverb.h"
 #include "cpu/psx/psx.h"
+#include "corestr.h"
 
 //
 //

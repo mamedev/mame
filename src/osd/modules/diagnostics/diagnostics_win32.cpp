@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "diagnostics_module.h"
 
+#include "corestr.h"
+
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
@@ -529,7 +531,7 @@ bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::s
 				chptr++;
 
 			// extract the symbol name
-			strtrimspace(symbol.assign(chptr));
+			symbol.assign(strtrimspace(chptr));
 			return (symbol.length() > 0);
 		}
 	}
@@ -569,7 +571,7 @@ bool symbol_manager::parse_map_line(const char *line, uintptr_t &address, std::s
 			chptr++;
 
 		// extract the symbol name
-		strtrimspace(symbol.assign(chptr));
+		symbol.assign(strtrimspace(chptr));
 		return (symbol.length() > 0);
 	}
 #endif

@@ -755,12 +755,14 @@ void vip_state::vip(machine_config &config)
 	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(vip_state::quickload_cb));
+	quickload.set_interface("chip8quik");
+	SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("V");
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vip_cass");
-
-	// software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram

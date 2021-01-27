@@ -40,12 +40,22 @@ DEFINE_DEVICE_TYPE(V50,  v50_device,  "v50",  "NEC V50")
 DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "NEC V53")
 DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "NEC V53A")
 
+u8 device_v5x_interface::SULA_r()
+{
+	return m_SULA;
+}
+
 void device_v5x_interface::SULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("SULA_w %02x\n", data);
 	m_SULA = data;
 	install_peripheral_io();
+}
+
+u8 device_v5x_interface::TULA_r()
+{
+	return m_TULA;
 }
 
 void device_v5x_interface::TULA_w(u8 data)
@@ -56,6 +66,11 @@ void device_v5x_interface::TULA_w(u8 data)
 	install_peripheral_io();
 }
 
+u8 device_v5x_interface::IULA_r()
+{
+	return m_IULA;
+}
+
 void device_v5x_interface::IULA_w(u8 data)
 {
 	if (VERBOSE)
@@ -64,12 +79,22 @@ void device_v5x_interface::IULA_w(u8 data)
 	install_peripheral_io();
 }
 
+u8 device_v5x_interface::DULA_r()
+{
+	return m_DULA;
+}
+
 void device_v5x_interface::DULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("DULA_w %02x\n", data);
 	m_DULA = data;
 	install_peripheral_io();
+}
+
+u8 device_v5x_interface::OPHA_r()
+{
+	return m_OPHA;
 }
 
 void device_v5x_interface::OPHA_w(u8 data)
@@ -83,12 +108,22 @@ void device_v5x_interface::OPHA_w(u8 data)
 	m_OPHA = data;
 }
 
+u8 device_v5x_interface::OPSEL_r()
+{
+	return m_OPSEL;
+}
+
 void device_v5x_interface::OPSEL_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("OPSEL_w %02x\n", data);
-	m_OPSEL = data;
+	m_OPSEL = data & 0x0f;
 	install_peripheral_io();
+}
+
+u8 device_v5x_interface::TCKS_r()
+{
+	return m_TCKS;
 }
 
 void device_v5x_interface::TCKS_w(u8 data)
@@ -265,6 +300,11 @@ void v50_base_device::io_write_word(offs_t a, u16 v)
 }
 
 
+u8 v50_base_device::OPCN_r()
+{
+	return m_OPCN;
+}
+
 void v50_base_device::OPCN_w(u8 data)
 {
 	// bit 7: unused
@@ -416,7 +456,7 @@ void v50_device::install_peripheral_io()
 
 void v50_base_device::internal_port_map(address_map &map)
 {
-	map(0xfff0, 0xfff0).w(FUNC(v50_base_device::TCKS_w));
+	map(0xfff0, 0xfff0).rw(FUNC(v50_base_device::TCKS_r), FUNC(v50_base_device::TCKS_w));
 
 	map(0xfff2, 0xfff2).w(FUNC(v50_base_device::RFC_w));
 
@@ -424,13 +464,13 @@ void v50_base_device::internal_port_map(address_map &map)
 	map(0xfff5, 0xfff5).w(FUNC(v50_base_device::WCY1_w));
 	map(0xfff6, 0xfff6).w(FUNC(v50_base_device::WCY2_w));
 
-	map(0xfff8, 0xfff8).w(FUNC(v50_base_device::SULA_w));
-	map(0xfff9, 0xfff9).w(FUNC(v50_base_device::TULA_w));
-	map(0xfffa, 0xfffa).w(FUNC(v50_base_device::IULA_w));
-	map(0xfffb, 0xfffb).w(FUNC(v50_base_device::DULA_w));
-	map(0xfffc, 0xfffc).w(FUNC(v50_base_device::OPHA_w));
-	map(0xfffd, 0xfffd).w(FUNC(v50_base_device::OPSEL_w));
-	map(0xfffe, 0xfffe).w(FUNC(v50_base_device::OPCN_w));
+	map(0xfff8, 0xfff8).rw(FUNC(v50_base_device::SULA_r), FUNC(v50_base_device::SULA_w));
+	map(0xfff9, 0xfff9).rw(FUNC(v50_base_device::TULA_r), FUNC(v50_base_device::TULA_w));
+	map(0xfffa, 0xfffa).rw(FUNC(v50_base_device::IULA_r), FUNC(v50_base_device::IULA_w));
+	map(0xfffb, 0xfffb).rw(FUNC(v50_base_device::DULA_r), FUNC(v50_base_device::DULA_w));
+	map(0xfffc, 0xfffc).rw(FUNC(v50_base_device::OPHA_r), FUNC(v50_base_device::OPHA_w));
+	map(0xfffd, 0xfffd).rw(FUNC(v50_base_device::OPSEL_r), FUNC(v50_base_device::OPSEL_w));
+	map(0xfffe, 0xfffe).rw(FUNC(v50_base_device::OPCN_r), FUNC(v50_base_device::OPCN_w));
 }
 
 void v50_base_device::execute_set_input(int irqline, int state)
@@ -550,6 +590,11 @@ void v53_device::io_write_word(offs_t a, u16 v)
 }
 
 
+u8 v53_device::SCTL_r()
+{
+	return m_SCTL;
+}
+
 void v53_device::SCTL_w(u8 data)
 {
 	// bit 7: unused
@@ -562,7 +607,7 @@ void v53_device::SCTL_w(u8 data)
 	// bit 0: Onboard pripheral I/O maps to 8-bit boundaries? (otherwise 16-bit)
 
 	LOG("SCTL_w %02x\n", data);
-	m_SCTL = data;
+	m_SCTL = data & 0x1f;
 	install_peripheral_io();
 }
 
@@ -703,7 +748,7 @@ void v53_device::internal_port_map(address_map &map)
 	map(0xffec, 0xffec).w(FUNC(v53_device::WCY0_w));  // waitstate control
 	map(0xffed, 0xffed).w(FUNC(v53_device::WAC_w));   // waitstate control
 	// 0xffee-0xffef reserved
-	map(0xfff0, 0xfff0).w(FUNC(v53_device::TCKS_w));  // timer clocks
+	map(0xfff0, 0xfff0).rw(FUNC(v53_device::TCKS_r), FUNC(v53_device::TCKS_w));  // timer clocks
 	map(0xfff1, 0xfff1).w(FUNC(v53_device::SBCR_w));  // internal clock divider, halt behavior etc.
 	map(0xfff2, 0xfff2).w(FUNC(v53_device::RFC_w));   // ram refresh control
 	map(0xfff3, 0xfff3).w(FUNC(v53_device::WMB1_w));  // waitstate control
@@ -711,13 +756,13 @@ void v53_device::internal_port_map(address_map &map)
 	map(0xfff5, 0xfff5).w(FUNC(v53_device::WCY3_w));  // waitstate control
 	map(0xfff6, 0xfff6).w(FUNC(v53_device::WCY4_w));  // waitstate control
 	// 0xfff6 reserved
-	map(0xfff8, 0xfff8).w(FUNC(v53_device::SULA_w));  // scu mapping
-	map(0xfff9, 0xfff9).w(FUNC(v53_device::TULA_w));  // tcu mapping
-	map(0xfffa, 0xfffa).w(FUNC(v53_device::IULA_w));  // icu mapping
-	map(0xfffb, 0xfffb).w(FUNC(v53_device::DULA_w));  // dmau mapping
-	map(0xfffc, 0xfffc).w(FUNC(v53_device::OPHA_w));  // peripheral mapping (upper bits, common)
-	map(0xfffd, 0xfffd).w(FUNC(v53_device::OPSEL_w)); // peripheral enabling
-	map(0xfffe, 0xfffe).w(FUNC(v53_device::SCTL_w));  // peripheral configuration (& byte / word mapping)
+	map(0xfff8, 0xfff8).rw(FUNC(v53_device::SULA_r), FUNC(v53_device::SULA_w));  // scu mapping
+	map(0xfff9, 0xfff9).rw(FUNC(v53_device::TULA_r), FUNC(v53_device::TULA_w));  // tcu mapping
+	map(0xfffa, 0xfffa).rw(FUNC(v53_device::IULA_r), FUNC(v53_device::IULA_w));  // icu mapping
+	map(0xfffb, 0xfffb).rw(FUNC(v53_device::DULA_r), FUNC(v53_device::DULA_w));  // dmau mapping
+	map(0xfffc, 0xfffc).rw(FUNC(v53_device::OPHA_r), FUNC(v53_device::OPHA_w));  // peripheral mapping (upper bits, common)
+	map(0xfffd, 0xfffd).rw(FUNC(v53_device::OPSEL_r), FUNC(v53_device::OPSEL_w)); // peripheral enabling
+	map(0xfffe, 0xfffe).rw(FUNC(v53_device::SCTL_r), FUNC(v53_device::SCTL_w));  // peripheral configuration (& byte / word mapping)
 	// 0xffff reserved
 }
 

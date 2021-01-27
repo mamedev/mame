@@ -493,7 +493,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
 			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
-			// [1] u--l pppp pppp ssss    u = unknown, always on for most games, on for the backgrounds only on sams64, l = low-res texture?  p = palette?  s = texture sheet (1024 x 1024 pages)
+			// [1] t--l pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
+			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
+			//                            l = low-res texture?  p = palette?  s = texture sheet (1024 x 1024 pages)
 			// [2] S?XX *--- -YY# ----    S = use 4x4 sub-texture pages?  ? = SNK logo roadedge / bbust2 / broken banners in xrally,  XX = horizontal subtexture  * = broken banners in xrally  YY = vertical subtexture  @ = broken banners in xrally
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
@@ -534,6 +536,11 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
 
+			// Flat shaded polygon, no texture, no lighting
+			if (chunkOffset[1] & 0x8000)
+				currentPoly.flatShade = false;
+			else
+				currentPoly.flatShade = true;
 
 			// PALETTE
 			currentPoly.palOffset = 0;
@@ -563,7 +570,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			}
 
 			currentPoly.palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
-
 
 #if 0
 			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
@@ -612,6 +618,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
 					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
 					currentPoly.vert[m].normal[3] = 0.0f;
+
+					if (currentPoly.flatShade)
+						currentPoly.vert[m].colorIndex = chunkOffset[7 + (9*m)] >> 5;
 				}
 
 				// Redundantly called, but it works...
@@ -642,6 +651,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
 					currentPoly.vert[m].texCoords[2] = 0.0f;
 					currentPoly.vert[m].texCoords[3] = 1.0f;
+
+					if (currentPoly.flatShade)
+						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
@@ -681,6 +693,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.vert[0].texCoords[2] = 0.0f;
 				currentPoly.vert[0].texCoords[3] = 1.0f;
 
+				if (currentPoly.flatShade)
+					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+
 				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
 				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
 				currentPoly.vert[0].normal[2] = uToF(chunkOffset[11]);
@@ -717,6 +732,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.vert[0].texCoords[2] = 0.0f;
 				currentPoly.vert[0].texCoords[3] = 1.0f;
 
+				if (currentPoly.flatShade)
+					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
 				currentPoly.vert[0].normal[1] = lastPoly.faceNormal[1];
@@ -751,7 +769,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				break;
 			}
 
-			currentPoly.visible = 1;
+			currentPoly.visible = true;
 
 			// Backup the last polygon (for triangle fans [strips?])
 			memcpy(&lastPoly, &currentPoly, sizeof(polygon));
@@ -821,15 +839,15 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
 			if (backfaceCullResult < 0.0f)
-				currentPoly.visible = 1;
+				currentPoly.visible = true;
 			else
-				currentPoly.visible = 0;
+				currentPoly.visible = false;
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
-				currentPoly.visible = 0;
+				currentPoly.visible = false;
 			}
 
 
@@ -1186,7 +1204,7 @@ void hng64_state::normalize(float* x)
 // POLYGON RASTERIZATION CODE //
 ////////////////////////////////
 
-void hng64_poly_renderer::render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
+void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
@@ -1320,6 +1338,50 @@ void hng64_poly_renderer::render_scanline(int32_t scanline, const extent_t& exte
 	}
 }
 
+void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
+{
+	// Pull the parameters out of the extent structure
+	float z = extent.param[0].start;
+	float r = extent.param[1].start;
+	float g = extent.param[2].start;
+	float b = extent.param[3].start;
+
+	const float dz = extent.param[0].dpdx;
+	const float dr = extent.param[1].dpdx;
+	const float dg = extent.param[2].dpdx;
+	const float db = extent.param[3].dpdx;
+
+	// Pointers to the pixel buffers
+	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+
+	// Step over each pixel in the horizontal span
+	for(int x = extent.startx; x < extent.stopx; x++)
+	{
+		if (z < *depthBuffer)
+		{
+
+			// Clamp and finalize
+			if (r >= 255) r = 255;
+			if (g >= 255) g = 255;
+			if (b >= 255) b = 255;
+
+			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
+
+			*colorBuffer = color;
+			*depthBuffer = z;
+		}
+
+		z += dz;
+		r += dr;
+		g += dg;
+		b += db;
+
+		colorBuffer++;
+		depthBuffer++;
+	}
+}
+
 void hng64_poly_renderer::drawShaded(polygon *p)
 {
 	// Polygon information for the rasterizer
@@ -1333,62 +1395,105 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
 
-	// The perspective-correct texture divide...
-	// Note: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
-	for (int j = 0; j < p->n; j++)
+	// Pass the render data into the rasterizer
+	hng64_poly_data& renderData = object_data_alloc();
+	renderData = rOptions;
+
+	const rectangle& visibleArea = m_state.m_screen->visible_area();
+
+	if (p->flatShade)
 	{
-		p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
-		p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
-		p->vert[j].light[1]      = p->vert[j].light[1]     * p->vert[j].clipCoords[3];
-		p->vert[j].light[2]      = p->vert[j].light[2]     * p->vert[j].clipCoords[3];
-		p->vert[j].texCoords[0]  = p->vert[j].texCoords[0] * p->vert[j].clipCoords[3];
-		p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
+		// Rasterize the triangles
+		for (int j = 1; j < p->n-1; j++)
+		{
+			// Build some MAME rasterizer vertices from the hng64 vertices
+			vertex_t pVert[3];
+			rgb_t color;
+
+			const polyVert& pv0 = p->vert[0];
+			color = m_state.m_palette->pen(renderData.palOffset + pv0.colorIndex);
+			pVert[0].x = pv0.clipCoords[0];
+			pVert[0].y = pv0.clipCoords[1];
+			pVert[0].p[0] = pv0.clipCoords[2];
+			pVert[0].p[1] = color.r();
+			pVert[0].p[2] = color.g();
+			pVert[0].p[3] = color.b();
+
+			const polyVert& pvj = p->vert[j];
+			color = m_state.m_palette->pen(renderData.palOffset + pvj.colorIndex);
+			pVert[1].x = pvj.clipCoords[0];
+			pVert[1].y = pvj.clipCoords[1];
+			pVert[1].p[0] = pvj.clipCoords[2];
+			pVert[1].p[1] = color.r();
+			pVert[1].p[2] = color.g();
+			pVert[1].p[3] = color.b();
+
+			const polyVert& pvjp1 = p->vert[j+1];
+			color = m_state.m_palette->pen(renderData.palOffset + pvjp1.colorIndex);
+			pVert[2].x = pvjp1.clipCoords[0];
+			pVert[2].y = pvjp1.clipCoords[1];
+			pVert[2].p[0] = pvjp1.clipCoords[2];
+			pVert[2].p[1] = color.r();
+			pVert[2].p[2] = color.g();
+			pVert[2].p[3] = color.b();
+
+			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), 4, pVert[0], pVert[1], pVert[2]);
+		}
 	}
-
-	// Rasterize the triangles
-	for (int j = 1; j < p->n-1; j++)
+	else
 	{
-		// Build some MAME rasterizer vertices from the hng64 vertices
-		vertex_t pVert[3];
+		// The perspective-correct texture divide...
+		// Note: There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping - explore
+		for (int j = 0; j < p->n; j++)
+		{
+			p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
+			p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
+			p->vert[j].light[1]      = p->vert[j].light[1]     * p->vert[j].clipCoords[3];
+			p->vert[j].light[2]      = p->vert[j].light[2]     * p->vert[j].clipCoords[3];
+			p->vert[j].texCoords[0]  = p->vert[j].texCoords[0] * p->vert[j].clipCoords[3];
+			p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
+		}
 
-		const polyVert& pv0 = p->vert[0];
-		pVert[0].x = pv0.clipCoords[0];
-		pVert[0].y = pv0.clipCoords[1];
-		pVert[0].p[0] = pv0.clipCoords[2];
-		pVert[0].p[1] = pv0.clipCoords[3];
-		pVert[0].p[2] = pv0.light[0];
-		pVert[0].p[3] = pv0.light[1];
-		pVert[0].p[4] = pv0.light[2];
-		pVert[0].p[5] = pv0.texCoords[0];
-		pVert[0].p[6] = pv0.texCoords[1];
+		// Rasterize the triangles
+		for (int j = 1; j < p->n-1; j++)
+		{
+			// Build some MAME rasterizer vertices from the hng64 vertices
+			vertex_t pVert[3];
 
-		const polyVert& pvj = p->vert[j];
-		pVert[1].x = pvj.clipCoords[0];
-		pVert[1].y = pvj.clipCoords[1];
-		pVert[1].p[0] = pvj.clipCoords[2];
-		pVert[1].p[1] = pvj.clipCoords[3];
-		pVert[1].p[2] = pvj.light[0];
-		pVert[1].p[3] = pvj.light[1];
-		pVert[1].p[4] = pvj.light[2];
-		pVert[1].p[5] = pvj.texCoords[0];
-		pVert[1].p[6] = pvj.texCoords[1];
+			const polyVert& pv0 = p->vert[0];
+			pVert[0].x = pv0.clipCoords[0];
+			pVert[0].y = pv0.clipCoords[1];
+			pVert[0].p[0] = pv0.clipCoords[2];
+			pVert[0].p[1] = pv0.clipCoords[3];
+			pVert[0].p[2] = pv0.light[0];
+			pVert[0].p[3] = pv0.light[1];
+			pVert[0].p[4] = pv0.light[2];
+			pVert[0].p[5] = pv0.texCoords[0];
+			pVert[0].p[6] = pv0.texCoords[1];
 
-		const polyVert& pvjp1 = p->vert[j+1];
-		pVert[2].x = pvjp1.clipCoords[0];
-		pVert[2].y = pvjp1.clipCoords[1];
-		pVert[2].p[0] = pvjp1.clipCoords[2];
-		pVert[2].p[1] = pvjp1.clipCoords[3];
-		pVert[2].p[2] = pvjp1.light[0];
-		pVert[2].p[3] = pvjp1.light[1];
-		pVert[2].p[4] = pvjp1.light[2];
-		pVert[2].p[5] = pvjp1.texCoords[0];
-		pVert[2].p[6] = pvjp1.texCoords[1];
+			const polyVert& pvj = p->vert[j];
+			pVert[1].x = pvj.clipCoords[0];
+			pVert[1].y = pvj.clipCoords[1];
+			pVert[1].p[0] = pvj.clipCoords[2];
+			pVert[1].p[1] = pvj.clipCoords[3];
+			pVert[1].p[2] = pvj.light[0];
+			pVert[1].p[3] = pvj.light[1];
+			pVert[1].p[4] = pvj.light[2];
+			pVert[1].p[5] = pvj.texCoords[0];
+			pVert[1].p[6] = pvj.texCoords[1];
 
-		// Pass the render data into the rasterizer
-		hng64_poly_data& renderData = object_data_alloc();
-		renderData = rOptions;
+			const polyVert& pvjp1 = p->vert[j+1];
+			pVert[2].x = pvjp1.clipCoords[0];
+			pVert[2].y = pvjp1.clipCoords[1];
+			pVert[2].p[0] = pvjp1.clipCoords[2];
+			pVert[2].p[1] = pvjp1.clipCoords[3];
+			pVert[2].p[2] = pvjp1.light[0];
+			pVert[2].p[3] = pvjp1.light[1];
+			pVert[2].p[4] = pvjp1.light[2];
+			pVert[2].p[5] = pvjp1.texCoords[0];
+			pVert[2].p[6] = pvjp1.texCoords[1];
 
-		const rectangle& visibleArea = m_state.m_screen->visible_area();
-		render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_scanline, this), 7, pVert[0], pVert[1], pVert[2]);
+			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_texture_scanline, this), 7, pVert[0], pVert[1], pVert[2]);
+		}
 	}
 }

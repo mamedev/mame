@@ -8,7 +8,7 @@ Romstar Inc., 1989
 Driver by Pierpaolo Prazzoli
 
 To Do:
-  Hook up player 2 controls for cocktail mode
+  Player 2 controls for cocktail mode work, but might not be 100% figured out
 
 -----------------------------------------------------------
 
@@ -191,8 +191,9 @@ class champbwl_state : public champbwl_base_state
 public:
 	champbwl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		champbwl_base_state(mconfig, type, tag),
-		m_fakex(*this, "FAKEX"),
-		m_fakey(*this, "FAKEY")
+		m_nvram(*this, "nvram"),
+		m_fakex(*this, "FAKEX%u", 1U),
+		m_fakey(*this, "FAKEY%u", 1U)
 	{ }
 
 	void champbwl(machine_config &config);
@@ -202,9 +203,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_ioport m_fakex;
-	required_ioport m_fakey;
-	uint8_t m_last_trackball_val[2];
+	required_shared_ptr<uint8_t> m_nvram;
+	required_ioport_array<2> m_fakex;
+	required_ioport_array<2> m_fakey;
+	uint8_t m_last_trackball_val[2][2];
 
 	uint8_t trackball_r();
 	uint8_t trackball_reset_r();
@@ -248,21 +250,26 @@ void champbwl_base_state::palette(palette_device &palette) const
 
 uint8_t champbwl_state::trackball_r()
 {
-	uint8_t port4 = m_fakex->read();
-	uint8_t port5 = m_fakey->read();
+	uint8_t which = BIT(m_nvram[0x400], 7);
 
-	uint8_t ret = (((port4 - m_last_trackball_val[0]) & 0x0f) << 4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
+	uint8_t port4 = m_fakex[which]->read();
+	uint8_t port5 = m_fakey[which]->read();
+
+	uint8_t ret = (((port4 - m_last_trackball_val[which][0]) & 0x0f) << 4) | ((port5 - m_last_trackball_val[which][1]) & 0x0f);
 
 	return ret;
 }
 
 uint8_t champbwl_state::trackball_reset_r()
 {
+	uint8_t which = BIT(m_nvram[0x400], 7);
+
 	if (!machine().side_effects_disabled())
 	{
-		m_last_trackball_val[0] = m_fakex->read();
-		m_last_trackball_val[1] = m_fakey->read();
+		m_last_trackball_val[which][0] = m_fakex[which]->read();
+		m_last_trackball_val[which][1] = m_fakey[which]->read();
 	}
+
 	return 0xff;
 }
 
@@ -291,7 +298,7 @@ void champbwl_state::prg_map(address_map &map)
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8)); // enable / disable background transparency
 
 	map(0xf000, 0xf000).r(FUNC(champbwl_state::trackball_r));
-	map(0xf002, 0xf002).portr("IN0");
+	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return !BIT(m_nvram[0x400], 7) ? ioport("IN0")->read() : ioport("IN1")->read(); }));
 	map(0xf004, 0xf004).r(FUNC(champbwl_state::trackball_reset_r));
 	map(0xf006, 0xf006).portr("IN2");
 	map(0xf007, 0xf007).portr("IN3");
@@ -348,6 +355,16 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // INT( 4M)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // INT(16M)
 
+	PORT_START("IN1") // muxed
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Player Change (cocktail)") PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) // test mode only registers these two but in game also the ones in IN0 work
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // INT( 4M)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // INT(16M)
+
 	PORT_START("IN2")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
@@ -397,11 +414,17 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FAKEX")     // FAKE
+	PORT_START("FAKEX1")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0)
 
-	PORT_START("FAKEY")     // FAKE
+	PORT_START("FAKEY1")     // FAKE
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE
+
+	PORT_START("FAKEX2")     // FAKE
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0) PORT_COCKTAIL
+
+	PORT_START("FAKEY2")     // FAKE
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( doraemon )
@@ -492,8 +515,10 @@ void champbwl_state::machine_start()
 
 void champbwl_state::machine_reset()
 {
-	m_last_trackball_val[0] = 0;
-	m_last_trackball_val[1] = 0;
+	m_last_trackball_val[0][0] = 0;
+	m_last_trackball_val[0][1] = 0;
+	m_last_trackball_val[1][0] = 0;
+	m_last_trackball_val[1][1] = 0;
 }
 
 uint32_t champbwl_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

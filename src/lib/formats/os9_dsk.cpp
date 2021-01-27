@@ -69,7 +69,7 @@ const char *os9_format::extensions() const
 	return "dsk,os9";
 }
 
-int os9_format::identify(io_generic *io, uint32_t form_factor)
+int os9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 

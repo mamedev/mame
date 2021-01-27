@@ -183,7 +183,7 @@ const char *jfd_format::extensions() const
 	return "jfd";
 }
 
-int jfd_format::identify(io_generic *io, uint32_t form_factor)
+int jfd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
@@ -221,7 +221,7 @@ int jfd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool jfd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool jfd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);

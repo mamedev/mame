@@ -170,7 +170,6 @@ void lua_engine::initialize_input(sol::table &emu)
 			&ioport_manager::input_type_to_token,
 			[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
-	ioport_manager_type["natkeyboard"] = sol::property(&ioport_manager::natkeyboard);
 
 
 	auto natkeyboard_type = sol().registry().new_usertype<natural_keyboard>("natkeyboard", sol::no_constructor);

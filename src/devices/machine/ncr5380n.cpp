@@ -183,8 +183,11 @@ void ncr5380n_device::scsi_ctrl_changed()
 			else
 			{
 				LOG("phase mismatch %d != %d\n", (ctrl & S_PHASE_MASK), (m_tcmd & TC_PHASE));
+
+				m_state = IDLE;
 				m_state_timer->enable(false);
 
+				set_drq(true);
 				set_irq(true);
 			}
 		}
@@ -525,7 +528,6 @@ int ncr5380n_device::state_step()
 				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 			}
 		}
-		delay = 5;
 		break;
 	case DMA_OUT_ACK:
 		if (!(ctrl & S_REQ))

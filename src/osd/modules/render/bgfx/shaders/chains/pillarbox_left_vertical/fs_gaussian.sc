@@ -22,7 +22,7 @@ SAMPLER2D(s_tex, 0);
 void main()
 {
 	vec4 sum = vec4(0.0, 0.0, 0.0, 0.0);
-	
+
 	vec2 blur = (u_radius.xx * u_dimension.xy) / u_tex_size0.xy;
 
 	sum += texture2D(s_tex, v_texcoord0 - vec2(12.0, 12.0) * blur) * 0.001133;

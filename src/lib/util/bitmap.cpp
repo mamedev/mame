@@ -11,6 +11,7 @@
 #include "bitmap.h"
 
 #include <cassert>
+#include <cstring>
 #include <new>
 
 

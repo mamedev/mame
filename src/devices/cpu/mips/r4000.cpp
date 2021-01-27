@@ -473,10 +473,10 @@ void r4000_base_device::cpu_execute(u32 const op)
 			}
 			break;
 		case 0x1c: // DMULT
-			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], reinterpret_cast<s64 *>(&m_hi));
+			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], *reinterpret_cast<s64 *>(&m_hi));
 			break;
 		case 0x1d: // DMULTU
-			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], &m_hi);
+			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], m_hi);
 			break;
 		case 0x1e: // DDIV
 			if (m_r[RTREG])
@@ -3043,11 +3043,11 @@ void r4000_base_device::cp1_execute(u32 const op)
 			// TODO: MIPS3 only
 			switch (op & 0x3f)
 			{
-			case 0x02a00020: // CVT.S.L
+			case 0x20: // CVT.S.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f32(s64(m_f[FSREG])).v);
 				break;
-			case 0x02a00021: // CVT.D.L
+			case 0x21: // CVT.D.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f64(s64(m_f[FSREG])).v);
 				break;

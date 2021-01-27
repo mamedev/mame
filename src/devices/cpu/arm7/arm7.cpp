@@ -30,6 +30,8 @@ TODO:
 
 *****************************************************************************/
 #include "emu.h"
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "arm7.h"
 #include "arm7core.h"   //include arm7 core
@@ -47,6 +49,7 @@ TODO:
 #include "logmacro.h"
 
 #define PRINT_HAPYFSH2      (0)
+#define PRINT_CE_KERNEL     (0)
 
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
@@ -276,7 +279,7 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
 			   | ARM9_COPRO_ID_ARCH_V4
 			   | ARM9_COPRO_ID_PART_SA1110
-			   | ARM9_COPRO_ID_STEP_SA1110_A0;
+			   | ARM9_COPRO_ID_STEP_SA1110_B4;
 }
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
@@ -453,7 +456,7 @@ int arm7_cpu_device::detect_fault(int desc_lvl1, int ap, int flags)
 
 arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, const int flags)
 {
-	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
 	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
 	const uint32_t start = section << 1;
 	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
@@ -476,19 +479,22 @@ arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, c
 	}
 
 	if (flags & ARM7_TLB_ABORT_D)
-		m_dtlb_entry_index[section >> 1] = index;
+		m_dtlb_entry_index[section] = index;
 	else
-		m_itlb_entry_index[section >> 1] = index;
+		m_itlb_entry_index[section] = index;
 
 	return &entries[start + index];
 }
 
 arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_probe(const offs_t vaddr, const int flags)
 {
-	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0x1F;
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
 	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
 	const uint32_t start = section << 1;
 	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
+
+	if (m_tlb_log)
+		LOGMASKED(LOG_TLB, "%s: tlb_probe: vaddr %08x, section %02x, start %02x, index %d\n", machine().describe_context(), vaddr, section, start, index);
 
 	for (uint32_t i = 0; i < 2; i++)
 	{
@@ -511,6 +517,12 @@ arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_probe(const offs_t vaddr, const
 					return &entries[position];
 				break;
 			}
+		}
+		if (m_tlb_log)
+		{
+			LOGMASKED(LOG_TLB, "%s: tlb_probe: skipped due to mismatch (valid %d, domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
+				machine().describe_context(), entries[position].valid ? 1 : 0, entries[position].domain, entries[position].access,
+				entries[position].table_bits, entries[position].base_addr, entries[position].type);
 		}
 
 		index = (index - 1) & 1;
@@ -797,6 +809,12 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 
 	if (entry)
 	{
+		if (m_tlb_log)
+		{
+			LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: found entry (domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
+				machine().describe_context(), entry->domain, entry->access, entry->table_bits, entry->base_addr, entry->type);
+		}
+
 		const uint32_t access_result = tlb_check_permissions(entry, flags);
 		if (access_result == 0)
 		{
@@ -823,6 +841,31 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 	}
 }
 
+void arm7_cpu_device::translate_insn_command(int ref, const std::vector<std::string> &params)
+{
+	translate_command(ref, params, TRANSLATE_FETCH);
+}
+
+void arm7_cpu_device::translate_data_command(int ref, const std::vector<std::string> &params)
+{
+	translate_command(ref, params, TRANSLATE_READ);
+}
+
+void arm7_cpu_device::translate_command(int ref, const std::vector<std::string> &params, int intention)
+{
+	uint64_t vaddr;
+
+	if (!machine().debugger().commands().validate_number_parameter(params[0], vaddr)) return;
+
+	vaddr &= 0xffffffff;
+
+	offs_t paddr = (offs_t)vaddr;
+	bool can_translate = memory_translate(AS_PROGRAM, intention, paddr);
+	if (can_translate)
+		machine().debugger().console().printf("%s vaddr %08x => phys %08x\n", intention == TRANSLATE_FETCH ? "instruction" : "data", (uint32_t)vaddr, paddr);
+	else
+		machine().debugger().console().printf("%s vaddr %08x => unmapped\n", intention == TRANSLATE_FETCH ? "instruction" : "data");
+}
 
 bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
@@ -870,6 +913,8 @@ void arm7_cpu_device::postload()
 
 void arm7_cpu_device::device_start()
 {
+	init_ce_kernel_addrs();
+
 	m_program = &space(AS_PROGRAM);
 
 	if(m_program->endianness() == ENDIANNESS_LITTLE) {
@@ -923,12 +968,6 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_itlb_entry_index));
 	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
-	for (uint32_t i = 0; i < 32; i++)
-	{
-		m_dtlb_entry_start[i] = i * 2;
-		m_itlb_entry_start[i] = i * 2;
-	}
-
 	set_icountptr(m_icount);
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
@@ -981,6 +1020,13 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_LOGTLB, "LOGTLB", m_actual_log).formatstr("%01X");
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1, _2));
+		machine().debugger().console().register_command("translate_data", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_data_command, this, _1, _2));
+	}
 }
 
 
@@ -1135,6 +1181,14 @@ bool arm7_cpu_device::insn_fetch_arm(uint32_t pc, uint32_t &out_insn)
 	m_insn_prefetch_count--;
 	return valid;
 }
+
+void arm7_cpu_device::add_ce_kernel_addr(offs_t addr, std::string value)
+{
+	m_ce_kernel_addrs[addr - 0xf0000000] = value;
+	m_ce_kernel_addr_present[addr - 0xf0000000] = true;
+}
+
+#include "cecalls.hxx"
 
 void arm7_cpu_device::execute_run()
 {
@@ -1373,6 +1427,12 @@ void arm7_cpu_device::execute_run()
 
 			if (!insn_fetch_arm(raddr, insn))
 			{
+#if PRINT_CE_KERNEL
+				if (raddr >= 0xf0000000)
+				{
+					print_ce_kernel_address(raddr - 0xf0000000);
+				}
+#endif
 				m_pendingAbtP = true;
 				update_irq_state();
 				goto skip_exec;
@@ -1729,21 +1789,21 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 					{
 						case 5:
 							// Flush I
-							for (uint32_t i = 0; i < 64; i++)
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_itlb_entries); i++)
 							{
 								m_itlb_entries[i].valid = false;
 							}
 							break;
 						case 6:
 							// Flush D
-							for (uint32_t i = 0; i < 64; i++)
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
 							{
 								m_dtlb_entries[i].valid = false;
 							}
 							break;
 						case 7:
 							// Flush I+D
-							for (uint32_t i = 0; i < 64; i++)
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
 							{
 								m_dtlb_entries[i].valid = false;
 								m_itlb_entries[i].valid = false;

@@ -678,7 +678,7 @@ void debug_gdbstub::send_reply(const char *str)
 		checksum += str[i];
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply.c_str());
+	m_socket.puts(reply);
 }
 
 

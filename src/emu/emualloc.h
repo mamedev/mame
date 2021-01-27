@@ -13,12 +13,13 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "coretmpl.h"
+#include "osdcomm.h"
+#include "corealloc.h"
 
 #include <memory>
 #include <mutex>
 #include <new>
+#include <vector>
 
 
 //**************************************************************************
