@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "strconv.h"
+#include "corestr.h"
 
 // OSD headers
 #include "video.h"

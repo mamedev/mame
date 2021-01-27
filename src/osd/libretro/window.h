@@ -48,7 +48,6 @@ public:
 	void toggle_full_screen();
 	void modify_prescale(int dir);
 	void resize(int32_t width, int32_t height);
-	void destroy() override;
 
 	void capture_pointer() override;
 	void release_pointer() override;
@@ -60,12 +59,6 @@ public:
 	osd_dim get_size() override;
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
-
-	running_machine &machine() const override { return m_machine; }
-	osd_monitor_info *monitor() const override { return m_monitor.get(); }
-	int fullscreen() const override { return m_fullscreen; }
-
-	render_target *target() override { return m_target; }
 
 	int prescale() const { return m_prescale; }
 

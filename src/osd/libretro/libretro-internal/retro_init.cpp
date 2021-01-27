@@ -10,6 +10,7 @@
 #include "ui/uimain.h"
 #include "uiinput.h"
 #include "drivenum.h"
+#include "corestr.h"
 
 #include "libretro.h"
 #include "options.h"

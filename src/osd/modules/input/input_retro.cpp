@@ -10,6 +10,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "corestr.h"
 
 #include "libretro/libretro-internal/libretro.h"
 #include "libretro/libretro-internal/libretro_shared.h"
