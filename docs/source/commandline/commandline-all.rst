@@ -66,11 +66,13 @@ executable (for example you could call it ``mame-here`` )::
     exec ./mame
 
 You should be able to use any text editor.  If you have a choice of file format
-or line ending style, choose UNIX. Once you've created the file, you need to
-mark it as executable.  You can do this by opening a Terminal window,
-typing **chmod a+x** followed by a space, dragging the file you created onto
-the window (this causes Terminal to insert the full escaped path to the file),
-and then ensuring the Terminal window is active and hitting **Return**
+or line ending style, choose UNIX. This assumes you're using a 64-bit release
+build of MAME, but if you aren't you just need to change ``mame`` to the name
+of your MAME executable (e.g. mamed, mamep, mamedp).  Once you've created the
+file, you need to mark it as executable.  You can do this by opening a Terminal
+window, typing **chmod a+x** followed by a space, dragging the file you created
+onto the window (this causes Terminal to insert the full escaped path to the
+file), and then ensuring the Terminal window is active and hitting **Return**
 (or **Enter**) on your keyboard.  You can close the Terminal window after doing
 this.  Now if you double-click the script in the Finder, it will open a
 Terminal window, set the working directory to the location of the script
