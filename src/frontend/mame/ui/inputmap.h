@@ -75,6 +75,7 @@ private:
 	input_item_data *erroritem;
 	input_item_data *lastitem;
 	bool record_next;
+	osd_ticks_t modified_ticks;
 	input_seq starting_seq;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2) override;
