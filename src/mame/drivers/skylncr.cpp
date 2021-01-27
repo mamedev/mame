@@ -75,7 +75,7 @@
   '---------------------------------------'
 
   Pressing BOOKKEEPING key again, you can find 2 screens showing
-  all statistics and the whole historial by winning hand.
+  all statistics and the whole history by winning hand.
 
   Press START (key 1) to exit the mode.
 
@@ -113,7 +113,7 @@
   TODO:
 
   - Proper M5M82C255 device emulation.
-  - Colors: Find the palette in Sonik Fighter.
+  - Colors: Find the palette in the Z Games' sets.
 
 ***************************************************************************************************/
 
@@ -132,7 +132,8 @@
 #include <algorithm>
 
 
-#define MASTER_CLOCK        XTAL(12'000'000)  /* confirmed */
+namespace {
+
 #define HOPPER_PULSE        50 // guessed
 
 
@@ -150,7 +151,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamps(*this, "lamp%u", 1U),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	void neraidou(machine_config &config);
@@ -158,9 +160,11 @@ public:
 	void bdream97(machine_config &config);
 	void skylncr(machine_config &config);
 	void mbutrfly(machine_config &config);
+	void olymp(machine_config &config);
 
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
 	void init_miaction();
+	void init_olymp();
 	void init_sonikfig();
 
 	READ_LINE_MEMBER(mbutrfly_prot_r);
@@ -176,7 +180,8 @@ private:
 	template<uint8_t Which> void reeltileshigh_w(offs_t offset, uint8_t data);
 	template<uint8_t Which> void reelscroll_w(offs_t offset, uint8_t data);
 	void coin_w(uint8_t data);
-	uint8_t ret_ff();
+	uint8_t ret_ff() { return 0xff; }
+	[[maybe_unused]] uint8_t ret_00() { return 0x00; }
 	void nmi_enable_w(uint8_t data);
 	void mbutrfly_prot_w(uint8_t data);
 	uint8_t bdream97_opcode_r(offs_t offset);
@@ -186,6 +191,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void bdream97_opcode_map(address_map &map);
+	void olymp_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
 	void io_map_skylncr(address_map &map);
 	void mem_map(address_map &map);
@@ -206,6 +212,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
 	output_finder<7> m_lamps;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };
 
 
@@ -321,18 +328,6 @@ void skylncr_state::coin_w(uint8_t data)
 	m_hopper->motor_w(data & 0x20);
 }
 
-uint8_t skylncr_state::ret_ff()
-{
-	return 0xff;
-}
-
-#ifdef UNUSED_FUNCTION
-uint8_t skylncr_state::ret_00()
-{
-	return 0x00;
-}
-#endif
-
 void skylncr_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data & 0x10;
@@ -431,6 +426,10 @@ void skylncr_state::bdream97_opcode_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(skylncr_state::bdream97_opcode_r));
 }
 
+void skylncr_state::olymp_opcode_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
+}
 
 void skylncr_state::ramdac_map(address_map &map)
 {
@@ -1657,7 +1656,7 @@ INTERRUPT_GEN_MEMBER(skylncr_state::vblank_interrupt)
 void skylncr_state::skylncr(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	Z80(config, m_maincpu, 12_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &skylncr_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_skylncr);
 	m_maincpu->set_vblank_int("screen", FUNC(skylncr_state::vblank_interrupt));
@@ -1698,7 +1697,7 @@ void skylncr_state::skylncr(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/8));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1737,6 +1736,15 @@ void skylncr_state::bdream97(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::bdream97_opcode_map);
 
 	m_gfxdecode->set_info(gfx_bdream97);
+}
+
+
+void skylncr_state::olymp(machine_config &config)
+{
+	skylncr(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::olymp_opcode_map);
 }
 
 
@@ -2133,6 +2141,23 @@ ROM_START( superb2k )
 	ROM_LOAD16_BYTE( "u58", 0x40001, 0x10000, CRC(0a7023aa) SHA1(2efdb4ad2acd90fff39144e08b012e39b571a682) )
 ROM_END
 
+ROM_START( olymp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v1.bin", 0x00000, 0x10000, CRC(3b49a550) SHA1(b3add0affba091eb6e1ad9a680de41226885fcec) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(26a83503) SHA1(84ed7b0c2552f2c7b4ef9b5b4f0303b9183a3a26) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x20000, CRC(fe5bde82) SHA1(0925d230b4773eeb8caf5e12a4c30ac8607ae358) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x20000, CRC(a33209f7) SHA1(f43cab5c78bb6a63c9633ba85a84c8ba1e2b1d2b) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(2f665877) SHA1(8eb779a87319e04f28ccc8165fdef7ac643b3602) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(17f77640) SHA1(570407e6fe282ad3a96ad43c8ff36a06ddb43579) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(c626aa6c) SHA1(145e35fe687a8b028d7fbdc08ce608ebdbe3fb46) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(312d1dda) SHA1(88b6214fff700698093591cdce052f36b2a4014f) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(f939f3f0) SHA1(0a089f78ca66d1e660cb854bbf5b0eb38e317a19) )
+ROM_END
+
 /**********************************
 *           Driver Init           *
 **********************************/
@@ -2206,6 +2231,25 @@ void skylncr_state::init_miaction()
 	}
 }
 
+void skylncr_state::init_olymp() // very weird, needs to be checked / finished, putting RAM in the 0xac00-0xac3f range gets in game
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x0007; x++) // this range doesn´t seem encrypted
+		m_decrypted_opcodes[x] = ROM[x];
+
+	for (int x = 0x0007; x < 0x6500; x++) // in this range both data and opcodes appear to be xor'ed 0x40
+	{
+		ROM[x] ^= 0x40;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0x6500; x < 0x10000; x++) // in this range data seems untouched and opcodes appear to be xor'ed 0x18
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x18;
+}
+
+} // Anonymous namespace
+
 
 /****************************************************
 *                  Game Drivers                     *
@@ -2223,6 +2267,7 @@ GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,    ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun Internationl 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
