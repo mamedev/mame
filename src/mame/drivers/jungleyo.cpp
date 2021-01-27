@@ -112,10 +112,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	template <int layer_num> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	template <int Layer> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template <int layer_num> void reel_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <int Layer> void reel_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void main_map(address_map &map);
 
@@ -154,11 +154,11 @@ TILE_GET_INFO_MEMBER(jungleyo_state::get_fg_tile_info)
 	tileinfo.set(2, code, color & 0x1f, 0);
 }
 
-template <int layer_num> TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info)
+template <int Layer> TILE_GET_INFO_MEMBER(jungleyo_state::get_reel_tile_info)
 {
-	u16 code = m_reel_vram[layer_num][tile_index*2+1];
+	u16 code = m_reel_vram[Layer][tile_index*2+1];
 	// colscroll is on upper 8 bits of this (handled in update)
-	u16 color = m_reel_vram[layer_num][tile_index*2];
+	u16 color = m_reel_vram[Layer][tile_index*2];
 	// TODO: confirm if bit 6 is really connected here
 	// upper palette bank is initialized with black at POST and never ever touched again,
 	// not enough to pinpoint one way or another ...
@@ -177,10 +177,10 @@ void jungleyo_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-template <int layer_num> void jungleyo_state::reel_vram_w(offs_t offset, u16 data, u16 mem_mask)
+template <int Layer> void jungleyo_state::reel_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_reel_vram[layer_num][offset]);
-	m_reel_tilemap[layer_num]->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_reel_vram[Layer][offset]);
+	m_reel_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
 void jungleyo_state::video_start()
@@ -193,10 +193,10 @@ void jungleyo_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);
-	for (int i = 0;i < 3; i++)
+	for (auto &reel : m_reel_tilemap)
 	{
-		m_reel_tilemap[i]->set_scroll_cols(64);
-		m_reel_tilemap[i]->set_transparent_pen(0xff);
+		reel->set_scroll_cols(64);
+		reel->set_transparent_pen(0xff);
 	}
 }
 
@@ -207,15 +207,15 @@ uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	if (m_layer_enable == 0)
 		return 0;
 
-	for (int layer_num = 0; layer_num < 3; layer_num++)
+	for (int Layer = 0; Layer < 3; Layer++)
 	{
-		for (int i=0;i<64;i++)
+		for (int i = 0; i < 64; i++)
 		{
-			u16 scroll = m_reel_vram[layer_num][i*2] >> 8;
-			m_reel_tilemap[layer_num]->set_scrolly(i, scroll);
+			u16 scroll = m_reel_vram[Layer][i*2] >> 8;
+			m_reel_tilemap[Layer]->set_scrolly(i, scroll);
 		}
 		
-		m_reel_tilemap[layer_num]->draw(screen, bitmap, cliprect, 0, 0);
+		m_reel_tilemap[Layer]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	
 	if ((m_video_priority & 1) == 0)
@@ -308,7 +308,7 @@ void jungleyo_state::main_map(address_map &map)
 	map(0xba0000, 0xba07ff).ram().share(m_reel_vram[0]).w(FUNC(jungleyo_state::reel_vram_w<0>));
 	map(0xba0800, 0xba0fff).ram().share(m_reel_vram[1]).w(FUNC(jungleyo_state::reel_vram_w<1>));
 	map(0xba1000, 0xba17ff).ram().share(m_reel_vram[2]).w(FUNC(jungleyo_state::reel_vram_w<2>));
-	map(0xba1800, 0xba1fff).ram(); // supposedly the 4th reel VRAM bank, inited at POST only and prolly just tied to NOP instead
+	map(0xba1800, 0xba1fff).ram(); // supposedly the 4th reel VRAM bank, inited at POST only and probably just tied to NOP instead
 
 	map(0xff0000, 0xff7fff).ram();
 	map(0xff8000, 0xffffff).ram().share("nvram");
