@@ -36,7 +36,7 @@ ifeq ($(platform),)
 		platform = osx
 	else ifneq ($(findstring win,$(UNAME_S)),)
 		platform = win
-	else ifneq ($(UNAME_M), "i686")
+	else ifeq ($(UNAME_M), "i686")
 		platform = linux32
 	endif
 endif
