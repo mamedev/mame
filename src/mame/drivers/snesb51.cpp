@@ -234,16 +234,12 @@ ROM_START( mk3snes )
 	ROM_LOAD("spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0))
 ROM_END
 
-// Siemens SAB 8051A-P (4KBytes internal ROM undumped)
 ROM_START( snes4sl )
 	ROM_REGION(0x8000, "mcu", 0)
-	ROM_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164))
-ROM_END
-
-// WD1016D-PL
-ROM_START( snes4sl1103 )
-	ROM_REGION(0x8000, "mcu", 0)
-	ROM_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670))
+	ROM_SYSTEM_BIOS(0, "1207", "12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
+	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "1103", "11-03") // Found on PCB with WD1016D-PL
+	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(1))
 ROM_END
 
 ROM_START( snes4sln )
@@ -260,6 +256,5 @@ ROM_END
 
 //    YEAR  NAME         PARENT   MACHINE   INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                                 FLAGS
 GAME( 199?, mk3snes,     0,       mk3snes,  mk3snes, snesb51_state, empty_init, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,     0,       snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (12/07)",   MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl1103, snes4sl, snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (11/03)",   MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,     0,       snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
 GAME( 1994, snes4sln,    0,       snes4sln, snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
