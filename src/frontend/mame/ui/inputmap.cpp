@@ -311,7 +311,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 			{
 				char const *const text[] = {
 					record_next ? appendprompt.c_str() : assignprompt.c_str(),
-					item.seq.empty() ? defaultprompt.c_str() : clearprompt.c_str() };
+					(!item.seq.empty() || item.defseq->empty()) ? clearprompt.c_str() : defaultprompt.c_str() };
 				draw_text_box(
 						std::begin(text), std::end(text),
 						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
