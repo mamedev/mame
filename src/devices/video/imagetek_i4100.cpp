@@ -71,6 +71,12 @@
 
 #include <algorithm>
 
+#define LOG_INT (1 << 1U)
+//#define VERBOSE (LOG_INT)
+#include "logmacro.h"
+
+#define LOGINT(...) LOGMASKED(LOG_INT, __VA_ARGS__)
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -156,6 +162,8 @@ void imagetek_i4100_device::map(address_map &map)
 	map(0x78880, 0x78881).w(FUNC(imagetek_i4100_device::crtc_vert_w));
 	map(0x78890, 0x78891).w(FUNC(imagetek_i4100_device::crtc_horz_w));
 	map(0x788a0, 0x788a1).w(FUNC(imagetek_i4100_device::crtc_unlock_w));
+	map(0x788a3, 0x788a3).rw(FUNC(imagetek_i4100_device::irq_cause_r), FUNC(imagetek_i4100_device::irq_cause_w));
+	map(0x788a5, 0x788a5).w(FUNC(imagetek_i4100_device::irq_enable_w));
 	map(0x788aa, 0x788ab).w(FUNC(imagetek_i4100_device::rombank_w));
 	map(0x788ac, 0x788ad).w(FUNC(imagetek_i4100_device::screen_ctrl_w));
 }
@@ -184,6 +192,8 @@ void imagetek_i4220_device::v2_map(address_map &map)
 	map(0x78880, 0x78881).w(FUNC(imagetek_i4220_device::crtc_vert_w));
 	map(0x78890, 0x78891).w(FUNC(imagetek_i4220_device::crtc_horz_w));
 	map(0x788a0, 0x788a1).w(FUNC(imagetek_i4220_device::crtc_unlock_w));
+	map(0x788a3, 0x788a3).rw(FUNC(imagetek_i4220_device::irq_cause_r), FUNC(imagetek_i4220_device::irq_cause_w));
+	map(0x788a5, 0x788a5).w(FUNC(imagetek_i4220_device::irq_enable_w));
 	map(0x788aa, 0x788ab).w(FUNC(imagetek_i4220_device::rombank_w));
 	map(0x788ac, 0x788ad).w(FUNC(imagetek_i4220_device::screen_ctrl_w));
 
@@ -228,6 +238,11 @@ void imagetek_i4300_device::v3_map(address_map &map)
 	map(0x78802, 0x78803).w(FUNC(imagetek_i4300_device::crtc_horz_w));
 	map(0x78804, 0x78805).w(FUNC(imagetek_i4300_device::crtc_vert_w));
 
+	map(0x78810, 0x7881f).w(FUNC(imagetek_i4300_device::irq_level_w)).umask16(0x00ff);
+	map(0x78820, 0x7882f).w(FUNC(imagetek_i4300_device::irq_vector_w)).umask16(0x00ff);
+	map(0x78831, 0x78831).w(FUNC(imagetek_i4300_device::irq_enable_w));
+	map(0x78833, 0x78833).rw(FUNC(imagetek_i4300_device::irq_cause_r), FUNC(imagetek_i4300_device::irq_cause_w));
+
 	map(0x78840, 0x7884d).w(FUNC(imagetek_i4300_device::blitter_w)).share("blitter_regs");
 	map(0x78850, 0x7885b).rw(FUNC(imagetek_i4300_device::scroll_r), FUNC(imagetek_i4300_device::scroll_w)).share("scrollregs");
 	map(0x78860, 0x7886b).rw(FUNC(imagetek_i4300_device::window_r), FUNC(imagetek_i4300_device::window_w)).share("windowregs");
@@ -266,7 +281,9 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 	, m_scroll(*this, "scrollregs")
 	, m_palette(*this, "palette")
 	, m_gfxrom(*this, DEVICE_SELF)
-	, m_blit_irq_cb(*this)
+	, m_irq_cb(*this)
+	, m_vblank_irq_level(-1)
+	, m_blit_irq_level(-1)
 	, m_support_8bpp(has_ext_tiles)
 	, m_support_16x16(has_ext_tiles)
 	, m_tilemap_scrolldx{0, 0, 0}
@@ -291,6 +308,8 @@ imagetek_i4220_device::imagetek_i4220_device(const machine_config &mconfig, cons
 imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: imagetek_i4100_device(mconfig, I4300, tag, owner, clock, true)
 {
+	std::fill(std::begin(m_irq_levels), std::end(m_irq_levels), 0);
+	std::fill(std::begin(m_irq_vectors), std::end(m_irq_vectors), 0);
 }
 
 //-------------------------------------------------
@@ -335,8 +354,12 @@ void imagetek_i4100_device::device_start()
 	m_screen_blank = false;
 	m_screen_flip = false;
 
+	save_item(NAME(m_requested_int));
+	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_crtc_unlock));
+	save_item(NAME(m_crtc_horz));
+	save_item(NAME(m_crtc_vert));
 	save_item(NAME(m_sprite_count));
 	save_item(NAME(m_sprite_priority));
 	save_item(NAME(m_sprite_color_code));
@@ -357,11 +380,19 @@ void imagetek_i4100_device::device_start()
 
 	m_gfxrom_size = m_gfxrom.bytes();
 
-	m_blit_irq_cb.resolve_safe();
+	m_irq_cb.resolve_safe();
 	m_blit_done_timer = timer_alloc(TIMER_BLIT_END);
 
 	m_spritelist = std::make_unique<sprite_t []>(0x1000 / 8);
 	m_sprite_end = m_spritelist.get();
+}
+
+void imagetek_i4300_device::device_start()
+{
+	imagetek_i4100_device::device_start();
+
+	save_item(NAME(m_irq_levels));
+	save_item(NAME(m_irq_vectors));
 }
 
 
@@ -371,6 +402,8 @@ void imagetek_i4100_device::device_start()
 
 void imagetek_i4100_device::device_reset()
 {
+	m_requested_int = 0;
+	m_irq_enable = 0xff;
 	m_rombank = 0;
 	m_crtc_unlock = false;
 	m_sprite_count = 0;
@@ -378,6 +411,7 @@ void imagetek_i4100_device::device_reset()
 	m_sprite_xoffset = 0;
 	m_sprite_yoffset = 0;
 	m_sprite_color_code = 0;
+	update_irq_state();
 
 	for(int i=0; i != 3; i++) {
 		m_layer_priority[i] = 0;
@@ -393,13 +427,108 @@ void imagetek_i4100_device::device_reset()
 	expand_gfx1();
 }
 
+//**************************************************************************
+//  INTERRUPTS
+//**************************************************************************
+
+u8 imagetek_i4100_device::irq_cause_r()
+{
+	/* interrupt cause, used by
+
+	int[0] vblank
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
+	int[2] blitter
+	int[3] ?            KARATOUR
+	int[4] ?
+	int[5] ?            KARATOUR, BLZNTRND
+	int[6] unused
+	int[7] unused
+
+	*/
+
+	return m_requested_int;
+}
+
+void imagetek_i4100_device::irq_cause_w(u8 data)
+{
+	if ((m_requested_int & data) == 0)
+		return;
+
+	LOGINT("%s: Interrupts acknowledged (%02X)\n", machine().describe_context(), data);
+	m_requested_int &= ~data;
+	update_irq_state();
+}
+
+void imagetek_i4100_device::set_irq(int level)
+{
+	if (!BIT(m_requested_int, level))
+	{
+		LOGINT("IRQ %d set\n", level);
+		m_requested_int |= 1 << level;
+		update_irq_state();
+	}
+}
+
+void imagetek_i4100_device::clear_irq(int level)
+{
+	if (BIT(m_requested_int, level))
+	{
+		LOGINT("IRQ %d cleared\n", level);
+		m_requested_int &= ~(1 << level);
+		update_irq_state();
+	}
+}
+
+void imagetek_i4100_device::update_irq_state()
+{
+	m_irq_cb((m_requested_int & ~m_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void imagetek_i4100_device::irq_enable_w(u8 data)
+{
+	LOGINT("%s: IRQ enable register = %02X\n", machine().describe_context(), data);
+	m_irq_enable = data;
+	update_irq_state();
+}
+
+void imagetek_i4300_device::irq_level_w(offs_t offset, u8 data)
+{
+	m_irq_levels[offset] = data;
+}
+
+void imagetek_i4300_device::irq_vector_w(offs_t offset, u8 data)
+{
+	m_irq_vectors[offset] = data;
+}
+
+u8 imagetek_i4300_device::irq_vector_r(offs_t offset)
+{
+	return m_irq_vectors[offset];
+}
+
+void imagetek_i4300_device::update_irq_state()
+{
+	u8 irqs = m_requested_int & ~m_irq_enable;
+
+	int level = 0;
+	for (int i = 0; i < 8; i++)
+		if (BIT(irqs, i))
+			level = std::max(level, m_irq_levels[i] & 7);
+
+	m_irq_cb(level);
+}
 
 void imagetek_i4100_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
 		case TIMER_BLIT_END:
-			m_blit_irq_cb(ASSERT_LINE);
+			if (m_blit_irq_level != -1)
+				set_irq(m_blit_irq_level);
 			break;
 	}
 }
@@ -597,6 +726,7 @@ void imagetek_i4100_device::crtc_horz_w(offs_t offset, uint16_t data, uint16_t m
 {
 	if (m_crtc_unlock == true)
 	{
+		COMBINE_DATA(&m_crtc_horz);
 		//logerror("%s CRTC horizontal %04x %04x\n",this->tag(),data,mem_mask);
 	}
 }
@@ -605,6 +735,7 @@ void imagetek_i4100_device::crtc_vert_w(offs_t offset, uint16_t data, uint16_t m
 {
 	if (m_crtc_unlock == true)
 	{
+		COMBINE_DATA(&m_crtc_vert);
 		//logerror("%s CRTC vertical %04x %04x\n",this->tag(),data,mem_mask);
 	}
 }
@@ -1295,9 +1426,10 @@ WRITE_LINE_MEMBER(imagetek_i4100_device::screen_eof)
 {
 	if (state)
 	{
-		if (!m_spriteram_buffered)
-			return;
+		if (m_vblank_irq_level != -1)
+			set_irq(m_vblank_irq_level);
 
-		m_spriteram->copy();
+		if (m_spriteram_buffered)
+			m_spriteram->copy();
 	}
 }

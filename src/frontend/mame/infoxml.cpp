@@ -23,6 +23,7 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "corestr.h"
 #include "xmlfile.h"
 
 #include <algorithm>

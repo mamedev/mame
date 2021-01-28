@@ -127,11 +127,11 @@ license:CC0
 	</element>
 	<element name="text_l07"><text string="SOUND"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 
-	<element name="text_pp"><image file="chess/wp.png"><color alpha="0.8" /></image></element>
-	<element name="text_pn"><image file="chess/wn.png"><color alpha="0.8" /></image></element>
-	<element name="text_pb"><image file="chess/wb.png"><color alpha="0.8" /></image></element>
-	<element name="text_pr"><image file="chess/wr.png"><color alpha="0.8" /></image></element>
-	<element name="text_pq"><image file="chess/wq.png"><color alpha="0.8" /></image></element>
+	<element name="text_pp"><image file="chess/wp.svg"><color alpha="0.8" /></image></element>
+	<element name="text_pn"><image file="chess/wn.svg"><color alpha="0.8" /></image></element>
+	<element name="text_pb"><image file="chess/wb.svg"><color alpha="0.8" /></image></element>
+	<element name="text_pr"><image file="chess/wr.svg"><color alpha="0.8" /></image></element>
+	<element name="text_pq"><image file="chess/wq.svg"><color alpha="0.8" /></image></element>
 
 	<element name="text_l2a"><text string="BOARD"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 	<element name="text_l2b"><text string="VERIFY"><color red="0.65" green="0.65" blue="0.65" /></text></element>

@@ -13,6 +13,8 @@
 
 #include "ui/ui.h"
 #include "ui/utils.h"
+
+#include "corestr.h"
 #include "unicode.h"
 
 

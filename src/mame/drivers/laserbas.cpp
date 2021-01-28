@@ -6,7 +6,7 @@
 
 ============================================
 TODO:
-- Video: weird palette changes, Laserbase colors, missing bg scrolling between stages (CRT address lines + m_hset ( or m_vset ?))
+- Video: weird palette changes, Laserbase colors, gfx rendering in general needs verification
 - Sound: sound related i/o writes ( out_w handler )
 - Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB
 TS 20.01.2017
@@ -106,7 +106,8 @@ private:
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
-	void videoctrl_w(offs_t offset, uint8_t data);
+	void videoctrl1_w(offs_t offset, uint8_t data);
+	void videoctrl2_w(offs_t offset, uint8_t data);
 	uint8_t z1_r(offs_t offset);
 	uint8_t track_lo_r();
 	uint8_t track_hi_r();
@@ -136,41 +137,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 {
-	int x = 0;
-	int x_max = 0x100;
-	int dx = 1;
-
-	if (m_flipscreen)
-	{
-		y = 0xdf - y;
-		x = 0xff;
-		x_max = -1;
-		dx = -1;
-	}
-
-	int pixaddr = y << 8;
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *const b = &bitmap.pix(y);
 
-	while (x != x_max)
+	offs_t addr = ((ma & 0x3ff) << 5) | (ra << 7);
+	addr += (m_vset << 7);
+
+	for (int x = 0; x < x_count; x++)
 	{
-		int offset = (pixaddr >> 1) & 0x7fff;
-		int shift = (pixaddr & 1) * 4; // two 4 bit pixels in one byte
-		int p1 = (m_vram[offset] >> shift) & 0xf;
-		int p2 = (m_vram[offset + 0x8000] >> shift) & 0xf; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
-		int p;
+		// draw 8 pixels
+		for (int i = 0; i < 8; i++)
+		{
+			// layer 1 (scrolling)
+			offs_t offset_p1 = (addr + (x << 2) + (i >> 1)) & 0x7fff;
+			uint8_t p1 = (m_vram[0x0000 + offset_p1] >> ((i & 1) * 4)) & 0x0f;
 
-		if (p2)
-			p = p2;
-		else if (p1)
-			p = p1 + 16;
-		else
-			p = m_bset;
+			// layer 2 (fixed)
+			offs_t offset_p2= ((y * 0x80) | (ra << 7)) + (x << 2) + (i >> 1);
+			uint8_t p2 = (m_vram[0x8000 + offset_p2] >> ((i & 1) * 4)) & 0x0f;
+			
+			// priority: p2 > p1 > background
+			uint8_t p = p2 ? p2 : p1 ? (p1 + 16) : m_bset;
 
-		b[x] = palette[p];
-
-		pixaddr++;
-		x += dx;
+			if (m_flipscreen)
+				bitmap.pix(0xdf - y, 0xff - (x * 8 + i)) = palette[p];
+			else
+				bitmap.pix(y, x * 8 + i) = palette[p];
+		}
 	}
 }
 
@@ -184,22 +176,33 @@ void laserbas_state::vram_w(offs_t offset, uint8_t data)
 	m_vram[offset+(m_vrambank?0x8000:0)] = data;
 }
 
-void laserbas_state::videoctrl_w(offs_t offset, uint8_t data)
+void laserbas_state::videoctrl1_w(offs_t offset, uint8_t data)
 {
-	if (!(offset&1))
-	{
-		m_vrambank = data & 0x40; // layer select
-		m_flipscreen = !(data & 0x80);
-		m_vset = (data>>3)&7; // inc-ed on interrupts ( 8 ints / frame ?)
-		m_hset = data&7;
-	}
-	else
-	{
-		data^=0xff;
-		m_bset = data>>4; // bg pen
-		m_scl = (data&8)>>3; // unknown
-		m_nmi=data&1; // nmi enable (not on schematics, traced)
-	}
+	data ^= 0xff;
+
+	// 7-------  flip screen
+	// -6------  layer select
+	// --543---  vset (vertical scroll, inc'ed on interrupts - 8 ints/frame?)
+	// -----210  hset (presumely horizontal scroll)
+
+	m_flipscreen = bool(BIT(data, 7));
+	m_vrambank = BIT(data, 6) ? 0 : 1;
+	m_vset = (data >> 3) & 0x07;
+	m_hset = (data >> 0) & 0x07;
+}
+
+void laserbas_state::videoctrl2_w(offs_t offset, uint8_t data)
+{
+	data ^= 0xff;
+
+	// 7654----  background pen
+	// ----3---  scl (unknown)
+	// -----21-  not used?
+	// -------0  nmi enable (not on schematics, traced)
+
+	m_bset = (data >> 4) & 0x0f;
+	m_scl = BIT(data, 3);
+	m_nmi = BIT(data, 0);
 }
 
 uint8_t laserbas_state::z1_r(offs_t offset)
@@ -301,7 +304,8 @@ void laserbas_state::laserbas_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x10, 0x11).w(FUNC(laserbas_state::videoctrl_w));
+	map(0x10, 0x10).w(FUNC(laserbas_state::videoctrl1_w));
+	map(0x11, 0x11).w(FUNC(laserbas_state::videoctrl2_w));
 	map(0x20, 0x20).portr("DSW");
 	map(0x21, 0x21).portr("INPUTS");
 	map(0x22, 0x22).r(FUNC(laserbas_state::track_hi_r));
@@ -392,7 +396,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(4000000, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_raw(6000000, 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */

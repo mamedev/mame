@@ -99,6 +99,7 @@
 #include "inputdev.h"
 #include "natkeyboard.h"
 
+#include "corestr.h"
 #include "osdepend.h"
 #include "unicode.h"
 
@@ -1366,7 +1367,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		}
 
 		// trim extra spaces
-		strtrimspace(name);
+		name = strtrimspace(name);
 
 		// special case
 		if (name.empty())

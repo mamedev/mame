@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "render.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 #include "rendfont.h"
 #include "rendlay.h"

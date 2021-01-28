@@ -21,19 +21,24 @@
 #define LOG_GPIO        (1 << 10)
 #define LOG_INTC        (1 << 11)
 #define LOG_CARD        (1 << 12)
+#define LOG_AUDIO_DMA   (1 << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
-#define VERBOSE         (0) // (LOG_ALL)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SA1111, sa1111_device, "sa1111", "Intel SA1111 Microprocessor Companion Chip")
 
 sa1111_device::sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SA1111, tag, owner, clock)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_audio_codec(*this, finder_base::DUMMY_TAG)
+	, m_irq_out(*this)
 	, m_gpio_out(*this)
 	, m_ssp_out(*this)
 	, m_l3_addr_out(*this)
 	, m_l3_data_out(*this)
+	, m_i2s_out(*this)
 {
 }
 
@@ -188,12 +193,25 @@ void sa1111_device::skcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	LOGMASKED(LOG_SBI, "%s:         Enable Scan Test: %d\n", machine().describe_context(), BIT(data, SKCR_SCANTST_BIT));
 	LOGMASKED(LOG_SBI, "%s:         Enable Clock Test: %d\n", machine().describe_context(), BIT(data, SKCR_CLKTST_BIT));
 	LOGMASKED(LOG_SBI, "%s:         Enable RDY Response: %d\n", machine().describe_context(), BIT(data, SKCR_RDY_BIT));
-	LOGMASKED(LOG_SBI, "%s:         Audio Feature Select: %s\n", machine().describe_context(), BIT(data, SKCR_SLAC_BIT) ? "AC Link" : "I2S");
+	LOGMASKED(LOG_SBI, "%s:         Audio Feature Select: %s\n", machine().describe_context(), BIT(data, SKCR_SACMDSL_BIT) ? "AC Link" : "I2S");
 	LOGMASKED(LOG_SBI, "%s:         Out-Only Pad Control: %d\n", machine().describe_context(), BIT(data, SKCR_OPPC_BIT));
 	LOGMASKED(LOG_SBI, "%s:         Enable PII Test: %d\n", machine().describe_context(), BIT(data, SKCR_PII_BIT));
 	LOGMASKED(LOG_SBI, "%s:         USB IO Cell Test: %d\n", machine().describe_context(), BIT(data, SKCR_UIOTEN_BIT));
 	LOGMASKED(LOG_SBI, "%s:         Enable /OE on SDRAM DMA Read Cycles: %d\n", machine().describe_context(), 1 - BIT(data, SKCR_OEEN_BIT));
-	COMBINE_DATA(&m_sbi_regs.skcr);
+	const bool audio_mode_changed = BIT(m_sbi_regs.skcr ^ ((m_sbi_regs.skcr & ~mem_mask) | (data & mem_mask)), SKCR_SACMDSL_BIT);
+	const bool audio_enabled = BIT(m_audio_regs.sacr0, SACR0_ENB_BIT);
+	if (audio_mode_changed && audio_enabled)
+	{
+		// If we're changing audio output modes while the audio interface is active, bring it down in the old mode,
+		// then bring it back up in the new mode.
+		audio_set_enabled(false);
+		COMBINE_DATA(&m_sbi_regs.skcr);
+		audio_set_enabled(true);
+	}
+	else
+	{
+		COMBINE_DATA(&m_sbi_regs.skcr);
+	}
 }
 
 void sa1111_device::smcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -296,9 +314,13 @@ void sa1111_device::skcdr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void sa1111_device::skaud_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	const uint32_t audio_divider = ((data & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 	LOGMASKED(LOG_SK, "%s: skaud_w: Audio Clock Divider Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	LOGMASKED(LOG_SK, "%s:          Audio Clock Divider: %02x\n", machine().describe_context(), ((data & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1);
+	LOGMASKED(LOG_SK, "%s:          Audio Clock Divider: %02x\n", machine().describe_context(), audio_divider);
 	COMBINE_DATA(&m_sk_regs.skaud);
+	const uint32_t pll_clock = clock() * 39;
+	if (m_audio_codec)
+		m_audio_codec->set_unscaled_clock(pll_clock / audio_divider);
 }
 
 void sa1111_device::skpmc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -442,12 +464,322 @@ WRITE_LINE_MEMBER(sa1111_device::l3wd_in)
 		m_audio_regs.sasr0 |= (1 << SASR0_L3WD_BIT);
 }
 
+TIMER_CALLBACK_MEMBER(sa1111_device::audio_rx_dma_callback)
+{
+	// TODO: Audio input
+}
+
 TIMER_CALLBACK_MEMBER(sa1111_device::audio_rx_callback)
 {
+	// TODO: Audio input
+}
+
+TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
+{
+	const uint32_t buf = BIT(m_audio_regs.sadtcs, SADTCS_TBIU_BIT);
+	const uint32_t remaining = m_audio_regs.sadtcc >> 2;
+	const uint32_t avail = ARRAY_LENGTH(m_audio_regs.tx_fifo) - m_audio_regs.tx_fifo_count;
+	if (remaining == 0 || avail == 0)
+		return;
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint32_t count;
+	for (count = 0; count < remaining && count < avail; count++)
+	{
+		const uint32_t data = space.read_dword(m_audio_regs.sadta);
+		LOGMASKED(LOG_AUDIO_DMA, "audio_tx_dma_callback: read data %08x from %08x, pushing to FIFO\n", data, m_audio_regs.sadta);
+		audio_tx_fifo_push(data);
+		m_audio_regs.sadta += 4;
+	}
+
+	m_audio_regs.sadtcc = (remaining - count) << 2;
+	if (!m_audio_regs.sadtcc)
+	{
+		static constexpr uint32_t s_start_masks[2] = { (1 << SADTCS_TDSTA_BIT), (1 << SADTCS_TDSTB_BIT) };
+		static constexpr uint32_t s_done_masks[2] = { (1 << SADTCS_TDBDA_BIT), (1 << SADTCS_TDBDB_BIT) };
+		static constexpr uint32_t s_done_ints[2] = { INT_AUDTXA, INT_AUDTXB };
+		m_audio_regs.sadtcs &= ~s_start_masks[buf];
+		m_audio_regs.sadtcs |= s_done_masks[buf];
+		set_irq_line(s_done_ints[buf], 1);
+		m_audio_regs.sadtcs ^= (1 << SADTCS_TBIU_BIT);
+		m_audio_regs.sadta = m_audio_regs.sadts[1 - buf];
+		m_audio_regs.sadtcc = m_audio_regs.sadtc[1 - buf];
+		if (!BIT(m_audio_regs.sadtcs, s_start_masks[1 - buf]))
+		{
+			m_audio_regs.tx_dma_timer->adjust(attotime::never);
+		}
+	}
 }
 
 TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_callback)
 {
+	m_i2s_out(audio_tx_fifo_pop());
+}
+
+void sa1111_device::audio_update_mode()
+{
+	audio_set_enabled(BIT(m_audio_regs.sacr0, SACR0_ENB_BIT));
+}
+
+void sa1111_device::audio_clear_interrupts()
+{
+	set_irq_line(INT_AUDTXA, 0);
+	set_irq_line(INT_AUDRXA, 0);
+	set_irq_line(INT_AUDTXB, 0);
+	set_irq_line(INT_AUDRXB, 0);
+	set_irq_line(INT_AUDTFS, 0);
+	set_irq_line(INT_AUDRFS, 0);
+	set_irq_line(INT_AUDTUR, 0);
+	set_irq_line(INT_AUDROR, 0);
+	set_irq_line(INT_AUDDTS, 0);
+	set_irq_line(INT_AUDRDD, 0);
+	set_irq_line(INT_AUDSTO, 0);
+}
+
+void sa1111_device::audio_controller_reset()
+{
+	m_audio_regs.rx_fifo_read_idx = 0;
+	m_audio_regs.rx_fifo_write_idx = 0;
+	m_audio_regs.rx_fifo_count = 0;
+	m_audio_regs.tx_fifo_read_idx = 0;
+	m_audio_regs.tx_fifo_write_idx = 0;
+	m_audio_regs.tx_fifo_count = 0;
+}
+
+void sa1111_device::audio_set_enabled(bool enabled)
+{
+	if (enabled)
+	{
+		audio_set_tx_dma_enabled(BIT(m_audio_regs.sadtcs, SADTCS_TDEN_BIT));
+		audio_set_rx_dma_enabled(BIT(m_audio_regs.sadrcs, SADRCS_RDEN_BIT));
+		audio_update_tx_fifo_levels();
+		audio_update_rx_fifo_levels();
+		audio_update_busy_flag();
+
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		set_irq_line(INT_AUDTUR, BIT(status, SASR_TUR_BIT));
+		set_irq_line(INT_AUDROR, BIT(status, SASR_ROR_BIT));
+		set_irq_line(INT_AUDDTS, BIT(status, SASR_SEND_BIT));
+		set_irq_line(INT_AUDRDD, BIT(status, SASR_RECV_BIT));
+		set_irq_line(INT_AUDSTO, BIT(m_audio_regs.sasr1, SASR1_RSTO_BIT));
+	}
+	else
+	{
+		audio_set_tx_dma_enabled(false);
+		audio_set_rx_dma_enabled(false);
+		audio_clear_interrupts();
+	}
+}
+
+void sa1111_device::audio_set_tx_dma_enabled(bool enabled)
+{
+	LOGMASKED(LOG_AUDIO_DMA, "audio_set_tx_dma_enabled: %d\n", enabled);
+	if (enabled)
+	{
+		if (m_audio_regs.tx_dma_timer->remaining() == attotime::never)
+		{
+			const uint32_t buf = BIT(m_audio_regs.sadtcs, SADTCS_TBIU_BIT);
+			if ((buf == 0 && BIT(m_audio_regs.sadtcs, SADTCS_TDSTA_BIT)) || (buf == 1 && BIT(m_audio_regs.sadtcs, SADTCS_TDSTB_BIT)))
+			{
+				LOGMASKED(LOG_AUDIO_DMA, "audio_set_tx_dma_enabled, starting Tx DMA from buffer %d\n", buf);
+				audio_start_tx_dma(buf);
+			}
+		}
+	}
+	else
+	{
+		m_audio_regs.tx_timer->adjust(attotime::never);
+		m_audio_regs.tx_dma_timer->adjust(attotime::never);
+
+		set_irq_line(INT_AUDTXA, 0);
+		set_irq_line(INT_AUDTXB, 0);
+		set_irq_line(INT_AUDTFS, 0);
+		set_irq_line(INT_AUDTUR, 0);
+	}
+}
+
+void sa1111_device::audio_set_rx_dma_enabled(bool enabled)
+{
+	if (enabled)
+	{
+		if (m_audio_regs.rx_dma_timer->remaining() == attotime::never)
+		{
+			const uint32_t buf = BIT(m_audio_regs.sadrcs, SADRCS_RBIU_BIT);
+			if ((buf == 0 && BIT(m_audio_regs.sadrcs, SADRCS_RDSTA_BIT)) || (buf == 1 && BIT(m_audio_regs.sadrcs, SADRCS_RDSTB_BIT)))
+			{
+				audio_start_rx_dma(buf);
+			}
+		}
+	}
+	else
+	{
+		m_audio_regs.rx_timer->adjust(attotime::never);
+		m_audio_regs.rx_dma_timer->adjust(attotime::never);
+
+		set_irq_line(INT_AUDRXA, 0);
+		set_irq_line(INT_AUDRXB, 0);
+		set_irq_line(INT_AUDRFS, 0);
+		set_irq_line(INT_AUDROR, 0);
+	}
+}
+
+void sa1111_device::audio_start_tx_dma(const uint32_t buf)
+{
+	if (!m_audio_codec)
+		return;
+
+	m_audio_regs.sadta = m_audio_regs.sadts[buf];
+	m_audio_regs.sadtcc = m_audio_regs.sadtc[buf];
+
+	const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
+	const uint32_t pll_clock = clock() * 39;
+	attotime clock_period = attotime::from_ticks(divisor * 128, pll_clock);
+	m_audio_regs.tx_dma_timer->adjust(clock_period, 0, clock_period);
+
+	LOGMASKED(LOG_AUDIO_DMA, "audio_start_tx_dma, setting start address to %08x, Tx clock to %d / %d\n", m_audio_regs.sadta, pll_clock, divisor);
+}
+
+void sa1111_device::audio_start_rx_dma(const uint32_t buf)
+{
+	if (!m_audio_codec)
+		return;
+
+	m_audio_regs.sadra = m_audio_regs.sadrs[buf];
+
+	const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
+	const uint32_t pll_clock = clock() * 39;
+	attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
+	m_audio_regs.rx_dma_timer->adjust(clock_period, 0, clock_period);
+}
+
+void sa1111_device::audio_update_tx_fifo_levels()
+{
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+	if (m_audio_regs.tx_fifo_count < ARRAY_LENGTH(m_audio_regs.tx_fifo))
+		status |= (1 << SASR_TNF_BIT);
+	else
+		status &= ~(1 << SASR_TNF_BIT);
+
+	const uint32_t tfl = ((m_audio_regs.tx_fifo_count == ARRAY_LENGTH(m_audio_regs.tx_fifo)) ? (m_audio_regs.tx_fifo_count - 1) : m_audio_regs.tx_fifo_count);
+	status &= ~SASR_TFL_MASK;
+	status |= (tfl << SASR_TFL_BIT);
+
+	const uint32_t tfth = ((m_audio_regs.sacr0 & SACR0_TFTH_MASK) >> SACR0_TFTH_BIT) + 1;
+	if (tfl <= tfth)
+	{
+		status |= (1 << SASR_TFS_BIT);
+		set_irq_line(INT_AUDTFS, 1);
+	}
+	else
+	{
+		status &= ~(1 << SASR_TFS_BIT);
+		set_irq_line(INT_AUDTFS, 0);
+	}
+}
+
+void sa1111_device::audio_update_rx_fifo_levels()
+{
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+	if (m_audio_regs.rx_fifo_count != 0)
+		status |= (1 << SASR_RNE_BIT);
+	else
+		status &= ~(1 << SASR_RNE_BIT);
+
+	const uint32_t rfl = ((m_audio_regs.rx_fifo_count == ARRAY_LENGTH(m_audio_regs.rx_fifo)) ? (m_audio_regs.rx_fifo_count - 1) : m_audio_regs.rx_fifo_count);
+	status &= ~SASR_RFL_MASK;
+	status |= (rfl << SASR_RFL_BIT);
+
+	const uint32_t rfth = ((m_audio_regs.sacr0 & SACR0_RFTH_MASK) >> SACR0_RFTH_BIT) + 1;
+	if (rfl >= rfth)
+	{
+		status |= (1 << SASR_RFS_BIT);
+		set_irq_line(INT_AUDRFS, 1);
+	}
+	else
+	{
+		status &= ~(1 << SASR_RFS_BIT);
+		set_irq_line(INT_AUDRFS, 0);
+	}
+}
+
+void sa1111_device::audio_update_busy_flag()
+{
+	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+	if (m_audio_regs.rx_fifo_count > 0 || m_audio_regs.tx_fifo_count > 0)
+		status |= (1 << SASR_BSY_BIT);
+	else
+		status &= ~(1 << SASR_BSY_BIT);
+}
+
+void sa1111_device::audio_tx_fifo_push(uint32_t data)
+{
+	if (m_audio_regs.tx_fifo_count < ARRAY_LENGTH(m_audio_regs.tx_fifo))
+	{
+		m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_write_idx] = data;
+		m_audio_regs.tx_fifo_write_idx = (m_audio_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_audio_regs.tx_fifo);
+		m_audio_regs.tx_fifo_count++;
+		audio_update_tx_fifo_levels();
+		if (m_audio_regs.tx_timer->remaining() == attotime::never)
+		{
+			const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
+			const uint32_t pll_clock = clock() * 39;
+			attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
+			m_audio_regs.tx_timer->adjust(clock_period, 0, clock_period);
+		}
+	}
+}
+
+uint32_t sa1111_device::audio_tx_fifo_pop()
+{
+	if (m_audio_regs.tx_fifo_count > 0)
+	{
+		const uint32_t data = m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_read_idx];
+		m_audio_regs.tx_fifo_read_idx = (m_audio_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_audio_regs.tx_fifo);
+		m_audio_regs.tx_fifo_count--;
+		audio_update_tx_fifo_levels();
+		if (m_audio_regs.tx_fifo_count == 0)
+		{
+			m_audio_regs.tx_timer->adjust(attotime::never);
+		}
+		return data;
+	}
+	else
+	{
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		status |= (1 << SASR_TUR_BIT);
+		set_irq_line(INT_AUDTUR, 1);
+		return m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_read_idx];
+	}
+}
+
+void sa1111_device::audio_rx_fifo_push(uint32_t data)
+{
+	if (m_audio_regs.rx_fifo_count < ARRAY_LENGTH(m_audio_regs.rx_fifo))
+	{
+		m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_write_idx] = data;
+		m_audio_regs.rx_fifo_write_idx = (m_audio_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_audio_regs.rx_fifo);
+		m_audio_regs.rx_fifo_count++;
+		audio_update_rx_fifo_levels();
+	}
+	else
+	{
+		uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
+		status |= (1 << SASR_ROR_BIT);
+		set_irq_line(INT_AUDROR, 1);
+	}
+}
+
+uint32_t sa1111_device::audio_rx_fifo_pop()
+{
+	if (m_audio_regs.rx_fifo_count > 0)
+	{
+		const uint32_t data = m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_read_idx];
+		m_audio_regs.rx_fifo_read_idx = (m_audio_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_audio_regs.rx_fifo);
+		m_audio_regs.rx_fifo_count--;
+		audio_update_rx_fifo_levels();
+		return data;
+	}
+	return m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_read_idx];
 }
 
 uint32_t sa1111_device::sacr0_r(offs_t offset, uint32_t mem_mask)
@@ -472,15 +804,15 @@ uint32_t sa1111_device::sasr0_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_audio_regs.sasr0;
 	LOGMASKED(LOG_AUDIO, "%s: sasr0_r: Serial Audio Status Register 0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Not Full: %d\n", machine().describe_context(), BIT(data, SASR0_TNF_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Not Empty: %d\n", machine().describe_context(), BIT(data, SASR0_RNE_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Serial Audio Controller Busy: %d\n", machine().describe_context(), BIT(data, SASR0_BSY_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR0_TFS_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR0_RFS_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Underrun: %d\n", machine().describe_context(), BIT(data, SASR0_TUR_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Overrun: %d\n", machine().describe_context(), BIT(data, SASR0_ROR_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Level: %02x\n", machine().describe_context(), (data & SASR0_TFL_MASK) >> SASR0_TFL_BIT);
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Level: %02x\n", machine().describe_context(), (data & SASR0_RFL_MASK) >> SASR0_RFL_BIT);
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Not Full: %d\n", machine().describe_context(), BIT(data, SASR_TNF_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Not Empty: %d\n", machine().describe_context(), BIT(data, SASR_RNE_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Serial Audio Controller Busy: %d\n", machine().describe_context(), BIT(data, SASR_BSY_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR_TFS_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR_RFS_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Underrun: %d\n", machine().describe_context(), BIT(data, SASR_TUR_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Overrun: %d\n", machine().describe_context(), BIT(data, SASR_ROR_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Level: %02x\n", machine().describe_context(), (data & SASR_TFL_MASK) >> SASR_TFL_BIT);
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Level: %02x\n", machine().describe_context(), (data & SASR_RFL_MASK) >> SASR_RFL_BIT);
 	LOGMASKED(LOG_AUDIO, "%s:          L3 Control Bus Data Write Done: %d\n", machine().describe_context(), BIT(data, SASR0_L3WD_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          L3 Control Bus Data Read Done: %d\n", machine().describe_context(), BIT(data, SASR0_L3RD_BIT));
 	return data;
@@ -490,15 +822,15 @@ uint32_t sa1111_device::sasr1_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_audio_regs.sasr1;
 	LOGMASKED(LOG_AUDIO, "%s: sasr1_r: Serial Audio Status Register 1: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Not Full: %d\n", machine().describe_context(), BIT(data, SASR1_TNF_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Not Empty: %d\n", machine().describe_context(), BIT(data, SASR1_RNE_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Serial Audio Controller Busy: %d\n", machine().describe_context(), BIT(data, SASR1_BSY_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR1_TFS_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR1_RFS_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Underrun: %d\n", machine().describe_context(), BIT(data, SASR1_TUR_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Overrun: %d\n", machine().describe_context(), BIT(data, SASR1_ROR_BIT));
-	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Level: %02x\n", machine().describe_context(), (data & SASR1_TFL_MASK) >> SASR1_TFL_BIT);
-	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Level: %02x\n", machine().describe_context(), (data & SASR1_RFL_MASK) >> SASR1_RFL_BIT);
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Not Full: %d\n", machine().describe_context(), BIT(data, SASR_TNF_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Not Empty: %d\n", machine().describe_context(), BIT(data, SASR_RNE_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Serial Audio Controller Busy: %d\n", machine().describe_context(), BIT(data, SASR_BSY_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR_TFS_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Service Request: %d\n", machine().describe_context(), BIT(data, SASR_RFS_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Underrun: %d\n", machine().describe_context(), BIT(data, SASR_TUR_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Overrun: %d\n", machine().describe_context(), BIT(data, SASR_ROR_BIT));
+	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Level: %02x\n", machine().describe_context(), (data & SASR_TFL_MASK) >> SASR_TFL_BIT);
+	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Level: %02x\n", machine().describe_context(), (data & SASR_RFL_MASK) >> SASR_RFL_BIT);
 	LOGMASKED(LOG_AUDIO, "%s:          AC-Link Command Address and Data Transmitted: %d\n", machine().describe_context(), BIT(data, SASR1_CADT_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          AC-Link Status Address and Data Received: %d\n", machine().describe_context(), BIT(data, SASR1_SADR_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          Read Status Time-Out: %d\n", machine().describe_context(), BIT(data, SASR1_RSTO_BIT));
@@ -553,26 +885,26 @@ uint32_t sa1111_device::sadtcs_r(offs_t offset, uint32_t mem_mask)
 
 uint32_t sa1111_device::sadtsa_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadtsa_r: Serial Audio DMA Transmit Buffer Start Address Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtsa, mem_mask);
-	return m_audio_regs.sadtsa;
+	LOGMASKED(LOG_AUDIO, "%s: sadtsa_r: Serial Audio DMA Transmit Buffer Start Address Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadts[0], mem_mask);
+	return m_audio_regs.sadts[0];
 }
 
 uint32_t sa1111_device::sadtca_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadtca_r: Serial Audio DMA Transmit Buffer Count Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtca, mem_mask);
-	return m_audio_regs.sadtca;
+	LOGMASKED(LOG_AUDIO, "%s: sadtca_r: Serial Audio DMA Transmit Buffer Count Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtc[0], mem_mask);
+	return m_audio_regs.sadtc[0];
 }
 
 uint32_t sa1111_device::sadtsb_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadtsb_r: Serial Audio DMA Transmit Buffer Start Address Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtsb, mem_mask);
-	return m_audio_regs.sadtsb;
+	LOGMASKED(LOG_AUDIO, "%s: sadtsb_r: Serial Audio DMA Transmit Buffer Start Address Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadts[1], mem_mask);
+	return m_audio_regs.sadts[1];
 }
 
 uint32_t sa1111_device::sadtcb_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadtcb_r: Serial Audio DMA Transmit Buffer Count Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtcb, mem_mask);
-	return m_audio_regs.sadtcb;
+	LOGMASKED(LOG_AUDIO, "%s: sadtcb_r: Serial Audio DMA Transmit Buffer Count Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadtc[1], mem_mask);
+	return m_audio_regs.sadtc[1];
 }
 
 uint32_t sa1111_device::sadrcs_r(offs_t offset, uint32_t mem_mask)
@@ -583,32 +915,33 @@ uint32_t sa1111_device::sadrcs_r(offs_t offset, uint32_t mem_mask)
 
 uint32_t sa1111_device::sadrsa_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadrsa_r: Serial Audio DMA Receive Buffer Start Address Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrsa, mem_mask);
-	return m_audio_regs.sadrsa;
+	LOGMASKED(LOG_AUDIO, "%s: sadrsa_r: Serial Audio DMA Receive Buffer Start Address Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrs[0], mem_mask);
+	return m_audio_regs.sadrs[0];
 }
 
 uint32_t sa1111_device::sadrca_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadrca_r: Serial Audio DMA Receive Buffer Count Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrca, mem_mask);
-	return m_audio_regs.sadrca;
+	LOGMASKED(LOG_AUDIO, "%s: sadrca_r: Serial Audio DMA Receive Buffer Count Register A: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrc[0], mem_mask);
+	return m_audio_regs.sadrc[0];
 }
 
 uint32_t sa1111_device::sadrsb_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadrsb_r: Serial Audio DMA Receive Buffer Start Address Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrsb, mem_mask);
-	return m_audio_regs.sadrsb;
+	LOGMASKED(LOG_AUDIO, "%s: sadrsb_r: Serial Audio DMA Receive Buffer Start Address Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrs[1], mem_mask);
+	return m_audio_regs.sadrs[1];
 }
 
 uint32_t sa1111_device::sadrcb_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadrcb_r: Serial Audio DMA Receive Buffer Count Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrcb, mem_mask);
-	return m_audio_regs.sadrcb;
+	LOGMASKED(LOG_AUDIO, "%s: sadrcb_r: Serial Audio DMA Receive Buffer Count Register B: %08x & %08x\n", machine().describe_context(), m_audio_regs.sadrc[1], mem_mask);
+	return m_audio_regs.sadrc[1];
 }
 
 uint32_t sa1111_device::sadr_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_AUDIO, "%s: sadr_r: Serial Audio Data Register: %08x & %08x\n", machine().describe_context(), m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_read_idx], mem_mask);
-	return m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_read_idx];
+	const uint32_t data = audio_rx_fifo_pop();
+	LOGMASKED(LOG_AUDIO, "%s: sadr_r: Serial Audio Data Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
 }
 
 void sa1111_device::sacr0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -619,7 +952,25 @@ void sa1111_device::sacr0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	LOGMASKED(LOG_AUDIO, "%s:          Reset SAC Control and FIFOs: %d\n", machine().describe_context(), BIT(data, SACR0_RST_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:          Transmit FIFO Threshold: %02x\n", machine().describe_context(), (data & SACR0_TFTH_MASK) >> SACR0_TFTH_BIT);
 	LOGMASKED(LOG_AUDIO, "%s:          Receive FIFO Threshold: %02x\n", machine().describe_context(), (data & SACR0_RFTH_MASK) >> SACR0_RFTH_BIT);
+
+	const uint32_t old = m_audio_regs.sacr0;
 	COMBINE_DATA(&m_audio_regs.sacr0);
+	const uint32_t changed = old ^ m_audio_regs.sacr0;
+
+	if (BIT(m_audio_regs.sacr0, SACR0_RST_BIT))
+		audio_controller_reset();
+
+	if (BIT(changed, SACR0_ENB_BIT))
+	{
+		audio_set_enabled(BIT(m_audio_regs.sacr0, SACR0_ENB_BIT));
+	}
+	else
+	{
+		if (changed & SACR0_TFTH_MASK)
+			audio_update_tx_fifo_levels();
+		if (changed & SACR0_RFTH_MASK)
+			audio_update_rx_fifo_levels();
+	}
 }
 
 void sa1111_device::sacr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -658,26 +1009,33 @@ void sa1111_device::sascr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (BIT(data, SASCR_TUR_BIT))
 	{
-		m_audio_regs.sasr0 &= ~(1 << SASR0_TUR_BIT);
-		m_audio_regs.sasr1 &= ~(1 << SASR1_TUR_BIT);
+		m_audio_regs.sasr0 &= ~(1 << SASR_TUR_BIT);
+		m_audio_regs.sasr1 &= ~(1 << SASR_TUR_BIT);
+		set_irq_line(INT_AUDTUR, 0);
 	}
 	if (BIT(data, SASCR_ROR_BIT))
 	{
-		m_audio_regs.sasr0 &= ~(1 << SASR0_ROR_BIT);
-		m_audio_regs.sasr1 &= ~(1 << SASR1_ROR_BIT);
+		m_audio_regs.sasr0 &= ~(1 << SASR_ROR_BIT);
+		m_audio_regs.sasr1 &= ~(1 << SASR_ROR_BIT);
+		set_irq_line(INT_AUDROR, 0);
 	}
 	if (BIT(data, SASCR_DTS_BIT))
 	{
 		m_audio_regs.sasr0 &= ~(1 << SASR0_L3WD_BIT);
 		m_audio_regs.sasr1 &= ~(1 << SASR1_CADT_BIT);
+		set_irq_line(INT_AUDDTS, 0);
 	}
 	if (BIT(data, SASCR_RDD_BIT))
 	{
 		m_audio_regs.sasr0 &= ~(1 << SASR0_L3RD_BIT);
 		m_audio_regs.sasr1 &= ~(1 << SASR1_SADR_BIT);
+		set_irq_line(INT_AUDRDD, 0);
 	}
 	if (BIT(data, SASCR_STO_BIT))
+	{
 		m_audio_regs.sasr1 &= ~(1 << SASR1_RSTO_BIT);
+		set_irq_line(INT_AUDSTO, 0);
+	}
 }
 
 void sa1111_device::l3car_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -727,51 +1085,60 @@ void sa1111_device::sadtcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	LOGMASKED(LOG_AUDIO, "%s:           Clear Serial Audio DMA Transmit Buffer Done B: %d\n", machine().describe_context(), BIT(data, SADTCS_TDBDB_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:           Serial Audio DMA Transmit Buffer Start Transfer B: %d\n", machine().describe_context(), BIT(data, SADTCS_TDSTB_BIT));
 
-	m_audio_regs.sadtcs &= ~(1 << SADTCS_TDEN_BIT);
-	m_audio_regs.sadtcs |= data & (1 << SADTCS_TDEN_BIT);
+	const uint32_t old = m_audio_regs.sadtcs;
 
-	if (BIT(data, SADTCS_TDBDA_BIT))
-		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDA_BIT);
-	if (BIT(data, SADTCS_TDBDB_BIT))
-		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDB_BIT);
+	static constexpr uint32_t start_mask = (1 << SADTCS_TDSTA_BIT) | (1 << SADTCS_TDSTB_BIT);
+	static constexpr uint32_t write_mask = (1 << SADTCS_TDEN_BIT) | start_mask;
+	m_audio_regs.sadtcs &= ~write_mask;
+	m_audio_regs.sadtcs |= data & write_mask & mem_mask;
 
-	if (BIT(m_audio_regs.sadtcs, SADTCS_TDEN_BIT))
+	if (BIT(data, SADTCS_TDBDA_BIT) || BIT(data, SADTCS_TDSTA_BIT))
 	{
-		if (BIT(data, SADTCS_TDSTA_BIT))
-		{
-			m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDA_BIT);
-			// TODO: Begin DMA transmit of Buffer A
-		}
-		if (BIT(data, SADTCS_TDSTB_BIT))
-		{
-			m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDB_BIT);
-			// TODO: Begin DMA transmit of Buffer B
-		}
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done A bit, lowering AUDTXA IRQ\n");
+		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDA_BIT);
+		set_irq_line(INT_AUDTXA, 0);
+	}
+	if (BIT(data, SADTCS_TDBDB_BIT) || BIT(data, SADTCS_TDSTB_BIT))
+	{
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done B bit, lowering AUDTXB IRQ\n");
+		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDB_BIT);
+		set_irq_line(INT_AUDTXB, 0);
+	}
+
+	const uint32_t changed = old ^ m_audio_regs.sadtcs;
+
+	if (BIT(changed, SADTCS_TDEN_BIT))
+	{
+		audio_set_tx_dma_enabled(BIT(changed, SADTCS_TDEN_BIT));
+	}
+	else if (BIT(m_audio_regs.sadtcs, SADTCS_TDEN_BIT) && (changed & start_mask))
+	{
+		audio_set_tx_dma_enabled(true);
 	}
 }
 
 void sa1111_device::sadtsa_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadtsa_w: Serial Audio DMA Transmit Buffer Start Address Register A = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadtsa);
+	COMBINE_DATA(&m_audio_regs.sadts[0]);
 }
 
 void sa1111_device::sadtca_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadtca_w: Serial Audio DMA Transmit Buffer Count Register A = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadtca);
+	COMBINE_DATA(&m_audio_regs.sadtc[0]);
 }
 
 void sa1111_device::sadtsb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadtsb_w: Serial Audio DMA Transmit Buffer Start Address Register B = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadtsb);
+	COMBINE_DATA(&m_audio_regs.sadts[1]);
 }
 
 void sa1111_device::sadtcb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadtcb_w: Serial Audio DMA Transmit Buffer Count Register B = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadtcb);
+	COMBINE_DATA(&m_audio_regs.sadtc[1]);
 }
 
 void sa1111_device::sadrcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -783,51 +1150,58 @@ void sa1111_device::sadrcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	LOGMASKED(LOG_AUDIO, "%s:           Clear Serial Audio DMA Receive Buffer Done B: %d\n", machine().describe_context(), BIT(data, SADRCS_RDBDB_BIT));
 	LOGMASKED(LOG_AUDIO, "%s:           Serial Audio DMA Receive Buffer Start Transfer B: %d\n", machine().describe_context(), BIT(data, SADRCS_RDSTB_BIT));
 
-	m_audio_regs.sadrcs &= ~(1 << SADRCS_RDEN_BIT);
-	m_audio_regs.sadrcs |= data & (1 << SADRCS_RDEN_BIT);
+	const uint32_t old = m_audio_regs.sadrcs;
+
+	static constexpr uint32_t start_mask = (1 << SADRCS_RDSTA_BIT) | (1 << SADRCS_RDSTB_BIT);
+	static constexpr uint32_t write_mask = (1 << SADRCS_RDEN_BIT) | start_mask;
+	m_audio_regs.sadrcs &= ~write_mask;
+	m_audio_regs.sadrcs |= data & write_mask & mem_mask;
 
 	if (BIT(data, SADRCS_RDBDA_BIT))
-		m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDA_BIT);
-	if (BIT(data, SADRCS_RDBDB_BIT))
-		m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDB_BIT);
-
-	if (BIT(m_audio_regs.sadrcs, SADRCS_RDEN_BIT))
 	{
-		if (BIT(data, SADRCS_RDSTA_BIT))
-		{
-			m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDA_BIT);
-			// TODO: Begin DMA receive of Buffer A
-		}
-		if (BIT(data, SADRCS_RDSTB_BIT))
-		{
-			m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDB_BIT);
-			// TODO: Begin DMA receive of Buffer B
-		}
+		m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDA_BIT);
+		set_irq_line(INT_AUDRXA, 0);
+	}
+	if (BIT(data, SADRCS_RDBDB_BIT))
+	{
+		m_audio_regs.sadrcs &= ~(1 << SADRCS_RDBDB_BIT);
+		set_irq_line(INT_AUDRXB, 0);
+	}
+
+	const uint32_t changed = old ^ m_audio_regs.sadrcs;
+
+	if (BIT(changed, SADRCS_RDEN_BIT))
+	{
+		audio_set_rx_dma_enabled(BIT(changed, SADRCS_RDEN_BIT));
+	}
+	else if (BIT(m_audio_regs.sadrcs, SADRCS_RDEN_BIT) && (changed & start_mask))
+	{
+		audio_set_rx_dma_enabled(true);
 	}
 }
 
 void sa1111_device::sadrsa_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadrsa_w: Serial Audio DMA Receive Buffer Start Address Register A = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadrsa);
+	COMBINE_DATA(&m_audio_regs.sadrs[0]);
 }
 
 void sa1111_device::sadrca_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadrca_w: Serial Audio DMA Receive Buffer Count Register A = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadrca);
+	COMBINE_DATA(&m_audio_regs.sadrc[0]);
 }
 
 void sa1111_device::sadrsb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadrsb_w: Serial Audio DMA Receive Buffer Start Address Register B = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadrsb);
+	COMBINE_DATA(&m_audio_regs.sadrs[1]);
 }
 
 void sa1111_device::sadrcb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadrcb_w: Serial Audio DMA Receive Buffer Count Register B = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_audio_regs.sadrcb);
+	COMBINE_DATA(&m_audio_regs.sadrc[1]);
 }
 
 void sa1111_device::saitr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -849,7 +1223,7 @@ void sa1111_device::saitr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void sa1111_device::sadr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO, "%s: sadr_w: Serial Audio Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	// TODO: Push into audio FIFO
+	audio_tx_fifo_push(data);
 }
 
 /*
@@ -1283,41 +1657,62 @@ void sa1111_device::gpio_in(const uint32_t line, const int state)
 
 void sa1111_device::gpio_update_direction(const uint32_t block, const uint32_t old_dir)
 {
+	const uint32_t new_outputs = old_dir & ~m_gpio_regs.ddr[block];
+	if (new_outputs)
+	{
+		for (uint32_t line = 0; line < 8; line++)
+		{
+			if (BIT(new_outputs, line))
+			{
+				m_gpio_out[block * 8 + line](BIT(m_gpio_regs.out_latch[block], line));
+			}
+		}
+	}
 }
 
-void sa1111_device::gpio_update_outputs(const uint32_t block, const uint32_t old_latch)
+void sa1111_device::gpio_update_outputs(const uint32_t block, const uint32_t changed)
 {
+	uint32_t remaining_changed = changed;
+
+	for (uint32_t line = 0; line < 8 && remaining_changed != 0; line++)
+	{
+		if (BIT(remaining_changed, line))
+		{
+			m_gpio_out[block * 8 + line](BIT(m_gpio_regs.level[block], line));
+			remaining_changed &= ~(1 << line);
+		}
+	}
 }
 
-template <unsigned Block>
+template <int Block>
 uint32_t sa1111_device::ddr_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: ddr_r: GPIO Block %c Data Direction: %08x & %08x\n", machine().describe_context(), 'A' + Block, m_gpio_regs.ddr[Block], mem_mask);
 	return m_gpio_regs.ddr[Block];
 }
 
-template <unsigned Block>
+template <int Block>
 uint32_t sa1111_device::drr_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: drr_r: GPIO Block %c Data Value Register: %08x & %08x\n", machine().describe_context(), 'A' + Block, m_gpio_regs.level[Block], mem_mask);
 	return m_gpio_regs.level[Block];
 }
 
-template <unsigned Block>
+template <int Block>
 uint32_t sa1111_device::sdr_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: sdr_r: GPIO Block %c Sleep Direction: %08x & %08x\n", machine().describe_context(), 'A' + Block, m_gpio_regs.sdr[Block], mem_mask);
 	return m_gpio_regs.sdr[Block];
 }
 
-template <unsigned Block>
+template <int Block>
 uint32_t sa1111_device::ssr_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: ssr_r: GPIO Block %c Sleep State: %08x & %08x\n", machine().describe_context(), 'A' + Block, m_gpio_regs.ssr[Block], mem_mask);
 	return m_gpio_regs.ssr[Block];
 }
 
-template <unsigned Block>
+template <int Block>
 void sa1111_device::ddr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: ddr_w: GPIO Block %c Data Direction = %08x & %08x\n", machine().describe_context(), 'A' + Block, data, mem_mask);
@@ -1327,24 +1722,25 @@ void sa1111_device::ddr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		gpio_update_direction(Block, old);
 }
 
-template <unsigned Block>
+template <int Block>
 void sa1111_device::dwr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: dwr_w: GPIO Block %c Data Value Register = %08x & %08x\n", machine().describe_context(), 'A' + Block, data, mem_mask);
-	const uint32_t old = m_gpio_regs.out_latch[Block];
+	const uint32_t old = m_gpio_regs.level[Block];
 	COMBINE_DATA(&m_gpio_regs.out_latch[Block]);
-	if (old != m_gpio_regs.out_latch[Block])
-		gpio_update_outputs(Block, old);
+	m_gpio_regs.level[Block] = (m_gpio_regs.ddr[Block] & m_gpio_regs.in_latch[Block]) | (~m_gpio_regs.ddr[Block] & m_gpio_regs.out_latch[Block]);
+	if (old != m_gpio_regs.level[Block])
+		gpio_update_outputs(Block, old ^ m_gpio_regs.level[Block]);
 }
 
-template <unsigned Block>
+template <int Block>
 void sa1111_device::sdr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: sdr_w: GPIO Block %c Sleep Direction = %08x & %08x\n", machine().describe_context(), 'A' + Block, data, mem_mask);
 	COMBINE_DATA(&m_gpio_regs.sdr[Block]);
 }
 
-template <unsigned Block>
+template <int Block>
 void sa1111_device::ssr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_GPIO, "%s: ssr_w: GPIO Block %c Sleep State = %08x & %08x\n", machine().describe_context(), 'A' + Block, data, mem_mask);
@@ -1359,7 +1755,40 @@ void sa1111_device::ssr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 */
 
-template <unsigned Set>
+void sa1111_device::set_irq_line(uint32_t line, int state)
+{
+	const uint32_t set = BIT(line, 5);
+	const uint32_t local_bit = line & 0x1f;
+	const uint32_t mask = (1 << local_bit);
+	const uint32_t old_raw = BIT(m_intc_regs.intraw[set], local_bit);
+	//LOGMASKED(LOG_INTC, "Setting IRQ line %d to state %d. Current intraw[%d] state %08x, bit state %d\n", line, state, set, m_intc_regs.intraw[set], old_raw);
+	if (old_raw == state)
+		return;
+
+	m_intc_regs.intraw[set] &= ~mask;
+	m_intc_regs.intraw[set] |= (state << local_bit);
+
+	const uint32_t falling_edge = BIT(m_intc_regs.intpol[set], local_bit);
+	const bool new_rising = (!old_raw && state && !falling_edge);
+	const bool new_falling = (old_raw && !state && falling_edge);
+
+	if (new_rising || new_falling)
+		m_intc_regs.intstat[set] |= mask;
+
+	if (BIT(m_intc_regs.inten[set], local_bit))
+	{
+		LOGMASKED(LOG_INTC, "IRQ line %d is enabled, updating interrupts\n", line);
+		update_interrupts();
+	}
+}
+
+void sa1111_device::update_interrupts()
+{
+	const bool any_interrupt = (m_intc_regs.intstat[0] & m_intc_regs.inten[0]) || (m_intc_regs.intstat[1] & m_intc_regs.inten[1]);
+	m_irq_out(any_interrupt);
+}
+
+template <int Set>
 uint32_t sa1111_device::inttest_r(offs_t offset, uint32_t mem_mask)
 {
 	if (Set == 0)
@@ -1375,14 +1804,14 @@ uint32_t sa1111_device::inttest_r(offs_t offset, uint32_t mem_mask)
 	}
 }
 
-template <unsigned Set>
+template <int Set>
 uint32_t sa1111_device::inten_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: inten_r: Interrupt Enable Register %d: %08x & %08x\n", machine().describe_context(), Set, m_intc_regs.inten[Set], mem_mask);
 	return m_intc_regs.inten[Set];
 }
 
-template <unsigned Set>
+template <int Set>
 uint32_t sa1111_device::intpol_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intpol_r: Interrupt Polarity Register %d: %08x & %08x\n", machine().describe_context(), Set, m_intc_regs.intpol[Set], mem_mask);
@@ -1395,42 +1824,47 @@ uint32_t sa1111_device::inttstsel_r(offs_t offset, uint32_t mem_mask)
 	return m_intc_regs.inttstsel;
 }
 
-template <unsigned Set>
+template <int Set>
 uint32_t sa1111_device::intstat_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intstat_r: Interrupt Status Register %d: %08x & %08x\n", machine().describe_context(), Set, m_intc_regs.intstat[Set], mem_mask);
 	return m_intc_regs.intstat[Set];
 }
 
-template <unsigned Set>
+template <int Set>
 uint32_t sa1111_device::wake_en_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: wake_en_r: Interrupt Wake-Up Enable Register %d: %08x & %08x\n", machine().describe_context(), Set, m_intc_regs.wake_en[Set], mem_mask);
 	return m_intc_regs.wake_en[Set];
 }
 
-template <unsigned Set>
+template <int Set>
 uint32_t sa1111_device::wake_pol_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: wake_pol_r: Interrupt Wake-Up Polarity Register %d: %08x & %08x\n", machine().describe_context(), Set, m_intc_regs.wake_pol[Set], mem_mask);
 	return m_intc_regs.wake_pol[Set];
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::inttest_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: inttest_w: Interrupt Test Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
 	COMBINE_DATA(&m_intc_regs.inttest[Set]);
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::inten_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: inten_w: Interrupt Enable Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
+	const uint32_t old = m_intc_regs.inten[Set];
 	COMBINE_DATA(&m_intc_regs.inten[Set]);
+	if (old != m_intc_regs.inten[Set] && (m_intc_regs.intstat[Set] & old) != 0)
+	{
+		update_interrupts();
+	}
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::intpol_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_w: Interrupt Polarity Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
@@ -1443,28 +1877,38 @@ void sa1111_device::inttstsel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	COMBINE_DATA(&m_intc_regs.inttstsel);
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::intclr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_w: Interrupt Clear Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
+	const uint32_t old = m_intc_regs.intstat[Set];
 	m_intc_regs.intstat[Set] &= ~(data & mem_mask);
+	if (old != m_intc_regs.intstat[Set] && (old & m_intc_regs.inten[Set]) != 0)
+	{
+		update_interrupts();
+	}
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::intset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intset_w: Interrupt Set Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
+	const uint32_t old = m_intc_regs.intstat[Set];
 	m_intc_regs.intstat[Set] |= (data & mem_mask);
+	if (old != m_intc_regs.intstat[Set] && (m_intc_regs.intstat[Set] & m_intc_regs.inten[Set]) != 0)
+	{
+		update_interrupts();
+	}
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::wake_en_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: wake_en_w: Interrupt Wake-Up Enable Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
 	COMBINE_DATA(&m_intc_regs.wake_en[Set]);
 }
 
-template <unsigned Set>
+template <int Set>
 void sa1111_device::wake_pol_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: wake_pol_w: Interrupt Wake-Up Polarity Register %d = %08x & %08x\n", machine().describe_context(), Set, data, mem_mask);
@@ -1568,15 +2012,15 @@ void sa1111_device::device_start()
 	save_item(NAME(m_audio_regs.acsar));
 	save_item(NAME(m_audio_regs.acsdr));
 	save_item(NAME(m_audio_regs.sadtcs));
-	save_item(NAME(m_audio_regs.sadtsa));
-	save_item(NAME(m_audio_regs.sadtca));
-	save_item(NAME(m_audio_regs.sadtsb));
-	save_item(NAME(m_audio_regs.sadtcb));
+	save_item(NAME(m_audio_regs.sadts));
+	save_item(NAME(m_audio_regs.sadtc));
+	save_item(NAME(m_audio_regs.sadta));
+	save_item(NAME(m_audio_regs.sadtcc));
 	save_item(NAME(m_audio_regs.sadrcs));
-	save_item(NAME(m_audio_regs.sadrsa));
-	save_item(NAME(m_audio_regs.sadrca));
-	save_item(NAME(m_audio_regs.sadrsb));
-	save_item(NAME(m_audio_regs.sadrcb));
+	save_item(NAME(m_audio_regs.sadrs));
+	save_item(NAME(m_audio_regs.sadrc));
+	save_item(NAME(m_audio_regs.sadra));
+	save_item(NAME(m_audio_regs.sadrcc));
 	save_item(NAME(m_audio_regs.saitr));
 	save_item(NAME(m_audio_regs.rx_fifo));
 	save_item(NAME(m_audio_regs.rx_fifo_read_idx));
@@ -1630,21 +2074,26 @@ void sa1111_device::device_start()
 	save_item(NAME(m_intc_regs.intstat));
 	save_item(NAME(m_intc_regs.wake_en));
 	save_item(NAME(m_intc_regs.wake_pol));
+	save_item(NAME(m_intc_regs.intraw));
 
 	save_item(NAME(m_card_regs.pccr));
 	save_item(NAME(m_card_regs.pcssr));
 	save_item(NAME(m_card_regs.pcsr));
 
 	m_audio_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_rx_callback), this));
+	m_audio_regs.rx_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_rx_dma_callback), this));
 	m_audio_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_tx_callback), this));
+	m_audio_regs.tx_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::audio_tx_dma_callback), this));
 
 	m_ssp_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::ssp_rx_callback), this));
 	m_ssp_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1111_device::ssp_tx_callback), this));
 
+	m_irq_out.resolve_safe();
 	m_gpio_out.resolve_all_safe();
 	m_ssp_out.resolve_safe();
 	m_l3_addr_out.resolve_safe();
 	m_l3_data_out.resolve_safe();
+	m_i2s_out.resolve_safe();
 }
 
 void sa1111_device::device_reset()
@@ -1681,26 +2130,28 @@ void sa1111_device::device_reset()
 	m_audio_regs.acsar = 0;
 	m_audio_regs.acsdr = 0;
 	m_audio_regs.sadtcs = 0;
-	m_audio_regs.sadtsa = 0;
-	m_audio_regs.sadtca = 0;
-	m_audio_regs.sadtsb = 0;
-	m_audio_regs.sadtcb = 0;
+	memset(m_audio_regs.sadts, 0, sizeof(uint32_t) * 2);
+	memset(m_audio_regs.sadtc, 0, sizeof(uint32_t) * 2);
+	m_audio_regs.sadta = 0;
+	m_audio_regs.sadtcc = 0;
 	m_audio_regs.sadrcs = 0;
-	m_audio_regs.sadrsa = 0;
-	m_audio_regs.sadrca = 0;
-	m_audio_regs.sadrsb = 0;
-	m_audio_regs.sadrcb = 0;
+	memset(m_audio_regs.sadrs, 0, sizeof(uint32_t) * 2);
+	memset(m_audio_regs.sadrc, 0, sizeof(uint32_t) * 2);
+	m_audio_regs.sadra = 0;
+	m_audio_regs.sadrcc = 0;
 	m_audio_regs.saitr = 0;
-	memset(m_audio_regs.rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_audio_regs.rx_fifo));
+	memset(m_audio_regs.rx_fifo, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_audio_regs.rx_fifo));
 	m_audio_regs.rx_fifo_read_idx = 0;
 	m_audio_regs.rx_fifo_write_idx = 0;
 	m_audio_regs.rx_fifo_count = 0;
 	m_audio_regs.rx_timer->adjust(attotime::never);
-	memset(m_audio_regs.tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_audio_regs.tx_fifo));
+	m_audio_regs.rx_dma_timer->adjust(attotime::never);
+	memset(m_audio_regs.tx_fifo, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_audio_regs.tx_fifo));
 	m_audio_regs.tx_fifo_read_idx = 0;
 	m_audio_regs.tx_fifo_write_idx = 0;
 	m_audio_regs.tx_fifo_count = 0;
 	m_audio_regs.tx_timer->adjust(attotime::never);
+	m_audio_regs.tx_dma_timer->adjust(attotime::never);
 
 	m_ssp_regs.sspcr0 = 0;
 	m_ssp_regs.sspcr1 = (0x7 << SSPCR1_RFT_BIT) | (0x7 << SSPCR1_TFT_BIT);
@@ -1734,10 +2185,11 @@ void sa1111_device::device_reset()
 	memset(m_intc_regs.intstat, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.intstat));
 	memset(m_intc_regs.wake_en, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.wake_en));
 	memset(m_intc_regs.wake_pol, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.wake_pol));
+	memset(m_intc_regs.intraw, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.intraw));
 
 	m_card_regs.pccr = 0;
 	m_card_regs.pcssr = 0;
-	m_card_regs.pcsr = 0x0000000c;
+	m_card_regs.pcsr = 0x000000fc;
 }
 
 void sa1111_device::device_add_mconfig(machine_config &config)

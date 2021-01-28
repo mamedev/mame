@@ -163,7 +163,7 @@ void main()
   // Of all the pixels that are mapped onto the texel we are
   // currently rendering, which pixel are we currently rendering?
   vec2 ratio_scale = xy * u_tex_size0.xy - vec2_splat(0.5);
-  
+
 #ifdef OVERSAMPLE
   float filter = fwidth(ratio_scale.y);
 #endif
@@ -179,7 +179,7 @@ void main()
 
   // Prevent division by zero.
   coeffs = FIX(coeffs);
-  
+
   // Lanczos2 kernel.
   coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
 
@@ -193,7 +193,7 @@ void main()
                    TEX2D(xy)*coeffs.y +
 		   TEX2D(xy +vec2(v_one.x, 0.0))*coeffs.z +
 		   TEX2D(xy + vec2(2.0 * v_one.x, 0.0))*coeffs.w , 0.0, 1.0);
-			 
+
   vec4 col2 = clamp(TEX2D(xy + vec2(-v_one.x, v_one.y))*coeffs.x +
 		    TEX2D(xy + vec2(0.0, v_one.y))*coeffs.y +
 		    TEX2D(xy + v_one)*coeffs.z +
@@ -222,7 +222,7 @@ void main()
   // halation and corners
   vec3 blur = pow(texture2D(blur_texture,xy0).rgb, vec3_splat(CRTgamma.x));
   mul_res = mix(mul_res, blur, halation.x) * vec3_splat(cval);
-  
+
   // Convert the image gamma for display on our output device.
   mul_res = pow(mul_res, vec3_splat(1.0 / monitorgamma.x));
 
@@ -230,6 +230,6 @@ void main()
   xy = v_texCoord.xy * u_quad_dims.xy / u_tex_size1.xy;
   vec3 mask = texture2D(mask_texture, xy).rgb;
   mask = mix(vec3_splat(1.0), mask, aperture_strength.x);
-  
+
   gl_FragColor = vec4(mul_res*mask, col.a);
 }

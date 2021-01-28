@@ -170,6 +170,15 @@ protected:
 	void crt_cursor_color1_red_w(offs_t offset, uint8_t data);
 	void crt_cursor_fifo_thresh_w(offs_t offset, uint8_t data);
 
+	template <bool Linear> void bitblt_solid_fill();
+	uint16_t bitblt_rop(const uint8_t rop, const uint16_t s, const uint16_t d);
+	void bitblt_async_advance(uint32_t &addr);
+	void bitblt_write_continue(const uint16_t s);
+	void bitblt_write();
+	uint16_t bitblt_read_continue();
+	void bitblt_read();
+	template <bool SrcLinear, bool DstLinear> void bitblt_move_negative();
+	void bitblt_execute_command();
 	uint8_t bitblt_ctrl0_r(offs_t offset);
 	uint8_t bitblt_ctrl1_r(offs_t offset);
 	uint8_t bitblt_rop_code_r(offs_t offset);
@@ -221,8 +230,8 @@ protected:
 	void mplug_resv_cmd_w(offs_t offset, uint8_t data);
 	void mplug_data_w(offs_t offset, uint8_t data);
 
-	uint8_t bitblt_data_r(offs_t offset);
-	void bitblt_data_w(offs_t offset, uint8_t data);
+	uint16_t bitblt_data_r(offs_t offset);
+	void bitblt_data_w(offs_t offset, uint16_t data);
 
 	enum
 	{
@@ -520,6 +529,11 @@ protected:
 	uint16_t m_bitblt_height;
 	uint16_t m_bitblt_bgcolor;
 	uint16_t m_bitblt_fgcolor;
+
+	uint32_t m_bitblt_curr_src_addr;
+	uint32_t m_bitblt_curr_dst_addr;
+	uint32_t m_bitblt_x;
+	uint32_t m_bitblt_y;
 
 	uint8_t m_lut_mode;
 	uint8_t m_lut_addr;

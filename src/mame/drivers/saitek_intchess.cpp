@@ -297,7 +297,7 @@ void intchess_state::intchess(machine_config &config)
 	M6502(config, m_maincpu, 4.433619_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &intchess_state::main_map);
 
-	VIA6522(config, m_via, 4.433619_MHz_XTAL / 4); // DDRA = 0xff, DDRB = 0xef
+	MOS6522(config, m_via, 4.433619_MHz_XTAL / 4); // DDRA = 0xff, DDRB = 0xef
 	m_via->writepa_handler().set(FUNC(intchess_state::seg_w));
 	m_via->writepb_handler().set(FUNC(intchess_state::control_w));
 	m_via->readpb_handler().set(FUNC(intchess_state::control_r));

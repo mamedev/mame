@@ -1256,7 +1256,7 @@ core_file::core_file()
 // assumptions about path separators
 // -------------------------------------------------
 
-std::string core_filename_extract_base(const std::string &name, bool strip_extension)
+std::string_view core_filename_extract_base(std::string_view name, bool strip_extension)
 {
 	// find the start of the basename
 	auto const start = std::find_if(name.rbegin(), name.rend(), &util::is_directory_separator);
@@ -1269,8 +1269,7 @@ std::string core_filename_extract_base(const std::string &name, bool strip_exten
 		? std::next(chop_position)
 		: name.rbegin();
 
-	// copy the result into an string
-	return std::string(start.base(), end.base());
+	return std::string_view(&*start.base(), end.base() - start.base());
 }
 
 
@@ -1278,13 +1277,13 @@ std::string core_filename_extract_base(const std::string &name, bool strip_exten
 // core_filename_extract_extension
 // -------------------------------------------------
 
-std::string core_filename_extract_extension(const std::string &filename, bool strip_period)
+std::string_view core_filename_extract_extension(std::string_view filename, bool strip_period)
 {
 	auto loc = filename.find_last_of('.');
-	std::string result = loc != std::string::npos
-		? filename.substr(loc + (strip_period ? 1 : 0))
-		: "";
-	return result;
+	if (loc != std::string_view::npos)
+		return filename.substr(loc + (strip_period ? 1 : 0));
+	else
+		return std::string_view();
 }
 
 
@@ -1293,7 +1292,7 @@ std::string core_filename_extract_extension(const std::string &filename, bool st
 // filename end with the specified extension?
 // -------------------------------------------------
 
-bool core_filename_ends_with(const std::string &filename, const std::string &extension)
+bool core_filename_ends_with(std::string_view filename, std::string_view extension)
 {
 	auto namelen = filename.length();
 	auto extlen = extension.length();

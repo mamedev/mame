@@ -314,7 +314,6 @@ win_window_info::win_window_info(
 	, m_lastclicky(0)
 	, m_attached_mode(false)
 {
-	memset(m_title,0,sizeof(m_title));
 	m_non_fullscreen_bounds.left = 0;
 	m_non_fullscreen_bounds.top = 0;
 	m_non_fullscreen_bounds.right  = 0;
@@ -779,12 +778,6 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_targetlayerconfig = window->target()->layer_config();
 	window->m_targetvismask = window->target()->visibility_mask();
 
-	// make the window title
-	if (video_config.numscreens == 1)
-		sprintf(window->m_title, "%s: %s [%s]", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name);
-	else
-		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name, index);
-
 	// set the initial maximized state
 	window->m_startmaximized = downcast<windows_options &>(machine.options()).maximize();
 
@@ -1046,7 +1039,7 @@ int win_window_info::complete_create()
 		hwnd = win_create_window_ex_utf8(
 						fullscreen() ? FULLSCREEN_STYLE_EX : WINDOW_STYLE_EX,
 						"MAME",
-						m_title,
+						title().c_str(),
 						fullscreen() ? FULLSCREEN_STYLE : WINDOW_STYLE,
 						monitorbounds.left() + 20, monitorbounds.top() + 20,
 						monitorbounds.left() + 100, monitorbounds.top() + 100,
@@ -1275,6 +1268,22 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				else
 					window->maximize_window();
 				break;
+			}
+		}
+		return DefWindowProc(wnd, message, wparam, lparam);
+
+	case WM_ACTIVATE:
+		if (window->has_renderer() && window->fullscreen())
+		{
+			if ((wparam == WA_ACTIVE) || (wparam == WA_CLICKACTIVE))
+			{
+				for (const auto &w : osd_common_t::s_window_list)
+					ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_RESTORE);
+			}
+			else if ((wparam == WA_INACTIVE) && !is_mame_window(HWND(lparam)))
+			{
+				for (const auto &w : osd_common_t::s_window_list)
+					ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_MINIMIZE);
 			}
 		}
 		return DefWindowProc(wnd, message, wparam, lparam);

@@ -18,6 +18,8 @@
 #include "emuopts.h"
 #include "mame.h"
 
+#include "corestr.h"
+
 
 namespace ui {
 static int ADDING = 1;

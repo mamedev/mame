@@ -11,13 +11,6 @@
 #include "emu.h"
 #include "m740.h"
 
-DEFINE_DEVICE_TYPE(M740, m740_device, "m740", "Mitsubishi M740")
-
-m740_device::m740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m740_device(mconfig, M740, tag, owner, clock)
-{
-}
-
 m740_device::m740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock), m_irq_multiplex(0), m_irq_vector(0)
 {

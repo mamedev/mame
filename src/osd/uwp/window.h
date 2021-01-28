@@ -78,7 +78,6 @@ public:
 	volatile int        m_init_state;
 
 	// window handle and info
-	char                m_title[256];
 	RECT                m_non_fullscreen_bounds;
 	int                 m_startmaximized;
 	int                 m_isminimized;

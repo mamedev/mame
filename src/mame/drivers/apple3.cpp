@@ -141,12 +141,12 @@ void apple3_state::apple3(machine_config &config)
 	m_rtc->irq().set(m_via[1], FUNC(via6522_device::write_ca1));
 
 	/* via */
-	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
 	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
 	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	VIA6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
 	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
 	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));

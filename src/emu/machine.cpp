@@ -86,6 +86,7 @@
 #include "tilemap.h"
 #include "natkeyboard.h"
 #include "ui/uimain.h"
+#include "corestr.h"
 #include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>

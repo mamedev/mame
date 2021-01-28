@@ -31,7 +31,7 @@ namespace {
 
 struct parent_rom
 {
-	parent_rom(device_type t, rom_entry const *r) : type(t), name(ROM_GETNAME(r)), hashes(ROM_GETHASHDATA(r)), length(rom_file_size(r)) { }
+	parent_rom(device_type t, rom_entry const *r) : type(t), name(r->name()), hashes(r->hashdata()), length(rom_file_size(r)) { }
 
 	std::reference_wrapper<std::remove_reference_t<device_type> >   type;
 	std::string                                                     name;
@@ -74,7 +74,7 @@ public:
 		}
 	}
 
-	std::add_pointer_t<device_type> find_shared_device(device_t &current, char const *name, util::hash_collection const &hashes, uint64_t length) const
+	std::add_pointer_t<device_type> find_shared_device(device_t &current, std::string_view name, util::hash_collection const &hashes, uint64_t length) const
 	{
 		// if we're examining a child device, it will always have a perfect match
 		if (current.owner())
@@ -120,7 +120,7 @@ public:
 				{
 					if (rom_file_size(rom) == record.actual_length())
 					{
-						util::hash_collection const hashes(ROM_GETHASHDATA(rom));
+						util::hash_collection const hashes(rom->hashdata());
 						if (hashes == record.actual_hashes())
 							return std::make_pair(&current.type(), empty());
 						else if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) && (rom->name() == record.name()))
@@ -228,8 +228,8 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 				}
 
 				// look for a matching parent or device ROM
-				char const *const name(ROM_GETNAME(rom));
-				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
+				std::string const &name(rom->name());
+				util::hash_collection const hashes(rom->hashdata());
 				bool const dumped(!hashes.flag(util::hash_collection::FLAG_NO_DUMP));
 				std::add_pointer_t<device_type> const shared_device(parentroms.find_shared_device(device, name, hashes, rom_file_size(rom)));
 				if (shared_device)
@@ -557,7 +557,7 @@ void media_auditor::audit_regions(T do_audit, const rom_entry *region, std::size
 		for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 		{
 			// count the number of files with hashes
-			util::hash_collection const hashes(ROM_GETHASHDATA(rom));
+			util::hash_collection const hashes(rom->hashdata());
 			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 				required++;
 
@@ -679,14 +679,13 @@ media_auditor::audit_record::audit_record(const rom_entry &media, media_type typ
 	: m_type(type)
 	, m_status(audit_status::UNVERIFIED)
 	, m_substatus(audit_substatus::UNVERIFIED)
-	, m_name(ROM_GETNAME(&media))
+	, m_name(media.name())
 	, m_explength(rom_file_size(&media))
 	, m_length(0)
-	, m_exphashes()
+	, m_exphashes(media.hashdata())
 	, m_hashes()
 	, m_shared_device(nullptr)
 {
-	m_exphashes.from_internal_string(ROM_GETHASHDATA(&media));
 }
 
 media_auditor::audit_record::audit_record(const char *name, media_type type)

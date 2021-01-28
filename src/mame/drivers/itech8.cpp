@@ -1744,7 +1744,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch, 0);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
-	via6522_device &via(VIA6522(config, "via6522_0", CLOCK_8MHz/4));
+	via6522_device &via(MOS6522(config, "via6522_0", CLOCK_8MHz/4));
 	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 	via.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }

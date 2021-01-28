@@ -6,7 +6,7 @@ $input v_texcoord0, v_texcoord1, v_color0
 /*
 
    Hyllian's xBR MultiLevel4 Shader - Pass3
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,7 +62,7 @@ vec4 unpack_info(float i)
 	float frac_val = fract(i / 2.0f);
 	info.w = round(frac_val);
 	i = i / 2.0f - frac_val;
-	
+
 	frac_val = fract(i / 2.0f);
 	info.z = round(frac_val);
 	i = i / 2.0f - frac_val;
@@ -116,7 +116,7 @@ vec3 color_mix(vec3 c, vec3 color, vec3 E)
 void main()
 {
 	float scale_factor = u_target_size.x / u_tex_size1.x;
-	
+
 	vec2 fp = fract(v_texcoord0 * u_tex_size1.xy) - vec2(0.5, 0.5); // pos = pixel position
 
 	vec4 UL = texture2D(decal, v_texcoord0 + 0.25 * v_texcoord1.xy + 0.25 * v_texcoord1.zw);

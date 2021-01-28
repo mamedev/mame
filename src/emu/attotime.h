@@ -357,7 +357,7 @@ inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 			return attotime(0, ticks * attos_per_tick);
 
 		u32 remainder;
-		s32 secs = divu_64x32_rem(ticks, frequency, &remainder);
+		s32 secs = divu_64x32_rem(ticks, frequency, remainder);
 		return attotime(secs, u64(remainder) * attos_per_tick);
 	}
 	else

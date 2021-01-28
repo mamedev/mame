@@ -10,7 +10,7 @@ Two versions are known: "B" from 1988/1989, and "C" from 1989.
 
 Hardware notes:
 - WDC W65C02P @ 5MHz
-- 64KB ROM (2*AMI 27256), socket for 32KB Endgame ROM
+- 64KB ROM (2*AMI 27256), socket for 32KB Endgame ROM (ver. 2)
 - 8KB RAM (SRM2264LC) battery-backed
 - "HELIOS" NEC gate array
 - Epson SED1502F, LCD screen
@@ -21,6 +21,7 @@ with hardware differences: 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
 TODO:
 - where does the IRQ come from? same problem as with stratos
+- verify that egr(1) does not work on real chesscomputer
 
 ***************************************************************************/
 
@@ -336,7 +337,7 @@ void simultano_state::simultano(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
-	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
+	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 
 

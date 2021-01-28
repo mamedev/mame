@@ -13,46 +13,72 @@ DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_FPGA, k573fpga_device)
 class k573fpga_device : public device_t
 {
 public:
-	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
+	template <typename T> void set_ram(T &&tag) { ram.set_tag(std::forward<T>(tag)); }
 
 	void set_ddrsbm_fpga(bool flag) { use_ddrsbm_fpga = flag; }
 
-	void set_ram(u16 *v) { ram = v; }
-	u16 get_decrypted();
+	uint16_t get_decrypted();
 
-	void set_crypto_key1(u16 v) { crypto_key1 = v; }
-	void set_crypto_key2(u16 v) { crypto_key2 = v; }
-	void set_crypto_key3(u8 v) { crypto_key3 = v; }
+	void set_crypto_key1(uint16_t v) { crypto_key1 = v; }
+	void set_crypto_key2(uint16_t v) { crypto_key2 = v; }
+	void set_crypto_key3(uint8_t v) { crypto_key3 = v; }
 
-	uint32_t get_mp3_cur_adr() { return mp3_cur_adr; }
-	void set_mp3_cur_adr(u32 v) { mp3_cur_adr = v; }
+	uint32_t get_mp3_start_addr() { return mp3_start_addr; }
+	void set_mp3_start_addr(uint32_t v) { mp3_start_addr = v; }
 
-	uint32_t get_mp3_end_adr() { return mp3_end_adr; }
-	void set_mp3_end_adr(u32 v) { mp3_end_adr = v; }
+	uint32_t get_mp3_end_addr() { return mp3_end_addr; }
+	void set_mp3_end_addr(uint32_t v) { mp3_end_addr = v; }
 
-	u16 i2c_read();
-	void i2c_write(u16 data);
+	uint16_t mas_i2c_r();
+	void mas_i2c_w(uint16_t data);
 
-	u16 get_mpeg_ctrl();
-	void set_mpeg_ctrl(u16 data);
+	uint16_t get_fpga_ctrl();
+	void set_mpeg_ctrl(uint16_t data);
 
-	bool is_playing() { return (mpeg_ctrl_flag & 0xe000) == 0xe000 && mp3_cur_adr < mp3_end_adr; }
+	uint16_t get_mpeg_ctrl();
+
+	uint32_t get_counter();
+	uint32_t get_counter_diff();
+
+	void status_update();
+	void reset_counter();
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	u16 *ram;
+	uint16_t decrypt_default(uint16_t data);
+	uint16_t decrypt_ddrsbm(uint16_t data);
 
-	u16 crypto_key1, crypto_key2;
-	u8 crypto_key3;
+	bool is_mp3_playing();
+	bool is_streaming();
 
-	u32 mp3_cur_adr, mp3_end_adr, mpeg_ctrl_flag;
+	enum {
+		PLAYBACK_STATE_UNKNOWN = 0x8000,
+		PLAYBACK_STATE_ERROR = 0xa000, // Error?
+		PLAYBACK_STATE_IDLE = 0xb000, // Not playing
+		PLAYBACK_STATE_BUFFER_FULL = 0xc000, // Playing, demand pin = 0?
+		PLAYBACK_STATE_DEMAND_BUFFER = 0xd000 // Playing, demand pin = 1?
+	};
+
+	required_shared_ptr<uint16_t> ram;
+	required_device<mas3507d_device> mas3507d;
+
+	uint16_t crypto_key1, crypto_key2;
+	uint8_t crypto_key3;
+
+	uint32_t mp3_start_addr, mp3_cur_addr, mp3_end_addr;
 	bool use_ddrsbm_fpga;
 
-	u16 decrypt_default(u16 data);
-	u16 decrypt_ddrsbm(u16 data);
+	bool is_stream_active, is_timer_active;
+	uint32_t counter_previous, counter_offset;
+	int32_t counter_current;
+	uint32_t last_playback_status;
 };
 
 #endif // MAME_MACHINE_K573FPGA_H

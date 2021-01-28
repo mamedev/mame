@@ -65,28 +65,14 @@ class osd_monitor_info;
 class osd_window : public std::enable_shared_from_this<osd_window>
 {
 public:
-	osd_window(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config)
-	:
-#ifdef OSD_WINDOWS
-		m_dc(nullptr), m_resize_state(0),
-#endif
-		m_target(nullptr),
-		m_primlist(nullptr),
-		m_win_config(config),
-		m_index(index),
-		m_fullscreen(false),
-		m_prescale(1),
-		m_machine(machine),
-		m_monitor(std::move(monitor)),
-		m_renderer(nullptr),
-		m_main(nullptr)
-		{}
+	osd_window(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config);
 
 	virtual ~osd_window() { }
 
 	render_target *target() const { return m_target; }
 	int fullscreen() const { return m_fullscreen; }
 	running_machine &machine() const { return m_machine; }
+	const std::string &title() const { return m_title; }
 
 	bool has_renderer() const { return m_renderer != nullptr; }
 	osd_renderer &renderer() const { return *m_renderer; }
@@ -168,6 +154,7 @@ private:
 	std::shared_ptr<osd_monitor_info> m_monitor;
 	std::unique_ptr<osd_renderer>  m_renderer;
 	std::shared_ptr<osd_window>    m_main;
+	const std::string              m_title;
 };
 
 template <class TWindowHandle>

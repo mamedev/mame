@@ -1415,7 +1415,7 @@ private:
 	void frame_update_callback();
 	void frame_update();
 
-	ioport_port *port(const char *tag) const { if (tag) { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
+	ioport_port *port(const std::string &tag) const { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
 	static const char *const seqtypestrings[];

@@ -721,7 +721,7 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
+	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
 	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
 	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
@@ -2499,8 +2499,12 @@ void atarisy1_state::init_slapstic()
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
-	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range marble madness actually needs
+	// Some states of the slapstic seems trigger on the whole address space, but that slows things down too much and this point.
+	// limit to the ranges marble madness and peterpak actually need
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x2ff5a, 0x2ff5b, 0, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x101d4, 0x101d9, 0, "slapstic",
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }

@@ -1663,6 +1663,15 @@ void gauntlet_state::common_init(int vindctr2)
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
 													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
+
+	// Out-of-range access on alternate 1
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x4fed0, 0x4fed7, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x56e54, 0x56e57, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+
 	// swap the top and bottom halves of the main CPU ROM images
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);
 	swap_memory(rom + 0x040000, rom + 0x048000, 0x8000);

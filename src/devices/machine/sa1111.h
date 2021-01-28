@@ -11,25 +11,38 @@
 
 #pragma once
 
-#include "machine/input_merger.h"
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
 
 class sa1111_device : public device_t
 {
 public:
-	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template <typename T>
+	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: sa1111_device(mconfig, tag, owner, clock)
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+	}
 
-	template <unsigned Line> void pa_in(int state) { gpio_in(0 + Line, state); }
-	template <unsigned Line> void pb_in(int state) { gpio_in(8 + Line, state); }
-	template <unsigned Line> void pc_in(int state) { gpio_in(16 + Line, state); }
-	template <unsigned Line> auto pa_out() { return m_gpio_out[0 + Line].bind(); }
-	template <unsigned Line> auto pb_out() { return m_gpio_out[8 + Line].bind(); }
-	template <unsigned Line> auto pc_out() { return m_gpio_out[16 + Line].bind(); }
+	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_audio_codec_tag(T &&tag) { m_audio_codec.set_tag(std::forward<T>(tag)); }
+
+	auto irq_out() { return m_irq_out.bind(); }
+
+	template <int Line> void pa_in(int state) { gpio_in(0 + Line, state); }
+	template <int Line> void pb_in(int state) { gpio_in(8 + Line, state); }
+	template <int Line> void pc_in(int state) { gpio_in(16 + Line, state); }
+	template <int Line> auto pa_out() { return m_gpio_out[0 + Line].bind(); }
+	template <int Line> auto pb_out() { return m_gpio_out[8 + Line].bind(); }
+	template <int Line> auto pc_out() { return m_gpio_out[16 + Line].bind(); }
 
 	void ssp_in(uint16_t data) { ssp_rx_fifo_push(data); }
 	auto ssp_out() { return m_ssp_out.bind(); }
 
 	auto l3_addr_out() { return m_l3_addr_out.bind(); }
 	auto l3_data_out() { return m_l3_data_out.bind(); }
+	auto i2s_out() { return m_i2s_out.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(l3wd_in);
 
@@ -40,11 +53,31 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	void set_irq_line(uint32_t line, int state);
+	void update_interrupts();
+
 	TIMER_CALLBACK_MEMBER(ssp_rx_callback);
 	TIMER_CALLBACK_MEMBER(ssp_tx_callback);
 
+	TIMER_CALLBACK_MEMBER(audio_rx_dma_callback);
 	TIMER_CALLBACK_MEMBER(audio_rx_callback);
+	TIMER_CALLBACK_MEMBER(audio_tx_dma_callback);
 	TIMER_CALLBACK_MEMBER(audio_tx_callback);
+	void audio_update_mode();
+	void audio_clear_interrupts();
+	void audio_set_enabled(bool enabled);
+	void audio_controller_reset();
+	void audio_set_tx_dma_enabled(bool enabled);
+	void audio_set_rx_dma_enabled(bool enabled);
+	void audio_start_tx_dma(const uint32_t buf);
+	void audio_start_rx_dma(const uint32_t buf);
+	void audio_update_tx_fifo_levels();
+	void audio_update_rx_fifo_levels();
+	void audio_update_busy_flag();
+	void audio_tx_fifo_push(uint32_t data);
+	uint32_t audio_tx_fifo_pop();
+	void audio_rx_fifo_push(uint32_t data);
+	uint32_t audio_rx_fifo_pop();
 
 	uint32_t unknown_r(offs_t offset, uint32_t mem_mask);
 	void unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -161,30 +194,30 @@ protected:
 	void mouse_kbdprecnt_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void mouse_kbditr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	template <unsigned Block> uint32_t ddr_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Block> uint32_t drr_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Block> uint32_t sdr_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Block> uint32_t ssr_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Block> void ddr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Block> void dwr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Block> void sdr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Block> void ssr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Block> uint32_t ddr_r(offs_t offset, uint32_t mem_mask);
+	template <int Block> uint32_t drr_r(offs_t offset, uint32_t mem_mask);
+	template <int Block> uint32_t sdr_r(offs_t offset, uint32_t mem_mask);
+	template <int Block> uint32_t ssr_r(offs_t offset, uint32_t mem_mask);
+	template <int Block> void ddr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Block> void dwr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Block> void sdr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Block> void ssr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	template <unsigned Set> uint32_t inttest_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> uint32_t inten_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> uint32_t intpol_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> uint32_t inttest_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> uint32_t inten_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> uint32_t intpol_r(offs_t offset, uint32_t mem_mask);
 	uint32_t inttstsel_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> uint32_t intstat_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> uint32_t wake_en_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> uint32_t wake_pol_r(offs_t offset, uint32_t mem_mask);
-	template <unsigned Set> void inttest_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void inten_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void intpol_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> uint32_t intstat_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> uint32_t wake_en_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> uint32_t wake_pol_r(offs_t offset, uint32_t mem_mask);
+	template <int Set> void inttest_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void inten_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void intpol_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void inttstsel_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void intclr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void intset_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void wake_en_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	template <unsigned Set> void wake_pol_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void intclr_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void intset_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void wake_en_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Set> void wake_pol_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	uint32_t pccr_r(offs_t offset, uint32_t mem_mask);
 	uint32_t pcssr_r(offs_t offset, uint32_t mem_mask);
@@ -201,13 +234,7 @@ protected:
 
 	void gpio_in(const uint32_t line, const int state);
 	void gpio_update_direction(const uint32_t block, const uint32_t old_dir);
-	void gpio_update_outputs(const uint32_t block, const uint32_t old_latch);
-
-	// interrupt lines
-	enum : uint32_t
-	{
-		INT_AUDDTS			= 40
-	};
+	void gpio_update_outputs(const uint32_t block, const uint32_t changed);
 
 	// register contents
 	enum : uint32_t
@@ -220,7 +247,7 @@ protected:
 		SKCR_SCANTST_BIT    = 5,
 		SKCR_CLKTST_BIT     = 6,
 		SKCR_RDY_BIT        = 7,
-		SKCR_SLAC_BIT       = 8,
+		SKCR_SACMDSL_BIT    = 8,
 		SKCR_OPPC_BIT       = 9,
 		SKCR_PII_BIT        = 10,
 		SKCR_UIOTEN_BIT     = 11,
@@ -319,31 +346,23 @@ protected:
 		SASCR_RDD_BIT       = 17,
 		SASCR_STO_BIT       = 18,
 
-		SASR0_TNF_BIT       = 0,
-		SASR0_RNE_BIT       = 1,
-		SASR0_BSY_BIT       = 2,
-		SASR0_TFS_BIT       = 3,
-		SASR0_RFS_BIT       = 4,
-		SASR0_TUR_BIT       = 5,
-		SASR0_ROR_BIT       = 6,
-		SASR0_TFL_BIT       = 7,
-		SASR0_TFL_MASK      = 0x00000f00,
-		SASR0_RFL_BIT       = 12,
-		SASR0_RFL_MASK      = 0x0000f000,
+		SASR_TNF_BIT        = 0,
+		SASR_RNE_BIT        = 1,
+		SASR_BSY_BIT        = 2,
+		SASR_TFS_BIT        = 3,
+		SASR_RFS_BIT        = 4,
+		SASR_TUR_BIT        = 5,
+		SASR_ROR_BIT        = 6,
+		SASR_TFL_BIT        = 8,
+		SASR_TFL_MASK       = 0x00000f00,
+		SASR_RFL_BIT        = 12,
+		SASR_RFL_MASK       = 0x0000f000,
+		SASR_SEND_BIT       = 16,
+		SASR_RECV_BIT       = 17,
+
 		SASR0_L3WD_BIT      = 16,
 		SASR0_L3RD_BIT      = 17,
 
-		SASR1_TNF_BIT       = 0,
-		SASR1_RNE_BIT       = 1,
-		SASR1_BSY_BIT       = 2,
-		SASR1_TFS_BIT       = 3,
-		SASR1_RFS_BIT       = 4,
-		SASR1_TUR_BIT       = 5,
-		SASR1_ROR_BIT       = 6,
-		SASR1_TFL_BIT       = 8,
-		SASR1_TFL_MASK      = 0x00000f00,
-		SASR1_RFL_BIT       = 12,
-		SASR1_RFL_MASK      = 0x0000f000,
 		SASR1_CADT_BIT      = 16,
 		SASR1_SADR_BIT      = 17,
 		SASR1_RSTO_BIT      = 18,
@@ -357,12 +376,14 @@ protected:
 		SADTCS_TDSTA_BIT    = 4,
 		SADTCS_TDBDB_BIT    = 5,
 		SADTCS_TDSTB_BIT    = 6,
+		SADTCS_TBIU_BIT     = 7,
 
 		SADRCS_RDEN_BIT     = 0,
 		SADRCS_RDBDA_BIT    = 3,
 		SADRCS_RDSTA_BIT    = 4,
 		SADRCS_RDBDB_BIT    = 5,
 		SADRCS_RDSTB_BIT    = 6,
+		SADRCS_RBIU_BIT     = 7,
 
 		SAITR_TFS_BIT       = 0,
 		SAITR_RFS_BIT       = 1,
@@ -456,6 +477,61 @@ protected:
 		PCSSR_S1SLP_BIT     = 1
 	};
 
+	// interrupt lines
+	enum : uint32_t
+	{
+		INT_GPA0            = 0,
+		INT_GPA1            = 1,
+		INT_GPA2            = 2,
+		INT_GPA3            = 3,
+		INT_GPB0            = 4,
+		INT_GPB1            = 5,
+		INT_GPB2            = 6,
+		INT_GPB3            = 7,
+		INT_GPB4            = 8,
+		INT_GPB5            = 9,
+		INT_GPC0            = 10,
+		INT_GPC1            = 11,
+		INT_GPC2            = 12,
+		INT_GPC3            = 13,
+		INT_GPC4            = 14,
+		INT_GPC5            = 15,
+		INT_GPC6            = 16,
+		INT_GPC7            = 17,
+		INT_MSTX            = 18,
+		INT_MSRX            = 19,
+		INT_MSERR           = 20,
+		INT_TPTX            = 21,
+		INT_TPRX            = 22,
+		INT_TPERR           = 23,
+		INT_SSPTX           = 24,
+		INT_SSPRX           = 25,
+		INT_SSPROR          = 26,
+		INT_AUDTXA          = 32,
+		INT_AUDRXA          = 33,
+		INT_AUDTXB          = 34,
+		INT_AUDRXB          = 35,
+		INT_AUDTFS          = 36,
+		INT_AUDRFS          = 37,
+		INT_AUDTUR          = 38,
+		INT_AUDROR          = 39,
+		INT_AUDDTS          = 40,
+		INT_AUDRDD          = 41,
+		INT_AUDSTO          = 42,
+		INT_USBPWR          = 43,
+		INT_USBHCIM         = 44,
+		INT_USBHCIBUF       = 45,
+		INT_USBHCIWAKE      = 46,
+		INT_USBHCIMFC       = 47,
+		INT_USBRESUME       = 48,
+		INT_S0RDY           = 49,
+		INT_S1RDY           = 50,
+		INT_S0CD            = 51,
+		INT_S1CD            = 52,
+		INT_S0BVD           = 53,
+		INT_S1BVD           = 54
+	};
+
 	struct sbi_regs
 	{
 		uint32_t skcr;
@@ -499,15 +575,15 @@ protected:
 		uint32_t acsar;
 		uint32_t acsdr;
 		uint32_t sadtcs;
-		uint32_t sadtsa;
-		uint32_t sadtca;
-		uint32_t sadtsb;
-		uint32_t sadtcb;
+		uint32_t sadts[2];
+		uint32_t sadtc[2];
+		uint32_t sadta;
+		uint32_t sadtcc;
 		uint32_t sadrcs;
-		uint32_t sadrsa;
-		uint32_t sadrca;
-		uint32_t sadrsb;
-		uint32_t sadrcb;
+		uint32_t sadrs[2];
+		uint32_t sadrc[2];
+		uint32_t sadra;
+		uint32_t sadrcc;
 		uint32_t saitr;
 
 		uint32_t rx_fifo[16];
@@ -515,12 +591,14 @@ protected:
 		int rx_fifo_write_idx;
 		int rx_fifo_count;
 		emu_timer *rx_timer;
+		emu_timer *rx_dma_timer;
 
 		uint32_t tx_fifo[16];
 		int tx_fifo_read_idx;
 		int tx_fifo_write_idx;
 		int tx_fifo_count;
 		emu_timer *tx_timer;
+		emu_timer *tx_dma_timer;
 	};
 
 	struct ssp_regs
@@ -573,6 +651,8 @@ protected:
 		uint32_t intstat[2];
 		uint32_t wake_en[2];
 		uint32_t wake_pol[2];
+
+		uint32_t intraw[2];
 	};
 
 	struct card_regs
@@ -593,10 +673,15 @@ protected:
 	intc_regs m_intc_regs;
 	card_regs m_card_regs;
 
+	required_device<sa1110_cpu_device> m_maincpu;
+	optional_device<device_t> m_audio_codec;
+
+	devcb_write_line m_irq_out;
 	devcb_write_line::array<24> m_gpio_out;
 	devcb_write16 m_ssp_out;
 	devcb_write8 m_l3_addr_out;
 	devcb_write8 m_l3_data_out;
+	devcb_write32 m_i2s_out;
 };
 
 DECLARE_DEVICE_TYPE(SA1111, sa1111_device)

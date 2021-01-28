@@ -8,14 +8,19 @@
 
 ***************************************************************************/
 
-#include <cctype>
-
 #include "emu.h"
-#include "emuopts.h"
 #include "image.h"
+
 #include "config.h"
-#include "xmlfile.h"
+#include "drivenum.h"
+#include "emuopts.h"
 #include "softlist.h"
+
+#include "corestr.h"
+#include "xmlfile.h"
+#include "zippath.h"
+
+#include <cctype>
 
 
 //**************************************************************************
@@ -250,4 +255,86 @@ void image_manager::postdevice_init()
 	}
 	/* add a callback for when we shut down */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&image_manager::unload_all, this));
+}
+
+
+//**************************************************************************
+//  WORKING DIRECTORIES
+//**************************************************************************
+
+//-------------------------------------------------
+//  try_change_working_directory - tries to change
+//  the working directory, but only if the directory
+//  actually exists
+//-------------------------------------------------
+
+bool image_manager::try_change_working_directory(std::string &working_directory, const std::string &subdir)
+{
+	bool success = false;
+
+	auto directory = osd::directory::open(working_directory);
+	if (directory)
+	{
+		const osd::directory::entry *entry;
+		bool done = false;
+		while (!done && (entry = directory->read()) != nullptr)
+		{
+			if (!core_stricmp(subdir.c_str(), entry->name))
+			{
+				done = true;
+				success = entry->type == osd::directory::entry::entry_type::DIR;
+			}
+		}
+
+		directory.reset();
+	}
+
+	// did we successfully identify the directory?
+	if (success)
+		working_directory = util::zippath_combine(working_directory, subdir);
+
+	return success;
+}
+
+
+//-------------------------------------------------
+//  setup_working_directory - sets up the working
+//  directory according to a few defaults
+//-------------------------------------------------
+
+std::string image_manager::setup_working_directory()
+{
+	bool success = false;
+	// get user-specified directory and make sure it exists
+	std::string working_directory = machine().options().sw_path();
+	// if multipath, get first
+	size_t i = working_directory.find_first_of(';');
+	if (i != std::string::npos)
+		working_directory.resize(i);
+	// validate directory
+	if (!working_directory.empty())
+		if (osd::directory::open(working_directory))
+			success = true;
+
+	// if not exist, use previous method
+	if (!success)
+	{
+		// first set up the working directory to be the starting directory
+		osd_get_full_path(working_directory, ".");
+		// now try browsing down to "software"
+		if (try_change_working_directory(working_directory, "software"))
+			success = true;
+	}
+
+	if (success)
+	{
+		// now down to a directory for this computer
+		int gamedrv = driver_list::find(machine().system());
+		while(gamedrv != -1 && !try_change_working_directory(working_directory, driver_list::driver(gamedrv).name))
+		{
+			gamedrv = driver_list::compatible_with(gamedrv);
+		}
+	}
+
+	return working_directory;
 }

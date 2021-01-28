@@ -85,6 +85,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_bank1(*this, "bank1")
+		, m_leftspriteclip(16)
 	{ }
 
 	/* video extension callbacks */
@@ -525,6 +526,7 @@ protected:
 	uint8_t m_stars_blink_state;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
+	uint8_t m_leftspriteclip;
 
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
 	void videight_rombank_w(offs_t offset, uint8_t data);
@@ -562,7 +564,9 @@ class namenayo_state : public galaxian_state
 public:
 	namenayo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxian_state(mconfig, type, tag)
-	{}
+	{
+		m_leftspriteclip = 0;
+	}
 
 	void namenayo(machine_config &config);
 	void init_namenayo();

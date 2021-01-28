@@ -33,7 +33,7 @@ class SDL_DM_Wrapper;
 
 typedef uintptr_t HashT;
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
+#define OSDWORK_CALLBACK(name)  void *name(void *param, int threadid)
 
 class sdl_window_info : public osd_window_t<SDL_Window*>
 {
@@ -64,7 +64,6 @@ public:
 
 private:
 	// window handle and info
-	char                m_title[256];
 	int                 m_startmaximized;
 
 	// dimensions

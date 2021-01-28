@@ -27,7 +27,7 @@ const uint32_t g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-int g64_format::identify(io_generic *io, uint32_t form_factor)
+int g64_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[8];
 
@@ -38,7 +38,7 @@ int g64_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool g64_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
@@ -97,19 +97,19 @@ bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-int g64_format::generate_bitstream(int track, int head, int speed_zone, uint8_t *trackbuf, int &track_size, floppy_image *image)
+int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image)
 {
 	int cell_size = c1541_cell_size[speed_zone];
 
-	generate_bitstream_from_track(track, head, cell_size, trackbuf, track_size, image);
+	trackbuf = generate_bitstream_from_track(track, head, cell_size, image);
 
-	int actual_cell_size = 200000000L/track_size;
+	int actual_cell_size = 200000000L/trackbuf.size();
 
 	// allow a tolerance of +- 10 us (3990..4010 -> 4000)
 	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
 }
 
-bool g64_format::save(io_generic *io, floppy_image *image)
+bool g64_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);
@@ -123,7 +123,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	for (int head = 0; head < heads; head++) {
 		int tracks_written = 0;
 
-		std::vector<uint8_t> trackbuf(TRACK_LENGTH-2);
+		std::vector<bool> trackbuf;
 
 		for (int track = 0; track < TRACK_COUNT; track++) {
 			uint32_t tpos = POS_TRACK_OFFSET + (track * 4);
@@ -140,15 +140,20 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 			int speed_zone;
 
 			// figure out the cell size and speed zone from the track data
-			if ((speed_zone = generate_bitstream(track, head, 3, &trackbuf[0], track_size, image)) == -1)
-				if ((speed_zone = generate_bitstream(track, head, 2, &trackbuf[0], track_size, image)) == -1)
-					if ((speed_zone = generate_bitstream(track, head, 1, &trackbuf[0], track_size, image)) == -1)
-						if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1) {
+			if ((speed_zone = generate_bitstream(track, head, 3, trackbuf, image)) == -1)
+				if ((speed_zone = generate_bitstream(track, head, 2, trackbuf, image)) == -1)
+					if ((speed_zone = generate_bitstream(track, head, 1, trackbuf, image)) == -1)
+						if ((speed_zone = generate_bitstream(track, head, 0, trackbuf, image)) == -1) {
 							osd_printf_error("g64_format: Cannot determine speed zone for track %u\n", track);
 							return false;
 						}
 
 			LOG_FORMATS("head %u track %u size %u cell %u\n", head, track, track_size, c1541_cell_size[speed_zone]);
+
+			std::vector<uint8_t> packed((trackbuf.size() + 7) >> 3, 0);
+			for(uint32_t i = 0; i != trackbuf.size(); i++)
+				if(trackbuf[i])
+					packed[i >> 3] |= 0x80 >> (i & 7);
 
 			uint8_t track_offset[4];
 			uint8_t speed_offset[4];
@@ -156,13 +161,13 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 
 			place_integer_le(track_offset, 0, 4, dpos);
 			place_integer_le(speed_offset, 0, 4, speed_zone);
-			place_integer_le(track_length, 0, 2, track_size/8);
+			place_integer_le(track_length, 0, 2, packed.size());
 
 			io_generic_write(io, track_offset, tpos, 4);
 			io_generic_write(io, speed_offset, spos, 4);
 			io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
 			io_generic_write(io, track_length, dpos, 2);
-			io_generic_write(io, &trackbuf[0], dpos + 2, track_size);
+			io_generic_write(io, packed.data(), dpos + 2, packed.size());
 
 			tracks_written++;
 		}

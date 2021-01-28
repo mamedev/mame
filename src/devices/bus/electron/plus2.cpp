@@ -50,7 +50,7 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 	m_cart[1]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 
 	/* via */
-	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));

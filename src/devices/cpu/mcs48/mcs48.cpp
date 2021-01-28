@@ -15,6 +15,8 @@
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - according to the user manual, some opcodes(dis/enable timer/interrupt)
       don't increment the timer, does it affect the prescaler too?
+      Most likely, timer input (prescaler overflow or T1 edge) still occurs,
+      just that m_timer increment is delayed 1 opcode.
     - IRQ timing is hacked due to WY-100 needing to take JNI branch before servicing interrupt
 
 ****************************************************************************
@@ -432,7 +434,7 @@ void mcs48_cpu_device::pull_pc_psw()
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
 	m_psw = ((m_pc >> 8) & 0xf0) | sp;
-	m_pc &= 0xfff;
+	m_pc &= (m_irq_in_progress) ? 0x7ff : 0xfff;
 	update_regptr();
 }
 
@@ -447,7 +449,7 @@ void mcs48_cpu_device::pull_pc()
 	uint8_t sp = (m_psw - 1) & 0x07;
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
-	m_pc &= 0xfff;
+	m_pc &= (m_irq_in_progress) ? 0x7ff : 0xfff;
 	m_psw = (m_psw & 0xf0) | sp;
 }
 
@@ -866,10 +868,10 @@ OPHANDLER( ret )            { burn_cycles(2); pull_pc(); }
 OPHANDLER( retr )
 {
 	burn_cycles(2);
-	pull_pc_psw();
 
 	// implicitly clear the IRQ in progress flip flop
 	m_irq_in_progress = false;
+	pull_pc_psw();
 }
 
 OPHANDLER( rl_a )           { burn_cycles(1); m_a = (m_a << 1) | (m_a >> 7); }

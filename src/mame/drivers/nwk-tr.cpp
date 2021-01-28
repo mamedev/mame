@@ -644,9 +644,9 @@ void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		// TODO: The data below would normally be present on the serialflash at 2G.
 
-		if (core_stricmp(machine().system().name, "thrilld") == 0 ||
-			core_stricmp(machine().system().name, "thrilldb") == 0 ||
-			core_stricmp(machine().system().name, "thrilldbe") == 0)
+		if (strcmp(machine().system().name, "thrilld") == 0 ||
+			strcmp(machine().system().name, "thrilldb") == 0 ||
+			strcmp(machine().system().name, "thrilldbe") == 0)
 		{
 			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;      // G*71
 			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;      // 3
@@ -658,7 +658,7 @@ void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;      //   JA
 			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;      // A
 		}
-		else if (core_stricmp(machine().system().name, "racingj2") == 0)
+		else if (strcmp(machine().system().name, "racingj2") == 0)
 		{
 			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;      // GE88
 			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;      // 8 00

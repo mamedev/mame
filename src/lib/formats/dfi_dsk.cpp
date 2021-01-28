@@ -56,14 +56,14 @@ bool dfi_format::supports_save() const
 	return false;
 }
 
-int dfi_format::identify(io_generic *io, uint32_t form_factor)
+int dfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 
-bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "rendfont.h"
 #include "emuopts.h"
+#include "corestr.h"
 #include "coreutil.h"
 
 #include "osdepend.h"

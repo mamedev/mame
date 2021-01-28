@@ -512,7 +512,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_gdc->set_draw_text(FUNC(hhtiger_state::draw_text));
 	m_gdc->set_screen(m_screen);
 
-	VIA6522(config, m_via[0], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[0], 16_MHz_XTAL / 16);
 	m_via[0]->readpa_handler().set(FUNC(hhtiger_state::via_0_in_a));
 	m_via[0]->writepa_handler().set(FUNC(hhtiger_state::via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(hhtiger_state::via_0_out_b));
@@ -520,7 +520,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_via[0]->cb2_handler().set(FUNC(hhtiger_state::via_0_out_cb2));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	VIA6522(config, m_via[1], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[1], 16_MHz_XTAL / 16);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_via[1]->writepa_handler().set(FUNC(hhtiger_state::via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(hhtiger_state::via_1_out_b));

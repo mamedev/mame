@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "audio/bu3905.h"
+#include "audio/sa16.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "imagedev/floppy.h"
@@ -31,6 +32,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_vdp(*this, "vdp")
+		, m_wave(*this, "wave")
 		, m_keyscan(*this, "keyscan")
 	{
 	}
@@ -64,7 +66,7 @@ protected:
 	required_device<wd_fdc_digital_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	optional_device<tms3556_device> m_vdp;
-	//required_device<sa16_device> m_wave;
+	required_device<sa16_base_device> m_wave;
 	optional_device<mb63h149_device> m_keyscan;
 };
 
@@ -213,7 +215,7 @@ void roland_s50_state::io_map(address_map &map)
 	map(0x1200, 0x1200).r(m_vdp, FUNC(tms3556_device::vram_r));
 	map(0x1202, 0x1202).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
 	map(0x1204, 0x1204).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
-	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
+	map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c36_device::read), FUNC(rf5c36_device::write)).umask16(0xff00);
 	map(0x4000, 0x4fff).mirror(0x3000).rw(FUNC(roland_s50_state::key_r), FUNC(roland_s50_state::key_w));
 }
 
@@ -238,7 +240,7 @@ void roland_s550_state::io_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(roland_s550_state::sram_bank_w));
 	map(0x2800, 0x281f).w("outas", FUNC(bu3905_device::write)).umask16(0x00ff);
 	//map(0x3800, 0x381f).rw(m_scsic, FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
-	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
+	map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c36_device::read), FUNC(rf5c36_device::write)).umask16(0xff00);
 }
 
 void roland_w30_state::w30_mem_map(address_map &map)
@@ -255,7 +257,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	//map(0xe800, 0xe83f).w("output", FUNC(upd65006gf_376_3b8_device::write)).umask16(0x00ff);
 	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
-	//map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
+	map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 
 #ifdef UNUSED_DEFINITION
@@ -265,7 +267,7 @@ void roland_w30_state::s330_mem_map(address_map &map)
 	map(0x2000, 0x3fff).rom().region("program", 0x2000);
 	map(0x4000, 0x7fff).ram().share("common");
 	map(0x8000, 0xbfff).m(m_psram[1], FUNC(address_map_bank_device::amap16));
-	//map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
+	map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 #endif
 
@@ -368,8 +370,8 @@ void roland_s50_state::s50(machine_config &config)
 
 	TIMER(config, "vdp_timer").configure_scanline(FUNC(roland_s50_state::vdp_timer), "screen", 0, 1);
 
-	//RF5C16(config, m_wave, 26.88_MHz_XTAL);
-	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+	RF5C36(config, m_wave, 26.88_MHz_XTAL);
+	m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 }
 
 void roland_s550_state::s550(machine_config &config)
@@ -396,6 +398,8 @@ void roland_s550_state::s550(machine_config &config)
 	BU3905(config, "outas");
 
 	//MB654419U(config, m_tvf, 20_MHz_XTAL);
+
+	m_wave->sh_callback().set("outas", FUNC(bu3905_device::axi_w));
 }
 
 void roland_w30_state::w30(machine_config &config)
@@ -429,8 +433,8 @@ void roland_w30_state::w30(machine_config &config)
 
 	LM24014H(config, "lcd"); // LCD unit: LM240142
 
-	//R15229874(config, m_wave, 26.88_MHz_XTAL);
-	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+	SA16(config, m_wave, 26.88_MHz_XTAL);
+	m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 
 	//UPD65006GF_376_3B8(config, "output", 26.88_MHz_XTAL);
 
@@ -480,8 +484,9 @@ void roland_w30_state::s330(machine_config &config)
 
 	TIMER(config, "vdp_timer").configure_scanline(FUNC(roland_w30_state::vdp_timer), "screen", 0, 1);
 
-	//R15229874(config, m_wave, 26.88_MHz_XTAL);
-	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+	SA16(config, m_wave, 26.88_MHz_XTAL);
+	m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+	m_wave->sh_callback().set("outas", FUNC(bu3905_device::axi_w));
 
 	BU3905(config, "outas");
 

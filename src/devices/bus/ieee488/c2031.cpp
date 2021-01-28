@@ -300,14 +300,14 @@ void c2031_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c2031_device::c2031_mem);
 	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
-	VIA6522(config, m_via0, XTAL(16'000'000)/16);
+	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c2031_device::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c2031_device::via0_pb_r));
 	m_via0->writepa_handler().set(FUNC(c2031_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c2031_device::via0_pb_w));
 	m_via0->irq_handler().set(FUNC(c2031_device::via0_irq_w));
 
-	VIA6522(config, m_via1, XTAL(16'000'000)/16);
+	MOS6522(config, m_via1, XTAL(16'000'000)/16);
 	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
 	m_via1->readpb_handler().set(FUNC(c2031_device::via1_pb_r));
 	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));

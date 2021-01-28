@@ -245,6 +245,7 @@ menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	, erroritem(nullptr)
 	, lastitem(nullptr)
 	, record_next(false)
+	, modified_ticks(0)
 {
 }
 
@@ -322,11 +323,15 @@ void menu_input::handle()
 		// if we are polling, handle as a special case
 		input_item_data *const item = pollingitem;
 
+		// prevent race condition between ui_input().pressed() and poll()
+		if (modified_ticks == 0 && seq_poll->modified())
+			modified_ticks = osd_ticks();
+
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
 			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
-			if (!seq_poll->modified())
+			if (!seq_poll->modified() || modified_ticks == osd_ticks())
 			{
 				// cancelled immediately - toggle between default and none
 				record_next = false;
@@ -368,6 +373,7 @@ void menu_input::handle()
 		case IPT_UI_SELECT: // an item was selected: begin polling
 			errormsg.clear();
 			erroritem = nullptr;
+			modified_ticks = 0;
 			pollingitem = &item;
 			lastitem = &item;
 			starting_seq = item.seq;
