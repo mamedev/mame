@@ -38097,6 +38097,7 @@ wldgunsb                        // bootleg
 @source:snesb51.cpp
 mk3snes
 snes4sl
+snes4sl1103
 snes4sln
 
 @source:snk.cpp
