@@ -71,7 +71,7 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   window management, audio/video output, font rendering, etc.  If you want to
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
   add **OSD=sdl** to the make options.  The main emulator binary will have an
-  ``sdl`` prefix prepended (e.g. ``sdlmame64.exe`` or ``sdlmame.exe``).  You
+  ``sdl`` prefix prepended (e.g. ``sdlmame.exe``).  You
   will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
 * By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You

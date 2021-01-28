@@ -21,7 +21,7 @@ Layout scripting requires the layout plugin to be enabled.  For example, to run
 BWB Double Take with the Lua script in the layout enabled, you might use this
 command::
 
-    mame64 -plugins -plugin layout v4dbltak
+    mame -plugins -plugin layout v4dbltak
 
 If you may want to add the settings to enable the layout plugin to an INI file
 to save having to enable it every time you start a system.
