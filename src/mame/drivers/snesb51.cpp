@@ -254,7 +254,7 @@ ROM_START( snes4sln )
 	ROM_LOAD("5.bin", 0x0000, 0x8000, CRC(af8a64e3) SHA1(f13187d213fe7c2a0edcb88d4e828bd24112e812))
 ROM_END
 
-//    YEAR  NAME      PARENT MACHINE   INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                                 FLAGS
-GAME( 199?, mk3snes,  0,     mk3snes,  mk3snes, snesb51_state, empty_init, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,  0,     snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln, 0,     snes4sln, snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  MACHINE   INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                                 FLAGS
+GAME( 199?, mk3snes,  0,      mk3snes,  mk3snes, snesb51_state, empty_init, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,  0,      snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
+GAME( 1994, snes4sln, 0,      snes4sln, snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )
