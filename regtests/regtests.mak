@@ -43,9 +43,17 @@
 #-------------------------------------------------
 
 REGTESTS += \
-	jedutiltest \
 	chdmantest \
+	jedutiltest \
 
+
+#-------------------------------------------------
+# chdman
+#-------------------------------------------------
+
+chdmantest:
+	@echo Running chdman unittest
+	$(PYTHON) regtests/chdman/chdtest.py
 
 
 #-------------------------------------------------
@@ -58,10 +66,3 @@ jedutiltest:
 
 
 
-#-------------------------------------------------
-# chdman
-#-------------------------------------------------
-
-chdmantest:
-	@echo Running chdman unittest
-	$(PYTHON) regtests/chdman/chdtest.py
