@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 *  V-tech Socrates-series devices
-*  Copyright (C) 2009-2020 Jonathan Gevaryahu AKA Lord Nightmare
+*  Copyright (C) 2009-2021 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
 *  The devices in this driver all use a similar ASIC, presumably produced by
