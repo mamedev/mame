@@ -15,7 +15,7 @@
     3 XTALs (1 21.05300MHz and 2 18.43200MHz)
 
     TTL char readback:
-    C000-D000 window, control bit 7 enables ROM readback, bit 6 selects which ROM, F450 banks
+    C000-D000 window, control bit 7 enables ROM readback, bit 5 selects which ROM, F450 banks
 */
 
 #include "emu.h"
@@ -37,11 +37,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainbank(*this, "mainbank"),
+		m_k053246(*this, "k053246"),
+		m_k054539(*this, "k054539"),
 		m_ttl_vram(*this, "ttl_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_charview(*this, "charview"),
-		m_charrom(*this, "chars")
+		m_charrom(*this, "chars"),
+		m_sprrom(*this, "k053246")
 	{ }
 
 	void kpontoon(machine_config &config);
@@ -58,15 +61,21 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_mainbank;
+	required_device<k053247_device> m_k053246;
+	required_device<k054539_device> m_k054539;
 	required_shared_ptr<u8> m_ttl_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	memory_view m_charview;
-	required_region_ptr<u8> m_charrom;
+	required_region_ptr<u8> m_charrom, m_sprrom;
 
 	void control_w(u8 data);
 	void charrom_bank_w(u8 data);
+	void sprrom_adr_h(u8 data);
+	void sprrom_adr_m(u8 data);
+	void sprrom_adr_l(u8 data);
 	u8 charrom_r(offs_t offset);
+	u8 sprrom_r(offs_t offset);
 	void ttl_ram_w(offs_t offset, u8 data);
 
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
@@ -75,6 +84,7 @@ private:
 
 	u8 m_control;
 	u8 m_charrom_bank;
+	u32 m_sprrom_adr;
 };
 
 void kpontoon_state::control_w(u8 data)
@@ -112,6 +122,29 @@ u8 kpontoon_state::charrom_r(offs_t offset)
 	return m_charrom[loc];
 }
 
+void kpontoon_state::sprrom_adr_h(u8 data)
+{
+	m_sprrom_adr &= 0xffff;
+	m_sprrom_adr |= (data << 16);
+}
+
+void kpontoon_state::sprrom_adr_m(u8 data)
+{
+	m_sprrom_adr &= 0xff00ff;
+	m_sprrom_adr |= (data << 8);
+}
+
+void kpontoon_state::sprrom_adr_l(u8 data)
+{
+	m_sprrom_adr &= 0xffff00;
+	m_sprrom_adr |= data;
+}
+
+u8 kpontoon_state::sprrom_r(offs_t offset)
+{
+	return m_sprrom[(offset ^ 1) + (m_sprrom_adr << 1)];
+}
+
 void kpontoon_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
@@ -125,6 +158,10 @@ void kpontoon_state::main_map(address_map &map)
 
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf405, 0xf405).w(FUNC(kpontoon_state::sprrom_adr_l));
+	map(0xf406, 0xf406).w(FUNC(kpontoon_state::sprrom_adr_m));
+	map(0xf407, 0xf407).w(FUNC(kpontoon_state::sprrom_adr_h));
+	map(0xf410, 0xf411).r(FUNC(kpontoon_state::sprrom_r));
 	map(0xf450, 0xf450).w(FUNC(kpontoon_state::charrom_bank_w));
 	map(0xf470, 0xf470).nopw(); // watchdog
 	map(0xf830, 0xf830).w(FUNC(kpontoon_state::control_w));
@@ -245,14 +282,14 @@ void kpontoon_state::kpontoon(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	k053247_device &k053246(K053246(config, "k053246", 0));
-	//k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
-	k053246.set_config(NORMAL_PLANE_ORDER, 0, 0); // TODO: verify
-	k053246.set_palette(m_palette);
+	K053246(config, m_k053246, 0);
+	//m_k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 0, 0); // TODO: verify
+	m_k053246->set_palette(m_palette);
 
-	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
-	k054539.add_route(0, "rspeaker", 0.75);
-	k054539.add_route(1, "lspeaker", 0.75);
+	K054539(config, m_k054539, 18.432_MHz_XTAL);
+	m_k054539->add_route(0, "rspeaker", 0.75);
+	m_k054539->add_route(1, "lspeaker", 0.75);
 }
 
 
@@ -260,10 +297,10 @@ ROM_START( kpontoon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "270eac04.bin", 0x00000, 0x10000, CRC(614e35bd) SHA1(50a7740f0442949d9c49209b04589296d065af52) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // really?
-	ROM_LOAD( "270b01.bin", 0x00000, 0x10000, CRC(012f542e) SHA1(b83f53e5297ec0c2f742701f694149d1e466648e) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "270b01.bin", 0x00000, 0x10000, BAD_DUMP CRC(012f542e) SHA1(b83f53e5297ec0c2f742701f694149d1e466648e) )
 
-	ROM_REGION( 0x80000, "k053246", 0 ) // TODO: correct ROM loading
+	ROM_REGION( 0x80000, "k053246", 0 )
 	ROM_LOAD64_BYTE( "270ea07.bin", 0x00007, 0x10000, CRC(27e791fa) SHA1(fcafe9fd74ab729a90e4a36b25dbc4ce050b68ba) )
 	ROM_LOAD64_BYTE( "270ea08.bin", 0x00006, 0x10000, CRC(aa1474cc) SHA1(b935ab41daeaace62a90885c0d29f49df67ca3a3) )
 	ROM_LOAD64_BYTE( "270ea09.bin", 0x00005, 0x10000, CRC(0462f9ea) SHA1(c16f6b8ef8b04fcc2b11783e3a5e553a45fafb84) )
