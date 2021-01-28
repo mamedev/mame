@@ -37,38 +37,21 @@ bgfx_slider::~bgfx_slider()
 {
 }
 
-int32_t bgfx_slider::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, int32_t newval)
-{
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<bgfx_slider*>(arg)->update(str, newval);
-	}
-	return 0;
-}
-
 void bgfx_slider::import(float val)
 {
 	m_value = val;
-	slider_changed(m_machine, this, m_slider_state->id, nullptr, int32_t(floor(m_value / m_step + 0.5f)));
+	update(nullptr, int32_t(floor(m_value / m_step + 0.5f)));
 }
 
 std::unique_ptr<slider_state> bgfx_slider::create_core_slider()
 {
-	auto state = std::make_unique<slider_state>();
-
-	state->minval = int32_t(floor(m_min / m_step + 0.5f));
-	state->defval = int32_t(floor(m_default / m_step + 0.5f));
-	state->maxval = int32_t(floor(m_max / m_step + 0.5f));
-	state->incval = int32_t(floor(m_step / m_step + 0.5f));
+	int32_t minval = int32_t(floor(m_min / m_step + 0.5f));
+	int32_t defval = int32_t(floor(m_default / m_step + 0.5f));
+	int32_t maxval = int32_t(floor(m_max / m_step + 0.5f));
+	int32_t incval = int32_t(floor(m_step / m_step + 0.5f));
 
 	using namespace std::placeholders;
-	state->update = std::bind(&bgfx_slider::slider_changed, this, _1, _2, _3, _4, _5);
-
-	state->arg = this;
-	state->id = 0;
-	state->description = m_description;
-
-	return state;
+	return std::make_unique<slider_state>(m_description, minval, defval, maxval, incval, std::bind(&bgfx_slider::update, this, _1, _2));
 }
 
 int32_t bgfx_slider::update(std::string *str, int32_t newval)

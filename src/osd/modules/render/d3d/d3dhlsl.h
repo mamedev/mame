@@ -290,7 +290,7 @@ private:
 	void *          m_value;
 };
 
-class shaders : public slider_changed_notifier
+class shaders
 {
 	friend class effect;
 	friend class uniform;
@@ -330,8 +330,7 @@ public:
 	void delete_resources();
 
 	// slider-related functions
-	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
-	std::unique_ptr<slider_state> slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
+	std::unique_ptr<slider_state> slider_alloc(std::string &&title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, slider *arg);
 	void init_slider_list();
 	std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	void *get_slider_option(int id, int index = 0);

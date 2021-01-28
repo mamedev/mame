@@ -1987,23 +1987,10 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> shaders::slider_alloc(std::string &&title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, slider *arg)
 {
-	auto state = std::make_unique<slider_state>();
-
-	state->minval = minval;
-	state->defval = defval;
-	state->maxval = maxval;
-	state->incval = incval;
-
 	using namespace std::placeholders;
-	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
-
-	state->arg = arg;
-	state->id = id;
-	state->description = title;
-
-	return state;
+	return std::make_unique<slider_state>(std::move(title), minval, defval, maxval, incval, std::bind(&slider::update, arg, _1, _2));
 }
 
 
@@ -2065,15 +2052,6 @@ int32_t slider::update(std::string *str, int32_t newval)
 			}
 			return (int32_t)floor(*val_ptr / m_desc->scale + 0.5f);
 		}
-	}
-	return 0;
-}
-
-int32_t shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, int32_t newval)
-{
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<slider *>(arg)->update(str, newval);
 	}
 	return 0;
 }
@@ -2388,7 +2366,7 @@ void shaders::init_slider_list()
 						break;
 				}
 
-				std::unique_ptr<slider_state> core_slider = slider_alloc(desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
 				ui::menu_item item;
 				item.text = core_slider->description;
