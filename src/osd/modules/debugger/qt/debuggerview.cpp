@@ -33,6 +33,7 @@ DebuggerView::DebuggerView(
 	viewFontRequest.setStyleHint(QFont::TypeWriter);
 	viewFontRequest.setPointSize((selectedFontSize <= 0) ? 11 : selectedFontSize);
 	setFont(viewFontRequest);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	m_view = m_machine.debug_view().alloc_view(
 			type,
@@ -54,22 +55,21 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 {
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
-	const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
-	const int fontHeight = std::max(1, actualFont.lineSpacing());
-	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
-
+	double const fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
+	int const fontHeight = std::max(1, actualFont.lineSpacing());
+	int const contentWidth = width() - verticalScrollBar()->width();
+	int const lineWidth = contentWidth / fontWidth;
+	bool const fullWidth = lineWidth >= m_view->total_size().x;
+	int const contentHeight = height() - (fullWidth ? 0 : horizontalScrollBar()->height());
+	m_view->set_visible_size(debug_view_xy(lineWidth, contentHeight / fontHeight));
 
 	// Handle the scroll bars
-	const int horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
-	const int horizontalScrollSize = horizontalScrollCharDiff < 0 ? 0 : horizontalScrollCharDiff;
-	horizontalScrollBar()->setRange(0, horizontalScrollSize);
+	int const horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
+	horizontalScrollBar()->setRange(0, (std::max)(0, horizontalScrollCharDiff));
 
-	// If the horizontal scroll bar appears, make sure to adjust the vertical scrollbar accordingly
-	const int verticalScrollAdjust = horizontalScrollSize > 0 ? 1 : 0;
-
-	const int verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
-	const int verticalScrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff+verticalScrollAdjust;
-	const bool atEnd = verticalScrollBar()->value() == verticalScrollBar()->maximum();
+	int const verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
+	int const verticalScrollSize = (std::max)(0, verticalScrollCharDiff);
+	bool const atEnd = verticalScrollBar()->value() == verticalScrollBar()->maximum();
 	verticalScrollBar()->setRange(0, verticalScrollSize);
 	if (m_preferBottom && atEnd)
 		verticalScrollBar()->setValue(verticalScrollSize);
@@ -85,15 +85,14 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 	bgBrush.setStyle(Qt::SolidPattern);
 	painter.setPen(QPen(QColor(0,0,0)));
 
-	size_t viewDataOffset = 0;
-	const debug_view_xy& visibleCharDims = m_view->visible_size();
-	const debug_view_char* viewdata = m_view->viewdata();
-	for (int y = 0; y < visibleCharDims.y; y++)
+	const debug_view_xy visibleCharDims = m_view->visible_size();
+	const debug_view_char *viewdata = m_view->viewdata();
+	for (int y = 0; y < visibleCharDims.y; y++, viewdata += visibleCharDims.x)
 	{
 		int width = 1;
-		for (int x = 0; x < visibleCharDims.x; viewDataOffset += width, x += width)
+		for (int x = 0; x < visibleCharDims.x; x += width)
 		{
-			const unsigned char textAttr = viewdata[viewDataOffset].attrib;
+			const unsigned char textAttr = viewdata[x].attrib;
 
 			// Text color handling
 			QColor fgColor(0,0,0);
@@ -128,27 +127,32 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 						(fgColor.blue()  + bgColor.blue())  >> 1);
 			}
 
-			if(textAttr & DCA_COMMENT)
+			if (textAttr & DCA_COMMENT)
 				fgColor.setRgb(0x00, 0x80, 0x00);
 
 			bgBrush.setColor(bgColor);
 			painter.setBackground(bgBrush);
 			painter.setPen(QPen(fgColor));
 
-			QString text(QChar(viewdata[viewDataOffset].byte));
-			for (width = 1; x + width < visibleCharDims.x; width++)
+			QString text(QChar(viewdata[x].byte));
+			for (width = 1; (x + width) < visibleCharDims.x; width++)
 			{
-				if (textAttr != viewdata[viewDataOffset + width].attrib)
+				if (textAttr != viewdata[x + width].attrib)
 					break;
-				text.append(QChar(viewdata[viewDataOffset + width].byte));
+				text.append(QChar(viewdata[x + width].byte));
 			}
 
 			// Your characters are not guaranteed to take up the entire length x fontWidth x fontHeight, so fill before.
-			painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
+			painter.fillRect(
+					x * fontWidth,
+					y * fontHeight,
+					((x + width) < visibleCharDims.x) ? (width * fontWidth) : (contentWidth - (x * fontWidth)),
+					((y + 1) < visibleCharDims.y) ? fontHeight : (contentHeight - (y * fontHeight)),
+					bgBrush);
 
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
-			painter.drawText(x*fontWidth, (y*fontHeight + (fontHeight*0.80)), text);
+			painter.drawText(x * fontWidth, (y * fontHeight + (fontHeight * 0.80)), text);
 		}
 	}
 }
@@ -234,10 +238,11 @@ void DebuggerView::mousePressEvent(QMouseEvent *event)
 	const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
 	const int fontHeight = std::max(1, actualFont.lineSpacing());
 
-	debug_view_xy topLeft = m_view->visible_position();
+	debug_view_xy const topLeft = m_view->visible_position();
+	debug_view_xy const visibleCharDims = m_view->visible_size();
 	debug_view_xy clickViewPosition;
-	clickViewPosition.x = topLeft.x + (event->x() / fontWidth);
-	clickViewPosition.y = topLeft.y + (event->y() / fontHeight);
+	clickViewPosition.x = (std::min)(int(topLeft.x + (event->x() / fontWidth)), topLeft.x + visibleCharDims.x - 1);
+	clickViewPosition.y = (std::min)(int(topLeft.y + (event->y() / fontHeight)), topLeft.y + visibleCharDims.y - 1);
 
 	if (event->button() == Qt::LeftButton)
 	{
