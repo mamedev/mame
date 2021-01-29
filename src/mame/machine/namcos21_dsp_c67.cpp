@@ -42,6 +42,28 @@ void namcos21_dsp_c67_device::device_start()
 	m_mpDspState = std::make_unique<dsp_state>();
 
 	save_item(NAME(m_dspram16));
+
+	save_item(NAME(m_mpDspState->masterSourceAddr));
+	save_item(NAME(m_mpDspState->slaveInputBuffer));
+	save_item(NAME(m_mpDspState->slaveBytesAvailable));
+	save_item(NAME(m_mpDspState->slaveBytesAdvertised));
+	save_item(NAME(m_mpDspState->slaveInputStart));
+	save_item(NAME(m_mpDspState->slaveOutputBuffer));
+	save_item(NAME(m_mpDspState->slaveOutputSize));
+	save_item(NAME(m_mpDspState->masterDirectDrawBuffer));
+	save_item(NAME(m_mpDspState->masterDirectDrawSize));
+	save_item(NAME(m_mpDspState->masterFinished));
+	save_item(NAME(m_mpDspState->slaveActive));
+
+	save_pointer(NAME(m_pointram), PTRAM_SIZE);
+	save_item(NAME(m_pointram_idx));
+	save_item(NAME(m_pointram_control));
+	save_item(NAME(m_pointrom_idx));
+	save_item(NAME(m_mPointRomMSB));
+	save_item(NAME(m_mbPointRomDataAvailable));
+	save_item(NAME(m_depthcue));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_mbNeedsKickstart));
 }
 
 void namcos21_dsp_c67_device::device_reset()

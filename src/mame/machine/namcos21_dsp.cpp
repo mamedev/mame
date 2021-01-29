@@ -32,6 +32,17 @@ void namcos21_dsp_device::device_start()
 	m_suspend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos21_dsp_device::suspend_callback),this));
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
+
+	save_pointer(NAME(m_pointram), PTRAM_SIZE);
+	save_item(NAME(m_pointram_idx));
+	save_item(NAME(m_pointram_control));
+
+	save_item(NAME(m_winrun_dspcomram_control));
+	save_pointer(NAME(m_winrun_dspcomram), 0x1000*2);
+	save_item(NAME(m_winrun_poly_buf));
+	save_item(NAME(m_winrun_poly_index));
+	save_item(NAME(m_winrun_pointrom_addr));
+	save_item(NAME(m_winrun_dsp_alive));
 }
 
 TIMER_CALLBACK_MEMBER(namcos21_dsp_device::suspend_callback)

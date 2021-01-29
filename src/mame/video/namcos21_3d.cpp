@@ -40,6 +40,12 @@ void namcos21_3d_device::allocate_poly_framebuffer()
 
 	swap_and_clear_poly_framebuffer();
 	swap_and_clear_poly_framebuffer();
+
+	save_pointer(NAME(m_mpPolyFrameBufferZ), m_framebuffer_size_in_bytes / 2);
+	save_pointer(NAME(m_mpPolyFrameBufferPens), m_framebuffer_size_in_bytes / 2);
+
+	save_pointer(NAME(m_mpPolyFrameBufferZ2), m_framebuffer_size_in_bytes / 2);
+	save_pointer(NAME(m_mpPolyFrameBufferPens2), m_framebuffer_size_in_bytes / 2);
 }
 
 void namcos21_3d_device::swap_and_clear_poly_framebuffer()
