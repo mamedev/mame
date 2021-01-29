@@ -6,6 +6,7 @@
  */
 
 #include "emu.h"
+#include "corestr.h"
 
 //#define sc45helperlog printf
 #define sc45helperlog machine.logerror
@@ -209,8 +210,7 @@ int find_input_strings(running_machine &machine)
 
 					}
 
-					strtrimspace(tempstring);
-					strmakelower(tempstring);
+					tempstring = strmakelower(strtrimspace(tempstring));
 
 
 					//if (pos <= 5)
@@ -498,8 +498,7 @@ int find_lamp_strings(running_machine &machine)
 				lamps[row][col].lampname = tempstring;
 				lamps[row][col].lamptypename = "matrixlamp";
 
-				strtrimspace(lamps[row][col].lampname);
-				strmakelower(lamps[row][col].lampname);
+				lamps[row][col].lampname = strmakelower(strtrimspace(lamps[row][col].lampname));
 			}
 			else
 			{
@@ -895,8 +894,7 @@ int find_reel_strings(running_machine &machine)
 
 			}
 
-			strtrimspace(tempstring);
-			strmakelower(tempstring);
+			tempstring = strmakelower(strtrimspace(tempstring));
 
 			if (tempstring[0] == '!')
 			{

@@ -543,10 +543,9 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-
-#include "rendlay.h"
 #include "speaker.h"
 
+#include "layout/generic.h"
 #include "radr.lh"
 
 /*
@@ -654,6 +653,8 @@ void sega_multi32_analog_state::device_start()
 {
 	sega_multi32_state::device_start();
 	m_analog_bank = 0;
+
+	save_item(NAME(m_analog_bank));
 }
 
 void segas32_state::device_reset()
@@ -5715,6 +5716,8 @@ void segas32_state::init_arescue(int m_hasdsp)
 		elem = 0x00;
 
 	m_sw1_output = &segas32_state::arescue_sw1_output;
+
+	save_item(NAME(m_arescue_dsp_io));
 }
 
 
@@ -5732,6 +5735,8 @@ void segas32_state::init_brival()
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16s_delegate(*this, FUNC(segas32_state::brival_protection_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16sm_delegate(*this, FUNC(segas32_state::brival_protection_w)));
+
+	save_pointer(NAME(m_system32_protram), 0x1000/2);
 }
 
 

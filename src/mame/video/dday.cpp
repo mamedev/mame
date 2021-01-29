@@ -278,7 +278,7 @@ void dday_state::dday_control_w(uint8_t data)
 	if (!(data & 0x10) && (m_control & 0x10))
 		m_ay1->reset();
 
-	machine().sound().system_enable(data & 0x10);
+	machine().sound().system_mute(!BIT(data, 4));
 
 	/* bit 6 is search light enable */
 	m_sl_enable = data & 0x40;

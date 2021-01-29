@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Philips UCB1200 Advanced modem/audio analog front-end skeleton
+    Philips UCB1200 Advanced modem/audio analog front-end skeleton
 
 ***************************************************************************/
 
@@ -10,8 +10,8 @@
 #include "ucb1200.h"
 
 #define LOG_UNKNOWN     (1 << 1)
-#define LOG_READS		(1 << 2)
-#define LOG_WRITES		(1 << 3)
+#define LOG_READS       (1 << 2)
+#define LOG_WRITES      (1 << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
 #define VERBOSE         (LOG_ALL)

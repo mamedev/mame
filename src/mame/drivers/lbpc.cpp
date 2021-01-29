@@ -56,7 +56,7 @@ public:
 	}
 
 	void lbpc(machine_config &config);
-	
+
 	DECLARE_READ_LINE_MEMBER(hsi_r);
 
 protected:

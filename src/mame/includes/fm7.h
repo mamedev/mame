@@ -136,7 +136,7 @@ protected:
 		uint16_t y1;
 		uint8_t busy;
 	};
-	
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

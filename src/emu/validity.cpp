@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "validity.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 #include "romload.h"
 #include "video/rgbutil.h"
@@ -291,7 +292,7 @@ void validity_checker::validate_one(const game_driver &driver)
 {
 	// help verbose validation detect configuration-related crashes
 	if (m_print_verbose)
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()).c_str());
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()));
 
 	// set the current driver
 	m_current_driver = &driver;
@@ -326,7 +327,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
 		if (!m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()).c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()));
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
@@ -475,13 +476,13 @@ void validity_checker::validate_inlines()
 	if (resultu32 != expectedu32)
 		osd_printf_error("Error testing divu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
-	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
+	resulti32 = div_64x32_rem(testi64a, testi32a, remainder);
 	expectedi32 = testi64a / s64(testi32a);
 	expremainder = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32 || remainder != expremainder)
 		osd_printf_error("Error testing div_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", s64(testi64a), s32(testi32a), resulti32, remainder, expectedi32, expremainder);
 
-	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
+	resultu32 = divu_64x32_rem(testu64a, testu32a, uremainder);
 	expectedu32 = testu64a / u64(testu32a);
 	expuremainder = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32 || uremainder != expuremainder)
@@ -2121,10 +2122,10 @@ void validity_checker::validate_device_types()
 		device_t *const dev = config.device_add(type.shortname(), type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()), name) : name);
 
 		if (m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description.c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description);
 
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
@@ -2327,5 +2328,5 @@ void validity_checker::output_indented_errors(std::string &text, const char *hea
 	if (text[text.size()-1] == '\n')
 		text.erase(text.size()-1, 1);
 	strreplace(text, "\n", "\n   ");
-	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text.c_str());
+	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text);
 }

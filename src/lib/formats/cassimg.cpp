@@ -11,6 +11,8 @@
 #include "cassimg.h"
 #include "imageutl.h"
 
+#include "corealloc.h" // make_unique_clear
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -351,6 +353,15 @@ void cassette_image::change(void *file, const io_procs *procs, const Format *for
 void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 {
 	io_generic_read(&m_io, buffer, offset, length);
+}
+
+
+
+uint8_t cassette_image::image_read_byte(uint64_t offset)
+{
+	uint8_t data;
+	io_generic_read(&m_io, &data, offset, 1);
+	return data;
 }
 
 

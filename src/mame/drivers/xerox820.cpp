@@ -410,7 +410,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	bankswitch(0);
@@ -423,6 +423,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -608,7 +609,6 @@ GFXDECODE_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

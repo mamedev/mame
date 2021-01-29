@@ -36,12 +36,12 @@ function gdbstub.startplugin()
 	local running
 
 	emu.register_start(function ()
-		debugger = manager:machine():debugger()
+		debugger = manager.machine.debugger
 		if not debugger then
 			print("gdbstub: debugger not enabled")
 			return
 		end
-		cpu = manager:machine().devices[":maincpu"]
+		cpu = manager.machine.devices[":maincpu"]
 		if not cpu then
 			print("gdbstub: maincpu not found")
 		end

@@ -23,7 +23,7 @@ license:CC0
 						for ledno, lamps in pairs(ledlamps) do
 							local ledstate = 0
 							for bit, lampno in pairs(lamps) do
-								if machine:outputs():get_indexed_value("lamp", lampno) > 0 then
+								if machine.output:get_indexed_value("lamp", lampno) > 0 then
 									ledstate = ledstate | (1 << (bit - 1))
 								end
 							end

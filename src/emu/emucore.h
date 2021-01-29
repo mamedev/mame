@@ -28,7 +28,6 @@
 #endif
 
 // standard C++ includes
-#include <cassert>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -37,9 +36,10 @@
 // core system includes
 #include "osdcomm.h"
 #include "emualloc.h"
-#include "corestr.h"
+#include "coretmpl.h"
 #include "bitmap.h"
 #include "strformat.h"
+#include "vecstream.h"
 
 #include "emufwd.h"
 
@@ -77,6 +77,7 @@ using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;
+using util::string_format;
 
 
 // genf is a generic function pointer; cast function pointers to this instead of void *

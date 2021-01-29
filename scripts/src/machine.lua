@@ -72,6 +72,30 @@ files {
 
 --------------------------------------------------
 --
+--@src/devices/machine/acorn_ioc.h,MACHINES["ACORN_IOC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_IOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_ioc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_ioc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/machine/acorn_memc.h,MACHINES["ACORN_MEMC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_MEMC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_memc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_memc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/machine/acorn_vidc.h,MACHINES["ACORN_VIDC"] = true
 --------------------------------------------------
 
@@ -1718,6 +1742,18 @@ if (MACHINES["K056230"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/k056230.cpp",
 		MAME_DIR .. "src/devices/machine/k056230.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/m950x0.h,MACHINES["M950X0"] = true
+---------------------------------------------------
+
+if (MACHINES["M950X0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m950x0.cpp",
+		MAME_DIR .. "src/devices/machine/m950x0.h",
 	}
 end
 

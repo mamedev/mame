@@ -469,7 +469,7 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 
 QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
 
 
@@ -1663,7 +1663,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));
 	m_via->writepa_handler().set(FUNC(pet_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));

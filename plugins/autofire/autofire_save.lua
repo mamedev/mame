@@ -1,7 +1,7 @@
 local lib = {}
 
 local function get_settings_path()
-	return emu.subst_env(manager:machine():options().entries.homepath:value():match('([^;]+)')) .. '/autofire/'
+	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/autofire/'
 end
 
 local function get_settings_filename()
@@ -13,12 +13,12 @@ local function initialize_button(settings)
 		local new_button = {
 			port = settings.port,
 			field = settings.field,
-			key = manager:machine():input():seq_from_tokens(settings.key),
+			key = manager.machine.input:seq_from_tokens(settings.key),
 			on_frames = settings.on_frames,
 			off_frames = settings.off_frames,
 			counter = 0
 		}
-		local port = manager:machine():ioport().ports[settings.port]
+		local port = manager.machine.ioport.ports[settings.port]
 		if port then
 			local field = port.fields[settings.field]
 			if field then
@@ -36,7 +36,7 @@ local function serialize_settings(button_list)
 		setting = {
 			port = button.port,
 			field = button.field,
-			key = manager:machine():input():seq_to_tokens(button.key),
+			key = manager.machine.input:seq_to_tokens(button.key),
 			on_frames = button.on_frames,
 			off_frames = button.off_frames
 		}

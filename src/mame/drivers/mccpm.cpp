@@ -212,12 +212,12 @@ void mccpm_state::mccpm(machine_config &config)
 
 	/* Devices */
 	// clock supplied by pair of HD4702 baud rate generators
-	F4702(config, m_brg[0], 2.4576_MHz_XTAL);
+	F4702(config, m_brg[0], 2.4576_MHz_XTAL); // XTAL connected to Ix/Ox
 	m_brg[0]->s_callback().set_ioport("BAUD1");
 	m_brg[0]->z_callback().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	m_brg[0]->z_callback().append(FUNC(mccpm_state::bd_q_w<0>));
 
-	F4702(config, m_brg[1], 2.4576_MHz_XTAL);
+	F4702(config, m_brg[1], 2.4576_MHz_XTAL); // Cp connected to first BRG's CO
 	m_brg[1]->s_callback().set_ioport("BAUD2");
 	m_brg[1]->z_callback().set("sio", FUNC(z80sio_device::txca_w));
 	m_brg[1]->z_callback().append("sio", FUNC(z80sio_device::rxca_w));

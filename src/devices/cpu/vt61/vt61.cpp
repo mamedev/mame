@@ -306,7 +306,7 @@ void vt61_cpu_device::operate_t5(u16 i)
 			// LD PC
 			m_pc_mode = pc_mode::LD;
 			break;
-	
+
 		case 3:
 			// LD UART (TODO)
 			break;

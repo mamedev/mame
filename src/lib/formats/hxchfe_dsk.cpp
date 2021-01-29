@@ -144,7 +144,7 @@ bool hfe_format::supports_save() const
 	return true;
 }
 
-int hfe_format::identify(io_generic *io, uint32_t form_factor)
+int hfe_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[8];
 
@@ -155,7 +155,7 @@ int hfe_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool hfe_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool hfe_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t header[HEADER_LENGTH];
 	uint8_t track_table[TRACK_TABLE_LENGTH];
@@ -412,7 +412,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	image->set_write_splice_position(cyl, head, 0, 0);
 }
 
-bool hfe_format::save(io_generic *io, floppy_image *image)
+bool hfe_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	std::vector<uint8_t> cylbuf;
 

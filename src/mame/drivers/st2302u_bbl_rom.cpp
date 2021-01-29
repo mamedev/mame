@@ -18,7 +18,7 @@ public:
 		, m_portb(0xff)
 	{
 	}
-	
+
 	void st22xx_bbl338(machine_config &config);
 	void st22xx_dphh8213(machine_config &config);
 
@@ -119,7 +119,7 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 			u8 param3 = mainspace.read_byte(0x103);
 
 			logerror("command 0x28 (draw text direct) using params Xpos: %02x Ypos: %02x char '%c' unk %02x\n", param0, param1, param2, param3);
-		
+
 			break;
 		}
 
@@ -131,7 +131,7 @@ u8 st22xx_bbl338_sim_state::sim152_r()
 		}
 
 		//if (command == 0x00)
-		//	return 0x60;
+		//  return 0x60;
 	}
 	return m_152_dat;
 }
@@ -157,12 +157,12 @@ void st22xx_bbl338_sim_state::machine_reset()
 		0xa4, 0x32,       // 000153:         ldy $32 |
 		0x5a,             // 000155:         phy     /
 		0x64, 0x32,       // 000156:         stz $32 | - Zero Bank (manually optimized compared to the dphh8213 implementation to reduce code size so call to 0x0164 is correct)
-		0x64, 0x33,       // 000158:         stz $33 / 
+		0x64, 0x33,       // 000158:         stz $33 /
 		//0x20, 0x3d, 0x41, // 000152:         jsr $xxxx   -- this needs to go to a jump table to process the command stored in X
 		0xea, 0xea, 0xea, // NOP above out for now as it isn't clear where to jump to
 		0x7a,             // 00015d:         ply     |- restore previous bank
 		0x84, 0x32,       // 00015e:         sty $32 |
-		0x7a,             // 000160:         ply     | 
+		0x7a,             // 000160:         ply     |
 		0x84, 0x33,       // 000161:         sty $33 /
 		0x60,             // 000163:         rts
 
@@ -265,7 +265,7 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -273,7 +273,7 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // bbl338 - must be IP_ACTIVE_HIGH to avoid system hanging with 'wai' opcode after code turns on port interrupt if not in test mode (power off?)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
@@ -312,7 +312,7 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(160, 128); 
+	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
@@ -331,7 +331,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(160, 128); 
+	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 

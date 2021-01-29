@@ -11,15 +11,22 @@
 #include "emu.h"
 #include "drccache.h"
 
+#include <algorithm>
 
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
+namespace {
 
-// ensure that all memory allocated is aligned to an 8-byte boundary
-#define ALIGN_PTR_UP(p)         ((void *)(((uintptr_t)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
-#define ALIGN_PTR_DOWN(p)       ((void *)((uintptr_t)(p) & ~(CACHE_ALIGNMENT - 1)))
+template <typename T, typename U> constexpr T *ALIGN_PTR_UP(T *p, U align)
+{
+	return reinterpret_cast<T *>((uintptr_t(p) + (align - 1)) & ~uintptr_t(align - 1));
+}
+
+template <typename T, typename U> constexpr T *ALIGN_PTR_DOWN(T *p, U align)
+{
+	return reinterpret_cast<T *>(uintptr_t(p) & ~uintptr_t(align - 1));
+}
+
+} // anonymous namespace
 
 
 
@@ -31,17 +38,46 @@
 //  drc_cache - constructor
 //-------------------------------------------------
 
-drc_cache::drc_cache(size_t bytes)
-	: m_near((drccodeptr)osd_alloc_executable(bytes)),
-		m_neartop(m_near),
-		m_base(m_near + NEAR_CACHE_SIZE),
-		m_top(m_base),
-		m_end(m_near + bytes),
-		m_codegen(nullptr),
-		m_size(bytes)
+drc_cache::drc_cache(size_t bytes) :
+	m_cache({ NEAR_CACHE_SIZE, bytes - NEAR_CACHE_SIZE }, osd::virtual_memory_allocation::READ_WRITE_EXECUTE),
+	m_near(reinterpret_cast<drccodeptr>(m_cache.get())),
+	m_neartop(m_near),
+	m_base(ALIGN_PTR_UP(m_near + NEAR_CACHE_SIZE, m_cache.page_size())),
+	m_top(m_base),
+	m_limit(m_near + m_cache.size()),
+	m_end(m_limit),
+	m_codegen(nullptr),
+	m_size(m_cache.size()),
+	m_executable(false),
+	m_rwx(false)
 {
-	memset(m_free, 0, sizeof(m_free));
-	memset(m_nearfree, 0, sizeof(m_nearfree));
+	// alignment and page size must be powers of two, cache must be page-aligned
+	assert(!(CACHE_ALIGNMENT & (CACHE_ALIGNMENT - 1)));
+	assert(!(m_cache.page_size() & (m_cache.page_size() - 1)));
+	assert(!(uintptr_t(m_near) & (m_cache.page_size() - 1)));
+	assert(m_cache.page_size() >= CACHE_ALIGNMENT);
+
+	std::fill(std::begin(m_free), std::end(m_free), nullptr);
+	std::fill(std::begin(m_nearfree), std::end(m_nearfree), nullptr);
+
+	if (!m_cache)
+	{
+		throw emu_fatalerror("drc_cache: Error allocating virtual memory");
+	}
+	else if (!m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE))
+	{
+		throw emu_fatalerror("drc_cache: Error marking cache read/write");
+	}
+	else if (m_cache.set_access(m_base - m_near, m_end - m_base, osd::virtual_memory_allocation::READ_WRITE_EXECUTE))
+	{
+		osd_printf_verbose("drc_cache: RWX pages supported\n");
+		m_rwx = true;
+	}
+	else
+	{
+		osd_printf_verbose("drc_cache: Using W^X mode\n");
+		m_rwx = false;
+	}
 }
 
 
@@ -51,8 +87,6 @@ drc_cache::drc_cache(size_t bytes)
 
 drc_cache::~drc_cache()
 {
-	// release the memory
-	osd_free_executable(m_near, m_size);
 }
 
 
@@ -64,10 +98,11 @@ drc_cache::~drc_cache()
 void drc_cache::flush()
 {
 	// can't flush in the middle of codegen
-	assert(m_codegen == nullptr);
+	assert(!m_codegen);
 
 	// just reset the top back to the base and re-seed
 	m_top = m_base;
+	codegen_init();
 }
 
 
@@ -83,9 +118,9 @@ void *drc_cache::alloc(size_t bytes)
 	// pick first from the free list
 	if (bytes < MAX_PERMANENT_ALLOC)
 	{
-		free_link **linkptr = &m_free[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
-		free_link *link = *linkptr;
-		if (link != nullptr)
+		free_link **const linkptr = &m_free[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
+		free_link *const link = *linkptr;
+		if (link)
 		{
 			*linkptr = link->m_next;
 			return link;
@@ -93,11 +128,13 @@ void *drc_cache::alloc(size_t bytes)
 	}
 
 	// if no space, we just fail
-	drccodeptr ptr = (drccodeptr)ALIGN_PTR_DOWN(m_end - bytes);
-	if (m_top > ptr)
+	drccodeptr const ptr = ALIGN_PTR_DOWN(m_end - bytes, CACHE_ALIGNMENT);
+	drccodeptr const limit = ALIGN_PTR_DOWN(ptr, m_cache.page_size());
+	if (m_top > limit)
 		return nullptr;
 
 	// otherwise update the end of the cache
+	m_limit = limit;
 	m_end = ptr;
 	return ptr;
 }
@@ -115,9 +152,9 @@ void *drc_cache::alloc_near(size_t bytes)
 	// pick first from the free list
 	if (bytes < MAX_PERMANENT_ALLOC)
 	{
-		free_link **linkptr = &m_nearfree[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
-		free_link *link = *linkptr;
-		if (link != nullptr)
+		free_link **const linkptr = &m_nearfree[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
+		free_link *const link = *linkptr;
+		if (link)
 		{
 			*linkptr = link->m_next;
 			return link;
@@ -125,8 +162,8 @@ void *drc_cache::alloc_near(size_t bytes)
 	}
 
 	// if no space, we just fail
-	drccodeptr ptr = (drccodeptr)ALIGN_PTR_UP(m_neartop);
-	if (ptr + bytes > m_base)
+	drccodeptr const ptr = ALIGN_PTR_UP(m_neartop, CACHE_ALIGNMENT);
+	if ((ptr + bytes) > m_base)
 		return nullptr;
 
 	// otherwise update the top of the near part of the cache
@@ -143,15 +180,16 @@ void *drc_cache::alloc_near(size_t bytes)
 void *drc_cache::alloc_temporary(size_t bytes)
 {
 	// can't allocate in the middle of codegen
-	assert(m_codegen == nullptr);
+	assert(!m_codegen);
 
 	// if no space, we just fail
-	drccodeptr ptr = m_top;
-	if (ptr + bytes >= m_end)
+	drccodeptr const ptr = m_top;
+	if ((ptr + bytes) > m_limit)
 		return nullptr;
 
 	// otherwise, update the cache top
-	m_top = (drccodeptr)ALIGN_PTR_UP(ptr + bytes);
+	codegen_init();
+	m_top = ALIGN_PTR_UP(ptr + bytes, CACHE_ALIGNMENT);
 	return ptr;
 }
 
@@ -163,20 +201,39 @@ void *drc_cache::alloc_temporary(size_t bytes)
 
 void drc_cache::dealloc(void *memory, size_t bytes)
 {
+	drccodeptr const mem = reinterpret_cast<drccodeptr>(memory);
 	assert(bytes < MAX_PERMANENT_ALLOC);
-	assert(((drccodeptr)memory >= m_near && (drccodeptr)memory < m_base) || ((drccodeptr)memory >= m_end && (drccodeptr)memory < m_near + m_size));
+	assert(((mem >= m_near) && (mem < m_base)) || ((mem >= m_end) && (mem < (m_near + m_size))));
 
 	// determine which free list to add to
-	free_link **linkptr;
-	if ((drccodeptr)memory < m_base)
-		linkptr = &m_nearfree[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
-	else
-		linkptr = &m_free[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
+	free_link **const linkptr = &((mem < m_base) ? m_nearfree : m_free)[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
 
 	// link is into the free list for our size
-	free_link *link = (free_link *)memory;
+	free_link *const link = reinterpret_cast<free_link *>(memory);
 	link->m_next = *linkptr;
 	*linkptr = link;
+}
+
+
+void drc_cache::codegen_init()
+{
+	if (m_executable)
+	{
+		if (!m_rwx)
+			m_cache.set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
+		m_executable = false;
+	}
+}
+
+
+void drc_cache::codegen_complete()
+{
+	if (!m_executable)
+	{
+		if (!m_rwx)
+			m_cache.set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache.page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
+		m_executable = true;
+	}
 }
 
 
@@ -187,15 +244,15 @@ void drc_cache::dealloc(void *memory, size_t bytes)
 drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 {
 	// can't restart in the middle of codegen
-	assert(m_codegen == nullptr);
-	assert(m_ooblist.first() == nullptr);
+	assert(!m_codegen);
+	assert(m_oob_list.empty());
 
-	// if still no space, we just fail
-	drccodeptr ptr = m_top;
-	if (ptr + reserve_bytes >= m_end)
+	// if no space, we just fail
+	if ((m_top + reserve_bytes) > m_limit)
 		return nullptr;
 
 	// otherwise, return a pointer to the cache top
+	codegen_init();
 	m_codegen = m_top;
 	return &m_top;
 }
@@ -207,23 +264,22 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes)
 
 drccodeptr drc_cache::end_codegen()
 {
-	drccodeptr result = m_codegen;
+	drccodeptr const result = m_codegen;
 
 	// run the OOB handlers
-	oob_handler *oob;
-	while ((oob = m_ooblist.detach_head()) != nullptr)
+	while (!m_oob_list.empty())
 	{
 		// call the callback
-		oob->m_callback(&m_top, oob->m_param1, oob->m_param2);
-		assert(m_top - m_codegen < CODEGEN_MAX_BYTES);
+		m_oob_list.front().m_callback(&m_top, m_oob_list.front().m_param1, m_oob_list.front().m_param2);
+		assert((m_top - m_codegen) < CODEGEN_MAX_BYTES);
 
-		// release our memory
-		oob->~oob_handler();
-		dealloc(oob, sizeof(*oob));
+		// add it to the free list
+		m_oob_free.splice(m_oob_free.begin(), m_oob_list, m_oob_list.begin());
 	}
 
 	// update the cache top
-	m_top = (drccodeptr)ALIGN_PTR_UP(m_top);
+	osd::invalidate_instruction_cache(m_codegen, m_top - m_codegen);
+	m_top = ALIGN_PTR_UP(m_top, CACHE_ALIGNMENT);
 	m_codegen = nullptr;
 
 	return result;
@@ -235,20 +291,24 @@ drccodeptr drc_cache::end_codegen()
 //  out-of-band codegen
 //-------------------------------------------------
 
-void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, void *param2)
+void drc_cache::request_oob_codegen(drc_oob_delegate &&callback, void *param1, void *param2)
 {
-	assert(m_codegen != nullptr);
+	assert(m_codegen);
 
 	// pull an item from the free list
-	oob_handler *oob = (oob_handler *)alloc(sizeof(*oob));
-	assert(oob != nullptr);
-	new (oob) oob_handler();
+	std::list<oob_handler>::iterator oob;
+	if (m_oob_free.empty())
+	{
+		oob = m_oob_list.emplace(m_oob_list.end());
+	}
+	else
+	{
+		oob = m_oob_free.begin();
+		m_oob_list.splice(m_oob_list.end(), m_oob_free, oob);
+	}
 
 	// fill it in
 	oob->m_callback = std::move(callback);
 	oob->m_param1 = param1;
 	oob->m_param2 = param2;
-
-	// add to the tail
-	m_ooblist.append(*oob);
 }

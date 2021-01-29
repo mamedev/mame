@@ -10,7 +10,9 @@
 
 #include "msdib.h"
 
+#include "coretmpl.h"
 #include "eminline.h"
+#include "osdcore.h"
 
 #include <cassert>
 #include <cstdlib>

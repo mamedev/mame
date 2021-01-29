@@ -165,6 +165,7 @@ CPUS["GTRON"] = true
 CPUS["M88000"] = true
 CPUS["XAVIX2"] = true
 CPUS["UPD78K"] = true
+CPUS["ROMP"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -314,6 +315,7 @@ SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
 SOUNDS["RP2C33_SOUND"] = true
+SOUNDS["UDA1344"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -451,6 +453,8 @@ MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
 MACHINES["AAKARTDEV"] = true
 MACHINES["ACIA6850"] = true
+MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
@@ -567,6 +571,7 @@ MACHINES["LSI53C810"] = true
 MACHINES["M3002"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
+MACHINES["M950X0"] = true
 MACHINES["M68SFDC"] = true
 MACHINES["M6M80011AP"] = true
 MACHINES["MB14241"] = true
@@ -919,6 +924,7 @@ BUSES["PSX_PARALLEL"] = true
 BUSES["QL"] = true
 BUSES["QBUS"] = true
 BUSES["RS232"] = true
+BUSES["RTPC_KBD"] = true
 BUSES["S100"] = true
 BUSES["SAMCOUPE_DRIVE_PORT"] = true
 BUSES["SAMCOUPE_EXPANSION"] = true
@@ -1172,6 +1178,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"atari",
 		"att",
 		"ave",
+		"aviion",
 		"bally",
 		"bandai",
 		"banctec",
@@ -1333,6 +1340,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"rockwell",
 		"roland",
 		"rolm",
+		"rtpc",
 		"sage",
 		"saitek",
 		"samcoupe",
@@ -1359,6 +1367,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"swtpc",
 		"synertek",
 		"ta",
+		"tab",
 		"tandberg",
 		"tangerin",
 		"tasc",
@@ -1611,6 +1620,8 @@ files {
 createMESSProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/drivers/aa310.cpp",
+	MAME_DIR .. "src/mame/machine/archimedes_keyb.cpp",
+	MAME_DIR .. "src/mame/machine/archimedes_keyb.h",
 	MAME_DIR .. "src/mame/drivers/accomm.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys1.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys.cpp",
@@ -1875,6 +1886,11 @@ files {
 createMESSProjects(_target, _subtarget, "ave")
 files {
 	MAME_DIR .. "src/mame/drivers/ave_arb.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "aviion")
+files {
+	MAME_DIR .. "src/mame/drivers/aviion88k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "bally")
@@ -2596,6 +2612,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp2100.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
 	MAME_DIR .. "src/mame/drivers/hp700.cpp",
+	MAME_DIR .. "src/mame/machine/hp2640_tape.cpp",
+	MAME_DIR .. "src/mame/machine/hp2640_tape.h",
 	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
 	MAME_DIR .. "src/mame/drivers/hp95lx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9825.cpp",
@@ -3010,6 +3028,7 @@ files {
 createMESSProjects(_target, _subtarget, "nec")
 files {
 	MAME_DIR .. "src/mame/drivers/apc.cpp",
+	MAME_DIR .. "src/mame/drivers/ews4800.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_ucom4.cpp",
 	MAME_DIR .. "src/mame/drivers/pce.cpp",
 	MAME_DIR .. "src/mame/includes/pce.h",
@@ -3410,6 +3429,8 @@ files {
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
 	MAME_DIR .. "src/mame/audio/mb63h114.cpp",
 	MAME_DIR .. "src/mame/audio/mb63h114.h",
+	MAME_DIR .. "src/mame/audio/sa16.cpp",
+	MAME_DIR .. "src/mame/audio/sa16.h",
 	MAME_DIR .. "src/mame/machine/mb62h195.cpp",
 	MAME_DIR .. "src/mame/machine/mb62h195.h",
 	MAME_DIR .. "src/mame/machine/mb63h149.cpp",
@@ -3429,6 +3450,15 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "rtpc")
+files {
+	MAME_DIR .. "src/mame/drivers/rtpc.cpp",
+	MAME_DIR .. "src/mame/machine/rosetta.cpp",
+	MAME_DIR .. "src/mame/machine/rosetta.h",
+	MAME_DIR .. "src/mame/machine/rtpc_iocc.cpp",
+	MAME_DIR .. "src/mame/machine/rtpc_iocc.h",
 }
 
 createMESSProjects(_target, _subtarget, "sage")
@@ -3774,6 +3804,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/alphatpx.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatpc16.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatro.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "tab")
+files {
+	MAME_DIR .. "src/mame/drivers/tabe22.cpp",
+	MAME_DIR .. "src/mame/machine/e22_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/e22_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "tandberg")
@@ -4353,6 +4390,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
+	MAME_DIR .. "src/mame/drivers/alphasma3k.cpp",
 	MAME_DIR .. "src/mame/drivers/am1000.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex210.cpp",

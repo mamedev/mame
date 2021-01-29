@@ -390,7 +390,7 @@ ROM_END
 
 ROM_START( gls )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP ) // As per decap, confirmed to be a Motorola 68HC05 CSIC (Customer Specification Integrated Circuit)
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))

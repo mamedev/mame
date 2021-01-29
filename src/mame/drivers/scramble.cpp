@@ -1652,6 +1652,30 @@ ROM_START( mars )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+// 2 PCB set: 10041A and 09041A. All ROMs have been dumped multiple times with different programmers, but needs a redump from a different PCB to be sure
+ROM_START( marsarf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10041a.ma1", 0x0000, 0x0800, CRC(2fe47b97) SHA1(5e33bd8cdb7e510f5ecac5e59e687d7aa531f488) )
+	ROM_LOAD( "10041a.ma3", 0x0800, 0x0800, CRC(5c37ed57) SHA1(bac8513894ccd06ac1461182e3a246ae590c6788) )
+	ROM_LOAD( "10041a.ma2", 0x1000, 0x0800, CRC(06c6bb56) SHA1(404ddc600f0c41fa6358f86bb7a3159835d1a04d) )
+	ROM_LOAD( "10041a.ma4", 0x1800, 0x0800, CRC(8e68a1a2) SHA1(6f5b176a4f3fef91646a2cb783e5b52c8c15fbfd) )
+	ROM_LOAD( "10041a.ma5", 0x2000, 0x0800, CRC(5b7eac43) SHA1(d24034b6f6a4c93ce21142bcaac1dde014612793) )
+	ROM_LOAD( "10041a.ma6", 0x2800, 0x0800, CRC(4b83a795) SHA1(b6a0f1096e3b649ce8d6d1b7f074df0d9dcec626) )
+	ROM_LOAD( "10041a.ma7", 0x3000, 0x0800, CRC(a09f402e) SHA1(8799cd82f611bc8eef170f89f4f8d8a3d9a871b0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "09041a.s1",  0x0000, 0x0800, BAD_DUMP CRC(fd47b688) SHA1(211606011d41d870ce2fef22eb900c65ca08d64f) ) // always drops data bit 2 on address line 2, it's identical to the standard Scramble ROM otherwise
+	ROM_LOAD( "09041a.s2",  0x0800, 0x0800, CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "09041a.s3",  0x1000, 0x0800, CRC(ebf90e0b) SHA1(9fedcaf0bff61f61d20b5876dcdf8705f4ab6e14) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // the game shows a corrupted M in MARS at the title screen. Verified it happens on PCB, too. Probably a bad ROM.
+	ROM_LOAD( "10041a.c1", 0x0000, 0x0800, CRC(3bd970ba) SHA1(f688d6066f894ae46a7888727d997b21c01b8e54) )
+	ROM_LOAD( "10041a.c2", 0x0800, 0x0800, CRC(d9929b15) SHA1(6e1679a0204c62b885ac096e737d37005b6aa0ac) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "10041a_7603-5.bin", 0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
+ROM_END
+
 ROM_START( devilfsh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u26.1",        0x0000, 0x0800, CRC(ec047d71) SHA1(c35555010fe239213e92946b65a54612d5a23399) )
@@ -1812,7 +1836,7 @@ ROM_START( troopy )
 	ROM_LOAD( "ic5e.bin", 0x2000, 0x1000, CRC(a0396cc8) SHA1(c8266b58b144a4bc564f3a2503d5b953c0ba6ca7) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
+	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, BAD_DUMP CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
 	ROM_LOAD( "ic5f_neu.bin",      0x0800, 0x0800, CRC(cbbfefc2) SHA1(2378949275b8d3fc69551b00d9b2c654b91fd780) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -2038,6 +2062,7 @@ GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner
 GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, marsarf,  mars,     mars,     mars,     scramble_state, empty_init,        ROT90, "bootleg (Arfyc)",     "Mars (bootleg)",                     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // unencrypted, very similar to the original. Bad sound ROM
 
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                         MACHINE_SUPPORTS_SAVE )
 
@@ -2048,7 +2073,7 @@ GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkouga
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad GFX ROM
 
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",      MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino

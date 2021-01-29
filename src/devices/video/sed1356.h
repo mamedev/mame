@@ -170,6 +170,15 @@ protected:
 	void crt_cursor_color1_red_w(offs_t offset, uint8_t data);
 	void crt_cursor_fifo_thresh_w(offs_t offset, uint8_t data);
 
+	template <bool Linear> void bitblt_solid_fill();
+	uint16_t bitblt_rop(const uint8_t rop, const uint16_t s, const uint16_t d);
+	void bitblt_async_advance(uint32_t &addr);
+	void bitblt_write_continue(const uint16_t s);
+	void bitblt_write();
+	uint16_t bitblt_read_continue();
+	void bitblt_read();
+	template <bool SrcLinear, bool DstLinear> void bitblt_move_negative();
+	void bitblt_execute_command();
 	uint8_t bitblt_ctrl0_r(offs_t offset);
 	uint8_t bitblt_ctrl1_r(offs_t offset);
 	uint8_t bitblt_rop_code_r(offs_t offset);
@@ -221,227 +230,227 @@ protected:
 	void mplug_resv_cmd_w(offs_t offset, uint8_t data);
 	void mplug_data_w(offs_t offset, uint8_t data);
 
-	uint8_t bitblt_data_r(offs_t offset);
-	void bitblt_data_w(offs_t offset, uint8_t data);
+	uint16_t bitblt_data_r(offs_t offset);
+	void bitblt_data_w(offs_t offset, uint16_t data);
 
 	enum
 	{
-		MISC_RMS_BIT			= 7,
-		MISC_MASK				= 0x80,
+		MISC_RMS_BIT            = 7,
+		MISC_MASK               = 0x80,
 
-		GPCFG_GPIO1_BIT			= 1,
-		GPCFG_GPIO2_BIT			= 2,
-		GPCFG_GPIO3_BIT			= 3,
-		GPCFG_MASK				= 0x0e,
+		GPCFG_GPIO1_BIT         = 1,
+		GPCFG_GPIO2_BIT         = 2,
+		GPCFG_GPIO3_BIT         = 3,
+		GPCFG_MASK              = 0x0e,
 
-		GPCTRL_GPIO1_BIT		= 1,
-		GPCTRL_GPIO2_BIT		= 2,
-		GPCTRL_GPIO3_BIT		= 3,
-		GPCTRL_MASK				= 0x0e,
+		GPCTRL_GPIO1_BIT        = 1,
+		GPCTRL_GPIO2_BIT        = 2,
+		GPCTRL_GPIO3_BIT        = 3,
+		GPCTRL_MASK             = 0x0e,
 
-		MEMCLK_SRC_BIT			= 0,
-		MEMCLK_DIV_BIT			= 4,
-		MEMCLK_MASK				= 0x11,
+		MEMCLK_SRC_BIT          = 0,
+		MEMCLK_DIV_BIT          = 4,
+		MEMCLK_MASK             = 0x11,
 
-		LCDCLK_SRC_BIT			= 0,
-		LCDCLK_SRC_MASK			= 0x03,
-		LCDCLK_DIV_BIT			= 4,
-		LCDCLK_DIV_MASK			= 0x30,
-		LCDCLK_MASK				= 0x33,
+		LCDCLK_SRC_BIT          = 0,
+		LCDCLK_SRC_MASK         = 0x03,
+		LCDCLK_DIV_BIT          = 4,
+		LCDCLK_DIV_MASK         = 0x30,
+		LCDCLK_MASK             = 0x33,
 
-		CRTCLK_SRC_BIT			= 0,
-		CRTCLK_SRC_MASK			= 0x03,
-		CRTCLK_DIV_BIT			= 4,
-		CRTCLK_DIV_MASK			= 0x30,
-		CRTCLK_2X_BIT			= 7,
-		CRTCLK_MASK				= 0xb3,
+		CRTCLK_SRC_BIT          = 0,
+		CRTCLK_SRC_MASK         = 0x03,
+		CRTCLK_DIV_BIT          = 4,
+		CRTCLK_DIV_MASK         = 0x30,
+		CRTCLK_2X_BIT           = 7,
+		CRTCLK_MASK             = 0xb3,
 
-		PLUGCLK_SRC_BIT			= 0,
-		PLUGCLK_SRC_MASK		= 0x03,
-		PLUGCLK_DIV_BIT			= 4,
-		PLUGCLK_DIV_MASK		= 0x30,
-		PLUGCLK_MASK			= 0x33,
+		PLUGCLK_SRC_BIT         = 0,
+		PLUGCLK_SRC_MASK        = 0x03,
+		PLUGCLK_DIV_BIT         = 4,
+		PLUGCLK_DIV_MASK        = 0x30,
+		PLUGCLK_MASK            = 0x33,
 
-		CPUWAIT_SEL_BIT			= 0,
-		CPUWAIT_SEL_MASK		= 0x03,
-		CPUWAIT_MASK			= 0x03,
+		CPUWAIT_SEL_BIT         = 0,
+		CPUWAIT_SEL_MASK        = 0x03,
+		CPUWAIT_MASK            = 0x03,
 
-		MEMCFG_TYPE_BIT			= 0,
-		MEMCFG_TYPE_MASK		= 0x03,
-		MEMCFG_MASK				= 0x03,
+		MEMCFG_TYPE_BIT         = 0,
+		MEMCFG_TYPE_MASK        = 0x03,
+		MEMCFG_MASK             = 0x03,
 
-		MEMRFSH_RATE_BIT		= 0,
-		MEMRFSH_RATE_MASK		= 0x07,
-		MEMRFSH_SEL_BIT			= 6,
-		MEMRFSH_SEL_MASK		= 0xc0,
-		MEMRFSH_MASK			= 0xc7,
+		MEMRFSH_RATE_BIT        = 0,
+		MEMRFSH_RATE_MASK       = 0x07,
+		MEMRFSH_SEL_BIT         = 6,
+		MEMRFSH_SEL_MASK        = 0xc0,
+		MEMRFSH_MASK            = 0xc7,
 
-		DRAMTIME1_MASK			= 0x03,
+		DRAMTIME1_MASK          = 0x03,
 
-		PTYPE_TFT_PASS_BIT		= 0,
-		PTYPE_COUNT_BIT			= 1,
-		PTYPE_COLOR_BIT			= 2,
-		PTYPE_FORMAT_BIT		= 3,
-		PTYPE_WIDTH_BIT			= 4,
-		PTYPE_WIDTH_MASK		= 0x30,
-		PTYPE_EL_BIT			= 7,
-		PTYPE_MASK				= 0xbf,
+		PTYPE_TFT_PASS_BIT      = 0,
+		PTYPE_COUNT_BIT         = 1,
+		PTYPE_COLOR_BIT         = 2,
+		PTYPE_FORMAT_BIT        = 3,
+		PTYPE_WIDTH_BIT         = 4,
+		PTYPE_WIDTH_MASK        = 0x30,
+		PTYPE_EL_BIT            = 7,
+		PTYPE_MASK              = 0xbf,
 
-		MODRATE_MASK			= 0x3f,
+		MODRATE_MASK            = 0x3f,
 
-		LCDW_MASK				= 0x7f,
+		LCDW_MASK               = 0x7f,
 
-		LCDHBL_MASK				= 0x1f,
+		LCDHBL_MASK             = 0x1f,
 
-		TFTFPLS_MASK			= 0x1f,
+		TFTFPLS_MASK            = 0x1f,
 
-		TFTFPLW_WIDTH_BIT		= 0,
-		TFTFPLW_WIDTH_MASK		= 0x0f,
-		TFTFPLW_POL_BIT			= 7,
-		TFTFPLW_MASK			= 0x8f,
+		TFTFPLW_WIDTH_BIT       = 0,
+		TFTFPLW_WIDTH_MASK      = 0x0f,
+		TFTFPLW_POL_BIT         = 7,
+		TFTFPLW_MASK            = 0x8f,
 
-		LCDH_MASK				= 0x03ff,
+		LCDH_MASK               = 0x03ff,
 
-		LCDVBL_VALUE_BIT		= 0,
-		LCDVBL_VALUE_MASK		= 0x3f,
-		LCDVBL_STATUS_BIT		= 7,
-		LCDVBL_MASK				= 0x3f,
+		LCDVBL_VALUE_BIT        = 0,
+		LCDVBL_VALUE_MASK       = 0x3f,
+		LCDVBL_STATUS_BIT       = 7,
+		LCDVBL_MASK             = 0x3f,
 
-		TFTFPFS_MASK			= 0x3f,
+		TFTFPFS_MASK            = 0x3f,
 
-		TFTFPFW_WIDTH_BIT		= 0,
-		TFTFPFW_WIDTH_MASK		= 0x07,
-		TFTFPFW_POL_BIT			= 7,
-		TFTFPFW_MASK			= 0x87,
+		TFTFPFW_WIDTH_BIT       = 0,
+		TFTFPFW_WIDTH_MASK      = 0x07,
+		TFTFPFW_POL_BIT         = 7,
+		TFTFPFW_MASK            = 0x87,
 
-		LCDMODE_BPP_BIT			= 0,
-		LCDMODE_BPP_MASK		= 0x07,
-		LCDMODE_SWIVEN1_BIT		= 4,
-		LCDMODE_BLANK_BIT		= 7,
-		LCDMODE_MASK			= 0x97,
+		LCDMODE_BPP_BIT         = 0,
+		LCDMODE_BPP_MASK        = 0x07,
+		LCDMODE_SWIVEN1_BIT     = 4,
+		LCDMODE_BLANK_BIT       = 7,
+		LCDMODE_MASK            = 0x97,
 
-		LCDMISC_DPDIS_BIT		= 0,
-		LCDMISC_DITHDIS_BIT		= 1,
-		LCDMISC_MASK			= 0x03,
+		LCDMISC_DPDIS_BIT       = 0,
+		LCDMISC_DITHDIS_BIT     = 1,
+		LCDMISC_MASK            = 0x03,
 
-		LCDDS_MASK				= 0x000fffff,
+		LCDDS_MASK              = 0x000fffff,
 
-		LCDMOFS_MASK			= 0x07ff,
+		LCDMOFS_MASK            = 0x07ff,
 
-		LCDPAN_PAN_BIT			= 0,
-		LCDPAN_PAN_MASK			= 0x03,
-		LCDPAN_MASK				= 0x03,
+		LCDPAN_PAN_BIT          = 0,
+		LCDPAN_PAN_MASK         = 0x03,
+		LCDPAN_MASK             = 0x03,
 
-		LCDFIFO_MASK			= 0x3f,
+		LCDFIFO_MASK            = 0x3f,
 
-		CRTW_MASK				= 0x7f,
+		CRTW_MASK               = 0x7f,
 
-		CRTHBL_MASK				= 0x3f,
+		CRTHBL_MASK             = 0x3f,
 
-		CRTHRTS_MASK			= 0x3f,
+		CRTHRTS_MASK            = 0x3f,
 
-		CRTHRTW_WIDTH_BIT		= 0,
-		CRTHRTW_WIDTH_MASK		= 0x0f,
-		CRTHRTW_POL_BIT			= 7,
-		CRTHRTW_MASK			= 0x8f,
+		CRTHRTW_WIDTH_BIT       = 0,
+		CRTHRTW_WIDTH_MASK      = 0x0f,
+		CRTHRTW_POL_BIT         = 7,
+		CRTHRTW_MASK            = 0x8f,
 
-		CRTH_MASK				= 0x03ff,
+		CRTH_MASK               = 0x03ff,
 
-		CRTVBL_VALUE_BIT		= 0,
-		CRTVBL_VALUE_MASK		= 0x7f,
-		CRTVBL_STATUS_BIT		= 7,
-		CRTVBL_MASK				= 0xff,
+		CRTVBL_VALUE_BIT        = 0,
+		CRTVBL_VALUE_MASK       = 0x7f,
+		CRTVBL_STATUS_BIT       = 7,
+		CRTVBL_MASK             = 0xff,
 
-		CRTVRTS_MASK			= 0x7f,
+		CRTVRTS_MASK            = 0x7f,
 
-		CRTVRTW_WIDTH_BIT		= 0,
-		CRTVRTW_WIDTH_MASK		= 0x07,
-		CRTVRTW_POL_BIT			= 7,
-		CRTVRTW_MASK			= 0x87,
+		CRTVRTW_WIDTH_BIT       = 0,
+		CRTVRTW_WIDTH_MASK      = 0x07,
+		CRTVRTW_POL_BIT         = 7,
+		CRTVRTW_MASK            = 0x87,
 
-		CRTCTRL_PAL_BIT			= 0,
-		CRTCTRL_SVID_BIT		= 1,
-		CRTCTRL_DACLVL_BIT		= 3,
-		CRTCTRL_LUMF_BIT		= 4,
-		CRTCTRL_CHRF_BIT		= 5,
-		CRTCTRL_MASK			= 0x3b,
+		CRTCTRL_PAL_BIT         = 0,
+		CRTCTRL_SVID_BIT        = 1,
+		CRTCTRL_DACLVL_BIT      = 3,
+		CRTCTRL_LUMF_BIT        = 4,
+		CRTCTRL_CHRF_BIT        = 5,
+		CRTCTRL_MASK            = 0x3b,
 
-		CRTMODE_BPP_BIT			= 0,
-		CRTMODE_BPP_MASK		= 0x07,
-		CRTMODE_BLANK_BIT		= 7,
-		CRTMODE_MASK			= 0x87,
+		CRTMODE_BPP_BIT         = 0,
+		CRTMODE_BPP_MASK        = 0x07,
+		CRTMODE_BLANK_BIT       = 7,
+		CRTMODE_MASK            = 0x87,
 
-		CRTDS_MASK				= 0x000fffff,
+		CRTDS_MASK              = 0x000fffff,
 
-		CRTMOFS_MASK			= 0x07ff,
+		CRTMOFS_MASK            = 0x07ff,
 
-		CRTPAN_PAN_BIT			= 0,
-		CRTPAN_PAN_MASK			= 0x03,
-		CRTPAN_MASK				= 0x03,
+		CRTPAN_PAN_BIT          = 0,
+		CRTPAN_PAN_MASK         = 0x03,
+		CRTPAN_MASK             = 0x03,
 
-		CRTFIFO_MASK			= 0x3f,
+		CRTFIFO_MASK            = 0x3f,
 
-		CURCTRL_MODE_BIT		= 0,
-		CURCTRL_MODE_MASK		= 0x03,
-		CURCTRL_MASK			= 0x03,
+		CURCTRL_MODE_BIT        = 0,
+		CURCTRL_MODE_MASK       = 0x03,
+		CURCTRL_MASK            = 0x03,
 
-		CURX_SIGN_BIT			= 15,
-		CURX_MASK				= 0x83ff,
+		CURX_SIGN_BIT           = 15,
+		CURX_MASK               = 0x83ff,
 
-		CURY_SIGN_BIT			= 15,
-		CURY_MASK				= 0x83ff,
+		CURY_SIGN_BIT           = 15,
+		CURY_MASK               = 0x83ff,
 
-		CURB_MASK				= 0x1f,
-		CURG_MASK				= 0x3f,
-		CURR_MASK				= 0x1f,
+		CURB_MASK               = 0x1f,
+		CURG_MASK               = 0x3f,
+		CURR_MASK               = 0x1f,
 
-		CUR_FIFO_MASK			= 0x0f,
+		CUR_FIFO_MASK           = 0x0f,
 
-		BBCTRL0_SRCLIN_BIT		= 0,
-		BBCTRL0_DSTLIN_BIT		= 1,
-		BBCTRL0_FULL_BIT		= 4,
-		BBCTRL0_HALF_BIT		= 5,
-		BBCTRL0_ANY_BIT			= 6,
-		BBCTRL0_ACTIVE_BIT		= 7,
-		BBCTRL0_WR_MASK			= 0x03,
+		BBCTRL0_SRCLIN_BIT      = 0,
+		BBCTRL0_DSTLIN_BIT      = 1,
+		BBCTRL0_FULL_BIT        = 4,
+		BBCTRL0_HALF_BIT        = 5,
+		BBCTRL0_ANY_BIT         = 6,
+		BBCTRL0_ACTIVE_BIT      = 7,
+		BBCTRL0_WR_MASK         = 0x03,
 
-		BBCTRL1_COLFMT_BIT		= 0,
-		BBCTRL1_FIFO_DEPTH_BIT	= 4,
-		BBCTRL1_WR_MASK			= 0x11,
+		BBCTRL1_COLFMT_BIT      = 0,
+		BBCTRL1_FIFO_DEPTH_BIT  = 4,
+		BBCTRL1_WR_MASK         = 0x11,
 
-		BBCODE_MASK				= 0x0f,
+		BBCODE_MASK             = 0x0f,
 
-		BBOP_MASK				= 0x0f,
+		BBOP_MASK               = 0x0f,
 
-		BBSRC_MASK				= 0x001fffff,
-		BBDST_MASK				= 0x001fffff,
+		BBSRC_MASK              = 0x001fffff,
+		BBDST_MASK              = 0x001fffff,
 
-		BBMADR_MASK				= 0x07ff,
+		BBMADR_MASK             = 0x07ff,
 
-		BBWIDTH_MASK			= 0x03ff,
+		BBWIDTH_MASK            = 0x03ff,
 
-		BBHEIGHT_MASK			= 0x03ff,
+		BBHEIGHT_MASK           = 0x03ff,
 
-		LUTMODE_MODE_BIT		= 0,
-		LUTMODE_MODE_MASK		= 0x03,
-		LUTMODE_MASK			= 0x03,
+		LUTMODE_MODE_BIT        = 0,
+		LUTMODE_MODE_MASK       = 0x03,
+		LUTMODE_MASK            = 0x03,
 
-		LUTDATA_BIT				= 4,
-		LUTDATA_MASK			= 0xf0,
+		LUTDATA_BIT             = 4,
+		LUTDATA_MASK            = 0xf0,
 
-		PWRCFG_ENABLE_BIT		= 0,
-		PWRCFG_MASK				= 0x01,
+		PWRCFG_ENABLE_BIT       = 0,
+		PWRCFG_MASK             = 0x01,
 
-		PWRSTAT_MCPSS_BIT		= 0,
-		PWRSTAT_LCDPSS_BIT		= 1,
-		PWRSTAT_MASK			= 0x03,
+		PWRSTAT_MCPSS_BIT       = 0,
+		PWRSTAT_LCDPSS_BIT      = 1,
+		PWRSTAT_MASK            = 0x03,
 
-		WATCHDOG_MASK			= 0x3f,
+		WATCHDOG_MASK           = 0x3f,
 
-		DISPMODE_MODE_BIT		= 0,
-		DISPMODE_MODE_MASK		= 0x07,
-		DISPMODE_SWIVEN0_BIT	= 6,
-		DISPMODE_MASK			= 0x47
+		DISPMODE_MODE_BIT       = 0,
+		DISPMODE_MODE_MASK      = 0x07,
+		DISPMODE_SWIVEN0_BIT    = 6,
+		DISPMODE_MASK           = 0x47
 	};
 
 	uint8_t m_misc;
@@ -520,6 +529,11 @@ protected:
 	uint16_t m_bitblt_height;
 	uint16_t m_bitblt_bgcolor;
 	uint16_t m_bitblt_fgcolor;
+
+	uint32_t m_bitblt_curr_src_addr;
+	uint32_t m_bitblt_curr_dst_addr;
+	uint32_t m_bitblt_x;
+	uint32_t m_bitblt_y;
 
 	uint8_t m_lut_mode;
 	uint8_t m_lut_addr;

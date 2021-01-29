@@ -100,7 +100,7 @@ void coleco_state::paddle_on_w(uint8_t data)
 void bit90_state::init()
 {
 	auto pgm = &m_maincpu->space(AS_PROGRAM);
-	
+
 	if(m_ram->size() == 32768)
 		return;
 	else if(m_ram->size() == 16384)
@@ -709,7 +709,7 @@ ROM_END
 Circuit board is labelled: BIT90C-PAL-90002 or BIT90C-PAL-90003
 
 BIT90C-PAL-90002 has 2K Internal RAM (<1K Usable from BASIC)
-	Extra RAM can only be accessed via expansion port
+    Extra RAM can only be accessed via expansion port
 
 BIT90C-PAL-90003 has sockets for additional internal 16K or 32K internal RAM
 

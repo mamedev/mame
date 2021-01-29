@@ -833,6 +833,7 @@ void drcbe_x64::reset()
 int drcbe_x64::execute(code_handle &entry)
 {
 	// call our entry point which will jump to the destination
+	m_cache.codegen_complete();
 	return (*m_entry)(m_rbpvalue, (x86code *)entry.codeptr());
 }
 

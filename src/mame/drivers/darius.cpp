@@ -677,7 +677,7 @@ void darius_state::machine_reset()
 	m_adpcm_command = 0;
 	m_nmi_enable = 0;
 
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 
 	for (auto & elem : m_vol)
 		elem = 0x00;    /* min volume */

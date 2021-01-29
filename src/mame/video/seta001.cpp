@@ -30,8 +30,8 @@
 	appear to have 0x800 bytes of RAM that isn't connected to the sprite chip
 	between the banks.
 
-    This should implement device_video_interface, since it generates the vertical
-    and horizontal blanking and sync signals from a master clock.
+	This should implement device_video_interface, since it generates the vertical
+	and horizontal blanking and sync signals from a master clock.
 	*/
 
 #include "emu.h"

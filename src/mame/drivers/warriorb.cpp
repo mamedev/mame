@@ -154,7 +154,7 @@ Colscroll effects?
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -395,7 +395,7 @@ void warriorb_state::machine_start()
 void warriorb_state::machine_reset()
 {
 	/**** mixer control enable ****/
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 }
 
 void warriorb_state::darius2d(machine_config &config)

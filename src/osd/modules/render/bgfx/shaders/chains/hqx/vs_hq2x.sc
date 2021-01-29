@@ -13,7 +13,7 @@ void main()
 {
 	gl_Position = mul(u_viewProj, vec4(a_position.xy, 0.0, 1.0));
 	v_color0 = a_color0;
-	
+
 	vec2 ps = vec2(1.0, 1.0) / u_tex_size0.xy;
 	float dx = ps.x;
 	float dy = ps.y;

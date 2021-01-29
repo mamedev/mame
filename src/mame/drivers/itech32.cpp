@@ -638,7 +638,7 @@ u16 itech32_state::wcbowl_prot_result_r()
 
 u8 itech32_state::itech020_prot_result_r()
 {
-	u32 result = ((u32 *)m_nvram32.target())[m_itech020_prot_address >> 2];
+	u32 result = m_main_ram32[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return result & 0xff;
 }
@@ -1751,7 +1751,7 @@ void itech32_state::base_devices(machine_config &config)
 
 void itech32_state::via(machine_config &config)
 {
-	VIA6522(config, m_via, SOUND_CLOCK/8);
+	MOS6522(config, m_via, SOUND_CLOCK/8);
 	m_via->writepb_handler().set(FUNC(itech32_state::pia_portb_out));
 	m_via->irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }

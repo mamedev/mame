@@ -240,8 +240,8 @@ WRITE_LINE_MEMBER(saa5240_device::write_scl)
 							// active chapter - clear memory
 							//if (BIT(m_register[8], 3))
 							//{
-							//	for (int i = 0; i < 0x3ff; i++)
-							//		m_videoram->write_byte((m_register[8] & 0x07) * 0x400 + i, 0x20);
+							//  for (int i = 0; i < 0x3ff; i++)
+							//      m_videoram->write_byte((m_register[8] & 0x07) * 0x400 + i, 0x20);
 							//}
 							[[fallthrough]];
 						case 9: case 10:

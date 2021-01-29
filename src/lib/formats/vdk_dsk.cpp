@@ -31,7 +31,7 @@ const char *vdk_format::extensions() const
 	return "vdk";
 }
 
-int vdk_format::identify(io_generic *io, uint32_t form_factor)
+int vdk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t id[2];
 	io_generic_read(io, id, 0, 2);
@@ -42,7 +42,7 @@ int vdk_format::identify(io_generic *io, uint32_t form_factor)
 		return 0;
 }
 
-bool vdk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool vdk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t header[0x100];
 	io_generic_read(io, header, 0, 0x100);
@@ -85,11 +85,8 @@ bool vdk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool vdk_format::save(io_generic *io, floppy_image *image)
+bool vdk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sector_data[50000];
-	desc_xs sectors[256];
 	uint64_t file_offset = 0;
 
 	int track_count, head_count;
@@ -119,13 +116,12 @@ bool vdk_format::save(io_generic *io, floppy_image *image)
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			int track_size;
-			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			auto bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < SECTOR_COUNT; i++)
 			{
-				io_generic_write(io, sectors[FIRST_SECTOR_ID + i].data, file_offset, SECTOR_SIZE);
+				io_generic_write(io, sectors[FIRST_SECTOR_ID + i].data(), file_offset, SECTOR_SIZE);
 				file_offset += SECTOR_SIZE;
 			}
 		}

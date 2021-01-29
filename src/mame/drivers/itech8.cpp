@@ -1744,7 +1744,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch, 0);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
-	via6522_device &via(VIA6522(config, "via6522_0", CLOCK_8MHz/4));
+	via6522_device &via(MOS6522(config, "via6522_0", CLOCK_8MHz/4));
 	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 	via.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }
@@ -1953,7 +1953,7 @@ void itech8_state::ninclown(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	//	m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
+	//  m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
 
 	M68000(config, m_maincpu, CLOCK_12MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);

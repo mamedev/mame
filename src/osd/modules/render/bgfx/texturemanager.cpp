@@ -58,7 +58,7 @@ bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFor
 bgfx_texture* texture_manager::create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags, uint32_t screen)
 {
 	bitmap_argb32 bitmap;
-	emu_file file(path.c_str(), OPEN_FLAG_READ);
+	emu_file file(path, OPEN_FLAG_READ);
 	if (file.open(file_name) == osd_file::error::NONE)
 	{
 		render_load_png(bitmap, file);

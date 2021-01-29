@@ -188,6 +188,7 @@ public:
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
+	natural_keyboard &natkeyboard() noexcept { assert(m_natkeyboard != nullptr); return *m_natkeyboard; }
 	template <class DriverClass> DriverClass *driver_data() const { return &downcast<DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
@@ -336,6 +337,7 @@ private:
 	std::unique_ptr<image_manager> m_image;            // internal data from image.cpp
 	std::unique_ptr<rom_load_manager> m_rom_load;      // internal data from romload.cpp
 	std::unique_ptr<debugger_manager> m_debugger;      // internal data from debugger.cpp
+	std::unique_ptr<natural_keyboard> m_natkeyboard;   // internal data from natkeyboard.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

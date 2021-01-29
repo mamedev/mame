@@ -10,12 +10,12 @@
 #include "debug/dvdisasm.h"
 
 
-LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
+LogWindow::LogWindow(running_machine &machine, QWidget *parent) :
 	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Machine Log");
 
-	if (parent != nullptr)
+	if (parent)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -24,12 +24,10 @@ LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
 	//
 	// The main frame and its input and log widgets
 	//
-	QFrame* mainWindowFrame = new QFrame(this);
+	QFrame *mainWindowFrame = new QFrame(this);
 
 	// The main log view
-	m_logView = new DebuggerView(DVT_LOG,
-									m_machine,
-									this);
+	m_logView = new DebuggerView(DVT_LOG, m_machine, this);
 
 	// Layout
 	QVBoxLayout* vLayout = new QVBoxLayout(mainWindowFrame);
@@ -49,13 +47,13 @@ LogWindow::~LogWindow()
 //=========================================================================
 //  LogWindowQtConfig
 //=========================================================================
-void LogWindowQtConfig::buildFromQWidget(QWidget* widget)
+void LogWindowQtConfig::buildFromQWidget(QWidget *widget)
 {
 	WindowQtConfig::buildFromQWidget(widget);
 }
 
 
-void LogWindowQtConfig::applyToQWidget(QWidget* widget)
+void LogWindowQtConfig::applyToQWidget(QWidget *widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
 }

@@ -3561,11 +3561,11 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 35;
 			break;
 		case 0x1c:  /* DMULT */
-			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, reinterpret_cast<s64 *>(&HIVAL64));
+			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, *reinterpret_cast<s64 *>(&HIVAL64));
 			m_core->icount -= 7;
 			break;
 		case 0x1d:  /* DMULTU */
-			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, &HIVAL64);
+			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, HIVAL64);
 			m_core->icount -= 7;
 			break;
 		case 0x1e:  /* DDIV */

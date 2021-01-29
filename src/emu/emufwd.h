@@ -52,9 +52,6 @@ class chd_file;
 // declared in unzip.h
 namespace util { class archive_file; }
 
-// declared in wavwrite.h
-struct wav_file;
-
 // declared in xmlfile.h
 namespace util::xml { class data_node; }
 
@@ -81,7 +78,7 @@ class crosshair_manager;
 // declared in debug/debugcmd.h
 class debugger_commands;
 
-// declared in debug/debugcmd.h
+// declared in debug/debugcon.h
 class debugger_console;
 
 // declared in debug/debugcpu.h

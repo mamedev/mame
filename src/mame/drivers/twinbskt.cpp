@@ -5,9 +5,9 @@
     Skeleton driver for "Twin Basket", by Automatics Pasqual
 
     TODO:
-    	- Implement ST6225 microcontroller handling based on existing
-    	  ST6228 core
-    	- Everything else (peripherals, artwork, etc.)
+        - Implement ST6225 microcontroller handling based on existing
+          ST6228 core
+        - Everything else (peripherals, artwork, etc.)
 
   ___________________________________________________________________________________
   |  _______  _______  _______   ________  _____  ___________   ____________         |
@@ -26,7 +26,7 @@
   || |        _______  ______  ______  ______                     M74HC244B1 4DIPS|_||
   ||_|<-LEFT  74LS47N  74LS47N 74LS138 74LS138             XTAL   ___________     __ |
   |__  DIGITS                                            8.000MHz |ST62T25B6 |    | ||
-  || |                                                            |__________|    | || 
+  || |                                                            |__________|    | ||
   || |<-RIGHT                                                                SW1->|_||
   ||_| DIGITS                                                                8DIPS   |
   |__                                                                             __ |

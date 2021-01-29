@@ -399,7 +399,7 @@ void m32c_disassembler::dasm_00000001(std::ostream &stream, offs_t &pc, const m3
 				dasm_immediate_mode(stream, pc, opcodes, (op2 & 0x0e) << 1 | BIT(op3, 6, 2), BIT(op2, 0), indirect_dest, 2, true);
 			}
 			else
- 			{
+			{
 				util::stream_format(stream, "%-11s", util::string_format("%sad%c.%c ", BIT(op3, 5) ? "d" : "", BIT(op3, 4) ? 'd' : 'c', BIT(op2, 0) ? 'w' : 'b'));
 				dasm_immediate_mode(stream, pc, opcodes, (op2 & 0x0e) << 1 | BIT(op3, 6, 2), BIT(op2, 0), indirect_dest, 1, !BIT(op3, 5));
 			}

@@ -214,9 +214,9 @@ private:
 
 QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
 {
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size || image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 || image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;
@@ -606,7 +606,6 @@ WRITE_LINE_MEMBER(iris3000_state::duartb_irq_handler)
 static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

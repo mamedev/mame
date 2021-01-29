@@ -20,7 +20,7 @@ Might be some priority glitches
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 

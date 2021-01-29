@@ -169,7 +169,7 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(victor_9000_fdc_device::tach1_r));
 	m_maincpu->bus_out_cb().set(FUNC(victor_9000_fdc_device::da_w));
 
-	VIA6522(config, m_via4, XTAL(30'000'000)/30);
+	MOS6522(config, m_via4, XTAL(30'000'000)/30);
 	m_via4->readpa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_r));
 	m_via4->writepa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_w));
 	m_via4->readpb_handler().set(FUNC(victor_9000_fdc_device::via4_pb_r));
@@ -177,12 +177,12 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_via4->ca2_handler().set(FUNC(victor_9000_fdc_device::wrsync_w));
 	m_via4->irq_handler().set(FUNC(victor_9000_fdc_device::via4_irq_w));
 
-	VIA6522(config, m_via5, XTAL(30'000'000)/30);
+	MOS6522(config, m_via5, XTAL(30'000'000)/30);
 	m_via5->irq_handler().set(FUNC(victor_9000_fdc_device::via5_irq_w));
 	m_via5->readpa_handler().set(FUNC(victor_9000_fdc_device::via5_pa_r));
 	m_via5->writepb_handler().set(FUNC(victor_9000_fdc_device::via5_pb_w));
 
-	VIA6522(config, m_via6, XTAL(30'000'000)/30);
+	MOS6522(config, m_via6, XTAL(30'000'000)/30);
 	m_via6->readpa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_r));
 	m_via6->readpb_handler().set(FUNC(victor_9000_fdc_device::via6_pb_r));
 	m_via6->writepa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_w));

@@ -94,7 +94,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "cpu/v60/v60.h"
 #include "machine/jalcrpt.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -132,7 +132,7 @@ private:
 
 	// TODO: subclass this device for dual screen config
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
-	
+
 	required_device_array<screen_device, 2> m_screen;
 
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
@@ -177,9 +177,9 @@ private:
 	template <int which> u32 screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bnstars_map(address_map &map);
 	void bnstars_sound_map(address_map &map);
-	
+
 	void bnstars1_mahjong_select_w(u32 data);
-	
+
 	required_device_array<ymf271_device, 2> m_ymf;
 };
 
@@ -241,7 +241,7 @@ template <int chip> void ms32_bnstars_state::object_vram_w(offs_t offset, u16 da
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_ascii_tile_info)
 {
 	int tileno, colour;
-//	const int gfx_region[2] = {2, 5};
+//  const int gfx_region[2] = {2, 5};
 
 	tileno = m_ascii_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_ascii_vram[chip][tile_index *2+1] & 0x0000000f;
@@ -252,7 +252,7 @@ template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_ascii_tile_info
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_scroll_tile_info)
 {
 	int tileno, colour;
-//	const int gfx_region[2] = {1, 4};
+//  const int gfx_region[2] = {1, 4};
 
 	tileno = m_scroll_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_scroll_vram[chip][tile_index *2+1] & 0x0000000f;
@@ -263,7 +263,7 @@ template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_scroll_tile_inf
 template <int chip> TILE_GET_INFO_MEMBER(ms32_bnstars_state::get_rotate_tile_info)
 {
 	int tileno, colour;
-//	const int gfx_region[2] = {0, 3};
+//  const int gfx_region[2] = {0, 3};
 
 	tileno = m_rotate_vram[chip][tile_index *2+0] & 0x0000ffff;
 	colour = m_rotate_vram[chip][tile_index *2+1] & 0x0000000f;
@@ -345,16 +345,16 @@ template <int chip> void ms32_bnstars_state::draw_sprites(screen_device &screen,
 
 		// there are surely also shadows (see gametngk) but how they're enabled we don't know
 
-/*		if (m_flipscreen)
-		{
-			int yscale = 0x1000000/yzoom;
-			int xscale = 0x1000000/xzoom;
+/*      if (m_flipscreen)
+        {
+            int yscale = 0x1000000/yzoom;
+            int xscale = 0x1000000/xzoom;
 
-			sx = 320 - ((xsize*xscale)>>16) - sx;
-			sy = 224 - ((ysize*yscale)>>16) - sy;
-			flipx = !flipx;
-			flipy = !flipy;
-		}*/
+            sx = 320 - ((xsize*xscale)>>16) - sx;
+            sy = 224 - ((ysize*yscale)>>16) - sy;
+            flipx = !flipx;
+            flipy = !flipy;
+        }*/
 
 		pri >>= 4;
 		if (pri == 0x0)
@@ -445,7 +445,7 @@ CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
 void ms32_bnstars_state::bnstars1_mahjong_select_w(u32 data)
 {
 	m_bnstars1_mahjong_select = data;
-//	logerror("%08x\n",m_bnstars1_mahjong_select);
+//  logerror("%08x\n",m_bnstars1_mahjong_select);
 }
 
 void ms32_bnstars_state::bnstars_map(address_map &map)
@@ -461,8 +461,8 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 
 	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
-//	map(0xfce00280, 0xfce0028f) // left screen brightness control
-//	map(0xfce00300, 0xfce0030f) // right screen brightness control
+//  map(0xfce00280, 0xfce0028f) // left screen brightness control
+//  map(0xfce00300, 0xfce0030f) // right screen brightness control
 	map(0xfce00400, 0xfce0045f).writeonly().share("rotate_ctrl.0");
 	map(0xfce00700, 0xfce0075f).writeonly().share("rotate_ctrl.1"); // guess
 	map(0xfce00a00, 0xfce00a17).writeonly().share("ascii_ctrl.0");
@@ -480,7 +480,7 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 	// for some reason ***38*** isn't accessed by these two
 	map(0xfd200000, 0xfd23ffff).rw(FUNC(ms32_bnstars_state::palette_ram_r<1>), FUNC(ms32_bnstars_state::palette_ram_w<1>)).umask32(0x0000ffff);
 	map(0xfd400000, 0xfd43ffff).rw(FUNC(ms32_bnstars_state::palette_ram_r<0>), FUNC(ms32_bnstars_state::palette_ram_w<0>)).umask32(0x0000ffff);
-	
+
 	map(0xfe000000, 0xfe01ffff).rw(FUNC(ms32_bnstars_state::rotate_vram_r<1>), FUNC(ms32_bnstars_state::rotate_vram_w<1>)).umask32(0x0000ffff);
 	map(0xfe400000, 0xfe41ffff).rw(FUNC(ms32_bnstars_state::rotate_vram_r<0>), FUNC(ms32_bnstars_state::rotate_vram_w<0>)).umask32(0x0000ffff);
 
@@ -675,17 +675,17 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
-	
+
 	config.set_default_layout(layout_dualhsxs);
 
 	for (unsigned i=0; i < 2; i++)
 	{
 		PALETTE(config, m_palette[i]).set_entries(0x8000);
-		
+
 		SCREEN(config, m_screen[i], SCREEN_TYPE_RASTER);
 		m_screen[i]->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 		m_screen[i]->set_palette(m_palette[i]);
-		
+
 		JALECO_MEGASYSTEM32_SPRITE(config, m_sprite[i], XTAL(48'000'000)); // 48MHz for video?
 		m_sprite[i]->set_palette(m_palette[i]);
 		m_sprite[i]->set_color_base(0);
@@ -704,9 +704,9 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_sysctrl->prg_timer_cb().set(FUNC(ms32_bnstars_state::timer_irq_w));
 	m_sysctrl->sound_ack_cb().set(FUNC(ms32_bnstars_state::sound_ack_w));
 	m_sysctrl->sound_reset_cb().set(FUNC(ms32_bnstars_state::sound_reset_line_w));
-//	TODO: runs better with this on but eventually game crashes during match presentation
-//	(may be due of the field irq positioning)
-//	m_sysctrl->set_invert_vblank_lines(true);
+//  TODO: runs better with this on but eventually game crashes during match presentation
+//  (may be due of the field irq positioning)
+//  m_sysctrl->set_invert_vblank_lines(true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -719,7 +719,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	m_ymf[0]->add_route(0, "lspeaker", 1.0);
 	m_ymf[0]->add_route(1, "rspeaker", 1.0);
 // Output 2/3 not used?
-//  m_ymf[0]->add_route(2, "lspeaker", 1.0); 
+//  m_ymf[0]->add_route(2, "lspeaker", 1.0);
 //  m_ymf[0]->add_route(3, "rspeaker", 1.0);
 
 	YMF271(config, m_ymf[1], XTAL(16'934'400)); // 16.9344MHz

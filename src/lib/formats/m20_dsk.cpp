@@ -40,14 +40,14 @@ bool m20_format::supports_save() const
 	return true;
 }
 
-int m20_format::identify(io_generic *io, uint32_t form_factor)
+int m20_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	if(io_generic_size(io) == 286720)
 		return 50;
 	return 0;
 }
 
-bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool m20_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	for (int track = 0; track < 35; track++)
 		for (int head = 0; head < 2; head ++) {
@@ -76,24 +76,20 @@ bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool m20_format::save(io_generic *io, floppy_image *image)
+bool m20_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sector_data[50000];
-	desc_xs sectors[256];
-	int track_size;
 	uint64_t file_offset = 0;
 
 	int track_count, head_count;
 	track_count = 35; head_count = 2;  //FIXME: use image->get_actual_geometry(track_count, head_count) instead
 
 	// initial fm track
-	generate_bitstream_from_track(0, 0, 4000, bitstream, track_size, image);
-	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+	auto bitstream = generate_bitstream_from_track(0, 0, 4000, image);
+	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 
 	for (int i = 0; i < 16; i++)
 	{
-		io_generic_write(io, sectors[i + 1].data, file_offset, 128);
+		io_generic_write(io, sectors[i + 1].data(), file_offset, 128);
 		file_offset += 256; //128;
 	}
 
@@ -105,12 +101,12 @@ bool m20_format::save(io_generic *io, floppy_image *image)
 			// skip track 0, head 0
 			if (track == 0) { if (head_count == 1) break; else head++; }
 
-			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < 16; i++)
 			{
-				io_generic_write(io, sectors[i + 1].data, file_offset, 256);
+				io_generic_write(io, sectors[i + 1].data(), file_offset, 256);
 				file_offset += 256;
 			}
 		}

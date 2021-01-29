@@ -10,6 +10,7 @@
 
 #include "png.h"
 
+#include "osdcomm.h"
 #include "unicode.h"
 
 #include <zlib.h>

@@ -25,13 +25,6 @@ static const cassette_image::Modulation sordm5_cas_modulation =
 	3150.0 - 600, 3150.0, 3150.0 + 600
 };
 
-static uint8_t cassette_image_read_uint8( cassette_image *cassette, uint64_t offset)
-{
-	uint8_t data;
-	cassette->image_read(&data, offset, 1);
-	return data;
-}
-
 static cassette_image::error sordm5_tap_identify( cassette_image *cassette, cassette_image::Options *opts)
 {
 	return cassette->modulation_identify(sordm5_cas_modulation, opts);
@@ -64,10 +57,10 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 	while (image_pos < image_size)
 	{
 		// read block type
-		block_type = cassette_image_read_uint8(cassette, image_pos + 0);
+		block_type = cassette->image_read_byte(image_pos + 0);
 		if ((block_type != 'H') && (block_type != 'D')) return cassette_image::error::INVALID_IMAGE;
 		// read block size
-		block_size = cassette_image_read_uint8(cassette, image_pos + 1);
+		block_size = cassette->image_read_byte(image_pos + 1);
 		if (block_size == 0) block_size = 0x100;
 		block_size += 3;
 		// add silence (header block)
@@ -86,7 +79,7 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 		for (i=0;i<block_size;i++)
 		{
 			// read byte
-			byte = cassette_image_read_uint8(cassette, image_pos + i);
+			byte = cassette->image_read_byte(image_pos + i);
 			// calc/check checksum
 			#if 0
 			if (i == block_size)

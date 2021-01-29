@@ -54,13 +54,12 @@ public:
 
 	// setters
 	void set_frameskip(int frameskip);
-	void set_throttled(bool throttled = true) { m_throttled = throttled; }
+	void set_throttled(bool throttled) { m_throttled = throttled; }
 	void set_throttle_rate(float throttle_rate) { m_throttle_rate = throttle_rate; }
-	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
+	void set_fastforward(bool ffwd) { m_fastforward = ffwd; }
 	void set_output_changed() { m_output_changed = true; }
 
 	// misc
-	void toggle_throttle();
 	void toggle_record_movie(movie_recording::format format);
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
 	void compute_snapshot_size(s32 &width, s32 &height);

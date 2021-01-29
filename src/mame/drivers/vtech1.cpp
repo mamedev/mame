@@ -171,7 +171,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 
 	// get start and end addresses
 	uint16_t start = pick_integer_le(header, 22, 2);
-	uint16_t end = start + snapshot_size - sizeof(header);
+	uint16_t end = start + image.length() - sizeof(header);
 	uint16_t size = end - start;
 
 	// write it to ram
@@ -534,7 +534,7 @@ void vtech1_state::laser310(machine_config &config)
 void laser310h_state::laser310h(machine_config &config)
 {
 	vtech1(config);
-	
+
 	m_maincpu->set_clock(VZ300_XTAL1_CLK / 5);  /* 3.546894 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser310h_state::vtech1_shrg_mem);
 	m_maincpu->set_addrmap(AS_IO, &laser310h_state::vtech1_shrg_io);

@@ -68,17 +68,6 @@ static const cassette_image::Modulation atom_tap_modulation =
 };
 
 /*-------------------------------------------------
-    cassette_image_read_uint8 - read tape data
--------------------------------------------------*/
-
-static uint8_t cassette_image_read_uint8(cassette_image *cassette, uint64_t offset)
-{
-	uint8_t data;
-	cassette->image_read(&data, offset, 1);
-	return data;
-}
-
-/*-------------------------------------------------
     atom_tap_identify - identify cassette
 -------------------------------------------------*/
 
@@ -104,13 +93,12 @@ static cassette_image::error atom_tap_load(cassette_image *cassette)
 {
 	cassette_image::error err;
 	uint64_t image_size = cassette->image_size();
-	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
 
-	while (image_pos < image_size)
+	for (uint64_t image_pos = 0; image_pos < image_size; image_pos++)
 	{
-		uint8_t data = cassette_image_read_uint8(cassette, image_pos);
+		uint8_t data = cassette->image_read_byte(image_pos);
 
 		/* start bit */
 		MODULATE(0);
@@ -124,8 +112,6 @@ static cassette_image::error atom_tap_load(cassette_image *cassette)
 		/* stop bits */
 		MODULATE(1);
 		MODULATE(1);
-
-		image_pos++;
 	}
 
 	return cassette_image::error::SUCCESS;

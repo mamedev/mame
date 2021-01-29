@@ -179,7 +179,7 @@ void enmirage_state::mirage(machine_config &config)
 	es5503.add_route(0, "lspeaker", 1.0);
 	es5503.add_route(1, "rspeaker", 1.0);
 
-	VIA6522(config, m_via, 1000000);
+	MOS6522(config, m_via, 1000000);
 	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
 	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
 	m_via->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);

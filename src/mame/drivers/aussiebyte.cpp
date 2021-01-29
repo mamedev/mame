@@ -406,7 +406,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* RAM must be banked in */
@@ -423,6 +423,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	u16 quickload_size = image.length();
 	for (u16 i = 0; i < quickload_size; i++)
 	{
 		u8 data;

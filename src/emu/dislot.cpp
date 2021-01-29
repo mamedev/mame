@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "zippath.h"
+#include <algorithm>
+#include <cctype>
 
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
@@ -128,4 +130,10 @@ bool get_default_card_software_hook::hashfile_extrainfo(std::string &extrainfo)
 	}
 	extrainfo = m_hash_extrainfo;
 	return m_has_hash_extrainfo;
+}
+
+bool get_default_card_software_hook::is_filetype(std::string_view candidate_filetype) const
+{
+	return std::equal(m_file_type.begin(), m_file_type.end(), candidate_filetype.begin(), candidate_filetype.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
 }
