@@ -14,6 +14,7 @@
 #include "chd.h"
 #include "chdcd.h"
 #include "corefile.h"
+#include "corestr.h"
 #include "gdrom.h"
 
 
