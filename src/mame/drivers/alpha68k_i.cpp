@@ -432,7 +432,7 @@ void thenextspace_state::tnextspc(machine_config &config)
  *
  */
 
-// Several bootleg boards with identical ROMs but no Alpha MCU have been found.
+// Several bootleg boards with identical ROMs have been found.
 ROM_START( paddlema )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "padlem.6g",  0x00000, 0x10000, CRC(c227a6e8) SHA1(9c98be6e82a0dd76fd5b786601456b060407c57f) )
@@ -442,9 +442,6 @@ ROM_START( paddlema )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
 	ROM_LOAD( "padlem.18c", 0x000000, 0x10000, CRC(9269778d) SHA1(bdc9100827f2e018db943d9f7d81b7936c155bf0) )
-
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "padlem.9m",       0x00001, 0x10000, CRC(4ee4970d) SHA1(d57d9178129236dfb3a18688e8544e5e555ce559) )
