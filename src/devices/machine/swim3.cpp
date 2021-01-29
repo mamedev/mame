@@ -171,3 +171,6 @@ void swim3_device::write(offs_t offset, u8 data)
 	}
 }
 
+void swim3_device::sync()
+{
+}

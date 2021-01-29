@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HEDR_H
+#define MAME_EMU_EMUMEM_HEDR_H
+
+#pragma once
 
 // handler_entry_read_dispatch
 
@@ -10,8 +14,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> class hand
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read<Width, AddrShift, Endian>;
-	using mapping = typename inh::mapping;
+	using mapping = typename handler_entry_read<Width, AddrShift, Endian>::mapping;
 
 	handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift, Endian> *handler);
 	handler_entry_read_dispatch(address_space *space, memory_view &view);
@@ -96,3 +99,5 @@ private:
 	void populate_passthrough_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
 	void passthrough_patch(handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings, handler_entry_read<Width, AddrShift, Endian> *&target);
 };
+
+#endif // MAME_EMU_EMUMEM_HEDR_H

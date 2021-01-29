@@ -9,19 +9,23 @@
   stream questions, totaling 1000, divided into 4 categories.
 
 TODO:
-- preserve tape and hook it up, the game is not playable without it
+- tape recordings are available, but there are DC offset problems
+- MAME needs multi-track cassette support
 - is timing accurate?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
 #include "quizshow.lh"
 
 
@@ -48,6 +52,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
+		m_cass(*this, "cassette"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -56,10 +61,21 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
+	required_device<s2650_device> m_maincpu;
+	required_device<dac_bit_interface> m_dac;
+	required_shared_ptr<uint8_t> m_main_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cass;
+	output_finder<11> m_lamps;
+
 	void mem_map(address_map &map);
 
 	void lamps1_w(uint8_t data);
@@ -76,14 +92,6 @@ private:
 	void quizshow_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
-
-	required_device<s2650_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
-	required_shared_ptr<uint8_t> m_main_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	output_finder<11> m_lamps;
 
 	tilemap_t *m_tilemap;
 	uint32_t m_clocks;
@@ -179,7 +187,7 @@ void quizshow_state::tape_control_w(uint8_t data)
 	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
-	// TODO
+	m_cass->set_motor(BIT(data, 3));
 
 	// d0-d1: unused? (chip is shared with lamps3_w)
 	// d4-d7: N/C
@@ -221,8 +229,7 @@ uint8_t quizshow_state::timing_r()
 
 READ_LINE_MEMBER(quizshow_state::tape_signal_r)
 {
-	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return BIT(machine().rand(), 7); // better than machine().rand() & 1 for some reason
+	return (m_cass->input() > 0.0) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER(quizshow_state::flag_output_w)
@@ -392,7 +399,7 @@ void quizshow_state::machine_reset()
 
 void quizshow_state::quizshow(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	S2650(config, m_maincpu, MASTER_CLOCK / 16); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizshow_state::mem_map);
 	m_maincpu->sense_handler().set(FUNC(quizshow_state::tape_signal_r));
@@ -400,7 +407,7 @@ void quizshow_state::quizshow(machine_config &config)
 
 	TIMER(config, "clock_timer").configure_periodic(FUNC(quizshow_state::clock_timer_cb), attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))); // 8V
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(quizshow_state::screen_update));
@@ -409,10 +416,13 @@ void quizshow_state::quizshow(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizshow);
 	PALETTE(config, m_palette, FUNC(quizshow_state::quizshow_palette), 8*2, 2);
 
-	/* sound hardware (discrete) */
+	// sound hardware (discrete)
 	SPEAKER(config, "speaker").front_center();
-
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// cassette
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 }
 
 

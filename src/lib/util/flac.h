@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "osdcore.h"
 #include "corefile.h"
 
 #include <FLAC/all.h>

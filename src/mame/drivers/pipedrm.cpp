@@ -285,7 +285,7 @@ uint8_t hatris_state::pending_command_r()
  *  Video
  *
  *************************************/
- 
+
 void pipedrm_state::video_start()
 {
 	VIDEO_START_CALL_MEMBER(fromance);

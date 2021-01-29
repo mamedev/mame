@@ -39,7 +39,7 @@ ____________________________________
 |                                   | ↑ ↓
 |___________________________________| ← →
 
-IQ-8100M, IQ-8200, IQ-8300M and IQ-8500M models use a 240x64 screen (40 cols x 8 lines with 
+IQ-8100M, IQ-8200, IQ-8300M and IQ-8500M models use a 240x64 screen (40 cols x 8 lines with
 6x8 chars or 30 cols x 4 lines with 8x16 chars).
 IQ-8900G, IQ-8920G and OZ-9520 WIZARD models use a 240x160 screen.
 IQ-9000G and IQ-9200G models use a 320x240 screen.

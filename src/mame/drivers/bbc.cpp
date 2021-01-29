@@ -1136,7 +1136,7 @@ void bbc_state::bbca(machine_config &config)
 	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* system via */
-	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via6522_0, 16_MHz_XTAL / 16);
 	m_via6522_0->readpa_handler().set(FUNC(bbc_state::via_system_porta_r));
 	m_via6522_0->readpb_handler().set(FUNC(bbc_state::via_system_portb_r));
 	m_via6522_0->writepa_handler().set(FUNC(bbc_state::via_system_porta_w));
@@ -1175,7 +1175,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* user via */
-	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via6522_1, 16_MHz_XTAL / 16);
 	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
@@ -1667,7 +1667,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc));
 
 	/* system via */
-	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via6522_0, 16_MHz_XTAL / 16);
 	m_via6522_0->readpa_handler().set(FUNC(bbc_state::via_system_porta_r));
 	m_via6522_0->readpb_handler().set(FUNC(bbc_state::via_system_portb_r));
 	m_via6522_0->writepa_handler().set(FUNC(bbc_state::via_system_porta_w));
@@ -1675,7 +1675,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_0->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	/* user via */
-	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via6522_1, 16_MHz_XTAL / 16);
 	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));

@@ -499,7 +499,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	/* via */
-	via6522_device &via(VIA6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
+	via6522_device &via(MOS6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
 	via.readpb_handler().set_ioport("IN3");
 	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
 	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));

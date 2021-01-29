@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "ram.h"
+
+#include "corestr.h"
 #include "emuopts.h"
 
 #include <cstdio>

@@ -347,7 +347,7 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0300, 0x03ff).bankrw("ram2");
 	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw(); // IN0
 	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw(); // IN1
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));	    // DSW1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));       // DSW1
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2c40, 0x2c7f).r(FUNC(asteroid_state::earom_read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));

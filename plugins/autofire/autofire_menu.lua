@@ -52,8 +52,11 @@ end
 -- Main menu
 
 local function populate_main_menu(buttons)
+	local ioport = manager.machine.ioport
+	local input = manager.machine.input
 	local menu = {}
 	menu[#menu + 1] = {_('Autofire buttons'), '', 'off'}
+	menu[#menu + 1] = {string.format(_('Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
@@ -63,7 +66,7 @@ local function populate_main_menu(buttons)
 		-- Round to two decimal places
 		rate = math.floor(rate * 100) / 100
 		local text = button.button.name .. ' [' .. rate .. ' Hz]'
-		local subtext = manager:machine():input():seq_name(button.key)
+		local subtext = input:seq_name(button.key)
 		menu[#menu + 1] = {text, subtext, ''}
 	end
 	content_height = #menu
@@ -76,7 +79,6 @@ end
 local function handle_main_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if section == MENU_SECTIONS.CONTENT then
-		manager:machine():popmessage(_('Press UI Clear to delete'))
 		if event == 'select' then
 			current_button = buttons[adjusted_index]
 			table.insert(menu_stack, MENU_TYPES.EDIT)
@@ -99,7 +101,7 @@ end
 
 local function populate_configure_menu(menu)
 	local button_name = current_button.button and current_button.button.name or _('NOT SET')
-	local key_name = current_button.key and manager:machine():input():seq_name(current_button.key) or _('NOT SET')
+	local key_name = current_button.key and manager.machine.input:seq_name(current_button.key) or _('NOT SET')
 	menu[#menu + 1] = {_('Input'), button_name, ''}
 	menu[#menu + 1] = {_('Hotkey'), key_name, ''}
 	menu[#menu + 1] = {_('On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'}
@@ -108,26 +110,26 @@ end
 
 -- Borrowed from the cheat plugin
 local function poll_for_hotkey()
-	local input = manager:machine():input()
+	local input = manager.machine.input
 	local poller = input:switch_sequence_poller()
-	manager:machine():popmessage(_('Press button for hotkey or wait to leave unchanged'))
-	manager:machine():video():frame_update(true)
+	manager.machine:popmessage(_('Press button for hotkey or wait to leave unchanged'))
+	manager.machine.video:frame_update()
 	poller:start()
 	local time = os.clock()
 	local clearmsg = true
 	while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
 		if poller.modified then
 			if not poller.valid then
-				manager:machine():popmessage(_("Invalid sequence entered"))
+				manager.machine:popmessage(_("Invalid sequence entered"))
 				clearmsg = false
 				break
 			end
-			manager:machine():popmessage(input:seq_name(poller.sequence))
-			manager:machine():video():frame_update(true)
+			manager.machine:popmessage(input:seq_name(poller.sequence))
+			manager.machine.video:frame_update()
 		end
 	end
 	if clearmsg then
-		manager:machine():popmessage()
+		manager.machine:popmessage()
 	end
 	return poller.valid and poller.sequence or nil
 end
@@ -156,7 +158,7 @@ local function handle_configure_menu(index, event)
 		end
 	elseif index == 3 then
 		-- On frames
-		manager:machine():popmessage(_('Number of frames button will be pressed'))
+		manager.machine:popmessage(_('Number of frames button will be pressed'))
 		if event == 'left' then
 			current_button.on_frames = current_button.on_frames - 1
 		elseif event == 'right' then
@@ -164,7 +166,7 @@ local function handle_configure_menu(index, event)
 		end
 	elseif index == 4 then
 		-- Off frames
-		manager:machine():popmessage(_('Number of frames button will be released'))
+		manager.machine:popmessage(_('Number of frames button will be released'))
 		if event == 'left' then
 			current_button.off_frames = current_button.off_frames - 1
 		elseif event == 'right' then
@@ -244,7 +246,7 @@ local function populate_button_menu()
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
-	for port_key, port in pairs(manager:machine():ioport().ports) do
+	for port_key, port in pairs(manager.machine.ioport.ports) do
 		for field_key, field in pairs(port.fields) do
 			if is_supported_input(field) then
 				menu[#menu + 1] = {field.name, '', ''}
@@ -295,7 +297,7 @@ function lib:populate_menu(buttons)
 end
 
 function lib:handle_menu_event(index, event, buttons)
-	manager:machine():popmessage()
+	manager.machine:popmessage()
 	local current_menu = menu_stack[#menu_stack]
 	if current_menu == MENU_TYPES.MAIN then
 		return handle_main_menu(index, event, buttons)

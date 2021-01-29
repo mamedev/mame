@@ -552,7 +552,7 @@ void swtpc09_state::swtpc09d3(machine_config &config)
 	HARDDISK(config, "hdc:2", 0);
 	HARDDISK(config, "hdc:3", 0);
 
-	via6522_device &via(VIA6522(config, "via", 4_MHz_XTAL / 4));
+	via6522_device &via(MOS6522(config, "via", 4_MHz_XTAL / 4));
 	via.readpa_handler().set(FUNC(swtpc09_state::dmaf3_via_read_porta));
 	via.readpb_handler().set(FUNC(swtpc09_state::dmaf3_via_read_portb));
 	via.writepa_handler().set(FUNC(swtpc09_state::dmaf3_via_write_porta));

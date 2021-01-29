@@ -4,17 +4,6 @@
 #include "fdc_pll.h"
 #include "imagedev/floppy.h"
 
-std::string fdc_pll_t::tts(attotime t)
-{
-	char buf[256];
-	bool neg = t.seconds() < 0;
-	if(neg)
-		t = attotime::zero - t;
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%c%3d.%03d,%03d,%03d", neg ? '-' : ' ', int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
-	return buf;
-}
-
 void fdc_pll_t::set_clock(const attotime &_period)
 {
 	period = _period;
@@ -74,7 +63,7 @@ int fdc_pll_t::feed_read_data(attotime &tm, const attotime& edge, const attotime
 
 #if 0
 	if(!edge.is_never())
-		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).c_str(), tts(edge).c_str(), tts(next).c_str(), tts(phase_adjust).c_str());
+		fprintf(stderr, "%s\n", util::string_format("fdc pll ctime=%s, transition_time=%s, next=%s, pha=%s\n", ctime.to_string(), edge.to_string(), next.to_string(), phase_adjust.to_string()).c_str());
 #endif
 
 	if(next > limit)

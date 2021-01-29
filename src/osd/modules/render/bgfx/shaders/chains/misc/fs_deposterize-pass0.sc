@@ -5,7 +5,7 @@ $input v_color0, v_texcoord0, v_texcoord1
 
 /*
    Hyllian's Deposterize Shader - Pass0
-   
+
    Copyright (C) 2011/2016 Hyllian/Jararaca - sergiogdb@gmail.com
 
 */

@@ -323,7 +323,7 @@ void esq5505_state::machine_reset()
 
 	// on VFX, bit 0 is 1 for 'cartridge present'.
 	// on VFX-SD and later, bit 0 is2 1 for floppy present, bit 1 is 1 for cartridge present
-	if (core_stricmp(machine().system().name, "vfx") == 0)
+	if (strcmp(machine().system().name, "vfx") == 0)
 	{
 		// todo: handle VFX cart-in when we support cartridges
 		m_duart->ip0_w(ASSERT_LINE);

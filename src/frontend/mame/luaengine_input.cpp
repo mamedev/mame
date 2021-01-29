@@ -142,15 +142,34 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_manager_type = sol().registry().new_usertype<ioport_manager>("ioport", sol::no_constructor);
 	ioport_manager_type["count_players"] = &ioport_manager::count_players;
-	ioport_manager_type["type_group"] = &ioport_manager::type_group;
-	ioport_manager_type["type_seq"] =
-		[] (ioport_manager &im, ioport_type type, int player, std::string const &seq_type_string)
+	ioport_manager_type["type_pressed"] = sol::overload(
+			&ioport_manager::type_pressed,
+			[] (ioport_manager &im, ioport_type type) { return im.type_pressed(type, 0); });
+	ioport_manager_type["type_name"] = sol::overload(
+			&ioport_manager::type_name,
+			[] (ioport_manager &im, ioport_type type) { return im.type_name(type, 0); });
+	ioport_manager_type["type_group"] = sol::overload(
+			&ioport_manager::type_group,
+			[] (ioport_manager &im, ioport_type type) { return im.type_group(type, 0); });
+	ioport_manager_type["type_seq"] = sol::overload(
+			[] (ioport_manager &im, ioport_type type, int player, char const *seq_type_string)
+			{
+				input_seq_type seq_type = s_seq_type_parser(seq_type_string);
+				return im.type_seq(type, player, seq_type);
+			},
+			[] (ioport_manager &im, ioport_type type, int player) { return im.type_seq(type, player, SEQ_TYPE_STANDARD); },
+			[] (ioport_manager &im, ioport_type type) { return im.type_seq(type, 0, SEQ_TYPE_STANDARD); });
+	ioport_manager_type["token_to_input_type"] =
+		[] (ioport_manager &im, std::string const &string)
 		{
-			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-			return im.type_seq(type, player, seq_type);
+			int player;
+			ioport_type const type = im.token_to_input_type(string.c_str(), player);
+			return std::make_tuple(type, player);
 		};
+	ioport_manager_type["input_type_to_token"] = sol::overload(
+			&ioport_manager::input_type_to_token,
+			[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
-	ioport_manager_type["natkeyboard"] = sol::property(&ioport_manager::natkeyboard);
 
 
 	auto natkeyboard_type = sol().registry().new_usertype<natural_keyboard>("natkeyboard", sol::no_constructor);

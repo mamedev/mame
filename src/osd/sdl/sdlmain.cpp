@@ -36,6 +36,7 @@
 #include <SDL2/SDL.h>
 
 // MAME headers
+#include "corestr.h"
 #include "osdepend.h"
 #include "emu.h"
 #include "emuopts.h"
@@ -170,7 +171,7 @@ sdl_options::sdl_options()
 	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
-	set_default_value(SDLOPTION_INIPATH, ini_path.c_str());
+	set_default_value(SDLOPTION_INIPATH, std::move(ini_path));
 }
 
 //============================================================

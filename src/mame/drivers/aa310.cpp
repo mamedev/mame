@@ -29,6 +29,7 @@
  *  AGC20 - Acorn A4000 2MB HD 80
  *
  * Notes:
+ * - Hold DEL down during boot reset the CMOS memory to the default values.
  * - default NVRAM is plainly wrong. Use the status/configure commands to set up properly
  *   (Scroll Lock is currently mapped with Right SHIFT, use this to move to next page of status).
  *   In order to load a floppy, you need at very least:
@@ -38,8 +39,13 @@
  *   Then reboot / reset the machine, and use cat to (attempt) to load a floppy contents.
  *
  *  TODO:
- *  - RISC OS Alarm app crash the whole OS
  *  - RISC OS Draw app uses unimplemented copro instructions
+ *  - Move joystick ports into slot devices.
+ *  - Add ABORT line support to the ARM core.
+ *  - Hard disc controller.
+ *  - Serial interface.
+ *  - 82c711.
+ *  - Podules expansions.
  *
  *
  *
@@ -84,26 +90,40 @@
 
 
 #include "emu.h"
-#include "includes/archimds.h"
 
 #include "cpu/arm/arm.h"
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
 #include "formats/jfd_dsk.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
+#include "machine/acorn_ioc.h"
+#include "machine/acorn_memc.h"
+#include "machine/acorn_vidc.h"
+#include "machine/archimedes_keyb.h"
+#include "machine/pcf8583.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
-class aa310_state : public archimedes_state
+namespace {
+
+class aa310_state : public driver_device
 {
 public:
 	aa310_state(const machine_config &mconfig, device_type type, const char *tag)
-		: archimedes_state(mconfig, type, tag)
-		, m_physram(*this, "physicalram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ioc(*this, "ioc")
+		, m_memc(*this, "memc")
+		, m_vidc(*this, "vidc")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 		, m_ram(*this, RAM_TAG)
+		, m_joy(*this, "joy_p%u", 1U)
 	{ }
 
 	void aa5000a(machine_config &config);
@@ -121,18 +141,16 @@ public:
 	void aa440(machine_config &config);
 	void aa4201(machine_config &config);
 
-	void init_aa310();
-
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
-
 private:
-	required_shared_ptr<uint32_t> m_physram;
-
-	uint32_t aa310_psy_wram_r(offs_t offset);
-	void aa310_psy_wram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
+	uint32_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint32_t data);
+	uint32_t peripheral2_r(offs_t offset);
+	uint32_t peripheral5_r(offs_t offset);
+	void peripheral5_w(offs_t offset, uint32_t data);
+	uint32_t dram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	DECLARE_READ_LINE_MEMBER(floppy_ready_r);
+	DECLARE_WRITE_LINE_MEMBER(sound_mute_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -140,230 +158,260 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void aa310_mem(address_map &map);
+	void aa310_arm_mem(address_map &map);
 
+	required_device<arm_cpu_device> m_maincpu;
+	required_device<acorn_ioc_device> m_ioc;
+	required_device<acorn_memc_device> m_memc;
+	required_device<acorn_vidc10_device> m_vidc;
+	required_device<wd1772_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<ram_device> m_ram;
+	optional_ioport_array<2> m_joy;
+
+	floppy_image_device *m_selected_floppy;
+	std::unique_ptr<uint32_t[]> m_dram;
 };
 
-
-WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_intrq_w)
+uint32_t aa310_state::fdc_r(offs_t offset)
 {
-	if (state)
-		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY);
-	else
-		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
+	return m_fdc->read(offset & 0x03);
 }
 
-WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_drq_w)
+void aa310_state::fdc_w(offs_t offset, uint32_t data)
 {
-	if (state)
-		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
-	else
-		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
+	return m_fdc->write(offset & 0x03, data & 0xff);
 }
 
-uint32_t aa310_state::aa310_psy_wram_r(offs_t offset)
+uint32_t aa310_state::peripheral2_r(offs_t offset)
 {
-	return m_physram[offset];
+	// RTFM joystick interface routes here
+	// TODO: slot interface for econet (reads registers 0 and 1 during boot)
+	switch ((offset << 2) & 0xffff)
+	{
+		case 0x00:
+			return 0xed; // ID for econet
+		case 0x04:
+			return m_joy[0].read_safe(0xff);
+		case 0x08:
+			// Top Banana reads there and do various checks,
+			// disallowing player 1 joy use if they fails (?)
+			return m_joy[1].read_safe(0xff);
+	}
+
+	return 0xffffffff;
 }
 
-void aa310_state::aa310_psy_wram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+uint32_t aa310_state::peripheral5_r(offs_t offset)
 {
-	COMBINE_DATA(&m_physram[offset]);
+	switch ((offset << 2) & 0xfc)
+	{
+	case 0x18: return 0x00; // FDC latch B
+	case 0x40: return 0x00; // FDC latch A
+	case 0x50: return 0x00; // FDC type, an 82c711 returns 5 here
+	case 0x70: return 0x0f; // monitor type, TBD
+	case 0x74: return 0xff; // unknown
+	case 0x78:              // serial joystick?
+	case 0x7c:
+		logerror("FDC: reading Joystick port %04x at PC=%08x\n",offset << 2, m_maincpu->pc());
+		return 0xff;
+
+	}
+
+	return 0xffffffff;
 }
 
-
-void aa310_state::init_aa310()
+void aa310_state::peripheral5_w(offs_t offset, uint32_t data)
 {
-	uint32_t ram_size = m_ram->size();
+	switch ((offset << 2) & 0xfc)
+	{
+	case 0x00:  // HD63463
+		break;
 
-	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x02000000, 0x02ffffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x02000000, 0x02000000+(ram_size-1), read32sm_delegate(*this, FUNC(aa310_state::aa310_psy_wram_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x02000000, 0x02000000+(ram_size-1), write32s_delegate(*this, FUNC(aa310_state::aa310_psy_wram_w)));
+	case 0x08:  // HD63463 DACK
+		break;
 
-	archimedes_driver_init();
+	case 0x10:  // Printer port
+	{
+		// compared to RTFM they reversed bits 0-3 (or viceversa, dunno what came out first)
+		// for pragmatic convenience we bitswap here, but this should really be a slot option at some point.
+		// TODO: understand how player 2 inputs routes, related somehow to CONTROL bit 6 (cfr. blitz in SW list)
+		// TODO: paradr2k polls here with bit 7 and fails detection (Vertical Twist)
+		uint8_t cur_joy_in = bitswap<8>(m_joy[0].read_safe(0xff),7,6,5,4,0,1,2,3);
+		uint8_t joy_serial_data = (data & 0xff) ^ 0xff;
+		bool serial_on = false;
+
+		if (joy_serial_data == 0x20)
+			serial_on = true;
+		else if (joy_serial_data & cur_joy_in)
+			serial_on = true;
+
+		// wants printer irq for some reason (connected on parallel?)
+		m_ioc->il6_w(serial_on ? ASSERT_LINE : CLEAR_LINE);
+		break;
+	}
+	case 0x18: // Latch B
+		// xxx- ---- Not used
+		// ---x ---- Printer Strobe
+		// ---- x--- FDC Reset
+		// ---- --x- FDC DDEN
+		m_fdc->dden_w(BIT(data, 1));
+		m_fdc->mr_w(BIT(data, 3));
+		break;
+
+	case 0x40: // Latch A
+		// x--- ---- Not used
+		// -x-- ---- Floppy disc INUSE
+		// --x- ---- Floppy motor
+		// ---x ---- Side select
+		// ---- xxxx Floppy disc select
+
+		// Debug code to display RISC OS 3 POST failures
+		const int post_debug = 0;
+		if (post_debug && BIT(data, 17))
+		{
+			static attotime last_time(0, 0);
+			static int bitpos = 0;
+
+			if (BIT(data, 16) && bitpos <= 32)
+			{
+				bool state = (machine().time() - last_time) > m_maincpu->clocks_to_attotime(2000000);
+
+				switch (32 - bitpos)
+				{
+				// Status flags
+				case  0: printf("00000001  %-4s   Self-test due to power on\n"          , state ? "On" : "Off");   break;
+				case  1: printf("00000002  %-4s   Self-test due to interface hardware\n", state ? "On" : "Off");   break;
+				case  2: printf("00000004  %-4s   Self-test due to test link\n"         , state ? "On" : "Off");   break;
+				case  3: printf("00000008  %-4s   Long memory test performed\n"         , state ? "On" : "Off");   break;
+				case  4: printf("00000010  %-4s   ARM 3 fitted\n"                       , state ? "On" : "Off");   break;
+				case  5: printf("00000020  %-4s   Long memory test disabled\n"          , state ? "On" : "Off");   break;
+				case  6: printf("00000040  %-4s   PC-style IO world detected\n"         , state ? "On" : "Off");   break;
+				case  7: printf("00000080  %-4s   VRAM detected\n"                      , state ? "On" : "Off");   break;
+
+				// Fault flags
+				case  8: printf("00000100  %-4s   CMOS RAM checksum error\n"            , state ? "Fail" : "Pass");   break;
+				case  9: printf("00000200  %-4s   ROM failed checksum test\n"           , state ? "Fail" : "Pass");   break;
+				case 10: printf("00000400  %-4s   MEMC CAM mapping failed\n"            , state ? "Fail" : "Pass");   break;
+				case 11: printf("00000800  %-4s   MEMC protection failed\n"             , state ? "Fail" : "Pass");   break;
+				case 12: printf("00001000  %-4s   IOC register test failed\n"           , state ? "Fail" : "Pass");   break;
+				case 14: printf("00004000  %-4s   VIDC Virq timing failed\n"            , state ? "Fail" : "Pass");   break;
+				case 15: printf("00008000  %-4s   VIDC Sirq timing failed\n"            , state ? "Fail" : "Pass");   break;
+				case 16: printf("00010000  %-4s   CMOS unreadable\n"                    , state ? "Fail" : "Pass");   break;
+				case 17: printf("00020000  %-4s   RAM control line failure\n"           , state ? "Fail" : "Pass");   break;
+				case 18: printf("00040000  %-4s   Long RAM test failure\n"              , state ? "Fail" : "Pass");   break;
+				}
+
+				bitpos++;
+			}
+
+			last_time = machine().time();
+		}
+
+		if (!BIT(data, 0))     m_selected_floppy = m_floppy0->get_device();
+		if (!BIT(data, 1))     m_selected_floppy = m_floppy1->get_device();
+		if (!BIT(data, 2))     m_selected_floppy = nullptr; // floppy 2
+		if (!BIT(data, 3))     m_selected_floppy = nullptr; // floppy 3
+
+		m_fdc->set_floppy(m_selected_floppy);
+
+		if (m_selected_floppy)
+		{
+			m_selected_floppy->mon_w(BIT(data, 5));
+			m_selected_floppy->ss_w(!(BIT(data, 4)));
+		}
+		break;
+	}
+}
+
+READ_LINE_MEMBER( aa310_state::floppy_ready_r )
+{
+	if (m_selected_floppy)
+		return !m_selected_floppy->ready_r();
+
+	return 0;
+}
+
+WRITE_LINE_MEMBER( aa310_state::sound_mute_w )
+{
+	// popmessage("Muting sound, contact MAME/MESSdev");
+}
+
+uint32_t aa310_state::dram_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_dram[offset];
+}
+
+void aa310_state::dram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_dram[offset]);
 }
 
 void aa310_state::machine_start()
 {
-	archimedes_init();
+	// LK14 and LK15 are used to configure the installed RAM, different configurations
+	// create different memory mirrors that RISC OS uses to detect the available RAM.
+	int dram_size = m_ram->size() / 1024;
+	m_dram = nullptr;
+	switch (dram_size)
+	{
+	case 512:   // 512 kB
+	case 1024:  // 1 MB
+		// for configurations with less than 2 MB it is necessary to use a custom handler in order to emulate the correct memory mirrors.
+		m_memc->output_dram_rowcol(true);
+		m_memc->space(0).install_readwrite_handler(0x02000000,0x021fffff, dram_size == 512 ? 0x000ff7ff : 0x001ff7ff, 0x00e00000, 0,
+				read32s_delegate (*this, FUNC(aa310_state::dram_r)),
+				write32s_delegate(*this, FUNC(aa310_state::dram_w)));
+
+		// for better performance we allocate 2 MB and mask out unused lines in the handlers
+		m_dram = std::make_unique<uint32_t[]>(2048 * 1024 / 4);
+		save_pointer(NAME(m_dram), 2048 * 1024 / 4);
+		break;
+	case 2048:  // 2 MB
+		m_memc->space(0).install_ram(0x02000000, 0x021fffff, 0x00e00000, m_ram->pointer());
+		break;
+	case 4096:  // 4 MB
+		m_memc->space(0).install_ram(0x02000000, 0x023fffff, 0x00c00000, m_ram->pointer());
+		break;
+	case 4096 * 2:  // 8 MB
+		m_memc->space(0).install_ram(0x02000000, 0x027fffff, 0x00800000, m_ram->pointer());
+		break;
+	case 4096 * 3:  // 12 MB
+		m_memc->space(0).install_ram(0x02000000, 0x02bfffff, 0x00000000, m_ram->pointer());
+		break;
+	case 4096 * 4:  // 16 MB
+		m_memc->space(0).install_ram(0x02000000, 0x02ffffff, 0x00000000, m_ram->pointer());
+		break;
+	default:
+		fatalerror("Archimedes %d kB RAM not supported", dram_size);
+		break;
+	}
 }
 
 void aa310_state::machine_reset()
 {
-	archimedes_reset();
+	m_selected_floppy = m_floppy0->get_device();
+}
+
+void aa310_state::aa310_arm_mem(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).rw(m_memc, FUNC(acorn_memc_device::logical_r), FUNC(acorn_memc_device::logical_w));
+	map(0x02000000, 0x03ffffff).rw(m_memc, FUNC(acorn_memc_device::high_mem_r), FUNC(acorn_memc_device::high_mem_w));
 }
 
 void aa310_state::aa310_mem(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).rw(FUNC(aa310_state::archimedes_memc_logical_r), FUNC(aa310_state::archimedes_memc_logical_w));
-	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	map(0x03000000, 0x033fffff).rw(FUNC(aa310_state::archimedes_ioc_r), FUNC(aa310_state::archimedes_ioc_w));
+	map(0x00000000, 0x01ffffff).rw(m_memc, FUNC(acorn_memc_device::logical_r), FUNC(acorn_memc_device::logical_w));
+	map(0x02000000, 0x02ffffff).noprw();    // installed in machine_start
+	map(0x03000000, 0x033fffff).m(m_ioc, FUNC(acorn_ioc_device::map));
 	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(m_vidc, FUNC(acorn_vidc10_device::write));
-	map(0x03600000, 0x037fffff).rom().region("extension", 0x200000).w(FUNC(aa310_state::archimedes_memc_w));
-	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(aa310_state::archimedes_memc_page_w));
-}
-
-
-INPUT_CHANGED_MEMBER(aa310_state::key_stroke)
-{
-	uint8_t row_val = uint8_t(param) >> 4;
-	uint8_t col_val = uint8_t(param) & 0xf;
-
-	if(newval && !oldval)
-		m_kart->send_keycode_down(row_val,col_val);
-
-	if(oldval && !newval)
-		m_kart->send_keycode_up(row_val,col_val);
-}
-
-INPUT_CHANGED_MEMBER(aa310_state::send_mouse_input)
-{
-	int x = ioport("MOUSEX")->read();
-	int y = ioport("MOUSEY")->read();
-
-	if (x > 0x7fff) x = x - 0xffff;
-	if (y > 0x7fff) y = y - 0xffff;
-	if (x > 63)    x = 63;
-	if (y > 63)    y = 63;
-	if (x < -63)   x = -63;
-	if (y < -63)   y = -63;
-
-	m_kart->send_mouse(x & 0x7f, y & 0x7f);
+	map(0x03600000, 0x037fffff).rom().region("extension", 0x200000).w(m_memc, FUNC(acorn_memc_device::registers_w));
+	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
 }
 
 
 static INPUT_PORTS_START( aa310 )
-	PORT_START("dip") /* DIP switches */
-	PORT_BIT(0xfd, 0xfd, IPT_UNUSED)
-
-	PORT_START("key0") /* KEY ROW 0 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("Esc")         PORT_CODE(KEYCODE_ESC)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x00)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_F1)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x01)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("F2")          PORT_CODE(KEYCODE_F2)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x02)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("F3")          PORT_CODE(KEYCODE_F3)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x03)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("F4")          PORT_CODE(KEYCODE_F4)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x04)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME("F5")          PORT_CODE(KEYCODE_F5)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x05)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("F6")          PORT_CODE(KEYCODE_F6)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x06)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("F7")          PORT_CODE(KEYCODE_F7)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x07)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("F8")          PORT_CODE(KEYCODE_F8)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x08)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("F9")          PORT_CODE(KEYCODE_F9)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x09)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("F10")         PORT_CODE(KEYCODE_F10)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("F11")         PORT_CODE(KEYCODE_F11)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("F12")         PORT_CODE(KEYCODE_F12)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0c)
-	PORT_BIT(0x2000, 0x00, IPT_KEYBOARD) PORT_NAME("Print")       PORT_CODE(KEYCODE_PRTSCR)      PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0d)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("Scroll")    /*PORT_CODE(KEYCODE_SCRLOCK)*/   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("Break")       PORT_CODE(KEYCODE_PAUSE)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x0f)
-
-	PORT_START("key1") /* KEY ROW 1 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("`  ~")        PORT_CODE(KEYCODE_TILDE)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x10)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("1  !")        PORT_CODE(KEYCODE_1)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x11)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("2  \"")       PORT_CODE(KEYCODE_2)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x12)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("3  #")        PORT_CODE(KEYCODE_3)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x13)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("4  $")        PORT_CODE(KEYCODE_4)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x14)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME("5  %")        PORT_CODE(KEYCODE_5)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x15)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("6  &")        PORT_CODE(KEYCODE_6)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x16)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("7  '")        PORT_CODE(KEYCODE_7)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x17)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("8  *")        PORT_CODE(KEYCODE_8)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x18)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("9  (")        PORT_CODE(KEYCODE_9)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x19)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("0  )")        PORT_CODE(KEYCODE_0)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("-  _")        PORT_CODE(KEYCODE_MINUS)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("=  +")        PORT_CODE(KEYCODE_EQUALS)      PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1c)
-	PORT_BIT(0x2000, 0x00, IPT_KEYBOARD) PORT_NAME("\xc2\xa3")    PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1d)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("Back Space")  PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("Insert")      PORT_CODE(KEYCODE_INSERT)      PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x1f)
-
-	PORT_START("key2") /* KEY ROW 2 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("Home")        PORT_CODE(KEYCODE_HOME)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x20)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("PG UP")       PORT_CODE(KEYCODE_PGUP)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x21)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("Numlock")     PORT_CODE(KEYCODE_NUMLOCK)     PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x22)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("/")           PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x23)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("*")           PORT_CODE(KEYCODE_ASTERISK)    PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x24)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME("#")                                          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x25)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x26)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("q  Q")        PORT_CODE(KEYCODE_Q)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x27)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("w  W")        PORT_CODE(KEYCODE_W)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x28)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("e  E")        PORT_CODE(KEYCODE_E)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x29)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("r  R")        PORT_CODE(KEYCODE_R)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("t  T")        PORT_CODE(KEYCODE_T)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("y  Y")        PORT_CODE(KEYCODE_Y)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2c)
-	PORT_BIT(0x2000, 0x00, IPT_KEYBOARD) PORT_NAME("u  U")        PORT_CODE(KEYCODE_U)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2d)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("i  I")        PORT_CODE(KEYCODE_I)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("o  O")        PORT_CODE(KEYCODE_O)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x2f)
-
-	PORT_START("key3") /* KEY ROW 3 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("p  P")        PORT_CODE(KEYCODE_P)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x30)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("[  {")        PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x31)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("]  }")        PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x32)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("\\  |")       PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x33)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("DELETE")      PORT_CODE(KEYCODE_DEL)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x34)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME("COPY")        PORT_CODE(KEYCODE_END)         PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x35)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("PG DN")       PORT_CODE(KEYCODE_PGDN)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x36)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("KP 7")        PORT_CODE(KEYCODE_7_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x37)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("KP 8")        PORT_CODE(KEYCODE_8_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x38)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("KP 9")        PORT_CODE(KEYCODE_9_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x39)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("KP -")        PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("CTRL")        PORT_CODE(KEYCODE_LCONTROL)    PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("a  A")        PORT_CODE(KEYCODE_A)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3c)
-	PORT_BIT(0x2000, 0x00, IPT_KEYBOARD) PORT_NAME("s  S")        PORT_CODE(KEYCODE_S)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3d)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("d  D")        PORT_CODE(KEYCODE_D)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("f  F")        PORT_CODE(KEYCODE_F)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x3f)
-
-	PORT_START("key4") /* KEY ROW 4 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("g  G")        PORT_CODE(KEYCODE_G)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x40)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("h  H")        PORT_CODE(KEYCODE_H)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x41)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("j  J")        PORT_CODE(KEYCODE_J)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x42)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("k  K")        PORT_CODE(KEYCODE_K)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x43)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("l  L")        PORT_CODE(KEYCODE_L)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x44)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME(";  :")        PORT_CODE(KEYCODE_COLON)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x45)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("'  \"")       PORT_CODE(KEYCODE_QUOTE)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x46)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("RETURN")      PORT_CODE(KEYCODE_ENTER)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x47)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("KP 4")        PORT_CODE(KEYCODE_4_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x48)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("KP 5")        PORT_CODE(KEYCODE_5_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x49)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("KP 6")        PORT_CODE(KEYCODE_6_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x4a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("KP +")        PORT_CODE(KEYCODE_PLUS_PAD)    PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x4b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("SHIFT (L)")   PORT_CODE(KEYCODE_LSHIFT)      PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x4c)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("z  Z")        PORT_CODE(KEYCODE_Z)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x4e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("x  X")        PORT_CODE(KEYCODE_X)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x4f)
-
-	PORT_START("key5") /* KEY ROW 5 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("c  C")        PORT_CODE(KEYCODE_C)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x50)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("v  V")        PORT_CODE(KEYCODE_V)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x51)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("b  B")        PORT_CODE(KEYCODE_B)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x52)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("n  N")        PORT_CODE(KEYCODE_N)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x53)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("m  M")        PORT_CODE(KEYCODE_M)           PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x54)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME(",  <")        PORT_CODE(KEYCODE_COMMA)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x55)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME(".  >")        PORT_CODE(KEYCODE_STOP)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x56)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("/  ?")        PORT_CODE(KEYCODE_SLASH)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x57)
-	PORT_BIT(0x0100, 0x00, IPT_KEYBOARD) PORT_NAME("SHIFT (R)")   PORT_CODE(KEYCODE_RSHIFT)      PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x58)
-	PORT_BIT(0x0200, 0x00, IPT_KEYBOARD) PORT_NAME("Up")          PORT_CODE(KEYCODE_UP)          PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x59)
-	PORT_BIT(0x0400, 0x00, IPT_KEYBOARD) PORT_NAME("KP 1")        PORT_CODE(KEYCODE_1_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5a)
-	PORT_BIT(0x0800, 0x00, IPT_KEYBOARD) PORT_NAME("KP 2")        PORT_CODE(KEYCODE_2_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5b)
-	PORT_BIT(0x1000, 0x00, IPT_KEYBOARD) PORT_NAME("KP 3")        PORT_CODE(KEYCODE_3_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5c)
-	PORT_BIT(0x2000, 0x00, IPT_KEYBOARD) PORT_NAME("CAPS")        PORT_CODE(KEYCODE_CAPSLOCK)    PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5d)
-	PORT_BIT(0x4000, 0x00, IPT_KEYBOARD) PORT_NAME("ALT (L)")     PORT_CODE(KEYCODE_LALT)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5e)
-	PORT_BIT(0x8000, 0x00, IPT_KEYBOARD) PORT_NAME("SPACE")       PORT_CODE(KEYCODE_SPACE)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x5f)
-
-	PORT_START("key6") /* KEY ROW 6 */
-	PORT_BIT(0x0001, 0x00, IPT_KEYBOARD) PORT_NAME("ALT (R)")     PORT_CODE(KEYCODE_RALT)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x60)
-	PORT_BIT(0x0002, 0x00, IPT_KEYBOARD) PORT_NAME("CTRL")        PORT_CODE(KEYCODE_RCONTROL)    PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x61)
-	PORT_BIT(0x0004, 0x00, IPT_KEYBOARD) PORT_NAME("Left")        PORT_CODE(KEYCODE_LEFT)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x62)
-	PORT_BIT(0x0008, 0x00, IPT_KEYBOARD) PORT_NAME("Down")        PORT_CODE(KEYCODE_DOWN)        PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x63)
-	PORT_BIT(0x0010, 0x00, IPT_KEYBOARD) PORT_NAME("Right")       PORT_CODE(KEYCODE_RIGHT)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x64)
-	PORT_BIT(0x0020, 0x00, IPT_KEYBOARD) PORT_NAME("KP 0")        PORT_CODE(KEYCODE_0_PAD)       PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x65)
-	PORT_BIT(0x0040, 0x00, IPT_KEYBOARD) PORT_NAME("KP .")        PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x66)
-	PORT_BIT(0x0080, 0x00, IPT_KEYBOARD) PORT_NAME("KP ENTER")    PORT_CODE(KEYCODE_ENTER_PAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x67)
-
-	PORT_START("MOUSE")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x70)
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x71)
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)   PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, key_stroke, 0x72)
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)                 PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, send_mouse_input, 0) PORT_RESET
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)                 PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, send_mouse_input, 0) PORT_RESET PORT_REVERSE
-
 	// standard Atari/Commodore DB9
 	// TODO: 10 different joystick configurations (!), some of them supports multiple buttons as well
 	PORT_START("joy_p1")
@@ -399,52 +447,62 @@ static void aa310_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
-{
-	if(state)
-		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
-	else
-		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
-}
-
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
-{
-	if(state)
-		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
-	else
-		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
-}
 
 void aa310_state::aa310(machine_config &config)
 {
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 24_MHz_XTAL / 3); /* ARM2 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aa310_state::aa310_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa310_state::aa310_arm_mem);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	AAKART(config, m_kart, 8000000/256);
-	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
-	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
+	ACORN_MEMC(config, m_memc, 24_MHz_XTAL / 3, m_vidc);
+	m_memc->set_addrmap(0, &aa310_state::aa310_mem);
+	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
-	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583
+	ACORN_IOC(config, m_ioc, 24_MHz_XTAL / 3);
+	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->kout_w().set("keyboard", FUNC(archimedes_keyboard_device::kin_w));
+	m_ioc->peripheral_r<1>().set(FUNC(aa310_state::fdc_r));
+	m_ioc->peripheral_w<1>().set(FUNC(aa310_state::fdc_w));
+	m_ioc->peripheral_r<2>().set(FUNC(aa310_state::peripheral2_r));
+	m_ioc->peripheral_w<2>().set_log("IOC: Econet W");
+	m_ioc->peripheral_r<3>().set_log("IOC: Serial R");
+	m_ioc->peripheral_w<3>().set_log("IOC: Serial W");
+	m_ioc->peripheral_r<4>().set_log("IOC: Podule R");
+	m_ioc->peripheral_w<4>().set_log("IOC: Podule W");
+	m_ioc->peripheral_r<5>().set(FUNC(aa310_state::peripheral5_r));
+	m_ioc->peripheral_w<5>().set(FUNC(aa310_state::peripheral5_w));
+	m_ioc->peripheral_r<6>().set_log("IOC: External Expansion R");
+	m_ioc->peripheral_w<6>().set_log("IOC: External Expansion W");
+	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
+	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
+	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
+	m_ioc->gpio_r<2>().set(FUNC(aa310_state::floppy_ready_r));
+	m_ioc->gpio_w<5>().set(FUNC(aa310_state::sound_mute_w));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
+
+	PCF8583(config, "i2cmem", 32.768_kHz_XTAL);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
-	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
-	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
+	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
+	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 
 	RAM(config, m_ram).set_default_size("1M");
 
-	wd1772_device& fdc(WD1772(config, "fdc", 8000000 / 1)); // TODO: frequency
+	wd1772_device& fdc(WD1772(config, m_fdc, 24_MHz_XTAL / 3));
 	fdc.set_disable_motor_control(true);
-	fdc.intrq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_intrq_w));
-	fdc.drq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats).enable_sound(true);
+	fdc.intrq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::fh1_w));
+	fdc.drq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::fh0_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, aa310_floppies, "35dd", aa310_state::floppy_formats).enable_sound(true);
 
 	// rarely had 2nd FDD installed, space was used for HDD
-	FLOPPY_CONNECTOR(config, "fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, aa310_floppies, nullptr, aa310_state::floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("archimedes");
 
@@ -531,12 +589,13 @@ void aa310_state::aa4(machine_config &config)
 	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 
 	/* video hardware */
-	SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD);
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD));
+	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_VIDC10_LCD(config.replace(), m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
-	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
-	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
+	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
+	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 
 	/* 765 FDC */
 
@@ -613,8 +672,8 @@ ROM_START( aa305 )
 	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
-	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(017cdf3b) SHA1(03aa58fc8578de2019a34c6eeb4072e953f3444f), ROM_BIOS(0) )
-	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(017cdf3b) SHA1(03aa58fc8578de2019a34c6eeb4072e953f3444f), ROM_BIOS(1) )
+	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(4be5a84f) SHA1(2a6e52af01e23665a884f4693e2a397d731f7e4a), ROM_BIOS(0) )
+	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(4be5a84f) SHA1(2a6e52af01e23665a884f4693e2a397d731f7e4a), ROM_BIOS(1) )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(763b14e3) SHA1(0ccd41648a798ba4a5d92c19c24b605a8927fb76), ROM_BIOS(2) )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(763b14e3) SHA1(0ccd41648a798ba4a5d92c19c24b605a8927fb76), ROM_BIOS(3) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(0da2d31d) SHA1(4a5277f27e23f0eae9daa8cc5a4818a322f579a5), ROM_BIOS(4) )
@@ -701,6 +760,7 @@ ROM_END
 
 ROM_START( aa4 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	// RISC OS 3.10 (30 Apr 1992)
 	ROM_LOAD32_WORD( "0296,061-01.ic4",  0x000000, 0x100000, CRC(b77fe215) SHA1(57b19ea4b97a9b6a240aa61211c2c134cb295aa0) )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4) )
 
@@ -715,6 +775,7 @@ ROM_END
 
 ROM_START( aa3010 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	// RISC OS 3.11 (29 Sep 1992)
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
 
@@ -728,18 +789,21 @@ ROM_END
 #define rom_aa3020 rom_aa3010
 #define rom_aa4000 rom_aa3010
 
+} // anonymous namespace
+
+
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS */
-COMP( 1987, aa305,   aa310,  0,      aa305,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
-COMP( 1987, aa310,   0,      0,      aa310,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
-COMP( 1987, aa440,   aa310,  0,      aa440,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
-COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310, aa310_state, init_aa310, "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
-COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
-COMP( 1990, aa540,   aa310,  0,      aa540,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
-COMP( 1991, aa5000,  0,      0,      aa5000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310, aa310_state, init_aa310, "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
-COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
-COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4000,  0,      0,      aa4000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
-COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)
+COMP( 1987, aa305,   aa310,  0,      aa305,   aa310, aa310_state, empty_init, "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
+COMP( 1987, aa310,   0,      0,      aa310,   aa310, aa310_state, empty_init, "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
+COMP( 1987, aa440,   aa310,  0,      aa440,   aa310, aa310_state, empty_init, "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
+COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310, aa310_state, empty_init, "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
+COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310, aa310_state, empty_init, "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310, aa310_state, empty_init, "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310, aa310_state, empty_init, "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
+COMP( 1990, aa540,   aa310,  0,      aa540,   aa310, aa310_state, empty_init, "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
+COMP( 1991, aa5000,  0,      0,      aa5000,  aa310, aa310_state, empty_init, "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310, aa310_state, empty_init, "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
+COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310, aa310_state, empty_init, "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
+COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310, aa310_state, empty_init, "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4000,  0,      0,      aa4000,  aa310, aa310_state, empty_init, "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
+COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310, aa310_state, empty_init, "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)

@@ -38,6 +38,7 @@ public:
 
 	void cit220p(machine_config &config);
 	void vp122(machine_config &config);
+	void tabe22(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -50,6 +51,7 @@ private:
 	void cit220p_io_map(address_map &map);
 	void vp122_mem_map(address_map &map);
 	void vp122_io_map(address_map &map);
+
 	void char_map(address_map &map);
 	void attr_map(address_map &map);
 
@@ -165,7 +167,7 @@ void cit220_state::cit220p(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(14'916'000, 960, 0, 800, 259, 0, 240);
 	m_screen->set_raw(22'096'000, 1422, 0, 1188, 259, 0, 240);
-	m_screen->set_screen_update("avdc", FUNC(scn2674_device::screen_update));
+	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
 	SCN2674(config, m_avdc, 22'096'000 / 9);
 	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
@@ -176,7 +178,7 @@ void cit220_state::cit220p(machine_config &config)
 	m_avdc->set_screen(m_screen);
 
 	scn2681_device &duart(SCN2681(config, "duart", 3'686'400));
-	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
+	duart.irq_cb().set_inputline(m_maincpu, I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
@@ -199,7 +201,7 @@ void cit220_state::vp122(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(14.916_MHz_XTAL, 960, 0, 800, 259, 0, 240);
 	//m_screen->set_raw(22.096_MHz_XTAL, 1422, 0, 1188, 259, 0, 240);
-	m_screen->set_screen_update("avdc", FUNC(scn2674_device::screen_update));
+	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
 	SCN2674(config, m_avdc, 14.916_MHz_XTAL / 10);
 	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
@@ -210,7 +212,7 @@ void cit220_state::vp122(machine_config &config)
 	m_avdc->set_screen("screen");
 
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
-	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
+	duart.irq_cb().set_inputline(m_maincpu, I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
@@ -222,16 +224,16 @@ void cit220_state::vp122(machine_config &config)
 }
 
 
-ROM_START( cit220p )
+ROM_START(cit220p)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "v17_001a.ic23", 0x0000, 0x4000, CRC(2cc43026) SHA1(366f57292c6e44571368c29e3258203779847356) )
-	ROM_LOAD( "v17_001b.ic24", 0x4000, 0x4000, CRC(a56b16f1) SHA1(c68f26b35453153f7defcf1cf2b7ad7fe36cc9e7) )
+	ROM_LOAD("v17_001a.ic23", 0x0000, 0x4000, CRC(2cc43026) SHA1(366f57292c6e44571368c29e3258203779847356))
+	ROM_LOAD("v17_001b.ic24", 0x4000, 0x4000, CRC(a56b16f1) SHA1(c68f26b35453153f7defcf1cf2b7ad7fe36cc9e7))
 
 	ROM_REGION(0x1000, "eeprom", 0)
-	ROM_LOAD( "eeprom.bin",    0x0000, 0x1000, CRC(7b24878a) SHA1(20086fb792a24339b65abe627aefbcf48e2abcf4) ) // don't know where this fits in
+	ROM_LOAD("eeprom.bin",    0x0000, 0x1000, CRC(7b24878a) SHA1(20086fb792a24339b65abe627aefbcf48e2abcf4))
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10) )
+	ROM_LOAD("v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10))
 ROM_END
 
 /**************************************************************************************************************
@@ -242,15 +244,16 @@ Crystals: 22.096, 14.916, 3.6864, 8.000
 
 ***************************************************************************************************************/
 
-ROM_START( vp122 )
+ROM_START(vp122)
 	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD( "223-48600.uj1", 0x0000, 0x4000, CRC(4d140c69) SHA1(04aa5a4f0c0e0d07b9dc983a6d626ee88ef8b8ba) )
-	ROM_LOAD( "223-48500.ug1", 0x4000, 0x4000, CRC(4e98554d) SHA1(0cbb9cb7efd02a3209caed410ccc8495a5ec1772) )
-	ROM_LOAD( "223-49400.uj2", 0x8000, 0x4000, CRC(447d90d3) SHA1(f8c0db824198b5a571eef80cc3eaf1e829aa2c2a) )
+	ROM_LOAD("223-48600.uj1", 0x0000, 0x4000, CRC(4d140c69) SHA1(04aa5a4f0c0e0d07b9dc983a6d626ee88ef8b8ba))
+	ROM_LOAD("223-48500.ug1", 0x4000, 0x4000, CRC(4e98554d) SHA1(0cbb9cb7efd02a3209caed410ccc8495a5ec1772))
+	ROM_LOAD("223-49400.uj2", 0x8000, 0x4000, CRC(447d90d3) SHA1(f8c0db824198b5a571eef80cc3eaf1e829aa2c2a))
 
 	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
+	ROM_LOAD("223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62))
 ROM_END
+
 
 COMP(1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 COMP(1985, vp122, 0, 0, vp122, cit220p, cit220_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

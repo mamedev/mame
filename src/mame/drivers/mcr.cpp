@@ -718,7 +718,7 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 void mcr_state::cpu_90009_dp_map(address_map &map)
 {
 	cpu_90009_map(map);
-	map(0x8000, 0x81ff).ram(); 	// meter ram, is it battery backed?
+	map(0x8000, 0x81ff).ram();  // meter ram, is it battery backed?
 }
 
 void mcr_state::cpu_90009_dp_portmap(address_map &map)

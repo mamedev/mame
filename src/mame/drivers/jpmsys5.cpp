@@ -84,7 +84,7 @@ void jpmsys5v_state::sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_
 	int col;
 
 	if (func == 0 || func == 2)
-		col = offset  & 0xff;
+		col = offset & 0xff;
 	else
 	{
 		col = (offset << 1);
@@ -108,7 +108,7 @@ uint16_t jpmsys5v_state::sys5_tms34061_r(offs_t offset, uint16_t mem_mask)
 	int col;
 
 	if (func == 0 || func == 2)
-		col = offset  & 0xff;
+		col = offset & 0xff;
 	else
 	{
 		col = (offset << 1);
@@ -163,12 +163,12 @@ uint32_t jpmsys5v_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rg
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t const *const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
+		uint8_t const* const src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff) * 2 + 256 * y];
+		uint32_t* dest = &bitmap.pix(y, cliprect.min_x);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x +=2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint8_t const pen = src[(x-cliprect.min_x)>>1];
+			uint8_t const pen = src[(x - cliprect.min_x) >> 1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen((pen >> 4) & 0xf);
@@ -183,10 +183,11 @@ void jpmsys5_state::sys5_draw_lamps()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_lamps   [(m_lamp_strobe << 4) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 0], i);
-		m_lamps   [(m_lamp_strobe << 4) | i | 8] = BIT(m_muxram[(m_lamp_strobe << 2) | 1], i);
-		m_sys5leds[(m_lamp_strobe << 3) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 2], i);
+		m_lamps[(m_lamp_strobe << 4) | i]     = BIT(m_muxram[(m_lamp_strobe << 2) | 0], i);
+		m_lamps[(m_lamp_strobe << 4) | i | 8] = BIT(m_muxram[(m_lamp_strobe << 2) | 1], i);
 	}
+
+	m_sys5leds[m_lamp_strobe] = m_muxram[(m_lamp_strobe << 2) | 2];
 }
 
 /****************************************
@@ -200,36 +201,181 @@ void jpmsys5v_state::rombank_w(uint16_t data)
 	m_rombank->set_entry(data & 0x1f);
 }
 
-uint16_t jpmsys5_state::coins_r(offs_t offset)
+uint16_t jpmsys5_state::coins_r(offs_t offset, uint16_t mem_mask)
 {
-	if (offset == 2)
-		return ioport("COINS")->read() << 8;
-	else
-		return 0xffff;
+	return ioport("COINS")->read() << 8;
 }
 
-void jpmsys5_state::coins_w(uint16_t data)
+uint16_t jpmsys5_state::unknown_port_r(offs_t offset, uint16_t mem_mask)
 {
-	/* TODO */
+	return m_unknown_port.read_safe(0xffff);
 }
 
-uint16_t jpmsys5_state::unk_r()
+// these are read as a dword, masked with 0x77777777 and compared to 0x76543210
+uint16_t jpmsys5_state::unk_48000_r(offs_t offset, uint16_t mem_mask)
 {
+	logerror("%s: unk_48000_r %04x\n", machine().describe_context(), mem_mask);
+	return 0x7654;
+}
+
+uint16_t jpmsys5_state::unk_48002_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: unk_48002_r %04x\n", machine().describe_context(), mem_mask);
+	return 0x3210;
+}
+
+uint16_t jpmsys5_state::unk_48006_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: unk_48006_r %04x\n", machine().describe_context(), mem_mask);
 	return 0xffff;
 }
 
-void jpmsys5_state::mux_w(offs_t offset, uint16_t data)
+uint16_t jpmsys5_state::unk_r(offs_t offset, uint16_t mem_mask)
 {
-	m_muxram[offset]=data;
+	return machine().rand();
 }
 
-uint16_t jpmsys5_state::mux_r(offs_t offset)
+uint16_t jpmsys5_state::reel_optos_r(offs_t offset, uint16_t mem_mask)
 {
-	if (offset == 0x81/2)
-		return ioport("DSW")->read();
+	logerror("%s: reel_optos_r %04x\n", machine().describe_context(), mem_mask);
+	return m_optic_pattern;
+}
 
+void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reel_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+
+	// only writes 0/1/2/3 to each reel?
+	if (data & 0xcccc)
+		popmessage("reel_0123_w upper bits set", data & 0xcccc);
+
+	if (m_reel[0])
+	{
+		m_reel[0]->update((data >> 0) & 0x03);
+		awp_draw_reel(machine(), "reel1", *m_reel[0]);
+	}
+
+	if (m_reel[1])
+	{
+		m_reel[1]->update((data >> 4) & 0x03);
+		awp_draw_reel(machine(), "reel2", *m_reel[1]);
+	}
+
+	if (m_reel[2])
+	{
+		m_reel[2]->update((data >> 8) & 0x03);
+		awp_draw_reel(machine(), "reel3", *m_reel[2]);
+	}
+
+	if (m_reel[3])
+	{
+		m_reel[3]->update((data >> 12) & 0x03);
+		awp_draw_reel(machine(), "reel4", *m_reel[3]);
+	}
+}
+
+void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reel_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+
+	if (data & 0xcccc)
+		popmessage("reel_4567_w upper bits set", data & 0xcccc);
+
+	if (m_reel[4])
+	{
+		m_reel[4]->update((data >> 0) & 0x03);
+		awp_draw_reel(machine(), "reel5", *m_reel[4]);
+	}
+	if (m_reel[5])
+	{
+		m_reel[5]->update((data >> 4) & 0x03);
+		awp_draw_reel(machine(), "reel6", *m_reel[5]);
+	}
+#if 0
+	if (m_reel[6])
+	{
+		m_reel[6]->update(data >> 8) & 0x03);
+		awp_draw_reel(machine(), "reel6", *m_reel[6]);
+	}
+	if (m_reel[7])
+	{
+		m_reel[7]->update((data >> 12) & 0x03);
+		awp_draw_reel(machine(), "reel7", *m_reel[7]);
+	}
+#endif
+}
+
+void jpmsys5_state::unk_48000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: unk_48000_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+void jpmsys5_state::unk_48006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: unk_48006_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+uint16_t jpmsys5_state::reellamps_0123_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_0123_r %04x\n", machine().describe_context(), mem_mask);
+	return m_reellamps_0123;
+}
+
+void jpmsys5_state::reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_reellamps_0123);
+
+	for (int i = 0; i < 16; i++)
+		m_reellamp_out[i] = (m_reellamps_0123 >> (15 - i)) & 1;
+}
+
+uint16_t jpmsys5_state::reellamps_4567_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_4567_r %04x\n", machine().describe_context(), mem_mask);
+	return m_reellamps_5678;
+}
+
+void jpmsys5_state::reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: reellamps_4567_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_reellamps_5678);
+
+	for (int i = 0; i < 16; i++)
+		m_reellamp_out[i+16] = (m_reellamps_5678 >> (15 - i)) & 1;
+}
+
+
+// This mux_r / mux_w area seems to be a buffer for the strobing
+// are inputs actually only read into this area during strobing, just as the lamps values are only pulled
+// to go to the lamps during strobing?
+
+void jpmsys5_state::mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_muxram[offset]);
+}
+
+uint16_t jpmsys5_state::mux_r(offs_t offset, uint16_t mem_mask)
+{
+	logerror("%s: mux_r offset: %04x mask: %04x\n", machine().describe_context(), offset<<1, mem_mask);
+
+	switch (offset)
+	{
+	case 0x80 / 2: return m_dsw.read_safe(0xffff);
+	case 0x82 / 2: return m_dsw2.read_safe(0xffff);
+	case 0x84 / 2: return m_rotary.read_safe(0xffff);
+	case 0x86 / 2: return m_strobe0.read_safe(0xffff);
+	case 0x88 / 2: return m_strobe1.read_safe(0xffff);
+	case 0x8a / 2: return m_strobe2.read_safe(0xffff);
+	case 0x8c / 2: return m_strobe3.read_safe(0xffff);
+	case 0x8e / 2: return m_strobe4.read_safe(0xffff);
+	default: return 0xffff;
+	}
 	return 0xffff;
 }
+
+
+
 
 void jpmsys5_state::jpm_upd7759_w(offs_t offset, uint16_t data)
 {
@@ -286,17 +432,39 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x046040, 0x04604f).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0x046060, 0x046067).rw("6821pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
 	map(0x046080, 0x046083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+
+	map(0x046084, 0x046085).r(FUNC(jpmsys5_state::unknown_port_r));
+//  map(0x04608c, 0x04608f).r(FUNC(jpmsys5_state::unk_r));
+
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+
 	map(0x0460c0, 0x0460c1).nopw();
-	map(0x048000, 0x04801f).rw(FUNC(jpmsys5_state::coins_r), FUNC(jpmsys5_state::coins_w));
+
+	map(0x048000, 0x048001).rw(FUNC(jpmsys5_state::unk_48000_r), FUNC(jpmsys5_state::unk_48000_w));
+	map(0x048002, 0x048003).r(FUNC(jpmsys5_state::unk_48002_r));
+	map(0x048004, 0x048005).r(FUNC(jpmsys5_state::coins_r));
+	map(0x048006, 0x048007).rw(FUNC(jpmsys5_state::unk_48006_r), FUNC(jpmsys5_state::unk_48006_w));
+	map(0x048008, 0x048009).nopr().w(FUNC(jpmsys5_state::reel_0123_w)); // only reads are dummy clr opcode reads?
+	map(0x04800a, 0x04800b).nopr().w(FUNC(jpmsys5_state::reel_4567_w));
+	map(0x04800c, 0x04800d).rw(FUNC(jpmsys5_state::reellamps_0123_r), FUNC(jpmsys5_state::reellamps_0123_w));
+	map(0x04800e, 0x04800f).rw(FUNC(jpmsys5_state::reellamps_4567_r), FUNC(jpmsys5_state::reellamps_4567_w));
+
+	// 48010 - 4801f = some I/O device?
+	map(0x048012, 0x048013).r(FUNC(jpmsys5_state::reel_optos_r));
+
 	map(0x04c000, 0x04c0ff).r(FUNC(jpmsys5_state::mux_r)).w(FUNC(jpmsys5_state::mux_w));
 }
 
-void jpmsys5_state::m68000_awp_map(address_map &map)
+void jpmsys5_state::m68000_ym_map(address_map &map)
 {
 	jpm_sys5_common_map(map);
 	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w));
+}
+
+void jpmsys5_state::m68000_awp_map(address_map &map)
+{
+	m68000_ym_map(map);
 }
 
 void jpmsys5_state::m68000_awp_map_saa(address_map &map)
@@ -308,12 +476,12 @@ void jpmsys5_state::m68000_awp_map_saa(address_map &map)
 
 void jpmsys5v_state::m68000_map(address_map &map)
 {
-	jpm_sys5_common_map(map);
+	m68000_ym_map(map);
+
 	map(0x01fffe, 0x01ffff).w(FUNC(jpmsys5v_state::rombank_w)); // extra on video system (rom board?) (although regular games do write here?)
 	map(0x020000, 0x03ffff).bankr("bank1"); // extra on video system (rom board?)
-	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
+
 	map(0x0460e0, 0x0460e5).w(FUNC(jpmsys5v_state::ramdac_w));  // extra on video system (rom board?)
-	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5v_state::jpm_upd7759_r), FUNC(jpmsys5v_state::jpm_upd7759_w));
 	map(0x800000, 0xcfffff).rw(FUNC(jpmsys5v_state::sys5_tms34061_r), FUNC(jpmsys5v_state::sys5_tms34061_w)); // extra on video system (rom board?)
 }
 
@@ -584,13 +752,11 @@ void jpmsys5v_state::machine_reset()
  *
  *************************************/
 
-void jpmsys5v_state::jpmsys5v(machine_config &config)
+void jpmsys5_state::jpmsys5_common(machine_config& config)
 {
 	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5v_state::m68000_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
 	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
 
 	ACIA6850(config, m_acia6850[0], 0);
@@ -600,11 +766,11 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
+	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5_state::a1_tx_w));
 	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
 
 	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
+	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5_state::a2_tx_w));
 	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
 
 	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
@@ -618,9 +784,47 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	S16LF01(config, m_vfd);
 
-	S16LF01(config, m_vfd); //for debug ports
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
+	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
+	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
+	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
+	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
+	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
+	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
 
+	/* 6840 PTM */
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000/4)); // with this at 1mhz the non-video games run at a ridiculous speed
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
+	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
+	config.set_default_layout(layout_jpmsys5);
+}
+
+void jpmsys5_state::ymsound(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	ym2413_device &ym2413(YM2413(config, "ym2413", 4000000)); /* Unconfirmed */
+	ym2413.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+void jpmsys5_state::saasound(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	SAA1099(config, "saa", 4000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void jpmsys5v_state::tmsvideo(machine_config &config)
+{
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254);
 	screen.set_screen_update(FUNC(jpmsys5v_state::screen_update_jpmsys5v));
@@ -631,59 +835,65 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 	m_tms34061->int_callback().set(FUNC(jpmsys5v_state::generate_tms34061_interrupt));
 
 	PALETTE(config, "palette").set_entries(16);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	/* Earlier revisions use an SAA1099, but no video card games seem to (?) */
-	YM2413(config, "ym2413", 4000000).add_route(ALL_OUTPUTS, "mono", 1.00); /* Unconfirmed */
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5v_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5v_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5v_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5v_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5v_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5v_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5v_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5v_state::ptm_irq));
 }
 
-uint16_t jpmsys5_state::mux_awp_r(offs_t offset)
+void jpmsys5v_state::jpmsys5v(machine_config &config)
 {
-	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
+	jpmsys5_common(config);
 
-	if ((offset >0x7f) && (offset <0x8f))
-	{
-		return ioport(portnames[( (offset - 0x80) >>1)])->read();
-	}
-	else
-	{
-		return 0xffff;
-	}
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5v_state::m68000_map);
+
+	ymsound(config);
+
+	tmsvideo(config);
 }
 
-uint16_t jpmsys5_state::coins_awp_r(offs_t offset)
+void jpmsys5_state::reels(machine_config &config)
 {
-	switch (offset)
-	{
-		case 2:
-		{
-			return ioport("COINS")->read() << 8;
-		}
-		default:
-		{
-			logerror("coins read offset: %x",offset);
-			return 0xffff;
-		}
-	}
+	// probably incorrect reel types, but they do seem to only require 2 bits to write?
+	// forcing 200 steps keeps j5fair main reels aligned, so probably needs a type
+	// with the same write patterns as MPU3_48STEP_REEL, but with 200 steps defining?
+	REEL(config, m_reel[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[0]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[1]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[2]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[3]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[4]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	m_reel[5]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<5>));
 }
 
+// later (incompatible with earlier revision) motherboards used a YM2413
+void jpmsys5_state::jpmsys5_ym(machine_config &config)
+{
+	jpmsys5_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
+
+	METERS(config, m_meters, 0).set_number(8);
+
+	ymsound(config);
+
+	reels(config);
+}
+
+// the first rev PCB used an SAA1099
+void jpmsys5_state::jpmsys5(machine_config &config)
+{
+	jpmsys5_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
+
+	METERS(config, m_meters, 0).set_number(8);
+
+	saasound(config);
+
+	reels(config);
+}
 
 /*************************************
  *
@@ -743,13 +953,13 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, "Direct 0x08" ) // These are the % key, at least for popeye?
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Direct 0x10" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Direct 0x20" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
@@ -781,6 +991,57 @@ INPUT_PORTS_START( popeye )
 
 	PORT_START("STROBE5")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("UNKNOWN_PORT")
+	PORT_DIPNAME( 0x0001, 0x0000, "Unknown 0x0001" ) // if this and 0x0008 are on then j5popeye boots, what is it? something opto related?
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Unknown 0x0002" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 0x0004" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "Unknown 0x0008" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 0x0010" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 0x0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 0x0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 0x0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 0x0100" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Unknown 0x0200" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Unknown 0x0400" )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Unknown 0x0800" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 0x1000" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Unknown 0x2000" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 0x4000" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 0x8000" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 /*************************************
@@ -793,6 +1054,7 @@ void jpmsys5_state::machine_start()
 {
 	m_lamps.resolve();
 	m_sys5leds.resolve();
+	m_reellamp_out.resolve();
 
 	m_lamp_strobe = 0;
 }
@@ -804,138 +1066,6 @@ void jpmsys5_state::machine_reset()
 	m_vfd->reset();
 }
 
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-// later (incompatible with earlier revision) motherboards used a YM2413
-void jpmsys5_state::jpmsys5_ym(machine_config &config)
-{
-	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
-
-	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
-
-	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
-	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
-
-	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
-
-	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
-	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
-
-	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
-	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
-
-	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
-	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	S16LF01(config, m_vfd);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	/* Earlier revisions use an SAA1099 */
-	ym2413_device &ym2413(YM2413(config, "ym2413", 4000000)); /* Unconfirmed */
-	ym2413.add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
-
-	METERS(config, m_meters, 0).set_number(8);
-}
-
-// the first rev PCB used an SAA1099
-void jpmsys5_state::jpmsys5(machine_config &config)
-{
-	M68000(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
-
-	INPUT_MERGER_ANY_HIGH(config, "acia_irq").output_handler().set_inputline(m_maincpu, INT_6850ACIA);
-
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
-
-	ACIA6850(config, m_acia6850[0], 0);
-	m_acia6850[0]->txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
-	m_acia6850[0]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<0>));
-
-	bacta.rxd_handler().set(m_acia6850[0], FUNC(acia6850_device::write_rxd));
-
-	ACIA6850(config, m_acia6850[1], 0);
-	m_acia6850[1]->txd_handler().set(FUNC(jpmsys5v_state::a1_tx_w));
-	m_acia6850[1]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<1>));
-
-	ACIA6850(config, m_acia6850[2], 0);
-	m_acia6850[2]->txd_handler().set(FUNC(jpmsys5v_state::a2_tx_w));
-	m_acia6850[2]->irq_handler().set("acia_irq", FUNC(input_merger_device::in_w<2>));
-
-	clock_device &bacta_clock(CLOCK(config, "bacta_clock", 19200)); // Gives 1200 baud, but real timer is programmable (location?)
-	bacta_clock.signal_handler().set(m_acia6850[0], FUNC(acia6850_device::write_txc));
-	bacta_clock.signal_handler().append(m_acia6850[0], FUNC(acia6850_device::write_rxc));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 10000)); // What are the correct ACIA clocks ?
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[1], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	S16LF01(config, m_vfd);
-
-	SPEAKER(config, "mono").front_center();
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	SAA1099(config, "saa", 4000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	pia6821_device &pia(PIA6821(config, "6821pia", 0));
-	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
-	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
-	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));
-	pia.cb2_handler().set(FUNC(jpmsys5_state::u29_cb2_w));
-	pia.irqa_handler().set(FUNC(jpmsys5_state::pia_irq));
-	pia.irqb_handler().set(FUNC(jpmsys5_state::pia_irq));
-
-	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
-	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
-
-	METERS(config, m_meters, 0).set_number(8);
-}
 
 /*************************************
  *
@@ -1080,6 +1210,8 @@ ROM_START( cashcade )
 	ROM_LOAD16_BYTE( "cashcade_2_2.bin", 0x000001, 0x010000, CRC(8ce8cd66) SHA1(4eb00af6a0260496950d04fdcc1d3d976868ce3e) )
 	ROM_LOAD16_BYTE( "cashcade_2_3.bin", 0x020000, 0x010000, CRC(a4caddd1) SHA1(074e4aa870c3d28c2f120936ef6928c3b5e14301) )
 	ROM_LOAD16_BYTE( "cashcade_2_4.bin", 0x020001, 0x010000, CRC(b0f595e8) SHA1(5ca12839b87d092504d8b7cc579b8f1b2406cea1) )
+
+	// likely missing a disk? or something with the questions on
 ROM_END
 
 
@@ -1090,7 +1222,9 @@ GAME( 1994, monopoly4,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_
 GAME( 1994, monopoly3,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly (JPM) (Version 3) (SYSTEM5 VIDEO)",   0 )
 GAME( 1995, monoplcl,     monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5) (SYSTEM5 VIDEO)", 0 )
 GAME( 1995, monoplcld,    monopoly,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Classic (JPM) (Version 5, Protocol) (SYSTEM5 VIDEO)", 0 )
+
 GAME( 1995, monopldx,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6) (SYSTEM5 VIDEO)",  0 )
 GAME( 1995, monopldxd,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 6, Protocol) (SYSTEM5 VIDEO)", 0 )
 GAME( 1995, monopldx1,    monopldx,   jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Monopoly Deluxe (JPM) (Version 1) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING ) // no questions?
+
 GAME( 199?, cashcade,     0,          jpmsys5v, monopoly, jpmsys5v_state, empty_init, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?

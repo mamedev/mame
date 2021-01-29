@@ -690,7 +690,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 				int32_t csample = 0;
 				int32_t fpart = slot.m_offset & ((1 << TL_SHIFT) - 1);
 
-				if (slot.m_format & 8)	// 12-bit linear
+				if (slot.m_format & 8)  // 12-bit linear
 				{
 					offs_t adr = slot.m_base + (spos >> 2) * 6;
 					switch (spos & 3)

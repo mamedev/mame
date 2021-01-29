@@ -24,9 +24,10 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /*************************************

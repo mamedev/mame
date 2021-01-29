@@ -44,8 +44,8 @@
 
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()
-#define DECLARE_WRITE_LINE_MEMBER(name)     void name(ATTR_UNUSED int state)
-#define WRITE_LINE_MEMBER(name)             void name(ATTR_UNUSED int state)
+#define DECLARE_WRITE_LINE_MEMBER(name)     void name([[maybe_unused]] int state)
+#define WRITE_LINE_MEMBER(name)             void name([[maybe_unused]] int state)
 
 
 
@@ -412,18 +412,21 @@ class device_t : public delegate_late_bind
 
 	private:
 		// private helpers
-		device_t *find(const std::string &name) const
+		device_t &append(std::unique_ptr<device_t> &&device);
+		device_t &replace_and_remove(std::unique_ptr<device_t> &&device, device_t &existing);
+		void remove(device_t &device);
+		device_t *find(std::string_view name) const
 		{
-			device_t *curdevice;
-			for (curdevice = m_list.first(); curdevice != nullptr; curdevice = curdevice->next())
-				if (name.compare(curdevice->m_basetag) == 0)
-					return curdevice;
-			return nullptr;
+			auto result = m_tagmap.find(name);
+			if (result != m_tagmap.end())
+				return &result->second.get();
+			else
+				return nullptr;
 		}
 
 		// private state
 		simple_list<device_t>   m_list;         // list of sub-devices we own
-		mutable std::unordered_map<std::string,device_t *> m_tagmap;      // map of devices looked up and found by subtag
+		std::unordered_map<std::string_view, std::reference_wrapper<device_t>> m_tagmap;      // map of devices looked up and found by subtag
 	};
 
 	class interface_list
@@ -566,17 +569,17 @@ public:
 	const subdevice_list &subdevices() const { return m_subdevices; }
 
 	// device-relative tag lookups
-	std::string subtag(std::string tag) const;
-	std::string siblingtag(std::string tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : tag; }
-	memory_region *memregion(std::string tag) const;
-	memory_share *memshare(std::string tag) const;
-	memory_bank *membank(std::string tag) const;
-	ioport_port *ioport(std::string tag) const;
-	device_t *subdevice(const char *tag) const;
-	device_t *siblingdevice(const char *tag) const;
-	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
-	template<class DeviceClass> DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
-	std::string parameter(const char *tag) const;
+	std::string subtag(std::string_view tag) const;
+	std::string siblingtag(std::string_view tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
+	memory_region *memregion(std::string_view tag) const;
+	memory_share *memshare(std::string_view tag) const;
+	memory_bank *membank(std::string_view tag) const;
+	ioport_port *ioport(std::string_view tag) const;
+	device_t *subdevice(std::string_view tag) const;
+	device_t *siblingdevice(std::string_view tag) const;
+	template<class DeviceClass> DeviceClass *subdevice(std::string_view tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> DeviceClass *siblingdevice(std::string_view tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
+	std::string parameter(std::string_view tag) const;
 
 	// configuration helpers
 	void add_machine_configuration(machine_config &config);
@@ -824,7 +827,7 @@ protected:
 
 private:
 	// internal helpers
-	device_t *subdevice_slow(const char *tag) const;
+	device_t *subdevice_slow(std::string_view tag) const;
 	void calculate_derived_clock();
 
 	// private state; accessor use required
@@ -1336,15 +1339,15 @@ private:
 //  name relative to this device
 //-------------------------------------------------
 
-inline device_t *device_t::subdevice(const char *tag) const
+inline device_t *device_t::subdevice(std::string_view tag) const
 {
-	// empty string or nullptr means this device
-	if (tag == nullptr || *tag == 0)
+	// empty string means this device (DEVICE_SELF)
+	if (tag.empty())
 		return const_cast<device_t *>(this);
 
 	// do a quick lookup and return that if possible
 	auto quick = m_subdevices.m_tagmap.find(tag);
-	return (quick != m_subdevices.m_tagmap.end()) ? quick->second : subdevice_slow(tag);
+	return (quick != m_subdevices.m_tagmap.end()) ? &quick->second.get() : subdevice_slow(tag);
 }
 
 
@@ -1353,21 +1356,21 @@ inline device_t *device_t::subdevice(const char *tag) const
 //  by name relative to this device's parent
 //-------------------------------------------------
 
-inline device_t *device_t::siblingdevice(const char *tag) const
+inline device_t *device_t::siblingdevice(std::string_view tag) const
 {
-	// empty string or nullptr means this device
-	if (tag == nullptr || *tag == 0)
+	// empty string means this device (DEVICE_SELF)
+	if (tag.empty())
 		return const_cast<device_t *>(this);
 
 	// leading caret implies the owner, just skip it
-	if (tag[0] == '^') tag++;
+	if (tag[0] == '^') tag.remove_prefix(1);
 
 	// query relative to the parent, if we have one
 	if (m_owner != nullptr)
 		return m_owner->subdevice(tag);
 
 	// otherwise, it's nullptr unless the tag is absolute
-	return (tag[0] == ':') ? subdevice(tag) : nullptr;
+	return (!tag.empty() && tag[0] == ':') ? subdevice(tag) : nullptr;
 }
 
 

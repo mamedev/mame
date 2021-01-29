@@ -146,10 +146,10 @@ std::vector<std::string> device_t::searchpath() const
 //  info for a given region
 //-------------------------------------------------
 
-memory_region *device_t::memregion(std::string _tag) const
+memory_region *device_t::memregion(std::string_view tag) const
 {
 	// build a fully-qualified name and look it up
-	auto search = machine().memory().regions().find(subtag(std::move(_tag)));
+	auto search = machine().memory().regions().find(subtag(tag));
 	if (search != machine().memory().regions().end())
 		return search->second.get();
 	else
@@ -162,10 +162,10 @@ memory_region *device_t::memregion(std::string _tag) const
 //  info for a given share
 //-------------------------------------------------
 
-memory_share *device_t::memshare(std::string _tag) const
+memory_share *device_t::memshare(std::string_view tag) const
 {
 	// build a fully-qualified name and look it up
-	auto search = machine().memory().shares().find(subtag(std::move(_tag)));
+	auto search = machine().memory().shares().find(subtag(tag));
 	if (search != machine().memory().shares().end())
 		return search->second.get();
 	else
@@ -178,9 +178,9 @@ memory_share *device_t::memshare(std::string _tag) const
 //  bank info for a given bank
 //-------------------------------------------------
 
-memory_bank *device_t::membank(std::string _tag) const
+memory_bank *device_t::membank(std::string_view tag) const
 {
-	auto search = machine().memory().banks().find(subtag(std::move(_tag)));
+	auto search = machine().memory().banks().find(subtag(tag));
 	if (search != machine().memory().banks().end())
 		return search->second.get();
 	else
@@ -193,10 +193,10 @@ memory_bank *device_t::membank(std::string _tag) const
 //  object for a given port name
 //-------------------------------------------------
 
-ioport_port *device_t::ioport(std::string tag) const
+ioport_port *device_t::ioport(std::string_view tag) const
 {
 	// build a fully-qualified name and look it up
-	return machine().ioport().port(subtag(std::move(tag)).c_str());
+	return machine().ioport().port(subtag(tag));
 }
 
 
@@ -205,7 +205,7 @@ ioport_port *device_t::ioport(std::string tag) const
 //  parameter
 //-------------------------------------------------
 
-std::string device_t::parameter(const char *tag) const
+std::string device_t::parameter(std::string_view tag) const
 {
 	// build a fully-qualified name and look it up
 	return machine().parameters().lookup(subtag(tag));
@@ -437,7 +437,7 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 	else
 	{
 		u32 remainder;
-		u32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
+		u32 quotient = divu_64x32_rem(numclocks, m_clock, remainder);
 		return attotime(quotient, u64(remainder) * u64(m_attoseconds_per_clock));
 	}
 }
@@ -881,7 +881,7 @@ void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 //  caching the results
 //-------------------------------------------------
 
-device_t *device_t::subdevice_slow(const char *tag) const
+device_t *device_t::subdevice_slow(std::string_view tag) const
 {
 	// resolve the full path
 	std::string fulltag = subtag(tag);
@@ -893,16 +893,22 @@ device_t *device_t::subdevice_slow(const char *tag) const
 
 	// walk the device list to the final path
 	device_t *curdevice = &mconfig().root_device();
-	if (fulltag.length() > 1)
-		for (int start = 1, end = fulltag.find_first_of(':', start); start != 0 && curdevice != nullptr; start = end + 1, end = fulltag.find_first_of(':', start))
+	std::string_view part(std::string_view(fulltag).substr(1));
+	while (!part.empty() && curdevice != nullptr)
+	{
+		std::string_view::size_type end = part.find_first_of(':');
+		if (end == std::string::npos)
 		{
-			std::string part(fulltag, start, (end == -1) ? -1 : end - start);
 			curdevice = curdevice->subdevices().find(part);
+			part = std::string_view();
 		}
+		else
+		{
+			curdevice = curdevice->subdevices().find(part.substr(0, end));
+			part.remove_prefix(end + 1);
+		}
+	}
 
-	// if we got a match, add to the fast map
-	if (curdevice != nullptr)
-		m_subdevices.m_tagmap.insert(std::make_pair(tag, curdevice));
 	return curdevice;
 }
 
@@ -912,14 +918,13 @@ device_t *device_t::subdevice_slow(const char *tag) const
 //  to our device based on the provided tag
 //-------------------------------------------------
 
-std::string device_t::subtag(std::string _tag) const
+std::string device_t::subtag(std::string_view tag) const
 {
-	const char *tag = _tag.c_str();
 	std::string result;
-	if (*tag == ':')
+	if (!tag.empty() && tag[0] == ':')
 	{
 		// if the tag begins with a colon, ignore our path and start from the root
-		tag++;
+		tag.remove_prefix(1);
 		result.assign(":");
 	}
 	else
@@ -931,12 +936,12 @@ std::string device_t::subtag(std::string _tag) const
 	}
 
 	// iterate over the tag, look for special path characters to resolve
-	const char *caret;
-	while ((caret = strchr(tag, '^')) != nullptr)
+	std::string_view::size_type caret;
+	while ((caret = tag.find('^')) != std::string_view::npos)
 	{
 		// copy everything up to there
-		result.append(tag, caret - tag);
-		tag = caret + 1;
+		result.append(tag, 0, caret);
+		tag.remove_prefix(caret + 1);
 
 		// strip trailing colons
 		int len = result.length();
@@ -960,6 +965,43 @@ std::string device_t::subtag(std::string _tag) const
 	while (len > 1 && result[--len] == ':')
 		result = result.substr(0, len);
 	return result;
+}
+
+
+//-------------------------------------------------
+//  append - add a new subdevice to the list
+//-------------------------------------------------
+
+device_t &device_t::subdevice_list::append(std::unique_ptr<device_t> &&device)
+{
+	device_t &result(m_list.append(*device.release()));
+	m_tagmap.emplace(result.m_basetag, std::ref(result));
+	return result;
+}
+
+
+//-------------------------------------------------
+//  replace_and_remove - add a new device to
+//  replace an existing subdevice
+//-------------------------------------------------
+
+device_t &device_t::subdevice_list::replace_and_remove(std::unique_ptr<device_t> &&device, device_t &existing)
+{
+	m_tagmap.erase(existing.m_basetag);
+	device_t &result(m_list.replace_and_remove(*device.release(), existing));
+	m_tagmap.emplace(result.m_basetag, std::ref(result));
+	return result;
+}
+
+
+//-------------------------------------------------
+//  remove - remove a subdevice from the list
+//-------------------------------------------------
+
+void device_t::subdevice_list::remove(device_t &device)
+{
+	m_tagmap.erase(device.m_basetag);
+	m_list.remove(device);
 }
 
 

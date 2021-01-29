@@ -461,9 +461,9 @@ uint32_t archimedes_state::ioc_ctrl_r(offs_t offset)
 			uint8_t i2c_data = 1;
 			bool floppy_ready_state;
 
-			if ( m_i2cmem )
+			if ( m_rtc )
 			{
-				i2c_data = (m_i2cmem->read_sda() & 1);
+				i2c_data = (m_rtc->sda_r() & 1);
 			}
 
 			floppy_ready_state = check_floppy_ready();
@@ -531,10 +531,10 @@ void archimedes_state::ioc_ctrl_w(offs_t offset, uint32_t data)
 	{
 		case CONTROL:   // I2C bus control
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
-			if ( m_i2cmem )
+			if ( m_rtc )
 			{
-				m_i2cmem->write_sda(data & 0x01);
-				m_i2cmem->write_scl((data & 0x02) >> 1);
+				m_rtc->sda_w(data & 0x01);
+				m_rtc->scl_w((data & 0x02) >> 1);
 			}
 			m_i2c_clk = (data & 2) >> 1;
 			//TODO: does writing bit 2 here causes a fdc force ready?
@@ -549,7 +549,7 @@ void archimedes_state::ioc_ctrl_w(offs_t offset, uint32_t data)
 
 			//m_ioc_regs[CONTROL] = data & 0x38;
 			//if(data & 0x40)
-			//  popmessage("Muting sound, contact MAME/MESSdev");
+			//  popmessage("Muting sound, contact MAMEdev");
 			break;
 
 		case KART:

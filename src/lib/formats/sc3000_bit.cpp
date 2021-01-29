@@ -57,14 +57,12 @@ static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 {
 	cassette_image::error err;
 	uint64_t image_size = cassette->image_size();
-	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
-	uint8_t data;
 
-	while (image_pos < image_size)
+	for (uint64_t image_pos = 0; image_pos < image_size; image_pos++)
 	{
-		cassette->image_read(&data, image_pos, 1);
+		uint8_t data = cassette->image_read_byte(image_pos);
 
 		switch (data)
 		{
@@ -82,8 +80,6 @@ static cassette_image::error sc3000_bit_load(cassette_image *cassette)
 			time_index += 1/1200.0;
 			break;
 		}
-
-		image_pos++;
 	}
 
 	return cassette_image::error::SUCCESS;

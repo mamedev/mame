@@ -450,17 +450,17 @@ windows_options::windows_options()
 	add_entries(s_option_entries);
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	String^ path = ApplicationData::Current->LocalFolder->Path + L"\\";
-	set_default_value(OPTION_INIPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path()).c_str());
-	set_default_value(OPTION_CFG_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory()).c_str());
-	set_default_value(OPTION_NVRAM_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + nvram_directory()).c_str());
-	set_default_value(OPTION_INPUT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + input_directory()).c_str());
-	set_default_value(OPTION_STATE_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + state_directory()).c_str());
-	set_default_value(OPTION_SNAPSHOT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + snapshot_directory()).c_str());
-	set_default_value(OPTION_DIFF_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory()).c_str());
-	set_default_value(OPTION_COMMENT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory()).c_str());
+	set_default_value(OPTION_INIPATH, osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path());
+	set_default_value(OPTION_CFG_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory());
+	set_default_value(OPTION_NVRAM_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + nvram_directory());
+	set_default_value(OPTION_INPUT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + input_directory());
+	set_default_value(OPTION_STATE_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + state_directory());
+	set_default_value(OPTION_SNAPSHOT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + snapshot_directory());
+	set_default_value(OPTION_DIFF_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory());
+	set_default_value(OPTION_COMMENT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory());
 
-	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()).c_str());
-	set_default_value(OPTION_MEDIAPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + media_path()).c_str());
+	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()));
+	set_default_value(OPTION_MEDIAPATH, osd::text::from_wstring((LPCWSTR)path->Data()) + media_path());
 #endif
 }
 
@@ -568,7 +568,7 @@ void windows_osd_interface::init(running_machine &machine)
 	// notify listeners of screen configuration
 	for (const auto &info : osd_common_t::s_window_list)
 	{
-		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()).c_str(), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
 	}
 
 	// hook up the debugger log

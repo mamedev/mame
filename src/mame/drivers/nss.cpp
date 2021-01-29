@@ -302,7 +302,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
 #include "emupal.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 
 

@@ -17,6 +17,7 @@
 #include "ui/selector.h"
 
 #include "audit.h"
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "mame.h"
@@ -439,13 +440,12 @@ void menu_select_software::build_software_list()
 			{
 				std::string name;
 				if (dir->type == osd::directory::entry::entry_type::FILE)
-					name = core_filename_extract_base(dir->name, true);
+					name = strmakelower(core_filename_extract_base(dir->name, true));
 				else if (dir->type == osd::directory::entry::entry_type::DIR && strcmp(dir->name, ".") != 0)
-					name = dir->name;
+					name = strmakelower(dir->name);
 				else
 					continue;
 
-				strmakelower(name);
 				for (auto & yelem : m_swinfo)
 					if (yelem.shortname == name && yelem.listname == elem)
 					{

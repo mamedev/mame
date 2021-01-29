@@ -261,7 +261,7 @@ const char *cqm_format::extensions() const
 	return "cqm,cqi,dsk";
 }
 
-int cqm_format::identify(io_generic *io, uint32_t form_factor)
+int cqm_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[3];
 	io_generic_read(io, h, 0, 3);
@@ -272,7 +272,7 @@ int cqm_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool cqm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool cqm_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
 	std::vector<uint8_t> imagebuf(max_size);
@@ -369,7 +369,7 @@ bool cqm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool cqm_format::save(io_generic *io, floppy_image *image)
+bool cqm_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

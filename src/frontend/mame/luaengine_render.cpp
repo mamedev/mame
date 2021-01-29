@@ -12,6 +12,7 @@
 #include "luaengine.ipp"
 
 #include "render.h"
+#include "rendlay.h"
 
 #include <iterator>
 
@@ -348,12 +349,12 @@ void lua_engine::initialize_render(sol::table &emu)
 			}
 		};
 	layout_view_item_type["id"] = sol::property(
-			[this] (layout_view::item &i) -> sol::object
+			[] (layout_view::item &i, sol::this_state s) -> sol::object
 			{
 				if (i.id().empty())
-					return sol::make_object(sol(), sol::lua_nil);
+					return sol::lua_nil;
 				else
-					return sol::make_object(sol(), i.id());
+					return sol::make_object(s, i.id());
 			});
 	layout_view_item_type["bounds_animated"] = sol::property(&layout_view::item::bounds_animated);
 	layout_view_item_type["color_animated"] = sol::property(&layout_view::item::color_animated);

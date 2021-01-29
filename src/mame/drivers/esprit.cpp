@@ -181,7 +181,7 @@ void esprit_state::esprit3(machine_config &config)
 	acia2.set_xtal(1.8432_MHz_XTAL);
 	acia2.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	via6522_device &via(VIA6522(config, "via", 17.9712_MHz_XTAL / 18));
+	via6522_device &via(MOS6522(config, "via", 17.9712_MHz_XTAL / 18));
 	via.irq_handler().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 	via.writepb_handler().set("acia", FUNC(acia6850_device::write_rxc)).bit(7);
 	via.writepb_handler().append("acia", FUNC(acia6850_device::write_txc)).bit(7);

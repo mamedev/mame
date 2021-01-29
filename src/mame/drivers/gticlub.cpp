@@ -241,7 +241,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/k001604.h"
 
 #include "emupal.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 
 

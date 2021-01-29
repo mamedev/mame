@@ -190,6 +190,7 @@ protected:
 	virtual void logblit(const char *tag);
 	void update_interrupts(int fast);
 	void draw_raw(u16 *base, u16 color);
+	void draw_raw_widthpix(u16 *base, u16 color);
 	virtual void command_blit_raw();
 	virtual void command_shift_reg();
 	inline void draw_rle_fast(u16 *base, u16 color);

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	These seem to be GPL16250 related based on video register use
-	however the SPI ROM maps directly into CPU space, where you'd
-	expect internal ROM to be?!
+    These seem to be GPL16250 related based on video register use
+    however the SPI ROM maps directly into CPU space, where you'd
+    expect internal ROM to be?!
 */
 
 #include "emu.h"

@@ -628,72 +628,72 @@ void ms32_state::coin_counter_w(u32 data)
 void ms32_state::ms32_map(address_map &map)
 {
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-//	0xfc000000 NVRAM (8-bits wide, 0x2000 in size)
+//  0xfc000000 NVRAM (8-bits wide, 0x2000 in size)
 	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);
 //  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above
 
-//	0xfd180000 Priority RAM (8-bits wide, 0x2000 in size)
+//  0xfd180000 Priority RAM (8-bits wide, 0x2000 in size)
 	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000);
 //  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above
 
-//	0xfd200000 palette related, unknown
-//	0xfd400000 paletteram (16-bits wide, 0x20000 in size)
-//	0xfd400000 object palette
-//	0xfd408000 Background palette
-//	0xfd410000 ROZ1 palette
-//	0xfd420000 ROZ0 palette?
-//	0xfd430000 ASCII palette
+//  0xfd200000 palette related, unknown
+//  0xfd400000 paletteram (16-bits wide, 0x20000 in size)
+//  0xfd400000 object palette
+//  0xfd408000 Background palette
+//  0xfd410000 ROZ1 palette
+//  0xfd420000 ROZ0 palette?
+//  0xfd430000 ASCII palette
 	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000);
 //  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above
 
-//	0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
+//  0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
 	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
-//  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above 
+//  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above
 
-//	0xfe200000 ROZ1 line RAM (16-bits wide, 0x1000 in size)
+//  0xfe200000 ROZ1 line RAM (16-bits wide, 0x1000 in size)
 	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000);
 //  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above
 
-//	0xfe400000 ROZ0 VRAM?
-//	0xfe600000 ROZ0 line RAM?
-//	0xfe800000 object layer VRAM (16-bits wide, 0x10000 in size)
+//  0xfe400000 ROZ0 VRAM?
+//  0xfe600000 ROZ0 line RAM?
+//  0xfe800000 object layer VRAM (16-bits wide, 0x10000 in size)
 	map(0xc2800000, 0xc281ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
 //  map(0xc2820000, 0xc29fffff) // mirrors of sprram, handled above
 
-//	0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
+//  0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
 	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
 
-//	0xfec08000 Background layer VRAM (16-bits wide, 0x4000 in size)
+//  0xfec08000 Background layer VRAM (16-bits wide, 0x4000 in size)
 	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
 //  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above
 
-//	0xfee00000 Scratch RAM (32-bit wide, 0x20000 in size)
+//  0xfee00000 Scratch RAM (32-bit wide, 0x20000 in size)
 	map(0xc2e00000, 0xc2e1ffff).ram().mirror(0x3c0e0000);
-//	0xffc00000 ROM (32-bit wide, 0x200000 in size)
+//  0xffc00000 ROM (32-bit wide, 0x200000 in size)
 	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000);
 
 	// I/O section
 	// TODO: mirrors like above?
-	map(0xfc800000, 0xfc800003).nopr().w(FUNC(ms32_state::sound_command_w));	// open bus on read?
-//	map(0xfcc00000, 0xfcc0001f) 												// input
+	map(0xfc800000, 0xfc800003).nopr().w(FUNC(ms32_state::sound_command_w));    // open bus on read?
+//  map(0xfcc00000, 0xfcc0001f)                                                 // input
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
 	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
 	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
-	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w)); 		// global brightness control
-//	map(0xfce00400, 0xfce0045f)													// ROZ0 control registers
-/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        				// ROZ1 control registers
-/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   					// ASCII layer scroll
-/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   					// Background layer scroll
+	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));         // global brightness control
+//  map(0xfce00400, 0xfce0045f)                                                 // ROZ0 control registers
+/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");                        // ROZ1 control registers
+/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");                       // ASCII layer scroll
+/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");                       // Background layer scroll
 	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::bgmode_w));
-//	map(0xfce00c00, 0xfce00c1f)													// ???
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w)); 			// coin counters + something else
+//  map(0xfce00c00, 0xfce00c1f)                                                 // ???
+	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w));            // coin counters + something else
 	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::sound_result_r));
-	//	Extended I/O
-//	map(0xfd040000, 0xfd040003)
-//	map(0xfd080000, 0xfd080003)
-//	map(0xfd0c0000, 0xfd0c0003)
+	//  Extended I/O
+//  map(0xfd040000, 0xfd040003)
+//  map(0xfd080000, 0xfd080003)
+//  map(0xfd0c0000, 0xfd0c0003)
 	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
 }
 
@@ -748,15 +748,15 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-//	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
+//  map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
 	// bit 1: steering shock
 	// bit 0: seat motor
-//	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
+//  map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
 
 	// Note: it is unknown how COPRO irqs actually acks,
 	// most likely candidate is a 0x06 ping at both $fd1024c8 / $fd1424c8
 	// irq_2: 0xffe00878 (really unused)
-	// irq_5: 0xffe008ac 
+	// irq_5: 0xffe008ac
 	// irq_7: 0xffe008ea (basically identical to irq_5)
 	// COPRO 1
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
@@ -769,7 +769,7 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 
 	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
 	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
-//	map(0xfe202000, 0xfe2fffff).ram(); // vram?
+//  map(0xfe202000, 0xfe2fffff).ram(); // vram?
 }
 
 /* F1 Super Battle speculation from nuapete
@@ -1639,7 +1639,7 @@ void ms32_base_state::irq_init()
 }
 
 void ms32_base_state::irq_raise(int level, bool state)
-{	
+{
 	if (state == true)
 		m_irqreq |= (1<<level);
 	else
@@ -1724,7 +1724,7 @@ WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
 void ms32_base_state::base_sound_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom();
-//	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+//  map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 	map(0x3f10, 0x3f10).rw(FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
 	map(0x3f20, 0x3f20).nopr(); /* 2nd latch ? */
 	map(0x3f20, 0x3f20).nopw(); /* to_main2_w  ? */
@@ -1824,7 +1824,7 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 
 	m_gfxdecode->set_info(gfx_f1superb);
 
-//	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
+//  MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 }
 
 

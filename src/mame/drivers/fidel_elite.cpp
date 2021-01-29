@@ -35,7 +35,8 @@ hardware overview:
 
 *In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
-Though model EAS-C(Glasgow) had a 4MHz XTAL
+Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
+a 4MHz XTAL.
 
 A condensator/battery keeps RAM contents alive for a while when powered off.
 Note that EAS doesn't have a "new game" button, it is done through game options:
@@ -108,6 +109,7 @@ public:
 	// machine configs
 	void pc(machine_config &config);
 	void eas(machine_config &config);
+	void ewc(machine_config &config);
 	void easc(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
@@ -179,7 +181,7 @@ void elite_state::machine_reset()
 
 void elite_state::set_cpu_freq()
 {
-	// known official CPU speeds: 3MHz(EAS/EWC?), 3.57MHz(PC/Privat), 4MHz(PC/EAS-C)
+	// known official CPU speeds: 3MHz(EAS), 3.57MHz(PC/EWC/Privat), 4MHz(PC/EAS-C)
 	u8 inp = ioport("FAKE")->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 4_MHz_XTAL : ((inp & 1) ? 3.579545_MHz_XTAL : 3_MHz_XTAL));
 	div_refresh();
@@ -413,9 +415,19 @@ static INPUT_PORTS_START( eas )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz (original)" )
-	PORT_CONFSETTING(    0x01, "3.57MHz (Privat)" )
-	PORT_CONFSETTING(    0x02, "4MHz (Glasgow)" )
+	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
+	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ewc )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("FAKE") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
+	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easc )
@@ -423,9 +435,9 @@ static INPUT_PORTS_START( easc )
 
 	PORT_MODIFY("FAKE") // default to 4MHz
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elite_state, switch_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "3MHz (original)" )
-	PORT_CONFSETTING(    0x01, "3.57MHz (Privat)" )
-	PORT_CONFSETTING(    0x02, "4MHz (Glasgow)" )
+	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
+	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
+	PORT_CONFSETTING(    0x02, "4MHz (EAS-C)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc )
@@ -494,11 +506,12 @@ void elite_state::pc(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void elite_state::easc(machine_config &config)
+void elite_state::eas(machine_config &config)
 {
 	pc(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_clock(3_MHz_XTAL);
 	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eas_map);
 
 	I8255(config, m_ppi8255); // port B: input, port A & C: output
@@ -514,10 +527,16 @@ void elite_state::easc(machine_config &config)
 	config.set_default_layout(layout_fidel_eas);
 }
 
-void elite_state::eas(machine_config &config)
+void elite_state::ewc(machine_config &config)
 {
-	easc(config);
-	m_maincpu->set_clock(3_MHz_XTAL);
+	eas(config);
+	m_maincpu->set_clock(3.579545_MHz_XTAL);
+}
+
+void elite_state::easc(machine_config &config)
+{
+	eas(config);
+	m_maincpu->set_clock(4_MHz_XTAL);
 }
 
 void eag_state::eag(machine_config &config)
@@ -581,6 +600,42 @@ ROM_START( feasbu )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
+ROM_START( feasbua ) // model EWC
+	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_LOAD("white_a", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // HN482764G-2
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("black", 0xc000, 0x0800, CRC(132b7f68) SHA1(a7aaac221387275f3a11f4441dcef73c2bfd0ee6) ) // M5L2764K
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("green", 0xe000, 0x0800, CRC(c7bbfbbe) SHA1(63fe13d0e64d1e5c1ea1b4de13ac3e753797a992) ) // M5L2764K - only 4 bytes different to feasbu (after descramble)
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
 ROM_START( feasgla )
 	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("4.0_86", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
@@ -623,7 +678,7 @@ ROM_START( feasglaa ) // model EAS-C
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("black", 0xc000, 0x0800, CRC(3f0b01b6) SHA1(fe8d214f1678e000ba945e2f6dc3438af97c6f33) ) // only 2 bytes different
+	ROM_LOAD("black", 0xc000, 0x0800, CRC(3f0b01b6) SHA1(fe8d214f1678e000ba945e2f6dc3438af97c6f33) ) // only 2 bytes different to feasgla
 	ROM_CONTINUE( 0xd000, 0x0800 )
 	ROM_CONTINUE( 0xc800, 0x0800 )
 	ROM_CONTINUE( 0xd800, 0x0800 )
@@ -843,7 +898,8 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feasbua,   feasbu, 0, ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, feasgla,   feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, feasglaa,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, feasglab,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

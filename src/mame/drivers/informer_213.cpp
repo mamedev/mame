@@ -450,11 +450,17 @@ void informer_213_state::informer_213(machine_config &config)
 
 ROM_START( in213 )
 	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("26")
+	ROM_SYSTEM_BIOS(0,  "21",  "v2.1")
+	// 79687-101  213 SNA 201C  CK=1C22 V2.1 (checksum matches)
+	ROMX_LOAD("79687-101.bin", 0x0000, 0x8000, CRC(1ff023f3) SHA1(cbb027769d7744072045e60b020826f4f4bfe1b6), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1,  "26",  "v2.6")
 	// 79687-305  PTF02 SNA  V2.6 CK=24EE (checksum matches)
-	ROM_LOAD("79687-305.bin", 0x0000, 0x8000, CRC(0638c6d6) SHA1(1906f835f255d595c5743b453614ba21acb5acae))
+	ROMX_LOAD("79687-305.bin", 0x0000, 0x8000, CRC(0638c6d6) SHA1(1906f835f255d595c5743b453614ba21acb5acae), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "chargen", 0)
 	// 79688-003  ICT 213/CG.  CK=C4E0 (checksum matches)
+	// 79688-003  ICT 213/374  CK = C4E0 (checksum matches)
 	ROM_LOAD("79688-003.bin", 0x0000, 0x2000, CRC(75e0da94) SHA1(c10c71fcf980a5f868a85bc264661183fa69fa72))
 ROM_END
 

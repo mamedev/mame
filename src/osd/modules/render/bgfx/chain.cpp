@@ -19,6 +19,7 @@
 #include "chainmanager.h"
 #include "target.h"
 #include "vertex.h"
+#include "rendlay.h"
 #include "screen.h"
 #include "clear.h"
 #include "modules/osdwindow.h"

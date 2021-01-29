@@ -360,9 +360,10 @@
 #include "video/voodoo.h"
 #include "video/k037122.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 namespace {

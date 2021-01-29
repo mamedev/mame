@@ -82,14 +82,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
     This setting (as well as others) must be defined before resetting the games.
-  - On 'sauroa', "Test mode" crashes when trying to display "Difficult" ("Hard") 
+  - On 'sauroa', "Test mode" crashes when trying to display "Difficult" ("Hard")
     because the full string is 15 bytes long while other string are 14, so the 15th
-	"char" is NOT 0x00 :
+    "char" is NOT 0x00 :
       * 0xd49f : mask (0x30)
       * 0xd4a0-0xd4a7 : offset of settings to display (4 x 2 bytes, LSB first) :
         0xd58e, 0xd5a5, 0xd5bc, 0xd5d4
-	On 'sauro' (the parent set), the "Test mode" works fine and displays the
-	"Difficult" string.
+    On 'sauro' (the parent set), the "Test mode" works fine and displays the
+    "Difficult" string.
   - Player 2 uses player 2 inputs only when "Cabinet" Dip Switch is set to "Cocktail"
     (code at 0x2e40 : start reading inputs).
 

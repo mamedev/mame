@@ -181,7 +181,7 @@ protected:
 	uint8_t m_lcd_chrbuf[12];   //raw digits (not ASCII)
 	uint8_t m_lcd_text[13]; //mapped to ASCII, only for debug output
 	uint32_t m_lcd_segdata[12];
-	bool m_lcd_annuns[12];	//local copy of annunciators
+	bool m_lcd_annuns[12];  //local copy of annunciators
 	///////////////////////////
 
 
