@@ -1559,13 +1559,21 @@ static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
  * @brief   -------------------------------------------------
  *            EDC_crctable - each value represents a CRC used
  *            in calculating the EDC for MODE1 sectors. the
- *            CRC polynomial is from ECMA 130
+ *            CRC polynomial is from ECMA 130 section 14.3
  *
  *             P(X) = (X^16 + x^15 + x^2 + 1) * (x^16 + x^2 + x + 1)
  *
  *            where least significant parity bit (x^0) is the
- *            most significant bit of the checksum. this table
- *            of pre-calculated values is from cdrtools.
+ *            most significant bit of the checksum. it can
+ *            be regenerated using these poly parameters into
+ *            Rocksoft Model CRC Algorithm
+ *
+ *             Width   : 4 bytes
+ *             Poly    : 0x8001801BL
+ *             Reverse : TRUE
+ *
+ *            credit to cdrtools for the EDC table, code and
+ *            technical details.
  *          -------------------------------------------------.
  */
 
