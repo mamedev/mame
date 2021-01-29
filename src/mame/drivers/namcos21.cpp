@@ -997,7 +997,7 @@ ROM_START( winrun )
 	ROM_LOAD("wr-d2.4j",    0x000, 0x104, CRC(614de474) SHA1(80c3ab287896e07073a70dd42e7b47f515dd3931) ) /* PAL16L8ACN */
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	//ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93b4c4b5) SHA1(2fb5b9437304c97a2436b446671284aae69d545d) )
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93b4c4b5) SHA1(2fb5b9437304c97a2436b446671284aae69d545d) )
 ROM_END
 
 ROM_START( winrungp )
