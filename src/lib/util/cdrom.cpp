@@ -73,29 +73,29 @@ void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
 ***************************************************************************/
 
 /** @brief  offset within sector. */
-const int SYNC_OFFSET = 0x000;
+constexpr int SYNC_OFFSET = 0x000;
 /** @brief  12 bytes. */
-const int SYNC_NUM_BYTES = 12;
+constexpr int SYNC_NUM_BYTES = 12;
 
 /** @brief  offset within sector. */
-const int MODE_OFFSET = 0x00f;
+constexpr int MODE_OFFSET = 0x00f;
 
 /** @brief  EDC offsets */
-const int EDC_MODE1_OFFSET = 16+2048;
+constexpr int EDC_MODE1_OFFSET = 16+2048;
 
 /** @brief  offset within sector. */
-const int ECC_P_OFFSET = 0x81c;
+constexpr int ECC_P_OFFSET = 0x81c;
 /** @brief  2 lots of 86. */
-const int ECC_P_NUM_BYTES = 86;
+constexpr int ECC_P_NUM_BYTES = 86;
 /** @brief  24 bytes each. */
-const int ECC_P_COMP = 24;
+constexpr int ECC_P_COMP = 24;
 
 /** @brief  The ECC q offset. */
-const int ECC_Q_OFFSET = ECC_P_OFFSET + 2 * ECC_P_NUM_BYTES;
+constexpr int ECC_Q_OFFSET = ECC_P_OFFSET + 2 * ECC_P_NUM_BYTES;
 /** @brief  2 lots of 52. */
-const int ECC_Q_NUM_BYTES = 52;
+constexpr int ECC_Q_NUM_BYTES = 52;
 /** @brief  43 bytes each. */
-const int ECC_Q_COMP = 43;
+constexpr int ECC_Q_COMP = 43;
 
 
 
