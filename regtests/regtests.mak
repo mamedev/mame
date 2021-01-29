@@ -43,9 +43,9 @@
 #-------------------------------------------------
 
 REGTESTS += \
-	chdmantest \
-	jedutiltest \
-
+	unidasmtest \
+#	chdmantest \
+#	jedutiltest \
 
 #-------------------------------------------------
 # chdman
@@ -64,5 +64,10 @@ jedutiltest:
 	@echo Running jedutil unittest
 	$(PYTHON) regtests/jedutil/jedtest.py
 
+#-------------------------------------------------
+# unidasm
+#-------------------------------------------------
 
-
+unidasmtest:
+	@echo Running unidasm unittest
+	$(PYTHON) regtests/unidasm/unidasm.py
