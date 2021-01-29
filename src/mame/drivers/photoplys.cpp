@@ -10,7 +10,7 @@ RAM: 64MB
 PCB: Intel FW82801AA, IT8888F PCI-to-ISA Bridge, CMI8738 audio
 I/O: Winbond W83977, Winbond W83627HF
 BIOS: Intel N82802AB
-Dongle: Parallel port + keyboard DIN (uses both ports) with just a Parallax SX28AC/DP-G MCU or a combo of Ubicom SX28AC/DP MCU + 93C46LN SEEPROM
+Dongle: Parallel port + keyboard DIN (uses both ports) with a SX28AC/DP MCU (Parallax, Ubicom, etc.). On some versions there's also a SEEPROM (93C46LN, etc.).
 Net: Optional Ethernet PCI card with RTL8139C
 
 */
