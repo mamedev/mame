@@ -2622,7 +2622,7 @@ static void do_extract_cd(parameters_map &params)
 			}
 			else if (mode == MODE_GDROM_CUEBIN)
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), 0, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), 0, outputoffs);
 			}
 			else
 			{
