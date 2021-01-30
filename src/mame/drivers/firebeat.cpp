@@ -191,7 +191,6 @@ static void cdrom_config(device_t *device)
 {
 	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 0.5);
 	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 0.5);
-	device = device->subdevice("cdda");
 }
 
 static void dvdrom_config(device_t *device)
