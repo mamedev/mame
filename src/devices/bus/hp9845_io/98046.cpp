@@ -195,10 +195,10 @@ void hp98046_io_card_device::device_add_mconfig(machine_config &config)
 	m_rs232->txc_handler().set(FUNC(hp98046_io_card_device::rs232_txc_w));
 	// There's just one 2.4576 MHz xtal, Tx BRG gets its clock from Rx BRG
 	F4702(config , m_tx_brg , 2.4576_MHz_XTAL);
-	m_tx_brg->s_callback().set([this]() { return m_baudrate_sel & 0xf; });
+	m_tx_brg->s_callback().set([this]() { return m_txc_sel; });
 	m_tx_brg->z_callback().set(FUNC(hp98046_io_card_device::txc_w));
 	F4702(config , m_rx_brg , 2.4576_MHz_XTAL);
-	m_rx_brg->s_callback().set([this]() { return (m_baudrate_sel >> 4) & 0xf; });
+	m_rx_brg->s_callback().set([this]() { return m_rxc_sel; });
 	m_rx_brg->z_callback().set(FUNC(hp98046_io_card_device::rxc_w));
 	config.set_maximum_quantum(attotime::from_hz(5000));
 }
@@ -377,7 +377,8 @@ void hp98046_io_card_device::cpu_w(offs_t offset, uint8_t data)
 
 		case 3:
 			// xxxx'x111: write to BRGs
-			m_baudrate_sel = data;
+			m_rxc_sel = (data >> 4) & 0xf;
+			m_txc_sel = data & 0xf;
 			break;
 		}
 	} else {
@@ -495,7 +496,6 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_rxc_w)
 {
 	if (!m_loopback) {
 		m_rx_brg->im_w(state);
-		LOG("RxC %d %s\n" , state , machine().time().to_string());
 	}
 }
 
@@ -503,7 +503,6 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_txc_w)
 {
 	if (!m_loopback) {
 		m_tx_brg->im_w(state);
-		LOG("TxC %d %s\n" , state , machine().time().to_string());
 	}
 }
 
@@ -634,25 +633,33 @@ uint8_t hp98046_io_card_device::get_hs_input() const
 WRITE_LINE_MEMBER(hp98046_io_card_device::rxc_w)
 {
 	if (m_last_rxc != bool(state)) {
-		m_last_rxc = bool(state);
-		m_sio->rxca_w(m_last_rxc);
-		if (m_loopback) {
-			m_tx_brg->im_w(m_last_rxc);
-		}
-		machine().scheduler().synchronize();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_rxc_w) , this) , state);
 	}
 }
 
 WRITE_LINE_MEMBER(hp98046_io_card_device::txc_w)
 {
 	if (m_last_txc != bool(state)) {
-		m_last_txc = bool(state);
-		m_sio->txca_w(m_last_txc);
-		m_sio->txcb_w(m_last_txc);
-		m_sio->rxcb_w(m_last_txc);
-		if (m_loopback) {
-			m_rx_brg->im_w(m_last_txc);
-		}
-		machine().scheduler().synchronize();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_txc_w) , this) , state);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hp98046_io_card_device::sync_rxc_w)
+{
+	m_last_rxc = bool(param);
+	m_sio->rxca_w(m_last_rxc);
+	if (m_loopback) {
+		m_tx_brg->im_w(m_last_rxc);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hp98046_io_card_device::sync_txc_w)
+{
+	m_last_txc = bool(param);
+	m_sio->txca_w(m_last_txc);
+	m_sio->txcb_w(m_last_txc);
+	m_sio->rxcb_w(m_last_txc);
+	if (m_loopback) {
+		m_rx_brg->im_w(m_last_txc);
 	}
 }

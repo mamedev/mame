@@ -69,7 +69,8 @@ private:
 	bool m_last_rxc;
 	bool m_last_txc;
 
-	uint8_t m_baudrate_sel;
+	uint8_t m_rxc_sel;
+	uint8_t m_txc_sel;
 
 	void cpu_program_map(address_map &map);
 	void cpu_io_map(address_map &map);
@@ -97,6 +98,8 @@ private:
 	uint8_t get_hs_input() const;
 	DECLARE_WRITE_LINE_MEMBER(rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(txc_w);
+	TIMER_CALLBACK_MEMBER(sync_rxc_w);
+	TIMER_CALLBACK_MEMBER(sync_txc_w);
 };
 
 // device type definitions
