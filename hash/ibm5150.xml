@@ -13949,7 +13949,7 @@ has been replaced with an all-zero block. -->
 				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [3.5DD] [Disk 3 of 3] [Data Disk 2].img" size="737280" crc="122b40b0" sha1="7f5441ea4e350408a8fd2555b020e643392b511a"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="wingfury">
 		<description>Wings of Fury</description>

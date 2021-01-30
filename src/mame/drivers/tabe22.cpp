@@ -8,22 +8,22 @@
 
     Hardware:
     - P8085AH
-	- SCN2674B with SCB2675T
+    - SCN2674B with SCB2675T
     - SCN2681
     - P8251A
     - 3x HM6264LP-12 (8k)
     - 3x HM6116LP-2 (2k)
-	- XTAL: 3.6864 MHz, 10.0000 MHz, 21.7566 MHz, 35.8344 MHz
+    - XTAL: 3.6864 MHz, 10.0000 MHz, 21.7566 MHz, 35.8344 MHz
 
     TODO:
     - Dump keyboard controller and emulate it (currently HLE'd)
-	- NVRAM / memory layout
-	- Needs a hack to send out data on the RS232 port:
-	    Set $f7a3 = 0 after startup
+    - NVRAM / memory layout
+    - Needs a hack to send out data on the RS232 port:
+        Set $f7a3 = 0 after startup
 
     Notes:
-	- The hardware has some similarities to cit220.cpp
-	- Everything here is guessed (including the system name), no docs available
+    - The hardware has some similarities to cit220.cpp
+    - Everything here is guessed (including the system name), no docs available
 
 ***************************************************************************/
 
@@ -239,7 +239,6 @@ void printer_devices(device_slot_interface &device)
 static DEVICE_INPUT_DEFAULTS_START( printer_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -257,12 +256,12 @@ void tabe22_state::tabe22(machine_config &config)
 	m_vram_bank->set_data_width(8);
 	m_vram_bank->set_stride(0x1000);
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(21.7566_MHz_XTAL, 918, 0, 720, 395, 0, 378); // 80 column mode
-//	m_screen->set_raw(35.8344_MHz_XTAL, 1494, 0, 1188, 395, 0, 378); // 132 column mode
+//  m_screen->set_raw(35.8344_MHz_XTAL, 1494, 0, 1188, 395, 0, 378); // 132 column mode
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(tabe22_state::palette), 4);

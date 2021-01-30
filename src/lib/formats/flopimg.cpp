@@ -2845,7 +2845,7 @@ void floppy_image_format_t::build_mac_track_gcr(int track, int head, floppy_imag
 		30318342 / 429,
 		30318342 / 472,
 		30318342 / 525,
-		30318342 / 590		
+		30318342 / 590
 	};
 
 	static const std::array<uint8_t, 12> notag{};
@@ -2960,10 +2960,10 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 		if(hstate == 0xd5aa96)
 			hpos.push_back(pos == nib.size() - 1 ? 0 : pos+1);
 	}
-				
+
 	for(uint32_t pos : hpos) {
 		uint8_t h[7];
-					
+
 		for(auto &e : h) {
 			e = nib[pos];
 			pos ++;
@@ -2975,7 +2975,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 		uint8_t v3 = gcr6bw_tb[h[3]];
 		uint8_t tr = gcr6bw_tb[h[0]] | (v2 & 1 ? 0x40 : 0x00);
 		uint8_t se = gcr6bw_tb[h[1]];
-		//					uint8_t si = v2 & 0x20 ? 1 : 0;
+		//                  uint8_t si = v2 & 0x20 ? 1 : 0;
 		//                  uint8_t ds = v3 & 0x20 ? 1 : 0;
 		//                  uint8_t fmt = v3 & 0x1f;
 		uint8_t c1 = (tr^se^v2^v3) & 0x3f;

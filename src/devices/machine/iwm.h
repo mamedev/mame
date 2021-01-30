@@ -52,6 +52,7 @@ private:
 		S_IDLE,
 		SR_WINDOW_EDGE_0,
 		SR_WINDOW_EDGE_1,
+		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
 		SW_WINDOW_END
 	};
@@ -65,7 +66,7 @@ private:
 	u32 m_flux_write_count;
 	u32 m_q3_clock;
 	int m_active, m_rw, m_rw_state;
-	u8 m_data, m_whd, m_mode, m_status, m_control;
+	u8 m_data, m_whd, m_mode, m_status, m_control, m_rw_bit_count;
 	u8 m_rsh, m_wsh;
 	bool m_disable_mon;
 

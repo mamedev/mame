@@ -6454,12 +6454,12 @@ void model3_state::init_srally2()
 /*
 void model3_state::init_srally2pa()
 {
-	init_model3_20();
+    init_model3_20();
 
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	rom[(0x3ba44^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
-	rom[(0x3ba48^4)/4] = 0x60000000;
-	rom[(0x3ba4c^4)/4] = 0x60000000;
+    uint32_t *rom = (uint32_t*)memregion("user1")->base();
+    rom[(0x3ba44^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
+    rom[(0x3ba48^4)/4] = 0x60000000;
+    rom[(0x3ba4c^4)/4] = 0x60000000;
 }
 */
 
@@ -6497,7 +6497,7 @@ void model3_state::init_swtrilgp()
 	rom[(0x886e0^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
 	rom[(0x886e4^4)/4] = 0x60000000;
 	rom[(0x886e8^4)/4] = 0x60000000;
-	
+
 	rom[(0x0292c^4)/4] = 0x60000000;  // skip force feedback setup
 	rom[(0x02998^4)/4] = 0x60000000;
 }

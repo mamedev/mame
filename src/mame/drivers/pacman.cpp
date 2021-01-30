@@ -4768,6 +4768,32 @@ ROM_START( hangly3 )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
+// PCB marked KPM-II
+// Dumper's note: The PROMs are identical to regular Pac-Man. The board they were dumped from had a cut trace in the 4A prom circuit
+// which caused altered palettes to appear in-game. Although these palettes were unique and set it apart from being a simple sprite hack of Hanglyman,
+// the cut trace was likely accidental and there's no way to verify it was an intentional modification made by the bootleggers.
+ROM_START( baracuda )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all 2732
+	ROM_LOAD( "bcuda_prg1.bin", 0x0000, 0x1000, CRC(5fe8610a) SHA1(d63eaebd85e10aa6c27bb7f47642dd403eeb6934) )
+	ROM_LOAD( "bcuda_prg2.bin", 0x1000, 0x1000, CRC(61d38c6c) SHA1(1406aacdc9c8a3776e5853d214380ad3124408f4) )
+	ROM_LOAD( "bcuda_prg3.bin", 0x2000, 0x1000, CRC(4e7ef99f) SHA1(bd42e68b29b4d654dc817782ba00db69b7d2dfe2) )
+	ROM_LOAD( "bcuda_prg4.bin", 0x3000, 0x1000, CRC(55e86c2b) SHA1(ddbd98a585e38abda868c2ebc4494231aef00382) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // all 2716
+	ROM_LOAD( "bcuda_gfx1.bin", 0x0000, 0x0800, CRC(3fc4030c) SHA1(5e45f0c19cf96daa17afd2fa1c628d7ac7f4a79c) )
+	ROM_LOAD( "bcuda_gfx2.bin", 0x1000, 0x0800, CRC(f3e9c9d5) SHA1(709a75b2457f21f0f1a3d9e7f4c8579468ee5cad) )
+	ROM_LOAD( "bcuda_gfx3.bin", 0x0800, 0x0800, CRC(ea7fba5e) SHA1(3e9fde897037309e8dedda95e7bbdd1f0885f3ca) )
+	ROM_LOAD( "bcuda_gfx4.bin", 0x1800, 0x0800, CRC(133d720d) SHA1(8af75ed9e115a996379acedd44d0c09332ec5a03) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a", 0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
+ROM_END
+
 ROM_START( popeyeman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pop1.6e",      0x0000, 0x0800, CRC(9d027c4a) SHA1(88e094880057451a75cdc2ce9477403021813982) )
@@ -7867,6 +7893,7 @@ GAME( 198?, bucaner,  puckman,  pacman,   pacman,   pacman_state,  empty_init,  
 GAME( 1981, hangly,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 1)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 2)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 3)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, baracuda, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Coinex)",                     "Barracuda",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Popeye-Man",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacuman,  puckman,  pacman,   pacuman,  pacman_state,  empty_init,    ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)",                   MACHINE_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
 GAME( 1980, crockman, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (Rene Pierre)",             "Crock-Man",                                                MACHINE_SUPPORTS_SAVE )

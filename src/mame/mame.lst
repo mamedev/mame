@@ -13705,6 +13705,7 @@ fex68km4                        //
 
 @source:fidel_elite.cpp
 feasbu                          //
+feasbua                         //
 feasgla                         //
 feasglaa                        //
 feasglab                        //
@@ -15030,6 +15031,9 @@ pcv20                           // 198? PC-XT with V20 CPU
 
 @source:getaway.cpp
 getaway
+
+@source:gfamily.cpp
+gmfamily                        //
 
 @source:ggconnie.cpp
 fishingm                        // (c) 1997 Capcom
@@ -17119,6 +17123,7 @@ wcbowl161                       // (c) 1995 Incredible Technologies
 wcbowl165                       // (c) 1995 Incredible Technologies
 wcbowldx                        // (c) 1999 Incredible Technologies
 shoottv                         // (c) 199? Incredible Technologies
+pubball                         // (c) 1996 Midway/Incredible Technologies
 
 @source:itech8.cpp
 arlingtn                        // (c) 1991 Strata/Incredible Technologies
@@ -19749,6 +19754,7 @@ lordgun                         // (c) 1994
 daikaiju                        // A74 (c) 1986 Taito
 lsasquad                        // A64 (c) 1986 Taito Corporation / Taito America (dip switch)
 storming                        // A64 (c) 1986 Taito Corporation
+storminga                       // bootleg
 
 @source:ltcasino.cpp
 ltcasin2                        // (c) 1984 Digital Controls Inc
@@ -23238,6 +23244,7 @@ bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
 @source:missbamby.cpp
+goldfrts                        //
 gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
 minisupf                        // (c) 1981 Cirsa
@@ -33104,6 +33111,7 @@ abscam                          // hack
 acitya                          // (c) 1983 Epos Corporation
 alibaba                         // (c) 1982 Sega
 alibabab                        // Mustafa" and 40 Thieves (Ali Baba bootleg)
+baracuda                        // hack (Coinex)
 beastfp                         // (c) 1984 Epos Corporation
 bigbucks                        // (c) 1986 Dynasoft Inc.
 birdiy                          // (c) 1983 Mama Top
@@ -36580,6 +36588,7 @@ knockoutb                       // bootleg
 knockoutc                       //
 mariner                         // (c) 1981 Amenip
 mars                            // (c) 1981 Artic
+marsarf                         // bootleg (Arfyc)
 mrkougar                        // (c) 1984 ATW
 mrkougar2                       // (c) 1984 ATW
 mrkougb                         // bootleg
@@ -37963,9 +37972,13 @@ madzoo                          // (c) 1995 Bordun International
 mbutrfly                        // (c) 1999 (Bordun International?)
 miaction                        // (c) Vegas
 neraidou                        // Bootleg?
+olymp                           // Z Games
+rolla                           //
+score5                          // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
 sstar97                         // (c) 199? Bordun International
+superb2k                        // Random Games
 tigerslt                        // Bootleg?
 
 @source:skyraid.cpp
@@ -39601,6 +39614,7 @@ dondokod                        // 1989.?? B95 (c) 1989 Taito Corporation Japan 
 dondokodj                       // 1989.07 B95 (c) 1989 Taito Corporation (Japan)
 dondokodu                       // 1989.?? B95 (c) 1989 Taito America Corporation (US)
 driftout                        // 1991.10 (c) 1991 Visco (Europe)
+driftoutct                      // 1991.10 (c) 1991 Visco (Europe)
 driftoutj                       // 1991.10 (c) 1991 Visco (Japan)
 driveout                        // bootleg
 euroch92                        // 1991.??     (c) 1992 Taito Corporation Japan (World)
@@ -40260,10 +40274,12 @@ portmanj                        // (c) 1982 Taito Corp.
 roundup                         // (c) 1981 Amenip/Centuri
 rtriv                           // (c) 198? Romar
 suprmous                        // (c) 1982 Taito
+thehole                         // bootleg
 thepit                          // (c) 1982 Zilec
 thepitj                         // (c) 1982 Taito (licensed)
 thepitu1                        // (c) 1982 Centuri (licensed)
 thepitu2                        // (c) 1982 Centuri (licensed)
+theportr                        // bootleg
 ttfitter                        // bootleg
 zaryavos                        // (c) 1983 Nova Games of Canada (prototype)
 

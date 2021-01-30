@@ -5533,7 +5533,7 @@
 		</element>
 		<element name="lamp197" ref="lamp_197_1_border" state="0">
 			<bounds x="5" y="32" width="48" height="27"/>
-		</element>		
+		</element>
 		<element name="lamp197" ref="lamp_197_1" state="0">
 			<bounds x="7" y="34" width="44" height="23"/>
 		</element>

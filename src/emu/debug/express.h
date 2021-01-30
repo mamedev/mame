@@ -283,7 +283,6 @@ private:
 		parse_token(int offset = 0);
 
 		// getters
-		parse_token *next() const { return m_next; }
 		int offset() const { return m_offset; }
 		bool is_number() const { return (m_type == NUMBER); }
 		bool is_string() const { return (m_type == STRING); }
@@ -294,8 +293,9 @@ private:
 		bool is_lval() const { return ((m_type == SYMBOL && m_symbol->is_lval()) || m_type == MEMORY); }
 
 		u64 value() const { assert(m_type == NUMBER); return m_value; }
+		const char *string() const { assert(m_type == STRING); return m_string; }
 		u32 address() const { assert(m_type == MEMORY); return m_value; }
-		symbol_entry *symbol() const { assert(m_type == SYMBOL); return m_symbol; }
+		symbol_entry &symbol() const { assert(m_type == SYMBOL); return *m_symbol; }
 
 		u8 optype() const { assert(m_type == OPERATOR); return (m_flags & TIN_OPTYPE_MASK) >> TIN_OPTYPE_SHIFT; }
 		u8 precedence() const { assert(m_type == OPERATOR); return (m_flags & TIN_PRECEDENCE_MASK) >> TIN_PRECEDENCE_SHIFT; }
@@ -329,7 +329,6 @@ private:
 
 	private:
 		// internal state
-		parse_token *           m_next;             // next token in list
 		token_type              m_type;             // type of token
 		int                     m_offset;           // offset within the string
 		u64                     m_value;            // integral value
@@ -340,7 +339,7 @@ private:
 
 	// internal helpers
 	void copy(const parsed_expression &src);
-	void print_tokens(FILE *out);
+	void print_tokens();
 
 	// parsing helpers
 	void parse_string_into_tokens();
@@ -349,7 +348,7 @@ private:
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
 	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
-	void normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen);
+	void normalize_operator(parse_token &thistoken, parse_token *prevtoken, parse_token *nexttoken, const std::list<parse_token> &stack, bool was_rparen);
 	void infix_to_postfix();
 
 	// execution helpers

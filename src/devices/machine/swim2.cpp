@@ -231,7 +231,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		if(fifo_push(M_CRC) && !m_error)
 			m_error |= 0x04;
 		break;
-		
+
 	case 3: { // param
 		static const char *const pname[4] = {
 			"late", "time0", "early", "time1"
@@ -394,7 +394,7 @@ void swim2_device::sync()
 					cycles = 0;
 					break;
 				}
-			}			
+			}
 
 			if(m_tss_output & 0xc) {
 				bool bit;
@@ -525,7 +525,7 @@ void swim2_device::sync()
 						}
 					}
 				}
-			}				
+			}
 		}
 	}
 

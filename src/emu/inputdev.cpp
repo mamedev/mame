@@ -684,8 +684,7 @@ input_device_item::input_device_item(input_device &device, const char *name, voi
 	else
 	{
 		// otherwise, create a tokenized name
-		m_token.assign(name);
-		strmakeupper(m_token);
+		m_token.assign(strmakeupper(name));
 		strdelchr(m_token, ' ');
 		strdelchr(m_token, '_');
 	}

@@ -14,14 +14,13 @@ Hardware notes:
 - discrete sound
 
 TODO:
-- is accelerator min/max correct or should lowest be more than 0 like sspeedr?;
 - flyer mentions a gear shifter. Then I'd expect it at 0x30/0x31, but the game
   never reads from there;
 - unknown dipswitches, and verify factory defaults;
 - several unknowns in the video emulation:
   - score layer is a simplification hack, it is unknown how it should really
     cope RMW-wise against main layer. It also has wrong colors (different color
-	base or overlay artwork, with extra bit output for taking priority?).
+    base or overlay artwork, with extra bit output for taking priority?).
     The score background color should change from white(or is it cyan?) to red
     after Extended Play, the score digits themselves should always be black;
   - According to flyers, screen sides should have a green background color,
@@ -202,7 +201,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 
 	[0x07]
 	???w wwww transfer width, in 8 pixel units
-			Notice that 0xff is set on POST, either full clear or NOP
+	        Notice that 0xff is set on POST, either full clear or NOP
 
 	[0x08]
 	hhhh hhhh transfer height, in scanline units
@@ -350,7 +349,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(getaway_state, read_wheel)
 
 	PORT_START("WHEEL")
-	PORT_BIT( 0xff, 0x08, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x08, IPT_PADDLE ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
 	PORT_START("DSW.0") // DTS-8 dipswitch @ location k6
 	// TODO: defaults for these two, assume they have different quotas?

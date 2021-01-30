@@ -8,9 +8,9 @@
     - Currently hard-coded for use with the Jornada 720 driver.
     - Register contents are correctly stored, logged and masked, but
       register handling is otherwise largely non-present.
-	- There is the potential for endian issues, and it will be
-	  dealt with once the Jornada 720 driver makes heavier use of
-	  BitBLT operations or other operations relevant to endianness.
+    - There is the potential for endian issues, and it will be
+      dealt with once the Jornada 720 driver makes heavier use of
+      BitBLT operations or other operations relevant to endianness.
 
 **********************************************************************/
 
@@ -31,7 +31,7 @@
 #define LOG_LUT_WR      (1 << 11)
 #define LOG_MPLUG_RD    (1 << 12)
 #define LOG_MPLUG_WR    (1 << 13)
-#define LOG_LCD_RD_HF	(1 << 14)
+#define LOG_LCD_RD_HF   (1 << 14)
 #define LOG_ALL         (LOG_MISC_RD | LOG_MISC_WR | LOG_LCD_RD | LOG_LCD_WR | LOG_CRT_RD | LOG_CRT_WR | LOG_BITBLT_RD | LOG_BITBLT_WR | LOG_BITBLT_OP | LOG_LUT_RD \
 						| LOG_LUT_WR | LOG_MPLUG_RD | LOG_MPLUG_WR)
 

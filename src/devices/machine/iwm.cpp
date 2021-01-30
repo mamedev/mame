@@ -66,6 +66,7 @@ void iwm_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_rsh));
 	save_item(NAME(m_wsh));
+	save_item(NAME(m_rw_bit_count));
 }
 
 void iwm_device::device_reset()
@@ -78,7 +79,7 @@ void iwm_device::device_reset()
 	m_rw = MODE_IDLE;
 	m_rw_state = S_IDLE;
 	m_data = 0x00;
-	m_whd = 0xff;
+	m_whd = 0xbf;
 	m_mode = 0x00;
 	m_status = 0x00;
 	m_control = 0x00;
@@ -86,18 +87,20 @@ void iwm_device::device_reset()
 	m_rsh = 0x00;
 	m_flux_write_start = 0;
 	m_flux_write_count = 0;
-	m_devsel_cb(1);
+	m_rw_bit_count = 0;
+	m_devsel_cb(0);
 }
 
 void iwm_device::device_timer(emu_timer &, device_timer_id, int, void *)
 {
 	if(m_active == MODE_DELAY) {
+		flush_write();
 		m_active = MODE_IDLE;
 		if(m_floppy && !m_disable_mon)
 			m_floppy->mon_w(true);
-		if(m_disable_mon)
-			m_devsel_cb(0);
+		m_devsel_cb(0);
 		m_status &= ~0x20;
+		m_whd &= ~0x40;
 	}
 }
 
@@ -108,10 +111,10 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
-	if(m_floppy && !m_disable_mon)
+	if(m_floppy && (m_control & 0x10) && !m_disable_mon)
 		m_floppy->mon_w(true);
 	m_floppy = floppy;
-	if(m_floppy && !m_disable_mon)
+	if(m_floppy && (m_control & 0x10) && !m_disable_mon)
 		m_floppy->mon_w(false);
 	update_phases();
 }
@@ -150,7 +153,7 @@ void iwm_device::flush_write()
 u8 iwm_device::control(int offset, u8 data)
 {
 	sync();
-	logerror("control trigger %x, %02x\n", offset, data);
+	//	logerror("control trigger %x, %02x\n", offset, data);
 	u8 changed = m_control | (m_phases & 0xf);
 	if(offset < 8) {
 		if(offset & 1)
@@ -167,18 +170,25 @@ u8 iwm_device::control(int offset, u8 data)
 
 	changed ^= m_control | (m_phases & 0xf);
 
-	if(changed & 0x20)
-		m_devsel_cb(m_control & 0x20 ? 2 : 1);
+	if(changed & 0x30)
+		m_devsel_cb(m_control & 0x10 ? m_control & 0x20 ? 2 : 1 : 0);
 
 	if(changed & 0x10) {
 		if(m_control & 0x10) {
 			m_active = MODE_ACTIVE;
 			m_status |= 0x20;
+			if(m_floppy && !m_disable_mon)
+				m_floppy->mon_w(false);
 		} else {
 			if(m_mode & 0x04) {
+				flush_write();
 				m_active = MODE_IDLE;
 				m_status &= ~0x20;
+				m_whd &= ~0x40;
+				if(m_floppy && !m_disable_mon)
+					m_floppy->mon_w(true);
 			} else {
+				m_devsel_cb(m_control & 0x20 ? 2 : 1);
 				m_active = MODE_DELAY;
 				m_timer->adjust(cycles_to_time(8388608));
 			}
@@ -196,9 +206,10 @@ u8 iwm_device::control(int offset, u8 data)
 			m_async_update = 0;
 			m_data = 0x00;
 
-		} else if((m_control & 0xc0) == 0xc0 && (changed & 0xc0) == 0x40 && m_active && m_rw != MODE_WRITE) {
+		} else if((m_control & 0xc0) == 0xc0 && m_active && m_rw != MODE_WRITE) {
 			m_rw = MODE_WRITE;
 			m_rw_state = S_IDLE;
+			m_whd |= 0x40;
 			m_next_state_change = 0;
 			m_flux_write_start = m_last_sync;
 			m_flux_write_count = 0;
@@ -214,7 +225,7 @@ u8 iwm_device::control(int offset, u8 data)
 			m_rw = MODE_IDLE;
 	}
 
-	if(changed || 1) {
+	if(1) {
 		u8 s = m_control & 0xc0;
 		const char *slot = "?";
 		if(s == 0x00 && !m_active)
@@ -230,7 +241,7 @@ u8 iwm_device::control(int offset, u8 data)
 		if(s == 0xc0 && m_active)
 			slot = "write load / write data";
 
-		logerror("control %c%c %c%c %c%c%c%c (%s) [%s, %s]\n",
+		logerror("control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
 				 m_control & 0x80 ? '1' : '0',
 				 m_control & 0x40 ? '1' : '0',
 				 m_control & 0x20 ? 'b' : 'a',
@@ -241,7 +252,8 @@ u8 iwm_device::control(int offset, u8 data)
 				 m_phases & 0x01 ? '#' : '.',
 				 slot,
 				 m_active == MODE_IDLE ? "idle" : m_active == MODE_DELAY ? "delay" : "active",
-				 m_rw == MODE_IDLE ? "idle" : m_rw == MODE_READ ? "read" : "write");
+				 m_rw == MODE_IDLE ? "idle" : m_rw == MODE_READ ? "read" : "write",
+				 m_whd, m_data);
 	}
 
 	if(m_active && !(m_control & 0xc0) && !is_sync() && (m_data & 0x80))
@@ -249,7 +261,7 @@ u8 iwm_device::control(int offset, u8 data)
 
 	switch(m_control & 0xc0) {
 	case 0x00: return m_active ? m_data : 0xff;
-	case 0x40: return (m_status & 0x7f) | (!m_floppy || m_floppy->wpt_r() ? 0x80 : 0);;
+	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0);;
 	case 0x80: return m_whd;
 	case 0xc0: if(offset & 1) { if(m_active) data_w(data); else mode_w(data); } return 0xff;
 	}
@@ -277,6 +289,9 @@ void iwm_device::data_w(u8 data)
 	m_data = data;
 	if(is_sync() && m_rw == MODE_WRITE)
 		m_wsh = data;
+	if(m_mode & 0x01)
+		m_whd &= 0x7f;
+	logerror("data load %02x, m_mode %02x whd %02x\n", m_data, m_mode, m_whd);
 }
 
 u64 iwm_device::time_to_cycles(const attotime &tm) const
@@ -379,6 +394,9 @@ void iwm_device::sync()
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {
 						m_data = m_rsh;
+						logerror("DATAR %02x\n", m_data);
+						if(m_data == 0xfc)
+							machine().debug_break();
 						m_rsh = 0;
 					} else if(m_rsh >= 0x04) {
 						m_data = m_rsh;
@@ -388,6 +406,9 @@ void iwm_device::sync()
 
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
+					logerror("DATAR %02x\n", m_data);
+					if(m_data == 0xfc)
+						machine().debug_break();
 					m_rsh = 0;
 				}
 				break;
@@ -418,25 +439,65 @@ void iwm_device::sync()
 				m_last_sync = m_next_state_change;
 			switch(m_rw_state) {
 			case S_IDLE:
-				m_wsh = m_data;
-				m_rw_state = SW_WINDOW_MIDDLE;
-				m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+				//				logerror("%s: idle\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				m_flux_write_count = 0;
+				if(m_mode & 0x02) {
+					m_rw_state = SW_WINDOW_LOAD;
+					m_rw_bit_count = 8;
+					m_next_state_change = m_last_sync + 7;
+				} else {
+					m_wsh = m_data;
+					m_rw_state = SW_WINDOW_MIDDLE;
+					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+				}
+				break;
+
+			case SW_WINDOW_LOAD:
+				//				logerror("%s: window load\n", attotime::from_ticks(m_last_sync, clock()).to_string());
+				if(m_whd & 0x80) {
+					//					logerror("Underrun\n");
+					m_whd &= ~0x40;
+					m_rw_state = S_IDLE;
+					m_last_sync = next_sync;
+				} else {
+					logerror("DATAW %02x\n", m_data);
+					m_wsh = m_data;
+					m_rw_state = SW_WINDOW_MIDDLE;
+					m_whd |= 0x80;
+					m_next_state_change = m_last_sync + half_window_size() - 7;
+				}
 				break;
 
 			case SW_WINDOW_MIDDLE:
+				//				logerror("%s: window middle\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				if(m_wsh & 0x80)
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_wsh <<= 1;
-				m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
-
 				m_rw_state = SW_WINDOW_END;
+				if(m_mode & 0x02)
+					m_next_state_change = m_last_sync + half_window_size();
+				else
+					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
 				break;
+
 			case SW_WINDOW_END:
+				//				logerror("%s: window end\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				if(m_flux_write_count == m_flux_write.size())
 					flush_write();
-				m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
-				m_rw_state = SW_WINDOW_MIDDLE;
+				if(m_mode & 0x02) {
+					m_rw_bit_count --;
+					if(m_rw_bit_count == 0) {
+						m_rw_state = SW_WINDOW_LOAD;
+						m_rw_bit_count = 8;
+						m_next_state_change = m_last_sync + 7;
+					} else {
+						m_rw_state = SW_WINDOW_MIDDLE;
+						m_next_state_change = m_last_sync + half_window_size();
+					}
+				} else {
+					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					m_rw_state = SW_WINDOW_MIDDLE;
+				}
 				break;
 			}
 		}

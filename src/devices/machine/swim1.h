@@ -22,7 +22,6 @@ class swim1_device : public applefdintf_device
 {
 public:
 	// construction/destruction
-	swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock);
 	swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual u8 read(offs_t offset) override;
@@ -61,19 +60,17 @@ private:
 	std::array<u64, 32> m_flux_write;
 	u32 m_flux_write_count;
 	u64 m_last_sync;
-	double m_iwm_q3_fclk_ratio, m_iwm_fclk_q3_ratio;
-	[[maybe_unused]] u32 m_q3_clock;
 
 	u8 m_ism_param[16];
 	u8 m_ism_mode, m_ism_setup;
-	[[maybe_unused]] u8 m_ism_error;
+	//u8 m_ism_error;
 	u8 m_ism_param_idx, m_ism_fifo_pos;
-	[[maybe_unused]] u8 m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
+	//u8 m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
 	u16 m_ism_fifo[2];
-	[[maybe_unused]] u16 m_ism_sr;
+	//u16 m_ism_sr;
 	u16 m_ism_crc;
-	[[maybe_unused]] u16 m_ism_mfm_sync_counter;
-	[[maybe_unused]] u32 m_ism_half_cycles_before_change;
+	//u16 m_ism_mfm_sync_counter;
+	//u32 m_ism_half_cycles_before_change;
 
 	u64 m_iwm_next_state_change, m_iwm_sync_update, m_iwm_async_update;
 	int m_iwm_active, m_iwm_rw, m_iwm_rw_state;
@@ -85,12 +82,9 @@ private:
 	attotime cycles_to_time(u64 cycles) const;
 	void flush_write(u64 when = 0);
 
-	u64 iwm_fclk_to_q3(u64 cycles) const;
-	u64 iwm_q3_to_fclk(u64 cycles) const;
 	u64 iwm_window_size() const;
 	u64 iwm_half_window_size() const;
 	u64 iwm_read_register_update_delay() const;
-	u64 iwm_write_sync_half_window_size() const;
 	inline bool iwm_is_sync() const;
 	void iwm_mode_w(u8 data);
 	void iwm_data_w(u8 data);

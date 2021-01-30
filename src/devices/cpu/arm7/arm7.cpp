@@ -49,7 +49,7 @@ TODO:
 #include "logmacro.h"
 
 #define PRINT_HAPYFSH2      (0)
-#define PRINT_CE_KERNEL		(0)
+#define PRINT_CE_KERNEL     (0)
 
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
