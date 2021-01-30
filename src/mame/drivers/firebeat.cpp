@@ -180,10 +180,6 @@ struct IBUTTON
 static void firebeat_ata_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
-}
-
-static void firebeat_ata_devices_hdd(device_slot_interface &device)
-{
 	device.option_add("hdd", IDE_HARDDISK);
 }
 
@@ -1188,9 +1184,10 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 		screen->screen_vblank().set(FUNC(firebeat_bm3_state::bm3_vblank));
 	}
 
-	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices_hdd, "hdd", nullptr, true);
+	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_bm3_state::spu_ata_dmarq));
+	m_spuata->slot(0).set_fixed(true);
 
 	// 500 hz seems ok for beatmania III.
 	// Any higher makes things act weird.
@@ -1324,9 +1321,10 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 	firebeat_spu_base(config);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
-	m_spuata->slot(0).set_option_machine_config("cdrom", dvdrom_config);
 	m_spuata->irq_handler().set(FUNC(firebeat_popn_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_popn_state::spu_ata_dmarq));
+	m_spuata->slot(0).set_option_machine_config("cdrom", dvdrom_config);
+	m_spuata->slot(0).set_fixed(true);
 
 	// 500 hz works best for pop'n music.
 	// Any lower and sometimes you'll hear buzzing from certain keysounds, or fades take too long.
@@ -1511,6 +1509,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_kbm_state::ata_interrupt));
 	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
+	m_ata->slot(1).set_fixed(true);
 
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
