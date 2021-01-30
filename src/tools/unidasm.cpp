@@ -180,6 +180,7 @@ using util::BIT;
 #include "cpu/upd78k/upd78k3d.h"
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
+#include "cpu/v850/v850dasm.h"
 #include "cpu/vt50/vt50dasm.h"
 #include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
@@ -616,6 +617,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
+	{ "v850",            le,  0, []() -> util::disasm_interface * { return new v850_disassembler; } },
+	{ "v850es",          le,  0, []() -> util::disasm_interface * { return new v850es_disassembler; } },
+	{ "v850e2",          le,  0, []() -> util::disasm_interface * { return new v850e2_disassembler; } },
 	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
 	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
 	{ "vt61",            le, -1, []() -> util::disasm_interface * { return new vt61_disassembler; } },

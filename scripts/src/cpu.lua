@@ -2018,6 +2018,15 @@ if (CPUS["V810"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- NEC V850, disassembler only
+--------------------------------------------------
+
+if (_OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v850/v850dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v850/v850dasm.h")
+end
+
+--------------------------------------------------
 -- NEC uPD7725
 --@src/devices/cpu/upd7725/upd7725.h,CPUS["UPD7725"] = true
 --------------------------------------------------
