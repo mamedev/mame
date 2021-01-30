@@ -246,16 +246,16 @@ private:
 	int ibutton_w(uint8_t data);
 	void security_w(uint8_t data);
 
-	uint32_t extend_board_irq_r(offs_t offset, uint32_t mem_mask = ~0);
-	void extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t extend_board_irq_r(offs_t offset);
+	void extend_board_irq_w(offs_t offset, uint8_t data);
 
-	uint32_t input_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint8_t input_r(offs_t offset);
 
-	uint32_t ata_command_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t ata_command_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint32_t ata_control_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t ata_control_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ata_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 //  uint32_t comm_uart_r(offs_t offset, uint32_t mem_mask = ~ 0);
 //  void comm_uart_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -297,7 +297,6 @@ protected:
 	required_device<ata_interface_device> m_spuata;
 
 private:
-	uint16_t spu_unk_r();
 	void spu_status_led_w(uint16_t data);
 	void spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spu_ata_dma_low_w(uint16_t data);
@@ -366,7 +365,7 @@ private:
 
 	void init_keyboard();
 
-	uint32_t keyboard_wheel_r(offs_t offset);
+	uint8_t keyboard_wheel_r(offs_t offset);
 	uint8_t midi_uart_r(offs_t offset);
 	void midi_uart_w(offs_t offset, uint8_t data);
 
@@ -696,117 +695,60 @@ void firebeat_state::security_w(uint8_t data)
 // 0x10: ?
 // 0x20: ?
 
-uint32_t firebeat_state::extend_board_irq_r(offs_t offset, uint32_t mem_mask)
+uint8_t firebeat_state::extend_board_irq_r(offs_t offset)
 {
-	uint32_t r = 0;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= (~m_extend_board_irq_active) << 24;
-	}
-
-	return r;
+	return ~m_extend_board_irq_active;
 }
 
-void firebeat_state::extend_board_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void firebeat_state::extend_board_irq_w(offs_t offset, uint8_t data)
 {
-//  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+//  printf("extend_board_irq_w: %08X, %08X\n", data, offset);
 
-	if (ACCESSING_BITS_24_31)
-	{
-		m_extend_board_irq_active &= ~((data >> 24) & 0xff);
-
-		m_extend_board_irq_enable = (data >> 24) & 0xff;
-	}
+	m_extend_board_irq_active &= ~(data & 0xff);
+	m_extend_board_irq_enable = data & 0xff;
 }
 
 /*****************************************************************************/
 
-uint32_t firebeat_state::input_r(offs_t offset, uint32_t mem_mask)
+uint8_t firebeat_state::input_r(offs_t offset)
 {
-	uint32_t r = 0;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= (ioport("IN0")->read() & 0xff) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= (ioport("IN3")->read() & 0xff) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= (ioport("IN1")->read() & 0xff) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= (ioport("IN2")->read() & 0xff);
+	switch (offset) {
+		case 0: return (ioport("IN0")->read() & 0xff);
+		case 1: return (ioport("IN1")->read() & 0xff);
+		case 2: return (ioport("IN2")->read() & 0xff);
+		case 3: return (ioport("IN3")->read() & 0xff);
 	}
 
-	return r;
+	return 0;
 }
 
 /*****************************************************************************/
 /* ATA Interface */
 
-uint32_t firebeat_state::ata_command_r(offs_t offset, uint32_t mem_mask)
+uint16_t firebeat_state::ata_command_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t r;
-//  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
-	if (ACCESSING_BITS_16_31)
-	{
-		r = m_ata->cs0_r(offset*2, swapendian_int16((mem_mask >> 16) & 0xffff));
-		return swapendian_int16(r) << 16;
-	}
-	else
-	{
-		r = m_ata->cs0_r((offset*2) + 1, swapendian_int16((mem_mask >> 0) & 0xffff));
-		return swapendian_int16(r) << 0;
-	}
+// printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
+	uint16_t r = m_ata->cs0_r(offset, swapendian_int16(mem_mask));
+	return swapendian_int16(r);
 }
 
-void firebeat_state::ata_command_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void firebeat_state::ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("ata_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-
-	if (ACCESSING_BITS_16_31)
-	{
-		m_ata->cs0_w(offset*2, swapendian_int16((data >> 16) & 0xffff), swapendian_int16((mem_mask >> 16) & 0xffff));
-	}
-	else
-	{
-		m_ata->cs0_w((offset*2) + 1, swapendian_int16((data >> 0) & 0xffff), swapendian_int16((mem_mask >> 0) & 0xffff));
-	}
+	m_ata->cs0_w(offset, swapendian_int16(data & 0xffff), swapendian_int16(mem_mask & 0xffff));
 }
 
 
-uint32_t firebeat_state::ata_control_r(offs_t offset, uint32_t mem_mask)
+uint16_t firebeat_state::ata_control_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t r;
 //  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
-
-	if (ACCESSING_BITS_16_31)
-	{
-		r = m_ata->cs1_r(offset*2, swapendian_int16((mem_mask >> 16) & 0xffff));
-		return swapendian_int16(r) << 16;
-	}
-	else
-	{
-		r = m_ata->cs1_r((offset*2) + 1, swapendian_int16((mem_mask >> 0) & 0xffff));
-		return swapendian_int16(r) << 0;
-	}
+	uint16_t r = m_ata->cs1_r(offset, swapendian_int16(mem_mask));
+	return swapendian_int16(r);
 }
 
-void firebeat_state::ata_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void firebeat_state::ata_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (ACCESSING_BITS_16_31)
-	{
-		m_ata->cs1_w(offset*2, swapendian_int16(data >> 16) & 0xffff, swapendian_int16((mem_mask >> 16) & 0xffff));
-	}
-	else
-	{
-		m_ata->cs1_w((offset*2) + 1, swapendian_int16(data >> 0) & 0xffff, swapendian_int16((mem_mask >> 0) & 0xffff));
-	}
+	m_ata->cs1_w(offset, swapendian_int16(data & 0xffff), swapendian_int16(mem_mask & 0xffff));
 }
 
 
@@ -1567,15 +1509,11 @@ void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
 	map(0x7e800100, 0x7e8001ff).rw(m_gcu_sub, FUNC(k057714_device::read), FUNC(k057714_device::write));
 }
 
-uint32_t firebeat_kbm_state::keyboard_wheel_r(offs_t offset)
+uint8_t firebeat_kbm_state::keyboard_wheel_r(offs_t offset)
 {
-	if (offset == 0)        // Keyboard Wheel (P1)
-	{
-		return ioport("WHEEL_P1")->read() << 24;
-	}
-	else if (offset == 2)   // Keyboard Wheel (P2)
-	{
-		return ioport("WHEEL_P2")->read() << 24;
+	switch (offset) {
+		case 0: return ioport("WHEEL_P1")->read(); // Keyboard Wheel (P1)
+		case 8: return ioport("WHEEL_P2")->read(); // Keyboard Wheel (P2)
 	}
 
 	return 0;
@@ -1709,7 +1647,7 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 /*****************************************************************************/
 
 static INPUT_PORTS_START( firebeat )
-	PORT_START("IN2")
+	PORT_START("IN3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "DIP SW:8" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "DIP SW:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "DIP SW:6" )
@@ -1719,7 +1657,7 @@ static INPUT_PORTS_START( firebeat )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "DIP SW:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "DIP SW:1" )
 
-	PORT_START("IN3")
+	PORT_START("IN1")
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Fixes "FLASH RAM DATA ERROR" in some games (Mickey Tunes)
 INPUT_PORTS_END
@@ -1749,7 +1687,7 @@ static INPUT_PORTS_START(ppp)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )             // Fixes booting in PPP with certain dongle types
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// ParaParaParadise has 24 sensors, grouped into groups of 3 for each sensor bar
@@ -1786,7 +1724,7 @@ static INPUT_PORTS_START(kbm)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )              // Coin
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )           // e-Amusement
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )            // e-Amusement (Keyboardmania)
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1866,7 +1804,7 @@ static INPUT_PORTS_START(popn)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )            // Switch 7
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )            // Switch 8
 
-	PORT_START("IN1")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )            // Switch 9
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              // Coin
@@ -1890,7 +1828,7 @@ static INPUT_PORTS_START(bm3)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Foot") // P1 Foot Pedal
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Foot") // P2 Foot Pedal
 
-	PORT_START("IN1")
+	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IO1")
