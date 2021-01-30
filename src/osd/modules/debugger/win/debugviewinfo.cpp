@@ -401,6 +401,7 @@ void debugview_info::draw_contents(HDC windc)
 	// get the client rect
 	RECT client;
 	GetClientRect(m_wnd, &client);
+	bool const need_filldown = client.bottom > (metrics().debug_font_height() * visarea.y);
 
 	// create a compatible DC and an offscreen bitmap
 	HDC const dc = CreateCompatibleDC(windc);
@@ -413,6 +414,9 @@ void debugview_info::draw_contents(HDC windc)
 		return;
 	}
 	HGDIOBJ const oldbitmap = SelectObject(dc, bitmap);
+	bool const show_hscroll = m_hscroll && IsWindowVisible(m_hscroll);
+	if (show_hscroll)
+		client.bottom -= metrics().hscroll_height();
 
 	// set the font
 	HGDIOBJ const oldfont = SelectObject(dc, metrics().debug_font());
@@ -423,6 +427,8 @@ void debugview_info::draw_contents(HDC windc)
 	// iterate over rows and columns
 	for (uint32_t row = 0; row < visarea.y; row++)
 	{
+		bool do_filldown = (row == (visarea.y - 1)) && need_filldown;
+
 		// loop twice; once to fill the background and once to draw the text
 		for (int iter = 0; iter < 2; iter++)
 		{
@@ -451,16 +457,16 @@ void debugview_info::draw_contents(HDC windc)
 				{
 					COLORREF oldbg = bgcolor;
 
-					// reset to standard colors
-					fgcolor = RGB(0x00,0x00,0x00);
+					// pick new background color
 					bgcolor = RGB(0xff,0xff,0xff);
-
-					// pick new fg/bg colors
 					if (viewdata[col].attrib & DCA_VISITED) bgcolor = RGB(0xc6, 0xe2, 0xff);
 					if (viewdata[col].attrib & DCA_ANCILLARY) bgcolor = RGB(0xe0,0xe0,0xe0);
 					if (viewdata[col].attrib & DCA_SELECTED) bgcolor = RGB(0xff,0x80,0x80);
 					if (viewdata[col].attrib & DCA_CURRENT) bgcolor = RGB(0xff,0xff,0x00);
 					if ((viewdata[col].attrib & DCA_SELECTED) && (viewdata[col].attrib & DCA_CURRENT)) bgcolor = RGB(0xff,0xc0,0x80);
+
+					// pick new foreground color
+					fgcolor = RGB(0x00,0x00,0x00);
 					if (viewdata[col].attrib & DCA_CHANGED) fgcolor = RGB(0xff,0x00,0x00);
 					if (viewdata[col].attrib & DCA_INVALID) fgcolor = RGB(0x00,0x00,0xff);
 					if (viewdata[col].attrib & DCA_DISABLED) fgcolor = RGB((GetRValue(fgcolor) + GetRValue(bgcolor)) / 2, (GetGValue(fgcolor) + GetGValue(bgcolor)) / 2, (GetBValue(fgcolor) + GetBValue(bgcolor)) / 2);
@@ -471,21 +477,41 @@ void debugview_info::draw_contents(HDC windc)
 					{
 						bounds.right = bounds.left + (count * metrics().debug_font_width());
 						if (iter == 0)
+						{
 							FillRect(dc, &bounds, bgbrush);
+							if (do_filldown)
+							{
+								COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+								if (oldbg != filldown)
+								{
+									DeleteObject(bgbrush);
+									bgbrush = CreateSolidBrush(filldown);
+									oldbg = filldown;
+								}
+								RECT padding = bounds;
+								padding.top = padding.bottom;
+								padding.bottom = client.bottom;
+								FillRect(dc, &padding, bgbrush);
+							}
+						}
 						else
+						{
 							ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
+						}
 						bounds.left = bounds.right;
 						count = 0;
 					}
 
 					// set the new colors
-					if (iter == 0 && oldbg != bgcolor)
+					if (iter == 1)
+					{
+						SetTextColor(dc, fgcolor);
+					}
+					else if (oldbg != bgcolor)
 					{
 						DeleteObject(bgbrush);
 						bgbrush = CreateSolidBrush(bgcolor);
 					}
-					else if (iter == 1)
-						SetTextColor(dc, fgcolor);
 					last_attrib = viewdata[col].attrib;
 				}
 
@@ -494,22 +520,29 @@ void debugview_info::draw_contents(HDC windc)
 			}
 
 			// flush any remaining stuff
-			if (count > 0)
-			{
-				bounds.right = bounds.left + (count * metrics().debug_font_width());
-				if (iter == 0)
-					FillRect(dc, &bounds, bgbrush);
-				else
-					ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
-			}
-
-			// erase to the end of the line
+			bounds.right = bounds.left + (count * metrics().debug_font_width());
 			if (iter == 0)
 			{
-				bounds.left = bounds.right;
+				// erase to the end of the line
 				bounds.right = client.right;
 				FillRect(dc, &bounds, bgbrush);
+				if (do_filldown)
+				{
+					COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+					if (bgcolor != filldown)
+					{
+						DeleteObject(bgbrush);
+						bgbrush = CreateSolidBrush(filldown);
+					}
+					bounds.top = bounds.bottom;
+					bounds.bottom = client.bottom;
+					FillRect(dc, &bounds, bgbrush);
+				}
 				DeleteObject(bgbrush);
+			}
+			else if (count > 0)
+			{
+				ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
 			}
 		}
 
@@ -517,10 +550,13 @@ void debugview_info::draw_contents(HDC windc)
 		viewdata += visarea.x;
 	}
 
-	// erase anything beyond the bottom with white
-	GetClientRect(m_wnd, &client);
-	client.top = visarea.y * metrics().debug_font_height();
-	FillRect(dc, &client, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	// prevent garbage from showing in the corner
+	if (show_hscroll)
+	{
+		client.top = client.bottom;
+		client.bottom = client.top + metrics().hscroll_height();
+		FillRect(dc, &client, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	}
 
 	// reset the font
 	SetBkMode(dc, oldbkmode);
@@ -539,47 +575,48 @@ void debugview_info::draw_contents(HDC windc)
 
 void debugview_info::update()
 {
-	RECT bounds, vscroll_bounds, hscroll_bounds;
-	debug_view_xy totalsize, visiblesize, topleft;
-	bool show_vscroll, show_hscroll;
 	SCROLLINFO scrollinfo;
 
+	// get the updated total rows/cols and left row/col
+	debug_view_xy const totalsize = m_view->total_size();
+	debug_view_xy topleft = m_view->visible_position();
+
 	// get the view window bounds
+	RECT bounds;
 	GetClientRect(m_wnd, &bounds);
+	debug_view_xy visiblesize;
 	visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
 	visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
 
-	// get the updated total rows/cols and left row/col
-	totalsize = m_view->total_size();
-	topleft = m_view->visible_position();
-
 	// determine if we need to show the scrollbars
-	show_vscroll = show_hscroll = false;
-	if (totalsize.x > visiblesize.x && bounds.bottom >= metrics().hscroll_height())
+	bool const fit_hscroll = (bounds.bottom - bounds.top) > metrics().hscroll_height();
+	bool show_hscroll = fit_hscroll && (totalsize.x > visiblesize.x);
+	if (show_hscroll)
 	{
 		bounds.bottom -= metrics().hscroll_height();
 		visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
-		show_hscroll = true;
 	}
-	if (totalsize.y > visiblesize.y && bounds.right >= metrics().vscroll_width())
+	bool const fit_vscroll = (bounds.right - bounds.left) > metrics().vscroll_width();
+	bool const show_vscroll = fit_vscroll && (totalsize.y > visiblesize.y);
+	if (show_vscroll)
 	{
 		bounds.right -= metrics().vscroll_width();
 		visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
-		show_vscroll = true;
-	}
-	if (!show_vscroll && totalsize.y > visiblesize.y && bounds.right >= metrics().vscroll_width())
-	{
-		bounds.right -= metrics().vscroll_width();
-		visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
-		show_vscroll = true;
+		if (fit_hscroll && !show_hscroll && (totalsize.x > visiblesize.x))
+		{
+			bounds.bottom -= metrics().hscroll_height();
+			visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
+			show_hscroll = true;
+		}
 	}
 
 	// compute the bounds of the scrollbars
+	RECT vscroll_bounds;
 	GetClientRect(m_wnd, &vscroll_bounds);
 	vscroll_bounds.left = vscroll_bounds.right - metrics().vscroll_width();
 	if (show_hscroll)
 		vscroll_bounds.bottom -= metrics().hscroll_height();
-
+	RECT hscroll_bounds;
 	GetClientRect(m_wnd, &hscroll_bounds);
 	hscroll_bounds.top = hscroll_bounds.bottom - metrics().hscroll_height();
 	if (show_vscroll)
@@ -592,26 +629,34 @@ void debugview_info::update()
 		topleft.x = std::max(totalsize.x - visiblesize.x, 0);
 
 	// fill out the scroll info struct for the vertical scrollbar
-	scrollinfo.cbSize = sizeof(scrollinfo);
-	scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-	scrollinfo.nMin = 0;
-	scrollinfo.nMax = totalsize.y - 1;
-	scrollinfo.nPage = visiblesize.y;
-	scrollinfo.nPos = topleft.y;
-	SetScrollInfo(m_vscroll, SB_CTL, &scrollinfo, TRUE);
+	if (m_vscroll)
+	{
+		scrollinfo.cbSize = sizeof(scrollinfo);
+		scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+		scrollinfo.nMin = 0;
+		scrollinfo.nMax = totalsize.y - 1;
+		scrollinfo.nPage = visiblesize.y;
+		scrollinfo.nPos = topleft.y;
+		SetScrollInfo(m_vscroll, SB_CTL, &scrollinfo, TRUE);
+	}
 
 	// fill out the scroll info struct for the horizontal scrollbar
-	scrollinfo.cbSize = sizeof(scrollinfo);
-	scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-	scrollinfo.nMin = 0;
-	scrollinfo.nMax = totalsize.x - 1;
-	scrollinfo.nPage = visiblesize.x;
-	scrollinfo.nPos = topleft.x;
-	SetScrollInfo(m_hscroll, SB_CTL, &scrollinfo, TRUE);
+	if (m_hscroll)
+	{
+		scrollinfo.cbSize = sizeof(scrollinfo);
+		scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+		scrollinfo.nMin = 0;
+		scrollinfo.nMax = totalsize.x - 1;
+		scrollinfo.nPage = visiblesize.x;
+		scrollinfo.nPos = topleft.x;
+		SetScrollInfo(m_hscroll, SB_CTL, &scrollinfo, TRUE);
+	}
 
 	// update window info
-	visiblesize.y++;
-	visiblesize.x++;
+	if (((bounds.right - bounds.left) > (visiblesize.x * metrics().debug_font_width())) && ((topleft.x + visiblesize.x) < totalsize.x))
+		visiblesize.x++;
+	if (((bounds.bottom - bounds.top) > (visiblesize.y * metrics().debug_font_height())) && ((topleft.y + visiblesize.y) < totalsize.y))
+		visiblesize.y++;
 	m_view->set_visible_size(visiblesize);
 	m_view->set_visible_position(topleft);
 
@@ -691,7 +736,7 @@ uint32_t debugview_info::process_scroll(WORD type, HWND wnd)
 	scrollinfo.nPos = result;
 	SetScrollInfo(wnd, SB_CTL, &scrollinfo, TRUE);
 
-	return (uint32_t)result;
+	return uint32_t(result);
 }
 
 
@@ -864,10 +909,11 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 		{
-			debug_view_xy topleft = m_view->visible_position();
+			debug_view_xy const topleft = m_view->visible_position();
+			debug_view_xy const visiblesize = m_view->visible_size();
 			debug_view_xy newpos;
-			newpos.x = topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width();
-			newpos.y = topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height();
+			newpos.x = std::max(std::min<int>(topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width(), topleft.x + visiblesize.x - 1), 0);
+			newpos.y = std::max(std::min<int>(topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height(), topleft.y + visiblesize.y - 1), 0);
 			m_view->process_click((message == WM_LBUTTONDOWN) ? DCK_LEFT_CLICK : DCK_MIDDLE_CLICK, newpos);
 			SetFocus(m_wnd);
 			break;
@@ -877,10 +923,11 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_RBUTTONDOWN:
 		if (m_view->cursor_supported())
 		{
-			debug_view_xy topleft = m_view->visible_position();
+			debug_view_xy const topleft = m_view->visible_position();
+			debug_view_xy const visiblesize = m_view->visible_size();
 			debug_view_xy newpos;
-			newpos.x = topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width();
-			newpos.y = topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height();
+			newpos.x = std::max(std::min<int>(topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width(), topleft.x + visiblesize.x - 1), 0);
+			newpos.y = std::max(std::min<int>(topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height(), topleft.y + visiblesize.y - 1), 0);
 			m_view->set_cursor_position(newpos);
 			m_view->set_cursor_visible(true);
 		}

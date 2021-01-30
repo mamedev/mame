@@ -66,11 +66,13 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 	// Handle the scroll bars
 	int const horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
 	horizontalScrollBar()->setRange(0, (std::max)(0, horizontalScrollCharDiff));
+	horizontalScrollBar()->setPageStep(lineWidth - 1);
 
 	int const verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
 	int const verticalScrollSize = (std::max)(0, verticalScrollCharDiff);
 	bool const atEnd = verticalScrollBar()->value() == verticalScrollBar()->maximum();
 	verticalScrollBar()->setRange(0, verticalScrollSize);
+	verticalScrollBar()->setPageStep((contentHeight / fontHeight) - 1);
 	if (m_preferBottom && atEnd)
 		verticalScrollBar()->setValue(verticalScrollSize);
 
@@ -147,8 +149,23 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 					x * fontWidth,
 					y * fontHeight,
 					((x + width) < visibleCharDims.x) ? (width * fontWidth) : (contentWidth - (x * fontWidth)),
-					((y + 1) < visibleCharDims.y) ? fontHeight : (contentHeight - (y * fontHeight)),
+					fontHeight,
 					bgBrush);
+
+			if (((y + 1) == visibleCharDims.y) && (contentHeight > (visibleCharDims.y * fontHeight)))
+			{
+				if (textAttr & DCA_ANCILLARY)
+					bgColor.setRgb(0xe0, 0xe0, 0xe0);
+				else
+					bgColor.setRgb(0xff, 0xff, 0xff);
+				bgBrush.setColor(bgColor);
+				painter.fillRect(
+						x * fontWidth,
+						visibleCharDims.y * fontHeight,
+						((x + width) < visibleCharDims.x) ? (width * fontWidth) : (contentWidth - (x * fontWidth)),
+						contentHeight - (visibleCharDims.y * fontHeight),
+						bgBrush);
+			}
 
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.

@@ -326,7 +326,7 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 		if (addressSpace)
 		{
 			// get the last known PC to write to this memory location
-			debug_view_xy const pos = view()->cursor_position();
+			debug_view_xy const pos = memView.cursor_position();
 			offs_t const address = memView.addressAtCursorPosition(pos);
 			offs_t a = address & addressSpace->logaddrmask();
 			bool good = false;
