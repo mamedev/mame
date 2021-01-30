@@ -22,8 +22,7 @@ class iwm_device: public applefdintf_device
 {
 public:
 	// construction/destruction
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock, bool disable_mon = false);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock = 0, bool disable_mon = false);
 	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock, bool disable_mon = false) :
 		iwm_device(mconfig, tag, owner, clock, q3_clock.value(), disable_mon) {}
 

@@ -19,18 +19,8 @@ iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t 
 	m_q3_clock(q3_clock),
 	m_disable_mon(disable_mon)
 {
-	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
-	m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
-}
-
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	applefdintf_device(mconfig, IWM, tag, owner, clock),
-	m_floppy(nullptr),
-	m_q3_clock(0),
-	m_disable_mon(false)
-{
-	m_q3_fclk_ratio = 0;
-	m_fclk_q3_ratio = 0;
+	m_q3_fclk_ratio = q3_clock ? double(clock)/double(q3_clock) : 0; // ~0.25
+	m_fclk_q3_ratio = q3_clock ? double(q3_clock)/double(clock) : 0; // ~4
 }
 
 u64 iwm_device::q3_to_fclk(u64 cycles) const
@@ -448,7 +438,10 @@ void iwm_device::sync()
 				} else {
 					m_wsh = m_data;
 					m_rw_state = SW_WINDOW_MIDDLE;
-					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					if(m_q3_clock)
+						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					else
+						m_next_state_change = m_last_sync + half_window_size();
 				}
 				break;
 
@@ -474,7 +467,7 @@ void iwm_device::sync()
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_wsh <<= 1;
 				m_rw_state = SW_WINDOW_END;
-				if(m_mode & 0x02)
+				if((m_mode & 0x02) || !m_q3_clock)
 					m_next_state_change = m_last_sync + half_window_size();
 				else
 					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
@@ -495,7 +488,10 @@ void iwm_device::sync()
 						m_next_state_change = m_last_sync + half_window_size();
 					}
 				} else {
-					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					if(m_q3_clock)
+						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					else
+						m_next_state_change = m_last_sync + half_window_size();
 					m_rw_state = SW_WINDOW_MIDDLE;
 				}
 				break;

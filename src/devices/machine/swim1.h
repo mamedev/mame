@@ -49,6 +49,7 @@ private:
 		S_IDLE,
 		SR_WINDOW_EDGE_0,
 		SR_WINDOW_EDGE_1,
+		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
 		SW_WINDOW_END
 	};
@@ -74,7 +75,7 @@ private:
 
 	u64 m_iwm_next_state_change, m_iwm_sync_update, m_iwm_async_update;
 	int m_iwm_active, m_iwm_rw, m_iwm_rw_state;
-	u8 m_iwm_data, m_iwm_whd, m_iwm_mode, m_iwm_status, m_iwm_control;
+	u8 m_iwm_data, m_iwm_whd, m_iwm_mode, m_iwm_status, m_iwm_control, m_iwm_rw_bit_count;
 	u8 m_iwm_rsh, m_iwm_wsh;
 	u8 m_iwm_to_ism_counter;
 
