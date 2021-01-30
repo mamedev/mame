@@ -158,6 +158,7 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "osdcomm.h"
 
 #include "firebeat.lh"
 
@@ -748,21 +749,19 @@ uint32_t firebeat_state::input_r(offs_t offset, uint32_t mem_mask)
 /*****************************************************************************/
 /* ATA Interface */
 
-#define BYTESWAP16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
-
 uint32_t firebeat_state::ata_command_r(offs_t offset, uint32_t mem_mask)
 {
 	uint16_t r;
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->cs0_r(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
-		return BYTESWAP16(r) << 16;
+		r = m_ata->cs0_r(offset*2, swapendian_int16((mem_mask >> 16) & 0xffff));
+		return swapendian_int16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->cs0_r((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
-		return BYTESWAP16(r) << 0;
+		r = m_ata->cs0_r((offset*2) + 1, swapendian_int16((mem_mask >> 0) & 0xffff));
+		return swapendian_int16(r) << 0;
 	}
 }
 
@@ -772,11 +771,11 @@ void firebeat_state::ata_command_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->cs0_w(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->cs0_w(offset*2, swapendian_int16((data >> 16) & 0xffff), swapendian_int16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->cs0_w((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->cs0_w((offset*2) + 1, swapendian_int16((data >> 0) & 0xffff), swapendian_int16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -788,13 +787,13 @@ uint32_t firebeat_state::ata_control_r(offs_t offset, uint32_t mem_mask)
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->cs1_r(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
-		return BYTESWAP16(r) << 16;
+		r = m_ata->cs1_r(offset*2, swapendian_int16((mem_mask >> 16) & 0xffff));
+		return swapendian_int16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->cs1_r((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
-		return BYTESWAP16(r) << 0;
+		r = m_ata->cs1_r((offset*2) + 1, swapendian_int16((mem_mask >> 0) & 0xffff));
+		return swapendian_int16(r) << 0;
 	}
 }
 
@@ -802,11 +801,11 @@ void firebeat_state::ata_control_w(offs_t offset, uint32_t data, uint32_t mem_ma
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->cs1_w(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->cs1_w(offset*2, swapendian_int16(data >> 16) & 0xffff, swapendian_int16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->cs1_w((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->cs1_w((offset*2) + 1, swapendian_int16(data >> 0) & 0xffff, swapendian_int16((mem_mask >> 0) & 0xffff));
 	}
 }
 
