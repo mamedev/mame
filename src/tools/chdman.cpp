@@ -13,7 +13,6 @@
 #include "bitmap.h"
 #include "chdcd.h"
 #include "corefile.h"
-#include "gdrom.h"
 #include "hashing.h"
 #include "md5.h"
 #include "strformat.h"

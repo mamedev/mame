@@ -15,7 +15,6 @@
 #include "chdcd.h"
 #include "corefile.h"
 #include "corestr.h"
-#include "gdrom.h"
 
 
 
@@ -1131,6 +1130,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	return CHDERR_NONE;
 }
 
+
 /*---------------------------------------------------------------------------------------
     chdcd_is_gdicue - determine if CUE contains Redump multi-CUE format for Dreamcast GDI
 ----------------------------------------------------------------------------------------*/
@@ -1177,6 +1177,46 @@ bool chdcd_is_gdicue(const char *tocfname)
 
 	return has_rem_singledensity && has_rem_highdensity;
 }
+
+
+/*---------------------------------------------------------------------------------------
+    gdrom_identify_pattern - Dreamcast has well-known standardised GDROM patterns
+----------------------------------------------------------------------------------------*/
+
+/**
+ * Dreamcast GDROM patterns are identified by track types and number of tracks
+ *
+ *   Pattern I - (SD) DATA + AUDIO, (HD) DATA
+ *   Pattern II - (SD) DATA + AUDIO, (HD) DATA + ... + AUDIO
+ *   Pattern III - (SD) DATA + AUDIO, (HD) DATA + ... + DATA
+ *
+ * And a III variant when two HD DATA tracks are split by one or more AUDIO tracks.
+ */
+
+enum gdrom_pattern gdrom_identify_pattern(const cdrom_toc *toc)
+{
+	if (toc->numtrks > 4 && toc->tracks[toc->numtrks-1].trktype == CD_TRACK_MODE1_RAW)
+	{
+		if (toc->tracks[toc->numtrks-2].trktype == CD_TRACK_AUDIO)
+			return GDROM_TYPE_III_SPLIT;
+		else
+			return GDROM_TYPE_III;
+	}
+	else if (toc->numtrks > 3)
+	{
+		if (toc->tracks[toc->numtrks-1].trktype == CD_TRACK_AUDIO)
+			return GDROM_TYPE_II;
+		else
+			return GDROM_TYPE_III;
+	}
+	else if (toc->numtrks == 3)
+	{
+		return GDROM_TYPE_I;
+	}
+
+	return GDROM_TYPE_UNKNOWN;
+}
+
 
 /*-----------------------------------------------------------------
     chdcd_parse_gdicue - parse a Redump multi-CUE for Dreamcast GDI

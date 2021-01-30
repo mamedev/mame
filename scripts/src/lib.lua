@@ -37,8 +37,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/bitmap.h",
 		MAME_DIR .. "src/lib/util/cdrom.cpp",
 		MAME_DIR .. "src/lib/util/cdrom.h",
-		MAME_DIR .. "src/lib/util/gdrom.cpp",
-		MAME_DIR .. "src/lib/util/gdrom.h",
 		MAME_DIR .. "src/lib/util/chd.cpp",
 		MAME_DIR .. "src/lib/util/chd.h",
 		MAME_DIR .. "src/lib/util/chdcd.cpp",
