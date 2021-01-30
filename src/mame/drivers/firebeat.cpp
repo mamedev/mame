@@ -205,7 +205,8 @@ public:
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu"),
 		m_duart_com(*this, "duart_com"),
-		m_status_leds(*this, "status_led_%u", 0U)
+		m_status_leds(*this, "status_led_%u", 0U),
+		m_io_inputs(*this, "IN%u", 0U)
 	{ }
 
 	void firebeat(machine_config &config);
@@ -270,6 +271,8 @@ private:
 	required_device<pc16552_device> m_duart_com;
 
 	output_finder<8> m_status_leds;
+
+	required_ioport_array<4> m_io_inputs;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -344,7 +347,8 @@ public:
 		m_cab_led_right(*this, "right"),
 		m_cab_led_door_lamp(*this, "door_lamp"),
 		m_cab_led_ok(*this, "ok"),
-		m_cab_led_slim(*this, "slim")
+		m_cab_led_slim(*this, "slim"),
+		m_io_sensors(*this, "SENSOR%u", 1U)
 	{ }
 
 	void firebeat_ppp(machine_config &config);
@@ -370,6 +374,8 @@ private:
 	output_finder<> m_cab_led_door_lamp;
 	output_finder<> m_cab_led_ok;
 	output_finder<> m_cab_led_slim;
+
+	required_ioport_array<4> m_io_sensors;
 };
 
 class firebeat_kbm_state : public firebeat_state
@@ -384,7 +390,8 @@ public:
 		m_cab_led_door_lamp(*this, "door_lamp"),
 		m_cab_led_start1p(*this, "start1p"),
 		m_cab_led_start2p(*this, "start2p"),
-		m_lamp_neon(*this, "neon")
+		m_lamp_neon(*this, "neon"),
+		m_io_wheels(*this, "WHEEL_P%u", 1U)
 	{ }
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -421,13 +428,18 @@ private:
 	output_finder<> m_cab_led_start1p;
 	output_finder<> m_cab_led_start2p;
 	output_finder<> m_lamp_neon;
+
+	required_ioport_array<2> m_io_wheels;
 };
 
 class firebeat_bm3_state : public firebeat_spu_state
 {
 public:
 	firebeat_bm3_state(const machine_config &mconfig, device_type type, const char *tag) :
-		firebeat_spu_state(mconfig, type, tag)
+		firebeat_spu_state(mconfig, type, tag),
+		m_io(*this, "IO%u", 1U),
+		m_io_turntables(*this, "TURNTABLE_P%u", 1U),
+		m_io_effects(*this, "EFFECT%u", 1U)
 	{ }
 
 	void firebeat_bm3(machine_config &config);
@@ -444,6 +456,10 @@ private:
 	void fdd_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER( bm3_vblank );
+
+	required_ioport_array<4> m_io;
+	required_ioport_array<2> m_io_turntables;
+	required_ioport_array<7> m_io_effects;
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -759,10 +775,10 @@ void firebeat_state::extend_board_irq_w(offs_t offset, uint8_t data)
 uint8_t firebeat_state::input_r(offs_t offset)
 {
 	switch (offset) {
-		case 0: return (ioport("IN0")->read() & 0xff);
-		case 1: return (ioport("IN1")->read() & 0xff);
-		case 2: return (ioport("IN2")->read() & 0xff);
-		case 3: return (ioport("IN3")->read() & 0xff);
+		case 0: return (m_io_inputs[0]->read() & 0xff);
+		case 1: return (m_io_inputs[1]->read() & 0xff);
+		case 2: return (m_io_inputs[2]->read() & 0xff);
+		case 3: return (m_io_inputs[3]->read() & 0xff);
 	}
 
 	return 0;
@@ -1246,21 +1262,21 @@ uint32_t firebeat_bm3_state::spectrum_analyzer_r(offs_t offset)
 uint16_t firebeat_bm3_state::sensor_r(offs_t offset)
 {
 	switch (offset) {
-		case 0: return ioport("IO1")->read() | 0x0100;
-		case 1: return ioport("IO2")->read() | 0x0100;
-		case 2: return ioport("IO3")->read() | 0x0100;
-		case 3: return ioport("IO4")->read() | 0x0100;
-		case 5: return (ioport("TURNTABLE_P1")->read() >> 8) | 0x0100;
-		case 6: return (ioport("TURNTABLE_P1")->read() & 0xff) | 0x0100;
-		case 7: return (ioport("TURNTABLE_P2")->read() >> 8) | 0x0100;
-		case 8: return (ioport("TURNTABLE_P2")->read() & 0xff) | 0x0100;
-		case 9: return ioport("EFFECT1")->read() | 0x0100;
-		case 10: return ioport("EFFECT2")->read() | 0x0100;
-		case 11: return ioport("EFFECT3")->read() | 0x0100;
-		case 12: return ioport("EFFECT4")->read() | 0x0100;
-		case 13: return ioport("EFFECT5")->read() | 0x0100;
-		case 14: return ioport("EFFECT6")->read() | 0x0100;
-		case 15: return ioport("EFFECT7")->read() | 0x0100;
+		case 0: return m_io[0]->read() | 0x0100;
+		case 1: return m_io[1]->read() | 0x0100;
+		case 2: return m_io[2]->read() | 0x0100;
+		case 3: return m_io[3]->read() | 0x0100;
+		case 5: return (m_io_turntables[0]->read() >> 8) | 0x0100;
+		case 6: return (m_io_turntables[0]->read() & 0xff) | 0x0100;
+		case 7: return (m_io_turntables[1]->read() >> 8) | 0x0100;
+		case 8: return (m_io_turntables[1]->read() & 0xff) | 0x0100;
+		case 9: return m_io_effects[0]->read() | 0x0100;
+		case 10: return m_io_effects[1]->read() | 0x0100;
+		case 11: return m_io_effects[2]->read() | 0x0100;
+		case 12: return m_io_effects[3]->read() | 0x0100;
+		case 13: return m_io_effects[4]->read() | 0x0100;
+		case 14: return m_io_effects[5]->read() | 0x0100;
+		case 15: return m_io_effects[6]->read() | 0x0100;
 	}
 
 	return 0;
@@ -1387,10 +1403,10 @@ void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
 uint16_t firebeat_ppp_state::sensor_r(offs_t offset)
 {
 	switch (offset) {
-		case 0: return ioport("SENSOR1")->read() | 0x0100;
-		case 1: return ioport("SENSOR2")->read() | 0x0100;
-		case 2: return ioport("SENSOR3")->read() | 0x0100;
-		case 3: return ioport("SENSOR4")->read() | 0x0100;
+		case 0: return m_io_sensors[0]->read() | 0x0100;
+		case 1: return m_io_sensors[1]->read() | 0x0100;
+		case 2: return m_io_sensors[2]->read() | 0x0100;
+		case 3: return m_io_sensors[3]->read() | 0x0100;
 	}
 
 	return 0;
@@ -1595,8 +1611,8 @@ void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
 uint8_t firebeat_kbm_state::keyboard_wheel_r(offs_t offset)
 {
 	switch (offset) {
-		case 0: return ioport("WHEEL_P1")->read(); // Keyboard Wheel (P1)
-		case 8: return ioport("WHEEL_P2")->read(); // Keyboard Wheel (P2)
+		case 0: return m_io_wheels[0]->read(); // Keyboard Wheel (P1)
+		case 8: return m_io_wheels[1]->read(); // Keyboard Wheel (P2)
 	}
 
 	return 0;
