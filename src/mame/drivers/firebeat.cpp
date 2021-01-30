@@ -489,7 +489,6 @@ void firebeat_state::machine_start()
 
 void firebeat_state::device_resolve_objects()
 {
-	printf("Called firebeat_state::device_resolve_objects\n");
 	m_status_leds.resolve();
 }
 
