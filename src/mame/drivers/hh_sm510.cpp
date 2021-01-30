@@ -17,7 +17,7 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVGs of: exospace
+- improve/redo SVG of: exospace
 - confirm gnw_egg rom (now using gnw_mmouse rom, but pretty confident that it's
   the same)
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
