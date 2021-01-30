@@ -2,26 +2,26 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-    sync_io.h
+    rs232_sync_io.h
 
     Synchronous I/O on RS232 port
 
 *********************************************************************/
 
-#ifndef MAME_BUS_RS232_SYNC_IO_H
-#define MAME_BUS_RS232_SYNC_IO_H
+#ifndef MAME_BUS_RS232_RS232_SYNC_IO_H
+#define MAME_BUS_RS232_RS232_SYNC_IO_H
 
 #pragma once
 
 #include "rs232.h"
 #include "imagedev/bitbngr.h"
 
-class sync_io_device : public device_t, public device_rs232_port_interface
+class rs232_sync_io_device : public device_t, public device_rs232_port_interface
 {
 public:
 	// construction/destruction
-	sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~sync_io_device();
+	rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~rs232_sync_io_device();
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(input_rts) override;
@@ -56,6 +56,6 @@ private:
 };
 
 // device type definitions
-DECLARE_DEVICE_TYPE(SYNC_IO, sync_io_device)
+DECLARE_DEVICE_TYPE(RS232_SYNC_IO, rs232_sync_io_device)
 
-#endif // MAME_BUS_RS232_SYNC_IO_H
+#endif // MAME_BUS_RS232_RS232_SYNC_IO_H

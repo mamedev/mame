@@ -2,7 +2,7 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-    sync_io.cpp
+    rs232_sync_io.cpp
 
     Synchronous I/O on RS232 port
 
@@ -29,7 +29,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "sync_io.h"
+#include "rs232_sync_io.h"
 
 // Debugging
 
@@ -60,8 +60,8 @@ enum {
 	TMR_ID_CLK
 };
 
-sync_io_device::sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , SYNC_IO , tag , owner , clock)
+rs232_sync_io_device::rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig , RS232_SYNC_IO , tag , owner , clock)
 	, device_rs232_port_interface(mconfig , *this)
 	, m_stream(*this , "stream")
 	, m_rs232_baud(*this , "RS232_BAUD")
@@ -71,23 +71,23 @@ sync_io_device::sync_io_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-sync_io_device:: ~sync_io_device()
+rs232_sync_io_device:: ~rs232_sync_io_device()
 {
 }
 
-WRITE_LINE_MEMBER(sync_io_device::input_txd)
+WRITE_LINE_MEMBER(rs232_sync_io_device::input_txd)
 {
 	m_txd = state;
 	LOG("TxD %d %u\n" , state , m_tx_counter);
 }
 
-WRITE_LINE_MEMBER(sync_io_device::input_rts)
+WRITE_LINE_MEMBER(rs232_sync_io_device::input_rts)
 {
 	m_rts = state;
 }
 
-static INPUT_PORTS_START(sync_io)
-	PORT_RS232_BAUD("RS232_BAUD" , RS232_BAUD_2400 , "Baud rate" , sync_io_device , update_serial)
+static INPUT_PORTS_START(rs232_sync_io)
+	PORT_RS232_BAUD("RS232_BAUD" , RS232_BAUD_2400 , "Baud rate" , rs232_sync_io_device , update_serial)
 
 	PORT_START("rtsduplex")
 	PORT_CONFNAME(1 , 1 , "RTS controls half-duplex")
@@ -106,22 +106,22 @@ static INPUT_PORTS_START(sync_io)
 	PORT_CONFSETTING(2 , "When a byte is available")
 INPUT_PORTS_END
 
-ioport_constructor sync_io_device::device_input_ports() const
+ioport_constructor rs232_sync_io_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(sync_io);
+	return INPUT_PORTS_NAME(rs232_sync_io);
 }
 
-void sync_io_device::device_add_mconfig(machine_config &config)
+void rs232_sync_io_device::device_add_mconfig(machine_config &config)
 {
 	BITBANGER(config , m_stream , 0);
 }
 
-void sync_io_device::device_start()
+void rs232_sync_io_device::device_start()
 {
 	m_clk_timer = timer_alloc(TMR_ID_CLK);
 }
 
-void sync_io_device::device_reset()
+void rs232_sync_io_device::device_reset()
 {
 	output_dcd(0);
 	output_dsr(0);
@@ -141,7 +141,7 @@ void sync_io_device::device_reset()
 	output_rxc(1);
 }
 
-void sync_io_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rs232_sync_io_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id) {
 	case TMR_ID_CLK:
@@ -203,11 +203,11 @@ void sync_io_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE_LINE_MEMBER(sync_io_device::update_serial)
+WRITE_LINE_MEMBER(rs232_sync_io_device::update_serial)
 {
 	auto baud_rate = convert_baud(m_rs232_baud->read());
 	auto period = attotime::from_hz(baud_rate * 2);
 	m_clk_timer->adjust(period , 0 , period);
 }
 
-DEFINE_DEVICE_TYPE(SYNC_IO, sync_io_device, "sync_io", "RS232 Synchronous I/O")
+DEFINE_DEVICE_TYPE(RS232_SYNC_IO, rs232_sync_io_device, "rs232_sync_io", "RS232 Synchronous I/O")
