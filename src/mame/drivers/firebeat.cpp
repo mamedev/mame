@@ -1179,13 +1179,11 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_bm3_state::firebeat_bm3_map);
 
+	// beatmania III is the only game on the Firebeat platform to use 640x480
 	screen_device *screen = subdevice<screen_device>("screen");
-	if (screen != nullptr) {
-		// beatmania III is the only game on the Firebeat platform to use 640x480
-		screen->set_size(640, 480);
-		screen->set_visarea(0, 639, 0, 479);
-		screen->screen_vblank().set(FUNC(firebeat_bm3_state::bm3_vblank));
-	}
+	screen->set_size(640, 480);
+	screen->set_visarea(0, 639, 0, 479);
+	screen->screen_vblank().set(FUNC(firebeat_bm3_state::bm3_vblank));
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
