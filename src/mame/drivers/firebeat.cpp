@@ -204,13 +204,15 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu"),
-		m_duart_com(*this, "duart_com")
+		m_duart_com(*this, "duart_com"),
+		m_status_leds(*this, "status_led_%u", 0U)
 	{ }
 
 	void firebeat(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void device_resolve_objects() override;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -266,6 +268,8 @@ private:
 	uint8_t m_ibutton_subkey_data[0x40];
 
 	required_device<pc16552_device> m_duart_com;
+
+	output_finder<8> m_status_leds;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -276,18 +280,20 @@ public:
 		m_spuata(*this, "spu_ata"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dpram(*this, "spuram"),
-		m_waveram(*this, "rf5c400")
+		m_waveram(*this, "rf5c400"),
+		m_spu_status_leds(*this, "spu_status_led_%u", 0U)
 	{ }
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_resolve_objects() override;
+
 	void firebeat_spu_base(machine_config &config);
 	void firebeat_spu_map(address_map &map);
 	void spu_map(address_map &map);
 	void rf5c400_map(address_map& map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
@@ -316,6 +322,8 @@ private:
 	required_device<cy7c131_device> m_dpram;
 	required_shared_ptr<uint16_t> m_waveram;
 
+	output_finder<8> m_spu_status_leds;
+
 	enum
 	{
 		TIMER_SPU_DMA
@@ -328,7 +336,15 @@ class firebeat_ppp_state : public firebeat_state
 {
 public:
 	firebeat_ppp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		firebeat_state(mconfig, type, tag)
+		firebeat_state(mconfig, type, tag),
+		m_stage_leds(*this, "stage_led_%u", 0U),
+		m_top_leds(*this, "top_led_%u", 0U),
+		m_lamps(*this, "lamp_%u", 0U),
+		m_cab_led_left(*this, "left"),
+		m_cab_led_right(*this, "right"),
+		m_cab_led_door_lamp(*this, "door_lamp"),
+		m_cab_led_ok(*this, "ok"),
+		m_cab_led_slim(*this, "slim")
 	{ }
 
 	void firebeat_ppp(machine_config &config);
@@ -336,6 +352,8 @@ public:
 	void init_ppp();
 
 private:
+	virtual void device_resolve_objects() override;
+
 	void firebeat_ppp_map(address_map &map);
 
 	uint16_t sensor_r(offs_t offset);
@@ -343,6 +361,15 @@ private:
 	void lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	output_finder<8> m_stage_leds;
+	output_finder<8> m_top_leds;
+	output_finder<4> m_lamps;
+	output_finder<> m_cab_led_left;
+	output_finder<> m_cab_led_right;
+	output_finder<> m_cab_led_door_lamp;
+	output_finder<> m_cab_led_ok;
+	output_finder<> m_cab_led_slim;
 };
 
 class firebeat_kbm_state : public firebeat_state
@@ -352,7 +379,12 @@ public:
 		firebeat_state(mconfig, type, tag),
 		m_duart_midi(*this, "duart_midi"),
 		m_kbd(*this, "kbd%u", 0),
-		m_gcu_sub(*this, "gcu_sub")
+		m_gcu_sub(*this, "gcu_sub"),
+		m_lamps(*this, "lamp_%u", 1U),
+		m_cab_led_door_lamp(*this, "door_lamp"),
+		m_cab_led_start1p(*this, "start1p"),
+		m_cab_led_start2p(*this, "start2p"),
+		m_lamp_neon(*this, "neon")
 	{ }
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -361,6 +393,8 @@ public:
 	void firebeat_kbm(machine_config &config);
 
 private:
+	virtual void device_resolve_objects() override;
+
 	void firebeat_kbm_map(address_map &map);
 
 	void init_keyboard();
@@ -381,6 +415,12 @@ private:
 	required_device<pc16552_device> m_duart_midi;
 	required_device_array<midi_keyboard_device, 2> m_kbd;
 	required_device<k057714_device> m_gcu_sub;
+
+	output_finder<3> m_lamps;
+	output_finder<> m_cab_led_door_lamp;
+	output_finder<> m_cab_led_start1p;
+	output_finder<> m_cab_led_start2p;
+	output_finder<> m_lamp_neon;
 };
 
 class firebeat_bm3_state : public firebeat_spu_state
@@ -429,6 +469,12 @@ void firebeat_state::machine_start()
 
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
+}
+
+void firebeat_state::device_resolve_objects()
+{
+	printf("Called firebeat_state::device_resolve_objects\n");
+	m_status_leds.resolve();
 }
 
 void firebeat_state::init_firebeat()
@@ -825,14 +871,14 @@ void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_value("status_led_0", BIT(~data, 0));
-		output().set_value("status_led_1", BIT(~data, 1));
-		output().set_value("status_led_2", BIT(~data, 2));
-		output().set_value("status_led_3", BIT(~data, 3));
-		output().set_value("status_led_4", BIT(~data, 4));
-		output().set_value("status_led_5", BIT(~data, 5));
-		output().set_value("status_led_6", BIT(~data, 6));
-		output().set_value("status_led_7", BIT(~data, 7));
+		m_status_leds[0] = BIT(~data, 0);
+		m_status_leds[1] = BIT(~data, 1);
+		m_status_leds[2] = BIT(~data, 2);
+		m_status_leds[3] = BIT(~data, 3);
+		m_status_leds[4] = BIT(~data, 4);
+		m_status_leds[5] = BIT(~data, 5);
+		m_status_leds[6] = BIT(~data, 6);
+		m_status_leds[7] = BIT(~data, 7);
 	}
 
 //  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -899,6 +945,12 @@ void firebeat_spu_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		spu_dma_callback(ptr, param);
 		break;
 	}
+}
+
+void firebeat_spu_state::device_resolve_objects()
+{
+	firebeat_state::device_resolve_objects();
+	m_spu_status_leds.resolve();
 }
 
 void firebeat_spu_state::firebeat_spu_base(machine_config &config)
@@ -1014,6 +1066,16 @@ void firebeat_spu_state::spu_status_led_w(uint16_t data)
 	//
 	// Command 7 (0x9204):
 	// If all 30 SE channels are in use, bit 3 will be set to 1
+
+	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
+	m_spu_status_leds[0] = BIT(~data, 0);
+	m_spu_status_leds[1] = BIT(~data, 1);
+	m_spu_status_leds[2] = BIT(~data, 2);
+	m_spu_status_leds[3] = BIT(~data, 3);
+	m_spu_status_leds[4] = BIT(~data, 4);
+	m_spu_status_leds[5] = BIT(~data, 5);
+	m_spu_status_leds[6] = BIT(~data, 6);
+	m_spu_status_leds[7] = BIT(~data, 7);
 }
 
 void firebeat_spu_state::spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1283,6 +1345,19 @@ void firebeat_popn_state::init_popn()
 /*****************************************************************************
 * ParaParaParadise / ParaParaDancing
 ******************************************************************************/
+void firebeat_ppp_state::device_resolve_objects()
+{
+	firebeat_state::device_resolve_objects();
+	m_stage_leds.resolve();
+	m_top_leds.resolve();
+	m_lamps.resolve();
+	m_cab_led_left.resolve();
+	m_cab_led_right.resolve();
+	m_cab_led_door_lamp.resolve();
+	m_cab_led_ok.resolve();
+	m_cab_led_slim.resolve();
+}
+
 void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 {
 	firebeat(config);
@@ -1343,25 +1418,25 @@ void firebeat_ppp_state::lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_
 	// 0x00080000 Stage LED 7
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("left",      BIT(data, 8));
-		output().set_value("right",     BIT(data, 9));
-		output().set_value("door_lamp", BIT(data, 10));
-		output().set_value("ok",        BIT(data, 11));
-		output().set_value("slim",      BIT(data, 15));
+		m_cab_led_left = BIT(data, 8);
+		m_cab_led_right = BIT(data, 9);
+		m_cab_led_door_lamp = BIT(data, 10);
+		m_cab_led_ok = BIT(data, 11);
+		m_cab_led_slim = BIT(data, 15);
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		output().set_value("stage_led_0", BIT(data, 24));
-		output().set_value("stage_led_1", BIT(data, 25));
-		output().set_value("stage_led_2", BIT(data, 26));
-		output().set_value("stage_led_3", BIT(data, 27));
+		m_stage_leds[0] = BIT(data, 24);
+		m_stage_leds[1] = BIT(data, 25);
+		m_stage_leds[2] = BIT(data, 26);
+		m_stage_leds[3] = BIT(data, 27);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("stage_led_4", BIT(data, 16));
-		output().set_value("stage_led_5", BIT(data, 17));
-		output().set_value("stage_led_6", BIT(data, 18));
-		output().set_value("stage_led_7", BIT(data, 19));
+		m_stage_leds[4] = BIT(data, 16);
+		m_stage_leds[5] = BIT(data, 17);
+		m_stage_leds[6] = BIT(data, 18);
+		m_stage_leds[7] = BIT(data, 19);
 	}
 }
 
@@ -1380,17 +1455,17 @@ void firebeat_ppp_state::lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32
 	// 0x00000008 Top LED 7
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("top_led_0", BIT(data, 16));
-		output().set_value("top_led_1", BIT(data, 17));
-		output().set_value("top_led_2", BIT(data, 18));
-		output().set_value("top_led_3", BIT(data, 19));
+		m_top_leds[0] = BIT(data, 16);
+		m_top_leds[1] = BIT(data, 17);
+		m_top_leds[2] = BIT(data, 18);
+		m_top_leds[3] = BIT(data, 19);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_value("top_led_4", BIT(data, 0));
-		output().set_value("top_led_5", BIT(data, 1));
-		output().set_value("top_led_6", BIT(data, 2));
-		output().set_value("top_led_7", BIT(data, 3));
+		m_top_leds[4] = BIT(data, 0);
+		m_top_leds[5] = BIT(data, 1);
+		m_top_leds[6] = BIT(data, 2);
+		m_top_leds[7] = BIT(data, 3);
 	}
 }
 
@@ -1405,10 +1480,10 @@ void firebeat_ppp_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32
 	// 0x00400000 Lamp 3
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("lamp_0", BIT(data, 16));
-		output().set_value("lamp_1", BIT(data, 18));
-		output().set_value("lamp_2", BIT(data, 20));
-		output().set_value("lamp_3", BIT(data, 22));
+		m_lamps[0] = BIT(data, 16);
+		m_lamps[1] = BIT(data, 18);
+		m_lamps[2] = BIT(data, 20);
+		m_lamps[3] = BIT(data, 22);
 	}
 }
 
@@ -1416,6 +1491,16 @@ void firebeat_ppp_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32
 /*****************************************************************************
 * Keyboardmania
 ******************************************************************************/
+void firebeat_kbm_state::device_resolve_objects()
+{
+	firebeat_state::device_resolve_objects();
+	m_lamps.resolve();
+	m_cab_led_door_lamp.resolve();
+	m_cab_led_start1p.resolve();
+	m_cab_led_start2p.resolve();
+	m_lamp_neon.resolve();
+}
+
 void firebeat_kbm_state::init_kbm()
 {
 	init_firebeat();
@@ -1631,16 +1716,16 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 
 	if (ACCESSING_BITS_24_31)
 	{
-		output().set_value("door_lamp", BIT(data, 28));
-		output().set_value("start1p",   BIT(data, 24));
-		output().set_value("start2p",   BIT(data, 25));
+		m_cab_led_door_lamp = BIT(data, 28);
+		m_cab_led_start1p = BIT(data, 24);
+		m_cab_led_start2p = BIT(data, 25);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("lamp1", BIT(data, 8));
-		output().set_value("lamp2", BIT(data, 9));
-		output().set_value("lamp3", BIT(data, 10));
-		output().set_value("neon",  BIT(data, 11));
+		m_lamps[0] = BIT(data, 8);
+		m_lamps[1] = BIT(data, 9);
+		m_lamps[2] = BIT(data, 10);
+		m_lamp_neon = BIT(data, 11);
 	}
 }
 
