@@ -267,7 +267,7 @@ Apple macOS
 -----------
 
 You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
-Mojave or later. You will need SDL2 2.0.4 or later for macOS.
+Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
 
 * Install **Xcode** from the Mac App Store or `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
 * To find the corresponding Xcode for your MacOS release please visit `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of Xcode available to you.
