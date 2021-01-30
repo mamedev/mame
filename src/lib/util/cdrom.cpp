@@ -1577,7 +1577,7 @@ static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
  *             Reverse : TRUE
  *
  *            the CRC in this table are generated at runtime
- *            using edc_crcinittable(). credit to cdrtools and
+ *            with edc_crctable_init(). credit to cdrtools and
  *            Rocksoft for the code and technical details.
  *          -------------------------------------------------.
  */
@@ -1706,10 +1706,10 @@ void edc_generate(uint8_t *sector)
 		result = EDC_crctable[(result ^ sector[byte+3]) & 0xffL] ^ (result >> 8);
 	}
 
-	sector[EDC_MODE1_OFFSET+0] = ((uint8_t *) &result)[0];
-	sector[EDC_MODE1_OFFSET+1] = ((uint8_t *) &result)[1];
-	sector[EDC_MODE1_OFFSET+2] = ((uint8_t *) &result)[2];
-	sector[EDC_MODE1_OFFSET+3] = ((uint8_t *) &result)[3];
+	sector[EDC_MODE1_OFFSET+0] = (result >> 0) & 0xff;
+	sector[EDC_MODE1_OFFSET+1] = (result >> 8) & 0xff;
+	sector[EDC_MODE1_OFFSET+2] = (result >> 16) & 0xff;
+	sector[EDC_MODE1_OFFSET+3] = (result >> 24) & 0xff;
 }
 
 /**
