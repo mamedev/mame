@@ -825,14 +825,14 @@ void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_value("status_led_0", (data & 0x01) ? 0 : 1);
-		output().set_value("status_led_1", (data & 0x02) ? 0 : 1);
-		output().set_value("status_led_2", (data & 0x04) ? 0 : 1);
-		output().set_value("status_led_3", (data & 0x08) ? 0 : 1);
-		output().set_value("status_led_4", (data & 0x10) ? 0 : 1);
-		output().set_value("status_led_5", (data & 0x20) ? 0 : 1);
-		output().set_value("status_led_6", (data & 0x40) ? 0 : 1);
-		output().set_value("status_led_7", (data & 0x80) ? 0 : 1);
+		output().set_value("status_led_0", BIT(~data, 0));
+		output().set_value("status_led_1", BIT(~data, 1));
+		output().set_value("status_led_2", BIT(~data, 2));
+		output().set_value("status_led_3", BIT(~data, 3));
+		output().set_value("status_led_4", BIT(~data, 4));
+		output().set_value("status_led_5", BIT(~data, 5));
+		output().set_value("status_led_6", BIT(~data, 6));
+		output().set_value("status_led_7", BIT(~data, 7));
 	}
 
 //  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -1020,11 +1020,11 @@ void firebeat_spu_state::spu_irq_ack_w(offs_t offset, uint16_t data, uint16_t me
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data & 0x01)
+		if (BIT(data, 0))
 			m_audiocpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-		if (data & 0x02)
+		if (BIT(data, 1))
 			m_audiocpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-		if (data & 0x08)
+		if (BIT(data, 3))
 			m_audiocpu->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
 	}
 }
@@ -1343,25 +1343,25 @@ void firebeat_ppp_state::lamp_output_ppp_w(offs_t offset, uint32_t data, uint32_
 	// 0x00080000 Stage LED 7
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("left",            (data & 0x00000100) ? 1 : 0);
-		output().set_value("right",           (data & 0x00000200) ? 1 : 0);
-		output().set_value("door_lamp",       (data & 0x00000400) ? 1 : 0);
-		output().set_value("ok",              (data & 0x00000800) ? 1 : 0);
-		output().set_value("slim",            (data & 0x00008000) ? 1 : 0);
+		output().set_value("left",      BIT(data, 8));
+		output().set_value("right",     BIT(data, 9));
+		output().set_value("door_lamp", BIT(data, 10));
+		output().set_value("ok",        BIT(data, 11));
+		output().set_value("slim",      BIT(data, 15));
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		output().set_value("stage_led_0",     (data & 0x01000000) ? 1 : 0);
-		output().set_value("stage_led_1",     (data & 0x02000000) ? 1 : 0);
-		output().set_value("stage_led_2",     (data & 0x04000000) ? 1 : 0);
-		output().set_value("stage_led_3",     (data & 0x08000000) ? 1 : 0);
+		output().set_value("stage_led_0", BIT(data, 24));
+		output().set_value("stage_led_1", BIT(data, 25));
+		output().set_value("stage_led_2", BIT(data, 26));
+		output().set_value("stage_led_3", BIT(data, 27));
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("stage_led_4",     (data & 0x00010000) ? 1 : 0);
-		output().set_value("stage_led_5",     (data & 0x00020000) ? 1 : 0);
-		output().set_value("stage_led_6",     (data & 0x00040000) ? 1 : 0);
-		output().set_value("stage_led_7",     (data & 0x00080000) ? 1 : 0);
+		output().set_value("stage_led_4", BIT(data, 16));
+		output().set_value("stage_led_5", BIT(data, 17));
+		output().set_value("stage_led_6", BIT(data, 18));
+		output().set_value("stage_led_7", BIT(data, 19));
 	}
 }
 
@@ -1380,17 +1380,17 @@ void firebeat_ppp_state::lamp_output2_ppp_w(offs_t offset, uint32_t data, uint32
 	// 0x00000008 Top LED 7
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("top_led_0",       (data & 0x00010000) ? 1 : 0);
-		output().set_value("top_led_1",       (data & 0x00020000) ? 1 : 0);
-		output().set_value("top_led_2",       (data & 0x00040000) ? 1 : 0);
-		output().set_value("top_led_3",       (data & 0x00080000) ? 1 : 0);
+		output().set_value("top_led_0", BIT(data, 16));
+		output().set_value("top_led_1", BIT(data, 17));
+		output().set_value("top_led_2", BIT(data, 18));
+		output().set_value("top_led_3", BIT(data, 19));
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		output().set_value("top_led_4",       (data & 0x00000001) ? 1 : 0);
-		output().set_value("top_led_5",       (data & 0x00000002) ? 1 : 0);
-		output().set_value("top_led_6",       (data & 0x00000004) ? 1 : 0);
-		output().set_value("top_led_7",       (data & 0x00000008) ? 1 : 0);
+		output().set_value("top_led_4", BIT(data, 0));
+		output().set_value("top_led_5", BIT(data, 1));
+		output().set_value("top_led_6", BIT(data, 2));
+		output().set_value("top_led_7", BIT(data, 3));
 	}
 }
 
@@ -1405,10 +1405,10 @@ void firebeat_ppp_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32
 	// 0x00400000 Lamp 3
 	if (ACCESSING_BITS_16_23)
 	{
-		output().set_value("lamp_0",          (data & 0x00010000) ? 1 : 0);
-		output().set_value("lamp_1",          (data & 0x00040000) ? 1 : 0);
-		output().set_value("lamp_2",          (data & 0x00100000) ? 1 : 0);
-		output().set_value("lamp_3",          (data & 0x00400000) ? 1 : 0);
+		output().set_value("lamp_0", BIT(data, 16));
+		output().set_value("lamp_1", BIT(data, 18));
+		output().set_value("lamp_2", BIT(data, 20));
+		output().set_value("lamp_3", BIT(data, 22));
 	}
 }
 
@@ -1531,7 +1531,7 @@ void firebeat_kbm_state::midi_uart_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch0_irq_callback)
 {
-	if ((m_extend_board_irq_enable & 0x02) == 0 && state != CLEAR_LINE)
+	if (BIT(m_extend_board_irq_enable, 1) == 0 && state != CLEAR_LINE)
 	{
 		m_extend_board_irq_active |= 0x02;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
@@ -1542,7 +1542,7 @@ WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch0_irq_callback)
 
 WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch1_irq_callback)
 {
-	if ((m_extend_board_irq_enable & 0x01) == 0 && state != CLEAR_LINE)
+	if (BIT(m_extend_board_irq_enable, 0) == 0 && state != CLEAR_LINE)
 	{
 		m_extend_board_irq_active |= 0x01;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
@@ -1631,16 +1631,16 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 
 	if (ACCESSING_BITS_24_31)
 	{
-		output().set_value("door_lamp",   (data & 0x10000000) ? 1 : 0);
-		output().set_value("start1p",     (data & 0x01000000) ? 1 : 0);
-		output().set_value("start2p",     (data & 0x02000000) ? 1 : 0);
+		output().set_value("door_lamp", BIT(data, 28));
+		output().set_value("start1p",   BIT(data, 24));
+		output().set_value("start2p",   BIT(data, 25));
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("lamp1",       (data & 0x00000100) ? 1 : 0);
-		output().set_value("lamp2",       (data & 0x00000200) ? 1 : 0);
-		output().set_value("lamp3",       (data & 0x00000400) ? 1 : 0);
-		output().set_value("neon",        (data & 0x00000800) ? 1 : 0);
+		output().set_value("lamp1", BIT(data, 8));
+		output().set_value("lamp2", BIT(data, 9));
+		output().set_value("lamp3", BIT(data, 10));
+		output().set_value("neon",  BIT(data, 11));
 	}
 }
 
