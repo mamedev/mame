@@ -5159,3 +5159,4 @@ GAME( 2001, gtclasscs, gtclassc, sftm,   s_ver, itech32_state, init_s_ver,     R
 
 GAME( 199?, shoottv,  0,         shoottv, shoottv, shoottv_state, empty_init,  ROT0, "Incredible Technologies", "Must Shoot TV (prototype)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pubball,  0,         pubball, pubball, itech32_state, init_pubball,ROT0, "Midway / Incredible Technologies", "Power Up Baseball (prototype)" , MACHINE_SUPPORTS_SAVE )
+
