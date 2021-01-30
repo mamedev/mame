@@ -56,7 +56,9 @@ class SelfExeTests(ABC):
                     __launch_fullpath, 
                     encoding="utf-8",
                     capture_output=True,
-                    check=True,
+                    # TODO: we need to disable check here cause pngcmp has a returncode of 1 when diverging snapshots occurs (wtf)
+                    #check=True,
+                    check=False,
                     text=True,
                     shell=False
                 )

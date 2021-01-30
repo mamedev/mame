@@ -35,6 +35,8 @@ class UnidasmTests(SelfExeTests):
        (otherwise you get a diff error later on).
     3. now run make tests or python $(modulepath)/test_tools.py and check if the new test gets captured. 
 
+    Args:
+        SelfExeTests ([type]): [description]
     """
 
     def __init__(self, assets_path: str):
@@ -45,7 +47,7 @@ class UnidasmTests(SelfExeTests):
         logging.debug(self._bin_test_folder)
 
     def _collect_tests(self):
-        __static_tests = zip( os.listdir(self._asm_test_folder), os.listdir(self._bin_test_folder))
+        __static_tests = zip(os.listdir(self._asm_test_folder), os.listdir(self._bin_test_folder))
         return {
             __asm.split(".")[0]: UnidasmMapper(asm_filename=__asm, bin_filename=__bin) for __asm, __bin in __static_tests
         }

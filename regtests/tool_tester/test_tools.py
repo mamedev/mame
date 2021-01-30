@@ -6,9 +6,8 @@
 import sys
 from os.path import join, dirname, realpath
 import logging
-from tool_tester.unidasm import (
-    UnidasmTests
-)
+from tool_tester.pngcmp import PngCmpTests
+from tool_tester.unidasm import UnidasmTests
 
 if __name__ == "__main__":
     # TODO: add colorized messages
@@ -23,7 +22,7 @@ if __name__ == "__main__":
     chained_results = []
     # TODO: point to $(regtests)\assets, configure if necessary
     assets_folder = join(dirname(dirname(realpath(__file__))), "assets")
-    for test_cls in [UnidasmTests]:
+    for test_cls in [PngCmpTests, UnidasmTests]:
         test_fn = test_cls(assets_folder)
         logging.info("Start test suite: %s", test_fn.identifier)
         chained_results.append(test_fn.execute_tests(test_fn.compose_tests()))
