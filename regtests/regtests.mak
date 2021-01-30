@@ -43,9 +43,18 @@
 #-------------------------------------------------
 
 REGTESTS += \
-	unidasmtest \
+	toolstest \
+#	unidasmtest \
 #	chdmantest \
 #	jedutiltest \
+
+#-------------------------------------------------
+# tools
+#-------------------------------------------------
+
+toolstest:
+	@echo Running tools unittests
+	$(PYTHON) regtests/tool_tester/test_tools.py
 
 #-------------------------------------------------
 # chdman
