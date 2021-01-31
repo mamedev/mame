@@ -17,7 +17,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: '' : unreferenced formal
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4389) // warning C4389 : '==' : signed / unsigned mismatch
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4505) // warning C4505: 'tinyexr::miniz::def_realloc_func': unreferenced local function has been removed
 #if BX_PLATFORM_EMSCRIPTEN
-#	include <compat/ctype.h>
+#	include <ctype.h>
 #endif // BX_PLATFORM_EMSCRIPTEN
 #define MINIZ_NO_ARCHIVE_APIS
 #define MINIZ_NO_STDIO
