@@ -220,6 +220,12 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
 		"\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver type (arcade|console|computer|other) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver requiresartwork (yes|no) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver clickableartwork (yes|no) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver unofficial (yes|no) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver nosoundhardware (yes|no) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST driver incomplete (yes|no) #REQUIRED>\n"
 		"\t\t<!ELEMENT feature EMPTY>\n"
 		"\t\t\t<!ATTLIST feature type (protection|timing|graphics|palette|sound|capture|camera|microphone|controls|keyboard|mouse|media|disk|printer|tape|punch|drum|rom|comms|lan|wan) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST feature status (unemulated|imperfect) #IMPLIED>\n"
@@ -1808,6 +1814,40 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 		out << " savestate=\"supported\"";
 	else
 		out << " savestate=\"unsupported\"";
+
+	if (flags & machine_flags::TYPE_ARCADE)
+		out << " type=\"arcade\"";
+	else if (flags & machine_flags::TYPE_CONSOLE)
+		out << " type=\"console\"";
+	else if (flags & machine_flags::TYPE_COMPUTER)
+		out << " type=\"computer\"";
+	else if (flags & machine_flags::TYPE_OTHER)
+		out << " type=\"other\"";
+
+	if (flags & machine_flags::REQUIRES_ARTWORK)
+		out << " requiresartwork=\"yes\"";
+	else
+		out << " requiresartwork=\"no\"";
+
+	if (flags & machine_flags::CLICKABLE_ARTWORK)
+		out << " clickableartwork=\"yes\"";
+	else
+		out << " clickableartwork=\"no\"";
+
+	if (flags & machine_flags::UNOFFICIAL)
+		out << " unofficial=\"yes\"";
+	else
+		out << " unofficial=\"no\"";
+
+	if (flags & machine_flags::NO_SOUND_HW)
+		out << " nosoundhardware=\"yes\"";
+	else
+		out << " nosoundhardware=\"no\"";
+
+	if (flags & machine_flags::IS_INCOMPLETE)
+		out << " incomplete=\"yes\"";
+	else
+		out << " incomplete=\"no\"";
 
 	out << "/>\n";
 }
