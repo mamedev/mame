@@ -2501,9 +2501,21 @@ ROM_START(ppp2nd)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(ef0e7caa) SHA1(02fef7465445d33f0288c49a8998a2759ad70823))
 	// byte 0x1e (0) JAA (1) AAA
 	// byte 0x1f (1) rental
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "ppp2nd", 0, SHA1(b8b90483d515c83eac05ffa617af19612ea990b0))
+ROM_END
+
+ROM_START(ppp2nda)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430-aaa.u3", 0x00, 0x28, BAD_DUMP CRC(76906d8f) SHA1(ceea4addc881975cfd6b8e2283b9aecb6080bd99))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
@@ -3065,7 +3077,8 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper,    viper,   viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nda,   ppp2nd,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper,  boxingm,   viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
