@@ -471,15 +471,21 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // or if I am just not smart enough to figure out the "real" mapping that would make everything just work.
     // At least it is progress :)
     map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
-    map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { LOG("yo\n"); return 0x3ff17; }));
-    map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
-        if (data == 0x10001) {
-            LOG("Enabling map shift!\n");
-            map_shift = true;
-        } else {
-            LOG("Disabling map shift!\n");
-            map_shift = false;
-        } }));
+    map(0x1440003c, 0x1440003f).lw32(
+        NAME([this](offs_t offset, uint32_t data) {
+            if (data == 0x10001)
+            {
+                LOG("Enabling map shift!\n");
+                map_shift = true;
+            }
+            else
+            {
+                LOG("Disabling map shift!\n");
+                map_shift = false;
+            }
+        }));
+    // I have suspicions about addresses near these playing into the memory configuration
+    //map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
 
     // APBus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
@@ -502,9 +508,10 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             else { return 0x0;} })); // monitor ROM doesn't boot without this
 }
 
-uint8_t news_r4k_state::debug_ram_r(offs_t offset) {
+uint8_t news_r4k_state::debug_ram_r(offs_t offset)
+{
     uint8_t result = 0xff;
-    if ( (offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff )|| (!map_shift && offset >=0x7f00000) )
+    if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
     {
         result = m_ram->read(offset);
     }
@@ -514,8 +521,10 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset) {
     }
     return result;
 }
-void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data) {
-    if( (offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff )|| (!map_shift && offset >=0x7f00000) )
+
+void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
+{
+    if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
     {
         m_ram->write(offset, data);
     }
@@ -535,7 +544,7 @@ void news_r4k_state::machine_start()
     save_item(NAME(m_int_state));
 
     // Allocate freerunning clock (disabled for now)
-    // m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+    //m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
@@ -544,7 +553,7 @@ void news_r4k_state::machine_reset()
 {
     // TODO: what is the actual frequency of the freerunning clock?
     freerun_timer_val = 0;
-    // m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); tick disabled for now
+    //m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // tick disabled for now
 }
 
 void news_r4k_state::init_common()
@@ -605,6 +614,16 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 
 void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 {
+    // map(0x1f520004, 0x1f520007); // WBFLUSH
+    // map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
+    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK - interrupt mask
+    // map(0x14c00014, 0x14c00014); // APBUS_INTST - interrupt status
+    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A - Bus error address
+    // map(0x14c00034, 0x14c00034); // APBUS_CTRL - configuration control
+    // map(0x1400005c, 0x1400005c); // APBUS_DER_A - DMA error address
+    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
+    // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
+    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
     LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
@@ -612,8 +631,7 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
     // Need to determine the actual frequency, and find a good way to implement this.
     // With an unscientific method, I calculated the timer value to increment roughly once per us
-    // Probably need to have a timer running on its own thread or something that
-    // doesn't require conversion to be useful.
+    // NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
     // The timer callback seemed to be too slow (although I could easily be doing something wrong)
     // Also WAY too slow to use: machine().scheduler().time().as_ticks(1000000);
     // The below is a fast version that has even less basis in reality, but sorta kind ""works""?

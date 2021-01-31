@@ -153,7 +153,7 @@ protected:
     };
 
     // I'm not clear yet on what IPER, DERR, MPER are signalling
-    // NetBSD ignores IPER and MPER, but resets the dMAC if DERR is asserted during the interrupt routine
+    // NetBSD ignores IPER and MPER, but resets the DMAC if DERR is asserted during the interrupt routine
     // DCEN and PCEN are set by NetBSD during attach (along with FASTACCESS)
     enum cnf_mask : uint32_t
     {
