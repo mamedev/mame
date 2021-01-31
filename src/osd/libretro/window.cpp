@@ -379,25 +379,18 @@ int retro_window_info::window_init()
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	retro_options &options = downcast<retro_options &>(m_machine.options());
+	retro_options &options = downcast<retro_options &>(machine().options());
 	m_startmaximized = options.maximize();
 
-	// add us to the list
-	osd_common_t::s_window_list.push_back(std::static_pointer_cast<retro_window_info>(shared_from_this()));
+	create_target();
 
 	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
 
-	// load the layout
-	m_target = m_machine.render().target_alloc();
-
-	// set the specific view
-	set_starting_view(index(), options.view(), options.view(index()));
-
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(m_title, "%s: %s [%s]", emulator_info::get_appname(), m_machine.system().type.fullname(), m_machine.system().name);
+		sprintf(m_title, "%s: %s [%s]", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name);
 	else
-		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), m_machine.system().type.fullname(), m_machine.system().name, index());
+		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name, index());
 
 	result = complete_create();
 	
@@ -464,7 +457,7 @@ osd_dim retro_window_info::pick_best_mode()
    osd_dim ret(0,0);
 
    // determine the minimum width/height for the selected target
-   m_target->compute_minimum_size(minimum_width, minimum_height);
+   target()->compute_minimum_size(minimum_width, minimum_height);
 
    // use those as the target for now
    target_width = minimum_width * std::max(1, prescale());
@@ -497,13 +490,13 @@ void retro_window_info::update()
 	update_cursor_state();
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (m_target != nullptr)
+	if (target() != nullptr)
 	{
 		int tempwidth, tempheight;
 
 		if(alternate_renderer==false){
 			view_aspect = target()->current_view().effective_aspect();
-			if(m_target->orientation() & ORIENTATION_SWAP_XY)view_aspect=1.0f/view_aspect;
+			if(target()->orientation() & ORIENTATION_SWAP_XY)view_aspect=1.0f/view_aspect;
 		}
 
 		// see if the games video mode has changed
@@ -529,7 +522,7 @@ void retro_window_info::update()
 				view_aspect =retro_aspect;
 				monitor()->refresh();
 				monitor()->update_resolution(tempwidth, tempheight);
-				//osd_printf_info("(%dx%d)as:%f rot:%d %d\n",tempwidth, tempheight,retro_aspect,m_target->orientation(),m_target->orientation() & ORIENTATION_SWAP_XY);
+				//osd_printf_info("(%dx%d)as:%f rot:%d %d\n",tempwidth, tempheight,retro_aspect,target()->orientation(),target()->orientation() & ORIENTATION_SWAP_XY);
 
 				if(fb_width>max_width || fb_height>max_height)
 					NEWGAME_FROM_OSD = 1;
@@ -780,7 +773,6 @@ osd_rect retro_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int 
 	int32_t viswidth, visheight;
 	int32_t adjwidth, adjheight;
 	float pixel_aspect;
-	std::shared_ptr<osd_monitor_info> monitor = m_monitor;
 
 	// do not constrain aspect ratio for integer scaled views
 	if (target()->scale_mode() != SCALE_FRACTIONAL)
@@ -789,7 +781,7 @@ osd_rect retro_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int 
 	// get the pixel aspect ratio for the target monitor
 
 	//FIXME: RETRO set it to 1 seem to correct the aspect. (alternate renderer)
-	pixel_aspect = monitor->pixel_aspect();
+	pixel_aspect = monitor()->pixel_aspect();
 
 	// determine the proposed width/height
 	propwidth = rect.width() - extrawidth;
@@ -828,13 +820,13 @@ osd_rect retro_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int 
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (m_fullscreen)
 	{
-		maxwidth = monitor->position_size().width() - extrawidth;
-		maxheight = monitor->position_size().height() - extraheight;
+		maxwidth = monitor()->position_size().width() - extrawidth;
+		maxheight = monitor()->position_size().height() - extraheight;
 	}
 	else
 	{
-		maxwidth = monitor->usuable_position_size().width() - extrawidth;
-		maxheight = monitor->usuable_position_size().height() - extraheight;
+		maxwidth = monitor()->usuable_position_size().width() - extrawidth;
+		maxheight = monitor()->usuable_position_size().height() - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (m_win_config.width != 0)
@@ -966,7 +958,7 @@ osd_dim retro_window_info::get_max_bounds(int constrain)
 
 	// compute the maximum client area
 	// m_monitor->refresh();
-	osd_rect maximum = m_monitor->usuable_position_size();
+	osd_rect maximum = monitor()->usuable_position_size();
 
 	// clamp to the window's max
 	int tempw = maximum.width();
@@ -1005,17 +997,13 @@ retro_window_info::retro_window_info(
 		int index,
 		std::shared_ptr<osd_monitor_info> a_monitor,
 		const osd_window_config *config)
-	: osd_window(a_machine, index, std::move(a_monitor), *config)
-	, m_next(nullptr)
+	: osd_window_t(a_machine, index, std::move(a_monitor), *config)
 	, m_startmaximized(0)
 	// Following three are used by input code to defer resizes
 	, m_minimum_dim(0, 0)
 	, m_windowed_dim(0, 0)
 	, m_rendered_event(0, 1)
-	, m_target(nullptr)
 	, m_extra_flags(0)
-	, m_machine(a_machine)
-	, m_monitor(a_monitor)
 	, m_fullscreen(0)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
