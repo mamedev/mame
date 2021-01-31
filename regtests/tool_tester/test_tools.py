@@ -10,10 +10,14 @@ from tool_tester.pngcmp import PngCmpTests
 from tool_tester.unidasm import UnidasmTests
 
 if __name__ == "__main__":
+    # TODO: proper requirements.txt / setup.py or virtual env management
+    # dataclasses aren't supported in anything prior to 3.7 (dacite lib 3.6)
+    assert sys.version_info >= (3, 7), f"python version {sys.version_info.major}.{sys.version_info.minor} < 3.7"
+
     # TODO: add colorized messages
     # TODO: argparse the logging level
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-    
+
     # TODO: for now I'll just use class handlers here to chain test sources
     # In an ideal world you want to collect items thru inspect module instead
     # https://docs.python.org/3/library/inspect.html
