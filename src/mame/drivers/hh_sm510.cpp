@@ -1478,8 +1478,8 @@ ROM_START( exospace )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
-	ROM_REGION( 66850, "screen", 0)
-	ROM_LOAD( "exospace.svg", 0, 66850, BAD_DUMP CRC(905e2cf0) SHA1(38181381fb50bc01afe9f5827999636b051c0be0) )
+	ROM_REGION( 89361, "screen", 0)
+	ROM_LOAD( "exospace.svg", 0, 89361, BAD_DUMP CRC(d61f3bdc) SHA1(932d45dc9302db5550971ce0d295a88e8c507e3f) )
 ROM_END
 
 
