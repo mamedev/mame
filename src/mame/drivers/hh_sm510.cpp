@@ -18,8 +18,6 @@ TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
 - improve/redo SVG of: exospace
-- confirm gnw_egg rom (now using gnw_mmouse rom, but pretty confident that it's
-  the same)
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
@@ -63,7 +61,7 @@ OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
 FP-24     ws   SM5A    Chef
 MC-25     ws   SM5A    Mickey Mouse
-EG-26     ws   SM5A    Egg (near-certainly same ROM as MC-25, but LCD differs)
+EG-26     ws   SM5A    Egg (same ROM as MC-25, but LCD differs)
 FR-27     ws   SM5A    Fire
 TL-28     ws   SM510   Turtle Bridge
 ID-29     ws   SM510   Fire Attack
@@ -1369,7 +1367,7 @@ ROM_END
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * PCB label MC-25 EG-26 (yes, both listed)
-  * Sharp SM5A label MC-25 51YD (no decap)
+  * Sharp SM5A label MC-25 51YD (Mickey Mouse), MC-25 519D (Egg) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
@@ -1462,7 +1460,7 @@ ROM_END
 
 ROM_START( gnw_egg )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from MC-25
+	ROM_LOAD( "mc-25", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 193119, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 193119, CRC(1e469fe5) SHA1(bc80114337feefca590e48c823e8488f6b63f896) )
