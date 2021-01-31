@@ -383,7 +383,8 @@ public:
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
-		m_io_ports(*this, "IN%u", 0U)
+		m_io_ports(*this, "IN%u", 0U),
+		m_io_ppp_sensors(*this, "SENSOR%u", 1U)
 	{
 	}
 
@@ -392,6 +393,7 @@ public:
 	void init_viper();
 	void init_vipercf();
 	void init_viperhd();
+	void init_viperppp();
 
 	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
 
@@ -430,6 +432,8 @@ private:
 	uint64_t unk_serial_r(offs_t offset, uint64_t mem_mask = ~0);
 	void unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
+
+	uint16_t ppp_sensor_r(offs_t offset);
 
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
@@ -566,6 +570,7 @@ private:
 	required_shared_ptr<uint64_t> m_workram;
 	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
+	optional_ioport_array<4> m_io_ppp_sensors;
 
 	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -2129,7 +2134,6 @@ READ_LINE_MEMBER(viper_state::ds2430_unk_r)
 	return m_ds2430_unk_status;
 }
 
-
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2236,6 +2240,24 @@ INPUT_PORTS_START( ppp2nd )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // another OK button
+
+	PORT_START("SENSOR1")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_BUTTON3 )     // Sensor 0, 1, 2  (Sensor bar 1)
+	PORT_BIT( 0x0038, IP_ACTIVE_HIGH, IPT_BUTTON4 )     // Sensor 3, 4, 5  (Sensor bar 2)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_BUTTON5 )     // Sensor 6, 7, 8  (Sensor bar 3)
+
+	PORT_START("SENSOR2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON5 )     // Sensor 6, 7, 8  (Sensor bar 3)
+	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_BUTTON6 )     // Sensor 9, 10,11 (Sensor bar 4)
+
+	PORT_START("SENSOR3")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_BUTTON7 )     // Sensor 12,13,14 (Sensor bar 5)
+	PORT_BIT( 0x0038, IP_ACTIVE_HIGH, IPT_BUTTON8 )     // Sensor 15,16,17 (Sensor bar 6)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_BUTTON9 )     // Sensor 18,19,20 (Sensor bar 7)
+
+	PORT_START("SENSOR4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 )     // Sensor 18,19,20 (Sensor bar 7)
+	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_BUTTON10 )    // Sensor 21,22,23 (Sensor bar 8)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( thrild2 )
@@ -2472,6 +2494,23 @@ void viper_state::init_vipercf()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64s_delegate(*this, FUNC(viper_state::unk_serial_r)), write64s_delegate(*this, FUNC(viper_state::unk_serial_w)));
 }
 
+void viper_state::init_viperppp()
+{
+	init_viperhd();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xff400200, 0xff40023f, read16sm_delegate(*this, FUNC(viper_state::ppp_sensor_r)));
+}
+
+uint16_t viper_state::ppp_sensor_r(offs_t offset)
+{
+	switch(offset) {
+		case 0x06: return m_io_ppp_sensors[0]->read();
+		case 0x0e: return m_io_ppp_sensors[1]->read();
+		case 0x16: return m_io_ppp_sensors[2]->read();
+		case 0x1e: return m_io_ppp_sensors[3]->read();
+	}
+
+	return 0;
+}
 
 /*****************************************************************************/
 
@@ -3077,8 +3116,8 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper,    viper,   viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, ppp2nda,   ppp2nd,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperppp, ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nda,   ppp2nd,    viper,   ppp2nd,   viper_state, init_viperppp, ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper,  boxingm,   viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
