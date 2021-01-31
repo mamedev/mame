@@ -2502,7 +2502,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0x2: // Motor on
 			logerror("cmd motor on\n");
-			mon_w(0);
+			floppy_image_device::mon_w(0);
 			break;
 
 		case 0x3: // End eject
@@ -2516,7 +2516,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0x6: // Motor off
 			logerror("cmd motor off\n");
-			mon_w(1);
+			floppy_image_device::mon_w(1);
 			break;
 
 		case 0x7: // Start eject
@@ -2567,6 +2567,10 @@ void mac_floppy_device::track_changed()
 		set_rpm(new_rpm);
 }
 
+void mac_floppy_device::mon_w(int)
+{
+	// Motor control is through commands
+}
 
 oa_d34v_device::oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, OAD34V, tag, owner, clock)
 {

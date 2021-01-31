@@ -738,7 +738,7 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 #if NEW_SWIM
 	switch (woz_version) {
 	case 0:
-		IWM(config, m_fdc, C15M, 0, true);
+		IWM(config, m_fdc, C15M);
 		break;
 	case 1:
 		SWIM1(config, m_fdc, C15M);
