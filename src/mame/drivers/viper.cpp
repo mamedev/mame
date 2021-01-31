@@ -77,7 +77,7 @@
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
 
     Game status:
-        ppp2nd              POST: "NO SECURITY ERROR"
+        ppp2nd              Boots in-game, no sound or DVD support, crashes when going into song selection screen
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
