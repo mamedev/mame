@@ -117,7 +117,7 @@ public:
 	void maciifx(machine_config &config);
 	void macclas2(machine_config &config);
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
-		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 1);
+		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
 
 	void init_maclc2();

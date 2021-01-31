@@ -43,6 +43,7 @@ void swim1_device::device_start()
 	save_item(NAME(m_iwm_control));
 	save_item(NAME(m_iwm_rsh));
 	save_item(NAME(m_iwm_wsh));
+	save_item(NAME(m_iwm_rw_bit_count));
 	save_item(NAME(m_iwm_to_ism_counter));
 }
 
@@ -64,12 +65,13 @@ void swim1_device::device_reset()
 	m_iwm_rw = MODE_IDLE;
 	m_iwm_rw_state = S_IDLE;
 	m_iwm_data = 0x00;
-	m_iwm_whd = 0xff;
+	m_iwm_whd = 0xbf;
 	m_iwm_mode = 0x00;
 	m_iwm_status = 0x00;
 	m_iwm_control = 0x00;
 	m_iwm_wsh = 0x00;
 	m_iwm_rsh = 0x00;
+	m_iwm_rw_bit_count = 0;
 	m_iwm_to_ism_counter = 0;
 
 	m_devsel_cb(0);
@@ -216,6 +218,8 @@ void swim1_device::device_timer(emu_timer &, device_timer_id, int, void *)
 		m_iwm_active = MODE_IDLE;
 		m_iwm_status &= ~0x20;
 		m_devsel_cb(0);
+		m_iwm_status &= ~0x20;
+		m_iwm_whd &= ~0x40;
 	}
 }
 
@@ -246,7 +250,8 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 	sync();
 	u8 prev_iwm_to_ism_counter = m_iwm_to_ism_counter;
 
-	logerror("iwm control trigger %x, %02x\n", offset, data);
+	if(0)
+		logerror("iwm control trigger %x, %02x\n", offset, data);
 	u8 changed = m_iwm_control | (m_phases & 0xf);
 	if(offset < 8) {
 		if(offset & 1)
@@ -254,7 +259,6 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 		else
 			m_phases &= ~(1 << (offset >> 1));
 		update_phases();
-		machine().debug_break();
 	} else {
 		if(offset & 1)
 			m_iwm_control |= 1 << (offset >> 1);
@@ -289,14 +293,17 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 				flush_write();
 			m_iwm_rw = MODE_READ;
 			m_iwm_rw_state = S_IDLE;
+			m_iwm_status &= ~0x20;
+			m_iwm_whd &= ~0x40;
 			m_iwm_next_state_change = 0;
 			m_iwm_sync_update = 0;
 			m_iwm_async_update = 0;
 			m_iwm_data = 0x00;
 
-		} else if((m_iwm_control & 0xc0) == 0xc0 && (changed & 0xc0) == 0x40 && m_iwm_active && m_iwm_rw != MODE_WRITE) {
+		} else if((m_iwm_control & 0xc0) == 0xc0 && m_iwm_active && m_iwm_rw != MODE_WRITE) {
 			m_iwm_rw = MODE_WRITE;
 			m_iwm_rw_state = S_IDLE;
+			m_iwm_whd |= 0x40;
 			m_iwm_next_state_change = 0;
 			m_flux_write_start = m_last_sync;
 			m_flux_write_count = 0;
@@ -312,7 +319,7 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 			m_iwm_rw = MODE_IDLE;
 	}
 
-	if(changed || 1) {
+	if(changed && 0) {
 		u8 s = m_iwm_control & 0xc0;
 		const char *slot = "?";
 		if(s == 0x00 && !m_iwm_active)
@@ -358,7 +365,6 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 		case 3:
 			if(data & 0x40) {
 				m_ism_mode |= 0x40;
-				machine().debug_break();
 				logerror("switch to ism\n");
 			}
 			break;
@@ -447,6 +453,8 @@ void swim1_device::iwm_data_w(u8 data)
 	m_iwm_data = data;
 	if(iwm_is_sync() && m_iwm_rw == MODE_WRITE)
 		m_iwm_wsh = data;
+	if(m_iwm_mode & 0x01)
+		m_iwm_whd &= 0x7f;
 }
 
 bool swim1_device::iwm_is_sync() const
@@ -543,7 +551,6 @@ void swim1_device::iwm_sync()
 
 				} else if(m_iwm_rsh >= 0x80) {
 					m_iwm_data = m_iwm_rsh;
-					logerror("DATAR %02x\n", m_iwm_data);
 					m_iwm_rsh = 0;
 				}
 				break;
@@ -574,25 +581,57 @@ void swim1_device::iwm_sync()
 				m_last_sync = m_iwm_next_state_change;
 			switch(m_iwm_rw_state) {
 			case S_IDLE:
-				m_iwm_wsh = m_iwm_data;
-				m_iwm_rw_state = SW_WINDOW_MIDDLE;
-				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
 				m_flux_write_count = 0;
+				if(m_iwm_mode & 0x02) {
+					m_iwm_rw_state = SW_WINDOW_LOAD;
+					m_iwm_rw_bit_count = 8;
+					m_iwm_next_state_change = m_last_sync + 7;
+				} else {
+					m_iwm_wsh = m_iwm_data;
+					m_iwm_rw_state = SW_WINDOW_MIDDLE;
+					m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
+				}
+				break;
+
+			case SW_WINDOW_LOAD:
+				if(m_iwm_whd & 0x80) {
+					logerror("Underrun\n");
+					m_iwm_whd &= ~0x40;
+					m_iwm_rw_state = S_IDLE;
+					m_last_sync = next_sync;
+				} else {
+					m_iwm_wsh = m_iwm_data;
+					m_iwm_rw_state = SW_WINDOW_MIDDLE;
+					m_iwm_whd |= 0x80;
+					m_iwm_next_state_change = m_last_sync + iwm_half_window_size() - 7;
+				}
 				break;
 
 			case SW_WINDOW_MIDDLE:
 				if(m_iwm_wsh & 0x80)
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_iwm_wsh <<= 1;
-				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
-
 				m_iwm_rw_state = SW_WINDOW_END;
+				m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
 				break;
+
 			case SW_WINDOW_END:
 				if(m_flux_write_count == m_flux_write.size())
 					flush_write();
-				//				m_iwm_next_state_change = iwm_q3_to_fclk(iwm_fclk_to_q3(m_last_sync) + iwm_write_sync_half_window_size());
-				m_iwm_rw_state = SW_WINDOW_MIDDLE;
+				if(m_iwm_mode & 0x02) {
+					m_iwm_rw_bit_count --;
+					if(m_iwm_rw_bit_count == 0) {
+						m_iwm_rw_state = SW_WINDOW_LOAD;
+						m_iwm_rw_bit_count = 8;
+						m_iwm_next_state_change = m_last_sync + 7;
+					} else {
+						m_iwm_rw_state = SW_WINDOW_MIDDLE;
+						m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
+					}
+				} else {
+					m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
+					m_iwm_rw_state = SW_WINDOW_MIDDLE;
+				}
 				break;
 			}
 		}

@@ -738,7 +738,7 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 #if NEW_SWIM
 	switch (woz_version) {
 	case 0:
-		IWM(config, m_fdc, C7M, 1021800*4, true);
+		IWM(config, m_fdc, C15M);
 		break;
 	case 1:
 		SWIM1(config, m_fdc, C15M);
@@ -1151,7 +1151,7 @@ void mac_state::macclas2(machine_config &config)
 
 void mac_state::maciici(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, true, false, true);
+	macii(config, false, asc_device::asc_type::ASC, true, false, true, 1);
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);

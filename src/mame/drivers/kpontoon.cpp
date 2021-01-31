@@ -15,7 +15,7 @@
     3 XTALs (1 21.05300MHz and 2 18.43200MHz)
 
     TTL char readback:
-    C000-D000 window, control bit 7 enables ROM readback, bit 6 selects which ROM, F450 banks
+    C000-D000 window, control bit 7 enables ROM readback, bit 5 selects which ROM, F450 banks
 */
 
 #include "emu.h"
@@ -27,6 +27,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "machine/timer.h"
 
 namespace {
 
@@ -36,12 +37,19 @@ public:
 	kpontoon_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mainbank(*this, "mainbank"),
+		m_k053246(*this, "k053246"),
+		m_k054539(*this, "k054539"),
+		m_k053252(*this, "k053252"),
 		m_ttl_vram(*this, "ttl_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_charview(*this, "charview"),
-		m_charrom(*this, "chars")
+		m_charrom(*this, "chars"),
+		m_sprrom(*this, "k053246"),
+		m_sndrom(*this, "audiocpu")
 	{ }
 
 	void kpontoon(machine_config &config);
@@ -56,25 +64,50 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu, m_audiocpu;
 	required_memory_bank m_mainbank;
+	required_device<k053247_device> m_k053246;
+	required_device<k054539_device> m_k054539;
+	required_device<k053252_device> m_k053252;
 	required_shared_ptr<u8> m_ttl_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	memory_view m_charview;
-	required_region_ptr<u8> m_charrom;
+	required_region_ptr<u8> m_charrom, m_sprrom, m_sndrom;
 
 	void control_w(u8 data);
 	void charrom_bank_w(u8 data);
+	void sprrom_adr_h(u8 data);
+	void sprrom_adr_m(u8 data);
+	void sprrom_adr_l(u8 data);
 	u8 charrom_r(offs_t offset);
+	u8 sprrom_r(offs_t offset);
 	void ttl_ram_w(offs_t offset, u8 data);
+	void ccu_int_time_w(u8 data) { m_ccu_int_time = data; }
+	u8 vbl_r() { return m_screen->vblank() ? 0x80 : 0x00; }
+	void snd_to_main_w(offs_t offset, u8 data);
+	u8 snd_to_main_r() { return m_sound_to_main; }
+	void main_to_snd_w(offs_t offset, u8 data);
+	u8 main_to_snd_r();
+	u8 snd_rombank_r(offs_t offset);
+	void snd_bnk_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
+	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(ccu_scanline);
+	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	u8 m_control;
 	u8 m_charrom_bank;
+	int m_ccu_int_time, m_ccu_int_time_count;
+	u32 m_sprrom_adr;
+	u8 m_sound_nmi_clk;
+	u8 m_sound_to_main, m_main_to_sound;
+	u8 m_sound_rombank;
 };
 
 void kpontoon_state::control_w(u8 data)
@@ -112,6 +145,29 @@ u8 kpontoon_state::charrom_r(offs_t offset)
 	return m_charrom[loc];
 }
 
+void kpontoon_state::sprrom_adr_h(u8 data)
+{
+	m_sprrom_adr &= 0xffff;
+	m_sprrom_adr |= (data << 16);
+}
+
+void kpontoon_state::sprrom_adr_m(u8 data)
+{
+	m_sprrom_adr &= 0xff00ff;
+	m_sprrom_adr |= (data << 8);
+}
+
+void kpontoon_state::sprrom_adr_l(u8 data)
+{
+	m_sprrom_adr &= 0xffff00;
+	m_sprrom_adr |= data;
+}
+
+u8 kpontoon_state::sprrom_r(offs_t offset)
+{
+	return m_sprrom[(offset ^ 1) + (m_sprrom_adr << 1)];
+}
+
 void kpontoon_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
@@ -125,14 +181,74 @@ void kpontoon_state::main_map(address_map &map)
 
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf405, 0xf405).w(FUNC(kpontoon_state::sprrom_adr_l));
+	map(0xf406, 0xf406).w(FUNC(kpontoon_state::sprrom_adr_m));
+	map(0xf407, 0xf407).w(FUNC(kpontoon_state::sprrom_adr_h));
+	map(0xf410, 0xf411).r(FUNC(kpontoon_state::sprrom_r));
+// this sets a very wrong video mode when enabled
+//  map(0xf420, 0xf42f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xf450, 0xf450).w(FUNC(kpontoon_state::charrom_bank_w));
 	map(0xf470, 0xf470).nopw(); // watchdog
+	map(0xf810, 0xf810).w(FUNC(kpontoon_state::main_to_snd_w));
+	map(0xf820, 0xf820).r(FUNC(kpontoon_state::snd_to_main_r));
 	map(0xf830, 0xf830).w(FUNC(kpontoon_state::control_w));
+	map(0xf851, 0xf851).r(FUNC(kpontoon_state::vbl_r));
+}
+
+void kpontoon_state::main_to_snd_w(offs_t offset, u8 data)
+{
+	m_main_to_sound = data;
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+u8 kpontoon_state::main_to_snd_r()
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_main_to_sound;
+}
+
+void kpontoon_state::snd_to_main_w(offs_t offset, u8 data)
+{
+	if (offset == 0)
+	{
+		m_sound_to_main = data;
+	}
+}
+
+WRITE_LINE_MEMBER(kpontoon_state::k054539_nmi_gen)
+{
+	// Trigger an /NMI on the rising edge
+	if (!m_sound_nmi_clk && state)
+	{
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+	else if (!state)
+	{
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+	m_sound_nmi_clk = state;
+}
+
+u8 kpontoon_state::snd_rombank_r(offs_t offset)
+{
+	return m_sndrom[offset + (0x4000 * m_sound_rombank)];
+}
+
+void kpontoon_state::snd_bnk_w(u8 data)
+{
+	m_sound_rombank = data;
 }
 
 void kpontoon_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0x8000, 0xbfff).r(FUNC(kpontoon_state::snd_rombank_r));
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd001).w(FUNC(kpontoon_state::snd_to_main_w));
+	map(0xe000, 0xe001).r(FUNC(kpontoon_state::main_to_snd_r));
+	map(0xf000, 0xf000).w(FUNC(kpontoon_state::snd_bnk_w));
+	map(0xf800, 0xfa2f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 }
 
 static INPUT_PORTS_START( kpontoon )
@@ -186,6 +302,10 @@ void kpontoon_state::machine_start()
 void kpontoon_state::machine_reset()
 {
 	m_charview.select(0);
+	m_ccu_int_time_count = 0;
+	m_ccu_int_time = 31;
+	m_control = 0;
+	m_sound_nmi_clk = 0;
 }
 
 void kpontoon_state::ttl_ram_w(offs_t offset, u8 data)
@@ -213,6 +333,27 @@ uint32_t kpontoon_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(kpontoon_state::ccu_scanline)
+{
+	int scanline = param;
+
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
+	if (scanline == 255)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
+}
+
 static GFXDECODE_START( gfx_pontoon )
 	GFXDECODE_ENTRY( "chars", 0, gfx_16x16x4_packed_msb, 0, 1 ) // TODO: looks decent, but needs verifying
 GFXDECODE_END
@@ -222,37 +363,43 @@ void kpontoon_state::kpontoon(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 21'053'000 / 4); // clock unverified
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpontoon_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(kpontoon_state::ccu_scanline), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(18.432_MHz_XTAL) / 4)); // clock unverified
-	audiocpu.set_addrmap(AS_PROGRAM, &kpontoon_state::sound_map);
-	audiocpu.set_disable();
+	Z80(config, m_audiocpu, 21'053'000 / 3); // clock unverified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kpontoon_state::sound_map);
 
-	K053252(config, "k053252", 21'053'000 / 4); // clock unverified
+	K053252(config, m_k053252, 21'053'000 / 8); // clock unverified
+	m_k053252->int1_ack().set(FUNC(kpontoon_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(kpontoon_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(kpontoon_state::ccu_int_time_w));
+	m_k053252->set_offsets(256, 96); // not accurate
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(128*8, 64*8);
-	screen.set_visarea(26*8, 90*8-1, 24, 56*8-1);
-	screen.set_screen_update(FUNC(kpontoon_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(128*8, 64*8);
+	m_screen->set_visarea(25*8, 91*8-1, 24, 56*8-1);
+	m_screen->set_screen_update(FUNC(kpontoon_state::screen_update));
+	m_screen->set_palette("palette");
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256); // TODO: all wrong
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pontoon);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	k053247_device &k053246(K053246(config, "k053246", 0));
-	//k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
-	k053246.set_config(NORMAL_PLANE_ORDER, 0, 0); // TODO: verify
-	k053246.set_palette(m_palette);
+	K053246(config, m_k053246, 0);
+	//m_k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 0, 0); // TODO: verify
+	m_k053246->set_palette(m_palette);
 
-	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
-	k054539.add_route(0, "rspeaker", 0.75);
-	k054539.add_route(1, "lspeaker", 0.75);
+	K054539(config, m_k054539, 18.432_MHz_XTAL);
+	m_k054539->set_device_rom_tag("k054539");
+	m_k054539->timer_handler().set(FUNC(kpontoon_state::k054539_nmi_gen));
+	m_k054539->add_route(0, "rspeaker", 0.75);
+	m_k054539->add_route(1, "lspeaker", 0.75);
 }
 
 
@@ -260,10 +407,10 @@ ROM_START( kpontoon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "270eac04.bin", 0x00000, 0x10000, CRC(614e35bd) SHA1(50a7740f0442949d9c49209b04589296d065af52) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // really?
-	ROM_LOAD( "270b01.bin", 0x00000, 0x10000, CRC(012f542e) SHA1(b83f53e5297ec0c2f742701f694149d1e466648e) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "270b01.bin", 0x00000, 0x10000, CRC(f08ebef7) SHA1(126878cf32582cc5676be35c30aeeeeb462060a8) )
 
-	ROM_REGION( 0x80000, "k053246", 0 ) // TODO: correct ROM loading
+	ROM_REGION( 0x80000, "k053246", 0 )
 	ROM_LOAD64_BYTE( "270ea07.bin", 0x00007, 0x10000, CRC(27e791fa) SHA1(fcafe9fd74ab729a90e4a36b25dbc4ce050b68ba) )
 	ROM_LOAD64_BYTE( "270ea08.bin", 0x00006, 0x10000, CRC(aa1474cc) SHA1(b935ab41daeaace62a90885c0d29f49df67ca3a3) )
 	ROM_LOAD64_BYTE( "270ea09.bin", 0x00005, 0x10000, CRC(0462f9ea) SHA1(c16f6b8ef8b04fcc2b11783e3a5e553a45fafb84) )

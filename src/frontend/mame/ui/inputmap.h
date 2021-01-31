@@ -71,6 +71,8 @@ protected:
 
 private:
 	std::unique_ptr<input_sequence_poller> seq_poll;
+	std::string assignprompt, appendprompt;
+	std::string clearprompt, defaultprompt;
 	std::string errormsg;
 	input_item_data *erroritem;
 	input_item_data *lastitem;

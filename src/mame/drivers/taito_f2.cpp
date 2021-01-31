@@ -5328,7 +5328,7 @@ ROM_START( driftoutj )
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( driftoutct ) // conversion on Camel Try hardware
+ROM_START( driftoutct ) // conversion on Cameltry hardware
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "l.ic10",  0x00000, 0x80000, CRC(d1f779d3) SHA1(d70a52b74bed88e33da6bdaf34467c0353bef9a8) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "h.ic11",  0x00001, 0x80000, CRC(6ff1c660) SHA1(54e86795a166e49bf472577faddad5c640434414) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
@@ -5550,6 +5550,6 @@ GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, empty_in
 GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Camel Try hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Cameltry conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, init_driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )

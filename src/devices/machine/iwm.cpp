@@ -13,24 +13,13 @@
 
 DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock, bool disable_mon) :
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
 	applefdintf_device(mconfig, IWM, tag, owner, clock),
 	m_floppy(nullptr),
-	m_q3_clock(q3_clock),
-	m_disable_mon(disable_mon)
+	m_q3_clock(q3_clock)
 {
-	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
-	m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
-}
-
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	applefdintf_device(mconfig, IWM, tag, owner, clock),
-	m_floppy(nullptr),
-	m_q3_clock(0),
-	m_disable_mon(false)
-{
-	m_q3_fclk_ratio = 0;
-	m_fclk_q3_ratio = 0;
+	m_q3_fclk_ratio = q3_clock ? double(clock)/double(q3_clock) : 0; // ~0.25
+	m_fclk_q3_ratio = q3_clock ? double(q3_clock)/double(clock) : 0; // ~4
 }
 
 u64 iwm_device::q3_to_fclk(u64 cycles) const
@@ -96,7 +85,7 @@ void iwm_device::device_timer(emu_timer &, device_timer_id, int, void *)
 	if(m_active == MODE_DELAY) {
 		flush_write();
 		m_active = MODE_IDLE;
-		if(m_floppy && !m_disable_mon)
+		if(m_floppy)
 			m_floppy->mon_w(true);
 		m_devsel_cb(0);
 		m_status &= ~0x20;
@@ -111,10 +100,10 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
-	if(m_floppy && (m_control & 0x10) && !m_disable_mon)
+	if(m_floppy && (m_control & 0x10))
 		m_floppy->mon_w(true);
 	m_floppy = floppy;
-	if(m_floppy && (m_control & 0x10) && !m_disable_mon)
+	if(m_floppy && (m_control & 0x10))
 		m_floppy->mon_w(false);
 	update_phases();
 }
@@ -177,7 +166,7 @@ u8 iwm_device::control(int offset, u8 data)
 		if(m_control & 0x10) {
 			m_active = MODE_ACTIVE;
 			m_status |= 0x20;
-			if(m_floppy && !m_disable_mon)
+			if(m_floppy)
 				m_floppy->mon_w(false);
 		} else {
 			if(m_mode & 0x04) {
@@ -185,7 +174,7 @@ u8 iwm_device::control(int offset, u8 data)
 				m_active = MODE_IDLE;
 				m_status &= ~0x20;
 				m_whd &= ~0x40;
-				if(m_floppy && !m_disable_mon)
+				if(m_floppy)
 					m_floppy->mon_w(true);
 			} else {
 				m_devsel_cb(m_control & 0x20 ? 2 : 1);
@@ -225,7 +214,7 @@ u8 iwm_device::control(int offset, u8 data)
 			m_rw = MODE_IDLE;
 	}
 
-	if(1) {
+	if(0) {
 		u8 s = m_control & 0xc0;
 		const char *slot = "?";
 		if(s == 0x00 && !m_active)
@@ -394,7 +383,6 @@ void iwm_device::sync()
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {
 						m_data = m_rsh;
-						logerror("DATAR %02x\n", m_data);
 						if(m_data == 0xfc)
 							machine().debug_break();
 						m_rsh = 0;
@@ -406,7 +394,6 @@ void iwm_device::sync()
 
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
-					logerror("DATAR %02x\n", m_data);
 					if(m_data == 0xfc)
 						machine().debug_break();
 					m_rsh = 0;
@@ -448,7 +435,10 @@ void iwm_device::sync()
 				} else {
 					m_wsh = m_data;
 					m_rw_state = SW_WINDOW_MIDDLE;
-					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					if(m_q3_clock)
+						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					else
+						m_next_state_change = m_last_sync + half_window_size();
 				}
 				break;
 
@@ -460,7 +450,6 @@ void iwm_device::sync()
 					m_rw_state = S_IDLE;
 					m_last_sync = next_sync;
 				} else {
-					logerror("DATAW %02x\n", m_data);
 					m_wsh = m_data;
 					m_rw_state = SW_WINDOW_MIDDLE;
 					m_whd |= 0x80;
@@ -474,7 +463,7 @@ void iwm_device::sync()
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_wsh <<= 1;
 				m_rw_state = SW_WINDOW_END;
-				if(m_mode & 0x02)
+				if((m_mode & 0x02) || !m_q3_clock)
 					m_next_state_change = m_last_sync + half_window_size();
 				else
 					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
@@ -495,7 +484,10 @@ void iwm_device::sync()
 						m_next_state_change = m_last_sync + half_window_size();
 					}
 				} else {
-					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					if(m_q3_clock)
+						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+					else
+						m_next_state_change = m_last_sync + half_window_size();
 					m_rw_state = SW_WINDOW_MIDDLE;
 				}
 				break;

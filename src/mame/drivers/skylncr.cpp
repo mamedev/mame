@@ -2235,7 +2235,7 @@ void skylncr_state::init_olymp() // very weird, needs to be checked / finished, 
 {
 	uint8_t *const ROM = memregion("maincpu")->base();
 
-	for (int x = 0x0000; x < 0x0007; x++) // this range doesn´t seem encrypted
+	for (int x = 0x0000; x < 0x0007; x++) // this range doesn't seem encrypted
 		m_decrypted_opcodes[x] = ROM[x];
 
 	for (int x = 0x0007; x < 0x6500; x++) // in this range both data and opcodes appear to be xor'ed 0x40
@@ -2267,7 +2267,7 @@ GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,    ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun Internationl 1992 strings
+GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,    ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
 GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling

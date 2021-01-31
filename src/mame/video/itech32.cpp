@@ -559,13 +559,13 @@ void itech32_state::draw_raw_widthpix(u16 *base, u16 color)
 				if (xdststep > 0)
 				{
 					/* skip left pixels */
-					for ( ; x < width && sx < m_scaled_clip_rect.min_x; x += xsrcstep, px++, sx += xdststep) ;
+					for ( ; px < width && sx < m_scaled_clip_rect.min_x; x += xsrcstep, px += 0x100, sx += xdststep) ;
 
 					/* compute the address */
 					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px++, sx += xdststep)
+					for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep)
 					{
 						int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];
 						if (pixel != transparent_pen)
@@ -575,13 +575,13 @@ void itech32_state::draw_raw_widthpix(u16 *base, u16 color)
 				else
 				{
 					/* skip right pixels */
-					for ( ; px < width && sx >= m_scaled_clip_rect.max_x; x += xsrcstep, px++, sx += xdststep) ;
+					for ( ; px < width && sx >= m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep) ;
 
 					/* compute the address */
 					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					for ( ; px < width && sx >= m_scaled_clip_rect.min_x; x += xsrcstep, px++, sx += xdststep)
+					for ( ; px < width && sx >= m_scaled_clip_rect.min_x; x += xsrcstep, px += 0x100, sx += xdststep)
 					{
 						int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];
 						if (pixel != transparent_pen)
@@ -599,7 +599,7 @@ void itech32_state::draw_raw_widthpix(u16 *base, u16 color)
 
 			/* render all pixels */
 			sx = startx;
-			for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px++, sx += xdststep, ty += ystep)
+			for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep, ty += ystep)
 				if (m_scaled_clip_rect.contains(sx, ty))
 				{
 					int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];

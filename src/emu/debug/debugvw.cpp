@@ -250,6 +250,7 @@ void debug_view::adjust_visible_x_for_cursor()
 		m_topleft.x = m_cursor.x;
 	else if (m_cursor.x >= m_topleft.x + m_visible.x - 1)
 		m_topleft.x = m_cursor.x - m_visible.x + 2;
+	m_topleft.x = (std::max)((std::min)(m_topleft.x, m_total.x - m_visible.x), 0);
 }
 
 
@@ -265,6 +266,7 @@ void debug_view::adjust_visible_y_for_cursor()
 		m_topleft.y = m_cursor.y;
 	else if (m_cursor.y >= m_topleft.y + m_visible.y - 1)
 		m_topleft.y = m_cursor.y - m_visible.y + 2;
+	m_topleft.y = (std::max)((std::min)(m_topleft.y, m_total.y - m_visible.y), 0);
 }
 
 
