@@ -1956,7 +1956,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 void z80scc_channel::do_sccreg_wr2(uint8_t data)
 {
 	LOG("%s(%02x): Setting the interrupt vector\n", FUNCNAME, data);
-	m_wr2 = data;
+	m_uart->m_chanA->m_wr2 = data;
 	m_uart->m_chanA->m_rr2 = data;
 	m_uart->m_chanB->m_rr2 = data; /* TODO: Sort out the setting of ChanB depending on bits in WR9 */
 
