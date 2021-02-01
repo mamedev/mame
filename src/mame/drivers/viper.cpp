@@ -389,6 +389,7 @@ public:
 	}
 
 	void viper(machine_config &config);
+	void viper_ppp(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
@@ -444,6 +445,7 @@ private:
 	uint32_t m_mpc8240_regs[256/4];
 
 	void viper_map(address_map &map);
+	void viper_ppp_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -2127,6 +2129,12 @@ void viper_state::viper_map(address_map &map)
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
 }
 
+void viper_state::viper_ppp_map(address_map &map)
+{
+	viper_map(map);
+	map(0xff400200, 0xff40023f).r(FUNC(viper_state::ppp_sensor_r));
+}
+
 /*****************************************************************************/
 
 READ_LINE_MEMBER(viper_state::ds2430_unk_r)
@@ -2470,6 +2478,12 @@ void viper_state::viper(machine_config &config)
 	M48T58(config, "m48t58", 0);
 }
 
+void viper_state::viper_ppp(machine_config &config)
+{
+	viper(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
+}
+
 /*****************************************************************************/
 
 void viper_state::init_viper()
@@ -2492,12 +2506,6 @@ void viper_state::init_vipercf()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64s_delegate(*this, FUNC(viper_state::cf_card_r)), write64s_delegate(*this, FUNC(viper_state::cf_card_w)));
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64s_delegate(*this, FUNC(viper_state::unk_serial_r)), write64s_delegate(*this, FUNC(viper_state::unk_serial_w)));
-}
-
-void viper_state::init_viperppp()
-{
-	init_viperhd();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xff400200, 0xff40023f, read16sm_delegate(*this, FUNC(viper_state::ppp_sensor_r)));
 }
 
 uint16_t viper_state::ppp_sensor_r(offs_t offset)
@@ -3116,8 +3124,8 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper,    viper,   viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperppp, ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, ppp2nda,   ppp2nd,    viper,   ppp2nd,   viper_state, init_viperppp, ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd, viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd, viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper,  boxingm,   viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
