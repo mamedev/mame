@@ -280,7 +280,6 @@ void iwm_device::data_w(u8 data)
 		m_wsh = data;
 	if(m_mode & 0x01)
 		m_whd &= 0x7f;
-	logerror("data load %02x, m_mode %02x whd %02x\n", m_data, m_mode, m_whd);
 }
 
 u64 iwm_device::time_to_cycles(const attotime &tm) const
