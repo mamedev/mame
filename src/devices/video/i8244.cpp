@@ -564,24 +564,25 @@ void i8244_device::char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitma
 				m_control_status |= 0x80;
 
 				// TODO: much more complex on actual console (weird glitches happen)
-				continue;
+				if (colx & 0x80)
+					continue;
 			}
 			else
 				m_priority_map[px] = index;
 
-			// note: collision affects transparent pixels too
-			// check if we collide with an already drawn source object
-			if (m_vdc.s.collision & colx)
-				m_collision_status |= 0x80;
-
-			// check if an already drawn object would collide with us
-			if (m_vdc.s.collision & 0x80)
-				m_collision_status |= colx;
-
-			m_collision_map[px] |= 0x80;
-
 			if (pixel)
+			{
+				// check if we collide with an already drawn source object
+				if (m_vdc.s.collision & colx)
+					m_collision_status |= 0x80;
+
+				// check if an already drawn object would collide with us
+				if (m_vdc.s.collision & 0x80)
+					m_collision_status |= colx;
+
+				m_collision_map[px] |= 0x80;
 				bitmap.pix(y, px) = color;
+			}
 		}
 	}
 }

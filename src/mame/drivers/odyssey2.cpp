@@ -60,6 +60,7 @@ TODO:
   (including transparent pixels) will cause glitches and instability, it can even
   overwrite the VDC color and pointer registers
   * gunfight: accidental usage, sometimes causes 1-frame glitches near bullet
+  * powerlrd: occurs at pink mountain on the right, it's not 1:1 identical on MAME
   * several homebrews by Rafael: precisely placed overlap to force character
     color to change to white, see for example Piggyback Planet and Mean Santa
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
