@@ -550,6 +550,7 @@ void nbmj8688_state::common_video_start()
 	m_scrolly = 0;  // reset because crystalg/crystal2 don't write to this register
 	m_screen_refresh = 1;
 	m_blitter_src_addr = 0;
+	m_gfxrom = 0;
 
 	save_pointer(NAME(m_videoram), 512 * 256);
 	save_pointer(NAME(m_clut), 0x20);
