@@ -132,6 +132,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		, m_current_chr_table(nullptr)
 	 { }
 
 	void init_m4default_alt();
