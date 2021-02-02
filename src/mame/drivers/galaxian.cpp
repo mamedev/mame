@@ -9307,6 +9307,22 @@ ROM_START( galaktron )
 	ROM_LOAD( "galaktron_pr.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( galkamika )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",   0x0000, 0x0800, CRC(51ba70ac) SHA1(970070328f6e63f65c68270d0520cc3d26439132) )
+	ROM_LOAD( "2.bin",   0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "1.bin",   0x1000, 0x0800, CRC(aaf038d4) SHA1(2d070fe7c4e9b26092f0f12a9db3392f7d8a65f1) )
+	ROM_LOAD( "4.bin",   0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "5.bin",   0x2000, 0x0800, CRC(b1a8dfea) SHA1(6e6320c079d411bf950d5f8cf6b4219e8b53792c) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "hj.bin",  0x0000, 0x0800, CRC(5f1b4996) SHA1(b34e17b1a373e91b821431659417bd75512fb34f) )
+	ROM_LOAD( "kl.bin",  0x0800, 0x0800, BAD_DUMP CRC(5cd7df03) SHA1(77873408c89546a17b1da3f64b7e96e314fadb17) ) // Missing on the PCB, taken from Galaktron (causes some bad graphics)
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "m866l.bin", 0x000, 0x020, BAD_DUMP CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Not dumped, but original Midway PCB with original soldered PROM
+ROM_END
+
 // Late-to-market bootleg with PCB mods to use a single program rom
 // Datamat is the old name of Datasat, a technical service and distributor of arcade PCB's from the 80's and 90's.
 // A lot of the bootleg PCB's around Spain have Datamat stickers on the roms. It was one of the most important PCB sellers/distributors in the country from the era.
@@ -9336,7 +9352,7 @@ ROM_START( zerotimemc )
 	ROM_LOAD( "2_1hj.bin", 0x0000, 0x0800, CRC(bc7d0985) SHA1(550a44c9ddc8da66a29405591a590f91d2675cdf) )
 	ROM_LOAD( "1_1kl.bin", 0x0800, 0x0800, CRC(c48b88d0) SHA1(dc79f596395af0f3137eb932fe224ab8307d8771) )
 
-	/* Not dumped on the Marti Colls PCB, taken from the parent set */
+	// Not dumped on the Marti Colls PCB, taken from the parent set
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
@@ -14714,6 +14730,7 @@ GAME( 1979, galap1,      galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galap4,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack (G.G.I)",                               "Galaxian Part 4 (hack)",                                                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)",                     "Zero Time (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",                      "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galkamika,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Electrogame)",                      "Kamikaze (Electrogame, Spanish bootleg of Galaxian)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Imperfect graphics because of missing ROM
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimeu,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg)",                                                                  MACHINE_SUPPORTS_SAVE )
