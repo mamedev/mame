@@ -2005,7 +2005,7 @@ void galaxold_state::hunchbkg(machine_config &config)
 	s2650.set_addrmap(AS_DATA, &galaxold_state::hunchbkg_data);
 	s2650.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
-	// the NMI line seems to be inverted on the CPU plugin board */
+	// the NMI line seems to be inverted on the CPU plugin board
 	m_7474_9m_1->comp_output_cb().set_inputline("maincpu", S2650_SENSE_LINE);
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
