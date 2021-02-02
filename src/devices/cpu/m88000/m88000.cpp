@@ -134,6 +134,7 @@ mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, d
 	, m_xip(0)
 	, m_nip(0)
 	, m_fip(0)
+	, m_sb(0)
 	, m_r{ 0 }
 	, m_cr{ 0 }
 	, m_fcr{ 0 }
