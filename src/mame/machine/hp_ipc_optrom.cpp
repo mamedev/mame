@@ -81,5 +81,4 @@ image_init_result hp_ipc_optrom_device::call_load()
 void hp_ipc_optrom_device::call_unload()
 {
 	LOG("hp_ipc_optrom: call_unload\n");
-	machine().schedule_soft_reset();
 }

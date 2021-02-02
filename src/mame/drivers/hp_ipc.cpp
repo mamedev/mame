@@ -749,6 +749,10 @@ void hp_ipc_state::machine_reset()
 	m_spkr->di_w(0);
 
 	// Load optional ROMs (if any)
+	// But first unload anything in opt ROM range
+	m_bankdev->space().unmap_read(0x100000 , 0x4fffff);
+	m_bankdev->space().unmap_read(0x100000 + 0x1800000, 0x4fffff + 0x1800000);
+
 	for (auto& slot : m_rom_slots) {
 		slot->install_read_handler(m_bankdev->space());
 	}
