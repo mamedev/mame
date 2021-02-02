@@ -1815,24 +1815,10 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	else
 		out << " savestate=\"unsupported\"";
 
-	if (flags & machine_flags::TYPE_ARCADE)
-		out << " type=\"arcade\"";
-	else if (flags & machine_flags::TYPE_CONSOLE)
-		out << " type=\"console\"";
-	else if (flags & machine_flags::TYPE_COMPUTER)
-		out << " type=\"computer\"";
-	else if (flags & machine_flags::TYPE_OTHER)
-		out << " type=\"other\"";
-
 	if (flags & machine_flags::REQUIRES_ARTWORK)
 		out << " requiresartwork=\"yes\"";
 	else
 		out << " requiresartwork=\"no\"";
-
-	if (flags & machine_flags::CLICKABLE_ARTWORK)
-		out << " clickableartwork=\"yes\"";
-	else
-		out << " clickableartwork=\"no\"";
 
 	if (flags & machine_flags::UNOFFICIAL)
 		out << " unofficial=\"yes\"";
