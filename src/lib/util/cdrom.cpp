@@ -1582,7 +1582,7 @@ static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
  *          -------------------------------------------------.
  */
 
-uint32_t EDC_crctable[EDC_CRCTABLE_SIZE];
+static uint32_t EDC_crctable[EDC_CRCTABLE_SIZE];
 
 
 //-------------------------------------------------
