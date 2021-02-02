@@ -3561,6 +3561,32 @@
 			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="colour_button_150a_border">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="colour_button_150a">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
 		<text string="COLLECT">
 			<color red="0.0" green="0.0" blue="0.0">
 			</color>
@@ -5118,6 +5144,7 @@
 			<bounds x="738" y="3" width="38" height="23">
 			</bounds>
 		</element>
+
 		<element name="lamp209" ref="colour_button_145_border" state="0" inputtag="J9_0" inputmask="0x20">
 			<bounds x="190" y="604" width="82" height="38">
 			</bounds>
@@ -5126,12 +5153,12 @@
 			<bounds x="192" y="606" width="78" height="34">
 			</bounds>
 		</element>
-		<element name="lamp193" ref="colour_button_146_border" state="0" inputtag="J9_0" inputmask="0x02">
-			<bounds x="432" y="604" width="78" height="38">
+		<element name="lamp212" ref="colour_button_147_border" state="0" inputtag="J9_0" inputmask="0x08">
+			<bounds x="352" y="604" width="82" height="38">
 			</bounds>
 		</element>
-		<element name="lamp193" ref="colour_button_146" state="0" inputtag="J9_0" inputmask="0x02">
-			<bounds x="434" y="606" width="74" height="34">
+		<element name="lamp212" ref="colour_button_147" state="0" inputtag="J9_0" inputmask="0x08">
+			<bounds x="354" y="606" width="78" height="34">
 			</bounds>
 		</element>
 		<element name="lamp195" ref="colour_button_147_border" state="0" inputtag="J9_0" inputmask="0x08">
@@ -5142,6 +5169,14 @@
 			<bounds x="354" y="606" width="78" height="34">
 			</bounds>
 		</element>
+		<element name="lamp213" ref="colour_button_148_border" state="0" inputtag="J9_0" inputmask="0x10">
+			<bounds x="271" y="604" width="82" height="38">
+			</bounds>
+		</element>
+		<element name="lamp213" ref="colour_button_148" state="0" inputtag="J9_0" inputmask="0x10">
+			<bounds x="273" y="606" width="78" height="34">
+			</bounds>
+		</element>
 		<element name="lamp208" ref="colour_button_148_border" state="0" inputtag="J9_0" inputmask="0x10">
 			<bounds x="271" y="604" width="82" height="38">
 			</bounds>
@@ -5150,90 +5185,54 @@
 			<bounds x="273" y="606" width="78" height="34">
 			</bounds>
 		</element>
-		<element name="lamp210" ref="colour_button_150_border" state="0" inputtag="J9_0" inputmask="0x04">
+		<element name="lamp210" ref="colour_button_150_border" state="0" inputtag="J9_0" inputmask="0x40">
 			<bounds x="112" y="603" width="78" height="38">
 			</bounds>
 		</element>
-		<element name="lamp210" ref="colour_button_150" state="0" inputtag="J9_0" inputmask="0x04">
+		<element name="lamp210" ref="colour_button_150" state="0" inputtag="J9_0" inputmask="0x40">
 			<bounds x="114" y="605" width="74" height="34">
 			</bounds>
 		</element>
+
+		<element name="lamp194" ref="colour_button_150a_border" state="0" inputtag="J9_0" inputmask="0x04">
+			<bounds x="424" y="604" width="78" height="38">
+			</bounds>
+		</element>
+		<element name="lamp194" ref="colour_button_150a" state="0" inputtag="J9_0" inputmask="0x04">
+			<bounds x="426" y="606" width="74" height="34">
+			</bounds>
+		</element>
+		<element name="lamp193" ref="colour_button_146_border" state="0" inputtag="J9_0" inputmask="0x02">
+			<bounds x="498" y="604" width="78" height="38">
+			</bounds>
+		</element>
+		<element name="lamp193" ref="colour_button_146" state="0" inputtag="J9_0" inputmask="0x02">
+			<bounds x="500" y="606" width="74" height="34">
+			</bounds>
+		</element>
 		<element name="lamp192" ref="colour_button_151_border" state="0" inputtag="J9_0" inputmask="0x01">
-			<bounds x="509" y="604" width="80" height="38">
+			<bounds x="589" y="604" width="80" height="38">
 			</bounds>
 		</element>
 		<element name="lamp192" ref="colour_button_151" state="0" inputtag="J9_0" inputmask="0x01">
-			<bounds x="511" y="606" width="76" height="34">
+			<bounds x="591" y="606" width="76" height="34">
 			</bounds>
 		</element>
 		<element ref="vfd0_background">
 			<bounds x="185" y="364" width="272" height="30">
 			</bounds>
 		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="185" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="202" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="219" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="236" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="253" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="270" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="287" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="304" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="321" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="338" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="355" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="372" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="389" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="406" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="423" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="440" y="364" width="17" height="30">
-			</bounds>
-		</element>
+		
+		<repeat count="16">
+			<param name="i" start="0" increment="1" />
+			<param name="x" start="185" increment="17" />
+
+			<element name="vfd~i~" ref="vfd0" state="0">
+				<bounds x="~x~" y="364" width="17" height="30">
+				</bounds>
+			</element>
+		</repeat>
+		
 		<element name="label15" ref="label_15">
 			<bounds x="65" y="371" width="27" height="13">
 			</bounds>
