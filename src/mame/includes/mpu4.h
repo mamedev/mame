@@ -237,7 +237,6 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void mpu4_6809_map(address_map &map);
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
