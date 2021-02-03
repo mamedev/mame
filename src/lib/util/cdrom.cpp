@@ -1560,6 +1560,38 @@ static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
 
 
 /**
+ * @fn  static constexpr std::array<uint32_t, EDC_CRCTABLE_SIZE> edc_crctable_gen
+ *
+ * @brief   -------------------------------------------------
+ *           edc_crctable_gen - calculate CRC checksums as per
+ *           ECMA 130 and return lookup table
+ *          -------------------------------------------------.
+ */
+
+static constexpr std::array<uint32_t, EDC_CRCTABLE_SIZE> edc_crctable_gen(void)
+{
+	std::array<uint32_t, EDC_CRCTABLE_SIZE> table = { 0 };
+
+	for (int index = 0; index < EDC_CRCTABLE_SIZE; index++)
+	{
+		uint32_t r = reverse32(index);
+
+		for (int bit = 0; bit < 8; bit++)
+		{
+			if (r & 0x80000000L)
+				r = (r << 1) ^ EDC_POLYNOMIAL;
+			else
+				r <<= 1;
+		}
+
+		table[index] = reverse32(r);
+	}
+
+	return table;
+}
+
+
+/**
  * @brief   -------------------------------------------------
  *            EDC_crctable - each value represents a CRC used
  *            in calculating the EDC for MODE1 sectors. the
@@ -1576,13 +1608,13 @@ static const uint16_t qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
  *             Poly    : 0x8001801bL
  *             Reverse : TRUE
  *
- *            the CRC in this table are generated at runtime
- *            with edc_crctable_init(). credit to cdrtools and
+ *            the CRC in this table are generated at compile
+ *            with edc_crctable_gen(). credit to cdrtools and
  *            Rocksoft for the code and technical details.
  *          -------------------------------------------------.
  */
 
-static uint32_t EDC_crctable[EDC_CRCTABLE_SIZE];
+static const auto EDC_crctable = edc_crctable_gen();
 
 
 //-------------------------------------------------
@@ -1656,33 +1688,6 @@ bool ecc_verify(const uint8_t *sector)
 			return false;
 	}
 	return true;
-}
-
-/**
- * @fn  void edc_crctable_init(void)
- *
- * @brief   -------------------------------------------------
- *           edc_crctable_init - calculate CRC checksums as per
- *           ECMA 130 and store into lookup table EDC_crctable
- *          -------------------------------------------------.
- */
-
-void edc_crctable_init(void)
-{
-	for (int index = 0; index < EDC_CRCTABLE_SIZE; index++)
-	{
-		uint32_t r = reverse32(index);
-
-		for (int bit = 0; bit < 8; bit++)
-		{
-			if (r & 0x80000000L)
-				r = (r << 1) ^ EDC_POLYNOMIAL;
-			else
-				r <<= 1;
-		}
-
-		EDC_crctable[index] = reverse32(r);
-	}
 }
 
 /**

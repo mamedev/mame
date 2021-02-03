@@ -145,7 +145,6 @@ void ecc_generate(uint8_t *sector);
 void ecc_clear(uint8_t *sector);
 
 // EDC utilities
-void edc_crctable_init(void);
 void edc_generate(uint8_t *sector);
 
 
@@ -172,7 +171,7 @@ static inline uint32_t lba_to_msf(uint32_t lba)
 			((f / 10) <<  4) | ((f % 10) <<  0);
 }
 
-static inline uint32_t reverse32(uint32_t x)
+static constexpr inline uint32_t reverse32(uint32_t x)
 {
 	x = ((x & 0x55555555) <<  1) | ((x & 0xAAAAAAAA) >>  1);
 	x = ((x & 0x33333333) <<  2) | ((x & 0xCCCCCCCC) >>  2);

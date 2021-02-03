@@ -2656,9 +2656,6 @@ static void do_extract_cd(parameters_map &params)
 					static const uint8_t syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 					uint32_t physframeofs = trackinfo.physframeofs;
 
-					// populate CRC lookup table for EDC
-					edc_crctable_init();
-
 					for (int frame=0; frame < 150; frame++)
 					{
 						uint32_t msf = lba_to_msf(physframeofs);
