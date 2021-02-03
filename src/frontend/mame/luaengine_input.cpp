@@ -357,7 +357,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	input_type["seq_name"] = &input_manager::seq_name;
 	input_type["seq_to_tokens"] = &input_manager::seq_to_tokens;
 	input_type["seq_from_tokens"] =
-		[] (input_manager &input, const char *tokens)
+		[] (input_manager &input, std::string_view tokens)
 		{
 			input_seq seq;
 			input.seq_from_tokens(seq, tokens);
