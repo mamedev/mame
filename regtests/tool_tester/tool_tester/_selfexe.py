@@ -47,9 +47,9 @@ class SelfExeTests(ABC):
         """
         test_result = True
         for test_handle, test_params in test_pool.items():
-            logging.debug("Preparing %s-%s test ", self.identifier, test_handle)
+            __test_name = f"{self.identifier}-{test_handle}"
+            logging.debug("Preparing %s test ", __test_name)
             try:
-                logging.debug("Launching test %s", test_handle)
                 __launch_fullpath =  [self._exec_path] + self._subprocess_args(test_handle, test_params)
                 logging.debug(__launch_fullpath)
                 launch_result = subprocess.run(
@@ -62,9 +62,9 @@ class SelfExeTests(ABC):
                     text=True,
                     shell=False
                 )
-                logging.debug("Subprocess test %s pass", test_handle)
+                logging.debug("Subprocess test %s pass", __test_name)
                 self._assert_test_result(launch_result, test_handle, test_params)
-                logging.info("Test %s passed", test_handle)
+                logging.info("Test %s passed", __test_name)
             except (subprocess.CalledProcessError, AssertionError) as ex:
                 logging.exception(str(ex)) 
                 test_result = False
