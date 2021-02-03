@@ -107,7 +107,7 @@ public:
 	file_enumerator &operator=(file_enumerator const &) = delete;
 
 	// iterator
-	const osd::directory::entry *next();
+	const osd::directory::entry *next(const char *subdir = nullptr);
 
 private:
 	// internal state
