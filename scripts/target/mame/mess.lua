@@ -1275,6 +1275,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kurzweil",
 		"kyocera",
 		"leapfrog",
+		"learsiegler",
 		"lsi",
 		"luxor",
 		"magnavox",
@@ -2806,12 +2807,20 @@ files {
 	MAME_DIR .. "src/mame/drivers/leapfrog_iquest.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "lsi")
+createMESSProjects(_target, _subtarget, "learsiegler")
 files {
 	MAME_DIR .. "src/mame/drivers/adm11.cpp",
 	MAME_DIR .. "src/mame/drivers/adm23.cpp",
 	MAME_DIR .. "src/mame/drivers/adm31.cpp",
 	MAME_DIR .. "src/mame/drivers/adm36.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "lsi")
+files {
+	MAME_DIR .. "src/mame/drivers/m3.cpp",
+	MAME_DIR .. "src/mame/drivers/octopus.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/octo_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "luxor")
@@ -4519,7 +4528,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/lms46.cpp",
 	MAME_DIR .. "src/mame/drivers/lola8a.cpp",
 	MAME_DIR .. "src/mame/drivers/lilith.cpp",
-	MAME_DIR .. "src/mame/drivers/m3.cpp",
 	MAME_DIR .. "src/mame/drivers/mccpm.cpp",
 	MAME_DIR .. "src/mame/drivers/mes.cpp",
 	MAME_DIR .. "src/mame/drivers/mfabfz.cpp",
@@ -4557,9 +4565,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ngen.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.h",
-	MAME_DIR .. "src/mame/drivers/octopus.cpp",
-	MAME_DIR .. "src/mame/machine/octo_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/octo_kbd.h",
 	MAME_DIR .. "src/mame/drivers/onyx.cpp",
 	MAME_DIR .. "src/mame/drivers/p8k.cpp",
 	MAME_DIR .. "src/mame/drivers/pdt3100.cpp",
