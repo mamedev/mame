@@ -1216,8 +1216,8 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
 			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
-			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
+			if (x_is_integer) xscale = std::clamp(render_round_nearest(xscale), 1.0f, maxxscale);
+			if (y_is_integer) yscale = std::clamp(render_round_nearest(yscale), 1.0f, maxyscale);
 
 			// check if we have user defined scale factors, if so use them instead
 			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
