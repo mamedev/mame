@@ -329,8 +329,9 @@ void starwars_state::esb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 101);
-	m_slapstic_device->set_bank(m_slapstic_bank);
+	SLAPSTIC(config, m_slapstic, 101);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x8000, 0x9fff, 0);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
 }
@@ -526,10 +527,6 @@ void starwars_state::init_esb()
 
 	/* init the slapstic */
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x14000, 0x2000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0x9fff, 0, "slapstic",
-													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); },
-													   [this](offs_t offset, u8 &data, u8 mem_mask) { m_slapstic_device->tweak(offset & 0x1fff); });
-
 
 	/* prepare the matrix processor */
 	starwars_mproc_init();

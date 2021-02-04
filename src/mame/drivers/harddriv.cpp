@@ -367,7 +367,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_dsk_10c(*this, "dsk_10c"),
 			m_dsk_30c(*this, "dsk_30c"),
 			m_dsk_pio_access(0),
-			m_m68k_slapstic_base(nullptr),
+			m_m68k_sloop_base(nullptr),
 			m_m68k_sloop_alt_base(nullptr),
 			m_200e(*this, "200e"),
 			m_210e(*this, "210e"),
@@ -460,7 +460,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_sound_int_state(0),
 			m_video_int_state(0),
 			m_palette(*this, "palette"),
-			m_slapstic_device(*this, "slapstic"),
+			m_slapstic(*this, "slapstic"),
+			m_slapstic_bank(*this, "slapstic_bank"),
 			m_rs232(*this, "rs232")
 {
 	int i;
@@ -1455,7 +1456,9 @@ void harddriv_state::driver_nomsp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &harddriv_state::driver_68k_map);
 	m_maincpu->set_periodic_int(FUNC(harddriv_state::hd68k_irq_gen), attotime::from_hz(HARDDRIV_MASTER_CLOCK/16/16/16/16/2));
 
-	SLAPSTIC(config, m_slapstic_device, 117);
+	SLAPSTIC(config, m_slapstic, 117);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0xe0000, 0xe7fff, 0x18000);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -5061,8 +5064,8 @@ void harddriv_state::init_racedriv()
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
-	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xe0000, 0xe7fff, 0x18000, m_slapstic_bank);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0xe0000, 0x8000);
 
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync0_w)));
@@ -5085,8 +5088,8 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
-	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xe0000, 0xe7fff, 0x18000, m_slapstic_bank);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0xe0000, 0x8000);
 
 	/* synchronization */
 	m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32s_delegate(*this, FUNC(harddriv_state::rddsp32_sync0_w)));
@@ -5119,8 +5122,8 @@ void harddriv_state::init_racedrivc_panorama_side()
 	init_adsp();
 
 	/* set up the slapstic */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
-	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xe0000, 0xe7fff, 0x18000, m_slapstic_bank);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0xe0000, 0x8000);
 
 	/* set up protection hacks */
 	m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16smo_delegate(*this, FUNC(harddriv_state::hdgsp_protection_w)));
@@ -5177,7 +5180,7 @@ void harddriv_state::steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloo
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16sm_delegate(*this, FUNC(harddriv_state::st68k_protosloop_r)), write16sm_delegate(*this, FUNC(harddriv_state::st68k_protosloop_w)));
 
-	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_m68k_sloop_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
 	m_m68k_sloop_alt_base = (uint16_t *)(memregion("maincpu")->base() + 0x4e000);
 
 	/* set up protection hacks */
@@ -5218,8 +5221,8 @@ void harddriv_state::init_strtdriv()
 	init_dsk();
 
 	/* set up the slapstic */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_r)), write16sm_delegate(*this, FUNC(harddriv_state::rd68k_slapstic_w)));
-	m_m68k_slapstic_base = (uint16_t *)(memregion("maincpu")->base() + 0xe0000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xe0000, 0xe7fff, 0x18000, m_slapstic_bank);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0xe0000, 0x8000);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16smo_delegate(*this, FUNC(harddriv_state::hda68k_port1_r)));
 
