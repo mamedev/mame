@@ -250,7 +250,7 @@ u8 iwm_device::control(int offset, u8 data)
 
 	switch(m_control & 0xc0) {
 	case 0x00: return m_active ? m_data : 0xff;
-	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0);;
+	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0);
 	case 0x80: return m_whd;
 	case 0xc0: if(offset & 1) { if(m_active) data_w(data); else mode_w(data); } return 0xff;
 	}
@@ -382,8 +382,6 @@ void iwm_device::sync()
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {
 						m_data = m_rsh;
-						if(m_data == 0xfc)
-							machine().debug_break();
 						m_rsh = 0;
 					} else if(m_rsh >= 0x04) {
 						m_data = m_rsh;
@@ -393,8 +391,7 @@ void iwm_device::sync()
 
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
-					if(m_data == 0xfc)
-						machine().debug_break();
+					//					logerror("%s DATAR %02x\n", cycles_to_time(m_last_sync).to_string(), m_data);
 					m_rsh = 0;
 				}
 				break;

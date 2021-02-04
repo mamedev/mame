@@ -192,7 +192,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		motor_always_on(false),
 		dskchg_writable(false),
 		has_trk00_sensor(true),
-		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(1), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
 		angular_speed(0),
@@ -340,7 +340,7 @@ void floppy_image_device::device_start()
 	actual_ss = 0;
 	ds = -1;
 	stp = 1;
-	wpt = 0;
+	wpt = 1;
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
 	image_dirty = false;
@@ -438,10 +438,6 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 
 	index_resync();
 
-	wpt = 1; // disk sleeve is covering the sensor
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
-
 	wpt = is_readonly() || (!write_supported);
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
@@ -508,11 +504,11 @@ void floppy_image_device::call_unload()
 		image.reset();
 	}
 
-	wpt = 1; // disk sleeve is covering the sensor
+	wpt = 0;
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
-	wpt = 0; // sensor is uncovered
+	wpt = 1;
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
@@ -2385,6 +2381,7 @@ void ibm_6360::setup_characteristics()
 mac_floppy_device::mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : floppy_image_device(mconfig, type, tag, owner, clock)
 {
 	m_has_mfm = false;
+	dskchg_writable = true;
 }
 
 void mac_floppy_device::device_start()
@@ -2422,7 +2419,7 @@ bool mac_floppy_device::wpt_r()
 	// actual_ss may have changed after the phases were set
 	m_reg = (m_reg & 7) | (actual_ss ? 8 : 0);
 
-	if(m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13)
+	if(1 || (m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13))
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
@@ -2435,6 +2432,9 @@ bool mac_floppy_device::wpt_r()
 
 	case 0x2: // Is the motor on?
 		return mon;
+
+	case 0x3: // Disk change signal
+		return dskchg;
 
 	case 0x4:
 	case 0xc: // Index pulse, probably only on the superdrive though
@@ -2458,6 +2458,16 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return cyl != 0;
 
+	case 0xb:{// Tachometer, 60 pulses/rotation
+		if(image.get() != nullptr && !mon) {
+			attotime base;
+			uint32_t pos = find_position(base, machine().time());
+			uint32_t subpos = pos % 3333334;
+			return subpos < 20000;
+		} else
+			return false;
+	}
+
 	case 0xd: // Is the current mode GCR or MFM?
 		return m_mfm;
 
@@ -2478,7 +2488,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 		"DirNext", "StepOn", "MotorOn", "EjectOff",
 		"DirPrev", "StepOff", "MotorOff", "EjectOn",
 		"-", "MFMModeOn", "-", "-",
-		"-", "GCRModeOn", "-", "-"
+		"DskchgClear", "GCRModeOn", "-", "-"
 	};
 
 	bool prev_strb = m_strb;
@@ -2530,6 +2540,11 @@ void mac_floppy_device::seek_phase_w(int phases)
 				m_mfm = true;
 				track_changed();
 			}
+			break;
+
+		case 0xc: // Clear dskchg
+			logerror("cmd clear dskchg\n");
+			dskchg = 0;
 			break;
 
 		case 0xd: // GCR mode on
