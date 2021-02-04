@@ -880,7 +880,7 @@ input_code input_manager::code_from_token(std::string_view _token)
 	{
 		// make a token up to the next underscore
 		std::string_view::size_type score = _token.find('_');
-		token[numtokens++].assign(_token, (std::string_view::npos == score) ? _token.length() : score);
+		token[numtokens++].assign(_token, 0, (std::string_view::npos == score) ? _token.length() : score);
 
 		// if we hit the end, we're done, else advance our pointer
 		if (std::string_view::npos == score)
@@ -1331,7 +1331,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 		{
 			// make a token up to the next underscore
 			std::string_view::size_type score = _token.find('_');
-			token[numtokens++].assign(_token, (std::string_view::npos == score) ? _token.length() : score);
+			token[numtokens++].assign(_token, 0, (std::string_view::npos == score) ? _token.length() : score);
 
 			// if we hit the end, we're done, else advance our pointer
 			if (std::string_view::npos == score)
