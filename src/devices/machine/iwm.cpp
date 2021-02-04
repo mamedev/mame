@@ -100,6 +100,11 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
+	if(floppy && std::string(floppy->tag()) == ":fdc:0:525")
+		machine().debug_break();
+
+	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
+
 	if(m_floppy && (m_control & 0x10))
 		m_floppy->mon_w(true);
 	m_floppy = floppy;
@@ -251,7 +256,7 @@ u8 iwm_device::control(int offset, u8 data)
 
 	switch(m_control & 0xc0) {
 	case 0x00: return m_active ? m_data : 0xff;
-	case 0x40: return (m_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0);
+	case 0x40: return (m_status & 0x7f) | ((m_floppy && m_floppy->wpt_r()) ? 0x80 : 0x00);
 	case 0x80: return m_whd;
 	case 0xc0: if(offset & 1) { if(m_active) data_w(data); else mode_w(data); } return 0xff;
 	}

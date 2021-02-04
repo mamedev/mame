@@ -177,6 +177,8 @@ protected:
 	int ss, actual_ss; /* side select (forced to 0 if single-sided drive / actual value) */
 	int ds; /* drive select */
 
+	int phases; /* phases lines, when they exist */
+
 	/* state of output lines */
 	int idx;  /* index pulse */
 	int wpt;  /* write protect */

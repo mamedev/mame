@@ -192,7 +192,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		motor_always_on(false),
 		dskchg_writable(false),
 		has_trk00_sensor(true),
-		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(1), rdy(0), dskchg(0),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), ds(-1), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
 		angular_speed(0),
@@ -340,12 +340,13 @@ void floppy_image_device::device_start()
 	actual_ss = 0;
 	ds = -1;
 	stp = 1;
-	wpt = 1;
+	wpt = 0;
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
+	phases = 0;
 
 	setup_characteristics();
 
@@ -377,6 +378,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(cache_weak));
 	save_item(NAME(image_dirty));
 	save_item(NAME(ready_counter));
+	save_item(NAME(phases));
 }
 
 void floppy_image_device::device_reset()
@@ -437,6 +439,10 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	revolution_count = 0;
 
 	index_resync();
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
 
 	wpt = is_readonly() || (!write_supported);
 	if (!cur_wpt_cb.isnull())
@@ -504,11 +510,11 @@ void floppy_image_device::call_unload()
 		image.reset();
 	}
 
-	wpt = 0;
+	wpt = 1; // disk sleeve is covering the sensor
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
-	wpt = 1;
+	wpt = 0; // sensor is uncovered
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
@@ -554,10 +560,13 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	return image_init_result::PASS;
 }
 
-/* write protect, active high */
+/* write protect, active high
+   phase 1 can force it to 1 for drive detection
+   on the rare drives that actually use phases.
+ */
 bool floppy_image_device::wpt_r()
 {
-	return wpt;
+	return wpt || (phases & 2);
 }
 
 /* motor on, active low */
@@ -721,8 +730,10 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
-void floppy_image_device::seek_phase_w(int phases)
+void floppy_image_device::seek_phase_w(int _phases)
 {
+	phases = _phases;
+
 	int cur_pos = (cyl << 2) | subcyl;
 	int req_pos;
 	switch(phases) {
