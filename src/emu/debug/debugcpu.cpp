@@ -48,6 +48,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_rpindex(1)
 	, m_wpdata(0)
 	, m_wpaddr(0)
+	, m_wpsize(0)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
@@ -57,9 +58,10 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable = std::make_unique<symbol_table>(machine);
 	m_symtable->set_memory_modified_func([this]() { set_memory_modified(true); });
 
-	/* add "wpaddr", "wpdata" to the global symbol table */
+	/* add "wpaddr", "wpdata", "wpsize" to the global symbol table */
 	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
+	m_symtable->add("wpsize", symbol_table::READ_ONLY, &m_wpsize);
 
 	screen_device_enumerator screen_enumerator = screen_device_enumerator(m_machine.root_device());
 	screen_device_enumerator::iterator iter = screen_enumerator.begin();

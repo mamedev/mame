@@ -2802,11 +2802,11 @@ debug:wpset(space, type, addr, len, [cond], [act])
 
     If specified, the condition must be a debugger expression that will be
     evaluated each time the breakpoint is hit.  Execution will only be stopped
-    if the expression evaluates to a non-zero value.  For all watchpoints, a
-    ``wpaddr`` variable is set to the address that triggered the watchpoint.
-    When a watchpoint is triggered by a write, a ``wpdata`` variable is set to
-    the data being written.  If the condition is not specified, it defaults to
-    always active.
+    if the expression evaluates to a non-zero value.  The variable 'wpaddr' is
+    set to the address that actually triggered the watchpoint, the variable
+    'wpdata' is set to the data that is being read or written, and the variable
+    'wpsize' is set to the size of the data in bytes.  If the condition is not
+    specified, it defaults to always active.
 debug:wpenable([wp])
     Enable the specified watchpoint, or all watchpoints for the device if no
     watchpoint number is specified.  Returns whether the specified number
