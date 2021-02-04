@@ -2115,7 +2115,6 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	m_music_is_playing = 0;
 	m_tilebank = 0;
 	memset(m_control_0, 0, sizeof(m_control_0));
-	m_protbase = 0;
 	m_semicom_prot_offset = 0;
 }
 
