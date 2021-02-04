@@ -720,7 +720,7 @@ private:
 
 #define slow_cycle() \
 {   \
-	if (m_last_speed) \
+	if (!machine().side_effects_disabled() && m_last_speed) \
 	{\
 		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \

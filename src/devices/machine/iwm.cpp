@@ -230,7 +230,8 @@ u8 iwm_device::control(int offset, u8 data)
 		if(s == 0xc0 && m_active)
 			slot = "write load / write data";
 
-		logerror("control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
+		logerror("%s control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
+				 machine().time().to_string(),
 				 m_control & 0x80 ? '1' : '0',
 				 m_control & 0x40 ? '1' : '0',
 				 m_control & 0x20 ? 'b' : 'a',
@@ -391,7 +392,8 @@ void iwm_device::sync()
 
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
-					//					logerror("%s DATAR %02x\n", cycles_to_time(m_last_sync).to_string(), m_data);
+					m_async_update = 0;
+					//					logerror("%s %010d DATAR %s %02x\n", cycles_to_time(m_last_sync).to_string(), m_last_sync, m_floppy->tag(), m_data);
 					m_rsh = 0;
 				}
 				break;
@@ -404,9 +406,8 @@ void iwm_device::sync()
 			m_sync_update = 0;
 		}
 		if(m_async_update && m_async_update <= m_last_sync) {
-			if(!is_sync()) {
+			if(!is_sync())
 				m_data = 0;
-			}
 			m_async_update = 0;
 		}
 		break;

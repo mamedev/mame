@@ -1431,10 +1431,10 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 			for(int i=0; i<ns; i++) {
 				sectors[si].track = track;
 				sectors[si].head = head;
-				sectors[si].sector = si;
+				sectors[si].sector = i;
 				sectors[si].info = head_count == 2 ? 0x22 : 0x02;
 				sectors[si].tag = nullptr;
-				sectors[si].data = sdata + 512*si;
+				sectors[si].data = sdata + 512*i;
 				si = (si + 2) % ns;
 				if(si == 0)
 					si++;
