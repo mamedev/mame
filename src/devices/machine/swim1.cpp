@@ -27,10 +27,29 @@ void swim1_device::device_start()
 	save_item(NAME(m_flux_write));
 	save_item(NAME(m_flux_write_count));
 
+	save_item(NAME(m_ism_param));
 	save_item(NAME(m_ism_mode));
 	save_item(NAME(m_ism_setup));
+	save_item(NAME(m_ism_error));
 	save_item(NAME(m_ism_param_idx));
-	save_item(NAME(m_ism_param));
+	save_item(NAME(m_ism_fifo_pos));
+	save_item(NAME(m_ism_tss_sr));
+	save_item(NAME(m_ism_tss_output));
+	save_item(NAME(m_ism_current_bit));
+	save_item(NAME(m_ism_fifo));
+	save_item(NAME(m_ism_sr));
+	save_item(NAME(m_ism_crc));
+	save_item(NAME(m_ism_half_cycles_before_change));
+	save_item(NAME(m_ism_correction_factor));
+	save_item(NAME(m_ism_latest_edge));
+	save_item(NAME(m_ism_prev_ls));
+	save_item(NAME(m_ism_csm_state));
+	save_item(NAME(m_ism_csm_error_counter));
+	save_item(NAME(m_ism_csm_pair_side));
+	save_item(NAME(m_ism_csm_min_count));
+	save_item(NAME(m_ism_tsm_out));
+	save_item(NAME(m_ism_tsm_bits));
+	save_item(NAME(m_ism_tsm_mark));
 
 	save_item(NAME(m_iwm_next_state_change));
 	save_item(NAME(m_iwm_sync_update));
@@ -316,9 +335,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		// Entering read mode
 		m_ism_current_bit = 0;
 		m_ism_sr = 0;
-		m_ism_mfm_sync_counter = 0;
 		m_ism_latest_edge = m_last_sync;
-		m_ism_first_edge = true;
 		m_ism_prev_ls = (1<<2) | 1;
 		m_ism_csm_state = m_ism_setup & 0x04 ? CSM_SYNCHRONIZED : CSM_INIT;
 		m_ism_csm_error_counter[0] = m_ism_csm_error_counter[1] = 0;
@@ -804,9 +821,9 @@ void swim1_device::ism_sync()
 					if(m_flux_write_count == m_flux_write.size())
 						flush_write(next_sync - cycles);
 					m_flux_write[m_flux_write_count ++] = next_sync - cycles;
-					m_ism_half_cycles_before_change = 63;
+					m_ism_half_cycles_before_change = m_ism_param[P_TIME1] + 2*2;
 				} else
-					m_ism_half_cycles_before_change = m_ism_setup & 0x40 ? 63 : 31;
+					m_ism_half_cycles_before_change = m_ism_param[P_TIME0] + 2*2;
 				if(m_ism_setup & 8)
 					m_ism_half_cycles_before_change <<= 1;
 				continue;
@@ -958,11 +975,8 @@ void swim1_device::ism_sync()
 
 			if(will_hit_edge) {
 				if(sct == 0) {
-					if(!m_ism_error && !m_ism_first_edge) {
-						// Don't do the short cell error, write splices often trigger it and the physical media
-						// probably doesn't actually allow for it.
-						//						m_ism_error |= 0x10;
-					}
+					// Don't do the short cell error, write splices often trigger it and the physical media
+					// probably doesn't actually allow for it.
 					sct = lct = 1;
 				}
 				if(sct == 4)
@@ -1105,7 +1119,6 @@ void swim1_device::ism_sync()
 			if(will_hit_edge) {
 				m_ism_latest_edge += cycles_to_next;
 				m_last_sync = m_ism_latest_edge;
-				m_ism_first_edge = false;
 			} else
 				m_last_sync = next_sync;
 		}

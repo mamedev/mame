@@ -92,12 +92,10 @@ private:
 	u16 m_ism_fifo[2];
 	u16 m_ism_sr;
 	u16 m_ism_crc;
-	u16 m_ism_mfm_sync_counter;
 	u32 m_ism_half_cycles_before_change;
 	u8 m_ism_correction_factor[2];
 
 	u64 m_ism_latest_edge;
-	bool m_ism_first_edge;
 	u8 m_ism_prev_ls;
 	u8 m_ism_csm_state;
 	u32 m_ism_csm_error_counter[2];
