@@ -40,97 +40,99 @@ namespace bx
 
 	BX_SIMD_INLINE void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
-#if !BX_CONFIG_SUPPORTS_SIMD
-		const float *a = (const float*)_a;
-		const float *b = (const float*)_b;
-		float *r = (float*)_result;
-		r[0] = a[0]*b[0] + a[1]*b[4] + a[2]*b[8] + a[3]*b[12];
-		r[1] = a[0]*b[1] + a[1]*b[5] + a[2]*b[9] + a[3]*b[13];
-		r[2] = a[0]*b[2] + a[1]*b[6] + a[2]*b[10] + a[3]*b[14];
-		r[3] = a[0]*b[3] + a[1]*b[7] + a[2]*b[11] + a[3]*b[15];
-
-		r[4] = a[4]*b[0] + a[5]*b[4] + a[6]*b[8] + a[7]*b[12];
-		r[5] = a[4]*b[1] + a[5]*b[5] + a[6]*b[9] + a[7]*b[13];
-		r[6] = a[4]*b[2] + a[5]*b[6] + a[6]*b[10] + a[7]*b[14];
-		r[7] = a[4]*b[3] + a[5]*b[7] + a[6]*b[11] + a[7]*b[15];
-
-		r[8] = a[8]*b[0] + a[9]*b[4] + a[10]*b[8] + a[11]*b[12];
-		r[9] = a[8]*b[1] + a[9]*b[5] + a[10]*b[9] + a[11]*b[13];
-		r[10] = a[8]*b[2] + a[9]*b[6] + a[10]*b[10] + a[11]*b[14];
-		r[11] = a[8]*b[3] + a[9]*b[7] + a[10]*b[11] + a[11]*b[15];
-
-		r[12] = a[12]*b[0] + a[13]*b[4] + a[14]*b[8] + a[15]*b[12];
-		r[13] = a[12]*b[1] + a[13]*b[5] + a[14]*b[9] + a[15]*b[13];
-		r[14] = a[12]*b[2] + a[13]*b[6] + a[14]*b[10] + a[15]*b[14];
-		r[15] = a[12]*b[3] + a[13]*b[7] + a[14]*b[11] + a[15]*b[15];
-#else
+#if BX_CONFIG_SUPPORTS_SIMD
 		_result->col[0] = simd_mul(_a->col[0], _b);
 		_result->col[1] = simd_mul(_a->col[1], _b);
 		_result->col[2] = simd_mul(_a->col[2], _b);
 		_result->col[3] = simd_mul(_a->col[3], _b);
-#endif
+#else
+		const float* aa = (const float*)_a;
+		const float* bb = (const float*)_b;
+		float *rr = (float*)_result;
+
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8] + aa[ 3]*bb[12];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9] + aa[ 3]*bb[13];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10] + aa[ 3]*bb[14];
+		rr[ 3] = aa[ 0]*bb[ 3] + aa[ 1]*bb[ 7] + aa[ 2]*bb[11] + aa[ 3]*bb[15];
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8] + aa[ 7]*bb[12];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9] + aa[ 7]*bb[13];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10] + aa[ 7]*bb[14];
+		rr[ 7] = aa[ 4]*bb[ 3] + aa[ 5]*bb[ 7] + aa[ 6]*bb[11] + aa[ 7]*bb[15];
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8] + aa[11]*bb[12];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9] + aa[11]*bb[13];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10] + aa[11]*bb[14];
+		rr[11] = aa[ 8]*bb[ 3] + aa[ 9]*bb[ 7] + aa[10]*bb[11] + aa[11]*bb[15];
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + aa[15]*bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + aa[15]*bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + aa[15]*bb[14];
+		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + aa[15]*bb[15];
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	BX_SIMD_INLINE void model4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
-#if !BX_CONFIG_SUPPORTS_SIMD
-		const float *a = (const float*)_a; // a[3]==a[7]==a[11]==0, a[15]=1
-		const float *b = (const float*)_b; // b[3]==b[7]==b[11]==0, b[15]=1
-		float *r = (float*)_result;
-		r[0] = a[0]*b[0] + a[1]*b[4] + a[2]*b[8];
-		r[1] = a[0]*b[1] + a[1]*b[5] + a[2]*b[9];
-		r[2] = a[0]*b[2] + a[1]*b[6] + a[2]*b[10];
-		r[3] = 0.f;
-
-		r[4] = a[4]*b[0] + a[5]*b[4] + a[6]*b[8];
-		r[5] = a[4]*b[1] + a[5]*b[5] + a[6]*b[9];
-		r[6] = a[4]*b[2] + a[5]*b[6] + a[6]*b[10];
-		r[7] = 0.f;
-
-		r[8] = a[8]*b[0] + a[9]*b[4] + a[10]*b[8];
-		r[9] = a[8]*b[1] + a[9]*b[5] + a[10]*b[9];
-		r[10] = a[8]*b[2] + a[9]*b[6] + a[10]*b[10];
-		r[11] = 0.f;
-
-		r[12] = a[12]*b[0] + a[13]*b[4] + a[14]*b[8] + b[12];
-		r[13] = a[12]*b[1] + a[13]*b[5] + a[14]*b[9] + b[13];
-		r[14] = a[12]*b[2] + a[13]*b[6] + a[14]*b[10] + b[14];
-		r[15] = 1.f;
-#else
+#if BX_CONFIG_SUPPORTS_SIMD
 		// With SIMD faster to do the general 4x4 form:
 		float4x4_mul(_result, _a, _b);
-#endif
+#else
+		const float* aa = (const float*)_a; // aa[ 3] == aa[ 7] == aa[11] == 0.0f, aa[15] = 1.0f
+		const float* bb = (const float*)_b; // bb[ 3] == bb[ 7] == bb[11] == 0.0f, bb[15] = 1.0f
+		float *rr = (float*)_result;
+
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10];
+		rr[ 3] = 0.0f;
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10];
+		rr[ 7] = 0.0f;
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10];
+		rr[11] = 0.0f;
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
+		rr[15] = 1.0f;
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	BX_SIMD_INLINE void model4x4_mul_viewproj4x4(float4x4_t* _result, const float4x4_t* _model, const float4x4_t* _viewProj)
 	{
-#if !BX_CONFIG_SUPPORTS_SIMD
-		const float *a = (const float*)_model; // a[3]==a[7]==a[11]==0, a[15]=1
-		const float *b = (const float*)_viewProj;
-		float *r = (float*)_result;
-		r[0] = a[0]*b[0] + a[1]*b[4] + a[2]*b[8];
-		r[1] = a[0]*b[1] + a[1]*b[5] + a[2]*b[9];
-		r[2] = a[0]*b[2] + a[1]*b[6] + a[2]*b[10];
-		r[3] = a[0]*b[3] + a[1]*b[7] + a[2]*b[11];
-
-		r[4] = a[4]*b[0] + a[5]*b[4] + a[6]*b[8];
-		r[5] = a[4]*b[1] + a[5]*b[5] + a[6]*b[9];
-		r[6] = a[4]*b[2] + a[5]*b[6] + a[6]*b[10];
-		r[7] = a[4]*b[3] + a[5]*b[7] + a[6]*b[11];
-
-		r[8] = a[8]*b[0] + a[9]*b[4] + a[10]*b[8];
-		r[9] = a[8]*b[1] + a[9]*b[5] + a[10]*b[9];
-		r[10] = a[8]*b[2] + a[9]*b[6] + a[10]*b[10];
-		r[11] = a[8]*b[3] + a[9]*b[7] + a[10]*b[11];
-
-		r[12] = a[12]*b[0] + a[13]*b[4] + a[14]*b[8] + b[12];
-		r[13] = a[12]*b[1] + a[13]*b[5] + a[14]*b[9] + b[13];
-		r[14] = a[12]*b[2] + a[13]*b[6] + a[14]*b[10] + b[14];
-		r[15] = a[12]*b[3] + a[13]*b[7] + a[14]*b[11] + b[15];
-#else
+#if BX_CONFIG_SUPPORTS_SIMD
 		// With SIMD faster to do the general 4x4 form:
 		float4x4_mul(_result, _model, _viewProj);
-#endif
+#else
+		const float* aa = (const float*)_model; // aa[ 3] == aa[ 7] == aa[11] == 0.0f, aa[15] == 1.0f
+		const float* bb = (const float*)_viewProj;
+		float *rr = (float*)_result;
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10];
+		rr[ 3] = aa[ 0]*bb[ 3] + aa[ 1]*bb[ 7] + aa[ 2]*bb[11];
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10];
+		rr[ 7] = aa[ 4]*bb[ 3] + aa[ 5]*bb[ 7] + aa[ 6]*bb[11];
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10];
+		rr[11] = aa[ 8]*bb[ 3] + aa[ 9]*bb[ 7] + aa[10]*bb[11];
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
+		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + bb[15];
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	BX_SIMD_FORCE_INLINE void float4x4_transpose(float4x4_t* _result, const float4x4_t* _mtx)
