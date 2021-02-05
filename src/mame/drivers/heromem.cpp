@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -203,13 +203,13 @@ ROM_START( heromem )
 	ROM_LOAD( "e34-10.ic56", 0x100000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
 	ROM_LOAD( "e34-11.ic58", 0x180000, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
 
-	ROM_REGION( 0x200000, "ym_l", 0 ) // marked LS-PCM0 to LS-PCM3 on PCB (LS probably stands for left sound), same ROM content for the two YMs
+	ROM_REGION( 0x200000, "ym_l:adpcma", 0 ) // marked LS-PCM0 to LS-PCM3 on PCB (LS probably stands for left sound), same ROM content for the two YMs
 	ROM_LOAD( "e34-12.ic29", 0x000000, 0x80000, CRC(7bb1f476) SHA1(c06c27a2c59953f9ff1eb7679257970fd9c346a3) )
 	ROM_LOAD( "e34-13.ic27", 0x080000, 0x80000, CRC(a43e6cc0) SHA1(090f8f3977c99687dd8461382d0b552c4c3deb9f) )
 	ROM_LOAD( "e34-14.ic30", 0x100000, 0x80000, CRC(0fce5b29) SHA1(aeb626ecead85c5ca926763d928df9eca73acca3) )
 	ROM_LOAD( "e34-15.ic28", 0x180000, 0x80000, CRC(d2403bdd) SHA1(61be189a92c7c5143aa4a06d9bbfc667dd737fd8) )
 
-	ROM_REGION( 0x200000, "ym_r", 0 ) // marked RS-PCM0 to RS-PCM3 on PCB (RS probably stands for right sound)
+	ROM_REGION( 0x200000, "ym_r:adpcma", 0 ) // marked RS-PCM0 to RS-PCM3 on PCB (RS probably stands for right sound)
 	ROM_LOAD( "e34-12.ic15", 0x000000, 0x80000, CRC(7bb1f476) SHA1(c06c27a2c59953f9ff1eb7679257970fd9c346a3) )
 	ROM_LOAD( "e34-13.ic13", 0x080000, 0x80000, CRC(a43e6cc0) SHA1(090f8f3977c99687dd8461382d0b552c4c3deb9f) )
 	ROM_LOAD( "e34-14.ic16", 0x100000, 0x80000, CRC(0fce5b29) SHA1(aeb626ecead85c5ca926763d928df9eca73acca3) )
