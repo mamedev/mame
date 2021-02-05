@@ -29,14 +29,14 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |        | 80-099000(US)     | Learn and Discover Home (white background on title) (pack-in)              |
 |        | 80-099000(US)     | Learn and Discover Home (green background on title) (standalone)           |
-|        | 80-099002(NL)     | Dierenhuis                                                                 |
+|   XX   | 80-099002(NL)     | Dierenhuis                                                                 |
 |        | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)              |
 |   XX   | 80-099004(GE)     | Meine kleinen Tierfreunde (Explore and Learn Home on label)                |
 |   XX   | 80-099005(FR)     | La Maison des animaux                                                      |
 |   NA   | 80-099014(SE)     | Lär och upptäck (no-ROM cartridge)                                         |
 +========+===================+============================================================================+
 |   XX   | 80-099020(US)     | Pooh's Hundred Acre Wood Adventure                                         |
-|        | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur                                          |
+|   NA   | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur (no-ROM cartridge)                       |
 |        | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   NA   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald (no-ROM cartridge)                               |
 |        | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus (no-ROM cart exists, unknown if a regular cart was sold too)
@@ -158,7 +158,21 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhg" supported="no">
+	<software name="learndhnl" supported="no">
+		<description>Dierenhuis (Netherlands)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099002(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="99002 - Dierenhuis (NL).bin" size="8388608" crc="77adb3aa" sha1="0c9f96effb9e113c5e5050b074620ed27013d71f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "Learn and Discover Home" -->
+	<software name="learndhg" cloneof="learndhnl" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -174,7 +188,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhf" cloneof="learndhg" supported="no">
+	<software name="learndhf" cloneof="learndhnl" supported="no">
 		<description>La Maison Des Animaux (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
