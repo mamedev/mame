@@ -411,11 +411,11 @@ MC6845_UPDATE_ROW( m3_state::crtc_update_row )
 static const gfx_layout charlayout =
 {
 	7, 10,
-	128,
+	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
 	8*16
 };
 
@@ -442,11 +442,10 @@ void m3_state::ppi2_pa_w(uint8_t data)
 
 	logerror("ppi2_pa_w: %02x\n", data);
 
-	if (BIT(data, 0) == 0)
-		floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
-
-	if (BIT(data, 1) == 0)
-		floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
+	if (!BIT(data, 0) && m_floppy[0])
+		floppy = m_floppy[0]->get_device();
+	else if (!BIT(data, 1) && m_floppy[1])
+		floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -469,6 +468,12 @@ void m3_state::machine_start()
 void m3_state::machine_reset()
 {
 	m_maincpu->set_pc(0xf000);
+
+	// floppy motor is always on
+	if (m_floppy[0])
+		m_floppy[0]->get_device()->mon_w(0);
+	if (m_floppy[1])
+		m_floppy[1]->get_device()->mon_w(0);
 }
 
 
