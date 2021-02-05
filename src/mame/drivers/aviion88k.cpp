@@ -57,7 +57,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_kbdc(*this, "kbdc")
 		, m_duart(*this, "duart%u", 0U)
-		, m_async(*this, { "console", "seriala", "mouse", "serialb" })
+		, m_async(*this, { "console_port", "seriala", "mouse_port", "serialb" })
 		, m_duscc(*this, "duscc")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:ncr53c700")
