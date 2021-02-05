@@ -41,6 +41,7 @@ uniform vec4 u_tex_size1;
 uniform vec4 u_quad_dims;
 
 uniform vec4 aperture_strength;
+uniform vec4 aperture_brightboost;
 
 uniform vec4 CRTgamma;
 uniform vec4 monitorgamma;
@@ -214,14 +215,24 @@ void main()
 #endif
   vec3 mul_res  = (col * weights + col2 * weights2).rgb * vec3_splat(cval);
 
-  // Convert the image gamma for display on our output device.
-  mul_res = pow(mul_res, vec3_splat(1.0 / monitorgamma.x));
-
-  // Color the texel.
-  
+  // Shadow mask
   xy = v_texCoord.xy * u_quad_dims.xy / u_tex_size1.xy;
-  vec3 mask = texture2D(mask_texture, xy).rgb;
-  mask = mix(vec3_splat(1.0), mask, aperture_strength.x);
-  
-  gl_FragColor = vec4(mul_res*mask, col.a);
+  vec4 mask = texture2D(mask_texture, xy);
+  // count of total bright pixels is encoded in the mask's alpha channel
+  float nbright = 255.0 - 255.0*mask.a;
+  // fraction of bright pixels in the mask
+  float fbright = nbright / ( u_tex_size1.x * u_tex_size1.y );
+  // average darkening factor of the mask
+  float aperture_average = mix(1.0-aperture_strength.x*(1.0-aperture_brightboost.x), 1.0, fbright);
+  // colour of dark mask pixels
+  vec3 clow = vec3_splat(1.0-aperture_strength.x) * mul_res + vec3_splat(aperture_strength.x*(aperture_brightboost.x)) * mul_res * mul_res;
+  float ifbright = 1.0 / fbright;
+  // colour of bright mask pixels
+  vec3 chi = vec3_splat(ifbright*aperture_average) * mul_res - vec3_splat(ifbright - 1.0) * clow;
+  vec3 cout = mix(clow,chi,mask.rgb); // mask texture selects dark vs bright
+
+  // Convert the image gamma for display on our output device.
+  cout = pow(cout, vec3_splat(1.0 / monitorgamma.x));
+
+  gl_FragColor = vec4(cout,1.0);
 }

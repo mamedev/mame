@@ -12,6 +12,15 @@
           "format": "%1.2f",
           "screen": "raster" },
         { "type": "float",
+          "name": "aperture_brightboost",
+          "text": "Shadow mask brightness boost",
+          "default":  0.4,
+          "max"    :  1.0,
+          "min"    :  0.0,
+          "step"   :  0.05,
+          "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
           "name": "phosphor_power",
           "text": "Phosphor decay power",
           "default":  1.2,
@@ -224,6 +233,7 @@
 			    { "uniform": "CRTgamma",    "slider": "CRTgamma" },
 			    { "uniform": "monitorgamma","slider": "monitorgamma" },
 			    { "uniform": "aperture_strength","slider": "aperture_strength" },
+			    { "uniform": "aperture_brightboost","slider": "aperture_brightboost" },
 			    { "uniform": "halation",    "slider": "halation" }
 			],
 		    
