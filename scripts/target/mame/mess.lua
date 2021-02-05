@@ -4504,6 +4504,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
 	MAME_DIR .. "src/mame/drivers/icebox.cpp",
+	MAME_DIR .. "src/mame/drivers/iez80.cpp",
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
 	MAME_DIR .. "src/mame/drivers/ikt5a.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
