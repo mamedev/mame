@@ -76,7 +76,7 @@ void nsg6809_state::pitchhit(machine_config &config)
 	MC6809(config, m_maincpu, XTAL(4'000'000)); // clock buffered through 74HC4060
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsg6809_state::main_map);
 
-	via6522_device &via(VIA6522(config, "via", XTAL(4'000'000) / 4));
+	via6522_device &via(MOS6522(config, "via", XTAL(4'000'000) / 4));
 	via.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	mos6551_device &acia(MOS6551(config, "acia", 0));

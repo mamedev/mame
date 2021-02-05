@@ -877,8 +877,11 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 											  double c1t, // Unswitched cap, over amp-op, top
 											  double c1b) // Switched cap, over amp-op, bottom
 {
+	// The caps values puts the cutoff at around 150Hz, put that's no good.
+	// Recordings shows we want it around 4K, so fuzz it.
+
 	// Compute the only coefficient we care about
-	double k = c1b / (m_cclock * c1t);
+	double k = c1b / (m_cclock * c1t) * (150.0/4000.0);
 
 	// Compute the filter cutoff frequency
 	double fpeak = 1/(2*M_PI*k);
@@ -1001,7 +1004,7 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 	b[1] = k1 + m;
 
 	// That ends up in a numerically unstable filter.  Neutralize it for now.
-	a[0] = 1;
+	a[0] = 0;
 	a[1] = 0;
 	b[0] = 1;
 	b[1] = 0;

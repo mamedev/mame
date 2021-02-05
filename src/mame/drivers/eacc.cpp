@@ -63,10 +63,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pia(*this, "pia")
 		, m_p_nvram(*this, "nvram")
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void eacc(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	DECLARE_READ_LINE_MEMBER( cb1_r );
@@ -83,12 +89,13 @@ private:
 	bool m_cb1;
 	bool m_cb2;
 	bool m_nmi;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
+	required_ioport_array<4> m_io_keyboard;
 	output_finder<7> m_digits;
+	output_finder<8> m_leds;
 };
 
 
@@ -147,6 +154,7 @@ void eacc_state::machine_reset()
 void eacc_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_cb1));
 	save_item(NAME(m_cb2));
@@ -193,14 +201,9 @@ uint8_t eacc_state::keyboard_r()
 {
 	uint8_t data = m_digit;
 
-	if (BIT(m_digit, 3))
-		data |= ioport("X0")->read();
-	if (BIT(m_digit, 4))
-		data |= ioport("X1")->read();
-	if (BIT(m_digit, 5))
-		data |= ioport("X2")->read();
-	if (BIT(m_digit, 6))
-		data |= ioport("X3")->read();
+	for (uint8_t i = 3; i < 7; i++)
+		if (BIT(m_digit, i))
+			data |= m_io_keyboard[i - 3]->read();
 
 	return data;
 }
@@ -218,21 +221,16 @@ void eacc_state::segment_w(uint8_t data)
 
 	if (!m_nmi)
 	{
-		uint8_t i;
 		if (BIT(m_digit, 7))
 		{
-			char lednum[6];
 			data ^= 0xff;
 
-			for (i = 0; i < 8; i++)
-			{
-				sprintf(lednum,"led%d",i);
-				output().set_value(lednum, BIT(data, i));
-			}
+			for (uint8_t i = 0; i < 8; i++)
+				m_leds[i] = BIT(data, i);
 		}
 		else
 		{
-			for (i = 3; i < 7; i++)
+			for (uint8_t i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
 					m_digits[i] = bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3);
 		}

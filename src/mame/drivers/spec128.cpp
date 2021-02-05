@@ -165,7 +165,7 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-uint8_t spectrum_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
+uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -177,12 +177,12 @@ uint8_t spectrum_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 	return retval;
 }
 
-void spectrum_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
+void spectrum_128_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
 {
 	m_exp->mreq_w(offset, data);
 }
 
-uint8_t spectrum_state::spectrum_128_bank1_r(offs_t offset)
+uint8_t spectrum_128_state::spectrum_128_bank1_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -201,7 +201,7 @@ uint8_t spectrum_state::spectrum_128_bank1_r(offs_t offset)
 	return data;
 }
 
-void spectrum_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
+void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -224,7 +224,7 @@ void spectrum_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	m_exp->iorq_w(offset | 1, data);
 }
 
-void spectrum_state::spectrum_128_update_memory()
+void spectrum_128_state::spectrum_128_update_memory()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -239,37 +239,37 @@ void spectrum_state::spectrum_128_update_memory()
 		m_screen_location = messram + (5<<14);
 }
 
-uint8_t spectrum_state::spectrum_128_ula_r()
+uint8_t spectrum_128_state::spectrum_128_ula_r()
 {
 	int vpos = m_screen->vpos();
 
 	return vpos<193 ? m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-void spectrum_state::spectrum_128_io(address_map &map)
+void spectrum_128_state::spectrum_128_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
-	map(0x0000, 0x0000).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x0001, 0x0001).w(FUNC(spectrum_state::spectrum_128_port_7ffd_w)).select(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
+	map(0x0000, 0x0000).rw(FUNC(spectrum_128_state::spectrum_port_fe_r), FUNC(spectrum_128_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x0001, 0x0001).w(FUNC(spectrum_128_state::spectrum_128_port_7ffd_w)).select(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x0001, 0x0001).r(FUNC(spectrum_state::spectrum_128_ula_r)); // .mirror(0xfffe);
+	map(0x0001, 0x0001).r(FUNC(spectrum_128_state::spectrum_128_ula_r)); // .mirror(0xfffe);
 }
 
-void spectrum_state::spectrum_128_mem(address_map &map)
+void spectrum_128_state::spectrum_128_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_128_bank1_r), FUNC(spectrum_state::spectrum_128_bank1_w));
+	map(0x0000, 0x3fff).rw(FUNC(spectrum_128_state::spectrum_128_bank1_r), FUNC(spectrum_128_state::spectrum_128_bank1_w));
 	map(0x4000, 0x7fff).bankrw("bank2");
 	map(0x8000, 0xbfff).bankrw("bank3");
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-void spectrum_state::spectrum_128_fetch(address_map &map)
+void spectrum_128_state::spectrum_128_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(spectrum_state::spectrum_128_pre_opcode_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(spectrum_128_state::spectrum_128_pre_opcode_fetch_r));
 }
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
+void spectrum_128_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -282,7 +282,7 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	membank("bank3")->set_base(messram + (2<<14));
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	spectrum_state::machine_reset();
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;
@@ -309,23 +309,20 @@ static GFXDECODE_START( spec128 )
 GFXDECODE_END
 
 
-void spectrum_state::spectrum_128(machine_config &config)
+void spectrum_128_state::spectrum_128(machine_config &config)
 {
 	spectrum(config);
 
 	Z80(config.replace(), m_maincpu, X1_128_SINCLAIR / 5);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_128_mem);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_128_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_128_fetch);
-	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_128_state::spectrum_128_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
+	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
 	config.set_maximum_quantum(attotime::from_hz(60));
-
-	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
 	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 456, 0, 352,  311, 0, 296);
 
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
@@ -394,8 +391,8 @@ ROM_START(hc2000)
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE           INIT        COMPANY                  FULLNAME           FLAGS
-COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_state, empty_init, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
-COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "Amstrad plc",           "ZX Spectrum +2",  0 )
-COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-128",          0 )
-COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, empty_init, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE       CLASS      STATE               INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec128,   spectrum_128_state, empty_init, "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_128_state, empty_init, "Amstrad plc",           "ZX Spectrum +2",  0 )
+COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_128_state, empty_init, "ICE-Felix",             "HC-128",          0 )
+COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_128_state, empty_init, "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

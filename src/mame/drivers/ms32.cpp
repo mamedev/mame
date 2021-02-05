@@ -474,8 +474,9 @@ Notes from Charles MacDonald
 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "sound/ymf271.h"
 #include "speaker.h"
+
+#include "f1superb.lh"
 
 
 /********** READ INPUTS **********/
@@ -509,19 +510,7 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 	return  mj_input & 0xff;
 }
 
-
-u32 ms32_state::ms32_read_inputs3()
-{
-	int a,b,c,d;
-	a = ioport("AN2")->read(); // unused?
-	b = ioport("AN2")->read(); // unused?
-	c = ioport("AN1")->read();
-	d = (ioport("AN0")->read() - 0xb0) & 0xff;
-	return a << 24 | b << 16 | c << 8 | d << 0;
-}
-
-
-void ms32_state::ms32_sound_w(u32 data)
+void ms32_base_state::sound_command_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
 
@@ -529,21 +518,12 @@ void ms32_state::ms32_sound_w(u32 data)
 	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
-u32 ms32_state::ms32_sound_r()
+u32 ms32_base_state::sound_result_r()
 {
+	// tp2m32 never pings the sound ack, so irq ack is most likely done here
+	irq_raise(1, false);
 	return m_to_main^0xff;
 }
-
-void ms32_state::reset_sub_w(u32 data)
-{
-	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
-}
-
-
-
-
-/********** MEMORY MAP **********/
-
 
 u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
@@ -629,7 +609,7 @@ void ms32_state::ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask)
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-void ms32_state::pip_w(u32 data)
+void ms32_state::bgmode_w(u32 data)
 {
 	m_tilemaplayoutcontrol = data;
 
@@ -648,41 +628,72 @@ void ms32_state::coin_counter_w(u32 data)
 void ms32_state::ms32_map(address_map &map)
 {
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
-/*  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
-/*  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
-/*  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
-/*  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
-/*  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
-/*  map(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
-	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
-/*  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
-	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); /* mainram is 32-bit wide, 0x20000 in size */
-	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); // ROM is 32-bit wide, 0x200000 in size */
+//  0xfc000000 NVRAM (8-bits wide, 0x2000 in size)
+	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);
+//  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above
 
-	/* todo: clean up the mapping of these */
-	map(0xfc800000, 0xfc800003).nopr(); /* sound? */
-	map(0xfc800000, 0xfc800003).w(FUNC(ms32_state::ms32_sound_w)); /* sound? */
+//  0xfd180000 Priority RAM (8-bits wide, 0x2000 in size)
+	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000);
+//  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above
+
+//  0xfd200000 palette related, unknown
+//  0xfd400000 paletteram (16-bits wide, 0x20000 in size)
+//  0xfd400000 object palette
+//  0xfd408000 Background palette
+//  0xfd410000 ROZ1 palette
+//  0xfd420000 ROZ0 palette?
+//  0xfd430000 ASCII palette
+	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000);
+//  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above
+
+//  0xfe000000 ROZ1 VRAM (16-bits wide, 0x10000 in size)
+	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
+//  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above
+
+//  0xfe200000 ROZ1 line RAM (16-bits wide, 0x1000 in size)
+	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000);
+//  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above
+
+//  0xfe400000 ROZ0 VRAM?
+//  0xfe600000 ROZ0 line RAM?
+//  0xfe800000 object layer VRAM (16-bits wide, 0x10000 in size)
+	map(0xc2800000, 0xc281ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000);
+//  map(0xc2820000, 0xc29fffff) // mirrors of sprram, handled above
+
+//  0xfec00000 ASCII layer VRAM (16-bits wide, 0x4000 in size)
+	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
+
+//  0xfec08000 Background layer VRAM (16-bits wide, 0x4000 in size)
+	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000);
+//  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above
+
+//  0xfee00000 Scratch RAM (32-bit wide, 0x20000 in size)
+	map(0xc2e00000, 0xc2e1ffff).ram().mirror(0x3c0e0000);
+//  0xffc00000 ROM (32-bit wide, 0x200000 in size)
+	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000);
+
+	// I/O section
+	// TODO: mirrors like above?
+	map(0xfc800000, 0xfc800003).nopr().w(FUNC(ms32_state::sound_command_w));    // open bus on read?
+//  map(0xfcc00000, 0xfcc0001f)                                                 // input
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
-	map(0xfce00034, 0xfce00037).nopw(); // irq ack?
-	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::reset_sub_w));
-	map(0xfce00050, 0xfce0005f).nopw();    // watchdog? I haven't investigated
-//  map(0xfce00000, 0xfce0007f).writeonly().share("ms32_fce00000"); /* registers not ram? */
-	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
-	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));    // global brightness control
-/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        /* roz control registers */
-/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   /* tx layer scroll */
-/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   /* bg layer scroll */
-	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::pip_w));    // ??? layer related? seems to be always 0
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w)); //   coin counters + something else
-	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::ms32_sound_r));
+	// System Registers
+	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
+	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
+	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));         // global brightness control
+//  map(0xfce00400, 0xfce0045f)                                                 // ROZ0 control registers
+/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");                        // ROZ1 control registers
+/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");                       // ASCII layer scroll
+/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");                       // Background layer scroll
+	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::bgmode_w));
+//  map(0xfce00c00, 0xfce00c1f)                                                 // ???
+	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w));            // coin counters + something else
+	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::sound_result_r));
+	//  Extended I/O
+//  map(0xfd040000, 0xfd040003)
+//  map(0xfd080000, 0xfd080003)
+//  map(0xfd0c0000, 0xfd0c0003)
 	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
 }
 
@@ -690,51 +701,75 @@ void ms32_state::ms32_map(address_map &map)
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use its own memory map */
 
-void ms32_state::ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask)
+void ms32_f1superbattle_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_f1superb_extraram[offset]);
+	COMBINE_DATA(&m_road_vram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 
-u16 ms32_state::ms32_extra_r16(offs_t offset)
+u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
 {
-	return m_f1superb_extraram[offset];
+	return m_road_vram[offset];
 }
 
-void ms32_state::ms32_irq2_guess_w(u32 data)
+void ms32_f1superbattle_state::ms32_irq2_guess_w(u32 data)
 {
-	irq_raise(2);
+	irq_raise(2, true);
 }
 
-void ms32_state::ms32_irq5_guess_w(u32 data)
+void ms32_f1superbattle_state::ms32_irq5_guess_w(u32 data)
 {
-	irq_raise(5);
+	irq_raise(5, true);
 }
 
-void ms32_state::f1superb_map(address_map &map)
+u32 ms32_f1superbattle_state::analog_r()
+{
+	int a,b,c,d;
+	a = ioport("AN2")->read(); // unused?
+	b = ioport("AN2")->read(); // unused?
+	c = ioport("AN1")->read();
+	d = (ioport("AN0")->read() - 0xb0) & 0xff;
+	return a << 24 | b << 16 | c << 8 | d << 0;
+}
+
+void ms32_f1superbattle_state::f1superb_map(address_map &map)
 {
 	ms32_map(map);
 
+	// comms RAM, 8-bit resolution?
+	// unsurprisingly it seems to use similar mechanics to other Jaleco games
+	// Throws "FLAM ERROR" in test mode if irq 11 is enabled
+	// irq 11 is cleared to port $1e (irq_ack_w) in sysctrl.
+	map(0xfd0c0000, 0xfd0c0fff).ram();
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
-	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
+	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_f1superbattle_state::analog_r)).nopw(); // writes 7-led seg at very least
 
-	map(0xfce00004, 0xfce00023).ram(); // regs?
-	map(0xfce00200, 0xfce0021f).ram(); // regs?
-	map(0xfce00800, 0xfce0085f).ram(); // regs?
+	map(0xfce00800, 0xfce0085f).ram(); // ROZ0 control register (mirrored from 0x400?)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
-	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
+//  map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
+	// bit 1: steering shock
+	// bit 0: seat motor
+//  map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
 
+	// Note: it is unknown how COPRO irqs actually acks,
+	// most likely candidate is a 0x06 ping at both $fd1024c8 / $fd1424c8
+	// irq_2: 0xffe00878 (really unused)
+	// irq_5: 0xffe008ac
+	// irq_7: 0xffe008ea (basically identical to irq_5)
+	// COPRO 1
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
 	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
 
+	// COPRO 2
 	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
 	map(0xfd144000, 0xfd145fff).ram(); // same data here
+//  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff).share("f1sb_extraram"); // definitely line ram
+	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
 	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
+//  map(0xfe202000, 0xfe2fffff).ram(); // vram?
 }
 
 /* F1 Super Battle speculation from nuapete
@@ -837,14 +872,7 @@ what the operations might be, my maths isn't up to much though...
 
 */
 
-//  map(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
-///**/map(0xfd104000, 0xfd105fff).ram(); /* f1superb */
-///**/map(0xfd144000, 0xfd145fff).ram(); /* f1superb */
-///**/map(0xfd440000, 0xfd47ffff).ram(); /* f1superb color */
-///**/map(0xfdc00000, 0xfdc006ff).ram(); /* f1superb */
-///**/map(0xfde00000, 0xfde01fff).ram(); /* f1superb lineram #2? */
-///**/map(0xfe202000, 0xfe2fffff).ram(); /* f1superb vram */
-//  map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)); /* analog controls in f1superb? */
+
 
 /*************************************
  *
@@ -1360,7 +1388,7 @@ static INPUT_PORTS_START( hayaosi3 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00000004, 0x00000004, "SW2:6" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
+static INPUT_PORTS_START( kirarast )
 	PORT_INCLUDE( ms32_mahjong )
 
 	PORT_MODIFY("DSW")
@@ -1383,7 +1411,7 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPNAME( 0x00000004, 0x00000004, "Campaign Mode" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Tumo Pinfu" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x00000008, 0x00000008, "Tsumo Pinfu" ) PORT_DIPLOCATION("SW2:5") // "Tumo Pinfu" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
@@ -1400,17 +1428,17 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
+static INPUT_PORTS_START( suchie2 )
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )    /* coin 2 is unused */
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6") // "Campain Mode" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000800, 0x00000800, "Tumo Pinfu" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x00000800, 0x00000800, "Tsumo Pinfu" ) PORT_DIPLOCATION("SW1:5") // "Tumo Pinfu" (sic)
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000800, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Demo_Sounds) ) PORT_DIPLOCATION("SW1:4")
@@ -1430,12 +1458,11 @@ static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( wpksocv2 )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	/* Still missing the correct input for begin the left right movement */
+	// TODO: Still missing the correct input for begin the left right movement
 	PORT_BIT( 0x0000000f, 0x00000000, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(7) PORT_PLAYER(1)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1476,17 +1503,16 @@ static INPUT_PORTS_START( wpksocv2 )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00c00000, 0x00000000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW3:2,1")
 	PORT_DIPSETTING(          0x00400000, DEF_STR( USA ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( World ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Asia ) )
 //  PORT_DIPSETTING(          0x00800000, "?" )
 	PORT_DIPSETTING(          0x00c00000, DEF_STR( Japan ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( f1superb )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift") PORT_TOGGLE
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Brake")
 	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1564,7 +1590,6 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(    0x0c, "7" )
 	PORT_DIPSETTING(    0x0e, "8" )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 /********** GFX DECODE **********/
@@ -1585,7 +1610,7 @@ static GFXDECODE_START( gfx_f1superb )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x100 ) // not tilemap data?
+	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x80 ) // not tilemap data?
 GFXDECODE_END
 
 
@@ -1599,43 +1624,52 @@ GFXDECODE_END
 */
 
 
-IRQ_CALLBACK_MEMBER(ms32_state::irq_callback)
+IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
+	// TODO: confirm irq priority
 	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
-	m_irqreq &= ~(1<<i);
-	if(!m_irqreq)
-		device.execute().set_input_line(0, CLEAR_LINE);
 	return i;
 }
 
-void ms32_state::irq_init()
+void ms32_base_state::irq_init()
 {
 	m_irqreq = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void ms32_state::irq_raise(int level)
+void ms32_base_state::irq_raise(int level, bool state)
 {
-	m_irqreq |= (1<<level);
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	if (state == true)
+		m_irqreq |= (1<<level);
+	else
+		m_irqreq &= ~(1<<level);
+
+	if (m_irqreq)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-/* TODO: fix this arrangement (derived from old deprecat lib) */
-TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
+WRITE_LINE_MEMBER(ms32_base_state::timer_irq_w)
 {
-	int scanline = param;
-	if( scanline == 0) irq_raise(10);
-	if( scanline == 8) irq_raise(9);
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
-	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
-	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
-	   in different points. Could this be a raster interrupt?
-	   Other games using it but not needing it to work:
-	   desertwr
-	   p47aces
-	   */
-	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
+	irq_raise(0, state);
+}
+
+WRITE_LINE_MEMBER(ms32_base_state::vblank_irq_w)
+{
+	irq_raise(10, state);
+}
+
+WRITE_LINE_MEMBER(ms32_base_state::field_irq_w)
+{
+	irq_raise(9, state);
+}
+
+WRITE_LINE_MEMBER(ms32_base_state::sound_reset_line_w)
+{
+	if (state)
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -1662,27 +1696,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-u8 ms32_state::latch_r()
+u8 ms32_base_state::latch_r()
 {
 	return m_soundlatch->read()^0xff;
 }
 
-void ms32_state::ms32_snd_bank_w(u8 data)
+void ms32_base_state::ms32_snd_bank_w(u8 data)
 {
-	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
-	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
+	m_z80bank[0]->set_entry((data >> 0) & 0x0f);
+	m_z80bank[1]->set_entry((data >> 4) & 0x0f);
 }
 
-void ms32_state::to_main_w(u8 data)
+void ms32_base_state::to_main_w(u8 data)
 {
-	m_to_main=data;
-	irq_raise(1);
+	m_to_main = data;
+	irq_raise(1, true);
 }
 
-void ms32_state::ms32_sound_map(address_map &map)
+
+WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
+{
+	// used by f1superb, is it the reason for sound dying?
+	if (state)
+		m_to_main = 0xff;
+}
+
+void ms32_base_state::base_sound_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom();
-	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+//  map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
 	map(0x3f10, 0x3f10).rw(FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
 	map(0x3f20, 0x3f20).nopr(); /* 2nd latch ? */
 	map(0x3f20, 0x3f20).nopw(); /* to_main2_w  ? */
@@ -1694,10 +1736,22 @@ void ms32_state::ms32_sound_map(address_map &map)
 	map(0xc000, 0xffff).bankr("z80bank2");
 }
 
+void ms32_state::ms32_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x3f00, 0x3f0f).rw(m_ymf, FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+
+}
+
 
 /********** MACHINE INIT **********/
 
-void ms32_state::machine_reset()
+void ms32_base_state::machine_start()
+{
+	save_item(NAME(m_irqreq));
+}
+
+void ms32_base_state::machine_reset()
 {
 	for (int bank = 0; bank < 2; bank++)
 		m_z80bank[bank]->set_entry(bank);
@@ -1714,26 +1768,30 @@ void ms32_state::ms32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
-
 	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
+	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
+	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
+	m_sysctrl->vblank_cb().set(FUNC(ms32_state::vblank_irq_w));
+	m_sysctrl->field_cb().set(FUNC(ms32_state::field_irq_w));
+	m_sysctrl->prg_timer_cb().set(FUNC(ms32_state::timer_irq_w));
+	m_sysctrl->sound_ack_cb().set(FUNC(ms32_state::sound_ack_w));
+	m_sysctrl->sound_reset_cb().set(FUNC(ms32_state::sound_reset_line_w));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(40*8, 28*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
-	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank_ms32));
+	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
+	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
+	m_screen->set_screen_update(FUNC(ms32_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
-	PALETTE(config, m_palette).set_entries(0x10000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8);
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
@@ -1745,22 +1803,28 @@ void ms32_state::ms32(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf(YMF271(config, "ymf", XTAL(16'934'400))); // 16.9344MHz
-	ymf.add_route(0, "lspeaker", 1.0);
-	ymf.add_route(1, "rspeaker", 1.0);
-//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
-//  ymf.add_route(3, "rspeaker", 1.0);
+	YMF271(config, m_ymf, XTAL(16'934'400)); // 16.9344MHz
+	m_ymf->add_route(0, "lspeaker", 1.0);
+	m_ymf->add_route(1, "rspeaker", 1.0);
+// Output 2/3 not used?
+//  m_ymf->add_route(2, "lspeaker", 1.0);
+//  m_ymf->add_route(3, "rspeaker", 1.0);
 }
 
-void ms32_state::f1superb(machine_config &config)
+void ms32_state::ms32_invert_lines(machine_config &config)
 {
 	ms32(config);
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::f1superb_map);
+	m_sysctrl->set_invert_vblank_lines(true);
+}
+
+void ms32_f1superbattle_state::f1superb(machine_config &config)
+{
+	ms32(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
 
 	m_gfxdecode->set_info(gfx_f1superb);
 
-	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
+//  MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 }
 
 
@@ -2591,7 +2655,7 @@ ROM_START( wpksocv2 )
 ROM_END
 
 
-void ms32_state::configure_banks()
+void ms32_base_state::configure_banks()
 {
 	save_item(NAME(m_to_main));
 	for (int bank = 0; bank < 2; bank++)
@@ -2647,11 +2711,13 @@ void ms32_state::init_suchie2()
 	init_ss92048_01();
 }
 
-void ms32_state::init_f1superb()
+void ms32_f1superbattle_state::init_f1superb()
 {
-#if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
+#if 0
+	// hack for ?, game needs FPUs emulated anyway, eventually remove me
 	u32 *pROM = (u32 *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
+	// the x offsets are never copied either ...
 #endif
 	init_ss92046_01();
 }
@@ -2664,25 +2730,25 @@ void ms32_state::init_bnstars()
 /********** GAME DRIVERS **********/
 
 
-
+// TODO: inputs in akiss, bnstars (former has no dip display in service mode)
 GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3a, hayaosi3, ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",         "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1994, f1superb, 0,        f1superb, f1superb, ms32_f1superbattle_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

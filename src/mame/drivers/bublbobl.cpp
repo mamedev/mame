@@ -1004,6 +1004,8 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 void bublbobl_state::bublbobl(machine_config &config)
 {
 	bublbobl_nomcu(config);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(bublbobl_state::mcram_vect_r));
+
 	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	m_mcu->set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
 
@@ -1065,6 +1067,7 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 void bub68705_state::bub68705(machine_config &config)
 {
 	bublbobl_nomcu(config);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(bublbobl_state::mcram_vect_r));
 
 	/* basic machine hardware */
 	M68705P3(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally

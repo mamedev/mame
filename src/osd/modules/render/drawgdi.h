@@ -5,11 +5,11 @@
 //  drawgdi.h - Win32 GDI drawing
 //
 //============================================================
+#ifndef MAME_OSD_MODULES_RENDER_DRAWGDI_H
+#define MAME_OSD_MODULES_RENDER_DRAWGDI_H
 
 #pragma once
 
-#ifndef __DRAWGDI__
-#define __DRAWGDI__
 
 // standard windows headers
 #include <windows.h>
@@ -47,9 +47,9 @@ public:
 	virtual void toggle_fsfx() override {};
 
 private:
-	BITMAPINFO              m_bminfo;
-	uint8_t *                 m_bmdata;
-	size_t                  m_bmsize;
+	BITMAPINFO                  m_bminfo;
+	std::unique_ptr<uint8_t []> m_bmdata;
+	size_t                      m_bmsize;
 };
 
-#endif // __DRAWGDI__
+#endif // MAME_OSD_MODULES_RENDER_DRAWGDI_H

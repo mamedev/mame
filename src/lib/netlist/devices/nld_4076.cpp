@@ -49,11 +49,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-namespace devices
-{
-
+namespace netlist::devices {
 
 	NETLIB_OBJECT(CD4076)
 	{
@@ -128,5 +124,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(CD4076,     "CD4076",        "+I1,+I2,+I3,+I4,+ID1,+ID2,+OD1,+OD2,@VCC,@GND")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

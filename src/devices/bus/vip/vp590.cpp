@@ -131,7 +131,7 @@ vp590_device::vp590_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, VP590, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_cgc(*this, CDP1862_TAG),
-	m_color_ram(*this, "color_ram"),
+	m_color_ram(*this, "color_ram", COLOR_RAM_SIZE, ENDIANNESS_LITTLE),
 	m_j1(*this, "J1"),
 	m_j2(*this, "J2"),
 	m_a12(0), m_color(0), m_keylatch(0)
@@ -145,9 +145,6 @@ vp590_device::vp590_device(const machine_config &mconfig, const char *tag, devic
 
 void vp590_device::device_start()
 {
-	// allocate memory
-	m_color_ram.allocate(COLOR_RAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_a12));
 	save_item(NAME(m_color));

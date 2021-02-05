@@ -382,7 +382,7 @@ void pdp11_state::pdp11(machine_config &config)
 
 	RX01(config, "rx01", 0);
 	QBUS(config, m_qbus, 0);
-	m_qbus->set_cputag("maincpu");
+	m_qbus->set_space(m_maincpu, AS_PROGRAM);
 	m_qbus->birq4().set_inputline(m_maincpu, T11_IRQ0);
 	QBUS_SLOT(config, "qbus" ":1", qbus_cards, "pc11");
 	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr);

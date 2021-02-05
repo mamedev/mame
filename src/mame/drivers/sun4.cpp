@@ -1494,7 +1494,7 @@ void sun4c_state::sun4c(machine_config &config)
 	m_maincpu->set_mmu(m_mmu);
 
 	// SBus
-	SBUS(config, m_sbus, 20'000'000, "maincpu", "type1");
+	SBUS(config, m_sbus, 20'000'000, m_maincpu, m_type1space, 0);
 	m_sbus->irq<0>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ1>));
 	m_sbus->irq<1>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ2>));
 	m_sbus->irq<2>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ3>));

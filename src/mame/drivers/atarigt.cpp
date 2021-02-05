@@ -648,7 +648,7 @@ void atarigt_state::main_map(address_map &map)
 	map(0xd79000, 0xd7a1ff).ram();
 	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
 	map(0xd7a204, 0xd7ffff).ram();
-	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w));
 	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
 	map(0xe0a000, 0xe0a003).w(FUNC(atarigt_state::scanline_int_ack_w));

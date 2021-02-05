@@ -57,6 +57,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -95,11 +96,6 @@ void dbz_state::dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-void dbz_state::dbz_sound_command_w(uint16_t data)
-{
-	m_soundlatch->write(data >> 8);
-}
-
 void dbz_state::dbz_sound_cause_nmi(uint16_t data)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -126,9 +122,9 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
 	map(0x4e4000, 0x4e4001).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
-	map(0x4e8000, 0x4e8001).nopw();
+	map(0x4e8000, 0x4e8001).noprw();
 	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
-	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
+	map(0x4f0000, 0x4f0000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 252
 	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);   // 251
@@ -141,6 +137,24 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x700000, 0x7fffff).nopr();             // PSAC 2 ROM readback window
 }
 
+void dbz_state::dbz2bl_map(address_map &map)
+{
+	dbz_map(map);
+
+	map(0x4cc000, 0x4cc03f).unmapw();
+	map(0x4ccf00, 0x4ccf3f).w(m_k056832, FUNC(k056832_device::word_w));
+
+	map(0x4d4000, 0x4d401f).unmapw();
+	map(0x4d4f00, 0x4d4f1f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
+
+	map(0x4e4000, 0x4e4001).unmapr();
+	map(0x4e0004, 0x4e0005).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
+
+	map(0x4e3011, 0x4e3011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x4f0000, 0x4f0001).unmapw();
+	map(0x4f4000, 0x4f4001).unmapw(); // the bootleg nops this, so sound doesn't work with current emulation
+}
+
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
@@ -150,7 +164,7 @@ void dbz_state::dbz_sound_map(address_map &map)
 	map(0x8000, 0xbfff).ram();
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe000, 0xe001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 void dbz_state::dbz_sound_io_map(address_map &map)
@@ -375,7 +389,7 @@ void dbz_state::dbz(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -387,6 +401,12 @@ void dbz_state::dbz(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void dbz_state::dbz2bl(machine_config &config)
+{
+	dbz(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz2bl_map);
+}
 /**********************************************************************************/
 
 ROM_START( dbz )
@@ -496,6 +516,42 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
+// This PCB doesn't have Konami's custom chips.
+// Only the program /audio ROMs were dumped, all the mask ROMs were Banpresto original with same ROM number, so they're supposed to match, but marked as BAD_DUMP as precaution
+ROM_START( dbz2bl )
+	ROM_REGION( 0x400000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "374.bin", 0x000000, 0x80000, CRC(cb0b2fdc) SHA1(c791e788a8c2ab402afed215e70de1a66ab0e2a2) )
+	ROM_LOAD16_BYTE( "273.bin", 0x000001, 0x80000, CRC(55889c38) SHA1(9fa96e9c96abe42221ca3f383b8a2cc4bf6af979) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD("s-001.5e", 0x000000, 0x08000, CRC(154e6d03) SHA1(db15c20982692271f40a733dfc3f2486221cd604) )
+
+	// tiles
+	ROM_REGION( 0x400000, "k056832", 0)
+	ROM_LOAD32_WORD( "ds-b01.27c", 0x000000, 0x200000, BAD_DUMP CRC(8dc39972) SHA1(c6e3d4e0ff069e08bdb68e2b0ad24cc7314e4e93) )
+	ROM_LOAD32_WORD( "ds-b02.27e", 0x000002, 0x200000, BAD_DUMP CRC(7552f8cd) SHA1(1f3beffe9733b1a18d44b5e8880ff1cc97e7a8ab) )
+
+	// sprites
+	ROM_REGION( 0x800000, "k053246", 0)
+	ROM_LOAD64_WORD( "ds-o01.3j", 0x000000, 0x200000, BAD_DUMP CRC(d018531f) SHA1(d4082fe28e9f1f3f35aa75b4be650cadf1cef192) )
+	ROM_LOAD64_WORD( "ds-o02.1j", 0x000002, 0x200000, BAD_DUMP CRC(5a0f1ebe) SHA1(3bb9e1389299dc046a24740ef1a1c543e44b5c37) )
+	ROM_LOAD64_WORD( "ds-o03.3l", 0x000004, 0x200000, BAD_DUMP CRC(ddc3bef1) SHA1(69638ef53f627a238a12b6c206d57faadf894893) )
+	ROM_LOAD64_WORD( "ds-o04.1l", 0x000006, 0x200000, BAD_DUMP CRC(b5df6676) SHA1(194cfce460ccd29e2cceec577aae4ec936ae88e5) )
+
+	// K053536 PSAC-2 #1 equivalent
+	ROM_REGION( 0x400000, "gfx3", 0)
+	ROM_LOAD( "ds-p01.25k", 0x000000, 0x200000, BAD_DUMP CRC(1c7aad68) SHA1(a5296cf12cec262eede55397ea929965576fea81) )
+	ROM_LOAD( "ds-p02.27k", 0x200000, 0x200000, BAD_DUMP CRC(e4c3a43b) SHA1(f327f75fe82f8aafd2cfe6bdd3a426418615974b) )
+
+	// K053536 PSAC-2 #2 equivalent
+	ROM_REGION( 0x400000, "gfx4", 0)
+	ROM_LOAD( "ds-p03.25l", 0x000000, 0x200000, BAD_DUMP CRC(1eaa671b) SHA1(1875eefc6f2c3fc8feada56bfa6701144e8ef64b) )
+	ROM_LOAD( "ds-p04.27l", 0x200000, 0x200000, BAD_DUMP CRC(5845ff98) SHA1(73b4c3f439321ce9c462119fe933e7cbda8cd498) )
+
+	ROM_REGION( 0x40000, "oki", 0)
+	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
+ROM_END
+
 void dbz_state::init_dbz()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -583,6 +639,7 @@ void dbz_state::init_dbz2()
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz,  dbz_state, init_dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, init_dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, init_dbz2, ROT0, "Banpresto", "Dragon Ball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbz,    0,    dbz,    dbz,  dbz_state, init_dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza,   dbz,  dbz,    dbza, dbz_state, init_dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dbz2,   0,    dbz,    dbz2, dbz_state, init_dbz2, ROT0, "Banpresto", "Dragon Ball Z 2 - Super Battle",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1994, dbz2bl, dbz2, dbz2bl, dbz2, dbz_state, init_dbz2, ROT0, "bootleg",   "Dragon Ball Z 2 - Super Battle (bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // heavy priority / GFX issues, no sound

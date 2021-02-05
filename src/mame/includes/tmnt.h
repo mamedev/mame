@@ -26,7 +26,7 @@ public:
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
-		m_tmnt2_rom(*this, "tmnt2_rom"),
+		m_tmnt2_rom(*this, "maincpu"),
 		m_sunset_104000(*this, "sunset_104000"),
 		m_tmnt2_1c0800(*this, "tmnt2_1c0800"),
 		m_maincpu(*this, "maincpu"),
@@ -71,7 +71,7 @@ protected:
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_tmnt2_rom;
+	required_region_ptr<uint16_t> m_tmnt2_rom;
 	optional_shared_ptr<uint16_t> m_sunset_104000;
 	optional_shared_ptr<uint16_t> m_tmnt2_1c0800;
 

@@ -24,10 +24,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(82S16)
 	{
 		NETLIB_CONSTRUCTOR(82S16)
@@ -123,5 +121,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

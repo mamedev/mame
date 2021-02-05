@@ -30,6 +30,7 @@
 #include "debugger.h"
 #include "r4000.h"
 #include "mips3dsm.h"
+#include "unicode.h"
 
 #include "softfloat3/source/include/softfloat.h"
 
@@ -58,7 +59,7 @@
 
 #define USE_ABI_REG_NAMES 1
 
-// cpu instruction fiels
+// cpu instruction fields
 #define RSREG ((op >> 21) & 31)
 #define RTREG ((op >> 16) & 31)
 #define RDREG ((op >> 11) & 31)
@@ -93,6 +94,9 @@ r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
+	, m_r{}
+	, m_cp0{}
+	, m_f{}
 	, m_fcr0(fcr)
 {
 	m_cp0[CP0_PRId] = prid;
@@ -193,14 +197,17 @@ void r4000_base_device::device_start()
 
 void r4000_base_device::device_reset()
 {
+	if (!m_hard_reset)
+	{
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
+		m_cp0[CP0_ErrorEPC] = m_pc;
+	}
+	else
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+
 	m_branch_state = NONE;
 	m_pc = s64(s32(0xbfc00000));
 	m_r[0] = 0;
-
-	if (m_hard_reset)
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
-	else
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
 
 	m_cp0[CP0_Wired] = 0;
 	m_cp0[CP0_Compare] = 0;
@@ -472,10 +479,10 @@ void r4000_base_device::cpu_execute(u32 const op)
 			}
 			break;
 		case 0x1c: // DMULT
-			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], reinterpret_cast<s64 *>(&m_hi));
+			m_lo = mul_64x64(m_r[RSREG], m_r[RTREG], *reinterpret_cast<s64 *>(&m_hi));
 			break;
 		case 0x1d: // DMULTU
-			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], &m_hi);
+			m_lo = mulu_64x64(m_r[RSREG], m_r[RTREG], m_hi);
 			break;
 		case 0x1e: // DDIV
 			if (m_r[RTREG])
@@ -978,7 +985,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 				m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x04: // index load tag (I)
 			if (ICACHE)
 			{
@@ -989,7 +996,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x08: // index store tag (I)
 			if (ICACHE)
 			{
@@ -999,7 +1006,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 
 				break;
 			}
-
+			[[fallthrough]];
 		case 0x01: // index writeback invalidate (D)
 		case 0x02: // index invalidate (SI)
 		case 0x03: // index writeback invalidate (SD)
@@ -1891,6 +1898,7 @@ void r5000_device::cp1_execute(u32 const op)
 				return;
 			}
 		}
+		[[fallthrough]];
 		case 0x11: // D
 			switch (op & 0x3f)
 			{
@@ -3041,11 +3049,11 @@ void r4000_base_device::cp1_execute(u32 const op)
 			// TODO: MIPS3 only
 			switch (op & 0x3f)
 			{
-			case 0x02a00020: // CVT.S.L
+			case 0x20: // CVT.S.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f32(s64(m_f[FSREG])).v);
 				break;
-			case 0x02a00021: // CVT.D.L
+			case 0x21: // CVT.D.L
 				if ((SR & SR_FR) || !(op & ODD_REGS))
 					cp1_set(FDREG, i64_to_f64(s64(m_f[FSREG])).v);
 				break;

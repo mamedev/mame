@@ -45,8 +45,8 @@
 class qvt70_state : public driver_device
 {
 public:
-	qvt70_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qvt70_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rombank(*this, "rom"),
 		m_rambank(*this, "ram%d", 0U),
@@ -95,11 +95,11 @@ private:
 
 void qvt70_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("rom");
+	map(0x0000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0x8000).w(FUNC(qvt70_state::rombank_w));
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).bankrw("ram0");
-	map(0xe000, 0xffff).bankrw("ram1");
+	map(0xc000, 0xdfff).bankrw(m_rambank[0]);
+	map(0xe000, 0xffff).bankrw(m_rambank[1]);
 }
 
 void qvt70_state::io_map(address_map &map)

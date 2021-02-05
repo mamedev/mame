@@ -1871,11 +1871,11 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT)
-	// TODO: add other keys (ROLL UP, ROLL DOWN, HELP, COPY, XFER)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( x1turbo )
 	PORT_INCLUDE( x1 )
+	// X1TURBO TODO: add other keys (ROLL UP, ROLL DOWN, HELP, COPY, XFER)
 
 	PORT_START("X1TURBO_DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Interlace mode" )
@@ -2083,6 +2083,10 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 	m_sub_val[3] = 0;
 	m_sub_val[4] = 0;
 	m_sub_obf = (m_sub_cmd_length) ? 0x00 : 0x20;
+	m_sub_val_ptr = 0;
+	m_key_i = 0;
+	m_scrn_reg.v400_mode = 0;
+	m_scrn_reg.ank_sel = 0;
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
@@ -2359,7 +2363,7 @@ void x1_state::init_x1_kanji()
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
 COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state, empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
-// x1twin in x1twin.c
+// x1twin in x1twin.cpp
 COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
 COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
 //COMP( 1986, x1turboz,  x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

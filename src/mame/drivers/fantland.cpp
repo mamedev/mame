@@ -49,7 +49,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -111,8 +110,8 @@ void fantland_state::fantland_map(address_map &map)
 	map(0xa3002, 0xa3002).w(FUNC(fantland_state::soundlatch_w));
 	map(0xa3002, 0xa3003).portr("a3002");
 
-	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w)).share("spriteram");
-	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w)).share("spriteram2");
+	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w));
+	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w));
 
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0xe0000);
 }
@@ -839,9 +838,6 @@ void fantland_state::fantland(machine_config &config)
 	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

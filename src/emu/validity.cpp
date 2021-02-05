@@ -11,9 +11,11 @@
 #include "emu.h"
 #include "validity.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 #include "romload.h"
 #include "video/rgbutil.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <type_traits>
@@ -290,7 +292,7 @@ void validity_checker::validate_one(const game_driver &driver)
 {
 	// help verbose validation detect configuration-related crashes
 	if (m_print_verbose)
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()).c_str());
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()));
 
 	// set the current driver
 	m_current_driver = &driver;
@@ -325,7 +327,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
 		if (!m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()).c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()));
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
@@ -474,13 +476,13 @@ void validity_checker::validate_inlines()
 	if (resultu32 != expectedu32)
 		osd_printf_error("Error testing divu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
-	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
+	resulti32 = div_64x32_rem(testi64a, testi32a, remainder);
 	expectedi32 = testi64a / s64(testi32a);
 	expremainder = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32 || remainder != expremainder)
 		osd_printf_error("Error testing div_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", s64(testi64a), s32(testi32a), resulti32, remainder, expectedi32, expremainder);
 
-	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
+	resultu32 = divu_64x32_rem(testu64a, testu32a, uremainder);
 	expectedu32 = testu64a / u64(testu32a);
 	expuremainder = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32 || uremainder != expuremainder)
@@ -1539,7 +1541,7 @@ void validity_checker::validate_driver(device_t &root)
 	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
 	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
 	{
-		sound_interface_iterator iter(root);
+		sound_interface_enumerator iter(root);
 		if (!iter.first())
 			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
 	}
@@ -1563,7 +1565,7 @@ void validity_checker::validate_driver(device_t &root)
 void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1869,7 +1871,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 void validity_checker::validate_inputs(device_t &root)
 {
 	// iterate over devices
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// see if this device has ports; if not continue
 		if (device.input_ports() == nullptr)
@@ -2011,7 +2013,7 @@ void validity_checker::validate_devices(machine_config &config)
 {
 	std::unordered_set<std::string> device_map;
 
-	for (device_t &device : device_iterator(config.root_device()))
+	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -2057,7 +2059,7 @@ void validity_checker::validate_devices(machine_config &config)
 						additions(card);
 				}
 
-				for (device_slot_interface &subslot : slot_interface_iterator(*card))
+				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
 				{
 					if (subslot.fixed())
 					{
@@ -2077,11 +2079,11 @@ void validity_checker::validate_devices(machine_config &config)
 					}
 				}
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
 
-				for (device_t &card_dev : device_iterator(*card))
+				for (device_t &card_dev : device_enumerator(*card))
 				{
 					m_current_device = &card_dev;
 					card_dev.findit(this);
@@ -2120,10 +2122,10 @@ void validity_checker::validate_device_types()
 		device_t *const dev = config.device_add(type.shortname(), type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
-		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()), name) : name);
 
 		if (m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description.c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description);
 
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
@@ -2326,5 +2328,5 @@ void validity_checker::output_indented_errors(std::string &text, const char *hea
 	if (text[text.size()-1] == '\n')
 		text.erase(text.size()-1, 1);
 	strreplace(text, "\n", "\n   ");
-	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text.c_str());
+	output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%s:\n   %s\n", header, text);
 }

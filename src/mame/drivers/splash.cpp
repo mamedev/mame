@@ -155,9 +155,9 @@ WRITE_LINE_MEMBER(splash_state::ym_irq)
 
 void splash_state::roldfrog_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();                                                 /* ROM */
-	map(0x400000, 0x407fff).rom().share("protdata");                        /* Protection Data */
-	map(0x408000, 0x4087ff).ram();                                                 /* Extra Ram */
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);                     /* ROM */
+	map(0x400000, 0x407fff).rom().region("maincpu", 0x400000);              /* Protection Data, roldfrog but not rebus */
+	map(0x408000, 0x4087ff).ram();                                          /* Extra Ram */
 	map(0x800000, 0x83ffff).ram().share("pixelram");                        /* Pixel Layer */
 	map(0x840000, 0x840001).portr("DSW1");
 	map(0x840002, 0x840003).portr("DSW2");
@@ -887,7 +887,7 @@ Note
 */
 
 ROM_START( rebus ) // there's also a year hack dumped: it has 4 different bytes total, 2 to change 1995 to 1997 in two places and 2 corresponding changes to fix the checksum
-	ROM_REGION( 0x408000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x408000, "maincpu", ROMREGION_ERASE00 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u16", 0x000000, 0x080000, CRC(7c8a717f) SHA1(00b1e7986046a7705fc65a5c7d4701a002b2ea6f) )
 	ROM_LOAD16_BYTE( "6.u12", 0x000001, 0x080000, CRC(8f73d548) SHA1(210d95dc0db41da3252a09e598719d98bca41983) )
 	ROM_LOAD16_BYTE( "3.u17", 0x100000, 0x080000, CRC(7495409b) SHA1(b4d75713d31c0b01d7cb7d50a2a89fb3ea4ea42b) )
@@ -1167,9 +1167,10 @@ void splash_state::init_roldfrog()
 
 void splash_state::init_rebus()
 {
+	init_roldfrog();
+
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
-	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 0;
 
 	//d1 clear , regs restore and rte - end of trap $b

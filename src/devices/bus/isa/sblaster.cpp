@@ -16,7 +16,6 @@
 #include "machine/pic8259.h"
 #include "sound/262intf.h"
 #include "sound/spkrdev.h"
-#include "sound/volt_reg.h"
 
 #include "speaker.h"
 
@@ -345,6 +344,7 @@ void sb_device::process_fifo(uint8_t cmd)
 			case 0x17:  // 2-bit ADPCM w/new reference
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
+				[[fallthrough]];
 			case 0x16:  // 2-bit ADPCM
 				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
@@ -407,6 +407,7 @@ void sb_device::process_fifo(uint8_t cmd)
 			case 0x75:  // 4-bit ADPCM w/new reference
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
+				[[fallthrough]];
 			case 0x74:  // 4-bit ADPCM
 				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
@@ -421,6 +422,7 @@ void sb_device::process_fifo(uint8_t cmd)
 			case 0x77:  // 2.6-bit ADPCM w/new reference
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
+				[[fallthrough]];
 			case 0x76:  // 2.6-bit ADPCM
 				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
@@ -554,6 +556,7 @@ void sb_device::process_fifo(uint8_t cmd)
 					{
 						case 0x0f:  // read asp reg
 							queue_r(0);
+							[[fallthrough]];
 						case 0x0e:  // write asp reg
 						case 0x02:  // get asp version
 						case 0x04:  // set asp mode register
@@ -1151,11 +1154,6 @@ void sb_device::common(machine_config &config)
 
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PC_JOY(config, m_joy);
 

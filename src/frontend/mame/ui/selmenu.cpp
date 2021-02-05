@@ -20,10 +20,12 @@
 #include "ui/starimg.ipp"
 #include "ui/toolbar.ipp"
 
+#include "audit.h"
 #include "cheat.h"
 #include "mame.h"
 #include "mameopts.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendfont.h"
@@ -93,6 +95,62 @@ char const *const hover_msg[] = {
 	__("Export displayed list to file"),
 	__("Show DATs view"),
 };
+
+
+void load_image(bitmap_argb32 &bitmap, emu_file &file, std::string const &base)
+{
+	if (file.open(base + ".png") == osd_file::error::NONE)
+	{
+		render_load_png(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".jpg") == osd_file::error::NONE))
+	{
+		render_load_jpeg(bitmap, file);
+		file.close();
+	}
+
+	if (!bitmap.valid() && (file.open(base + ".bmp") == osd_file::error::NONE))
+	{
+		render_load_msdib(bitmap, file);
+		file.close();
+	}
+}
+
+
+void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const &driver)
+{
+	// try to load snapshot first from saved "0000.png" file
+	std::string fullname = driver.name;
+	load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+	// if fail, attempt to load from standard file
+	if (!bitmap.valid())
+		load_image(bitmap, file, fullname);
+
+	// if fail again, attempt to load from parent file
+	if (!bitmap.valid())
+	{
+		// ignore BIOS sets
+		bool isclone = strcmp(driver.parent, "0") != 0;
+		if (isclone)
+		{
+			int const cx = driver_list::find(driver.parent);
+			if ((0 <= cx) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
+				isclone = false;
+		}
+
+		if (isclone)
+		{
+			fullname = driver.parent;
+			load_image(bitmap, file, fullname + PATH_SEPARATOR + "0000");
+
+			if (!bitmap.valid())
+				load_image(bitmap, file, fullname);
+		}
+	}
+}
 
 } // anonymous namespace
 
@@ -306,7 +364,7 @@ menu_select_launch::bios_selection::~bios_selection()
 void menu_select_launch::bios_selection::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_bios)
-		item_append(elem.first, "", 0, (void *)&elem.first);
+		item_append(elem.first, 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
@@ -888,7 +946,7 @@ void menu_select_launch::draw_info_arrow(int ub, float origx1, float origx2, flo
 bool menu_select_launch::draw_error_text()
 {
 	if (m_ui_error)
-		ui().draw_text_box(container(), m_error_text.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		ui().draw_text_box(container(), m_error_text, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	return m_ui_error;
 }
@@ -915,9 +973,8 @@ float menu_select_launch::draw_left_panel(
 	}
 
 	// calculate horizontal offset for unadorned names
-	std::string tmp("_# ");
-	convert_command_glyph(tmp);
-	float const text_sign = ui().get_string_width(tmp.c_str(), text_size);
+	std::string tmp(convert_command_glyph("_# "));
+	float const text_sign = ui().get_string_width(tmp, text_size);
 
 	// get the maximum width of a filter name
 	float left_width(0.0f);
@@ -948,10 +1005,7 @@ float menu_select_launch::draw_left_panel(
 		else
 		{
 			if (current == filter)
-			{
-				str = std::string("_> ");
-				convert_command_glyph(str);
-			}
+				str = convert_command_glyph("_> ");
 			str.append(Filter::display_name(filter));
 		}
 
@@ -981,7 +1035,7 @@ float menu_select_launch::draw_left_panel(
 		// finally draw the text itself and move to the next line
 		float const x1t = x1 + ((str == Filter::display_name(filter)) ? text_sign : 0.0f);
 		ui().draw_text_full(
-				container(), str.c_str(),
+				container(), str,
 				x1t, y1, x2 - x1,
 				ui::text_layout::LEFT, ui::text_layout::NEVER,
 				mame_ui_manager::NORMAL, fgcolor, bgcolor,
@@ -1604,7 +1658,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		switch (local_menu_event.event_type)
 		{
 		// if we are hovering over a valid item, select it with a single click
-		case ui_event::MOUSE_DOWN:
+		case ui_event::type::MOUSE_DOWN:
 			if (m_ui_error)
 			{
 				ev.iptkey = IPT_OTHER;
@@ -1704,7 +1758,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-		case ui_event::MOUSE_DOUBLE_CLICK:
+		case ui_event::type::MOUSE_DOUBLE_CLICK:
 			if (hover() >= 0 && hover() < item_count())
 			{
 				set_selected_index(hover());
@@ -1720,7 +1774,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// caught scroll event
-		case ui_event::MOUSE_WHEEL:
+		case ui_event::type::MOUSE_WHEEL:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				if (local_menu_event.zdelta > 0)
@@ -1750,7 +1804,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			break;
 
 		// translate CHAR events into specials
-		case ui_event::IME_CHAR:
+		case ui_event::type::IME_CHAR:
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
 				stop = true;
@@ -1767,7 +1821,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			}
 			break;
 
-		case ui_event::MOUSE_RDOWN:
+		case ui_event::type::MOUSE_RDOWN:
 			if (hover() >= 0 && hover() < item_count() - skip_main_items - 1)
 			{
 				set_selected_index(hover());
@@ -1790,18 +1844,18 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 		{
 			switch (machine().ui_input().peek_event_type())
 			{
-			case ui_event::MOUSE_DOWN:
-			case ui_event::MOUSE_RDOWN:
-			case ui_event::MOUSE_DOUBLE_CLICK:
-			case ui_event::MOUSE_WHEEL:
+			case ui_event::type::MOUSE_DOWN:
+			case ui_event::type::MOUSE_RDOWN:
+			case ui_event::type::MOUSE_DOUBLE_CLICK:
+			case ui_event::type::MOUSE_WHEEL:
 				stop = true;
 				break;
-			case ui_event::NONE:
-			case ui_event::MOUSE_MOVE:
-			case ui_event::MOUSE_LEAVE:
-			case ui_event::MOUSE_UP:
-			case ui_event::MOUSE_RUP:
-			case ui_event::IME_CHAR:
+			case ui_event::type::NONE:
+			case ui_event::type::MOUSE_MOVE:
+			case ui_event::type::MOUSE_LEAVE:
+			case ui_event::type::MOUSE_UP:
+			case ui_event::type::MOUSE_RUP:
+			case ui_event::type::IME_CHAR:
 				break;
 			}
 		}
@@ -1895,7 +1949,7 @@ void menu_select_launch::draw(uint32_t flags)
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
 		const menu_item &pitem = item(itemnum);
-		const char *itemtext = pitem.text.c_str();
+		const std::string_view itemtext = pitem.text;
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
 		rgb_t fgcolor3 = ui().colors().clone_color();
@@ -1976,14 +2030,14 @@ void menu_select_launch::draw(uint32_t flags)
 		else
 		{
 			int const item_invert = pitem.flags & FLAG_INVERT;
-			const char *subitem_text = pitem.subtext.c_str();
+			std::string_view const subitem_text = pitem.subtext;
 			float item_width, subitem_width;
 
 			// compute right space for subitem
 			ui().draw_text_full(
 					container(),
 					subitem_text,
-					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext.c_str()),
+					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext),
 					ui::text_layout::RIGHT, ui::text_layout::NEVER,
 					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&subitem_width, nullptr);
@@ -2014,7 +2068,7 @@ void menu_select_launch::draw(uint32_t flags)
 	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
-		const char *itemtext = pitem.text.c_str();
+		const std::string_view itemtext = pitem.text;
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
 		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -2146,7 +2200,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 	float text_size = 1.0f;
 	for (auto & elem : buffer)
 	{
-		auto textlen = ui().get_string_width(elem.c_str()) + 0.01f;
+		auto textlen = ui().get_string_width(elem) + 0.01f;
 		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
 		text_size = std::min(text_size, tmp_size);
 	}
@@ -2187,7 +2241,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 					bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 
-		ui().draw_text_full(container(), buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
+		ui().draw_text_full(container(), buffer[cells], x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
 				ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
@@ -2225,41 +2279,16 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			if (software->startempty == 1)
 			{
 				// Load driver snapshot
-				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
+				load_driver_image(tmp_bitmap, snapfile, *software->driver);
 			}
 			else
 			{
 				// First attempt from name list
-				std::string pathname = software->listname;
-				std::string fullname = software->shortname + ".png";
-				render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				load_image(tmp_bitmap, snapfile, software->listname + PATH_SEPARATOR + software->shortname);
 
+				// Second attempt from driver name + part name
 				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap.valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(software->driver->name).append(software->part);
-					fullname.assign(software->shortname).append(".png");
-					render_load_png(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
+					load_image(tmp_bitmap, snapfile, software->driver->name + software->part + PATH_SEPARATOR + software->shortname);
 			}
 
 			m_cache->set_snapx_software(software);
@@ -2284,51 +2313,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		{
 			emu_file snapfile(searchstr, OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap.valid())
-				render_load_jpeg(tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap.valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap.valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap.valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap.valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
+			load_driver_image(tmp_bitmap, snapfile, *driver);
 
 			m_cache->set_snapx_driver(driver);
 			m_switch_image = false;
@@ -2385,7 +2370,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	}
 
 	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
+			snaptext, origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
@@ -2505,6 +2490,20 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 		// apply texture
 		container().add_quad(x1, y1, x2, y2, rgb_t::white(), m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+}
+
+
+std::string menu_select_launch::make_audit_fail_text(bool found, media_auditor const &auditor)
+{
+	std::ostringstream str;
+	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
+	if (found)
+	{
+		auditor.summarize(nullptr, &str);
+		str << "\n";
+	}
+	str << _("Press any key to continue.");
+	return str.str();
 }
 
 
@@ -2681,13 +2680,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_(first)));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		char const *const name(x ? m_items_list[x - 1].c_str() : _(first));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_(first)));
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,
@@ -2734,7 +2733,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (justify == 'f')
 	{
 		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer.c_str(),
+				container(), m_info_buffer,
 				0.0f, 0.0f, 1.0f - (2.0f * gutter_width),
 				xstart, xend,
 				text_size);
@@ -2742,7 +2741,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else
 	{
 		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer.c_str(),
+				container(), m_info_buffer,
 				origx1, origy1, origx2 - origx1 - (2.0f * gutter_width),
 				xstart, xend,
 				text_size);
@@ -2763,7 +2762,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
 		int itemline = r + m_topline_datsview;
-		std::string const tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+		std::string_view const tempbuf(std::string_view(m_info_buffer).substr(xstart[itemline], xend[itemline] - xstart[itemline]));
 		if (tempbuf[0] == '#')
 			continue;
 
@@ -2778,26 +2777,26 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else if (justify == '2') // two-column layout
 		{
 			// split at first tab
-			std::string::size_type const splitpos(tempbuf.find('\t'));
-			std::string const leftcol(tempbuf.substr(0, (std::string::npos == splitpos) ? 0U : splitpos));
-			std::string const rightcol(tempbuf.substr((std::string::npos == splitpos) ? 0U : (splitpos + 1U)));
+			std::string_view::size_type const splitpos(tempbuf.find('\t'));
+			std::string_view const leftcol(tempbuf.substr(0, (std::string_view::npos == splitpos) ? 0U : splitpos));
+			std::string_view const rightcol(tempbuf.substr((std::string_view::npos == splitpos) ? 0U : (splitpos + 1U)));
 
 			// measure space needed, condense if necessary
-			float const leftlen(ui().get_string_width(leftcol.c_str(), text_size));
-			float const rightlen(ui().get_string_width(rightcol.c_str(), text_size));
+			float const leftlen(ui().get_string_width(leftcol, text_size));
+			float const rightlen(ui().get_string_width(rightcol, text_size));
 			float const textlen(leftlen + rightlen);
 			float const tmp_size3((textlen > sc) ? (text_size * (sc / textlen)) : text_size);
 
 			// draw in two parts
 			ui().draw_text_full(
-					container(), leftcol.c_str(),
+					container(), leftcol,
 					origx1 + gutter_width, oy1, sc,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
 					nullptr, nullptr,
 					tmp_size3);
 			ui().draw_text_full(
-					container(), rightcol.c_str(),
+					container(), rightcol,
 					origx1 + gutter_width, oy1, sc,
 					ui::text_layout::RIGHT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
@@ -2807,10 +2806,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else if (justify == 'f' || justify == 'p') // full or partial justify
 		{
 			// check size
-			float const textlen = ui().get_string_width(tempbuf.c_str(), text_size);
+			float const textlen = ui().get_string_width(tempbuf, text_size);
 			float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 			ui().draw_text_full(
-					container(), tempbuf.c_str(),
+					container(), tempbuf,
 					origx1 + gutter_width, oy1, origx2 - origx1,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
@@ -2820,7 +2819,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else
 		{
 			ui().draw_text_full(
-					container(), tempbuf.c_str(),
+					container(), tempbuf,
 					origx1 + gutter_width, oy1, origx2 - origx1,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),

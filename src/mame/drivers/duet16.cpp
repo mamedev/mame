@@ -111,8 +111,7 @@ void duet16_state::fdcctrl_w(u8 data)
 
 	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
 	m_fd[1]->get_device()->mon_w(!BIT(data, 0));
-	if(!BIT(data, 1))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 1));
 
 	// TODO: bit 3 = LSPD
 }
@@ -349,7 +348,6 @@ void duet16_keyboard_devices(device_slot_interface &device)
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )

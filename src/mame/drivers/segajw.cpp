@@ -41,6 +41,8 @@ Also seem to be running on the same/similar hardware:
 
 #include "segajw.lh"
 
+namespace {
+
 class segajw_state : public driver_device
 {
 public:
@@ -59,6 +61,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_READ_LINE_MEMBER(hopper_sensors_r);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t coin_counter_r();
 	void coin_counter_w(uint8_t data);
@@ -66,10 +73,6 @@ private:
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
 	void coinlockout_w(uint8_t data);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void ramdac_map(address_map &map);
 	void segajw_audiocpu_io_map(address_map &map);
@@ -351,6 +354,9 @@ void segajw_state::machine_start()
 	m_lamps.resolve();
 	m_towerlamps.resolve();
 
+	m_coin_start_cycles = 0;
+	m_hopper_start_cycles = 0;
+
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_start_cycles));
 	save_item(NAME(m_coin_counter));
@@ -359,8 +365,6 @@ void segajw_state::machine_start()
 
 void segajw_state::machine_reset()
 {
-	m_coin_start_cycles = 0;
-	m_hopper_start_cycles = 0;
 	m_coin_counter = 0xff;
 }
 
@@ -444,6 +448,8 @@ ROM_START( segajw )
 	ROM_REGION16_BE( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_WORD_SWAP( "14586.epr",   0x00000, 0x80000, CRC(daeb0616) SHA1(17a8bb7137ad46a7c3ac07d22cbc4430e76e2f71) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )

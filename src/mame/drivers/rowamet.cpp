@@ -28,7 +28,6 @@ ToDO:
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "rowamet.lh"
@@ -180,7 +179,7 @@ uint8_t rowamet_state::sound_r()
 
 void rowamet_state::mute_w(uint8_t data)
 {
-	machine().sound().system_enable(data ? 0 : 1);
+	machine().sound().system_mute(data != 0);
 }
 
 uint8_t rowamet_state::io_r(offs_t offset)
@@ -240,9 +239,6 @@ void rowamet_state::rowamet(machine_config &config)
 	/* Sound */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /*-------------------------------------------------------------------

@@ -918,8 +918,6 @@ void mcr68_state::mcr68(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::mcr68_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
-	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
 	PTM6840(config, m_ptm, 7723800 / 10);
 	m_ptm->irq_callback().set_inputline("maincpu", 2);
@@ -937,8 +935,6 @@ void mcr68_state::mcr68(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mcr68);
 	PALETTE(config, "palette").set_format(palette_device::xRBG_333, 64);
-
-	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
 	/* sound hardware -- determined by specific machine */
 	SPEAKER(config, "speaker").front_center();

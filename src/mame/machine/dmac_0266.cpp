@@ -143,12 +143,15 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 		 * adapter waits for more data that the DMAC is not ready to supply.
 		 * It's not clear how the real hardware works - for now this hack
 		 * continues to read and discard data from the device, or write
-		 * arbitrary zero bytes to it until it deasserts the request line.
+		 * arbitrary zero bytes to it until it asserts EOP (driven by IRQ).
 		 */
-		if (m_control & DIRECTION)
-			m_dma_r();
-		else
-			m_dma_w(0);
+		if (!(m_status & INTERRUPT))
+		{
+			if (m_control & DIRECTION)
+				m_dma_r();
+			else
+				m_dma_w(0);
+		}
 
 		return;
 	}

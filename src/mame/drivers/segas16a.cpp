@@ -155,7 +155,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -491,7 +490,9 @@ void segas16a_state::mcu_io_w(offs_t offset, uint8_t data)
 
 		// access text RAM
 		case 1:
-			if (offset >= 0x8000 && offset < 0x9000)
+			if (offset < 0x8000)
+				m_maincpu->space(AS_PROGRAM).write_byte(0x400001 ^ (offset & 0x7fff), data);
+			else if (offset < 0x9000)
 				m_maincpu->space(AS_PROGRAM).write_byte(0x410001 ^ (offset & 0xfff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n", m_mcu->pc(), m_mcu_control, offset, data);
@@ -541,8 +542,11 @@ uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
 
 		// access text RAM
 		case 1:
-			if (offset >= 0x8000 && offset < 0x9000)
+			if (offset < 0x8000)
+				return m_maincpu->space(AS_PROGRAM).read_byte(0x400001 ^ (offset & 0x7fff));
+			else if (offset < 0x9000)
 				return m_maincpu->space(AS_PROGRAM).read_byte(0x410001 ^ (offset & 0xfff));
+
 			logerror("%03X: MCU movx read mode %02X offset %04X\n", m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 
@@ -2008,9 +2012,6 @@ void segas16a_state::system16a(machine_config &config)
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.43);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -2065,7 +2066,6 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	config.device_remove("n7751");
 	config.device_remove("n7751_8243");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2100,7 +2100,6 @@ void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2113,7 +2112,6 @@ void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2126,7 +2124,6 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 
 	config.device_remove("n7751");
 	config.device_remove("dac");
-	config.device_remove("vref");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);

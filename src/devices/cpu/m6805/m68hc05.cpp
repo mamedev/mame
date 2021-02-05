@@ -952,7 +952,7 @@ m68hc705c4a_device::m68hc705c4a_device(machine_config const &mconfig, char const
 			M68HC705C4A,
 			13,
 			address_map_constructor(FUNC(m68hc705c4a_device::c4a_map), this))
-	, m_rom(*this, DEVICE_SELF, 0x2000)
+	, m_rom(*this, DEVICE_SELF)
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -1048,7 +1048,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			M68HC705C8A,
 			13,
 			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
-	, m_rom(*this, DEVICE_SELF, 0x2000)
+	, m_rom(*this, DEVICE_SELF)
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }

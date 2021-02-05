@@ -63,6 +63,7 @@ private:
 	// devices
 	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
+	required_device<ym2151_device> m_ym2151;
 	required_device<hc55516_device> m_hc55516;
 
 	required_memory_bank m_rombank;

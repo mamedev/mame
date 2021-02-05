@@ -47,7 +47,6 @@ Cyber Animater                                                Fujitsu           
 CyberMotion                                                   Fujitsu                           1993/3     FD
 D.O. Kaizokuban                                               Brother Kougyou (Takeru)          1993/5     FD×03
 Daisenryaku 3 '90 Map Collection Vol. 2                       Pegasus Japan                     1992/7     FD
-Darwin's Dilemma                                              Starcraft                         1991/8     FD
 Data Townsman                                                 Log                               1991/7     FD
 Dennou Kyoushi (Cyber Teacher)                                Nikkonren Kikaku                  1993/?     FD
 Dennou Sakka DX                                               Nikkonren Kikaku                  1993/?     FD×02
@@ -84,7 +83,6 @@ Geitassha Towns (Data Shuu)                                   Shoubi Gakuen     
 Gokanshi                                                      Tensui Software                   1995/7     FD
 Gorby no Pipeline Daisakusen                                  Compile                           1991/4     FD
 Grapharmony V1.0                                              Fujitsu                           1992/3     FD
-Gyakutama Ou                                                  Grocer                            1995/1     FD×05
 Hametaoshi Tool                                               Nikkonren Kikaku                  1995/12    FD×02
 Hana yori Dango                                               Active                            1992/4     FD×03
 Healthy Life 2 Ryouri Data                                    Top Business System               1993/7     FD
@@ -155,20 +153,17 @@ Nihongo MS-DOS V6.2 (Basic)                                   Fujitsu           
 Nihongo MS-DOS V6.2 (Extended)                                Fujitsu                           1994/2     FD
 Nihongo MS-Windows V3.0                                       Fujitsu                           1992/12    FD
 Nonomura Byouin no Hitobito                                   Silky's                           1994/7     FD×05
-Oh! Pai                                                       Silky's                           1993/9     FD×05
 Orihime V1.0                                                  Yoshikawa Systec                  1993/8     FD
 Otoko to Onna no Aishou Shindan                               System House Space                1993/6     FD
 PC Globe 5.0                                                  Hiro                              1995/3     FD×04
 Planetary Campaign                                            Nikkonren Kikaku                  1993/?     FD
 Pleria                                                        Orange House                      1992/7     FD×05
 Ponyon                                                        Ponytail Soft                     1992/9     FD×04
-Premium                                                       Silky's                           1992/11    FD×04
 Present 2                                                     Orange House                      1992/10    FD×05
 Purple Cat Vol. 1                                             Palm Tree                         1993/3     FD×02
 Purple Cat Vol. 2                                             Palm Tree                         1993/6     FD×04
 Purple Cat Vol. 3                                             Palm Tree                         1993/10    FD×05
 Purupuru Paradise                                             Palm Tree                         1994/1     FD×05
-Quiz Banchou                                                  Active                            1992/5     FD×03
 School-Ace Alpha HG Seito-you                                 Fujitsu                           1994/7     FD×03
 School-Ace Alpha: Seito-you                                   Fujitsu                           1991/7     FD
 School-Ace Alpha: Sensei-you                                  Fujitsu                           1991/7     FD
@@ -180,7 +175,6 @@ School-Card Alpha Sensei Kit                                  Fujitsu           
 School-Edin Alpha Sensei-you V1.1 L10                         Fujitsu                           1993/5     FD
 Schoolmenu Henshuu-you                                        Fujitsu                           1994/9     FD
 Schoolmenu Jikkou-you                                         Fujitsu                           1994/9     FD
-Shangrlia                                                     Elf                               1992/1     FD×04
 Shin Kakeibo Good Manager                                     Cosmos Computer                   1992/7     FD×02
 Shisetsu Sangokushi                                           Tensui Software                   1993/9     FD
 Shisetsu Sengoku Jidai                                        Tensui Software                   1994/6     FD
@@ -243,7 +237,6 @@ Towns Jouhou Kiso Select-F                                    Tokyo Shoseki     
 TownsGEAR de Obenkyou Dai-1-kan: Seigo Mondai                 Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-2-kan: Sentaku Mondai               Kyouiku Soft Kenkyuusho           1992/3     FD×02
 TownsGEAR de Obenkyou Dai-3-kan: Suuchi Mondai                Kyouiku Soft Kenkyuusho           1992/3     FD×02
-Traffic Confusion                                             Masterpiece                       1992/6     FD×02
 Type Master Oshitaoshi                                        Nikkonren Kikaku                  1992/7     FD
 Video Library V1.1                                            Fujitsu                           1991/10    FD
 Video Library V2.1                                            Fujitsu                           1992/12    FD
@@ -460,6 +453,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
 	<software name="aishimai">
 		<description>Ai Shimai - Futari no Kajitsu</description>
 		<year>1994</year>
@@ -544,6 +538,38 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!--
+	Compatible with FM Towns, FM-R50 and FM-16 Beta.
+	All the text is misplaced in MAME, confirmed to not happen on real hardware.
+	Dumped from the original disks, no protection.
+	-->
+	<software name="bunkun" supported="no">
+		<description>Bun-kun Series - Youji Kiso Nouryoku Training Soft Set</description>
+		<year>1989?</year>
+		<publisher>日本教育情報センター (JEIC)</publisher>
+		<info name="alt_title" value="文君シリーズ　幼児　基礎能力トレーニングソフト・セット" />
+		<info name="usage" value="Prepare a bootable MS-DOS 3.1 disk and insert it on drive B. Insert one of the 3 original disks on drive A and run SETTW.BAT to install the program to the bootable disk." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="方向と迷路 / Houkou to Meiro" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - houkou to meiro.hdm" size="1261568" crc="c65dbb07" sha1="20837c3f5d6c1f92d668eadb3106ae5ba048c415"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="相似と順列 / Souji to Junretsu" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - souji to junretsu.hdm" size="1261568" crc="9866bb7b" sha1="a2eb5b5bf1d4575457ee8f62a1c8fa49d1bb12b8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="選択と記憶 / Sentaku to Kioku" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bun-kun - sentaku to kioku.hdm" size="1261568" crc="fa4ca205" sha1="3d52402adc2a37be62293488746821bf43687ad1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disk. Track 1 side 0 is protected (overlapped sectors). -->
 	<software name="cameltry">
 		<description>Cameltry</description>
 		<year>1994</year>
@@ -571,8 +597,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disk, no protection -->
 	<software name="dai3map1">
-		<!-- Origin: Private dump (r09) -->
 		<description>Daisenryaku III '90 Map Collection Vol. 1</description>
 		<year>1992</year>
 		<publisher>ペガサスジャパン (Pegasus Japan)</publisher>
@@ -586,6 +612,21 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disk, no protection -->
+	<software name="darwin">
+		<description>Darwin's Dilemma - The Solution Is Evolution</description>
+		<year>1991</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="ダーウィンズジレンマ" />
+		<info name="release" value="199108xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="darwins_dilemma.hdm" size="1261568" crc="61b65e1f" sha1="f5a109ac842fba5dfc15c9729085da4a71426b26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
 	<software name="dokyuse2sp">
 		<description>Doukyuusei 2 Special Disk</description>
 		<year>1995</year>
@@ -612,6 +653,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
 	<software name="dor">
 		<description>DOR</description>
 		<year>1992</year>
@@ -644,6 +686,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
 	<software name="dor3">
 		<description>DOR Part 3</description>
 		<year>1992</year>
@@ -790,6 +833,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks. The program disk matches the cracked version, but the other 2 have variable-size and overlapped sectors on track 6 head 0 -->
 	<software name="dinosaur">
 		<description>Dinosaur</description>
 		<year>1991</year>
@@ -799,24 +843,73 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 1 - program).hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
+				<rom name="dinosaur_program_disk.hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 1" />
+			<dataarea name="flop" size="3528460">
+				<rom name="dinosaur_scenario_disk_1.mfm" size="3528460" crc="b2144bf0" sha1="9ca582cbb17e9f1e82535cbe91c71b5c81f05dc9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 2" />
+			<dataarea name="flop" size="3528406">
+				<rom name="dinosaur_scenario_disk_2.mfm" size="3528406" crc="57a79dcb" sha1="99425a1fd67e247f5133bfad50840bc3da08dc6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinosaurc" cloneof="dinosaur">
+		<description>Dinosaur (cracked)</description>
+		<year>1991</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ダイナソア" />
+		<info name="release" value="199110xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur_program_disk.hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 2 - scenario 1).hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
+				<rom name="dinosaur_scenario_disk_1_cracked.hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Scenario Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur (disk 3 - scenario 2).hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
+				<rom name="dinosaur_scenario_disk_2_cracked.hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="dknight4sp">
+		<description>Dragon Knight 4 Special Disk</description>
+		<year>1994</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="ドラゴンナイト4　スペシャルディスク" />
+		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Dragon Knight 4 CD, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dknight4_specialdisk_a.hdm" size="1261568" crc="87afed79" sha1="dee027d6f9b52e2aeedc06087f1f226994e896bf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dknight4_specialdisk_b.hdm" size="1261568" crc="91f63bfb" sha1="6bed33c1fa6b88a752af6f912280f4fa1dbaefa3"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!--
+	Dumped from the original disks, all of them are protected (additional track).
+
 	The program disk backup option (needed in order to actually be able to save the game) seems to require a destination disk with 78 writable tracks,
 	instead of the usual 77. Creating an empty MFI image and using it as the target works, and the saves persist between MAME sessions.
 
@@ -850,6 +943,9 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 	</software>
 
 	<!--
+	Dumped from the original disks. Track 4 side 0 of Scenario Sisk 1, track 9 side 0 of Scenario Disk 2, and track 44 side 0 of
+	Scenario Disk 3 are protected (overlapped and variable-size sectors).
+
 	The Program Disk is modified, as it was intended to be used to save the game, but it's possible to create a new fresh copy with the
 	プログラムディスクのバックアップ (Program Disk backup) option. This requires the Master Program Disk, which is not bootable by itself.
 	-->
@@ -910,6 +1006,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
 	<software name="elle">
 		<description>Elle</description>
 		<year>1991</year>
@@ -948,11 +1045,54 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Compatible with the FM-R series -->
+	<software name="fbhc1231">
+		<description>F-BASIC86HG Interpreter/Compiler V1.2 L31A</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="fb86interpreter.hdm" size="1261568" crc="85bc0e54" sha1="dcab9f194092c7f816d274bb7cc07d8338d4f608"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Compatible with the FM-R series -->
+	<software name="fbhi1231">
+		<description>F-BASIC86HG Interpreter V1.2 L31A</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="fb86compiler.hdm" size="1261568" crc="6d57f1f7" sha1="0d0e6a0500e0210724c758b7c55999f61e6934c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Dumped from the original disk, no protection.
+	Bundled with "Oh! FM Towns Shinsoukan No.1" magazine.
+	-->
+	<software name="futoph01">
+		<description>Futoppara FD Heisei 1-gou</description>
+		<year>1991</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成1号" />
+		<info name="release" value="199110xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara_fd_heisei_1.hdm" size="1261568" crc="e52845bb" sha1="73aba829fa729b253723ee0a062a3ba5a6d10899"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1992)" magazine. -->
 	<software name="futoph02">
-		<description>Futoppara FD Heisei #02</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 2-gou</description>
+		<year>1992</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成2号" />
+		<info name="release" value="199204xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9"/>
@@ -960,11 +1100,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1992)" magazine. -->
 	<software name="futoph03">
-		<description>Futoppara FD Heisei #03</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 3-gou</description>
+		<year>1992</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成3号" />
+		<info name="release" value="199208xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8"/>
@@ -972,11 +1114,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Fuyu no Tokubetsu-gou (1992)" magazine. -->
 	<software name="futoph04">
-		<description>Futoppara FD Heisei #04</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 4-gou</description>
+		<year>1992</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成4号" />
+		<info name="release" value="199212xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5"/>
@@ -984,11 +1128,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1993)" magazine. -->
 	<software name="futoph05">
-		<description>Futoppara FD Heisei #05</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 5-gou</description>
+		<year>1993</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成5号" />
+		<info name="release" value="199303xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6"/>
@@ -996,11 +1142,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1993)" magazine. -->
 	<software name="futoph06">
-		<description>Futoppara FD Heisei #06</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 6-gou</description>
+		<year>1993</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成6号" />
+		<info name="release" value="199308xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb"/>
@@ -1008,11 +1156,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Aki no Tokubetsu-gou (1993)" magazine. -->
 	<software name="futoph07">
-		<description>Futoppara FD Heisei #07</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 7-gou</description>
+		<year>1993</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成7号" />
+		<info name="release" value="199311xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c"/>
@@ -1020,11 +1170,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1994)" magazine. -->
 	<software name="futoph08">
-		<description>Futoppara FD Heisei #08</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 8-gou</description>
+		<year>1994</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成8号" />
+		<info name="release" value="199403xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6"/>
@@ -1032,11 +1184,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Shoka no Tokubetsu-gou (1994)" magazine. -->
 	<software name="futoph09">
-		<description>Futoppara FD Heisei #09</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 9-gou</description>
+		<year>1994</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成9号" />
+		<info name="release" value="199406xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd"/>
@@ -1044,14 +1198,37 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns" magazine, March 1995 issue. -->
 	<software name="futoph10">
-		<description>Futoppara FD Heisei #10</description>
-		<year>199?</year>
+		<description>Futoppara FD Heisei 10-gou</description>
+		<year>1995</year>
 		<publisher>SoftBank</publisher>
 		<info name="alt_title" value="太っ腹FD平成10号" />
+		<info name="release" value="199503xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Probably FM-R compatible. It seems to require a specific version of MS-DOS that isn't currently dumped.
+	Dumped from the original disks, no protection.
+	-->
+	<software name="gokickj" supported="no">
+		<description>Jissen Igo Taikyoku - Gokichi-kun - Chuukyuu (Jou)</description>
+		<year>1989</year>
+		<publisher>ジーエーエム (GAM)</publisher>
+		<info name="alt_title" value="実戦囲碁対局　碁キチくん 中級（上）" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="jissen_igo_taikyoku_gokichi-kun_chuukyuu_jou_disk_a.hdm" size="1261568" crc="f8b4294d" sha1="58d6f13fa1622452eefaab6a1d47b9a4348c2fab"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="jissen_igo_taikyoku_gokichi-kun_chuukyuu_jou_disk_b.hdm" size="1261568" crc="f833ae7a" sha1="ff3ed44ae9ff071f37b1fd107c5c7a366c32fae4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1459,6 +1636,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks. Track 3 side 0 of Disk A is protected (overlapped sectors). -->
 	<software name="maririndx">
 		<description>Super Ultra Mucchin Puripuri Cyborg Maririn DX</description>
 		<year>1994</year>
@@ -1466,7 +1644,6 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="スーパーウルトラむっちんぷりぷりサイボーグマリリンＤＸ" />
 		<info name="release" value="199404xx" />
 		<info name="usage" value="Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
-		<!-- Copy protected disk, invalid sector headers on track 3 -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3594134">
@@ -1487,6 +1664,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="mightmgw">
+		<description>Might and Magic - World of Xeen</description>
+		<year>1994</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="ワールド・オブ・ジーン" />
+		<info name="usage" value="This disk combines MM4 and MM5 into a single game. Requires 4 MB RAM, both CDs and a save disk from either game. Boot TownsOS 2.1 and run the icon on drive A to install." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="might and magic - world of xeen (install disk).hdm" size="1261568" crc="42475067" sha1="f4a7c497b185f707ed2bf7077801adfcd20b5278"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjfantt">
 		<description>Mahjong Gensoukyoku / Mahjong Fantasia Taikenban</description>
 		<year>1992</year>
@@ -1499,6 +1689,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disk, no protection -->
 	<software name="musicpro">
 		<description>Music Pro-Towns (1990-05-23)</description>
 		<year>1989</year>
@@ -1523,6 +1714,82 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!--
+	Dumped from the original disks, no protection.
+	The disk labels are in hiragana and don't quite match the usual pronunciation of those letters. They are reproduced verbatim here.
+	-->
+	<software name="ohpai">
+		<description>Oh! Pai</description>
+		<year>1993</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="release" value="199309xx" />
+		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A / えぃ" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ohpai_disk_a.hdm" size="1261568" crc="d08f4200" sha1="00612e8284411d946679dfe7b8fd9eafa55efd09"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B / びぃ" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ohpai_disk_b.hdm" size="1261568" crc="91f57fc9" sha1="38b0a2ad47e5057534d0f3d1a2d722adb464a00e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C / しぃ" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ohpai_disk_c.hdm" size="1261568" crc="a547e1b8" sha1="a6c19e53adbddfc8691aa5fe09efbca962f6186d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D / でえぃ" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ohpai_disk_d.hdm" size="1261568" crc="7fac0f31" sha1="3f35953a1cc2496c979a2fe1527b4173f3d2bdd9"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E / い～" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ohpai_disk_e.hdm" size="1261568" crc="cb26de6b" sha1="1be5f1fff8826868f26aa90c4f9b688c1e753425"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="premium">
+		<description>Premium</description>
+		<year>1992</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="プレミアム" />
+		<info name="release" value="199211xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="premium_disk_a.hdm" size="1261568" crc="d4bc45e4" sha1="37d5af4ad0a663a6a2baed4346e692e6cad5e389"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="premium_disk_b.hdm" size="1261568" crc="7c36fb9d" sha1="a8d4ff974c312658e52da4e051b3189487605aae"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="premium_disk_c.hdm" size="1261568" crc="515b0f00" sha1="05a792825262684dc45cb1cdd0946ca6a85b456b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="premium_disk_d.hdm" size="1261568" crc="2ecf8e61" sha1="0ea7cbd8138280f40d48cce8d0e9ae0394e277d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
 	<software name="premium2">
 		<description>Premium 2</description>
 		<year>1993</year>
@@ -1547,6 +1814,33 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="premium 2 (disk 4).hdm" size="1261568" crc="5723ce84" sha1="5948e0ba82688fe321be6b49402722768996c63e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="quizban">
+		<description>Quiz Banchou</description>
+		<year>1992</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="クイズ番長" />
+		<info name="release" value="199205xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="quiz_banchou_disk_a.hdm" size="1261568" crc="be4adc3b" sha1="c0550d40d21fc5ee8c07c5c6b2e5776569ac929d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="quiz_banchou_disk_b.hdm" size="1261568" crc="06d5af3b" sha1="ef8cf36a5be954b1ed926695a4656b0def1445fe"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="quiz_banchou_disk_c.hdm" size="1261568" crc="15c2aaa3" sha1="edd328e77e74ca86aaaec41379f2883014a00e54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1734,6 +2028,40 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
+	<software name="shangrl">
+		<description>Shangrlia</description>
+		<year>1992</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="シャングリラ" />
+		<info name="release" value="199201xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia_disk_a.hdm" size="1261568" crc="99f9e8b8" sha1="54b891ef83c3fe41b5f35c39a7aee14bd1e294ce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia_disk_b.hdm" size="1261568" crc="61cfbdf5" sha1="9c2c1a8e9ddce049490ad8e75bff6ba9203b657e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia_disk_c.hdm" size="1261568" crc="c331b6bc" sha1="c7c49a33d5a6a3c5ba19e6e224a0c55d7d7d8403"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia_disk_d.hdm" size="1261568" crc="14be7807" sha1="3d77dbfdfd67c48161617cd0841cf9a54d5b2aa0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
 	<software name="shangrl2sp">
 		<description>Shangrlia 2 Special Disk</description>
 		<year>1993</year>
@@ -1849,6 +2177,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disks, no protection -->
 	<software name="sweetang">
 		<description>Sweet Angel</description>
 		<year>1992</year>
@@ -1965,6 +2294,27 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="trafconf">
+		<description>Traffic Confusion</description>
+		<year>1992</year>
+		<publisher>マスターピース (Masterpiece)</publisher>
+		<info name="alt_title" value="トラフィックコンフュージョン" />
+		<info name="release" value="199206xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="traffic confusion (system disk).hdm" size="1261568" crc="5b02ec79" sha1="e9223c67b18e53ce906ca65f29cf2807604fc124"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="traffic confusion (user disk).hdm" size="1261568" crc="a639e9b5" sha1="df1566fbbbd512e89aac75ca26664cceda3b0272"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2139,6 +2489,99 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="wrestle angels 2 (disk e).hdm" size="1261568" crc="ab3474d9" sha1="ea36d0bd3bbfdf057e9487be6a2ed761c3b66e9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="wedderra">
+		<description>Wedding Errantry - Gyakutama Ou</description>
+		<year>1995</year>
+		<publisher>グローサー (Grocer)</publisher>
+		<info name="alt_title" value="ウエディング・エラントリー 逆玉王" />
+		<info name="release" value="199501xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk a).hdm" size="1261568" crc="aaaafda4" sha1="0f11a09a075384d9a796cdfc67a9170a17b0b3c6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk b).hdm" size="1261568" crc="edaad3bd" sha1="87cec9967eaef39ac639825e9e9677fdba4ac02b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk c).hdm" size="1261568" crc="c4c805f0" sha1="72c5a1f0ceb0aa977f007de32204149a800913ac"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk d).hdm" size="1261568" crc="ebeae4bf" sha1="34d7a971381b12f3340a6991e376faeccfeadd13"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk e).hdm" size="1261568" crc="62317ff3" sha1="3505721f2f256f80bd8463e1dd90662cc60e95e6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="wedding errantry - gyakutama ou (disk f).hdm" size="1261568" crc="ec99238a" sha1="70eb057a67ffab0072473e37ed3fa39f81492917"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Dumped from the original disks, no protection.
+	Compatible with FM-R50, Panacom M353, FM Note Book, Panacom Pro Note and FM Towns, according to the box.
+	-->
+	<software name="yajipr2">
+		<description>Yajiuma Pennant Race 2</description>
+		<year>1990</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="serial" value="F-3552"/>
+		<info name="alt_title" value="やじうまペナントレース２" />
+		<info name="usage" value="Prepare a MS-DOS 3.1 boot disk with the GDS.SYS driver loaded, boot from it and run YAJI.EXE from Disk A" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<feature name="disk_serial" value="F-3552" />
+			<dataarea name="flop" size="1261568">
+				<rom name="yajiuma_pennant_race2_disk_a.hdm" size="1261568" crc="2c16da57" sha1="7811b2c00e59a4d89bd337567631fc9cf10a8017"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="disk_serial" value="F-3553" />
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="yajiuma_pennant_race2_disk_b.hdm" size="1261568" crc="6a21247c" sha1="4962f3c2080700fb8c3a979692e21bbd282518eb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="disk_serial" value="F-3554" />
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="yajiuma_pennant_race2_disk_c.hdm" size="1261568" crc="a741b38a" sha1="571c5abee9b8b1fc67239cdd5d566ec376e674ba"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="disk_serial" value="F-3555" />
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="yajiuma_pennant_race2_disk_d.hdm" size="1261568" crc="c02a294c" sha1="bcd8fc41d24c7967e52df29f94e22ee7255641e8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="disk_serial" value="F-3556" />
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="yajiuma_pennant_race2_disk_e.hdm" size="1261568" crc="ba33ff7f" sha1="43a4de18e2485426b88bfc59906ca7d2a5e55cee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2473,6 +2916,31 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!--
+	Runs too fast and has some slight graphical glitches in the score display.
+	Most of the visual artifacts (missing sprites in the water and explosions, for example) aren't emulation bugs, they also happen on real hardware.
+	-->
+	<software name="metalbld" supported="partial">
+		<description>Metal Blade</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Laizaps" />
+		<info name="alt_title" value="メタルブレード" />
+		<info name="usage" value="Boot TownsOS V1.1, then run the icon on drive A: with both floppy disks mounted" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size = "1261568">
+				<rom name="metal blade a.hdm" size="1261568" crc="f1eee349" sha1="8125d8d11477887a958ef8d10b63872ccb26917f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "1261568">
+				<rom name="metal blade b.hdm" size="1261568" crc="aa170a51" sha1="4f29e03d230db84c62347cdb9024e1853ba654dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mister">
 		<description>Mister - Meitantei Toujou</description>
 		<year>2014</year>
@@ -2558,6 +3026,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Dumped from the original disk, no protection -->
 	<software name="sa2">
 		<description>S. A. 2</description>
 		<year>1994</year>

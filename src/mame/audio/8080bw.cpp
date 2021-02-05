@@ -109,16 +109,16 @@ void _8080bw_state::invadpt2_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	m_sn->enable_w(!(data & 0x01));         /* SAUCER SOUND */
+	m_sn->enable_w(!BIT(data, 0));                      // SAUCER SOUND
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* MISSLE SOUND */
-	if (rising_bits & 0x04) m_samples->start(1, 1);     /* EXPLOSION */
-	if (rising_bits & 0x08) m_samples->start(2, 2);     /* INVADER HIT */
-	if (rising_bits & 0x10) m_samples->start(5, 8);     /* BONUS MISSILE BASE */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // MISSLE SOUND
+	if (BIT(rising_bits, 2)) m_samples->start(1, 1);    // EXPLOSION
+	if (BIT(rising_bits, 3)) m_samples->start(2, 2);    // INVADER HIT
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);    // BONUS MISSILE BASE
 
 	m_screen_red = data & 0x04;
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
@@ -134,11 +134,11 @@ void _8080bw_state::invadpt2_sh_port_2_w(uint8_t data)
 
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 3);    // FLEET
+	if (BIT(rising_bits, 1)) m_samples->start(4, 4);    // FLEET
+	if (BIT(rising_bits, 2)) m_samples->start(4, 5);    // FLEET
+	if (BIT(rising_bits, 3)) m_samples->start(4, 6);    // FLEET
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // SAUCER HIT
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 	m_color_map = BIT(data, 5);
@@ -158,11 +158,11 @@ void _8080bw_state::spacerng_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 3);    // FLEET
+	if (BIT(rising_bits, 1)) m_samples->start(4, 4);    // FLEET
+	if (BIT(rising_bits, 2)) m_samples->start(4, 5);    // FLEET
+	if (BIT(rising_bits, 3)) m_samples->start(4, 6);    // FLEET
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // SAUCER HIT
 
 	m_flip_screen = BIT(~data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -179,13 +179,13 @@ void _8080bw_state::spcewars_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	m_sn->enable_w(!(data & 0x01));         /* Saucer Sound */
+	m_sn->enable_w(!BIT(data, 0));                      // Saucer Sound
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(1, 1);     /* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(2, 2);     /* Invader Hit */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(1, 1);    // Base Hit
+	if (BIT(rising_bits, 3)) m_samples->start(2, 2);    // Invader Hit
 
-	m_speaker->level_w(BIT(data, 4));      /* Various bitstream tunes */
+	m_speaker->level_w(BIT(data, 4));                   // Various bitstream tunes
 
 	m_port_1_last_extra = data;
 }
@@ -217,13 +217,13 @@ void _8080bw_state::lrescue_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);     /* Thrust */
-	if (rising_bits & 0x02) m_samples->start(1, 2);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Death */
-	if (rising_bits & 0x08) m_samples->start(1, 0);     /* Alien Hit */
-	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Ship (not confirmed) */
+	if (BIT(rising_bits, 0)) m_samples->start(0, 3);    // Thrust
+	if (BIT(rising_bits, 1)) m_samples->start(1, 2);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);    // Death
+	if (BIT(rising_bits, 3)) m_samples->start(1, 0);    // Alien Hit
+	if (BIT(rising_bits, 4)) m_samples->start(2, 5);    // Bonus Ship (not confirmed)
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_screen_red = data & 0x04;
 
@@ -233,15 +233,16 @@ void _8080bw_state::lrescue_sh_port_1_w(uint8_t data)
 void _8080bw_state::lrescue_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
+	uint8_t falling_bits = ~data & m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 8);     /* Footstep high tone */
-	if (rising_bits & 0x02) m_samples->start(1, 7);     /* Footstep low tone */
-	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Bonus when counting men saved */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 8);    // Footstep high tone
+	if (BIT(rising_bits, 1)) m_samples->start(1, 7);    // Footstep low tone
+	if (BIT(rising_bits, 2)) m_samples->start(1, 4);    // Bonus when counting men saved
 
-	m_speaker->level_w(BIT(data, 3));                   /* Bitstream tunes - endlevel and bonus1 */
+	m_speaker->level_w(BIT(data, 3));                   // Bitstream tunes - endlevel and bonus1
 
-	if (rising_bits & 0x10) m_samples->start(3, 6);     /* Shooting Star and Rescue Ship sounds */
-	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3); /* This makes the rescue ship sound beep on and off */
+	if (BIT(rising_bits, 4)) m_samples->start(3, 6);    // Shooting Star and Rescue Ship sounds
+	if (BIT(falling_bits, 4)) m_samples->stop(3);       // This makes the rescue ship sound beep on and off
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -324,13 +325,13 @@ void _8080bw_state::ballbomb_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 2);     /* Hit a balloon */
-	if (rising_bits & 0x02) m_samples->start(2, 0);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 1);     /* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(1, 7);     /* Hit a Bomb */
-	if (rising_bits & 0x10) m_samples->start(3, 8);     /* Bonus Base at 1500 points */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 2);    // Hit a balloon
+	if (BIT(rising_bits, 1)) m_samples->start(2, 0);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(2, 1);    // Base Hit
+	if (BIT(rising_bits, 3)) m_samples->start(1, 7);    // Hit a Bomb
+	if (BIT(rising_bits, 4)) m_samples->start(3, 8);    // Bonus Base at 1500 points
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_screen_red = data & 0x04;
 
@@ -341,9 +342,9 @@ void _8080bw_state::ballbomb_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (data & 0x01) m_samples->start(0, 7);        /* Indicates plane will drop bombs */
-	if (data & 0x04) m_samples->start(0, 4);        /* Plane is dropping new balloons at start of level */
-	if (rising_bits & 0x10) m_samples->start(2, 2);     /* Balloon hit and bomb drops */
+	if (BIT(data, 0)) m_samples->start(0, 7);           // Indicates plane will drop bombs
+	if (BIT(data, 2)) m_samples->start(0, 4);           // Plane is dropping new balloons at start of level
+	if (BIT(rising_bits, 4)) m_samples->start(2, 2);    // Balloon hit and bomb drops
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -400,12 +401,12 @@ void _8080bw_state::indianbt_sh_port_1_w(uint8_t data)
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 7);     /* Death */
-	if (rising_bits & 0x02) m_samples->start(0, 1);     /* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 3);     /* Move */
-	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 7);    // Death
+	if (BIT(rising_bits, 1)) m_samples->start(0, 1);    // Shot Sound
+	if (BIT(rising_bits, 2)) m_samples->start(2, 3);    // Move
+	if (BIT(rising_bits, 3)) m_samples->start(3, 2);    // Hit
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
@@ -414,10 +415,10 @@ void _8080bw_state::indianbt_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 0);     /* Bird dropped an egg, Lasso used */
-	if (rising_bits & 0x02) m_samples->start(4, 2);     /* Egg hatches, egg shot */
-	if (rising_bits & 0x08) m_samples->start(5, 0);     /* Grabber, Lasso caught something */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Lasso sound */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 0);    // Bird dropped an egg, Lasso used
+	if (BIT(rising_bits, 1)) m_samples->start(4, 2);    // Egg hatches, egg shot
+	if (BIT(rising_bits, 3)) m_samples->start(5, 0);    // Grabber, Lasso caught something
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // Lasso sound
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -433,11 +434,11 @@ void _8080bw_state::indianbtbr_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 7);     /* Lasso */
-	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Shot Sound */
-	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
+	if (BIT(rising_bits, 0)) m_samples->start(4, 7);    // Lasso
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);    // Shot Sound
+	if (BIT(rising_bits, 3)) m_samples->start(3, 2);    // Hit
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
@@ -446,8 +447,8 @@ void _8080bw_state::indianbtbr_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x08) m_samples->start(2, 3);     /* Move */
-	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Death */
+	if (BIT(rising_bits, 3)) m_samples->start(2, 3);    // Move
+	if (BIT(rising_bits, 4)) m_samples->start(3, 7);    // Death
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -999,7 +1000,7 @@ void _8080bw_state::schaser_sh_port_2_w(uint8_t data)
 	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 
 	m_discrete->write(SCHASER_SND_EN, BIT(data, 1));
-	machine().sound().system_enable(BIT(data, 1));
+	machine().sound().system_mute(!BIT(data, 1));
 
 	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
 
@@ -1110,9 +1111,9 @@ void _8080bw_state::rollingc_sh_port_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_3_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(4, 0); /* Steering */
-	if (rising_bits & 0x04) m_samples->start(0, 1); /* Collision */
-	if (rising_bits & 0x10) m_samples->start(1, 8); /* Computer car is starting to move */
+	if (BIT(rising_bits, 1)) m_samples->start(4, 0); // Steering
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1); // Collision
+	if (BIT(rising_bits, 4)) m_samples->start(1, 8); // Computer car is starting to move
 
 	m_port_3_last_extra = data;
 }
@@ -1127,13 +1128,13 @@ void _8080bw_state::rollingc_sh_port_w(uint8_t data)
 const char *const lupin3_sample_names[] =
 {
 	"*lupin3",
-	"cap",      /* go to jail */
-	"bark",     /* dog barking */
-	"walk1",        /* walk, get money */
-	"walk2",        /* walk, get money */
-	"warp",     /* translocate, deposit money */
-	"extend",       /* bonus man */
-	"kick",     /* lands on top of building, wife kicks man */
+	"cap",      // go to jail
+	"bark",     // dog barking
+	"walk1",    // walk, get money
+	"walk2",    // walk, get money
+	"warp",     // translocate, deposit money
+	"extend",   // bonus man
+	"kick",     // lands on top of building, wife kicks man
 	nullptr
 };
 
@@ -1147,21 +1148,21 @@ void _8080bw_state::lupin3_sh_port_1_w(uint8_t data)
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 	static uint8_t lupin3_step = 2;
 
-	if (rising_bits & 0x01)
+	if (BIT(rising_bits, 0))
 	{
-		m_samples->start(0, lupin3_step);           /* Walking, steal money */
+		m_samples->start(0, lupin3_step);               // Walking, steal money
 		lupin3_step ^= 1;
 	}
 
-	m_sn->enable_w(data & 0x02 ? 0:1);          /* Helicopter */
+	m_sn->enable_w(BIT(~data, 1));                      // Helicopter
 
-	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Translocate */
-	if (rising_bits & 0x08) m_samples->start(0, 0);     /* Jail */
-	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Man */
+	if (BIT(rising_bits, 2)) m_samples->start(1, 4);     // Translocate
+	if (BIT(rising_bits, 3)) m_samples->start(0, 0);     // Jail
+	if (BIT(rising_bits, 4)) m_samples->start(2, 5);     // Bonus Man
 
-	//machine().sound().system_enable(data & 0x20);
+	//machine().sound().system_mute(!BIT(data, 5));
 
-	//machine().bookkeeping().coin_lockout_global_w(data & 0x80);
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 7));
 
 	m_port_1_last_extra = data;
 }
@@ -1198,17 +1199,17 @@ void _8080bw_state::schasercv_sh_port_1_w(uint8_t data)
 
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(1, 6);     /* Ran over a dot */
-	if (rising_bits & 0x10) m_samples->start(0, 1);     /* Death */
+	if (BIT(rising_bits, 1)) m_samples->start(1, 6);    // Ran over a dot
+	if (BIT(rising_bits, 4)) m_samples->start(0, 1);    // Death
 
 	m_port_1_last_extra = data;
 }
 
 void _8080bw_state::schasercv_sh_port_2_w(uint8_t data)
 {
-	m_speaker->level_w(BIT(data, 0));      /* End-of-Level */
+	m_speaker->level_w(BIT(data, 0));      // End-of-Level
 
-	machine().sound().system_enable(data & 0x10);
+	machine().sound().system_mute(!BIT(data, 4));
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 }
@@ -1229,8 +1230,8 @@ void _8080bw_state::crashrd_port03_w(uint8_t data)
 	   bit 4 - Dot Sound Enable (SX0)
 	   bit 5 - Effect Sound C (SX4) */
 
-	m_discrete->write(SCHASER_SND_EN, BIT(data,5));
-	machine().sound().system_enable(BIT(data,5));
+	m_discrete->write(SCHASER_SND_EN, BIT(data, 5));
+	machine().sound().system_mute(!BIT(data, 5));
 	m_discrete->write(SCHASER_DOT_EN, BIT(data, 4));
 	m_discrete->write(SCHASER_DOT_SEL, BIT(data, 0));
 
@@ -1302,13 +1303,13 @@ void _8080bw_state::yosakdon_sh_port_1_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);         /* Game Over */
-	if (rising_bits & 0x02) m_samples->start(2, 0);         /* Bird dead */
-	if (rising_bits & 0x04) m_samples->start(0, 1);         /* Rifle being fired */
-	if (rising_bits & 0x08) m_samples->start(1, 2);         /* Man dead */
-	if (rising_bits & 0x10) m_samples->start(5, 8);         /* Bonus Man? */
+	if (BIT(rising_bits, 0)) m_samples->start(0, 3);        //  Game Over
+	if (BIT(rising_bits, 1)) m_samples->start(2, 0);        //  Bird dead
+	if (BIT(rising_bits, 2)) m_samples->start(0, 1);        //  Rifle being fired
+	if (BIT(rising_bits, 3)) m_samples->start(1, 2);        //  Man dead
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);        //  Bonus Man?
 
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 
 	m_port_1_last_extra = data;
 }
@@ -1317,12 +1318,12 @@ void _8080bw_state::yosakdon_sh_port_2_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 6);         /* Ready? , Game Over */
-	if (rising_bits & 0x04) m_samples->start(3, 7);         /* Big bird dead */
+	if (BIT(rising_bits, 0)) m_samples->start(1, 6);        // Ready? , Game Over
+	if (BIT(rising_bits, 2)) m_samples->start(3, 7);        // Big bird dead
 
-	m_sn->enable_w(data & 0x08 ? 0:1);              /* Big bird */
+	m_sn->enable_w(BIT(~data, 3));                          // Big bird
 
-	if (rising_bits & 0x10) m_samples->start(2, 7);         /* Game Over */
+	if (BIT(rising_bits, 4)) m_samples->start(2, 7);        // Game Over
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -1386,20 +1387,20 @@ void _8080bw_state::darthvdr_08_w(uint8_t data)
 {
 	uint8_t rising_bits = data & ~m_port_1_last_extra;
 
-	machine().sound().system_enable(data & 0x01);
+	machine().sound().system_mute(!BIT(data, 0));
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shoot */
-	if (rising_bits & 0x04) m_samples->start(3, 7);     /* Hit UFO */
-	if (rising_bits & 0x10) m_samples->start(5, 8);     /* Bonus */
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // Shoot
+	if (BIT(rising_bits, 2)) m_samples->start(3, 7);    // Hit UFO
+	if (BIT(rising_bits, 4)) m_samples->start(5, 8);    // Bonus
 
-	m_sn->enable_w(data & 0x20 ? 0:1);          /* UFO */
+	m_sn->enable_w(BIT(~data, 5));                      // UFO
 
-	if (rising_bits & 0x40) m_samples->start(1, 1);     /* Death */
-	if (rising_bits & 0x80) m_samples->start(2, 2);     /* Hit */
+	if (BIT(rising_bits, 6)) m_samples->start(1, 1);    // Death
+	if (BIT(rising_bits, 7)) m_samples->start(2, 2);    // Hit
 
-	if (rising_bits & 0x08)
+	if (BIT(rising_bits, 3))
 	{
-		m_samples->start(4, m_fleet_step);          /* Fleet move in 4 steps */
+		m_samples->start(4, m_fleet_step);          // Fleet move in 4 steps
 		m_fleet_step++;
 		if (m_fleet_step > 6) m_fleet_step = 3;
 	}

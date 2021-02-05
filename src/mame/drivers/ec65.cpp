@@ -233,9 +233,9 @@ void ec65_state::ec65(machine_config &config)
 	ACIA6850(config, "fdc", 0); // used as a FDC on separate card
 	PIA6821(config, "pia", 0);   // assists 6850
 
-	VIA6522(config, m_via0, XTAL(4'000'000) / 4);
+	MOS6522(config, m_via0, XTAL(4'000'000) / 4);
 
-	VIA6522(config, m_via1, XTAL(4'000'000) / 4);
+	MOS6522(config, m_via1, XTAL(4'000'000) / 4);
 
 	mos6551_device &uart(MOS6551(config, "uart", 0));
 	uart.set_xtal(XTAL(1'843'200));

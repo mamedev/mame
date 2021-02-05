@@ -339,7 +339,6 @@ C - uses sub board with support for player 3 and 4 controls
 #include "includes/namcos1.h"
 
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1074,12 +1073,6 @@ void namcos1_state::ns1(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac[1], 0); // 10-pin 1Kx8R SIP with HC374 latch
 	m_dac[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_dac[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

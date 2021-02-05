@@ -135,7 +135,7 @@ bool path_iterator::next(std::string &buffer, const char *name)
 
 
 //-------------------------------------------------
-//  path_iteratr::reset - let's go again
+//  path_iterator::reset - let's go again
 //-------------------------------------------------
 
 void path_iterator::reset()
@@ -155,7 +155,7 @@ void path_iterator::reset()
 //  in the search path
 //-------------------------------------------------
 
-const osd::directory::entry *file_enumerator::next()
+const osd::directory::entry *file_enumerator::next(const char *subdir)
 {
 	// loop over potentially empty directories
 	while (true)
@@ -164,7 +164,7 @@ const osd::directory::entry *file_enumerator::next()
 		while (!m_curdir)
 		{
 			// if we fail to get anything more, we're done
-			if (!m_iterator.next(m_pathbuffer))
+			if (!m_iterator.next(m_pathbuffer, subdir))
 				return nullptr;
 
 			// open the path
@@ -255,16 +255,16 @@ emu_file::operator util::core_file &()
 //  hash - returns the hash for a file
 //-------------------------------------------------
 
-util::hash_collection &emu_file::hashes(const char *types)
+util::hash_collection &emu_file::hashes(std::string_view types)
 {
 	// determine the hashes we already have
 	std::string already_have = m_hashes.hash_types();
 
 	// determine which hashes we need
 	std::string needed;
-	for (const char *scan = types; *scan != 0; scan++)
-		if (already_have.find_first_of(*scan) == -1)
-			needed.push_back(*scan);
+	for (char scan : types)
+		if (already_have.find_first_of(scan) == -1)
+			needed.push_back(scan);
 
 	// if we need nothing, skip it
 	if (needed.empty())
@@ -298,10 +298,10 @@ util::hash_collection &emu_file::hashes(const char *types)
 //  open - open a file by searching paths
 //-------------------------------------------------
 
-osd_file::error emu_file::open(const std::string &name)
+osd_file::error emu_file::open(std::string &&name)
 {
 	// remember the filename and CRC info
-	m_filename = name;
+	m_filename = std::move(name);
 	m_crc = 0;
 	m_openflags &= ~OPEN_FLAG_HAS_CRC;
 
@@ -310,10 +310,10 @@ osd_file::error emu_file::open(const std::string &name)
 	return open_next();
 }
 
-osd_file::error emu_file::open(const std::string &name, u32 crc)
+osd_file::error emu_file::open(std::string &&name, u32 crc)
 {
 	// remember the filename and CRC info
-	m_filename = name;
+	m_filename = std::move(name);
 	m_crc = crc;
 	m_openflags |= OPEN_FLAG_HAS_CRC;
 
@@ -622,7 +622,7 @@ u32 emu_file::write(const void *buffer, u32 length)
 //  puts - write a line to a text file
 //-------------------------------------------------
 
-int emu_file::puts(const char *s)
+int emu_file::puts(std::string_view s)
 {
 	// write the data if we can
 	if (m_file)
@@ -762,16 +762,21 @@ osd_file::error emu_file::attempt_zipped()
 			int header = -1;
 
 			// see if we can find a file with the right name and (if available) CRC
-			if (m_openflags & OPEN_FLAG_HAS_CRC) header = zip->search(m_crc, filename, false);
-			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC)) header = zip->search(m_crc, filename, true);
+			if (m_openflags & OPEN_FLAG_HAS_CRC)
+				header = zip->search(m_crc, filename, false);
+			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC))
+				header = zip->search(m_crc, filename, true);
 
 			// if that failed, look for a file with the right CRC, but the wrong filename
-			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC)) header = zip->search(m_crc);
+			if (header < 0 && (m_openflags & OPEN_FLAG_HAS_CRC))
+				header = zip->search(m_crc);
 
 			// if that failed, look for a file with the right name;
 			// reporting a bad checksum is more helpful and less confusing than reporting "ROM not found"
-			if (header < 0) header = zip->search(filename, false);
-			if (header < 0) header = zip->search(filename, true);
+			if (header < 0)
+				header = zip->search(filename, false);
+			if (header < 0)
+				header = zip->search(filename, true);
 
 			// if we got it, read the data
 			if (header >= 0)
@@ -782,6 +787,7 @@ osd_file::error emu_file::attempt_zipped()
 				// build a hash with just the CRC
 				m_hashes.reset();
 				m_hashes.add_crc(m_zipfile->current_crc());
+				m_fullpath = savepath;
 				return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? osd_file::error::NONE : load_zipped_file();
 			}
 

@@ -9,14 +9,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
+
 #include "emuopts.h"
-#include "png.h"
+#include "render.h"
 #include "rendutil.h"
 
-#include <nanosvg/src/nanosvg.h>
-#include <nanosvg/src/nanosvgrast.h>
+#include "nanosvg.h"
+#include "png.h"
 
-#include <clocale>
 #include <set>
 
 
@@ -43,7 +44,6 @@ u32 screen_device::m_id_counter = 0;
 class screen_device::svg_renderer {
 public:
 	svg_renderer(memory_region *region);
-	~svg_renderer();
 
 	int width() const;
 	int height() const;
@@ -69,8 +69,8 @@ private:
 		int x0, y0, x1, y1;
 	};
 
-	NSVGimage *m_image;
-	NSVGrasterizer *m_rasterizer;
+	util::nsvg_image_ptr m_image;
+	util::nsvg_rasterizer_ptr m_rasterizer;
 	std::vector<bool> m_key_state;
 	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
 	std::unordered_map<std::string, int> m_key_ids;
@@ -94,20 +94,11 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
-	// nanosvg makes assumptions about the global locale
-	{
-		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
-		memcpy(s.get(), region->base(), region->bytes());
-		s[region->bytes()] = 0;
-		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
-		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
-		std::setlocale(LC_CTYPE, "C");
-		std::setlocale(LC_NUMERIC, "C");
-		m_image = nsvgParse(s.get(), "px", 72);
-		std::setlocale(LC_CTYPE, lcctype.c_str());
-		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
-	}
-	m_rasterizer = nsvgCreateRasterizer();
+	const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+	memcpy(s.get(), region->base(), region->bytes());
+	s[region->bytes()] = 0;
+	m_image.reset(nsvgParse(s.get(), "px", 72));
+	m_rasterizer.reset(nsvgCreateRasterizer());
 
 	m_key_count = 0;
 
@@ -132,12 +123,6 @@ screen_device::svg_renderer::svg_renderer(memory_region *region)
 	osd_printf_verbose("Parsed SVG '%s', aspect ratio %f\n", region->name(), (m_image->height == 0.0f) ? 0 : m_image->width / m_image->height);
 }
 
-screen_device::svg_renderer::~svg_renderer()
-{
-	nsvgDeleteRasterizer(m_rasterizer);
-	nsvgDelete(m_image);
-}
-
 int screen_device::svg_renderer::width() const
 {
 	return int(m_image->width + 0.5);
@@ -159,7 +144,7 @@ void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std
 				s->flags &= ~NSVG_FLAGS_VISIBLE;
 	}
 
-	nsvgRasterize(m_rasterizer, m_image, 0, 0, m_scale, (unsigned char *)&dest[0], m_sx, m_sy, m_sx*4);
+	nsvgRasterize(m_rasterizer.get(), m_image.get(), 0, 0, m_scale, (unsigned char *)&dest[0], m_sx, m_sy, m_sx*4);
 
 	// Nanosvg generates non-premultiplied alpha, so remultiply by
 	// alpha to "blend" against a black background.  Plus align the
@@ -809,7 +794,7 @@ void screen_device::device_start()
 		if (!m_svg_region)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
 		m_svg = std::make_unique<svg_renderer>(m_svg_region);
-		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
+		machine().output().set_global_notifier(svg_renderer::output_notifier, m_svg.get());
 
 		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
 		// just render at the size/aspect ratio supplied by the driver
@@ -841,8 +826,7 @@ void screen_device::device_start()
 	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
-	render_container::user_settings settings;
-	m_container->get_user_settings(settings);
+	render_container::user_settings settings = m_container->get_user_settings();
 	settings.m_xoffset = m_xoffset;
 	settings.m_yoffset = m_yoffset;
 	settings.m_xscale = m_xscale;
@@ -905,7 +889,7 @@ void screen_device::device_start()
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
 
-	m_is_primary_screen = (this == screen_device_iterator(machine().root_device()).first());
+	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
 
 
@@ -1930,14 +1914,14 @@ void screen_device::finalize_burnin()
 	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
 	if (filerr == osd_file::error::NONE)
 	{
-		png_info pnginfo;
+		util::png_info pnginfo;
 
 		// add two text entries describing the image
-		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
-		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()));
 
 		// now do the actual work
-		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
+		util::png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
 	}
 }
 
@@ -1956,8 +1940,13 @@ void screen_device::load_effect_overlay(const char *filename)
 	fullname.append(".png");
 
 	// load the file
+	m_screen_overlay_bitmap.reset();
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_screen_overlay_bitmap, file, nullptr, fullname.c_str());
+	if (file.open(fullname) == osd_file::error::NONE)
+	{
+		render_load_png(m_screen_overlay_bitmap, file);
+		file.close();
+	}
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else

@@ -275,7 +275,6 @@ void bebox_state::bebox2(machine_config &config)
 }
 
 static INPUT_PORTS_START( bebox )
-	PORT_INCLUDE( at_keyboard )
 INPUT_PORTS_END
 
 ROM_START(bebox)

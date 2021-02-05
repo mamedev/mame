@@ -13,6 +13,8 @@
 #include "unzip.h"
 
 #include "corestr.h"
+#include "osdcore.h"
+#include "osdfile.h"
 #include "unicode.h"
 #include "timeconv.h"
 

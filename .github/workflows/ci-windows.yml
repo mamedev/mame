@@ -1,0 +1,28 @@
+name: CI (Windows)
+
+on: [push, pull_request]
+
+jobs:
+
+  build-windows-gcc:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
+    - uses: actions/checkout@master
+    - name: Build
+      env:
+        MINGW64: "/mingw64"
+        ARCHOPTS: "-fuse-ld=lld"
+        TOOLS: 1
+      run: make -j2
+    - name: Validate
+      run: ./mame -validate
+    - uses: actions/upload-artifact@master
+      with:
+        name: mame-windows-gcc-${{ github.sha }}
+        path: mame.exe

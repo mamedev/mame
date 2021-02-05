@@ -71,7 +71,6 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -149,7 +148,7 @@ void megazone_state::megazone_map(address_map &map)
 	map(0x2800, 0x2bff).ram().share("colorram");
 	map(0x2c00, 0x2fff).ram().share("colorram2");
 	map(0x3000, 0x33ff).ram().share("spriteram");
-	map(0x3800, 0x3fff).ram().share("share1");
+	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_share1[off]; }, "share_r", [this](offs_t off, u8 data) { m_share1[off] = data; }, "share_w");
 	map(0x4000, 0xffff).rom();     /* 4000->5FFF is a debug rom */
 }
 
@@ -345,9 +344,6 @@ void megazone_state::megazone(machine_config &config)
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);

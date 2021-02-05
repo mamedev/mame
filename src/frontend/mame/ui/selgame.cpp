@@ -25,12 +25,14 @@
 #include "mame.h"
 
 #include "audit.h"
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
+#include "unicode.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -556,7 +558,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 					cloneof = false;
 			}
 
-			item_append(elem.driver->type.fullname(), "", (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
+			item_append(elem.driver->type.fullname(), (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
 			curitem++;
 		}
 	}
@@ -581,7 +583,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, "", cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
+						item_append(info.longname, cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
 					}
 					else
 					{
@@ -599,12 +601,12 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), "", FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
+			item_append(_("Plugins"), FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -786,32 +788,33 @@ void menu_select_game::inkey_select(const event *menu_event)
 	else
 	{
 		// anything else is a driver
-
-		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *driver);
 		enumerator.next();
+
+		// if there are software entries, show a software selection menu
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
+		{
+			if (!swlistdev.get_info().empty())
+			{
+				menu::stack_push<menu_select_software>(ui(), container(), *driver);
+				return;
+			}
+		}
+
+		// audit the system ROMs first to see if we're going to work
 		media_auditor auditor(enumerator);
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-			{
-				if (!swlistdev.get_info().empty())
-				{
-					menu::stack_push<menu_select_software>(ui(), container(), *driver);
-					return;
-				}
-			}
-
 			if (!select_bios(*driver, false))
 				launch_system(*driver);
 		}
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 }
@@ -858,23 +861,25 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
-		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *ui_swinfo->driver);
 		enumerator.next();
+
+		// if there are software entries, show a software selection menu
+		for (software_list_device &swlistdev : software_list_device_enumerator(enumerator.config()->root_device()))
+		{
+			if (!swlistdev.get_info().empty())
+			{
+				menu::stack_push<menu_select_software>(ui(), container(), *ui_swinfo->driver);
+				return;
+			}
+		}
+
+		// audit the system ROMs first to see if we're going to work
 		media_auditor auditor(enumerator);
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-			{
-				if (!swlistdev.get_info().empty())
-				{
-					menu::stack_push<menu_select_software>(ui(), container(), *ui_swinfo->driver);
-					return;
-				}
-			}
-
 			// if everything looks good, schedule the new driver
 			if (!select_bios(*ui_swinfo->driver, false))
 			{
@@ -885,7 +890,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 	else
@@ -907,7 +912,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_POSITION, make_error_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_POSITION, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
 		}
 	}
 }
@@ -1316,8 +1321,7 @@ bool menu_select_game::load_available_machines()
 	std::unordered_set<std::string> available;
 	while (file.gets(rbuf, MAX_CHAR_INFO))
 	{
-		readbuf = rbuf;
-		strtrimspace(readbuf);
+		readbuf = strtrimspace(rbuf);
 
 		if (readbuf.empty() || ('#' == readbuf[0])) // ignore empty lines and line comments
 			;
@@ -1453,20 +1457,6 @@ void menu_select_game::filter_selected()
 					reset(reset_options::SELECT_FIRST);
 				});
 	}
-}
-
-
-std::string menu_select_game::make_error_text(bool summary, media_auditor const &auditor)
-{
-	std::ostringstream str;
-	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
-	if (summary)
-	{
-		auditor.summarize(nullptr, &str);
-		str << "\n";
-	}
-	str << _("Press any key to continue.");
-	return str.str();
 }
 
 } // namespace ui

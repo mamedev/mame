@@ -22,7 +22,7 @@
 #include "machine/tms9901.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ccfdc_dec_pal_device;
 class ccfdc_sel_pal_device;
@@ -240,7 +240,7 @@ private:
 	void device_config_complete() override;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_CCDCC, bus::ti99::peb, corcomp_dcc_device)
 DECLARE_DEVICE_TYPE_NS(TI99_CCFDC, bus::ti99::peb, corcomp_fdca_device)

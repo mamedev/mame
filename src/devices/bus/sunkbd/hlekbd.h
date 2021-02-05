@@ -11,7 +11,7 @@
 #include "diserial.h"
 
 
-namespace bus { namespace sunkbd {
+namespace bus::sunkbd {
 
 class hle_device_base
 	: public device_t
@@ -199,7 +199,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-} } // namespace bus::sunkbd
+} // namespace bus::sunkbd
 
 
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_type3_device)

@@ -870,7 +870,6 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		/* 0x28: same for mk4b */
 		/* 0x30: same for invasn */
 		case 0x25:
-		{
 			/* 0x25 is used differently in mk4b. What determines this? */
 			if (m_is_mk4b)
 			{
@@ -879,7 +878,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 
 				break;
 			}
-		}
+			[[fallthrough]];
 		case 0x28:
 		case 0x30:
 			if (numwords < 4 || ((data[0] & 0x808000) && numwords < 10))

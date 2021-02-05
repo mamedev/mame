@@ -84,7 +84,9 @@
 #include "network.h"
 #include "romload.h"
 #include "tilemap.h"
+#include "natkeyboard.h"
 #include "ui/uimain.h"
+#include "corestr.h"
 #include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -140,7 +142,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	m_dummy_space.config_complete();
 
 	// set the machine on all devices
-	device_iterator iter(root_device());
+	device_enumerator iter(root_device());
 	for (device_t &device : iter)
 		device.set_machine(*this);
 
@@ -218,11 +220,14 @@ void running_machine::start()
 	if (newbase != 0)
 		m_base_time = newbase;
 
+	// initialize natural keyboard support after ports have been initialized
+	m_natkeyboard = std::make_unique<natural_keyboard>(*this);
+
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
 	// resolve objects that can be used by memory maps
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.resolve_pre_map();
 
 	// configure the address spaces, load ROMs (which needs
@@ -252,7 +257,7 @@ void running_machine::start()
 	manager().create_custom(*this);
 
 	// resolve objects that are created by memory maps
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
@@ -551,7 +556,7 @@ std::string running_machine::get_statename(const char *option) const
 			//printf("check template: %s\n", devname_str.c_str());
 
 			// verify that there is such a device for this system
-			for (device_image_interface &image : image_interface_iterator(root_device()))
+			for (device_image_interface &image : image_interface_enumerator(root_device()))
 			{
 				// get the device name
 				std::string tempdevname(image.brief_instance_name());
@@ -878,7 +883,7 @@ void running_machine::current_datetime(system_time &systime)
 
 void running_machine::set_rtc_datetime(const system_time &systime)
 {
-	for (device_rtc_interface &rtc : rtc_interface_iterator(root_device()))
+	for (device_rtc_interface &rtc : rtc_interface_enumerator(root_device()))
 		if (rtc.has_battery())
 			rtc.set_current_time(systime);
 }
@@ -984,10 +989,14 @@ void running_machine::handle_saveload()
 					file.remove_on_close();
 			}
 			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
+			}
 			else
+			{
 				popmessage("Error: Failed to open file for %s operation.", opname);
+			}
 		}
 	}
 
@@ -1047,7 +1056,7 @@ void running_machine::start_all_devices()
 	{
 		// iterate over all devices
 		int failed_starts = 0;
-		for (device_t &device : device_iterator(root_device()))
+		for (device_t &device : device_enumerator(root_device()))
 			if (!device.started())
 			{
 				// attempt to start the device, catching any expected exceptions
@@ -1104,7 +1113,7 @@ void running_machine::stop_all_devices()
 		debugger().cpu().comment_save();
 
 	// iterate over devices and stop them
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.stop();
 }
 
@@ -1116,7 +1125,7 @@ void running_machine::stop_all_devices()
 
 void running_machine::presave_all_devices()
 {
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.pre_save();
 }
 
@@ -1128,7 +1137,7 @@ void running_machine::presave_all_devices()
 
 void running_machine::postload_all_devices()
 {
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.post_load();
 }
 
@@ -1181,7 +1190,7 @@ std::string running_machine::nvram_filename(device_t &device) const
 
 void running_machine::nvram_load()
 {
-	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
@@ -1201,7 +1210,7 @@ void running_machine::nvram_load()
 
 void running_machine::nvram_save()
 {
-	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		if (nvram.nvram_can_save())
 		{
@@ -1269,7 +1278,7 @@ void running_machine::export_http_api()
 			writer.Key("devices");
 			writer.StartArray();
 
-			device_iterator iter(this->root_device());
+			device_enumerator iter(this->root_device());
 			for (device_t &device : iter)
 				writer.String(device.tag());
 

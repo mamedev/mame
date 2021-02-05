@@ -53,7 +53,7 @@ void tanbus_radisc_device::device_add_mconfig(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_RTC>));
 
-	VIA6522(config, m_via, 4_MHz_XTAL / 4);
+	MOS6522(config, m_via, 4_MHz_XTAL / 4);
 	m_via->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA>));
 
 	/* audio hardware */

@@ -667,13 +667,13 @@ void clcd_state::clcd(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
 
-	via6522_device &via0(VIA6522(config, "via0", 2000000));
+	via6522_device &via0(R65C22(config, "via0", 2000000));
 	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
 	via0.writepb_handler().set(FUNC(clcd_state::via0_pb_w));
 	via0.cb1_handler().set(FUNC(clcd_state::via0_cb1_w));
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	via6522_device &via1(VIA6522(config, "via1", 2000000));
+	via6522_device &via1(R65C22(config, "via1", 2000000));
 	via1.writepa_handler().set(FUNC(clcd_state::via1_pa_w));
 	via1.writepb_handler().set(FUNC(clcd_state::via1_pb_w));
 	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));

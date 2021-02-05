@@ -15,7 +15,7 @@
 #include "unzip.h"
 #include "xmlfile.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_cartridge_pcb;
 
@@ -170,21 +170,21 @@ private:
 	class rpk_socket
 	{
 	public:
-		rpk_socket(const char *id, int length, uint8_t *contents);
-		rpk_socket(const char *id, int length, uint8_t *contents, std::string &&pathname);
+		rpk_socket(const char *id, int length, std::unique_ptr<uint8_t []> &&contents);
+		rpk_socket(const char *id, int length, std::unique_ptr<uint8_t []> &&contents, std::string &&pathname);
 		~rpk_socket() {}
 
 		const char*     id() { return m_id; }
 		int             get_content_length() { return m_length; }
-		uint8_t*          get_contents() { return m_contents; }
+		uint8_t*          get_contents() { return m_contents.get(); }
 		bool            persistent_ram() { return !m_pathname.empty(); }
 		const char*     get_pathname() { return m_pathname.c_str(); }
-		void            cleanup() { if (m_contents != nullptr) global_free_array(m_contents); }
+		void            cleanup() { m_contents.reset(); }
 
 	private:
 		const char*     m_id;
 		uint32_t          m_length;
-		uint8_t*          m_contents;
+		std::unique_ptr<uint8_t []> m_contents;
 		const std::string m_pathname;
 	};
 
@@ -372,7 +372,8 @@ private:
 	bool    m_grom_read_mode;
 	bool    m_grom_address_mode;
 };
-} } } // end namespace bus::ti99::gromport
+
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::gromport, ti99_cartridge_device)
 

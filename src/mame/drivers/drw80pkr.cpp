@@ -39,6 +39,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class drw80pkr_state : public driver_device
 {
 public:
@@ -105,6 +107,8 @@ private:
 void drw80pkr_state::machine_start()
 {
 	subdevice<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
+
+	m_active_bank = 0;
 }
 
 /*****************
@@ -501,6 +505,8 @@ ROM_START( drw80pk2 )
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(be67a8d9) SHA1(24b8cd19a5ec09779a737f6fc8c07b44f1226c8f) )
 ROM_END
+
+} // Anonymous namespace
 
 /*************************
 *      Game Drivers      *

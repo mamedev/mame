@@ -165,8 +165,8 @@ static INPUT_PORTS_START( shine )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                                 PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('[')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                                 PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                                 PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP)              PORT_CODE(KEYCODE_TILDE)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")                PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP)              PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('^')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")                PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC),27)
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("COPY")               PORT_CODE(KEYCODE_TAB)
@@ -263,13 +263,13 @@ void shine_state::shine(machine_config &config)
 	m_ram->set_default_size("32K");
 	m_ram->set_extra_options("16K");
 
-	VIA6522(config, m_via[0], 1000000);
+	MOS6522(config, m_via[0], 1000000);
 	m_via[0]->readpa_handler().set(FUNC(shine_state::via0_pa_r));
 	m_via[0]->writepb_handler().set(FUNC(shine_state::via0_pb_w));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_via[0]->cb2_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	VIA6522(config, m_via[1], 1000000);
+	MOS6522(config, m_via[1], 1000000);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

@@ -76,7 +76,8 @@ public:
 		m_screen(*this, "screen"),
 		m_exp(*this, "exp"),
 		m_cartslot(*this, "nes_slot"),
-		m_disk(*this, "disk")
+		m_disk(*this, "disk"),
+		m_prg_bank(*this, "prg%u", 0U)
 	{ }
 
 
@@ -130,6 +131,7 @@ private:
 	optional_device<nes_control_port_device> m_exp;
 	optional_device<nes_cart_slot_device> m_cartslot;
 	optional_device<nes_disksys_device> m_disk;
+	memory_bank_array_creator<4> m_prg_bank;
 };
 
 #endif // MAME_INCLUDES_NES_H

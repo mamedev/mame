@@ -1204,7 +1204,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_subirq()
 	}
 }
 
-ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_subirq( uint32_t int_type)
+[[maybe_unused]] void S3C24_CLASS_NAME::s3c24xx_request_subirq( uint32_t int_type)
 {
 	LOGMASKED(LOG_IRQS, "request subirq %d\n", int_type);
 	m_irq.regs.subsrcpnd |= (1 << int_type);
@@ -1233,7 +1233,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_eint()
 	}
 }
 
-ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
+[[maybe_unused]] void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
 {
 	LOGMASKED(LOG_IRQS, "request external interrupt %d\n", number);
 	if (number < 4)
@@ -3086,7 +3086,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_w(offs_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-ATTR_UNUSED WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
+[[maybe_unused]] WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
 {
 	LOGMASKED(LOG_FLASH, "s3c24xx_pin_frnb_w (%d)\n", state);
 #if defined(DEVICE_S3C2440)

@@ -16,7 +16,7 @@ function cheatfind.startplugin()
 	-- return table of devices and spaces
 	function cheat.getspaces()
 		local spaces = {}
-		for tag, device in pairs(manager:machine().devices) do
+		for tag, device in pairs(manager.machine.devices) do
 			if device.spaces then
 				spaces[tag] = {}
 				for name, space in pairs(device.spaces) do
@@ -30,8 +30,8 @@ function cheatfind.startplugin()
 	-- return table of ram devices
 	function cheat.getram()
 		local ram = {}
-		for tag, device in pairs(manager:machine().devices) do
-			if device:shortname() == "ram" then
+		for tag, device in pairs(manager.machine.devices) do
+			if device.shortname == "ram" then
 				ram[tag] = {}
 				ram[tag].dev = device
 				ram[tag].size = emu.item(device.items["0/m_size"]):read(0)
@@ -43,7 +43,7 @@ function cheatfind.startplugin()
 	-- return table of share regions
 	function cheat.getshares()
 		local shares = {}
-		for tag, share in pairs(manager:machine():memory().shares) do
+		for tag, share in pairs(manager.machine.memory.shares) do
 			shares[tag] = share
 		end
 		return shares
@@ -56,7 +56,7 @@ function cheatfind.startplugin()
 			data.shift = space.shift
 		end
 		if getmetatable(space).__name:match("device_t") then
-			if space:shortname() == "ram" then
+			if space.shortname == "ram" then
 				data.block = emu.item(space.items["0/m_pointer"]):read_block(start, size)
 				if not data.block then
 					return nil
@@ -302,9 +302,11 @@ function cheatfind.startplugin()
 		for tag, list in pairs(space_table) do
 			for name, space in pairs(list) do
 				local ram = {}
-				for num, entry in pairs(space.map) do
-					if entry.writetype == "ram" then
-						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
+				for num, entry in pairs(space.map.entries) do
+					if entry.write.handlertype == "ram" then
+						ram[#ram + 1] = {
+							offset = entry.address_start & space.address_mask,
+							size = (entry.address_end & space.address_mask) - (entry.address_start & space.address_mask) }
 						if space.shift > 0 then
 							ram[#ram].size = ram[#ram].size >> space.shift
 						elseif space.shift < 0 then
@@ -393,7 +395,7 @@ function cheatfind.startplugin()
 					local r
 					name, r = incdec(event, name, 1, #c)
 					if (event == "select" or event == "comment") and name == 1 then
-						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
+						manager.machine:popmessage(string.format(_("Default name is %s"), cheat_save.name))
 					end
 					return r
 				end
@@ -422,7 +424,7 @@ function cheatfind.startplugin()
 									r = true
 								end
 							elseif event == "select" or event == "comment" or event == "right" then
-								manager:machine():popmessage(_("You can enter any type name"))
+								manager.machine:popmessage(_("You can enter any type name"))
 							end
 						end
 						return r
@@ -439,7 +441,7 @@ function cheatfind.startplugin()
 						if name == 2 then
 							desc = name_type ~= #ctype and ctype[name_type] or name_other
 							if #desc == 0 then
-								manager:machine():popmessage(_("Type name is empty"))
+								manager.machine:popmessage(_("Type name is empty"))
 								return
 							end
 							if cplayer[name_player] ~= "All" then
@@ -463,7 +465,7 @@ function cheatfind.startplugin()
 								-- old cheat .dat format, write support only (for cheat forum posting of new cheats if posted in simple format)
 								file:write(string.format(cheat_save.dat, desc))
 								file:close()
-								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
+								manager.machine:popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
 							end
 							written = true
 						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
@@ -473,12 +475,12 @@ function cheatfind.startplugin()
 								-- old cheat .dat format, write support only (for cheat forum posting of new cheats if posted in simple format)
 								file:write(string.format(cheat_save.dat, desc))
 								file:close()
-								manager:machine():popmessage(_("Cheat added to cheat.simple"))
+								manager.machine:popmessage(_("Cheat added to cheat.simple"))
 								written = true
 							end
 						end
 						if not written then
-							manager:machine():popmessage(_("Unable to write file\nEnsure that cheatpath folder exists"))
+							manager.machine:popmessage(_("Unable to write file\nEnsure that cheatpath folder exists"))
 						end
 						cheat_save = nil
 						return true
@@ -496,7 +498,7 @@ function cheatfind.startplugin()
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
-					manager:machine():popmessage(_("Changes to this only take effect when \"Start new search\" is selected"))
+					manager.machine:popmessage(_("Changes to this only take effect when \"Start new search\" is selected"))
 				end
 				devsel = incdec(event, devsel, 1, #devtable)
 				return true
@@ -513,10 +515,10 @@ function cheatfind.startplugin()
 					if pausesel == 1 then
 						pausesel = 2
 						menu_is_showing = false
-						manager:machine():popmessage(_("Manually toggle pause when needed"))
+						manager.machine:popmessage(_("Manually toggle pause when needed"))
 					else
 						pausesel = 1
-						manager:machine():popmessage(_("Automatically toggle pause with on-screen menus"))
+						manager.machine:popmessage(_("Automatically toggle pause with on-screen menus"))
 						emu.pause()
 					end
 				end
@@ -537,7 +539,7 @@ function cheatfind.startplugin()
 						menu_blocks[num] = {}
 						menu_blocks[num][1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 					end
-					manager:machine():popmessage(_("All slots cleared and current state saved to Slot 1"))
+					manager.machine:popmessage(_("All slots cleared and current state saved to Slot 1"))
 					watches = {}
 					opsel = 1
 					value = 0
@@ -560,7 +562,7 @@ function cheatfind.startplugin()
 						for num, region in ipairs(devtable[devcur].ram) do
 							menu_blocks[num][#menu_blocks[num] + 1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 						end
-						manager:machine():popmessage(string.format(_("Memory state saved to Slot %d"), #menu_blocks[1]))
+						manager.machine:popmessage(string.format(_("Memory state saved to Slot %d"), #menu_blocks[1]))
 						if (leftop == #menu_blocks[1] - 1 and rightop == #menu_blocks[1] - 2 ) then
 							leftop = #menu_blocks[1]
 							rightop = #menu_blocks[1]-1
@@ -607,7 +609,7 @@ function cheatfind.startplugin()
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(string.format(_("%d total matches found"), count))
+						manager.machine:popmessage(string.format(_("%d total matches found"), count))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
@@ -670,25 +672,25 @@ function cheatfind.startplugin()
 					opsel, r = incdec(event, opsel, 1, #optable)
 					if event == "left" or event == "right" or event == "comment" then
 						if optable[opsel] == "lt" then
-							manager:machine():popmessage(_("Left less than right"))
+							manager.machine:popmessage(_("Left less than right"))
 						elseif optable[opsel] == "gt" then
-							manager:machine():popmessage(_("Left greater than right"))
+							manager.machine:popmessage(_("Left greater than right"))
 						elseif optable[opsel] == "eq" then
-							manager:machine():popmessage(_("Left equal to right"))
+							manager.machine:popmessage(_("Left equal to right"))
 						elseif optable[opsel] == "ne" then
-							manager:machine():popmessage(_("Left not equal to right"))
+							manager.machine:popmessage(_("Left not equal to right"))
 						elseif optable[opsel] == "beq" then
-							manager:machine():popmessage(_("Left equal to right with bitmask"))
+							manager.machine:popmessage(_("Left equal to right with bitmask"))
 						elseif optable[opsel] == "bne" then
-							manager:machine():popmessage(_("Left not equal to right with bitmask"))
+							manager.machine:popmessage(_("Left not equal to right with bitmask"))
 						elseif optable[opsel] == "ltv" then
-							manager:machine():popmessage(_("Left less than value"))
+							manager.machine:popmessage(_("Left less than value"))
 						elseif optable[opsel] == "gtv" then
-							manager:machine():popmessage(_("Left greater than value"))
+							manager.machine:popmessage(_("Left greater than value"))
 						elseif optable[opsel] == "eqv" then
-							manager:machine():popmessage(_("Left equal to value"))
+							manager.machine:popmessage(_("Left equal to value"))
 						elseif optable[opsel] == "nev" then
-							manager:machine():popmessage(_("Left not equal to value"))
+							manager.machine:popmessage(_("Left not equal to value"))
 						end
 					end
 					return r
@@ -739,11 +741,11 @@ function cheatfind.startplugin()
 					pokevalsel, r = incdec(event, pokevalsel, 1, #pokevaltable)
 					if event == "left" or event == "right" or event == "comment" then
 						if pokevalsel == 1 then
-							manager:machine():popmessage(_("Use this if you want to poke the Slot 1 value (eg. You started with something but lost it)"))
+							manager.machine:popmessage(_("Use this if you want to poke the Slot 1 value (eg. You started with something but lost it)"))
 						elseif pokevalsel == 2 then
-							manager:machine():popmessage(_("Use this if you want to poke the Last Slot value (eg. You started without an item but finally got it)"))
+							manager.machine:popmessage(_("Use this if you want to poke the Last Slot value (eg. You started without an item but finally got it)"))
 						else
-							manager:machine():popmessage(string.format(_("Use this if you want to poke %s"), pokevaltable[pokevalsel]))
+							manager.machine:popmessage(string.format(_("Use this if you want to poke %s"), pokevaltable[pokevalsel]))
 						end
 					end
 					return r
@@ -938,7 +940,7 @@ function cheatfind.startplugin()
 					end
 					if match.mode == 1 then
 						if not emu.plugin.cheat then
-							manager:machine():popmessage(_("Cheat engine not available"))
+							manager.machine:popmessage(_("Cheat engine not available"))
 						else
 							emu.plugin.cheat.inject(cheat)
 						end
@@ -952,15 +954,14 @@ function cheatfind.startplugin()
 							if emu.softname():find(":") then
 								setname = emu.softname():gsub(":", "/")
 							else
-								for name, image in pairs(manager:machine().images) do
+								for name, image in pairs(manager.machine.images) do
 									if image:exists() and image:software_list_name() ~= "" then
 										setname = image:software_list_name() .. "/" .. emu.softname()
 									end
 								end
 							end
 						end
-						-- lfs.env_replace is defined in boot.lua
-						cheat_save.path = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.path = emu.subst_env(manager.machine.options.entries.cheatpath:value()):match("([^;]+)")
 						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
 						cheat_save.name = cheat.desc
 						local json = require("json")
@@ -969,7 +970,7 @@ function cheatfind.startplugin()
 						cheat_save.xml = string.format("<mamecheat version=\"1\">\n  <cheat desc=\"%%s\">\n    <script state=\"run\">\n      <action>%s.pp%s@%X=%X</action>\n    </script>\n  </cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, pokevalue)
 						cheat_save.dat = string.format(":%s:40000000:%X:%08X:FFFFFFFF:%%s\n", setname, match.addr, pokevalue)
-						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
+						manager.machine:popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true
 					else
 						local func = "return space:read"
@@ -1044,19 +1045,19 @@ function cheatfind.startplugin()
 	end
 	emu.register_menu(menu_callback, menu_populate, _("Cheat Finder"))
 	emu.register_frame_done(function ()
-			local tag, screen = next(manager:machine().screens)
-			local height = mame_manager:ui():get_line_height()
+			local screen = manager.machine.screens:at(1)
+			local height = mame_manager.ui.line_height
 			for num, watch in ipairs(watches) do
 				screen:draw_text("left", num * height, string.format(watch.format, watch.addr, watch.func()))
 			end
-			if tabbed_out and manager:ui():is_menu_active() then
+			if tabbed_out and manager.ui.menu_active then
 				emu.pause()
 				menu_is_showing = true
 				tabbed_out = false
 			end
 		end)
 	emu.register_periodic(function ()
-		if menu_is_showing and not manager:ui():is_menu_active() then
+		if menu_is_showing and not manager.ui.menu_active then
 			emu.unpause()
 			menu_is_showing = false
 			tabbed_out = true

@@ -349,7 +349,7 @@ void ps2_vif1_device::execute_run()
 					m_icount = 0;
 					break;
 				}
-				// Intentional fall-through
+				[[fallthrough]];
 			case STAT_MODE_DECODE:
 				decode_vifcode();
 				break;
@@ -359,7 +359,7 @@ void ps2_vif1_device::execute_run()
 					m_icount = 0;
 					break;
 				}
-				// Intentional fall-through
+				[[fallthrough]];
 			case STAT_MODE_DATA:
 				transfer_vifcode_data();
 				break;

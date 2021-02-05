@@ -51,6 +51,7 @@ public:
 		m_cat702(*this, "cat702_%u", 1),
 		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
+		m_spu(*this, "spu"),
 		m_ram(*this, "maincpu:ram"),
 		m_znmcu_dataout(1)
 	{
@@ -88,6 +89,7 @@ protected:
 	required_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
+	required_device<spu_device> m_spu;
 	required_device<ram_device> m_ram;
 
 	int m_cat702_dataout[2];

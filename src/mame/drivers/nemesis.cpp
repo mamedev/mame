@@ -273,7 +273,7 @@ void nemesis_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask
 			logerror("\tCopy page %02x to shared ram\n", page);
 
 			const uint8_t *src = memregion("bubblememory")->base();
-			memcpy(m_bubsys_shared_ram + 0xf00/2, src + page * 0x90, 0x80);
+			memcpy(&m_bubsys_shared_ram[0xf00/2], src + page * 0x90, 0x80);
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);

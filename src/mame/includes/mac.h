@@ -22,6 +22,7 @@
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
 #include "machine/applefdc.h"
+#include "machine/applefdintf.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/macrtc.h"
@@ -32,6 +33,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#define NEW_SWIM 0
+
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
@@ -40,7 +43,6 @@
 #define ADB_IS_BITBANG_CLASS    ((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_EGRET    (m_model >= MODEL_MAC_LC && m_model <= MODEL_MAC_CLASSIC_II) || ((m_model >= MODEL_MAC_IISI) && (m_model <= MODEL_MAC_IIVI))
 #define ADB_IS_CUDA     ((m_model >= MODEL_MAC_COLOR_CLASSIC && m_model <= MODEL_MAC_LC_580) || ((m_model >= MODEL_MAC_QUADRA_660AV) && (m_model <= MODEL_MAC_QUADRA_630)) || (m_model >= MODEL_MAC_POWERMAC_6100))
-#define ADB_IS_PM_CLASS ((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 // video parameters for classic Macs
 #define MAC_H_VIS   (512)
@@ -73,6 +75,7 @@ public:
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this, "rtc"),
 		m_montype(*this, "MONTYPE"),
 		m_main_buffer(true),
@@ -84,64 +87,50 @@ public:
 	{
 		m_rom_size = 0;
 		m_rom_ptr = nullptr;
+		m_cur_floppy = nullptr;
 	}
 
 	void add_scsi(machine_config &config, bool cdrom = false);
-	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
+	void add_base_devices(machine_config &config, bool rtc = true, int woz_version = 0);
 	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
 	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
 	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
 	void add_via1_adb(machine_config &config, bool macii);
 	void add_via2(machine_config &config);
-	void add_pb1xx_vias(machine_config &config);
-	void add_pb1xx_screen(machine_config &config);
 	void add_egret(machine_config &config, int type);
 	void add_cuda(machine_config &config, int type);
 
-	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
-	void macpb170(machine_config &config);
+	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8, int woz_version = 1);
 	void maciisi(machine_config &config);
-	void maclc2(machine_config &config, bool egret = true);
+	void maclc2(machine_config &config, bool egret = true, int woz_version = 1);
 	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
-	void macprtb(machine_config &config);
 	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maclc520(machine_config &config);
 	void pwrmac(machine_config &config);
 	void maciivx(machine_config &config);
 	void maccclas(machine_config &config);
 	void maciivi(machine_config &config);
-	void macpb160(machine_config &config);
 	void maciicx(machine_config &config);
-	void macqd700(machine_config &config);
 	void macse30(machine_config &config);
-	void macpb180(machine_config &config);
-	void macpb145(machine_config &config);
-	void macpb180c(machine_config &config);
 	void maciifx(machine_config &config);
-	void macpb140(machine_config &config);
 	void macclas2(machine_config &config);
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
-		bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true);
+		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
 
 	void init_maclc2();
 	void init_maciifdhd();
 	void init_macse30();
-	void init_macprtb();
 	void init_maciivx();
 	void init_maciivi();
-	void init_macpd210();
 	void init_macii();
 	void init_macclassic();
-	void init_macquadra700();
 	void init_macclassic2();
 	void init_maciifx();
 	void init_maclc();
-	void init_macpb160();
 	void init_macse();
-	void init_macpb140();
 	void init_macpm6100();
 	void init_maclc520();
 	void init_maciici();
@@ -153,7 +142,6 @@ public:
 	void init_maclc3plus();
 	void init_macpm7100();
 	void init_macpm8100();
-	void init_macpb100();
 
 	/* tells which model is being emulated (set by macxxx_init) */
 	enum model_t
@@ -243,7 +231,13 @@ private:
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
+#if NEW_SWIM
+	required_device<applefdintf_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+#else
 	required_device<applefdc_base_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
+#endif
 	optional_device<rtc3430042_device> m_rtc;
 
 	//required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -292,10 +286,6 @@ private:
 	uint8_t m_sonora_vctl[8];
 	emu_timer *m_vbl_timer, *m_cursor_timer;
 	uint16_t m_cursor_line;
-	uint16_t m_dafb_int_status;
-	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	uint8_t m_dafb_mode;
-	uint32_t m_dafb_base, m_dafb_stride;
 
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
@@ -362,20 +352,6 @@ private:
 	void amic_dma_w(offs_t offset, uint8_t data);
 	uint8_t pmac_diag_r(offs_t offset);
 
-	uint8_t mac_gsc_r(offs_t offset);
-	void mac_gsc_w(uint8_t data);
-
-	uint8_t mac_5396_r(offs_t offset);
-	void mac_5396_w(offs_t offset, uint8_t data);
-
-	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
-	void dafb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t dafb_dac_r(offs_t offset, uint32_t mem_mask = ~0);
-	void dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
-	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
@@ -391,22 +367,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
-	void mac512ke_map(address_map &map);
 	void macii_map(address_map &map);
 	void maciici_map(address_map &map);
 	void maciifx_map(address_map &map);
 	void maclc3_map(address_map &map);
 	void maclc_map(address_map &map);
-	void macpb140_map(address_map &map);
-	void macpb160_map(address_map &map);
-	void macpb165c_map(address_map &map);
-	void macpd210_map(address_map &map);
-	void macplus_map(address_map &map);
-	void macprtb_map(address_map &map);
 	void macse30_map(address_map &map);
-	void macse_map(address_map &map);
 	void pwrmac_map(address_map &map);
-	void quadra700_map(address_map &map);
 
 	inline bool has_adb() { return m_model >= MODEL_MAC_SE; }
 
@@ -430,27 +397,25 @@ private:
 
 	emu_timer *m_scanline_timer;
 
+	floppy_image_device *m_cur_floppy;
+
 	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
 
-	void macgsc_palette(palette_device &palette) const;
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
-	DECLARE_VIDEO_START(macprtb);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
-	DECLARE_VIDEO_START(macdafb);
-	DECLARE_VIDEO_RESET(macdafb);
 	DECLARE_VIDEO_START(macv8);
 	DECLARE_VIDEO_RESET(macsonora);
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macdafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -459,38 +424,25 @@ private:
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
-	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
 	uint8_t mac_via_in_b_ii();
 	void mac_via_out_a(uint8_t data);
 	void mac_via_out_b(uint8_t data);
-	uint8_t mac_via_in_a_pmu();
-	uint8_t mac_via_in_b_pmu();
-	void mac_via_out_a_pmu(uint8_t data);
-	void mac_via_out_b_pmu(uint8_t data);
 	void mac_via_out_b_bbadb(uint8_t data);
 	void mac_via_out_b_egadb(uint8_t data);
 	void mac_via_out_b_cdadb(uint8_t data);
-	uint8_t mac_via_in_b_via2pmu();
-	void mac_via_out_b_via2pmu(uint8_t data);
 	uint8_t mac_via2_in_a();
 	uint8_t mac_via2_in_b();
 	void mac_via2_out_a(uint8_t data);
 	void mac_via2_out_b(uint8_t data);
-	uint8_t mac_via2_in_a_pmu();
-	uint8_t mac_via2_in_b_pmu();
-	void mac_via2_out_a_pmu(uint8_t data);
-	void mac_via2_out_b_pmu(uint8_t data);
 	void mac_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
-	void dafb_recalc_ints();
 	void set_scc_waitrequest(int waitrequest);
 	void mac_driver_init(model_t model);
-	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom, const char *bank);
+	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 

@@ -384,7 +384,7 @@ uint8_t a2bus_agat_fdc_device::read_cnxx(uint8_t offset)
  */
 uint8_t a2bus_agat_fdc_device::d14_i_b()
 {
-	u8 data = 0x3;
+	u8 data = 0x0;
 
 	// all signals active low
 	if (floppy)
@@ -420,6 +420,16 @@ uint8_t a2bus_agat_fdc_device::d14_i_b()
 void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 {
 	m_unit = BIT(data, 3);
+
+	switch (m_unit)
+	{
+	case 0:
+		floppy = floppy0 ? floppy0->get_device() : nullptr;
+		break;
+	case 1:
+		floppy = floppy1 ? floppy1->get_device() : nullptr;
+		break;
+	}
 
 	if (floppy)
 	{

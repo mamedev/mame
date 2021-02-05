@@ -30,8 +30,18 @@ public:
 	}
 
 	void playch10(machine_config &config);
-	void playchnv(machine_config &config);
-	void playch10_hboard(machine_config &config);
+	void playch10_a(machine_config &config);
+	void playch10_b(machine_config &config);
+	void playch10_c(machine_config &config);
+	void playch10_d(machine_config &config);
+	void playch10_d2(machine_config &config);
+	void playch10_e(machine_config &config);
+	void playch10_f(machine_config &config);
+	void playch10_f2(machine_config &config);
+	void playch10_g(machine_config &config);
+	void playch10_h(machine_config &config);
+	void playch10_i(machine_config &config);
+	void playch10_k(machine_config &config);
 
 	void init_playch10();
 	void init_pc_gun();
@@ -93,6 +103,18 @@ private:
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void cart_map(address_map &map);
+	void cart_a_map(address_map &map);
+	void cart_b_map(address_map &map);
+	void cart_c_map(address_map &map);
+	void cart_d_map(address_map &map);
+	void cart_d2_map(address_map &map);
+	void cart_e_map(address_map &map);
+	void cart_f_map(address_map &map);
+	void cart_f2_map(address_map &map);
+	void cart_g_map(address_map &map);
+	void cart_h_map(address_map &map);
+	void cart_i_map(address_map &map);
+	void cart_k_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -153,6 +175,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t* m_nametable[4];
 	std::unique_ptr<uint8_t[]> m_nt_ram;
+	std::unique_ptr<uint8_t[]> m_extra_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;

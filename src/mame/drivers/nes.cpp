@@ -244,8 +244,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 		setup_disk(m_disk);
 
 		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0xe000, 0xffff, "ftbios");
-		membank("ftbios")->set_base(machine().root_device().memregion("maincpu")->base() + 0xe000);
+		m_maincpu->space(AS_PROGRAM).install_rom(0xe000, 0xffff, machine().root_device().memregion("maincpu")->base() + 0xe000);
 	}
 }
 

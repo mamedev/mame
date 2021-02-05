@@ -150,7 +150,8 @@ public:
 		m_to7qdd(*this, "to7qdd"),
 		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
-		m_floppy_image(*this, "floppy%u", 0U)
+		m_floppy_image(*this, "floppy%u", 0U),
+		m_caps_led(*this, "led0")
 	{
 	}
 
@@ -201,6 +202,9 @@ public:
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void bitmap16alt_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
+
+protected:
+	virtual void video_start() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(cd90_640_formats);
@@ -344,7 +348,6 @@ private:
 	TIMER_CALLBACK_MEMBER( thom_set_init );
 
 	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
-	DECLARE_VIDEO_START( thom );
 
 	uint8_t to7_5p14_r(offs_t offset);
 	void to7_5p14_w(offs_t offset, uint8_t data);
@@ -434,6 +437,8 @@ private:
 	output_finder<> m_floppy_led;
 	required_device_array<legacy_floppy_image_device, 4> m_floppy_image;
 
+	output_finder<> m_caps_led;
+
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
 	int m_old_cart_bank_was_read_only;
@@ -516,7 +521,7 @@ private:
 	emu_timer* m_thom_scanline_timer; /* scan-line update */
 	uint16_t m_thom_last_pal[16];   /* palette at last scanline start */
 	uint16_t m_thom_pal[16];        /* current palette */
-	uint8_t  m_thom_pal_changed;    /* whether pal != old_pal */
+	bool     m_thom_pal_changed;    /* whether pal != old_pal */
 	uint8_t  m_thom_border_index;   /* current border color index */
 	/* the left and right border color for each row (including top and bottom
 	   border rows); -1 means unchanged wrt last scanline
@@ -535,11 +540,11 @@ private:
 	int16_t m_thom_vmodepage[41];
 	uint8_t m_thom_vmodepage_changed;
 	/* one dirty flag for each video memory line */
-	uint8_t m_thom_vmem_dirty[205];
+	bool m_thom_vmem_dirty[205];
 	/* set to 1 if undirty scanlines need to be redrawn due to other video state
 	   changes */
-	uint8_t m_thom_vstate_dirty;
-	uint8_t m_thom_vstate_last_dirty;
+	bool m_thom_vstate_dirty;
+	bool m_thom_vstate_last_dirty;
 	uint32_t m_thom_mode_point;
 	uint32_t m_thom_floppy_wcount;
 	uint32_t m_thom_floppy_rcount;
@@ -555,7 +560,6 @@ private:
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
 	void thom_irq_reset();
-	void thom_set_caps_led( int led );
 	void to7_update_cart_bank();
 	void to7_set_init( int init );
 	void to7_modem_reset();
@@ -597,7 +601,7 @@ private:
 	void mo5nr_game_init();
 	void mo5nr_game_reset();
 
-	int thom_update_screen_size();
+	bool update_screen_size();
 	unsigned thom_video_elapsed();
 	struct thom_vsignal thom_get_vsignal();
 	void thom_get_lightpen_pos( int*x, int* y );

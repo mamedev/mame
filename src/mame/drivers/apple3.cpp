@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "includes/apple3.h"
-#include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
 #include "bus/a2bus/a2cffa.h"
@@ -56,7 +55,7 @@ static void a3_floppies(device_slot_interface &device)
 }
 
 FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
+	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT, FLOPPY_NIB_FORMAT
 FLOPPY_FORMATS_END
 
 void apple3_state::apple3(machine_config &config)
@@ -139,14 +138,15 @@ void apple3_state::apple3(machine_config &config)
 
 	/* rtc */
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_via[1], FUNC(via6522_device::write_ca1));
 
 	/* via */
-	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
 	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
 	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	VIA6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
 	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
 	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
@@ -155,10 +155,6 @@ void apple3_state::apple3(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_bell, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "bell", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	TIMER(config, "c040").configure_periodic(FUNC(apple3_state::apple3_c040_tick), attotime::from_hz(2000));
 

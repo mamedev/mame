@@ -53,13 +53,13 @@ protected:
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
 private:
-	osd_midi_device *m_midi;
+	std::unique_ptr<osd_midi_device> m_midi;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 
 // device iterator
-typedef device_type_iterator<midiout_device> midiout_device_iterator;
+typedef device_type_enumerator<midiout_device> midiout_device_enumerator;
 
 #endif // MAME_IMAGEDEV_MIDIOUT_H

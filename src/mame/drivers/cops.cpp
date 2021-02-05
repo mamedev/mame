@@ -430,7 +430,6 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 	switch(offset & 0x07)
 	{
 		case 0: /* IRQ enable Register 1 */
-		{
 			m_dacia_irq1_reg &= ~0x80;
 
 			if (data & 0x80) //enable bits
@@ -444,10 +443,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			if (LOG_DACIA) logerror("DACIA IRQ 1 Register: %02x\n", m_dacia_irq1_reg);
 			update_dacia_irq();
 			break;
-		}
 
 		case 1: /* Control / Format Register 1 */
-		{
 			if (data & 0x80) //Format Register
 			{
 				m_dacia_rts1 = (data & 0x01);
@@ -478,13 +475,12 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 
 			}
 			break;
-		}
+
 		case 2: /* Compare / Aux Ctrl Register 1 */
-		{
 			if (m_dacia_reg1 == CMP_REGISTER)
 			{
-				m_dacia_cmp1 =1;
-				m_dacia_cmpval1=data;
+				m_dacia_cmp1 = 1;
+				m_dacia_cmpval1 = data;
 				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);
 //              update_dacia_irq();
 			}
@@ -492,15 +488,13 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);
 			}
-		}
+			[[fallthrough]]; // FIXME: really?
 		case 3: /* Transmit Data Register 1 */
-		{
 			if (LOG_DACIA) logerror("DACIA Transmit: %02x %c\n", data, (char)data);
 			m_ld->command_w(data);
 			break;
-		}
+
 		case 4: /* IRQ enable Register 2 */
-		{
 			m_dacia_irq2_reg &= ~0x80;
 
 			if (data & 0x80) //enable bits
@@ -514,10 +508,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			if (LOG_DACIA) logerror("DACIA IRQ 2 Register: %02x\n", m_dacia_irq2_reg);
 			update_dacia_irq();
 			break;
-		}
 
 		case 5: /* Control / Format Register 2 */
-		{
 			if (data & 0x80) //Format Register
 			{
 				m_dacia_rts2 = (data & 0x01);
@@ -548,9 +540,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 
 			}
 			break;
-		}
+
 		case 6: /* Compare / Aux Ctrl Register 2 */
-		{
 			if (m_dacia_reg2 == CMP_REGISTER)
 			{
 				m_dacia_cmp2 =1;
@@ -562,9 +553,8 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				if (LOG_DACIA) logerror("DACIA Aux ctrl 2: %02x \n", data);
 			}
-		}
+			[[fallthrough]]; // FIXME: really?
 		case 7: /* Transmit Data Register 2 */
-		{
 			if (LOG_DACIA) logerror("DACIA Transmit 2: %02x %c\n", data, (char)data);
 
 		//  for (int i=0; i <8; i++)
@@ -573,7 +563,6 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			}
 //          m_ld->command_w(data);
 			break;
-		}
 	}
 }
 /*************************************
@@ -926,7 +915,7 @@ void cops_state::base(machine_config &config)
 	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* via */
-	via6522_device &via1(VIA6522(config, "via6522_1", MAIN_CLOCK/2));
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/2));
 	via1.irq_handler().set(FUNC(cops_state::via1_irq));
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
@@ -945,10 +934,10 @@ void cops_state::cops(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
-	via6522_device &via2(VIA6522(config, "via6522_2", MAIN_CLOCK/2));
+	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/2));
 	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-	via6522_device &via3(VIA6522(config, "via6522_3", MAIN_CLOCK/2));
+	via6522_device &via3(MOS6522(config, "via6522_3", MAIN_CLOCK/2));
 	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
 	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
 	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));

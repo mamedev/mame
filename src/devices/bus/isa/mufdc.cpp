@@ -160,7 +160,7 @@ void mufdc_device::device_start()
 
 void mufdc_device::device_reset()
 {
-	m_isa->install_rom(this, 0xc8000, 0xc9fff, shortname(), "option");
+	m_isa->install_rom(this, 0xc8000, 0xc9fff, "option");
 	m_isa->install_device(0x3f0, 0x3f7, *m_fdc, &mcs3201_device::map);
 	m_isa->set_dma_channel(2, this, true);
 }

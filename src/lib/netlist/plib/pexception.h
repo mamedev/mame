@@ -125,7 +125,7 @@ namespace plib {
 	private:
 		int m_last_enabled;
 
-		static bool m_enable;
+		static bool m_enable; // NOLINT
 	};
 
 

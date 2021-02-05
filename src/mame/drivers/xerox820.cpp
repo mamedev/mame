@@ -229,7 +229,7 @@ static INPUT_PORTS_START( xerox820 )
 	// inputs defined in machine/keyboard.c
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
+TIMER_DEVICE_CALLBACK_MEMBER(bigboard_state::beep_timer)
 {
 	m_beeper->set_state(0);
 }
@@ -322,7 +322,7 @@ void bigboard_state::kbpio_pa_w(uint8_t data)
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
 	{
-		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(bigboard_state::bigboard_beepoff),this));
+		m_beep_timer->adjust(attotime::from_msec(40));
 		m_beeper->set_state(1);
 	}
 	m_bit5 = BIT(data, 5);
@@ -410,7 +410,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	bankswitch(0);
@@ -423,6 +423,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -537,6 +538,8 @@ void xerox820_state::machine_start()
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_8n5));
 	save_item(NAME(m_400_460));
+
+	m_ncset2 = 0;
 }
 
 void xerox820_state::machine_reset()
@@ -606,7 +609,6 @@ GFXDECODE_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -696,6 +698,7 @@ void bigboard_state::bigboard(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
 }
 
 void xerox820ii_state::xerox820ii(machine_config &config)

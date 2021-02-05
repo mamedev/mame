@@ -2189,8 +2189,8 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.framebuffer[0] = std::make_unique<uint16_t[]>(1024 * 256 * 2 ); /* *2 is for double interlace */
 	m_vdp1.framebuffer[1] = std::make_unique<uint16_t[]>(1024 * 256 * 2 );
 
-	m_vdp1.framebuffer_display_lines = auto_alloc_array(machine(), uint16_t *, 512);
-	m_vdp1.framebuffer_draw_lines = auto_alloc_array(machine(), uint16_t *, 512);
+	m_vdp1.framebuffer_display_lines = std::make_unique<uint16_t * []>(512);
+	m_vdp1.framebuffer_draw_lines = std::make_unique<uint16_t * []>(512);
 
 	m_vdp1.framebuffer_width = m_vdp1.framebuffer_height = 0;
 	m_vdp1.framebuffer_mode = -1;

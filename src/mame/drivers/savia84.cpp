@@ -42,26 +42,31 @@ public:
 		, m_ppi8255(*this, "ppi8255")
 		, m_display(*this, "display")
 		, m_io_keyboard(*this, "X%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 		{ }
 
 	void savia84(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	uint8_t savia84_8255_portc_r();
-	void savia84_8255_porta_w(uint8_t data);
-	void savia84_8255_portb_w(uint8_t data);
-	void savia84_8255_portc_w(uint8_t data);
+	uint8_t ppi_portc_r();
+	void ppi_porta_w(uint8_t data);
+	void ppi_portb_w(uint8_t data);
+	void ppi_portc_w(uint8_t data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	uint8_t m_digit;
 	uint8_t m_seg;
-	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<9> m_io_keyboard;
+	output_finder<8> m_leds;
 };
 
 void savia84_state::mem_map(address_map &map)
@@ -133,29 +138,25 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-void savia84_state::savia84_8255_porta_w(uint8_t data) // OUT F8 - output segments on the selected digit
+void savia84_state::ppi_porta_w(uint8_t data) // OUT F8 - output segments on the selected digit
 {
 	m_seg = ~data;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-void savia84_state::savia84_8255_portb_w(uint8_t data) // OUT F9 - light the 8 leds down the left side
+void savia84_state::ppi_portb_w(uint8_t data) // OUT F9 - light the 8 leds down the left side
 {
-	char ledname[8];
 	for (int i = 0; i < 8; i++)
-	{
-		sprintf(ledname,"led%d",i);
-		output().set_value(ledname, !BIT(data, i));
-	}
+		m_leds[i] = !BIT(data, i);
 }
 
-void savia84_state::savia84_8255_portc_w(uint8_t data) // OUT FA - set keyboard scanning row; set digit to display
+void savia84_state::ppi_portc_w(uint8_t data) // OUT FA - set keyboard scanning row; set digit to display
 {
 	m_digit = data & 15;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-uint8_t savia84_state::savia84_8255_portc_r() // IN FA - read keyboard
+uint8_t savia84_state::ppi_portc_r() // IN FA - read keyboard
 {
 	if (m_digit < 9)
 		return m_io_keyboard[m_digit]->read();
@@ -165,6 +166,8 @@ uint8_t savia84_state::savia84_8255_portc_r() // IN FA - read keyboard
 
 void savia84_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_digit));
 	save_item(NAME(m_seg));
 }
@@ -183,10 +186,10 @@ void savia84_state::savia84(machine_config &config)
 
 	/* Devices */
 	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(savia84_state::savia84_8255_porta_w));
-	m_ppi8255->out_pb_callback().set(FUNC(savia84_state::savia84_8255_portb_w));
-	m_ppi8255->in_pc_callback().set(FUNC(savia84_state::savia84_8255_portc_r));
-	m_ppi8255->out_pc_callback().set(FUNC(savia84_state::savia84_8255_portc_w));
+	m_ppi8255->out_pa_callback().set(FUNC(savia84_state::ppi_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(savia84_state::ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(savia84_state::ppi_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(savia84_state::ppi_portc_w));
 }
 
 /* ROM definition */

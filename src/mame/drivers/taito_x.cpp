@@ -826,8 +826,10 @@ void taitox_state::superman(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -838,10 +840,9 @@ void taitox_state::superman(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -873,8 +874,10 @@ void taitox_state::daisenpu(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -885,10 +888,9 @@ void taitox_state::daisenpu(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -918,8 +920,7 @@ void taitox_state::gigandes(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -930,10 +931,9 @@ void taitox_state::gigandes(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -965,8 +965,10 @@ void taitox_state::ballbros(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -977,10 +979,9 @@ void taitox_state::ballbros(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state, seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

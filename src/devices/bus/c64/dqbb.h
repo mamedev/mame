@@ -38,8 +38,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram.get(), 0x4000); } }
+	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram.get(), 0x4000); } }
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;

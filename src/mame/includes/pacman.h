@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -43,11 +44,13 @@ protected:
 	void bigbucks_map(address_map &map);
 	void bigbucks_portmap(address_map &map);
 	void birdiy_map(address_map &map);
+	void cannonbp_map(address_map &map);
 	void crushs_map(address_map &map);
 	void crushs_portmap(address_map &map);
 	void dremshpr_map(address_map &map);
 	void dremshpr_portmap(address_map &map);
 	void drivfrcp_portmap(address_map &map);
+	void mspacii_portmap(address_map &map);
 	void mschamp_map(address_map &map);
 	void mschamp_portmap(address_map &map);
 	void mspacman_map(address_map &map);
@@ -97,11 +100,14 @@ protected:
 	uint8_t m_maketrax_offset;
 	int m_maketrax_disable_protection;
 
-	uint8_t m_irq_mask;
+	bool m_irq_mask;
+	uint8_t m_interrupt_vector;
 
 	void pacman_interrupt_vector_w(uint8_t data);
 	void piranha_interrupt_vector_w(uint8_t data);
 	void nmouse_interrupt_vector_w(uint8_t data);
+	void mspacii_interrupt_vector_w(uint8_t data);
+	IRQ_CALLBACK_MEMBER(interrupt_vector_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_global_w);
 	void alibaba_sound_w(offs_t offset, uint8_t data);
@@ -137,6 +143,7 @@ protected:
 	uint8_t mspacman_enable_decode_r_0x3ff8(offs_t offset);
 	void mspacman_enable_decode_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	uint8_t mspacii_protection_r(offs_t offset);
 	uint8_t cannonbp_protection_r(offs_t offset);
 	void pacman_videoram_w(offs_t offset, uint8_t data);
@@ -163,7 +170,6 @@ public:
 	void init_ponpoko();
 	void init_eyes();
 	void init_woodpek();
-	void init_cannonbp();
 	void init_jumpshot();
 	void init_mspacii();
 	void init_pacplus();
@@ -175,7 +181,6 @@ public:
 	void init_mschamp();
 	void init_mbrush();
 	void init_pengomc1();
-	void init_clubpacma();
 
 protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
@@ -196,7 +201,6 @@ protected:
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(periodic_irq);
-	DECLARE_WRITE_LINE_MEMBER(rocktrv2_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
 	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
 
@@ -208,9 +212,11 @@ private:
 
 public:
 	void birdiy(machine_config &config);
+	void cannonbp(machine_config &config);
 	void rocktrv2(machine_config &config);
 	void mspacman(machine_config &config);
 	void dremshpr(machine_config &config);
+	void mspacii(machine_config &config);
 	void mschamp(machine_config &config);
 	void nmouse(machine_config &config);
 	void vanvan(machine_config &config);
@@ -262,6 +268,28 @@ protected:
 
 	void epos_map(address_map &map);
 	void epos_portmap(address_map &map);
+};
+
+class clubpacm_state : public pacman_state
+{
+public:
+	clubpacm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+		, m_sublatch(*this, "sublatch")
+		, m_players(*this, "P%u", 1)
+	{ }
+
+	void clubpacm(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+
+	void init_clubpacma();
+
+protected:
+	void clubpacm_map(address_map &map);
+
+	required_device<generic_latch_8_device> m_sublatch;
+	required_ioport_array<2> m_players;
 };
 
 #endif // MAME_INCLUDES_PACMAN_H

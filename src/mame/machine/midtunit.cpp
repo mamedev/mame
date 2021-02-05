@@ -382,8 +382,11 @@ void midtunit_state::init_mktunit()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b00000, 0x1b6ffff, read16sm_delegate(*this, FUNC(midtunit_state::mk_prot_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b00000, 0x1b6ffff, write16s_delegate(*this, FUNC(midtunit_state::mk_prot_w)));
 
+	m_hidden_ram = std::make_unique<uint8_t[]>(42);
+	save_pointer(NAME(m_hidden_ram), 42);
+
 	/* sound chip protection (hidden RAM) */
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6, m_hidden_ram.get());
 }
 
 void midtunit_state::init_mkturbo()
@@ -415,11 +418,14 @@ void midtunit_state::init_nbajam_common(int te_protection)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b95f40, 0x1bb7f5f, write16sm_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
 	}
 
+	m_hidden_ram = std::make_unique<uint8_t[]>(42);
+	save_pointer(NAME(m_hidden_ram), 42);
+
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4, m_hidden_ram.get());
 	else
-		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16, m_hidden_ram.get());
 }
 
 void midtunit_state::init_nbajam()
@@ -443,10 +449,11 @@ void midtunit_state::init_jdreddp()
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16sm_delegate(*this, FUNC(midtunit_state::jdredd_prot_r)), write16sm_delegate(*this, FUNC(midtunit_state::jdredd_prot_w)));
 
+	m_hidden_ram = std::make_unique<uint8_t[]>(42);
+	save_pointer(NAME(m_hidden_ram), 42);
+
 	/* sound chip protection (hidden RAM) */
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
-	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), uint8_t, 0x80));
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbcf, 0xfbf9, m_hidden_ram.get());
 }
 
 

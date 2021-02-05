@@ -1831,6 +1831,7 @@ void dp8344_device::store_result()
 			write_register(m_latched_instr & 0x001f, m_source_data);
 			break;
 		}
+		break;
 
 	case 0xe000:
 		if (BIT(m_latched_instr, 11))

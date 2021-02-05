@@ -1018,7 +1018,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		}
 	}
 
-	png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
+	util::png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
 
 	if (m_log_json)
 	{

@@ -24,10 +24,10 @@ header and leader bytes.
 
 
 ********************************************************************/
+#include "sorc_cas.h"
 
 #include <cassert>
 
-#include "sorc_cas.h"
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -124,7 +124,7 @@ static int sorcerer_cassette_calculate_size_in_samples(const uint8_t *bytes, int
 	return sorcerer_handle_cassette(nullptr, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller sorcerer_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller sorcerer_legacy_fill_wave =
 {
 	sorcerer_cassette_fill_wave,                 /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -135,17 +135,17 @@ static const struct CassetteLegacyWaveFiller sorcerer_legacy_fill_wave =
 	0                                       /* trailer_samples */
 };
 
-static cassette_image::error sorcerer_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error sorcerer_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &sorcerer_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &sorcerer_legacy_fill_wave);
 }
 
 static cassette_image::error sorcerer_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &sorcerer_legacy_fill_wave);
+	return cassette->legacy_construct(&sorcerer_legacy_fill_wave);
 }
 
-static const struct CassetteFormat sorcerer_cassette_image_format =
+static const cassette_image::Format sorcerer_cassette_image_format =
 {
 	"tape",
 	sorcerer_cassette_identify,

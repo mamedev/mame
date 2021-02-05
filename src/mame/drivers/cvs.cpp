@@ -97,7 +97,6 @@ Todo & FIXME:
 
 #include "emu.h"
 #include "includes/cvs.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -959,6 +958,7 @@ void cvs_state::machine_reset()
 	m_stars_on = 0;
 	m_scroll_reg = 0;
 	m_stars_scroll = 0;
+	m_s2650_flag = 0;
 }
 
 void cvs_state::cvs(machine_config &config)
@@ -1018,12 +1018,6 @@ void cvs_state::cvs(machine_config &config)
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 
 	TMS5100(config, m_tms5110, XTAL(640'000));
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));

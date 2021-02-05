@@ -115,7 +115,8 @@ READ_LINE_MEMBER(psikyo_state::mcu_status_r)
 	if (m_mcu_status)
 		ret = 0x01;
 
-	m_mcu_status = !m_mcu_status;   /* hack */
+	if (!machine().side_effects_disabled())
+		m_mcu_status = !m_mcu_status;   /* hack */
 
 	return ret;
 }
@@ -207,12 +208,14 @@ u32 psikyo_state::s1945_mcu_data_r()
 	if (m_s1945_mcu_control & 16)
 	{
 		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-		m_s1945_mcu_latching |= 4;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 4;
 	}
 	else
 	{
 		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-		m_s1945_mcu_latching |= 1;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 1;
 	}
 	res |= m_s1945_mcu_bctrl & 0xf0;
 	return res;
@@ -255,8 +258,8 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 //  map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::input_r));                                        // Depends on board
 //  map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w));                                    // MCU on sh404
@@ -290,8 +293,8 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
@@ -442,7 +445,8 @@ READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
-		machine().scheduler().synchronize();
+		if (!machine().side_effects_disabled())
+			machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 
@@ -1007,6 +1011,9 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
+	// assumes it can make an address mask with m_spritelut.length() - 1
+	assert(!(m_spritelut.length() & (m_spritelut.length() - 1)));
+
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_tilemap_bank));
 }

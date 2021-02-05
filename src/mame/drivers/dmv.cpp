@@ -400,10 +400,11 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
 		return image_init_result::FAIL;
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;

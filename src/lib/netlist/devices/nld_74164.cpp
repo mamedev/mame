@@ -50,10 +50,8 @@
 
 // FIXME: clk input to be separated - only falling edge relevant
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(74164)
 	{
 		NETLIB_CONSTRUCTOR(74164)
@@ -115,5 +113,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74164, "TTL_74164", "+A,+B,+CLRQ,+CLK,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

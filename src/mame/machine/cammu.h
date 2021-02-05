@@ -239,7 +239,7 @@ protected:
 
 	struct memory_t
 	{
-		address_space *space;
+		address_space *space = nullptr;
 		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache cache;
 	};
 

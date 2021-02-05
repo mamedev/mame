@@ -129,7 +129,8 @@ void vtech_laser310_16k_device::device_reset()
 
 vtech_laser_64k_device::vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VTECH_LASER_64K, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this)
+	device_vtech_memexp_interface(mconfig, *this),
+	m_bank(*this, "bank")
 {
 }
 
@@ -152,10 +153,10 @@ void vtech_laser_64k_device::device_reset()
 	program_space().install_ram(0x8000, 0xbfff, &m_ram[0]);
 
 	// other banks
-	program_space().install_readwrite_bank(0xc000, 0xffff, tag());
+	program_space().install_readwrite_bank(0xc000, 0xffff, m_bank);
 
-	membank(tag())->configure_entries(0, 4, &m_ram[0], 0x4000);
-	membank(tag())->set_entry(1);
+	m_bank->configure_entries(0, 4, &m_ram[0], 0x4000);
+	m_bank->set_entry(1);
 
 	// bank switch
 	io_space().install_write_handler(0x70, 0x7f, write8smo_delegate(*this, FUNC(vtech_laser_64k_device::bankswitch_w)));
@@ -163,5 +164,5 @@ void vtech_laser_64k_device::device_reset()
 
 void vtech_laser_64k_device::bankswitch_w(uint8_t data)
 {
-	membank(tag())->set_entry(data & 0x03);
+	m_bank->set_entry(data & 0x03);
 }

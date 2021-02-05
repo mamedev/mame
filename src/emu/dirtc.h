@@ -75,7 +75,7 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_rtc_interface> rtc_interface_iterator;
+typedef device_interface_enumerator<device_rtc_interface> rtc_interface_enumerator;
 
 
 #endif // MAME_EMU_DIRTC_H

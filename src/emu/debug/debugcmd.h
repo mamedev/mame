@@ -151,6 +151,7 @@ private:
 	void execute_load(int ref, const std::vector<std::string> &params);
 	void execute_loadregion(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);
+	void execute_strdump(int ref, const std::vector<std::string> &params);
 	void execute_cheatinit(int ref, const std::vector<std::string> &params);
 	void execute_cheatnext(int ref, const std::vector<std::string> &params);
 	void execute_cheatlist(int ref, const std::vector<std::string> &params);

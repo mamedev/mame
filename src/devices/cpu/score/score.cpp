@@ -346,7 +346,7 @@ void score7_cpu_device::gen_exception(int cause, uint32_t param)
 	{
 		case EXCEPTION_P_EL:
 			REG_EMA = REG_EPC;
-			// intentional fallthrough
+			[[fallthrough]];
 		case EXCEPTION_NMI:
 		case EXCEPTION_CEE:
 		case EXCEPTION_SYSCALL:

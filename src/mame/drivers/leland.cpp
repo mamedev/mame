@@ -64,7 +64,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -84,7 +83,7 @@ void leland_state::master_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(leland_state::leland_battery_ram_w));
 	map(0xe000, 0xefff).ram().share(m_mainram);
 	map(0xf000, 0xf3ff).rw(FUNC(leland_state::gated_paletteram_r), FUNC(leland_state::gated_paletteram_w)).share("palette");
 	map(0xf800, 0xf801).w(FUNC(leland_state::master_video_addr_w));
@@ -111,7 +110,7 @@ void ataxx_state::master_map_program_2(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
+	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(ataxx_state::ataxx_battery_ram_w));
 	map(0xe000, 0xf7ff).ram().share(m_mainram);
 	map(0xf800, 0xffff).rw(FUNC(ataxx_state::paletteram_and_misc_r), FUNC(ataxx_state::paletteram_and_misc_w)).share("palette");
 }
@@ -178,6 +177,11 @@ void leland_state::slave_map_program(address_map &map)
 	map(0xffff, 0xffff).w(FUNC(leland_state::ataxx_slave_banksw_w));
 }
 
+void leland_state::asylum_slave_map_program(address_map &map)
+{
+	slave_map_program(map);
+	map(0xf000, 0xfffb).ram();
+}
 
 void ataxx_state::slave_map_io_2(address_map &map)
 {
@@ -1015,9 +1019,6 @@ void leland_state::leland(machine_config &config)
 
 	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
 	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1081,6 +1082,11 @@ void ataxx_state::wsf(machine_config &config)
 	WSF_80186(config.replace(), m_sound, 0).set_master_cpu_tag(m_master);
 }
 
+void ataxx_state::asylum(machine_config &config)
+{
+	wsf(config);
+	m_slave->set_addrmap(AS_PROGRAM, &ataxx_state::asylum_slave_map_program);
+}
 
 
 /*************************************
@@ -3355,9 +3361,6 @@ void ataxx_state::init_asylum()
 	rotate_memory("master");
 	rotate_memory("slave");
 
-	/* asylum appears to have some extra RAM for the slave CPU */
-	m_slave->space(AS_PROGRAM).install_ram(0xf000, 0xfffb);
-
 	/* set up additional input ports */
 	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
 	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
@@ -3421,4 +3424,4 @@ GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,   init_wsf,
 GAME( 1990, wsf3,       wsf,      wsf,      wsf,        ataxx_state,   init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
 GAME( 1991, indyheat,   0,        wsf,      indyheat,   ataxx_state,   init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
 GAME( 1991, brutforc,   0,        wsf,      brutforc,   ataxx_state,   init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
-GAME( 1991, asylum,     0,        wsf,      brutforc,   ataxx_state,   init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )
+GAME( 1991, asylum,     0,        asylum,   brutforc,   ataxx_state,   init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

@@ -369,7 +369,7 @@ void srmp5_state::srmp5_mem(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram(); //maybe 0 - 2fffff ?
 	map(0x002f0000, 0x002f7fff).ram();
-	map(0x01000000, 0x01000003).writeonly();  // 0xaa .. watchdog ?
+	map(0x01000000, 0x01000003).nopw();  // 0xaa .. watchdog ?
 	map(0x01800000, 0x01800003).ram(); //?1
 	map(0x01800004, 0x01800007).portr("DSW1");
 	map(0x01800008, 0x0180000b).portr("DSW2");
@@ -392,7 +392,7 @@ void srmp5_state::srmp5_mem(address_map &map)
 	map(0x0a200000, 0x0a3fffff).rw(FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
 	map(0x0fc00000, 0x0fdfffff).mirror(0x10000000).rom().region("maincpu", 0);
 
-	map(0x1eff0000, 0x1eff001f).writeonly();
+	map(0x1eff0000, 0x1eff001f).nopw();
 	map(0x1eff003c, 0x1eff003f).r(FUNC(srmp5_state::irq_ack_clear));
 }
 

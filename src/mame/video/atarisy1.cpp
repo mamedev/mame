@@ -169,6 +169,7 @@ void atarisy1_state::video_start()
 	m_next_timer_scanline = -1;
 	m_scanline_int_state = 0;
 	m_bankselect = 0xff;
+	m_playfield_tile_bank = 0;
 
 	// save state
 	save_item(NAME(m_playfield_tile_bank));

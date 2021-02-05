@@ -63,6 +63,9 @@ protected:
 	required_device_array<hp9845_io_slot_device, 4> m_io_slot;
 	required_device<ram_device> m_ram;
 	output_finder<8> m_softkeys;
+	output_finder<> m_shift_lock_led;
+	output_finder<> m_prt_all_led;
+	output_finder<> m_auto_st_led;
 
 	void setup_ram_block(unsigned block , unsigned offset);
 
@@ -83,11 +86,11 @@ protected:
 	required_region_ptr<uint8_t> m_chargen;
 
 	// Text mode video I/F
-	typedef struct {
+	struct video_buffer_t {
 		uint8_t chars[ 80 ];
 		uint8_t attrs[ 80 ];
-		bool full;
-	} video_buffer_t;
+		bool full = 0;
+	};
 
 	bitmap_rgb32 m_bitmap;
 	offs_t m_video_mar;
@@ -100,7 +103,7 @@ protected:
 	video_buffer_t m_video_buff[ 2 ];
 
 	// Graphic video
-	typedef enum {
+	enum gv_fsm_state_t {
 		GV_STAT_RESET,
 		GV_STAT_WAIT_DS_0 = GV_STAT_RESET,
 		GV_STAT_WAIT_TRIG_0,
@@ -110,7 +113,7 @@ protected:
 		GV_STAT_WAIT_TRIG_1,
 		GV_STAT_WAIT_MEM_1,
 		GV_STAT_WAIT_MEM_2
-	} gv_fsm_state_t;
+	};
 
 	bool m_graphic_sel;
 	gv_fsm_state_t m_gv_fsm_state;

@@ -9,18 +9,21 @@
 
 FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_525_13)
 	FLOPPY_EDD_FORMAT,
-	FLOPPY_WOZ_FORMAT
+	FLOPPY_WOZ_FORMAT,
+	FLOPPY_NIB_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_525)
 	FLOPPY_A216S_FORMAT,
 	FLOPPY_RWTS18_FORMAT,
 	FLOPPY_EDD_FORMAT,
-	FLOPPY_WOZ_FORMAT
+	FLOPPY_WOZ_FORMAT,
+	FLOPPY_NIB_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_35)
 	FLOPPY_DC42_FORMAT,
+	FLOPPY_APPLE_GCR_FORMAT,
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
@@ -31,7 +34,9 @@ void applefdintf_device::floppies_525(device_slot_interface &device)
 
 void applefdintf_device::floppies_35(device_slot_interface &device)
 {
-	device.option_add("35", FLOPPY_35_HD);
+	device.option_add("35sd", OAD34V);
+	device.option_add("35dd", MFD51W);
+	device.option_add("35hd", MFD75W);
 }
 
 applefdintf_device::applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

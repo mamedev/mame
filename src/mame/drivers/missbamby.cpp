@@ -4,16 +4,18 @@
 /*
 Skeleton driver for Cirsa "Mini Super Fruits" and clones.
 Known games on this hardware:
- __________________________________________________
- | Dumped | Game              | Manufacturer       |
- +--------+-------------------+--------------------+
- | YES    | Mini Super Fruits | Cirsa              |
- | YES    | Lucky Player      | Cirsa              |
- | YES    | Miss Bamby        | Automatics Pasqual |
- | YES    | Golden Winer      | Reben              |
- | NO     | Golden Fruits     | unknown            |
- | NO     | St.-Tropez        | unknown            |
- +-------------------------------------------------+
+ ________________________________________________________________________
+ | Dumped | Game              | Manufacturer       | Notes              |
+ +--------+-------------------+--------------------+--------------------|
+ | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
+ | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
+ | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | Golden Winner     | Reben              |                    |
+ | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
+ | NO     | St.-Tropez        | Video Game         |                    |
+ | NO     | Cocktails         | Video Game         |                    |
+ | NO     | Gold Mini II      | Video Game         |                    |
+ +-------------------------------------------------+--------------------+
 */
 /*
 Miss Bamby - Automatics Pasqual
@@ -40,7 +42,7 @@ Miss Bamby - Automatics Pasqual
 |__|   _______           ___________________  |D  | | 3.6V    | |
 |__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| LM311N      |
+|__|                                  8 dips->|S__| LM311N      |
    |____________________________________________________________|
 
 Golden Winner - Reben
@@ -67,7 +69,7 @@ Golden Winner - Reben
 |__|   _______           ___________________  |D  |             |
 |__|   |LM380N|          |    AY-3-8910     | |I  |             |
 |__|                     |__________________| |P  | ______      |
-|__|                                          |S__| CA311E      |
+|__|                                  8 dips->|S__| CA311E      |
    |____________________________________________________________|
 */
 
@@ -78,6 +80,9 @@ Golden Winner - Reben
 #include "machine/i8155.h"
 //#include "machine/nvram.h"
 #include "sound/ay8910.h"
+
+
+namespace {
 
 class missbamby_state : public driver_device
 {
@@ -135,6 +140,18 @@ static INPUT_PORTS_START( missbamby )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
+// 4 dipswitches on Cirsa 810601 A PCB
+static INPUT_PORTS_START( c_810601a )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+INPUT_PORTS_END
+
 
 void missbamby_state::machine_start()
 {
@@ -170,6 +187,7 @@ void missbamby_state::gldwinner(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // guess
 }
 
+// Cirsa PCB 810601 A
 ROM_START( minisupf )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "mini_av_1.4.a", 0x0000, 0x0800, CRC(d29a6468) SHA1(9a6d25a6d5602aff226340e8b4a87aa8a55e7c51) )
@@ -180,7 +198,7 @@ ROM_START( minisupf )
 	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
 ROM_END
 
-// The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
+// Cirsa PCB 810702 A. The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
 ROM_START( luckyplr )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "lucky_player_24.a", 0x0000, 0x1000, CRC(11a3daf2) SHA1(239d2e53f05eecfcbc0cf5e037df21e3851e4d69) )
@@ -197,6 +215,17 @@ ROM_START( msbamby )
 
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD( "prom.bin", 0x00, 0x20, CRC(f7013c11) SHA1(6e4e6d7f2a041d44359a7f5662bb4302da234ace) ) // Unknown manufacturer, dumped as 82s123
+ROM_END
+
+// 4 dipswitches, battery on PCB, exact clone of Mini Super Fruits PCB
+ROM_START( goldfrts )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "a.bin", 0x0000, 0x0800, CRC(4dc662b9) SHA1(f63cde167f8266c511c64903d6f694a6cf5885fc) )
+	ROM_LOAD( "b.bin", 0x0800, 0x0800, CRC(681c2c62) SHA1(c56d2f0ecabbc3e9d2aa7e5ec07a51c5905128ff) )
+	ROM_LOAD( "c.bin", 0x1000, 0x0800, CRC(0083d794) SHA1(d7d1f67fddab1560f5d42f4354b32a2e6ce0224d) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "golden_fruits_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) ) // Same as Mini Super Fruits
 ROM_END
 
 ROM_START( gwinner )
@@ -217,9 +246,22 @@ ROM_START( unkslot )
 	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
 ROM_END
 
+// PINBALL
+// CPU:   1 x I8085A
+// IO:    1 x I8155
+// Sound: 1 x AY8910
+ROM_START( trebol )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "m69.bin", 0x0000, 0x2000, CRC(8fb8cd39) SHA1(4ed505d06b489ce83316fdaa39f7ce128011fb4b) )
+ROM_END
 
-GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
+} // Anonymous namespace
+
+
+GAME( 1981, minisupf, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",                          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",                            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, goldfrts, 0, missbamby, c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, trebol,   0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Regama",             "Trebol",                                MACHINE_IS_SKELETON_MECHANICAL )

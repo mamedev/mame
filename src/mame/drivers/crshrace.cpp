@@ -167,7 +167,7 @@ void crshrace_state::main_map(address_map &map)
 	map(0xfff00a, 0xfff00b).portr("DSW1");
 	map(0xfff00e, 0xfff00f).portr("P3");
 	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xfff044, 0xfff047).writeonly();   // ??? moves during race
+	map(0xfff044, 0xfff047).nopw();   // ??? moves during race
 }
 
 void crshrace_state::sound_map(address_map &map)

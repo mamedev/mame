@@ -101,6 +101,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void maincpu_common_map(address_map &map);
 	virtual void maincpu_program_map(address_map &map);
 	void maincpu_io_map(address_map &map);
 

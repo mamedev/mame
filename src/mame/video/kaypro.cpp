@@ -144,7 +144,7 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 		if (x == cursor_x) inv=0xff;
 		u16 const mem = (ma + x) & 0x7ff;
 		u8 const chr = m_vram[mem];
-		u8 const attr = m_vram[mem | 0x800];
+		u8 const attr = m_vram[(mem+1) | 0x800];
 
 		u8 fg, bg;
 		if ((attr & 3) == 3)

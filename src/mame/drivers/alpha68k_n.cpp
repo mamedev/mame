@@ -53,6 +53,19 @@ Notes:
                        The chip is pin-compatible with Motorola MC68705U3, Motorola MC6805U2
                        and Hitachi HD6805U1. The 4k MC68705U3 dump in MAME is from a bootleg PCB.
 
+Note from Guru: The bootleg 4k MCU dump was written to a genuine
+Motorola MC68705U3 microcontroller and tested on the original Alpha
+Denshi Kyros no Yakata PCB and works. Since the bootleg PCB is
+visually the same this suggests the bootleggers copied the PCB 1:1
+including the HD6805U1 MCU data then adapted it for the 68705U3 with
+minimal changes.
+*******************************
+romcmp -d *.bin
+Comparing 2 files....
+kyros_68705u3.bin [3/4]      kyros_mcu.bin [1/2]      99.902344%
+kyros_68705u3.bin [4/4]      kyros_mcu.bin [2/2]      88.183594%
+*******************************
+
 Sound Board
 -----------
 
@@ -787,9 +800,6 @@ void sstingray_state::sstingry(machine_config &config)
 	ym3.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void kyros_state::kyros(machine_config &config)
@@ -823,9 +833,6 @@ void kyros_state::kyros(machine_config &config)
 	ym3.add_route(ALL_OUTPUTS, "speaker", 0.9);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void jongbou_state::jongbou(machine_config &config)

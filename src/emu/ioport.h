@@ -358,6 +358,7 @@ enum ioport_type
 		IPT_UI_ROTATE,
 		IPT_UI_SHOW_PROFILER,
 		IPT_UI_TOGGLE_UI,
+		IPT_UI_RELEASE_POINTER,
 		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
@@ -1388,7 +1389,6 @@ public:
 	running_machine &machine() const noexcept { return m_machine; }
 	const ioport_list &ports() const noexcept { return m_portlist; }
 	bool safe_to_read() const noexcept { return m_safe_to_read; }
-	natural_keyboard &natkeyboard() noexcept { assert(m_natkeyboard != nullptr); return *m_natkeyboard; }
 
 	// type helpers
 	const std::vector<input_type_entry> &types() const noexcept { return m_typelist; }
@@ -1415,7 +1415,7 @@ private:
 	void frame_update_callback();
 	void frame_update();
 
-	ioport_port *port(const char *tag) const { if (tag) { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
+	ioport_port *port(const std::string &tag) const { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
 	static const char *const seqtypestrings[];
@@ -1458,7 +1458,6 @@ private:
 
 	// specific special global input states
 	simple_list<digital_joystick> m_joystick_list;  // list of digital joysticks
-	std::unique_ptr<natural_keyboard> m_natkeyboard; // natural keyboard support
 
 	// frame time tracking
 	attotime                m_last_frame_time;      // time of the last frame callback

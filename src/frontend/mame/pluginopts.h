@@ -17,23 +17,20 @@
 #include <string>
 
 
-// ======================> plugin
-
-struct plugin
-{
-	std::string m_name;
-	std::string m_description;
-	std::string m_type;
-	std::string m_directory;
-	bool        m_start;
-};
-
-
 // ======================> plugin_options
 
 class plugin_options
 {
 public:
+	struct plugin
+	{
+		std::string m_name;
+		std::string m_description;
+		std::string m_type;
+		std::string m_directory;
+		bool        m_start;
+	};
+
 	plugin_options();
 
 	// accessors

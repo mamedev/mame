@@ -437,8 +437,6 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 
 void trs80m2_state::video_start()
 {
-	// allocate memory
-	m_video_ram.allocate(0x800);
 }
 
 uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

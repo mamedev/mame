@@ -52,7 +52,7 @@ Control B:
 02   select WR2
 00   int vector = 0
 03   select WR3
-c0   8 data bits, Rx disabled
+oc0   8 data bits, Rx disabled
 0f   select WR15, external interrupt status/control
 08   enable 08
 00   select WR0
@@ -80,10 +80,28 @@ c0   8 data bits, Rx disabled
 09   select WR9
 0a   enable MIE / NV
 
+VIA notes:
+
+Original 128K Macs use Synertek SYP6522 VIAs. Synertek's AN5 (March 1982)
+claims that their VIAs have a difference in shift register behavior
+compared to those from other manufacturers. However, this particular
+difference is not relevant to the Mac hardware, and later 512K Macs
+switched away from SYP6522 (Apple part number 338-6522-A) to either
+Rockwell R6522AP (R6522-66) or VTI VL6522-02PC. R6522AP is the most
+common VIA on the Mac Plus.
+
+Apple continued sourcing VIAs from the same two manufacturers for the
+Mac SE, though their ADB-era VIAs are newer CMOS models with a fix for the
+shift register's CB1 input synchronizer which Apple may have specifically
+requested. The new Rockwell version (R65NC22) is only labeled with Apple
+part number 338-6523 (later Macs use a PLCC version which Apple numbered
+338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
 ****************************************************************************/
 
 #include "emu.h"
+
+#define NEW_IWM 0
 
 #include "machine/macrtc.h"
 
@@ -95,15 +113,19 @@ c0   8 data bits, Rx disabled
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
+#include "machine/iwm.h"
 #include "machine/ncr5380.h"
 #include "machine/ram.h"
+#if NEW_IWM
+#include "machine/applefdintf.h"
+#else
 #include "machine/sonydriv.h"
+#endif
 #include "machine/swim.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -160,6 +182,9 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_iwm(*this, "fdc"),
+#if NEW_IWM
+		m_floppy(*this, "fdc:%d", 0U),
+#endif
 		m_mackbd(*this, "kbd"),
 		m_rtc(*this,"rtc"),
 		m_mouse0(*this, "MOUSE0"),
@@ -169,6 +194,8 @@ public:
 		m_dac(*this, DAC_TAG),
 		m_scc(*this, SCC_TAG)
 	{
+		m_cur_floppy = nullptr;
+		m_hdsel = 0;
 	}
 
 	void mac512ke(machine_config &config);
@@ -189,7 +216,12 @@ private:
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
+	#if NEW_IWM
+	required_device<applefdintf_device> m_iwm;
+	required_device_array<floppy_connector, 2> m_floppy;
+	#else
 	required_device<applefdc_base_device> m_iwm;
+	#endif
 	optional_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
@@ -241,16 +273,21 @@ private:
 	void macplus_map(address_map &map);
 	void macse_map(address_map &map);
 
+	floppy_image_device *m_cur_floppy;
+	int m_hdsel;
+
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
+
 	mac128model_t m_model;
 
 	uint32_t m_overlay;
 
 	int m_irq_count, m_ca1_data, m_ca2_data;
-	int m_mouse_bit_x;
-	int m_mouse_bit_y;
-	int last_mx, last_my;
-	int count_x, count_y;
-	int m_last_was_x;
+	uint8_t m_mouse_bit[2], m_mouse_last[2];
+	int16_t m_mouse_last_m[2], m_mouse_count[2];
 	int m_screen_buffer;
 	emu_timer *m_scan_timer;
 	emu_timer *m_hblank_timer;
@@ -288,13 +325,10 @@ void mac128_state::machine_start()
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_ca2_data));
-	save_item(NAME(m_mouse_bit_x));
-	save_item(NAME(m_mouse_bit_y));
-	save_item(NAME(last_mx));
-	save_item(NAME(last_my));
-	save_item(NAME(count_x));
-	save_item(NAME(count_y));
-	save_item(NAME(m_last_was_x));
+	save_item(NAME(m_mouse_bit));
+	save_item(NAME(m_mouse_last));
+	save_item(NAME(m_mouse_last_m));
+	save_item(NAME(m_mouse_count));
 	save_item(NAME(m_screen_buffer));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
@@ -306,6 +340,9 @@ void mac128_state::machine_start()
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(m_drive_select));
 	save_item(NAME(m_scsiirq_enable));
+
+	m_mouse_bit[0] = m_mouse_bit[1] = 0;
+	m_mouse_last[0] = m_mouse_last[1] = 0;
 }
 
 void mac128_state::machine_reset()
@@ -314,7 +351,6 @@ void mac128_state::machine_reset()
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
 	m_screen_buffer = 1;
-	m_mouse_bit_x = m_mouse_bit_y = 0;
 	m_last_taken_interrupt = 0;
 	m_snd_enable = false;
 	m_main_buffer = true;
@@ -518,153 +554,40 @@ void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 void mac128_state::scc_mouse_irq(int x, int y)
 {
-	static int lasty = 0;
-	static int lastx = 0;
-
 	// DCD lines are active low in hardware but active high to software
-	if (x && y)
+	if (x)
 	{
-		if (m_last_was_x)
+		m_scc->dcda_w(m_mouse_last[0] ? 1 : 0);
+		if (x < 0)
 		{
-			if(x == 2)
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 0;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 1;
-				}
-			}
-			else
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 1;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 0;
-				}
-			}
-			lastx = !lastx;
+			m_mouse_bit[0] = m_mouse_last[0] ? 0 : 1;
 		}
 		else
 		{
-			if(y == 2)
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 0;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 1;
-				}
-			}
-			else
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 1;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 0;
-				}
-			}
-			lasty = !lasty;
+			m_mouse_bit[0] = m_mouse_last[0] ? 1 : 0;
 		}
-
-		m_last_was_x ^= 1;
+		m_mouse_last[0] = !m_mouse_last[0];
 	}
-	else
+	if (y)
 	{
-		if (x)
+		m_scc->dcdb_w(m_mouse_last[1] ? 1 : 0);
+		if (y < 0)
 		{
-			if(x == 2)
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 0;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 1;
-				}
-			}
-			else
-			{
-				if(lastx)
-				{
-					m_scc->dcda_w(1);
-					m_mouse_bit_x = 1;
-				}
-				else
-				{
-					m_scc->dcda_w(0);
-					m_mouse_bit_x = 0;
-				}
-			}
-			lastx = !lastx;
+			m_mouse_bit[1] = m_mouse_last[1] ? 0 : 1;
 		}
 		else
 		{
-			if(y == 2)
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 0;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 1;
-				}
-			}
-			else
-			{
-				if(lasty)
-				{
-					m_scc->dcdb_w(1);
-					m_mouse_bit_y = 1;
-				}
-				else
-				{
-					m_scc->dcdb_w(0);
-					m_mouse_bit_y = 0;
-				}
-			}
-			lasty = !lasty;
+			m_mouse_bit[1] = m_mouse_last[1] ? 1 : 0;
 		}
+		m_mouse_last[1] = !m_mouse_last[1];
 	}
 }
 
 uint16_t mac128_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 {
-	/* The first time this is called is in a floppy test, which goes from
-	 * $400104 to $400126.  After that, all access to the floppy goes through
-	 * the disk driver in the MacOS
-	 *
-	 * I just thought this would be on interest to someone trying to further
-	 * this driver along
-	 */
-
 	uint16_t result = 0;
 
-	result = m_iwm->read(offset >> 8);
+	result = m_iwm->read((offset >> 8) & 0xf);
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
@@ -678,9 +601,9 @@ void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		m_iwm->write((offset >> 8), data & 0xff);
+		m_iwm->write((offset >> 8) & 0xf, data & 0xff);
 	else
-		m_iwm->write((offset >> 8), data>>8);
+		m_iwm->write((offset >> 8) & 0xf, data>>8);
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
@@ -748,12 +671,9 @@ uint8_t mac128_state::mac_via_in_b()
 {
 	int val = 0x40;
 
-	if (m_mouse_bit_y)  /* Mouse Y2 */
-		val |= 0x20;
-	if (m_mouse_bit_x)  /* Mouse X2 */
-		val |= 0x10;
-	if ((m_mouse0->read() & 0x01) == 0)
-		val |= 0x08;
+	val |= m_mouse_bit[1] << 5; // Mouse Y2
+	val |= m_mouse_bit[0] << 4; // Mouse X2
+	val |= BIT(~m_mouse0->read(), 0) << 3;
 
 	val |= m_rtc->data_r();
 
@@ -784,7 +704,19 @@ void mac128_state::mac_via_out_a(uint8_t data)
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
+	#if !NEW_IWM
 	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
+	#else
+	int hdsel = BIT(data, 5);
+	if (hdsel != m_hdsel)
+	{
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(hdsel);
+		}
+		m_hdsel = hdsel;
+	}
+	#endif
 
 	m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
 	m_snd_vol = data & 0x07;
@@ -805,7 +737,19 @@ void mac128_state::mac_via_out_a_se(uint8_t data)
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
+	#if !NEW_IWM
 	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
+	#else
+	int hdsel = BIT(data, 5);
+	if (hdsel != m_hdsel)
+	{
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(hdsel);
+		}
+		m_hdsel = hdsel;
+	}
+	#endif
 
 	m_snd_vol = data & 0x07;
 	update_volume();
@@ -849,79 +793,66 @@ void mac128_state::mac_via_out_b_se(uint8_t data)
 
 void mac128_state::mouse_callback()
 {
-	int     new_mx, new_my;
-	int     x_needs_update = 0, y_needs_update = 0;
-
-	new_mx = m_mouse1->read();
-	new_my = m_mouse2->read();
-
-	/* see if it moved in the x coord */
-	if (new_mx != last_mx)
+	// see if it moved in the x coord
+	const int new_mx = m_mouse1->read();
+	if (new_mx != m_mouse_last_m[0])
 	{
-		int     diff = new_mx - last_mx;
+		int diff = new_mx - m_mouse_last_m[0];
 
-		/* check for wrap */
+		// check for wrap
 		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
 
-		count_x += diff;
-
-		last_mx = new_mx;
+		m_mouse_count[0] += diff;
+		m_mouse_last_m[0] = new_mx;
 	}
-	/* see if it moved in the y coord */
-	if (new_my != last_my)
-	{
-		int     diff = new_my - last_my;
 
-		/* check for wrap */
+	// see if it moved in the y coord
+	const int new_my = m_mouse2->read();
+	if (new_my != m_mouse_last_m[1])
+	{
+		int diff = new_my - m_mouse_last_m[1];
+
+		// check for wrap
 		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
 
-		count_y += diff;
-
-		last_my = new_my;
+		m_mouse_count[1] += diff;
+		m_mouse_last_m[1] = new_my;
 	}
 
-	/* update any remaining count and then return */
-	if (count_x)
+	// update any remaining count and then return
+	int x_needs_update = 0;
+	if (m_mouse_count[0] < 0)
 	{
-		if (count_x < 0)
-		{
-			count_x++;
-			m_mouse_bit_x = 0;
-			x_needs_update = 2;
-		}
-		else
-		{
-			count_x--;
-			m_mouse_bit_x = 1;
-			x_needs_update = 1;
-		}
+		m_mouse_count[0]++;
+		x_needs_update = -1;
 	}
-	else if (count_y)
+	else if (m_mouse_count[0])
 	{
-		if (count_y < 0)
-		{
-			count_y++;
-			m_mouse_bit_y = 1;
-			y_needs_update = 1;
-		}
-		else
-		{
-			count_y--;
-			m_mouse_bit_y = 0;
-			y_needs_update = 2;
-		}
+		m_mouse_count[0]--;
+		x_needs_update = 1;
+	}
+	int y_needs_update = 0;
+	if (m_mouse_count[1] < 0)
+	{
+		m_mouse_count[1]++;
+		y_needs_update = 1;
+	}
+	else if (m_mouse_count[1])
+	{
+		m_mouse_count[1]--;
+		y_needs_update = -1;
 	}
 
 	if (x_needs_update || y_needs_update)
 	{
-		/* assert Port B External Interrupt on the SCC */
-		scc_mouse_irq(x_needs_update, y_needs_update );
+		// assert Port B External Interrupt on the SCC
+		scc_mouse_irq(x_needs_update, y_needs_update);
 	}
 }
 
@@ -956,6 +887,36 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 	}
 	return 0;
 }
+
+#if NEW_IWM
+void mac128_state::phases_w(uint8_t phases)
+{
+	if (m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void mac128_state::sel35_w(int sel35)
+{
+}
+
+void mac128_state::devsel_w(uint8_t devsel)
+{
+	if (devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if (devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+
+	m_iwm->set_floppy(m_cur_floppy);
+	if (m_cur_floppy)
+		m_cur_floppy->ss_w(m_hdsel);
+}
+
+void mac128_state::hdsel_w(int hdsel)
+{
+}
+#endif
 
 #define MAC_DRIVER_INIT(label, model)   \
 void mac128_state::init_##label()     \
@@ -1012,7 +973,7 @@ void mac128_state::macse_map(address_map &map)
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-
+#if !NEW_IWM
 static const applefdc_interface mac_iwm_interface =
 {
 	sony_set_lines,
@@ -1022,17 +983,19 @@ static const applefdc_interface mac_iwm_interface =
 	sony_write_data,
 	sony_read_status
 };
+#endif
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-
+#if !NEW_IWM
 static const floppy_interface mac_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
 	"floppy_3_5"
 };
+#endif
 
 static void mac_pds_cards(device_slot_interface &device)
 {
@@ -1057,20 +1020,27 @@ void mac128_state::mac512ke(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	#if NEW_IWM
+	IWM(config, m_iwm, C7M);
+	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+	m_iwm->sel35_cb().set(FUNC(mac128_state::sel35_w));
+	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
+
+	applefdintf_device::add_35(config, m_floppy[0]);
+	applefdintf_device::add_35(config, m_floppy[1]);
+	#else
 	LEGACY_IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
+	#endif
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
-	VIA6522(config, m_via, 1000000);
+	MOS6522(config, m_via, 1000000);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a));
@@ -1138,10 +1108,13 @@ void mac128_state::macse(machine_config &config)
 	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
 
+	R65NC22(config.replace(), m_via, 1000000);
+	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));
 	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b_se));
 	m_via->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
 	/* internal ram */
 	m_ram->set_default_size("4M");
@@ -1164,10 +1137,10 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macadb )

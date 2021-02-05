@@ -31,7 +31,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -332,9 +331,6 @@ void nbmj8900_state::ohpaipee(machine_config &config)
 	YM3812(config, "ymsnd", 2500000).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.42); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8900_state::togenkyo(machine_config &config)

@@ -355,6 +355,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="agassip" cloneof="agassi">
+		<description>Andre Agassi Tennis (prototype)</description>
+		<year>1993</year>
+		<publisher>TecMagik</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="andre agassi tennis (prototype).bin" size="262144" crc="f167028e" sha1="891407182b761957f9655f9c7d5365aa858fe49f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arcadecl">
 		<description>Arcade Classics (USA)</description>
 		<year>1996</year>
@@ -1217,6 +1228,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="bublboblp" cloneof="bublbobl">
+		<description>Bubble Bobble (prototype)</description>
+		<year>1994</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="bubble bobble (prototype).bin" size="262144" crc="be2dc770" sha1="6d4b02f63d5d0c5ffead8fb8c4726fd610c245ad"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bugsbun">
 		<description>Bugs Bunny in Double Trouble (Euro, USA)</description>
 		<year>1996</year>
@@ -1662,6 +1684,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="chicagop25" cloneof="chicago">
+		<description>Empire Syndicate (Chicago Syndicate) (prototype, 19950320)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="chicago syndicate (prototype - mar 20, 1995).bin" size="524288" crc="635bc4f5" sha1="0f4f83552680129d242a5f7646cf6739d3ecb70a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="choplft3">
 		<description>Choplifter III (USA)</description>
 		<year>1993</year>
@@ -1732,6 +1765,18 @@ a certain item) -->
 			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="cj elephant fugitive.bin" size="262144" crc="72981057" sha1="a60815aa0c6ec2bc5ad7f817668b74a42bb64026"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cjp" cloneof="cj">
+		<description>CJ Elephant Fugitive (prototype)</description>
+		<year>1993</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
+			<dataarea name="rom" size="262144">
+				<rom name="cj elephant fugitive (prototype).bin" size="262144" crc="3ace6335" sha1="322ea1294833659a205e313ca49667b921891e85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2097,6 +2142,18 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="dinobash">
+		<description>Dinobasher Starring Bignose the Caveman (Euro, prototype)</description>
+		<year>1993</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
+			<dataarea name="rom" size="262144">
+				<rom name="dinobasher starring bignose the caveman (europe) (proto).bin" size="262144" crc="2306aaf4" sha1="46d1689c09705341f593a18d4e9cfd7805ecff88" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developers: Aspect -->
 	<software name="donald42" cloneof="deepduck">
 		<description>Donald Duck no 4-Tsu no Hihou (Jpn)</description>
@@ -2224,6 +2281,17 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="dragon - the bruce lee story (usa).bin" size="262144" crc="17f588e8" sha1="60c7cbe782c3df094452835076b9425c329c82ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonp" cloneof="dragon">
+		<description>Dragon - The Bruce Lee Story (prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="dragon - the bruce lee story (prototype).bin" size="262144" crc="12e0e85b" sha1="b9a396be0e009c951f85bdd6e81ffe1a71232e44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3689,13 +3757,24 @@ a certain item) -->
 	</software>
 
 	<software name="kawasaki">
-		<description>Kawasaki Superbike Challenge (Euro, USA)</description>
+		<description>Kawasaki Superbike Challenge (Euro)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88098, T-88118-50"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kawasaki superbike challenge (usa, europe).bin" size="262144" crc="23f9150a" sha1="7b0801c4ad6c15546f61decf2620f198b990425d"/>
+				<rom name="kawasaki superbike challenge (europe).bin" size="262144" crc="23f9150a" sha1="7b0801c4ad6c15546f61decf2620f198b990425d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawasakius" cloneof="kawasaki">
+		<description>Kawasaki Superbike Challenge (USA)</description>
+		<year>1993</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="kawaksaki superbike challenge (usa).bin" size="262144" crc="fc508318" sha1="ba5981fed892a62006b20b6c913dcac84573f345"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4543,6 +4622,18 @@ a certain item) -->
 			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="micro machines (europe).bin" size="262144" crc="f7c524f6" sha1="7b2d39b68622e18eac6c27fd961133b1d002342b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromacp" cloneof="micromac" supported="partial">
+		<description>Micro Machines (prototype)</description>
+		<year>1993</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
+			<dataarea name="rom" size="262144">
+				<rom name="micro machines (prototype).bin" size="262144" crc="c21e6cd0" sha1="51cb41c00020f80d7c3c80b217b41841ad59a825"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7840,7 +7931,7 @@ a certain item) -->
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sports illustrated championship football &amp; baseball (usa, europe).bin" size="524288" crc="de25e2d8" sha1="781bc3ef9fbbbfcb5452dad99633b65c172b62fa"/>
+				<rom name="sports illustrated championship football &amp; baseball (usa, europe).bin" size="524288" crc="920ea193" sha1="c74a38e73facd557264a299e8799df480ad6d06f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9974,6 +10065,34 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="x-men - mojo world (prototype - jun 29,  1996).bin" size="524288" crc="ba71da19" sha1="cc3fc3b57bcd4daea90a572c935013d286ebbb99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xtermin">
+		<description>X-Terminator v2.1 for Game Gear (USA, Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="xterminator" />
+			<dataarea name="rom" size="8192">
+				<rom name="x-terminator v2.1.bin" size="8192" crc="0f448220" sha1="b6664c21a99a96392fe79237d326e96ac0bdd52a"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xterminj" cloneof="xtermin">
+		<description>X-Terminator v2.1J for Game Gear (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="xterminator" />
+			<dataarea name="rom" size="8192">
+				<rom name="x-terminator v2.1j.bin" size="8192" crc="e498090d" sha1="ee2123cc2addd9e48d3f4dc909334504c5b330ab"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>

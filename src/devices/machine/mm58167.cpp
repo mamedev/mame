@@ -247,10 +247,7 @@ void mm58167_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case R_CTL_IRQCONTROL:
-			if (data != 0)
-			{
-				logerror("MM58167: IRQs not implemented\n");
-			}
+			m_regs[R_CTL_IRQCONTROL]=data;
 			break;
 	}
 }

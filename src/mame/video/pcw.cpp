@@ -38,6 +38,8 @@ void pcw_state::video_start()
 
 	m_prn_output = std::make_unique<bitmap_ind16>(PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
 	m_prn_output->fill(1, rect);
+
+	m_roller_ram_addr = 0;
 }
 
 /* black/white printer */

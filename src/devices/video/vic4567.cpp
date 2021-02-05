@@ -191,7 +191,8 @@ void vic3_device::device_start()
 	m_lightpen_x_cb.resolve_safe(0);
 	m_lightpen_y_cb.resolve_safe(0);
 
-	m_screenptr[0] = auto_alloc_array(machine(), uint8_t, 216 * 656 / 8);
+	m_screendata = std::make_unique<uint8_t []>(216 * 656 / 8);
+	m_screenptr[0] = m_screendata.get();
 
 	for (int i = 1; i < 216; i++)
 		m_screenptr[i] = m_screenptr[i - 1] + 656 / 8;

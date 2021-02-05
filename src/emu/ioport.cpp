@@ -99,7 +99,9 @@
 #include "inputdev.h"
 #include "natkeyboard.h"
 
+#include "corestr.h"
 #include "osdepend.h"
+#include "unicode.h"
 
 #include <cctype>
 #include <ctime>
@@ -1282,7 +1284,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
-		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
+		m_diploclist.append(*new ioport_diplocation(name.c_str(), swnum, invert));
 		entries++;
 
 		// advance to the next item
@@ -1365,7 +1367,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		}
 
 		// trim extra spaces
-		strtrimspace(name);
+		name = strtrimspace(name);
 
 		// special case
 		if (name.empty())
@@ -1618,15 +1620,15 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		// allocate analog state if it's analog
 		analog_field *analog = nullptr;
 		if (field.is_analog())
-			analog = &analoglist.append(*global_alloc(analog_field(field)));
+			analog = &analoglist.append(*new analog_field(field));
 
 		// allocate a dynamic field for reading
 		if (field.has_dynamic_read())
-			readlist.append(*global_alloc(dynamic_field(field)));
+			readlist.append(*new dynamic_field(field));
 
 		// allocate a dynamic field for writing
 		if (field.has_dynamic_write())
-			writelist.append(*global_alloc(dynamic_field(field)));
+			writelist.append(*new dynamic_field(field));
 
 		// let the field initialize its live state
 		field.init_live_state(analog);
@@ -1675,7 +1677,7 @@ time_t ioport_manager::initialize()
 	init_port_types();
 
 	// if we have a token list, proceed
-	device_iterator iter(machine().root_device());
+	device_enumerator iter(machine().root_device());
 	for (device_t &device : iter)
 	{
 		std::string errors;
@@ -1694,9 +1696,10 @@ time_t ioport_manager::initialize()
 			if (&port.second->device() == &device)
 			{
 				for (ioport_field &field : port.second->fields())
-					if (field.type_class()==INPUT_CLASS_CONTROLLER)
+					if (field.type_class() == INPUT_CLASS_CONTROLLER)
 					{
-						if (players < field.player() + 1) players = field.player() + 1;
+						if (players < field.player() + 1)
+							players = field.player() + 1;
 						field.set_player(field.player() + player_offset);
 					}
 			}
@@ -1729,9 +1732,6 @@ time_t ioport_manager::initialize()
 					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
 					break;
 				}
-
-	// initialize natural keyboard
-	m_natkeyboard = std::make_unique<natural_keyboard>(machine());
 
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_load_delegate(&ioport_manager::load_config, this), config_save_delegate(&ioport_manager::save_config, this));
@@ -1956,7 +1956,7 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 			return joystick;
 
 	// create a new one
-	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
+	return m_joystick_list.append(*new digital_joystick(player, number));
 }
 
 
@@ -2120,6 +2120,68 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 		for (input_type_entry &entry : m_typelist)
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry.defseq(seqtype) = entry.seq(seqtype);
+
+	// load keyboard enable/disable state
+	if (cfg_type == config_type::GAME)
+	{
+		std::vector<bool> kbd_enable_set;
+		bool keyboard_enabled = false, missing_enabled = false;
+		natural_keyboard &natkbd = machine().natkeyboard();
+		for (util::xml::data_node const *kbdnode = parentnode->get_child("keyboard"); kbdnode; kbdnode = kbdnode->get_next_sibling("keyboard"))
+		{
+			char const *const tag = kbdnode->get_attribute_string("tag", nullptr);
+			int const enabled = kbdnode->get_attribute_int("enabled", -1);
+			if (tag && (0 <= enabled))
+			{
+				size_t i;
+				for (i = 0; natkbd.keyboard_count() > i; ++i)
+				{
+					if (!strcmp(natkbd.keyboard_device(i).tag(), tag))
+					{
+						if (kbd_enable_set.empty())
+							kbd_enable_set.resize(natkbd.keyboard_count(), false);
+						kbd_enable_set[i] = true;
+						if (enabled)
+						{
+							if (!natkbd.keyboard_is_keypad(i))
+								keyboard_enabled = true;
+							natkbd.enable_keyboard(i);
+						}
+						else
+						{
+							natkbd.disable_keyboard(i);
+						}
+						break;
+					}
+				}
+				missing_enabled = missing_enabled || (enabled && (natkbd.keyboard_count() <= i));
+			}
+		}
+
+		// if keyboard enable configuration was loaded, patch it up for principle of least surprise
+		if (!kbd_enable_set.empty())
+		{
+			for (size_t i = 0; natkbd.keyboard_count() > i; ++i)
+			{
+				if (!natkbd.keyboard_is_keypad(i))
+				{
+					if (!keyboard_enabled && missing_enabled)
+					{
+						natkbd.enable_keyboard(i);
+						keyboard_enabled = true;
+					}
+					else if (!kbd_enable_set[i])
+					{
+						if (keyboard_enabled)
+							natkbd.disable_keyboard(i);
+						else
+							natkbd.enable_keyboard(i);
+						keyboard_enabled = true;
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -2358,6 +2420,15 @@ void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 
 void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 {
+	// save keyboard enable/disable state
+	natural_keyboard &natkbd = machine().natkeyboard();
+	for (size_t i = 0; natkbd.keyboard_count() > i; ++i)
+	{
+		util::xml::data_node *const kbdnode = parentnode.add_child("keyboard", nullptr);
+		kbdnode->set_attribute("tag", natkbd.keyboard_device(i).tag());
+		kbdnode->set_attribute_int("enabled", natkbd.keyboard_enabled(i));
+	}
+
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field &field : port.second->fields())
@@ -2717,19 +2788,19 @@ void ioport_manager::timecode_init()
 	if (filerr != osd_file::error::NONE)
 		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
-	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
-	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
-	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
-	m_timecode_file.puts(std::string("#\n").c_str());
-	m_timecode_file.puts(std::string("# VIDEO_PART:     code of video timecode\n").c_str());
-	m_timecode_file.puts(std::string("# START:          start time (hh:mm:ss.mmm)\n").c_str());
-	m_timecode_file.puts(std::string("# ELAPSED:        elapsed time (hh:mm:ss.mmm)\n").c_str());
-	m_timecode_file.puts(std::string("# MSEC_START:     start time (milliseconds)\n").c_str());
-	m_timecode_file.puts(std::string("# MSEC_ELAPSED:   elapsed time (milliseconds)\n").c_str());
-	m_timecode_file.puts(std::string("# FRAME_START:    start time (frames)\n").c_str());
-	m_timecode_file.puts(std::string("# FRAME_ELAPSED:  elapsed time (frames)\n").c_str());
-	m_timecode_file.puts(std::string("#\n").c_str());
-	m_timecode_file.puts(std::string("# VIDEO_PART======= START======= ELAPSED===== MSEC_START===== MSEC_ELAPSED=== FRAME_START==== FRAME_ELAPSED==\n").c_str());
+	m_timecode_file.puts("# ==========================================\n");
+	m_timecode_file.puts("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n");
+	m_timecode_file.puts("# ==========================================\n");
+	m_timecode_file.puts("#\n");
+	m_timecode_file.puts("# VIDEO_PART:     code of video timecode\n");
+	m_timecode_file.puts("# START:          start time (hh:mm:ss.mmm)\n");
+	m_timecode_file.puts("# ELAPSED:        elapsed time (hh:mm:ss.mmm)\n");
+	m_timecode_file.puts("# MSEC_START:     start time (milliseconds)\n");
+	m_timecode_file.puts("# MSEC_ELAPSED:   elapsed time (milliseconds)\n");
+	m_timecode_file.puts("# FRAME_START:    start time (frames)\n");
+	m_timecode_file.puts("# FRAME_ELAPSED:  elapsed time (frames)\n");
+	m_timecode_file.puts("#\n");
+	m_timecode_file.puts("# VIDEO_PART======= START======= ELAPSED===== MSEC_START===== MSEC_ELAPSED=== FRAME_START==== FRAME_ELAPSED==\n");
 }
 
 //-------------------------------------------------
@@ -2989,7 +3060,7 @@ ioport_configurer& ioport_configurer::port_modify(const char *tag)
 	// find the existing port
 	m_curport = m_portlist.find(fulltag)->second.get();
 	if (m_curport == nullptr)
-		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
+		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag);
 
 	// bump the modification count, and reset current field/setting
 	m_curport->m_modcount++;
@@ -3011,7 +3082,7 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		m_curport->m_active |= mask;
-	m_curfield = &m_curport->m_fieldlist.append(*global_alloc(ioport_field(*m_curport, type, defval, mask, string_from_token(name))));
+	m_curfield = &m_curport->m_fieldlist.append(*new ioport_field(*m_curport, type, defval, mask, string_from_token(name)));
 
 	// reset the current setting
 	m_cursetting = nullptr;
@@ -3043,7 +3114,7 @@ ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char3
 		util::stream_format(s, "%s%d", is_first ? "" : ",", (int)ch);
 		is_first = false;
 	}
-	throw emu_fatalerror("PORT_CHAR(%s) could not be added - maximum amount exceeded\n", s.str().c_str());
+	throw emu_fatalerror("PORT_CHAR(%s) could not be added - maximum amount exceeded\n", s.str());
 }
 
 
@@ -3068,7 +3139,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 	if (m_curfield == nullptr)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
-	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
+	m_cursetting = new ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
 	return *this;

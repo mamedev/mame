@@ -156,9 +156,6 @@ VIDEO_START_MEMBER(zaxxon_state,razmataz)
 
 VIDEO_START_MEMBER(zaxxon_state,congo)
 {
-	/* allocate our own spriteram since it is not accessible by the main CPU */
-	m_spriteram.allocate(0x100);
-
 	/* register for save states */
 	save_item(NAME(m_congo_fg_bank));
 	save_item(NAME(m_congo_color_bank));

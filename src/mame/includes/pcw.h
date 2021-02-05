@@ -51,6 +51,22 @@ public:
 		, m_iptlines(*this, "LINE%u", 0U)
 	{ }
 
+	void pcw(machine_config &config);
+	void pcw8256(machine_config &config);
+	void pcw8512(machine_config &config);
+	void pcw9512(machine_config &config);
+	void pcw9256(machine_config &config);
+	void pcw9512p(machine_config &config);
+	void pcw10(machine_config &config);
+
+	void init_pcw();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	int m_boot;
 	int m_system_status;
 	int m_fdc_interrupt_code;
@@ -112,10 +128,7 @@ public:
 	uint8_t pcw9512_parallel_r(offs_t offset);
 	void pcw9512_parallel_w(offs_t offset, uint8_t data);
 	void mcu_transmit_serial(uint8_t bit);
-	void init_pcw();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	void set_8xxx_palette(palette_device &palette) const;
 	void set_9xxx_palette(palette_device &palette) const;
 	void set_printer_palette(palette_device &palette) const;
@@ -151,13 +164,6 @@ public:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
-	void pcw(machine_config &config);
-	void pcw8256(machine_config &config);
-	void pcw8512(machine_config &config);
-	void pcw9512(machine_config &config);
-	void pcw9256(machine_config &config);
-	void pcw9512p(machine_config &config);
-	void pcw10(machine_config &config);
 	void pcw9512_io(address_map &map);
 	void pcw_io(address_map &map);
 	void pcw_map(address_map &map);

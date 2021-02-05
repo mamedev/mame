@@ -67,29 +67,26 @@ namespace netlist
 
 			void push_to_queue(const netlist_time &delay) noexcept
 			{
-				if (has_connections())
-				{
-					if (!!is_queued())
-						exec().qremove(this);
+				if (!!is_queued())
+					exec().qremove(this);
 
-					m_next_scheduled_time = exec().time() + delay;
+				m_next_scheduled_time = exec().time() + delay;
 #if (AVOID_NOOP_QUEUE_PUSHES)
 					m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
 						: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
-					if (m_in_queue == queue_status::QUEUED)
-						exec().qpush(m_next_scheduled_time, this);
+				if (m_in_queue == queue_status::QUEUED)
+					exec().qpush(m_next_scheduled_time, this);
 					else
 						update_inputs();
 #else
-					m_in_queue = m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE : queue_status::QUEUED;
-					if (m_in_queue == queue_status::QUEUED)
-						exec().qpush(m_next_scheduled_time, this);
-					else
-						update_inputs();
+				m_in_queue = m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE : queue_status::QUEUED;
+				if (m_in_queue == queue_status::QUEUED)
+					exec().qpush(m_next_scheduled_time, this);
+				else
+					update_inputs();
 #endif
-				}
 			}
-			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+			constexpr bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			// -----------------------------------------------------------------------------
 			// Very hot
@@ -138,13 +135,11 @@ namespace netlist
 				}
 			}
 
-			const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+			constexpr const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
 			bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
-
-			bool has_connections() const noexcept { return !m_core_terms.empty(); }
 
 			void add_to_active_list(core_terminal_t &term) noexcept
 			{
@@ -207,7 +202,7 @@ namespace netlist
 
 			void rebuild_list();     // rebuild m_list after a load
 
-			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
+			//std::vector<core_terminal_t *> &core_terms() noexcept { return state().m_core_terms[this]; }
 
 			void update_inputs() noexcept
 			{
@@ -221,7 +216,7 @@ namespace netlist
 		protected:
 
 			// only used for logic nets
-			const netlist_sig_t &Q() const noexcept { return m_cur_Q; }
+			constexpr const netlist_sig_t &Q() const noexcept { return m_cur_Q; }
 
 			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
@@ -269,7 +264,7 @@ namespace netlist
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
 			core_terminal_t * m_railterminal;
-			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
+			//std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 		};
 	} // namespace detail

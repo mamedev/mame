@@ -29,10 +29,6 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "c64exp"),
-	m_roml(*this, "roml"),
-	m_romh(*this, "romh"),
-	m_romx(*this, "romx"),
-	m_nvram(*this, "nvram"),
 	m_game(1),
 	m_exrom(1)
 {
@@ -148,11 +144,11 @@ image_init_result c64_expansion_slot_device::call_load()
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
 
-					m_card->m_roml.allocate(roml_size);
-					m_card->m_romh.allocate(romh_size);
+					m_card->m_roml = std::make_unique<uint8_t[]>(roml_size);
+					m_card->m_romh = std::make_unique<uint8_t[]>(romh_size);
 
-					if (roml_size) roml = m_card->m_roml;
-					if (romh_size) romh = m_card->m_roml;
+					if (roml_size) roml = m_card->m_roml.get();
+					if (romh_size) romh = m_card->m_romh.get();
 
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}

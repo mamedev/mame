@@ -58,7 +58,7 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
-		, m_hector_vram(*this,"hector_videoram")
+		, m_hector_vram(*this,"hector_videoram", 0x4000, ENDIANNESS_LITTLE)
 		, m_disc2cpu(*this, "disc2cpu")
 		, m_discrete(*this, "discrete")
 		, m_sn(*this, "sn76477")
@@ -157,7 +157,6 @@ private:
 	int m_counter_write;
 	bool m_irq_current_state;
 	bool m_nmi_current_state;
-	uint8_t m_hector_videoram_hrx[0x4000];
 
 	DECLARE_MACHINE_RESET(interact);
 	DECLARE_MACHINE_START(hec2hrp);
@@ -198,7 +197,7 @@ private:
 	optional_memory_bank_array<4> m_bank;
 	required_region_ptr<u8> m_rom;
 	optional_device<ram_device> m_ram;
-	optional_shared_ptr<uint8_t> m_hector_vram;
+	memory_share_creator<uint8_t> m_hector_vram;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<discrete_device> m_discrete;
 	required_device<sn76477_device> m_sn;

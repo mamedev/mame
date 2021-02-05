@@ -6,7 +6,7 @@ $input v_texcoord0, v_texcoord1, v_color0
 /*
 
    Hyllian's xBR MultiLevel4 Shader - Pass1
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,7 +43,7 @@ const vec4 eq_thresholdold = vec4(15.0, 15.0, 15.0, 15.0);
 const vec4 eq_threshold    = vec4( 2.0,  2.0,  2.0,  2.0);
 const vec4 eq_threshold3   = vec4(25.0, 25.0, 25.0, 25.0);
 const vec4 yuv_weight      = vec4( 4.0,  1.0,  2.0,  0.0);
-const mat4 yuvT            = mat4(0.299, -0.169,  0.499, 0.0, 0.587, -0.331, -0.418, 0.0, 0.114,  0.499, -0.0813, 0.0, 0.0, 0.0, 0.0, 0.0); 
+const mat4 yuvT            = mat4(0.299, -0.169,  0.499, 0.0, 0.587, -0.331, -0.418, 0.0, 0.114,  0.499, -0.0813, 0.0, 0.0, 0.0, 0.0, 0.0);
 const mat4 yuv             = mat4(0.299, 0.587, 0.114, 0.0, -0.169, -0.331, 0.499, 0.0, 0.499, -0.418, -0.0813, 0.0, 0.0, 0.0, 0.0, 0.0);
 const mat4 yuv_weighted    = mat4(4.0 * vec4(0.299, 0.587, 0.114, 0.0), 2.0 * vec4(-0.169, -0.331, 0.499, 0.0), vec4(0.499, -0.418, -0.0813, 0.0), vec4(0.0, 0.0, 0.0, 0.0));
 const vec4 maximo          = vec4(255.0, 255.0, 255.0, 255.0);
@@ -111,7 +111,7 @@ vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, v
 
 void main()
 {
-	vec4 A3 = TEX(-1,-3);	vec4 B3 = TEX( 0,-3);	vec4 C3 = TEX( 1,-3);	
+	vec4 A3 = TEX(-1,-3);	vec4 B3 = TEX( 0,-3);	vec4 C3 = TEX( 1,-3);
 	vec4 A1 = TEX(-1,-2);	vec4 B1 = TEX( 0,-2);	vec4 C1 = TEX( 1,-2);
 	vec4 A2 = TEX(-3,-1);	vec4 A0 = TEX(-2,-1);	vec4 A  = TEX(-1,-1);
 	vec4 B  = TEX( 0,-1);	vec4 C  = TEX( 1,-1);	vec4 C4 = TEX( 2,-1);	vec4 C6 = TEX( 3,-1);

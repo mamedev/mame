@@ -1474,6 +1474,32 @@ ROM_START( cadashu )
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
+ROM_START( cadashu1 )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c21_14-x.ic11",  0x00000, 0x20000, CRC(64f22e5e) SHA1(3a68a4460173e7a90611c2ade8aa313700f98cf9) ) /* These program ROMs are most likely Rev 1 */
+	ROM_LOAD16_BYTE( "c21_16-x.ic15",  0x00001, 0x20000, CRC(77f5d79f) SHA1(eddfa55fd1e3038f98e3b49ec4e146b0edb92b8f) ) /* Need to verify proper label and revision */
+	ROM_LOAD16_BYTE( "c21_13-x.ic10",  0x40000, 0x20000, CRC(488fd6d6) SHA1(fda175bbc4f41c821922fb7310b14f6c74575174) )
+	ROM_LOAD16_BYTE( "c21_15-x.ic14",  0x40001, 0x20000, CRC(3a44a8b4) SHA1(19a9775872824d0f3596a1cea379f7b325a7e878) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
+
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
+	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal16l8b-c21-09.ic34",   0x0000, 0x0104, CRC(4b296700) SHA1(79d6c8fb13e30795d9c1f49885ada658f9722b68) )
+	ROM_LOAD( "pal16l8b-c21-10.ic45",   0x0200, 0x0104, CRC(35642f00) SHA1(a04403536b0ef7e8e7251dfc47274a6c8772fd2d) )
+	ROM_LOAD( "pal16l8b-c21-11-1.ic46", 0x0400, 0x0104, CRC(f4791e24) SHA1(7e3bbffec7b8f9171e6e09706e5622fef3c99ca0) )
+	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
+ROM_END
+
 ROM_START( cadashi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c21_27-1.ic11",  0x00000, 0x20000, CRC(d1d9e613) SHA1(296c188daec962bdb4e78e20f1cc4c7d1f4dda09) )
@@ -1732,6 +1758,7 @@ GAME( 1989, cadashj,   cadash,   cadash,   cadashj,  asuka_state, init_cadash,  
 GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,  asuka_state, init_cadash,   ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,  asuka_state, init_cadash,   ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashu,   cadash,   cadash,   cadashu,  asuka_state, init_cadash,   ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,  asuka_state, init_cadash,   ROT0,   "Taito America Corporation", "Cadash (US, version 1?)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashi,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashf,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )

@@ -290,42 +290,42 @@ void osd_common_t::register_options()
 	int num;
 	std::vector<const char *> dnames;
 
-	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, num, names);
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_MONITOR_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_KEYBOARDINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_MOUSEINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_LIGHTGUNINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_JOYSTICKINPUT_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -333,7 +333,7 @@ void osd_common_t::register_options()
 
 #if 0
 	// Register midi options and update options
-	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -341,13 +341,13 @@ void osd_common_t::register_options()
 #endif
 
 	// Register debugger options and update options
-	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_DEBUG_PROVIDER, dnames);
 
-	m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER, 20, num, names);
 	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
@@ -678,7 +678,7 @@ void osd_common_t::init_subsystems()
 
 	m_output = select_module_options<output_module *>(options(), OSD_OUTPUT_PROVIDER);
 	m_output->set_machine(&machine());
-	machine().output().set_notifier(nullptr, output_notifier_callback, this);
+	machine().output().set_global_notifier(output_notifier_callback, this);
 
 	m_mod_man.init(options());
 

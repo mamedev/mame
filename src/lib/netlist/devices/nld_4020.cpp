@@ -40,10 +40,7 @@
 #include "nl_base.h"
 #include "nl_factory.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	template <unsigned TotalBits, unsigned LiveBitmask>
 	NETLIB_OBJECT(CD4020_sub)
@@ -170,5 +167,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(CD4024,         "CD4024", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

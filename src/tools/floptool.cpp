@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include "corestr.h"
+#include "osdcomm.h"
 
 #include "formats/mfi_dsk.h"
 #include "formats/dfi_dsk.h"
@@ -88,10 +89,12 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_IBMXDF_FORMAT,
 
 	FLOPPY_DC42_FORMAT,
+	FLOPPY_APPLE_GCR_FORMAT,
 	FLOPPY_A216S_FORMAT,
 	FLOPPY_RWTS18_FORMAT,
 	FLOPPY_EDD_FORMAT,
 	FLOPPY_WOZ_FORMAT,
+	FLOPPY_NIB_FORMAT,
 
 	FLOPPY_ATOM_FORMAT,
 	FLOPPY_ACORN_SSD_FORMAT,
@@ -130,6 +133,8 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 enum { FORMAT_COUNT = ARRAY_LENGTH(floppy_formats) };
 
 static floppy_image_format_t *formats[FORMAT_COUNT];
+static std::vector<uint32_t> variants;
+
 
 static void init_formats()
 {
@@ -152,7 +157,7 @@ static floppy_image_format_t *find_format_by_identify(io_generic *image)
 
 	for(int i = 0; i != FORMAT_COUNT; i++) {
 		floppy_image_format_t *fif = formats[i];
-		int score = fif->identify(image, floppy_image::FF_UNKNOWN);
+		int score = fif->identify(image, floppy_image::FF_UNKNOWN, variants);
 		if(score > best) {
 			best = score;
 			best_fif = fif;
@@ -280,12 +285,12 @@ static int convert(int argc, char *argv[])
 	dest_io.filler = 0xff;
 
 	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
-	if(!source_format->load(&source_io, floppy_image::FF_UNKNOWN, &image)) {
+	if(!source_format->load(&source_io, floppy_image::FF_UNKNOWN, variants, &image)) {
 		fprintf(stderr, "Error: parsing input file as '%s' failed\n", source_format->name());
 		return 1;
 	}
 
-	if(!dest_format->save(&dest_io, &image)) {
+	if(!dest_format->save(&dest_io, variants, &image)) {
 		fprintf(stderr, "Error: writing output file as '%s' failed\n", dest_format->name());
 		return 1;
 	}

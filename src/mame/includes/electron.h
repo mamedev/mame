@@ -50,6 +50,7 @@ public:
 		, m_exp(*this, "exp")
 		, m_ram(*this, RAM_TAG)
 		, m_mrb(*this, "MRB")
+		, m_capslock_led(*this, "capslock_led")
 	{ }
 
 	void electron(machine_config &config);
@@ -117,6 +118,7 @@ protected:
 	required_device<electron_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_ioport m_mrb;
+	output_finder<> m_capslock_led;
 
 	void waitforramsync();
 	void electron_tape_start();

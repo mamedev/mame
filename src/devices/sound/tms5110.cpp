@@ -1509,7 +1509,7 @@ DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMSPROM, tag, owner, clock),
 		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, finder_base::DUMMY_TAG, 0x20),
+		m_prom(*this, finder_base::DUMMY_TAG),
 		m_rom_size(0),
 		m_pdc_bit(0),
 		m_ctl1_bit(0),

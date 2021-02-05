@@ -53,7 +53,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_MECMOUSE, bus::ti99::joyport, mecmouse_device, "ti99_mecmouse", "TI-99 Mechatronics Mouse")
 
-namespace bus { namespace ti99 { namespace joyport {
+namespace bus::ti99::joyport {
 
 #define POLL_TIMER 1
 
@@ -208,5 +208,4 @@ ioport_constructor mecmouse_device::device_input_ports() const
 	return INPUT_PORTS_NAME( mecmouse );
 }
 
-} } } // end namespace bus::ti99::joyport
-
+} // end namespace bus::ti99::joyport

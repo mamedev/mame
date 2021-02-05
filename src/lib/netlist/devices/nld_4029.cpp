@@ -130,10 +130,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	NETLIB_OBJECT(CD4029)
 	{
@@ -146,7 +143,7 @@ namespace devices
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_clk_old(*this, "m_clk_old", false)
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
-		, m_CO(*this, "CO", 0)
+		, m_CO(*this, "CO", false)
 		, m_cnt(*this, "m_cnt", 0)
 		, m_power_pins(*this)
 		{
@@ -268,5 +265,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(CD4029,     "CD4029",        "+PE,+J1,+J2,+J3,+J4,+CI,+UD,+BD,+CLK,@VCC,@GND")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

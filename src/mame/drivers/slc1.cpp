@@ -67,17 +67,21 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_chess_keyboard(*this, "X%u", 0U)
+		, m_trainer_keyboard(*this, "Y%u", 0U)
 		, m_display(*this, "digit%u", 0U)
+		, m_busyled(*this, "busyled")
 	{ }
 
 	void slc1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -87,7 +91,10 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<3> m_chess_keyboard;
+	required_ioport_array<3> m_trainer_keyboard;
 	output_finder<8> m_display;
+	output_finder<> m_busyled;
 };
 
 
@@ -126,7 +133,7 @@ void slc1_state::io_w(offs_t offset, u8 data)
 
 	m_display[m_digit] = segdata;
 
-	output().set_value("busyled", busyled);
+	m_busyled = busyled;
 
 	if (m_digit == 3)
 		m_kbd_type = segdata;
@@ -146,24 +153,24 @@ u8 slc1_state::io_r(offs_t offset)
 	if (m_kbd_type)
 	{ // Trainer
 		if (upper == 3)
-			data &= ioport("Y0")->read();
+			data &= m_trainer_keyboard[0]->read();
 		else
 		if (upper == 4)
-			data &= ioport("Y1")->read();
+			data &= m_trainer_keyboard[1]->read();
 		else
 		if (upper == 5)
-			data &= ioport("Y2")->read();
+			data &= m_trainer_keyboard[2]->read();
 	}
 	else
 	{ // Chess
 		if (upper == 3)
-			data &= ioport("X0")->read();
+			data &= m_chess_keyboard[0]->read();
 		else
 		if (upper == 4)
-			data &= ioport("X1")->read();
+			data &= m_chess_keyboard[1]->read();
 		else
 		if (upper == 5)
-			data &= ioport("X2")->read();
+			data &= m_chess_keyboard[2]->read();
 	}
 
 	return data;
@@ -180,6 +187,7 @@ u8 slc1_state::io_r(offs_t offset)
 void slc1_state::machine_start()
 {
 	m_display.resolve();
+	m_busyled.resolve();
 
 	save_item(NAME(m_digit));
 	save_item(NAME(m_kbd_type));

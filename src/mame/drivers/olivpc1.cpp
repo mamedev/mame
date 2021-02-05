@@ -106,7 +106,6 @@ void olivpc1_state::pc8_io(address_map &map)
 }
 
 static INPUT_PORTS_START(olivpc1)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 // TODO: replace with 8042 dump

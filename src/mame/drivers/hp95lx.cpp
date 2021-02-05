@@ -66,7 +66,6 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "emupal.h"
@@ -84,8 +83,6 @@
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
-
-#define KBDC_TAG "pc_kbdc"
 
 
 class hp95lx_state : public driver_device
@@ -742,20 +739,15 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(hp95lx_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(&pc_kbdc);
 
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.

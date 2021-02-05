@@ -11,7 +11,9 @@ Hardware notes:
 - Sanyo LC7582, 2 LCD panels (each 4-digit)
 - TTL, piezo, 8*8+8 LEDs, button sensors
 
-Sphinx Galaxy is assumed to be on similar hardware.
+Sphinx Commander also uses the Dominator program, and is on similar hardware,
+but with a Chess 3008 housing (wooden chessboard, magnet sensors).
+Sphinx Galaxy is assumed to be on similar hardware too.
 
 The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
 Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
@@ -24,13 +26,13 @@ This engine was also used in the newer Mephisto Modena.
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "video/lc7582.h"
 #include "speaker.h"
 
 // internal artwork
 #include "cxg_dominator.lh" // clickable
+#include "cxg_commander.lh" // clickable
 
 
 namespace {
@@ -52,6 +54,7 @@ public:
 
 	// machine configs
 	void dominator(machine_config &config);
+	void commander(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -192,6 +195,14 @@ static INPUT_PORTS_START( dominator )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( commander )
+	PORT_INCLUDE( dominator )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
@@ -223,7 +234,17 @@ void dominator_state::dominator(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void dominator_state::commander(machine_config &config)
+{
+	dominator(config);
+
+	/* basic machine hardware */
+	m_board->set_type(sensorboard_device::MAGNETS);
+	m_board->set_delay(attotime::from_msec(250));
+
+	config.set_default_layout(layout_cxg_commander);
 }
 
 
@@ -237,6 +258,11 @@ ROM_START( sdtor )
 	ROM_LOAD("22p_2.05", 0x8000, 0x8000, CRC(9707119c) SHA1(d7cde835a37bd5d9ff349a871c890ea4cd9b2c26) )
 ROM_END
 
+ROM_START( scmder )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("scmder.bin", 0x8000, 0x8000, CRC(7a3f27b4) SHA1(6b3bcca707f034124b8b4bd061b500ce1a75faf4) ) // label unknown
+ROM_END
+
 } // anonymous namespace
 
 
@@ -245,5 +271,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, sdtor, 0,      0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1989, sdtor,  0,      0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1989, scmder, 0,      0,      commander, commander, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Commander (v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -89,25 +89,6 @@ void scramble_state::scramble_sound_io_map(address_map &map)
 }
 
 
-void scramble_state::ckongs_map(address_map &map)
-{
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x6bff).ram();
-	map(0x7000, 0x7003).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7800, 0x7803).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x9000, 0x93ff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
-	map(0x9800, 0x983f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x9840, 0x985f).ram().share("spriteram");
-	map(0x9860, 0x987f).ram().share("bulletsram");
-	map(0x9880, 0x98ff).ram();
-	map(0xa801, 0xa801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
-	map(0xa802, 0xa802).w(FUNC(scramble_state::galaxold_coin_counter_w));
-	map(0xa806, 0xa806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
-	map(0xa807, 0xa807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
-	map(0xb000, 0xb000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-}
-
-
 
 uint8_t scramble_state::mars_ppi8255_0_r(offs_t offset)
 {
@@ -246,28 +227,6 @@ void scramble_state::hunchbks_map(address_map &map)
 	map(0x5000, 0x5fff).rw(FUNC(scramble_state::hunchbks_mirror_r), FUNC(scramble_state::hunchbks_mirror_w));
 	map(0x6000, 0x6fff).rom();
 	map(0x7000, 0x7fff).rw(FUNC(scramble_state::hunchbks_mirror_r), FUNC(scramble_state::hunchbks_mirror_w));
-}
-
-
-
-void scramble_state::mimonscr_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
-	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
-	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x5040, 0x505f).ram().share("spriteram");
-	map(0x5060, 0x507f).ram().share("bulletsram");
-	map(0x5080, 0x50ff).ram();
-	map(0x6800, 0x6802).w(FUNC(scramble_state::galaxold_gfxbank_w));
-	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_nmi_enable_w));
-	map(0x6806, 0x6806).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
-	map(0x6807, 0x6807).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
-	map(0x7000, 0x7000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0x8100, 0x8103).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x8200, 0x8203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xc000, 0xffff).rom();
 }
 
 
@@ -552,60 +511,6 @@ static INPUT_PORTS_START( knockoutb )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "256 (Cheat)")
-INPUT_PORTS_END
-
-/* ckongs coinage DIPs are spread across two input ports */
-template <int Mask>
-READ_LINE_MEMBER(scramble_state::ckongs_coinage_r)
-{
-	return (ioport("FAKE")->read() & Mask) ? 1 : 0;
-}
-
-static INPUT_PORTS_START( ckongs )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x01>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x02>)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scramble_state, ckongs_coinage_r<0x04>)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-
-	PORT_START("FAKE")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mars )
@@ -978,51 +883,6 @@ static INPUT_PORTS_START( cavelon )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* protection check? */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* protection check? */
-INPUT_PORTS_END
-
-/* Same as 'mimonkey' (scobra.cpp driver) */
-static INPUT_PORTS_START( mimonscr )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_DIPNAME( 0x20, 0x00, "Infinite Lives (Cheat)")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   /* used, something to do with the bullets */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ad2083 )
@@ -1432,19 +1292,6 @@ void scramble_state::mrkougar(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mrkougar);
 }
 
-void scramble_state::ckongs(machine_config &config)
-{
-	scramble(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::ckongs_map);
-
-	/* video hardware */
-	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
-	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
-}
-
 void scramble_state::hotshock(machine_config &config)
 {
 	scramble(config);
@@ -1480,17 +1327,6 @@ void scramble_state::cavelon(machine_config &config)
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets, 0/1 for background
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
-}
-
-void scramble_state::mimonscr(machine_config &config)
-{
-	scramble(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::mimonscr_map);
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
 }
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
@@ -1538,10 +1374,10 @@ void scramble_state::hunchbks(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
-	maincpu.intack_handler().set_constant(0x03);
-	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
+	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	/* video hardware */
 	m_palette->set_entries(32+64+2+0); // 32 for characters, 64 for stars, 2 for bullets
@@ -1794,27 +1630,6 @@ ROM_START( 800fatha )
 	ROM_LOAD( "t5.7p",        0x0000, 0x0020, CRC(1bd88cff) SHA1(8d1620386ef654d99c51e489c822eeb2e8a4fe76) )    /* char banking and star placement */
 ROM_END
 
-ROM_START( ckongs )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "vid_2c.bin",   0x0000, 0x1000, CRC(49a8c234) SHA1(91d8da03a76094b6fed4bf1d9a3943dee72bf039) )
-	ROM_LOAD( "vid_2e.bin",   0x1000, 0x1000, CRC(f1b667f1) SHA1(c09e0f3b70afd5a4b6ec47ac9237f278dff75783) )
-	ROM_LOAD( "vid_2f.bin",   0x2000, 0x1000, CRC(b194b75d) SHA1(514b195dd02a7324e439dd63ae654af117e0c70d) )
-	ROM_LOAD( "vid_2h.bin",   0x3000, 0x1000, CRC(2052ba8a) SHA1(e4200219d1a142a4aba8ef21ae1dd806400f4422) )
-	ROM_LOAD( "vid_2j.bin",   0x4000, 0x1000, CRC(b377afd0) SHA1(8e42e7623a1749cea1c9861cd7dfa9b97571dc8b) )
-	ROM_LOAD( "vid_2l.bin",   0x5000, 0x1000, CRC(fe65e691) SHA1(736fe70c9adc6d2c142fa876f1a1e3c6879eccd8) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "turt_snd.5c",  0x0000, 0x1000, CRC(f0c30f9a) SHA1(5621f336e9be8acf986a34bbb8855ed5d45c28ef) )
-	ROM_LOAD( "snd_5d.bin",   0x1000, 0x1000, CRC(892c9547) SHA1(c3ec98049b560eb0ddefdb1e1b2d551b418b9a1c) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "vid_5f.bin",   0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
-	ROM_LOAD( "vid_5h.bin",   0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "vid_6e.bin",   0x0000, 0x0020, CRC(5039af97) SHA1(b1a5b32b8c944bf19d9d97aaf678726df003c194) )
-ROM_END
-
 ROM_START( mars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u26.3",        0x0000, 0x0800, CRC(2f88892c) SHA1(580c7b502321868f63d9e67286e63b5c5268827c) )
@@ -1835,6 +1650,30 @@ ROM_START( mars )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+// 2 PCB set: 10041A and 09041A. All ROMs have been dumped multiple times with different programmers, but needs a redump from a different PCB to be sure
+ROM_START( marsarf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10041a.ma1", 0x0000, 0x0800, CRC(2fe47b97) SHA1(5e33bd8cdb7e510f5ecac5e59e687d7aa531f488) )
+	ROM_LOAD( "10041a.ma3", 0x0800, 0x0800, CRC(5c37ed57) SHA1(bac8513894ccd06ac1461182e3a246ae590c6788) )
+	ROM_LOAD( "10041a.ma2", 0x1000, 0x0800, CRC(06c6bb56) SHA1(404ddc600f0c41fa6358f86bb7a3159835d1a04d) )
+	ROM_LOAD( "10041a.ma4", 0x1800, 0x0800, CRC(8e68a1a2) SHA1(6f5b176a4f3fef91646a2cb783e5b52c8c15fbfd) )
+	ROM_LOAD( "10041a.ma5", 0x2000, 0x0800, CRC(5b7eac43) SHA1(d24034b6f6a4c93ce21142bcaac1dde014612793) )
+	ROM_LOAD( "10041a.ma6", 0x2800, 0x0800, CRC(4b83a795) SHA1(b6a0f1096e3b649ce8d6d1b7f074df0d9dcec626) )
+	ROM_LOAD( "10041a.ma7", 0x3000, 0x0800, CRC(a09f402e) SHA1(8799cd82f611bc8eef170f89f4f8d8a3d9a871b0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "09041a.s1",  0x0000, 0x0800, BAD_DUMP CRC(fd47b688) SHA1(211606011d41d870ce2fef22eb900c65ca08d64f) ) // always drops data bit 2 on address line 2, it's identical to the standard Scramble ROM otherwise
+	ROM_LOAD( "09041a.s2",  0x0800, 0x0800, CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "09041a.s3",  0x1000, 0x0800, CRC(ebf90e0b) SHA1(9fedcaf0bff61f61d20b5876dcdf8705f4ab6e14) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // the game shows a corrupted M in MARS at the title screen. Verified it happens on PCB, too. Probably a bad ROM.
+	ROM_LOAD( "10041a.c1", 0x0000, 0x0800, CRC(3bd970ba) SHA1(f688d6066f894ae46a7888727d997b21c01b8e54) )
+	ROM_LOAD( "10041a.c2", 0x0800, 0x0800, CRC(d9929b15) SHA1(6e1679a0204c62b885ac096e737d37005b6aa0ac) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "10041a_7603-5.bin", 0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
 ROM_START( devilfsh )
@@ -1997,7 +1836,7 @@ ROM_START( troopy )
 	ROM_LOAD( "ic5e.bin", 0x2000, 0x1000, CRC(a0396cc8) SHA1(c8266b58b144a4bc564f3a2503d5b953c0ba6ca7) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
+	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, BAD_DUMP CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
 	ROM_LOAD( "ic5f_neu.bin",      0x0800, 0x0800, CRC(cbbfefc2) SHA1(2378949275b8d3fc69551b00d9b2c654b91fd780) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -2163,54 +2002,6 @@ ROM_START( cavelon )
 	ROM_LOAD( "cavelon.clr",  0x0000, 0x0020, CRC(d133356b) SHA1(58db4013a9ad77107f0d462c96363d7c38d86fa2) )
 ROM_END
 
-ROM_START( mimonscr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mm1",          0x0000, 0x1000, CRC(0399a0c4) SHA1(8314124f9b535ce531663625d19cd3a76782ed3b) )
-	ROM_LOAD( "mm2",          0x1000, 0x1000, CRC(2c5e971e) SHA1(39f979b99566e30a19c63115c936bb11fae4c609) )
-	ROM_LOAD( "mm3",          0x2000, 0x1000, CRC(24ce1ce3) SHA1(ae5ba6913cabab2152bf48c0c0d5983ecbe5c700) )
-	ROM_LOAD( "mm4",          0x3000, 0x1000, CRC(c83fb639) SHA1(38ddd80b25cc0707b9e53396c322fe731ea8bc3e) )
-	ROM_LOAD( "mm5",          0xc000, 0x1000, CRC(a9f12dfc) SHA1(c279e3ac84194cc83642a2c330fd869eaae8f063) )
-	ROM_LOAD( "mm6",          0xd000, 0x1000, CRC(e492a40c) SHA1(d01d6f9c18821fd8c7ed11d65d13bd0c9595881f) )
-	ROM_LOAD( "mm7",          0xe000, 0x1000, CRC(5339928d) SHA1(7c28516fb7d762e2f77d0ed3dc56a57d0213dbf9) )
-	ROM_LOAD( "mm8",          0xf000, 0x1000, CRC(eee7a12e) SHA1(bde6bfe98b15215c48c85a22615b0242ea4f0224) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mmsound1",     0x0000, 0x1000, CRC(2d14c527) SHA1(062414ce0415b6c471149319ecae22f465df3a4f) )
-	ROM_LOAD( "mmsnd2a",      0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "mmgfx1",       0x0000, 0x2000, CRC(4af47337) SHA1(225f7bcfbb61e3a163ecaed675d4c81b3609562f) )
-	ROM_LOAD( "mmgfx2",       0x2000, 0x2000, CRC(def47da8) SHA1(8e62e5dc5c810efaa204d0fcb3d02bc84f61ba35) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
-ROM_END
-
-
-ROM_START( mimonscra )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.c2",          0x0000, 0x1000, CRC(cfff26f3) SHA1(6e611e370ce5a93099bdcdb3b34b86c9c6d49180) )
-	ROM_LOAD( "2.e2",          0x1000, 0x1000, CRC(1fca805f) SHA1(eb85d3c08b141d8bd85da38936a5fafcdd2ff709) )
-	ROM_LOAD( "3.f2",          0x2000, 0x1000, CRC(24ce1ce3) SHA1(ae5ba6913cabab2152bf48c0c0d5983ecbe5c700) )
-	ROM_LOAD( "4.h2",          0x3000, 0x1000, CRC(c83fb639) SHA1(38ddd80b25cc0707b9e53396c322fe731ea8bc3e) )
-	ROM_LOAD( "5.j2",          0xc000, 0x1000, CRC(a9f12dfc) SHA1(c279e3ac84194cc83642a2c330fd869eaae8f063) )
-	ROM_LOAD( "6.l2",          0xd000, 0x1000, CRC(e492a40c) SHA1(d01d6f9c18821fd8c7ed11d65d13bd0c9595881f) )
-	ROM_LOAD( "7.m2",          0xe000, 0x1000, CRC(5339928d) SHA1(7c28516fb7d762e2f77d0ed3dc56a57d0213dbf9) )
-	ROM_LOAD( "8.p2",          0xf000, 0x1000, CRC(0b9915b8) SHA1(bb5155eede699d0b612cae458499bd245ab44b4d) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "2732.c5",      0x0000, 0x1000, CRC(5995f24b) SHA1(e3cad71006346e6ca6579c09e65195718687dca1) )
-	ROM_LOAD( "2732.d5",      0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "top.g5",      0x0000, 0x1000, CRC(f73a8412) SHA1(9baf4336cceb9b039372b0a1c733910aeab5ec6d) )
-	ROM_LOAD( "bottom.g5",   0x1000, 0x1000, CRC(3828c9db) SHA1(eaf9e81c803ad2be6c2db3104f07f80788378286) )
-	ROM_LOAD( "top.f5",      0x2000, 0x1000, CRC(9e0e9289) SHA1(79d412dbceb364bc798feda658b15792feb63338) )
-	ROM_LOAD( "bottom.f5",   0x3000, 0x1000, CRC(92085b0c) SHA1(a791703fa9f17e42450c871d902430fc3c6b10ef) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mb7051.e6",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
-ROM_END
 
 ROM_START( ad2083 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2270,9 +2061,8 @@ GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, empty_init,        ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
-
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, marsarf,  mars,     mars,     mars,     scramble_state, empty_init,        ROT90, "bootleg (Arfyc)",     "Mars (bootleg)",                     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // unencrypted, very similar to the original. Bad sound ROM
 
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",               "Devil Fish",                         MACHINE_SUPPORTS_SAVE )
 
@@ -2283,7 +2073,7 @@ GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkouga
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, empty_init,        ROT90, "bootleg",             "Mr. Kougar (bootleg)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, init_mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad GFX ROM
 
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, init_hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",      MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
@@ -2296,9 +2086,6 @@ GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, init_scrambl
 GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, init_scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, init_cavelon,      ROT90, "Jetsoft",             "Cavelon",                            MACHINE_SUPPORTS_SAVE )
-
-GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg",              "Mighty Monkey (bootleg on Scramble hardware)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, init_mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, init_ad2083,       ROT90, "Midcoin",             "A. D. 2083",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 

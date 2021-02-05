@@ -764,19 +764,14 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	if (m_fdc.found())
+	m_fdd_sel = 0;
+	for(auto & elem : m_floppy_connector)
 	{
-		m_fdd_sel = 0;
-		{
-			for(auto & elem : m_floppy_connector)
-			{
-				elem->get_device()->mon_w(ASSERT_LINE);
-				elem->get_device()->set_rpm(300);
-			}
-
-			m_fdc->set_rate(250000);
-		}
+		elem->get_device()->mon_w(ASSERT_LINE);
+		elem->get_device()->set_rpm(300);
 	}
+
+	m_fdc->set_rate(250000);
 
 	m_beeper->set_state(0);
 }

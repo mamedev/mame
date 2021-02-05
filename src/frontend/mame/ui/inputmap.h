@@ -55,7 +55,7 @@ protected:
 		input_seq           seq;                        // copy of the live sequence
 		const input_seq *   defseq = nullptr;           // pointer to the default sequence
 		const char *        name = nullptr;             // pointer to the base name of the item
-		const char *        owner_name = nullptr;       // pointer to the name of the owner of the item
+		const device_t *    owner = nullptr;            // pointer to the owner of the item
 		ioport_group        group = IPG_INVALID;        // group type
 		uint8_t             type = 0U;                  // type of port
 		bool                is_optional = false;        // true if this input is considered optional
@@ -70,11 +70,14 @@ protected:
 	input_item_data *pollingitem;
 
 private:
-	input_sequence_poller seq_poll;
+	std::unique_ptr<input_sequence_poller> seq_poll;
+	std::string assignprompt, appendprompt;
+	std::string clearprompt, defaultprompt;
 	std::string errormsg;
 	input_item_data *erroritem;
 	input_item_data *lastitem;
 	bool record_next;
+	osd_ticks_t modified_ticks;
 	input_seq starting_seq;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2) override;

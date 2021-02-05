@@ -60,7 +60,6 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/clock.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/6850acia.h"
@@ -321,8 +320,6 @@ void galeb_state::galeb(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.0625); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));

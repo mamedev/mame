@@ -9,7 +9,7 @@
 #include "diserial.h"
 
 
-namespace bus { namespace sunmouse {
+namespace bus::sunmouse {
 
 class hle_device_base
 	: public device_t
@@ -73,7 +73,7 @@ public:
 			uint32_t clock);
 };
 
-} } // namespace bus::sunmouse
+} // namespace bus::sunmouse
 
 
 DECLARE_DEVICE_TYPE_NS(SUN_1200BAUD_HLE_MOUSE, bus::sunmouse, hle_1200baud_device)

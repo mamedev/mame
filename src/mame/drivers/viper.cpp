@@ -77,7 +77,7 @@
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
 
     Game status:
-        ppp2nd              POST: "NO SECURITY ERROR"
+        ppp2nd              Boots in-game, no sound or DVD support, crashes when going into song selection screen
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
@@ -87,7 +87,6 @@
         p911                "Distribution error"
         p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
-        popn9               Doesn't boot: bad CHD?
         sscopex/sogeki      Security code error
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
@@ -361,6 +360,8 @@ some other components. It will be documented at a later date.
 #include "speaker.h"
 
 
+namespace {
+
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
@@ -382,17 +383,24 @@ public:
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
-		m_io_ports(*this, "IN%u", 0U)
+		m_io_ports(*this, "IN%u", 0U),
+		m_io_ppp_sensors(*this, "SENSOR%u", 1U)
 	{
 	}
 
 	void viper(machine_config &config);
+	void viper_ppp(machine_config &config);
 
 	void init_viper();
 	void init_vipercf();
 	void init_viperhd();
+	void init_viperppp();
 
 	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint32_t epic_r(offs_t offset);
@@ -426,6 +434,8 @@ private:
 	void unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
 
+	uint16_t ppp_sensor_r(offs_t offset);
+
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	WRITE_LINE_MEMBER(voodoo_pciint);
@@ -435,9 +445,7 @@ private:
 	uint32_t m_mpc8240_regs[256/4];
 
 	void viper_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void viper_ppp_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
@@ -533,7 +541,7 @@ private:
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
 
-	// DS2430, to be device-ified, used at least by pyson.cpp, too
+	// DS2430, to be device-ified, used at least by kpython.cpp, too
 	enum
 	{
 		DS2430_STATE_ROM_COMMAND = 1,
@@ -564,6 +572,7 @@ private:
 	required_shared_ptr<uint64_t> m_workram;
 	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
+	optional_ioport_array<4> m_io_ppp_sensors;
 
 	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -2120,13 +2129,18 @@ void viper_state::viper_map(address_map &map)
 	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
 }
 
+void viper_state::viper_ppp_map(address_map &map)
+{
+	viper_map(map);
+	map(0xff400200, 0xff40023f).r(FUNC(viper_state::ppp_sensor_r));
+}
+
 /*****************************************************************************/
 
 READ_LINE_MEMBER(viper_state::ds2430_unk_r)
 {
 	return m_ds2430_unk_status;
 }
-
 
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
@@ -2234,6 +2248,24 @@ INPUT_PORTS_START( ppp2nd )
 
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // another OK button
+
+	PORT_START("SENSOR1")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_BUTTON3 )     // Sensor 0, 1, 2  (Sensor bar 1)
+	PORT_BIT( 0x0038, IP_ACTIVE_HIGH, IPT_BUTTON4 )     // Sensor 3, 4, 5  (Sensor bar 2)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_BUTTON5 )     // Sensor 6, 7, 8  (Sensor bar 3)
+
+	PORT_START("SENSOR2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON5 )     // Sensor 6, 7, 8  (Sensor bar 3)
+	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_BUTTON6 )     // Sensor 9, 10,11 (Sensor bar 4)
+
+	PORT_START("SENSOR3")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_BUTTON7 )     // Sensor 12,13,14 (Sensor bar 5)
+	PORT_BIT( 0x0038, IP_ACTIVE_HIGH, IPT_BUTTON8 )     // Sensor 15,16,17 (Sensor bar 6)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_BUTTON9 )     // Sensor 18,19,20 (Sensor bar 7)
+
+	PORT_START("SENSOR4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 )     // Sensor 18,19,20 (Sensor bar 7)
+	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_BUTTON10 )    // Sensor 21,22,23 (Sensor bar 8)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( thrild2 )
@@ -2375,20 +2407,20 @@ void viper_state::machine_start()
 	save_item(NAME(m_epic.i2c_cr));
 	save_item(NAME(m_epic.i2c_sr));
 	save_item(NAME(m_epic.i2c_state));
-	for (int i = 0; i < MPC8240_NUM_INTERRUPTS; i ++)
-	{
-		save_item(NAME(m_epic.irq[i].vector), i);
-		save_item(NAME(m_epic.irq[i].priority), i);
-		save_item(NAME(m_epic.irq[i].destination), i); // written but never read
-		save_item(NAME(m_epic.irq[i].active), i);
-		save_item(NAME(m_epic.irq[i].pending), i);
-		save_item(NAME(m_epic.irq[i].mask), i);
-	}
-	for (int i = 0; i < 4; i ++)
-	{
-		save_item(NAME(m_epic.global_timer[i].base_count), i);
-		save_item(NAME(m_epic.global_timer[i].enable), i);
-	}
+
+	save_item(STRUCT_MEMBER(m_epic.irq, vector));
+	save_item(STRUCT_MEMBER(m_epic.irq, priority));
+	save_item(STRUCT_MEMBER(m_epic.irq, destination)); // written but never read
+	save_item(STRUCT_MEMBER(m_epic.irq, active));
+	save_item(STRUCT_MEMBER(m_epic.irq, pending));
+	save_item(STRUCT_MEMBER(m_epic.irq, mask));
+
+	save_item(STRUCT_MEMBER(m_epic.global_timer, base_count));
+	save_item(STRUCT_MEMBER(m_epic.global_timer, enable));
+
+	m_ds2430_data_count = 0;
+	m_ds2430_state = 0;
+	m_ds2430_reset = 0;
 }
 
 void viper_state::machine_reset()
@@ -2446,6 +2478,12 @@ void viper_state::viper(machine_config &config)
 	M48T58(config, "m48t58", 0);
 }
 
+void viper_state::viper_ppp(machine_config &config)
+{
+	viper(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_ppp_map);
+}
+
 /*****************************************************************************/
 
 void viper_state::init_viper()
@@ -2470,6 +2508,17 @@ void viper_state::init_vipercf()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64s_delegate(*this, FUNC(viper_state::unk_serial_r)), write64s_delegate(*this, FUNC(viper_state::unk_serial_w)));
 }
 
+uint16_t viper_state::ppp_sensor_r(offs_t offset)
+{
+	switch(offset) {
+		case 0x06: return m_io_ppp_sensors[0]->read();
+		case 0x0e: return m_io_ppp_sensors[1]->read();
+		case 0x16: return m_io_ppp_sensors[2]->read();
+		case 0x1e: return m_io_ppp_sensors[3]->read();
+	}
+
+	return 0;
+}
 
 /*****************************************************************************/
 
@@ -2499,9 +2548,21 @@ ROM_START(ppp2nd)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(ef0e7caa) SHA1(02fef7465445d33f0288c49a8998a2759ad70823))
 	// byte 0x1e (0) JAA (1) AAA
 	// byte 0x1f (1) rental
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "ppp2nd", 0, SHA1(b8b90483d515c83eac05ffa617af19612ea990b0))
+ROM_END
+
+ROM_START(ppp2nda)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430-aaa.u3", 0x00, 0x28, BAD_DUMP CRC(76906d8f) SHA1(ceea4addc881975cfd6b8e2283b9aecb6080bd99))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
@@ -2734,19 +2795,6 @@ ROM_START(p9112) /* dongle-protected version */
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b11a02", 0, SHA1(57665664321b78c1913d01f0d2c0b8d3efd42e04) )
-ROM_END
-
-ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-based) move out of here.
-	VIPER_BIOS
-
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
-
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
-
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
 
 ROM_START(sscopex)
@@ -3067,12 +3115,17 @@ ROM_START(mfightcc) //*
 	DISK_IMAGE( "c09c04", 0, SHA1(bf5f7447d74399d34edd4eb6dfcca7f6fc2154f2) )
 ROM_END
 
+
+} // Anonymous namespace
+
+
 /*****************************************************************************/
 
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper,    viper,   viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper,   ppp2nd,   viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd, viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd, viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper,  boxingm,   viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -3091,7 +3144,6 @@ GAME(2001, p911e,     p911,      viper,     p911,   viper_state, init_vipercf,  
 GAME(2001, p911ea,    p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911j,     p911,      viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p9112,     kviper,    viper,     p911,   viper_state, init_vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2003, popn9,     kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, sscopefh,  kviper,    viper,    viper,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

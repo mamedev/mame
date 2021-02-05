@@ -52,7 +52,7 @@ void main()
 
 	vec4 PI = vec4(3.1415927, 3.1415927, 3.1415927, 3.1415927);
 	vec4 PI2 = vec4(6.2831854, 6.2831854, 6.2831854, 6.2831854);
-	
+
 	vec4 Fc_y1 = (u_cc_value.xxxx - u_notch_width.xxxx * onehalf) * TimePerSample;
 	vec4 Fc_y2 = (u_cc_value.xxxx + u_notch_width.xxxx * onehalf) * TimePerSample;
 	vec4 Fc_y3 = u_y_freq_response.xxxx * TimePerSample;
@@ -69,7 +69,7 @@ void main()
 	vec4 Fc_y2_pi2 = Fc_y2 * PI2;
 	vec4 Fc_y3_pi2 = Fc_y3 * PI2;
 	vec4 PI2Length = PI2 / SampleCount;
-	
+
 	vec4 W = PI2 * u_cc_value.xxxx * u_scan_time.xxxx;
 	vec4 WoPI = W / PI;
 
@@ -120,7 +120,7 @@ void main()
 		IAccum = IAccum + C * cos(WT) * FilterI;
 		QAccum = QAccum + C * sin(WT) * FilterQ;
 	}
-	
+
 	vec3 YIQ = vec3(
 		(YAccum.r + YAccum.g + YAccum.b + YAccum.a),
 		(IAccum.r + IAccum.g + IAccum.b + IAccum.a) * 2.0,

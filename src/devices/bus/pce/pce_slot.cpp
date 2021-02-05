@@ -11,7 +11,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "pce_slot.h"
 
@@ -188,7 +187,7 @@ static int pce_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 

@@ -582,7 +582,7 @@ u64 i82586_base_device::address_hash(u8 *buf, int length)
 	// address hash is computed using bits 2-7 from crc of address
 	u32 crc = compute_crc(buf, length, false);
 
-	return 1U << ((crc >> 2) & 0x3f);
+	return u64(1) << ((crc >> 2) & 0x3f);
 }
 
 int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
@@ -893,35 +893,49 @@ bool i82586_device::cu_configure()
 
 bool i82586_device::cu_mcsetup()
 {
-	int addr_len = cfg_address_length();
-	u16 mc_count;
-	u8 data[6];
-
-	if (addr_len != 6)
-	{
-		LOG("cu_mcsetup unexpected address length %d != 6\n", addr_len);
-		return false;
-	}
-
-	// read the address count
-	mc_count = m_space->read_word(m_cba + 6, TB_COUNT);
+	// read the address list length
+	int mc_count = m_space->read_word(m_cba + 6, TB_COUNT);
 
 	// reset current list
-	LOG("mc_setup configuring %d addresses\n", mc_count);
 	m_mac_multi = 0;
 
-	// read and process the addresses
-	for (int i = 0; i < mc_count; i++)
+	if (mc_count < cfg_address_length())
 	{
-		*(u16 *)&data[0] = m_space->read_word(m_cba + 8 + i * 6 + 0);
-		*(u16 *)&data[1] = m_space->read_word(m_cba + 8 + i * 6 + 2);
-		*(u16 *)&data[2] = m_space->read_word(m_cba + 8 + i * 6 + 4);
+		LOG("cu_mcsetup multicast filter disabled\n");
+
+		return true;
+	}
+	else
+		LOG("cu_mcsetup configuring %d addresses\n", mc_count / cfg_address_length());
+
+	std::vector<u8> buf;
+	offs_t offset = m_cba + 8;
+
+	// read and process the addresses
+	while (mc_count >= cfg_address_length())
+	{
+		// read an address
+		while (buf.size() < cfg_address_length())
+		{
+			u16 const data = m_space->read_word(offset);
+
+			buf.push_back(data >> 0);
+			buf.push_back(data >> 8);
+
+			offset += 2;
+		}
 
 		// add a hash of this address to the table
-		m_mac_multi |= address_hash(data, cfg_address_length());
+		m_mac_multi |= address_hash(buf.data(), cfg_address_length());
 
-		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
-			data[0], data[1], data[2], data[3], data[4], data[5]);
+		if (cfg_address_length() == 6)
+			LOG("cu_mcsetup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
+				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
+
+		// remove used address bytes from the buffer
+		buf.erase(buf.begin(), buf.begin() + cfg_address_length());
+
+		mc_count -= cfg_address_length();
 	}
 
 	return true;
@@ -1483,68 +1497,65 @@ bool i82596_device::cu_configure()
 
 bool i82596_device::cu_mcsetup()
 {
-	int addr_len = cfg_address_length();
-	u16 mc_count = 0;
+	u32 data = (mode() == MODE_LINEAR) ? m_space->read_dword(m_cba + 8) : m_space->read_word(m_cba + 6);
+	int mc_count = data & TB_COUNT;
 
-	int offset = 0;
-	u8 data[20];
-	bool multi_ia;
-
-	if (addr_len != 6)
+	// if length less than one address, clear multicast filter and finish
+	if (mc_count < cfg_address_length())
 	{
-		LOG("cu_mcsetup unexpected address length %d != 6\n", addr_len);
-		return false;
-	}
-
-	switch (mode())
-	{
-	case MODE_82586:
-	case MODE_32SEGMENTED:
-		mc_count = m_space->read_word(m_cba + 6, TB_COUNT);
-		break;
-
-	case MODE_LINEAR:
-		mc_count = m_space->read_word(m_cba + 8, TB_COUNT);
-		offset = 2;
-		break;
-	}
-
-	// if count is zero, release multicast list and finish
-	if (mc_count == 0)
-	{
-		LOG("mc_setup multicast filter disabled\n");
+		LOG("cu_mcsetup multicast filter disabled\n");
 		m_mac_multi = 0;
 
 		return true;
 	}
 
-	// fetch the first word
-	*(u32 *)&data[0] = m_space->read_dword(m_cba + 8);
+	std::vector<u8> buf;
+	offs_t offset = m_cba + 8;
+
+	// already have the first two address bytes in linear mode
+	if (mode() != MODE_LINEAR)
+	{
+		data = m_space->read_dword(offset);
+
+		buf.push_back(data >> 0);
+		buf.push_back(data >> 8);
+	}
+	buf.push_back(data >> 16);
+	buf.push_back(data >> 24);
+	offset += 4;
 
 	// multi ia when configured and lsb of first address is clear
-	multi_ia = cfg_multi_ia() && !BIT(data[offset], 0);
+	bool const multi_ia = cfg_multi_ia() && !BIT(buf[0], 0);
 
-	// clear existing list
-	LOG("mc_setup configuring %d %s addresses\n", mc_count, multi_ia ? "multi-ia" : "multicast");
+	LOG("cu_mcsetup configuring %d %s addresses\n", mc_count / cfg_address_length(), multi_ia ? "multi-ia" : "multicast");
 	(multi_ia ? m_mac_multi_ia : m_mac_multi) = 0;
 
-	for (int i = 0; i < mc_count; i++)
+	while (mc_count >= cfg_address_length())
 	{
-		// compute offset of address in 18 byte buffer
-		int n = (i % 3) * 6;
+		// read an address
+		while (buf.size() < cfg_address_length())
+		{
+			data = m_space->read_dword(offset);
 
-		// read the next dword
-		*(u32 *)&data[n + 6] = m_space->read_dword(m_cba + 8 + i * 4 + 4);
+			buf.push_back(data >> 0);
+			buf.push_back(data >> 8);
+			buf.push_back(data >> 16);
+			buf.push_back(data >> 24);
 
-		// unaligned case needs special handling
-		if (n == 12 && offset == 2)
-			*(u16 *)&data[18] = *(u16 *)&data[0];
+			offset += 4;
+		}
 
 		// add a hash of this address to the table
-		(multi_ia ? m_mac_multi_ia : m_mac_multi) |= address_hash(&data[n + offset], cfg_address_length());
+		(multi_ia ? m_mac_multi_ia : m_mac_multi) |= address_hash(buf.data(), cfg_address_length());
 
-		LOG("mc_setup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
-			data[n + offset + 0], data[n + offset + 1], data[n + offset + 2], data[n + offset + 3], data[n + offset + 4], data[n + offset + 5]);
+		if (cfg_address_length() == 6)
+			LOG("cu_mcsetup inserting address %02x:%02x:%02x:%02x:%02x:%02x\n",
+				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
+
+		// remove used address bytes from the buffer
+		buf.erase(buf.begin(), buf.begin() + cfg_address_length());
+
+		mc_count -= cfg_address_length();
 	}
 
 	return true;

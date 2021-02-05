@@ -19,17 +19,10 @@
 #define LOG_DAI_PORT_R(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 #define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 
-void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(dai_state::tms_timer)
 {
-	switch (id)
-	{
-	case TIMER_TMS5501:
-		m_tms5501->xi7_w(BIT(m_io_keyboard[8]->read(), 2));
-		timer_set(attotime::from_hz(100), TIMER_TMS5501);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in dai_state::device_timer");
-	}
+	m_tms5501->xi7_w(BIT(m_io_keyboard[8]->read(), 2));
+	m_tms_timer->adjust(attotime::from_hz(100));
 }
 
 
@@ -68,7 +61,7 @@ IRQ_CALLBACK_MEMBER(dai_state::int_ack)
 void dai_state::machine_start()
 {
 	membank("bank2")->configure_entries(0, 4, m_rom + 0x2000, 0x1000);
-	timer_set(attotime::from_hz(100), TIMER_TMS5501);
+	m_tms_timer->adjust(attotime::from_hz(100));
 	save_item(NAME(m_paddle_select));
 	save_item(NAME(m_paddle_enable));
 	save_item(NAME(m_cassette_motor));

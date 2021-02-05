@@ -173,7 +173,6 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -418,14 +417,14 @@ void wheelfir_state::wheelfir_blit_w(offs_t offset, uint16_t data, uint16_t mem_
 		{
 			vpage=LAYER_BG;
 /*
-			printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
+            printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
-			for(int i=0;i<16;++i)
-			{
-				printf("%x = %.4x\n",i,m_blitter_data[i]);
-			}
+            for(int i=0;i<16;++i)
+            {
+                printf("%x = %.4x\n",i,m_blitter_data[i]);
+            }
 
-			printf("\n");
+            printf("\n");
 */
 		}
 
@@ -505,7 +504,7 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 	copybitmap_trans(bitmap, *m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 /*
-	m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
+    m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
 */
 
 	return 0;
@@ -757,9 +756,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+;
 }
 
 

@@ -8,6 +8,9 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+namespace {
+
 class capcom_state : public driver_device
 {
 public:
@@ -18,15 +21,14 @@ public:
 
 	void capcom(machine_config &config);
 	void capcom_map(address_map &map);
+
 protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_capcom();
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -39,10 +41,6 @@ static INPUT_PORTS_START( capcom )
 INPUT_PORTS_END
 
 void capcom_state::machine_reset()
-{
-}
-
-void capcom_state::init_capcom()
 {
 }
 
@@ -316,18 +314,39 @@ ROM_START(ghv101)
 	ROM_LOAD("u34_v10.bin",  0x400000,  0x80000, CRC(cd5ea236) SHA1(dded158bc2f8443d2e69834cde87e81661ca7c53))
 ROM_END
 
-GAME(1996,  abv106,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Airborne",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  abv106r, abv106, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Airborne (Redemption)",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bbb109,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Big Bang Bar (Beta 1.9 US)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bbb108,  bbb109, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Big Bang Bar (Beta 1.8 US)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bsv103,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Breakshot (1.3)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bsv102,  bsv103, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Breakshot (1.2)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bsv100r, bsv103, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Breakshot (Redemption 1.0)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bsv102r, bsv103, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Breakshot (Redemption 1.2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  bsb105,  bsv103, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Breakshot (Beta)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  ffv104,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Flipper Football (v1.04)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  ffv101,  ffv104, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Flipper Football (v1.01)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  kpv106,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Kingpin (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  pmv112,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Pinball Magic",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  pmv112r, pmv112, capcom, capcom, capcom_state, init_capcom, ROT0, "Capcom",  "Pinball Magic (Redemption)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  ghv101,  0,      capcom, capcom, capcom_state, init_capcom, ROT0, "Romstar", "Goofy Hoops",                MACHINE_IS_SKELETON_MECHANICAL)
+/*-------------------------------------------------------------------
+/ Pool Player (Illinois Pinball, 2000)
+/-------------------------------------------------------------------*/
+ROM_START(pp100)
+	ROM_REGION16_BE(0x00100000, "user1",0)
+	ROM_LOAD16_BYTE("u1l-v1_0.bin", 0x000001, 0x80000, CRC(cb14635e) SHA1(8d7bb25fdc7ee7f38eaf3cad6326cf678a81b85f))
+	ROM_LOAD16_BYTE("u1h-v1_0.bin", 0x000000, 0x80000, CRC(9839ff76) SHA1(79c3a9700d2e68ed7d83e669b2df543bcabf7164))
+	ROM_REGION(0x00100000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "cpu2", 0)
+	ROM_LOAD("u24_v11.bin", 0x0000, 0x2000, CRC(d46212f4) SHA1(50f1279d995b597c468805b323e0252800b28274))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("u28_v11.bin", 0 , 0x80000, CRC(b076ad2e) SHA1(1be8e3bda2890545253f6f7e4825d2db1d925255))
+	ROM_LOAD("u29_v11.bin", 0x100000, 0x20000, CRC(b251a27c) SHA1(bc30791cb9b5497c11f1cff06c89a729a07b5d4a))
+	ROM_FILL( 0x200000, 0x100000,0xff)
+	ROM_FILL( 0x300000, 0x100000,0xff)
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME(1996,  abv106,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  abv106r, abv106, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Airborne (Redemption)",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bbb109,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Big Bang Bar (Beta 1.9 US)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bbb108,  bbb109, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Big Bang Bar (Beta 1.8 US)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bsv103,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Breakshot (1.3)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bsv102,  bsv103, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Breakshot (1.2)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bsv100r, bsv103, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Breakshot (Redemption 1.0)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bsv102r, bsv103, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Breakshot (Redemption 1.2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  bsb105,  bsv103, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Breakshot (Beta)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  ffv104,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Flipper Football (v1.04)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  ffv101,  ffv104, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Flipper Football (v1.01)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  kpv106,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Kingpin (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  pmv112,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Pinball Magic",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  pmv112r, pmv112, capcom, capcom, capcom_state, empty_init, ROT0, "Capcom",           "Pinball Magic (Redemption)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  ghv101,  0,      capcom, capcom, capcom_state, empty_init, ROT0, "Romstar",          "Goofy Hoops",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2000,  pp100,   bsv103, capcom, capcom, capcom_state, empty_init, ROT0, "Illinois Pinball", "Pool Player (1.0)",          MACHINE_IS_SKELETON_MECHANICAL)

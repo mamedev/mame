@@ -53,14 +53,17 @@ public:
 
 	enum
 	{
-		NTSC_SCANLINES_PER_FRAME   = 262,
-		PAL_SCANLINES_PER_FRAME    = 312,
+		NTSC_SCANLINES_PER_FRAME     = 262,
+		PAL_SCANLINES_PER_FRAME      = 312,
+		VS_CLONE_SCANLINES_PER_FRAME = 280,
 
-		BOTTOM_VISIBLE_SCANLINE    = 239,
-		VBLANK_FIRST_SCANLINE      = 241,
-		VBLANK_FIRST_SCANLINE_PALC = 291,
-		VBLANK_LAST_SCANLINE_NTSC  = 260,
-		VBLANK_LAST_SCANLINE_PAL   = 310
+		BOTTOM_VISIBLE_SCANLINE        = 239,
+		VBLANK_FIRST_SCANLINE          = 241,
+		VBLANK_FIRST_SCANLINE_PALC     = 291,
+		VBLANK_FIRST_SCANLINE_VS_CLONE = 240,
+		VBLANK_LAST_SCANLINE_NTSC      = 260,
+		VBLANK_LAST_SCANLINE_PAL       = 310,
+		VBLANK_LAST_SCANLINE_VS_CLONE  = 279
 
 		// Both the scanline immediately before and immediately after VBLANK
 		// are non-rendering and non-vblank.
@@ -207,6 +210,7 @@ protected:
 	int                         m_back_color;           /* background color */
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_x_fine;               /* refresh-related */
+	int                         m_toggle;               /* used to latch hi-lo scroll */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
 
@@ -228,7 +232,6 @@ private:
 	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
 	int                         m_refresh_latch;        /* refresh-related */
-	int                         m_toggle;               /* used to latch hi-lo scroll */
 	int                         m_add;              /* vram increment amount */
 	int                         m_videomem_addr;        /* videomem address pointer */
 	int                         m_data_latch;           /* latched videomem data */
@@ -300,17 +303,39 @@ public:
 	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class ppu2c04_clone_device : public ppu2c0x_device {
+public:
+	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+	virtual void draw_background(uint8_t *line_priority) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
+	virtual void draw_sprites(uint8_t *line_priority) override;
+
+	virtual void init_palette_tables() override;
+
+protected:
+	virtual void device_start() override;
+
+private:
+	required_region_ptr<uint8_t> m_palette_data;
+
+	std::unique_ptr<uint8_t[]>   m_spritebuf; /* buffered sprite ram for next frame */
+};
 
 // device type definition
 //extern const device_type PPU_2C0X;
-DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)    // NTSC NES
-DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)   // Playchoice 10
-DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)    // Vs. Unisystem
-DECLARE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device)    // PAL NES
-DECLARE_DEVICE_TYPE(PPU_PALC,    ppupalc_device)    // PAL Clones
-DECLARE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device) // Vs. Unisystem (Ninja Jajamaru Kun)
-DECLARE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device) // Vs. Unisystem (Mighty Bomb Jack)
-DECLARE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device) // Vs. Unisystem (Gumshoe)
-DECLARE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device) // Vs. Unisystem (Top Gun)
+DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)       // NTSC NES
+DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)      // Playchoice 10
+DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)       // Vs. Unisystem
+DECLARE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device)       // PAL NES
+DECLARE_DEVICE_TYPE(PPU_PALC,    ppupalc_device)       // PAL Clones
+DECLARE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device)    // Vs. Unisystem (Ninja Jajamaru Kun)
+DECLARE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device)    // Vs. Unisystem (Mighty Bomb Jack)
+DECLARE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device)    // Vs. Unisystem (Gumshoe)
+DECLARE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device)    // Vs. Unisystem (Top Gun)
+DECLARE_DEVICE_TYPE(PPU_2C04C,   ppu2c04_clone_device) // Vs. Unisystem (Super Mario Bros. bootlegs)
 
 #endif // MAME_VIDEO_PPU2C0X_H

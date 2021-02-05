@@ -1,45 +1,60 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:R. Belmont, Robbbert
 /***************************************************************************
 
         Micro Craft Dimension 68000
 
-        28/12/2011 Skeleton driver.
-
         This computer had the facility for plug-in cards to emulate popular
-        computers of the time such as apple, trs80, kaypro, etc. The floppy
-        disk parameters could be set to be able to read the disks of the
-        various systems, or you create any other format you wished.
+        computers of the time such as the Apple II Plus, TRS80, Kaypro, etc.
+        The floppy disk parameters could be set to be able to read the disks
+        of the emulated systems, or you create any other format you wished.
 
-        There is no schematic available, so not fully able to emulate at
-        this time.
-
-        ToDo:
-
-        - Floppy controller
-        - Floppy formats (not sure if MESS supports user-defined formats)
-        - Banking
+        TODO:
+        - HLE serial keyboard
         - Graphics display (including colour and video_control options)
-        - DUART
-        - RTC
-        - RS232 interface
-        - Keyboard
+        - RTC (is this a thing?  the manual indicates it just uses the DUART's timers to track time)
         - Centronics printer
         - Video-high
         - Video-reset
-        - Game switches, paddles and timers
+        - Game switches, paddles and timers (which work almost identically to the Apple II)
         - The plug-in boards
         - Emulator trap function
+
+        DUART I/O port bits:
+        INPUT:
+        bit 0 = Centronics RDY
+
+        OUTPUT:
+        all bits = Centronics data
+
+        Colors (from COLORDEM.BAS)
+        0 = black
+        1 = dark blue
+        2 = red
+        3 = magenta
+        4 = brown
+        5 = grey
+        6 = orange
+        7 = pink
+        8 = dark aqua
+        9 = blue
+        A = grey 2
+        B = light blue
+        C = green
+        D = aqua
+        E = yellow
+        F = white
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
-#include "machine/keyboard.h"
+#include "machine/mc68681.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -53,20 +68,24 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ram(*this, "ram")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
+		, m_duart(*this, "duart")
+		, m_bootview(*this, "bootview")
 	{ }
 
 	void dim68k(machine_config &config);
 
 private:
-	u16 dim68k_duart_r(offs_t offset);
+	void dim68k_palette(palette_device &palette);
 	u16 dim68k_fdc_r();
 	u16 dim68k_game_switches_r();
 	u16 dim68k_speaker_r();
+	u16 dim68k_banksw_r();
 	void dim68k_banksw_w(u16 data);
-	void dim68k_duart_w(u16 data);
 	void dim68k_fdc_w(u16 data);
 	void dim68k_printer_strobe_w(u16 data);
 	void dim68k_reset_timers_w(u16 data);
@@ -74,35 +93,49 @@ private:
 	void dim68k_video_control_w(u16 data);
 	void dim68k_video_high_w(u16 data);
 	void dim68k_video_reset_w(u16 data);
-	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 
 	void mem_map(address_map &map);
 
 	bool m_speaker_bit;
 	u8 m_video_control;
-	u8 m_term_data;
+	u8 m_fdc_irq;
 	void machine_reset() override;
 	void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<scn2681_device> m_duart;
+	memory_view m_bootview;
 };
 
-u16 dim68k_state::dim68k_duart_r(offs_t offset)
-// Port A is for the keyboard : 300 baud, no parity, 8 bits, 1 stop bit. Port B is for RS232.
-// The device also controls the parallel printer (except the strobe) and the RTC.
-// Device = SCN2681, not emulated. The keyboard is standard ASCII, so we can use the terminal
-// keyboard for now.
+void dim68k_state::dim68k_palette(palette_device &palette)
 {
-	if (offset==3)
-		return m_term_data;
-	else
-	return 0;
-}
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0x40, 0x1c, 0xf7)); /* Dark Blue */
+	palette.set_pen_color(2, rgb_t(0xa7, 0x0b, 0x40)); /* Dark Red */
+	palette.set_pen_color(3, rgb_t(0xe6, 0x28, 0xff)); /* Purple */
+	palette.set_pen_color(4, rgb_t(0x40, 0x63, 0x00)); /* Brown */
+	palette.set_pen_color(5, rgb_t(0x80, 0x80, 0x80)); /* Dark Gray */
+	palette.set_pen_color(6, rgb_t(0xe6, 0x6f, 0x00)); /* Orange */
+	palette.set_pen_color(7, rgb_t(0xff, 0x8b, 0xbf)); /* Pink */
+	palette.set_pen_color(8, rgb_t(0x00, 0x74, 0x40)); /* Dark Green */
+	palette.set_pen_color(9, rgb_t(0x19, 0x90, 0xff)); /* Medium Blue */
+	palette.set_pen_color(10, rgb_t(0x80, 0x80, 0x80)); /* Light Grey */
+	palette.set_pen_color(11, rgb_t(0xbf, 0x9c, 0xff)); /* Light Blue */
+	palette.set_pen_color(12, rgb_t(0x19, 0xd7, 0x00)); /* Light Green */
+	palette.set_pen_color(13, rgb_t(0x58, 0xf4, 0xbf)); /* Aquamarine */
+	palette.set_pen_color(14, rgb_t(0xbf, 0xe3, 0x08)); /* Yellow */
+	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));  /* White */
+};
 
 u16 dim68k_state::dim68k_fdc_r()
 {
@@ -131,8 +164,30 @@ void dim68k_state::dim68k_speaker_w(u16 data)
 	m_speaker->level_w(m_speaker_bit);
 }
 
+WRITE_LINE_MEMBER(dim68k_state::fdc_irq_w)
+{
+	if (state)
+	{
+		m_fdc_irq = 0;
+	}
+	else
+	{
+		m_fdc_irq = 0x80;
+	}
+}
+
 void dim68k_state::dim68k_fdc_w(u16 data)
 {
+	m_fdc->tc_w(BIT(data, 5));
+
+	if (BIT(data, 1))
+	{
+		m_floppy[BIT(data, 0)^1]->get_device()->mon_w(true);
+	}
+	else
+	{
+		m_floppy[BIT(data, 0)^1]->get_device()->mon_w(false);
+	}
 }
 
 void dim68k_state::dim68k_video_high_w(u16 data)
@@ -149,7 +204,7 @@ void dim68k_state::dim68k_video_control_w(u16 data)
    D2 0 = Screen On; 1 = Off [emulated]
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
- */
+*/
 	unsigned dots = (data & 0x40) ? 7 : 8;
 	m_crtc->set_hpixels_per_column(dots);
 	m_video_control = data;
@@ -171,10 +226,6 @@ void dim68k_state::dim68k_video_reset_w(u16 data)
 {
 }
 
-void dim68k_state::dim68k_duart_w(u16 data)
-{
-}
-
 void dim68k_state::dim68k_reset_timers_w(u16 data)
 // reset game port timer before reading paddles
 {
@@ -185,38 +236,54 @@ void dim68k_state::dim68k_printer_strobe_w(u16 data)
 {
 }
 
-void dim68k_state::dim68k_banksw_w(u16 data)
-// At boot time, the rom and IO occupy 0-FFFF, this moves it to the proper place
+u16 dim68k_state::dim68k_banksw_r()
 {
+	m_bootview.disable();
+	return 0xffff;
+}
+
+void dim68k_state::dim68k_banksw_w(u16 data)
+{
+	m_bootview.disable();
 }
 
 void dim68k_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x00000000, 0x00feffff).ram().share("ram"); // 16MB RAM / ROM at boot
-	map(0x00ff0000, 0x00ff1fff).rom().region("bootrom", 0);
-	map(0x00ff2000, 0x00ff7fff).ram(); // Graphics Video RAM
-	map(0x00ff8001, 0x00ff8001).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x00ff8003, 0x00ff8003).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x00ff8004, 0x00ff8005).w(FUNC(dim68k_state::dim68k_video_high_w));
-	map(0x00ff8008, 0x00ff8009).w(FUNC(dim68k_state::dim68k_video_control_w));
-	map(0x00ff800a, 0x00ff800b).w(FUNC(dim68k_state::dim68k_video_reset_w));
-	map(0x00ff8800, 0x00ff8fff).rom().region("cop6512", 0); // slot 1 controller rom
-	map(0x00ff9000, 0x00ff97ff).rom().region("copz80", 0); // slot 2 controller rom
-	map(0x00ff9800, 0x00ff9fff).rom().region("cop8086", 0); // slot 3 controller rom
+	map(0x000000, 0x7fffff).ram().share("ram"); // 8 MiB of RAM
+	map(0x000000, 0x00ffff).view(m_bootview);
+	m_bootview[0](0x000000, 0x001fff).rom().region("bootrom", 0);
+	// graphics VRAM is not used by the stub before the bankswitch occurs, so it's not mapped here
+	m_bootview[0](0x008001, 0x008001).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	m_bootview[0](0x008003, 0x008003).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	m_bootview[0](0x008004, 0x008005).w(FUNC(dim68k_state::dim68k_video_high_w));
+	m_bootview[0](0x008008, 0x008009).w(FUNC(dim68k_state::dim68k_video_control_w));
+	m_bootview[0](0x00800a, 0x00800b).w(FUNC(dim68k_state::dim68k_video_reset_w));
+	m_bootview[0](0x00dc00, 0x00dc01).rw(FUNC(dim68k_state::dim68k_banksw_r), FUNC(dim68k_state::dim68k_banksw_w));
+
+	map(0xff0000, 0xff1fff).rom().region("bootrom", 0);
+	map(0xff2000, 0xff7fff).ram(); // Graphics Video RAM
+	map(0xff8001, 0xff8001).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xff8003, 0xff8003).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xff8004, 0xff8005).w(FUNC(dim68k_state::dim68k_video_high_w));
+	map(0xff8008, 0xff8009).w(FUNC(dim68k_state::dim68k_video_control_w));
+	map(0xff800a, 0xff800b).w(FUNC(dim68k_state::dim68k_video_reset_w));
+	map(0xff8800, 0xff8fff).rom().region("cop6512", 0); // slot 1 controller rom
+	map(0xff9000, 0xff97ff).rom().region("copz80", 0); // slot 2 controller rom
+	map(0xff9800, 0xff9fff).rom().region("cop8086", 0); // slot 3 controller rom
 #if 0
-	map(0x00ffa000, 0x00ffa7ff).rom(); // slot 4 controller rom
-	map(0x00ffa800, 0x00ffafff).rom(); // slot 5 controller rom
-	map(0x00ffb000, 0x00ffb7ff).rom(); // slot 6 controller rom
+	map(0xffa000, 0xffa7ff).rom(); // slot 4 controller rom
+	map(0xffa800, 0xffafff).rom(); // slot 5 controller rom
+	map(0xffb000, 0xffb7ff).rom(); // slot 6 controller rom
 #endif
-	map(0x00ffc400, 0x00ffc41f).rw(FUNC(dim68k_state::dim68k_duart_r), FUNC(dim68k_state::dim68k_duart_w)); // Signetics SCN2681AC1N40 Dual UART
-	map(0x00ffc800, 0x00ffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
-	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
-	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
-	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
+	map(0xffc400, 0xffc41f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0xffc800, 0xffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
+	map(0xffcc00, 0xffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
+	map(0xffd000, 0xffd003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
+	map(0xffd000, 0xffd000).lr8([this]() -> u8 { return m_fdc_irq; }, "free0");
+	map(0xffd004, 0xffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
 	//map(0x00ffd400, 0x00ffd403) emulation trap control
-	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
-	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
+	map(0xffd800, 0xffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
+	map(0xffdc00, 0xffdc01).rw(FUNC(dim68k_state::dim68k_banksw_r), FUNC(dim68k_state::dim68k_banksw_w));
 }
 
 /* Input ports */
@@ -226,9 +293,8 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	u16* ROM = &memregion("bootrom")->as_u16();
-
-	memcpy((u16*)m_ram.target(), ROM, 0x2000);
+	m_bootview.select(0);
+	m_fdc_irq = 0;
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -256,30 +322,58 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 		xx++;
 
 		chr = chr16>>8;
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		if (dot8) *p++ = palette[BIT(gfx, 1)];
+		if (m_video_control & 0x80)
+		{
+			gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+			*p++ = palette[BIT(gfx, 7)*15];
+			*p++ = palette[BIT(gfx, 6)*15];
+			*p++ = palette[BIT(gfx, 5)*15];
+			*p++ = palette[BIT(gfx, 4)*15];
+			*p++ = palette[BIT(gfx, 3)*15];
+			*p++ = palette[BIT(gfx, 2)*15];
+			*p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 0)*15];
+		}
+		else
+		{
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[(chr>>4) & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			if (dot8) *p++ = palette[chr & 0xf];
+		}
 
 		inv = 0;
 		if (xx == cursor_x) inv=0xff;
 		xx++;
 
 		chr = chr16;
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		if (dot8) *p++ = palette[BIT(gfx, 1)];
+		if (m_video_control & 0x80)
+		{
+			gfx = m_p_chargen[(chr << 4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+			*p++ = palette[BIT(gfx, 7)*15];
+			*p++ = palette[BIT(gfx, 6)*15];
+			*p++ = palette[BIT(gfx, 5)*15];
+			*p++ = palette[BIT(gfx, 4)*15];
+			*p++ = palette[BIT(gfx, 3)*15];
+			*p++ = palette[BIT(gfx, 2)*15];
+			*p++ = palette[BIT(gfx, 1)*15];
+			if (dot8) *p++ = palette[BIT(gfx, 0)*15];
+		}
+		else
+		{
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[(chr >> 4) & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			*p++ = palette[chr & 0xf];
+			if (dot8) *p++ = palette[chr & 0xf];
+		}
 	}
 }
 
@@ -303,20 +397,22 @@ GFXDECODE_END
 
 static void dim68k_floppies(device_slot_interface &device)
 {
-	device.option_add("525hd", FLOPPY_525_HD);
-}
-
-void dim68k_state::kbd_put(u8 data)
-{
-	m_term_data = data;
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 void dim68k_state::machine_start()
 {
 	save_item(NAME(m_speaker_bit));
 	save_item(NAME(m_video_control));
-	save_item(NAME(m_term_data));
 }
+
+static DEVICE_INPUT_DEFAULTS_START(keyboard)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
 
 void dim68k_state::dim68k(machine_config &config)
 {
@@ -331,7 +427,7 @@ void dim68k_state::dim68k(machine_config &config)
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 250-1);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, FUNC(dim68k_state::dim68k_palette), 16);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
@@ -339,9 +435,10 @@ void dim68k_state::dim68k(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, "fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);
 	m_crtc->set_screen("screen");
@@ -349,8 +446,16 @@ void dim68k_state::dim68k(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &kbdport(RS232_PORT(config, "kbdport", default_rs232_devices, "keyboard"));
+	kbdport.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->a_tx_cb().set(kbdport, FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(rs232, FUNC(rs232_port_device::write_txd));
+
+	kbdport.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");
@@ -387,6 +492,7 @@ ROM_START( dim68k )
 	ROM_REGION16_BE( 0x2000, "bootrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "mc103e.bin", 0x0001, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
 	ROM_LOAD16_BYTE( "mc104.bin",  0x0000, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
+	ROM_FILL(0x11dd, 1, 0x0d)   // TEMP: patch keyboard table so return is return
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))

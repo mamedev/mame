@@ -1814,7 +1814,7 @@ ROM_END
 
 ROM_START( wtennis )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ten14.h4",     0xc000, 0x1000, CRC(f7b27303) SHA1(043476429bcc8def412f77d1f79a01586d984bfc) )
+	ROM_LOAD( "ten14.h4",     0xc000, 0x0800, CRC(fd343474) SHA1(1e1fd3f20ce1c7533767344f924029c8c62139a1) )
 	ROM_LOAD( "ten4.d4",      0xd000, 0x1000, CRC(e465d82c) SHA1(c357dcf17539150425574985afa559db2e6ab834) ) // was t4
 	ROM_LOAD( "ten3.c4",      0xe000, 0x1000, CRC(8f090eab) SHA1(baeef8ee05010bf44cf8865a22911f3d458df1b0) ) // was t3
 	ROM_LOAD( "ten2.a4",      0xf000, 0x1000, CRC(d2f9dd30) SHA1(1faa088806e8627b5e561d8b99054d295045dcfb) ) // was t2
@@ -2165,8 +2165,7 @@ void btime_state::init_disco()
 
 void btime_state::init_cookrace()
 {
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2180,8 +2179,7 @@ void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8smo_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
 
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

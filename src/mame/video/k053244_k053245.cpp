@@ -119,6 +119,9 @@ void k05324x_device::set_bpp(int bpp)
 
 void k05324x_device::device_start()
 {
+	// assumes it can make an address mask with m_sprite_rom.length() - 1
+	assert(!(m_sprite_rom.length() & (m_sprite_rom.length() - 1)));
+
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
@@ -210,7 +213,7 @@ u8 k05324x_device::k053244_r(offs_t offset)
 		addr = (m_rombank << 19) | ((m_regs[11] & 0x7) << 18)
 			| (m_regs[8] << 10) | (m_regs[9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= m_sprite_rom.mask();
+		addr &= m_sprite_rom.length() - 1;
 
 		//  popmessage("%s: offset %02x addr %06x", machine().describe_context(), offset & 3, addr);
 

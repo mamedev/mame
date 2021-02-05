@@ -360,21 +360,18 @@ u8 sei80bu_device::opcode_r(offs_t offset)
 /***************************************************************************
     Seibu ADPCM device
     (MSM5205 with interface to sample ROM provided by YM3931)
-
-    FIXME: hook up an actual MSM5205 in place of this custom implementation
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM (MSM5205)")
+DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM interface")
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_current(0),
-		m_end(0),
-		m_nibble(0),
-		m_playing(0),
-		m_base(*this, DEVICE_SELF)
+	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock)
+	, m_msm(*this, finder_base::DUMMY_TAG)
+	, m_current(0)
+	, m_end(0)
+	, m_nibble(0)
+	, m_playing(0)
+	, m_base(*this, DEVICE_SELF)
 {
 }
 
@@ -384,14 +381,16 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 
 void seibu_adpcm_device::device_start()
 {
-	m_playing = 0;
-	m_stream = stream_alloc(0, 1, clock());
-	m_adpcm.reset();
-
 	save_item(NAME(m_current));
 	save_item(NAME(m_end));
 	save_item(NAME(m_nibble));
 	save_item(NAME(m_playing));
+}
+
+void seibu_adpcm_device::device_reset()
+{
+	m_playing = 0;
+	m_msm->reset_w(1);
 }
 
 // "decrypt" is a bit flowery here, as it's probably just line-swapping to
@@ -408,9 +407,6 @@ void seibu_adpcm_device::decrypt()
 
 void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 {
-	if (m_stream)
-		m_stream->update();
-
 	if (offset)
 	{
 		m_end = data<<8;
@@ -425,45 +421,37 @@ void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 void seibu_adpcm_device::ctl_w(u8 data)
 {
 	// sequence is 00 02 01 each time.
-	if (m_stream)
-		m_stream->update();
-
 	switch (data)
 	{
 		case 0:
+			m_msm->reset_w(1);
 			m_playing = 0;
 			break;
 		case 2:
 			break;
 		case 1:
+			m_msm->reset_w(0);
 			m_playing = 1;
 			break;
 	}
 }
 
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void seibu_adpcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void seibu_adpcm_device::msm_int(int state)
 {
-	auto &dest = outputs[0];
+	if (!state || !m_playing)
+		return;
 
-	int sampindex;
-	for (sampindex = 0; m_playing && sampindex < dest.samples(); sampindex++)
+	int val = (m_base[m_current] >> m_nibble) & 15;
+	m_msm->data_w(val);
+
+	m_nibble ^= 4;
+	if (m_nibble == 4)
 	{
-		int val = (m_base[m_current] >> m_nibble) & 15;
-
-		m_nibble ^= 4;
-		if (m_nibble == 4)
+		m_current++;
+		if (m_current >= m_end)
 		{
-			m_current++;
-			if (m_current >= m_end)
-				m_playing = 0;
+			m_msm->reset_w(1);
+			m_playing = 0;
 		}
-
-		dest.put_int(sampindex, m_adpcm.clock(val), 32768 >> 4);
 	}
-	dest.fill(0, sampindex);
 }

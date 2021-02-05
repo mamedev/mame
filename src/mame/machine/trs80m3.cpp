@@ -612,6 +612,8 @@ void trs80m3_state::machine_reset()
 		port_9c_w(1);    // 4P - enable rom
 	if (m_model4 & 6)
 		port_84_w(0);    // 4 & 4P - switch in devices
+
+	m_floppy = nullptr;
 }
 
 

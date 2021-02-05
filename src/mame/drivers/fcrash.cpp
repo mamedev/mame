@@ -234,30 +234,31 @@ void fcrash_state::sf2m1_layer_w(offs_t offset, uint16_t data)
 		m_cps_a_regs[0x14 / 2] = data;
 		break;
 	case 0x06:
-			switch (data)
-			{
-			case 0:
-				data = 0x078e;
-				break;
-			case 1:
-				data = 0x12c0;
-				break;
-			case 2:
-				data = 0x06ce;
-				break;
-			case 3:
-				data = 0x09ce;
-				break;
-			case 4:
-				data = 0x12ce;
-				break;
-			case 5:
-				data = 0x0b4e;
-				break;
-			}
-	case 0xb3:
-			m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		switch (data)
+		{
+		case 0:
+			data = 0x078e;
 			break;
+		case 1:
+			data = 0x12c0;
+			break;
+		case 2:
+			data = 0x06ce;
+			break;
+		case 3:
+			data = 0x09ce;
+			break;
+		case 4:
+			data = 0x12ce;
+			break;
+		case 5:
+			data = 0x0b4e;
+			break;
+		}
+		[[fallthrough]];
+	case 0xb3:
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		break;
 	case 0x0b:
 	case 0x1b:
 		m_cps_a_regs[0x06 / 2] = data;
@@ -972,6 +973,10 @@ MACHINE_START_MEMBER(fcrash_state, kodb)
 
 MACHINE_START_MEMBER(fcrash_state, mtwinsb)
 {
+	uint8_t *ROM = memregion("audiocpu")->base();
+
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
 	m_layer_mask_reg[1] = 0x16;

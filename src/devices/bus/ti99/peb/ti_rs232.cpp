@@ -122,7 +122,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device,      
 DEFINE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
 DEFINE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define SENILA_0_BIT 0x80
 #define SENILA_1_BIT 0x40
@@ -1130,4 +1130,4 @@ ioport_constructor ti_rs232_pio_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti_rs232);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

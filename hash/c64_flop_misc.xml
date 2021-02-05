@@ -52,7 +52,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Flippy disk. The other side is for Apple II. -->
+	<!-- "Flippy disk", the other side is for Apple II. -->
 	<software name="jingldsk">
 		<description>JingleDisk - Holiday Musical Story with Computer Animation</description>
 		<year>1985</year>

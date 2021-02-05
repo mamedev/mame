@@ -28,6 +28,7 @@ project "utils"
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",
 		MAME_DIR .. "src/lib/util/coretmpl.h",
+		MAME_DIR .. "src/lib/util/lrucache.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",
 		MAME_DIR .. "src/lib/util/avhuff.h",
 		MAME_DIR .. "src/lib/util/aviio.cpp",
@@ -74,7 +75,10 @@ project "utils"
 		MAME_DIR .. "src/lib/util/jedparse.h",
 		MAME_DIR .. "src/lib/util/md5.cpp",
 		MAME_DIR .. "src/lib/util/md5.h",
+		MAME_DIR .. "src/lib/util/msdib.cpp",
+		MAME_DIR .. "src/lib/util/msdib.h",
 		MAME_DIR .. "src/lib/util/nanosvg.cpp",
+		MAME_DIR .. "src/lib/util/nanosvg.h",
 		MAME_DIR .. "src/lib/util/opresolv.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.h",
 		MAME_DIR .. "src/lib/util/options.cpp",

@@ -16,6 +16,7 @@
 #include "ui/selector.h"
 #include "ui/utils.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "osdepend.h"
@@ -166,8 +167,8 @@ void menu_custom_ui::handle()
 void menu_custom_ui::populate(float &customtop, float &custombottom)
 {
 	uint32_t arrow_flags;
-	item_append(_("Fonts"), "", 0, (void *)(uintptr_t)FONT_MENU);
-	item_append(_("Colors"), "", 0, (void *)(uintptr_t)COLORS_MENU);
+	item_append(_("Fonts"), 0, (void *)(uintptr_t)FONT_MENU);
+	item_append(_("Colors"), 0, (void *)(uintptr_t)COLORS_MENU);
 
 	if (!m_lang.empty())
 	{
@@ -484,25 +485,25 @@ void menu_colors_ui::handle()
 
 void menu_colors_ui::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Normal text"), "", 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
-	item_append(_("Selected color"), "", 0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
-	item_append(_("Normal text background"), "", 0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
-	item_append(_("Selected background color"), "", 0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
-	item_append(_("Subitem color"), "", 0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
-	item_append(_("Clone"), "", 0, (void *)(uintptr_t)MUI_CLONE_COLOR);
-	item_append(_("Border"), "", 0, (void *)(uintptr_t)MUI_BORDER_COLOR);
-	item_append(_("Background"), "", 0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
-	item_append(_("Dipswitch"), "", 0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
-	item_append(_("Unavailable color"), "", 0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
-	item_append(_("Slider color"), "", 0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
-	item_append(_("Gfx viewer background"), "", 0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
-	item_append(_("Mouse over color"), "", 0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
-	item_append(_("Mouse over background color"), "", 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
-	item_append(_("Mouse down color"), "", 0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
-	item_append(_("Mouse down background color"), "", 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
+	item_append(_("Normal text"), 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
+	item_append(_("Selected color"), 0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
+	item_append(_("Normal text background"), 0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
+	item_append(_("Selected background color"), 0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
+	item_append(_("Subitem color"), 0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
+	item_append(_("Clone"), 0, (void *)(uintptr_t)MUI_CLONE_COLOR);
+	item_append(_("Border"), 0, (void *)(uintptr_t)MUI_BORDER_COLOR);
+	item_append(_("Background"), 0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
+	item_append(_("Dipswitch"), 0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
+	item_append(_("Unavailable color"), 0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
+	item_append(_("Slider color"), 0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
+	item_append(_("Gfx viewer background"), 0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
+	item_append(_("Mouse over color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
+	item_append(_("Mouse over background color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
+	item_append(_("Mouse down color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
+	item_append(_("Mouse down background color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Restore originals colors"), "", 0, (void *)(uintptr_t)MUI_RESTORE);
+	item_append(_("Restore originals colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -549,7 +550,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	for (auto & elem: sampletxt)
 	{
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		ui().draw_text_full(container(), elem, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 										mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * lr_border;
 		maxwidth = std::max(maxwidth, width);
@@ -590,29 +591,29 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	y1 += ui().box_tb_border();
 
 	// draw normal text
-	ui().draw_text_full(container(), sampletxt[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt[0], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NORMAL, m_color_table[MUI_TEXT_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw subitem text
-	ui().draw_text_full(container(), sampletxt[1].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt[1], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NORMAL, m_color_table[MUI_SUBITEM_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw selected text
 	highlight(x1, y1, x2, y1 + line_height, m_color_table[MUI_SELECTED_BG_COLOR].color);
-	ui().draw_text_full(container(), sampletxt[2].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt[2], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NORMAL, m_color_table[MUI_SELECTED_COLOR].color, m_color_table[MUI_SELECTED_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw mouse over text
 	highlight(x1, y1, x2, y1 + line_height, m_color_table[MUI_MOUSEOVER_BG_COLOR].color);
-	ui().draw_text_full(container(), sampletxt[3].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt[3], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NORMAL, m_color_table[MUI_MOUSEOVER_COLOR].color, m_color_table[MUI_MOUSEOVER_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw clone text
-	ui().draw_text_full(container(), sampletxt[4].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt[4], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NORMAL, m_color_table[MUI_CLONE_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 
 }
@@ -774,7 +775,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 	// set filter arrow
 	uint32_t arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	std::string s_text = std::string(m_search).append("_");
-	item_append(_("ARGB Settings"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("ARGB Settings"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 
 	if (m_lock_ref != RGB_ALPHA)
 	{
@@ -809,7 +810,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 		item_append(_("Blue"), s_text, 0, (void *)(uintptr_t)RGB_BLUE);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Choose from palette"), "", 0, (void *)(uintptr_t)PALETTE_CHOOSE);
+	item_append(_("Choose from palette"), 0, (void *)(uintptr_t)PALETTE_CHOOSE);
 	item_append(menu_item_type::SEPARATOR);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -824,7 +825,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	float width, maxwidth = origx2 - origx1;
 
 	// top text
-	ui().draw_text_full(container(), m_title.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), m_title, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
 	const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	width += 2 * lr_border;
@@ -845,11 +846,11 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
-	ui().draw_text_full(container(), m_title.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), m_title, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
 	std::string sampletxt(_("Color preview ="));
-	ui().draw_text_full(container(), sampletxt.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
 	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
@@ -868,7 +869,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 += ui().box_tb_border();
 
 	// draw the normal text
-	ui().draw_text_full(container(), sampletxt.c_str(), x1, y1, width - lr_border, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt, x1, y1, width - lr_border, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
 
 	x1 += width + lr_border;

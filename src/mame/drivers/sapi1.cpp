@@ -285,8 +285,8 @@ void sapi_state::sapi3b_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().bankrw("bank1");
 	map(0x0800, 0xafff).ram();
-	map(0xb000, 0xb7ff).ram().share("videoram");
-	map(0xb800, 0xffff).ram();
+	map(0xb000, 0xbfff).ram().share("videoram");
+	map(0xc000, 0xffff).ram();
 }
 
 void sapi_state::sapi3_io(address_map &map)
@@ -858,7 +858,6 @@ void sapi_state::sapi3b(machine_config &config)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 ) // high bit stripped off in software
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

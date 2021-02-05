@@ -25,14 +25,10 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-void ut88mini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(ut88mini_state::display_timer)
 {
-	if (id == TIMER_UPDATE_DISPLAY)
-	{
-		for (int i = 0; i < 6; i++)
-			m_digits[i] = hex_to_7seg[m_lcd_digit[i]];
-		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
-	}
+	for (u8 i = 0; i < 6; i++)
+		m_digits[i] = hex_to_7seg[m_lcd_digit[i]];
 }
 
 uint8_t ut88_state::ppi_portb_r()
@@ -123,7 +119,7 @@ uint8_t ut88mini_state::keyboard_r()
 {
 	// This is real keyboard implementation
 	uint8_t *keyrom1 = m_proms->base();
-	uint8_t *keyrom2 = m_proms->base()+100;
+	uint8_t *keyrom2 = m_proms->base()+0x100;
 
 	uint8_t key = keyrom2[m_io_line1->read()];
 
@@ -164,7 +160,6 @@ void ut88mini_state::led_w(offs_t offset, uint8_t data)
 void ut88mini_state::machine_start()
 {
 	m_digits.resolve();
-	timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 	save_item(NAME(m_lcd_digit));
 }
 

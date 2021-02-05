@@ -170,8 +170,6 @@ static INPUT_PORTS_START(compciii)
 	PORT_DIPSETTING(    0x10, "Color 40x25" )
 	PORT_DIPSETTING(    0x20, "Color 80x25" )
 	PORT_DIPSETTING(    0x30, "Monochrome" )
-
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(compc)
@@ -197,8 +195,6 @@ static INPUT_PORTS_START(compc)
 	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
 	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
-
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 void compc_state::compc_map(address_map &map)

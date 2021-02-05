@@ -6,10 +6,14 @@
 
 #pragma once
 
+#include "slave.h"
+
 template <int Width>
 class ns32000_device : public cpu_device
 {
 public:
+	template <typename T> void set_fpu(T &&tag) { m_fpu.set_tag(std::forward<T>(tag)); }
+
 	// construction/destruction
 	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
@@ -48,42 +52,74 @@ private:
 		EXT,
 		TOS,
 	};
+	enum access_class : unsigned
+	{
+		NONE,
+		READ,
+		WRITE,
+		RMW,
+		ADDR,
+		REGADDR,
+	};
+	enum size_code : unsigned
+	{
+		SIZE_B = 0,
+		SIZE_W = 1,
+		SIZE_D = 3,
+		SIZE_Q = 7,
+	};
+
 	struct addr_mode
 	{
 		addr_mode(unsigned gen)
 			: gen(gen)
+			, access(NONE)
+			, slave(false)
 			, base(0)
 			, disp(0)
+			, imm(0)
 		{};
 
-		void rmw() { if (type == TOS) type = MEM; }
-		void addr() { if (type == TOS) type = MEM; }
-		void regaddr() { if (type == TOS) type = MEM; }
+		void read_i(size_code code)  { access = READ;    size = code; }
+		void read_f(size_code code)  { access = READ;    size = code; slave = true; }
+		void write_i(size_code code) { access = WRITE;   size = code; }
+		void write_f(size_code code) { access = WRITE;   size = code; slave = true; }
+		void rmw_i(size_code code)   { access = RMW;     size = code; }
+		void rmw_f(size_code code)   { access = RMW;     size = code; slave = true; }
+		void addr()                  { access = ADDR;    size = SIZE_D; }
+		void regaddr()               { access = REGADDR; size = SIZE_D; }
 
 		unsigned gen;
 		addr_mode_type type;
+		access_class access;
+		size_code size;
+		bool slave;
 		u32 base;
 		u32 disp;
+		u64 imm;
 	};
 
 	// instruction decoding helpers
 	s32 displacement(unsigned &bytes);
-	void decode(addr_mode *mode, unsigned imm_size, unsigned &bytes);
+	void decode(addr_mode *mode, unsigned &bytes);
 
 	// operand read/write helpers
 	u32 ea(addr_mode const mode);
-	u64 gen_read(addr_mode mode, unsigned size);
-	s64 gen_read_sx(addr_mode mode, unsigned size);
-	void gen_write(addr_mode mode, unsigned size, u64 data);
+	u64 gen_read(addr_mode mode);
+	s64 gen_read_sx(addr_mode mode);
+	void gen_write(addr_mode mode, u64 data);
 
 	// other execution helpers
 	bool condition(unsigned const cc);
 	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
 	void interrupt(unsigned const vector, u32 const return_address, bool const trap = true);
+	u16 slave(addr_mode op1, addr_mode op2);
 
 	// configuration
 	address_space_config m_program_config;
 	address_space_config m_interrupt_config;
+
+	optional_device<ns32000_slave_interface> m_fpu;
 
 	// emulation state
 	int m_icount;
@@ -106,6 +142,7 @@ private:
 	bool m_nmi_line;
 	bool m_int_line;
 	bool m_wait;
+	bool m_sequential;
 };
 
 class ns32008_device : public ns32000_device<0>

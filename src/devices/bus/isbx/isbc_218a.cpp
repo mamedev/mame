@@ -47,6 +47,7 @@ static void isbc_218a_floppies(device_slot_interface &device)
 {
 	device.option_add("8dd", FLOPPY_8_DSDD);
 	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 

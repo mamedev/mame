@@ -86,15 +86,15 @@ namespace solver
 
 		for (std::size_t k = 0; k < nets.size(); k++)
 		{
-			analog_net_t *net = nets[k];
+			analog_net_t &net = *nets[k];
 
-			log().debug("adding net with {1} populated connections\n", net->core_terms().size());
+			log().debug("adding net with {1} populated connections\n", setup.nlstate().core_terms(net).size());
 
-			net->set_solver(this);
+			net.set_solver(this);
 
-			for (auto &p : net->core_terms())
+			for (auto &p : setup.nlstate().core_terms(net))
 			{
-				log().debug("{1} {2} {3}\n", p->name(), net->name(), net->is_rail_net());
+				log().debug("{1} {2} {3}\n", p->name(), net.name(), net.is_rail_net());
 				switch (p->type())
 				{
 					case detail::terminal_type::TERMINAL:

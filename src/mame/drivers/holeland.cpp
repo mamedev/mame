@@ -571,22 +571,22 @@ ROM_START( crzrallyrf )
 	ROM_LOAD( "crzrallyrf_8.1k", 0x4000, 0x2000, CRC(2a0d5bca) SHA1(8d7aedd63ea374a5809c24f957b0afa3cad437d0) )
 	ROM_LOAD( "crzrallyrf_9.1i", 0x6000, 0x2000, CRC(49c0c2b8) SHA1(30c4fe1dc2df499927f8fd4a041a707b81a04e1d) )
 
-	/* Not dumped on the Refreativos Franco PCB, taken from the parent set */
+	// Not dumped on the Recreativos Franco PCB, taken from the parent set
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "82s129.9n", 0x0000, 0x0100, CRC(98ff725a) SHA1(553f033212a7c4785c0beb8156400cabcd53cf25) )  /* Red component */
-	ROM_LOAD( "82s129.9m", 0x0100, 0x0100, CRC(d41f5800) SHA1(446046f5694357da876e1307f49584d79c8d9a1a) )  /* Green component */
-	ROM_LOAD( "82s129.9l", 0x0200, 0x0100, CRC(9ed49cb4) SHA1(f54e66e2211d5fb0da9a81e11670367ee4d9b49a) )  /* Blue component */
+	ROM_LOAD( "82s129.9n", 0x0000, 0x0100, CRC(98ff725a) SHA1(553f033212a7c4785c0beb8156400cabcd53cf25) )  // Red component
+	ROM_LOAD( "82s129.9m", 0x0100, 0x0100, CRC(d41f5800) SHA1(446046f5694357da876e1307f49584d79c8d9a1a) )  // Green component
+	ROM_LOAD( "82s129.9l", 0x0200, 0x0100, CRC(9ed49cb4) SHA1(f54e66e2211d5fb0da9a81e11670367ee4d9b49a) )  // Blue component
 
-	/* Not dumped on the Refreativos Franco PCB, taken from the parent set */
+	// Not dumped on the Recreativos Franco PCB, taken from the parent set
 	ROM_REGION( 0x0200, "user1", 0 ) // unknown
 	ROM_LOAD( "82s147.1f", 0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 
-	/* Not dumped on the Refreativos Franco PCB, taken from the parent set */
+	// Not dumped on the Recreativos Franco PCB, taken from the parent set
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "pal16r6a.5k", 0x0000, 0x0104, CRC(3d12afba) SHA1(60245089947e4a4f7bfa94a8cc96d4d8eebe4afc) )
-	ROM_LOAD( "pal16r4a.5l", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.5m", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r8a.1d", 0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r4a.5l", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.5m", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r8a.1d", 0x0600, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
 GAME( 1984, holeland,   0,        holeland, holeland,  holeland_state, empty_init, ROT0,   "Tecfri",                              "Hole Land (Japan)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

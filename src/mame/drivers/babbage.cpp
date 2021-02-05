@@ -37,14 +37,17 @@ public:
 	babbage_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pio_1(*this, "z80pio_1")
-		, m_pio_2(*this, "z80pio_2")
+		, m_pio(*this, "z80pio_%u", 1U)
 		, m_ctc(*this, "z80ctc")
 		, m_display(*this, "display")
 		, m_io_keyboard(*this, "X%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void babbage(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	uint8_t pio2_a_r();
@@ -62,13 +65,13 @@ private:
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
-	virtual void machine_start() override;
+
 	required_device<z80_device> m_maincpu;
-	required_device<z80pio_device> m_pio_1;
-	required_device<z80pio_device> m_pio_2;
+	required_device_array<z80pio_device, 2> m_pio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_io_keyboard;
+	output_finder<8> m_leds;
 };
 
 
@@ -90,8 +93,8 @@ void babbage_state::babbage_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x13).rw(m_pio_1, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x20, 0x23).rw(m_pio_2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).rw(m_pio[0], FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x20, 0x23).rw(m_pio[1], FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
 
@@ -153,17 +156,14 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 // bios never writes here - you need to set PIO for output yourself - see test program above
 void babbage_state::pio1_b_w(uint8_t data)
 {
-	char ledname[8];
 	for (int i = 0; i < 8; i++)
-	{
-		sprintf(ledname,"led%d",i);
-		output().set_value(ledname, BIT(data, i));
-	}
+		m_leds[i] = BIT(data, i);
 }
 
 uint8_t babbage_state::pio2_a_r()
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
 	return m_key;
 }
 
@@ -212,14 +212,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 	if (data < 0xff)
 	{
 		m_key = data;
-		m_pio_2->strobe(0, 0);
+		m_pio[1]->strobe(0, 0);
 	}
 	else
-		m_pio_2->strobe(0, 1);
+		m_pio[1]->strobe(0, 1);
 }
 
 void babbage_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_seg));
 	save_item(NAME(m_key));
 	save_item(NAME(m_prev_key));
@@ -252,14 +254,14 @@ void babbage_state::babbage(machine_config &config)
 	m_ctc->zc_callback<1>().set(FUNC(babbage_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(babbage_state::ctc_z2_w));
 
-	Z80PIO(config, m_pio_1, MAIN_CLOCK);
-	m_pio_1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio_1->out_pb_callback().set(FUNC(babbage_state::pio1_b_w));
+	Z80PIO(config, m_pio[0], MAIN_CLOCK);
+	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_pb_callback().set(FUNC(babbage_state::pio1_b_w));
 
-	Z80PIO(config, m_pio_2, MAIN_CLOCK);
-	m_pio_2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio_2->in_pa_callback().set(FUNC(babbage_state::pio2_a_r));
-	m_pio_2->out_pb_callback().set(FUNC(babbage_state::pio2_b_w));
+	Z80PIO(config, m_pio[1], MAIN_CLOCK);
+	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[1]->in_pa_callback().set(FUNC(babbage_state::pio2_a_r));
+	m_pio[1]->out_pb_callback().set(FUNC(babbage_state::pio2_b_w));
 
 	TIMER(config, "keyboard_timer", 0).configure_periodic(FUNC(babbage_state::keyboard_callback), attotime::from_hz(30));
 }

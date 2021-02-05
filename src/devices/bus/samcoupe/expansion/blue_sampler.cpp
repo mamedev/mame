@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "machine/rescap.h"
-#include "sound/volt_reg.h"
 #include "blue_sampler.h"
 #include "speaker.h"
 
@@ -33,9 +32,6 @@ void sam_blue_sound_sampler_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(sam_blue_sound_sampler_device::ppi_portc_r));
 
 	ZN426E(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// TODO: ZN449E ADC
 

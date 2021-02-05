@@ -296,7 +296,6 @@ void speaker_sound_device::level_w(int new_level)
 
 	/* Finally update speaker state before returning */
 	m_level = new_level;
-
 }
 
 
@@ -401,7 +400,7 @@ double speaker_sound_device::get_filtered_volume()
 	{
 		if (i >= FILTER_LENGTH) i = 0;
 		filtered_volume += m_composed_volume[i] * m_ampl[c];
-		ampsum += m_ampl[c];
+		ampsum += std::abs(m_ampl[c]);
 	}
 	filtered_volume /= ampsum;
 

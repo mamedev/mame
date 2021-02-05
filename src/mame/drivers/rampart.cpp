@@ -51,21 +51,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(rampart_state::scanline_interrupt)
 }
 
 
-void rampart_state::scanline_int_ack_w(uint16_t data)
+void rampart_state::scanline_int_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
- *  Initialization
- *
- *************************************/
-
-void rampart_state::machine_reset()
-{
 }
 
 
@@ -76,7 +64,7 @@ void rampart_state::machine_reset()
  *
  *************************************/
 
-void rampart_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* bit layout in this register:
 
@@ -128,7 +116,7 @@ void rampart_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fffff);
 	map(0x000000, 0x0fffff).rom();
-	map(0x140000, 0x147fff).mirror(0x438000).rom(); /* slapstic goes here */
+	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank); /* slapstic goes here */
 	map(0x200000, 0x21ffff).ram().share("bitmap");
 	map(0x220000, 0x3bffff).nopw();    /* the code blasts right through this when initializing */
 	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
@@ -340,7 +328,8 @@ void rampart_state::rampart(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 118, true);
+	SLAPSTIC(config, m_slapstic, 118);
+	m_slapstic->set_bank(m_slapstic_bank);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
 
@@ -381,7 +370,7 @@ void rampart_state::rampart(machine_config &config)
  *************************************/
 
 ROM_START( rampart )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-1033.13l", 0x00000, 0x80000, CRC(5c36795f) SHA1(2f3dcdfd6b04d851aa1082848624687ac0cec9e2) )
 	ROM_LOAD16_BYTE( "136082-1032.13j", 0x00001, 0x80000, CRC(ec7bc38c) SHA1(72d4dbb11e92c69cb560bbb39d7bbd5e845b1e4d) )
 	ROM_LOAD16_BYTE( "136082-2031.13l", 0x00000, 0x10000, CRC(07650c7e) SHA1(0a8eec76aefd4fd1515c1a0d5b96f71c674cdce7) )
@@ -408,7 +397,7 @@ ROM_END
 
 
 ROM_START( rampart2p )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-1033.13l",  0x00000, 0x80000, CRC(5c36795f) SHA1(2f3dcdfd6b04d851aa1082848624687ac0cec9e2) )
 	ROM_LOAD16_BYTE( "136082-1032.13j",  0x00001, 0x80000, CRC(ec7bc38c) SHA1(72d4dbb11e92c69cb560bbb39d7bbd5e845b1e4d) )
 	ROM_LOAD16_BYTE( "136082-2051.13kl", 0x00000, 0x20000, CRC(d4e26d0f) SHA1(5106549e6d003711bfd390aa2e19e6e5f33f2cf9) )
@@ -435,7 +424,7 @@ ROM_END
 
 
 ROM_START( rampart2pa ) // original Atari PCB but with mostly hand-written labels, uses smaller ROMs for the main CPU
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "0h.13k-l",  0x00000, 0x20000, CRC(d4e26d0f) SHA1(5106549e6d003711bfd390aa2e19e6e5f33f2cf9) )
 	ROM_LOAD16_BYTE( "0l.13h",    0x00001, 0x20000, CRC(ed2a49bd) SHA1(b97ee41b7f930ba7b8b113c1b19c7729a5880b1f) )
 	ROM_LOAD16_BYTE( "1h.13l",    0x40000, 0x20000, CRC(b232b807) SHA1(1e405371595d97d44dec97387a0dedc6bc1ad1d2) )
@@ -466,7 +455,7 @@ ROM_END
 
 
 ROM_START( rampartj )
-	ROM_REGION( 0x148000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "136082-3451.bin",  0x00000, 0x20000, CRC(c6596d32) SHA1(3e3e0cbb3b5fc6dd9685bbc4b18c22e0858d9282) )
 	ROM_LOAD16_BYTE( "136082-3450.bin",  0x00001, 0x20000, CRC(563b33cc) SHA1(8b454bc19644f1d3d76e4a13f08071cf5eab36e2) )
 	ROM_LOAD16_BYTE( "136082-1463.bin",  0x40000, 0x20000, CRC(65fe3491) SHA1(3aa3b98fb7fe808ef89e100b5e1ee1c99c4312b6) )
@@ -503,14 +492,17 @@ ROM_END
  *
  *************************************/
 
-void rampart_state::init_rampart()
+void rampart_state::machine_start()
 {
-	uint8_t *rom = memregion("maincpu")->base();
-
-	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	m_slapstic->legacy_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x140000, 0x147fff, 0x438000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range rampart actually needs
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x040000, 0x041fff, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
-
 
 
 /*************************************
@@ -519,7 +511,7 @@ void rampart_state::init_rampart()
  *
  *************************************/
 
-GAME( 1990, rampart,    0,       rampart, rampart,  rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,  rampart, rampart, ramprt2p, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Joystick, bigger ROMs)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2pa, rampart, rampart, ramprt2p, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Joystick, smaller ROMs)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampartj,   rampart, rampart, rampartj, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart,    0,       rampart, rampart,  rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,  rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, bigger ROMs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2pa, rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, smaller ROMs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj,   rampart, rampart, rampartj, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )

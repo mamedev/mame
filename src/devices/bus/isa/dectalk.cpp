@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "dectalk.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -172,9 +171,6 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)

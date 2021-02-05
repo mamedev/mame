@@ -6,13 +6,21 @@
 
     Functions to emulate general the various Midway sound cards.
 
+    TODO: the "Turbo Cheap Squeak" and "Sounds Good" boards are nearly identical
+      in function, but use different CPUs and Memory maps (The PIA hookup, DAC
+      and Filter are all exactly the same), so these should probably be combined
+      into one base class with two subclass device implementations to reduce
+      duplicated code.
+      The "Cheap Squeak Deluxe" board in /audio/csd.cpp is also almost identical
+      to the "Sounds Good" board, and should also be a member of any future
+      combined class/device implementation.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/mcr.h"
 #include "audio/midway.h"
 #include "audio/williams.h"
-#include "sound/volt_reg.h"
 
 #include <algorithm>
 
@@ -471,13 +479,14 @@ void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int 
 //-------------------------------------------------
 
 midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_status(0),
-		m_dacval(0)
+	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, tag, owner, clock)
+		, device_mixer_interface(mconfig, *this)
+		, m_cpu(*this, "cpu")
+		, m_pia(*this, "pia")
+		, m_dac(*this, "dac")
+		, m_dac_filter(*this, "dac_filter%u", 0U)
+		, m_status(0)
+		, m_dacval(0)
 {
 }
 
@@ -556,14 +565,36 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
 //  audio CPU map
 //-------------------------------------------------
 
-// address map determined by PAL; not verified
+// address map determined by PAL20L10 @U15; not dumped/verified yet
+//Address map (x = ignored; * = selects address within this range)
+//68k address map known for certain:
+//a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
+//x   x   x   x   x   *   *   *   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?       RW PAL@
+//BEGIN 68k map guesses (until we have a pal dump):
+//x   x   x   x   x   0  [a] [b]  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U7, U17
+//x   x   x   x   x   0  [c] [d]  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U8, U18
+//x   x   x   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   0  *e* *f*  1       RW  PIA U9 (e goes to PIA RS0, f goes to PIA RS1, D8-D15 go to PIA D0-D7)
+//x   x   x   x   x   1   1   1   x   x   x   x   *   *   *   *   *   *   *   *   *   *   *   ?       RW  RAM U6, U16
+//The ROMTYPE PAL line, is pulled low if JW1 is present, and this presumably controls [a] [b] [c] [d] as such:
+//When ROMTYPE is HIGH/JW1 absent, 27256 roms: (JW3 should be present, JW2 absent)
+//x   x   x   x   x   0   0?  0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U7, U17
+//x   x   x   x   x   0   0?  1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U8, U18
+//When ROMTYPE is LOW/JW1 present, 27512 roms: (JW3 should be absent, JW2 present)
+//x   x   x   x   x   0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U7, U17
+//x   x   x   x   x   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   ->      R   ROM U8, U18
+//JW2 and JW3 are mutually exclusive, and control whether 68k a16 connects to the EPROM pin 1 line (JW2 present), or whether it is tied high (JW3 present).
+//EPROM pin 1 is A15 on 27512, and VPP(usually an active high enable) on 27256
+//END guesses
+
+
+
 void midway_sounds_good_device::soundsgood_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x7ffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x060007).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0xff00);
-	map(0x070000, 0x070fff).ram();
+	map(0x060000, 0x060007).mirror(0x00fff0).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0xff00); // RS0 connects to A2, RS1 connects to A1, hence the "alt" functions are used.
+	map(0x070000, 0x070fff).mirror(0x00f000).ram();
 }
 
 
@@ -582,10 +613,19 @@ void midway_sounds_good_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set(FUNC(midway_sounds_good_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_sounds_good_device::irq_w));
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0); /// ad7533jn.u10
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	AD7533(config, m_dac, 0); /// ad7533jn.u10
+
+	// The DAC filters here are identical to those on the "Turbo Cheap Squeak" and "Cheap Squeak Deluxe" boards.
+	//LM359 @U2.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[2]).opamp_mfb_lowpass_setup(RES_K(150), RES_K(82), RES_K(150), CAP_P(470), CAP_P(150)); // R115, R109, R108, C112, C111
+	m_dac_filter[2]->add_route(ALL_OUTPUTS, *this, 1.0);
+	//LM359 @U3.2, 2nd order MFB low-pass (fc = 5310.690763, Q = 1.608630, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[1]).opamp_mfb_lowpass_setup(RES_K(33), RES_K(18), RES_K(33), CAP_P(5600), CAP_P(270)); // R113, R117, R116, C115, C118
+	m_dac_filter[1]->add_route(ALL_OUTPUTS, m_dac_filter[2], 1.0);
+	//LM359 @U3.1, 1st order MFB low-pass (fc = 4912.189602, Q = 0.707107(ignored), gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[0]).opamp_mfb_lowpass_setup(RES_K(120), RES_K(0), RES_K(120), CAP_P(0), CAP_P(270)); // R112, <short>, R111, <nonexistent>, C113
+	m_dac_filter[0]->add_route(ALL_OUTPUTS, m_dac_filter[1], 1.0);
+	m_dac->add_route(ALL_OUTPUTS, m_dac_filter[0], 1.0);
 }
 
 
@@ -634,13 +674,14 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 //-------------------------------------------------
 
 midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock),
-		device_mixer_interface(mconfig, *this),
-		m_cpu(*this, "cpu"),
-		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
-		m_status(0),
-		m_dacval(0)
+	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock)
+		, device_mixer_interface(mconfig, *this)
+		, m_cpu(*this, "cpu")
+		, m_pia(*this, "pia")
+		, m_dac(*this, "dac")
+		, m_dac_filter(*this, "dac_filter%u", 0U)
+		, m_status(0)
+		, m_dacval(0)
 {
 }
 
@@ -739,10 +780,19 @@ void midway_turbo_cheap_squeak_device::device_add_mconfig(machine_config &config
 	m_pia->irqa_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_turbo_cheap_squeak_device::irq_w));
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	AD7533(config, m_dac, 0); /// ad7533jn.u11
+
+	// The DAC filters here are identical to those on the "Sounds Good" and "Cheap Squeak Deluxe" boards.
+	//LM359 @U14.2, 2nd order MFB low-pass (fc = 5404.717733, Q = 0.625210, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[2]).opamp_mfb_lowpass_setup(RES_K(150), RES_K(82), RES_K(150), CAP_P(470), CAP_P(150)); // R36, R37, R39, C19, C20
+	m_dac_filter[2]->add_route(ALL_OUTPUTS, *this, 1.0);
+	//LM359 @U13.2, 2nd order MFB low-pass (fc = 5310.690763, Q = 1.608630, gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[1]).opamp_mfb_lowpass_setup(RES_K(33), RES_K(18), RES_K(33), CAP_P(5600), CAP_P(270)); // R32, R33, R35, C16, C17
+	m_dac_filter[1]->add_route(ALL_OUTPUTS, m_dac_filter[2], 1.0);
+	//LM359 @U13.1, 1st order MFB low-pass (fc = 4912.189602, Q = 0.707107(ignored), gain = -1.000000)
+	FILTER_BIQUAD(config, m_dac_filter[0]).opamp_mfb_lowpass_setup(RES_K(120), RES_K(0), RES_K(120), CAP_P(0), CAP_P(270)); // R27, <short>, R31, <nonexistent>, C14
+	m_dac_filter[0]->add_route(ALL_OUTPUTS, m_dac_filter[1], 1.0);
+	m_dac->add_route(ALL_OUTPUTS, m_dac_filter[0], 1.0);
 }
 
 

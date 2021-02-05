@@ -500,6 +500,7 @@ void strataflash_device::write8_16(offs_t offset, uint16_t data, bus_width_t bus
 		else
 			m_wrbuf_base = offset;
 		memset(m_wrbuf, 0xff, m_wrbuf_len); /* right??? */
+		[[fallthrough]];
 	case FM_WRBUFPART3:
 		if ((offset < m_wrbuf_base) || (offset >= (m_wrbuf_base + m_wrbuf_len)))
 			m_status |= 0x30;

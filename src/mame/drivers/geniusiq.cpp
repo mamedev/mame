@@ -682,9 +682,9 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 		const char *pcb_type = image.get_feature("pcb_type");
 		if (pcb_type)
 		{
-			if (!core_stricmp(pcb_type, "romless1"))
+			if (!strcmp(pcb_type, "romless1"))
 				m_cart_state = IQ128_ROMLESS1_CART;
-			if (!core_stricmp(pcb_type, "romless2"))
+			if (!strcmp(pcb_type, "romless2"))
 				m_cart_state = IQ128_ROMLESS2_CART;
 		}
 	}

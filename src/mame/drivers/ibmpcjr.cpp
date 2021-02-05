@@ -119,8 +119,6 @@ private:
 };
 
 static INPUT_PORTS_START( ibmpcjr )
-	PORT_INCLUDE(pc_keyboard)
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
@@ -404,8 +402,7 @@ void pcjr_state::pcjr_fdc_dor_w(uint8_t data)
 	else
 		m_fdc->set_floppy(nullptr);
 
-	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(m_pcjr_dor, 7));
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
@@ -583,8 +580,8 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 void pcjr_state::ibmpcjx_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0x80000, 0x9ffff).ram().share("vram"); // TODO: remove this part of vram hack
+	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
 	map(0xd0000, 0xdffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);

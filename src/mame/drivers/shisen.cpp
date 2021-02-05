@@ -15,7 +15,6 @@ driver by Nicola Salmoria
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
 #include "sound/ym2151.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -240,9 +239,6 @@ void shisen_state::shisen(machine_config &config)
 	ymsnd.add_route(1, "rspeaker", 0.5);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

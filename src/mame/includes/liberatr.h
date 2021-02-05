@@ -92,7 +92,7 @@ private:
 	// for the 128 lines.
 	struct planet
 	{
-		uint8_t *frames[256];
+		std::unique_ptr<uint8_t []> frames[256];
 	};
 
 	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);

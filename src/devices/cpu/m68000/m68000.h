@@ -10,8 +10,9 @@
 #define softfloat_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
-extern flag floatx80_is_nan(floatx80 a);
 #endif
+
+extern flag floatx80_is_nan(floatx80 a);
 
 
 /* MMU constants */
@@ -374,10 +375,66 @@ protected:
 
 #include "m68kcpu.h"
 #include "m68kops.h"
-#include "m68kfpu.hxx"
 #include "m68kmmu.h"
 
 	virtual void m68k_reset_peripherals() { }
+
+	static double fx80_to_double(floatx80 fx)
+	{
+		u64 d;
+		double *foo;
+
+		foo = (double *)&d;
+
+		d = floatx80_to_float64(fx);
+
+		return *foo;
+	}
+
+	static floatx80 double_to_fx80(double in)
+	{
+		u64 *d;
+
+		d = (u64 *)&in;
+
+		return float64_to_floatx80(*d);
+	}
+
+	// defined in m68kfpu.cpp
+	static const u32 pkmask2[18];
+	static const u32 pkmask3[18];
+	inline floatx80 load_extended_float80(u32 ea);
+	inline void store_extended_float80(u32 ea, floatx80 fpr);
+	inline floatx80 load_pack_float80(u32 ea);
+	inline void store_pack_float80(u32 ea, int k, floatx80 fpr);
+	inline void SET_CONDITION_CODES(floatx80 reg);
+	inline int TEST_CONDITION(int condition);
+	u8 READ_EA_8(int ea);
+	u16 READ_EA_16(int ea);
+	u32 READ_EA_32(int ea);
+	u64 READ_EA_64(int ea);
+	floatx80 READ_EA_FPE(int ea);
+	floatx80 READ_EA_PACK(int ea);
+	void WRITE_EA_8(int ea, u8 data);
+	void WRITE_EA_16(int ea, u16 data);
+	void WRITE_EA_32(int ea, u32 data);
+	void WRITE_EA_64(int ea, u64 data);
+	void WRITE_EA_FPE(int ea, floatx80 fpr);
+	void WRITE_EA_PACK(int ea, int k, floatx80 fpr);
+	void fpgen_rm_reg(u16 w2);
+	void fmove_reg_mem(u16 w2);
+	void fmove_fpcr(u16 w2);
+	void fmovem(u16 w2);
+	void fscc();
+	void fbcc16();
+	void fbcc32();
+	void m68040_fpu_op0();
+	int perform_fsave(u32 addr, int inc);
+	void do_frestore_null();
+	void m68040_do_fsave(u32 addr, int reg, int inc);
+	void m68040_do_frestore(u32 addr, int reg);
+	void m68040_fpu_op1();
+	void m68881_ftrap();
 };
 
 

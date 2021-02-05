@@ -58,7 +58,7 @@ void adam_digital_data_pack_device::adam_ddp_mem(address_map &map)
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
 
-static const struct CassetteOptions adam_cassette_options =
+static const cassette_image::Options adam_cassette_options =
 {
 	2,      /* channels */
 	16,     /* bits per sample */

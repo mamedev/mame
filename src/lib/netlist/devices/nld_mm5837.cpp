@@ -19,10 +19,8 @@
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_matrix_solver.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(MM5837)
 	{
 		NETLIB_CONSTRUCTOR(MM5837)
@@ -115,5 +113,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(MM5837, "MM5837", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -40,7 +40,6 @@ ToDo:
 //#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -584,15 +583,12 @@ void mrgame_state::mrgame(machine_config &config)
 	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0)); // unknown DAC
-	dacvol.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	dacvol.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
+	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0));
+	dacvol.set_output_range(0, 1); // unknown DAC
+	dacvol.add_route(0, "ldac", 1.0, DAC_INPUT_RANGE_HI);
+	dacvol.add_route(0, "ldac", -1.0, DAC_INPUT_RANGE_LO);
+	dacvol.add_route(0, "rdac", 1.0, DAC_INPUT_RANGE_HI);
+	dacvol.add_route(0, "rdac", -1.0, DAC_INPUT_RANGE_LO);
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
 	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);

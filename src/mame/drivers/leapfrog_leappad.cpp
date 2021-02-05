@@ -114,8 +114,7 @@ void leapfrog_leappad_state::machine_start()
 	// if there's a cart, override the standard mapping
 	if (m_cart && m_cart->exists())
 	{
-		std::string region_tag;
-		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
 	}
 }
 

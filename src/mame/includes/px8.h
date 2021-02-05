@@ -36,6 +36,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_video_ram(*this, "video_ram")
+		, m_leds(*this, "led_%u", 0U)
 	{ }
 
 	void px8(machine_config &config);
@@ -46,6 +47,7 @@ private:
 	required_device<ram_device> m_ram;
 	/* video state */
 	required_shared_ptr<uint8_t> m_video_ram;         /* LCD video RAM */
+	output_finder<3> m_leds;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

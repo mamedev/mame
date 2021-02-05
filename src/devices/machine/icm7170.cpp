@@ -305,7 +305,7 @@ void icm7170_device::write(offs_t offset, uint8_t data)
 
 		case REG_COMMAND:
 			m_timer->enable(data & CMD_REG_RUN);
-			// fall through
+			[[fallthrough]];
 
 		default:
 			m_regs[offset & 0x1f] = data;

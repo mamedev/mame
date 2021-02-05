@@ -36,6 +36,7 @@ public:
 		ST_VOL3,
 		ST_VOLM0,
 		ST_VOLM1,
+		ST_MUL,
 		ST_DMS0,
 		ST_DMS1,
 		ST_DMD0,
@@ -124,6 +125,11 @@ protected:
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
+	u8 mull_r();
+	void mull_w(u8 data);
+	u8 mulh_r();
+	void mulh_w(u8 data);
+
 	void base_map(address_map &map);
 
 	u8 m_btc;
@@ -140,6 +146,7 @@ protected:
 	u8 m_psg_on;
 	u8 m_psg_vol[4];
 	u8 m_psg_volm[2];
+	u16 m_mul;
 	u8 m_usbcon;
 	u8 m_usbien;
 	u16 m_dptr[4];
@@ -270,6 +277,16 @@ private:
 		u8 dreadc(u16 adr);
 		void dwrite(u16 adr, u8 val);
 	};
+
+	void unk18_w(u8 data);
+	void unk6d_w(u8 data);
+	void unk6e_w(u8 data);
+	u8 unk7b_r();
+	void unk7b_w(u8 data);
+	void unk7c_w(u8 data);
+	void unk7d_w(u8 data);
+	void unk7e_w(u8 data);
+	void unk7f_w(u8 data);
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);

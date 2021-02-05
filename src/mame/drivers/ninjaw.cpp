@@ -373,6 +373,7 @@ void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
+	offset ^= 1;
 
 	switch (offset)
 	{
@@ -695,7 +696,7 @@ void ninjaw_state::machine_reset()
 	memset(m_pandata, 0, sizeof(m_pandata));
 
 	/**** mixer control enable ****/
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 }
 
 void ninjaw_state::ninjaw(machine_config &config)

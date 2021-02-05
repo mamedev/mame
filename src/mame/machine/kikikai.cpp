@@ -187,8 +187,7 @@ void kikikai_simulation_state::mcu_simulate(  )
 
 INTERRUPT_GEN_MEMBER(kikikai_state::kikikai_interrupt)
 {
-	device.execute().set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-	device.execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -197,8 +196,14 @@ INTERRUPT_GEN_MEMBER(kikikai_simulation_state::kikikai_interrupt)
 	if (m_kikikai_simulated_mcu_running)
 		mcu_simulate();
 
-	device.execute().set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-	device.execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+IRQ_CALLBACK_MEMBER(kikikai_state::mcram_vect_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_mcu_sharedram[0];
 }
 
 #if 0
@@ -323,8 +328,7 @@ void mexico86_state::mexico86_68705_port_b_w(offs_t offset, u8 data, u8 mem_mask
 
 	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
 	{
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE); // HOLD_LINE works better in Z80 interrupt mode 1.
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_68705mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 

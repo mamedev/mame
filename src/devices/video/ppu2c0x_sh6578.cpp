@@ -99,15 +99,25 @@ void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 	m_planebuf[0] = readbyte(address);
 	m_planebuf[1] = readbyte(address + 8);
 
-	m_extplanebuf[0] = readbyte(address + 16);
-	m_extplanebuf[1] = readbyte(address + 24);
+	if (m_colsel_pntstart & 0x80)
+	{
+		m_extplanebuf[0] = readbyte(address + 16);
+		m_extplanebuf[1] = readbyte(address + 24);
+	}
 }
 
 void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t*& dest)
 {
 	int color = color_byte;
 
-	color &= 0xc;
+	if (m_colsel_pntstart & 0x80)
+	{
+		color &= 0xc;
+	}
+	else
+	{
+		color &= 0xf;
+	}
 
 	read_tile_plane_data(address, color);
 
@@ -118,19 +128,29 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 		pix =  ((m_planebuf[0] & 0x80) >> 7);
 		pix |= ((m_planebuf[1] & 0x80) >> 6);
-		pix |= ((m_extplanebuf[0] & 0x80) >> 5);
-		pix |= ((m_extplanebuf[1] & 0x80) >> 4);
+
+		if (m_colsel_pntstart & 0x80)
+		{
+			pix |= ((m_extplanebuf[0] & 0x80) >> 5);
+			pix |= ((m_extplanebuf[1] & 0x80) >> 4);
+		}
 
 		m_planebuf[0] <<= 1;
 		m_planebuf[1] <<= 1;
-		m_extplanebuf[0] <<= 1;
-		m_extplanebuf[1] <<= 1;
+
+		if (m_colsel_pntstart & 0x80)
+		{
+			m_extplanebuf[0] <<= 1;
+			m_extplanebuf[1] <<= 1;
+		}
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
 			pen_t pen;
 
-			uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
+			uint8_t palval;
+
+			palval = m_palette_ram[(pix | color << 2)] & 0x3f;
 
 			bool trans = false;
 			if ((palval & 0x1f) == 0x1f)

@@ -57,7 +57,7 @@ void main()
 
 	mat3 pattern = mat3(diff(w5, w1), diff(w5, w2), diff(w5, w3), diff(w5, w4), 0.0, diff(w5, w6), diff(w5, w7), diff(w5, w8), diff(w5, w9));
 	vec4 cross = vec4(diff(w4, w2), diff(w2, w6), diff(w8, w4), diff(w6, w8));
-	
+
 	vec2 index;
 	index.x = dot(pattern[0], vec3( 1.0,  2.0,   4.0)) +
 	          dot(pattern[1], vec3( 8.0,  0.0,  16.0)) +

@@ -22,7 +22,6 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,7 +30,8 @@
 #include "ctstein.lh" // clickable
 #include "einvaderc.lh"
 #include "funjacks.lh" // clickable
-#include "funrlgl.lh"
+#include "funrlgl.lh" // clickable
+#include "funtag.lh" // clickable
 #include "h2hbaskbc.lh"
 #include "h2hhockeyc.lh"
 #include "h2hsoccerc.lh"
@@ -555,7 +555,6 @@ public:
 	void write_l(u8 data);
 	u8 read_l();
 
-	DECLARE_INPUT_CHANGED_MEMBER(position_changed) { update_display(); }
 	void unkeinv(machine_config &config);
 };
 
@@ -563,17 +562,12 @@ public:
 
 void unkeinv_state::update_display()
 {
-	m_display->matrix(m_l, m_g << 4 | m_d, false);
-
-	// positional led row is on L6,L7
-	u16 wand = m_display->read_row(7) << 8 | m_display->read_row(6);
-	m_display->write_row(8 + m_inputs[1]->read(), wand);
-	m_display->update();
+	m_display->matrix(m_g << 4 | m_d, m_l);
 }
 
 void unkeinv_state::write_g(u8 data)
 {
-	// G0-G3: led select part
+	// G0,G1: led select part
 	// G2,G3: input mux
 	m_g = ~data & 0xf;
 	update_display();
@@ -619,7 +613,7 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, 0)
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 void unkeinv_state::unkeinv(machine_config &config)
@@ -635,7 +629,7 @@ void unkeinv_state::unkeinv(machine_config &config)
 	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(8+12, 8+8);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */
@@ -821,7 +815,7 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel Funtronics: Jacks
+  Mattel Funtronics: Jacks (model 1603)
   * COP410L MCU bonded directly to PCB (die label COP410L/B NGS)
   * 8 LEDs, 1-bit sound
 
@@ -888,32 +882,32 @@ u8 funjacks_state::read_g()
 // config
 
 static INPUT_PORTS_START( funjacks )
-	PORT_START("IN.0") // D0 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_START("IN.0") // D0 port L
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START("IN.1") // D1 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_START("IN.1") // D1 port L
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START("IN.2") // D2 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
+	PORT_START("IN.2") // D2 port L
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 
 	PORT_START("IN.3") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speaker
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x08, "2" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
 void funjacks_state::funjacks(machine_config &config)
 {
 	/* basic machine hardware */
-	COP410(config, m_maincpu, 750000); // approximation - RC osc. R=47K, C=56pF
-	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	COP410(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=56pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
 	m_maincpu->write_l().set(FUNC(funjacks_state::write_l));
 	m_maincpu->write_g().set(FUNC(funjacks_state::write_g));
@@ -942,7 +936,7 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel Funtronics: Red Light Green Light
+  Mattel Funtronics: Red Light Green Light (model 1604)
   * COP410L MCU bonded directly to PCB (die label COP410L/B NHZ)
   * 14 LEDs, 1-bit sound
 
@@ -1012,8 +1006,8 @@ INPUT_PORTS_END
 void funrlgl_state::funrlgl(machine_config &config)
 {
 	/* basic machine hardware */
-	COP410(config, m_maincpu, 750000); // approximation - RC osc. R=51K, C=91pF
-	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	COP410(config, m_maincpu, 800000); // approximation - RC osc. R=51K, C=91pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
 	m_maincpu->write_l().set(FUNC(funrlgl_state::write_l));
 	m_maincpu->read_l_tristate().set_constant(0xff);
@@ -1022,7 +1016,7 @@ void funrlgl_state::funrlgl(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
-	m_display->set_bri_levels(0.01, 0.1); // top led is brighter
+	m_display->set_bri_levels(0.005, 0.1); // top led is brighter
 	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */
@@ -1035,6 +1029,126 @@ void funrlgl_state::funrlgl(machine_config &config)
 ROM_START( funrlgl )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "cop410l_b_nhz", 0x0000, 0x0200, CRC(4065c3ce) SHA1(f0bc8125d922949e0d7ab1ba89c805a836d20e09) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Funtronics: Tag (model 1497)
+  * COP410L MCU bonded directly to PCB (die label COP410L/B GTJ)
+  * 7 LEDs, 7 buttons, 1-bit sound
+
+***************************************************************************/
+
+class funtag_state : public hh_cop400_state
+{
+public:
+	funtag_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u8 data);
+	void write_l(u8 data);
+	void write_g(u8 data);
+	u8 read_l();
+	u8 read_g();
+	void funtag(machine_config &config);
+};
+
+// handlers
+
+void funtag_state::update_display()
+{
+	m_display->matrix(m_d, m_l);
+}
+
+void funtag_state::write_d(u8 data)
+{
+	// D: led grid + input mux
+	m_inp_mux = data;
+	m_d = ~data & 0xf;
+	update_display();
+}
+
+void funtag_state::write_l(u8 data)
+{
+	// L0,L1: led state
+	m_l = data & 3;
+	update_display();
+}
+
+void funtag_state::write_g(u8 data)
+{
+	// G2: speaker out
+	m_speaker->level_w(data >> 2 & 1);
+}
+
+u8 funtag_state::read_l()
+{
+	// L2: difficulty switch
+	return m_inputs[4]->read() | 8;
+}
+
+u8 funtag_state::read_g()
+{
+	// G0,G1: multiplexed inputs
+	// G3: start button
+	return read_inputs(3, 3) | m_inputs[3]->read() | 4;
+}
+
+// config
+
+static INPUT_PORTS_START( funtag )
+	PORT_START("IN.0") // D0 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 )
+
+	PORT_START("IN.1") // D1 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
+
+	PORT_START("IN.2") // D2 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
+
+	PORT_START("IN.3") // port G
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )
+
+	PORT_START("IN.4") // port L
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+void funtag_state::funtag(machine_config &config)
+{
+	/* basic machine hardware */
+	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=91pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(funtag_state::write_d));
+	m_maincpu->write_l().set(FUNC(funtag_state::write_l));
+	m_maincpu->write_g().set(FUNC(funtag_state::write_g));
+	m_maincpu->read_l().set(FUNC(funtag_state::read_l));
+	m_maincpu->read_g().set(FUNC(funtag_state::read_g));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 2);
+	config.set_default_layout(layout_funtag);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( funtag )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_gtj", 0x0000, 0x0200, CRC(ce565da6) SHA1(34e5f39e32f220007d353c93787c1a6d117592c1) )
 ROM_END
 
 
@@ -1083,7 +1197,7 @@ void mdallas_state::write_l(u8 data)
 void mdallas_state::write_d(u8 data)
 {
 	// D: select digit, input mux high
-	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 3);
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
 	m_d = data & 0xf;
 	update_display();
 }
@@ -1558,9 +1672,6 @@ void bship82_state::bship82(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // see above
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 // roms
@@ -1796,9 +1907,6 @@ void vidchal_state::vidchal(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 // roms
@@ -1832,7 +1940,8 @@ CONS( 1980, unkeinv,    0,         0, unkeinv,    unkeinv,    unkeinv_state,   e
 CONS( 1980, lchicken,   0,         0, lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
 CONS( 1979, funjacks,   0,         0, funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, funrlgl,    0,         0, funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, funtag,     0,         0, funtag,     funtag,     funtag_state,    empty_init, "Mattel", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   empty_init, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***

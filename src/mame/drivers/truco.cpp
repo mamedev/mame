@@ -198,7 +198,6 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
@@ -426,8 +425,6 @@ void truco_state::truco(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

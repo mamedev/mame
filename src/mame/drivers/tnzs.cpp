@@ -626,7 +626,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 #include "cpu/z80/z80.h"
 #include "sound/ym2203.h"
-#include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1545,8 +1544,9 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 12'000'000, m_palette, gfx_tnzs);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1557,7 +1557,6 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(tnzs_base_state::screen_vblank_tnzs));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnzs);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
 	/* sound hardware */
@@ -1629,7 +1628,7 @@ void insectx_state::insectx(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_insectx);
+	m_seta001->set_info(gfx_insectx);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
@@ -1700,9 +1699,6 @@ void kabukiz_state::kabukiz(machine_config &config)
 	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void jpopnics_state::jpopnics(machine_config &config)

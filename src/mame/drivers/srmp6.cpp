@@ -85,7 +85,7 @@ public:
 	srmp6_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_chrram(*this, "chrram"),
-		m_dmaram(*this, "dmaram"),
+		m_dmaram(*this, "dmaram", 0x100, ENDIANNESS_BIG),
 		m_video_regs(*this, "video_regs"),
 		m_nile_region(*this, "nile"),
 		m_nile_bank(*this, "nile_bank"),
@@ -106,7 +106,7 @@ protected:
 private:
 	std::unique_ptr<u16[]> m_tileram;
 	required_shared_ptr<u16> m_chrram;
-	optional_shared_ptr<u16> m_dmaram;
+	memory_share_creator<u16> m_dmaram;
 	required_shared_ptr<u16> m_video_regs;
 	required_region_ptr<u8> m_nile_region;
 
@@ -192,7 +192,6 @@ void srmp6_state::update_palette()
 void srmp6_state::video_start()
 {
 	m_tileram = make_unique_clear<u16[]>(0x100000*16/2);
-	m_dmaram.allocate(0x100/2);
 
 	// create the char set (gfx will then be updated dynamically from RAM)
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tiles8x8_layout, (u8*)m_tileram.get(), 0, m_palette->entries() / 256, 0));

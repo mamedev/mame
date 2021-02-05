@@ -123,18 +123,18 @@ void partner_state::bank_switch()
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *ram = m_ram->pointer();
 
-	space.install_write_bank(0x0000, 0x07ff, "bank1");
-	space.install_write_bank(0x0800, 0x3fff, "bank2");
-	space.install_write_bank(0x4000, 0x5fff, "bank3");
-	space.install_write_bank(0x6000, 0x7fff, "bank4");
-	space.install_write_bank(0x8000, 0x9fff, "bank5");
-	space.install_write_bank(0xa000, 0xb7ff, "bank6");
-	space.install_write_bank(0xb800, 0xbfff, "bank7");
-	space.install_write_bank(0xc000, 0xc7ff, "bank8");
-	space.install_write_bank(0xc800, 0xcfff, "bank9");
-	space.install_write_bank(0xd000, 0xd7ff, "bank10");
+	space.install_write_bank(0x0000, 0x07ff, m_bank[0]);
+	space.install_write_bank(0x0800, 0x3fff, m_bank[1]);
+	space.install_write_bank(0x4000, 0x5fff, m_bank[2]);
+	space.install_write_bank(0x6000, 0x7fff, m_bank[3]);
+	space.install_write_bank(0x8000, 0x9fff, m_bank[4]);
+	space.install_write_bank(0xa000, 0xb7ff, m_bank[5]);
+	space.install_write_bank(0xb800, 0xbfff, m_bank[6]);
+	space.install_write_bank(0xc000, 0xc7ff, m_bank[7]);
+	space.install_write_bank(0xc800, 0xcfff, m_bank[8]);
+	space.install_write_bank(0xd000, 0xd7ff, m_bank[9]);
 	space.unmap_write(0xdc00, 0xddff);
-	space.install_read_bank (0xdc00, 0xddff, "bank11");
+	space.install_read_bank (0xdc00, 0xddff, m_bank[10]);
 	space.unmap_write(0xe000, 0xe7ff);
 	space.unmap_write(0xe800, 0xffff);
 
@@ -311,7 +311,7 @@ void partner_state::bank_switch()
 		m_bank[11]->set_base(rom);
 	else
 		//window 1
-		window_1(12, 0, rom);
+		window_1(11, 0, rom);
 
 	// BANK 13 (0xe800 - 0xffff)
 	switch (m_mem_page)
@@ -344,7 +344,7 @@ void partner_state::mem_page_w(u8 data)
 I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 const *const charmap = m_chargen + 0x400 * (gpa * 2 + hlgt);
+	u8 const *const charmap = &m_chargen[0x400 * (gpa * 2 + hlgt)];
 	u8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;

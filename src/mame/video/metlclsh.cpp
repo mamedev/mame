@@ -26,16 +26,11 @@
 
 void metlclsh_state::metlclsh_rambank_w(uint8_t data)
 {
+	m_rambank->set_entry(data & 1);
 	if (data & 1)
-	{
 		m_write_mask = 0;
-		membank("bank1")->set_base(m_bgram);
-	}
 	else
-	{
 		m_write_mask = 1 << (data >> 1);
-		membank("bank1")->set_base(m_otherram.get());
-	}
 }
 
 void metlclsh_state::metlclsh_gfxbank_w(uint8_t data)
@@ -140,6 +135,10 @@ void metlclsh_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_rambank->configure_entry(0, m_otherram.get());
+	m_rambank->configure_entry(1, m_bgram.target());
+	m_rambank->set_entry(0);
 
 	save_pointer(NAME(m_otherram), 0x800);
 }

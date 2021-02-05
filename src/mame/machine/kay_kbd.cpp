@@ -281,7 +281,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)           PORT_NAME("SHIFT")
 INPUT_PORTS_END
 
-INPUT_PORTS_START(kaypro_keyboard_bitshift)
+[[maybe_unused]] INPUT_PORTS_START(kaypro_keyboard_bitshift)
 	PORT_INCLUDE(kaypro_keyboard_typewriter)
 
 	PORT_MODIFY("ROW.2")
@@ -338,6 +338,7 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 	, m_bell(*this, "bell")
 	, m_matrix(*this, "ROW.%X", 0)
 	, m_modifiers(*this, "MOD")
+	, m_led_caps_lock(*this, "led_caps_lock")
 	, m_rxd_cb(*this)
 	, m_txd(1U)
 	, m_bus(0U)
@@ -365,13 +366,13 @@ void kaypro_10_keyboard_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 {
-	(void)&INPUT_PORTS_NAME(kaypro_keyboard_bitshift);
 	return INPUT_PORTS_NAME(kaypro_keyboard_typewriter);
 }
 
 void kaypro_10_keyboard_device::device_start()
 {
 	m_rxd_cb.resolve_safe();
+	m_led_caps_lock.resolve();
 
 	save_item(NAME(m_txd));
 	save_item(NAME(m_bus));
@@ -424,6 +425,6 @@ uint8_t kaypro_10_keyboard_device::bus_r()
 void kaypro_10_keyboard_device::bus_w(uint8_t data)
 {
 	if (BIT(m_bus ^ data, 4))
-		machine().output().set_value("led_caps_lock", BIT(data, 4));
+		m_led_caps_lock = BIT(data, 4);
 	m_bus = data;
 }

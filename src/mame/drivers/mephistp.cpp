@@ -18,7 +18,6 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
 
@@ -212,9 +211,6 @@ void mephisto_pinball_state::mephisto(machine_config &config)
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -259,7 +259,7 @@ void gauntlet_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x037fff).mirror(0x280000).rom();
-	map(0x038000, 0x03ffff).mirror(0x280000).rom(); // slapstic maps here
+	map(0x038000, 0x039fff).mirror(0x286000).bankr(m_slapstic_bank); // slapstic maps here
 	map(0x040000, 0x07ffff).mirror(0x280000).rom();
 
 	// MBUS
@@ -548,28 +548,32 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 void gauntlet_state::gauntlet(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 104, true);
+	SLAPSTIC(config, m_slapstic, 104);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void gauntlet_state::gaunt2p(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 107, true);
+	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void gauntlet_state::gauntlet2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 106, true);
+	SLAPSTIC(config, m_slapstic, 106);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
 void gauntlet_state::vindctr2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 118, true);
+	SLAPSTIC(config, m_slapstic, 118);
+	m_slapstic->set_bank(m_slapstic_bank);
 }
 
 
@@ -1653,8 +1657,20 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 
 void gauntlet_state::common_init(int vindctr2)
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	u8 *rom = memregion("maincpu")->base();
+	m_slapstic_bank->configure_entries(0, 4, rom + 0x38000, 0x2000);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x38000, 0x3ffff, 0x280000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+
+
+	// Out-of-range access on alternate 1
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x4fed0, 0x4fed7, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
+	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x56e54, 0x56e57, 0x000000, "slapstic",
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
+													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 
 	// swap the top and bottom halves of the main CPU ROM images
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);

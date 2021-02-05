@@ -25,7 +25,7 @@
 
 DEFINE_DEVICE_TYPE_NS(V9938_BUSMOUSE, bus::ti99::colorbus, v9938_busmouse_device, "v9938_busmouse", "V9938 Bus Mouse")
 
-namespace bus { namespace ti99 { namespace colorbus {
+namespace bus::ti99::colorbus {
 
 v9938_busmouse_device::v9938_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, V9938_BUSMOUSE, tag, owner, clock),
@@ -100,4 +100,5 @@ ioport_constructor v9938_busmouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( busmouse );
 }
-} } } // end namespace bus::ti99::colorbus
+
+} // end namespace bus::ti99::colorbus

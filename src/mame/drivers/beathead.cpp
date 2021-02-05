@@ -249,7 +249,7 @@ void beathead_state::coin_count_w(offs_t offset, uint32_t data)
 void beathead_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().share("ram_base");
-	map(0x01800000, 0x01bfffff).rom().region("user1", 0).share("rom_base");
+	map(0x01800000, 0x01bfffff).rom().region("user1", 0);
 	map(0x40000000, 0x400007ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0x000000ff);
 	map(0x41000000, 0x41000000).rw(m_jsa, FUNC(atari_jsa_iii_device::main_response_r), FUNC(atari_jsa_iii_device::main_command_w));
 	map(0x41000100, 0x41000103).r(FUNC(beathead_state::interrupt_control_r));

@@ -109,10 +109,11 @@ protected:
 	std::vector<sound_route> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
+	u32             m_specified_inputs_mask;    // mask of inputs explicitly specified (not counting auto-allocated)
 };
 
 // iterator
-typedef device_interface_iterator<device_sound_interface> sound_interface_iterator;
+typedef device_interface_enumerator<device_sound_interface> sound_interface_enumerator;
 
 
 
@@ -141,7 +142,7 @@ protected:
 };
 
 // iterator
-typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
+typedef device_interface_enumerator<device_mixer_interface> mixer_interface_enumerator;
 
 
 #endif // MAME_EMU_DISOUND_H

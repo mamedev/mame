@@ -15,7 +15,7 @@ Crazy Ballooon
 #include "emupal.h"
 #include "tilemap.h"
 
-#define CRBALOON_MASTER_XTAL    (XTAL(9'987'000))
+constexpr XTAL CRBALOON_MASTER_XTAL = 9.987_MHz_XTAL;
 
 
 class crbaloon_state : public driver_device
@@ -33,6 +33,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void crbaloon(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -51,13 +59,10 @@ public:
 	void port_sound_w(uint8_t data);
 	void crbaloon_videoram_w(offs_t offset, uint8_t data);
 	void crbaloon_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void crbaloon_palette(palette_device &palette) const;
 	uint32_t screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vbl_int_w);
 	void crbaloon_audio_set_music_freq(uint8_t data);
 	void crbaloon_audio_set_music_enable(uint8_t data);
 	void crbaloon_audio_set_laugh_enable(uint8_t data);
@@ -70,7 +75,6 @@ public:
 	void crbaloon_audio_set_explosion_enable(int enabled);
 	void crbaloon_audio_set_breath_enable(int enabled);
 	void crbaloon_audio_set_appear_enable(int enabled);
-	void crbaloon(machine_config &config);
 	void crbaloon_audio(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);

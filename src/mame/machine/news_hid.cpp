@@ -200,8 +200,8 @@ u8 news_hid_hle_device::status_68k_r()
 		(!m_fifo[MOUSE].empty()    ? 0x40 : 0) |
 		(m_fifo[KEYBOARD].full()   ? 0x20 : 0) |
 		(m_fifo[MOUSE].full()      ? 0x10 : 0) |
-		(m_irq_out_state[KEYBOARD] ? 0x08 : 0) |
-		(m_irq_out_state[MOUSE]    ? 0x08 : 0) |
+		(m_irq_out_state[KEYBOARD] ? 0 : 0x08) |
+		(m_irq_out_state[MOUSE]    ? 0 : 0x04) |
 		(m_irq_enabled[KEYBOARD]   ? 0x02 : 0) |
 		(m_irq_enabled[MOUSE]      ? 0x01 : 0);
 

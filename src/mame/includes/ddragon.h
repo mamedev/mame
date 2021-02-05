@@ -33,7 +33,6 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainbank(*this, "mainbank")
-		, m_rambase(*this, "rambase")
 		, m_bgvideoram(*this, "bgvideoram")
 		, m_fgvideoram(*this, "fgvideoram")
 		, m_comram(*this, "comram")
@@ -58,6 +57,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(subcpu_bus_free_r);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
@@ -67,7 +70,6 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	optional_memory_bank m_mainbank;
-	optional_shared_ptr<uint8_t> m_rambase;
 
 	/* video-related */
 	tilemap_t      *m_fg_tilemap;
@@ -84,17 +86,6 @@ protected:
 	uint32_t       m_adpcm_end[2];
 	bool           m_adpcm_idle[2];
 	int            m_adpcm_data[2];
-
-	/* for Sai Yu Gou Ma Roku */
-	int            m_adpcm_addr;
-	int            m_i8748_P1;
-	int            m_i8748_P2;
-	int            m_pcm_shift;
-	int            m_pcm_nibble;
-	int            m_mcu_command;
-#if 0
-	int            m_m5205_clk;
-#endif
 
 	void ddragon_bgvideoram_w(offs_t offset, uint8_t data);
 	void ddragon_fgvideoram_w(offs_t offset, uint8_t data);
@@ -127,13 +118,9 @@ private:
 	void ddragon_interrupt_ack(offs_t offset, uint8_t data);
 	void dd_adpcm_int(int chip);
 
-	/* video/ddragon.c */
+	/* video/ddragon.cpp */
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-
-	DECLARE_MACHINE_START(ddragon);
-	DECLARE_MACHINE_RESET(ddragon);
-	DECLARE_VIDEO_START(ddragon);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 
@@ -171,6 +158,7 @@ public:
 		: ddragon_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
 		, m_darktowr_bank(*this, "darktowr_bank")
+		, m_rambase(*this, "rambase")
 		, m_mcu_port_a_out(0xff)
 	{
 	}
@@ -189,7 +177,8 @@ private:
 	void darktowr_banked_map(address_map &map);
 
 	required_device<m68705p_device> m_mcu;
-	optional_device<address_map_bank_device> m_darktowr_bank;
+	required_device<address_map_bank_device> m_darktowr_bank;
+	required_shared_ptr<uint8_t> m_rambase;
 
 	uint8_t m_mcu_port_a_out;
 };

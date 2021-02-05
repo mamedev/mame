@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sean Young
-#include <cassert>
-
 #include "svi_cas.h"
+
+#include <cassert>
 
 #define CAS_PERIOD_0        (37)
 #define CAS_PERIOD_1        (18)
@@ -19,7 +19,7 @@ static const uint8_t CasHeader[17] =
 #define SMPLO   -32768
 #define SMPHI   32767
 
-static int cas_size;
+static int cas_size; // FIXME: global variable prevents multiple instances
 
 /*******************************************************************
    Generate samples for the tape image
@@ -171,7 +171,7 @@ static int svi_cas_to_wav_size(const uint8_t *casdata, int caslen)
 }
 
 
-static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller svi_legacy_fill_wave =
 {
 	svi_cas_fill_wave,                      /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -184,21 +184,21 @@ static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
 
 
 
-static cassette_image::error svi_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error svi_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &svi_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &svi_legacy_fill_wave);
 }
 
 
 
 static cassette_image::error svi_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &svi_legacy_fill_wave);
+	return cassette->legacy_construct(&svi_legacy_fill_wave);
 }
 
 
 
-static const struct CassetteFormat svi_cas_format =
+static const cassette_image::Format svi_cas_format =
 {
 	"cas",
 	svi_cas_identify,

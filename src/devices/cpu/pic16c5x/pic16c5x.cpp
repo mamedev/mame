@@ -98,9 +98,7 @@ void pic16c5x_device::rom_9(address_map &map)
 
 void pic16c5x_device::ram_5(address_map &map)
 {
-	map(0x00, 0x07).ram();
-	map(0x08, 0x0f).ram();
-	map(0x10, 0x1f).ram();
+	map(0x00, 0x1f).ram();
 }
 
 void pic16c5x_device::rom_10(address_map &map)
@@ -115,8 +113,7 @@ void pic16c5x_device::rom_11(address_map &map)
 
 void pic16c5x_device::ram_7(address_map &map)
 {
-	map(0x00, 0x07).ram().mirror(0x60);
-	map(0x08, 0x0f).ram().mirror(0x60);
+	map(0x00, 0x0f).ram().mirror(0x60);
 	map(0x10, 0x1f).ram();
 	map(0x30, 0x3f).ram();
 	map(0x50, 0x5f).ram();
@@ -130,9 +127,11 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
 					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::ram_7), this) ) )
+	, m_internalram(nullptr)
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
 	, m_temp_config(0)
+	, m_rtcc(0)
 	, m_picRAMmask((data_width == 5) ? 0x1f : 0x7f)
 	, m_read_a(*this)
 	, m_read_b(*this)

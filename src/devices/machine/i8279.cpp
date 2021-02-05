@@ -487,8 +487,9 @@ u8 i8279_device::data_r()
 				case 0x10: // underrun
 					if (!fifo_size)
 						break;
+					[[fallthrough]];
 				default:
-					printf("Invalid status: %X\n", m_status);
+					logerror("Invalid status: %X\n", m_status);
 			}
 		}
 		m_status = (m_status & 0xd0) | fifo_size; // turn off overrun & full

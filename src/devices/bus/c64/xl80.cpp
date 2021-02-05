@@ -157,7 +157,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),
 	m_char_rom(*this, HD46505SP_TAG),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -168,8 +168,6 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 
 void c64_xl80_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(RAM_SIZE);
 }
 
 

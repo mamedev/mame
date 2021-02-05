@@ -113,9 +113,9 @@ public:
 protected:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<uint8_t> m_bank1;
-	optional_shared_ptr<uint8_t> m_bank2;
-	optional_shared_ptr<uint8_t> m_bank3;
+	std::unique_ptr<uint8_t[]> m_bank1;
+	std::unique_ptr<uint8_t[]> m_bank2;
+	std::unique_ptr<uint8_t[]> m_bank3;
 
 	cbm2_expansion_slot_device *m_slot;
 };

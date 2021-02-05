@@ -373,7 +373,7 @@ void raiden_state::raiden(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);

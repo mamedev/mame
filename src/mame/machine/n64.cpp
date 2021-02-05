@@ -1754,6 +1754,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, uint8_t *s
 							rdata[2] = 0x01;
 							return 0;
 					}
+					break;
 				}
 				case 4:
 				{

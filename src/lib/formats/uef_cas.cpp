@@ -17,13 +17,13 @@ the size of memory to alloc for the decoding.
 Not nice, but it works...
 
 */
-
-#include <cstring>
-#include <cmath>
-#include <cassert>
+#include "uef_cas.h"
 
 #include <zlib.h>
-#include "uef_cas.h"
+
+#include <cassert>
+#include <cmath>
+#include <cstring>
 
 
 #define UEF_WAV_FREQUENCY   4800
@@ -334,7 +334,7 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return p - buffer;
 }
 
-static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
+static const cassette_image::LegacyWaveFiller uef_legacy_fill_wave = {
 	uef_cas_fill_wave,      /* fill_wave */
 	-1,                     /* chunk_size */
 	0,                      /* chunk_samples */
@@ -344,21 +344,21 @@ static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
 	0                       /* trailer_samples */
 };
 
-static cassette_image::error uef_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error uef_cassette_identify( cassette_image *cassette, cassette_image::Options *opts ) {
 	uint8_t header[10];
 
-	cassette_image_read(cassette, header, 0, sizeof(header));
+	cassette->image_read(header, 0, sizeof(header));
 	if (memcmp(&header[0], GZ_HEADER, sizeof(GZ_HEADER)) && memcmp(&header[0], UEF_HEADER, sizeof(UEF_HEADER))) {
 		return cassette_image::error::INVALID_IMAGE;
 	}
-	return cassette_legacy_identify( cassette, opts, &uef_legacy_fill_wave );
+	return cassette->legacy_identify( opts, &uef_legacy_fill_wave );
 }
 
 static cassette_image::error uef_cassette_load( cassette_image *cassette ) {
-	return cassette_legacy_construct( cassette, &uef_legacy_fill_wave );
+	return cassette->legacy_construct( &uef_legacy_fill_wave );
 }
 
-const struct CassetteFormat uef_cassette_format = {
+const cassette_image::Format uef_cassette_format = {
 	"uef",
 	uef_cassette_identify,
 	uef_cassette_load,

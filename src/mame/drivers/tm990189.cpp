@@ -93,6 +93,7 @@ public:
 		, m_tms9901_sys(*this, TMS9901_1_TAG)
 		, m_tms9902(*this, "tms9902")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void tm990_189_v(machine_config &config);
@@ -165,6 +166,7 @@ private:
 	required_device<tms9901_device> m_tms9901_sys;
 	required_device<tms9902_device> m_tms9902;
 	output_finder<10> m_digits;
+	output_finder<7> m_leds;
 
 	int m_load_state;
 
@@ -196,18 +198,26 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
 	m_digits.resolve();
+	m_leds.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+
+	m_digitsel = 0;
+	m_LED_state = 0;
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
 	m_digits.resolve();
+	m_leds.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+
+	m_digitsel = 0;
+	m_LED_state = 0;
 }
 
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
@@ -259,11 +269,9 @@ void tm990189_state::draw_digit()
 
 TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 {
-	uint8_t i;
-	char ledname[8];
 	// since the segment data is cleared after being used, the old_segment is there
 	// in case the segment data hasn't been refreshed yet.
-	for (i = 0; i < 10; i++)
+	for (uint8_t i = 0; i < 10; i++)
 	{
 		m_old_segment_state[i] |= m_segment_state[i];
 		m_digits[i] = m_old_segment_state[i];
@@ -271,11 +279,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 		m_segment_state[i] = 0;
 	}
 
-	for (i = 0; i < 7; i++)
-	{
-		sprintf(ledname,"led%d",i);
-		output().set_value(ledname, !BIT(m_LED_state, i));
-	}
+	for (uint8_t i = 0; i < 7; i++)
+		m_leds[i] = !BIT(m_LED_state, i);
 }
 
 /*

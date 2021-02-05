@@ -113,7 +113,7 @@ void adamnet_device::device_stop()
 
 void adamnet_device::add_device(device_t *target)
 {
-	auto entry = global_alloc(daisy_entry(target));
+	auto entry = new daisy_entry(target);
 
 	entry->m_interface->m_bus = this;
 

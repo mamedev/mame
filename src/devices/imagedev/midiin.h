@@ -60,7 +60,7 @@ private:
 
 	void xmit_char(uint8_t data);
 
-	osd_midi_device *m_midi;
+	std::unique_ptr<osd_midi_device> m_midi;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
 	uint8_t m_xmitring[XMIT_RING_SIZE];
@@ -72,6 +72,6 @@ private:
 DECLARE_DEVICE_TYPE(MIDIIN, midiin_device)
 
 // device iterator
-typedef device_type_iterator<midiin_device> midiin_device_iterator;
+typedef device_type_enumerator<midiin_device> midiin_device_enumerator;
 
 #endif // MAME_IMAGEDEV_MIDIIN_H

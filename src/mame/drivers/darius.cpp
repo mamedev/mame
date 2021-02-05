@@ -324,8 +324,8 @@ void darius_state::update_psg1(int port)
 
 void darius_state::update_da()
 {
-	const int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
-	const int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int left  = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
 		m_msm5205_l->flt_volume_set_volume(left / 100.0);
@@ -677,7 +677,7 @@ void darius_state::machine_reset()
 	m_adpcm_command = 0;
 	m_nmi_enable = 0;
 
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 
 	for (auto & elem : m_vol)
 		elem = 0x00;    /* min volume */

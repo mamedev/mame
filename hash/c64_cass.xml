@@ -19,14 +19,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="1762760">
-				<rom name="10hits2a.tap" size="1762760" crc="362781a0" sha1="35556185604bef3b91d49367adee9eba11e4975a"/>
+				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1762760" crc="362781a0" sha1="35556185604bef3b91d49367adee9eba11e4975a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1773633">
-				<rom name="10hits2b.tap" size="1773633" crc="a8ece050" sha1="71e252d2b3c620796d1234877e68a9418f01bd89"/>
+				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1773633" crc="a8ece050" sha1="71e252d2b3c620796d1234877e68a9418f01bd89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,14 +210,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Rock &amp; Wrestle / I Ball"/>
 			<dataarea name="cass" size="1408943">
-				<rom name="actionpa.tap" size="1408943" crc="83e0479f" sha1="e254ae6b0a91eedec0fb153ef3c1d59b353d484a"/>
+				<rom name="The_Action_Pack_Side_1.tap" size="1408943" crc="83e0479f" sha1="e254ae6b0a91eedec0fb153ef3c1d59b353d484a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side 2: Sea Base Delta / Thrust"/>
 			<dataarea name="cass" size="997801">
-				<rom name="actionpb.tap" size="997801" crc="44e0a2c3" sha1="0cf00f97787e176343a80b2f24e115fe6ad4c23b"/>
+				<rom name="The_Action_Pack_Side_2.tap" size="997801" crc="44e0a2c3" sha1="0cf00f97787e176343a80b2f24e115fe6ad4c23b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -451,14 +451,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="582692">
-				<rom name="apba.tap" size="582692" crc="6bd55d0f" sha1="54cadbb25e03ce82eeba4fd5a46db21f6236c9fb"/>
+				<rom name="APB_Side_1.tap" size="582692" crc="6bd55d0f" sha1="54cadbb25e03ce82eeba4fd5a46db21f6236c9fb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="591896">
-				<rom name="apbb.tap" size="591896" crc="2405c53d" sha1="2a8f9757d7c38462314aada36598f8b0c802c0a0"/>
+				<rom name="APB_Side_2.tap" size="591896" crc="2405c53d" sha1="2a8f9757d7c38462314aada36598f8b0c802c0a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -562,14 +562,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="281695">
-				<rom name="atcamela.tap" size="281695" crc="18919d6b" sha1="001462db8a5b194d22f12148e1af9273c2125521"/>
+				<rom name="Attack_of_the_Mutant_Camels.tap" size="281695" crc="18919d6b" sha1="001462db8a5b194d22f12148e1af9273c2125521"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="281695">
-				<rom name="atcamelb.tap" size="281695" crc="22087b7c" sha1="33953669cdf0c7994a1008070ae2aee9b00deb86"/>
+				<rom name="Attack_of_the_Mutant_Camels_a1.tap" size="281695" crc="22087b7c" sha1="33953669cdf0c7994a1008070ae2aee9b00deb86"/>
 			</dataarea>
 		</part>
 	</software>

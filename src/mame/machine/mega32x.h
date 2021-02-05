@@ -121,6 +121,7 @@ protected:
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device> m_scan_timer;
+	memory_bank_creator m_rombank;
 
 	int m_32x_hcount_compare_val;
 	int m_32x_vblank_flag;

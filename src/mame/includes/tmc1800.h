@@ -119,7 +119,7 @@ public:
 	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_cti(*this, CDP1864_TAG)
-		, m_colorram(*this, "color_ram")
+		, m_colorram(*this, "color_ram", TMC2000_COLORRAM_SIZE, ENDIANNESS_LITTLE)
 		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 		, m_led(*this, "led1")
 	{ }
@@ -148,7 +148,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<cdp1864_device> m_cti;
-	optional_shared_ptr<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_colorram;
 	required_ioport_array<8> m_key_row;
 	output_finder<> m_led;
 

@@ -58,16 +58,16 @@ void f1gp_state::f1gp_cpu1_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
 	map(0xa00000, 0xbfffff).rom().region("user2", 0);
-	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share("rozgfxram");
-	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share("rozvideoram");
-	map(0xe00000, 0xe03fff).ram().share("spr1cgram");               // SPR-1 CG RAM
-	map(0xe04000, 0xe07fff).ram().share("spr2cgram");               // SPR-2 CG RAM
-	map(0xf00000, 0xf003ff).ram().share("spr1vram");                                // SPR-1 VRAM
-	map(0xf10000, 0xf103ff).ram().share("spr2vram");                                // SPR-2 VRAM
-	map(0xff8000, 0xffbfff).ram();                                                         // WORK RAM-1
-	map(0xffc000, 0xffcfff).ram().share("sharedram");       // DUAL RAM
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share("fgvideoram");         // CHARACTER
-	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // PALETTE
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share(m_rozgfxram);
+	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share(m_rozvideoram);
+	map(0xe00000, 0xe03fff).ram().share(m_sprcgram[0]);                                         // SPR-1 CG RAM
+	map(0xe04000, 0xe07fff).ram().share(m_sprcgram[1]);                                         // SPR-2 CG RAM
+	map(0xf00000, 0xf003ff).ram().share(m_sprvram[0]);                                          // SPR-1 VRAM
+	map(0xf10000, 0xf103ff).ram().share(m_sprvram[1]);                                          // SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                              // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share(m_sharedram);                                           // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share(m_fgvideoram);        // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // PALETTE
 	map(0xfff000, 0xfff001).portr("INPUTS");
 	map(0xfff001, 0xfff001).w(FUNC(f1gp_state::gfxctrl_w));
 	map(0xfff002, 0xfff003).portr("WHEEL");
@@ -84,13 +84,13 @@ void f1gp2_state::f1gp2_cpu1_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
-	map(0xa00000, 0xa07fff).ram().share("spr1cgram");                                    // SPR-1 CG RAM + SPR-2 CG RAM
-	map(0xd00000, 0xd01fff).ram().w(FUNC(f1gp2_state::rozvideoram_w)).share("rozvideoram");   // BACK VRAM
-	map(0xe00000, 0xe00fff).ram().share("spr1vram");                          // not checked + SPR-1 VRAM + SPR-2 VRAM
-	map(0xff8000, 0xffbfff).ram();                                                             // WORK RAM-1
-	map(0xffc000, 0xffcfff).ram().share("sharedram");           // DUAL RAM
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp2_state::fgvideoram_w)).share("fgvideoram");             // CHARACTER
-	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // PALETTE
+	map(0xa00000, 0xa07fff).ram().share(m_sprcgram[0]);                                         // SPR-1 CG RAM + SPR-2 CG RAM
+	map(0xd00000, 0xd01fff).ram().w(FUNC(f1gp2_state::rozvideoram_w)).share(m_rozvideoram);     // BACK VRAM
+	map(0xe00000, 0xe00fff).ram().share(m_sprvram[0]);                                          // not checked + SPR-1 VRAM + SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                              // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share(m_sharedram);                                           // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp2_state::fgvideoram_w)).share(m_fgvideoram);       // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // PALETTE
 	map(0xfff000, 0xfff001).portr("INPUTS");
 	map(0xfff000, 0xfff000).w(FUNC(f1gp2_state::rozbank_w));
 	map(0xfff001, 0xfff001).w(FUNC(f1gp2_state::gfxctrl_w));
@@ -107,7 +107,7 @@ void f1gp_state::f1gp_cpu2_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0xff8000, 0xffbfff).ram();
-	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xffc000, 0xffcfff).ram().share(m_sharedram);
 	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 }
 
@@ -115,7 +115,7 @@ void f1gp_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("z80bank");
+	map(0x8000, 0xffff).bankr(m_z80bank);
 }
 
 void f1gp_state::sound_io_map(address_map &map)
@@ -157,16 +157,16 @@ void f1gp_state::f1gpb_cpu1_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
 	map(0xa00000, 0xbfffff).rom().region("user2", 0);
-	map(0x800000, 0x801fff).ram().share("spriteram");
-	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share("rozgfxram");
-	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share("rozvideoram");
+	map(0x800000, 0x801fff).ram().share(m_spriteram);
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(f1gp_state::rozgfxram_w)).share(m_rozgfxram);
+	map(0xd00000, 0xd01fff).mirror(0x006000).ram().w(FUNC(f1gp_state::rozvideoram_w)).share(m_rozvideoram);
 	map(0xe00000, 0xe03fff).ram(); //unused
 	map(0xe04000, 0xe07fff).ram(); //unused
 	map(0xf00000, 0xf003ff).ram(); //unused
 	map(0xf10000, 0xf103ff).ram(); //unused
 	map(0xff8000, 0xffbfff).ram();
-	map(0xffc000, 0xffcfff).ram().share("sharedram");
-	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share("fgvideoram");
+	map(0xffc000, 0xffcfff).ram().share(m_sharedram);
+	map(0xffd000, 0xffdfff).ram().w(FUNC(f1gp_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("INPUTS");
 	map(0xfff002, 0xfff003).portr("WHEEL");
@@ -174,20 +174,20 @@ void f1gp_state::f1gpb_cpu1_map(address_map &map)
 	map(0xfff006, 0xfff007).portr("DSW2");
 	map(0xfff008, 0xfff009).nopr(); //?
 	map(0xfff006, 0xfff007).nopw();
-	map(0xfff00a, 0xfff00b).ram().share("fgregs");
+	map(0xfff00a, 0xfff00b).ram().share(m_fgregs);
 	map(0xfff00f, 0xfff00f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfff00c, 0xfff00d).w(FUNC(f1gp_state::f1gpb_misc_w));
 	map(0xfff010, 0xfff011).nopw();
 	map(0xfff020, 0xfff023).nopw(); // GGA access
 	map(0xfff050, 0xfff051).portr("DSW3");
-	map(0xfff800, 0xfff809).ram().share("rozregs");
+	map(0xfff800, 0xfff809).ram().share(m_rozregs);
 }
 
 void f1gp_state::f1gpb_cpu2_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0xff8000, 0xffbfff).ram();
-	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xffc000, 0xffcfff).ram().share(m_sharedram);
 	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 }
 
@@ -333,6 +333,10 @@ GFXDECODE_END
 
 void f1gp_state::machine_start()
 {
+	// assumes it can make an address mask with .length() - 1
+	assert(!m_sprcgram[0].found() || !(m_sprcgram[0].length() & (m_sprcgram[0].length() - 1)));
+	assert(!m_sprcgram[1].found() || !(m_sprcgram[1].length() & (m_sprcgram[1].length() - 1)));
+
 	if (m_z80bank)
 		m_z80bank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x8000);
 
@@ -357,7 +361,7 @@ void f1gp2_state::machine_reset()
 template<int Chip>
 uint32_t f1gp_state::tile_callback( uint32_t code )
 {
-	return m_sprcgram[Chip][code & (m_sprcgram[Chip].mask()>>1)];
+	return m_sprcgram[Chip][code & (m_sprcgram[Chip].length() - 1)];
 }
 
 void f1gp_state::f1gp(machine_config &config)
@@ -498,10 +502,56 @@ void f1gp2_state::f1gp2(machine_config &config)
 }
 
 
-
 ROM_START( f1gp )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) )
+	ROM_LOAD16_WORD_SWAP( "v1.rom1.rom",     0x000000, 0x40000, CRC(56c8eccd) SHA1(2b55f13df83761ea2d1f9cc64519c35a9ff64c6e) ) // 27C2048 is correct, game data extends to 0x28ADE then 0xFF filled
+
+	ROM_REGION16_BE( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
+	ROM_LOAD16_BYTE( "rom10-a.1",    0x000000, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
+	ROM_LOAD16_BYTE( "rom11-a.2",    0x000001, 0x40000, CRC(53df8ea1) SHA1(25d50bb787f3bd35c9a8ae2b0ab9a21e000debb0) )
+	ROM_LOAD16_BYTE( "rom12-a.3",    0x080000, 0x40000, CRC(d8c1bcf4) SHA1(d6d77354eb1ab413ba8cfa5d973cf5b0c851c23b) )
+	ROM_LOAD16_BYTE( "rom13-a.4",    0x080001, 0x40000, CRC(7d92e1fa) SHA1(c23f5beea85b0804c61ef9e7f131b186d076221f) )
+	ROM_LOAD16_BYTE( "rom7-a.5",     0x100000, 0x40000, CRC(7a014ba6) SHA1(8f0abbb68100e396e5a41337254cb6bf1a2ed00b) )
+	ROM_LOAD16_BYTE( "rom6-a.6",     0x100001, 0x40000, CRC(6d947a3f) SHA1(2cd01ee2a73ab105a45a5464a29fd75aa43ba2db) )
+	ROM_LOAD16_BYTE( "rom8-a.7",     0x180000, 0x40000, CRC(0ed783c7) SHA1(c0c467ede51c08d84999897c6d5cc8b584b23b67) )
+	ROM_LOAD16_BYTE( "rom9-a.8",     0x180001, 0x40000, CRC(49286572) SHA1(c5e16bd1ccd43452337a4cd76db70db079ca0706) )
+
+	ROM_REGION16_BE( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
+											/* containing gfx data for the 053936 */
+	ROM_LOAD16_WORD_SWAP( "rom2-a.06",    0x000000, 0x100000, CRC(747dd112) SHA1(b9264bec61467ab256cf6cb698b6e0ea8f8006e0) )
+	ROM_LOAD16_WORD_SWAP( "rom3-a.05",    0x100000, 0x100000, CRC(264aed13) SHA1(6f0de860d4299befffc530b7a8f19656982a51c4) )
+
+	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "rom4-a.4",     0x000000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "rom5-a.8",     0x00000, 0x20000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "rom3-b.07",    0x000000, 0x100000, CRC(ffb1d489) SHA1(9330b67e0eaaf67d6c38f40a02c72419bd38fb81) )
+	ROM_LOAD( "rom2-b.04",    0x100000, 0x100000, CRC(d1b3471f) SHA1(d1a95fbaad1c3d9ec2121bf65abbcdb5441bd0ac) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD32_WORD( "rom5-b.2",     0x000000, 0x80000, CRC(17572b36) SHA1(c58327c2f708783a3e8470e290cae0d71454f1da) )
+	ROM_LOAD32_WORD( "rom4-b.3",     0x000002, 0x80000, CRC(72d12129) SHA1(11da6990a54ae1b6f6d0bed5d0431552f83a0dda) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD32_WORD( "rom7-b.17",    0x000000, 0x40000, CRC(2aed9003) SHA1(45ff9953ad98063573e7fd7b930ae8b0183cdd04) )
+	ROM_LOAD32_WORD( "rom6-b.16",    0x000002, 0x40000, CRC(6789ef12) SHA1(9b0d1cc6e9c6398ccb7f635c4c148fddd224a21f) )
+
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )    /* gfx data for the 053936 */
+	/* RAM, not ROM - handled at run time */
+
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_LOAD( "rom14-a.09",   0x000000, 0x100000, CRC(b4c1ac31) SHA1(acab2e1b5ce4ca3a5c4734562481b54db4b46995) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_LOAD( "rom17-a.08",   0x000000, 0x100000, CRC(ea70303d) SHA1(8de1a0e6d47cd80a622663c1745a1da54cd0ea05) )
+ROM_END
+
+ROM_START( f1gpa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) ) // 27C1024 is correct, game data extends to 0x195AC then 0xFF filled
 
 	ROM_REGION16_BE( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
 	ROM_LOAD16_BYTE( "rom10-a.1",    0x000000, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
@@ -642,7 +692,8 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpa, f1gp, f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
 GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

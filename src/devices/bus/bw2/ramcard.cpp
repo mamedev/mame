@@ -51,7 +51,7 @@ bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char
 	: device_t(mconfig, BW2_RAMCARD, tag, owner, clock),
 		device_bw2_expansion_slot_interface(mconfig, *this),
 		m_rom(*this, "ramcard"),
-		m_ram(*this, "ram"),
+		m_ram(*this, "ram", 512*1024, ENDIANNESS_LITTLE),
 		m_en(0),
 		m_bank(0)
 {
@@ -64,9 +64,6 @@ bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char
 
 void bw2_ramcard_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(512 * 1024);
-
 	// state saving
 	save_item(NAME(m_en));
 	save_item(NAME(m_bank));

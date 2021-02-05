@@ -46,6 +46,7 @@
 #ifndef MAME_EMU_RENDER_H
 #define MAME_EMU_RENDER_H
 
+#include "rendertypes.h"
 #include "screen.h"
 
 #include <array>
@@ -55,34 +56,16 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 
-namespace emu { namespace render { namespace detail {
-
-class layout_environment;
-class view_environment;
-
-} } } // namespace emu::render::detail
-
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// blending modes
-enum
-{
-	BLENDMODE_NONE = 0,                                 // no blending
-	BLENDMODE_ALPHA,                                    // standard alpha blend
-	BLENDMODE_RGB_MULTIPLY,                             // apply source alpha to source pix, then multiply RGB values
-	BLENDMODE_ADD,                                      // apply source alpha to source pix, then add to destination
-
-	BLENDMODE_COUNT
-};
 
 
 // render creation flags
@@ -173,48 +156,6 @@ constexpr u32 PRIMFLAG_GET_VECTORBUF(u32 x) { return (x & PRIMFLAG_VECTORBUF_MAS
 
 // texture scaling callback
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-
-// render_bounds - floating point bounding rectangle
-struct render_bounds
-{
-	float               x0;                 // leftmost X coordinate
-	float               y0;                 // topmost Y coordinate
-	float               x1;                 // rightmost X coordinate
-	float               y1;                 // bottommost Y coordinate
-
-	constexpr float width() const { return x1 - x0; }
-	constexpr float height() const { return y1 - y0; }
-	constexpr float aspect() const { return width() / height(); }
-	constexpr bool includes(float x, float y) const { return (x >= x0) && (x <= x1) && (y >= y0) && (y <= y1); }
-};
-
-
-// render_color - floating point set of ARGB values
-struct render_color
-{
-	float               a;                  // alpha component (0.0 = transparent, 1.0 = opaque)
-	float               r;                  // red component (0.0 = none, 1.0 = max)
-	float               g;                  // green component (0.0 = none, 1.0 = max)
-	float               b;                  // blue component (0.0 = none, 1.0 = max)
-};
-
-
-// render_texuv - floating point set of UV texture coordinates
-struct render_texuv
-{
-	float               u;                  // U coordinate (0.0-1.0)
-	float               v;                  // V coordinate (0.0-1.0)
-};
-
-
-// render_quad_texuv - floating point set of UV texture coordinates
-struct render_quad_texuv
-{
-	render_texuv        tl;                 // top-left UV coordinate
-	render_texuv        tr;                 // top-right UV coordinate
-	render_texuv        bl;                 // bottom-left UV coordinate
-	render_texuv        br;                 // bottom-right UV coordinate
-};
 
 
 // render_texinfo - texture information
@@ -411,8 +352,8 @@ private:
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
 	{
-		bitmap_argb32 *     bitmap;                 // final bitmap
-		u32                 seqid;                  // sequence number
+		std::unique_ptr<bitmap_argb32>  bitmap;     // final bitmap
+		u32                             seqid;      // sequence number
 	};
 
 	// internal state
@@ -474,8 +415,8 @@ public:
 	float yscale() const { return m_user.m_yscale; }
 	float xoffset() const { return m_user.m_xoffset; }
 	float yoffset() const { return m_user.m_yoffset; }
-	bool is_empty() const { return (m_itemlist.count() == 0); }
-	void get_user_settings(user_settings &settings) const { settings = m_user; }
+	bool is_empty() const { return m_itemlist.empty(); }
+	const user_settings &get_user_settings() const { return m_user; }
 
 	// setters
 	void set_overlay(bitmap_argb32 *bitmap);
@@ -553,449 +494,6 @@ private:
 };
 
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-
-/// \brief A description of a piece of visible artwork
-///
-/// Most view_items (except for those in the screen layer) have exactly
-/// one layout_element which describes the contents of the item.
-/// Elements are separate from items because they can be re-used
-/// multiple times within a layout.  Even though an element can contain
-/// a number of components, they are treated as if they were a single
-/// bitmap.
-class layout_element
-{
-public:
-	using environment = emu::render::detail::layout_environment;
-
-	// construction/destruction
-	layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname);
-	virtual ~layout_element();
-
-	// getters
-	running_machine &machine() const { return m_machine; }
-	int default_state() const { return m_defstate; }
-	render_texture *state_texture(int state);
-
-private:
-	/// \brief An image, rectangle, or disk in an element
-	///
-	/// Each layout_element contains one or more components. Each
-	/// component can describe either an image or a rectangle/disk
-	/// primitive. Each component also has a "state" associated with it,
-	/// which controls whether or not the component is visible (if the
-	/// owning item has the same state, it is visible).
-	class component
-	{
-	public:
-		typedef std::unique_ptr<component> ptr;
-
-		// construction/destruction
-		component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-		virtual ~component() = default;
-
-		// setup
-		void normalize_bounds(float xoffs, float yoffs, float xscale, float yscale);
-
-		// getters
-		int statemask() const { return m_statemask; }
-		int stateval() const { return m_stateval; }
-		std::pair<int, bool> statewrap() const;
-		render_bounds overall_bounds() const;
-		render_bounds bounds(int state) const;
-		render_color color(int state) const;
-
-		// operations
-		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
-
-	protected:
-		// helper
-		virtual int maxstate() const { return -1; }
-
-		// drawing helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
-		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
-		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
-		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
-		void draw_segment_vertical(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, rgb_t color);
-		void draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_decimal(bitmap_argb32 &dest, int midx, int midy, int width, rgb_t color);
-		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void apply_skew(bitmap_argb32 &dest, int skewwidth);
-
-	private:
-		struct bounds_step
-		{
-			int             state;
-			render_bounds   bounds;
-			render_bounds   delta;
-		};
-		using bounds_vector = std::vector<bounds_step>;
-
-		struct color_step
-		{
-			int             state;
-			render_color    color;
-			render_color    delta;
-		};
-		using color_vector = std::vector<color_step>;
-
-		// internal state
-		int const           m_statemask;                // bits of state used to control visibility
-		int const           m_stateval;                 // masked state value to make component visible
-		bounds_vector       m_bounds;                   // bounds of the element
-		color_vector        m_color;                    // color of the element
-	};
-
-	// component implementations
-	class image_component;
-	class rect_component;
-	class disk_component;
-	class text_component;
-	class led7seg_component;
-	class led8seg_gts1_component;
-	class led14seg_component;
-	class led16seg_component;
-	class led14segsc_component;
-	class led16segsc_component;
-	class dotmatrix_component;
-	class simplecounter_component;
-	class reel_component;
-
-	// a texture encapsulates a texture for a given element in a given state
-	class texture
-	{
-	public:
-		texture();
-		texture(texture const &that) = delete;
-		texture(texture &&that);
-
-		~texture();
-
-		texture &operator=(texture const &that) = delete;
-		texture &operator=(texture &&that);
-
-		layout_element *    m_element;      // pointer back to the element
-		render_texture *    m_texture;      // texture for this state
-		int                 m_state;        // associated state number
-	};
-
-	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *dirname);
-	typedef std::map<std::string, make_component_func> make_component_map;
-
-	// internal helpers
-	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
-
-	static make_component_map const s_make_component; // maps component XML names to creator functions
-
-	// internal state
-	running_machine &           m_machine;      // reference to the owning machine
-	std::vector<component::ptr> m_complist;     // list of components
-	int const                   m_defstate;     // default state of this element
-	int                         m_statemask;    // mask to apply to state values
-	bool                        m_foldhigh;     // whether we need to fold state values above the mask range
-	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
-};
-
-
-/// \brief A reusable group of elements
-///
-/// Views expand/flatten groups into their component elements applying
-/// an optional coordinate transform.  This is mainly useful duplicating
-/// the same sublayout in multiple views.  It would be more useful
-/// within a view if it could be parameterised.  Groups only exist while
-/// parsing a layout file - no information about element grouping is
-/// preserved.
-class layout_group
-{
-public:
-	using environment = emu::render::detail::layout_environment;
-	using group_map = std::unordered_map<std::string, layout_group>;
-	using transform = std::array<std::array<float, 3>, 3>;
-
-	layout_group(util::xml::data_node const &groupnode);
-	~layout_group();
-
-	util::xml::data_node const &get_groupnode() const { return m_groupnode; }
-
-	transform make_transform(int orientation, render_bounds const &dest) const;
-	transform make_transform(int orientation, transform const &trans) const;
-	transform make_transform(int orientation, render_bounds const &dest, transform const &trans) const;
-
-	void set_bounds_unresolved();
-	void resolve_bounds(environment &env, group_map &groupmap);
-
-private:
-	void resolve_bounds(environment &env, group_map &groupmap, std::vector<layout_group const *> &seen);
-	void resolve_bounds(
-			environment &env,
-			util::xml::data_node const &parentnode,
-			group_map &groupmap,
-			std::vector<layout_group const *> &seen,
-			bool &empty,
-			bool vistoggle,
-			bool repeat,
-			bool init);
-
-	util::xml::data_node const &    m_groupnode;
-	render_bounds                   m_bounds;
-	bool                            m_bounds_resolved;
-};
-
-
-/// \brief A single view within a layout_file
-///
-/// The view is described using arbitrary coordinates that are scaled to
-/// fit within the render target.  Pixels within a view are assumed to
-/// be square.
-class layout_view
-{
-public:
-	using layout_environment = emu::render::detail::layout_environment;
-	using view_environment = emu::render::detail::view_environment;
-	using element_map = std::unordered_map<std::string, layout_element>;
-	using group_map = std::unordered_map<std::string, layout_group>;
-	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device> >;
-
-	/// \brief A single item in a view
-	///
-	/// Each view has a list of item structures describing the visual
-	/// elements to draw, where they are located, additional blending
-	/// modes, and bindings for inputs and outputs.
-	class item
-	{
-		friend class layout_view;
-
-	public:
-		// construction/destruction
-		item(
-				view_environment &env,
-				util::xml::data_node const &itemnode,
-				element_map &elemmap,
-				int orientation,
-				layout_group::transform const &trans,
-				render_color const &color);
-		~item();
-
-		// getters
-		layout_element *element() const { return m_element; }
-		screen_device *screen() { return m_screen; }
-		const render_bounds &bounds() const { return m_bounds; }
-		const render_color &color() const { return m_color; }
-		int blend_mode() const { return m_blend_mode; }
-		u32 visibility_mask() const { return m_visibility_mask; }
-		int orientation() const { return m_orientation; }
-		render_container *screen_container(running_machine &machine) const;
-
-		// interactivity
-		bool has_input() const { return bool(m_input_port); }
-		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
-		bool clickthrough() const { return m_clickthrough; }
-
-		// fetch state based on configured source
-		int state() const;
-
-		// resolve tags, if any
-		void resolve_tags();
-
-	private:
-		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
-		static render_bounds make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
-		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
-		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
-		static unsigned get_input_shift(ioport_value mask);
-
-		// internal state
-		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
-		output_finder<>         m_output;           // associated output
-		bool const              m_have_output;      // whether we actually have an output
-		ioport_port *           m_input_port;       // input port of this item
-		ioport_field const *    m_input_field;      // input port field of this item
-		ioport_value const      m_input_mask;       // input mask of this item
-		u8 const                m_input_shift;      // input mask rightshift for raw (trailing 0s)
-		bool const              m_input_raw;        // get raw data from input port
-		bool                    m_clickthrough;     // should click pass through to lower elements
-		screen_device *         m_screen;           // pointer to screen
-		int                     m_orientation;      // orientation of this item
-		render_bounds           m_bounds;           // bounds of the item
-		render_color            m_color;            // color of the item
-		int                     m_blend_mode;       // blending mode to use when drawing
-		u32                     m_visibility_mask;  // combined mask of parent visibility groups
-
-		// cold items
-		std::string const       m_input_tag;        // input tag of this item
-		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
-		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
-	};
-	using item_list = std::list<item>;
-	using item_ref_vector = std::vector<std::reference_wrapper<item> >;
-
-	/// \brief A subset of items in a view that can be hidden or shown
-	///
-	/// Visibility toggles allow the user to show or hide selected parts
-	/// of a view.
-	class visibility_toggle
-	{
-	public:
-		// construction/destruction/assignment
-		visibility_toggle(std::string &&name, u32 mask);
-		visibility_toggle(visibility_toggle const &) = default;
-		visibility_toggle(visibility_toggle &&) = default;
-		visibility_toggle &operator=(visibility_toggle const &) = default;
-		visibility_toggle &operator=(visibility_toggle &&) = default;
-
-		// getters
-		std::string const &name() const { return m_name; }
-		u32 mask() const { return m_mask; }
-
-	private:
-		std::string             m_name;             // display name for the toggle
-		u32                     m_mask;             // toggle combination to show
-	};
-	using visibility_toggle_vector = std::vector<visibility_toggle>;
-
-	/// \brief An edge of an item in a view
-	class edge
-	{
-	public:
-		// construction/destruction
-		constexpr edge(unsigned index, float position, bool trailing)
-			: m_index(index)
-			, m_position(position)
-			, m_trailing(trailing)
-		{
-		}
-
-		// getters
-		constexpr unsigned index() const { return m_index; }
-		constexpr float position() const { return m_position; }
-		constexpr bool trailing() const { return m_trailing; }
-
-		// comparison
-		constexpr bool operator<(edge const &that) const
-		{
-			return std::make_tuple(m_position, m_trailing, m_index) < std::make_tuple(that.m_position, that.m_trailing, that.m_index);
-		}
-
-	private:
-		unsigned                m_index;            // index of item in some collection
-		float                   m_position;         // position of edge on given axis
-		bool                    m_trailing;         // false for edge at lower position on axis
-	};
-	using edge_vector = std::vector<edge>;
-
-	// construction/destruction
-	layout_view(
-			layout_environment &env,
-			util::xml::data_node const &viewnode,
-			element_map &elemmap,
-			group_map &groupmap);
-	~layout_view();
-
-	// getters
-	item_list &items() { return m_items; }
-	const std::string &name() const { return m_name; }
-	size_t screen_count() const { return m_screens.size(); }
-	float effective_aspect() const { return m_effaspect; }
-	const render_bounds &bounds() const { return m_bounds; }
-	bool has_screen(screen_device &screen) const;
-	const item_ref_vector &screen_items() const { return m_screen_items; }
-	const item_ref_vector &interactive_items() const { return m_interactive_items; }
-	const edge_vector &interactive_edges_x() const { return m_interactive_edges_x; }
-	const edge_vector &interactive_edges_y() const { return m_interactive_edges_y; }
-	const screen_ref_vector &screens() const { return m_screens; }
-	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
-	u32 default_visibility_mask() const { return m_defvismask; }
-	bool has_art() const { return m_has_art; }
-
-	// operations
-	void recompute(u32 visibility_mask, bool zoom_to_screens);
-
-	// resolve tags, if any
-	void resolve_tags();
-
-private:
-	struct layer_lists;
-
-	// add items, recursing for groups
-	void add_items(
-			layer_lists &layers,
-			view_environment &env,
-			util::xml::data_node const &parentnode,
-			element_map &elemmap,
-			group_map &groupmap,
-			int orientation,
-			layout_group::transform const &trans,
-			render_color const &color,
-			bool root,
-			bool repeat,
-			bool init);
-
-	static std::string make_name(layout_environment &env, util::xml::data_node const &viewnode);
-
-	// internal state
-	std::string                 m_name;             // name of the layout
-	float                       m_effaspect;        // X/Y of the layout in current configuration
-	render_bounds               m_bounds;           // computed bounds of the view in current configuration
-	item_list                   m_items;            // list of layout items
-	item_ref_vector             m_screen_items;     // visible items that represent screens to draw
-	item_ref_vector             m_interactive_items;// visible items that can accept pointer input
-	edge_vector                 m_interactive_edges_x;
-	edge_vector                 m_interactive_edges_y;
-	screen_ref_vector           m_screens;          // list screens visible in current configuration
-
-	// cold items
-	visibility_toggle_vector    m_vistoggles;       // collections of items that can be shown/hidden
-	render_bounds               m_expbounds;        // explicit bounds of the view
-	u32                         m_defvismask;       // default visibility mask
-	bool                        m_has_art;          // true if the layout contains non-screen elements
-};
-
-
-/// \brief Layout description file
-///
-/// Comprises a list of elements and a list of views.  The elements are
-/// reusable items that the views reference.
-class layout_file
-{
-public:
-	using element_map = std::unordered_map<std::string, layout_element>;
-	using group_map = std::unordered_map<std::string, layout_group>;
-	using view_list = std::list<layout_view>;
-
-	// construction/destruction
-	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname);
-	~layout_file();
-
-	// getters
-	element_map const &elements() const { return m_elemmap; }
-	view_list &views() { return m_viewlist; }
-	view_list const &views() const { return m_viewlist; }
-
-private:
-	using environment = emu::render::detail::layout_environment;
-
-	// add elements and parameters
-	void add_elements(
-			char const *dirname,
-			environment &env,
-			util::xml::data_node const &parentnode,
-			group_map &groupmap,
-			bool repeat,
-			bool init);
-
-	// internal state
-	element_map     m_elemmap;      // list of shared layout elements
-	view_list       m_viewlist;     // list of views
-};
-
 // ======================> render_target
 
 // a render_target describes a surface that is being rendered to
@@ -1017,11 +515,12 @@ public:
 	u32 width() const { return m_width; }
 	u32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
+	bool keepaspect() const { return m_keepaspect; }
 	int scale_mode() const { return m_scale_mode; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
 	render_layer_config layer_config() const { return m_layerconfig; }
-	layout_view &current_view() const { return m_views[m_curview].first.get(); }
+	layout_view &current_view() const { return m_views[m_curview].first; }
 	unsigned view() const { return m_curview; }
 	bool external_artwork() const { return m_external_artwork; }
 	bool hidden() const { return ((m_flags & RENDER_CREATE_HIDDEN) != 0); }
@@ -1053,7 +552,6 @@ public:
 
 	// view information
 	char const *view_name(unsigned index);
-	layout_view::visibility_toggle_vector const &visibility_toggles();
 
 	// bounds computations
 	void compute_visible_area(s32 target_width, s32 target_height, float target_pixel_aspect, int target_orientation, s32 &visible_width, s32 &visible_height);
@@ -1078,7 +576,7 @@ public:
 	void resolve_tags();
 
 private:
-	using view_mask_pair = std::pair<std::reference_wrapper<layout_view>, u32>;
+	using view_mask_pair = std::pair<layout_view &, u32>;
 	using view_mask_vector = std::vector<view_mask_pair>;
 
 	// private classes declared in render.cpp
@@ -1093,7 +591,7 @@ private:
 	void load_additional_layout_files(const char *basename, bool have_artwork);
 	bool load_layout_file(const char *dirname, const char *filename);
 	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
-	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
+	bool load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
@@ -1119,7 +617,7 @@ private:
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
-	std::list<layout_file>  m_filelist;                 // list of layout files
+	std::unique_ptr<std::list<layout_file>> m_filelist; // list of layout files
 	view_mask_vector        m_views;                    // views we consider
 	unsigned                m_curview;                  // current view index
 	u32                     m_flags;                    // creation flags
@@ -1192,8 +690,7 @@ public:
 	void texture_free(render_texture *texture);
 
 	// fonts
-	render_font *font_alloc(const char *filename = nullptr);
-	void font_free(render_font *font);
+	std::unique_ptr<render_font> font_alloc(const char *filename = nullptr);
 
 	// reference tracking
 	void invalidate_all(void *refptr);

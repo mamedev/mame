@@ -98,37 +98,13 @@ end
 		configuration "**/*"
 			flags { "DeploymentContent" }
 
-	configuration { "x64", "Release" }
-		targetsuffix "64"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "64p"
-		end
-
-	configuration { "x64", "Debug" }
-		targetsuffix "64d"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "64dp"
-		end
-
-	configuration { "x32", "Release" }
+	configuration { "Release" }
 		targetsuffix ""
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "p"
 		end
 
-	configuration { "x32", "Debug" }
-		targetsuffix "d"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "dp"
-		end
-
-	configuration { "Native", "Release" }
-		targetsuffix ""
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "p"
-		end
-
-	configuration { "Native", "Debug" }
+	configuration { "Debug" }
 		targetsuffix "d"
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
@@ -148,8 +124,6 @@ end
 				.. " -s USE_SDL=2"
 				.. " -s USE_SDL_TTF=2"
 				.. " --memory-init-file 0"
-				.. " -s ALLOW_MEMORY_GROWTH=0"
-				.. " -s TOTAL_MEMORY=268435456"
 				.. " -s DISABLE_EXCEPTION_CATCHING=2"
 				.. " -s EXCEPTION_CATCHING_WHITELIST=\"['__ZN15running_machine17start_all_devicesEv','__ZN12cli_frontend7executeEiPPc','__ZN8chd_file11open_commonEb','__ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','__ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','__ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\""
 				.. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\""
@@ -175,6 +149,19 @@ end
 			if _OPTIONS["WEBASSEMBLY"] then
 				emccopts = emccopts
 					.. " -s WASM=" .. _OPTIONS["WEBASSEMBLY"]
+			else
+				emccopts = emccopts
+					.. " -s WASM=1"
+			end
+
+			if _OPTIONS["WEBASSEMBLY"]~=nil and _OPTIONS["WEBASSEMBLY"]=="0" then
+				-- define a fixed memory size because allowing memory growth disables asm.js optimizations
+				emccopts = emccopts
+					.. " -s ALLOW_MEMORY_GROWTH=0"
+					.. " -s TOTAL_MEMORY=268435456"
+			else
+				emccopts = emccopts
+					.. " -s ALLOW_MEMORY_GROWTH=1"
 			end
 
 			if _OPTIONS["ARCHOPTS"] then

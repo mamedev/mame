@@ -119,6 +119,8 @@ OSC:    12.000MHz
 #include "tilemap.h"
 
 
+namespace {
+
 class jalmah_state : public driver_device
 {
 public:
@@ -127,6 +129,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_tmap(*this, "scroll%u", 0),
+		m_jmcu_rom_region(*this, "jmcu_rom"),
+		m_jmcu_rom_share(*this, "jmcu_rom"),
 		m_sharedram(*this, "sharedram"),
 		m_prirom(*this, "prirom"),
 		m_p1_key_io(*this, "P1_KEY%u", 0U),
@@ -174,6 +178,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device_array<megasys1_tilemap_device, 4> m_tmap;
+	optional_region_ptr<uint16_t> m_jmcu_rom_region;
+	optional_shared_ptr<uint16_t> m_jmcu_rom_share;
 
 	uint16_t m_tile_bank;
 	uint16_t m_pri;
@@ -271,6 +277,7 @@ Video Hardware start
 
 void jalmah_state::video_start()
 {
+	m_tile_bank = 0;
 	// ...
 }
 
@@ -691,7 +698,7 @@ void jalmah_state::jalmah_map(address_map &map)
 void jalmah_state::jalmahv1_map(address_map &map)
 {
 	jalmah_map(map);
-	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0); // extended ROM functions (not on real HW)
+	map(0x100000, 0x10ffff).ram().share("jmcu_rom"); // extended ROM functions (not on real HW)
 }
 
 void urashima_state::urashima_map(address_map &map)
@@ -721,7 +728,7 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x0a0000, 0x0a1fff).noprw();
 	map(0x0f0000, 0x0f0fff).ram().share("sharedram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
-	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0);/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	map(0x100000, 0x10ffff).ram().share("jmcu_rom");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 }
 
 void jalmah_state::oki_map(address_map &map)
@@ -1057,6 +1064,11 @@ void jalmah_state::machine_start()
 	const int okimax = (memregion("oki")->bytes() - 0x40000) / 0x20000;
 	m_okibank->configure_entries(0,okimax,memregion("oki")->base() + 0x40000,0x20000);
 
+	m_prg_prot = 0;
+	m_oki_rom = 0;
+	m_oki_bank = 0;
+	m_oki_za = 0;
+
 	save_item(NAME(m_respcount));
 	save_item(NAME(m_test_mode));
 	save_item(NAME(m_prg_prot));
@@ -1067,6 +1079,9 @@ void jalmah_state::machine_start()
 
 void jalmah_state::machine_reset()
 {
+	if(m_jmcu_rom_share)
+		memcpy(m_jmcu_rom_share, m_jmcu_rom_region, 0x10000);
+
 	m_pri = 0;
 	refresh_priority_system();
 
@@ -1075,6 +1090,9 @@ void jalmah_state::machine_reset()
 
 void urashima_state::machine_reset()
 {
+	if(m_jmcu_rom_share)
+		memcpy(m_jmcu_rom_share, m_jmcu_rom_region, 0x10000);
+
 //  m_pri = 0;
 
 	// initialize tilemap vram to sane defaults (test mode cares)
@@ -1743,6 +1761,8 @@ void jalmah_state::init_suchiesp()
 
 	m_mcu_prg = SUCHIESP_MCU;
 }
+
+} // Anonymous namespace
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

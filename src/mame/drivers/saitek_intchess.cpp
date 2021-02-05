@@ -33,7 +33,6 @@ TODO:
 #include "machine/mm74c922.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 
 #include "emupal.h"
@@ -298,7 +297,7 @@ void intchess_state::intchess(machine_config &config)
 	M6502(config, m_maincpu, 4.433619_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &intchess_state::main_map);
 
-	VIA6522(config, m_via, 4.433619_MHz_XTAL / 4); // DDRA = 0xff, DDRB = 0xef
+	MOS6522(config, m_via, 4.433619_MHz_XTAL / 4); // DDRA = 0xff, DDRB = 0xef
 	m_via->writepa_handler().set(FUNC(intchess_state::seg_w));
 	m_via->writepb_handler().set(FUNC(intchess_state::control_w));
 	m_via->readpb_handler().set(FUNC(intchess_state::control_r));
@@ -331,7 +330,6 @@ void intchess_state::intchess(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	// cassette
 	CASSETTE(config, m_cass);

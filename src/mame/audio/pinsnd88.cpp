@@ -104,7 +104,6 @@
 
 #include "emu.h"
 #include "pinsnd88.h"
-#include "sound/volt_reg.h"
 
 
 DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '88 Audio Board")
@@ -128,7 +127,7 @@ pinsnd88_device::pinsnd88_device(const machine_config &mconfig, const char *tag,
 0  0  0  *  *  *  *  *  *  *  *  *  *  *  *  *  RW  - 0x0000 - SRAM @U7
 0  0  1  0  0  0  x  x  x  x  x  x  x  x  x  *  RW  - 0x2000 - YM2151 @U16
 0  0  1  0  0  1  x  x  x  x  x  x  x  x  x  x  x   - 0x2400 - open bus (hypothesis: leftover from cvsd_clock_set_w circuit)
-0  0  1  0  1  0  x  x  x  x  x  x  x  x  x  x  W[1]- 0x2800 - ANALOG SWITCH, input sound and output stereo control; on NARC, latch to respond to main pcb
+0  0  1  0  1  0  x  x  x  x  x  x  x  x  x  x  W[1]- 0x2800 - ANALOG SWITCH, goes to active low inputs of an ADG201 quad analog switch; on NARC, latch to respond to main pcb
 0  0  1  0  1  1  x  x  x  x  x  x  x  x  x  x  x   - 0x2C00 - open bus (hypothesis: leftover from cvsd_digit_clock_clear_w circuit; on NARC, secondary command_w)
 0  0  1  1  0  0  x  x  x  x  x  x  x  x  x  x  W   - 0x3000 - 7224 DAC write
 0  0  1  1  0  1  x  x  x  x  x  x  x  x  x  x  R[2]- 0x3400 - Latch Read and de-assert MC68B09E /IRQ
@@ -156,7 +155,7 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0x3400, 0x3400).mirror(0x03ff).r(m_inputlatch, FUNC(generic_latch_8_device::read));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(pinsnd88_device::bgbank_w));
 	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(pinsnd88_device::sync_w));
-	map(0x4000, 0xbfff).bankr("bank").region("cpu", 0); // banked rom
+	map(0x4000, 0xbfff).bankr("bank"); // banked rom
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 
@@ -221,9 +220,6 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 
 	// TODO: analog filters and "volume" controls for the two channels
 	AD7224(config, m_dac, 0);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 

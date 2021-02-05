@@ -19,7 +19,7 @@
 #include "peribox.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ti_32k_expcard_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -39,7 +39,7 @@ private:
 	required_device<ram_device> m_ram;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_32KMEM, bus::ti99::peb, ti_32k_expcard_device)
 

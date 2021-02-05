@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "inputdev.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 
 
@@ -31,7 +32,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
-	virtual bool item_check_axis(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifiers, s32 memory) override;
 
 	// steadykey helper
 	bool steadykey_changed();
@@ -57,7 +58,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
-	virtual bool item_check_axis(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) override;
 };
 
 
@@ -74,7 +75,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
-	virtual bool item_check_axis(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) override;
 };
 
 
@@ -328,13 +329,10 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 //  substring search
 //-------------------------------------------------
 
-bool input_device::match_device_id(const char *deviceid)
+bool input_device::match_device_id(std::string_view deviceid) const
 {
-	std::string deviceidupper(deviceid);
-	std::string idupper(m_id);
-
-	strmakeupper(deviceidupper);
-	strmakeupper(idupper);
+	std::string deviceidupper(strmakeupper(deviceid));
+	std::string idupper(strmakeupper(m_id));
 
 	return std::string::npos == idupper.find(deviceidupper) ? false : true;
 }
@@ -675,18 +673,18 @@ input_device_item::input_device_item(input_device &device, const char *name, voi
 		m_itemid(itemid),
 		m_itemclass(itemclass),
 		m_getstate(getstate),
-		m_current(0),
-		m_memory(0)
+		m_current(0)
 {
-	// use a standard token name for know item IDs
 	const char *standard_token = manager().standard_token(itemid);
-	if (standard_token != nullptr)
+	if (standard_token)
+	{
+		// use a standard token name for know item IDs
 		m_token.assign(standard_token);
-
-	// otherwise, create a tokenized name
-	else {
-		m_token.assign(name);
-		strmakeupper(m_token);
+	}
+	else
+	{
+		// otherwise, create a tokenized name
+		m_token.assign(strmakeupper(name));
 		strdelchr(m_token, ' ');
 		strdelchr(m_token, '_');
 	}
@@ -707,19 +705,10 @@ input_device_item::~input_device_item()
 //  to trigger a read when polling
 //-------------------------------------------------
 
-bool input_device_item::check_axis(input_item_modifier modifier)
+bool input_device_item::check_axis(input_item_modifier modifier, s32 memory)
 {
-	// if we've already reported this one, don't bother
-	if (m_memory == INVALID_AXIS_VALUE)
-		return false;
-
-	if (item_check_axis(modifier))
-	{
-		m_memory = INVALID_AXIS_VALUE;
-		return true;
-	}
-
-	return false;
+	// use INVALID_AXIS_VALUE as a short-circuit
+	return (memory != INVALID_AXIS_VALUE) && item_check_axis(modifier, memory);
 }
 
 
@@ -801,7 +790,7 @@ s32 input_device_switch_item::read_as_absolute(input_item_modifier modifier)
 //  enough to trigger a read when polling
 //-------------------------------------------------
 
-bool input_device_switch_item::item_check_axis(input_item_modifier modifier)
+bool input_device_switch_item::item_check_axis(input_item_modifier modifier, s32 memory)
 {
 	return false;
 }
@@ -889,12 +878,12 @@ s32 input_device_relative_item::read_as_absolute(input_item_modifier modifier)
 //  enough to trigger a read when polling
 //-------------------------------------------------
 
-bool input_device_relative_item::item_check_axis(input_item_modifier modifier)
+bool input_device_relative_item::item_check_axis(input_item_modifier modifier, s32 memory)
 {
-	s32 curval = read_as_relative(modifier);
+	const s32 curval = read_as_relative(modifier);
 
 	// for relative axes, look for ~20 pixels movement
-	return std::abs(curval - memory()) > 20 * INPUT_RELATIVE_PER_PIXEL;
+	return std::abs(curval - memory) > (20 * INPUT_RELATIVE_PER_PIXEL);
 }
 
 
@@ -1002,15 +991,15 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 //  enough to trigger a read when polling
 //-------------------------------------------------
 
-bool input_device_absolute_item::item_check_axis(input_item_modifier modifier)
+bool input_device_absolute_item::item_check_axis(input_item_modifier modifier, s32 memory)
 {
 	// ignore min/max for lightguns
 	// so the selection will not be affected by a gun going out of range
-	s32 curval = read_as_absolute(modifier);
+	const s32 curval = read_as_absolute(modifier);
 	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN &&
 		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
 		return false;
 
 	// for absolute axes, look for 25% of maximum
-	return std::abs(curval - memory()) > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4;
+	return std::abs(curval - memory) > ((INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4);
 }

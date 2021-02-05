@@ -74,7 +74,7 @@ protected:
 		ARM9_COPRO_ID_STEP_SA1110_A0 = 0,
 		ARM9_COPRO_ID_STEP_SA1110_B0 = 4,
 		ARM9_COPRO_ID_STEP_SA1110_B1 = 5,
-		ARM9_COPRO_ID_STEP_SA1110_B2 = 6,
+		ARM9_COPRO_ID_STEP_SA1110_B2 = 8,
 		ARM9_COPRO_ID_STEP_SA1110_B4 = 8,
 
 		ARM9_COPRO_ID_STEP_PXA255_A0 = 6,
@@ -146,18 +146,45 @@ protected:
 
 	uint32_t m_r[/*NUM_REGS*/37];
 
+	void translate_insn_command(int ref, const std::vector<std::string> &params);
+	void translate_data_command(int ref, const std::vector<std::string> &params);
+	void translate_command(int ref, const std::vector<std::string> &params, int intention);
+
 	void update_insn_prefetch(uint32_t curr_pc);
-	virtual uint16_t insn_fetch_thumb(uint32_t pc);
-	uint32_t insn_fetch_arm(uint32_t pc);
-	int get_insn_prefetch_index(uint32_t address);
+	bool insn_fetch_thumb(uint32_t pc, uint32_t &out_insn);
+	bool insn_fetch_arm(uint32_t pc, uint32_t &out_insn);
+
+	void add_ce_kernel_addr(offs_t addr, std::string value);
+	void init_ce_kernel_addrs();
+	void print_ce_kernel_address(const offs_t addr);
+
+	std::string m_ce_kernel_addrs[0x10400];
+	bool m_ce_kernel_addr_present[0x10400];
 
 	uint32_t m_insn_prefetch_depth;
 	uint32_t m_insn_prefetch_count;
 	uint32_t m_insn_prefetch_index;
 	uint32_t m_insn_prefetch_buffer[3];
 	uint32_t m_insn_prefetch_address[3];
+	bool m_insn_prefetch_valid[3];
 	const uint32_t m_prefetch_word0_shift;
 	const uint32_t m_prefetch_word1_shift;
+	int m_tlb_log;
+	int m_actual_log;
+
+	struct tlb_entry
+	{
+		bool valid;
+		uint8_t domain;
+		uint8_t access;
+		uint32_t table_bits;
+		uint32_t base_addr;
+		uint8_t type;
+	};
+	tlb_entry m_dtlb_entries[0x2000];
+	tlb_entry m_itlb_entries[0x2000];
+	uint8_t m_dtlb_entry_index[0x1000];
+	uint8_t m_itlb_entry_index[0x1000];
 
 	bool m_pendingIrq;
 	bool m_pendingFiq;
@@ -235,8 +262,15 @@ protected:
 	void arm9ops_e(uint32_t insn);
 
 	void set_cpsr(uint32_t val);
-	bool arm7_tlb_translate(offs_t &addr, int flags, bool no_exception = false);
-	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
+	bool translate_vaddr_to_paddr(offs_t &addr, const int flags);
+	bool page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a);
+	bool page_table_translate(offs_t &vaddr, const int flags);
+	tlb_entry *tlb_map_entry(const offs_t vaddr, const int flags);
+	tlb_entry *tlb_probe(const offs_t vaddr, const int flags);
+	uint32_t get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, const int flags);
+	uint32_t tlb_check_permissions(tlb_entry *entry, const int flags);
+	offs_t tlb_translate(tlb_entry *entry, const offs_t vaddr);
+	uint32_t get_lvl2_desc_from_page_table(uint32_t granularity, uint32_t first_desc, uint32_t vaddr);
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
 	void update_irq_state();
@@ -368,17 +402,17 @@ protected:
 	/* fast RAM info */
 	struct fast_ram_info
 	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
+		offs_t              start = 0;                  /* start of the RAM block */
+		offs_t              end = 0;                    /* end of the RAM block */
+		bool                readonly = false;           /* true if read-only */
+		void *              base = nullptr;             /* base in memory where the RAM lives */
 	};
 
 	struct hotspot_info
 	{
-		uint32_t             pc;
-		uint32_t             opcode;
-		uint32_t             cycles;
+		uint32_t             pc = 0;
+		uint32_t             opcode = 0;
+		uint32_t             cycles = 0;
 	};
 
 	/* internal compiler state */
@@ -386,9 +420,9 @@ protected:
 	{
 		compiler_state &operator=(compiler_state const &) = delete;
 
-		uint32_t              cycles;                     /* accumulated cycles */
-		uint8_t               checkints;                  /* need to check interrupts before next instruction */
-		uint8_t               checksoftints;              /* need to check software interrupts before next instruction */
+		uint32_t         cycles = 0;                 /* accumulated cycles */
+		uint8_t          checkints = 0;              /* need to check interrupts before next instruction */
+		uint8_t          checksoftints = 0;          /* need to check software interrupts before next instruction */
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
@@ -396,45 +430,45 @@ protected:
 	struct arm7imp_state
 	{
 		/* core state */
-		drc_cache *         cache;                      /* pointer to the DRC code cache */
-		drcuml_state *      drcuml;                     /* DRC UML generator state */
-		//arm7_frontend *     drcfe;                      /* pointer to the DRC front-end state */
-		uint32_t              drcoptions;                 /* configurable DRC options */
+		std::unique_ptr<drc_cache> cache;               /* pointer to the DRC code cache */
+		std::unique_ptr<drcuml_state> drcuml;           /* DRC UML generator state */
+		//arm7_frontend *     drcfe = nullptr;            /* pointer to the DRC front-end state */
+		uint32_t            drcoptions = 0;             /* configurable DRC options */
 
 		/* internal stuff */
-		uint8_t               cache_dirty;                /* true if we need to flush the cache */
-		uint32_t              jmpdest;                    /* destination jump target */
+		uint8_t             cache_dirty = 0;            /* true if we need to flush the cache */
+		uint32_t            jmpdest = 0;                /* destination jump target */
 
 		/* parameters for subroutines */
-		uint64_t              numcycles;                  /* return value from gettotalcycles */
-		uint32_t              mode;                       /* current global mode */
-		const char *        format;                     /* format string for print_debug */
-		uint32_t              arg0;                       /* print_debug argument 1 */
-		uint32_t              arg1;                       /* print_debug argument 2 */
+		uint64_t            numcycles = 0;              /* return value from gettotalcycles */
+		uint32_t            mode = 0;                   /* current global mode */
+		const char *        format = nullptr;           /* format string for print_debug */
+		uint32_t            arg0 = 0;                   /* print_debug argument 1 */
+		uint32_t            arg1 = 0;                   /* print_debug argument 2 */
 
 		/* register mappings */
-		uml::parameter   regmap[/*NUM_REGS*/37];               /* parameter to register mappings for all 16 integer registers */
+		uml::parameter      regmap[/*NUM_REGS*/37];     /* parameter to register mappings for all 16 integer registers */
 
 		/* subroutines */
-		uml::code_handle *   entry;                      /* entry point */
-		uml::code_handle *   nocode;                     /* nocode exception handler */
-		uml::code_handle *   out_of_cycles;              /* out of cycles exception handler */
-		uml::code_handle *   tlb_translate;              /* tlb translation handler */
-		uml::code_handle *   detect_fault;               /* tlb fault detection handler */
-		uml::code_handle *   check_irq;                  /* irq check handler */
-		uml::code_handle *   read8;                      /* read byte */
-		uml::code_handle *   write8;                     /* write byte */
-		uml::code_handle *   read16;                     /* read half */
-		uml::code_handle *   write16;                    /* write half */
-		uml::code_handle *   read32;                     /* read word */
-		uml::code_handle *   write32;                    /* write word */
+		uml::code_handle *  entry = nullptr;            /* entry point */
+		uml::code_handle *  nocode = nullptr;           /* nocode exception handler */
+		uml::code_handle *  out_of_cycles = nullptr;    /* out of cycles exception handler */
+		uml::code_handle *  tlb_translate = nullptr;    /* tlb translation handler */
+		uml::code_handle *  detect_fault = nullptr;     /* tlb fault detection handler */
+		uml::code_handle *  check_irq = nullptr;        /* irq check handler */
+		uml::code_handle *  read8 = nullptr;            /* read byte */
+		uml::code_handle *  write8 = nullptr;           /* write byte */
+		uml::code_handle *  read16 = nullptr;           /* read half */
+		uml::code_handle *  write16 = nullptr;          /* write half */
+		uml::code_handle *  read32 = nullptr;           /* read word */
+		uml::code_handle *  write32 = nullptr;          /* write word */
 
 		/* fast RAM */
-		uint32_t              fastram_select;
+		uint32_t            fastram_select = 0;
 		fast_ram_info       fastram[ARM7_MAX_FASTRAM];
 
 		/* hotspots */
-		uint32_t              hotspot_select;
+		uint32_t            hotspot_select = 0;
 		hotspot_info        hotspot[ARM7_MAX_HOTSPOTS];
 	} m_impstate;
 

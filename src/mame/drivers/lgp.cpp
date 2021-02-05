@@ -69,7 +69,6 @@ Dumping Notes:
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
 #include "emupal.h"
-#include "render.h"
 #include "speaker.h"
 
 

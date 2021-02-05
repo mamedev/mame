@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_X86LOG_H
+#define MAME_CPU_X86LOG_H
 
-#ifndef __X86LOG_H__
-#define __X86LOG_H__
+#pragma once
 
 #include <cstdint>
 #include <cassert>
@@ -38,34 +38,34 @@ typedef uint8_t       x86code;
 /* code logging info */
 struct log_comment
 {
-	x86code* base;
-	const char* string;
+	x86code* base = nullptr;
+	const char* string = nullptr;
 };
 
 
 /* data ranges */
 struct data_range_t
 {
-	x86code* base;
-	x86code* end;
-	int size;
+	x86code* base = nullptr;
+	x86code* end = nullptr;
+	int size = 0;
 };
 
 
 /* the code logging context */
 struct x86log_context
 {
-	std::string filename; /* name of the file */
-	FILE* file;           /* file we are logging to */
+	std::string filename;                       // name of the file
+	FILE* file = nullptr;                       // file we are logging to
 
-	data_range_t data_range[MAX_DATA_RANGES]; /* list of data ranges */
-	int data_range_count;                     /* number of data ranges */
+	data_range_t data_range[MAX_DATA_RANGES];   // list of data ranges
+	int data_range_count = 0;                   // number of data ranges
 
-	log_comment comment_list[MAX_COMMENTS]; /* list of comments */
-	int comment_count;                      /* number of live comments */
+	log_comment comment_list[MAX_COMMENTS];     // list of comments
+	int comment_count = 0;                      // number of live comments
 
-	char comment_pool[COMMENT_POOL_SIZE]; /* string pool to hold comments */
-	char* comment_pool_next; /* pointer to next string pool location */
+	char comment_pool[COMMENT_POOL_SIZE];       // string pool to hold comments
+	char* comment_pool_next = nullptr;          // pointer to next string pool location
 };
 
 
@@ -160,4 +160,4 @@ inline void x86log_printf(x86log_context* log, const char* format, Ts&&... xs)
 	fflush(log->file);
 }
 
-#endif /* __X86LOG_H__ */
+#endif // MAME_CPU_X86LOG_H

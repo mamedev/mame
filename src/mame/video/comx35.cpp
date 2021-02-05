@@ -7,7 +7,6 @@
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,8 +82,6 @@ WRITE_LINE_MEMBER( comx35_state::prd_w )
 
 void comx35_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(COMX35_CHARRAM_SIZE);
 }
 
 /* Machine Drivers */

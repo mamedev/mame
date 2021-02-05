@@ -69,7 +69,6 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 #include "machine/sensorboard.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -259,7 +258,7 @@ void prodigy_state::prodigy(machine_config &config)
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prodigy_state::main_map);
 
-	VIA6522(config, m_via, 2_MHz_XTAL); // DDRA = 0x00, DDRB = 0x8f
+	MOS6522(config, m_via, 2_MHz_XTAL); // DDRA = 0x00, DDRB = 0x8f
 	m_via->readpa_handler().set(FUNC(prodigy_state::input1_r));
 	m_via->readpb_handler().set(FUNC(prodigy_state::input2_r));
 	m_via->writepb_handler().set(FUNC(prodigy_state::control_w));
@@ -279,7 +278,6 @@ void prodigy_state::prodigy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
