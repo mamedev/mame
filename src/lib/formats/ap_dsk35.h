@@ -57,6 +57,10 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 	virtual bool supports_save() const override;
+
+private:
+	bool m_bIs2MG;
+	uint32_t m_u2MGOffset;
 };
 
 extern const floppy_format_type FLOPPY_APPLE_GCR_FORMAT;

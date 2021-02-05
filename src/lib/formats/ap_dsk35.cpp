@@ -1378,6 +1378,8 @@ const floppy_format_type FLOPPY_DC42_FORMAT = &floppy_image_format_creator<dc42_
 
 apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
 {
+	m_bIs2MG = false;
+	m_u2MGOffset = 0;
 }
 
 const char *apple_gcr_format::name() const
@@ -1405,6 +1407,14 @@ int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::
 	uint64_t size = io_generic_size(io);
 	if(size == 409600 || size == 819200)
 		return 50;
+
+	uint8_t signature[4];
+	io_generic_read(io, signature, 0, 4);
+	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
+	{
+		return 100;
+	}
+
 	return 0;
 }
 
@@ -1415,8 +1425,17 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 
 	int pos_data = 0;
 
+	uint8_t header[64];
+	io_generic_read(io, header, 0, 64);
+	m_bIs2MG = false;
+	if (!strncmp(reinterpret_cast<char *>(header), "2IMG", 4))
+	{
+		m_u2MGOffset = pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+		m_bIs2MG = true;
+	}
+
 	uint64_t size = io_generic_size(io);
-	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
+	int head_count = size == 409600 ? 1 : size >= 819200 ? 2 : 0;
 
 	if(!head_count)
 		return false;
@@ -1454,6 +1473,11 @@ bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variant
 		g_heads = 1;
 
 	int pos_data = 0;
+
+	if (m_bIs2MG)
+	{
+		pos_data = m_u2MGOffset;
+	}
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < g_heads; head++) {
