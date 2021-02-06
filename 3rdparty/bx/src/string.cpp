@@ -564,23 +564,13 @@ namespace bx
 	{
 		StringView str(_str);
 
-		for (; str.getPtr() != _str.getTerm()
-			; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
-			)
+		// This method returns the character past the \n, so
+		// there is no need to look for he \r which preceedes it.
+		StringView eol = strFind(str, "\n");
+		if (!eol.isEmpty() )
 		{
-			StringView eol = strFind(str, "\r\n");
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
-
-			eol = strFind(str, '\n');
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
+			return StringView(eol.getTerm(), str.getTerm() );
 		}
-
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 

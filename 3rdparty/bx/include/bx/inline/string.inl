@@ -276,7 +276,7 @@ namespace bx
 
 			StringView line(curr.getPtr(), m_curr.getPtr() );
 
-			return strRTrim(line, "\n\r");
+			return strRTrim(strRTrim(line, "\n"), "\r");
 		}
 
 		return m_curr;
