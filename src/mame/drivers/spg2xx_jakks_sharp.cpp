@@ -70,10 +70,16 @@ ROM_START( jsc_thom )
 	ROM_LOAD16_WORD_SWAP( "shckthomas.bin", 0x000000, 0x200000, CRC(bc9549ed) SHA1(7925a8ac166f9c7a56bc5f9d4f9f774af1c92d05) )
 ROM_END
 
-// has UK specific voice actors, US versions on YouTube have different voices not present in this set
-CONS( 2007, jsc_thom, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "Thomas & Friends - Learning Circus Express (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is pink/purple.
+ROM_START( jsc_spid )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "sharpcookiespiderman.bin", 0x000000, 0x200000, CRC(84cf58bf) SHA1(ac0be079c2469c9c0dea3decd7a7318806cc7ac0) )
+ROM_END
 
-// The Amazing Spider-Man - Great Math Caper
+// has UK specific voice actors, US versions on YouTube have different voices not present in this set
+CONS( 2007, jsc_thom, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "Thomas & Friends - Learning Circus Express (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, jsc_spid, 0, 0, base_config,         jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "The Amazing Spider-Man - Great Math Caper (Sharp Cookie) (NTSC, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // Scooby-Doo! - The Pirate's Puzzles
 // Go Diego Go - Aztec ABC Adventure
 // Dora the Explorer - Dora Saves the Mermaids

@@ -199,6 +199,7 @@ const double XTAL::known_xtals[] = {
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
 	 12'480'000, /* 12.48_MHz_XTAL         TRS-80 Model II */
 	 12'500'000, /* 12.5_MHz_XTAL          Red Alert audio board */
+	 12'638'000, /* 12.638_MHz_XTAL        Exidy Sorcerer */
 	 12'672'000, /* 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video */
 	 12'800'000, /* 12.8_MHz_XTAL          Cave CV1000 */
 	 12'854'400, /* 12.8544_MHz_XTAL       Alphatronic P3 */

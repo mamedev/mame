@@ -1976,6 +1976,8 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
+
+	m_polaris_cloud_pos = m_polaris_cloud_speed = 0;
 }
 
 uint8_t _8080bw_state::polaris_port00_r()

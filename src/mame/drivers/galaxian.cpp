@@ -9307,6 +9307,22 @@ ROM_START( galaktron )
 	ROM_LOAD( "galaktron_pr.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( galkamika )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",   0x0000, 0x0800, CRC(51ba70ac) SHA1(970070328f6e63f65c68270d0520cc3d26439132) )
+	ROM_LOAD( "2.bin",   0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "1.bin",   0x1000, 0x0800, CRC(aaf038d4) SHA1(2d070fe7c4e9b26092f0f12a9db3392f7d8a65f1) )
+	ROM_LOAD( "4.bin",   0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "5.bin",   0x2000, 0x0800, CRC(b1a8dfea) SHA1(6e6320c079d411bf950d5f8cf6b4219e8b53792c) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "hj.bin",  0x0000, 0x0800, CRC(5f1b4996) SHA1(b34e17b1a373e91b821431659417bd75512fb34f) )
+	ROM_LOAD( "kl.bin",  0x0800, 0x0800, BAD_DUMP CRC(5cd7df03) SHA1(77873408c89546a17b1da3f64b7e96e314fadb17) ) // Missing on the PCB, taken from Galaktron (causes some bad graphics)
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "m866l.bin", 0x000, 0x020, BAD_DUMP CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Not dumped, but original Midway PCB with original soldered PROM
+ROM_END
+
 // Late-to-market bootleg with PCB mods to use a single program rom
 // Datamat is the old name of Datasat, a technical service and distributor of arcade PCB's from the 80's and 90's.
 // A lot of the bootleg PCB's around Spain have Datamat stickers on the roms. It was one of the most important PCB sellers/distributors in the country from the era.
@@ -9336,7 +9352,7 @@ ROM_START( zerotimemc )
 	ROM_LOAD( "2_1hj.bin", 0x0000, 0x0800, CRC(bc7d0985) SHA1(550a44c9ddc8da66a29405591a590f91d2675cdf) )
 	ROM_LOAD( "1_1kl.bin", 0x0800, 0x0800, CRC(c48b88d0) SHA1(dc79f596395af0f3137eb932fe224ab8307d8771) )
 
-	/* Not dumped on the Marti Colls PCB, taken from the parent set */
+	// Not dumped on the Marti Colls PCB, taken from the parent set
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
@@ -12202,6 +12218,28 @@ ROM_START( jumpbugb )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( olibug ) // bootleg on an original Midway Galaxian PCB
+	ROM_REGION( 0x10000, "maincpu", 0 ) // b6 and b7 differ from jumpbugb
+	ROM_LOAD( "b1.bin",  0x0000, 0x1000, CRC(415aa1b7) SHA1(4f9edd7e9720acf085dd8910849c2f2fac5cb547) )
+	ROM_LOAD( "b2.bin",  0x1000, 0x1000, CRC(b1c27510) SHA1(66fbe0b94b6c101cb50d7a3ff78160110415dff9) )
+	ROM_LOAD( "b3.bin",  0x2000, 0x1000, CRC(cb8b8a0f) SHA1(9e8591471dda2cb964ba2a866d4a5a3ef65d8707) )
+	ROM_LOAD( "b4.bin",  0x3000, 0x1000, CRC(66751d12) SHA1(26c68cfb59596ae164ee9ae4a24ddf8dc7a923a7) )
+	ROM_LOAD( "b5.bin",  0x8000, 0x1000, CRC(7553b5e2) SHA1(6439585e713581dd36cea6324414f803d683216f) )
+	ROM_LOAD( "b6.bin",  0x9000, 0x1000, CRC(bed2e85c) SHA1(3e7e224bfa4997a3156fd37fc33689cc7d2d8a88) )
+	ROM_LOAD( "b7.bin",  0xa000, 0x1000, CRC(859a11d0) SHA1(edd1cbb9747497c4978b4662ba44fb4910dc4192) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "b10.bin", 0x0000, 0x0800, CRC(9a091b0a) SHA1(19b88f802ee80ff8901ef99e3688f2869f1a69c5) )
+	ROM_LOAD( "b9.bin",  0x1000, 0x0800, BAD_DUMP CRC(feb20db0) SHA1(8ca1a21a1ef5f19d34acc6fb1bbc5221de847f72) )
+	ROM_CONTINUE(        0x0800, 0x0800 )
+	ROM_LOAD( "b11.bin", 0x1800, 0x0800, CRC(795e81be) SHA1(0a30a8e7429a99161d6cc62cd10b50a20117ba1d) )
+	ROM_LOAD( "b8.bin",  0x2800, 0x0800, CRC(9a9d35b3) SHA1(c363fae7108e0bb0d3e1bb4b1c9af62a3e3f654f) )
+	ROM_CONTINUE(        0x2000, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // uses the original Midway Galaxian PROM
+	ROM_LOAD( "6l.bpr",  0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( levers )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g96059.a8",    0x0000, 0x1000, CRC(9550627a) SHA1(3da9a614622d5b880852fe2bb2e8e4a60afb2d34) )
@@ -14714,6 +14752,7 @@ GAME( 1979, galap1,      galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galap4,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack (G.G.I)",                               "Galaxian Part 4 (hack)",                                                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)",                     "Zero Time (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",                      "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galkamika,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Electrogame)",                      "Kamikaze (Electrogame, Spanish bootleg of Galaxian)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Imperfect graphics because of missing ROM
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimeu,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg)",                                                                  MACHINE_SUPPORTS_SAVE )
@@ -14904,9 +14943,10 @@ GAME( 198?, fantastc,    0,        fantastc,   fantastc,   galaxian_state, init_
 GAME( 198?, timefgtr,    0,        timefgtr,   timefgtr,   galaxian_state, init_timefgtr,   ROT90,  "Taito do Brasil", "Time Fighter (Time Pilot conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Time Pilot (!) not a clone
 
 // Extra ROMs, protection, and sound hardware replaced with AY8910
-GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "Hoei (Rock-Ola license)", "Jump Bug",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // or by Alpha Denshi Co. under contract from Hoei?
-GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                 "Jump Bug (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // bootleg of Sega license
-GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, init_jumpbug,    ROT90,  "Rock-Ola",                "Levers",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "Hoei (Rock-Ola license)", "Jump Bug",                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // or by Alpha Denshi Co. under contract from Hoei?
+GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                 "Jump Bug (bootleg)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // bootleg of Sega license
+GAME( 1982, olibug,      jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                 "Oli Bug (Jump Bug bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // one bad GFX ROM, uses Galaxian color PROM?
+GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, init_jumpbug,    ROT90,  "Rock-Ola",                "Levers",                     MACHINE_SUPPORTS_SAVE )
 
 // 2nd CPU driving AY8910 for sound
 GAME( 1982, checkman,    0,        checkman,   checkman,   galaxian_state, init_checkman,   ROT90,  "Zilec-Zenitone",                                     "Check Man",         MACHINE_SUPPORTS_SAVE )

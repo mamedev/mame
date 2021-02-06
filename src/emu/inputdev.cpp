@@ -329,7 +329,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 //  substring search
 //-------------------------------------------------
 
-bool input_device::match_device_id(const char *deviceid) const
+bool input_device::match_device_id(std::string_view deviceid) const
 {
 	std::string deviceidupper(strmakeupper(deviceid));
 	std::string idupper(strmakeupper(m_id));

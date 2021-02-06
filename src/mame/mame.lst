@@ -2183,7 +2183,8 @@ asterockv                       // Videotron bootleg(c) 1979
 asteroid                        // 035127-035145    (c) 1979
 asteroid1                       // 035127-035145    no copyright notice
 asteroid2                       // 035127-035145    (c) 1979
-asteroidb                       // (bootleg)
+asteroidb1                      // (bootleg)
+asteroidb2                      // (bootleg)
 hyperspc                        // Rumiano bootleg  (c) 1979
 llander                         // 0345xx           no copyright notice
 llander1                        // 0345xx           no copyright notice
@@ -13456,6 +13457,7 @@ galsnewj                        // (c) 1990 Kaneko (Japan)
 galsnewk                        // (c) 1990 Kaneko (Korea)
 galsnewt                        // (c) 1990 Kaneko (Taiwan)
 galsnewu                        // (c) 1990 Kaneko (US)
+hotnight                        // (c) 1994 Bulldog Amusements Inc.
 missmw96                        // (c) 1996 Comad
 missw02                         // (c) 2002 Daigom
 missw96                         // (c) 1996 Comad
@@ -14311,6 +14313,7 @@ galaxrf                         // bootleg (Recreativos Franco)
 galaxrfgg                       // bootleg (Recreativos Franco)
 galaxyx                         // bootleg
 galemp                          // (c) Taito do Brasil
+galkamika                       // bootleg (Video Game / Electrogame)
 galturbo                        // hack
 ghostmun                        //
 gmgalax                         // bootleg
@@ -14376,6 +14379,7 @@ mshuttlej2                      // (c) 1981 Nichibutsu
 namenayo                        // (c) 1982 Cat's
 ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
+olibug                          // bootleg
 olmandingo                      // bootleg
 olmandingc                      // bootleg (Calfesa)
 omegab                          // bootleg
@@ -14491,6 +14495,7 @@ froggerv                        // bootleg
 guttangt                        //
 hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
+hunchbgb                        // bootleg
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
@@ -16068,6 +16073,7 @@ ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
 funrlgl                         // Mattel
+funtag                          // Mattel
 h2hbaskbc                       // Coleco
 h2hhockeyc                      // Coleco
 h2hsoccerc                      // Coleco
@@ -16135,6 +16141,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
+auslalom                        // Elektronika
 bassmate                        // Telko
 exospace                        // Elektronika
 gnw_ball                        // Nintendo
@@ -16724,6 +16731,9 @@ v1                              //
 
 @source:ie15.cpp
 ie15                            //
+
+@source:iez80.cpp
+iez80                           //
 
 @source:if800.cpp
 if800                           //
@@ -32017,6 +32027,7 @@ ncd19                           // 1990 Network Computing Devices
 
 @source:ncd88k.cpp
 ncd19c                          //
+ncdmcx
 
 @source:ncdmips.cpp
 hmxpro                          // 1994 Network Computing Devices
@@ -38518,6 +38529,7 @@ jak_nick                        //
 jak_sbfc                        //
 
 @source:spg2xx_jakks_sharp.cpp
+jsc_spid
 jsc_thom
 
 @source:spg2xx_jakks_tvtouch.cpp
@@ -41627,6 +41639,7 @@ p911j                           // 2001
 p911kc                          // 2001
 p911uc                          // 2001
 ppp2nd                          // 2001
+ppp2nda                         // 2001
 sogeki                          // 2001
 sscopefh                        // 2002
 sscopex                         // 2001

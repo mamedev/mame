@@ -1746,3 +1746,171 @@ uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
 
 
 const floppy_format_type FLOPPY_WOZ_FORMAT = &floppy_image_format_creator<a2_woz_format>;
+
+
+a2_nib_format::a2_nib_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_nib_format::name() const
+{
+	return "a2_nib";
+}
+
+const char *a2_nib_format::description() const
+{
+	return "Apple II NIB Image";
+}
+
+const char *a2_nib_format::extensions() const
+{
+	return "nib";
+}
+
+bool a2_nib_format::supports_save() const
+{
+	return false;
+}
+
+int a2_nib_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	const auto size = io_generic_size(io);
+	if (size == expected_size_35t || size == expected_size_40t) {
+		return 50;
+	}
+	return 0;
+}
+
+
+template<class It>
+static
+size_t count_leading_FFs(const It first, const It last)
+{
+	auto curr = first;
+	for (; curr != last; ++curr) {
+		if (*curr != 0xFF) {
+			break;
+		}
+	}
+	return curr - first;
+}
+
+static
+size_t count_trailing_padding(const std::vector<uint8_t>& nibbles) {
+	const auto b = nibbles.rbegin();
+	const auto e = nibbles.rend();
+	auto i = b;
+
+	// skip until the first valid nibble...
+	for (; i != e; ++i) {
+		if ((*i & 0x80) != 0) { // valid nibble
+			break;
+		}
+	}
+	return i - b;
+}
+
+std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles)
+{
+	std::vector<uint32_t> levels;
+	const auto append_FFs = [&] (size_t count) {
+		while (count-- > 0) {
+			raw_w(levels, 8, 0xFF);
+		}
+	};
+	const auto append_syncs = [&] (size_t count) {
+		while (count-- > 0) {
+			raw_w(levels, 10, 0x00FF << 2);
+		}
+	};
+	const auto append_byte = [&] (uint8_t byte) {
+		raw_w(levels, 8, byte);
+	};
+
+
+	const auto leading_FF_count =
+		count_leading_FFs(nibbles.begin(), nibbles.end());
+
+	if (leading_FF_count >= nibbles.size()) { // all are 0xFF !?!?
+		assert(leading_FF_count >= min_sync_bytes);
+		append_syncs(leading_FF_count);
+		return levels;
+	}
+
+	const auto trailing_padding_size = count_trailing_padding(nibbles);
+	const auto trailing_FF_count =
+		count_leading_FFs(nibbles.rbegin() + trailing_padding_size,
+		                  nibbles.rend());
+	const auto wrapped_FF_count = leading_FF_count + trailing_FF_count;
+	const bool wrapped_FF_are_syncs = wrapped_FF_count >= min_sync_bytes;
+
+	if (wrapped_FF_are_syncs) {
+		append_syncs(leading_FF_count);
+	} else {
+		append_FFs(leading_FF_count);
+	}
+
+	{
+		size_t FF_count = 0;
+		const auto flush_FFs = [&] {
+			if (FF_count == 0) {
+				return;
+			}
+
+			if (FF_count >= a2_nib_format::min_sync_bytes) {
+				append_syncs(FF_count);
+			} else {
+				append_FFs(FF_count);
+			}
+			FF_count = 0;
+		};
+
+		const auto end = nibbles.end() - trailing_padding_size - trailing_FF_count;
+		for (auto i = nibbles.begin() + leading_FF_count; i != end; ++i) {
+			const auto nibble = *i;
+			if ((nibble & 0x80) == 0) {
+				continue;
+			}
+
+			if (nibble == 0xFF) {
+				++FF_count;
+				continue;
+			}
+
+			flush_FFs();
+			append_byte(nibble);
+		}
+		flush_FFs();
+	}
+
+	if (wrapped_FF_are_syncs) {
+		append_syncs(trailing_FF_count);
+	} else {
+		append_FFs(trailing_FF_count);
+	}
+
+	return levels;
+}
+
+bool a2_nib_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	auto size = io_generic_size(io);
+	if (size != expected_size_35t && size != expected_size_40t) {
+		return false;
+	}
+	const auto nr_tracks = size == expected_size_35t? 35 : 40;
+
+	std::vector<uint8_t> nibbles(nibbles_per_track);
+	for (unsigned track = 0; track < nr_tracks; ++track) {
+		io_generic_read(io, &nibbles[0],
+		                track * nibbles_per_track, nibbles_per_track);
+		auto levels = generate_levels_from_nibbles(nibbles);
+		generate_track_from_levels(track, 0,
+		                           levels,
+		                           0, image);
+	}
+	return true;
+}
+
+
+const floppy_format_type FLOPPY_NIB_FORMAT = &floppy_image_format_creator<a2_nib_format>;

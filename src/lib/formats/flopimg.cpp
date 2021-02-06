@@ -2986,8 +2986,14 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 		auto &sdata = sector_data[se];
 		uint8_t ca = 0, cb = 0, cc = 0;
 
-		uint32_t hstate = (nib[pos] << 8) | nib[pos + 1];
-		pos += 2;
+		uint32_t hstate = (nib[pos] << 8);
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
+		hstate |= nib[pos];
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
 		for(;;) {
 			hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
 			pos ++;

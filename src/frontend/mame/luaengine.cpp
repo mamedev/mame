@@ -63,10 +63,10 @@ void do_draw_box(screen_device &sdev, float x1, float y1, float x2, float y2, ui
 {
 	float const sc_width(sdev.visible_area().width());
 	float const sc_height(sdev.visible_area().height());
-	x1 = std::min(std::max(0.0f, x1), sc_width) / sc_width;
-	y1 = std::min(std::max(0.0f, y1), sc_height) / sc_height;
-	x2 = std::min(std::max(0.0f, x2), sc_width) / sc_width;
-	y2 = std::min(std::max(0.0f, y2), sc_height) / sc_height;
+	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
 	mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
 }
 
@@ -74,10 +74,10 @@ void do_draw_line(screen_device &sdev, float x1, float y1, float x2, float y2, u
 {
 	float const sc_width(sdev.visible_area().width());
 	float const sc_height(sdev.visible_area().height());
-	x1 = std::min(std::max(0.0f, x1), sc_width) / sc_width;
-	y1 = std::min(std::max(0.0f, y1), sc_height) / sc_height;
-	x2 = std::min(std::max(0.0f, x2), sc_width) / sc_width;
-	y2 = std::min(std::max(0.0f, y2), sc_height) / sc_height;
+	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
 	sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
@@ -89,7 +89,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 	float x = 0;
 	if (xobj.is<float>())
 	{
-		x = std::min(std::max(0.0f, xobj.as<float>()), sc_width) / sc_width;
+		x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
 	}
 	else if (xobj.is<char const *>())
 	{
@@ -106,7 +106,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 		luaL_error(L, "Error in param 1 to draw_text");
 		return;
 	}
-	y = std::min(std::max(0.0f, y), sc_height) / sc_height;
+	y = std::clamp(y, 0.0f, sc_height) / sc_height;
 	mame_machine_manager::instance()->ui().draw_text_full(
 			sdev.container(),
 			msg,

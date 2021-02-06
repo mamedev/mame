@@ -1831,7 +1831,8 @@ void dp8344_device::store_result()
 			write_register(m_latched_instr & 0x001f, m_source_data);
 			break;
 		}
-		[[fallthrough]]; // FIXME: really?
+		break;
+
 	case 0xe000:
 		if (BIT(m_latched_instr, 11))
 			m_source_data = sub_nzcv(m_source_data, read_accumulator(), BIT(m_latched_instr, 10) && BIT(m_ccr, 1));

@@ -155,7 +155,7 @@ void path_iterator::reset()
 //  in the search path
 //-------------------------------------------------
 
-const osd::directory::entry *file_enumerator::next()
+const osd::directory::entry *file_enumerator::next(const char *subdir)
 {
 	// loop over potentially empty directories
 	while (true)
@@ -164,7 +164,7 @@ const osd::directory::entry *file_enumerator::next()
 		while (!m_curdir)
 		{
 			// if we fail to get anything more, we're done
-			if (!m_iterator.next(m_pathbuffer))
+			if (!m_iterator.next(m_pathbuffer, subdir))
 				return nullptr;
 
 			// open the path
