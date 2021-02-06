@@ -983,7 +983,37 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	}
 }
 
-void powervr2_device::startrender_w(address_space &space, uint32_t data)
+void powervr2_device::startrender_w(address_space& space, uint32_t data)
+{
+	if (m_render_request)
+	{
+		int result;
+		do
+		{
+			result = osd_work_item_wait(m_render_request, 1000);
+			//printf("waiting\n");
+
+		} while (result == 0);
+		osd_work_item_release(m_render_request);
+	}
+
+	m_render_request = osd_work_item_queue(m_work_queue, blit_request_callback, (void*)this, 0);
+}
+
+void *powervr2_device::blit_request_callback(void *param, int threadid)
+{
+	powervr2_device *object = reinterpret_cast<powervr2_device *>(param);
+
+	dc_state *state = object->machine().driver_data<dc_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+
+	object->startrender_real_w(space);
+	return nullptr;
+}
+
+
+
+void powervr2_device::startrender_real_w(address_space &space)
 {
 	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
@@ -1040,7 +1070,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 
 					// should render to the accumulation buffer here using pointers we filled in when processing the data
 					// sent to the TA.  HOWEVER, we don't process the TA data and create the real format object lists, so
-					// instead just use these co-ordinates to copy data from our fake full-screnen accumnulation buffer into
+					// instead just use these co-ordinates to copy data from our fake fullscreen accumnulation buffer into
 					// the framebuffer
 
 					pvr_accumulationbuffer_to_framebuffer(space, x,y);
@@ -1050,9 +1080,10 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 					break;
 
 				sanitycount++;
-				// prevent infinite loop if asked to process invalid data
-				//if(sanitycount>2000)
-				//  break;
+				// prevent infinite loop if asked to process invalid data, this happens frequently with the unsafe threading
+				// code as it can end up trying to process lists mid-state.
+				if(sanitycount>2000)
+				  break;
 			}
 //          printf("ISP START %d %d\n",sanitycount,screen().vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
@@ -4106,6 +4137,9 @@ void powervr2_device::device_start()
 	save_pointer(NAME(tafifo_buff),32);
 	save_item(NAME(scanline));
 	save_item(NAME(next_y));
+
+	m_work_queue = nullptr;
+	m_render_request = nullptr;
 }
 
 void powervr2_device::device_reset()
@@ -4143,6 +4177,8 @@ void powervr2_device::device_reset()
 	dc_state *state = machine().driver_data<dc_state>();
 	dc_texture_ram = state->dc_texture_ram.target();
 	dc_framebuffer_ram = state->dc_framebuffer_ram.target();
+
+	m_work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 }
 
 /* called by TIMER_ADD_PERIODIC, in driver sections (controlled by SPG, that's a PVR sub-device) */
