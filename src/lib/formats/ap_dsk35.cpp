@@ -1378,8 +1378,6 @@ const floppy_format_type FLOPPY_DC42_FORMAT = &floppy_image_format_creator<dc42_
 
 apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
 {
-	m_bIs2MG = false;
-	m_u2MGOffset = 0;
 }
 
 const char *apple_gcr_format::name() const
@@ -1408,13 +1406,6 @@ int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::
 	if(size == 409600 || size == 819200)
 		return 50;
 
-	uint8_t signature[4];
-	io_generic_read(io, signature, 0, 4);
-	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
-	{
-		return 100;
-	}
-
 	return 0;
 }
 
@@ -1427,15 +1418,9 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 
 	uint8_t header[64];
 	io_generic_read(io, header, 0, 64);
-	m_bIs2MG = false;
-	if (!strncmp(reinterpret_cast<char *>(header), "2IMG", 4))
-	{
-		m_u2MGOffset = pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
-		m_bIs2MG = true;
-	}
 
 	uint64_t size = io_generic_size(io);
-	int head_count = size == 409600 ? 1 : size >= 819200 ? 2 : 0;
+	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
 	if(!head_count)
 		return false;
@@ -1474,11 +1459,6 @@ bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variant
 
 	int pos_data = 0;
 
-	if (m_bIs2MG)
-	{
-		pos_data = m_u2MGOffset;
-	}
-
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < g_heads; head++) {
 			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
@@ -1495,3 +1475,116 @@ bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variant
 }
 
 const floppy_format_type FLOPPY_APPLE_GCR_FORMAT = &floppy_image_format_creator<apple_gcr_format>;
+
+// .2MG format
+apple_2mg_format::apple_2mg_format() : floppy_image_format_t()
+{
+}
+
+const char *apple_2mg_format::name() const
+{
+	return "apple_2mg";
+}
+
+const char *apple_2mg_format::description() const
+{
+	return "Apple II .2MG image";
+}
+
+const char *apple_2mg_format::extensions() const
+{
+	return "2mg";
+}
+
+bool apple_2mg_format::supports_save() const
+{
+	return true;
+}
+
+int apple_2mg_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	uint8_t signature[4];
+	io_generic_read(io, signature, 0, 4);
+	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
+	{
+		return 100;
+	}
+
+	return 0;
+}
+
+bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	desc_gcr_sector sectors[12];
+	uint8_t sdata[512*12], header[64];
+	io_generic_read(io, header, 0, 64);
+	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
+	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+
+	if(blocks != 1600)
+		return false;
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < 2; head++) {
+			int ns = 12 - (track/16);
+			io_generic_read(io, sdata, pos_data, 512*ns);
+			pos_data += 512*ns;
+
+			int si = 0;
+			for(int i=0; i<ns; i++) {
+				sectors[si].track = track;
+				sectors[si].head = head;
+				sectors[si].sector = i;
+				sectors[si].info = 0x22;
+				sectors[si].tag = nullptr;
+				sectors[si].data = sdata + 512*i;
+				si = (si + 2) % ns;
+				if(si == 0)
+					si++;
+			}
+			build_mac_track_gcr(track, head, image, sectors);
+		}
+	}
+	return true;
+}
+
+bool apple_2mg_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	uint8_t header[0x40];
+	int pos_data = 0x40;
+
+	memset(header, 0, sizeof(header));
+	// file ID
+	header[0] = '2'; header[1] = 'I'; header[2] = 'M'; header[3] = 'G';
+	// creator program
+	header[4] = 'M'; header[5] = 'A'; header[6] = 'M'; header[7] = 'E';
+	// header size
+	header[8] = 0x40;
+	// version
+	header[0xa] = 1;
+	// flags
+	header[0xc] = 1;    // ProDOS sector order
+	// number of ProDOS blocks
+	header[0x14] = 0x40; header[0x15] = 0x06;   // 0x640 (1600)
+	// offset to sector data
+	header[0x18] = 0x40;
+	// bytes of disk data
+	header[0x1c] = 0x00; header[0x1d] = 0x80; header[0x1e] = 0x0c;  // 0xC8000 (819200)
+	io_generic_write(io, header, 0, 0x40);
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < 2; head++) {
+			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
+			for(unsigned int i=0; i < sectors.size(); i++) {
+				auto &sdata = sectors[i];
+				sdata.resize(512+12);
+				io_generic_write(io, &sdata[12], pos_data, 512);
+				pos_data += 512;
+			}
+		}
+	}
+
+	return true;
+}
+
+const floppy_format_type FLOPPY_APPLE_2MG_FORMAT = &floppy_image_format_creator<apple_2mg_format>;
