@@ -145,7 +145,6 @@ public:
 
 private:
 	// internal state
-	device_t &m_device;              // owning device
 	std::vector<std::unique_ptr<ymadpcm_a_channel>> m_channel; // vector of channels
 	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_a_registers m_regs;      // register accessor
@@ -327,7 +326,6 @@ public:
 
 private:
 	// internal state
-	device_t &m_device;              // owning device
 	std::vector<std::unique_ptr<ymadpcm_b_channel>> m_channel; // vector of channels
 	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_b_registers m_regs;      // register accessor

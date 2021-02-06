@@ -196,7 +196,6 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 //-------------------------------------------------
 
 ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8 addrshift) :
-	m_device(device),
 	m_regdata(0x30),
 	m_regs(m_regdata)
 {
@@ -592,7 +591,6 @@ void ymadpcm_b_channel::load_start()
 //-------------------------------------------------
 
 ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift) :
-	m_device(device),
 	m_regdata(0x10),
 	m_regs(m_regdata)
 {
