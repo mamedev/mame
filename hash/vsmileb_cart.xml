@@ -88,7 +88,7 @@ VTech V.Smile Baby cartridges
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
 
-	<software name="babyeninf" supported="no">
+	<software name="babyeninfr" supported="no">
 		<description>Baby Einstein - Un monde de découvertes (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -101,7 +101,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmg" supported="no">
+	<software name="dayfarmge" supported="no">
 		<description>Mein erster Bauernhof (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -116,7 +116,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmf" cloneof="dayfarmg" supported="no">
+	<software name="dayfarmfr" cloneof="dayfarmge" supported="no">
 		<description>Un jour à la ferme (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -129,7 +129,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarms" cloneof="dayfarmg" supported="no">
+	<software name="dayfarmsp" cloneof="dayfarmge" supported="no">
 		<description>Un Día en la Granja (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -144,7 +144,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymif" supported="no">
+	<software name="dbabymifr" supported="no">
 		<description>Les découvertes de Mickey et ses amis (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -172,7 +172,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhg" cloneof="learndhnl" supported="no">
+	<software name="learndhge" cloneof="learndhnl" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -188,7 +188,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhf" cloneof="learndhnl" supported="no">
+	<software name="learndhfr" cloneof="learndhnl" supported="no">
 		<description>La Maison Des Animaux (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -201,7 +201,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noaharkf" supported="no">
+	<software name="noaharkfr" supported="no">
 		<description>L'arche de Noé - L'aventure des animaux (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -226,7 +226,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="poohhawasw" cloneof="poohhawa" supported="no">
+	<software name="poohhawase" cloneof="poohhawa" supported="no">
 		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -241,7 +241,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubf" supported="no">
+	<software name="teletubfr" supported="no">
 		<description>Teletubbies (France)</description>
 		<year>1996</year>
 		<publisher>VTech</publisher>
