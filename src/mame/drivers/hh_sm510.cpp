@@ -1431,22 +1431,22 @@ INPUT_PORTS_END
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
-	sm5a_common(config, 1684, 1080); // R mask option ?
+	sm5a_common(config, 1684, 1080); // R mask option confirmed
 }
 
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
-	sm5a_common(config, 1690, 1080); // R mask option ?
+	sm5a_common(config, 1690, 1080); // R mask option confirmed
 }
 
 void gnw_mmouse_state::nupogodi(machine_config &config)
 {
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+	kb1013vk12_common(config, 1715, 1080); // assuming same R mask option as mickey mouse
 }
 
 void gnw_mmouse_state::exospace(machine_config &config)
 {
-	kb1013vk12_common(config, 1756, 1080); // R mask option ?
+	kb1013vk12_common(config, 1756, 1080); // assuming same R mask option as mickey mouse
 }
 
 // roms
