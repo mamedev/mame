@@ -1441,12 +1441,12 @@ void gnw_mmouse_state::gnw_egg(machine_config &config)
 
 void gnw_mmouse_state::nupogodi(machine_config &config)
 {
-	kb1013vk12_common(config, 1715, 1080); // assuming same R mask option as mickey mouse
+	kb1013vk12_common(config, 1715, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::exospace(machine_config &config)
 {
-	kb1013vk12_common(config, 1756, 1080); // assuming same R mask option as mickey mouse
+	kb1013vk12_common(config, 1756, 1080); // R mask option ?
 }
 
 // roms
