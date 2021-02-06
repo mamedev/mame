@@ -84,7 +84,7 @@ void prehisle_state::prehisle_sound_io_map(address_map &map)
 /******************************************************************************/
 
 static INPUT_PORTS_START( prehisle )
-	PORT_START("P1")    /* Player 1 controls */
+	PORT_START("P1")    // Player 1 controls
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -94,7 +94,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("P2")    /* Player 2 controls */
+	PORT_START("P2")    // Player 2 controls
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -104,7 +104,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2  )
 
-	PORT_START("COIN")  /* coin */
+	PORT_START("COIN")  // Coin
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -112,7 +112,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")  /* Dip switches */
+	PORT_START("DSW0")  // Dip switches
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -162,24 +162,24 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
+	8,8,    // 8*8 characters
 	RGN_FRAC(1,1),
-	4,      /* 4 bits per pixel */
+	4,      // 4 bits per pixel
 	{ STEP4(0,1) },
 	{ STEP8(0,4) },
 	{ STEP8(0,4*8) },
-	32*8    /* every char takes 32 consecutive bytes */
+	32*8    // every char takes 32 consecutive bytes
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,  /* 16*16 sprites */
+	16,16,  // 16*16 sprites
 	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
+	4,  // 4 bits per pixel
 	{ STEP4(0,1) },
 	{ STEP8(0,4), STEP8(4*8*16,4) },
 	{ STEP16(0,4*8) },
-	128*8   /* every sprite takes 64 consecutive bytes */
+	128*8   // every sprite takes 64 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_prehisle )
@@ -193,7 +193,7 @@ GFXDECODE_END
 
 void prehisle_state::machine_start()
 {
-	/* register for saving */
+	// register for saving
 	save_item(NAME(m_invert_controls));
 }
 
@@ -201,16 +201,16 @@ void prehisle_state::machine_start()
 
 void prehisle_state::prehisle(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(18'000'000)/2);   /* verified on pcb */
+	// Basic machine hardware
+	M68000(config, m_maincpu, XTAL(18'000'000)/2);   // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &prehisle_state::prehisle_map);
 	m_maincpu->set_vblank_int("screen", FUNC(prehisle_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(4'000'000));    /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(4'000'000));    // Verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &prehisle_state::prehisle_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &prehisle_state::prehisle_sound_io_map);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
@@ -222,12 +222,12 @@ void prehisle_state::prehisle(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prehisle);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000)));  /* verified on pcb */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000)));  // Verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -239,10 +239,10 @@ void prehisle_state::prehisle(machine_config &config)
 
 ROM_START( prehisle )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gt-e2.2h", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) ) /* red "E" stamped on printed label */
-	ROM_LOAD16_BYTE( "gt-e3.3h", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) ) /* red "E" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-e2.2h", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) ) // red "E" stamped on printed label
+	ROM_LOAD16_BYTE( "gt-e3.3h", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) ) // red "E" stamped on printed label
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
@@ -258,19 +258,51 @@ ROM_START( prehisle )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
-	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
+ROM_END
+
+ROM_START( prehislea )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "gt-e2.2h", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) )
+	ROM_LOAD16_BYTE( "gt-e3.3h", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
+	ROM_LOAD( "gt1.1", 0x00000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+
+	ROM_REGION( 0x008000, "chars", 0 )
+	ROM_LOAD( "gt15.b15", 0x00000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
+
+	ROM_REGION( 0x40000, "bgtiles", 0 )
+	ROM_LOAD( "12.bin", 0x00000, 0x20000, CRC(c30ff459) SHA1(d84dc293e0f3c3e5532e3c899fad3359e4298a18) )
+	ROM_LOAD( "13.bin", 0x20000, 0x20000, CRC(c7da6980) SHA1(f27ad56881a46080cc2a221a179a36e70e173607) )
+
+	ROM_REGION( 0x040000, "fgtiles", 0 )
+	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
+
+	ROM_REGION( 0xa0000, "sprites", 0 )
+	ROM_LOAD( "9.bin", 0x00000, 0x20000, CRC(d81f8db5) SHA1(073bd8ec87ee02f6ff760b410df5633e40a0e0f3) )
+	ROM_LOAD( "8.bin", 0x20000, 0x20000, CRC(5f3e0148) SHA1(90cd8d3b453c36214b27c65f9fa6da8eca149ee0) )
+	ROM_LOAD( "7.bin", 0x40000, 0x20000, CRC(4486939d) SHA1(63ce8916a9fb2c63a0d2efc9c9cc8cc357373eba) )
+	ROM_LOAD( "6.bin", 0x60000, 0x20000, CRC(099beac7) SHA1(8712db4465f9318f20977733daf70150ca40ec09) )
+	ROM_LOAD( "gt5.5", 0x80000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
+
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
+	ROM_LOAD( "gt11.11", 0x00000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
+	ROM_LOAD( "gt4.4", 0x00000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 ROM_START( prehisleu )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) ) /* red "U" stamped on printed label */
-	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) ) /* red "U" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) ) // red "U" stamped on printed label
+	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) ) // red "U" stamped on printed label
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
@@ -286,19 +318,19 @@ ROM_START( prehisleu )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
-	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 ROM_START( prehislek )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gt-k2.2h", 0x00000, 0x20000, CRC(f2d3544d) SHA1(28d41a81ac12ef951610ba0aa70945c069d69d75) ) /* red "K" stamped on printed label */
-	ROM_LOAD16_BYTE( "gt-k3.3h", 0x00001, 0x20000, CRC(ebf7439b) SHA1(76fcad47bc8ae371ecf265fd378e2c4856d39c7f) ) /* red "K" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-k2.2h", 0x00000, 0x20000, CRC(f2d3544d) SHA1(28d41a81ac12ef951610ba0aa70945c069d69d75) ) // red "K" stamped on printed label
+	ROM_LOAD16_BYTE( "gt-k3.3h", 0x00001, 0x20000, CRC(ebf7439b) SHA1(76fcad47bc8ae371ecf265fd378e2c4856d39c7f) ) // red "K" stamped on printed label
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
@@ -314,19 +346,19 @@ ROM_START( prehislek )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
-	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 ROM_START( gensitou )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gt-j2.2h", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) ) /* red "J" stamped on printed label */
-	ROM_LOAD16_BYTE( "gt-j3.3h", 0x00001, 0x20000, CRC(c1a0ae8e) SHA1(2c9643abfd71edf8612e63d69cea4fbc19aad19d) ) /* red "J" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-j2.2h", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) ) // red "J" stamped on printed label
+	ROM_LOAD16_BYTE( "gt-j3.3h", 0x00001, 0x20000, CRC(c1a0ae8e) SHA1(2c9643abfd71edf8612e63d69cea4fbc19aad19d) ) // red "J" stamped on printed label
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
@@ -342,10 +374,10 @@ ROM_START( gensitou )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
-	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
@@ -357,7 +389,7 @@ ROM_START( prehisleb )
 	ROM_LOAD16_BYTE( "u_j2.bin", 0x20000, 0x10000, CRC(7b12501d) SHA1(678d32f70d86807449ffe617c7c6e257d308d8af) )
 	ROM_LOAD16_BYTE( "u_j3.bin", 0x20001, 0x10000, CRC(2a86f7c4) SHA1(5bca393f6edfcd41e1803ea1062497752fd400a9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "u_e12.bin", 0x00000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
@@ -387,10 +419,10 @@ ROM_START( prehisleb )
 	ROM_LOAD( "u_j12.bin" ,0x80000, 0x10000, CRC(5ba5bbed) SHA1(6af3503e0277a926815afb973d67c4ad7a0427d1) )
 	ROM_LOAD( "u_j13.bin", 0x90000, 0x10000, CRC(007dee47) SHA1(e45ce52a471783864cc2704b3b0462c32ddf7e52) ) // modified by bootleggers
 
-	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    // Background tilemaps
 	ROM_LOAD( "l_a6.bin",  0x00000, 0x10000, CRC(e2b9a44b) SHA1(4a1be44c19a724727218bbdc120bafbbe095747a) ) // modified by bootleggers
 
-	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x20000, "upd", 0 ) // ADPCM samples
 	ROM_LOAD( "u_f14.bin", 0x00000, 0x10000, CRC(2fb32933) SHA1(2cea86dfe9a6a0b2de34c3c952c625ad30a7ebea) )
 	ROM_LOAD( "u_j14.bin", 0x10000, 0x10000, CRC(32d5f7c9) SHA1(23abc82f83296c62320a047b9f63032a7f07bf6d) )
 ROM_END
@@ -398,7 +430,8 @@ ROM_END
 /******************************************************************************/
 
 //原始島(Shared Title GFX for Japan and Korea set, JP: げんしとう-Genshitō; KR: 원시도-Wonsido)/Prehistoric Isle in 1930(English)
-GAME( 1989, prehisle,  0,        prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisle,  0,        prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World, set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehislea, 0,        prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World, set 2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1989, prehisleu, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1989, prehislek, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK (Victor license)", "Wonsido 1930's (Korea)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gensitou,  prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Genshitou 1930's",                          MACHINE_SUPPORTS_SAVE )
