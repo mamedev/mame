@@ -136,7 +136,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 								}
 								else
 								{
-									file_path = file_directory + "/" + file;
+									file_path = file_directory + PATH_SEPARATOR + file;
 								}
 
 								// check for .png extension
