@@ -1339,6 +1339,7 @@ ROM_START( borntofi )
 	ROMX_LOAD( "63.bin",  0x1b0000, 0x10000, CRC(5f530559) SHA1(d1d3edc2082985ccec9fe8ca0b27810623cb5b89), ROM_SKIP(2) )
 ROM_END
 
+// Date "15/3/89" handwritten on sound program label, date "3/4/89" handwritten on main program label
 ROM_START( borntofiv )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // V20
 	ROM_LOAD( "3.3", 0x10000, 0x10000, CRC(b81cea79) SHA1(1c274c67e2390c854c13b15e8c6f436b9d3dcec5) )
@@ -1487,10 +1488,10 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??,  borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",                  "Born To Fight",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989?, borntofiv, borntofi, borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games (Vifico license)", "Born To Fight (Vifico license)",  MACHINE_SUPPORTS_SAVE ) // Date from sound program handwritten sticker
-GAME( 19??,  fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",             "Fantasy Land (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 19??,  fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",             "Fantasy Land (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 19??,  wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",                  "Wheels Runner",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989,  galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",             "Galaxy Gunners",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990,  galaxygnh, galaxygn, galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",             "Galaxy Gunners (1990 year hack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",                  "Born To Fight",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, borntofiv, borntofi, borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games (Vifico license)", "Born To Fight (Vifico license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",             "Fantasy Land (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",             "Fantasy Land (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",                  "Wheels Runner",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",             "Galaxy Gunners",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galaxygnh, galaxygn, galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",             "Galaxy Gunners (1990 year hack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
