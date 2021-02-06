@@ -2918,17 +2918,22 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const 
 	if (renderselect < 0)
 		return;
 
-	memset(wbuffer, 0x00, sizeof(wbuffer));
+	if (!machine().video().skip_this_frame()) // technically not safe as the framebuffer can be read back
+	{
+		memset(wbuffer, 0x00, sizeof(wbuffer));
 
-	dc_state *state = machine().driver_data<dc_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	uint32_t c=space.read_dword(0x05000000+((isp_backgnd_t & 0xfffff8)>>1)+(3+3)*4);
-	bitmap.fill(c, cliprect);
+		dc_state* state = machine().driver_data<dc_state>();
+		address_space& space = state->m_maincpu->space(AS_PROGRAM);
+		uint32_t c = space.read_dword(0x05000000 + ((isp_backgnd_t & 0xfffff8) >> 1) + (3 + 3) * 4);
 
-	// TODO: modifier volumes
-	render_group_to_accumulation_buffer<DISPLAY_LIST_OPAQUE>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_TRANS>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, cliprect);
+
+		bitmap.fill(c, cliprect);
+
+		// TODO: modifier volumes
+		render_group_to_accumulation_buffer<DISPLAY_LIST_OPAQUE>(bitmap, cliprect);
+		render_group_to_accumulation_buffer<DISPLAY_LIST_TRANS>(bitmap, cliprect);
+		render_group_to_accumulation_buffer<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, cliprect);
+	}
 
 	grab[renderselect].busy=0;
 }
