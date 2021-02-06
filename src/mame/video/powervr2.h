@@ -513,7 +513,7 @@ private:
 									float const offl[4], float const offr[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+		inline void render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
 								float y0, float y1,
 								float xl, float xr,
 								float ul, float ur,
@@ -529,12 +529,12 @@ private:
 								float const doldy[4], float const dordy[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti,
+		inline void render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
 										const vert *v0,
 										const vert *v1, const vert *v2);
 
 	template <int group_no>
-		void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
+		void render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti, const vert *v);
 
 	template <int group_no>
 		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
