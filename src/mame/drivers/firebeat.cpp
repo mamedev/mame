@@ -773,7 +773,8 @@ void firebeat_state::extend_board_irq_w(offs_t offset, uint8_t data)
 
 uint8_t firebeat_state::input_r(offs_t offset)
 {
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: return (m_io_inputs[0]->read() & 0xff);
 		case 1: return (m_io_inputs[1]->read() & 0xff);
 		case 2: return (m_io_inputs[2]->read() & 0xff);
@@ -872,9 +873,9 @@ static void comm_uart_irq_callback(running_machine &machine, int channel, int va
 
 void firebeat_state::init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3)
 {
-	if(out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
-	if(out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
-	if(out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
+	if (out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
+	if (out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
+	if (out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
@@ -1161,9 +1162,12 @@ TIMER_CALLBACK_MEMBER(firebeat_spu_state::spu_dma_callback)
 		m_spu_ata_dma++;
 	}
 
-	if (m_spu_ata_dmarq) {
+	if (m_spu_ata_dmarq)
+	{
 		m_dma_timer->adjust(next_dma_timing);
-	} else {
+	}
+	else
+	{
 		m_spuata->write_dmack(CLEAR_LINE);
 		m_dma_timer->enable(false);
 	}
@@ -1260,7 +1264,8 @@ uint32_t firebeat_bm3_state::spectrum_analyzer_r(offs_t offset)
 
 uint16_t firebeat_bm3_state::sensor_r(offs_t offset)
 {
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: return m_io[0]->read() | 0x0100;
 		case 1: return m_io[1]->read() | 0x0100;
 		case 2: return m_io[2]->read() | 0x0100;
@@ -1297,31 +1302,31 @@ WRITE_LINE_MEMBER(firebeat_bm3_state::bm3_vblank)
 {
 	// Patch out FDD errors since the game otherwise runs fine without it
 	// and the FDD might not be implemented for a while
-	if(strcmp(machine().system().name, "bm3") == 0)
+	if (strcmp(machine().system().name, "bm3") == 0)
 	{
 		if (m_work_ram[0x918C / 4] == 0x4809202D) m_work_ram[0x918C / 4] = 0x38600000;
 		if (m_work_ram[0x3380C / 4] == 0x4BFFFD99) m_work_ram[0x3380C / 4] = 0x38600000;
 		if (m_work_ram[0x33834 / 4] == 0x4BFFFD71) m_work_ram[0x33834 / 4] = 0x38600000;
 	}
-	else if(strcmp(machine().system().name, "bm3core") == 0)
+	else if (strcmp(machine().system().name, "bm3core") == 0)
 	{
 		if (m_work_ram[0x91E4 / 4] == 0x480A19F5) m_work_ram[0x91E4 / 4] = 0x38600000;
 		if (m_work_ram[0x37BB0 / 4] == 0x4BFFFD71) m_work_ram[0x37BB0 / 4] = 0x38600000;
 		if (m_work_ram[0x37BD8 / 4] == 0x4BFFFD49) m_work_ram[0x37BD8 / 4] = 0x38600000;
 	}
-	else if(strcmp(machine().system().name, "bm36th") == 0)
+	else if (strcmp(machine().system().name, "bm36th") == 0)
 	{
 		if (m_work_ram[0x91E4 / 4] == 0x480BC8BD) m_work_ram[0x91E4 / 4] = 0x38600000;
 		if (m_work_ram[0x451D8 / 4] == 0x4BFFFD75) m_work_ram[0x451D8 / 4] = 0x38600000;
 		if (m_work_ram[0x45200 / 4] == 0x4BFFFD4D) m_work_ram[0x45200 / 4] = 0x38600000;
 	}
-	else if(strcmp(machine().system().name, "bm37th") == 0)
+	else if (strcmp(machine().system().name, "bm37th") == 0)
 	{
 		if (m_work_ram[0x91E4 / 4] == 0x480CF62D) m_work_ram[0x91E4 / 4] = 0x38600000;
 		if (m_work_ram[0x46A58 / 4] == 0x4BFFFD45) m_work_ram[0x46A58 / 4] = 0x38600000;
 		if (m_work_ram[0x46AB8 / 4] == 0x4BFFFCE5) m_work_ram[0x46AB8 / 4] = 0x38600000;
 	}
-	else if(strcmp(machine().system().name, "bm3final") == 0)
+	else if (strcmp(machine().system().name, "bm3final") == 0)
 	{
 		if (m_work_ram[0x47F8 / 4] == 0x480CEF91) m_work_ram[0x47F8 / 4] = 0x38600000;
 		if (m_work_ram[0x3FAF4 / 4] == 0x4BFFFD59) m_work_ram[0x3FAF4 / 4] = 0x38600000;
@@ -1401,7 +1406,8 @@ void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
 
 uint16_t firebeat_ppp_state::sensor_r(offs_t offset)
 {
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: return m_io_sensors[0]->read() | 0x0100;
 		case 1: return m_io_sensors[1]->read() | 0x0100;
 		case 2: return m_io_sensors[2]->read() | 0x0100;
@@ -1609,7 +1615,8 @@ void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
 
 uint8_t firebeat_kbm_state::keyboard_wheel_r(offs_t offset)
 {
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: return m_io_wheels[0]->read(); // Keyboard Wheel (P1)
 		case 8: return m_io_wheels[1]->read(); // Keyboard Wheel (P2)
 	}
