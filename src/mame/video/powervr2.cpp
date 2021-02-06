@@ -998,6 +998,12 @@ void powervr2_device::startrender_w(address_space& space, uint32_t data)
 	}
 
 	m_render_request = osd_work_item_queue(m_work_queue, blit_request_callback, (void*)this, 0);
+
+	dc_state *state = machine().driver_data<dc_state>();
+
+	// hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
+	int sanitycount = 1500;
+    endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 2000000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 }
 
 void *powervr2_device::blit_request_callback(void *param, int threadid)
@@ -1015,7 +1021,7 @@ void *powervr2_device::blit_request_callback(void *param, int threadid)
 
 void powervr2_device::startrender_real_w(address_space &space)
 {
-	dc_state *state = machine().driver_data<dc_state>();
+//	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
 #if DEBUG_PVRTA
 	logerror("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
@@ -1087,7 +1093,6 @@ void powervr2_device::startrender_real_w(address_space &space)
 			}
 //          printf("ISP START %d %d\n",sanitycount,screen().vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 			break;
 		}
 	}
