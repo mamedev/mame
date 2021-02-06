@@ -55,6 +55,8 @@ ToDo:
 #include "atari_s1.lh"
 
 
+namespace {
+
 #define MASTER_CLK XTAL(4'000'000) / 4
 #define DMA_CLK MASTER_CLK / 2
 #define AUDIO_CLK DMA_CLK / 4
@@ -77,6 +79,10 @@ public:
 	void midearth(machine_config &config);
 	void atari_s1(machine_config &config);
 	void atarians(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 
 private:
 	uint8_t m1080_r();
@@ -109,8 +115,6 @@ private:
 	uint8_t m_out_offs;
 	uint8_t m_t_c;
 	uint8_t *m_p_prom;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<dac_4bit_r2r_device> m_dac;
@@ -447,6 +451,8 @@ void atari_s1_state::machine_reset()
 	m_dac->set_output_gain(0, 0);
 	m_t_c = 0;
 	m_audiores = 0;
+	m_bit6 = 0;
+	m_out_offs = 0;
 }
 
 void atari_s1_state::atari_s1(machine_config &config)
@@ -550,6 +556,8 @@ ROM_START(spcrider)
 	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
