@@ -31,17 +31,17 @@ void tc0090lvc_device::vram_w(offs_t offset, u8 data)
 	if (offset >= 0x8000 && offset < 0x9000) // 0x8000-0x9000 bg 0
 	{
 		offset -= 0x8000;
-		bg_tilemap[0]->mark_tile_dirty(offset/2);
+		m_bg_tilemap[0]->mark_tile_dirty(offset/2);
 	}
 	else if (offset >= 0x9000 && offset < 0xa000) // 0x9000-0xa000 bg 1
 	{
 		offset -= 0x9000;
-		bg_tilemap[1]->mark_tile_dirty(offset/2);
+		m_bg_tilemap[1]->mark_tile_dirty(offset/2);
 	}
 	else if (offset >= 0xa000 && offset < 0xb000) // 0xa000-0xb000 text
 	{
 		offset -= 0xa000;
-		tx_tilemap->mark_tile_dirty(offset/2);
+		m_tx_tilemap->mark_tile_dirty(offset/2);
 	}
 	// 0xb000-0xb3ff sprites
 }
@@ -50,17 +50,11 @@ void tc0090lvc_device::vregs_w(offs_t offset, u8 data)
 {
 	if ((offset & 0xfc) == 0)
 	{
-		bg_tilemap[0]->mark_all_dirty();
-		bg_tilemap[1]->mark_all_dirty();
+		m_bg_tilemap[0]->mark_all_dirty();
+		m_bg_tilemap[1]->mark_all_dirty();
 	}
 
 	m_vregs[offset] = data;
-}
-
-void tc0090lvc_device::ram_bank_w(offs_t offset, u8 data)
-{
-	m_ram_bank[offset] = data;
-	m_bankdev[offset]->set_bank(m_ram_bank[offset]);
 }
 
 static const gfx_layout layout_8x8 =
@@ -100,15 +94,12 @@ void tc0090lvc_device::cpu_map(address_map &map)
 	// 0x8000-0xbfff External mappable area
 
 	// 0xc000-0xfdff RAM banks (Connected in VRAMs, 4KB boundary)
-	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xdfff).m(m_bankdev[1], FUNC(address_map_bank_device::amap8));
-	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
-	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xfdff).rw(FUNC(tc0090lvc_device::banked_vram_r), FUNC(tc0090lvc_device::banked_vram_w));
 
 	// 0xfe00-0xffff Internal functions
 }
 
-void tc0090lvc_device::banked_map(address_map &map)
+void tc0090lvc_device::vram_map(address_map &map)
 {
 	map(0x010000, 0x01ffff).readonly().share("vram");
 	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
@@ -124,14 +115,16 @@ tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, const char *ta
 }
 
 tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
+	: z80_device(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
+	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tc0090lvc_device::cpu_map), this))
+	, m_vram_space_config("vram_space", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(tc0090lvc_device::vram_map), this))
+	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0) // TODO: IO space exists like original Z80?
 	, m_tilemap_xoffs(0)
 	, m_tilemap_yoffs(0)
 	, m_tilemap_flipped_xoffs(0)
 	, m_tilemap_flipped_yoffs(0)
 	, m_irq_enable(0)
-	, m_bankdev(*this, "bankdev_%u", 0U)
 	, m_vram(*this, "vram")
 	, m_bitmap_ram(*this, "bitmap_ram")
 	, m_rom(*this, DEVICE_SELF)
@@ -142,6 +135,15 @@ tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, device_type &t
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tc0090lvc_device(mconfig, TC0091LVC, tag, owner, clock)
 {
+}
+
+device_memory_interface::space_config_vector tc0090lvc_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_space_config),
+		std::make_pair(AS_DATA,    &m_vram_space_config),
+		std::make_pair(AS_IO,      &m_io_space_config)
+	};
 }
 
 /*
@@ -197,18 +199,13 @@ TILE_GET_INFO_MEMBER(tc0090lvc_device::get_tx_tile_info)
 
 void tc0090lvc_device::device_add_mconfig(machine_config &config)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		ADDRESS_MAP_BANK(config, m_bankdev[i]).set_map(&tc0090lvc_device::banked_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x1000);
-	}
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 0x100);
 }
 
 
 void tc0090lvc_device::device_post_load()
 {
-	for (int i = 0; i < 4; i++)
-		m_bankdev[i]->set_bank(m_ram_bank[i]);
+	gfx(2)->mark_all_dirty();
 }
 
 
@@ -217,32 +214,34 @@ void tc0090lvc_device::device_start()
 	// rom_r assumes it can make a mask with (m_rom.length() - 1)
 	assert(!(m_rom.length() & (m_rom.length() - 1)));
 
+	z80_device::device_start();
+
+	space(AS_DATA).specific(m_vram_space);
+
 	m_tile_cb.resolve();
 
 	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
 	std::fill(std::begin(m_ram_bank), std::end(m_ram_bank), 0);
-	for (int i = 0; i < 4; i++)
-		m_bankdev[i]->set_bank(m_ram_bank[i]);
 
 	m_vregs = make_unique_clear<u8[]>(0x100);
 	m_sprram_buffer = make_unique_clear<u8[]>(0x400);
 
-	tx_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tx_tile_info)),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	bg_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tile_info<0x8000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tile_info<0x9000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tx_tile_info)),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tile_info<0x8000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0090lvc_device::get_tile_info<0x9000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	tx_tilemap->set_transparent_pen(0);
-	bg_tilemap[0]->set_transparent_pen(0);
-	bg_tilemap[1]->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
 
-	tx_tilemap->set_scrolldx((-8) + m_tilemap_xoffs, (-8) + m_tilemap_flipped_xoffs);
-	bg_tilemap[0]->set_scrolldx(28 + m_tilemap_xoffs, (-11) + m_tilemap_flipped_xoffs);
-	bg_tilemap[1]->set_scrolldx(38 + m_tilemap_xoffs, (-21) + m_tilemap_flipped_xoffs);
+	m_tx_tilemap->set_scrolldx((-8) + m_tilemap_xoffs, (-8) + m_tilemap_flipped_xoffs);
+	m_bg_tilemap[0]->set_scrolldx(28 + m_tilemap_xoffs, (-11) + m_tilemap_flipped_xoffs);
+	m_bg_tilemap[1]->set_scrolldx(38 + m_tilemap_xoffs, (-21) + m_tilemap_flipped_xoffs);
 
-	tx_tilemap->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
-	bg_tilemap[0]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
-	bg_tilemap[1]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
+	m_tx_tilemap->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
+	m_bg_tilemap[0]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
+	m_bg_tilemap[1]->set_scrolldy(m_tilemap_yoffs, m_tilemap_flipped_yoffs);
 
 	save_item(NAME(m_bg_scroll));
 	save_item(NAME(m_irq_vector));
@@ -262,12 +261,11 @@ void tc0090lvc_device::device_reset()
 	m_irq_enable = 0;
 
 	for (int i = 0; i < 4; i++)
-	{
 		m_ram_bank[i] = 0x80;
-		m_bankdev[i]->set_bank(m_ram_bank[i]);
-	}
 
 	m_rom_bank = 0;
+
+	z80_device::device_reset();
 
 	/* video related */
 	m_vregs[0] = m_vregs[1] = m_vregs[2] = m_vregs[3] = m_vregs[4] = 0;
@@ -275,9 +273,9 @@ void tc0090lvc_device::device_reset()
 
 void tc0090lvc_device::mark_all_layer_dirty()
 {
-	tx_tilemap->mark_all_dirty();
-	bg_tilemap[0]->mark_all_dirty();
-	bg_tilemap[1]->mark_all_dirty();
+	m_tx_tilemap->mark_all_dirty();
+	m_bg_tilemap[0]->mark_all_dirty();
+	m_bg_tilemap[1]->mark_all_dirty();
 }
 
 /*
@@ -365,31 +363,32 @@ u32 tc0090lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (global_flip()) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; }
 		int dy = m_bg_scroll[0][2];
 
-		bg_tilemap[0]->set_scrollx(0, -dx);
-		bg_tilemap[0]->set_scrolly(0, -dy);
+		m_bg_tilemap[0]->set_scrollx(0, -dx);
+		m_bg_tilemap[0]->set_scrolly(0, -dy);
 
 		dx = m_bg_scroll[1][0] | (m_bg_scroll[1][1] << 8);
 		if (global_flip()) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; }
 		dy = m_bg_scroll[1][2];
 
-		bg_tilemap[1]->set_scrollx(0, -dx);
-		bg_tilemap[1]->set_scrolly(0, -dy);
+		m_bg_tilemap[1]->set_scrollx(0, -dx);
+		m_bg_tilemap[1]->set_scrolly(0, -dy);
 
 		screen.priority().fill(0, cliprect);
-		bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // TODO: opaque?
-		bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, (bg0_pri()) ? 0 : 1);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // TODO: opaque flag?
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, (bg0_pri()) ? 0 : 1);
 		draw_sprites(screen, bitmap, cliprect);
-		tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }
 
 u32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(palette().black_pen(), cliprect);
-
 	if (!screen_enable())
+	{
+		bitmap.fill(palette().black_pen(), cliprect);
 		return 0;
+	}
 
 	if (bitmap_mode()) // 8bpp bitmap enabled
 	{
@@ -414,21 +413,21 @@ u32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (global_flip()) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; }
 		int dy = m_bg_scroll[0][2];
 
-		bg_tilemap[0]->set_scrollx(0, -dx);
-		bg_tilemap[0]->set_scrolly(0, -dy);
+		m_bg_tilemap[0]->set_scrollx(0, -dx);
+		m_bg_tilemap[0]->set_scrolly(0, -dy);
 
 		dx = m_bg_scroll[1][0] | (m_bg_scroll[1][1] << 8);
 		if (global_flip()) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; }
 		dy = m_bg_scroll[1][2];
 
-		bg_tilemap[1]->set_scrollx(0, -dx);
-		bg_tilemap[1]->set_scrolly(0, -dy);
+		m_bg_tilemap[1]->set_scrollx(0, -dx);
+		m_bg_tilemap[1]->set_scrolly(0, -dy);
 
 		screen.priority().fill(0, cliprect);
-		bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0); // not opaque?
-		bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, (bg0_pri()) ? 0 : 1);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // TODO: opaque flag?
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, (bg0_pri()) ? 0 : 1);
 		draw_sprites(screen, bitmap, cliprect);
-		tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }

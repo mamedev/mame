@@ -23,7 +23,7 @@ void horshoes_state::bankg_w(u8 data)
 	{
 		m_horshoes_gfxbank = data;
 
-		m_vdp->mark_all_layer_dirty();
+		m_main_cpu->mark_all_layer_dirty();
 	}
 }
 
@@ -38,6 +38,6 @@ WRITE_LINE_MEMBER(taitol_state::screen_vblank_taitol)
 	// rising edge
 	if (state)
 	{
-		m_vdp->screen_eof();
+		m_main_cpu->screen_eof();
 	}
 }
