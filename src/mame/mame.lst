@@ -38529,6 +38529,7 @@ jak_nick                        //
 jak_sbfc                        //
 
 @source:spg2xx_jakks_sharp.cpp
+jsc_gdg
 jsc_spid
 jsc_thom
 
