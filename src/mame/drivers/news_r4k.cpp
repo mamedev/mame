@@ -100,6 +100,9 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
+// Uncomment to use "accurate" freerun_timer (too slow??)
+// #define USE_ACCURATE_FREERUN
+
 class news_r4k_state : public driver_device
 {
 public:
@@ -185,11 +188,11 @@ protected:
     template <irq4_number Number>
     void irq_w(int state) { generic_irq_w(4, Number, state); }
     void int_check();
-    #ifndef NO_MIPS3
+#ifndef NO_MIPS3
     const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
-    #else
+#else
     const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
-    #endif
+#endif
 
     // Devices
     // MIPS R4400 CPU
@@ -235,7 +238,7 @@ protected:
     const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
 
     // Interrupts and other platform state
-    bool m_int_state[6];
+    bool m_int_state[6] = {false, false, false, false, false, false};
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
     uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
@@ -247,6 +250,7 @@ protected:
 
     // Freerun timer
     uint32_t freerun_timer_val;
+    const int FREERUN_FREQUENCY = 1000000; // one tick per us, see comments in freerun function
     TIMER_CALLBACK_MEMBER(freerun_clock);
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
@@ -324,7 +328,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_fdc->intrq_wr_callback().set(m_dmac, FUNC(dmac3_device::irq<1>));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(dmac3_device::drq<1>));
     */
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
+    FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
@@ -332,36 +336,33 @@ void news_r4k_state::machine_common(machine_config &config)
     m_dmac->out_int_cb().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
     // Create SCSI buses
-	NSCSI_BUS(config, m_scsibus0);
+    NSCSI_BUS(config, m_scsibus0);
     NSCSI_BUS(config, m_scsibus1);
 
     // Create SCSI connectors
-	NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:3", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:3", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:3", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:4", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:5", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:3", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:4", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:5", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
-    // Connect SPIFI3s to the buses 
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config(
-		[this](device_t *device)
-		{
-            // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-		});
-        NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config(
-		[this](device_t *device)
-		{
-            // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-		});
+    // Connect SPIFI3s to the buses
+    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {
+        // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
+    });
+
+    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {
+        // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
+    });
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
@@ -404,10 +405,8 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
 
     // WSC-ESCC1 (CXD8421Q) serial controller
-    map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>),
-                                           FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
-    map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>),
-                                           FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
+    map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
+    map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
     // TODO: FIFO mapping
 
     // Sonic network controller
@@ -471,19 +470,18 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // or if I am just not smart enough to figure out the "real" mapping that would make everything just work.
     // At least it is progress :)
     map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
-    map(0x1440003c, 0x1440003f).lw32(
-        NAME([this](offs_t offset, uint32_t data) {
-            if (data == 0x10001)
-            {
-                LOG("Enabling map shift!\n");
-                map_shift = true;
-            }
-            else
-            {
-                LOG("Disabling map shift!\n");
-                map_shift = false;
-            }
-        }));
+    map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
+        if (data == 0x10001)
+        {
+            LOG("Enabling map shift!\n");
+            map_shift = true;
+        }
+        else
+        {
+            LOG("Disabling map shift!\n");
+            map_shift = false;
+        }
+    }));
     // I have suspicions about addresses near these playing into the memory configuration
     //map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
 
@@ -500,8 +498,8 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
 
-    map(0x1e980000, 0x1e9fffff).ram();   // is this mirrored?
-    map(0x1fe00000, 0x1fffffff).ram();   // determine mirror of this RAM - it is smaller than this size
+    map(0x1e980000, 0x1e9fffff).ram();                                // is this mirrored?
+    map(0x1fe00000, 0x1fffffff).ram();                                // determine mirror of this RAM - it is smaller than this size
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
@@ -544,16 +542,15 @@ void news_r4k_state::machine_start()
     save_item(NAME(m_int_state));
 
     // Allocate freerunning clock (disabled for now)
-    //m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+    m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
 
 void news_r4k_state::machine_reset()
 {
-    // TODO: what is the actual frequency of the freerunning clock?
     freerun_timer_val = 0;
-    //m_freerun_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // tick disabled for now
+    m_freerun_timer->adjust(attotime::zero, 0, attotime::from_hz(FREERUN_FREQUENCY));
 }
 
 void news_r4k_state::init_common()
@@ -578,7 +575,7 @@ uint64_t news_r4k_state::front_panel_r(offs_t offset)
 
 void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
-    if(m_led[offset] != data)
+    if (m_led[offset] != data)
     {
         LOG(LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
         m_led[offset] = data;
@@ -629,14 +626,14 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
-    // Need to determine the actual frequency, and find a good way to implement this.
-    // With an unscientific method, I calculated the timer value to increment roughly once per us
-    // NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-    // The timer callback seemed to be too slow (although I could easily be doing something wrong)
-    // Also WAY too slow to use: machine().scheduler().time().as_ticks(1000000);
-    // The below is a fast version that has even less basis in reality, but sorta kind ""works""?
-    return machine().scheduler().time().as_ticks(1000000) << 10;
-    //return freerun_timer_val;
+// With an unscientific method, I calculated the timer value to increment roughly once per us
+// NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
+// The timer callback seemed to be too slow (although I could easily be doing something wrong)
+#ifdef USE_ACCURATE_FREERUN
+    return freerun_timer_val;
+#else
+    return freerun_timer_val << 10;
+#endif
 }
 
 void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
@@ -749,43 +746,43 @@ void news_r4k_state::itimer(void *ptr, s32 param)
  * 8. No Memory Mode - If set, do not use the main memory (limits system to 128KiB)
  */
 static INPUT_PORTS_START(nws5000)
-    PORT_START("FRONT_PANEL")
-    PORT_DIPNAME(0x01, 0x00, "Console") PORT_DIPLOCATION("FRONT_PANEL:1")
-        PORT_DIPSETTING(0x00, "Serial Terminal")
-        PORT_DIPSETTING(0x01, "Bitmap")
-    PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
-        PORT_DIPSETTING(0x00, "Enable built-in bitmap")
-        PORT_DIPSETTING(0x02, "Disable built-in bitmap")
-    PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
-        PORT_DIPSETTING(0x00, "Disable Abort/Resume")
-        PORT_DIPSETTING(0x04, "Enable Abort/Resume")
-    PORT_DIPNAME(0x08, 0x00, "Clear NVRAM") PORT_DIPLOCATION("FRONT_PANEL:4")
-        PORT_DIPSETTING(0x00, "Do not clear")
-        PORT_DIPSETTING(0x08, "Clear NVRAM")
-    PORT_DIPNAME(0x10, 0x00, "Auto Boot") PORT_DIPLOCATION("FRONT_PANEL:5")
-        PORT_DIPSETTING(0x00, "Auto Boot Disable")
-        PORT_DIPSETTING(0x10, "Auto Boot Enable")
-    PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
-        PORT_DIPSETTING(0x00, "No Diagnostic Test")
-        PORT_DIPSETTING(0x20, "Run Diagnostic Test")
-    PORT_DIPNAME(0x40, 0x00, "External APSlot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
-        PORT_DIPSETTING(0x00, "Enable External APSlot Probe")
-        PORT_DIPSETTING(0x40, "Disable External APSlot Probe")
-    PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
-        PORT_DIPSETTING(0x00, "Main Memory Enabled")
-        PORT_DIPSETTING(0x80, "Main Memory Disabled");
+PORT_START("FRONT_PANEL")
+PORT_DIPNAME(0x01, 0x00, "Console") PORT_DIPLOCATION("FRONT_PANEL:1")
+PORT_DIPSETTING(0x00, "Serial Terminal")
+PORT_DIPSETTING(0x01, "Bitmap")
+PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
+PORT_DIPSETTING(0x00, "Enable built-in bitmap")
+PORT_DIPSETTING(0x02, "Disable built-in bitmap")
+PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
+PORT_DIPSETTING(0x00, "Disable Abort/Resume")
+PORT_DIPSETTING(0x04, "Enable Abort/Resume")
+PORT_DIPNAME(0x08, 0x00, "Clear NVRAM") PORT_DIPLOCATION("FRONT_PANEL:4")
+PORT_DIPSETTING(0x00, "Do not clear")
+PORT_DIPSETTING(0x08, "Clear NVRAM")
+PORT_DIPNAME(0x10, 0x00, "Auto Boot") PORT_DIPLOCATION("FRONT_PANEL:5")
+PORT_DIPSETTING(0x00, "Auto Boot Disable")
+PORT_DIPSETTING(0x10, "Auto Boot Enable")
+PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
+PORT_DIPSETTING(0x00, "No Diagnostic Test")
+PORT_DIPSETTING(0x20, "Run Diagnostic Test")
+PORT_DIPNAME(0x40, 0x00, "External APSlot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
+PORT_DIPSETTING(0x00, "Enable External APSlot Probe")
+PORT_DIPSETTING(0x40, "Disable External APSlot Probe")
+PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
+PORT_DIPSETTING(0x00, "Main Memory Enabled")
+PORT_DIPSETTING(0x80, "Main Memory Disabled");
 INPUT_PORTS_END
 
 // ROM definitions
 ROM_START(nws5000x)
-    ROM_REGION64_BE(0x40000, "mrom", 0)
-    ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-    ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+ROM_REGION64_BE(0x40000, "mrom", 0)
+ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
+ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-    ROM_REGION64_BE(0x400, "idrom", 0)
-    ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+ROM_REGION64_BE(0x400, "idrom", 0)
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 ROM_END
 
 // Machine definitions
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
