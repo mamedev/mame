@@ -629,6 +629,7 @@ private:
 	void adb_post_response(const u8 *bytes, size_t length);
 	void adb_post_response_1(u8 b);
 	void adb_post_response_2(u8 b1, u8 b2);
+	void adb_post_response_3(u8 b1, u8 b2, u8 b3);
 	void adb_do_command();
 	void adb_write_datareg(u8 data);
 	void adb_write_kmstatus(u8 data);
@@ -965,6 +966,15 @@ void apple2gs_state::adb_post_response_2(u8 b1, u8 b2)
 	adb_post_response(b, 2);
 }
 
+void apple2gs_state::adb_post_response_3(u8 b1, u8 b2, u8 b3)
+{
+	u8 b[3];
+	b[0] = b1;
+	b[1] = b2;
+	b[2] = b3;
+	adb_post_response(b, 3);
+}
+
 void apple2gs_state::adb_do_command()
 {
 	int device;
@@ -978,6 +988,12 @@ void apple2gs_state::adb_do_command()
 	switch(m_adb_command)
 	{
 		case 0x00:  /* ??? */
+			break;
+
+		case 0x01: /* abort */
+			break;
+
+		case 0x02: /* reset keyboard uC */
 			break;
 
 		case 0x03:  /* flush keyboard buffer */
@@ -1011,12 +1027,20 @@ void apple2gs_state::adb_do_command()
 			adb_post_response_1(adb_read_memory(address));
 			break;
 
-		case 0x0a: /* ??? */
-		case 0x0b: /* ??? */
+		case 0x0a: /* read modes */
+			adb_post_response_1(m_adb_mode);
+			break;
+
+		case 0x0b: /* read config */
+			adb_post_response_3(0, 0, 0); /* ignored for now */
+			break;
+
+		case 0x0c: /* read adb error */
+			adb_post_response_1(0);
 			break;
 
 		case 0x0d:  /* get version */
-			adb_post_response_1(0x06);
+			adb_post_response_1(m_is_rom3 ? 0x06 : 0x05); /* rom0 0x04 */
 			break;
 
 		case 0x0e:  /* read available charsets */
@@ -1027,9 +1051,24 @@ void apple2gs_state::adb_do_command()
 			adb_post_response_2(0x01, 0x00);
 			break;
 
-		case 0x12:  /* mystery command 0x12 */
-		case 0x13:  /* mystery command 0x13 */
+		case 0x10: /* reset system */
 			break;
+
+		case 0x11: /* send adb keycode */
+			break;
+
+		case 0x12:  /* mystery command 0x12 - mouse key parameters */
+		case 0x13:  /* mystery command 0x13 - disk key parameters */
+			break;
+
+		case 0x40: /* reset adb */
+			break;
+
+		case 0x49: case 0x4a: case 0x4b: case 0x4c:
+		case 0x4d: case 0x4e: case 0x4f:
+			/* transmit adb bytes. first byte is adb device command */
+			break;
+
 
 		case 0x84:  // ACS demo disk #2 has a bug and writes this accidentally to $C026
 			break;
@@ -1101,6 +1140,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 			{
 				case 0x00:  /* ??? */
 				case 0x01:  /* abort */
+				case 0x02:  /* reset keyboard uC */
 					/* do nothing for now */
 					break;
 
@@ -1129,28 +1169,50 @@ void apple2gs_state::adb_write_datareg(u8 data)
 					m_adb_command_length = 2;
 					break;
 
-				case 0x0a:  /* ??? */
-				case 0x0b:  /* ??? */
-					m_adb_command_length = 0;
-					break;
-
+				case 0x0a:  /* read modes */
+				case 0x0b:  /* read config */
+				case 0x0c:  /* read adb error */
 				case 0x0d:  /* get version */
-					m_adb_command_length = 0;
-					break;
-
 				case 0x0e:  /* read available charsets */
-					m_adb_command_length = 0;
-					m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
-					break;
-
 				case 0x0f:  /* read available layouts */
 					m_adb_command_length = 0;
 					m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
 					break;
 
-				case 0x12:  /* mystery command 0x12 */
-				case 0x13:  /* mystery command 0x13 */
+				case 0x10: /* reset system */
+					/* do nothing for now */
+					break;
+
+				case 0x11: /* send adb keycode */
+					m_adb_command_length = 1;
+					break;
+
+				case 0x12:  /* mystery command 0x12 - mouse key parameters? */
+				case 0x13:  /* mystery command 0x13 - disk eject parameters? */
 					m_adb_command_length = 2;
+					break;
+
+				case 0x40: /* reset ADB */
+					break;
+
+				/* 0x49 - 0x4f - transmit ADB bytes where length = command & 0xf - 6*/
+				case 0x49: case 0x4a: case 0x4b: case 0x4c:
+				case 0x4d: case 0x4e: case 0x4f:
+					m_adb_command_length = (m_adb_command & 0x0f) - 6;
+					break;
+
+				case 0x50:  /* enable SRQ device 0 */
+				case 0x51:  /* enable SRQ device 1 */
+				case 0x52:  /* enable SRQ device 2 */
+				case 0x53:  /* enable SRQ device 3 */
+					/* ignore for now */
+					break;
+
+				case 0x60:  /* flush adb buffer device 0 */
+				case 0x61:  /* flush adb buffer device 1 */
+				case 0x62:  /* flush adb buffer device 2 */
+				case 0x63:  /* flush adb buffer device 3 */
+					/* ignore for now */
 					break;
 
 				case 0x70:  /* disable SRQ device 0 */
