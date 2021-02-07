@@ -2281,6 +2281,14 @@ void seattle_state::hyprdriv(machine_config &config)
  *************************************/
 
 ROM_START( wg3dh )
+	/* ------------------------ ROM Sticker
+	| 2 | GRETZKY VIDEO    | Vertical: revision (L1.2)
+	| . |                  |
+	| 1 | SYSTEM BOOT U32  |
+	| L | (c) 1996 ATARI   |
+	------------------------ 
+	*/
+
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.2 (10/8/96)
 	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
 
@@ -2291,6 +2299,33 @@ ROM_START( wg3dh )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+ROM_END
+
+ROM_START( wg3dha )
+	/* ------------------------ Boot ROM Sticker
+	   | 1 | GRETZKY VIDEO    | Vertical: revision (L0.1)
+	   | . |                  |
+	   | 0 | SYSTEM BOOT U32  |
+	   | L | (c) 1995 ATARI   |
+	   ------------------------
+	*/
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L0.1 (8/13/96)
+	ROM_LOAD( "wg3dh_01.u32", 0x000000, 0x80000, CRC(80fb6dfd) SHA1(b78d1c8abdb875196c5cd9afc986f54865a90aba) )
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Dev Version (Guts 2/4/97, Main 3/21/97)
+	DISK_IMAGE( "wg3dh_dev", 0, SHA1(49b72e7e76036b119bfc8b9a0ef8b9acd346d0be) )
+
+	/* ------------------------ Soudn ROM Sticker
+	   | 1 | GRETZKY VIDEO    | Vertical: revision (L0.1)
+	   | . |                  |
+	   | 0 | SOUND BOOT U95   |
+	   | L | (c) 1995 ATARI   |
+	   ------------------------
+	*/
+	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
+	ROM_LOAD16_BYTE( "soundl01.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
@@ -2825,7 +2860,8 @@ void seattle_state::init_hyprdriv()
  *************************************/
 
 // Atari
-GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey (ver 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey (ver 1.3, boot rom L1.2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, wg3dha,     wg3dh,    wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey (dev version, boot rom L0.1)", MACHINE_SUPPORTS_SAVE )
 GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
