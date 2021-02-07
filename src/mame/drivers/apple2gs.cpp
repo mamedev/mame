@@ -726,7 +726,7 @@ private:
 		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
-		m_maincpu->adjust_icount(-cycles); \
+		if(0) m_maincpu->adjust_icount(-cycles);	\
 	} \
 }
 
