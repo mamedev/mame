@@ -85,6 +85,10 @@ ROM_START( jsc_dora )
 	ROM_LOAD16_WORD_SWAP( "shckdora.bin", 0x000000, 0x200000, CRC(4a973046) SHA1(13b38b5db23169731ebf1a4657d95e34fc88b9b8) )
 ROM_END
 
+ROM_START( jsc_sdoo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "shckscooby.bin", 0x000000, 0x200000, CRC(ce7039a4) SHA1(d5815149b75262253d03fac946b10c43e96945c0) )
+ROM_END
 
 
 // has UK specific voice actors, US versions on YouTube have different voices not present in this set
@@ -97,6 +101,4 @@ CONS( 2007, jsc_gdg,  0, 0, base_config_pal,     jak_sharp,      jakks_sharp_sta
 
 CONS( 2007, jsc_dora, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Handheld Games",        "Dora the Explorer - Dora Saves the Mermaids (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Scooby-Doo! - The Pirate's Puzzles
-// 
-// 
+CONS( 2007, jsc_sdoo, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Handheld Games",        "Scooby-Doo! and The Pirate's Puzzles (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
