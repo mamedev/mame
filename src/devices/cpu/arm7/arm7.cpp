@@ -30,6 +30,8 @@ TODO:
 
 *****************************************************************************/
 #include "emu.h"
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "arm7.h"
 #include "arm7core.h"   //include arm7 core
@@ -41,11 +43,13 @@ TODO:
 #define LOG_COPRO_WRITES    (1 << 3)
 #define LOG_COPRO_UNKNOWN   (1 << 4)
 #define LOG_COPRO_RESERVED  (1 << 5)
+#define LOG_TLB             (1 << 6)
 
-#define VERBOSE             (0) //(LOG_MMU | LOG_COPRO_READS | LOG_COPRO_WRITES)
+#define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"
 
 #define PRINT_HAPYFSH2      (0)
+#define PRINT_CE_KERNEL     (0)
 
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
@@ -100,8 +104,11 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 
 	memset(m_insn_prefetch_buffer, 0, sizeof(uint32_t) * 3);
 	memset(m_insn_prefetch_address, 0, sizeof(uint32_t) * 3);
+	memset(m_insn_prefetch_valid, 0, sizeof(bool) * 3);
 	m_insn_prefetch_count = 0;
 	m_insn_prefetch_index = 0;
+	m_tlb_log = 0;
+	m_actual_log = 0;
 }
 
 
@@ -272,7 +279,7 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
 			   | ARM9_COPRO_ID_ARCH_V4
 			   | ARM9_COPRO_ID_PART_SA1110
-			   | ARM9_COPRO_ID_STEP_SA1110_A0;
+			   | ARM9_COPRO_ID_STEP_SA1110_B4;
 }
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
@@ -346,7 +353,7 @@ enum
 
 
 // COARSE, desc_level1, vaddr
-uint32_t arm7_cpu_device::arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr )
+uint32_t arm7_cpu_device::get_lvl2_desc_from_page_table( uint32_t granularity, uint32_t first_desc, uint32_t vaddr )
 {
 	uint32_t desc_lvl2 = vaddr;
 
@@ -354,9 +361,13 @@ uint32_t arm7_cpu_device::arm7_tlb_get_second_level_descriptor( uint32_t granula
 	{
 		case TLB_COARSE:
 			desc_lvl2 = (first_desc & COPRO_TLB_CFLD_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_CSLTI_MASK) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT);
+			if (m_tlb_log)
+				LOGMASKED(LOG_TLB, "%s: get_lvl2_desc_from_page_table: coarse descriptor, lvl2 address is %08x\n", machine().describe_context(), desc_lvl2);
 			break;
 		case TLB_FINE:
 			desc_lvl2 = (first_desc & COPRO_TLB_FPTB_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_FSLTI_MASK) >> COPRO_TLB_VADDR_FSLTI_MASK_SHIFT);
+			if (m_tlb_log)
+				LOGMASKED(LOG_TLB, "%s: get_lvl2_desc_from_page_table: fine descriptor, lvl2 address is %08x\n", machine().describe_context(), desc_lvl2);
 			break;
 		default:
 			// We shouldn't be here
@@ -443,182 +454,446 @@ int arm7_cpu_device::detect_fault(int desc_lvl1, int ap, int flags)
 	return FAULT_NONE;
 }
 
-
-bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_exception)
+arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, const int flags)
 {
-	if (addr < 0x2000000)
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
+	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
+	const uint32_t start = section << 1;
+	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
+
+	bool entry_found = false;
+
+	for (uint32_t i = 0; i < 2; i++)
 	{
-		addr += m_pid_offset;
+		index = (index + 1) & 1;
+		if (!entries[start + index].valid)
+		{
+			entry_found = true;
+			break;
+		}
 	}
 
-	uint32_t desc_lvl1 = m_program->read_dword(m_tlb_base_mask | ((addr & COPRO_TLB_VADDR_FLTI_MASK) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT));
-
-#if ARM7_MMU_ENABLE_HACK
-	if ((m_r[eR15] == (m_mmu_enable_addr + 4)) || (m_r[eR15] == (m_mmu_enable_addr + 8)))
+	if (!entry_found)
 	{
-		LOGMASKED(LOG_MMU, "ARM7: fetch flat, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
-		return true;
+		index = (index + 1) & 1;
 	}
+
+	if (flags & ARM7_TLB_ABORT_D)
+		m_dtlb_entry_index[section] = index;
 	else
-	{
-		m_mmu_enable_addr = 1;
-	}
-#endif
+		m_itlb_entry_index[section] = index;
 
-	uint8_t tlb_type = desc_lvl1 & 3;
-	if (tlb_type == COPRO_TLB_SECTION_TABLE)
-	{
-		// Entry is a section
-		int fault = detect_fault(desc_lvl1, (desc_lvl1 >> 10) & 3, flags);
-		if (fault == FAULT_NONE)
-		{
-			addr = ( desc_lvl1 & COPRO_TLB_SECTION_PAGE_MASK ) | ( addr & ~COPRO_TLB_SECTION_PAGE_MASK );
-		}
-		else
-		{
-			if (no_exception)
-				return false;
+	return &entries[start + index];
+}
 
-			if (flags & ARM7_TLB_ABORT_D)
+arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_probe(const offs_t vaddr, const int flags)
+{
+	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
+	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
+	const uint32_t start = section << 1;
+	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
+
+	if (m_tlb_log)
+		LOGMASKED(LOG_TLB, "%s: tlb_probe: vaddr %08x, section %02x, start %02x, index %d\n", machine().describe_context(), vaddr, section, start, index);
+
+	for (uint32_t i = 0; i < 2; i++)
+	{
+		uint32_t position = start + index;
+		if (entries[position].valid)
+		{
+			switch (entries[position].type)
 			{
-				uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-				LOGMASKED(LOG_MMU, "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
-				m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
-				m_faultAddress = addr;
-				m_pendingAbtD = true;
-				update_irq_state();
-				LOGMASKED(LOG_MMU, "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
-					addr, desc_lvl1, domain, (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3, (desc_lvl1 >> 10) & 3, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
-					m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0);
+			case COPRO_TLB_TYPE_SECTION:
+				if (entries[position].table_bits == (vaddr & COPRO_TLB_STABLE_MASK))
+					return &entries[position];
+				break;
+			case COPRO_TLB_TYPE_LARGE:
+			case COPRO_TLB_TYPE_SMALL:
+				if (entries[position].table_bits == (vaddr & COPRO_TLB_LSTABLE_MASK))
+					return &entries[position];
+				break;
+			case COPRO_TLB_TYPE_TINY:
+				if (entries[position].table_bits == (vaddr & COPRO_TLB_TTABLE_MASK))
+					return &entries[position];
+				break;
 			}
-			else if (flags & ARM7_TLB_ABORT_P)
-			{
-				LOGMASKED(LOG_MMU, "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
-				m_pendingAbtP = true;
-				update_irq_state();
-			}
-			return false;
 		}
-	}
-	else if (tlb_type == COPRO_TLB_UNMAPPED)
-	{
-		if (no_exception)
-			return false;
-
-		// Unmapped, generate a translation fault
-		if (flags & ARM7_TLB_ABORT_D)
+		if (m_tlb_log)
 		{
-			LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
-			m_faultStatus[0] = (5 << 0); // 5 = section translation fault
-			m_faultAddress = addr;
+			LOGMASKED(LOG_TLB, "%s: tlb_probe: skipped due to mismatch (valid %d, domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
+				machine().describe_context(), entries[position].valid ? 1 : 0, entries[position].domain, entries[position].access,
+				entries[position].table_bits, entries[position].base_addr, entries[position].type);
+		}
+
+		index = (index - 1) & 1;
+	}
+
+	return nullptr;
+}
+
+uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, int flags)
+{
+	const uint8_t domain_bits = m_decoded_access_control[domain];
+	switch (domain_bits)
+	{
+		case COPRO_DOMAIN_NO_ACCESS:
+			if (type == COPRO_TLB_TYPE_SECTION)
+				return (domain << 4) | COPRO_FAULT_DOMAIN_SECTION;
+			return (domain << 4) | COPRO_FAULT_DOMAIN_PAGE;
+		case COPRO_DOMAIN_CLIENT:
+		{
+			const uint32_t mode = GET_CPSR & 0xF;
+			switch (access)
+			{
+				case 0: // Check System/ROM bit
+				{
+					const uint32_t sr = (COPRO_CTRL >> COPRO_CTRL_SYSTEM_SHIFT) & 3;
+					switch (sr)
+					{
+						case 0: // No Access
+							if (type == COPRO_TLB_TYPE_SECTION)
+								return (domain << 4) | COPRO_FAULT_PERM_SECTION;
+							return (domain << 4) | COPRO_FAULT_PERM_PAGE;
+						case 1: // No User Access, Read-Only System Access
+							if (mode == 0 || (flags & ARM7_TLB_WRITE))
+							{
+								if (type == COPRO_TLB_TYPE_SECTION)
+									return (domain << 4) | COPRO_FAULT_PERM_SECTION;
+								return (domain << 4) | COPRO_FAULT_PERM_PAGE;
+							}
+							return COPRO_FAULT_NONE;
+						case 2: // Read-Only Access
+							if (flags & ARM7_TLB_WRITE)
+							{
+								if (type == COPRO_TLB_TYPE_SECTION)
+									return (domain << 4) | COPRO_FAULT_PERM_SECTION;
+								return (domain << 4) | COPRO_FAULT_PERM_PAGE;
+							}
+							return COPRO_FAULT_NONE;
+						case 3: // Unpredictable Access
+							LOGMASKED(LOG_MMU, "%s: get_fault_from_permissions: Unpredictable access permissions (AP bits are 0, SR bits are 3).", machine().describe_context());
+							return COPRO_FAULT_NONE;
+					}
+					return COPRO_FAULT_NONE;
+				}
+				case 1: // No User Access
+					if (mode != 0)
+						return COPRO_FAULT_NONE;
+					if (type == COPRO_TLB_TYPE_SECTION)
+						return (domain << 4) | COPRO_FAULT_PERM_SECTION;
+					return (domain << 4) | COPRO_FAULT_PERM_PAGE;
+				case 2: // Read-Only User Access
+					if (mode != 0 || (flags & ARM7_TLB_READ))
+						return COPRO_FAULT_NONE;
+					if (type == COPRO_TLB_TYPE_SECTION)
+						return (domain << 4) | COPRO_FAULT_PERM_SECTION;
+					return (domain << 4) | COPRO_FAULT_PERM_PAGE;
+				case 3: // Full Access
+					return COPRO_FAULT_NONE;
+			}
+			return COPRO_FAULT_NONE;
+		}
+		case COPRO_DOMAIN_RESV:
+			LOGMASKED(LOG_MMU, "%s: get_fault_from_permissions: Domain type marked as Reserved.\n", machine().describe_context());
+			return COPRO_FAULT_NONE;
+		default:
+			return COPRO_FAULT_NONE;
+	}
+}
+
+uint32_t arm7_cpu_device::tlb_check_permissions(tlb_entry *entry, const int flags)
+{
+	return get_fault_from_permissions(entry->access, entry->domain, entry->type, flags);
+}
+
+offs_t arm7_cpu_device::tlb_translate(tlb_entry *entry, const offs_t vaddr)
+{
+	switch (entry->type)
+	{
+		case COPRO_TLB_TYPE_SECTION:
+			return entry->base_addr | (vaddr & ~COPRO_TLB_SECTION_PAGE_MASK);
+		case COPRO_TLB_TYPE_LARGE:
+			return entry->base_addr | (vaddr & ~COPRO_TLB_LARGE_PAGE_MASK);
+		case COPRO_TLB_TYPE_SMALL:
+			return entry->base_addr | (vaddr & ~COPRO_TLB_SMALL_PAGE_MASK);
+		case COPRO_TLB_TYPE_TINY:
+			return entry->base_addr | (vaddr & ~COPRO_TLB_TINY_PAGE_MASK);
+		default:
+			return 0;
+	}
+}
+
+bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a)
+{
+	const uint8_t domain = (uint8_t)(lvl1 >> 5) & 0xF;
+	uint8_t access = 0;
+	uint32_t table_bits = 0;
+	switch (type)
+	{
+		case COPRO_TLB_TYPE_SECTION:
+			access = (uint8_t)((lvl2 >> 10) & 3);
+			table_bits = vaddr & COPRO_TLB_STABLE_MASK;
+			break;
+		case COPRO_TLB_TYPE_LARGE:
+		{
+			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 13) & 6);
+			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
+			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
+			break;
+		}
+
+		case COPRO_TLB_TYPE_SMALL:
+		{
+			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 9) & 6);
+			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
+			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
+			break;
+		}
+
+		case COPRO_TLB_TYPE_TINY:
+			access = (uint8_t)((lvl2 >> 4) & 3);
+			table_bits = vaddr & COPRO_TLB_TTABLE_MASK;
+			break;
+	}
+
+	const uint32_t access_result = get_fault_from_permissions(access, domain, type, flags);
+	if (access_result != 0)
+	{
+		if (flags & ARM7_TLB_ABORT_P)
+		{
+			LOGMASKED(LOG_MMU, "ARM7: Page walk, Potential prefetch abort, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", vaddr, lvl1a, lvl1, lvl2a, lvl2);
+		}
+		else if (flags & ARM7_TLB_ABORT_D)
+		{
+			LOGMASKED(LOG_MMU, "ARM7: Page walk, Data abort, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", vaddr, lvl1a, lvl1, lvl2a, lvl2);
+			LOGMASKED(LOG_MMU, "access: %d, domain: %d, type: %d\n", access, domain, type);
+			m_faultStatus[0] = access_result;
+			m_faultAddress = vaddr;
 			m_pendingAbtD = true;
 			update_irq_state();
 		}
+		return false;
+	}
+
+	static const uint32_t s_page_masks[4] = { COPRO_TLB_SECTION_PAGE_MASK, COPRO_TLB_LARGE_PAGE_MASK, COPRO_TLB_SMALL_PAGE_MASK, COPRO_TLB_TINY_PAGE_MASK };
+	const uint32_t base_addr = lvl2 & s_page_masks[type];
+	const uint32_t paddr = base_addr | (vaddr & ~s_page_masks[type]);
+
+	if (flags)
+	{
+		tlb_entry *entry = tlb_map_entry(vaddr, flags);
+
+		entry->valid = true;
+		entry->domain = domain;
+		entry->access = access;
+		entry->table_bits = table_bits;
+		entry->base_addr = base_addr;
+		entry->type = type;
+	}
+
+	vaddr = paddr;
+	return true;
+}
+
+bool arm7_cpu_device::page_table_translate(offs_t &vaddr, const int flags)
+{
+	const uint32_t lvl1_addr = m_tlb_base_mask | ((vaddr & COPRO_TLB_VADDR_FLTI_MASK) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT);
+	const uint32_t lvl1_desc = m_program->read_dword(lvl1_addr);
+
+	switch (lvl1_desc & 3)
+	{
+		case 0: // Unmapped
+			if (flags & ARM7_TLB_ABORT_D)
+			{
+				LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (D), PC %08x, lvl1 unmapped, vaddr = %08x, lvl1A = %08x, lvl1D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc);
+				m_faultStatus[0] = COPRO_FAULT_TRANSLATE_SECTION;
+				m_faultAddress = vaddr;
+				m_pendingAbtD = true;
+				update_irq_state();
+			}
+			else if (flags & ARM7_TLB_ABORT_P)
+			{
+				LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (P), PC %08x, lvl1 unmapped, vaddr = %08x, lvl1A = %08x, lvl1D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc);
+			}
+			return false;
+
+		case 1: // Coarse Table
+		{
+			const uint32_t lvl2_addr = (lvl1_desc & COPRO_TLB_CFLD_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_CSLTI_MASK) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT);
+			const uint32_t lvl2_desc = m_program->read_dword(lvl2_addr);
+
+			switch (lvl2_desc & 3)
+			{
+				case 0: // Unmapped
+					if (flags & ARM7_TLB_ABORT_D)
+					{
+						LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (D), coarse lvl2 unmapped, PC %08x, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
+						m_faultStatus[0] = ((lvl1_desc >> 1) & 0xF0) | COPRO_FAULT_TRANSLATE_PAGE;
+						m_faultAddress = vaddr;
+						m_pendingAbtD = true;
+						update_irq_state();
+					}
+					else if (flags & ARM7_TLB_ABORT_P)
+					{
+						LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (P), coarse lvl2 unmapped, PC %08x, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
+					}
+					return false;
+
+				case 1: // Large Page
+					return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_LARGE, lvl1_desc, lvl2_desc, flags, lvl1_addr, lvl2_addr);
+
+				case 2: // Small Page
+					return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_SMALL, lvl1_desc, lvl2_desc, flags, lvl1_addr, lvl2_addr);
+
+				case 3: // Tiny Page (invalid)
+					LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed, tiny page present in coarse lvl2 table, PC %08x, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
+					return false;
+			}
+			return false;
+		}
+
+		case 2: // Section Descriptor
+			return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_SECTION, lvl1_desc, lvl1_desc, flags, lvl1_addr, lvl1_addr);
+
+		case 3: // Fine Table
+		{
+			const uint32_t lvl2_addr = (lvl1_desc & COPRO_TLB_FPTB_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_FSLTI_MASK) >> COPRO_TLB_VADDR_FSLTI_MASK_SHIFT);
+			const uint32_t lvl2_desc = m_program->read_dword(lvl2_addr);
+
+			switch (lvl2_desc & 3)
+			{
+				case 0: // Unmapped
+					if (flags & ARM7_TLB_ABORT_D)
+					{
+						LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (D), fine lvl2 unmapped, PC %08x, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
+						m_faultStatus[0] = ((lvl1_desc >> 1) & 0xF0) | COPRO_FAULT_TRANSLATE_PAGE;
+						m_faultAddress = vaddr;
+						m_pendingAbtD = true;
+						update_irq_state();
+					}
+					else if (flags & ARM7_TLB_ABORT_P)
+					{
+						LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (P), fine lvl2 unmapped, PC %08x, vaddr = %08x, lvl1A = %08x, lvl1D = %08x, lvl2A = %08x, lvl2D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
+					}
+					return false;
+
+				case 1: // Large Page
+					return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_LARGE, lvl1_desc, lvl2_desc, flags, lvl1_addr, lvl2_addr);
+
+				case 2: // Small Page
+					return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_SMALL, lvl1_desc, lvl2_desc, flags, lvl1_addr, lvl2_addr);
+
+				case 3: // Tiny Page
+					return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_TINY, lvl1_desc, lvl2_desc, flags, lvl1_addr, lvl2_addr);
+			}
+			return false;
+		}
+	}
+
+	return false;
+}
+
+bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
+{
+	if (m_tlb_log)
+		LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: vaddr %08x, flags %08x\n", machine().describe_context(), vaddr, flags);
+
+	if (vaddr < 0x2000000)
+	{
+		vaddr += m_pid_offset;
+		if (m_tlb_log)
+			LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: vaddr < 32M, adding PID (%08x) = %08x\n", machine().describe_context(), m_pid_offset, vaddr);
+	}
+
+	tlb_entry *entry = tlb_probe(vaddr, flags);
+
+	if (entry)
+	{
+		if (m_tlb_log)
+		{
+			LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: found entry (domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
+				machine().describe_context(), entry->domain, entry->access, entry->table_bits, entry->base_addr, entry->type);
+		}
+
+		const uint32_t access_result = tlb_check_permissions(entry, flags);
+		if (access_result == 0)
+		{
+			vaddr = tlb_translate(entry, vaddr);
+			return true;
+		}
 		else if (flags & ARM7_TLB_ABORT_P)
 		{
-			LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
-			m_pendingAbtP = true;
+			LOGMASKED(LOG_MMU, "ARM7: TLB, Potential prefetch abort, vaddr = %08x\n", vaddr);
+		}
+		else if (flags & ARM7_TLB_ABORT_D)
+		{
+			LOGMASKED(LOG_MMU, "ARM7: TLB, Data abort, vaddr = %08x\n", vaddr);
+			m_faultStatus[0] = access_result;
+			m_faultAddress = vaddr;
+			m_pendingAbtD = true;
 			update_irq_state();
 		}
 		return false;
 	}
 	else
 	{
-		// Entry is the physical address of a coarse second-level table
-		uint8_t permission = (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3;
-		uint32_t desc_lvl2 = arm7_tlb_get_second_level_descriptor( (desc_lvl1 & 3) == COPRO_TLB_COARSE_TABLE ? TLB_COARSE : TLB_FINE, desc_lvl1, addr );
-		if ((permission != 1) && (permission != 3))
-		{
-			uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-			fatalerror("ARM7: Not Yet Implemented: Coarse Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", addr, domain, m_r[eR15]);
-		}
-
-		switch( desc_lvl2 & 3 )
-		{
-			case COPRO_TLB_UNMAPPED:
-				if (no_exception)
-					return false;
-
-				// Unmapped, generate a translation fault
-				if (flags & ARM7_TLB_ABORT_D)
-				{
-					uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-					LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15]);
-					m_faultStatus[0] = (7 << 0) | (domain << 4); // 7 = page translation fault
-					m_faultAddress = addr;
-					m_pendingAbtD = true;
-					update_irq_state();
-				}
-				else if (flags & ARM7_TLB_ABORT_P)
-				{
-					LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15]);
-					m_pendingAbtP = true;
-					update_irq_state();
-				}
-				return false;
-			case COPRO_TLB_LARGE_PAGE:
-				// Large page descriptor
-				addr = ( desc_lvl2 & COPRO_TLB_LARGE_PAGE_MASK ) | ( addr & ~COPRO_TLB_LARGE_PAGE_MASK );
-				break;
-			case COPRO_TLB_SMALL_PAGE:
-				// Small page descriptor
-				{
-					uint8_t ap = ((((desc_lvl2 >> 4) & 0xFF) >> (((addr >> 10) & 3) << 1)) & 3);
-					int fault = detect_fault(desc_lvl1, ap, flags);
-					if (fault == FAULT_NONE)
-					{
-						addr = ( desc_lvl2 & COPRO_TLB_SMALL_PAGE_MASK ) | ( addr & ~COPRO_TLB_SMALL_PAGE_MASK );
-					}
-					else if (no_exception)
-					{
-						return false;
-					}
-					else
-					{
-						if (flags & ARM7_TLB_ABORT_D)
-						{
-							uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-							// hapyfish expects a data abort when something tries to write to a read-only memory location from user mode
-							LOGMASKED(LOG_MMU, "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
-							m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
-							m_faultAddress = addr;
-							m_pendingAbtD = true;
-							update_irq_state();
-							LOGMASKED(LOG_MMU, "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
-								addr, desc_lvl2, domain, permission, ap, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
-								m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0);
-						}
-						else if (flags & ARM7_TLB_ABORT_P)
-						{
-							LOGMASKED(LOG_MMU, "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
-							m_pendingAbtP = true;
-							update_irq_state();
-						}
-						return false;
-					}
-				}
-				break;
-			case COPRO_TLB_TINY_PAGE:
-				// Tiny page descriptor
-				if( ( desc_lvl1 & 3 ) == 1 )
-				{
-					LOGMASKED(LOG_MMU, "ARM7: It would appear that we're looking up a tiny page from a coarse TLB lookup.  This is bad. vaddr = %08x\n", addr);
-				}
-				addr = ( desc_lvl2 & COPRO_TLB_TINY_PAGE_MASK ) | ( addr & ~COPRO_TLB_TINY_PAGE_MASK );
-				break;
-		}
+		return page_table_translate(vaddr, flags);
 	}
-
-	return true;
 }
 
+void arm7_cpu_device::translate_insn_command(int ref, const std::vector<std::string> &params)
+{
+	translate_command(ref, params, TRANSLATE_FETCH);
+}
+
+void arm7_cpu_device::translate_data_command(int ref, const std::vector<std::string> &params)
+{
+	translate_command(ref, params, TRANSLATE_READ);
+}
+
+void arm7_cpu_device::translate_command(int ref, const std::vector<std::string> &params, int intention)
+{
+	uint64_t vaddr;
+
+	if (!machine().debugger().commands().validate_number_parameter(params[0], vaddr)) return;
+
+	vaddr &= 0xffffffff;
+
+	offs_t paddr = (offs_t)vaddr;
+	bool can_translate = memory_translate(AS_PROGRAM, intention, paddr);
+	if (can_translate)
+		machine().debugger().console().printf("%s vaddr %08x => phys %08x\n", intention == TRANSLATE_FETCH ? "instruction" : "data", (uint32_t)vaddr, paddr);
+	else
+		machine().debugger().console().printf("%s vaddr %08x => unmapped\n", intention == TRANSLATE_FETCH ? "instruction" : "data");
+}
 
 bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
-	if( spacenum == AS_PROGRAM && ( m_control & COPRO_CTRL_MMU_EN ) )
+	if (spacenum == AS_PROGRAM && (m_control & COPRO_CTRL_MMU_EN))
 	{
-		return arm7_tlb_translate(address, 0);
+		int intention_type = intention & TRANSLATE_TYPE_MASK;
+
+		const int flags = (intention_type & TRANSLATE_FETCH) ? ARM7_TLB_ABORT_P : ARM7_TLB_ABORT_D;
+		if (address < 0x2000000)
+			address += m_pid_offset;
+
+		tlb_entry *entry = tlb_probe(address, flags);
+
+		if (entry)
+		{
+			const uint32_t access_result = tlb_check_permissions(entry, flags);
+			if (access_result == 0)
+			{
+				address = tlb_translate(entry, address);
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			return page_table_translate(address, 0);
+		}
 	}
 	return true;
 }
@@ -638,6 +913,8 @@ void arm7_cpu_device::postload()
 
 void arm7_cpu_device::device_start()
 {
+	init_ce_kernel_addrs();
+
 	m_program = &space(AS_PROGRAM);
 
 	if(m_program->endianness() == ENDIANNESS_LITTLE) {
@@ -655,6 +932,9 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_insn_prefetch_index));
 	save_item(NAME(m_insn_prefetch_buffer));
 	save_item(NAME(m_insn_prefetch_address));
+	save_item(NAME(m_insn_prefetch_valid));
+	save_item(NAME(m_tlb_log));
+	save_item(NAME(m_actual_log));
 	save_item(NAME(m_r));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
@@ -672,6 +952,20 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pid_offset));
 	save_item(NAME(m_domainAccessControl));
 	save_item(NAME(m_decoded_access_control));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, valid));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, domain));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, access));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, table_bits));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, base_addr));
+	save_item(STRUCT_MEMBER(m_dtlb_entries, type));
+	save_item(STRUCT_MEMBER(m_itlb_entries, valid));
+	save_item(STRUCT_MEMBER(m_itlb_entries, domain));
+	save_item(STRUCT_MEMBER(m_itlb_entries, access));
+	save_item(STRUCT_MEMBER(m_itlb_entries, table_bits));
+	save_item(STRUCT_MEMBER(m_itlb_entries, base_addr));
+	save_item(STRUCT_MEMBER(m_itlb_entries, type));
+	save_item(NAME(m_dtlb_entry_index));
+	save_item(NAME(m_itlb_entry_index));
 	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
 	set_icountptr(m_icount);
@@ -723,8 +1017,16 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_UR13,  "UR13", m_r[eR13_UND] ).formatstr("%08X");
 	state_add( ARM7_UR14,  "UR14", m_r[eR14_UND] ).formatstr("%08X");
 	state_add( ARM7_USPSR, "UR16", m_r[eSPSR_UND]).formatstr("%08X");
+	state_add( ARM7_LOGTLB, "LOGTLB", m_actual_log).formatstr("%01X");
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1, _2));
+		machine().debugger().console().register_command("translate_data", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_data_command, this, _1, _2));
+	}
 }
 
 
@@ -803,6 +1105,11 @@ void arm7_cpu_device::device_reset()
 	m_r[eR15] = 0 | m_vectorbase;
 
 	m_impstate.cache_dirty = true;
+
+	memset(m_dtlb_entries, 0, sizeof(tlb_entry) * ARRAY_LENGTH(m_dtlb_entries));
+	memset(m_itlb_entries, 0, sizeof(tlb_entry) * ARRAY_LENGTH(m_itlb_entries));
+	memset(m_dtlb_entry_index, 0, ARRAY_LENGTH(m_dtlb_entry_index));
+	memset(m_itlb_entry_index, 0, ARRAY_LENGTH(m_itlb_entry_index));
 }
 
 void arm1176jzf_s_cpu_device::device_reset()
@@ -835,11 +1142,14 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 	for (uint32_t i = 0; i < to_fetch; i++)
 	{
 		uint32_t index = (i + start_index) % m_insn_prefetch_depth;
-		if ((m_control & COPRO_CTRL_MMU_EN) && !arm7_tlb_translate(pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ, true))
+		m_insn_prefetch_valid[index] = true;
+		offs_t physical_pc = pc;
+		if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical_pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
 		{
+			m_insn_prefetch_valid[index] = false;
 			break;
 		}
-		uint32_t op = m_pr32(pc);
+		uint32_t op = m_pr32(physical_pc);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
 		m_insn_prefetch_address[index] = pc;
@@ -848,42 +1158,42 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 	}
 }
 
-uint16_t arm7_cpu_device::insn_fetch_thumb(uint32_t pc)
+bool arm7_cpu_device::insn_fetch_thumb(uint32_t pc, uint32_t &out_insn)
 {
 	if (pc & 2)
 	{
-		uint16_t insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word1_shift);
-		m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_count;
+		out_insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word1_shift);
+		bool valid = m_insn_prefetch_valid[m_insn_prefetch_index];
+		m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_depth;
 		m_insn_prefetch_count--;
-		return insn;
+		return valid;
 	}
-	return (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word0_shift);
+	out_insn = (uint16_t)(m_insn_prefetch_buffer[m_insn_prefetch_index] >> m_prefetch_word0_shift);
+	return m_insn_prefetch_valid[m_insn_prefetch_index];
 }
 
-uint32_t arm7_cpu_device::insn_fetch_arm(uint32_t pc)
+bool arm7_cpu_device::insn_fetch_arm(uint32_t pc, uint32_t &out_insn)
 {
 	//printf("ipb[%d] = %08x\n", m_insn_prefetch_index, m_insn_prefetch_buffer[m_insn_prefetch_index]);
-	uint32_t insn = m_insn_prefetch_buffer[m_insn_prefetch_index];
-	m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_count;
+	out_insn = m_insn_prefetch_buffer[m_insn_prefetch_index];
+	bool valid = m_insn_prefetch_valid[m_insn_prefetch_index];
+	m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_depth;
 	m_insn_prefetch_count--;
-	return insn;
+	return valid;
 }
 
-int arm7_cpu_device::get_insn_prefetch_index(uint32_t address)
+void arm7_cpu_device::add_ce_kernel_addr(offs_t addr, std::string value)
 {
-	address &= ~3;
-	for (uint32_t i = 0; i < m_insn_prefetch_depth; i++)
-	{
-		if (m_insn_prefetch_address[i] == address)
-		{
-			return (int)i;
-		}
-	}
-	return -1;
+	m_ce_kernel_addrs[addr - 0xf0000000] = value;
+	m_ce_kernel_addr_present[addr - 0xf0000000] = true;
 }
+
+#include "cecalls.hxx"
 
 void arm7_cpu_device::execute_run()
 {
+	m_tlb_log = m_actual_log;
+
 	uint32_t insn;
 
 	do
@@ -1084,7 +1394,9 @@ void arm7_cpu_device::execute_run()
 #endif
 		update_insn_prefetch(pc);
 
+		m_tlb_log = 0;
 		debugger_instruction_hook(pc);
+		m_tlb_log = m_actual_log;
 
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))
@@ -1096,17 +1408,13 @@ void arm7_cpu_device::execute_run()
 			// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
 			raddr = pc & (~1);
 
-			if ( m_control & COPRO_CTRL_MMU_EN )
+			if (!insn_fetch_thumb(raddr, insn))
 			{
-				if (!arm7_tlb_translate(raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
-				{
-					goto skip_exec;
-				}
+				m_pendingAbtP = true;
+				update_irq_state();
+				goto skip_exec;
 			}
-
-			insn = insn_fetch_thumb(raddr);
 			(this->*thumb_handler[(insn & 0xffc0) >> 6])(pc, insn);
-
 		}
 		else
 		{
@@ -1117,25 +1425,18 @@ void arm7_cpu_device::execute_run()
 			// "In ARM state, bits [1:0] of r15 are undefined and must be ignored. Bits [31:2] contain the PC."
 			raddr = pc & (~3);
 
-			if ( m_control & COPRO_CTRL_MMU_EN )
+			if (!insn_fetch_arm(raddr, insn))
 			{
-				if (!arm7_tlb_translate(raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+#if PRINT_CE_KERNEL
+				if (raddr >= 0xf0000000)
 				{
-					goto skip_exec;
+					print_ce_kernel_address(raddr - 0xf0000000);
 				}
-			}
-
-#if 0
-			if (MODE26)
-			{
-				uint32_t temp1, temp2;
-				temp1 = GET_CPSR & 0xF00000C3;
-				temp2 = (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> (26 - 6)) | (R15 & 0x00000003);
-				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)\n", pc, temp1, temp2);
-			}
 #endif
-
-			insn = insn_fetch_arm(raddr);
+				m_pendingAbtP = true;
+				update_irq_state();
+				goto skip_exec;
+			}
 
 			int op_offset = 0;
 			/* process condition codes for this instruction */
@@ -1220,6 +1521,8 @@ skip_exec:
 		/* All instructions remove 3 cycles.. Others taking less / more will have adjusted this # prior to here */
 		m_icount -= 3;
 	} while (m_icount > 0);
+
+	m_tlb_log = 0;
 }
 
 
@@ -1353,14 +1656,15 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 			data = COPRO_CTRL | 0x70;   // bits 4-6 always read back as "1" (bit 3 too in XScale)
 			break;
 		case 2:             // Translation Table Base
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, TLB Base, PC = %08x\n", m_r[eR15]);
 			data = COPRO_TLB_BASE;
 			break;
 		case 3:             // Domain Access Control
-			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Domain Access Control\n");
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Domain Access Control, PC = %08x\n", m_r[eR15]);
 			data = COPRO_DOMAIN_ACCESS_CONTROL;
 			break;
 		case 5:             // Fault Status
-			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Status\n");
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Status, PC = %08x, op3 %d, FSR0 = %08x, FSR1 = %08x\n", m_r[eR15], op3, COPRO_FAULT_STATUS_D, COPRO_FAULT_STATUS_P);
 			switch (op3)
 			{
 				case 0: data = COPRO_FAULT_STATUS_D; break;
@@ -1368,11 +1672,11 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 			}
 			break;
 		case 6:             // Fault Address
-			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Address\n");
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Address, PC = %08x, FAR = %08x\n", m_r[eR15], COPRO_FAULT_ADDRESS);
 			data = COPRO_FAULT_ADDRESS;
 			break;
 		case 13:            // Read Process ID (PID)
-			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Read PID\n");
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Read PID, PC = %08x\n", m_r[eR15]);
 			data = COPRO_FCSE_PID;
 			break;
 		case 14:            // Read Breakpoint
@@ -1440,7 +1744,7 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			}
 			if (((data & COPRO_CTRL_MMU_EN) == 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) != 0))
 			{
-				if (!arm7_tlb_translate( R15, 0))
+				if (!translate_vaddr_to_paddr( R15, 0))
 				{
 					fatalerror("ARM7_MMU_ENABLE_HACK translate failed\n");
 				}
@@ -1449,12 +1753,12 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			COPRO_CTRL = data & COPRO_CTRL_MASK;
 			break;
 		case 2:             // Translation Table Base
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Base = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Base = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_TLB_BASE = data;
 			m_tlb_base_mask = data & COPRO_TLB_BASE_MASK;
 			break;
 		case 3:             // Domain Access Control
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Domain Access Control = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Domain Access Control = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_DOMAIN_ACCESS_CONTROL = data;
 			for (int i = 0; i < 32; i += 2)
 			{
@@ -1462,7 +1766,7 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			}
 			break;
 		case 5:             // Fault Status
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			switch (op3)
 			{
 				case 0: COPRO_FAULT_STATUS_D = data; break;
@@ -1470,20 +1774,68 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			}
 			break;
 		case 6:             // Fault Address
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_FAULT_ADDRESS = data;
 			break;
 		case 7:             // Cache Operations
 //            LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 8:             // TLB Operations
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
+			switch (op2)
+			{
+				case 0:
+					switch (op3)
+					{
+						case 5:
+							// Flush I
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_itlb_entries); i++)
+							{
+								m_itlb_entries[i].valid = false;
+							}
+							break;
+						case 6:
+							// Flush D
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
+							{
+								m_dtlb_entries[i].valid = false;
+							}
+							break;
+						case 7:
+							// Flush I+D
+							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
+							{
+								m_dtlb_entries[i].valid = false;
+								m_itlb_entries[i].valid = false;
+							}
+							break;
+						default:
+							LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
+							break;
+					}
+					break;
+				case 1:
+					if (op3 == 6)
+					{
+						// Flush D single entry
+						tlb_entry *entry = tlb_map_entry(m_r[op3], ARM7_TLB_ABORT_D);
+						if (entry)
+						{
+							entry->valid = false;
+						}
+					}
+					else
+					{
+						LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
+					}
+					break;
+			}
 			break;
 		case 9:             // Read Buffer Operations
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Read Buffer Ops = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Read Buffer Ops = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			break;
 		case 13:            // Write Process ID (PID)
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write PID = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write PID = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_FCSE_PID = data;
 			m_pid_offset = (((COPRO_FCSE_PID >> 25) & 0x7F)) * 0x2000000;
 			break;
@@ -1847,7 +2199,7 @@ void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
 		{
 			return;
 		}
@@ -1862,7 +2214,7 @@ void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
 		{
 			return;
 		}
@@ -1876,7 +2228,7 @@ void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
 		{
 			return;
 		}
@@ -1891,7 +2243,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
 		{
 			return 0;
 		}
@@ -1916,7 +2268,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
 		{
 			return 0;
 		}
@@ -1936,7 +2288,7 @@ uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
-		if (!arm7_tlb_translate( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		if (!translate_vaddr_to_paddr( addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
 		{
 			return 0;
 		}

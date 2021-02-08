@@ -323,30 +323,30 @@ INPUT_PORTS_END
 
 void textelcomp_state::textelcomp(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // GS65SC02P-2 (clock not verified)
+	M65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // G65SC02P-2 (clock not verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &textelcomp_state::mem_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m65sc02_device::IRQ_LINE);
 
-	via6522_device &via0(VIA6522(config, "via0", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
+	via6522_device &via0(R65C22(config, "via0", 3.6864_MHz_XTAL / 2)); // G65SC22P-2
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	VIA6522(config, "via1", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
+	R65C22(config, "via1", 3.6864_MHz_XTAL / 2); // G65SC22P-2
 	// IRQ might be connected on hardware, but is never enabled
 
-	via6522_device &via2(VIA6522(config, "via2", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
+	via6522_device &via2(R65C22(config, "via2", 3.6864_MHz_XTAL / 2)); // G65SC22P-2
 	via2.readpa_handler().set(FUNC(textelcomp_state::keyboard_r));
 	via2.writepb_handler().set(FUNC(textelcomp_state::keyscan_w));
 	via2.cb1_handler().set(FUNC(textelcomp_state::shift_clock_w));
 	via2.cb2_handler().set(FUNC(textelcomp_state::shift_data_w));
 
-	via6522_device &via3(VIA6522(config, "via3", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
+	via6522_device &via3(R65C22(config, "via3", 3.6864_MHz_XTAL / 2)); // G65SC22P-2
 	via3.writepa_handler().set(FUNC(textelcomp_state::rtc_w));
 	via3.ca2_handler().set(m_rtc, FUNC(msm58321_device::cs2_w)).invert();
 	via3.ca2_handler().append(m_rtc, FUNC(msm58321_device::stop_w)).invert();
 	// TODO: PB7 toggling generates beeps?
 
-	mos6551_device &acia(MOS6551(config, "acia", 3.6864_MHz_XTAL / 2)); // GS65SC51P-2
+	mos6551_device &acia(MOS6551(config, "acia", 3.6864_MHz_XTAL / 2)); // G65SC51P-2
 	acia.set_xtal(3.6864_MHz_XTAL / 2);
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 

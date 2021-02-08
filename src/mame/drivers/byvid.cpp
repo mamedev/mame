@@ -48,6 +48,9 @@ ToDo (granny):
 #include "video/tms9928a.h"
 #include "speaker.h"
 
+
+namespace {
+
 class by133_state : public driver_device
 {
 public:
@@ -75,14 +78,54 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	uint8_t sound_data_r();
-	void sound_data_w(uint8_t data);
-	uint8_t m6803_port2_r();
-	void m6803_port2_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+	void babypac(machine_config &config);
+	void granny(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	uint8_t m_mpu_to_vid;
+	uint8_t m_vid_to_mpu;
+	uint8_t m_u7_a;
+	uint8_t m_u7_b;
+	uint8_t m_u10_a;
+	uint8_t m_u10_b;
+	bool m_u10_cb2;
+	uint8_t m_u11_a;
+	uint8_t m_u11_b;
+	bool m_u10_timer;
+	bool m_u11_timer;
+	required_device<m6800_cpu_device> m_maincpu;
+	required_device<mc6809_device> m_videocpu;
+	required_device<m6803_cpu_device> m_audiocpu;
+	required_device<pia6821_device> m_pia_u7;
+	required_device<pia6821_device> m_pia_u10;
+	required_device<pia6821_device> m_pia_u11;
+	required_device<tms9928a_device> m_crtc;
+	optional_device<tms9928a_device> m_crtc2; // for Granny only
+	optional_device<beep_device> m_beep; // temp
+	required_ioport m_io_test;
+	required_ioport m_io_dsw0;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_dsw2;
+	required_ioport m_io_dsw3;
+	required_ioport m_io_joy;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
+	required_ioport m_io_x2;
+	required_ioport m_io_x3;
+	required_ioport m_io_x4; // Granny
+
+	uint8_t sound_data_r();
+	void sound_data_w(uint8_t data);
+	uint8_t m6803_port2_r();
+	void m6803_port2_w(uint8_t data);
 	uint8_t u7_a_r();
 	void u7_a_w(uint8_t data);
 	uint8_t u7_b_r();
@@ -105,45 +148,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void granny_crtc_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void babypac(machine_config &config);
-	void granny(machine_config &config);
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void video_map(address_map &map);
-private:
-	uint8_t m_mpu_to_vid;
-	uint8_t m_vid_to_mpu;
-	uint8_t m_u7_a;
-	uint8_t m_u7_b;
-	uint8_t m_u10_a;
-	uint8_t m_u10_b;
-	bool m_u10_cb2;
-	uint8_t m_u11_a;
-	uint8_t m_u11_b;
-	bool m_u10_timer;
-	bool m_u11_timer;
-	virtual void machine_reset() override;
-	required_device<m6800_cpu_device> m_maincpu;
-	required_device<mc6809_device> m_videocpu;
-	required_device<m6803_cpu_device> m_audiocpu;
-	required_device<pia6821_device> m_pia_u7;
-	required_device<pia6821_device> m_pia_u10;
-	required_device<pia6821_device> m_pia_u11;
-	required_device<tms9928a_device> m_crtc;
-	optional_device<tms9928a_device> m_crtc2; // for Granny only
-	optional_device<beep_device> m_beep; // temp
-	required_ioport m_io_test;
-	required_ioport m_io_dsw0;
-	required_ioport m_io_dsw1;
-	required_ioport m_io_dsw2;
-	required_ioport m_io_dsw3;
-	required_ioport m_io_joy;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
-	required_ioport m_io_x4; // Granny
 };
 
 
@@ -724,6 +732,8 @@ void by133_state::machine_reset()
 	m_mpu_to_vid = 0;
 	m_vid_to_mpu = 0;
 	m_beep->set_state(0);
+	m_u10_timer = false;
+	m_u11_timer = false;
 }
 
 uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -864,6 +874,8 @@ ROM_START(granny)
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD( "cs_u3.764", 0xe000, 0x2000, CRC(0a39a51d) SHA1(98342ba38e48578ce9870f2ee85b553d46c0e35f))
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1982, babypac,  0,       babypac, babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

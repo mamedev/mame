@@ -10,6 +10,8 @@
 
 #include "unicode.h"
 
+#include "osdcomm.h"
+
 #ifdef _WIN32
 #include "strconv.h"
 #define UTF8PROC_DLLEXPORT
@@ -117,6 +119,17 @@ bool uchar_is_printable(char32_t uchar)
 bool uchar_is_digit(char32_t uchar)
 {
 	return uchar >= '0' && uchar <= '9';
+}
+
+
+//-------------------------------------------------
+//  uchar_from_utf8 - convert a UTF-8 sequence
+//  into a unicode character
+//-----------------------------------------------
+
+int uchar_from_utf8(char32_t *uchar, std::string_view utf8str)
+{
+	return uchar_from_utf8(uchar, utf8str.data(), utf8str.length());
 }
 
 
@@ -494,9 +507,9 @@ std::string normalize_unicode(const char *s, unicode_normalization_form normaliz
 //  unicode
 //-------------------------------------------------
 
-std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool fold_case)
+std::string normalize_unicode(std::string_view s, unicode_normalization_form normalization_form, bool fold_case)
 {
-	return internal_normalize_unicode(s, length, normalization_form, fold_case, false);
+	return internal_normalize_unicode(s.data(), s.length(), normalization_form, fold_case, false);
 }
 
 

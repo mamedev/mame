@@ -213,6 +213,7 @@ void hanaawas_state::machine_start()
 void hanaawas_state::machine_reset()
 {
 	m_mux = 0;
+	m_coin_impulse = 0;
 }
 
 void hanaawas_state::hanaawas(machine_config &config)

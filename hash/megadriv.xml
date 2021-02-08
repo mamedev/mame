@@ -8283,7 +8283,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only USA is confirmed -->
 	<software name="term2">
 		<description>T2 - Terminator 2 - Judgment Day (Euro, USA)</description>
-		<year>1991</year>
+		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670100 REV 10"/>
@@ -30770,6 +30770,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<!-- USA dump is confirmed to be 1MB with second 512KB padded with 0xff -->
 				<rom name="mpr-18431-f.u1" size="1048576" crc="faa490dc" sha1="ce34408f98769b03e0f8d62c3dc1261a072691aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This was both sold as a cart and released as a Freeware ROM by the programmers -->
+	<!-- https://playonretro.itch.io/labbaye-des-morts-megadrivegenesis-por-002 -->
+	<software name="abbaye">
+		<description>L'Abbaye des Morts</description>
+		<year>2017</year>
+		<publisher>PlayOnRetro</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3932160">
+				<rom name="20170907 - AbbayeMD.bin" size="3932160" crc="8865ee24" sha1="c65b9c58a01973700ababccf1e4ae3064345c9d6"/>
 			</dataarea>
 		</part>
 	</software>

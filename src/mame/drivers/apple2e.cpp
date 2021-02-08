@@ -168,6 +168,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grapplerplus.h"
 #include "bus/a2bus/laser128.h"
@@ -178,6 +179,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
+#include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
 #include "bus/a2gameio/gameio.h"
 
@@ -324,73 +326,73 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t ram0000_r(offs_t offset);
-	void ram0000_w(offs_t offset, uint8_t data);
-	uint8_t ram0200_r(offs_t offset);
-	void ram0200_w(offs_t offset, uint8_t data);
-	uint8_t ram0400_r(offs_t offset);
-	void ram0400_w(offs_t offset, uint8_t data);
-	uint8_t ram0800_r(offs_t offset);
-	void ram0800_w(offs_t offset, uint8_t data);
-	uint8_t ram2000_r(offs_t offset);
-	void ram2000_w(offs_t offset, uint8_t data);
-	uint8_t ram4000_r(offs_t offset);
-	void ram4000_w(offs_t offset, uint8_t data);
-	uint8_t cec4000_r(offs_t offset);
-	uint8_t cec8000_r(offs_t offset);
-	void ram8000_w(offs_t offset, uint8_t data);
-	uint8_t auxram0000_r(offs_t offset);
-	void auxram0000_w(offs_t offset, uint8_t data);
-	uint8_t auxram0200_r(offs_t offset);
-	void auxram0200_w(offs_t offset, uint8_t data);
-	uint8_t auxram0400_r(offs_t offset);
-	void auxram0400_w(offs_t offset, uint8_t data);
-	uint8_t auxram0800_r(offs_t offset);
-	void auxram0800_w(offs_t offset, uint8_t data);
-	uint8_t auxram2000_r(offs_t offset);
-	void auxram2000_w(offs_t offset, uint8_t data);
-	uint8_t auxram4000_r(offs_t offset);
-	void auxram4000_w(offs_t offset, uint8_t data);
-	uint8_t c000_r(offs_t offset);
-	void c000_w(offs_t offset, uint8_t data);
-	void c000_laser_w(offs_t offset, uint8_t data);
-	uint8_t c000_iic_r(offs_t offset);
-	void c000_iic_w(offs_t offset, uint8_t data);
-	uint8_t c080_r(offs_t offset);
-	void c080_w(offs_t offset, uint8_t data);
-	uint8_t c100_r(offs_t offset);
-	uint8_t c100_int_r(offs_t offset);
-	uint8_t c100_int_bank_r(offs_t offset);
-	uint8_t c100_cec_r(offs_t offset);
-	uint8_t c100_cec_bank_r(offs_t offset);
-	void c100_w(offs_t offset, uint8_t data);
-	uint8_t c300_r(offs_t offset);
-	uint8_t c300_int_r(offs_t offset);
-	uint8_t c300_int_bank_r(offs_t offset);
-	uint8_t c300_cec_r(offs_t offset);
-	uint8_t c300_cec_bank_r(offs_t offset);
-	void c300_w(offs_t offset, uint8_t data);
-	uint8_t c400_r(offs_t offset);
-	uint8_t c400_int_r(offs_t offset);
-	uint8_t c400_int_bank_r(offs_t offset);
-	uint8_t c400_cec_r(offs_t offset);
-	uint8_t c400_cec_bank_r(offs_t offset);
-	void c400_w(offs_t offset, uint8_t data);
-	void c400_cec_w(offs_t offset, uint8_t data);
-	uint8_t c800_r(offs_t offset);
-	uint8_t c800_int_r(offs_t offset);
-	uint8_t c800_cec_r(offs_t offset);
-	uint8_t c800_cec_bank_r(offs_t offset);
-	uint8_t c800_b2_int_r(offs_t offset);
-	void c800_w(offs_t offset, uint8_t data);
-	uint8_t inh_r(offs_t offset);
-	void inh_w(offs_t offset, uint8_t data);
-	uint8_t lc_r(offs_t offset);
-	void lc_w(offs_t offset, uint8_t data);
-	uint8_t lc_romswitch_r(offs_t offset);
-	void lc_romswitch_w(offs_t offset, uint8_t data);
+	u8 ram0000_r(offs_t offset);
+	void ram0000_w(offs_t offset, u8 data);
+	u8 ram0200_r(offs_t offset);
+	void ram0200_w(offs_t offset, u8 data);
+	u8 ram0400_r(offs_t offset);
+	void ram0400_w(offs_t offset, u8 data);
+	u8 ram0800_r(offs_t offset);
+	void ram0800_w(offs_t offset, u8 data);
+	u8 ram2000_r(offs_t offset);
+	void ram2000_w(offs_t offset, u8 data);
+	u8 ram4000_r(offs_t offset);
+	void ram4000_w(offs_t offset, u8 data);
+	u8 cec4000_r(offs_t offset);
+	u8 cec8000_r(offs_t offset);
+	void ram8000_w(offs_t offset, u8 data);
+	u8 auxram0000_r(offs_t offset);
+	void auxram0000_w(offs_t offset, u8 data);
+	u8 auxram0200_r(offs_t offset);
+	void auxram0200_w(offs_t offset, u8 data);
+	u8 auxram0400_r(offs_t offset);
+	void auxram0400_w(offs_t offset, u8 data);
+	u8 auxram0800_r(offs_t offset);
+	void auxram0800_w(offs_t offset, u8 data);
+	u8 auxram2000_r(offs_t offset);
+	void auxram2000_w(offs_t offset, u8 data);
+	u8 auxram4000_r(offs_t offset);
+	void auxram4000_w(offs_t offset, u8 data);
+	u8 c000_r(offs_t offset);
+	void c000_w(offs_t offset, u8 data);
+	void c000_laser_w(offs_t offset, u8 data);
+	u8 c000_iic_r(offs_t offset);
+	void c000_iic_w(offs_t offset, u8 data);
+	u8 c080_r(offs_t offset);
+	void c080_w(offs_t offset, u8 data);
+	u8 c100_r(offs_t offset);
+	u8 c100_int_r(offs_t offset);
+	u8 c100_int_bank_r(offs_t offset);
+	u8 c100_cec_r(offs_t offset);
+	u8 c100_cec_bank_r(offs_t offset);
+	void c100_w(offs_t offset, u8 data);
+	u8 c300_r(offs_t offset);
+	u8 c300_int_r(offs_t offset);
+	u8 c300_int_bank_r(offs_t offset);
+	u8 c300_cec_r(offs_t offset);
+	u8 c300_cec_bank_r(offs_t offset);
+	void c300_w(offs_t offset, u8 data);
+	u8 c400_r(offs_t offset);
+	u8 c400_int_r(offs_t offset);
+	u8 c400_int_bank_r(offs_t offset);
+	u8 c400_cec_r(offs_t offset);
+	u8 c400_cec_bank_r(offs_t offset);
+	void c400_w(offs_t offset, u8 data);
+	void c400_cec_w(offs_t offset, u8 data);
+	u8 c800_r(offs_t offset);
+	u8 c800_int_r(offs_t offset);
+	u8 c800_cec_r(offs_t offset);
+	u8 c800_cec_bank_r(offs_t offset);
+	u8 c800_b2_int_r(offs_t offset);
+	void c800_w(offs_t offset, u8 data);
+	u8 inh_r(offs_t offset);
+	void inh_w(offs_t offset, u8 data);
+	u8 lc_r(offs_t offset);
+	void lc_w(offs_t offset, u8 data);
+	u8 lc_romswitch_r(offs_t offset);
+	void lc_romswitch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -398,9 +400,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
-	uint8_t memexp_r(offs_t offset);
-	void memexp_w(offs_t offset, uint8_t data);
-	uint8_t nsc_backing_r(offs_t offset);
+	u8 memexp_r(offs_t offset);
+	void memexp_w(offs_t offset, u8 data);
+	u8 nsc_backing_r(offs_t offset);
 
 	void apple2cp(machine_config &config);
 	void laser128ex2(machine_config &config);
@@ -441,21 +443,16 @@ public:
 	bool m_35sel, m_hdsel, m_intdrive;
 
 private:
-	int m_speaker_state;
-	int m_cassette_state, m_cassette_out;
+	int m_speaker_state, m_cassette_state, m_cassette_out;
 
-	double m_joystick_x1_time;
-	double m_joystick_y1_time;
-	double m_joystick_x2_time;
-	double m_joystick_y2_time;
+	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
 
-	uint16_t m_lastchar, m_strobe;
-	uint8_t m_transchar;
+	u16 m_lastchar, m_strobe;
+	u8 m_transchar;
 	bool m_anykeydown;
 	int m_repeatdelay;
 
-	int m_inh_slot;
-	int m_cnxx_slot;
+	int m_inh_slot, m_cnxx_slot;
 
 	bool m_page2;
 	bool m_an0, m_an1, m_an2, m_an3;
@@ -479,8 +476,8 @@ private:
 	bool m_intc8rom;
 
 	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_pal;
-	uint8_t m_migram[0x800];
-	uint16_t m_migpage;
+	u8 m_migram[0x800];
+	u16 m_migpage;
 
 	bool m_accel_unlocked;
 	bool m_accel_fast;
@@ -489,14 +486,14 @@ private:
 	bool m_accel_laser;
 	int m_accel_stage;
 	u32 m_accel_speed;
-	u8 m_accel_slotspk;
+	u8 m_accel_slotspk, m_accel_gameio;
 
-	uint8_t *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
+	u8 *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
 	int m_ram_size;
 
 	int m_cec_bank;
 
-	uint8_t *m_aux_ptr, *m_aux_bank_ptr;
+	u8 *m_aux_ptr, *m_aux_bank_ptr;
 
 	int m_inh_bank;
 
@@ -507,19 +504,19 @@ private:
 
 	int m_irqmask;
 
-	uint8_t m_exp_bankhior;
+	u8 m_exp_bankhior;
 	int m_exp_addrmask;
-	uint8_t m_exp_regs[0x10];
-	uint8_t *m_exp_ram;
+	u8 m_exp_regs[0x10];
+	u8 *m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 
 	void do_io(int offset, bool is_iic);
-	uint8_t read_floatingbus();
+	u8 read_floatingbus();
 	void update_slotrom_banks();
 	void lc_update(int offset, bool writing);
-	uint8_t read_slot_rom(int slotbias, int offset);
-	void write_slot_rom(int slotbias, int offset, uint8_t data);
-	uint8_t read_int_rom(int slotbias, int offset);
+	u8 read_slot_rom(int slotbias, int offset);
+	void write_slot_rom(int slotbias, int offset, u8 data);
+	u8 read_int_rom(int slotbias, int offset);
 	void auxbank_update();
 	void cec_lcrom_update();
 	void raise_irq(int irq);
@@ -529,10 +526,10 @@ private:
 	void accel_normal_speed();
 	void accel_slot(int slot);
 
-	uint8_t m_cec_remap[0x40000];
+	u8 m_cec_remap[0x40000];
 
-	uint8_t mig_r(uint16_t offset);
-	void mig_w(uint16_t offset, uint8_t data);
+	u8 mig_r(u16 offset);
+	void mig_w(u16 offset, u8 data);
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
@@ -543,7 +540,7 @@ offs_t apple2e_state::dasm_trampoline(std::ostream &stream, offs_t pc, const uti
 	return m_a2common->dasm_override(stream, pc, opcodes, params);
 }
 
-uint8_t apple2e_state::mig_r(uint16_t offset)
+u8 apple2e_state::mig_r(u16 offset)
 {
 	//printf("mig_r @ %x\n", offset + 0xc00);
 	// MIG RAM window
@@ -555,7 +552,7 @@ uint8_t apple2e_state::mig_r(uint16_t offset)
 	// increment MIG RAM window and return previous value
 	if ((offset >= 0x220) && (offset < 0x240))
 	{
-		uint8_t rv = m_migram[m_migpage + offset];
+		u8 rv = m_migram[m_migpage + offset];
 		m_migpage += 0x20;
 		m_migpage &= 0x7ff;
 		return rv;
@@ -582,7 +579,7 @@ uint8_t apple2e_state::mig_r(uint16_t offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::mig_w(uint16_t offset, uint8_t data)
+void apple2e_state::mig_w(u16 offset, u8 data)
 {
 	//printf("mig_w %x @ %x\n", data, offset + 0xc00);
 
@@ -707,9 +704,9 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
-uint8_t apple2e_state::memexp_r(offs_t offset)
+u8 apple2e_state::memexp_r(offs_t offset)
 {
-	uint8_t retval = m_exp_regs[offset];
+	u8 retval = m_exp_regs[offset];
 
 	if (!m_exp_ram)
 	{
@@ -735,7 +732,7 @@ uint8_t apple2e_state::memexp_r(offs_t offset)
 	return retval;
 }
 
-void apple2e_state::memexp_w(offs_t offset, uint8_t data)
+void apple2e_state::memexp_w(offs_t offset, u8 data)
 {
 	if (!m_exp_ram)
 	{
@@ -923,7 +920,7 @@ void apple2e_state::machine_start()
 
 		// remap cec gfx1 rom
 		// for ALTCHARSET
-		uint8_t *rom = m_video->m_char_ptr;
+		u8 *rom = m_video->m_char_ptr;
 		for(int i=0; i<0x1000; i++)
 		{
 			rom[i+0x1000] = rom[i];
@@ -1006,6 +1003,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_accel_fast));
 	save_item(NAME(m_accel_present));
 	save_item(NAME(m_accel_slotspk));
+	save_item(NAME(m_accel_gameio));
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_laser));
 	save_item(NAME(m_accel_speed));
@@ -1041,6 +1039,7 @@ void apple2e_state::machine_reset()
 	m_accel_unlocked = false;
 	m_accel_stage = 0;
 	m_accel_slotspk = 0x41; // speaker and slot 6 slow
+	m_accel_gameio = 0x40;  // paddle delay on
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
 	m_accel_fast = false;
@@ -1178,7 +1177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	}
 }
 
-uint32_t apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_video->m_page2;
 
@@ -1764,6 +1763,14 @@ void apple2e_state::do_io(int offset, bool is_iic)
 				lower_irq(IRQ_VBL);
 			}
 
+			// Zip paddle flag
+			if ((m_accel_present) && (BIT(m_accel_gameio, 6)))
+			{
+				m_accel_temp_slowdown = true;
+				m_acceltimer->adjust(attotime::from_msec(5));
+				accel_normal_speed();
+			}
+
 			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
@@ -1776,7 +1783,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	}
 }
 
-uint8_t apple2e_state::c000_r(offs_t offset)
+u8 apple2e_state::c000_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -1790,7 +1797,7 @@ uint8_t apple2e_state::c000_r(offs_t offset)
 	{
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
@@ -1885,9 +1892,25 @@ uint8_t apple2e_state::c000_r(offs_t offset)
 		default:
 			do_io(offset, false);
 
-			if ((offset == 0x5c) && (m_accel_unlocked))
+			if (m_accel_unlocked)
 			{
-				return m_accel_slotspk;
+				if (offset == 0x5b)
+				{
+					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
+					const int time = machine().time().as_ticks(1.0f / 0.00050175f);
+					if (time & 1)
+					{
+						return 0x03;
+					}
+					else
+					{
+						return 0x83;
+					}
+				}
+				else if (offset == 0x5c)
+				{
+					return m_accel_slotspk;
+				}
 			}
 			break;
 	}
@@ -1895,7 +1918,7 @@ uint8_t apple2e_state::c000_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::c000_laser_w(offs_t offset, uint8_t data)
+void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 {
 	if ((m_accel_laser) && (offset == 0x74))
 	{
@@ -1926,7 +1949,7 @@ void apple2e_state::c000_laser_w(offs_t offset, uint8_t data)
 	}
 }
 
-void apple2e_state::c000_w(offs_t offset, uint8_t data)
+void apple2e_state::c000_w(offs_t offset, u8 data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -2069,6 +2092,13 @@ void apple2e_state::c000_w(offs_t offset, uint8_t data)
 			}
 			break;
 
+		case 0x5f: // Zip game I/O flags
+			if (m_accel_unlocked)
+			{
+				m_accel_gameio = data;
+			}
+			break;
+
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
 			if (m_auxslotdevice)
@@ -2093,7 +2123,7 @@ void apple2e_state::c000_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::c000_iic_r(offs_t offset)
+u8 apple2e_state::c000_iic_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -2107,13 +2137,13 @@ uint8_t apple2e_state::c000_iic_r(offs_t offset)
 	{
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
+			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
 			return (m_lcram ? 0x80 : 0x00) | m_transchar;
@@ -2224,7 +2254,7 @@ uint8_t apple2e_state::c000_iic_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::c000_iic_w(offs_t offset, uint8_t data)
+void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -2483,7 +2513,7 @@ void apple2e_state::update_iic_mouse()
 	}
 }
 
-uint8_t apple2e_state::c080_r(offs_t offset)
+u8 apple2e_state::c080_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -2525,7 +2555,7 @@ uint8_t apple2e_state::c080_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::c080_w(offs_t offset, uint8_t data)
+void apple2e_state::c080_w(offs_t offset, u8 data)
 {
 	int slot;
 
@@ -2573,7 +2603,7 @@ void apple2e_state::c080_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::read_slot_rom(int slotbias, int offset)
+u8 apple2e_state::read_slot_rom(int slotbias, int offset)
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
@@ -2591,7 +2621,7 @@ uint8_t apple2e_state::read_slot_rom(int slotbias, int offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
+void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 {
 	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
@@ -2627,23 +2657,23 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
+u8 apple2e_state::read_int_rom(int slotbias, int offset)
 {
 	//return m_rom_ptr[slotbias + offset];
 	return m_ds1315->read(slotbias + offset);
 }
 
-uint8_t apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
+u8 apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
 
-uint8_t apple2e_state::c100_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_slot_rom(1, offset); }
-uint8_t apple2e_state::c100_int_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x100, offset); }
-uint8_t apple2e_state::c100_int_bank_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x4100, offset); }
-uint8_t apple2e_state::c100_cec_r(offs_t offset)  { return m_rom_ptr[0xc100 + offset]; }
-uint8_t apple2e_state::c100_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4100 + offset]; }
-void apple2e_state::c100_w(offs_t offset, uint8_t data) { accel_slot(1); write_slot_rom(1, offset, data); }
-uint8_t apple2e_state::c300_r(offs_t offset)  { accel_slot(3 + ((offset >> 8) & 0x7)); return read_slot_rom(3, offset); }
+u8 apple2e_state::c100_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_slot_rom(1, offset); }
+u8 apple2e_state::c100_int_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x100, offset); }
+u8 apple2e_state::c100_int_bank_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x4100, offset); }
+u8 apple2e_state::c100_cec_r(offs_t offset)  { return m_rom_ptr[0xc100 + offset]; }
+u8 apple2e_state::c100_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4100 + offset]; }
+void apple2e_state::c100_w(offs_t offset, u8 data) { accel_slot(1); write_slot_rom(1, offset, data); }
+u8 apple2e_state::c300_r(offs_t offset)  { accel_slot(3 + ((offset >> 8) & 0x7)); return read_slot_rom(3, offset); }
 
-uint8_t apple2e_state::c300_int_r(offs_t offset)
+u8 apple2e_state::c300_int_r(offs_t offset)
 {
 	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2654,7 +2684,7 @@ uint8_t apple2e_state::c300_int_r(offs_t offset)
 	return read_int_rom(0x300, offset);
 }
 
-uint8_t apple2e_state::c300_int_bank_r(offs_t offset)
+u8 apple2e_state::c300_int_bank_r(offs_t offset)
 {
 	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2665,7 +2695,7 @@ uint8_t apple2e_state::c300_int_bank_r(offs_t offset)
 	return read_int_rom(0x4300, offset);
 }
 
-void apple2e_state::c300_w(offs_t offset, uint8_t data)
+void apple2e_state::c300_w(offs_t offset, u8 data)
 {
 	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2677,11 +2707,11 @@ void apple2e_state::c300_w(offs_t offset, uint8_t data)
 	write_slot_rom(3, offset, data);
 }
 
-uint8_t apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
-uint8_t apple2e_state::c300_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4300 + offset]; }
+u8 apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
+u8 apple2e_state::c300_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4300 + offset]; }
 
-uint8_t apple2e_state::c400_r(offs_t offset)  { accel_slot(4 + ((offset >> 8) & 0x7)); return read_slot_rom(4, offset); }
-uint8_t apple2e_state::c400_int_r(offs_t offset)
+u8 apple2e_state::c400_r(offs_t offset)  { accel_slot(4 + ((offset >> 8) & 0x7)); return read_slot_rom(4, offset); }
+u8 apple2e_state::c400_int_r(offs_t offset)
 {
 	accel_slot(4 + ((offset >> 8) & 0x7));
 	if ((offset < 0x100) && (m_mockingboard4c))
@@ -2692,7 +2722,7 @@ uint8_t apple2e_state::c400_int_r(offs_t offset)
 	return read_int_rom(0x400, offset);
 }
 
-uint8_t apple2e_state::c400_int_bank_r(offs_t offset)
+u8 apple2e_state::c400_int_bank_r(offs_t offset)
 {
 	accel_slot(4 + ((offset >> 8) & 0x7));
 	if ((offset < 0x100) && (m_mockingboard4c))
@@ -2703,7 +2733,7 @@ uint8_t apple2e_state::c400_int_bank_r(offs_t offset)
 	return read_int_rom(0x4400, offset);
 }
 
-void apple2e_state::c400_w(offs_t offset, uint8_t data)
+void apple2e_state::c400_w(offs_t offset, u8 data)
 {
 	accel_slot(4 + ((offset >> 8) & 0x7));
 	if ((m_isiic) && (offset < 0x100))
@@ -2714,10 +2744,10 @@ void apple2e_state::c400_w(offs_t offset, uint8_t data)
 	write_slot_rom(4, offset, data);
 }
 
-uint8_t apple2e_state::c400_cec_r(offs_t offset)  { return m_rom_ptr[0xc400 + offset]; }
-uint8_t apple2e_state::c400_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4400 + offset]; }
+u8 apple2e_state::c400_cec_r(offs_t offset)  { return m_rom_ptr[0xc400 + offset]; }
+u8 apple2e_state::c400_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4400 + offset]; }
 
-void apple2e_state::c400_cec_w(offs_t offset, uint8_t data)
+void apple2e_state::c400_cec_w(offs_t offset, u8 data)
 {
 	if ((m_iscecm))
 	{
@@ -2725,11 +2755,11 @@ void apple2e_state::c400_cec_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::c800_r(offs_t offset)
+u8 apple2e_state::c800_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		uint8_t rv = 0xff;
+		u8 rv = 0xff;
 
 		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 		{
@@ -2749,7 +2779,7 @@ uint8_t apple2e_state::c800_r(offs_t offset)
 	return read_floatingbus();
 }
 
-uint8_t apple2e_state::c800_int_r(offs_t offset)
+u8 apple2e_state::c800_int_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
@@ -2766,7 +2796,7 @@ uint8_t apple2e_state::c800_int_r(offs_t offset)
 	return m_rom_ptr[0x800 + offset];
 }
 
-uint8_t apple2e_state::c800_b2_int_r(offs_t offset)
+u8 apple2e_state::c800_b2_int_r(offs_t offset)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
@@ -2783,7 +2813,7 @@ uint8_t apple2e_state::c800_b2_int_r(offs_t offset)
 	return m_rom_ptr[0x4800 + offset];
 }
 
-void apple2e_state::c800_w(offs_t offset, uint8_t data)
+void apple2e_state::c800_w(offs_t offset, u8 data)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
@@ -2807,10 +2837,10 @@ void apple2e_state::c800_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::c800_cec_r(offs_t offset)  { return m_rom_ptr[0xc800 + offset]; }
-uint8_t apple2e_state::c800_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4800 + offset]; }
+u8 apple2e_state::c800_cec_r(offs_t offset)  { return m_rom_ptr[0xc800 + offset]; }
+u8 apple2e_state::c800_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4800 + offset]; }
 
-uint8_t apple2e_state::inh_r(offs_t offset)
+u8 apple2e_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2821,7 +2851,7 @@ uint8_t apple2e_state::inh_r(offs_t offset)
 	return read_floatingbus();
 }
 
-void apple2e_state::inh_w(offs_t offset, uint8_t data)
+void apple2e_state::inh_w(offs_t offset, u8 data)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2829,17 +2859,17 @@ void apple2e_state::inh_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t apple2e_state::lc_romswitch_r(offs_t offset)
+u8 apple2e_state::lc_romswitch_r(offs_t offset)
 {
 	return m_rom_ptr[0x5000 + offset];
 }
 
-void apple2e_state::lc_romswitch_w(offs_t offset, uint8_t data)
+void apple2e_state::lc_romswitch_w(offs_t offset, u8 data)
 {
 	lc_w(offset, data);
 }
 
-uint8_t apple2e_state::lc_r(offs_t offset)
+u8 apple2e_state::lc_r(offs_t offset)
 {
 	if ((m_altzp) && (!m_iscec))
 	{
@@ -2882,7 +2912,7 @@ uint8_t apple2e_state::lc_r(offs_t offset)
 	}
 }
 
-void apple2e_state::lc_w(offs_t offset, uint8_t data)
+void apple2e_state::lc_w(offs_t offset, u8 data)
 {
 	if (!m_lcwriteenable)
 	{
@@ -2929,7 +2959,7 @@ void apple2e_state::lc_w(offs_t offset, uint8_t data)
 }
 
 // floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
-uint8_t apple2e_state::read_floatingbus()
+u8 apple2e_state::read_floatingbus()
 {
 	enum
 	{
@@ -3046,26 +3076,26 @@ uint8_t apple2e_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-uint8_t apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
-void apple2e_state::ram0000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset] = data; }
-uint8_t apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
-void apple2e_state::ram0200_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x200] = data; }
-uint8_t apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
-void apple2e_state::ram0400_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x400] = data; }
-uint8_t apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
-void apple2e_state::ram0800_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x800] = data; }
-uint8_t apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
-void apple2e_state::ram2000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x2000] = data; }
-uint8_t apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
-void apple2e_state::ram4000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x4000] = data; }
-void apple2e_state::ram8000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x8000] = data; }
-uint8_t apple2e_state::cec4000_r(offs_t offset)
+u8 apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
+void apple2e_state::ram0000_w(offs_t offset, u8 data) { m_ram_ptr[offset] = data; }
+u8 apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
+void apple2e_state::ram0200_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x200] = data; }
+u8 apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
+void apple2e_state::ram0400_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x400] = data; }
+u8 apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
+void apple2e_state::ram0800_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x800] = data; }
+u8 apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
+void apple2e_state::ram2000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x2000] = data; }
+u8 apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
+void apple2e_state::ram4000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x4000] = data; }
+void apple2e_state::ram8000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x8000] = data; }
+u8 apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
 	return m_cec_remap[((m_cec_bank & 0xf) << 14) + offset];
 }
 
-uint8_t apple2e_state::cec8000_r(offs_t offset)
+u8 apple2e_state::cec8000_r(offs_t offset)
 {
 	//printf("cec8000_r: ofs %x\n", offset);
 	if (m_cec_bank & 0x20)
@@ -3078,18 +3108,18 @@ uint8_t apple2e_state::cec8000_r(offs_t offset)
 	}
 }
 
-uint8_t apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-uint8_t apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0200_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-uint8_t apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0400_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-uint8_t apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram0800_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-uint8_t apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram2000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-uint8_t apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
-void apple2e_state::auxram4000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
+u8 apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
+u8 apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0200_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
+u8 apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0400_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
+u8 apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0800_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
+u8 apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram2000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
+u8 apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram4000_w(offs_t offset, u8 data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
 void apple2e_state::apple2e_map(address_map &map)
 {
@@ -3304,8 +3334,8 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		uint8_t *decode = m_kbdrom->base();
-		uint16_t trans;
+		u8 *decode = m_kbdrom->base();
+		u16 trans;
 
 		// if the user presses a valid key to start the driver from the info screen,
 		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
@@ -4486,6 +4516,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
 	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
 	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("ssi", APRICORN_SSI);    /* Apricorn Super Serial Imager */
 	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
 	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
 	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
@@ -4532,6 +4563,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET); /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4768,7 +4801,7 @@ void apple2e_state::apple2c(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K");
 }
 
-static void apple2cp_set_lines(device_t *device, uint8_t lines)
+static void apple2cp_set_lines(device_t *device, u8 lines)
 {
 	apple2e_state *state = device->machine().driver_data<apple2e_state>();
 
@@ -4802,7 +4835,7 @@ static void apple2cp_set_enable_lines(device_t *device,int enable_mask)
 	}
 }
 
-static uint8_t apple2cp_read_data(device_t *device)
+static u8 apple2cp_read_data(device_t *device)
 {
 	apple2e_state *state = device->machine().driver_data<apple2e_state>();
 
@@ -4818,7 +4851,7 @@ static uint8_t apple2cp_read_data(device_t *device)
 	return 0;
 }
 
-static void apple2cp_write_data(device_t *device, uint8_t data)
+static void apple2cp_write_data(device_t *device, u8 data)
 {
 	apple2e_state *state = device->machine().driver_data<apple2e_state>();
 

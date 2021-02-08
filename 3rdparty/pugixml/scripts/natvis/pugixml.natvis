@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="pugi::xml_node">
+    <DisplayString Condition="_root">{_root}</DisplayString>
+    <DisplayString Condition="!_root">none</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="_root">_root</ExpandedItem>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_node_struct">
+    <DisplayString Condition="name &amp;&amp; value">{(pugi::xml_node_type)(header &amp; 0xf),en} name={name,na} value={value,na}</DisplayString>
+    <DisplayString Condition="name">{(pugi::xml_node_type)(header &amp; 0xf),en} name={name,na}</DisplayString>
+    <DisplayString Condition="value">{(pugi::xml_node_type)(header &amp; 0xf),en} value={value,na}</DisplayString>
+    <DisplayString>{(pugi::xml_node_type)(header &amp; 0xf),en}</DisplayString>
+    <Expand>
+      <Item Name="value" Condition="value">value,na</Item>
+      <Synthetic Name="attributes" Condition="first_attribute">
+        <Expand>
+          <CustomListItems>
+            <Variable Name="curr" InitialValue="first_attribute" />
+
+            <Loop Condition="curr">
+              <Item Name="{curr->name,na}">curr,view(child)na</Item>
+              <Exec>curr = curr->next_attribute</Exec>
+            </Loop>
+          </CustomListItems>
+        </Expand>
+      </Synthetic>
+      <LinkedListItems>
+        <HeadPointer>first_child</HeadPointer>
+        <NextPointer>next_sibling</NextPointer>
+        <ValueNode>this,na</ValueNode>
+      </LinkedListItems>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_attribute">
+    <DisplayString Condition="_attr">{_attr}</DisplayString>
+    <DisplayString Condition="!_attr">none</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="_attr">_attr</ExpandedItem>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_attribute_struct">
+    <DisplayString ExcludeView="child">{name,na} = {value,na}</DisplayString>
+    <DisplayString>{value,na}</DisplayString>
+    <Expand>
+      <Item Name="name">name,na</Item>
+      <Item Name="value">value,na</Item>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xpath_node">
+    <DisplayString Condition="_node._root &amp;&amp; _attribute._attr">{_node,na} "{_attribute._attr->name,na}"="{_attribute._attr->value,na}"</DisplayString>
+    <DisplayString Condition="_node._root">{_node,na}</DisplayString>
+    <DisplayString Condition="_attribute._attr">{_attribute}</DisplayString>
+    <DisplayString>empty</DisplayString>
+    <Expand HideRawView="1">
+      <ExpandedItem Condition="_node._root &amp;&amp; !_attribute._attr">_node</ExpandedItem>
+      <ExpandedItem Condition="!_node._root &amp;&amp; _attribute._attr">_attribute</ExpandedItem>
+      <Item Name="node" Condition="_node._root &amp;&amp; _attribute._attr">_node,na</Item>
+      <Item Name="attribute" Condition="_node._root &amp;&amp; _attribute._attr">_attribute,na</Item>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xpath_node_set">
+    <Expand>
+      <Item Name="type">_type</Item>
+      <ArrayItems>
+        <Size>_end - _begin</Size>
+        <ValuePointer>_begin</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

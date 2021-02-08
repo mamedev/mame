@@ -151,7 +151,7 @@ void cninja_state::cninjabl2_map(address_map &map)
 
 	map(0x180000, 0x18ffff).ram();
 	map(0x1b4000, 0x1b4001).r(FUNC(cninja_state::cninjabl2_sprite_dma_r));
-}	
+}
 
 uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
 {

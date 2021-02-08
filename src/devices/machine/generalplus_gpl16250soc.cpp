@@ -46,6 +46,35 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 }
 
 
+uint16_t generalplus_gpspi_direct_device::spi_direct_7b40_r()
+{
+	return machine().rand();
+}
+
+
+void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+
+	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+
+	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
+}
+
+
+DEFINE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device, "gpac800spi_direct", "GeneralPlus GPL16250 (with direct SPI handling)")
+
+generalplus_gpspi_direct_device::generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GP_SPI_DIRECT, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspi_direct_device::gpspi_direct_internal_map), this))
+{
+}
+
+
+
+
 void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
 	logerror("callback not hooked\n");
@@ -487,6 +516,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7869_portb_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7869_portb_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portb_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portb_out(data);
 }
 
 void sunplus_gcm394_base_device::ioarea_7868_portb_w(uint16_t data)
@@ -598,6 +630,9 @@ uint16_t sunplus_gcm394_base_device::ioarea_7879_portd_buffer_r()
 void sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_IO, "%s:sunplus_gcm394_base_device::ioarea_7879_portd_buffer_w %04x\n", machine().describe_context(), data);
+
+	if (m_portd_out) // buffer writes must update output state too, beijuehh requires it for banking
+		m_portd_out(data);
 }
 
 
@@ -852,7 +887,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007087, 0x007087).w(m_spg_video, FUNC(gcm394_base_video_device::video_7087_w));
 	map(0x007088, 0x007088).w(m_spg_video, FUNC(gcm394_base_video_device::video_7088_w));
 
-	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_r)); // gormiti checks this
+	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_prng_r)); // gormiti checks this
 
 	// ######################################################################################################################################################################################
 	// 73xx-77xx = video ram

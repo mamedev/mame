@@ -1606,3 +1606,15 @@ if (SOUNDS["TT5665"]~=null) then
 		MAME_DIR .. "src/devices/sound/tt5665.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/uda1344.h,SOUNDS["UDA1344"] = true
+---------------------------------------------------
+
+if (SOUNDS["UDA1344"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/uda1344.cpp",
+		MAME_DIR .. "src/devices/sound/uda1344.h",
+	}
+end

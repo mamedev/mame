@@ -82,15 +82,24 @@
 
 **************************************************************************/
 
-#include <cstddef>
 #include "emu.h"
+#include "drcbex86.h"
+
 #include "debugger.h"
 #include "emuopts.h"
 #include "drcuml.h"
-#include "drcbex86.h"
+
+#include <cstddef>
+
 
 namespace drc {
+
 using namespace uml;
+
+using namespace asmjit;
+using namespace asmjit::x86;
+
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -794,6 +803,7 @@ void drcbe_x86::reset()
 int drcbe_x86::execute(code_handle &entry)
 {
 	// call our entry point which will jump to the destination
+	m_cache.codegen_complete();
 	return (*m_entry)((x86code *)entry.codeptr());
 }
 

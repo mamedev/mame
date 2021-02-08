@@ -12,6 +12,34 @@
 #pragma once
 
 
+// pinout reference
+
+/*
+            ______   ______                                   ______   ______
+    Vss  1 |*     \_/      | 40 A4    10*address      Vss  1 |*     \_/      | 40 A7
+     A5  2 |               | 39 A3    ------------>  ADR0  2 |               | 39 A6
+     A6  3 |               | 38 A2          |        ADR1  3 |               | 38 A5
+    Vss  4 |               | 37 A1          |        ADR2  4 |               | 37 A4
+    CLK  5 |               | 36 A0          v        ADR3  5 |               | 36 A3
+    _VE  6 |               | 35 ADR0   ___________  R/_WI  6 |               | 35 A2
+   C/_T  7 |               | 34 ADR1  |           |   _SG  7 |               | 34 A1
+      B  8 |               | 33 ADR2  |           |   _SM  8 |               | 33 A0
+      G  9 |               | 32 ADR3  |           |    B7  9 |               | 32 D0
+      R 10 |     EF9340    | 31 ADR4  | 2*1KB RAM |    B6 10 |     EF9341    | 31 D1
+      I 11 |     (VIN)     | 30 ADR5  |           |    B5 11 |     (GEN)     | 30 D2
+    _SM 12 |               | 29 ADR6  |           |    B4 12 |               | 29 D3
+    _SG 13 |               | 28 ADR7  |           |    B3 13 |               | 28 D4
+    _ST 14 |               | 27 ADR8  |___________|    B2 14 |               | 27 D5
+  R/_WI 15 |               | 26 ADR9                   B1 15 |               | 26 D6
+     TT 16 |               | 25 TL          ^          B0 16 |               | 25 D7
+    SYT 17 |               | 24 TEST        |         _ST 17 |               | 24 C/_T
+     B7 18 |               | 23 _RES        v         _VE 18 |               | 23 R/_W
+     B6 19 |               | 22 A7    <----------->   _CS 19 |               | 22 B/_A
+     B5 20 |_______________| 21 Vcc   16*data           E 20 |_______________| 21 Vcc
+
+*/
+
+
 class ef9340_1_device : public device_t,
 						public device_video_interface
 {
@@ -48,7 +76,7 @@ protected:
 
 	void ef9340_scanline(int vpos);
 
-	/* timers */
+	// timers
 	static constexpr device_timer_id TIMER_LINE = 0;
 	static constexpr device_timer_id TIMER_BLINK = 1;
 

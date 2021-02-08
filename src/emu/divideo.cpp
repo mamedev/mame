@@ -88,7 +88,7 @@ void device_video_interface::interface_validity_check(validity_checker &valid) c
 		else
 		{
 			// otherwise, look for a single match
-			screen_device_iterator iter(device().mconfig().root_device());
+			screen_device_enumerator iter(device().mconfig().root_device());
 			screen = iter.first();
 			if (iter.count() > 1)
 				osd_printf_error("No screen specified for device '%s', but multiple screens found\n", device().tag());
@@ -121,7 +121,7 @@ void device_video_interface::interface_pre_start()
 		else
 		{
 			// otherwise, look for a single match
-			screen_device_iterator iter(device().machine().root_device());
+			screen_device_enumerator iter(device().machine().root_device());
 			m_screen = iter.first();
 			if (iter.count() > 1)
 				throw emu_fatalerror("No screen specified for device '%s', but multiple screens found", device().tag());

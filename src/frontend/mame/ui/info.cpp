@@ -82,7 +82,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 {
 	ioport_list local_ports;
 	std::string sink;
-	for (device_t &device : device_iterator(config.root_device()))
+	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// the "no sound hardware" warning doesn't make sense when you plug in a sound card
 		if (dynamic_cast<device_sound_interface *>(&device))
@@ -343,7 +343,7 @@ std::string machine_info::game_info_string() const
 			core_filename_extract_base(m_machine.system().type.source()));
 
 	// loop over all CPUs
-	execute_interface_iterator execiter(m_machine.root_device());
+	execute_interface_enumerator execiter(m_machine.root_device());
 	std::unordered_set<std::string> exectags;
 	for (device_execute_interface &exec : execiter)
 	{
@@ -382,7 +382,7 @@ std::string machine_info::game_info_string() const
 	}
 
 	// loop over all sound chips
-	sound_interface_iterator snditer(m_machine.root_device());
+	sound_interface_enumerator snditer(m_machine.root_device());
 	std::unordered_set<std::string> soundtags;
 	bool found_sound = false;
 	for (device_sound_interface &sound : snditer)
@@ -426,7 +426,7 @@ std::string machine_info::game_info_string() const
 
 	// display screen information
 	buf << _("\nVideo:\n");
-	screen_device_iterator scriter(m_machine.root_device());
+	screen_device_enumerator scriter(m_machine.root_device());
 	int scrcount = scriter.count();
 	if (scrcount == 0)
 		buf << _("None\n");
@@ -468,7 +468,7 @@ std::string machine_info::game_info_string() const
 
 std::string machine_info::get_screen_desc(screen_device &screen) const
 {
-	if (screen_device_iterator(m_machine.root_device()).count() > 1)
+	if (screen_device_enumerator(m_machine.root_device()).count() > 1)
 		return string_format(_("Screen '%1$s'"), screen.tag());
 	else
 		return _("Screen");
@@ -490,8 +490,7 @@ menu_game_info::~menu_game_info()
 
 void menu_game_info::populate(float &customtop, float &custombottom)
 {
-	std::string tempstring = ui().machine_info().game_info_string();
-	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+	item_append(ui().machine_info().game_info_string(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_game_info::handle()
@@ -515,8 +514,7 @@ menu_warn_info::~menu_warn_info()
 
 void menu_warn_info::populate(float &customtop, float &custombottom)
 {
-	std::string tempstring = ui().machine_info().warnings_string();
-	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+	item_append(ui().machine_info().warnings_string(), FLAG_MULTILINE, nullptr);
 }
 
 void menu_warn_info::handle()
@@ -540,10 +538,10 @@ menu_image_info::~menu_image_info()
 
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
-	item_append(machine().system().type.fullname(), "", FLAG_DISABLE, nullptr);
-	item_append("", "", FLAG_DISABLE, nullptr);
+	item_append(machine().system().type.fullname(), FLAG_DISABLE, nullptr);
+	item_append(std::string(), FLAG_DISABLE, nullptr);
 
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
 }
 
@@ -569,29 +567,31 @@ void menu_image_info::image_info(device_image_interface *image)
 		// if image has been loaded through softlist, let's add some more info
 		if (image->loaded_through_softlist())
 		{
-			// display long filename
-			item_append(image->longname(), "", FLAG_DISABLE, nullptr);
+			software_info const &swinfo(*image->software_entry());
 
-			// display manufacturer and year
-			item_append(string_format("%s, %s", image->manufacturer(), image->year()), "", FLAG_DISABLE, nullptr);
+			// display full name, publisher and year
+			item_append(swinfo.longname(), FLAG_DISABLE, nullptr);
+			item_append(string_format("%1$s, %2$s", swinfo.publisher(), swinfo.year()), FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
-			switch (image->supported())
+			switch (swinfo.supported())
 			{
-				case SOFTWARE_SUPPORTED_NO:
-					item_append(_("Not supported"), "", FLAG_DISABLE, nullptr);
-					break;
-				case SOFTWARE_SUPPORTED_PARTIAL:
-					item_append(_("Partially supported"), "", FLAG_DISABLE, nullptr);
-					break;
-				default:
-					break;
+			case SOFTWARE_SUPPORTED_NO:
+				item_append(_("Not supported"), FLAG_DISABLE, nullptr);
+				break;
+			case SOFTWARE_SUPPORTED_PARTIAL:
+				item_append(_("Partially supported"), FLAG_DISABLE, nullptr);
+				break;
+			default:
+				break;
 			}
 		}
 	}
 	else
+	{
 		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
-	item_append("", "", FLAG_DISABLE, nullptr);
+	}
+	item_append(std::string(), FLAG_DISABLE, nullptr);
 }
 
 } // namespace ui

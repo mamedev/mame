@@ -594,7 +594,7 @@ static int gba_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -659,13 +659,13 @@ image_init_result gba_cart_slot_device::call_load()
 		{
 			case 2 * 1024 * 1024:
 				memcpy(ROM + 0x200000, ROM, 0x200000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 4 * 1024 * 1024:
 				memcpy(ROM + 0x400000, ROM, 0x400000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 8 * 1024 * 1024:
 				memcpy(ROM + 0x800000, ROM, 0x800000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 16 * 1024 * 1024:
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
@@ -719,7 +719,11 @@ static inline std::string gba_chip_string( uint32_t chip )
 	if (chip & GBA_CHIP_FLASH_512) str += "FLASH_512 ";
 	if (chip & GBA_CHIP_SRAM) str += "SRAM ";
 	if (chip & GBA_CHIP_RTC) str += "RTC ";
-	strtrimspace(str);
+	if (!str.empty())
+	{
+		assert(str.back() == ' ');
+		str = str.substr(0, str.length() - 1);
+	}
 	return str;
 }
 

@@ -28,7 +28,7 @@ local portname = exports
 
 function portname.startplugin()
 	local json = require("json")
-	local ctrlrpath = lfs.env_replace(manager:options().entries.ctrlrpath:value():match("([^;]+)"))
+	local ctrlrpath = emu.subst_env(manager.options.entries.ctrlrpath:value():match("([^;]+)"))
 	local function get_filename(nosoft)
 		local filename
 		if emu.softname() ~= "" and not nosoft then
@@ -56,7 +56,7 @@ function portname.startplugin()
 			return
 		end
 		for pname, port in pairs(ctable.ports) do
-			local ioport = manager:machine():ioport().ports[pname]
+			local ioport = manager.machine.ioport.ports[pname]
 			if ioport then
 				for mask, label in pairs(port.labels) do
 					for num3, field in pairs(ioport.fields) do
@@ -76,7 +76,7 @@ function portname.startplugin()
 		if ret then
 			if emu.softname() ~= "" then
 				local parent
-				for tag, image in pairs(manager:machine().images) do
+				for tag, image in pairs(manager.machine.images) do
 					parent = image.software_parent
 					if parent ~= "" then
 						break
@@ -89,7 +89,7 @@ function portname.startplugin()
 			if ret then
 				ret = file:open(get_filename(true))
 				if ret then
-					ret = file:open(manager:machine():system().parent .. ".json")
+					ret = file:open(manager.machine.system.parent .. ".json")
 					if ret then
 						return
 					end
@@ -106,7 +106,7 @@ function portname.startplugin()
 	local function menu_callback(index, event)
 		if event == "select" then
 			local ports = {}
-			for pname, port in pairs(manager:machine():ioport().ports) do
+			for pname, port in pairs(manager.machine.ioport.ports) do
 				local labels = {}
 				local sort = {}
 				for fname, field in pairs(port.fields) do
@@ -131,12 +131,12 @@ function portname.startplugin()
 				if not attr then
 					lfs.mkdir(path)
 					if not lfs.attributes(path) then
-						manager:machine():popmessage(_("Failed to save input name file"))
+						manager.machine:popmessage(_("Failed to save input name file"))
 						emu.print_verbose("portname: unable to create path " .. path .. "\n")
 						return false
 				end
 				elseif attr.mode ~= "directory" then
-					manager:machine():popmessage(_("Failed to save input name file"))
+					manager.machine:popmessage(_("Failed to save input name file"))
 					emu.print_verbose("portname: path exists but isn't directory " .. path .. "\n")
 					return false
 				end
@@ -152,7 +152,7 @@ function portname.startplugin()
 			local file = io.open(ctrlrpath .. "/portname/" .. filename, "r")
 			if file then
 				emu.print_verbose("portname: input name file exists " .. filename .. "\n")
-				manager:machine():popmessage(_("Failed to save input name file"))
+				manager.machine:popmessage(_("Failed to save input name file"))
 				file:close()
 				return false
 			end
@@ -164,7 +164,7 @@ function portname.startplugin()
 			setmetatable(ctable, { __jsonorder = { "romname", "softname", "ports" }})
 			file:write(json.stringify(ctable, { indent = true }))
 			file:close()
-			manager:machine():popmessage(string.format(_("Input port name file saved to %s"), ctrlrpath .. "/portname/" .. filename))
+			manager.machine:popmessage(string.format(_("Input port name file saved to %s"), ctrlrpath .. "/portname/" .. filename))
 		end
 		return false
 	end

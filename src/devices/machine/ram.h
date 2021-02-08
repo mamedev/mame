@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
     RAM device
@@ -83,6 +83,6 @@ private:
 DECLARE_DEVICE_TYPE(RAM, ram_device)
 
 // device iterator
-typedef device_type_iterator<ram_device> ram_device_iterator;
+typedef device_type_enumerator<ram_device> ram_device_enumerator;
 
 #endif // MAME_MACHINE_RAM_H

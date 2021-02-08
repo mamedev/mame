@@ -22,6 +22,7 @@
 #include "screen.h"
 #include "uiinput.h"
 
+#include "corestr.h"
 #include "coreutil.h"
 #include "osdepend.h"
 #include "xmlfile.h"
@@ -60,9 +61,9 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 
-	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
-	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
-	const uint32_t count = (uint32_t)screen_iterator.count();
+	screen_device_enumerator screen_enumerator = screen_device_enumerator(m_machine.root_device());
+	screen_device_enumerator::iterator iter = screen_enumerator.begin();
+	const uint32_t count = (uint32_t)screen_enumerator.count();
 
 	if (count == 1)
 	{
@@ -104,7 +105,7 @@ void debugger_cpu::flush_traces()
 {
 	/* this can be called on exit even when no debugging is enabled, so
 	 make sure the devdebug is valid before proceeding */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 		if (device.debug() != nullptr)
 			device.debug()->trace_flush();
 }
@@ -146,7 +147,7 @@ bool debugger_cpu::comment_save()
 
 		// for each device
 		bool found_comments = false;
-		for (device_t &device : device_iterator(m_machine.root_device()))
+		for (device_t &device : device_enumerator(m_machine.root_device()))
 			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
@@ -272,7 +273,7 @@ void debugger_cpu::on_vblank(screen_device &device, bool vblank_state)
 void debugger_cpu::reset_transient_flags()
 {
 	/* loop over CPUs and reset the transient flags */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 		device.debug()->reset_transient_flag();
 	m_stop_when_not_device = nullptr;
 }
@@ -503,14 +504,13 @@ device_debug::device_debug(device_t &device)
 		}
 
 		// add all registers into it
-		std::string tempstr;
 		for (const auto &entry : m_state->state_entries())
 		{
 			// TODO: floating point registers
 			if (!entry->is_float())
 			{
 				using namespace std::placeholders;
-				strmakelower(tempstr.assign(entry->symbol()));
+				std::string tempstr(strmakelower(entry->symbol()));
 				m_symtable->add(
 						tempstr.c_str(),
 						std::bind(&device_state_entry::value, entry.get()),
@@ -1669,7 +1669,7 @@ void device_debug::breakpoint_update_flags()
 			break;
 		}
 
-	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
+	if (!(m_flags & DEBUG_FLAG_LIVE_BP))
 	{
 		// see if there are any enabled registerpoints
 		for (debug_registerpoint &rp : *m_rplist)
@@ -1677,6 +1677,7 @@ void device_debug::breakpoint_update_flags()
 			if (rp.m_enabled)
 			{
 				m_flags |= DEBUG_FLAG_LIVE_BP;
+				break;
 			}
 		}
 	}

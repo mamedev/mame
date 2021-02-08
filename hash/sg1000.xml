@@ -143,6 +143,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="3ninmja" cloneof="3ninmj">
+		<description>San-nin Mahjong (Jpn, alt)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<info name="alt_title" value="三人麻雀"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="san-nin mahjong (alt).bin" size="40960" crc="0e641f36" sha1="a5c2acba93cd3809577f401c00fa9d728627ed60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bankp">
 		<description>Bank Panic (Jpn)</description>
 		<year>1985</year>

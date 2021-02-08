@@ -308,7 +308,7 @@ void ssystem3_state::lcd2_output_w(offs_t offset, u32 data)
 
 	m_lcd2_data = u64(data) << 32 | m_lcd2_data >> 32;
 
-	if (N == 1)
+	if constexpr (N == 1)
 		lcd2_update();
 }
 
@@ -461,7 +461,7 @@ void ssystem3_state::ssystem4(machine_config &config)
 	M6502(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem4_map);
 
-	VIA6522(config, m_via, 4_MHz_XTAL / 2);
+	MOS6522(config, m_via, 4_MHz_XTAL / 2);
 	m_via->writepa_handler().set(FUNC(ssystem3_state::input_w));
 	m_via->readpa_handler().set(FUNC(ssystem3_state::input_r));
 	m_via->writepb_handler().set(FUNC(ssystem3_state::control_w));

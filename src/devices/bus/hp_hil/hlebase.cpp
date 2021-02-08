@@ -6,8 +6,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 /***************************************************************************
     BASE HLE KEYBOARD DEVICE
@@ -160,4 +159,3 @@ out:
 }
 
 } // namespace bus::hp_hil
-} // namespace bus

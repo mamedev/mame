@@ -1632,7 +1632,7 @@ void duart_channel::write_CR(uint8_t data)
 		SR &= ~STATUS_RECEIVER_READY;
 	}
 
-	if (BIT(data, 2))
+	if (!tx_enabled && BIT(data, 2))
 	{
 		tx_enabled = 1;
 		tx_ready = 1;

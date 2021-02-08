@@ -352,7 +352,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		break;
 
 	case 0xa:
-		logerror("vt03_410aw %02x\n", data);
+		logerror("vt03_410a_w %02x\n", data);
 		m_410x[0xa] = data;
 		update_banks();
 		break;
@@ -704,7 +704,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 	offset &= 0x7fff;
 
 	uint16_t addr = offset+0x8000;
-	if ((m_411d & 0x01) && (m_411d & 0x03)) // this condition is nonsense, maybe should be ((m_411d & 0x03) == 0x03) check it!  (newer VT only, not VT03/09, split)
+	if ((m_411d & 0x03) == 0x03) // (VT32 only, not VT03/09, split)
 	{
 		//CNROM compat
 		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
@@ -716,13 +716,13 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 		m_ppu->set_201x_reg(0x5, data * 8 + 7);
 
 	}
-	else if (m_411d & 0x01) // (newer VT only, not VT03/09, split)
+	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09, split)
 	{
 		//MMC1 compat, TODO
 		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 	}
-	else if (m_411d & 0x02) // (newer VT only, not VT03/09, split)
+	else if ((m_411d & 0x03) == 0x02) // (VT32 only, not VT03/09, split)
 	{
 		//UNROM compat
 		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);

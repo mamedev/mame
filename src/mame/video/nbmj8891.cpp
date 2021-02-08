@@ -493,6 +493,8 @@ VIDEO_START_MEMBER( nbmj8891_state, _1layer )
 	memset(m_videoram0.get(), 0xff, (width * height * sizeof(char)));
 	m_gfxdraw_mode = 0;
 	m_screen_refresh = 1;
+	m_blitter_src_addr = 0;
+	m_gfxrom = 0;
 
 	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_TAIWANMB)
 	{
@@ -527,6 +529,7 @@ void nbmj8891_state::video_start()
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
 	m_blitter_src_addr = 0;
+	m_gfxrom = 0;
 
 	common_save_state();
 	save_pointer(NAME(m_videoram1), width * height);

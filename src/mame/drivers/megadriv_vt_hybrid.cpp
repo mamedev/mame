@@ -2,13 +2,13 @@
 // copyright-holders:David Haywood
 
 /*
-	This is an enhanced 'Mega Drive / Genesis on a Chip' combined with a VT02/VT03 system for the 'Bonus Games' menu
+    This is an enhanced 'Mega Drive / Genesis on a Chip' combined with a VT02/VT03 system for the 'Bonus Games' menu
 
-	The menu for the MD side of things doesn't work as it needs enhanced chipset emulation?
-	at the moment it just boots the game in the lowest ROM bank (Flicky)
+    The menu for the MD side of things doesn't work as it needs enhanced chipset emulation?
+    at the moment it just boots the game in the lowest ROM bank (Flicky)
 
-	TODO:
-	hook up the VT side again
+    TODO:
+    hook up the VT side again
 
 */
 
@@ -135,7 +135,7 @@ void megadriv_vt0203_state::megadriv_vt0203_pal(machine_config &config)
 	md_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_vt0203_state::megadriv_vt0203_map);
 
-	m_screen->set_screen_update(FUNC(megadriv_vt0203_state::screen_update_hybrid)); 
+	m_screen->set_screen_update(FUNC(megadriv_vt0203_state::screen_update_hybrid));
 	m_screen->screen_vblank().set(FUNC(megadriv_vt0203_state::screen_vblank_hybrid));
 
 	// TODO: add the VT part, this might require refactoring of the VT stuff as the SoC currently contains the screen

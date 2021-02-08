@@ -15,8 +15,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device, "hp98620", "HP98620 DMA Controller")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dio16_98620_device(mconfig, HPDIO_98620, tag, owner, clock)
@@ -377,5 +376,3 @@ WRITE_LINE_MEMBER(dio16_98620_device::dmar1_in)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus
-

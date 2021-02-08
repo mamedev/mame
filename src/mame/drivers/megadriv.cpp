@@ -297,12 +297,15 @@ void md_cons_state::machine_start()
 
 void md_cons_state::install_cartslot()
 {
-	// for now m_cartslot is only in MD and not 32x and SegaCD
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_cart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a15)));
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	if (m_cart)
+	{
+		// for now m_cartslot is only in MD and not 32x and SegaCD
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_cart, FUNC(base_md_cart_slot_device::write)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a13)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a15)));
+//      m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	}
 }
 
 uint16_t md_cons_state::tmss_r(offs_t offset)
@@ -342,7 +345,7 @@ void md_cons_slot_state::machine_start()
 	md_cons_state::machine_start();
 
 	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-	if (m_cart->get_type() == SEGA_SVP)
+	if (m_cart && (m_cart->get_type() == SEGA_SVP))
 		m_vdp->set_dma_delay(2);
 
 	if (m_tmss)
@@ -1161,8 +1164,6 @@ CONS( 1993, segacd2,      0,        0,      genesis_scd,     md,       md_cons_c
 CONS( 1993, megacd2,      segacd2,  0,      md_scd,          md,       md_cons_cd_state, init_md_eur,  "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 1993, megacd2j,     segacd2,  0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1994, aiwamcd,      segacd2,  0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1993, xeye,         0,        0,      genesis2_scd,    md,       md_cons_cd_state, init_genesis, "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1992, wmega,        xeye,     0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1993, wmegam2,      xeye,     0,      md2j_scd,        md,       md_cons_cd_state, init_md_jpn,  "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
@@ -1179,6 +1180,12 @@ CONS( 1995, gen_nomd,     0,        0,      ms_megadriv2,    gen_nomd, md_cons_s
 
 // handheld without LCD
 CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )
+
+// LaserActive (Laserdisc Player(ex: CLD-A100) with 'Control Pack' Addon slot)
+// Mega Drive Pack(PAC-S1)/Genesis Pack(PAC-S10) plugged into the Control Pack slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs
+CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer / Sega","LaserActive with Genesis Pack PAC-S10 (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
+//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, LD-ROM2 stuffs, but not emulated.
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

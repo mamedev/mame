@@ -275,14 +275,26 @@ Few other notes:
 
 
 #include "emu.h"
-#include "includes/m5.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/wd_fdc.h" //brno mod
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
+#include "bus/rs232/rs232.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/m5/rom.h"
+#include "bus/m5/slot.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -290,6 +302,148 @@ Few other notes:
 #include "formats/m5_dsk.h"
 #include "formats/sord_cas.h"
 
+//brno mod
+#define RAMDISK         "ramdisk"
+
+
+class m5_state : public driver_device
+{
+public:
+	m5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ctc(*this, "ctc")
+		, m_fd5cpu(*this, "z80fd5")
+		, m_ppi(*this, "ppi")
+		, m_fdc(*this, "upd765")
+		, m_floppy0(*this, "upd765:0:525dd")
+		, m_cassette(*this, "cassette")
+		, m_cart1(*this, "cartslot1")
+		, m_cart2(*this, "cartslot2")
+		, m_centronics(*this, "centronics")
+		, m_ram(*this, RAM_TAG)
+		, m_reset(*this, "RESET")
+		, m_DIPS(*this, "DIPS")
+		, m_centronics_busy(0)
+	{ }
+
+	void m5(machine_config &config);
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+
+protected:
+	required_device<z80_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	//I've changed following devices to optional since we have to remove them in BRNO mod (I don't know better solution)
+	optional_device<cpu_device> m_fd5cpu;
+	optional_device<i8255_device> m_ppi;
+	optional_device<upd765a_device> m_fdc;
+	optional_device<floppy_image_device> m_floppy0;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<m5_cart_slot_device> m_cart1;
+	optional_device<m5_cart_slot_device> m_cart2;
+	required_device<centronics_device> m_centronics;
+	optional_device<ram_device> m_ram;
+	required_ioport m_reset;
+	optional_ioport m_DIPS;
+	m5_cart_slot_device *m_cart_ram, *m_cart;
+
+	u8 sts_r();
+	void com_w(u8 data);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
+	u8 ppi_pa_r();
+	void ppi_pa_w(u8 data);
+	void ppi_pb_w(u8 data);
+	u8 ppi_pc_r();
+	void ppi_pc_w(u8 data);
+
+	u8 fd5_data_r();
+	void fd5_data_w(u8 data);
+	u8 fd5_com_r();
+	void fd5_com_w(u8 data);
+	void fd5_ctrl_w(u8 data);
+	void fd5_tc_w(u8 data);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+
+	// memory
+	u8 mem64KBI_r();
+	void mem64KBI_w(offs_t offset, u8 data);
+	void mem64KBF_w(u8 data);
+	void mem64KRX_w(offs_t offset, u8 data);
+
+	void fd5_io(address_map &map);
+	void fd5_mem(address_map &map);
+	void m5_io(address_map &map);
+	void m5_mem(address_map &map);
+
+	// video state
+//  const TMS9928a_interface *m_vdp_intf;
+
+protected:
+	bool m_centronics_busy;
+
+private:
+	u8 m_ram_mode;
+	u8 m_ram_type;
+	memory_region *m_cart_rom;
+
+	// floppy state for fd5
+	u8 m_fd5_data;
+	u8 m_fd5_com;
+	int m_intra;
+	int m_ibfa;
+	int m_obfa;
+};
+
+
+class brno_state : public m5_state
+{
+public:
+	brno_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m5_state(mconfig, type, tag)
+		, m_rom_view(*this, "rom")
+		, m_ram_view(*this, "ram")
+		, m_wdfdc(*this, "wd")
+		, m_floppy0(*this, "wd:0")
+		, m_floppy1(*this, "wd:1")
+	{ }
+
+	void brno(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	u8 ramdisk_r(offs_t offset);
+	void ramdisk_w(offs_t offset, u8 data);
+	void mmu_w(offs_t offset, u8 data);
+	void ramsel_w(u8 data);
+	void romsel_w(u8 data);
+	void fd_w(u8 data);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_SNAPSHOT_LOAD_MEMBER(brno);
+
+	void brno_io(address_map &map);
+	void m5_mem_brno(address_map &map);
+
+	memory_view m_rom_view;
+	memory_view m_ram_view;
+	required_device<wd2797_device> m_wdfdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
+
+	u8 m_rammap[16]; // memory map
+};
 
 
 //**************************************************************************
@@ -305,7 +459,7 @@ WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
 //  sts_r -
 //-------------------------------------------------
 
-uint8_t m5_state::sts_r()
+u8 m5_state::sts_r()
 {
 	/*
 
@@ -322,13 +476,14 @@ uint8_t m5_state::sts_r()
 
 	*/
 
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// cassette input
 	data |= m_cassette->input() >= 0 ? 1 : 0;
 
 	// centronics busy
-	data |= m_centronics_busy << 1;
+	if (m_centronics_busy)
+		data |= 2;
 
 	// RESET key
 	data |= m_reset->read();
@@ -341,7 +496,7 @@ uint8_t m5_state::sts_r()
 //  com_w -
 //-------------------------------------------------
 
-void m5_state::com_w(uint8_t data)
+void m5_state::com_w(u8 data)
 {
 	/*
 
@@ -378,7 +533,7 @@ void m5_state::com_w(uint8_t data)
 //  fd5_data_r -
 //-------------------------------------------------
 
-uint8_t m5_state::fd5_data_r()
+u8 m5_state::fd5_data_r()
 {
 	m_ppi->pc6_w(0);
 
@@ -390,7 +545,7 @@ uint8_t m5_state::fd5_data_r()
 //  fd5_data_w -
 //-------------------------------------------------
 
-void m5_state::fd5_data_w(uint8_t data)
+void m5_state::fd5_data_w(u8 data)
 {
 	m_fd5_data = data;
 
@@ -402,7 +557,7 @@ void m5_state::fd5_data_w(uint8_t data)
 //  fd5_com_r -
 //-------------------------------------------------
 
-uint8_t m5_state::fd5_com_r()
+u8 m5_state::fd5_com_r()
 {
 	/*
 
@@ -427,7 +582,7 @@ uint8_t m5_state::fd5_com_r()
 //  fd5_com_w -
 //-------------------------------------------------
 
-void m5_state::fd5_com_w(uint8_t data)
+void m5_state::fd5_com_w(u8 data)
 {
 	/*
 
@@ -452,7 +607,7 @@ void m5_state::fd5_com_w(uint8_t data)
 //  fd5_com_w -
 //-------------------------------------------------
 
-void m5_state::fd5_ctrl_w(uint8_t data)
+void m5_state::fd5_ctrl_w(u8 data)
 {
 	/*
 
@@ -477,7 +632,7 @@ void m5_state::fd5_ctrl_w(uint8_t data)
 //  fd5_com_w -
 //-------------------------------------------------
 
-void m5_state::fd5_tc_w(uint8_t data)
+void m5_state::fd5_tc_w(u8 data)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);
@@ -487,19 +642,20 @@ void m5_state::fd5_tc_w(uint8_t data)
 //  64KBI support for oldest memory module
 //**************************************************************************
 
-uint8_t m5_state::mem64KBI_r() //in 0x6c
+u8 m5_state::mem64KBI_r() //in 0x6c
 {
 	return BIT(m_ram_mode, 0);
 }
 
-void m5_state::mem64KBI_w(offs_t offset, uint8_t data) //out 0x6c
+void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 {
 	if (m_ram_type != MEM64KBI) return;
 
+#if 0 // FIXME: disabled for now
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
-	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
+	memory_region *ram_region = memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
 
 	if (m_ram_mode == BIT(data, 0))
 		return;
@@ -513,7 +669,7 @@ void m5_state::mem64KBI_w(offs_t offset, uint8_t data) //out 0x6c
 	}
 	else
 	{
-		program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
+		program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 		program.unmap_write(0x0000, 0x1fff);
 
 		//if AUTOSTART is on don't load any ROM cart
@@ -525,6 +681,7 @@ void m5_state::mem64KBI_w(offs_t offset, uint8_t data) //out 0x6c
 		else
 			program.unmap_readwrite(0x2000, 0x3fff);
 	}
+#endif
 
 	logerror("64KBI: ROM %s", m_ram_mode == 0 ? "enabled\n" : "disabled\n");
 }
@@ -533,10 +690,11 @@ void m5_state::mem64KBI_w(offs_t offset, uint8_t data) //out 0x6c
 //  64KBF paging
 //**************************************************************************
 
-void m5_state::mem64KBF_w(uint8_t data) //out 0x30
+void m5_state::mem64KBF_w(u8 data) //out 0x30
 {
 	if (m_ram_type != MEM64KBF) return;
 
+#if 0 // FIXME: disabled for now
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str()); //ROM region of the cart
@@ -552,7 +710,7 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 	{
 		case 0:
 			program.unmap_write(0x0000, 0x6fff);
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());
+			membank("bank1r")->set_base(memregion("maincpu")->base());
 			membank("bank2r")->set_base(m_cart_rom->base());
 			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);
 			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);
@@ -576,7 +734,7 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
 			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank1r")->set_base(memregion("maincpu")->base());  membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(ram_region->base()+0x4000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
 			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
@@ -608,7 +766,7 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
 			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank1r")->set_base(memregion("maincpu")->base());  membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
 			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
@@ -620,7 +778,7 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
 			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base()+0x0000);
+			membank("bank1r")->set_base(memregion("maincpu")->base());  membank("bank1w")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(rom_region->base()+0x0000);     membank("bank2w")->set_base(ram_region->base()+0x2000);
 			membank("bank3r")->set_base(rom_region->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
 			membank("bank4r")->set_base(rom_region->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
@@ -642,6 +800,7 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 			membank("bank6r")->set_base(rom_region->base()+0xc000);     membank("bank6w")->set_base(rom_region->base()+0xc000);
 			break;
 	}
+#endif
 
 	logerror("64KBF RAM mode set to %d\n", m_ram_mode);
 }
@@ -650,11 +809,12 @@ void m5_state::mem64KBF_w(uint8_t data) //out 0x30
 //  64KRX paging
 //**************************************************************************
 
-void m5_state::mem64KRX_w(offs_t offset, uint8_t data) //out 0x7f
+void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 {
 	if (m_ram_type != MEM64KRX) return;
 	if (m_ram_mode == data) return;
 
+#if 0 // FIXME: disabled for now
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
@@ -662,7 +822,7 @@ void m5_state::mem64KRX_w(offs_t offset, uint8_t data) //out 0x7f
 
 	m_ram_mode = data;
 
-	BIT(m_ram_mode, 0) ? membank("bank1r")->set_base(memregion(Z80_TAG)->base())    :   membank("bank1r")->set_base(ram_region->base());
+	BIT(m_ram_mode, 0) ? membank("bank1r")->set_base(memregion("maincpu")->base())  :   membank("bank1r")->set_base(ram_region->base());
 	BIT(m_ram_mode, 1) ? membank("bank2r")->set_base(m_cart_rom->base())            :   membank("bank2r")->set_base(ram_region->base()+0x2000);
 	BIT(m_ram_mode, 2) ? membank("bank3r")->set_base(m_cart_rom->base()+0x2000)     :   membank("bank3r")->set_base(ram_region->base()+0x4000);
 
@@ -683,6 +843,7 @@ void m5_state::mem64KRX_w(offs_t offset, uint8_t data) //out 0x7f
 		program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 		program.unmap_write(0x2000, 0x6fff);
 	}
+#endif
 
 	logerror("64KRX RAM mode set to %02x\n", m_ram_mode);
 }
@@ -699,13 +860,14 @@ void m5_state::mem64KRX_w(offs_t offset, uint8_t data) //out 0x7f
 void m5_state::m5_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankr("bank1r").bankw("bank1w"); //monitor rom(bios)
-	map(0x2000, 0x3fff).bankr("bank2r").bankw("bank2w");
-	map(0x4000, 0x5fff).bankr("bank3r").bankw("bank3w");
-	map(0x6000, 0x6fff).bankr("bank4r").bankw("bank4w");
+	map(0x0000, 0x1fff).rom().region("maincpu", 0); //monitor rom(bios)
+	//map(0x0000, 0x1fff).bankr("bank1r").bankw("bank1w");
+	//map(0x2000, 0x3fff).bankr("bank2r").bankw("bank2w");
+	//map(0x4000, 0x5fff).bankr("bank3r").bankw("bank3w");
+	//map(0x6000, 0x6fff).bankr("bank4r").bankw("bank4w");
 	map(0x7000, 0x7fff).ram();                                         //4kb internal RAM
-	map(0x8000, 0xbfff).bankr("bank5r").bankw("bank5w");
-	map(0xc000, 0xffff).bankr("bank6r").bankw("bank6w");
+	//map(0x8000, 0xbfff).bankr("bank5r").bankw("bank5w");
+	//map(0xc000, 0xffff).bankr("bank6r").bankw("bank6w");
 }
 
 
@@ -719,7 +881,7 @@ void m5_state::m5_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x20, 0x20).mirror(0x0f).w("sgc", FUNC(sn76489a_device::write));
 	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
 	map(0x31, 0x31).mirror(0x08).portr("Y1");
 	map(0x32, 0x32).mirror(0x08).portr("Y2");
@@ -732,7 +894,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  map(0x60, 0x63) SIO
 	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
-	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7f, 0x7f).w(FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
 }
 
@@ -870,29 +1032,15 @@ static INPUT_PORTS_START( m5 )
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  TMS9928a_interface vdp_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
-{
-	if (state)
-	{
-		m_ctc->trg3(1);
-		m_ctc->trg3(0);
-	}
-}
-
-
-//-------------------------------------------------
 //  I8255 Interface
 //-------------------------------------------------
 
-uint8_t m5_state::ppi_pa_r()
+u8 m5_state::ppi_pa_r()
 {
 	return m_fd5_data;
 }
 
-uint8_t m5_state::ppi_pc_r()
+u8 m5_state::ppi_pc_r()
 {
 	/*
 
@@ -919,12 +1067,12 @@ uint8_t m5_state::ppi_pc_r()
 	);
 }
 
-void m5_state::ppi_pa_w(uint8_t data)
+void m5_state::ppi_pa_w(u8 data)
 {
 	m_fd5_data = data;
 }
 
-void m5_state::ppi_pb_w(uint8_t data)
+void m5_state::ppi_pb_w(u8 data)
 {
 	/*
 
@@ -948,7 +1096,7 @@ void m5_state::ppi_pb_w(uint8_t data)
 	}
 }
 
-void m5_state::ppi_pc_w(uint8_t data)
+void m5_state::ppi_pc_w(u8 data)
 {
 	/*
 
@@ -995,7 +1143,7 @@ static void m5_cart(device_slot_interface &device)
 
 static const z80_daisy_config m5_daisy_chain[] =
 {
-	{ Z80CTC_TAG },
+	{ "ctc" },
 	{ nullptr }
 };
 
@@ -1013,22 +1161,11 @@ static const z80_daisy_config m5_daisy_chain[] =
 void brno_state::m5_mem_brno(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("bank1");
-	map(0x1000, 0x1fff).bankrw("bank2");
-	map(0x2000, 0x2fff).bankrw("bank3");
-	map(0x3000, 0x3fff).bankrw("bank4");
-	map(0x4000, 0x4fff).bankrw("bank5");
-	map(0x5000, 0x5fff).bankrw("bank6");
-	map(0x6000, 0x6fff).bankrw("bank7");
-	map(0x7000, 0x7fff).bankrw("bank8");
-	map(0x8000, 0x8fff).bankrw("bank9");
-	map(0x9000, 0x9fff).bankrw("bank10");
-	map(0xa000, 0xafff).bankrw("bank11");
-	map(0xb000, 0xbfff).bankrw("bank12");
-	map(0xc000, 0xcfff).bankrw("bank13");
-	map(0xd000, 0xdfff).bankrw("bank14");
-	map(0xe000, 0xefff).bankrw("bank15");
-	map(0xf000, 0xffff).bankrw("bank16");
+	map(0x0000, 0xffff).view(m_ram_view);
+	m_ram_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r), FUNC(brno_state::ramdisk_w));
+	map(0x0000, 0x7fff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0x3fff).rom().region("maincpu", 0).unmapw();
+	m_rom_view[0](0x7000, 0x7fff).ram();
 }
 
 //-------------------------------------------------
@@ -1037,116 +1174,75 @@ void brno_state::m5_mem_brno(address_map &map)
 void brno_state::brno_io(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
-	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x10, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x30, 0x30).portr("Y0");
-	map(0x31, 0x31).portr("Y1");
-	map(0x32, 0x32).portr("Y2");
-	map(0x33, 0x33).portr("Y3");
-	map(0x34, 0x34).portr("Y4");
-	map(0x35, 0x35).portr("Y5");
-	map(0x36, 0x36).portr("Y6");
-	map(0x37, 0x37).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
-//  map(0x60, 0x63)                                                                            //  SIO
-	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)
-	map(0x68, 0x6b).rw(FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                     //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
-	map(0x6c, 0x6f).rw(FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                     //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
-//  map(0x70, 0x73).mirror(0x04).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
-	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));     //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
-	map(0x7c, 0x7c).rw(FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                             //  drive select
+	map(0x00, 0x03).mirror(0xff0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x11).mirror(0xff0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0x20, 0x20).mirror(0xff0f).w("sgc", FUNC(sn76489a_device::write));
+	map(0x30, 0x30).mirror(0xff00).portr("Y0");
+	map(0x31, 0x31).mirror(0xff00).portr("Y1");
+	map(0x32, 0x32).mirror(0xff00).portr("Y2");
+	map(0x33, 0x33).mirror(0xff00).portr("Y3");
+	map(0x34, 0x34).mirror(0xff00).portr("Y4");
+	map(0x35, 0x35).mirror(0xff00).portr("Y5");
+	map(0x36, 0x36).mirror(0xff00).portr("Y6");
+	map(0x37, 0x37).mirror(0xff00).portr("JOY");
+	map(0x40, 0x40).mirror(0xff0f).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).mirror(0xff0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
+	map(0x60, 0x61).mirror(0xff02).rw("sio", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x64, 0x64).select(0xf000).mirror(0x0f03).w(FUNC(brno_state::mmu_w));         //  MMU - page select (ramdisk memory paging)
+	map(0x68, 0x68).mirror(0xff03).w(FUNC(brno_state::ramsel_w));                     //  CASEN
+	map(0x6c, 0x6c).mirror(0xff03).w(FUNC(brno_state::romsel_w));                     //  RAMEN
+	map(0x70, 0x73).mirror(0xff00).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
+	map(0x78, 0x7b).mirror(0xff00).rw(m_wdfdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));   //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
+	map(0x7c, 0x7c).mirror(0xff03).w(FUNC(brno_state::fd_w));                         //  drive select
 }
 
 
-uint8_t brno_state::mmu_r()
+u8 brno_state::ramdisk_r(offs_t offset)
 {
-	return 0;
-}
-
-
-void brno_state::mmu_w(uint8_t data)
-{
-	m_ramcpu = m_maincpu->state_int(Z80_B);
-	m_rambank = ~data; //m_maincpu->state_int(Z80_A);
-	m_rammap[m_ramcpu >> 4]=m_rambank;
-
-
-	switch (m_ramcpu>>4)
-	{
-		case 0: membank("bank1")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 1: membank("bank2")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 2: membank("bank3")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 3: membank("bank4")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 4: membank("bank5")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 5: membank("bank6")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 6: membank("bank7")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 7: if (!m_romen) membank("bank8")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 8: membank("bank9")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 9: membank("bank10")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 10: membank("bank11")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 11: membank("bank12")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 12: membank("bank13")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 13: membank("bank14")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 14: membank("bank15")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-		case 15: membank("bank16")->set_base(memregion(RAMDISK)->base()+(m_rambank << 12));break;
-	}
-
-	//logerror("RAMdisk page change(CPURAM<=BANK): &%02X00<=%02X at address &%04X\n",m_ramcpu,m_rambank,m_maincpu->state_int(Z80_PC)-2);
-
-
-}
-
-uint8_t brno_state::ramsel_r()
-{
-	return m_ramen;
-}
-
-
-void brno_state::ramsel_w(uint8_t data) //out 6b
-{
-	//address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (!data)
-		m_ramen=true;
+	offset = (offset & 0x0fff) | u32(m_rammap[offset >> 12]) << 12;
+	if (offset < m_ram->size())
+		return m_ram->read(offset);
 	else
-		m_ramen=false;
-
-	logerror("CASEN change: out (&6b),%x\n",data);
+		return 0xff;
 }
 
-uint8_t brno_state::romsel_r()
+void brno_state::ramdisk_w(offs_t offset, u8 data)
 {
-	return m_romen;
+	offset = (offset & 0x0fff) | u32(m_rammap[offset >> 12]) << 12;
+	if (offset < m_ram->size())
+		m_ram->write(offset, data);
 }
 
-void brno_state::romsel_w(uint8_t data) //out 6c
+void brno_state::mmu_w(offs_t offset, u8 data)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	u8 ramcpu = offset >> 12;
+	u8 rambank = ~data;
+	m_rammap[ramcpu] = rambank;
 
-	if (!data)
-	{
-		program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
-		program.unmap_write(0x0000, 0x3fff);
-		m_romen=true;
-	}
+	//logerror("RAMdisk page change(CPURAM<=BANK): &%X000<=%02X at %s\n", ramcpu, rambank, machine().describe_context());
+}
 
+void brno_state::ramsel_w(u8 data) //out 6b
+{
+	// 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
+	// Note that RAM disk is not banked in 0000-3FFF or 7000-7FFF unless ROM is disabled
+	if (!BIT(data, 0))
+		m_ram_view.select(0);
 	else
-	{
-		program.install_readwrite_bank(0x0000, 0x0fff, membank("bank1"));
-		program.install_readwrite_bank(0x1000, 0x1fff, membank("bank2"));
-		program.install_readwrite_bank(0x2000, 0x2fff, membank("bank3"));
-		program.install_readwrite_bank(0x3000, 0x3fff, membank("bank4"));
-		program.install_readwrite_bank(0x4000, 0x4fff, membank("bank5"));
-		program.install_readwrite_bank(0x5000, 0x5fff, membank("bank6"));
-		program.install_readwrite_bank(0x6000, 0x6fff, membank("bank7"));
+		m_ram_view.disable();
 
-		m_romen=false;
-	}
+	//logerror("CASEN change: out (&6b),%x\n",data);
+}
 
-	logerror("RAMEN change: out (&6c),%x\n",data);
+void brno_state::romsel_w(u8 data) //out 6c
+{
+	// 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
+	if (!BIT(data, 0))
+		m_rom_view.select(0);
+	else
+		m_rom_view.disable();
+
+	//logerror("RAMEN change: out (&6c),%x\n",data);
 }
 
 
@@ -1154,18 +1250,11 @@ void brno_state::romsel_w(uint8_t data) //out 6c
 //  FD port 7c - Floppy select
 //-------------------------------------------------
 
-uint8_t brno_state::fd_r()
-{
-	return 0;
-}
-
-
-void brno_state::fd_w(uint8_t data)
+void brno_state::fd_w(u8 data)
 {
 	floppy_image_device *floppy;
 	m_floppy = nullptr;
 	int disk = 0;
-
 
 	floppy = m_floppy0->get_device();
 	if (floppy)
@@ -1194,14 +1283,13 @@ void brno_state::fd_w(uint8_t data)
 		}
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_wdfdc->set_floppy(m_floppy);
 	if (m_floppy)
 	{
 		m_floppy->set_rpm(300);
 		m_floppy->mon_w(0);
 		logerror("Select floppy %d\n", disk);
 	}
-
 }
 
 
@@ -1234,6 +1322,7 @@ void m5_state::machine_start()
 	save_item(NAME(m_intra));
 	save_item(NAME(m_ibfa));
 	save_item(NAME(m_obfa));
+	save_item(NAME(m_centronics_busy));
 }
 
 void m5_state::machine_reset()
@@ -1261,7 +1350,7 @@ void m5_state::machine_reset()
 	// no cart inserted - there is nothing to do - not allowed in original Sord m5
 	if (m_cart_ram == nullptr && m_cart == nullptr)
 	{
-		membank("bank1r")->set_base(memregion(Z80_TAG)->base());
+	//  membank("bank1r")->set_base(memregion("maincpu")->base());
 		program.unmap_write(0x0000, 0x1fff);
 	//  program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on real hw
 		program.unmap_readwrite(0x8000, 0xffff);
@@ -1274,12 +1363,12 @@ void m5_state::machine_reset()
 		m_ram_type=m_cart_ram->get_type();
 
 		m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
-		memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
+		//memory_region *ram_region = memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
 
 		switch (m_ram_type)
 		{
 			case EM_5:
-				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
+				program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 				program.unmap_write(0x0000, 0x1fff);
 				program.install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::read_ram)), write8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::write_ram)));
 				if (m_cart)
@@ -1288,8 +1377,9 @@ void m5_state::machine_reset()
 					program.unmap_write(0x2000, 0x6fff);
 				}
 				break;
+#if 0 // FIXME: disabled for now
 			case MEM64KBI:
-				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
+				program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 				program.unmap_write(0x0000, 0x1fff);
 				program.install_ram(0x8000, 0xffff, ram_region->base()+0x8000);
 
@@ -1305,7 +1395,7 @@ void m5_state::machine_reset()
 				break;
 			case MEM64KBF:
 				program.unmap_write(0x0000, 0x6fff);
-				membank("bank1r")->set_base(memregion(Z80_TAG)->base());
+				membank("bank1r")->set_base(memregion("maincpu")->base());
 				membank("bank2r")->set_base(m_cart_rom->base());
 				membank("bank3r")->set_base(m_cart_rom->base()+0x2000);
 				membank("bank4r")->set_base(m_cart_rom->base()+0x4000);
@@ -1313,7 +1403,7 @@ void m5_state::machine_reset()
 				membank("bank6r")->set_base(ram_region->base()+0xc000); membank("bank6w")->set_base(ram_region->base()+0xc000);
 				break;
 			case MEM64KRX:
-				membank("bank1r")->set_base(memregion(Z80_TAG)->base());    membank("bank1w")->set_base(ram_region->base());
+				membank("bank1r")->set_base(memregion("maincpu")->base());    membank("bank1w")->set_base(ram_region->base());
 				membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
 				membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
 				membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
@@ -1330,6 +1420,7 @@ void m5_state::machine_reset()
 					membank("bank6r")->set_base(m_cart_rom->base()+0x12000); membank("bank6w")->set_base(ram_region->base()+0xc000);
 				}
 				break;
+#endif
 			default:
 				program.unmap_readwrite(0x8000, 0xffff);
 		}
@@ -1340,7 +1431,7 @@ void m5_state::machine_reset()
 		//ram cart wasn't found so if rom cart present install it
 		if (m_cart)
 		{
-			program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
+			program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
 			program.unmap_write(0x0000, 0x1fff);
 			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x6fff);
@@ -1352,16 +1443,15 @@ void m5_state::machine_reset()
 
 void brno_state::machine_start()
 {
+	std::fill(std::begin(m_rammap), std::end(m_rammap), 0);
+
+	save_item(NAME(m_rammap));
+	save_item(NAME(m_centronics_busy));
 }
 
 void brno_state::machine_reset()
 {
-	/* enable ROM1+ROM2 */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
-	program.unmap_write(0x0000, 0x3fff);
-
 
 	//is ram/rom cart plugged in?
 	if (m_cart1->exists())
@@ -1380,17 +1470,18 @@ void brno_state::machine_reset()
 	}
 
 	if (m_cart)
-		{
-			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
-			program.unmap_write(0x2000, 0x6fff);
-		}
+	{
+		program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+		//program.unmap_write(0x2000, 0x6fff);
+	}
 
-	m_romen=true;
-	m_ramen=false;
+	// enable ROM1+ROM2
+	m_rom_view.select(0);
+	m_ram_view.disable();
 
 	floppy_image_device *floppy = nullptr;
 	floppy = m_floppy0->get_device();
-	m_fdc->set_floppy(floppy);
+	m_wdfdc->set_floppy(floppy);
 	floppy->mon_w(0);
 }
 
@@ -1405,22 +1496,23 @@ void brno_state::machine_reset()
 void m5_state::m5(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	Z80(config, m_maincpu, 10.738635_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m5_state::m5_mem);
 	m_maincpu->set_addrmap(AS_IO, &m5_state::m5_io);
 	m_maincpu->set_daisy_config(m5_daisy_chain);
 
-	Z80(config, m_fd5cpu, 14.318181_MHz_XTAL / 4);
+	Z80(config, m_fd5cpu, 16_MHz_XTAL / 4);
 	m_fd5cpu->set_addrmap(AS_PROGRAM, &m5_state::fd5_mem);
 	m_fd5cpu->set_addrmap(AS_IO, &m5_state::fd5_io);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, SN76489AN_TAG, 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, "sgc", 10.738635_MHz_XTAL / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
+	Z80CTC(config, m_ctc, 10.738635_MHz_XTAL / 3);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<2>(10.738635_MHz_XTAL / 24);
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
@@ -1443,9 +1535,9 @@ void m5_state::m5(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true); // clocked by SED9420C
 	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", m5_floppies, "525dd", m5_state::floppy_formats);
 
 	// cartridge
 	M5_CART_SLOT(config, m_cart1, m5_cart, nullptr);
@@ -1458,7 +1550,7 @@ void m5_state::m5(machine_config &config)
 
 	// internal ram
 	//68K is not possible, 'cos internal ram always overlays any expansion memory in that area
-	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("36K,64K");
+	//RAM(config, m_ram).set_default_size("4K").set_extra_options("36K,64K");
 }
 
 
@@ -1473,7 +1565,7 @@ void m5_state::ntsc(machine_config &config)
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 }
 
@@ -1489,7 +1581,7 @@ void m5_state::pal(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 }
 
@@ -1508,23 +1600,39 @@ void brno_state::brno(machine_config &config)
 
 
 	//remove devices used for fd5 floppy
-	config.device_remove(Z80_FD5_TAG);
-	config.device_remove(I8255A_TAG);
-	config.device_remove(UPD765_TAG);
+	config.device_remove("z80fd5");
+	config.device_remove("ppi");
+	config.device_remove("upd765");
 
 	// video hardware
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(m5_state::sordm5_video_interrupt_callback));
+	vdp.int_callback().set(m_ctc, FUNC(z80ctc_device::trg3)).invert();
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
+	// RAM disk (maximum is 1024kB 256x 4kB banks)
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K,768K,1M");
+
+	i8251_device &sio(I8251(config, "sio", 10.738635_MHz_XTAL / 3));
+	sio.txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	sio.rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
+	serial.rxd_handler().set("sio", FUNC(i8251_device::write_rxd));
+	serial.cts_handler().set("sio", FUNC(i8251_device::write_cts));
+
+	m_ctc->zc_callback<2>().set("sio", FUNC(i8251_device::write_txc));
+	m_ctc->zc_callback<2>().append("sio", FUNC(i8251_device::write_rxc));
+
+	I8255(config, "pio");
+
 	// floppy
-	WD2797(config, m_fdc, 1_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, WD2797_TAG":0", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, WD2797_TAG":1", brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
+	WD2797(config, m_wdfdc, 4_MHz_XTAL / 4);
+	FLOPPY_CONNECTOR(config, m_floppy0, brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
 	// only one floppy drive
-	//config.device_remove(WD2797_TAG":1");
+	//config.device_remove("wd:1");
 
 	//SNAPSHOT(config, "snapshot", "rmd", 0).set_load_callback(brno_state::snapshot_cb));
 
@@ -1542,10 +1650,10 @@ void brno_state::brno(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( m5 )
-	ROM_REGION( 0x7000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x7000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sordjap.ic21", 0x0000, 0x2000, CRC(92cf9353) SHA1(b0a4b3658fde68cb1f344dfb095bac16a78e9b3e) )
 
-	ROM_REGION( 0x4000, Z80_FD5_TAG, 0 )
+	ROM_REGION( 0x4000, "z80fd5", 0 )
 	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, CRC(7263bbc5) SHA1(b729500d3d2b2e807d384d44b76ea5ad23996f4a))
 ROM_END
 
@@ -1555,10 +1663,10 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( m5p )
-	ROM_REGION( 0x7000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x7000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sordint.ic21", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2) )
 
-	ROM_REGION( 0x4000, Z80_FD5_TAG, 0 )
+	ROM_REGION( 0x4000, "z80fd5", 0 )
 	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, CRC(7263bbc5) SHA1(b729500d3d2b2e807d384d44b76ea5ad23996f4a))
 ROM_END
 
@@ -1567,53 +1675,18 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( m5p_brno )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "sordint.ic21", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2)) // monitor rom
 	ROM_LOAD( "brno_win.rom", 0x2000, 0x2000, CRC(f4cfb2ee) SHA1(23f41d2d9ac915545409dd0163f3dc298f04eea2)) //windows
 	//ROM_LOAD( "brno_rom12.rom", 0x2000, 0x4000, CRC(cac52406) SHA1(91f6ba97e85a2b3a317689635d425ee97413bbe3)) //windows+BI
 	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(fb26e2ae9f74b0ae0d723b417a038a8ef3d72782))
-
-	//Ramdisc area (maximum is 1024kB 256x 4kB banks)
-	ROM_REGION(1024*1024,RAMDISK,0)
-	ROM_FILL(0,1024*1024,0xff)
 ROM_END
-
-//**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  ROM( ntsc )
-//-------------------------------------------------
-
-void m5_state::init_ntsc()
-{
-}
-
-
-//-------------------------------------------------
-//  ROM( pal )
-//-------------------------------------------------
-
-void m5_state::init_pal()
-{
-}
-
-//-------------------------------------------------
-//  ROM( BRNO )
-//-------------------------------------------------
-
-void brno_state::init_brno()
-{
-//  logerror("Driver init entered\n" );
-}
-
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY  FULLNAME                 FLAGS
-COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   init_ntsc, "Sord",  "m.5 (Japan)",           0 )
-COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   init_pal,  "Sord",  "m.5 (Europe)",          0 )
-COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, init_brno, "Sord",  "m.5 (Europe) BRNO mod", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   empty_init, "Sord",  "m.5 (Japan)",           0 )
+COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   empty_init, "Sord",  "m.5 (Europe)",          0 )
+COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, empty_init, "Sord",  "m.5 (Europe) BRNO mod", 0 )

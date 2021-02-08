@@ -174,7 +174,7 @@ void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_ban
 	/* count determines the size of the area mapped */
 	for (i = 0; i < count; i++)
 	{
-		m_bank_vrom[i + start]->set_entry(vrom_start_bank + i);
+		m_chr_banks[i + start]->set_entry(vrom_start_bank + i);
 	}
 }
 

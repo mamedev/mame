@@ -630,6 +630,6 @@ GAME(1986,  halley,   0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Popul
 GAME(1986,  halleya,  halley, jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1986,  aqualand, 0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1986,  america,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  olympus,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  olympus,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1987,  lortium,  0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  pimbal,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL)

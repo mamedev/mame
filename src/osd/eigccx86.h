@@ -31,22 +31,7 @@
     multiply and return the full 64 bit result
 -------------------------------------------------*/
 
-#ifndef __x86_64__
-#define mul_32x32 _mul_32x32
-inline int64_t ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32(int32_t a, int32_t b)
-{
-	int64_t result;
-	__asm__ (
-		" imull  %[b] ;"
-		: [result] "=A" (result)    // result in edx:eax
-		: [a]      "%a"  (a)        // 'a' should also be in eax on entry
-		, [b]      "rm"  (b)        // 'b' can be memory or register
-		: "cc"                      // Clobbers condition codes
-	);
-	return result;
-}
-#endif
+// GCC can do a good job of this.
 
 
 /*-------------------------------------------------
@@ -55,22 +40,7 @@ _mul_32x32(int32_t a, int32_t b)
     result
 -------------------------------------------------*/
 
-#ifndef __x86_64__
-#define mulu_32x32 _mulu_32x32
-inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32(uint32_t a, uint32_t b)
-{
-	uint64_t result;
-	__asm__ (
-		" mull  %[b] ;"
-		: [result] "=A" (result)    // result in edx:eax
-		: [a]      "%a"  (a)        // 'a' should also be in eax on entry
-		, [b]      "rm"  (b)        // 'b' can be memory or register
-		: "cc"                      // Clobbers condition codes
-	);
-	return result;
-}
-#endif
+// GCC can do a good job of this.
 
 
 /*-------------------------------------------------
@@ -79,21 +49,7 @@ _mulu_32x32(uint32_t a, uint32_t b)
     result
 -------------------------------------------------*/
 
-#define mul_32x32_hi _mul_32x32_hi
-inline int32_t ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_hi(int32_t a, int32_t b)
-{
-	int32_t result, temp;
-	__asm__ (
-		" imull  %[b] ;"
-		: [result] "=d"  (result)   // result in edx
-		, [temp]   "=a"  (temp)     // This is effectively a clobber
-		: [a]      "a"   (a)        // 'a' should be in eax on entry
-		, [b]      "rm"  (b)        // 'b' can be memory or register
-		: "cc"                      // Clobbers condition codes
-	);
-	return result;
-}
+// GCC can do a good job of this.
 
 
 /*-------------------------------------------------
@@ -102,21 +58,7 @@ _mul_32x32_hi(int32_t a, int32_t b)
     of the result
 -------------------------------------------------*/
 
-#define mulu_32x32_hi _mulu_32x32_hi
-inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_hi(uint32_t a, uint32_t b)
-{
-	uint32_t result, temp;
-	__asm__ (
-		" mull  %[b] ;"
-		: [result] "=d"  (result)   // result in edx
-		, [temp]   "=a"  (temp)     // This is effectively a clobber
-		: [a]      "a"   (a)        // 'a' should be in eax on entry
-		, [b]      "rm"  (b)        // 'b' can be memory or register
-		: "cc"                      // Clobbers condition codes
-	);
-	return result;
-}
+// GCC can do a good job of this.
 
 
 /*-------------------------------------------------
@@ -241,21 +183,19 @@ _divu_64x32(uint64_t a, uint32_t b)
 
 #define div_64x32_rem _div_64x32_rem
 inline int32_t ATTR_FORCE_INLINE
-_div_64x32_rem(int64_t dividend, int32_t divisor, int32_t *remainder)
+_div_64x32_rem(int64_t dividend, int32_t divisor, int32_t &remainder)
 {
 	int32_t quotient;
 #ifndef __x86_64__
-
 	// Throws arithmetic exception if result doesn't fit in 32 bits
 	__asm__ (
 		" idivl  %[divisor] ;"
 		: [result]    "=a" (quotient)   // quotient ends up in eax
-		, [remainder] "=d" (*remainder) // remainder ends up in edx
+		, [remainder] "=d" (remainder)  // remainder ends up in edx
 		: [dividend]  "A"  (dividend)   // 'dividend' in edx:eax
 		, [divisor]   "rm" (divisor)    // 'divisor' in register or memory
 		: "cc"                          // clobbers condition codes
 	);
-
 #else
 	int32_t const divh{ int32_t(uint32_t(uint64_t(dividend) >> 32)) };
 	int32_t const divl{ int32_t(uint32_t(uint64_t(dividend))) };
@@ -264,13 +204,12 @@ _div_64x32_rem(int64_t dividend, int32_t divisor, int32_t *remainder)
 	__asm__ (
 		" idivl  %[divisor] ;"
 		: [result]    "=a" (quotient)   // quotient ends up in eax
-		, [remainder] "=d" (*remainder) // remainder ends up in edx
+		, [remainder] "=d" (remainder)  // remainder ends up in edx
 		: [divl]      "a"  (divl)       // 'dividend' in edx:eax
 		, [divh]      "d"  (divh)
 		, [divisor]   "rm" (divisor)    // 'divisor' in register or memory
 		: "cc"                          // clobbers condition codes
 	);
-
 #endif
 	return quotient;
 }
@@ -284,21 +223,19 @@ _div_64x32_rem(int64_t dividend, int32_t divisor, int32_t *remainder)
 
 #define divu_64x32_rem _divu_64x32_rem
 inline uint32_t ATTR_FORCE_INLINE
-_divu_64x32_rem(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
+_divu_64x32_rem(uint64_t dividend, uint32_t divisor, uint32_t &remainder)
 {
 	uint32_t quotient;
 #ifndef __x86_64__
-
 	// Throws arithmetic exception if result doesn't fit in 32 bits
 	__asm__ (
 		" divl  %[divisor] ;"
 		: [result]    "=a" (quotient)   // quotient ends up in eax
-		, [remainder] "=d" (*remainder) // remainder ends up in edx
+		, [remainder] "=d" (remainder)  // remainder ends up in edx
 		: [dividend]  "A"  (dividend)   // 'dividend' in edx:eax
 		, [divisor]   "rm" (divisor)    // 'divisor' in register or memory
 		: "cc"                          // clobbers condition codes
 	);
-
 #else
 	uint32_t const divh{ uint32_t(dividend >> 32) };
 	uint32_t const divl{ uint32_t(dividend) };
@@ -307,7 +244,7 @@ _divu_64x32_rem(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
 	__asm__ (
 		" divl  %[divisor] ;"
 		: [result]    "=a" (quotient)   // quotient ends up in eax
-		, [remainder] "=d" (*remainder) // remainder ends up in edx
+		, [remainder] "=d" (remainder)  // remainder ends up in edx
 		: [divl]      "a"  (divl)       // 'dividend' in edx:eax
 		, [divh]      "d"  (divh)
 		, [divisor]   "rm" (divisor)    // 'divisor' in register or memory
@@ -444,11 +381,11 @@ _modu_64x32(uint64_t a, uint32_t b)
 
 #ifdef __SSE2__
 #define recip_approx _recip_approx
-inline float ATTR_CONST
+inline float ATTR_CONST ATTR_FORCE_INLINE
 _recip_approx(float value)
 {
-	__m128 const value_xmm = _mm_set_ss(value);
-	__m128 const result_xmm = _mm_rcp_ss(value_xmm);
+	__m128 const value_xmm(_mm_set_ss(value));
+	__m128 const result_xmm(_mm_rcp_ss(value_xmm));
 	float result;
 	_mm_store_ss(&result, result_xmm);
 	return result;
@@ -464,10 +401,10 @@ _recip_approx(float value)
 #ifdef __x86_64__
 #define mul_64x64 _mul_64x64
 inline int64_t ATTR_FORCE_INLINE
-_mul_64x64(int64_t a, int64_t b, int64_t *hi)
+_mul_64x64(int64_t a, int64_t b, int64_t &hi)
 {
 	__int128 const r(__int128(a) * b);
-	*hi = int64_t(uint64_t((unsigned __int128)r >> 64));
+	hi = int64_t(uint64_t((unsigned __int128)r >> 64));
 	return int64_t(uint64_t((unsigned __int128)r));
 }
 #endif
@@ -481,10 +418,10 @@ _mul_64x64(int64_t a, int64_t b, int64_t *hi)
 #ifdef __x86_64__
 #define mulu_64x64 _mulu_64x64
 inline uint64_t ATTR_FORCE_INLINE
-_mulu_64x64(uint64_t a, uint64_t b, uint64_t *hi)
+_mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 {
 	unsigned __int128 const r((unsigned __int128)a * b);
-	*hi = uint64_t(r >> 64);
+	hi = uint64_t(r >> 64);
 	return uint64_t(r);
 }
 #endif

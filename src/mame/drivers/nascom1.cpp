@@ -45,6 +45,8 @@ Cassette (nascom2):
 #include "screen.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -145,9 +147,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(cass_speed);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom2_kansas_r);
-	DECLARE_MACHINE_RESET(nascom2);
 	DECLARE_WRITE_LINE_MEMBER(nascom2_kansas_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
@@ -313,7 +317,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
 }
 
 // This stuff has never been connected up - what's it for?
-DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
+[[maybe_unused]] DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
 {
 	m_tape_size = image.length();
 	m_tape_image = (uint8_t*)image.ptr();
@@ -325,7 +329,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state::unload_nascom1_cassette )
+[[maybe_unused]] DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state::unload_nascom1_cassette )
 {
 	m_tape_image = nullptr;
 	m_tape_size = m_tape_index = 0;
@@ -459,10 +463,8 @@ void nascom_state::machine_reset()
 	m_hd6402->write_cs(1);
 }
 
-MACHINE_RESET_MEMBER(nascom2_state, nascom2)
+void nascom2_state::machine_reset()
 {
-	machine_reset();
-
 	// nascom2: restore speed at machine start
 	m_cass_speed = ioport("DSW0")->read();
 
@@ -839,8 +841,6 @@ void nascom2_state::nascom2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2_mem);
 	m_maincpu->set_addrmap(AS_IO, &nascom2_state::nascom2_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(nascom2_state, nascom2 )
-
 	// video hardware
 	m_screen->set_size(48 * 8, 16 * 14);
 	m_screen->set_visarea(0, 48 * 8 - 1, 0, 16 * 14 - 1);
@@ -939,6 +939,8 @@ ROM_START( nascom2c )
 	ROM_LOAD("nascom1.ic66", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 	ROM_LOAD("nasgra.ic54",  0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
 ROM_END
+
+} // Anonymous namespace
 
 
 //**************************************************************************

@@ -100,23 +100,21 @@ void decodmd_type3_device::crtc_register_w(offs_t offset, uint16_t data, uint16_
 
 MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 {
-	uint8_t intensity;
-	uint16_t addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
-	addr += ((ra & 0x01) * 24);
+	uint16_t addr = ((ma & 0x7ff) << 1) | ((ra & 0x02) << 11);
+	addr += ((ra & 0x01) * 12);
 
-	for (int x = 0; x < 192; x += 16)
+	for (int x = 0; x < 192; x += 16, addr++)
 	{
 		for (int dot = 0; dot < 8; dot++)
 		{
-			intensity = ((m_ram[addr + 1] >> (7-dot) & 0x01) << 1) | (m_ram[addr + 0x801] >> (7-dot) & 0x01);
+			uint8_t intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		for (int dot = 8; dot < 16; dot++)
 		{
-			intensity = ((m_ram[addr] >> (15-dot) & 0x01) << 1) | (m_ram[addr + 0x800] >> (15-dot) & 0x01);
+			uint8_t intensity = (BIT(m_ram[addr], 15-dot) << 1) | BIT(m_ram[addr + 0x400], 15-dot);
 			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
-		addr += 2;
 	}
 }
 

@@ -23,8 +23,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device, "dio98543", "HP98543 medium-res color DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98543_device::device_add_mconfig(machine_config &config)
 {
@@ -253,4 +252,3 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

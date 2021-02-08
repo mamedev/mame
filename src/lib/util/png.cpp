@@ -10,6 +10,7 @@
 
 #include "png.h"
 
+#include "osdcomm.h"
 #include "unicode.h"
 
 #include <zlib.h>
@@ -828,38 +829,36 @@ png_error png_info::expand_buffer_8bit()
     add_text - add a text entry to the png_info
 -------------------------------------------------*/
 
-png_error png_info::add_text(const char *keyword, const char *text)
+png_error png_info::add_text(std::string_view keyword, std::string_view text)
 {
 	// apply rules to keyword
 	char32_t prev(0);
 	std::size_t cnt(0);
-	char const *const kwend(keyword + std::strlen(keyword));
-	for (char const *ptr = keyword; kwend > ptr; )
+	for (std::string_view kw = keyword; !kw.empty(); )
 	{
 		char32_t ch;
-		int const len(uchar_from_utf8(&ch, ptr, kwend - ptr));
-		if ((0 >= len) || (32 > ch) || (255 < ch) || ((126 < ch) && (161 > ch)) || (((32 == prev) || (keyword == ptr)) && (32 == ch)))
+		int const len(uchar_from_utf8(&ch, kw));
+		if ((0 >= len) || (32 > ch) || (255 < ch) || ((126 < ch) && (161 > ch)) || (((32 == prev) || (0 == cnt)) && (32 == ch)))
 			return png_error::UNSUPPORTED_FORMAT;
 		prev = ch;
 		++cnt;
-		ptr += len;
+		kw.remove_prefix(len);
 	}
 	if ((32 == prev) || (1 > cnt) || (79 < cnt))
 		return png_error::UNSUPPORTED_FORMAT;
 
 	// apply rules to text
-	char const *const textend(text + std::strlen(text));
-	for (char const *ptr = text; textend > ptr; )
+	for (std::string_view tx = text; !tx.empty(); )
 	{
 		char32_t ch;
-		int const len(uchar_from_utf8(&ch, ptr, textend - ptr));
+		int const len(uchar_from_utf8(&ch, tx));
 		if ((0 >= len) || (1 > ch) || (255 < ch))
 			return png_error::UNSUPPORTED_FORMAT;
-		ptr += len;
+		tx.remove_prefix(len);
 	}
 
 	// allocate a new text element
-	try { textlist.emplace_back(std::piecewise_construct, std::forward_as_tuple(keyword, kwend), std::forward_as_tuple(text, textend)); }
+	try { textlist.emplace_back(std::piecewise_construct, std::forward_as_tuple(keyword), std::forward_as_tuple(text)); }
 	catch (std::bad_alloc const &) { return png_error::OUT_OF_MEMORY; }
 	return png_error::NONE;
 }
@@ -1177,30 +1176,28 @@ static png_error write_png_stream(core_file &fp, png_info &pnginfo, const bitmap
 		std::uint8_t *dst(&textbuf[0]);
 
 		// convert keyword to ISO-8859-1
-		char const *const kwend(text.first.c_str() + text.first.length());
-		for (char const *src = text.first.c_str(); kwend > src; ++dst)
+		for (std::string_view src = text.first; !src.empty(); ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, kwend - src));
+			int const len(uchar_from_utf8(&ch, src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);
-			src += len;
+			src.remove_prefix(len);
 		}
 
 		// NUL separator between keword and text
 		*dst++ = 0;
 
 		// convert text to ISO-8859-1
-		char const *const textend(text.second.c_str() + text.second.length());
-		for (char const *src = text.second.c_str(); textend > src; ++dst)
+		for (std::string_view src = text.second; !src.empty(); ++dst)
 		{
 			char32_t ch;
-			int const len(uchar_from_utf8(&ch, src, textend - src));
+			int const len(uchar_from_utf8(&ch, src));
 			if (0 >= len)
 				break;
 			*dst = std::uint8_t(ch);
-			src += len;
+			src.remove_prefix(len);
 		}
 
 		error = write_chunk(fp, &textbuf[0], PNG_CN_tEXt, dst - &textbuf[0]);

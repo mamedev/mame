@@ -326,7 +326,7 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<z8038_device> m_fio;
 	required_device<at_keyboard_controller_device> m_kbdc;
-	required_device<pc_kbdc_slot_device> m_kbd;
+	required_device<pc_kbdc_device> m_kbd;
 	required_device<z80scc_device> m_scc;
 	required_device_array<rs232_port_device, 2> m_tty;
 	required_device<wd37c65c_device> m_fdc;
@@ -410,7 +410,7 @@ private:
 	required_device<m48t02_device> m_rtc;
 	required_device<i82072_device> m_fdc;
 	required_device<at_keyboard_controller_device> m_kbdc;
-	required_device<pc_kbdc_slot_device> m_kbd;
+	required_device<pc_kbdc_device> m_kbd;
 	required_device<speaker_sound_device> m_buzzer;
 
 	// optional colour video board
@@ -750,7 +750,7 @@ void rx2030_state::rx2030(machine_config &config)
 	V50(config, m_iop, 20_MHz_XTAL);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
-	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_iop->tout2_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
@@ -775,19 +775,15 @@ void rx2030_state::rx2030(machine_config &config)
 	m_fio->out_int_cb<1>().set_inputline(m_iop, INPUT_LINE_IRQ4);
 
 	// keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
-
-	// keyboard port
-	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
-	m_kbd->set_pc_kbdc_slot(&kbd_con);
+	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_kbd->out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(m_kbd, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(m_kbd, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
@@ -1088,18 +1084,14 @@ void rx3230_state::rx3230(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
 
 	// keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
-
-	// keyboard port
-	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
-	m_kbd->set_pc_kbdc_slot(&kbd_con);
+	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_kbd->out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(m_kbd, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(m_kbd, FUNC(pc_kbdc_device::data_write_from_mb));
 	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer

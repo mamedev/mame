@@ -81,8 +81,8 @@ public:
 
 	std::wstring enum_key(int index) const
 	{
-		WCHAR keyname[MAX_PATH];
-		DWORD namelen = MAX_PATH;
+		WCHAR keyname[256];
+		DWORD namelen = ARRAY_LENGTH(keyname);
 		if (RegEnumKeyEx(m_key, index, keyname, &namelen, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
 			return std::wstring(keyname, namelen);
 		else

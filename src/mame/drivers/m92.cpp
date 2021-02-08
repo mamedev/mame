@@ -64,7 +64,7 @@ Glitch list!
 
     Irem Skins:
         - EEPROM load/save not yet implemented - when done, MT2EEP should
-          be removed from the ROM definition.
+          be removed from the ROM definition. (?)
 
     LeagueMan:
         Raster effects don't work properly (not even cpu time per line?).
@@ -211,9 +211,9 @@ psoldier dip locations still need verification.
 #include "includes/iremipt.h"
 
 #include "cpu/nec/nec.h"
+#include "machine/eeprompar.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
-#include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
 #include "speaker.h"
@@ -258,19 +258,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 
 
 /*****************************************************************************/
-
-uint16_t m92_state::eeprom_r(offs_t offset)
-{
-//  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
-	return m_eeprom[offset] | 0xff00;
-}
-
-void m92_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-//  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
-	if (ACCESSING_BITS_0_7)
-		m_eeprom[offset] = data;
-}
 
 void m92_state::coincounter_w(uint8_t data)
 {
@@ -350,7 +337,7 @@ void m92_state::m92_banked_map(address_map &map)
 void m92_state::majtitl2_map(address_map &map)
 {
 	m92_banked_map(map);
-	map(0xf0000, 0xf3fff).rw(FUNC(m92_state::eeprom_r), FUNC(m92_state::eeprom_w)).share("eeprom");
+	map(0xf0000, 0xf3fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 }
 
 void m92_state::m92_portmap(address_map &map)
@@ -1012,7 +999,8 @@ void m92_state::majtitl2(machine_config &config)
 {
 	m92_banked(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::majtitl2_map);
-	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
+
+	EEPROM_2864(config, "eeprom"); // D28C64C-20
 
 	m_soundcpu->set_decryption_table(majtitl2_decryption_table);
 }
@@ -1183,8 +1171,8 @@ ROM_START( skingame )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1220,8 +1208,8 @@ ROM_START( majtitl2 )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1258,8 +1246,8 @@ ROM_START( majtitl2b )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1297,8 +1285,8 @@ ROM_START( majtitl2a )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1334,8 +1322,8 @@ ROM_START( majtitl2j )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1371,8 +1359,8 @@ ROM_START( skingame2 )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */

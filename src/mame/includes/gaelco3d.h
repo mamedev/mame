@@ -32,7 +32,8 @@ public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_adsp_ram_base(*this, "adsp_ram_base")
-		, m_m68k_ram_base(*this, "m68k_ram_base")
+		, m_m68k_ram_base16(*this, "m68k_ram_base16")
+		, m_m68k_ram_base32(*this, "m68k_ram_base32")
 		, m_adsp_control_regs(*this, "adsp_regs")
 		, m_adsp_fastram_base(*this, "adsp_fastram")
 		, m_maincpu(*this, "maincpu")
@@ -46,8 +47,8 @@ public:
 		, m_mainlatch(*this, "mainlatch")
 		, m_outlatch(*this, "outlatch")
 		, m_adsp_autobuffer_timer(*this, "adsp_timer")
-		, m_paletteram16(*this, "paletteram")
-		, m_paletteram32(*this, "paletteram")
+		, m_paletteram16(*this, "paletteram16")
+		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
 		, m_adsp_bank(*this, "adspbank")
 	{ }
@@ -102,7 +103,8 @@ private:
 	};
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
-	required_shared_ptr<uint32_t> m_m68k_ram_base;
+	optional_shared_ptr<uint16_t> m_m68k_ram_base16;
+	optional_shared_ptr<uint32_t> m_m68k_ram_base32;
 	required_shared_ptr<uint16_t> m_adsp_control_regs;
 	required_shared_ptr<uint16_t> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +125,6 @@ private:
 	required_memory_bank m_adsp_bank;
 
 	uint8_t m_sound_status;
-	offs_t m_tms_offset_xor;
 	uint8_t m_analog_ports[4];
 	uint32_t m_fp_analog_ports[2];
 	uint32_t m_fp_lenght[2];

@@ -111,7 +111,7 @@ void segahang_state::tilemap_sound_w(uint8_t data)
 	m_segaic16vid->tilemap_set_rowscroll(0, ~data & 0x02);
 
 	// bit 0: sound mute
-	machine().sound().system_enable(data & 0x01);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 

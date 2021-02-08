@@ -17,6 +17,7 @@
 #include "unzip.h"
 
 #include <string>
+#include <string_view>
 
 
 namespace util {
@@ -31,7 +32,7 @@ public:
 	typedef std::unique_ptr<zippath_directory> ptr;
 
 	// opens a directory
-	static osd_file::error open(std::string const &path, ptr &directory);
+	static osd_file::error open(std::string_view path, ptr &directory);
 
 	// closes a directory
 	virtual ~zippath_directory();
@@ -52,12 +53,7 @@ public:
 // ----- path operations -----
 
 // retrieves the parent directory
-std::string &zippath_parent(std::string &dst, const std::string &path);
-std::string zippath_parent(const std::string &path);
-
-// retrieves the parent directory basename
-std::string &zippath_parent_basename(std::string &dst, const std::string &path);
-std::string zippath_parent_basename(const std::string &path);
+std::string zippath_parent(std::string_view path);
 
 // combines two paths
 std::string &zippath_combine(std::string &dst, const std::string &path1, const std::string &path2);
@@ -67,7 +63,7 @@ std::string zippath_combine(const std::string &path1, const std::string &path2);
 // ----- file operations -----
 
 // opens a zip path file
-osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path);
+osd_file::error zippath_fopen(std::string_view filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path);
 
 } // namespace util
 

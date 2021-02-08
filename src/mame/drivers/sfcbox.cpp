@@ -15,10 +15,9 @@ for which the system holds two at once.
 The "To Do" list:
 -----------------
 -Main CPU banks cartridges via ports $c0/$c1
--Consider moving the 3 cartridges of the slot 2 in a software list since they are interchangable
+-Consider moving the 3 cartridges of the slot 2 in a software list since they are interchangeable
  (that's bs, since that pss61 should always be there anyway ... -AS)
 -Hook the z180 clone, the DSP 1A/1B and the Super FX
--Add the missing GROM4-1
 -Add the possibly alternate revision of the attract ROM, with Kirby holding a coin
  (unless it is unlocked with some DIP switch)
 
@@ -59,7 +58,7 @@ S-ENC A (9504 BA)
 MB90082 001 (9351 M02)
 
 2. The BIOS board (PU 0871-101) must be inserted into the main board.
-BIOS ROM: KROM 1, 512Kibit
+BIOS ROM: KROM 1, 512Kibit or KROM 2.00, 1024Kibit
 SRAM: SRM20257LM12 F27K 256 (S-MOS Systems) - SRAM accounting and control circuits are
       self-diagnostic features that set time and operational status of the
       game(s) that are installed.
@@ -76,7 +75,7 @@ PSS-003 - SUPER FAMICOM BOX - Coin Box
 
 Software/Cartridge:
 The PSS-61 cartridge is required on the slot 1 for the machine to operate.
-The slot 2 may be free or contain PSS-62, PSS-63 or PSS-64 interchangably.
+The slot 2 may be free or contain PSS-62, PSS-63 or PSS-64 interchangeably.
 
 PSS-61  - SUPER FAMICOM BOX Commercial Regular Cart
 WARNING: This cartridge is required for the machine to operate.
@@ -104,7 +103,7 @@ Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Tetris 2 + Bombliss (BPS), SHVC-T2-1, 8Mibit
 
 PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart
-GameData ROM: GROM4-1, undumped
+GameData ROM: GROM4-1, 256Kibit
 Lower ROM: Super Donkey Kong (Nintendo), SHVC-8X-1, 32Mibit
 Lower ROM: Super Bomberman 2 (Hudson Soft), SHVC-M4-0, 8Mibit
 
@@ -123,9 +122,12 @@ How does the Super Famicom Box operates
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
-#include "rendlay.h"
+
+#include "layout/generic.h"
 #include "speaker.h"
 
+
+namespace {
 
 class sfcbox_state : public snes_state
 {
@@ -138,6 +140,10 @@ public:
 	{ }
 
 	void sfcbox(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_bios;
@@ -153,8 +159,6 @@ private:
 	void port_83_w(uint8_t data);
 	void snes_map_0_w(uint8_t data);
 	void snes_map_1_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);
@@ -181,7 +185,7 @@ void sfcbox_state::spc_map(address_map &map)
 
 void sfcbox_state::sfcbox_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom().region("krom", 0);
+	map(0x00000, 0x1ffff).rom().region("krom", 0);
 	map(0x20000, 0x27fff).ram();
 	map(0x40000, 0x47fff).rom().region("grom1", 0);
 	map(0x60000, 0x67fff).rom().region("grom2", 0);
@@ -506,8 +510,11 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x10000, "krom", 0 ) \
-	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
+	ROM_REGION( 0x20000, "krom", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "2.00", "SFCBox Bios Version 2.00" ) \
+	ROMX_LOAD( "krom2.00.ic1", 0x00000, 0x20000, CRC(e31b5580) SHA1(4a6a34a9a94c8249c3b441c2516bdd03e198c458), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "1.00", "SFCBox Bios Version 1.00" ) \
+	ROMX_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4), ROM_BIOS(1) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \
 	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
 
@@ -562,8 +569,8 @@ ROM_END
 ROM_START( pss64 )
 	SFCBOX_BIOS
 
-	ROM_REGION( 0x8000, "grom1", ROMREGION_ERASEFF )
-	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x8000, "grom1", 0 )
+	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, CRC(fcdbcb7d) SHA1(f27e8a264a427c3b74c8a370c380a79b9363affa) )
 
 	ROM_REGION( 0x8000, "grom2", ROMREGION_ERASEFF )
 
@@ -574,6 +581,8 @@ ROM_START( pss64 )
 //  ROM_LOAD( "shvc-8x-1.rom1", 0x000000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
 //  ROM_LOAD( "shvc-m4-0.rom3", 0x400000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

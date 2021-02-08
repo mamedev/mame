@@ -41,8 +41,6 @@ private:
 	void scroll_y_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void kopunch_palette(palette_device &palette) const;

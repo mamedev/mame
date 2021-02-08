@@ -97,6 +97,8 @@ private:
 	uint16_t m_cursor_addr;
 	uint8_t m_screen_ctrl;
 	uint8_t m_firq_vector;
+
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 };
 
 
@@ -162,8 +164,10 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 			else
 				addr = m_vram_start_addr2 + y * 80 + x;
 
-			uint8_t code = m_vram[addr - 0x6000];
-			uint8_t attr = m_aram[addr - 0x6000];
+			uint8_t code = m_program.read_byte(addr);
+			uint8_t attr = m_program.read_byte(addr+0x1000);
+
+			//logerror("%02d.%02d %04x %02x %02x\n", x, y, addr, code, attr);
 
 			if (code == 0xc0 || code == 0xe8)
 				line_attr = attr;
@@ -359,6 +363,8 @@ void informer_213_state::machine_start()
 
 	m_nvram[1]->set_base(m_banked_ram.get(), 0x800);
 
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+
 	// register for save states
 	save_item(NAME(m_vram_start_addr));
 	save_item(NAME(m_vram_start_addr2));
@@ -366,11 +372,20 @@ void informer_213_state::machine_start()
 	save_item(NAME(m_cursor_addr));
 	save_item(NAME(m_screen_ctrl));
 	save_item(NAME(m_firq_vector));
+	save_item(NAME(m_cursor_start));
+	save_item(NAME(m_cursor_end));
 }
 
 void informer_213_state::machine_reset()
 {
 	m_firq_vector = 0x00;
+	m_vram_start_addr = 0x0084;
+	m_vram_start_addr2 = 0x0084;
+	m_vram_end_addr = 0xffff;
+	m_cursor_start = 0x20;
+	m_cursor_end = 0x09;
+	m_cursor_addr = 0xffff;
+	m_screen_ctrl = 0x18;
 }
 
 
@@ -435,11 +450,17 @@ void informer_213_state::informer_213(machine_config &config)
 
 ROM_START( in213 )
 	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("26")
+	ROM_SYSTEM_BIOS(0,  "21",  "v2.1")
+	// 79687-101  213 SNA 201C  CK=1C22 V2.1 (checksum matches)
+	ROMX_LOAD("79687-101.bin", 0x0000, 0x8000, CRC(1ff023f3) SHA1(cbb027769d7744072045e60b020826f4f4bfe1b6), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1,  "26",  "v2.6")
 	// 79687-305  PTF02 SNA  V2.6 CK=24EE (checksum matches)
-	ROM_LOAD("79687-305.bin", 0x0000, 0x8000, CRC(0638c6d6) SHA1(1906f835f255d595c5743b453614ba21acb5acae))
+	ROMX_LOAD("79687-305.bin", 0x0000, 0x8000, CRC(0638c6d6) SHA1(1906f835f255d595c5743b453614ba21acb5acae), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "chargen", 0)
 	// 79688-003  ICT 213/CG.  CK=C4E0 (checksum matches)
+	// 79688-003  ICT 213/374  CK = C4E0 (checksum matches)
 	ROM_LOAD("79688-003.bin", 0x0000, 0x2000, CRC(75e0da94) SHA1(c10c71fcf980a5f868a85bc264661183fa69fa72))
 ROM_END
 

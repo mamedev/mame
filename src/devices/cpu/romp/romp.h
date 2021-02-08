@@ -6,12 +6,17 @@
 
 #pragma once
 
+#include "rsc.h"
+
 class romp_device : public cpu_device
 {
 public:
 	romp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	auto out_tm() { return m_out_tm.bind(); }
+	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_iou(T &&tag) { m_iou.set_tag(std::forward<T>(tag)); }
+
+	void clk_w(int state);
 
 protected:
 	enum registers : unsigned
@@ -23,16 +28,24 @@ protected:
 	enum scr : unsigned
 	{
 		COUS =  6, // counter source
-		COU =   7, // counter
-		TS  =   8, // timer status
-		MQ  =  10, // multiplier quotient
+		COU  =  7, // counter
+		TS   =  8, // timer status
+		ECR  =  9, // exception control (advanced/enhanced only)
+		MQ   = 10, // multiplier quotient
 		MPCS = 11, // machine/program check status
-		IRB =  12, // interrupt request buffer
-		IAR =  13, // instruction address register
-		ICS =  14, // interrupt control status
-		CS  =  15, // condition status
+		IRB  = 12, // interrupt request buffer
+		IAR  = 13, // instruction address register
+		ICS  = 14, // interrupt control status
+		CS   = 15, // condition status
 	};
 
+	enum ts_mask : u32
+	{
+		TS_E = 0x0000'0040, // enable
+		TS_I = 0x0000'0020, // interrupt status
+		TS_O = 0x0000'0010, // overflow
+		TS_P = 0x0000'0007, // timer interrupt priority
+	};
 	enum mpcs_mask : u32
 	{
 							   // reserved
@@ -80,6 +93,7 @@ protected:
 		ICS_US = 0x0000'0400, // unprivileged state
 		ICS_MP = 0x0000'0800, // memory protect
 		ICS_PE = 0x0000'1000, // parity error retry interrupt enable
+		ICS_UA = 0x0000'2000, // unaligned access interrupt enable (advanced/enhanced only)
 	};
 	enum cs_mask : u32
 	{
@@ -120,7 +134,7 @@ private:
 	u32 ba(u16 hi, u16 lo) const { return ((u32(hi) << 16) | lo) & 0x00ff'fffeU; }
 	s32 bi(u16 hi, u16 lo) const { return s32((u32(hi) << 16 | lo) << 12) >> 11; }
 
-	void flags(u32 const op1);
+	void flags_log(u32 const op1);
 	void flags_add(u32 const op1, u32 const op2);
 	void flags_sub(u32 const op1, u32 const op2);
 
@@ -128,14 +142,87 @@ private:
 
 	void interrupt_check();
 	void machine_check(u32 mcs);
-	void program_check(u32 pcs);
-	void interrupt_enter(unsigned vector, u16 svc = 0);
+	void program_check(u32 pcs, u32 iar);
+	void program_check(u32 pcs) { program_check(pcs, m_scr[IAR]); }
+	void interrupt_enter(unsigned vector, u32 iar, u16 svc = 0);
+
+	using rsc_mode = rsc_bus_interface::rsc_mode;
+
+	void fetch(u32 address, std::function<void(u16)> f)
+	{
+		u16 data = 0;
+
+		if (m_mmu->fetch(address, data, rsc_mode((m_scr[ICS] >> 9) & 7)))
+			f(data);
+		else
+			program_check(PCS_PCK | PCS_IAE);
+	}
+
+	template <typename T> void load(u32 address, std::function<void(T)> f, bool mask = true)
+	{
+		rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+		T data = 0;
+
+		switch (address >> 28)
+		{
+		default:
+			if (m_mmu->load(address, data, mode))
+				f(data);
+			else
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 15:
+			if (m_iou->load(address, data, mode))
+				f(data);
+			else
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+		}
+	}
+
+	template <typename T> void store(u32 address, T data, bool mask = true)
+	{
+		rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+		switch (address >> 28)
+		{
+		default:
+			if (!m_mmu->store(address, data, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 15:
+			if (!m_iou->store(address, data, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+		}
+	}
+
+	template <typename T> void modify(u32 address, std::function<T(T)> f, bool mask = true)
+	{
+		rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
+
+		switch (address >> 28)
+		{
+		default:
+			if (!m_mmu->modify(address, f, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 15:
+			if (!m_iou->modify(address, f, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+		}
+	}
 
 	// address spaces
 	address_space_config const m_mem_config;
-	address_space_config const m_io_config;
 
-	devcb_write_line m_out_tm;
+	required_device<rsc_cpu_interface> m_mmu;
+	required_device<rsc_bus_interface> m_iou;
 
 	// mame state
 	int m_icount;
@@ -144,6 +231,10 @@ private:
 	u32 m_scr[16];
 	u32 m_gpr[16];
 
+	// input line state
+	u8 m_reqi;
+	bool m_trap;
+
 	// internal state
 	enum branch_state : unsigned
 	{
@@ -151,8 +242,10 @@ private:
 		BRANCH    = 1, // branch subject instruction active
 		DELAY     = 2, // delayed branch instruction active
 		EXCEPTION = 3,
+		WAIT      = 4,
 	}
 	m_branch_state;
+	u32 m_branch_source;
 	u32 m_branch_target;
 };
 

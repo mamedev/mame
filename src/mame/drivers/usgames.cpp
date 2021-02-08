@@ -76,8 +76,8 @@ void usgames_state::usgames_map(address_map &map)
 	map(0x2060, 0x2060).w(FUNC(usgames_state::rombank_w));
 	map(0x2070, 0x2070).portr("UNK2");
 	map(0x2400, 0x2401).w("aysnd", FUNC(ay8912_device::address_data_w));
-	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share(m_charram);
+	map(0x3000, 0x3fff).ram().share(m_videoram);
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -96,8 +96,8 @@ void usgames_state::usg185_map(address_map &map)
 	map(0x2441, 0x2441).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x2460, 0x2460).w(FUNC(usgames_state::rombank_w));
 	map(0x2470, 0x2470).portr("UNK2");
-	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share(m_charram);
+	map(0x3000, 0x3fff).ram().share(m_videoram);
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }

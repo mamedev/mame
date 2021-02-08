@@ -48,6 +48,7 @@ private:
 		uint8_t m_key_rate_scale = 0;
 		uint8_t m_lfo_vibrato_reg = 0;
 		uint8_t m_lfo_amplitude_reg = 0;
+		uint8_t m_format = 0;
 	};
 
 	enum class state_t : u8

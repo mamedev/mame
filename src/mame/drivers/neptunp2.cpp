@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
-    Neptune's Pearls (c) Unidesa?
+    Neptune's Pearls (c) Unidesa
 
     skeleton driver, can't do much without gfx roms anyway.
 
@@ -88,7 +88,8 @@ Unidesa Cirsa Multi Points
 
 P4, P8, P13, P15, P16 and P19 are unused.
 
-Some service manuals contains the complete PCB schematics (e.g., see the "Manual Técnico Cirsa Vulcano" PDF).
+The service manual contains the complete PCB schematics:
+https://media.recreativas.org/manuales/201909/cirsa-unidesa-carta-control-960606-5-manual.pdf
 
 */
 
@@ -98,6 +99,8 @@ Some service manuals contains the complete PCB schematics (e.g., see the "Manual
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class neptunp2_state : public driver_device
 {
@@ -109,6 +112,10 @@ public:
 
 	void neptunp2(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void video_start() override;
+
 private:
 	uint8_t test_r();
 
@@ -119,9 +126,6 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void video_start() override;
 };
 
 
@@ -184,13 +188,13 @@ GFXDECODE_END
 
 void neptunp2_state::neptunp2(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	I80188(config, m_maincpu, 36.864_MHz_XTAL); // N80C188-20 AMD
 	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_map);
 	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -202,7 +206,7 @@ void neptunp2_state::neptunp2(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_neptunp2);
 	PALETTE(config, "palette").set_entries(512);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// OKIM6376(config, "oki", xxx).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -229,45 +233,52 @@ ROM_START( neptunp2 )
 	ROM_LOAD( "flash_roms", 0x00000, 0x10000, NO_DUMP )
 ROM_END
 
+
+/***************************************************************************
+Games on Cirsa "960606-5" PCB
+***************************************************************************/
+
 ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical, no GFX but a Samsung VFD.
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u2",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "prg_data", 0 )
-	ROM_LOAD( "u3",   0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "c.rock_n_roll_b-2103_6219_otp_b-82_m27c801.u14",  0x000000, 0x100000, CRC(963d184b) SHA1(8ad8b3215d3fc513dfae27bea2ed2ae9939c0f02) )
-	ROM_LOAD( "u15",  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+	ROM_LOAD( "c.rock_n_roll_b-2103_6219_otp_b-82_m27c801.u14", 0x000000, 0x100000, CRC(963d184b) SHA1(8ad8b3215d3fc513dfae27bea2ed2ae9939c0f02) )
+	ROM_LOAD( "u15",                                            0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
 	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(fee6b8e4) SHA1(cb0ddd23e0decda540f22ebb455c91c2aabc60fd) )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP ) // Protected
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // Protected
 ROM_END
 
-ROM_START( mexlindo )
+ROM_START( unk960606 ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. Like 'rockroll', it was found with most sockets unpopulated. This is mechanical.
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "m27c801.u2",   0x000000, 0x100000, CRC(b3269247) SHA1(85911f130325e3082a83cd46b65c270c33e94d3f) )
+	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "prg_data", 0 ) // dunno how this maps ...
-	ROM_LOAD( "m27c801.u3",   0x000000, 0x100000, CRC(7f08dade) SHA1(be320cdd0c1de5d5524878ebcd9779e48cf98b1d) )
+	ROM_REGION( 0x100000, "prg_data", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "m27c801.u14",  0x000000, 0x100000, CRC(418bffcd) SHA1(267e5bf4d06b05902a030949149d56f37459292c) )
-	ROM_LOAD( "m27c801.u15",  0x100000, 0x100000, CRC(8932660c) SHA1(800fe27a74c0adaeebcddcbf5e0cd29767c7a4b3) )
+	ROM_LOAD( "s284_otp_m27c801.u14", 0x000000, 0x100000, CRC(87325ae4) SHA1(6d77f1933f0aab29371795e8fc7bef9bd05cafea) )
+	ROM_LOAD( "u15",                  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
 
-	ROM_REGION( 0x1000000, "gfx", 0 )
-	ROM_LOAD( "m29f032b.u1", 0x000000, 0x400000, CRC(0edf4c06) SHA1(12d625e7fbac19666df16c298864dcb203acd32b) )
-	ROM_LOAD( "m29f032b.u2", 0x400000, 0x400000, CRC(3b082f34) SHA1(ec1668656a885c96ea1946a58a065a56eb3ec60f) )
-	ROM_LOAD( "m29f032b.u3", 0x800000, 0x400000, CRC(caf0dc06) SHA1(8defcb5d83464068a10ba0d45be21fb03ec2155e) )
-	ROM_LOAD( "m29f032b.u4", 0xc00000, 0x400000, CRC(bd623e3c) SHA1(e42743fd1dab83c3de604c347793bb6cfc69e78e) )
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(5e2d52ac) SHA1(98bc7a668ee23de4184bdef23fbceda0c1987cd7) )
 
-	ROM_REGION( 0x0800, "eeprom", 0 )
-	ROM_LOAD( "24c16_it7_0,05.u10",  0x000, 0x800, CRC(d84a3fae) SHA1(56e743a74d1934a6c6d99dc3dbbf6172c30e58a9) )
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pal16l8.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-GAME( 2003, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
-GAME( 2004, mexlindo,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Mexico Lindo",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
-GAME( 1999, rockroll,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from parts' manual and sticker on PCB
+} // Anonymous namespace
+
+
+GAME( 2003,  neptunp2,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Neptune's Pearls 2",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
+
+// Games on Cirsa "960606-5" PCB
+GAME( 1999,  rockroll,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from parts' manual and sticker on PCB
+GAME( 2001?, unk960606, 0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "unknown 960606-5 based machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from sticker on PCB

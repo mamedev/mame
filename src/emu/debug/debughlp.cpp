@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debughlp.h"
+#include "corestr.h"
 #include <cctype>
 
 
@@ -112,16 +113,25 @@ static const help_item static_help_list[] =
 		"  f[ind] <address>,<length>[,<data>[,...]] -- search program memory for data\n"
 		"  f[ind]d <address>,<length>[,<data>[,...]] -- search data memory for data\n"
 		"  f[ind]i <address>,<length>[,<data>[,...]] -- search I/O memory for data\n"
+		"  fill <address>,<length>[,<data>[,...]] -- fill program memory with data\n"
+		"  filld <address>,<length>[,<data>[,...]] -- fill data memory with data\n"
+		"  filli <address>,<length>[,<data>[,...][ -- fill I/O memory with data\n"
 		"  dump <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump program memory as text\n"
 		"  dumpd <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump data memory as text\n"
 		"  dumpi <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump I/O memory as text\n"
 		"  dumpo <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump opcodes memory as text\n"
+		"  strdump <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from program memory\n"
+		"  strdumpd <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from data memory\n"
+		"  strdumpi <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from I/O memory\n"
+		"  strdumpo <filename>,<address>,<length>[,<term>[,<CPU>]] -- dump ASCII strings from opcodes memory\n"
 		"  save <filename>,<address>,<length>[,<CPU>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<CPU>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<CPU>] -- save binary I/O memory to the given file\n"
+		"  saver <filename>,<address>,<length>,<region> -- save binary memory region to the given file\n"
 		"  load <filename>,<address>[,<length>,<CPU>] -- load binary program memory from the given file\n"
 		"  loadd <filename>,<address>[,<length>,<CPU>] -- load binary data memory from the given file\n"
 		"  loadi <filename>,<address>[,<length>,<CPU>] -- load binary I/O memory from the given file\n"
+		"  loadr <filename>,<address>,<length>,<region> -- load binary memory region from the given file\n"
 		"  map <address> -- map logical program address to physical address and bank\n"
 		"  mapd <address> -- map logical data address to physical address and bank\n"
 		"  mapi <address> -- map logical I/O address to physical address and bank\n"
@@ -646,6 +656,21 @@ static const help_item static_help_list[] =
 		"to the file 'harddriv.dmp'.\n"
 	},
 	{
+		"strdump",
+		"\n"
+		"  strdump[{d|i}] <filename>,<address>,<length>[,<term>[,<CPU>]]\n"
+		"\n"
+		"The strdump/strdumpd/strdumpi/strdumpo commands dump memory to the text file specified in the "
+		"<filename> parameter. 'strdump' will dump program space memory, while 'strdumpd' will dump data "
+		"space memory, 'strdumpi' will dump I/O space memory and 'strdumpo' will dump opcodes memory. "
+		"<address> indicates the address of the start of dumping, and <length> indicates how much memory "
+		"to dump. The range <address> through <address>+<length>-1 inclusive will be output to the file. "
+		"By default, the data will be interpreted as a series of null-terminated strings, and the dump "
+		"will have one string on each line and C-style escapes for non-ASCII characters. The optional "
+		"<term> parameter can be used to specify a different character as the string terminator. Finally, "
+		"you can dump memory from another CPU by specifying the <CPU> parameter.\n"
+	},
+	{
 		"save",
 		"\n"
 		"  save[{d|i}] <filename>,<address>,<length>[,<CPU>]\n"
@@ -666,13 +691,28 @@ static const help_item static_help_list[] =
 		"  Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
 	},
 	{
+		"saver",
+		"\n"
+		"  saver <filename>,<address>,<length>,<region>\n"
+		"\n"
+		"The saver command saves the raw content of memory region <region> to the binary file specified in the "
+		"<filename> parameter. <address> indicates the address of the start of saving, and <length> indicates "
+		"how much memory to save. The range <address> through <address>+<length>-1 inclusive will be output to "
+		"the file.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"saver harddriv.bin,80000,40000,:maincpu\n"
+		"  Saves :maincpu region addresses 80000-bffff to the binary file 'harddriv.bin'.\n"
+	},
+	{
 		"load",
 		"\n"
 		"  load[{d|i}] <filename>,<address>[,<length>,<CPU>]\n"
 		"\n"
 		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
 		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "
-		"and 'loadi' will load I/O space memory. <address> indicates the address of the start of saving, "
+		"and 'loadi' will load I/O space memory. <address> indicates the address of the start of loading, "
 		"and <length> indicates how much memory to load. The range <address> through <address>+<length>-1 "
 		"inclusive will be read in from the file. If you specify <length> = 0 or a length greater than the "
 		"total length of the file it will load the entire contents of the file and no more. You can also load "
@@ -686,6 +726,22 @@ static const help_item static_help_list[] =
 		"\n"
 		"loadd harddriv.bin,3000,1000,3\n"
 		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
+	},
+	{
+		"loadr",
+		"\n"
+		"  loadr <filename>,<address>,<length>,<region>\n"
+		"\n"
+		"The loadr command loads raw memory in the memory region <region> from the binary file specified "
+		"in the <filename> parameter. <address> indicates the address of the start of loading, and <length> "
+		"indicates how much memory to load. The range <address> through <address>+<length>-1 inclusive will "
+		"be read in from the file. If you specify <length> = 0 or a length greater than the total length of "
+		"the file it will load the entire contents of the file and no more.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"loadr harddriv.bin,80000,40000,:maincpu\n"
+		"  Loads addresses 80000-bffff in the :maincpu region from the binary file 'harddriv.bin'.\n"
 	},
 	{
 		"step",

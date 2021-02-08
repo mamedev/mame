@@ -149,7 +149,7 @@ public:
 	const image_device_format *device_get_named_creatable_format(const std::string &format_name) noexcept;
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
-	const char *error();
+	std::string_view error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
@@ -158,7 +158,7 @@ public:
 	const char *basename() const noexcept { return m_basename.empty() ? nullptr : m_basename.c_str(); }
 	const char *basename_noext()  const noexcept { return m_basename_noext.empty() ? nullptr : m_basename_noext.c_str(); }
 	const std::string &filetype() const noexcept { return m_filetype; }
-	bool is_filetype(const std::string &candidate_filetype) { return !core_stricmp(filetype().c_str(), candidate_filetype.c_str()); }
+	bool is_filetype(std::string_view candidate_filetype) const;
 	bool is_open() const noexcept { return bool(m_file); }
 	util::core_file &image_core_file() const noexcept { return *m_file; }
 	u64 length() { check_for_file(); return m_file->size(); }
@@ -175,18 +175,15 @@ public:
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
 
-	const std::string &longname() const noexcept { return m_longname; }
-	const std::string &manufacturer() const noexcept { return m_manufacturer; }
-	const std::string &year() const noexcept { return m_year; }
-	u32 supported() const noexcept { return m_supported; }
-
 	const software_info *software_entry() const noexcept;
 	const software_part *part_entry() const noexcept { return m_software_part_ptr; }
 	const char *software_list_name() const noexcept { return m_software_list_name.c_str(); }
 	bool loaded_through_softlist() const noexcept { return m_software_part_ptr != nullptr; }
 
+	void set_working_directory(std::string_view working_directory) { m_working_directory = working_directory; }
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
-	const std::string &working_directory();
+	void set_working_directory(std::string &&working_directory) { m_working_directory = std::move(working_directory); }
+	const std::string &working_directory() const { return m_working_directory; }
 
 	u8 *get_software_region(const char *tag);
 	u32 get_software_region_length(const char *tag);
@@ -210,17 +207,17 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	image_init_result load(const std::string &path);
+	image_init_result load(std::string_view path);
 
 	// loads a softlist item by name
-	image_init_result load_software(const std::string &software_identifier);
+	image_init_result load_software(std::string_view software_identifier);
 
 	image_init_result finish_load();
 	void unload();
-	image_init_result create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args);
-	image_init_result create(const std::string &path);
-	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
-	int reopen_for_write(const std::string &path);
+	image_init_result create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(std::string_view path);
+	bool load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
+	int reopen_for_write(std::string_view path);
 
 	void set_user_loadable(bool user_loadable) { m_user_loadable = user_loadable; }
 
@@ -235,26 +232,23 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
-	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args);
-	image_error_t load_image_by_path(u32 open_flags, const std::string &path);
+	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
+	image_error_t load_image_by_path(u32 open_flags, std::string_view path);
 	void clear();
-	bool is_loaded();
+	bool is_loaded() const { return m_file != nullptr; }
 
-	void set_image_filename(const std::string &filename);
+	void set_image_filename(std::string_view filename);
 
 	void clear_error();
 
 	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
-	void setup_working_directory();
-	bool try_change_working_directory(const std::string &subdir);
-
 	void make_readonly() noexcept { m_readonly = true; }
 
 	bool image_checkhash();
 
-	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	std::string software_get_default_slot(const char *default_card_slot) const;
+	const software_part *find_software_item(std::string_view identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
+	std::string software_get_default_slot(std::string_view default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
@@ -286,26 +280,20 @@ private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
-	bool load_software_part(const std::string &identifier);
+	bool load_software_part(std::string_view identifier);
 
 	bool init_phase() const;
 	static bool run_hash(util::core_file &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
 
 	// loads an image or software items and resets - called internally when we
 	// load an is_reset_on_load() item
-	void reset_and_load(const std::string &path);
+	void reset_and_load(std::string_view path);
 
 	// creation info
 	formatlist_type m_formatlist;
 
 	// working directory; persists across mounts
 	std::string m_working_directory;
-
-	// info read from the hash file/software list
-	std::string m_longname;
-	std::string m_manufacturer;
-	std::string m_year;
-	u32 m_supported;
 
 	// flags
 	bool m_readonly;
@@ -331,6 +319,6 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_image_interface> image_interface_iterator;
+typedef device_interface_enumerator<device_image_interface> image_interface_enumerator;
 
 #endif  /* MAME_EMU_DIIMAGE_H */

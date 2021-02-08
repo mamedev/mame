@@ -38,6 +38,10 @@ public:
 
 	void driver_init() override;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 2> m_mainbank;
@@ -58,7 +62,7 @@ private:
 	emu_timer *m_vblank_interrupt_timer;
 	emu_timer *m_network_interrupt_timer;
 	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<uint32_t> m_shareram;
 	uint8_t m_mcu_port6;
 	uint32_t m_sprbank;
 
@@ -74,7 +78,8 @@ private:
 	uint32_t sysreg_r();
 	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void c116_w(offs_t offset, uint8_t data);
-	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t port6_r();
 	void port6_w(uint8_t data);
 	uint8_t port7_r();
@@ -87,9 +92,6 @@ private:
 	uint8_t dac1_r();
 	uint8_t dac0_r();
 	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_MACHINE_START(namcofl);
-	DECLARE_MACHINE_RESET(namcofl);
-	DECLARE_VIDEO_START(namcofl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);

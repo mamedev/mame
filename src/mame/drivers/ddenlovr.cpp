@@ -980,7 +980,7 @@ int ddenlovr_state::blit_draw( int src, int sx )
 
 			default:
 				log_draw_error(src, cmd);
-			// fall through
+				[[fallthrough]];
 			case BLIT_STOP:
 				return ((bit_addr + m_ddenlovr_blit_rom_bits - 1) / m_ddenlovr_blit_rom_bits) & 0xffffff;
 		}
@@ -4334,6 +4334,7 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 //          popmessage("COINS %02x",data);
 #endif
 			m_coins = data;
+			break;
 
 		case 0x0d:  break;  // ff resets input port sequence?
 

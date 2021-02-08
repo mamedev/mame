@@ -37,7 +37,7 @@ private:
 	virtual void handle() override;
 
 	device_slot_interface::slot_option const *get_current_option(device_slot_interface &slot) const;
-	void set_slot_device(device_slot_interface &slot, const char *val);
+	void set_slot_device(device_slot_interface &slot, std::string_view val);
 	void record_current_options();
 	bool try_refresh_current_options();
 	void rotate_slot_device(device_slot_interface &slot, step_t step);

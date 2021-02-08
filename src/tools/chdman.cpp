@@ -7,9 +7,6 @@
 ****************************************************************************/
 #include <stdio.h> // must be stdio.h and here otherwise issues with I64FMT in MINGW
 
-// osd
-#include "osdcore.h"
-
 // lib/util
 #include "avhuff.h"
 #include "aviio.h"
@@ -18,6 +15,7 @@
 #include "corefile.h"
 #include "hashing.h"
 #include "md5.h"
+#include "strformat.h"
 #include "vbiparse.h"
 
 #include <cassert>
@@ -32,6 +30,8 @@
 #include <memory>
 #include <new>
 #include <unordered_map>
+
+using util::string_format;
 
 
 
@@ -395,10 +395,27 @@ public:
 				uint64_t src_track_start = m_info.track[tracknum].offset;
 				uint64_t src_track_end = src_track_start + bytesperframe * (uint64_t)trackinfo.frames;
 				uint64_t pad_track_start = src_track_end - ((uint64_t)m_toc.tracks[tracknum].padframes * bytesperframe);
+				uint64_t split_track_start = pad_track_start - ((uint64_t)m_toc.tracks[tracknum].splitframes * bytesperframe);
+
+				// dont split when split-bin read not required
+				if ((uint64_t)m_toc.tracks[tracknum].splitframes == 0L)
+					split_track_start = UINT64_MAX;
+
 				while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame
 					uint64_t src_frame_start = src_track_start + ((offset - startoffs) / CD_FRAME_SIZE) * bytesperframe;
+
+					// auto-advance next track for split-bin read
+					if (src_frame_start == split_track_start && m_lastfile.compare(m_info.track[tracknum+1].fname)!=0)
+					{
+						m_file.reset();
+						m_lastfile = m_info.track[tracknum+1].fname;
+						osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+						if (filerr != osd_file::error::NONE)
+							report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
+					}
+
 					if (src_frame_start < src_track_end)
 					{
 						// read it in, or pad if we're into the padframes
@@ -408,7 +425,9 @@ public:
 						}
 						else
 						{
-							m_file->seek(src_frame_start, SEEK_SET);
+							m_file->seek((src_frame_start >= split_track_start)
+								? src_frame_start - split_track_start
+								: src_frame_start, SEEK_SET);
 							uint32_t count = m_file->read(dest, bytesperframe);
 							if (count != bytesperframe)
 								report_error(1, "Error reading input file (%s)'", m_lastfile.c_str());
@@ -1251,7 +1270,7 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_track_info &info, const char *filename, uint32_t frameoffs, uint64_t discoffs)
+void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t discoffs)
 {
 	if (mode == MODE_GDI)
 	{
@@ -1299,8 +1318,9 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 				size = 2352;
 				break;
 		}
-		bool needquote = strchr(filename, ' ') != nullptr;
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
+		const bool needquote = filename.find(' ') != std::string::npos;
+		const char *const quotestr = needquote ? "\"" : "";
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, quotestr, filename, quotestr, discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
@@ -2472,11 +2492,11 @@ static void do_extract_cd(parameters_map &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(*output_bin_file_str).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(*output_bin_file_str)), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include

@@ -47,10 +47,8 @@
 #include "analog/nlid_twoterm.h"
 #include "nl_factory.h"
 
-namespace netlist
-{
-	namespace analog
-	{
+namespace netlist::analog {
+
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
 		NETLIB_CONSTRUCTOR(r2r_dac)
@@ -85,10 +83,11 @@ namespace netlist
 			}
 		);
 	}
-	} //namespace analog
 
-	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac, "R2R_DAC", "VIN,R,N")
-	} // namespace devices
+} // namespace netlist::analog
 
-} // namespace netlist
+namespace netlist::devices {
+
+	NETLIB_DEVICE_IMPL_NS(analog, r2r_dac, "R2R_DAC", "VIN,R,N")
+
+} // namespace netlist::devices

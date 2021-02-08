@@ -61,6 +61,8 @@ public:
 		, m_ps88(*this, "ps88")
 		, m_digits(*this, "digit%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
+		, m_timer_irq_active(false)
+		, m_pia_irq_active(false)
 		{ }
 
 	void s11(machine_config &config);
@@ -108,7 +110,9 @@ public:
 	void s11_audio_map(address_map &map);
 
 protected:
-	DECLARE_MACHINE_RESET(s11);
+	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -147,9 +151,6 @@ protected:
 	static const device_timer_id TIMER_IRQ = 0;
 
 private:
-	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
 	uint8_t m_switch_col;

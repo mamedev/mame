@@ -183,6 +183,8 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "speaker.h"
 
 
+namespace {
+
 class tutor_state : public driver_device
 {
 public:
@@ -202,6 +204,10 @@ public:
 	void pyuutajr(machine_config &config);
 	void tutor(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -212,7 +218,12 @@ private:
 	required_memory_bank m_bank2;
 	memory_region *m_cart_rom;
 
+	int m_tape_interrupt_enable;
+	emu_timer *m_tape_interrupt_timer;
+
 	int m_bank1_switching;
+	int m_centronics_busy;
+
 	uint8_t key_r(offs_t offset);
 	uint8_t tutor_mapper_r(offs_t offset);
 	void tutor_mapper_w(offs_t offset, uint8_t data);
@@ -222,14 +233,11 @@ private:
 	void tutor_printer_w(offs_t offset, uint8_t data);
 
 	uint8_t tutor_highmem_r(offs_t offset);
-	int m_tape_interrupt_enable;
-	emu_timer *m_tape_interrupt_timer;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 
-	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	[[maybe_unused]] void test_w(offs_t offset, uint8_t data);
+
 	void pyuutajr_mem(address_map &map);
 	void tutor_io(address_map &map);
 	void tutor_memmap(address_map &map);
@@ -540,7 +548,6 @@ void tutor_state::tutor_printer_w(offs_t offset, uint8_t data)
     @>f000-@>f0fb: tms9995 internal RAM 2
 */
 
-#ifdef UNUSED_FUNCTION
 void tutor_state::test_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -550,7 +557,6 @@ void tutor_state::test_w(offs_t offset, uint8_t data)
 		break;
 	}
 }
-#endif
 
 void tutor_state::tutor_memmap(address_map &map)
 {
@@ -807,6 +813,8 @@ ROM_START(pyuutajr)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY   FULLNAME           FLAGS
 COMP( 1983?, tutor,    0,      0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Tutor" ,     0)

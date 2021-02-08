@@ -87,7 +87,6 @@ private:
 
 	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);

@@ -696,7 +696,7 @@ void ninjaw_state::machine_reset()
 	memset(m_pandata, 0, sizeof(m_pandata));
 
 	/**** mixer control enable ****/
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 }
 
 void ninjaw_state::ninjaw(machine_config &config)

@@ -76,7 +76,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define BUFFER "ram"
 #define FDC_TAG "hdc9234"
@@ -1088,4 +1088,4 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_hfdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

@@ -93,6 +93,8 @@
 #include "emu.h"
 #include "includes/mac.h"
 #include "machine/sonydriv.h"
+#include "machine/iwm.h"
+#include "machine/swim1.h"
 
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
@@ -654,6 +656,9 @@ uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 
 	uint16_t result = m_fdc->read(offset >> 8);
 
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
+
 	if (LOG_MAC_IWM)
 		printf("%s mac_iwm_r: offset=0x%08x mem_mask %04x = %02x\n", machine().describe_context().c_str(), offset, mem_mask, result);
 
@@ -669,6 +674,9 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_fdc->write((offset >> 8), data & 0xff);
 	else
 		m_fdc->write((offset >> 8), data>>8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
@@ -850,7 +858,12 @@ void mac_state::mac_via_out_a(uint8_t data)
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
+#if NEW_SWIM
+	if (m_cur_floppy)
+		m_cur_floppy->ss_w((data & 0x20) >> 5);
+#else
 	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
+#endif
 }
 
 void mac_state::mac_via_out_b(uint8_t data)
@@ -923,7 +936,8 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
 	data = m_via1->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(m_via_cycles);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1131,10 +1145,16 @@ void mac_state::machine_reset()
 			fatalerror("mac: unknown clock\n");
 	}
 
-	// Egret currently needs more dramatic VIA slowdowns.  Need to determine what's realistic.
+	// Egret currently needs a larger VIA slowdown
 	if (ADB_IS_EGRET)
 	{
-		m_via_cycles *= 35;
+		m_via_cycles *= 2;
+	}
+
+	// And a little more for Cuda.
+	if (ADB_IS_CUDA)
+	{
+		m_via_cycles *= 3;
 	}
 
 	// default to 32-bit mode on LC
@@ -2455,4 +2475,52 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	logerror("mac_trace_trap: %s at 0x%08x: %s\n",cpu_name_local, addr, buf);
 }
+#endif
+
+#if !NEW_SWIM
+void mac_state::phases_w(u8)
+{
+}
+
+void mac_state::sel35_w(int)
+{
+}
+
+void mac_state::devsel_w(u8)
+{
+}
+
+void mac_state::hdsel_w(int)
+{
+}
+#else
+
+void mac_state::phases_w(uint8_t phases)
+{
+	if(m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void mac_state::sel35_w(int sel35)
+{
+	logerror("fdc mac sel35 %d\n", sel35);
+}
+
+void mac_state::devsel_w(uint8_t devsel)
+{
+	if(devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if(devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+	m_fdc->set_floppy(m_cur_floppy);
+	if(m_cur_floppy)
+		m_cur_floppy->ss_w((m_via1->read_pa() & 0x20) >> 5);
+}
+
+void mac_state::hdsel_w(int hdsel)
+{
+}
+
 #endif

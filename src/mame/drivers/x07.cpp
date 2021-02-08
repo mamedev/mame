@@ -1135,7 +1135,7 @@ uint8_t x07_state::x07_io_r(offs_t offset)
 		break;
 	case 0xf6:
 		if (m_cass_motor)   m_regs_r[6] |= 4;
-		//fall through
+		[[fallthrough]];
 	case 0xf0:
 	case 0xf1:
 	case 0xf3:

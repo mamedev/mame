@@ -166,17 +166,23 @@
 
 ***************************************************************************/
 
-#include <cstddef>
 #include "emu.h"
+#include "drcbex64.h"
+
 #include "debugger.h"
 #include "emuopts.h"
-#include "drcuml.h"
-#include "drcbex64.h"
+
+#include <cstddef>
+
 
 // This is a trick to make it build on Android where the ARM SDK declares ::REG_Rn
 // and the x64 SDK declares ::REG_Exx and ::REG_Rxx
 namespace drc {
+
 using namespace uml;
+
+using namespace asmjit;
+using namespace asmjit::x86;
 
 
 
@@ -827,6 +833,7 @@ void drcbe_x64::reset()
 int drcbe_x64::execute(code_handle &entry)
 {
 	// call our entry point which will jump to the destination
+	m_cache.codegen_complete();
 	return (*m_entry)(m_rbpvalue, (x86code *)entry.codeptr());
 }
 

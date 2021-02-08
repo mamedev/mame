@@ -44,7 +44,7 @@ void network_manager::config_load(config_type cfg_type, util::xml::data_node con
 
 			if ((tag != nullptr) && (tag[0] != '\0'))
 			{
-				for (device_network_interface &network : network_interface_iterator(machine().root_device()))
+				for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 				{
 					if (!strcmp(tag, network.device().tag())) {
 						int interface = node->get_attribute_int("interface", 0);
@@ -74,7 +74,7 @@ void network_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 	/* only care about game-specific data */
 	if (cfg_type == config_type::GAME)
 	{
-		for (device_network_interface &network : network_interface_iterator(machine().root_device()))
+		for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 		{
 			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)

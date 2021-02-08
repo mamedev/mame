@@ -46,7 +46,7 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 	{}
 };
 
-int ccvf_format::identify(io_generic *io, uint32_t form_factor)
+int ccvf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[36];
 
@@ -87,7 +87,7 @@ floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &c
 	return desc;
 }
 
-bool ccvf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool ccvf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const format &f = formats[0];
 

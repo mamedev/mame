@@ -178,7 +178,7 @@ uint8_t abc_super_smartaid_device::abcbus_xmemfl(offs_t offset)
 	{
 	case 0x08:
 		m_prom_bank = 1;
-		// fallthru
+		[[fallthrough]];
 	case 0x0c: case 0x0f:
 		data = m_rom_2->base()[(m_rom_bank << 12) | (offset & 0xfff)];
 		break;

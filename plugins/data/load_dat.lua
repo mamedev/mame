@@ -26,8 +26,8 @@ function datfile.open(file, vertag, fixupcb)
 	local filepath
 	local fh
 
-	for path in mame_manager:ui():options().entries.historypath:value():gmatch("([^;]+)") do
-		filepath = lfs.env_replace(path) .. "/" .. file
+	for path in mame_manager.ui.options.entries.historypath:value():gmatch("([^;]+)") do
+		filepath = emu.subst_env(path) .. "/" .. file
 		fh = io.open(filepath, "r")
 		if fh then
 			break

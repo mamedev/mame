@@ -281,7 +281,7 @@
     GFX PCB:  GQ871 PWB(B)A    (C) 1999 Konami
     ------------------------------------------
 
-    There are no ROMs on the two GFX PCBs, all sockets are empty. They are loacted on the LAN PCB.
+    There are no ROMs on the two GFX PCBs, all sockets are empty. They are located on the LAN PCB.
     Prior to the game starting there is a message saying downloading data.
 
 
@@ -360,10 +360,13 @@
 #include "video/voodoo.h"
 #include "video/k037122.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "layout/generic.h"
+
+
+namespace {
 
 class hornet_state : public driver_device
 {
@@ -410,6 +413,10 @@ public:
 	void init_terabrst();
 	void init_sscope();
 	void init_sscope2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -474,9 +481,6 @@ private:
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(hornet_2board);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -1715,6 +1719,9 @@ ROM_START(terabrsta)
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************************************************/
 

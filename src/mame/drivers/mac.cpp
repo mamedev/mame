@@ -62,6 +62,10 @@
 #include "machine/swim.h"
 #include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
+#include "machine/iwm.h"
+#include "machine/swim1.h"
+#include "machine/swim2.h"
+#include "machine/swim3.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
@@ -670,7 +674,7 @@ void mac_state::pwrmac_map(address_map &map)
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-
+#if !NEW_SWIM
 static const applefdc_interface mac_iwm_interface =
 {
 	sony_set_lines,
@@ -680,7 +684,7 @@ static const applefdc_interface mac_iwm_interface =
 	sony_write_data,
 	sony_read_status
 };
-
+#endif
 static void mac_nubus_cards(device_slot_interface &device)
 {
 	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
@@ -718,24 +722,50 @@ static void mac_lcpds_cards(device_slot_interface &device)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-
+#if !NEW_SWIM
 static const floppy_interface mac_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
 	"floppy_3_5"
 };
-
-void mac_state::add_base_devices(machine_config &config, bool rtc, bool super_woz)
+#endif
+void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
 		RTC3430042(config, m_rtc, XTAL(32'768));
 
-	if (super_woz)
+#if NEW_SWIM
+	switch (woz_version) {
+	case 0:
+		IWM(config, m_fdc, C15M);
+		break;
+	case 1:
+		SWIM1(config, m_fdc, C15M);
+		break;
+	case 2:
+		SWIM2(config, m_fdc, C15M);
+		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
+		break;
+	case 3:
+		SWIM3(config, m_fdc, C15M);
+		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
+		break;
+	}
+
+	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
+	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+
+	applefdintf_device::add_35(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
+#else
+	if (woz_version)
 		LEGACY_SWIM(config, m_fdc, &mac_iwm_interface);
 	else
 		LEGACY_IWM(config, m_fdc, &mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
+#endif
 
 	SCC8530(config, m_scc, C7M);
 	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
@@ -758,7 +788,7 @@ void mac_state::add_scsi(machine_config &config, bool cdrom)
 
 void mac_state::add_via1_adb(machine_config &config, bool macii)
 {
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	if (macii)
 		m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
@@ -772,7 +802,7 @@ void mac_state::add_via1_adb(machine_config &config, bool macii)
 
 void mac_state::add_via2(machine_config &config)
 {
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a));
@@ -851,7 +881,7 @@ template <typename T> void mac_state::add_nubus_pds(machine_config &config, cons
 	NUBUS_SLOT(config, slot_tag, "pds", std::forward<T>(opts), nullptr);
 }
 
-void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc_type, bool nubus, bool nubus_bank1, bool nubus_bank2)
+void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc_type, bool nubus, bool nubus_bank1, bool nubus_bank2, int woz_version)
 {
 	if (cpu)
 	{
@@ -863,7 +893,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	PALETTE(config, m_palette).set_entries(256);
 
 	add_asc(config, asc_type);
-	add_base_devices(config);
+	add_base_devices(config, true, woz_version);
 	add_scsi(config, true);
 	if (nubus)
 		add_nubus(config, nubus_bank1, nubus_bank2);
@@ -900,10 +930,10 @@ void mac_state::maciifx(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
 	add_asc(config, asc_device::asc_type::ASC);
-	add_base_devices(config);
+	add_base_devices(config, true, 1);
 	add_scsi(config);
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
@@ -920,9 +950,9 @@ void mac_state::maciifx(machine_config &config)
 	add_nubus(config);
 }
 
-void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::asc_type asc_type)
+void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::asc_type asc_type, int woz_version)
 {
-	macii(config, false, asc_type, false);
+	macii(config, false, asc_type, false, true, true, woz_version);
 
 	if (cpu)
 	{
@@ -955,9 +985,9 @@ void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::
 	}
 }
 
-void mac_state::maclc2(machine_config &config, bool egret)
+void mac_state::maclc2(machine_config &config, bool egret, int woz_version)
 {
-	maclc(config, false, egret);
+	maclc(config, false, egret, asc_device::asc_type::V8, woz_version);
 
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
@@ -969,7 +999,7 @@ void mac_state::maclc2(machine_config &config, bool egret)
 
 void mac_state::maccclas(machine_config &config)
 {
-	maclc(config, false, false, asc_device::asc_type::VASP);
+	maclc(config, false, false, asc_device::asc_type::VASP, 2);
 
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
@@ -984,7 +1014,7 @@ void mac_state::maccclas(machine_config &config)
 
 void mac_state::maclc3(machine_config &config, bool egret)
 {
-	maclc(config, false, false, asc_device::asc_type::SONORA);
+	maclc(config, false, false, asc_device::asc_type::SONORA, 2);
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
@@ -1075,7 +1105,7 @@ void mac_state::macse30(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
-	add_base_devices(config, true, true);
+	add_base_devices(config, true, 1);
 	add_asc(config, asc_device::asc_type::ASC);
 	add_scsi(config);
 
@@ -1121,7 +1151,7 @@ void mac_state::macclas2(machine_config &config)
 
 void mac_state::maciici(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, true, false, true);
+	macii(config, false, asc_device::asc_type::ASC, true, false, true, 1);
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
@@ -1195,7 +1225,7 @@ void mac_state::pwrmac(machine_config &config)
 	m_awacs->add_route(1, "rspeaker", 1.0);
 
 	add_scsi(config);
-	add_base_devices(config, false, false);
+	add_base_devices(config, false, 3);
 
 	add_via1_adb(config, false);
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));

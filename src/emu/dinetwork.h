@@ -50,6 +50,6 @@ protected:
 
 
 // iterator
-typedef device_interface_iterator<device_network_interface> network_interface_iterator;
+typedef device_interface_enumerator<device_network_interface> network_interface_enumerator;
 
 #endif // MAME_EMU_DINETWORK_H

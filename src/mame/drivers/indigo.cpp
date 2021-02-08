@@ -183,10 +183,10 @@ void indigo4k_state::mem_map(address_map &map)
 {
 	indigo_map(map);
 	map(0x00000000, 0x0007ffff).bankrw("bank1");
-	map(0x08000000, 0x17ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 128 MB of main RAM */
+	map(0x08000000, 0x17ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 256 MB of main RAM */
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 128 MB of main RAM */
+	map(0x20000000, 0x2fffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 256 MB of main RAM */
 }
 
 static INPUT_PORTS_START(indigo)

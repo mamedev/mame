@@ -50,6 +50,8 @@ public:
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
 	void slot(machine_config &config);
+	void spcpokan(machine_config &config);
+	void gs662(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -89,6 +91,19 @@ private:
 		return m_k056832->piratesh_rom_r(offset);
 	}
 
+	uint16_t vrom_spcpokan_r(offs_t offset)
+	{
+		if (m_control2 & 0x10)
+		{
+			offset |= 0x1000;
+		}
+
+		if (offset & 1)
+			offset |= 0x100000;
+
+		return m_k056832->piratesh_rom_r(offset);
+	}
+
 	uint16_t vrom_koropens_r(offs_t offset)
 	{
 		if (m_control2 & 0x10)
@@ -103,6 +118,8 @@ private:
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
 	void slot_main(address_map &map);
+	void spcpokan_main(address_map &map);
+	void gs662_main(address_map &map);
 
 	static constexpr int NUM_LAYERS = 4;
 
@@ -233,6 +250,13 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
 }
 
+void konmedal68k_state::spcpokan_main(address_map &map)
+{
+	common_main(map);
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_spcpokan_r));
+}
+
 void konmedal68k_state::koropens_main(address_map &map)
 {
 	common_main(map);
@@ -248,6 +272,18 @@ void konmedal68k_state::slot_main(address_map &map)
 		NAME([this](offs_t offset, u16 data) { if (offset & 1) m_palette->write16(offset / 2, data); })
 	).share("palette");
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
+}
+
+void konmedal68k_state::gs662_main(address_map &map)
+{
+	common_main(map);
+
+	// game explicitly tests all 4 mirrors of the VRAM.  Or maybe there really is 4x VRAM and some not-quite-56832 ASIC?
+	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa04000, 0xa05fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa06000, 0xa07fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xb00000, 0xb0ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_koropens_r));
 }
 
 static INPUT_PORTS_START( kzaurus )
@@ -383,6 +419,33 @@ void konmedal68k_state::koropens(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
 }
 
+void konmedal68k_state::spcpokan(machine_config &config)
+{
+	kzaurus(config);
+
+	M68000(config.replace(), m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::spcpokan_main);
+}
+
+void konmedal68k_state::gs662(machine_config &config)
+{
+	kzaurus(config);
+
+	M68000(config.replace(), m_maincpu, XTAL(33'868'800) / 4); // 33.8688 MHz crystal verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::gs662_main);
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64 * 8, 32 * 8);
+	screen.set_visarea(0, 360 - 1, 16, 240 - 1);
+	screen.set_screen_update(FUNC(konmedal68k_state::screen_update_konmedal68k));
+	screen.set_palette("palette");
+
+	PALETTE(config.replace(), "palette").set_format(palette_device::xBGR_888, 32768).enable_shadows();
+}
+
 void konmedal68k_state::slot(machine_config &config)
 {
 	kzaurus(config);
@@ -472,6 +535,33 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
+ROM_START(spcpokan)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP("642-a05-2n.bin", 0x000000, 0x080000, CRC(ec8047d0) SHA1(4c9c3a7db3b56109b384df2031a396a8d4dc19f6))
+
+	ROM_REGION(0x200000, "k056832", 0)
+	ROM_LOAD("642-a06-14n.bin", 0x000000, 0x080000, CRC(ebcc67cf) SHA1(b2efd41438fa562e8545695b09d124c730a9c8d3))
+	ROM_LOAD("642-a07-17n.bin", 0x080000, 0x080000, CRC(80da3c5e) SHA1(843db853958ed994185e9d3a156014466e080863))
+	ROM_LOAD("642-a08-19n.bin", 0x100000, 0x080000, CRC(cfaeba54) SHA1(83a8a7b6a4cfa26d2c804a26d7ab17ed376625f4))
+	ROM_LOAD("642-a09-22n.bin", 0x180000, 0x080000, BAD_DUMP CRC(8b01e2cb) SHA1(8a15c2462f0a35136386eeba0d926349fb9f5cf9)) // byte sum should be f9c7, is f9c8 so POST fails
+
+	ROM_REGION(0x200000, "ymz", 0)
+	ROM_LOAD("642-a01-2f.bin", 0x000000, 0x080000, CRC(2096c185) SHA1(948ec4bc3896fae5d1f7c478ee7fafd25ef30b74))
+	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
+ROM_END
+
+ROM_START(unkkonmd)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP("662-unk-2n.bin", 0x000000, 0x080000, CRC(e6168538) SHA1(093153adc97bc4add67bb1477b9ad3b25fee26f0))
+
+	ROM_REGION(0x200000, "k056832", 0)
+	ROM_LOAD("662-unk-14n.bin", 0x000000, 0x080000, CRC(168aa21c) SHA1(183cbf8fda0e204e09d6b04e21d46f8855273000))
+	ROM_LOAD("662-unk-17n.bin", 0x080000, 0x080000, CRC(91c3f03e) SHA1(9feaa3beaef314bef40392bff3f92792a96a8bce))
+
+	ROM_REGION(0x200000, "ymz", 0)
+	ROM_LOAD("662-unk-2d.bin", 0x000000, 0x080000, CRC(8133c41c) SHA1(c0ee21d3d8def86221ef9be008b910d1a58796b0))
+ROM_END
+
 // GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
 // at 1st boot press Service1 to initialise NVRAM
 ROM_START( konslot )
@@ -502,7 +592,9 @@ GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0,
 GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, konslot,  0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, konslot2, 0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, unkkonmd, 0, gs662,    kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, spcpokan, 0, spcpokan, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

@@ -27,7 +27,7 @@
 #define TI992_VDC_TAG    "vdc"
 #define TI992_HEXBUS_TAG "hexbus"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 class video992_device : public device_t,
 							public device_video_interface
@@ -220,7 +220,7 @@ private:
 };
 
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI992_EXPPORT, bus::ti99::internal, ti992_expport_device)
 

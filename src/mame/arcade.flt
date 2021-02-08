@@ -230,6 +230,7 @@ cidelsa.cpp
 cinemat.cpp
 circus.cpp
 circusc.cpp
+cirsa820xxx.cpp
 cischeat.cpp
 citycon.cpp
 clayshoo.cpp
@@ -246,6 +247,7 @@ cobra.cpp
 cocoloco.cpp
 coinmstr.cpp
 coinmvga.cpp
+cointek.cpp
 combatsc.cpp
 comebaby.cpp
 commando.cpp
@@ -258,6 +260,7 @@ cops.cpp
 copsnrob.cpp
 corona.cpp
 cosmic.cpp
+cosmicg.cpp
 cowtipping.cpp
 cps1.cpp
 cps1bl_5205.cpp
@@ -325,6 +328,7 @@ de_3.cpp
 de_3b.cpp
 dfruit.cpp
 dgpix.cpp
+diamondking.cpp
 dietgo.cpp
 dinoking.cpp
 discoboy.cpp
@@ -467,6 +471,8 @@ gauntlet.cpp
 gberet.cpp
 gcpinbal.cpp
 gei.cpp
+getaway.cpp
+gfamily.cpp
 ggconnie.cpp
 ghosteo.cpp
 giclassic.cpp
@@ -527,6 +533,7 @@ harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
 headonb.cpp
+heromem.cpp
 hexion.cpp
 hideseek.cpp
 higemaru.cpp
@@ -551,6 +558,7 @@ hyperspt.cpp
 hyprduel.cpp
 icecold.cpp
 ice_bozopail.cpp
+ice_hhhippos.cpp
 ice_tbd.cpp
 ichiban.cpp
 idsa.cpp
@@ -645,6 +653,7 @@ konmedal.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
+kpontoon.cpp
 kpython.cpp
 ksayakyu.cpp
 ksys573.cpp
@@ -780,6 +789,7 @@ midzeus.cpp
 mikie.cpp
 mil4000.cpp
 miniboy7.cpp
+miniguay.cpp
 minivadr.cpp
 minivideo.cpp
 mirage.cpp
@@ -1023,10 +1033,10 @@ re900.cpp
 realbrk.cpp
 redalert.cpp
 redclash.cpp
-regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
+rf51w14cg.cpp
 rfslots8085.cpp
 rfslotspcpent.cpp
 rgum.cpp
@@ -1070,6 +1080,7 @@ saturn.cpp
 sauro.cpp
 savquest.cpp
 sbasketb.cpp
+sbmjb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
@@ -1356,6 +1367,7 @@ tutankhm.cpp
 tvcapcom.cpp
 tvg01.cpp
 twin16.cpp
+twinbskt.cpp
 twincobr.cpp
 twinkle.cpp
 twins.cpp

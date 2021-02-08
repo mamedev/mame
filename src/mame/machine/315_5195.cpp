@@ -47,6 +47,7 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 	, m_mcu_int_callback(*this)
 	, m_space(nullptr)
 	, m_decrypted_space(nullptr)
+	, m_decryption_banks(*this, "decrypted bank %u", 0U)
 	, m_curregion(0)
 	, m_to_sound(0)
 	, m_from_sound(0)
@@ -239,13 +240,12 @@ void sega_315_5195_mapper_device::map_as_rom(u32 offset, u32 length, offs_t mirr
 		void *memptr = m_cpuregion->base() + rgnoffset;
 
 		// remember this bank, and decrypt if necessary
-		void *decrypt = m_banks[m_curregion].set(info.start, romend, rgnoffset, memptr);
+		m_banks[m_curregion].set(info.start, romend, rgnoffset, memptr, m_decryption_banks[m_curregion].target());
 
 		// map now
 		m_space->install_rom(info.start, romend, info.mirror, memptr);
 		if (m_decrypted_space)
-			m_decrypted_space->install_rom(info.start, romend, info.mirror, decrypt ? decrypt : memptr);
-
+			m_decrypted_space->install_read_bank(info.start, romend, info.mirror, m_decryption_banks[m_curregion].target());
 	}
 
 	// either install a write handler if provided or unmap the region
@@ -275,6 +275,31 @@ void sega_315_5195_mapper_device::map_as_ram(u32 offset, u32 length, offs_t mirr
 
 	// map now
 	m_space->install_ram(info.start, info.end, info.mirror, owner()->memshare(bank_share_name)->ptr());
+
+	// either install a write handler or a write bank, as appropriate
+	if (!whandler.isnull())
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
+
+	// clear this rom bank reference
+	m_banks[m_curregion].clear();
+}
+
+
+//-------------------------------------------------
+//  map_as_region - map a region as ROM, with an
+//  optional write handler
+//-------------------------------------------------
+
+void sega_315_5195_mapper_device::map_as_region(u32 offset, u32 length, offs_t mirror, const char *region_name, write16_delegate whandler)
+{
+	// determine parameters
+	region_info info;
+	compute_region(info, m_curregion, length, mirror, offset);
+	LOG("Map %06X-%06X (%06X) as REGION(%s) with handler=%s\n", info.start, info.end, info.mirror, region_name,
+		whandler.isnull() ? "none" : whandler.name());
+
+	// map now
+	m_space->install_rom(info.start, info.end, info.mirror, owner()->memregion(region_name)->base());
 
 	// either install a write handler or a write bank, as appropriate
 	if (!whandler.isnull())
@@ -330,8 +355,8 @@ void sega_315_5195_mapper_device::configure_explicit(const u8 *map_data)
 void sega_315_5195_mapper_device::fd1094_state_change(u8 state)
 {
 	// iterate over regions and set the decrypted address of any ROM banks
-	for (auto & elem : m_banks)
-		elem.update();
+	for (int i=0; i != 8; i++)
+		m_banks[i].update(m_decryption_banks[i].target());
 }
 
 
@@ -547,15 +572,15 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 //  a change
 //-------------------------------------------------
 
-void *sega_315_5195_mapper_device::decrypt_bank::set(offs_t start, offs_t end, offs_t rgnoffs, void *src)
+void sega_315_5195_mapper_device::decrypt_bank::set(offs_t start, offs_t end, offs_t rgnoffs, void *src, memory_bank *bank)
 {
 	// ignore if not encrypted
 	if (m_fd1089 == nullptr && m_fd1094_cache == nullptr)
-		return nullptr;
+		return;
 
 	// ignore if nothing is changing
 	if (start == m_start && end == m_end && rgnoffs == m_rgnoffs && src == m_srcptr)
-		return nullptr;
+		return;
 
 	// if the start, end, or src change, throw away any cached data
 	reset();
@@ -571,7 +596,7 @@ void *sega_315_5195_mapper_device::decrypt_bank::set(offs_t start, offs_t end, o
 		m_fd1094_cache->configure(m_start, m_end + 1 - m_start, m_rgnoffs);
 
 	// force an update of what we have
-	return update();
+	update(bank);
 }
 
 
@@ -580,22 +605,21 @@ void *sega_315_5195_mapper_device::decrypt_bank::set(offs_t start, offs_t end, o
 //  if this rom bank has been assigned
 //-------------------------------------------------
 
-void *sega_315_5195_mapper_device::decrypt_bank::update()
+void sega_315_5195_mapper_device::decrypt_bank::update(memory_bank *bank)
 {
 	// if this isn't a valid state, don't try to do anything
 	if (m_srcptr == nullptr)
-		return nullptr;
+		return;
 
 	// fd1089 case
 	if (m_fd1089 != nullptr)
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
 		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<u16 *>(m_srcptr));
-		return &m_fd1089_decrypted[0];
+		bank->set_base(&m_fd1089_decrypted[0]);
 	}
 
 	// fd1094 case
 	if (m_fd1094_cache != nullptr)
-		return m_fd1094_cache->decrypted_opcodes(m_fd1094_cache->fd1094().state());
-	return nullptr;
+		bank->set_base(m_fd1094_cache->decrypted_opcodes(m_fd1094_cache->fd1094().state()));
 }

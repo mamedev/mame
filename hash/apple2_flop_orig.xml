@@ -2808,7 +2808,7 @@ license:CC0
 	</software>
 
 	<software name="stellar7">
-		<description>Stellar 7</description>
+		<description>Stellar 7 (Penguin Software)</description>
 		<year>1984</year>
 		<publisher>Penguin Software</publisher>
 		<info name="release" value="2018-11-17"/>
@@ -3771,7 +3771,7 @@ license:CC0
 	</software>
 
 	<software name="dazldraw">
-		<description>Dazzle Draw (version 1.1)</description>
+		<description>Dazzle Draw (Version 1.1)</description>
 		<year>1984</year>
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2019-03-03"/>
@@ -4370,7 +4370,7 @@ license:CC0
 	</software>
 
 	<software name="wizrdry3">
-		<description>Wizardry III: Legacy of Llylgamyn (version 4, 20-Aug-1983 update)</description>
+		<description>Wizardry III: Legacy of Llylgamyn (Version 4, 20-Aug-1983 update)</description>
 		<year>1983</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="release" value="2019-04-08"/>
@@ -9315,7 +9315,7 @@ license:CC0
 	</software>
 
 	<software name="journey">
-		<description>Journey (version 16)</description>
+		<description>Journey (Version 16)</description>
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<info name="release" value="2019-12-14"/>
@@ -11427,7 +11427,7 @@ license:CC0
 	</software>
 
 	<software name="cndalman">
-		<description>Carmen's North Dakota Almanac Database (version 1.0)</description>
+		<description>Carmen's North Dakota Almanac Database (Version 1.0)</description>
 		<year>1989</year>
 		<publisher>North Dakota Database Project</publisher>
 		<info name="release" value="2020-03-11"/>
@@ -15651,6 +15651,772 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234790">
 				<rom name="i.o. silver.woz" size="234790" crc="b6356107" sha1="b31b227a08ab2d7631cb9e411a8c6d99044f3d37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="g1985v2">
+		<description>Germany 1985 (Version 2.0)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-10-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="germany 1985 v2.0.woz" size="234775" crc="85a4ff9d" sha1="daf67f5de2cce689f9692b3d92c5e80dc6668a12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionshar">
+		<description>The Lion's Share</description>
+		<year>1983</year>
+		<publisher>Davka Corporation</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234838">
+				<rom name="the lion's share side a.woz" size="234838" crc="e86edbd7" sha1="f3a800ad9227c99c8b52700c394ec88a46da42ac"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234838">
+				<rom name="the lion's share side b.woz" size="234838" crc="c4bc96c2" sha1="35c1881049c0756ba1ae61e3e322e90e058807c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thescoop">
+		<description>The Scoop</description>
+		<year>1989</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234760">
+				<rom name="the scoop side a.woz" size="234760" crc="b98d0aaf" sha1="dd7c87b717f886e0559761163915d9577214c032"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234760">
+				<rom name="the scoop side b.woz" size="234760" crc="6878f40f" sha1="6e9ae7e37e3c11e9e4f04dc083fe62723acf58ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corruptn">
+		<description>Corruption (Version 1.11)</description>
+		<year>1988</year>
+		<publisher>Rainbird</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="241435">
+				<rom name="corruption disk 1.woz" size="241435" crc="5fc8e161" sha1="c766a38fab6475eab02b3e02a8a728f540f551a3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="241435">
+				<rom name="corruption disk 2.woz" size="241435" crc="23fa76eb" sha1="974dc470422cb4d26b0923f466205ac421d56aea"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="241435">
+				<rom name="corruption disk 3.woz" size="241435" crc="03d66fbf" sha1="afc3beb1c046b32d3ce43989e3b96c98c64efc3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnwrld">
+		<description>Dragonworld</description>
+		<year>1984</year>
+		<publisher>Telarium</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234884">
+				<rom name="dragonworld - side a.woz" size="234884" crc="4cf1f14b" sha1="cd826c43644c2f29dc0fd44f39f15c6a3b42d056"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234884">
+				<rom name="dragonworld - side b.woz" size="234884" crc="929d1da3" sha1="133173262d97ef75642bdae475e5eb9676c92aed"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="234884">
+				<rom name="dragonworld - side c.woz" size="234884" crc="02fe5de7" sha1="57c286ac024e5acbc04013216a2e508b5b7454d5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="234884">
+				<rom name="dragonworld - side d.woz" size="234884" crc="19d8e4ed" sha1="37cda631a969e6ad9bc80f60be5d2961b42a500b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side E"/>
+			<dataarea name="flop" size="234884">
+				<rom name="dragonworld - side e.woz" size="234884" crc="dcd256bf" sha1="1bd69ec85f9c96701c9f05a184128f0c5dd84767"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esctraam">
+		<description>The Escape from Traam</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234835">
+				<rom name="the escape from traam.woz" size="234835" crc="32c62e16" sha1="5c3e7f84dd9a2edfa1f8e7489bee77bfa548947a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ringqst">
+		<description>Ring Quest</description>
+		<year>1986</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234773">
+				<rom name="ring quest side a.woz" size="234773" crc="c4cfcc97" sha1="c662ca402e3e48c0313340890b64ce7d5bb57179"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234773">
+				<rom name="ring quest side b.woz" size="234773" crc="2c038626" sha1="0424eaf527833a0de9781b76ac663b9f1fdab69d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpst10b">
+		<description>The Serpent's Star (Version 1.0) (Broderbund release)</description>
+		<year>1983</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="the serpent's star v1.0-broderbund side a.woz" size="234815" crc="9f64b113" sha1="b6e4a8adc936857c7e3731053d562f1a762c7deb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234815">
+				<rom name="the serpent's star v1.0-broderbund side b.woz" size="234815" crc="c725b491" sha1="ce3699f47968b69139874915476e94ce6c8ac55d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thequest">
+		<description>The Quest</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-11-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234796">
+				<rom name="the quest side a.woz" size="234796" crc="cd012991" sha1="71f0041276cf8647d90b70268374662008199ebf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234796">
+				<rom name="the quest side b.woz" size="234796" crc="b0587d13" sha1="2ae465cd8af0cc6f9474de84fc57ee268a5f683f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tquestv2">
+		<description>The Quest (Version 2.0)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-11-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!-- This updated version displays double hi-res graphics on supporting machines.
+		(Double hi-res graphics require a 128K Apple //e or later.) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234823">
+				<rom name="the quest v2.0 side a.woz" size="234823" crc="f3d27280" sha1="2bcdd7a22583403e66f2a4c0e1829b9b585f2d29"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234823">
+				<rom name="the quest v2.0 side b.woz" size="234823" crc="802f008f" sha1="13d06f6d50cd83692b9aa287c58c36969728dc35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprmrtn">
+		<description>Supermartian: The Adventure</description>
+		<year>1984</year>
+		<publisher>Computer Easy</publisher>
+		<info name="release" value="2020-11-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234808">
+				<rom name="supermartian- the adventure disk 1a.woz" size="234808" crc="fcb0f7dd" sha1="fadf162e2f7e3e0649f70b9ce982c0feef3e4945"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234808">
+				<rom name="supermartian- the adventure disk 1b.woz" size="234808" crc="cc477a8c" sha1="4c7a02460ad5a2bbe030bbd8518a566a1b4b3f66"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234808">
+				<rom name="supermartian- the adventure disk 2a.woz" size="234808" crc="4883f060" sha1="509cd0e4bcb25ad54faf7d973ea6bc68fa48fbd8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234808">
+				<rom name="supermartian- the adventure disk 2b.woz" size="234808" crc="0b06c09f" sha1="e9378ee03241953ad2a2330d3d82e2bcb7b75495"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kukulcan">
+		<description>Kukulcan</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-11-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234774">
+				<rom name="kukulcan side a.woz" size="234774" crc="b6569ba8" sha1="a49894c1ca5d00cfd5b6acce8e9d1c6c3160f80b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234774">
+				<rom name="kukulcan side b.woz" size="234774" crc="bab3ec94" sha1="00f052ede224e0b58cf224980cc439591d9737ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucirelm">
+		<description>Lucifer's Realm</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-11-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="lucifer's realm side a.woz" size="234815" crc="7b46b563" sha1="7ae2905fe79a2d69b6a1abec4f3f4820c5bfd84d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234815">
+				<rom name="lucifer's realm side b.woz" size="234815" crc="9076ecbc" sha1="9e5886eae777949b507ba87af90e8ae6e34e162f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talsman">
+		<description>Talisman: Challenging the Sands of Time</description>
+		<year>1987</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2020-11-04"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1 - Boot"/>
+			<dataarea name="flop" size="234815">
+				<rom name="talisman- challenging the sands of time side 1 - boot.woz" size="234815" crc="e47a66c5" sha1="e56c9dc88165b4cd58d44c2c9694d08dc9cd6e9e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2 - Empire"/>
+			<dataarea name="flop" size="234817">
+				<rom name="talisman- challenging the sands of time side 2 - empire.woz" size="234817" crc="2c5ae431" sha1="4fd8539305078c031b693aff3b4fe1a98f26b98b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3 - Lands beyond"/>
+			<dataarea name="flop" size="234823">
+				<rom name="talisman- challenging the sands of time side 3 - lands beyond.woz" size="234823" crc="c96710c0" sha1="02767ab4644eb85b596f86df38283ced772ec1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="9piamber">
+		<description>Nine Princes in Amber</description>
+		<year>1985</year>
+		<publisher>Telarium</publisher>
+		<info name="release" value="2020-11-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235009">
+				<rom name="nine princes in amber side a.woz" size="235009" crc="6701d82c" sha1="184bf16567708bfb1f6f1490ef3f2cd2f5ad6270"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235009">
+				<rom name="nine princes in amber side b.woz" size="235009" crc="221df34b" sha1="fa59af185668151d8f02fbecd12d1671a4509105"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="235009">
+				<rom name="nine princes in amber side c.woz" size="235009" crc="97b8caea" sha1="55d6ca5743ecbbac20f106f6791091dfe31da961"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="235009">
+				<rom name="nine princes in amber side d.woz" size="235009" crc="436e7fdb" sha1="9dcbcaf9313541185dcc27797ee41d8a0a4e7919"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="far451">
+		<description>Fahrenheit 451</description>
+		<year>1984</year>
+		<publisher>Trillium</publisher>
+		<info name="release" value="2020-11-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234887">
+				<rom name="fahrenheit 451 - side 1.woz" size="234887" crc="d9e35457" sha1="4d3775a05451ae09a764800afead17c7fcfc3078"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="241543">
+				<rom name="fahrenheit 451 - side 2.woz" size="241543" crc="56adb420" sha1="cb2049ea53c54811efdac072ecd17c2210fa75bd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="241543">
+				<rom name="fahrenheit 451 - side 3.woz" size="241543" crc="f8871313" sha1="c8d78dd32a24b4b72784fc2bc74b9304eba8221a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="241543">
+				<rom name="fahrenheit 451 - side 4.woz" size="241543" crc="29432ad0" sha1="8c4b01b9f7b180612adb19e8bd9097b3dfcddb4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathcrb">
+		<description>Death in the Caribbean</description>
+		<year>1983</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-11-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234798">
+				<rom name="death in the caribbean side a.woz" size="234798" crc="6ea59a9b" sha1="8d63ae9bc2cabeeae3e56a763f14cef91035115c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234798">
+				<rom name="death in the caribbean side b.woz" size="234798" crc="af03363c" sha1="0fe806b9c68a9b2d47d626b32cadaab0f272a188"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brwdtime">
+		<description>Borrowed Time</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234787">
+				<rom name="borrowed time side a.woz" size="234787" crc="0048da0f" sha1="a415e827eb2111260eadf73fc6d9e2d2df250b78"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234787">
+				<rom name="borrowed time side b.woz" size="234787" crc="17d975c7" sha1="26af7cbcf1b7bbcf7fd0ffdb47c5439de52855e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgclair">
+		<description>Cave Girl Clair</description>
+		<year>1984</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="cave girl clair.woz" size="234791" crc="b6a09b11" sha1="780169fa88ff4e7d205715750d2e099a2f5c6dca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advkrist">
+		<description>The Adventures of Kristen and Her Family</description>
+		<year>1985</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241436">
+				<rom name="the adventures of kristen and her family.woz" size="241436" crc="942f949f" sha1="b1e5280508e28b926cc613cfa336a7b387b86184"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advsarah">
+		<description>The Adventures of Sarah and Her Friends</description>
+		<year>1985</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="the adventures of sarah and her friends.woz" size="234779" crc="5ed3d668" sha1="d5a742a2c17baa48695a5b2daa0b48cfd9e456ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chelsssi">
+		<description>Chelsea of the South Sea Islands</description>
+		<year>1984</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2020-11-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="chelsea of the south sea islands.woz" size="234808" crc="79396b23" sha1="d27d0df160427403786ebf52dee20b45d1552e3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jennypr">
+		<description>Jenny of the Prairie</description>
+		<year>1983</year>
+		<publisher>Rhiannon</publisher>
+		<info name="release" value="2020-11-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="jenny of the prairie.woz" size="234777" crc="eddbf992" sha1="ae94333e5c846f51505bf699715011c51cc99785"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vortex">
+		<description>Vortex</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-12-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="240901">
+				<rom name="vortex.woz" size="240901" crc="79f5cc2d" sha1="404fa8d43726567ac610bcf2cbbad244d44bbcc0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batsbelf">
+		<description>Bats in the Belfry</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2020-12-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121627">
+				<rom name="bats in the belfry.woz" size="121627" crc="b42681ec" sha1="84d8e3a1cc653faee017a319decdd87d353d7c36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnrain">
+		<description>Alien Rain</description>
+		<year>1980</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-12-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101653">
+				<rom name="alien rain.woz" size="101653" crc="3a2ecd02" sha1="3e5bce778cae684dd3dca0c195150b0152340d84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awawhale">
+		<description>Audubon Wildlife Adventures: Whales!</description>
+		<year>1990</year>
+		<publisher>The National Audubon Society</publisher>
+		<info name="release" value="2020-12-08"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 1.woz" size="235010" crc="3826388a" sha1="a382890a44668d318c6f387eec4c0720840fdd69"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 2.woz" size="235010" crc="bb8f4d4a" sha1="fdf44da707c68e8988be461eacf8e92cbd6914fc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 3.woz" size="235010" crc="37a32d28" sha1="ddcb1a55b0a668313953a18120f51963668effc3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 4.woz" size="235010" crc="4aaf4b8c" sha1="c9d5d06bb0b8b4849e10e349913984c1e5e8155f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 5.woz" size="235010" crc="d66ddb15" sha1="2ac14b32b993789cd27d01d1d822ade804fd2db8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side 6"/>
+			<dataarea name="flop" size="235010">
+				<rom name="audubon wildlife adventures- whales side 6.woz" size="235010" crc="b6f153f3" sha1="0ad0c8ba6a3f9ff11ff2aa83cc84e486f7429346"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horses">
+		<description>Horses</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234736">
+				<rom name="horses.woz" size="234736" crc="40cc52e7" sha1="afc59d569bc30ca26aece790ab9a551cfef0a568"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrcycls">
+		<description>Motorcycles</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="motorcycles.woz" size="234741" crc="c3f8adb0" sha1="0b5494ae379ccf14cc19cef3944a3c8f6e74fb0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbunyan">
+		<description>Paul Bunyan</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="paul bunyan.woz" size="234741" crc="631f1848" sha1="7be38cff6392cda6d5e32b52b61cd6ffc310ecda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tseasons">
+		<description>The Seasons</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234741">
+				<rom name="the seasons.woz" size="234741" crc="7cf0ba08" sha1="492c2a744c5945affff28aa15a3ea6a1747725e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbee">
+		<description>The Spelling Bee</description>
+		<year>1985</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="the spelling bee.woz" size="234771" crc="4ce1d2fc" sha1="c5b2eef97a5f5d5c857e25f00221f44270c6b07f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casechic">
+		<description>Case of the Missing Chick: Finding The Main Idea</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="case of the missing chick - main idea and supporting details.woz" size="234797" crc="c02fae11" sha1="cf32964f2852d299008965e9dadc337e9932df1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casegtr">
+		<description>Case of the Great Train Robbery: Fact and Opinion</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="case of the great train robbery - fact or opinion.woz" size="234786" crc="7c129532" sha1="52d5d4207c13c082ca85bf2af1e9922e82cbc0f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrswiggl">
+		<description>Mrs. Wigglesworth's Secret</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="mrs. wigglesworth's secret - drawing conclusions.woz" size="234785" crc="692a79e3" sha1="778bab447ebcd74dd1886b8c2e7e1291c00ef66d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lrn2time">
+		<description>Learning to Tell Time</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="learning to tell time.woz" size="234751" crc="ab2804c5" sha1="77a74d6c72a35bb43797b8fab783420412c643df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algncroc">
+		<description>Alligators and Crocodiles</description>
+		<year>1984</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="alligators and crocodiles.woz" size="234780" crc="ce4f1d6d" sha1="5d9bdbe3cf47723775b18e79a14fd2df6dce2659"/>
 			</dataarea>
 		</part>
 	</software>

@@ -420,7 +420,7 @@ void ggm_state::ggm(machine_config &config)
 	M6502(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggm_state::main_map);
 
-	VIA6522(config, m_via, 2000000); // DDRA = 0xff, DDRB = 0x81
+	MOS6522(config, m_via, 2000000); // DDRA = 0xff, DDRB = 0x81
 	m_via->writepa_handler().set(FUNC(ggm_state::select_w));
 	m_via->writepb_handler().set(FUNC(ggm_state::control_w));
 	m_via->readpb_handler().set(FUNC(ggm_state::input_r));

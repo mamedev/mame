@@ -98,9 +98,7 @@ void pic16c5x_device::rom_9(address_map &map)
 
 void pic16c5x_device::ram_5(address_map &map)
 {
-	map(0x00, 0x07).ram();
-	map(0x08, 0x0f).ram();
-	map(0x10, 0x1f).ram();
+	map(0x00, 0x1f).ram();
 }
 
 void pic16c5x_device::rom_10(address_map &map)
@@ -115,8 +113,7 @@ void pic16c5x_device::rom_11(address_map &map)
 
 void pic16c5x_device::ram_7(address_map &map)
 {
-	map(0x00, 0x07).ram().mirror(0x60);
-	map(0x08, 0x0f).ram().mirror(0x60);
+	map(0x00, 0x0f).ram().mirror(0x60);
 	map(0x10, 0x1f).ram();
 	map(0x30, 0x3f).ram();
 	map(0x50, 0x5f).ram();

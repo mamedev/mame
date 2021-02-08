@@ -25,10 +25,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	// FIXME: Optimize
 	NETLIB_OBJECT(74194)
@@ -113,5 +110,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74194,    "TTL_74194",     "+CLK,+S0,+S1,+SRIN,+A,+B,+C,+D,+SLIN,+CLRQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -118,7 +118,7 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	/* via */
-	VIA6522(config, m_via6522_0, 6_MHz_XTAL / 4);
+	MOS6522(config, m_via6522_0, 6_MHz_XTAL / 4);
 	m_via6522_0->readpa_handler().set(FUNC(vectrex_base_state::vectrex_via_pa_r));
 	m_via6522_0->readpb_handler().set(FUNC(vectrex_base_state::vectrex_via_pb_r));
 	m_via6522_0->writepa_handler().set(FUNC(vectrex_base_state::v_via_pa_w));

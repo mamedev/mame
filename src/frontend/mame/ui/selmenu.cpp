@@ -25,6 +25,7 @@
 #include "mame.h"
 #include "mameopts.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendfont.h"
@@ -363,7 +364,7 @@ menu_select_launch::bios_selection::~bios_selection()
 void menu_select_launch::bios_selection::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_bios)
-		item_append(elem.first, "", 0, (void *)&elem.first);
+		item_append(elem.first, 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
@@ -945,7 +946,7 @@ void menu_select_launch::draw_info_arrow(int ub, float origx1, float origx2, flo
 bool menu_select_launch::draw_error_text()
 {
 	if (m_ui_error)
-		ui().draw_text_box(container(), m_error_text.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		ui().draw_text_box(container(), m_error_text, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	return m_ui_error;
 }
@@ -972,9 +973,8 @@ float menu_select_launch::draw_left_panel(
 	}
 
 	// calculate horizontal offset for unadorned names
-	std::string tmp("_# ");
-	convert_command_glyph(tmp);
-	float const text_sign = ui().get_string_width(tmp.c_str(), text_size);
+	std::string tmp(convert_command_glyph("_# "));
+	float const text_sign = ui().get_string_width(tmp, text_size);
 
 	// get the maximum width of a filter name
 	float left_width(0.0f);
@@ -1005,10 +1005,7 @@ float menu_select_launch::draw_left_panel(
 		else
 		{
 			if (current == filter)
-			{
-				str = std::string("_> ");
-				convert_command_glyph(str);
-			}
+				str = convert_command_glyph("_> ");
 			str.append(Filter::display_name(filter));
 		}
 
@@ -1038,7 +1035,7 @@ float menu_select_launch::draw_left_panel(
 		// finally draw the text itself and move to the next line
 		float const x1t = x1 + ((str == Filter::display_name(filter)) ? text_sign : 0.0f);
 		ui().draw_text_full(
-				container(), str.c_str(),
+				container(), str,
 				x1t, y1, x2 - x1,
 				ui::text_layout::LEFT, ui::text_layout::NEVER,
 				mame_ui_manager::NORMAL, fgcolor, bgcolor,
@@ -1952,7 +1949,7 @@ void menu_select_launch::draw(uint32_t flags)
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
 		const menu_item &pitem = item(itemnum);
-		const char *itemtext = pitem.text.c_str();
+		const std::string_view itemtext = pitem.text;
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
 		rgb_t fgcolor3 = ui().colors().clone_color();
@@ -2033,14 +2030,14 @@ void menu_select_launch::draw(uint32_t flags)
 		else
 		{
 			int const item_invert = pitem.flags & FLAG_INVERT;
-			const char *subitem_text = pitem.subtext.c_str();
+			std::string_view const subitem_text = pitem.subtext;
 			float item_width, subitem_width;
 
 			// compute right space for subitem
 			ui().draw_text_full(
 					container(),
 					subitem_text,
-					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext.c_str()),
+					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext),
 					ui::text_layout::RIGHT, ui::text_layout::NEVER,
 					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&subitem_width, nullptr);
@@ -2071,7 +2068,7 @@ void menu_select_launch::draw(uint32_t flags)
 	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
-		const char *itemtext = pitem.text.c_str();
+		const std::string_view itemtext = pitem.text;
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
 		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -2203,7 +2200,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 	float text_size = 1.0f;
 	for (auto & elem : buffer)
 	{
-		auto textlen = ui().get_string_width(elem.c_str()) + 0.01f;
+		auto textlen = ui().get_string_width(elem) + 0.01f;
 		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
 		text_size = std::min(text_size, tmp_size);
 	}
@@ -2244,7 +2241,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 					bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 
-		ui().draw_text_full(container(), buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
+		ui().draw_text_full(container(), buffer[cells], x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
 				ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
@@ -2373,7 +2370,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 	}
 
 	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
+			snaptext, origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
@@ -2683,13 +2680,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	char const *const snaptext(m_info_view ? m_items_list[m_info_view - 1].c_str() : _(first));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_(first)));
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		char const *const name(x ? m_items_list[x - 1].c_str() : _(first));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_(first)));
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,
@@ -2736,7 +2733,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (justify == 'f')
 	{
 		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer.c_str(),
+				container(), m_info_buffer,
 				0.0f, 0.0f, 1.0f - (2.0f * gutter_width),
 				xstart, xend,
 				text_size);
@@ -2744,7 +2741,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	else
 	{
 		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer.c_str(),
+				container(), m_info_buffer,
 				origx1, origy1, origx2 - origx1 - (2.0f * gutter_width),
 				xstart, xend,
 				text_size);
@@ -2765,7 +2762,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
 		int itemline = r + m_topline_datsview;
-		std::string const tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+		std::string_view const tempbuf(std::string_view(m_info_buffer).substr(xstart[itemline], xend[itemline] - xstart[itemline]));
 		if (tempbuf[0] == '#')
 			continue;
 
@@ -2780,26 +2777,26 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else if (justify == '2') // two-column layout
 		{
 			// split at first tab
-			std::string::size_type const splitpos(tempbuf.find('\t'));
-			std::string const leftcol(tempbuf.substr(0, (std::string::npos == splitpos) ? 0U : splitpos));
-			std::string const rightcol(tempbuf.substr((std::string::npos == splitpos) ? 0U : (splitpos + 1U)));
+			std::string_view::size_type const splitpos(tempbuf.find('\t'));
+			std::string_view const leftcol(tempbuf.substr(0, (std::string_view::npos == splitpos) ? 0U : splitpos));
+			std::string_view const rightcol(tempbuf.substr((std::string_view::npos == splitpos) ? 0U : (splitpos + 1U)));
 
 			// measure space needed, condense if necessary
-			float const leftlen(ui().get_string_width(leftcol.c_str(), text_size));
-			float const rightlen(ui().get_string_width(rightcol.c_str(), text_size));
+			float const leftlen(ui().get_string_width(leftcol, text_size));
+			float const rightlen(ui().get_string_width(rightcol, text_size));
 			float const textlen(leftlen + rightlen);
 			float const tmp_size3((textlen > sc) ? (text_size * (sc / textlen)) : text_size);
 
 			// draw in two parts
 			ui().draw_text_full(
-					container(), leftcol.c_str(),
+					container(), leftcol,
 					origx1 + gutter_width, oy1, sc,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
 					nullptr, nullptr,
 					tmp_size3);
 			ui().draw_text_full(
-					container(), rightcol.c_str(),
+					container(), rightcol,
 					origx1 + gutter_width, oy1, sc,
 					ui::text_layout::RIGHT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
@@ -2809,10 +2806,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else if (justify == 'f' || justify == 'p') // full or partial justify
 		{
 			// check size
-			float const textlen = ui().get_string_width(tempbuf.c_str(), text_size);
+			float const textlen = ui().get_string_width(tempbuf, text_size);
 			float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 			ui().draw_text_full(
-					container(), tempbuf.c_str(),
+					container(), tempbuf,
 					origx1 + gutter_width, oy1, origx2 - origx1,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
@@ -2822,7 +2819,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		else
 		{
 			ui().draw_text_full(
-					container(), tempbuf.c_str(),
+					container(), tempbuf,
 					origx1 + gutter_width, oy1, origx2 - origx1,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),

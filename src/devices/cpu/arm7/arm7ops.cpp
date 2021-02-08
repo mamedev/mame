@@ -183,24 +183,23 @@ int arm7_cpu_device::loadInc(uint32_t pat, uint32_t rbv, uint32_t s, int mode)
 	{
 		if ((pat >> i) & 1)
 		{
-			if (!m_pendingAbtD) // "Overwriting of registers stops when the abort happens."
+			data = READ32(rbv += 4);
+			if (m_pendingAbtD) // "Overwriting of registers stops when the abort happens."
+				return result;
+			if (i == 15)
 			{
-				data = READ32(rbv += 4);
-				if (i == 15)
-				{
-					if (s) /* Pull full contents from stack */
-						SetModeRegister(mode, 15, data);
-					else if (MODE32) /* Pull only address, preserve mode & status flags */
-						SetModeRegister(mode, 15, data);
-					else
-					{
-						SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
-					}
-				}
+				if (s) /* Pull full contents from stack */
+					SetModeRegister(mode, 15, data);
+				else if (MODE32) /* Pull only address, preserve mode & status flags */
+					SetModeRegister(mode, 15, data);
 				else
 				{
-					SetModeRegister(mode, i, data);
+					SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
 				}
+			}
+			else
+			{
+				SetModeRegister(mode, i, data);
 			}
 			result++;
 		}
@@ -220,24 +219,23 @@ int arm7_cpu_device::loadDec(uint32_t pat, uint32_t rbv, uint32_t s, int mode)
 	{
 		if ((pat >> i) & 1)
 		{
-			if (!m_pendingAbtD) // "Overwriting of registers stops when the abort happens."
+			data = READ32(rbv -= 4);
+			if (m_pendingAbtD) // "Overwriting of registers stops when the abort happens."
+				return result;
+			if (i == 15)
 			{
-				data = READ32(rbv -= 4);
-				if (i == 15)
-				{
-					if (s) /* Pull full contents from stack */
-						SetModeRegister(mode, 15, data);
-					else if (MODE32) /* Pull only address, preserve mode & status flags */
-						SetModeRegister(mode, 15, data);
-					else
-					{
-						SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
-					}
-				}
+				if (s) /* Pull full contents from stack */
+					SetModeRegister(mode, 15, data);
+				else if (MODE32) /* Pull only address, preserve mode & status flags */
+					SetModeRegister(mode, 15, data);
 				else
 				{
-					SetModeRegister(mode, i, data);
+					SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
 				}
+			}
+			else
+			{
+				SetModeRegister(mode, i, data);
 			}
 			result++;
 		}
@@ -260,6 +258,8 @@ int arm7_cpu_device::storeInc(uint32_t pat, uint32_t rbv, int mode)
 				LOGMASKED(LOG_OPS, "%08x: StoreInc on R15\n", R15);
 #endif
 			WRITE32(rbv += 4, GetModeRegister(mode, i));
+			if (m_pendingAbtD)
+				return result;
 			result++;
 		}
 	}
@@ -271,6 +271,7 @@ int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 {
 	// pre-count the # of registers being stored
 	int const result = population_count_32(pat & 0x0000ffff);
+	int actual_result = 0;
 
 	// adjust starting address
 	rbv -= (result << 2);
@@ -284,7 +285,10 @@ int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 				LOGMASKED(LOG_OPS, "%08x: StoreDec on R15\n", R15);
 #endif
 			WRITE32(rbv, GetModeRegister(mode, i));
+			if (m_pendingAbtD)
+				return actual_result;
 			rbv += 4;
+			actual_result++;
 		}
 	}
 	return result;
@@ -815,14 +819,20 @@ void arm7_cpu_device::HandleSwap(uint32_t insn)
 	if (insn & 0x400000)
 	{
 		tmp = READ8(rn);
-		WRITE8(rn, rm);
-		SetRegister(rd, tmp);
+		if (!m_pendingAbtD)
+		{
+			WRITE8(rn, rm);
+			SetRegister(rd, tmp);
+		}
 	}
 	else
 	{
 		tmp = READ32(rn);
-		WRITE32(rn, rm);
-		SetRegister(rd, tmp);
+		if (!m_pendingAbtD)
+		{
+			WRITE32(rn, rm);
+			SetRegister(rd, tmp);
+		}
 	}
 
 	R15 += 4;

@@ -185,7 +185,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
-	VIA6522(config, m_via, 1000000);
+	MOS6522(config, m_via, 1000000);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->writepb_handler().set(FUNC(rmnimbus_state::nimbus_via_write_portb));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));

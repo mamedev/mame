@@ -153,6 +153,7 @@ Fax                  1982  6502   FXL, FLA
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/exidy.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -234,7 +235,7 @@ void exidy_state::sidetrac_map(address_map &map)
 {
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
-	map(0x4800, 0x4fff).rom().share("characterram");
+	map(0x4800, 0x4fff).rom();
 	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
 	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
@@ -977,6 +978,201 @@ void exidy_state::fax(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::fax_map);
 }
 
+/*************************************************************************
+
+    Targ hardware
+
+*************************************************************************/
+
+/* Sound channel usage
+   0 = CPU music,  Shoot
+   1 = Crash
+   2 = Spectar sound
+   3 = Tone generator
+*/
+
+#define SPECTAR_MAXFREQ     525000
+#define TARG_MAXFREQ        125000
+
+static const int16_t sine_wave[32] =
+{
+		0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
+	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
+};
+
+
+/* some macros to make detecting bit changes easier */
+#define RISING_EDGE(bit)  ( (data & bit) && !(m_port_1_last & bit))
+#define FALLING_EDGE(bit) (!(data & bit) &&  (m_port_1_last & bit))
+
+
+void exidy_state::adjust_sample(uint8_t freq)
+{
+	m_tone_freq = freq;
+
+	if (!m_samples->playing(3))
+	{
+		m_samples->set_volume(3, 0);
+		m_samples->start_raw(3, sine_wave, 32, 1000, true);
+	}
+
+	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
+		m_samples->set_volume(3, 0);
+	else
+	{
+		m_samples->set_frequency(3, 1.0 * m_max_freq / (0xff - m_tone_freq));
+		m_samples->set_volume(3, m_tone_active);
+	}
+}
+
+
+void exidy_state::targ_audio_1_w(uint8_t data)
+{
+	/* CPU music */
+	if (BIT(m_port_1_last ^ data, 0))
+		m_dac->write(BIT(data, 0));
+
+	/* shot */
+	if (FALLING_EDGE(0x02) && !m_samples->playing(0))  m_samples->start(0,1);
+	if (RISING_EDGE(0x02)) m_samples->start(0,1);
+
+	/* crash */
+	if (RISING_EDGE(0x20))
+	{
+		if (data & 0x40)
+			m_samples->start(1,0);
+		else
+			m_samples->start(1,2);
+	}
+
+	/* Sspec */
+	if (data & 0x10)
+		m_samples->stop(2);
+	else
+	{
+		if ((data & 0x08) != (m_port_1_last & 0x08))
+		{
+			if (data & 0x08)
+				m_samples->start(2,3,true);
+			else
+				m_samples->start(2,4,true);
+		}
+	}
+
+	/* Game (tone generator enable) */
+	if (FALLING_EDGE(0x80))
+	{
+		m_tone_pointer = 0;
+		m_tone_active = 0;
+
+		adjust_sample(m_tone_freq);
+	}
+
+	if (RISING_EDGE(0x80))
+		m_tone_active=1;
+
+	m_port_1_last = data;
+}
+
+
+void exidy_state::targ_audio_2_w(uint8_t data)
+{
+	if ((data & 0x01) && !(m_port_2_last & 0x01))
+	{
+		uint8_t *prom = memregion("targ")->base();
+
+		m_tone_pointer = (m_tone_pointer + 1) & 0x0f;
+
+		adjust_sample(prom[((data & 0x02) << 3) | m_tone_pointer]);
+	}
+
+	m_port_2_last = data;
+}
+
+
+void exidy_state::spectar_audio_2_w(uint8_t data)
+{
+	adjust_sample(data);
+}
+
+
+static const char *const sample_names[] =
+{
+	"*targ",
+	"expl",
+	"shot",
+	"sexpl",
+	"spslow",
+	"spfast",
+	nullptr
+};
+
+
+
+void exidy_state::common_audio_start(int freq)
+{
+	m_max_freq = freq;
+
+	m_tone_freq = 0;
+	m_tone_active = 0;
+
+	/* start_raw can't be called here: chan.source will be set by
+	samples_device::device_start and then nulled out by samples_device::device_reset
+	at the soft_reset stage of init_machine() and will never be set again.
+	Thus, I've moved it to exidy_state::adjust_sample() were it will be set after
+	machine initialization. */
+	//m_samples->set_volume(3, 0);
+	//m_samples->start_raw(3, sine_wave, 32, 1000, true);
+
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
+	save_item(NAME(m_tone_freq));
+	save_item(NAME(m_tone_active));
+}
+
+
+SAMPLES_START_CB_MEMBER(exidy_state::spectar_audio_start)
+{
+	common_audio_start(SPECTAR_MAXFREQ);
+}
+
+
+SAMPLES_START_CB_MEMBER(exidy_state::targ_audio_start)
+{
+	common_audio_start(TARG_MAXFREQ);
+
+	m_tone_pointer = 0;
+
+	save_item(NAME(m_tone_pointer));
+}
+
+
+void exidy_state::spectar_audio(machine_config &config)
+{
+	SPEAKER(config, "speaker").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(sample_names);
+	m_samples->set_samples_start_callback(FUNC(exidy_state::spectar_audio_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+}
+
+void exidy_state::targ_audio(machine_config &config)
+{
+	SPEAKER(config, "speaker").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(sample_names);
+	m_samples->set_samples_start_callback(FUNC(exidy_state::targ_audio_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+}
+
 
 
 /*************************************
@@ -1387,9 +1583,9 @@ ROM_START( venture )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture5a )
@@ -1414,9 +1610,9 @@ ROM_START( venture5a )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture4 )
@@ -1441,9 +1637,9 @@ ROM_START( venture4 )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture5b )
@@ -1481,16 +1677,18 @@ ROM_START( pepper2 )
 	ROM_LOAD( "p2l-8_6a.6a",   0xf000, 0x1000, CRC(515b1046) SHA1(bdcccd4e415c00ee8e5ec185597df75ecafe7d3d) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // unknown revision
-	ROM_LOAD( "p2a_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
-	ROM_LOAD( "p2a_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(caa857ed) SHA1(e92a9c84e958b1811d29960acd3590c8c6a904e8) ) // revision 2
+	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(6c4cb05b) SHA1(ab49abc937159fdc814742582ffdfd1e7dce12e6) )
+	ROM_LOAD( "p2a-2_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "p2l-1_11d.11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )
 
-	ROM_REGION( 0x120, "proms", 0 )
-	ROM_LOAD( "p2l5c-1.c5",   0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "p2l6d-1.d6",   0x0100, 0x0020, NO_DUMP )
+	// loaded, but not hooked up
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // == HRL14H-1 from other Exidy games
+	ROM_LOAD( "p2l5c-1.c5",   0x0020, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) ) // == fxl-6b from FAX set
+	ROM_LOAD( "p2l6d-1.d6",   0x0120, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) ) // == fxl-8b from FAX set
 ROM_END
 
 ROM_START( pepper27 )
@@ -1504,16 +1702,18 @@ ROM_START( pepper27 )
 	ROM_LOAD( "p2l-7_6a.6a",   0xf000, 0x1000, CRC(db8dd4fc) SHA1(9ae00f8d1a19280670dc65a20cf9cc4e7f1cc973) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // unknown revision
-	ROM_LOAD( "p2a_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
-	ROM_LOAD( "p2a_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+	ROM_LOAD( "p2a-1_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // revision 1
+	ROM_LOAD( "p2a-1_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
+	ROM_LOAD( "p2a-1_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "p2l-1_11d.11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )
 
-	ROM_REGION( 0x120, "proms", 0 )
-	ROM_LOAD( "p2l5c-1.c5",   0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "p2l6d-1.d6",   0x0100, 0x0020, NO_DUMP )
+	// loaded, but not hooked up
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // == HRL14H-1 from other Exidy games
+	ROM_LOAD( "p2l5c-1.c5",   0x0020, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) ) // == fxl-6b from FAX set
+	ROM_LOAD( "p2l6d-1.d6",   0x0120, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) ) // == fxl-8b from FAX set
 ROM_END
 
 

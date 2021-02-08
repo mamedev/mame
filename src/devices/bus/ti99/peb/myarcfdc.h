@@ -20,7 +20,7 @@
 #include "machine/74259.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ddcc1_pal_device;
 
@@ -125,7 +125,7 @@ private:
 	myarc_fdc_device* m_board;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device)
 DECLARE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device)

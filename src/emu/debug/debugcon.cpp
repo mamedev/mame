@@ -14,6 +14,7 @@
 #include "debugvw.h"
 #include "textbuf.h"
 #include "debugger.h"
+#include "corestr.h"
 #include <cctype>
 #include <fstream>
 
@@ -68,10 +69,10 @@ debugger_console::debugger_console(running_machine &machine)
 	register_command("condump", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_console::execute_condump, this, _1, _2));
 
 	/* first CPU is visible by default */
-	for (device_t &device : device_iterator(m_machine.root_device()))
+	for (device_t &device : device_enumerator(m_machine.root_device()))
 	{
 		auto *cpu = dynamic_cast<cpu_device *>(&device);
-		if (cpu != nullptr)
+		if (cpu)
 		{
 			m_visiblecpu = cpu;
 			break;
@@ -158,9 +159,9 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 		return;
 	}
 
-	for (auto line_info : text_buffer_lines(*m_console_textbuf))
+	for (std::string_view line_info : text_buffer_lines(*m_console_textbuf))
 	{
-		fwrite(line_info.text, sizeof(char), line_info.length, f);
+		fwrite(line_info.data(), sizeof(char), line_info.length(), f);
 		fputc('\n', f);
 	}
 
@@ -517,7 +518,7 @@ void debugger_console::process_source_file()
 			buf.resize(pos);
 
 		// strip whitespace
-		strtrimrightspace(buf);
+		buf = strtrimrightspace(buf);
 
 		// execute the command
 		if (!buf.empty())
@@ -571,63 +572,61 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 ***************************************************************************/
 
 
-/*-------------------------------------------------
-    print_core - write preformatted text
-    to the debug console
--------------------------------------------------*/
+//-------------------------------------------------
+//  print_core - write preformatted text
+//  to the debug console
+//-------------------------------------------------
 
-void debugger_console::print_core(const char *text)
+void debugger_console::print_core(std::string_view text)
 {
-	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
 	text_buffer_print(*m_console_textbuf, text);
 	if (m_logfile)
-		m_logfile->write(text, strlen(text));
+		m_logfile->write(text.data(), text.length());
 }
 
-/*-------------------------------------------------
-    print_core_wrap - write preformatted text
-    to the debug console, with wrapping
--------------------------------------------------*/
+//-------------------------------------------------
+//  print_core_wrap - write preformatted text
+//  to the debug console, with wrapping
+//-------------------------------------------------
 
-void debugger_console::print_core_wrap(const char *text, int wrapcol)
+void debugger_console::print_core_wrap(std::string_view text, int wrapcol)
 {
-	// FIXME: this invokes strlen() twice; compute it once and pass it to text_buffer_print
-	// FIXME: also look into honoring wrapcol for the logfile
+	// FIXME: look into honoring wrapcol for the logfile
 	text_buffer_print_wrap(*m_console_textbuf, text, wrapcol);
 	if (m_logfile)
-		m_logfile->write(text, strlen(text));
+		m_logfile->write(text.data(), text.length());
 }
 
-/*-------------------------------------------------
-    vprintf - vprintfs the given arguments using
-    the format to the debug console
--------------------------------------------------*/
+//-------------------------------------------------
+//  vprintf - vprintfs the given arguments using
+//  the format to the debug console
+//-------------------------------------------------
 
 void debugger_console::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	print_core(util::string_format(args).c_str());
+	print_core(util::string_format(args));
 
-	/* force an update of any console views */
+	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
 void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 {
-	print_core(util::string_format(std::move(args)).c_str());
+	print_core(util::string_format(std::move(args)));
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
 
-/*-------------------------------------------------
-    vprintf_wrap - vprintfs the given arguments
-    using the format to the debug console
--------------------------------------------------*/
+//-------------------------------------------------
+//  vprintf_wrap - vprintfs the given arguments
+//  using the format to the debug console
+//-------------------------------------------------
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args)
 {
-	print_core_wrap(util::string_format(args).c_str(), wrapcol);
+	print_core_wrap(util::string_format(args), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -635,17 +634,17 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std:
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args)
 {
-	print_core_wrap(util::string_format(std::move(args)).c_str(), wrapcol);
+	print_core_wrap(util::string_format(std::move(args)), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
 
-/*-------------------------------------------------
-    errorlog_write_line - writes a line to the
-    errorlog ring buffer
--------------------------------------------------*/
+//-------------------------------------------------
+//  errorlog_write_line - writes a line to the
+//  errorlog ring buffer
+//-------------------------------------------------
 
 void debugger_console::errorlog_write_line(const char *line)
 {

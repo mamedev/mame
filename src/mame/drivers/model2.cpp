@@ -5729,6 +5729,18 @@ ROM_START( topskatrj ) /* Top Skater (Japan), Model 2C, Sega Game ID# 833-13080-
 	ROM_LOAD("mpr-19750.24s", 0xc00000, 0x400000, CRC(cd95d0bf) SHA1(40e2a2980c89049c339fefd48bf7aac79962cd2e) )
 ROM_END
 
+/*
+Dead or Alive below also known to have genuine Tecmo labels:
+ PROJECT      PROJECT
+  EPR-AK       EPR-AK
+ ROM No.  &   ROM No.
+  19310A       19311A
+ DATE         DATE
+  97/1/10      97/1/10
+
+Sega ID# 836-12884 DEAD OR ALIVE
+
+*/
 ROM_START( doaa ) /* Dead or Alive Revision A, Model 2A, Sega Game ID# 833-11341, ROM board ID# 834-11342, 837-12880 security board */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19310a.12", 0x000000, 0x080000, CRC(06486f7a) SHA1(b3e14103570e5f45aed16e1c158e469bc85002ae) )
@@ -7072,14 +7084,14 @@ u32 model2_state::doa_unk_r()
 void model2_state::sega_0229_map(address_map &map)
 {
 	// view the protection device has into RAM, this might need endian swapping
-	map(0x000000, 0x007fff).ram().share("protram0229");
+	map(0x000000, 0x007fff).lrw8([this](offs_t offset){ return m_maincpu->space(AS_PROGRAM).read_byte(0x1d80000+offset); }, "prot", [this](offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x1d80000+offset, data); }, "prot");
 }
 
 /* common map for 0229 protection */
 void model2_state::model2_0229_mem(address_map &map)
 {
 	// the addresses here suggest this is only connected to a 0x8000 byte window, not 0x80000 like ST-V
-	map(0x01d80000, 0x01d87fff).ram().share("protram0229");
+	map(0x01d80000, 0x01d87fff).ram();
 	map(0x01d87ff0, 0x01d87ff3).w(m_0229crypt, FUNC(sega_315_5838_comp_device::srcaddr_w));
 	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::data_w_doa));
 	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));

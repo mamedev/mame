@@ -2649,8 +2649,7 @@ void renderer_ogl::texture_shader_update(ogl_texture_info *texture, render_conta
 
 	if (container!=nullptr)
 	{
-		render_container::user_settings settings;
-		container->get_user_settings(settings);
+		render_container::user_settings settings = container->get_user_settings();
 		/* FIXME: the code below is in just for illustration issue on
 		 * how to set shader variables. gamma, contrast and brightness are
 		 * handled already by the core

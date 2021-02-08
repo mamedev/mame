@@ -87,10 +87,10 @@ public:
 	bool is_playing() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY; }
 	bool is_recording() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD; }
 
-	void set_motor(int state) { change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR); } // aka remote control
-	int motor_on() { return ((m_state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? 1 : 0; }
-	void set_speaker(int state) { change_state(state ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER); }
-	int speaker_on() { return ((m_state & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_ENABLED) ? 1 : 0; }
+	void set_motor(bool state) { change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR); } // aka remote control
+	bool motor_on() { return (m_state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED; }
+	void set_speaker(bool state) { change_state(state ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER); }
+	bool speaker_on() { return (m_state & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_ENABLED; }
 
 	cassette_image *get_image() { return m_cassette.get(); }
 	double get_position();
@@ -140,6 +140,6 @@ private:
 DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 
 // device iterator
-typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
+typedef device_type_enumerator<cassette_image_device> cassette_device_enumerator;
 
 #endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H

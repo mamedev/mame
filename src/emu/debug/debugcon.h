@@ -30,7 +30,7 @@ constexpr u32 CMDFLAG_NONE                  = 0x0000;
 constexpr u32 CMDFLAG_KEEP_QUOTES           = 0x0001;
 constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 
-/* parameter separator macros */
+// parameter separator macros
 #define CMDPARAM_SEPARATOR                  "\0"
 #define CMDPARAM_TERMINATOR                 "\0\0"
 
@@ -94,11 +94,11 @@ public:
 	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
 	text_buffer &get_console_textbuf() const { return *m_console_textbuf; }
 
-	/* errorlog management */
+	// errorlog management
 	void errorlog_write_line(const char *line);
 	text_buffer &get_errorlog_textbuf() const { return *m_errorlog_textbuf; }
 
-	/* convenience templates */
+	// convenience templates
 	template <typename Format, typename... Params>
 	inline void printf(Format &&fmt, Params &&...args)
 	{
@@ -126,8 +126,8 @@ private:
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
-	void print_core(const char *text);                   // core text output
-	void print_core_wrap(const char *text, int wrapcol); // core text output
+	void print_core(std::string_view text);                   // core text output
+	void print_core_wrap(std::string_view text, int wrapcol); // core text output
 
 	struct debug_command
 	{

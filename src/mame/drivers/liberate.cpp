@@ -79,7 +79,7 @@ void liberate_state::deco16_bank_w(uint8_t data)
 	if (m_bank)
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, membank("bank1"));
+		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x800f, memregion("maincpu")->base());
 }
 
 uint8_t liberate_state::prosoccr_bank_r(offs_t offset)
@@ -253,7 +253,7 @@ void liberate_state::prosport_map(address_map &map)
 	map(0x3800, 0x3fff).ram().share("spriteram");
 	map(0x4000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::prosport_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::liberate_map(address_map &map)
@@ -267,7 +267,7 @@ void liberate_state::liberate_map(address_map &map)
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
 	map(0x8000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::deco16_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::decrypted_opcodes_map(address_map &map)

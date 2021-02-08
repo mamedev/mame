@@ -137,6 +137,7 @@ out:
 #include "sound/3812intf.h"
 #include "speaker.h"
 
+namespace {
 
 class wardner_state : public twincobr_state
 {
@@ -299,6 +300,17 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wardnerjb )
+	PORT_INCLUDE( wardner_generic )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -496,6 +508,58 @@ ROM_START( wardner )
 	ROM_LOAD( "82s123.f1",   0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )   /* tile to sprite priority ?? */
 ROM_END
 
+// the ROM contents of the bootleg are the same of the original, the difference is the TMS320C10 code which is in external PROMs instead of internal
+ROM_START( wardnerb )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) /* Banked Main Z80 code */
+	ROM_LOAD( "b25-31.6m",  0x00000, 0x08000, CRC(c5dd56fd) SHA1(f0a09557150e9c1c6b9d8e125f5408fc269c9d17) )    /* Main Z80 code */
+	ROM_LOAD( "b25-18.7m",  0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )    /* OBJ ROMs */
+	ROM_LOAD( "b25-19.8m",  0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
+	ROM_LOAD( "b25-32.10m", 0x38000, 0x08000, CRC(347f411b) SHA1(1fb2883d74d10350cb1c62fb58d5783652861b37) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 */
+	ROMX_LOAD( "82s137.1d",  0x0000, 0x0400, CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) /* msb */
+	ROMX_LOAD( "82s137.1e",  0x0000, 0x0400, CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s137.3d",  0x0001, 0x0400, CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) /* lsb */
+	ROMX_LOAD( "82s137.3e",  0x0001, 0x0400, CRC(6edb2de8) SHA1(48459037c3b865f0c0d63a416fa71ba1119f7a09), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.3b",  0x0800, 0x0200, CRC(9dfffaff) SHA1(2f4a1c1afba6a362dc5774a82656883b08fa16f2), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.3a",  0x0800, 0x0200, CRC(712bad47) SHA1(b9f7be13cbd90a17fe7d13fb7987a0b9b759ccad), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.2a",  0x0801, 0x0200, CRC(ac843ca6) SHA1(8fd278748ec89d8ebe2d4f3bf8b6731f357ddfb3), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.1a",  0x0801, 0x0200, CRC(50452ff8) SHA1(76964fa9ee89a51cc71904e08cfc83bf81bb89aa), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+
+	ROM_REGION( 0x0c000, "gfx1", 0 )    /* chars */
+	ROM_LOAD( "b25-28.10f", 0x00000, 0x04000, CRC(1392b60d) SHA1(86b9eab87f8d5f68fda500420f4ed61331089fc2) )
+	ROM_LOAD( "b25-27.8f",  0x04000, 0x04000, CRC(0ed848da) SHA1(e4b38e21c101a28a8961a9fe30c9cb10919cc148) )
+	ROM_LOAD( "b25-26.7f",  0x08000, 0x04000, CRC(79792c86) SHA1(648b97f1ec30d46e40e60eb13159b4f6f86e9243) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* fg tiles */
+	ROM_LOAD( "b25-12.18f",  0x00000, 0x08000, CRC(15d08848) SHA1(e2e62d95a3f240664b5e0ac0f163a0d5cefa5312) )
+	ROM_LOAD( "b25-15.23f",  0x08000, 0x08000, CRC(cdd2d408) SHA1(7e4d77f8725fa30d4d65e811d10e0b2c00b23cfe) )
+	ROM_LOAD( "b25-14.21f",  0x10000, 0x08000, CRC(5a2aef4f) SHA1(60f4ab2582a924defb5241ab367826ae1f4b3f5e) )
+	ROM_LOAD( "b25-13.19f",  0x18000, 0x08000, CRC(be21db2b) SHA1(7fc1809618f2432c9ec6eb33ce57a5faffd44974) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* bg tiles */
+	ROM_LOAD( "b25-08.12f",  0x00000, 0x08000, CRC(883ccaa3) SHA1(90d686094eac6e80caf8e2cf90c00bb41a0d26e2) )
+	ROM_LOAD( "b25-11.16f",  0x08000, 0x08000, CRC(d6ebd510) SHA1(d65e0db7756ebe6828bf637a6c915bb06082636c) )
+	ROM_LOAD( "b25-10.15f",  0x10000, 0x08000, CRC(b9a61e81) SHA1(541e579664d583fbbf81111046115018fdaff073) )
+	ROM_LOAD( "b25-09.14f",  0x18000, 0x08000, CRC(585411b7) SHA1(67c0f4b7ab303341d5481c4024dc4199acb7c279) )
+
+	ROM_REGION( 0x40000, "scu", 0 )    /* sprites */
+	ROM_LOAD( "b25-01.14c",  0x00000, 0x10000, CRC(42ec01fb) SHA1(646192a2e89f795ed016860cdcdc0b5ef645fca2) )
+	ROM_LOAD( "b25-02.16c",  0x10000, 0x10000, CRC(6c0130b7) SHA1(8b6ad72848d03c3d4ee3acd35abbb3a0e678122c) )
+	ROM_LOAD( "b25-03.17c",  0x20000, 0x10000, CRC(b923db99) SHA1(2f4be81afdf200586bc44b1e94553d84d16d0b62) )
+	ROM_LOAD( "b25-04.19c",  0x30000, 0x10000, CRC(8059573c) SHA1(75bd19e504433438b85ed00e50e85fb98eebf4de) )
+
+	ROM_REGION( 0x260, "proms", 0 )     /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "82s129.b19",  0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )   /* sprite priority control ?? */
+	ROM_LOAD( "82s129.b18",  0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )   /* sprite priority control ?? */
+	ROM_LOAD( "82s123.b21",  0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )   /* sprite control ?? */
+	ROM_LOAD( "82s123.c6",   0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "82s123.f1",   0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )   /* tile to sprite priority ?? */
+ROM_END
+
 ROM_START( pyros )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) /* Banked Z80 code */
 	ROM_LOAD( "b25-29.6m",  0x00000, 0x08000, CRC(b568294d) SHA1(5d04dd006f5180fa0c9340e2efa6613625d712a8) )    /* Main Z80 code */
@@ -584,7 +648,67 @@ ROM_START( wardnerj )
 	ROM_LOAD( "82s123.f1",   0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )   /* tile to sprite priority ?? */
 ROM_END
 
+// This bootleg has World main CPU ROMs mixed with Japanese char ROMs. The only unique ROM is 17.bin, where they changed the lives table, disabled the video RAM check and did some other minor changes
+ROM_START( wardnerjb )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "17.bin", 0x00000, 0x08000, CRC(c06804ec) SHA1(848acfc77af42f62d8d4584bfea83e7089593e71) ) // Main Z80 code
+	ROM_LOAD( "18.bin", 0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) ) // OBJ ROMs
+	ROM_LOAD( "19.bin", 0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
+	ROM_LOAD( "20.bin", 0x38000, 0x08000, CRC(45185301) SHA1(f0b30a1337801230d49dc267cfe715559e0d1b41) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x38000, 0x08000 )
 
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "16.bin", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10, not dumped for this set
+	ROMX_LOAD( "82s137.1d", 0x0000, 0x0400, BAD_DUMP CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // MSB
+	ROMX_LOAD( "82s137.1e", 0x0000, 0x0400, BAD_DUMP CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s137.3d", 0x0001, 0x0400, BAD_DUMP CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // LSB
+	ROMX_LOAD( "82s137.3e", 0x0001, 0x0400, BAD_DUMP CRC(6edb2de8) SHA1(48459037c3b865f0c0d63a416fa71ba1119f7a09), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.3b", 0x0800, 0x0200, BAD_DUMP CRC(9dfffaff) SHA1(2f4a1c1afba6a362dc5774a82656883b08fa16f2), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.3a", 0x0800, 0x0200, BAD_DUMP CRC(712bad47) SHA1(b9f7be13cbd90a17fe7d13fb7987a0b9b759ccad), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.2a", 0x0801, 0x0200, BAD_DUMP CRC(ac843ca6) SHA1(8fd278748ec89d8ebe2d4f3bf8b6731f357ddfb3), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
+	ROMX_LOAD( "82s131.1a", 0x0801, 0x0200, BAD_DUMP CRC(50452ff8) SHA1(76964fa9ee89a51cc71904e08cfc83bf81bb89aa), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
+
+	ROM_REGION( 0x0c000, "gfx1", 0 )    // chars
+	ROM_LOAD( "7.bin", 0x00000, 0x04000, CRC(22abf48e) SHA1(5e8d895f50af0e5fc8499ee0f8c6e8a9ffd1fad8) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x00000, 0x04000 )
+	ROM_LOAD( "6.bin", 0x04000, 0x04000, CRC(49b66bc0) SHA1(5ec4b95cc557b29d26314ce12fe4d6b7e35389ed) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x04000, 0x04000 )
+	ROM_LOAD( "5.bin", 0x08000, 0x04000, CRC(cc7e7850) SHA1(14fcd5f13be46a348c749aef121524709604e9e2) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x08000, 0x04000 )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    // fg tiles
+	ROM_LOAD( "12.bin", 0x00000, 0x08000, CRC(15d08848) SHA1(e2e62d95a3f240664b5e0ac0f163a0d5cefa5312) )
+	ROM_LOAD( "15.bin", 0x08000, 0x08000, CRC(cdd2d408) SHA1(7e4d77f8725fa30d4d65e811d10e0b2c00b23cfe) )
+	ROM_LOAD( "14.bin", 0x10000, 0x08000, CRC(5a2aef4f) SHA1(60f4ab2582a924defb5241ab367826ae1f4b3f5e) )
+	ROM_LOAD( "13.bin", 0x18000, 0x08000, CRC(be21db2b) SHA1(7fc1809618f2432c9ec6eb33ce57a5faffd44974) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles
+	ROM_LOAD( "8.bin",  0x00000, 0x08000, CRC(883ccaa3) SHA1(90d686094eac6e80caf8e2cf90c00bb41a0d26e2) )
+	ROM_LOAD( "11.bin", 0x08000, 0x08000, CRC(d6ebd510) SHA1(d65e0db7756ebe6828bf637a6c915bb06082636c) )
+	ROM_LOAD( "10.bin", 0x10000, 0x08000, CRC(b9a61e81) SHA1(541e579664d583fbbf81111046115018fdaff073) )
+	ROM_LOAD( "9.bin",  0x18000, 0x08000, CRC(585411b7) SHA1(67c0f4b7ab303341d5481c4024dc4199acb7c279) )
+
+	ROM_REGION( 0x40000, "scu", 0 )    // sprites
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(42ec01fb) SHA1(646192a2e89f795ed016860cdcdc0b5ef645fca2) )
+	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(6c0130b7) SHA1(8b6ad72848d03c3d4ee3acd35abbb3a0e678122c) )
+	ROM_LOAD( "3.bin", 0x20000, 0x10000, CRC(b923db99) SHA1(2f4be81afdf200586bc44b1e94553d84d16d0b62) )
+	ROM_LOAD( "4.bin", 0x30000, 0x10000, CRC(8059573c) SHA1(75bd19e504433438b85ed00e50e85fb98eebf4de) )
+
+	ROM_REGION( 0x260, "proms", 0 )     // nibble bproms, lo/hi order to be determined, not dumped for this set
+	ROM_LOAD( "82s129.b19", 0x000, 0x100, BAD_DUMP CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )  // Sprite priority control ??
+	ROM_LOAD( "82s129.b18", 0x100, 0x100, BAD_DUMP CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )  // Sprite priority control ??
+	ROM_LOAD( "82s123.b21", 0x200, 0x020, BAD_DUMP CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )  // Sprite control ??
+	ROM_LOAD( "82s123.c6",  0x220, 0x020, BAD_DUMP CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )  // Sprite attribute (flip/position) ??
+	ROM_LOAD( "82s123.f1",  0x240, 0x020, BAD_DUMP CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )  // Tile to sprite priority ??
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME( 1987, wardner,   0,       wardner, wardner,   wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerb,  wardner, wardner, wardner,   wardner_state, empty_init, ROT0, "bootleg",                             "Wardner (World, bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,     wardner, wardner, pyros,     wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj,  wardner, wardner, wardnerj,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerjb, wardner, wardner, wardnerjb, wardner_state, empty_init, ROT0, "bootleg",                             "Wardner no Mori (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

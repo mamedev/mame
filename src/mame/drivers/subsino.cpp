@@ -253,7 +253,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_reel_scroll(*this, "reel_scroll.%u", 0U),
+		m_reel_scroll(*this, "reel_scroll.%u", 0U, 0x40U, ENDIANNESS_LITTLE),
 		m_reel_ram(*this, "reel_ram.%u", 0U),
 		m_stbsub_out_c(*this, "stbsub_out_c"),
 		m_maincpu(*this, "maincpu"),
@@ -293,7 +293,7 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr_array<uint8_t, 3> m_reel_scroll;
+	memory_share_array_creator<uint8_t, 3> m_reel_scroll;
 	optional_shared_ptr_array<uint8_t, 3> m_reel_ram;
 	optional_shared_ptr<uint8_t> m_stbsub_out_c;
 	required_device<cpu_device> m_maincpu;

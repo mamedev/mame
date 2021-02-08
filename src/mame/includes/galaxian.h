@@ -76,17 +76,20 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_netlist(*this, "konami")
 		, m_filter_ctl(*this, "konami:ctl%u", 0)
+		, m_ckong_coinage(*this, "COINAGE")
 		, m_fake_select(*this, "FAKE_SELECT")
 		, m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"})
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
+		, m_exattrram(*this, "extattrram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_bank1(*this, "bank1")
+		, m_leftspriteclip(16)
 	{ }
 
 	/* video extension callbacks */
-	typedef void (galaxian_state::*galaxian_extend_tile_info_func)(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	typedef void (galaxian_state::*galaxian_extend_tile_info_func)(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	typedef void (galaxian_state::*galaxian_extend_sprite_info_func)(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	typedef void (galaxian_state::*galaxian_draw_bullet_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	typedef void (galaxian_state::*galaxian_draw_background_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -192,20 +195,19 @@ public:
 	void init_pacmanbl();
 	void init_tenspot();
 	void init_devilfsg();
+	void init_bagmanmc();
 	void init_zigzag();
 	void init_jumpbug();
 	void init_checkman();
 	void init_checkmaj();
 	void init_dingo();
 	void init_dingoe();
-	void init_skybase();
 	void init_kong();
 	void init_mshuttle();
 	void init_mshuttlj();
 	void init_fantastc();
 	void init_timefgtr();
 	void init_kingball();
-	void init_scorpnmc();
 	void init_theend();
 	void init_scramble();
 	void init_sidam();
@@ -224,6 +226,8 @@ public:
 	void init_quaak();
 	void init_turtles();
 	void init_scorpion();
+	void init_ckongs();
+	void init_ckonggx();
 	void init_anteater();
 	void init_anteateruk();
 	void init_superbon();
@@ -233,6 +237,8 @@ public:
 	void init_froggrs();
 	void init_warofbugg();
 	void init_jungsub();
+	void init_mimonkey();
+	void init_mimonkeyb();
 	void init_victoryc();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
@@ -261,29 +267,34 @@ public:
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
 	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void scramble_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-	void upper_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void upper_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void upper_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void frogger_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void frogger_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void frogger_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void gmgalax_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void gmgalax_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void gmgalax_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void batman2_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
-	void mooncrst_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void batman2_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
+	void mooncrst_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void mooncrst_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void moonqsr_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void moonqsr_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void moonqsr_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void mshuttle_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void mshuttle_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void mshuttle_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void calipso_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void jumpbug_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void jumpbug_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
+	void mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
+	void namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void monsterz_set_latch();
 	void decode_mooncrst(int length, uint8_t *dest);
 	void decode_checkman();
@@ -308,6 +319,7 @@ public:
 	void moonqsr(machine_config &config);
 	void frogger(machine_config &config);
 	void anteatergg(machine_config &config);
+	void ozon1(machine_config &config);
 	void theend(machine_config &config);
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
@@ -316,6 +328,7 @@ public:
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
+	void pisces(machine_config &config);
 	void highroll(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
@@ -339,6 +352,7 @@ public:
 	void mooncrst(machine_config &config);
 	void eagle(machine_config &config);
 	void scorpion(machine_config &config);
+	void ckongs(machine_config &config);
 	void frogf(machine_config &config);
 	void amigo2(machine_config &config);
 	void zigzag(machine_config &config);
@@ -348,20 +362,40 @@ public:
 	void frogg(machine_config &config);
 	void mandingarf(machine_config &config);
 	void thepitm(machine_config &config);
+	void porter(machine_config &config);
 	void skybase(machine_config &config);
 	void kong(machine_config &config);
+	void bongo(machine_config &config);
 	void scorpnmc(machine_config &config);
+	void ckongg(machine_config &config);
+	void ckongmc(machine_config &config);
+	void bagmanmc(machine_config &config);
 	void fourplay(machine_config &config);
 	void videight(machine_config &config);
+	void astroamb(machine_config &config);
+	void mimonkey(machine_config &config);
+	void mimonscr(machine_config &config);
+
+	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
 	void anteatergg_map(address_map &map);
 	void anteateruk_map(address_map &map);
+	void astroamb_map(address_map &map);
+	void bagmanmc_map(address_map &map);
+	void bagmanmc_io_map(address_map &map);
+	void bongo_map(address_map &map);
+	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
 	void checkman_sound_portmap(address_map &map);
+	void ckongg_map(address_map &map);
+	void ckongg_map_base(address_map &map);
+	void ckongmc_map(address_map &map);
+	void ckongs_map(address_map &map);
 	void explorer_map(address_map &map);
 	void fantastc_map(address_map &map);
 	void frogf_map(address_map &map);
@@ -385,7 +419,10 @@ protected:
 	void konami_sound_portmap(address_map &map);
 	void kong_map(address_map &map);
 	void mandingarf_map(address_map &map);
+	void mimonkey_map(address_map &map);
+	void mimonscr_map(address_map &map);
 	void monsterz_map(address_map &map);
+	void monsterz_sound_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void mooncrst_map_base(address_map &map);
 	void mooncrst_map_discrete(address_map &map);
@@ -393,6 +430,10 @@ protected:
 	void mshuttle_decrypted_opcodes_map(address_map &map);
 	void mshuttle_map(address_map &map);
 	void mshuttle_portmap(address_map &map);
+	void ozon1_map(address_map &map);
+	void ozon1_io_map(address_map &map);
+	void pisces_map(address_map &map);
+	void porter_map(address_map &map);
 	void scobra_map(address_map &map);
 	void scorpion_map(address_map &map);
 	void scorpion_sound_map(address_map &map);
@@ -431,11 +472,13 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<netlist_mame_sound_device> m_netlist;
 	optional_device_array<netlist_mame_logic_input_device, 12> m_filter_ctl;
+	optional_ioport m_ckong_coinage;
 	optional_ioport m_fake_select;
 	optional_ioport_array<10> m_tenspot_game_dsw;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_exattrram; // belongs in namenayo_state but the callbacks are problematic as things are set up
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<2> m_lamps;
 
@@ -483,11 +526,12 @@ protected:
 	uint8_t m_stars_blink_state;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
+	uint8_t m_leftspriteclip;
 
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
 	void videight_rombank_w(offs_t offset, uint8_t data);
 	void videight_gfxbank_w(offs_t offset, uint8_t data);
-	void videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void fourplay_map(address_map &map);
 	void videight_map(address_map &map);
@@ -513,6 +557,24 @@ private:
 	uint8_t m_selected_game;
 	required_ioport_array<3> m_glin;
 	required_ioport_array<3> m_gmin;
+};
+
+class namenayo_state : public galaxian_state
+{
+public:
+	namenayo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+	{
+		m_leftspriteclip = 0;
+	}
+
+	void namenayo(machine_config &config);
+	void init_namenayo();
+
+private:
+	void namenayo_map(address_map &map);
+	void namenayo_extattr_w(offs_t offset, uint8_t data);
+	void namenayo_unk_d800_w(uint8_t data);
 };
 
 #endif // MAME_INCLUDES_GALAXIAN_H

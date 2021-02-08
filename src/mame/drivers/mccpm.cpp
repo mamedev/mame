@@ -30,7 +30,7 @@ No software to test with, so we'll never know if the FDC works.
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
+#include "machine/f4702.h"
 #include "machine/bankdev.h"
 #include "machine/wd_fdc.h"
 #include "bus/rs232/rs232.h"
@@ -44,12 +44,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bank(*this, "bankdev_map")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_fdc(*this, "fdc")
+		, m_fdd(*this, "fdc:%u", 0U)
+		, m_brg(*this, "brg%u", 1U)
 	{ }
 
 	void mccpm(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	void io_map(address_map &map);
@@ -58,15 +62,16 @@ private:
 	void port44_w(u8);
 	u8 port44_r();
 	void fdc_irq(bool);
+	template <int N> void bd_q_w(offs_t offset, u8 data);
+
 	u8 m_fdc_status;
 	floppy_image_device *m_floppy;
-	void machine_reset() override;
-	void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_fdd;
+	required_device_array<f4702_device, 2> m_brg;
 };
 
 
@@ -97,16 +102,49 @@ void mccpm_state::io_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( mccpm )
+	PORT_START("BAUD1")
+	PORT_DIPNAME(0xf, 0x8, "Baud Rate B (Printer)") PORT_DIPLOCATION("S:5,6,7,8")
+	PORT_DIPSETTING(0x2, "50")
+	PORT_DIPSETTING(0x3, "75")
+	PORT_DIPSETTING(0xf, "110")
+	PORT_DIPSETTING(0x4, "134.5")
+	PORT_DIPSETTING(0xe, "150")
+	PORT_DIPSETTING(0x5, "200")
+	PORT_DIPSETTING(0xd, "300")
+	PORT_DIPSETTING(0x6, "600")
+	PORT_DIPSETTING(0xb, "1200")
+	PORT_DIPSETTING(0xa, "1800")
+	PORT_DIPSETTING(0x7, "2400")
+	PORT_DIPSETTING(0x9, "4800")
+	PORT_DIPSETTING(0x8, "9600")
+	PORT_DIPSETTING(0x0, "19200")
+
+	PORT_START("BAUD2")
+	PORT_DIPNAME(0xf, 0x8, "Baud Rate A (Terminal)") PORT_DIPLOCATION("S:1,2,3,4")
+	PORT_DIPSETTING(0x2, "50")
+	PORT_DIPSETTING(0x3, "75")
+	PORT_DIPSETTING(0xf, "110")
+	PORT_DIPSETTING(0x4, "134.5")
+	PORT_DIPSETTING(0xe, "150")
+	PORT_DIPSETTING(0x5, "200")
+	PORT_DIPSETTING(0xd, "300")
+	PORT_DIPSETTING(0x6, "600")
+	PORT_DIPSETTING(0xb, "1200")
+	PORT_DIPSETTING(0xa, "1800")
+	PORT_DIPSETTING(0x7, "2400")
+	PORT_DIPSETTING(0x9, "4800")
+	PORT_DIPSETTING(0x8, "9600")
+	PORT_DIPSETTING(0x0, "19200")
 INPUT_PORTS_END
 
 void mccpm_state::port44_w(u8 data)
 {
 	m_floppy = nullptr;
 	if (BIT(data, 1))
-		m_floppy = m_floppy1->get_device();
+		m_floppy = m_fdd[1]->get_device();
 	else
 	if (BIT(data, 0))
-		m_floppy = m_floppy0->get_device();
+		m_floppy = m_fdd[0]->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 
@@ -134,6 +172,12 @@ void mccpm_state::fdc_irq(bool state)
 {
 	m_fdc_status = (m_fdc_status & 0xfd) | (state ? 2 : 0);
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+template <int N> void mccpm_state::bd_q_w(offs_t offset, u8 data)
+{
+	// "19200 extern" obtained by connecting Q2 to Im
+	m_brg[N]->im_w(BIT(offset, 2));
 }
 
 void mccpm_state::machine_reset()
@@ -168,20 +212,36 @@ void mccpm_state::mccpm(machine_config &config)
 
 	/* Devices */
 	// clock supplied by pair of HD4702 baud rate generators
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153'600));
-	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
-	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
+	F4702(config, m_brg[0], 2.4576_MHz_XTAL); // XTAL connected to Ix/Ox
+	m_brg[0]->s_callback().set_ioport("BAUD1");
+	m_brg[0]->z_callback().set("sio", FUNC(z80sio_device::rxtxcb_w));
+	m_brg[0]->z_callback().append(FUNC(mccpm_state::bd_q_w<0>));
+
+	F4702(config, m_brg[1], 2.4576_MHz_XTAL); // Cp connected to first BRG's CO
+	m_brg[1]->s_callback().set_ioport("BAUD2");
+	m_brg[1]->z_callback().set("sio", FUNC(z80sio_device::txca_w));
+	m_brg[1]->z_callback().append("sio", FUNC(z80sio_device::rxca_w));
+	m_brg[1]->z_callback().append(FUNC(mccpm_state::bd_q_w<1>));
 
 	// Ch A: terminal; Ch B: printer
 	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	sio.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	sio.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
-	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232a.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+	rs232a.dcd_handler().set("sio", FUNC(z80sio_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232b.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
+	rs232b.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
 
 	Z80PIO(config, "pio", XTAL(4'000'000));
 

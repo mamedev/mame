@@ -28,7 +28,7 @@
 #include "imagedev/floppy.h"
 #include "tp0370.h"
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 class hx5102_device : public hexbus_chained_device
 {
@@ -121,7 +121,7 @@ private:
 	uint8_t* m_rom2;
 };
 
-}   } // end namespace bus::hexbus
+} // end namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device)
 

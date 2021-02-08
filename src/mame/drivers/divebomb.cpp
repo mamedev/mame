@@ -428,11 +428,6 @@ void divebomb_state::divebomb(machine_config &config)
 	m_k051316[1]->set_offsets(-88, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
-	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
-	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
-
-	MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -538,7 +533,7 @@ ROM_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_start()
 {
 	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
@@ -547,7 +542,7 @@ MACHINE_START_MEMBER(divebomb_state, divebomb)
 }
 
 
-MACHINE_RESET_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_reset()
 {
 	for (int chip = 0; chip < 2; chip++)
 	{

@@ -248,7 +248,7 @@ public:
 		m_pal(*this, GENEVE_PAL_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_colorbus(*this, COLORBUS_TAG),
-		m_kbdconn(*this, GENEVE_KEYBOARD_CONN_TAG),
+		m_kbdconn(*this, "kbd"),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_pfm512(*this, GENEVE_PFM512_TAG),
 		m_pfm512a(*this, GENEVE_PFM512A_TAG),
@@ -632,16 +632,15 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
 
 	if (machine().side_effects_disabled())
 	{
-		// TODO: add method to tms9995
-//      if (m_cpu->is_onchip(offset))
-//      {
-//          m_cpu->debug_write_onchip_memory(offset, data);
-//          return;
-//      }
+		if (m_cpu->is_onchip(offset))
+		{
+			m_cpu->debug_write_onchip_memory(offset, data);
+			return;
+		}
 
 		// The debugger does not call setaddress, so we do it here
 		// Also, the decode result is replaced by the debugger version
-		setaddress_debug(true, addr13, 0);
+		setaddress_debug(true, offset, 0);
 	}
 
 	// Video write (never by debugger)
@@ -1132,6 +1131,8 @@ void geneve_state::geneve(machine_config &config)
 	// Gate array
 	GENEVE_GATE_ARRAY(config, m_gatearray, 0);
 	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
+	m_gatearray->kbdclk_cb().set(m_kbdconn, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_gatearray->kbddata_cb().set(m_kbdconn, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// Peripheral expansion box (Geneve composition)
 	TI99_PERIBOX_GEN(config, m_peribox, 0);
@@ -1148,6 +1149,8 @@ void geneve_state::genmod(machine_config &config)
 	// Gate Array
 	GENEVE_GATE_ARRAY(config, m_gatearray, 0);
 	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
+	m_gatearray->kbdclk_cb().set(m_kbdconn, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_gatearray->kbddata_cb().set(m_kbdconn, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
 	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
@@ -1212,8 +1215,7 @@ void geneve_state::geneve_common(machine_config &config)
 	m_sound->ready_cb().set(FUNC(geneve_state::sndready));
 
 	// User interface devices: PC-style keyboard, joystick port, mouse connector
-	PC_KBDC(config, m_kbdconn, 0);
-	PC_KBDC_SLOT(config, "kbd", geneve_xt_keyboards, STR_KBD_GENEVE_XT_101_HLE).set_pc_kbdc_slot(m_kbdconn);
+	PC_KBDC(config, m_kbdconn, geneve_xt_keyboards, STR_KBD_GENEVE_XT_101_HLE);
 	m_kbdconn->out_clock_cb().set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::kbdclk));
 	m_kbdconn->out_data_cb().set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::kbddata));
 

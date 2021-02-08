@@ -110,7 +110,7 @@ static cassette_image::error to7_k7_load( cassette_image *cass )
 #endif
 	size_t size = cass->image_size( ), pos = 0;
 	int i, sz, sz2, bitmax = 1024, invalid = 0;
-	uint8_t in, typ, block[264];
+	uint8_t typ, block[264];
 
 	LOG (( "to7_k7_load: start conversion, size=%li\n", (long)size ));
 	PRINT (( "to7_k7_load: open cassette, length: %li bytes\n", (long) size ));
@@ -226,8 +226,7 @@ static cassette_image::error to7_k7_load( cassette_image *cass )
 	/* skip to first 0xff filler */
 	for ( sz = 0; pos < size; pos++, sz++ )
 	{
-		cass->image_read( &in, pos, 1 );
-		if ( in == 0xff )
+		if ( cass->image_read_byte( pos ) == 0xff )
 			break;
 	}
 	if ( sz > 0 )
@@ -240,7 +239,7 @@ static cassette_image::error to7_k7_load( cassette_image *cass )
 		/* skip 0xff filler */
 		for ( sz = 0; pos < size; pos++, sz++ )
 		{
-			cass->image_read( &in, pos, 1 );
+			uint8_t in = cass->image_read_byte( pos );
 			/* actually, we are bit laxist and treat as 0xff bytes with at least
 			   5 bits out of 8 set to 1
 			*/
@@ -322,17 +321,16 @@ static cassette_image::error to7_k7_load( cassette_image *cass )
 		/* put block */
 		for (; pos < size; pos++ )
 		{
-			cass->image_read( &in, pos, 1 );
+			uint8_t in = cass->image_read_byte( pos );
 			for ( sz = 0; pos < size && in == 0xff; sz++ )
 			{
 				pos++;
-				cass->image_read( &in, pos, 1 );
+				in = cass->image_read_byte( pos );
 			}
 			if ( invalid < 10 && sz > 4 && in == 0x01 && pos + 4 <= size )
 			{
-				uint8_t in1,in2;
-				cass->image_read( &in1, pos+1, 1 );
-				cass->image_read( &in2, pos+2, 1 );
+				uint8_t in1 = cass->image_read_byte( pos+1 );
+				uint8_t in2 = cass->image_read_byte( pos+2 );
 				if ( (in1 == 0x3c) && ((in2 == 0x00) || (in2 == 0x01) ) )
 				{
 					/* seems we have a regular block hidden in raw data => rebounce */
@@ -463,7 +461,7 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 {
 	size_t size = cass->image_size( ), pos = 0;
 	int i, sz, sz2, hbit = 0;
-	uint8_t in, in2, in3, typ, block[264], sum;
+	uint8_t typ, block[264], sum;
 	int invalid = 0, hbitsize = 0, dcmoto = 0;
 
 	LOG (( "mo5_k5_load: start conversion, size=%li\n", (long)size ));
@@ -580,8 +578,7 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 		/* skip 0x01 filler */
 		for ( sz = 0; pos < size; pos++, sz++ )
 		{
-			cass->image_read( &in, pos, 1 );
-			if ( in != 0x01 )
+			if ( cass->image_read_byte(pos) != 0x01 )
 				break;
 		}
 
@@ -662,7 +659,7 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 		LOG (( "mo5_k5_load: trailing trash off=$%x size=%i hbitstart=%i\n", (int) pos, (int) (size-pos), hbitsize ));
 		for ( ; pos < size; pos++ )
 		{
-			cass->image_read( &in, pos, 1 );
+			uint8_t in = cass->image_read_byte( pos );
 			if ( dcmoto && in=='D' )
 			{
 				/* skip DCMOTO header*/
@@ -671,24 +668,24 @@ static cassette_image::error mo5_k5_load( cassette_image *cass )
 				{
 					LOG (( "mo5_k5_load: DCMOTO signature found at off=$%x\n", (int)pos ));
 					pos += 6;
-					cass->image_read( &in, pos, 1 );
+					in = cass->image_read_byte( pos );
 				}
 				else if ( ! memcmp( block, "DCMO", 4 ) )
 				{
 					LOG (( "mo5_k5_load: DCMO* signature found at off=$%x\n", (int)pos ));
 					pos += 5;
-					cass->image_read( &in, pos, 1 );
+					in = cass->image_read_byte( pos );
 				}
 			}
 			for ( sz = 0; pos < size && in == 0x01; sz++ )
 			{
 				pos++;
-				cass->image_read( &in, pos, 1 );
+				in = cass->image_read_byte( pos );
 			}
 			if ( sz > 6 )
 			{
-				cass->image_read( &in2, pos+1, 1 );
-				cass->image_read( &in3, pos+2, 1 );
+				uint8_t in2 = cass->image_read_byte( pos+1 );
+				uint8_t in3 = cass->image_read_byte( pos+2 );
 				if ( invalid < 10 &&  in == 0x3c && in2 == 0x5a && (in3 == 0x00 || in3 == 0x01 || in3 == 0xff ) )
 				{
 					/* regular block found */

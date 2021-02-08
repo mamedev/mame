@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/menu.h"
 
 #include "ui/ui.h"
@@ -20,6 +19,7 @@
 #include "cheat.h"
 #include "mame.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "rendutil.h"
 #include "uiinput.h"
@@ -136,7 +136,6 @@ void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 {
 	menu->m_parent = std::move(m_stack);
 	m_stack = std::move(menu);
-	m_stack->reset(reset_options::SELECT_FIRST);
 	m_stack->machine().ui_input().reset();
 }
 
@@ -289,26 +288,6 @@ void menu::reset(reset_options options)
 	m_items.clear();
 	m_visible_items = 0;
 	m_selected = 0;
-
-	// add an item to return
-	if (!m_parent)
-	{
-		item_append(_("Return to Machine"), "", 0, nullptr);
-	}
-	else if (m_parent->is_special_main_menu())
-	{
-		if (machine().options().ui() == emu_options::UI_SIMPLE)
-			item_append(_("Exit"), "", 0, nullptr);
-		else
-			item_append(_("Exit"), "", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-	}
-	else
-	{
-		if (machine().options().ui() != emu_options::UI_SIMPLE && stack_has_special_main_menu())
-			item_append(_("Return to Previous Menu"), "", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-		else
-			item_append(_("Return to Previous Menu"), "", 0, nullptr);
-	}
 }
 
 
@@ -339,30 +318,10 @@ void menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item item)
-{
-	item_append(item.text, item.subtext, item.flags, item.ref, item.type);
-}
-
-//-------------------------------------------------
-//  item_append - append a new item to the
-//  end of the menu
-//-------------------------------------------------
-
 void menu::item_append(menu_item_type type, uint32_t flags)
 {
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, "", flags, nullptr, menu_item_type::SEPARATOR);
-}
-
-//-------------------------------------------------
-//  item_append - append a new item to the
-//  end of the menu
-//-------------------------------------------------
-
-void menu::item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type)
-{
-	item_append(std::string(text), std::string(subtext), flags, ref, type);
+		item_append(MENU_SEPARATOR_ITEM, flags, nullptr, menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------
@@ -419,17 +378,6 @@ void menu::item_append_on_off(const std::string &text, bool state, uint32_t flag
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
 	item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
-}
-
-
-//-------------------------------------------------
-//  repopulate - repopulate menu items
-//-------------------------------------------------
-
-void menu::repopulate(reset_options options)
-{
-	reset(options);
-	populate(m_customtop, m_custombottom);
 }
 
 
@@ -510,7 +458,7 @@ void menu::draw(uint32_t flags)
 	// first draw the FPS counter
 	if (ui().show_fps_counter())
 	{
-		ui().draw_text_full(container(), machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+		ui().draw_text_full(container(), machine().video().speed_text(), 0.0f, 0.0f, 1.0f,
 				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 	}
 
@@ -533,11 +481,11 @@ void menu::draw(uint32_t flags)
 	for (auto const &pitem : m_items)
 	{
 		// compute width of left hand side
-		float total_width = gutter_width + ui().get_string_width(pitem.text.c_str()) + gutter_width;
+		float total_width = gutter_width + ui().get_string_width(pitem.text) + gutter_width;
 
 		// add in width of right hand side
 		if (!pitem.subtext.empty())
-			total_width += 2.0f * gutter_width + ui().get_string_width(pitem.subtext.c_str());
+			total_width += 2.0f * gutter_width + ui().get_string_width(pitem.subtext);
 
 		// track the maximum
 		if (total_width > visible_width)
@@ -612,7 +560,7 @@ void menu::draw(uint32_t flags)
 		{
 			auto const itemnum = top_line + linenum;
 			menu_item const &pitem = m_items[itemnum];
-			char const *const itemtext = pitem.text.c_str();
+			std::string_view const itemtext = pitem.text;
 			rgb_t fgcolor = ui().colors().text_color();
 			rgb_t bgcolor = ui().colors().text_bg_color();
 			rgb_t fgcolor2 = ui().colors().subitem_color();
@@ -689,7 +637,6 @@ void menu::draw(uint32_t flags)
 			{
 				// otherwise, draw the item on the left and the subitem text on the right
 				bool const subitem_invert(pitem.flags & FLAG_INVERT);
-				char const *subitem_text(pitem.subtext.c_str());
 				float item_width, subitem_width;
 
 				// draw the left-side text
@@ -698,7 +645,7 @@ void menu::draw(uint32_t flags)
 
 				if (pitem.flags & FLAG_COLOR_BOX)
 				{
-					rgb_t color = rgb_t((uint32_t)strtoul(subitem_text, nullptr, 16));
+					rgb_t color = rgb_t((uint32_t)strtoul(pitem.subtext.c_str(), nullptr, 16));
 
 					// give 2 spaces worth of padding
 					subitem_width = ui().get_string_width("FF00FF00");
@@ -708,6 +655,8 @@ void menu::draw(uint32_t flags)
 				}
 				else
 				{
+					std::string_view subitem_text(pitem.subtext);
+
 					// give 2 spaces worth of padding
 					item_width += 2.0f * gutter_width;
 
@@ -720,13 +669,13 @@ void menu::draw(uint32_t flags)
 					}
 
 					// customize subitem text color
-					if (!core_stricmp(subitem_text, _("On")))
+					if (!core_stricmp(pitem.subtext.c_str(), _("On")))
 						fgcolor2 = rgb_t(0x00,0xff,0x00);
 
-					if (!core_stricmp(subitem_text, _("Off")))
+					if (!core_stricmp(pitem.subtext.c_str(), _("Off")))
 						fgcolor2 = rgb_t(0xff,0x00,0x00);
 
-					if (!core_stricmp(subitem_text, _("Auto")))
+					if (!core_stricmp(pitem.subtext.c_str(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
 					// draw the subitem right-justified
@@ -769,7 +718,7 @@ void menu::draw(uint32_t flags)
 		float target_width, target_height;
 
 		// compute the multi-line target width/height
-		ui().draw_text_full(container(), pitem.subtext.c_str(), 0, 0, visible_width * 0.75f,
+		ui().draw_text_full(container(), pitem.subtext, 0, 0, visible_width * 0.75f,
 			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &target_width, &target_height);
 
 		// determine the target location
@@ -785,7 +734,7 @@ void menu::draw(uint32_t flags)
 				target_y + target_height + ui().box_tb_border(),
 				subitem_invert ? ui().colors().selected_bg_color() : ui().colors().background_color());
 
-		ui().draw_text_full(container(), pitem.subtext.c_str(), target_x, target_y, target_width,
+		ui().draw_text_full(container(), pitem.subtext, target_x, target_y, target_width,
 				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().selected_color(), ui().colors().selected_bg_color(), nullptr, nullptr);
 	}
 
@@ -805,8 +754,8 @@ void menu::custom_render(void *selectedref, float top, float bottom, float x, fl
 
 void menu::draw_text_box()
 {
-	const char *text = m_items[0].text.c_str();
-	const char *backtext = m_items[1].text.c_str();
+	std::string_view const text = m_items[0].text;
+	std::string_view const backtext = m_items[1].text;
 	float const aspect = machine().render().ui_aspect(&container());
 	float line_height = ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * aspect;
@@ -1220,8 +1169,31 @@ void menu::validate_selection(int scandir)
 
 void menu::do_handle()
 {
-	if (m_items.size() < 2)
+	if (m_items.empty())
+	{
+		// add an item to return - this is a really hacky way of doing this
+		if (!m_parent)
+		{
+			item_append(_("Return to Machine"), 0, nullptr);
+		}
+		else if (m_parent->is_special_main_menu())
+		{
+			if (machine().options().ui() == emu_options::UI_SIMPLE)
+				item_append(_("Exit"), 0, nullptr);
+			else
+				item_append(_("Exit"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+		}
+		else
+		{
+			if (machine().options().ui() != emu_options::UI_SIMPLE && stack_has_special_main_menu())
+				item_append(_("Return to Previous Menu"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+			else
+				item_append(_("Return to Previous Menu"), 0, nullptr);
+		}
+
+		// let implementation add other items
 		populate(m_customtop, m_custombottom);
+	}
 	handle();
 }
 
@@ -1286,7 +1258,7 @@ void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uin
 //  or footer text
 //-------------------------------------------------
 
-void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
+void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction)
 {
 	// get the size of the text
 	auto layout = ui().create_layout(container());
@@ -1343,14 +1315,11 @@ void menu::extra_text_position(float origx1, float origx2, float origy, float ys
 //  and footer text
 //-------------------------------------------------
 
-void menu::extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer)
+void menu::extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, std::string_view header, std::string_view footer)
 {
-	header = (header && *header) ? header : nullptr;
-	footer = (footer && *footer) ? footer : nullptr;
-
-	if (header != nullptr)
+	if (!header.empty())
 		extra_text_draw_box(origx1, origx2, origy1, top, header, -1);
-	if (footer != nullptr)
+	if (!footer.empty())
 		extra_text_draw_box(origx1, origx2, origy2, bottom, footer, +1);
 }
 

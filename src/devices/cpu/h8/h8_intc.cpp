@@ -382,5 +382,5 @@ void h8s_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	}
 
 	icr_pri = (icr >> (slot ^ 7)) & 1;
-	ipr_pri = (ipr[slot >> 1] >> (slot & 1 ? 4 : 0)) & 7;
+	ipr_pri = (ipr[slot >> 1] >> (slot & 1 ? 0 : 4)) & 7;
 }

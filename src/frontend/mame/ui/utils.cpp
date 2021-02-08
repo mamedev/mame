@@ -22,6 +22,8 @@
 #include "romload.h"
 #include "softlist.h"
 
+#include "corestr.h"
+
 #include <atomic>
 #include <bitset>
 #include <condition_variable>
@@ -124,7 +126,7 @@ public:
 
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
-		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()).c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()));
 	}
 
 	virtual typename Base::type get_type() const override { return Type; }
@@ -133,10 +135,7 @@ public:
 	{
 		std::string result;
 		if (Type == n)
-		{
-			result = "_> ";
-			convert_command_glyph(result);
-		}
+			result = convert_command_glyph("_> ");
 		result.append(Base::display_name(n));
 		return result;
 	}
@@ -206,7 +205,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "").c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
 	}
 
 protected:
@@ -250,7 +249,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		auto const tail(std::find_if(std::begin(m_filters), std::end(m_filters), [] (typename Base::ptr const &flt) { return !flt; }));
-		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)).c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)));
 		for (auto it = std::begin(m_filters); tail != it; ++it)
 			(*it)->save_ini(file, indent + 1);
 	}
@@ -259,18 +258,14 @@ public:
 	{
 		std::string result;
 		if (Type == n)
-		{
-			result = "_> ";
-			convert_command_glyph(result);
-		}
+			result = convert_command_glyph("_> ");
 		else
 		{
 			for (unsigned i = 0; (MAX > i) && m_filters[i]; ++i)
 			{
 				if (m_filters[i]->get_type() == n)
 				{
-					result = util::string_format("@custom%u ", i + 1);
-					convert_command_glyph(result);
+					result = convert_command_glyph(util::string_format("@custom%u ", i + 1));
 					break;
 				}
 			}
@@ -509,8 +504,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 			set_selected_index(item_count() - 2);
 		if (m_parent.m_filters[i]->wants_adjuster())
 		{
-			std::string name("^!");
-			convert_command_glyph(name);
+			std::string name(convert_command_glyph("^!"));
 			item_append(name, m_parent.m_filters[i]->adjust_text(), m_parent.m_filters[i]->arrow_flags(), (void *)(ADJUST_FIRST + i));
 		}
 		item_append(menu_item_type::SEPARATOR);
@@ -519,9 +513,9 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 
 	// add remove/add handlers
 	if (1 < i)
-		item_append(_("Remove last filter"), "", 0, (void *)REMOVE_FILTER);
+		item_append(_("Remove last filter"), 0, (void *)REMOVE_FILTER);
 	if (MAX > i)
-		item_append(_("Add filter"), "", 0, (void *)ADD_FILTER);
+		item_append(_("Add filter"), 0, (void *)ADD_FILTER);
 	item_append(menu_item_type::SEPARATOR);
 
 	// leave space for heading
@@ -845,21 +839,18 @@ public:
 		inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 		if (value)
 		{
-			char const *const split(std::strchr(value, '/'));
-			std::string ini;
-			if (split)
-				ini.assign(value, split);
-			else
-				ini.assign(value);
+			std::string_view const s(value);
+			std::string_view::size_type const split(s.find('/'));
+			std::string_view const ini(s.substr(0, split));
 
 			for (unsigned i = 0; mgr.get_file_count() > i; ++i)
 			{
 				if (mgr.get_file_name(i) == ini)
 				{
 					m_ini = i;
-					if (split)
+					if (std::string_view::npos != split)
 					{
-						std::string const group(split + 1);
+						std::string_view const group(s.substr(split + 1));
 						for (unsigned j = 0; mgr.get_category_count(i) > j; ++j)
 						{
 							if (mgr.get_category_name(i, j) == group)
@@ -894,7 +885,7 @@ public:
 	virtual void save_ini(emu_file &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "").c_str());
+		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
 	}
 
 	virtual bool apply(ui_system_info const &system) const override
@@ -1036,7 +1027,7 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 	unsigned const filecnt(mgr.get_file_count());
 	if (!filecnt)
 	{
-		item_append(_("No category INI files found"), "", FLAG_DISABLE, nullptr);
+		item_append(_("No category INI files found"), FLAG_DISABLE, nullptr);
 	}
 	else
 	{
@@ -1045,7 +1036,7 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 		unsigned const groupcnt(mgr.get_category_count(m_ini));
 		if (!groupcnt)
 		{
-			item_append(_("No groups found in category file"), "", FLAG_DISABLE, nullptr);
+			item_append(_("No groups found in category file"), FLAG_DISABLE, nullptr);
 		}
 		else
 		{
@@ -1595,13 +1586,12 @@ void software_filter_data::finalise()
 
 std::string software_filter_data::extract_region(std::string const &longname)
 {
-	std::string fullname(longname);
-	strmakelower(fullname);
+	std::string fullname(strmakelower(longname));
 	std::string::size_type const found(fullname.find('('));
 	if (found != std::string::npos)
 	{
 		std::string::size_type const ends(fullname.find_first_not_of("abcdefghijklmnopqrstuvwxyz", found + 1));
-		std::string const temp(fullname.substr(found + 1, ends - found - 1));
+		std::string_view const temp(std::string_view(fullname).substr(found + 1, ends - found - 1));
 		auto const match(std::find_if(
 				std::begin(SOFTWARE_REGIONS),
 				std::end(SOFTWARE_REGIONS),
@@ -1686,19 +1676,19 @@ machine_filter::ptr machine_filter::create(emu_file &file, machine_filter_data c
 		return nullptr;
 
 	// split it into a key/value or bail
-	std::string key(buffer);
-	for (std::string::size_type i = 0; (2 * indent) > i; ++i)
+	std::string_view key(buffer);
+	for (std::string_view::size_type i = 0; (2 * indent) > i; ++i)
 	{
 		if ((key.length() <= i) || (' ' != key[i]))
 			return nullptr;
 	}
 	key = key.substr(2 * indent);
-	std::string::size_type const split(key.find(" = "));
-	if (std::string::npos == split)
+	std::string_view::size_type const split(key.find(" = "));
+	if (std::string_view::npos == split)
 		return nullptr;
-	std::string::size_type const nl(key.find_first_of("\r\n", split));
-	std::string const value(key.substr(split + 3, (std::string::npos == nl) ? nl : (nl - split - 3)));
-	key.resize(split);
+	std::string_view::size_type const nl(key.find_first_of("\r\n", split));
+	std::string const value(key.substr(split + 3, (std::string_view::npos == nl) ? nl : (nl - split - 3)));
+	key = key.substr(0, split);
 
 	// look for a filter type that matches
 	for (type n = FIRST; COUNT > n; ++n)
@@ -1794,19 +1784,19 @@ software_filter::ptr software_filter::create(emu_file &file, software_filter_dat
 		return nullptr;
 
 	// split it into a key/value or bail
-	std::string key(buffer);
-	for (std::string::size_type i = 0; (2 * indent) > i; ++i)
+	std::string_view key(buffer);
+	for (std::string_view::size_type i = 0; (2 * indent) > i; ++i)
 	{
 		if ((key.length() <= i) || (' ' != key[i]))
 			return nullptr;
 	}
 	key = key.substr(2 * indent);
-	std::string::size_type const split(key.find(" = "));
-	if (std::string::npos == split)
+	std::string_view::size_type const split(key.find(" = "));
+	if (std::string_view::npos == split)
 		return nullptr;
-	std::string::size_type const nl(key.find_first_of("\r\n", split));
-	std::string const value(key.substr(split + 3, (std::string::npos == nl) ? nl : (nl - split - 3)));
-	key.resize(split);
+	std::string_view::size_type const nl(key.find_first_of("\r\n", split));
+	std::string const value(key.substr(split + 3, (std::string_view::npos == nl) ? nl : (nl - split - 3)));
+	key = key.substr(0, split);
 
 	// look for a filter type that matches
 	for (type n = FIRST; COUNT > n; ++n)

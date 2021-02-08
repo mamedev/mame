@@ -423,8 +423,9 @@
     three ROMs, and a smaller board with lots of ROMs,
     the CPU, the 6821 PIAs, and the two "Special Chip 2"
     custom BIT/BLT chips.
-    Joust 2 has an additional music/speech board that has a
-    68B09E CPU, 68B21 PIA, Harris 55564-5 CVSD, and a YM2151.
+    Joust 2 has an additional D-11298 Williams System 11 background
+    music/speech board (the older board version from PIN*BOT)
+    that has a 68B09E CPU, 68B21 PIA, Harris 55564-5 CVSD, and a YM2151.
 
     Contact Michael Soderstrom (ichael@geocities.com) if you
     have any additional information or corrections.
@@ -553,8 +554,8 @@ void mayday_state::main_map(address_map &map)
 
 void williams_state::base_map(address_map &map)
 {
-	map(0x0000, 0x8fff).bankr("mainbank").writeonly().share("videoram");
-	map(0x9000, 0xbfff).ram();
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0x0000, 0x8fff).bankr("mainbank");
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -624,12 +625,9 @@ void spdball_state::main_map(address_map &map)
 
 void blaster_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("mainbank").writeonly().share("videoram");
-	map(0x4000, 0x8fff).bankr("blaster_bankb").writeonly().share("bankb");
-	map(0x9000, 0xbaff).ram();
-	map(0xbb00, 0xbbff).ram().share("blaster_pal0");
-	map(0xbc00, 0xbcff).ram().share("blaster_scan");
-	map(0xbd00, 0xbfff).ram();
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0x0000, 0x3fff).bankr("mainbank");
+	map(0x4000, 0x8fff).bankr("blaster_bankb");
 	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));

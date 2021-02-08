@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER(thepit_state::coin_lockout_w)
 
 WRITE_LINE_MEMBER(thepit_state::sound_enable_w)
 {
-	machine().sound().system_enable(state);
+	machine().sound().system_mute(!state);
 }
 
 WRITE_LINE_MEMBER(thepit_state::nmi_mask_w)
@@ -261,6 +261,14 @@ void thepit_state::dockmanb_main_map(address_map &map)
 	map(0x8800, 0x8bff).ram().w(FUNC(thepit_state::colorram_w)).share("colorram"); // moved here from 0x9400-0x97ff
 	map(0x8c00, 0x8fff).unmaprw();
 	map(0x9400, 0x97ff).unmaprw();
+}
+
+void thepit_state::theportr_main_map(address_map &map)
+{
+	dockmanb_main_map(map);
+
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x87ff).unmaprw();
 }
 
 void thepit_state::audio_map(address_map &map)
@@ -804,6 +812,13 @@ void thepit_state::dockmanb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::dockmanb_main_map);
 }
 
+void thepit_state::theportr(machine_config &config)
+{
+	dockmanb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::theportr_main_map);
+}
+
 void thepit_state::suprmous(machine_config &config)
 {
 	intrepid(config);
@@ -896,6 +911,25 @@ ROM_START( thepitj )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
+ROM_END
+
+ROM_START( thehole ) // uses many components (i.e. the Z80s) marked by SGS, an Italian company.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.6e",  0x0000, 0x1000, CRC(71affecc) SHA1(e64cb2f8d546f5d44dc10a4178f3d211882c45a9) )
+	ROM_LOAD( "2.8e",  0x1000, 0x1000, CRC(894063cd) SHA1(772ff81cf44d21981f9768f017af5cb81ff57be3) )
+	ROM_LOAD( "3.9e",  0x2000, 0x1000, CRC(5b2a28dd) SHA1(a714e81fd71cb1116a210bf49054f8f2765f7807) )
+	ROM_LOAD( "4.10e", 0x3000, 0x1000, CRC(61af8a42) SHA1(7737d16a801ece03051396f224935ce924f28900) )
+	ROM_LOAD( "5.10d", 0x4000, 0x1000, CRC(bc03f14d) SHA1(4424ce00cfb9f6be0f389b03ac52b1e67b7a53fd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6.6d",     0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 ) // chars and sprites
+	ROM_LOAD( "8.3l",     0x0000, 0x0800, CRC(2ff010ca) SHA1(67dfa8ac3f52c7a502ba24d2cbeae932e57b854e) )
+	ROM_LOAD( "7.1l",     0x1000, 0x0800, CRC(d901b353) SHA1(4a35dd857ca352e0260361376fe666af4b3315af) )
+
+	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
+	// no PROMs on PCB according to the dumper, where does the colour come from? They are different from the original
 ROM_END
 
 ROM_START( roundup )
@@ -1203,6 +1237,25 @@ ROM_START( portmanj )
 	ROM_LOAD( "mb7051.3",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) )
 ROM_END
 
+ROM_START( theportr ) // uses many components (i.e. the Z80s) marked by SGS, an Italian company.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pm1.6e",  0x0000, 0x1000, CRC(35a126fc) SHA1(2ad524a8f1cd150b00292cb7672c1d59f3d1ed23) )
+	ROM_LOAD( "pm2.8e",  0x1000, 0x1000, CRC(bfbe90b1) SHA1(6e51924e9e6cff7fd7f07bc231037070f8830f40) )
+	ROM_LOAD( "pm3.9e",  0x2000, 0x1000, CRC(af815b6f) SHA1(24f355a3f773a0371075b72ab8271137e81a853d) )
+	ROM_LOAD( "pm4.10e", 0x3000, 0x1000, CRC(22970128) SHA1(418fa7738160e35f23f11979de795e7d59b0fd35) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pe7.22", 0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "pm6.7d", 0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars and sprites
+	ROM_LOAD( "pm8.3l", 0x0000, 0x1000, CRC(51097dde) SHA1(afaba4ec8612949f0b3dc551f32195e16b74c3dc) )
+	ROM_LOAD( "pm9.1l", 0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
+
+	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
+	// no PROMs on PCB according to the dumper, where does the colour come from? They are different from the original
+ROM_END
+
 ROM_START( suprmous )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sm.1",         0x0000, 0x1000, CRC(9db2b786) SHA1(ece6c267e45e0bfd430b94539737a7f8498273ea) )
@@ -1370,12 +1423,14 @@ GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, empty_init, 
 GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
 GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thehole,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no PROM on PCB. Where do the colours come from?
 
 GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
 GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, theportr,   dockman,  theportr, dockman,  thepit_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no PROM on PCB. Where do the colours come from?
 
 GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
@@ -1392,4 +1447,4 @@ GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, empty_init, 
 
 GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, rtriv,      0,        intrepid, rtriv,    thepit_state, init_rtriv,  ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, rtriv,      0,        intrepid, rtriv,    thepit_state, init_rtriv, ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

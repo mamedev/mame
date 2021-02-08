@@ -19,6 +19,7 @@ TODO:
 - does not work, most likely due to incomplete cpu emulation (unemulated timer registers),
   could also be a bad rom dump on top of that - even when adding IRQ3 with a hack, it
   doesn't do much at all
+- I/O seems very similar to nsnova, can drivers be merged? (get this one working first)
 - is 1988 version the same ROM?
 
 ******************************************************************************/
@@ -54,9 +55,14 @@ private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	optional_device<dac_bit_interface> m_dac;
+	required_device<dac_bit_interface> m_dac;
 
 	void main_map(address_map &map);
+
+	u8 p2_r();
+	void p2_w(u8 data);
+	void p5_w(u8 data);
+	void p6_w(u8 data);
 };
 
 void supremo_state::machine_start()
@@ -69,7 +75,25 @@ void supremo_state::machine_start()
     I/O
 ******************************************************************************/
 
-// ...
+
+u8 supremo_state::p2_r()
+{
+	return 1;
+}
+
+void supremo_state::p2_w(u8 data)
+{
+	// P22: speaker out
+	m_dac->write(BIT(data, 2));
+}
+
+void supremo_state::p5_w(u8 data)
+{
+}
+
+void supremo_state::p6_w(u8 data)
+{
+}
 
 
 
@@ -105,6 +129,10 @@ void supremo_state::supremo(machine_config &config)
 	/* basic machine hardware */
 	HD6303Y(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supremo_state::main_map);
+	m_maincpu->in_p2_cb().set(FUNC(supremo_state::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(supremo_state::p2_w));
+	m_maincpu->out_p5_cb().set(FUNC(supremo_state::p5_w));
+	m_maincpu->out_p6_cb().set(FUNC(supremo_state::p6_w));
 
 	// THIS IS A HACK, vector @ 0xffec, use ROM_COPY
 	//const attotime irq_period = attotime::from_ticks(4 * 128 * 10, 8_MHz_XTAL);

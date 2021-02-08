@@ -8,12 +8,6 @@
 DEFINE_DEVICE_TYPE(SGIKBD_PORT, sgi_keyboard_port_device, "sgikbd", "SGI Keyboard Port")
 
 
-int const device_sgi_keyboard_port_interface::START_BIT_COUNT;
-int const device_sgi_keyboard_port_interface::DATA_BIT_COUNT;
-device_serial_interface::parity_t const device_sgi_keyboard_port_interface::PARITY;
-device_serial_interface::stop_bits_t const device_sgi_keyboard_port_interface::STOP_BITS;
-int const device_sgi_keyboard_port_interface::BAUD;
-
 sgi_keyboard_port_device::sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: sgi_keyboard_port_device(mconfig, SGIKBD_PORT, tag, owner, clock)
 {

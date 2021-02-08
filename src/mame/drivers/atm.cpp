@@ -17,11 +17,13 @@ Not working because of banking issues.
 #include "machine/beta.h"
 
 
-class atm_state : public spectrum_state
+namespace {
+
+class atm_state : public spectrum_128_state
 {
 public:
 	atm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
+		: spectrum_128_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
@@ -32,12 +34,14 @@ public:
 	void atm(machine_config &config);
 	void atmtb2(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	void atm_port_7ffd_w(uint8_t data);
 	uint8_t beta_neutral_r(offs_t offset);
 	uint8_t beta_enable_r(offs_t offset);
 	uint8_t beta_disable_r(offs_t offset);
-	DECLARE_MACHINE_RESET(atm);
 
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
@@ -141,7 +145,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(atm_state,atm)
+void atm_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -194,8 +198,6 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
-
-	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	BETA_DISK(config, m_beta, 0);
 
@@ -253,6 +255,9 @@ ROM_START( atmtb2 )
 	// Char gen rom
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME      FLAGS */
 COMP( 1991, atm,    spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM",        MACHINE_NOT_WORKING)

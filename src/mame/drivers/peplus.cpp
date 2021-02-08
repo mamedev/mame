@@ -240,7 +240,6 @@ public:
 		m_touch_y(*this, "TOUCH_Y"),
 		m_inp_bank(*this, "IN_BANK%u", 1U),
 		m_cmos_ram(*this, "cmos"),
-		m_program_ram(*this, "prograram"),
 		m_s3000_ram(*this, "s3000_ram"),
 		m_s5000_ram(*this, "s5000_ram"),
 		m_videoram(*this, "videoram"),
@@ -287,7 +286,6 @@ private:
 	optional_ioport_array<2> m_inp_bank;
 
 	required_shared_ptr<uint8_t> m_cmos_ram;
-	required_shared_ptr<uint8_t> m_program_ram;
 	required_shared_ptr<uint8_t> m_s3000_ram;
 	required_shared_ptr<uint8_t> m_s5000_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -1027,7 +1025,7 @@ GFXDECODE_END
 
 void peplus_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share(m_program_ram);
+	map(0x0000, 0xffff).rom();
 }
 
 void peplus_state::main_iomap(address_map &map)

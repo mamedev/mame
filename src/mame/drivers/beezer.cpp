@@ -508,7 +508,7 @@ void beezer_state::beezer(machine_config &config)
 	m_sysbank->set_addr_width(15);
 	m_sysbank->set_stride(0x1000);
 
-	VIA6522(config, m_via_system, XTAL(12'000'000) / 12);
+	MOS6522(config, m_via_system, XTAL(12'000'000) / 12);
 	m_via_system->readpa_handler().set(FUNC(beezer_state::via_system_pa_r));
 	m_via_system->readpb_handler().set(FUNC(beezer_state::via_system_pb_r));
 	m_via_system->writepa_handler().set(FUNC(beezer_state::via_system_pa_w));
@@ -537,7 +537,7 @@ void beezer_state::beezer(machine_config &config)
 	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
 	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	VIA6522(config, m_via_audio, XTAL(4'000'000) / 4);
+	MOS6522(config, m_via_audio, XTAL(4'000'000) / 4);
 	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
 	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
 	m_via_audio->writepb_handler().set(FUNC(beezer_state::via_audio_pb_w));

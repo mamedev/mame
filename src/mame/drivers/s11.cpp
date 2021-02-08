@@ -188,7 +188,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s11_state, s11 )
+void s11_state::machine_reset()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -399,7 +399,6 @@ void s11_state::s11(machine_config &config)
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 

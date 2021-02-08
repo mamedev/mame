@@ -1747,7 +1747,7 @@ u16 igs011_state::lhb2_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 			break;
@@ -1882,7 +1882,7 @@ u16 igs011_state::xymg_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;

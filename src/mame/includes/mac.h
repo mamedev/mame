@@ -22,6 +22,7 @@
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
 #include "machine/applefdc.h"
+#include "machine/applefdintf.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/macrtc.h"
@@ -31,6 +32,8 @@
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
+
+#define NEW_SWIM 0
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -72,6 +75,7 @@ public:
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this, "rtc"),
 		m_montype(*this, "MONTYPE"),
 		m_main_buffer(true),
@@ -83,10 +87,11 @@ public:
 	{
 		m_rom_size = 0;
 		m_rom_ptr = nullptr;
+		m_cur_floppy = nullptr;
 	}
 
 	void add_scsi(machine_config &config, bool cdrom = false);
-	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
+	void add_base_devices(machine_config &config, bool rtc = true, int woz_version = 0);
 	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
 	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
 	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
@@ -95,9 +100,9 @@ public:
 	void add_egret(machine_config &config, int type);
 	void add_cuda(machine_config &config, int type);
 
-	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
+	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8, int woz_version = 1);
 	void maciisi(machine_config &config);
-	void maclc2(machine_config &config, bool egret = true);
+	void maclc2(machine_config &config, bool egret = true, int woz_version = 1);
 	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
@@ -112,7 +117,7 @@ public:
 	void maciifx(machine_config &config);
 	void macclas2(machine_config &config);
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
-		bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true);
+		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
 
 	void init_maclc2();
@@ -226,7 +231,13 @@ private:
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
+#if NEW_SWIM
+	required_device<applefdintf_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+#else
 	required_device<applefdc_base_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
+#endif
 	optional_device<rtc3430042_device> m_rtc;
 
 	//required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -386,7 +397,14 @@ private:
 
 	emu_timer *m_scanline_timer;
 
+	floppy_image_device *m_cur_floppy;
+
 	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
+
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macsonora);

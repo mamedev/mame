@@ -25,10 +25,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	static constexpr const unsigned MAXCNT = 15;
 
@@ -137,5 +134,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74193,     "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

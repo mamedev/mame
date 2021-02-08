@@ -451,6 +451,9 @@ void hp9845_base_state::machine_start()
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
+	m_t15->set_name("T15");
+	m_t14->set_name("T14");
+
 	// setup RAM dynamically for -ramsize
 	// 0K..64K
 	setup_ram_block(0 , 0);
@@ -2093,7 +2096,7 @@ uint16_t hp9845c_state::graphic_r(offs_t offset)
 	case 2:
 		// R6: data register with DMA TC
 		m_gv_dma_en = false;
-		// Intentional fall-through
+		[[fallthrough]];
 
 	case 0:
 		// R4: data register
@@ -2785,7 +2788,7 @@ uint16_t hp9845t_state::graphic_r(offs_t offset)
 	case 2:
 		// R6: data register with DMA TC
 		m_gv_dma_en = false;
-		// Intentional fall-through
+		[[fallthrough]];
 
 	case 0:
 		// R4: data register

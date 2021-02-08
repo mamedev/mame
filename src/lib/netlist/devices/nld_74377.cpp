@@ -50,10 +50,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
 
@@ -101,5 +98,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74377_GATE, "TTL_74377_GATE", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

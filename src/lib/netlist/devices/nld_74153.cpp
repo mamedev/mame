@@ -44,10 +44,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	// FIXME: timing is not 100% accurate, Strobe and Select inputs have a
 	//        slightly longer timing .
@@ -107,5 +104,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(74153, "TTL_74153", "+C0,+C1,+C2,+C3,+A,+B,+G,@VCC,@GND")
 
-} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

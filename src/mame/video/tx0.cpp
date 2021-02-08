@@ -8,7 +8,6 @@
 
 #include "emu.h"
 
-#include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
 

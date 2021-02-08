@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98643, bus::hp_dio, dio16_98643_device, "dio98643", "HP98643A LANIC Ethernet card")
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98643_device::device_add_mconfig(machine_config &config)
 {
@@ -213,4 +213,3 @@ void dio16_98643_device::addrmap(address_map &map)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

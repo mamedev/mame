@@ -22,7 +22,7 @@
     multiply and return the full 64 bit result
 -------------------------------------------------*/
 
-/* GCC can do a good job of this. */
+// GCC can do a good job of this.
 
 
 /*-------------------------------------------------
@@ -31,7 +31,7 @@
     result
 -------------------------------------------------*/
 
-/* GCC can do a good job of this */
+// GCC can do a good job of this
 
 
 /*-------------------------------------------------
@@ -40,21 +40,7 @@
     result
 -------------------------------------------------*/
 
-#define mul_32x32_hi _mul_32x32_hi
-static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_hi(int32_t val1, int32_t val2)
-{
-	int32_t result;
-
-	__asm__ (
-		" mulhw  %[result], %[val1], %[val2] \n"
-		: [result] "=r" (result)
-		: [val1]   "%r" (val1)
-		, [val2]   "r"  (val2)
-	);
-
-	return result;
-}
+// GCC can do a good job of this
 
 
 /*-------------------------------------------------
@@ -63,21 +49,7 @@ _mul_32x32_hi(int32_t val1, int32_t val2)
     of the result
 -------------------------------------------------*/
 
-#define mulu_32x32_hi _mulu_32x32_hi
-static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_hi(uint32_t val1, uint32_t val2)
-{
-	uint32_t result;
-
-	__asm__ (
-		" mulhwu  %[result], %[val1], %[val2] \n"
-		: [result] "=r" (result)
-		: [val1]   "%r" (val1)
-		, [val2]   "r"  (val2)
-	);
-
-	return result;
-}
+// GCC can do a good job of this
 
 
 /*-------------------------------------------------
@@ -89,27 +61,22 @@ _mulu_32x32_hi(uint32_t val1, uint32_t val2)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mul_32x32_shift _mul_32x32_shift
-static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+inline int32_t ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
 {
-	int32_t result;
+	uint32_t l, h;
 
-	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
-		" mullw   %[result], %[val1], %[val2]    \n"
-		" mulhw   %[val1], %[val1], %[val2]      \n"
-		" srw     %[result], %[result], %[shift] \n"
-		" subfic  %[shift], %[shift], 0x20       \n"
-		" slw     %[val1], %[val1], %[shift]     \n"
-		" or      %[result], %[result], %[val1]  \n"
-		: [result] "=&r" (result)
-		, [shift]  "+r"  (shift)
-		, [val1]   "+r"  (val1)
-		: [val2]   "r"   (val2)
-		: "xer"
+		" mullw   %[l], %[val1], %[val2] \n"
+		" mulhw   %[h], %[val1], %[val2] \n"
+		: [l]    "=&r" (l)
+		, [h]    "=r"  (h)
+		: [val1] "%r"  (val1)
+		, [val2] "r"   (val2)
 	);
 
-	return result;
+	// Valid for (0 <= shift <= 31)
+	return int32_t((l >> shift) | (h << (32 - shift)));
 }
 #endif
 
@@ -123,27 +90,22 @@ _mul_32x32_shift(int32_t val1, int32_t val2, uint8_t shift)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mulu_32x32_shift _mulu_32x32_shift
-static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
 {
-	uint32_t result;
+	uint32_t l, h;
 
-	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
-		" mullw   %[result], %[val1], %[val2]    \n"
-		" mulhwu  %[val1], %[val1], %[val2]      \n"
-		" srw     %[result], %[result], %[shift] \n"
-		" subfic  %[shift], %[shift], 0x20       \n"
-		" slw     %[val1], %[val1], %[shift]     \n"
-		" or      %[result], %[result], %[val1]  \n"
-		: [result] "=&r" (result)
-		, [shift]  "+r"  (shift)
-		, [val1]   "+r"  (val1)
-		: [val2]   "r"   (val2)
-		: "xer"
+		" mullw   %[l], %[val1], %[val2] \n"
+		" mulhwu  %[h], %[val1], %[val2] \n"
+		: [l]    "=&r" (l)
+		, [h]    "=r"  (h)
+		: [val1] "%r"  (val1)
+		, [val2] "r"   (val2)
 	);
 
-	return result;
+	// Valid for (0 <= shift <= 31)
+	return (l >> shift) | (h << (32 - shift));
 }
 #endif
 
@@ -153,7 +115,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -161,7 +123,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     divide and return the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -170,7 +132,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -179,7 +141,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     and 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -188,7 +150,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     division, and returning the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -197,7 +159,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     division, and returning the 32 bit quotient
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -205,7 +167,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -213,7 +175,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
     divide and return the 32 bit remainder
 -------------------------------------------------*/
 
-/* TBD */
+// TBD
 
 
 /*-------------------------------------------------
@@ -222,7 +184,7 @@ _mulu_32x32_shift(uint32_t val1, uint32_t val2, uint8_t shift)
 -------------------------------------------------*/
 
 #define recip_approx _recip_approx
-static inline float ATTR_CONST ATTR_FORCE_INLINE
+inline float ATTR_CONST ATTR_FORCE_INLINE
 _recip_approx(float value)
 {
 	float result;
@@ -237,6 +199,40 @@ _recip_approx(float value)
 }
 
 
+/*-------------------------------------------------
+    mul_64x64 - perform a signed 64 bit x 64 bit
+    multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#if defined(__ppc64__)
+#define mul_64x64 _mul_64x64
+inline int64_t ATTR_FORCE_INLINE
+_mul_64x64(int64_t a, int64_t b, int64_t &hi)
+{
+	__int128 const r(__int128(a) * b);
+	hi = int64_t(uint64_t((unsigned __int128)r >> 64));
+	return int64_t(uint64_t((unsigned __int128)r));
+}
+#endif
+
+
+/*-------------------------------------------------
+    mulu_64x64 - perform an unsigned 64 bit x 64
+    bit multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#if defined(__ppc64__)
+#define mulu_64x64 _mulu_64x64
+inline uint64_t ATTR_FORCE_INLINE
+_mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
+{
+	unsigned __int128 const r((unsigned __int128)a * b);
+	hi = uint64_t(r >> 64);
+	return uint64_t(r);
+}
+#endif
+
+
 
 /***************************************************************************
     INLINE BIT MANIPULATION FUNCTIONS
@@ -248,15 +244,15 @@ _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_zeros(uint32_t value)
 {
 	uint32_t result;
 
 	__asm__ (
 		" cntlzw  %[result], %[value] \n"
-		: [result] "=r" (result)    /* result can be in any register */
-		: [value]  "r"  (value)     /* 'value' can be in any register */
+		: [result] "=r" (result)
+		: [value]  "r"  (value)
 	);
 
 	return result;
@@ -269,15 +265,15 @@ _count_leading_zeros(uint32_t value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_ones(uint32_t value)
 {
 	uint32_t result;
 
 	__asm__ (
-		" cntlzw  %[result], %[result] \n"
-		: [result] "=r" (result)    /* result can be in any register */
-		: [value]  "r"  (~value)    /* 'value' can be in any register */
+		" cntlzw  %[result], %[value] \n"
+		: [result] "=r" (result)
+		: [value]  "r"  (~value)
 	);
 
 	return result;

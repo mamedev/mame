@@ -311,7 +311,7 @@ void partner_state::bank_switch()
 		m_bank[11]->set_base(rom);
 	else
 		//window 1
-		window_1(12, 0, rom);
+		window_1(11, 0, rom);
 
 	// BANK 13 (0xe800 - 0xffff)
 	switch (m_mem_page)

@@ -12109,7 +12109,7 @@ GAME( 2003, pnyaa,      neogeo,   pnyaa,     neogeo,    mvs_led_state, empty_ini
 GAME( 2003, pnyaaa,     pnyaa,    pnyaa,     neogeo,    mvs_led_state, empty_init, ROT0, "Aiky / Taito", "Pochi and Nyaa (Ver 2.00)", MACHINE_SUPPORTS_SAVE )
 
 // Takara
-GAME( 1995, marukodq,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Takara", "Chibi Marukochan Deluxe Quiz", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, marukodq,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Takara", "Chibi Maruko-chan: Maruko Deluxe Quiz", MACHINE_SUPPORTS_SAVE )
 
 // Technos Japan
 GAME( 1995, doubledr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Technos Japan", "Double Dragon (Neo-Geo)", MACHINE_SUPPORTS_SAVE )

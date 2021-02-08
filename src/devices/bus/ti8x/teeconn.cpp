@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device, "ti8x_tconn", "TI-8x T-connector")
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 tee_connector_device::tee_connector_device(
 		machine_config const &mconfig,
@@ -102,4 +102,4 @@ WRITE_LINE_MEMBER(tee_connector_device::input_ring)
 	m_port_b->ring_w((m_ring_host && m_ring_a) ? 1 : 0);
 }
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x

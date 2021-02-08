@@ -30,6 +30,8 @@ public:
 	virtual void set_floppy(floppy_image_device *floppy) override;
 	virtual floppy_image_device *get_floppy() const override;
 
+	virtual void sync() override;
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

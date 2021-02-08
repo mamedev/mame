@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, hap
+// copyright-holders:Peter Trauner, Wilbert Pol, hap
 /*******************************************************************************
 
 Driver file to handle emulation of the Magnavox Odyssey 2 (stylized Odyssey²),
@@ -22,7 +22,7 @@ Videopac consoles:
 - Radiola Jet 25 (France)
 - Siera Videopac Computer G7000 (France)
 - Schneider Videopac 7000 (Germany)
-- Philips Videopac G7200 (Europe, Videopac with built-in screen)
+- Philips Videopac G7200 (Europe, Videopac with built-in B/W screen)
 - Philips Videojeu N60 (France)
 
 Videopac+ consoles:
@@ -53,30 +53,41 @@ XTAL notes (differs per model):
 
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
-  and writes to the ptr/color registers, but does not increment the Y regs
+  and writes to the ptr/color registers, but does not increment the Y regs.
+  Does it (ab)use an undocumented 8245 feature?
+- g7400 helicopt sometimes locks up at the sea level, timing or IRQ related?
+- volley has a sprite-char collision detection problem, causing the team on the
+  right to never serve the ball. Sprite positions are correct so it's not that,
+  and as seen on videos of other games, transparent pixels don't cause a collision.
 - screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
-- 824x on the real console, overlapping characters on eachother will cause
-  glitches (it is used to an advantage in some as-of-yet undumped homebrews)
-- 8244(NTSC) is not supposed to show characters near the upper border, but
-  hiding them will cause bugs in some Euro games
+- 824x on the real console, overlapping major system characters with eachother
+  (including transparent pixels) will cause glitches and instability, it can even
+  overwrite the VDC color and pointer registers
+  * gunfight: accidental usage, sometimes causes 1-frame glitches near bullet
+  * powerlrd: occurs at pink mountain on the right, it's not 1:1 identical on MAME
+  * several homebrews by Rafael: precisely placed overlap to force character
+    color to change to white, see for example Piggyback Planet and Mean Santa
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
-  be correct
+  be correct. The 8245 is put into slave mode at vblank, timing signals and
+  vblank IRQ are taken over during it (the Videopac pcb even has extra TTL to
+  catch the I/O read from 0xA1 to acknowledge the IRQ)
+  * ppp(the tetris game) does not work properly on PAL, it does look like
+    PAL/NTSC detection is working, see internal RAM $3D d7. So maybe it is due
+    to inaccurate PAL video timing. The game does mid-scanline video updates.
+  * gtwallst turns the display on too soon, the middle scroller is partially
+    visible when it's not supposed to (also a bit glitchy on NTSC but not as bad)
+- g7400 probably has different video timing too (not same as g7000)
+- 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
+  caused by bus conflict or because they write to P2?
 - according to tests, 8244 does not have a sound interrupt, but the Philips
   service test cartridge for 8245 tests for it and fails if it did not get an irq
 - likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
-- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but
-  that is inconsistent with the Philips service test cartridge: It reads X, Y, X,
+- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but that
+  is inconsistent with the Philips service test cartridge: It reads X, Y, X,
   then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
   will also cause video glitches to look different on some games when compared
   to the real console, for example powerlrd.
-- ppp(the tetris game) does not work properly on PAL, it does look like PAL/NTSC
-  detection is working, see internal RAM $3D d7. So maybe it is due to inaccurate
-  PAL video timing. The game does mid-scanline video updates.
-- g7400 probably has different video timing too (not same as g7000)
-- g7400 helicopt sometimes locks up at the sea level, timing related?
-- 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
-  caused by bus conflict or because they write to P2?
 - verify odyssey3 cpu/video clocks
 - problems with natural keyboard: videopacp has two enter keys, odyssey3 has
   alternate inputs for -, =, +
@@ -87,6 +98,8 @@ TODO:
 
 BTANB:
 - a lot of PAL games have problems on NTSC (the other way around, not so much)
+  * most-common cause is due to shorter vblank, less time to prepare frame
+  * characters are not rendered near upper border on 8244 (eg. tutank, chezmxme)
 - g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
   placed lower on odyssey3
 - Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine
@@ -122,10 +135,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_cart(*this, "cartslot"),
 		m_keyboard(*this, "KEY.%u", 0),
 		m_joysticks(*this, "JOY.%u", 0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(palette_changed) { adjust_palette(); }
 
 	// Reset button is tied to 8048 RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
@@ -140,21 +156,15 @@ protected:
 	required_device<i8048_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<o2_cart_slot_device> m_cart;
-
-	u8 m_ram[0x80];
-	u8 m_p1 = 0xff;
-	u8 m_p2 = 0xff;
-
-	DECLARE_READ_LINE_MEMBER(t1_read);
-
-	void odyssey2_io(address_map &map);
-	void odyssey2_mem(address_map &map);
-
-	virtual void machine_start() override;
-
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void adjust_palette();
 
 	virtual u8 io_read(offs_t offset);
 	virtual void io_write(offs_t offset, u8 data);
@@ -162,6 +172,14 @@ protected:
 	void p1_write(u8 data);
 	u8 p2_read();
 	void p2_write(u8 data);
+	DECLARE_READ_LINE_MEMBER(t1_read);
+
+	void odyssey2_io(address_map &map);
+	void odyssey2_mem(address_map &map);
+
+	u8 m_ram[0x80];
+	u8 m_p1 = 0xff;
+	u8 m_p2 = 0xff;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -214,6 +232,11 @@ void odyssey2_state::machine_start()
 	save_item(NAME(m_p2));
 }
 
+void odyssey2_state::machine_reset()
+{
+	adjust_palette();
+}
+
 void vpp_state::machine_start()
 {
 	odyssey2_state::machine_start();
@@ -258,6 +281,14 @@ void odyssey2_state::odyssey2_palette(palette_device &palette) const
 	palette.set_pen_colors(0, odyssey2_colors);
 }
 
+void odyssey2_state::adjust_palette()
+{
+	// JO7400 has an RGB port, on other consoles it's an optional homebrew modification
+	if (ioport("CONF")->read() & 1)
+		m_i8244->i8244_palette(*m_palette);
+	else
+		odyssey2_palette(*m_palette);
+}
 
 u32 odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -321,12 +352,17 @@ u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
     I/O
 ******************************************************************************/
 
+// 8048 ports
+
 u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
+
+	// P14, A7: RAM _CS
 	if (!(m_p1 & 0x10) && ~offset & 0x80)
 		data &= m_ram[offset];
 
+	// P13: 824x _CS, 824x RD is only enabled if P16 is low
 	if ((m_p1 & 0x48) == 0)
 		data &= m_i8244->read(offset);
 
@@ -335,6 +371,7 @@ u8 odyssey2_state::io_read(offs_t offset)
 
 void odyssey2_state::io_write(offs_t offset, u8 data)
 {
+	// external write is only enabled if P16 is low
 	if (!(m_p1 & 0x40))
 	{
 		m_cart->io_write(offset, data);
@@ -345,9 +382,6 @@ void odyssey2_state::io_write(offs_t offset, u8 data)
 	if (!(m_p1 & 0x08))
 		m_i8244->write(offset, data);
 }
-
-
-// 8048 ports
 
 void odyssey2_state::p1_write(u8 data)
 {
@@ -365,6 +399,7 @@ u8 odyssey2_state::p2_read()
 
 	if (!(m_p1 & 0x04))
 	{
+		// P12: 74156 keyboard decoder enable, 74156 inputs from P20-P22
 		// 74148 priority encoder, GS to P24, outputs to P25-P27
 		u8 inp = count_leading_zeros(m_keyboard[m_p2 & 0x07]->read()) - 24;
 		if (inp < 8)
@@ -382,8 +417,9 @@ void odyssey2_state::p2_write(u8 data)
 
 u8 odyssey2_state::bus_read()
 {
-	u8 data = 0xff;
+	u8 data = m_cart->bus_read();
 
+	// same chip as keyboard
 	if (!(m_p1 & 0x04))
 	{
 		u8 sel = m_p2 & 0x07;
@@ -440,7 +476,7 @@ void vpp_state::i8243_port_w(u8 data)
 	// P4,P5: color mix I8244 side (IC674)
 	// P6,P7: color mix EF9340 side (IC678)
 	u8 mask = 0xf;
-	if (~P & 1)
+	if constexpr (~P & 1)
 	{
 		data <<= 4;
 		mask <<= 4;
@@ -448,7 +484,7 @@ void vpp_state::i8243_port_w(u8 data)
 
 	m_screen->update_now();
 
-	if (P & 2)
+	if constexpr ((P & 2) != 0)
 		m_mix_i8244 = (m_mix_i8244 & ~mask) | (data & mask);
 	else
 		m_mix_ef934x = (m_mix_ef934x & ~mask) | (data & mask);
@@ -569,15 +605,7 @@ static INPUT_PORTS_START( o2 )
 	PORT_START("KEY.7")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("JOY.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_PLAYER(2)
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("JOY.1")
+	PORT_START("JOY.0") // left
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_PLAYER(1)
@@ -585,8 +613,21 @@ static INPUT_PORTS_START( o2 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_PLAYER(1)
 	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
+	PORT_START("JOY.1") // right
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)   PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_PLAYER(2)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, reset_button, 0)
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x00, "Color Output" ) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, palette_changed, 0)
+	PORT_CONFSETTING(    0x00, "RF" )
+	PORT_CONFSETTING(    0x01, "RGB" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vpp )
@@ -716,7 +757,8 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->bus_out_cb().set(m_cart, FUNC(o2_cart_slot_device::bus_write));
+	m_maincpu->t0_in_cb().set(m_cart, FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
 	/* video hardware */
@@ -731,7 +773,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -749,7 +791,7 @@ void odyssey2_state::videopac(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
@@ -776,7 +818,8 @@ void vpp_state::g7400(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(vpp_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(vpp_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(vpp_state::bus_read));
-	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->bus_out_cb().set(m_cart, FUNC(o2_cart_slot_device::bus_write));
+	m_maincpu->t0_in_cb().set(m_cart, FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(vpp_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
@@ -786,7 +829,7 @@ void vpp_state::g7400(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", m_i8244, FUNC(i8244_device::i8244_palette), 16);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(vpp_state::i8243_port_w<0>));
@@ -803,7 +846,7 @@ void vpp_state::g7400(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -830,15 +873,12 @@ void vpp_state::odyssey3(machine_config &config)
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
-	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	m_ef934x->set_clock(7.15909_MHz_XTAL / 2);
 	m_ef934x->set_offsets(15, 15);
 
 	m_maincpu->set_clock((7.15909_MHz_XTAL * 3) / 4);
-
-	// same color encoder as O2 (no RGB port)
-	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	subdevice<software_list_device>("cart_list")->set_filter("O3");
 }
@@ -850,28 +890,28 @@ void vpp_state::odyssey3(machine_config &config)
 ******************************************************************************/
 
 ROM_START (videopac)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (odyssey2)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
 ROM_START (videopacf)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("c52.rom", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e))
 ROM_END
 
 
 ROM_START (videopacp)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("g7400.bin", 0x0000, 0x0400, CRC(e20a9f41) SHA1(5130243429b40b01a14e1304d0394b8459a6fbae))
 ROM_END
 
 ROM_START (jopac)
-	ROM_REGION(0x0400,"maincpu",0)
+	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
 ROM_END
 
