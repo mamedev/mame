@@ -101,7 +101,7 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 
 #include "emu.h"
 
-#define NEW_IWM 1
+#define NEW_IWM 0
 
 #include "machine/macrtc.h"
 

@@ -219,7 +219,7 @@ u8 iwm_device::control(int offset, u8 data)
 			m_rw = MODE_IDLE;
 	}
 
-	if(1) {
+	if(0) {
 		u8 s = m_control & 0xc0;
 		const char *slot = "?";
 		if(s == 0x00 && !m_active)
@@ -388,7 +388,6 @@ void iwm_device::sync()
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {
 						m_data = m_rsh;
-						logerror("%s %010d DATAR2 %s %02x\n", cycles_to_time(m_last_sync).to_string(), m_last_sync, m_floppy->tag(), m_data);
 						m_rsh = 0;
 					} else if(m_rsh >= 0x04) {
 						m_data = m_rsh;
@@ -399,7 +398,7 @@ void iwm_device::sync()
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
 					m_async_update = 0;
-					logerror("%s %010d DATAR %s %02x\n", cycles_to_time(m_last_sync).to_string(), m_last_sync, m_floppy->tag(), m_data);
+					//					logerror("%s %010d DATAR %s %02x\n", cycles_to_time(m_last_sync).to_string(), m_last_sync, m_floppy->tag(), m_data);
 					m_rsh = 0;
 				}
 				break;

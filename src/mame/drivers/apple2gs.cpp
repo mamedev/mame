@@ -53,7 +53,7 @@
 
 #define RUN_ADB_MICRO (0)
 #define LOG_ADB (0)
-#define NEW_IWM (1)
+#define NEW_IWM (0)
 
 #include "screen.h"
 #include "softlist.h"
@@ -726,7 +726,7 @@ private:
 		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
-		if(0) m_maincpu->adjust_icount(-cycles);	\
+		m_maincpu->adjust_icount(-cycles); \
 	} \
 }
 
