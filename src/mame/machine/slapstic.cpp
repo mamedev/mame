@@ -758,6 +758,7 @@ void atari_slapstic_device::device_start()
 	/* save state */
 	save_item(NAME(m_current_bank));
 	save_item(NAME(m_loaded_bank));
+	save_item(NAME(m_saved_state));
 
 	/* Address space tap installation */
 	if(m_space->data_width() == 16)
