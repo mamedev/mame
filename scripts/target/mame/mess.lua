@@ -2603,6 +2603,8 @@ files {
 	MAME_DIR .. "src/mame/machine/hp9845_printer.h",
 	MAME_DIR .. "src/mame/machine/hp98x5_io_sys.cpp",
 	MAME_DIR .. "src/mame/machine/hp98x5_io_sys.h",
+	MAME_DIR .. "src/mame/machine/hp_ipc_optrom.cpp",
+	MAME_DIR .. "src/mame/machine/hp_ipc_optrom.h",
 	MAME_DIR .. "src/mame/video/hp48.cpp",
 	MAME_DIR .. "src/mame/drivers/hp49gp.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9845.cpp",
