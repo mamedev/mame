@@ -18,27 +18,12 @@ TODO:
 #include "machine/fidel_clockdiv.h"
 
 
-// machine start/reset
+// machine start
 
 void fidel_clockdiv_state::machine_start()
 {
-	// zerofill
-	m_div_config = 0;
-	m_read_tap = nullptr;
-	m_write_tap = nullptr;
-
-	// register for savestates
-	save_item(NAME(m_div_status));
-	save_item(NAME(m_div_config));
-	save_item(NAME(m_div_scale));
-
 	// dummy timer for cpu divider
 	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(), this);
-}
-
-void fidel_clockdiv_state::machine_reset()
-{
-	div_refresh();
 }
 
 
@@ -89,8 +74,7 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 
 	m_maincpu->set_clock_scale(1.0);
 	m_div_status = ~0;
-	m_div_config = val;
-	m_div_scale = (m_div_config & 1) ? 0.25 : 0.5;
+	m_div_scale = (val & 1) ? 0.25 : 0.5;
 
 	// stop high frequency background timer if cpu divider is disabled
 	attotime period = (val) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
@@ -105,7 +89,7 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 		m_write_tap = nullptr;
 	}
 
-	if (m_div_config)
+	if (val)
 	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 
