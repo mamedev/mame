@@ -2,17 +2,22 @@
 // copyright-holders:Nathan Woods
 NMI:
 	m_nmi_asserted = false;
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_NMI);
-	eat(1);
 	standard_irq_callback(INPUT_LINE_NMI);
 	goto INTERRUPT_VECTOR;
 
 FIRQ:
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	if (firq_saves_entire_state())
 	{
 		m_cc |= CC_E;
@@ -27,25 +32,27 @@ FIRQ:
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_FIRQ);
-	eat(1);
 	standard_irq_callback(M6809_FIRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 IRQ:
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 	m_cc |= CC_I;
 	set_ea(VECTOR_IRQ);
-	eat(1);
 	standard_irq_callback(M6809_IRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 INTERRUPT_VECTOR:
-	@eat(4);
+	@dummy_vma(1);
 	@m_pc.b.h = read_operand(0);	// Not sure if this is cycle exact
 	@m_pc.b.l = read_operand(1);	// Not sure if this is cycle exact
+	@dummy_vma(1);
 	return;
 
 NEG8:
@@ -406,7 +413,7 @@ SYNC:
 	// SYNC stops processing instructions until an interrupt request happens.
 	// This doesn't require the corresponding interrupt to be enabled: if it
 	// is disabled, execution continues with the next instruction.
-	eat(3);
+	@dummy_read_opcode_arg(0);
 
 	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
 	{
@@ -439,7 +446,10 @@ ORCC:
 
 ANDCC:
 	m_cc &= read_operand();
-	eat(1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 SEX:
@@ -506,7 +516,7 @@ GOTO_SUBROUTINE:
 RTS:
 	m_temp.w = 0x80;	// RTS is equivalent to "PULS PC"
 	if(!hd6309_native_mode()) {
-		@dummy_vma(1);
+		@dummy_read_opcode_arg(0);
 		;
     }
 	set_regop16(m_s);
@@ -528,6 +538,7 @@ MUL:
 	return;
 
 RTI:
+	@dummy_read_opcode_arg(0);
 	set_regop16(m_s);
 	m_temp.w = 0x01;	// PULS CC
 	%PULL_REGISTERS;
@@ -587,25 +598,33 @@ LEA_us:
 
 PSHS:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 2 : 3);
+	@dummy_vma(2);
 	set_regop16(m_s);
+	if(!hd6309_native_mode() {
+		@(void)read_memory(regop16().w);
+		;
+    }
 	goto PUSH_REGISTERS;
 
 PULS:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 1 : 2);
+	@dummy_vma(hd6309_native_mode() ? 1 : 2);
 	set_regop16(m_s);
 	goto PULL_REGISTERS;
 
 PSHU:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 2 : 3);
+	@dummy_vma(2);
 	set_regop16(m_u);
+	if(!hd6309_native_mode() {
+		@(void)read_memory(regop16().w);
+		;
+    }
 	goto PUSH_REGISTERS;
 
 PULU:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 1 : 2);
+	@dummy_vma(hd6309_native_mode() ? 1 : 2);
 	set_regop16(m_u);
 	goto PULL_REGISTERS;
 
@@ -617,6 +636,8 @@ SWI:
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	goto INTERRUPT_VECTOR;
@@ -636,6 +657,8 @@ SOFTWARE_INTERRUPT:
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	%PUSH_REGISTERS;
 	goto INTERRUPT_VECTOR;
 
@@ -650,5 +673,8 @@ DIRECT:
 EXTENDED:
 	@set_ea_h(read_opcode_arg());
 	@set_ea_l(read_opcode_arg());
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	return;

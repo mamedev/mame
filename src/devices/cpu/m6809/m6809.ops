@@ -434,7 +434,7 @@ PULL_REGISTERS:
 		@m_pc.b.l = read_memory(regop16().w++);
 		nop();
 	}
-	@eat(1);
+	@(void)read_memory(regop16().w);
 	return;
 
 INDEXED:
@@ -506,22 +506,22 @@ INDEXED:
 				@m_temp.b.h = read_opcode_arg();
 				@m_temp.b.l = read_opcode_arg();
 				m_temp.w = ireg() + m_temp.w;
-				@dummy_read_opcode_arg(0);
-				@dummy_vma(2);
+				@dummy_vma(3);
 				break;
 
 			case 0x0B: case 0x2B: case 0x4B: case 0x6B:
 			case 0x1B: case 0x3B: case 0x5B: case 0x7B:
 				m_temp.w = ireg() + m_q.r.d;
 				@dummy_read_opcode_arg(0);
-				@dummy_vma(4);
+				@dummy_read_opcode_arg(1);
+				@dummy_vma(3);
 				break;
 
 			case 0x0C: case 0x2C: case 0x4C: case 0x6C:
 			case 0x1C: case 0x3C: case 0x5C: case 0x7C:
 				@m_temp.b.l = read_opcode_arg();
 				m_temp.w = m_pc.w + (int8_t) m_temp.b.l;
-				@dummy_read_opcode_arg(0);
+				@dummy_vma(1);
 				break;
 
 			case 0x0D: case 0x2D: case 0x4D: case 0x6D:
@@ -529,15 +529,14 @@ INDEXED:
 				@m_temp.b.h = read_opcode_arg();
 				@m_temp.b.l = read_opcode_arg();
 				m_temp.w = m_pc.w + (int16_t) m_temp.w;
-				@dummy_read_opcode_arg(0);
-				@dummy_vma(3);
+				@dummy_vma(4);
 				break;
 
 			case 0x0F: case 0x2F: case 0x4F: case 0x6F:
 			case 0x1F: case 0x3F: case 0x5F: case 0x7F:
 				@m_temp.b.h = read_opcode_arg();
 				@m_temp.b.l = read_opcode_arg();
-				@dummy_read_opcode_arg(0);
+				@dummy_vma(1);
 				break;
 
 			default:
@@ -551,7 +550,7 @@ INDEXED:
 			set_ea(m_temp.w);
 			@m_temp.b.h = read_operand(0);
 			@m_temp.b.l = read_operand(1);
-			eat(1);
+			@dummy_vma(1);
 		}
 	}
 	else
@@ -573,7 +572,7 @@ EXG:
 		write_exgtfr_register(param >> 4, reg2);
 		write_exgtfr_register(param >> 0, reg1);
 	}
-	eat(hd6309_native_mode() ? 3 : 6);
+	@dummy_vma(hd6309_native_mode() ? 3 : 6);
 	return;
 
 TFR:
@@ -585,7 +584,7 @@ TFR:
 			m_lds_encountered = true;
 		}
 	}
-	eat(hd6309_native_mode() ? 2 : 4);
+	@dummy_vma(hd6309_native_mode() ? 2 : 4);
 	return;
 
 ILLEGAL:
