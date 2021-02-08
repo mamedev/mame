@@ -600,7 +600,7 @@ PSHS:
 	@m_temp.w = read_opcode_arg();
 	@dummy_vma(2);
 	set_regop16(m_s);
-	if(!hd6309_native_mode() {
+	if(!hd6309_native_mode()) {
 		@(void)read_memory(regop16().w);
 		;
     }
@@ -616,7 +616,7 @@ PSHU:
 	@m_temp.w = read_opcode_arg();
 	@dummy_vma(2);
 	set_regop16(m_u);
-	if(!hd6309_native_mode() {
+	if(!hd6309_native_mode()) {
 		@(void)read_memory(regop16().w);
 		;
     }

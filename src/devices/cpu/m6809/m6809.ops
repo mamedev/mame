@@ -551,6 +551,7 @@ INDEXED:
 			@m_temp.b.h = read_operand(0);
 			@m_temp.b.l = read_operand(1);
 			@dummy_vma(1);
+			;
 		}
 	}
 	else
