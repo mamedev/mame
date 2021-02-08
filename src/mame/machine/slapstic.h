@@ -53,6 +53,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 private:
 	struct mask_value {
@@ -135,6 +137,7 @@ private:
 		virtual ~state() = default;
 
 		virtual void test(offs_t addr) const = 0;
+		virtual u8 state_id() const = 0;
 	};
 
 	struct idle : public state {
@@ -142,6 +145,7 @@ private:
 
 		idle(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct active_101_102 : public state {
@@ -149,6 +153,7 @@ private:
 
 		active_101_102(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct active_103_110 : public state {
@@ -156,6 +161,7 @@ private:
 
 		active_103_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct active_111_118 : public state {
@@ -163,6 +169,7 @@ private:
 
 		active_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_valid_101_102 : public state {
@@ -170,6 +177,7 @@ private:
 
 		alt_valid_101_102(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_valid_103_110 : public state {
@@ -177,6 +185,7 @@ private:
 
 		alt_valid_103_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_valid_111_118 : public state {
@@ -184,6 +193,7 @@ private:
 
 		alt_valid_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_select_101_110 : public state {
@@ -192,6 +202,7 @@ private:
 
 		alt_select_101_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, int shift);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_select_111_118 : public state {
@@ -200,6 +211,7 @@ private:
 
 		alt_select_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, int shift);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct alt_commit : public state {
@@ -207,6 +219,7 @@ private:
 
 		alt_commit(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct bit_load : public state {
@@ -214,6 +227,7 @@ private:
 
 		bit_load(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct bit_set : public state {
@@ -222,6 +236,7 @@ private:
 
 		bit_set(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, bool odd);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct add_load : public state {
@@ -229,6 +244,7 @@ private:
 
 		add_load(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 	struct add_set : public state {
@@ -236,6 +252,7 @@ private:
 
 		add_set(atari_slapstic_device *sl, const checker &check, const slapstic_data *data);
 		virtual void test(offs_t addr) const override;
+		virtual u8 state_id() const override;
 	};
 
 
@@ -262,6 +279,9 @@ private:
 	std::unique_ptr<state> m_s_add_set;
 
 	const state *m_state;
+
+	enum { S_IDLE, S_ACTIVE, S_ALT_VALID, S_ALT_SELECT, S_ALT_COMMIT, S_BIT_LOAD, S_BIT_SET_ODD, S_BIT_SET_EVEN, S_ADD_LOAD, S_ADD_SET };
+	u8 m_saved_state;
 
 	u8 m_current_bank;
 	u8 m_loaded_bank;

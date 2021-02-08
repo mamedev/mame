@@ -211,6 +211,7 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 	m_start(0),
 	m_end(0),
 	m_mirror(0),
+	m_saved_state(S_IDLE),
 	m_current_bank(0),
 	m_loaded_bank(0)
 {
@@ -1253,5 +1254,44 @@ void atari_slapstic_device::add_set::test(offs_t addr) const
 	} else if(m_end(addr)) {
 		m_sl->logerror("add end (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_alt_commit.get();
+	}
+}
+
+
+// state saving management
+
+void atari_slapstic_device::device_pre_save()
+{
+	m_saved_state = m_state->state_id();
+}
+
+u8 atari_slapstic_device::idle              ::state_id() const { return S_IDLE; }
+u8 atari_slapstic_device::active_101_102    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::active_103_110    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::active_111_118    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::alt_valid_101_102 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_valid_103_110 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_valid_111_118 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_select_101_110::state_id() const { return S_ALT_SELECT; }
+u8 atari_slapstic_device::alt_select_111_118::state_id() const { return S_ALT_SELECT; }
+u8 atari_slapstic_device::alt_commit        ::state_id() const { return S_ALT_COMMIT; }
+u8 atari_slapstic_device::bit_load          ::state_id() const { return S_BIT_LOAD; }
+u8 atari_slapstic_device::bit_set           ::state_id() const { return m_is_odd ? S_BIT_SET_ODD : S_BIT_SET_EVEN; }
+u8 atari_slapstic_device::add_load          ::state_id() const { return S_ADD_LOAD; }
+u8 atari_slapstic_device::add_set           ::state_id() const { return S_ADD_SET; }
+
+void atari_slapstic_device::device_post_load()
+{
+	switch(m_saved_state) {
+	case S_IDLE:         m_state = m_s_idle.get(); break;
+	case S_ACTIVE:       m_state = m_s_active.get(); break;
+	case S_ALT_VALID:    m_state = m_s_alt_valid.get(); break;
+	case S_ALT_SELECT:   m_state = m_s_alt_select.get(); break;
+	case S_ALT_COMMIT:   m_state = m_s_alt_commit.get(); break;
+	case S_BIT_LOAD:     m_state = m_s_bit_load.get(); break;
+	case S_BIT_SET_ODD:  m_state = m_s_bit_set_odd.get(); break;
+	case S_BIT_SET_EVEN: m_state = m_s_bit_set_even.get(); break;
+	case S_ADD_LOAD:     m_state = m_s_add_load.get(); break;
+	case S_ADD_SET:      m_state = m_s_add_set.get(); break;
 	}
 }
