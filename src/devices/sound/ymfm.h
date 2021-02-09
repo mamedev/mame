@@ -77,7 +77,7 @@
 //*********************************************************
 
 // turn this on to output all key on events
-#define LOG_KEY_ONS (1)
+#define LOG_KEY_ONS (0)
 
 
 
