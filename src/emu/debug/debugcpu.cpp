@@ -825,6 +825,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (debugcpu.memory_modified())
 			{
 				machine.debug_view().update_all(DVT_DISASSEMBLY);
+				machine.debug_view().update_all(DVT_STATE);
 				machine.debugger().refresh_display();
 			}
 
