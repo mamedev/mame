@@ -1,12 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Berger
+// thanks-to:Berger, bataais
 /******************************************************************************
 
-Novag Super Nova (model 904)
+Novag Super Nova & related chess computers. I believe the series started with
+Primo. The chess engine is by David Kittinger.
 
-The chess engine is by David Kittinger. Older versions of the program have a bug
-in the opening moves, always playing B5 after D4.
+TODO:
+- remove timer hack for supremo (missing extra timer emulation in MCU core)
+- NMI on power-off switch, it sets 0x14 bit 7 for standby power (see below)
+- add nvram, MCU is missing standby power emulation
+- beeps are glitchy, as if interrupted for too long
+- nsnova serial port isn't working, MCU emulation problem?
+- nsnova unmapped reads from 0x33/0x34
+- is the 1988 version of supremo the same ROM?
+
+===============================================================================
+
+Novag Super Nova (model 904)
+----------------------------
 
 Hardware notes:
 - Hitachi HD63A03YP MCU @ 16MHz (4MHz internal)
@@ -15,12 +27,21 @@ Hardware notes:
 - RJ-12 port for Novag Super System (like the one in sexpertc)
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
-TODO:
-- NMI on power-off switch, it sets 0x14 bit 7 for standby power (see below)
-- add nvram, MCU is missing standby power emulation
-- beeps are glitchy, as if interrupted for too long
-- rs232 port isn't working?
-- unmapped reads from 0x33/0x34
+Older versions had a bug in the opening moves, always playing B5 after D4.
+
+===============================================================================
+
+Novag Supremo (model 881)
+----------------------------
+
+Hardware notes:
+- Hitachi HD63A03YP MCU @ 8MHz (2MHz internal)
+- 32KB ROM(TC57256AD-12), 2KB RAM(TC5516APL)
+- LCD with 4 digits and custom segments, no LCD chip
+- buzzer, 16 LEDs, 8*8 chessboard buttons
+
+Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
+instead of black, otherwise it's the same game.
 
 ******************************************************************************/
 
@@ -58,6 +79,7 @@ public:
 
 	// machine configs
 	void snova(machine_config &config);
+	void supremo(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -69,11 +91,12 @@ private:
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<dac_bit_interface> m_dac;
-	required_device<rs232_port_device> m_rs232;
+	optional_device<rs232_port_device> m_rs232;
 	required_ioport_array<2> m_inputs;
 	output_finder<4, 10> m_out_lcd;
 
-	void main_map(address_map &map);
+	void snova_map(address_map &map);
+	void supremo_map(address_map &map);
 
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_leds();
@@ -137,7 +160,10 @@ u8 snova_state::p2_r()
 			data |= BIT(m_inputs[i]->read(), m_inp_mux);
 
 	// P23: serial rx
-	return (data ^ 1) | (m_rs232->rxd_r() << 3);
+	if (m_rs232)
+		data |= m_rs232->rxd_r() << 3;
+
+	return data ^ 1;
 }
 
 void snova_state::p2_w(u8 data)
@@ -154,7 +180,8 @@ void snova_state::p2_w(u8 data)
 	m_dac->write(BIT(data, 2));
 
 	// P24: serial tx
-	m_rs232->write_txd(BIT(~data, 4));
+	if (m_rs232)
+		m_rs232->write_txd(BIT(~data, 4));
 
 	// P25-P27: 4051 S1-S2
 	// 4051 Y0-Y7: multiplexed inputs
@@ -183,12 +210,18 @@ void snova_state::p6_w(u8 data)
     Address Maps
 ******************************************************************************/
 
-void snova_state::main_map(address_map &map)
+void snova_state::supremo_map(address_map &map)
 {
 	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0040, 0x013f).ram(); // internal
-	map(0x4000, 0x5fff).ram();
+	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();
+}
+
+void snova_state::snova_map(address_map &map)
+{
+	supremo_map(map);
+	map(0x4000, 0x5fff).ram();
 }
 
 
@@ -229,7 +262,7 @@ void snova_state::snova(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6303Y(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
 	m_maincpu->in_p2_cb().set(FUNC(snova_state::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(snova_state::p2_w));
 	m_maincpu->out_p5_cb().set(FUNC(snova_state::p5_w));
@@ -259,6 +292,21 @@ void snova_state::snova(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
+void snova_state::supremo(machine_config &config)
+{
+	snova(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
+
+	// THIS IS A HACK, vector @ 0xffec, use ROM_COPY
+	const attotime irq_period = attotime::from_ticks(4 * 128 * 11, 8_MHz_XTAL);
+	m_maincpu->set_periodic_int(FUNC(snova_state::irq0_line_hold), irq_period);
+
+	config.device_remove("rs232");
+}
+
 
 
 /******************************************************************************
@@ -268,6 +316,16 @@ void snova_state::snova(machine_config &config)
 ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("n_530.u5", 0x8000, 0x8000, CRC(727a0ada) SHA1(129c1edc5c1d2e12ce97ebef81c6d5555464a11d) )
+
+	ROM_REGION( 50926, "screen", 0 )
+	ROM_LOAD("nsnova.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
+ROM_END
+
+ROM_START( supremo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
+
+	ROM_COPY("maincpu", 0xffec, 0xfff8, 2) // HACK
 
 	ROM_REGION( 50926, "screen", 0 )
 	ROM_LOAD("nsnova.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )
@@ -284,3 +342,4 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1990, nsnova, 0,      0,      snova,  snova, snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1990, supremo, 0,      0,      supremo,  snova, snova_state, empty_init, "Novag", "Supremo - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )

@@ -3179,7 +3179,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_snova.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_supremo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "novation")
