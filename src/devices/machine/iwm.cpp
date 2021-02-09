@@ -130,7 +130,7 @@ void iwm_device::write(offs_t offset, u8 data)
 
 void iwm_device::flush_write()
 {
-	if(m_floppy && m_last_sync > m_flux_write_start) {
+	if(m_floppy && m_flux_write_start && m_last_sync > m_flux_write_start) {
 		if(m_flux_write_count && m_flux_write[m_flux_write_count-1] == m_last_sync)
 			m_flux_write_count--;
 		attotime start = cycles_to_time(m_flux_write_start);
@@ -139,9 +139,9 @@ void iwm_device::flush_write()
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
+		m_flux_write_start = m_last_sync;
 	}
 	m_flux_write_count = 0;
-	m_flux_write_start = m_last_sync;
 }
 
 u8 iwm_device::control(int offset, u8 data)
@@ -176,6 +176,7 @@ u8 iwm_device::control(int offset, u8 data)
 		} else {
 			if(m_mode & 0x04) {
 				flush_write();
+				m_flux_write_start = 0;
 				m_active = MODE_IDLE;
 				m_status &= ~0x20;
 				m_whd &= ~0x40;
@@ -191,8 +192,10 @@ u8 iwm_device::control(int offset, u8 data)
 
 	if(changed & 0xd0) {
 		if((m_control & 0xc0) == 0x00 && m_active) {
-			if(m_rw == MODE_WRITE)
+			if(m_rw == MODE_WRITE) {
 				flush_write();
+				m_flux_write_start = 0;
+			}
 			m_rw = MODE_READ;
 			m_rw_state = S_IDLE;
 			m_next_state_change = 0;
@@ -213,6 +216,7 @@ u8 iwm_device::control(int offset, u8 data)
 		} else if(m_rw == MODE_WRITE) {
 			if(!(m_control & 0x80)) {
 				flush_write();
+				m_flux_write_start = 0;
 				m_rw = MODE_IDLE;
 			}
 		} else
