@@ -75,11 +75,28 @@ ROM_START( jsc_spid )
 	ROM_LOAD16_WORD_SWAP( "sharpcookiespiderman.bin", 0x000000, 0x200000, CRC(84cf58bf) SHA1(ac0be079c2469c9c0dea3decd7a7318806cc7ac0) )
 ROM_END
 
+ROM_START( jsc_gdg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "shckdiego.bin", 0x000000, 0x200000, CRC(8069147a) SHA1(3f90dd3deff89d7d66b4f14b6246c2bf63c44586) )
+ROM_END
+
+ROM_START( jsc_dora )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "shckdora.bin", 0x000000, 0x200000, CRC(4a973046) SHA1(13b38b5db23169731ebf1a4657d95e34fc88b9b8) )
+ROM_END
+
+
+
 // has UK specific voice actors, US versions on YouTube have different voices not present in this set
 CONS( 2007, jsc_thom, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "Thomas & Friends - Learning Circus Express (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, jsc_spid, 0, 0, base_config,         jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "The Amazing Spider-Man - Great Math Caper (Sharp Cookie) (NTSC, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// from a UK unit but still says 'Zee' instead of 'Zed' for 'Z'  This does not appear to be controlled by a PAL/NTSC flag in the inputs.
+CONS( 2007, jsc_gdg,  0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "Go Diego Go! - Aztec ABC Adventure (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, jsc_dora, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Handheld Games",        "Dora the Explorer - Dora Saves the Mermaids (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // Scooby-Doo! - The Pirate's Puzzles
-// Go Diego Go - Aztec ABC Adventure
-// Dora the Explorer - Dora Saves the Mermaids
+// 
+// 

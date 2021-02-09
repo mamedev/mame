@@ -61,6 +61,8 @@ public:
 		, m_ps88(*this, "ps88")
 		, m_digits(*this, "digit%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
+		, m_timer_irq_active(false)
+		, m_pia_irq_active(false)
 		{ }
 
 	void s11(machine_config &config);

@@ -158,15 +158,17 @@
 #include "emu.h"
 #include "includes/hh_tms1k.h"
 
-#include "machine/tms1024.h"
 #include "machine/clock.h"
+#include "machine/ds8874.h"
 #include "machine/timer.h"
+#include "machine/tms1024.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -2779,8 +2781,12 @@ class cnfball_state : public hh_tms1k_state
 {
 public:
 	cnfball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_ds8874(*this, "ds8874")
 	{ }
+
+	required_device<ds8874_device> m_ds8874;
+	void ds8874_output_w(u16 data);
 
 	void update_display();
 	void write_r(u16 data);
@@ -2793,7 +2799,13 @@ public:
 
 void cnfball_state::update_display()
 {
-	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
+	m_display->matrix(~m_grid, m_o | (m_r << 6 & 0x700));
+}
+
+void cnfball_state::ds8874_output_w(u16 data)
+{
+	m_grid = data;
+	update_display();
 }
 
 void cnfball_state::write_r(u16 data)
@@ -2805,14 +2817,10 @@ void cnfball_state::write_r(u16 data)
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
 
-	// R0: DS8874N CP: clock pulse edge-triggered
-	// note: DS8874N CP goes back to K8 too, game relies on it
-	if ((data ^ m_r) & 1)
-		m_grid = m_grid << 1 & 0x1ff;
-
-	// R1: DS8874N _DATA: reset shift register
-	if (~data & 2)
-		m_grid = 1;
+	// R0: DS8874N CP (note: it goes back to K8 too, game relies on it)
+	// R1: DS8874N _DATA
+	m_ds8874->cp_w(BIT(data, 0));
+	m_ds8874->data_w(BIT(data, 1));
 
 	// R2-R4: led data
 	m_r = data;
@@ -2863,7 +2871,8 @@ void cnfball_state::cnfball(machine_config &config)
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
+	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 8+3);
 	m_display->set_segmask(0xc3, 0x7f);
 	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
