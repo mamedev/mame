@@ -821,11 +821,13 @@ void prestige_state::snotec(machine_config &config)
 	SOFTWARE_LIST(config, "glcolor_cart").set_compatible("glcolor");
 }
 
+
+
 void prestige_state::prestige(machine_config &config)
 {
 	prestige_base(config);
 
-	SOFTWARE_LIST(config, "gl6000sl_cart").set_compatible("gl6000sl");
+	SOFTWARE_LIST(config, "cart_list").set_original("gl6000sl");
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
 }
@@ -846,6 +848,15 @@ void prestige_state::gl7007sl(machine_config &config)
 	SOFTWARE_LIST(config, "gl6000sl_cart").set_compatible("gl6000sl");
 	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+}
+
+void prestige_state::gl1510sl(machine_config &config)
+{
+	prestige_base(config);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("gl6000sl");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
 }
 
 
@@ -917,7 +928,10 @@ ROM_START( gmmc )
 	ROM_CONTINUE( 0x000000, 0x020000 )
 ROM_END
 
-
+ROM_START( gl1500sl )
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "27-5894-01",   0x000000, 0x080000, CRC(7336231c) SHA1(35a1f739994b5c8fb67a7f76d423e50d8154e9ea) )
+ROM_END
 
 /* Driver */
 
@@ -934,3 +948,5 @@ COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 199?, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2003, gl1500sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 1500SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+		
