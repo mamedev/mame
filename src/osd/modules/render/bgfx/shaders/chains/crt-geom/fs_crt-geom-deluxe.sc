@@ -28,6 +28,7 @@ $input v_sinangle, v_cosangle, v_stretch, v_one, v_texCoord
 SAMPLER2D(mpass_texture, 0);
 SAMPLER2D(mask_texture, 1);
 SAMPLER2D(blur_texture, 2);
+SAMPLER2D(mipmap_texture, 3);
 
 vec4 TEX2D(vec2 c)
 {
@@ -62,6 +63,8 @@ uniform vec4 cornersize;
 uniform vec4 cornersmooth;
 
 uniform vec4 halation;
+uniform vec4 rasterbloom;
+
 uniform vec4 blurwidth;
 
 vec3 texblur(vec2 c)
@@ -176,8 +179,13 @@ void main()
     xy = transform(v_texCoord, v_stretch, v_sinangle, v_cosangle);
   else
     xy = (v_texCoord-vec2_splat(0.5))/overscan.xy+vec2_splat(0.5);
-  vec2 xy0 = xy;
   float cval = corner(xy);
+  // extract average brightness from the mipmap texture
+  float avgbright = dot(texture2D(mipmap_texture,vec2(1.0,1.0)).rgb,vec3_splat(1.0))/3.0;
+  float rbloom = 1.0 - rasterbloom.x * ( avgbright - 0.5 );
+  // expand the screen when average brightness is higher
+  xy = (xy - vec2_splat(0.5)) * rbloom + vec2_splat(0.5);
+  vec2 xy0 = xy;
 
   // Of all the pixels that are mapped onto the texel we are
   // currently rendering, which pixel are we currently rendering?
@@ -240,7 +248,9 @@ void main()
 
   // halation and corners
   vec3 blur = texblur(xy0);
-  mul_res = mix(mul_res, blur, halation.x) * vec3_splat(cval);
+  // include factor of rbloom:
+  // (probably imperceptible) brightness reduction when raster grows
+  mul_res = mix(mul_res, blur, halation.x) * vec3_splat(cval*rbloom);
   
   // Shadow mask
   xy = v_texCoord.xy * u_quad_dims.xy / u_tex_size1.xy;

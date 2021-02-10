@@ -27,6 +27,7 @@
 	{ "name": "mpass_texture",  "type": "int",  "values": [ 0 ] },
 	{ "name": "mask_texture",   "type": "int",  "values": [ 1 ] },
 	{ "name": "blur_texture",   "type": "int",  "values": [ 2 ] },
+	{ "name": "mipmap_texture", "type": "int",  "values": [ 3 ] },
      	{ "name": "curvature",      "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }, 
      	{ "name": "CRTgamma",       "type": "vec4", "values": [ 2.4, 0.0, 0.0, 0.0 ] }, 
      	{ "name": "monitorgamma",   "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] },
@@ -40,6 +41,7 @@
      	{ "name": "aperture_strength",   "type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] },
      	{ "name": "aperture_brightboost","type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] },
      	{ "name": "halation",   "type": "vec4", "values": [ 0.1,0.0,0.0,0.0 ] },
-     	{ "name": "blurwidth",  "type": "vec4", "values": [ 2.0,0.0,0.0,0.0 ] }
+     	{ "name": "blurwidth",  "type": "vec4", "values": [ 2.0,0.0,0.0,0.0 ] },
+     	{ "name": "rasterbloom","type": "vec4", "values": [ 0.01,0.0,0.0,0.0 ] }
     ]
 }
