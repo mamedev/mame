@@ -13,7 +13,7 @@ TODO:
 - beeps are glitchy, as if interrupted for too long
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
-- is the 1988 version of supremo the same ROM?
+- is the 1st version of supremo(black plastic) the same ROM?
 
 ===============================================================================
 
@@ -41,7 +41,8 @@ Hardware notes:
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
 Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
-instead of black, otherwise it's the same game.
+instead of black and backpanel sticker is gold, otherwise it's the same game.
+The model number is still 881, ROM is the same as the standard fake-wood version.
 
 ******************************************************************************/
 
@@ -367,4 +368,4 @@ ROM_END
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1990, nsnova,  0,      0,      snova,   snova,   snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, supremo, 0,      0,      supremo, supremo, snova_state, empty_init, "Novag", "Supremo - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, supremo, 0,      0,      supremo, supremo, snova_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
