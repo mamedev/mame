@@ -1049,8 +1049,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 {
-	// rising edge
-	if (state)
+	// rising edge and buffer swap
+	if (state && (m_tcram[0x50/4] & 0x10000))
 		clear3d();
 }
 
