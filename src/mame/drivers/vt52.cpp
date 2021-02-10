@@ -43,6 +43,7 @@ public:
 		, m_serial_out(true)
 		, m_rec_data(true)
 		, m_110_baud_counter(0)
+		, m_ready_for_input(false)
 	{
 	}
 
@@ -83,6 +84,7 @@ private:
 	bool m_serial_out;
 	bool m_rec_data;
 	u8 m_110_baud_counter;
+	bool m_ready_for_input;
 };
 
 void vt52_state::machine_start()
@@ -90,11 +92,13 @@ void vt52_state::machine_start()
 	save_item(NAME(m_serial_out));
 	save_item(NAME(m_rec_data));
 	save_item(NAME(m_110_baud_counter));
+	save_item(NAME(m_ready_for_input));
 }
 
 void vt52_state::machine_reset()
 {
 	m_110_baud_counter = 0;
+	m_ready_for_input = true;
 
 	update_serial_settings();
 	m_uart->write_swe(0);
@@ -224,9 +228,12 @@ WRITE_LINE_MEMBER(vt52_state::rec_data_w)
 {
 	m_rec_data = state;
 
-	ioport_value baud = m_baud_sw->read();
-	if (BIT(baud, 9) && ((~baud & 0x0880) == 0 || (m_serial_out && m_break_key->read())))
-		m_uart->write_si(state);
+	if (m_ready_for_input)
+	{
+		ioport_value baud = m_baud_sw->read();
+		if (BIT(baud, 9) && ((~baud & 0x0880) == 0 || (m_serial_out && m_break_key->read())))
+			m_uart->write_si(state);
+	}
 }
 
 READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)
