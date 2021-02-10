@@ -27,11 +27,16 @@ $input v_sinangle, v_cosangle, v_stretch, v_one, v_texCoord
 
 SAMPLER2D(mpass_texture, 0);
 SAMPLER2D(mask_texture, 1);
+
+vec4 TEX2D(vec2 c)
+{
+  vec2 underscan = step(0.0,c) * step(0.0,vec2_splat(1.0)-c);
+  vec4 col = texture2D(mpass_texture, c) * vec4_splat(underscan.x*underscan.y);
 #ifdef LINEAR_PROCESSING
-#       define TEX2D(c) pow(texture2D(mpass_texture, (c)), vec4(CRTgamma))
-#else
-#       define TEX2D(c) texture2D(mpass_texture, (c))
+  col = pow(col, vec4_splat(CRTgamma.x));
 #endif
+  return col;
+}
 
 // Enable screen curvature.
 uniform vec4 curvature;
