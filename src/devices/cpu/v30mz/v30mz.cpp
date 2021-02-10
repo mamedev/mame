@@ -12,10 +12,10 @@
 
     Todo!
       - Double check cycle timing is 100%.
-			- Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
-			  preceding instruction.
-			- wswan mjkiwame (at 0x40141) has rep in al,$b5 (f3 e4 b5). Should this
-			  repeat the in instruction or is this a bug made by the programmer?
+            - Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
+              preceding instruction.
+            - wswan mjkiwame (at 0x40141) has rep in al,$b5 (f3 e4 b5). Should this
+              repeat the in instruction or is this a bug made by the programmer?
 
 ****************************************************************************/
 
@@ -2382,7 +2382,7 @@ void v30mz_cpu_device::execute_run()
 				case 0x20:                      and_word(); store_ea_rm_word(m_dst); break;
 				case 0x28:                      sub_word(); store_ea_rm_word(m_dst); break;
 				case 0x30:                      xor_word(); store_ea_rm_word(m_dst); break;
-				case 0x38:                      sub_word();	                      break; // CMP
+				case 0x38:                      sub_word();                       break; // CMP
 				}
 				break;
 

@@ -28,7 +28,7 @@ class render_target;
 
 typedef uintptr_t HashT;
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
+#define OSDWORK_CALLBACK(name)  void *name(void *param, int threadid)
 
 class mac_window_info : public osd_window_t<void *>
 {
@@ -59,7 +59,6 @@ public:
 
 private:
 	// window handle and info
-	char                m_title[256];
 	int                 m_startmaximized;
 
 	// dimensions

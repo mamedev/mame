@@ -721,7 +721,7 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
+	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
 	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
 	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
@@ -796,6 +796,7 @@ void atarisy1_state::marble(machine_config &config)
 {
 	atarisy1(config);
 	SLAPSTIC(config, m_slapstic, 103);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
 
@@ -804,6 +805,7 @@ void atarisy1_state::peterpak(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
@@ -819,6 +821,7 @@ void atarisy1_state::indytemp(machine_config &config)
 	add_adc(config);
 	add_speech(config);
 	SLAPSTIC(config, m_slapstic, 105);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Digital joystick read through ADC
@@ -834,6 +837,7 @@ void atarisy1_state::roadrunn(machine_config &config)
 	add_adc(config);
 	add_speech(config);
 	SLAPSTIC(config, m_slapstic, 108);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Hall-effect analog joystick
@@ -847,6 +851,7 @@ void atarisy1_state::roadb109(machine_config &config)
 	add_adc(config);
 	add_speech(config);
 	SLAPSTIC(config, m_slapstic, 109);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
@@ -859,6 +864,7 @@ void atarisy1_state::roadb110(machine_config &config)
 	add_adc(config);
 	add_speech(config);
 	SLAPSTIC(config, m_slapstic, 110);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	// Road Blasters gas pedal
@@ -2495,14 +2501,6 @@ ROM_END
 void atarisy1_state::init_slapstic()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x80000, 0x2000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x80000, 0x87fff, 0, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
-
-	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range marble madness actually needs
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x2ff5a, 0x2ff5b, 0, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
 
 void atarisy1_state::init_marble()

@@ -269,7 +269,7 @@ void arb_state::v2(machine_config &config)
 	M65C02(config, m_maincpu, 16_MHz_XTAL); // W65C02S6TPG-14
 	m_maincpu->set_addrmap(AS_PROGRAM, &arb_state::v2_map);
 
-	VIA6522(config, m_via, 16_MHz_XTAL); // W65C22S6TPG-14
+	W65C22S(config, m_via, 16_MHz_XTAL); // W65C22S6TPG-14
 	m_via->writepa_handler().set(FUNC(arb_state::leds_w));
 	m_via->writepb_handler().set(FUNC(arb_state::control_w));
 	m_via->readpa_handler().set(FUNC(arb_state::input_r));
@@ -298,7 +298,11 @@ void arb_state::arb(machine_config &config)
 	M6502(config.replace(), m_maincpu, 4_MHz_XTAL/2); // R6502P
 	m_maincpu->set_addrmap(AS_PROGRAM, &arb_state::main_map);
 
-	m_via->set_clock(4_MHz_XTAL/4); // R6522P
+	MOS6522(config.replace(), m_via, 4_MHz_XTAL/4); // R6522P
+	m_via->writepa_handler().set(FUNC(arb_state::leds_w));
+	m_via->writepb_handler().set(FUNC(arb_state::control_w));
+	m_via->readpa_handler().set(FUNC(arb_state::input_r));
+	m_via->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");

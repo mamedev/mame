@@ -53,7 +53,6 @@ public:
 // ----- path operations -----
 
 // retrieves the parent directory
-std::string &zippath_parent(std::string &dst, std::string_view path);
 std::string zippath_parent(std::string_view path);
 
 // combines two paths

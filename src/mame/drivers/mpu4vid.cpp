@@ -209,6 +209,8 @@ TODO:
 #include "v4strike.lh"
 
 
+namespace {
+
 class mpu4vid_state : public mpu4_state
 {
 public:
@@ -267,6 +269,12 @@ public:
 	void init_cybcas();
 	void init_v4frfact();
 	void init_bwbhack();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
@@ -287,9 +295,6 @@ private:
 	int m_gfx_index;
 	int8_t m_cur[2];
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -321,6 +326,7 @@ private:
 	void mpu4_vram(address_map &map);
 	void mpu4oki_68k_map(address_map &map);
 
+	void mpu4_6809_map(address_map &map);
 	void mpu4_6809_german_map(address_map &map);
 
 	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
@@ -346,7 +352,7 @@ private:
  *************************************/
 
 /* The interrupt system consists of a 74148 priority encoder
-   with the following interrupt priorites.  A lower number
+   with the following interrupt priorities.  A lower number
    indicates a lower priority:
 
     7 - Game Card
@@ -1886,6 +1892,9 @@ void mpu4vid_state::machine_reset()
 	m_prot_col  = 0;
 	m_chr_counter    = 0;
 	m_chr_value     = 0;
+
+	m_m6840_irq_state = 0;
+	m_m6850_irq_state = 0;
 }
 
 void mpu4vid_state::mpu4_68k_map_base(address_map &map)
@@ -2027,7 +2036,7 @@ void mpu4vid_state::bwbvidoki_68k_bt471_map(address_map& map)
 }
 
 /* TODO: Fix up MPU4 map*/
-void mpu4_state::mpu4_6809_map(address_map &map)
+void mpu4vid_state::mpu4_6809_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0801).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -8972,6 +8981,7 @@ ROM_START( v4rencasi )
 	/* none present */
 ROM_END
 
+} // Anonymous namespace
 
 
 /* Complete sets */

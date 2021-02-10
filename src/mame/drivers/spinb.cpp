@@ -643,7 +643,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void spinb_state::spinb(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spinb_state::spinb_map);
 	m_maincpu->set_periodic_int(FUNC(spinb_state::irq0_line_hold), attotime::from_hz(160)); // NE556 adjustable (if faster, then jolypark has a stack problem)
@@ -663,7 +663,7 @@ void spinb_state::spinb(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -674,22 +674,22 @@ void spinb_state::spinb(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(spinb_state::spinb_palette), 3);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 
 	SPEAKER(config, "msmavol").front_center();
 	MSM5205(config, m_msm_a, XTAL(384'000));
 	m_msm_a->vck_callback().set("ic5a", FUNC(ttl7474_device::clock_w));
-	m_msm_a->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_a->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
 	m_msm_a->add_route(ALL_OUTPUTS, "msmavol", 1.0);
 
 	SPEAKER(config, "msmmvol").front_center();
 	MSM5205(config, m_msm_m, XTAL(384'000));
 	m_msm_m->vck_callback().set("ic5m", FUNC(ttl7474_device::clock_w));
-	m_msm_m->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_m->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
 	m_msm_m->add_route(ALL_OUTPUTS, "msmmvol", 1.0);
 
-	/* Devices */
+	// Devices
 	i8255_device &ppi60(I8255A(config, "ppi60"));
 	//ppi60.in_pa_callback().set(FUNC(spinb_state::ppi60a_r));
 	ppi60.out_pa_callback().set(FUNC(spinb_state::ppi60a_w));
@@ -843,6 +843,28 @@ ROM_START(mach2)
 	ROM_LOAD("m2musc.01", 0x80000, 0x80000, CRC(88851b82) SHA1(d0c9fa391ca213a69b7c8ae7ca52063503b5656e))
 ROM_END
 
+ROM_START(mach2a)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("mach_cpu_0.bin", 0x0000, 0x2000, CRC(4eee3d63) SHA1(dc7c919dd909a134ec434ce665c421aa03aaa637))
+	ROM_LOAD("mach_cpu_1.bin", 0x2000, 0x2000, CRC(c115b900) SHA1(712ae2a38528c05f28e3743cb49e072fc05bf908))
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
+	ROM_LOAD("m2dmdf.01", 0x00000, 0x10000, CRC(c45ccc74) SHA1(8362e799a76536a16dd2d5dde500ad3db273180f))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("m2sndd.01", 0x0000, 0x2000, CRC(e789f22d) SHA1(36aa7eac1dd37a02c982d109462dddbd85a305cc))
+
+	ROM_REGION(0x180000, "audiorom", 0)
+	ROM_LOAD("m2snde.01", 0x00000, 0x80000, CRC(f5721119) SHA1(9082198e8d875b67323266c4bf8c2c378b63dfbb))
+
+	ROM_REGION(0x2000, "musiccpu", 0)
+	ROM_LOAD("m2musa.01", 0x0000, 0x2000, CRC(2d92a882) SHA1(cead22e434445e5c25414646b1e9ae2b9457439d))
+
+	ROM_REGION(0x180000, "musicrom", 0)
+	ROM_LOAD("m2musb.01", 0x00000, 0x80000, CRC(6689cd19) SHA1(430092d51704dfda8bd8264875f1c1f4461c56e5))
+	ROM_LOAD("m2musc.01", 0x80000, 0x80000, CRC(88851b82) SHA1(d0c9fa391ca213a69b7c8ae7ca52063503b5656e))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Jolly Park (1996)
 /-------------------------------------------------------------------*/
@@ -901,6 +923,7 @@ ROM_END
 
 GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2a,    mach2,   spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

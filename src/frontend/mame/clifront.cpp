@@ -18,17 +18,18 @@
 #include "language.h"
 #include "luaengine.h"
 #include "mame.h"
+#include "mameopts.h"
 #include "media_ident.h"
 #include "pluginopts.h"
 
 #include "emuopts.h"
-#include "mameopts.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "validity.h"
 #include "sound/samples.h"
 
 #include "chd.h"
+#include "corestr.h"
 #include "unzip.h"
 #include "xmlfile.h"
 
@@ -229,12 +230,12 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	}
 
 	// determine the base name of the EXE
-	std::string exename = core_filename_extract_base(args[0], true);
+	std::string_view exename = core_filename_extract_base(args[0], true);
 
 	// if we have a command, execute that
 	if (!m_options.command().empty())
 	{
-		execute_commands(exename.c_str());
+		execute_commands(exename);
 		return;
 	}
 
@@ -253,10 +254,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	manager->start_luaengine();
 
 	if (option_errors.tellp() > 0)
-	{
-		std::string option_errors_string = option_errors.str();
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string));
-	}
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors.str()));
 
 	// if we can't find it, give an appropriate error
 	const game_driver *system = mame_options::system(m_options);
@@ -285,9 +283,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{
-		std::string str(fatal.what());
-		strtrimspace(str);
-		osd_printf_error("%s\n", str);
+		osd_printf_error("%s\n", strtrimspace(fatal.what()));
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : EMU_ERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
@@ -568,8 +564,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 								length = rom_file_size(rom);
 
 							// start with the name
-							const char *name = ROM_GETNAME(rom);
-							osd_printf_info("%-32s ", name);
+							osd_printf_info("%-32s ", rom->name());
 
 							// output the length next
 							if (length >= 0)
@@ -578,7 +573,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 								osd_printf_info("%10s", "");
 
 							// output the hash data
-							util::hash_collection hashes(ROM_GETHASHDATA(rom));
+							util::hash_collection hashes(rom->hashdata());
 							if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 							{
 								if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
@@ -1101,7 +1096,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
 
 		for (const feature_list_item &flist : swinfo.other_info())
-			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
+			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1112,7 +1107,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 			out << ">\n";
 
 			for (const feature_list_item &flist : part.featurelist())
-				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
+				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 			// TODO: display ROM region information
 			for (const rom_entry *region = part.romdata().data(); region; region = rom_next_region(region))
@@ -1120,9 +1115,9 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 				int is_disk = ROMREGION_ISDISKDATA(region);
 
 				if (!is_disk)
-					util::stream_format(out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", util::xml::normalize_string(ROMREGION_GETTAG(region)), ROMREGION_GETLENGTH(region));
+					util::stream_format(out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", util::xml::normalize_string(region->name().c_str()), region->get_length());
 				else
-					util::stream_format(out, "\t\t\t\t<diskarea name=\"%s\">\n", util::xml::normalize_string(ROMREGION_GETTAG(region)));
+					util::stream_format(out, "\t\t\t\t<diskarea name=\"%s\">\n", util::xml::normalize_string(region->name().c_str()));
 
 				for (const rom_entry *rom = rom_first_file(region); rom && !ROMENTRY_ISREGIONEND(rom); rom++)
 				{
@@ -1134,7 +1129,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 							util::stream_format(out, "\t\t\t\t\t<disk name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(rom)));
 
 						// dump checksum information only if there is a known dump
-						util::hash_collection hashes(ROM_GETHASHDATA(rom));
+						util::hash_collection hashes(rom->hashdata());
 						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 							util::stream_format(out, " %s", hashes.attribute_string());
 						else
@@ -1607,7 +1602,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 //  commands
 //-------------------------------------------------
 
-void cli_frontend::execute_commands(const char *exename)
+void cli_frontend::execute_commands(std::string_view exename)
 {
 	// help?
 	if (m_options.command() == CLICOMMAND_HELP)
@@ -1726,7 +1721,7 @@ void cli_frontend::execute_commands(const char *exename)
 //  output
 //-------------------------------------------------
 
-void cli_frontend::display_help(const char *exename)
+void cli_frontend::display_help(std::string_view exename)
 {
 	osd_printf_info(
 			"%3$s v%2$s\n"

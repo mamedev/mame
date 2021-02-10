@@ -3218,7 +3218,7 @@ ROM_START( vs2 )    /* Step 2.0 */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs215 )  /* Step 1.5 */
+ROM_START( vs215 )  /* Step 1.5, Sega game ID# is 833-13089-02, ROM board ID# 834-13090-02 V.STRIKER 2 USA EXP */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19900.17",  0x600006, 0x080000, CRC(8fb6045d) SHA1(88497eafc23ba70ab4a43de552a16caccd8dccbe) )
@@ -3497,7 +3497,7 @@ ROM_START( vs29815 )    /* Step 1.5, Sega game ID# is 833-13494, ROM board ID# 8
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs2v991 )    /* Step 2.0 */
+ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP 2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535b.17", 0x400006, 0x100000, CRC(76c5fa8e) SHA1(862438198cb7fdd20beeba53e707a7c59e618ad9) )
@@ -3553,7 +3553,7 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 	ROM_LOAD_VROM( "mpr-21530.41",     0x00000c, 0x200000, CRC(78400d5e) SHA1(9b4546848dbe213f33b02e8ea42743e60a0f763f) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "epr-21539.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
+	ROM_LOAD16_WORD_SWAP( "epr-21539.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) ) // EPR-21539A known to exist
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
@@ -3569,7 +3569,7 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
+ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688-01, ROM board ID# 834-13689-01 VS2 VER99 STEP2 JPN, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) )
@@ -3713,7 +3713,7 @@ ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
 ROM_END
 
-ROM_START( vs299 )  /* Step 2.0 */
+ROM_START( vs299 )  /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535.17",  0x400006, 0x100000, CRC(976a00bf) SHA1(d4be52ff59faa877b169f96ac509a2196cefb908) )
@@ -3784,6 +3784,13 @@ ROM_START( vs299 )  /* Step 2.0 */
 	//             ????     317-0245-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
+
+/*
+Known to exist:
+
+834-13687-01 VS2 VER99 STEP1.5 JPN
+Program ROMs numbered: EPR-21546B, EPR-21547B, EPR-21548B & EPR-21549B with EPR-21539A for the sound CPU program
+*/
 
 ROM_START( vs29915 )  /* Step 1.5, Sega game ID# is 833-13686-01 VS2 VER99 STEP 1.5 JPN */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
@@ -6454,12 +6461,12 @@ void model3_state::init_srally2()
 /*
 void model3_state::init_srally2pa()
 {
-	init_model3_20();
+    init_model3_20();
 
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	rom[(0x3ba44^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
-	rom[(0x3ba48^4)/4] = 0x60000000;
-	rom[(0x3ba4c^4)/4] = 0x60000000;
+    uint32_t *rom = (uint32_t*)memregion("user1")->base();
+    rom[(0x3ba44^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
+    rom[(0x3ba48^4)/4] = 0x60000000;
+    rom[(0x3ba4c^4)/4] = 0x60000000;
 }
 */
 
@@ -6497,7 +6504,7 @@ void model3_state::init_swtrilgp()
 	rom[(0x886e0^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
 	rom[(0x886e4^4)/4] = 0x60000000;
 	rom[(0x886e8^4)/4] = 0x60000000;
-	
+
 	rom[(0x0292c^4)/4] = 0x60000000;  // skip force feedback setup
 	rom[(0x02998^4)/4] = 0x60000000;
 }

@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's 2xBR v3.8c+ReverseAA (squared) Shader - beta1
-   
+
    Copyright (C) 2011/2012 Hyllian/Jararaca - sergiogdb@gmail.com
 */
 
@@ -176,7 +176,7 @@ void main()
 	vec4 Cy = vec4( 2.0,  0.0, -1.0, 0.5 );
 
 	// These inequations define the line below which interpolation occurs.
-	vec4 fx      = (Ao*fp.y+Bo*fp.x); 
+	vec4 fx      = (Ao*fp.y+Bo*fp.x);
 	vec4 fx_left = (Ax*fp.y+Bx*fp.x);
 	vec4 fx_up   = (Ay*fp.y+By*fp.x);
 

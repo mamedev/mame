@@ -24,8 +24,9 @@
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "romload.h"
-
 #include "uiinput.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <cstring>

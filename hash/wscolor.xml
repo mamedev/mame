@@ -100,27 +100,27 @@ See the wswan software list for the full game list.
 	</software>
 
 <!--
-	<software name="battlespa" cloneof="battlesp">
-		<description>Battle Spirit - Digimon Frontier (Rev 0)</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BANC31"/>
-		<info name="release" value="20021207"/>
-		<info name="alt_title" value="バトルスピリット デジモンフロンティア"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTS-0133A" />
-			<feature name="u1" value="BANDAI 2003" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="HY62KT081ED70C SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304" width="16" endianness="little">
-				<rom name="sd32m256s222d.u3" size="4194304" crc="a28d3dc5" sha1="" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768" width="16" endianness="little">
-			</dataarea>
-		</part>
-	</software>
+    <software name="battlespa" cloneof="battlesp">
+        <description>Battle Spirit - Digimon Frontier (Rev 0)</description>
+        <year>2002</year>
+        <publisher>Bandai</publisher>
+        <info name="serial" value="SWJ-BANC31"/>
+        <info name="release" value="20021207"/>
+        <info name="alt_title" value="バトルスピリット デジモンフロンティア"/>
+        <part name="cart" interface="wswan_cart">
+            <feature name="pcb" value="PTS-0133A" />
+            <feature name="u1" value="BANDAI 2003" />
+            <feature name="u2" value="GIZA" />
+            <feature name="u3" value="ROM" />
+            <feature name="u4" value="HY62KT081ED70C SRAM" />
+            <feature name="slot" value="ws_sram" />
+            <dataarea name="rom" size="4194304" width="16" endianness="little">
+                <rom name="sd32m256s222d.u3" size="4194304" crc="a28d3dc5" sha1="" offset="000000" />
+            </dataarea>
+            <dataarea name="sram" size="32768" width="16" endianness="little">
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="bluewing">
@@ -327,27 +327,27 @@ See the wswan software list for the full game list.
 	</software>
 
 <!--
-	<software name="digimdp">
-		<description>Digital Monster - D-Project (Rev 2)</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BANC2E"/>
-		<info name="release" value="20020803"/>
-		<info name="alt_title" value="デジタルモンスター ディープロジェクト"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTS-0133A" />
-			<feature name="u1" value="BANDAI 2003" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="HY62KT081ED70C SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="4194304" width="16" endianness="little">
-				<rom name="sd32m256s217d.u3" size="4194304" crc="0e40829c" sha1="" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768" width="16" endianness="little">
-			</dataarea>
-		</part>
-	</software>
+    <software name="digimdp">
+        <description>Digital Monster - D-Project (Rev 2)</description>
+        <year>2002</year>
+        <publisher>Bandai</publisher>
+        <info name="serial" value="SWJ-BANC2E"/>
+        <info name="release" value="20020803"/>
+        <info name="alt_title" value="デジタルモンスター ディープロジェクト"/>
+        <part name="cart" interface="wswan_cart">
+            <feature name="pcb" value="PTS-0133A" />
+            <feature name="u1" value="BANDAI 2003" />
+            <feature name="u2" value="GIZA" />
+            <feature name="u3" value="ROM" />
+            <feature name="u4" value="HY62KT081ED70C SRAM" />
+            <feature name="slot" value="ws_sram" />
+            <dataarea name="rom" size="4194304" width="16" endianness="little">
+                <rom name="sd32m256s217d.u3" size="4194304" crc="0e40829c" sha1="" offset="000000" />
+            </dataarea>
+            <dataarea name="sram" size="32768" width="16" endianness="little">
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="digimdp">
@@ -1195,9 +1195,11 @@ See the wswan software list for the full game list.
 		<publisher>Qute</publisher>
 		<info name="release" value="20040205"/>
 		<part name="cart" interface="wswan_cart">
+			<!-- no markings on pcb
 			<feature name="pcb" value="no label" />
-			<feature name="uX" value="BANDAI 2003" /><!-- no markings on pcb -->
+			<feature name="uX" value="BANDAI 2003" />
 			<feature name="uX" value="CS18LV40963DCR70 SRAM" />
+			-->
 			<feature name="slot" value="ws_sram" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152" width="16" endianness="little">
@@ -1484,27 +1486,27 @@ See the wswan software list for the full game list.
 	</software>
 
 <!--
-	<software name="onepbatla" cloneof="onepbatl">
-		<description>From TV Animation One Piece - Grand Battle Swan Colosseum Sample Edition</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="SWC-BANC29"/>
-		<info name="release" value="20020712"/>
-		<info name="alt_title" value="フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTS-0133A" />
-			<feature name="u1" value="BANDAI 2003" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="BS62LV256TC SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="8388608" width="16" endianness="little">
-				<rom name="sd64m256s210d.u3" size="8388608" crc="23853305" sha1="" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768" width="16" endianness="little">
-			</dataarea>
-		</part>
-	</software>
+    <software name="onepbatla" cloneof="onepbatl">
+        <description>From TV Animation One Piece - Grand Battle Swan Colosseum Sample Edition</description>
+        <year>2002</year>
+        <publisher>Bandai</publisher>
+        <info name="serial" value="SWC-BANC29"/>
+        <info name="release" value="20020712"/>
+        <info name="alt_title" value="フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム"/>
+        <part name="cart" interface="wswan_cart">
+            <feature name="pcb" value="PTS-0133A" />
+            <feature name="u1" value="BANDAI 2003" />
+            <feature name="u2" value="GIZA" />
+            <feature name="u3" value="ROM" />
+            <feature name="u4" value="BS62LV256TC SRAM" />
+            <feature name="slot" value="ws_sram" />
+            <dataarea name="rom" size="8388608" width="16" endianness="little">
+                <rom name="sd64m256s210d.u3" size="8388608" crc="23853305" sha1="" offset="000000" />
+            </dataarea>
+            <dataarea name="sram" size="32768" width="16" endianness="little">
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="onepchop">
@@ -1923,27 +1925,27 @@ See the wswan software list for the full game list.
 	</software>
 
 <!--
-	<software name="sdgundg2">
-		<description>SD Gundam G-Generation - Mono-Eye Gundams (Rev 2)</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BANC2F"/>
-		<info name="release" value="20020926"/>
-		<info name="alt_title" value="SDガンダム ジージェネレーション モノアイガンダムズ"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTS-0133A" />
-			<feature name="u1" value="BANDAI 2003" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="HY62KT081ED70C SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="8388608" width="16" endianness="little">
-				<rom name="sd64m256s226d.u3" size="8388608" crc="a3ecc9ac" sha1="" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768" width="16" endianness="little">
-			</dataarea>
-		</part>
-	</software>
+    <software name="sdgundg2">
+        <description>SD Gundam G-Generation - Mono-Eye Gundams (Rev 2)</description>
+        <year>2002</year>
+        <publisher>Bandai</publisher>
+        <info name="serial" value="SWJ-BANC2F"/>
+        <info name="release" value="20020926"/>
+        <info name="alt_title" value="SDガンダム ジージェネレーション モノアイガンダムズ"/>
+        <part name="cart" interface="wswan_cart">
+            <feature name="pcb" value="PTS-0133A" />
+            <feature name="u1" value="BANDAI 2003" />
+            <feature name="u2" value="GIZA" />
+            <feature name="u3" value="ROM" />
+            <feature name="u4" value="HY62KT081ED70C SRAM" />
+            <feature name="slot" value="ws_sram" />
+            <dataarea name="rom" size="8388608" width="16" endianness="little">
+                <rom name="sd64m256s226d.u3" size="8388608" crc="a3ecc9ac" sha1="" offset="000000" />
+            </dataarea>
+            <dataarea name="sram" size="32768" width="16" endianness="little">
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="sdgundg2">

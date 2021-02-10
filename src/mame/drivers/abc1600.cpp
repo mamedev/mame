@@ -35,9 +35,9 @@
     TODO:
 
     - sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
-		- MAC task/page/segment addressing failure?
-		- MAC page/segment RAM write strobe decoding failure?
-		- CPU does not enter supervisor mode when needed?
+        - MAC task/page/segment addressing failure?
+        - MAC page/segment RAM write strobe decoding failure?
+        - CPU does not enter supervisor mode when needed?
 
         [:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
         [:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800

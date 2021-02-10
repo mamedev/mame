@@ -4,30 +4,30 @@
 
     m950x0.cpp
 
-	STmicro M95010/20/40 SPI-bus EEPROM
+    STmicro M95010/20/40 SPI-bus EEPROM
 
-	Common characteristics:
-	- 16-byte page size
-	- Write protection selectable in quarter, half, or full sizes
+    Common characteristics:
+    - 16-byte page size
+    - Write protection selectable in quarter, half, or full sizes
 
-	Part variants with a -DF designation have additional support for an
-	identification page, which is not currently emulated.
+    Part variants with a -DF designation have additional support for an
+    identification page, which is not currently emulated.
 
-	Sizes:
-	M95010 - 1kbit
-	M95020 - 2kbit
-	M95040 - 4kbit, slightly altered instructions for 9th address bit
+    Sizes:
+    M95010 - 1kbit
+    M95020 - 2kbit
+    M95040 - 4kbit, slightly altered instructions for 9th address bit
 
-	Current issues:
-	- Implementation currently operates in a parallel manner, rather than
-	  serial.
+    Current issues:
+    - Implementation currently operates in a parallel manner, rather than
+      serial.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "m950x0.h"
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(M95010, m95010_device, "m95010", "STmicro M95010 1kbit SPI EEPROM")

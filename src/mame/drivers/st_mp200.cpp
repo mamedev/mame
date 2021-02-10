@@ -27,6 +27,9 @@ ToDo:
 
 #include "st_mp200.lh"
 
+
+namespace{
+
 #define S14001_CLOCK                (25e5)
 
 class st_mp200_state : public genpin_class
@@ -61,6 +64,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t u10_a_r();
 	void u10_a_w(uint8_t data);
@@ -92,8 +99,6 @@ private:
 	uint8_t m_digit;
 	uint8_t m_counter;
 	uint8_t m_segment[5];
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
 	required_device<pia6821_device> m_pia_u10;
@@ -549,6 +554,8 @@ void st_mp200_state::machine_reset()
 	m_u10_cb2 = 0;
 	m_u11a = 0;
 	m_u11b = 0;
+	m_timer_x = false;
+	m_u11_timer = false;
 }
 
 void st_mp200_state::init_st_mp200()
@@ -948,6 +955,9 @@ ROM_START(st_game)
 	ROM_RELOAD( 0x5800, 0x0800)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
+
+} // Anonymous namespace
+
 
 // 6-digit
 GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_IS_SKELETON_MECHANICAL)

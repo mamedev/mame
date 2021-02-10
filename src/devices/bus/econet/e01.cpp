@@ -30,7 +30,7 @@
             2 x TMM27256D-20 white labelled EPROMs, TMSE01 MOS on left and E01 FS on the right
     IC20    WD2793-APL-02 floppy disc controller
             2 x NEC D41464C-12 64k x 4bit NMOS RAM ICs giving 64K memory
-    IC21    Rockwell RC6522AP VIA behind to the right
+    IC21    Rockwell R65C22AP or CMD G65SC22P-2 VIA behind to the right
 
 */
 
@@ -248,7 +248,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	m_rtc->irq().set(FUNC(econet_e01_device::rtc_irq_w));
 
 	// devices
-	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));
+	via6522_device &via(R65C22(config, R6522_TAG, 8_MHz_XTAL / 4));
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 

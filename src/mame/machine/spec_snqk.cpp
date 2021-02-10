@@ -36,6 +36,7 @@
 #include "includes/specpls3.h"
 #include "sound/ay8910.h"
 #include "machine/spec_snqk.h"
+#include "corestr.h"
 
 #define EXEC_NA "N/A"
 

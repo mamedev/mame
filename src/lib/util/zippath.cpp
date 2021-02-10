@@ -65,7 +65,7 @@ bool is_root(std::string_view path)
 //  7-zip file
 // -------------------------------------------------
 
-bool is_7z_file(std::string const &path)
+bool is_7z_file(std::string_view path)
 {
 	return core_filename_ends_with(path, ".7z");
 }
@@ -76,7 +76,7 @@ bool is_7z_file(std::string const &path)
 //  ZIP file
 // -------------------------------------------------
 
-bool is_zip_file(std::string const &path)
+bool is_zip_file(std::string_view path)
 {
 	return core_filename_ends_with(path, ".zip");
 }
@@ -593,7 +593,7 @@ zippath_directory::~zippath_directory()
 //  zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 
-std::string &zippath_parent(std::string &dst, std::string_view path)
+std::string zippath_parent(std::string_view path)
 {
 	// skip over trailing path separators
 	std::string_view::size_type pos = path.find_last_not_of(PATH_SEPARATOR);
@@ -603,23 +603,9 @@ std::string &zippath_parent(std::string &dst, std::string_view path)
 		pos = (pos > 0) ? pos - 1 : std::string_view::npos;
 
 	if (pos != std::string_view::npos)
-		dst = std::string(path, 0, pos + 1);
+		return std::string(path, 0, pos + 1);
 	else
-		dst = std::string();
-	return dst;
-}
-
-
-
-// -------------------------------------------------
-//  zippath_parent - retrieves the parent directory
-// -------------------------------------------------
-
-std::string zippath_parent(std::string_view path)
-{
-	std::string result;
-	zippath_parent(result, path);
-	return result;
+		return std::string();
 }
 
 

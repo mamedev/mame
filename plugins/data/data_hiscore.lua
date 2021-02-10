@@ -5,7 +5,7 @@ local dat = {}
 local env = {}
 local output
 local curset
-local path = emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")) 
+local path = emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt"))
 local htmlentites = {
 	["amp"] = "&",
 	["quot"] = utf8.char(34),

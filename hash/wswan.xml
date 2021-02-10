@@ -742,23 +742,23 @@ The GIZA chip used on a lot of cartridges is a sram voltage switch.
 
 	<!--
 	<software name="digiadvc">
-		<description>Digimon Adventure Campaign Limited Version</description>
-		<year>2000</year>
-		<publisher>Bandai</publisher>
-		<info name="alt_title" value="デジモンアドベンチャー キャンペーン限定バージョン"/>
-		<part name="cart" interface="wswan_cart">
-			<feature name="pcb" value="PTE-0022A" />
-			<feature name="u1" value="BANDAI 2001" />
-			<feature name="u2" value="GIZA" />
-			<feature name="u3" value="ROM" />
-			<feature name="u4" value="BS62LV256TC SRAM" />
-			<feature name="slot" value="ws_sram" />
-			<dataarea name="rom" size="2097152" width="16" endianness="little">
-				<rom name="m5m29ft160avp.u3" size="2097152" crc="7e03e8da" sha1="" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768" width="16" endianness="little">
-			</dataarea>
-		</part>
+	    <description>Digimon Adventure Campaign Limited Version</description>
+	    <year>2000</year>
+	    <publisher>Bandai</publisher>
+	    <info name="alt_title" value="デジモンアドベンチャー キャンペーン限定バージョン"/>
+	    <part name="cart" interface="wswan_cart">
+	        <feature name="pcb" value="PTE-0022A" />
+	        <feature name="u1" value="BANDAI 2001" />
+	        <feature name="u2" value="GIZA" />
+	        <feature name="u3" value="ROM" />
+	        <feature name="u4" value="BS62LV256TC SRAM" />
+	        <feature name="slot" value="ws_sram" />
+	        <dataarea name="rom" size="2097152" width="16" endianness="little">
+	            <rom name="m5m29ft160avp.u3" size="2097152" crc="7e03e8da" sha1="" offset="000000" />
+	        </dataarea>
+	        <dataarea name="sram" size="32768" width="16" endianness="little">
+	        </dataarea>
+	    </part>
 	</software>
 	-->
 

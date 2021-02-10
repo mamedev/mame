@@ -56,7 +56,7 @@ public:
 
 	// construction/destruction
 	hash_collection();
-	hash_collection(const char *string);
+	hash_collection(std::string_view string);
 	hash_collection(const hash_collection &src);
 	~hash_collection();
 

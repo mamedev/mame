@@ -146,10 +146,10 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		{
 			const uint8_t sample8 = wave_ptr[addr++ & 0x3fff];
 			s32 sample = (int32_t)(int8_t)(sample8 ^ 0x80) * m_env * m_vol_latch;
-//			if (m_channel == 5) printf("%08x:%02x:%02x:%02x", (uint32_t)sample, sample8, m_env, m_vol_latch);
+//          if (m_channel == 5) printf("%08x:%02x:%02x:%02x", (uint32_t)sample, sample8, m_env, m_vol_latch);
 			buf.put_int(sampindex, (int16_t)(sample >> 8), 32768);
 		}
-//		if (m_channel == 5) printf("\n");
+//      if (m_channel == 5) printf("\n");
 
 		m_segment_cnt = (m_segment_cnt & ~mask) | addr;
 	}

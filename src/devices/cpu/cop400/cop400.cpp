@@ -2,9 +2,12 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    cop400.c
+    cop400.cpp
 
-    National Semiconductor COP400 Emulator.
+    National Semiconductor COPS(COP400 series) emulator.
+
+    This MCU series was initially briefly known as COPS II, where COPS I was
+    designated to the earlier MM57xx series.
 
 ****************************************************************************
 
@@ -194,9 +197,9 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_in_mask(in_mask)
 {
 	for (int i = 0; i < 256; i++)
-		m_InstLen[i] = 1;
+		m_instlen[i] = 1;
 
-	m_InstLen[0x33] = m_InstLen[0x23] = 2;
+	m_instlen[0x33] = m_instlen[0x23] = 2;
 
 	switch (featuremask)
 	{
@@ -205,8 +208,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 			for (int r = 0; r < 2; r++)
 			{
-				m_InstLen[0x60 + r] = 2; // JMP
-				m_InstLen[0x68 + r] = 2; // JSR
+				m_instlen[0x60 + r] = 2; // JMP
+				m_instlen[0x68 + r] = 2; // JSR
 			}
 			break;
 
@@ -215,8 +218,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 			for (int r = 0; r < 4; r++)
 			{
-				m_InstLen[0x60 + r] = 2; // JMP
-				m_InstLen[0x68 + r] = 2; // JSR
+				m_instlen[0x60 + r] = 2; // JMP
+				m_instlen[0x68 + r] = 2; // JSR
 			}
 			break;
 
@@ -225,8 +228,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 			for (int r = 0; r < 8; r++)
 			{
-				m_InstLen[0x60 + r] = 2; // JMP
-				m_InstLen[0x68 + r] = 2; // JSR
+				m_instlen[0x60 + r] = 2; // JMP
+				m_instlen[0x68 + r] = 2; // JSR
 			}
 			break;
 
@@ -235,8 +238,8 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 			for (int r = 0; r < 8; r++)
 			{
-				m_InstLen[0x60 + r] = 2; // JMP
-				m_InstLen[0x68 + r] = 2; // JSR
+				m_instlen[0x60 + r] = 2; // JMP
+				m_instlen[0x68 + r] = 2; // JSR
 			}
 			break;
 
@@ -1264,7 +1267,7 @@ void cop400_cpu_device::execute_run()
 				// disable interrupts
 				EN &= ~2;
 			}
-			else if (!m_second_byte && m_InstLen[m_opcode] > 1)
+			else if (!m_second_byte && m_instlen[m_opcode] > 1)
 			{
 				m_second_byte = true;
 			}

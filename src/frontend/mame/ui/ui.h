@@ -36,6 +36,8 @@ class machine_info;
 
 } // namespace ui
 
+class laserdisc_device;
+
 
 /***************************************************************************
     CONSTANTS
@@ -53,62 +55,6 @@ class machine_info;
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)
-
-#define SLIDER_DEVICE_SPACING   0x0ff
-#define SLIDER_SCREEN_SPACING   0x0f
-#define SLIDER_INPUT_SPACING    0x0f
-
-enum
-{
-	SLIDER_ID_VOLUME                = 0,
-	SLIDER_ID_MIXERVOL,
-	SLIDER_ID_MIXERVOL_LAST         = SLIDER_ID_MIXERVOL + SLIDER_DEVICE_SPACING,
-	SLIDER_ID_ADJUSTER,
-	SLIDER_ID_ADJUSTER_LAST         = SLIDER_ID_ADJUSTER + SLIDER_DEVICE_SPACING,
-	SLIDER_ID_OVERCLOCK,
-	SLIDER_ID_OVERCLOCK_LAST        = SLIDER_ID_OVERCLOCK + SLIDER_DEVICE_SPACING,
-	SLIDER_ID_REFRESH,
-	SLIDER_ID_REFRESH_LAST          = SLIDER_ID_REFRESH + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_BRIGHTNESS,
-	SLIDER_ID_BRIGHTNESS_LAST       = SLIDER_ID_BRIGHTNESS + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_CONTRAST,
-	SLIDER_ID_CONTRAST_LAST         = SLIDER_ID_CONTRAST + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_GAMMA,
-	SLIDER_ID_GAMMA_LAST            = SLIDER_ID_GAMMA + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_XSCALE,
-	SLIDER_ID_XSCALE_LAST           = SLIDER_ID_XSCALE + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_YSCALE,
-	SLIDER_ID_YSCALE_LAST           = SLIDER_ID_YSCALE + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_XOFFSET,
-	SLIDER_ID_XOFFSET_LAST          = SLIDER_ID_XOFFSET + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_YOFFSET,
-	SLIDER_ID_YOFFSET_LAST          = SLIDER_ID_YOFFSET + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_OVERLAY_XSCALE,
-	SLIDER_ID_OVERLAY_XSCALE_LAST   = SLIDER_ID_OVERLAY_XSCALE + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_OVERLAY_YSCALE,
-	SLIDER_ID_OVERLAY_YSCALE_LAST   = SLIDER_ID_OVERLAY_YSCALE + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_OVERLAY_XOFFSET,
-	SLIDER_ID_OVERLAY_XOFFSET_LAST  = SLIDER_ID_OVERLAY_XOFFSET + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_OVERLAY_YOFFSET,
-	SLIDER_ID_OVERLAY_YOFFSET_LAST  = SLIDER_ID_OVERLAY_YOFFSET + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_FLICKER,
-	SLIDER_ID_FLICKER_LAST          = SLIDER_ID_FLICKER + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_BEAM_WIDTH_MIN,
-	SLIDER_ID_BEAM_WIDTH_MIN_LAST   = SLIDER_ID_BEAM_WIDTH_MIN + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_BEAM_WIDTH_MAX,
-	SLIDER_ID_BEAM_WIDTH_MAX_LAST   = SLIDER_ID_BEAM_WIDTH_MAX + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_BEAM_INTENSITY,
-	SLIDER_ID_BEAM_INTENSITY_LAST   = SLIDER_ID_BEAM_INTENSITY + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_BEAM_DOT_SIZE,
-	SLIDER_ID_BEAM_DOT_SIZE_LAST    = SLIDER_ID_BEAM_DOT_SIZE + SLIDER_SCREEN_SPACING,
-	SLIDER_ID_CROSSHAIR_SCALE,
-	SLIDER_ID_CROSSHAIR_SCALE_LAST  = SLIDER_ID_CROSSHAIR_SCALE + SLIDER_INPUT_SPACING,
-	SLIDER_ID_CROSSHAIR_OFFSET,
-	SLIDER_ID_CROSSHAIR_OFFSET_LAST = SLIDER_ID_CROSSHAIR_OFFSET + SLIDER_INPUT_SPACING,
-
-	SLIDER_ID_CORE_LAST         = SLIDER_ID_CROSSHAIR_OFFSET,
-	SLIDER_ID_CORE_COUNT
-};
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -170,7 +116,7 @@ private:
 
 // ======================> mame_ui_manager
 
-class mame_ui_manager : public ui_manager, public slider_changed_notifier
+class mame_ui_manager : public ui_manager
 {
 public:
 	enum draw_mode
@@ -312,36 +258,34 @@ private:
 	void exit();
 	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
-	std::unique_ptr<slider_state> slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
+	template <typename... Params> void slider_alloc(Params &&...args) { m_sliders.push_back(std::make_unique<slider_state>(std::forward<Params>(args)...)); }
 
 	// slider controls
-	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
-
-	int32_t slider_volume(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_overclock(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_refresh(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_overxscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_overyscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_overxoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_overyoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_flicker(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_beam_dot_size(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_volume(std::string *str, int32_t newval);
+	int32_t slider_mixervol(int item, std::string *str, int32_t newval);
+	int32_t slider_adjuster(ioport_field &field, std::string *str, int32_t newval);
+	int32_t slider_overclock(device_t &device, std::string *str, int32_t newval);
+	int32_t slider_refresh(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_brightness(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_contrast(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_gamma(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_xscale(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_yscale(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_xoffset(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_yoffset(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_overxscale(laserdisc_device &laserdisc, std::string *str, int32_t newval);
+	int32_t slider_overyscale(laserdisc_device &laserdisc, std::string *str, int32_t newval);
+	int32_t slider_overxoffset(laserdisc_device &laserdisc, std::string *str, int32_t newval);
+	int32_t slider_overyoffset(laserdisc_device &laserdisc, std::string *str, int32_t newval);
+	int32_t slider_flicker(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_beam_width_min(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_beam_width_max(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_beam_dot_size(screen_device &screen, std::string *str, int32_t newval);
+	int32_t slider_beam_intensity_weight(screen_device &screen, std::string *str, int32_t newval);
 	std::string slider_get_screen_desc(screen_device &screen);
 	#ifdef MAME_DEBUG
-	int32_t slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
-	int32_t slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_crossscale(ioport_field &field, std::string *str, int32_t newval);
+	int32_t slider_crossoffset(ioport_field &field, std::string *str, int32_t newval);
 	#endif
 
 	std::vector<std::unique_ptr<slider_state>> m_sliders;

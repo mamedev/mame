@@ -329,6 +329,7 @@ void rampart_state::rampart(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
 	SLAPSTIC(config, m_slapstic, 118);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x140000, 0x147fff, 0x438000);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
@@ -495,13 +496,6 @@ ROM_END
 void rampart_state::machine_start()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x140000, 0x147fff, 0x438000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
-	// The slapstic seems to trigger on the whole rom, but that slows things down too much.  limit to the range rampart actually needs
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x040000, 0x041fff, 0x000000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
 }
 
 

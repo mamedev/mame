@@ -23,6 +23,8 @@ ToDo:
 #include "st_mp100.lh"
 
 
+namespace {
+
 class st_mp100_state : public genpin_class
 {
 public:
@@ -48,6 +50,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 
 private:
 	uint8_t u10_a_r();
@@ -77,8 +83,7 @@ private:
 	uint8_t m_digit;
 	uint8_t m_counter;
 	uint8_t m_segment[5];
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
@@ -693,6 +698,8 @@ void st_mp100_state::machine_reset()
 	m_u10_cb2 = 0;
 	m_u11a = 0;
 	m_u11b = 0;
+	m_timer_x = false;
+	m_u11_timer = false;
 }
 
 // zero-cross detection
@@ -860,6 +867,9 @@ ROM_START(magic)
 	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(8838091f) SHA1(d2702b5e15076793b4560c77b78eed6c1da571b6))
 	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))
 ROM_END
+
+} // Anonymous namespace
+
 
 // chimes
 GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

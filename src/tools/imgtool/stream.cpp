@@ -147,8 +147,7 @@ imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read
 	char c;
 
 	// maybe we are just a ZIP?
-	std::string ext = core_filename_extract_extension(filename);
-	if (!core_stricmp(ext.c_str(), ".zip"))
+	if (core_filename_ends_with(filename, ".zip"))
 		return open_zip(filename, nullptr, read_or_write);
 
 	util::core_file::ptr f = nullptr;

@@ -53,7 +53,7 @@ public:
 private:
 	static const desc_e mac_gcr[];
 
-	uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+	uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 
 	bool m_prodos_order;
@@ -80,7 +80,7 @@ public:
 private:
 	static const desc_e mac_gcr[];
 
-	uint8_t gb(const uint8_t *buf, int ts, int &pos, int &wrap);
+	uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 	void update_chk(const uint8_t *data, int size, uint32_t &chk);
 };
 
@@ -131,5 +131,31 @@ private:
 };
 
 extern const floppy_format_type FLOPPY_WOZ_FORMAT;
+
+
+class a2_nib_format : public floppy_image_format_t
+{
+public:
+	a2_nib_format();
+
+	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual bool supports_save() const override;
+
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+
+
+private:
+	static constexpr size_t nibbles_per_track = 0x1a00;
+	static constexpr size_t min_sync_bytes = 4;
+	static constexpr auto expected_size_35t = 35 * nibbles_per_track;
+	static constexpr auto expected_size_40t = 40 * nibbles_per_track;
+
+	std::vector<uint32_t> generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles);
+};
+
+extern const floppy_format_type FLOPPY_NIB_FORMAT;
 
 #endif // MAME_FORMATS_AP2_DSK_H

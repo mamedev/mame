@@ -274,11 +274,11 @@ void design6_state::design6(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	CD4099(config, "outlatch0");
-//	outlatch0.q_out_cb<0>() // enable coin return motor 1
-//	outlatch0.q_out_cb<1>() // enable coin return motor 2
-//	outlatch0.q_out_cb<2>() // enable coin return motor 3
-//	outlatch0.q_out_cb<3>() // master enable coin return motor?
-//	outlatch0.q_out_cb<6>() // ?
+//  outlatch0.q_out_cb<0>() // enable coin return motor 1
+//  outlatch0.q_out_cb<1>() // enable coin return motor 2
+//  outlatch0.q_out_cb<2>() // enable coin return motor 3
+//  outlatch0.q_out_cb<3>() // master enable coin return motor?
+//  outlatch0.q_out_cb<6>() // ?
 
 	cd4099_device &outlatch1(CD4099(config, "outlatch1"));
 	outlatch1.q_out_cb<5>().set("vfd", FUNC(roc10937_device::data));

@@ -36,9 +36,12 @@ Todo:
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/tms9928a.h"
 #include "speaker.h"
+
+#include "kingpin.lh"
 
 
 namespace {
@@ -51,10 +54,15 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
+		, m_hopper(*this, "hopper")
+		, m_leds(*this, "led_%u", 0U)
 	{ }
 
 	void kingpin(machine_config &config);
 	void dealracl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void sound_nmi_w(uint8_t data);
@@ -66,8 +74,50 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<hopper_device> m_hopper;
+
+	output_finder<16> m_leds;
+
+	void output1_w(uint8_t data);
+	void output2_w(uint8_t data);
 };
 
+void kingpin_state::machine_start()
+{
+	m_leds.resolve();
+}
+
+void kingpin_state::output1_w(uint8_t data)
+{
+	// 7-------  bottom row button 3
+	// -6------  bottom row button 2
+	// --5-----  bottom row button 1
+	// ---4----  top row button 5
+	// ----3---  top row button 4
+	// -----2--  top row button 3
+	// ------1-  top row button 2
+	// -------0  top row button 1
+
+	for (int i = 0; i < 8; i++)
+		m_leds[i] = BIT(data, i);
+}
+
+void kingpin_state::output2_w(uint8_t data)
+{
+	// 7-------  coin out counter/motor?
+	// -6------  payout
+	// --5-----  service
+	// ---4----  coin slot 2
+	// ----3---  coin slot 1
+	// -----2--  hopper motor
+	// ------1-  bottom row button 5
+	// -------0  bottom row button 4
+
+	for (int i = 0; i < 8; i++)
+		m_leds[8 + i] = BIT(data, i);
+
+	m_hopper->motor_w(BIT(data, 2));
+}
 
 void kingpin_state::sound_nmi_w(uint8_t data)
 {
@@ -93,11 +143,11 @@ void kingpin_state::kingpin_io_map(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0x30, 0x30).w(FUNC(kingpin_state::output1_w));
+	map(0x40, 0x40).w(FUNC(kingpin_state::output2_w));
+//  map(0x50, 0x50)
 	map(0x60, 0x60).w(FUNC(kingpin_state::sound_nmi_w));
-	//map(0x30, 0x30).nopw(); // lamps?
-	//map(0x40, 0x40).nopw(); // lamps?
-	//map(0x50, 0x50).nopw(); // ?
-	//map(0x70, 0x70).nopw(); // ?
+//  map(0x70, 0x70)
 }
 
 void kingpin_state::kingpin_sound_map(address_map &map)
@@ -114,33 +164,41 @@ void kingpin_state::kingpin_sound_map(address_map &map)
 
 static INPUT_PORTS_START( kingpin )
 	PORT_START("IN0")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_NAME("Choice 1")
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_NAME("Choice 2")
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    PORT_NAME("Choice 3")
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )    PORT_NAME("Choice 4")
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )    PORT_NAME("Choice 5")
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )    PORT_NAME("Even")
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_NAME("Start / Bowl")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Credits / Kingpin")
 
 	PORT_START("IN1")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )    PORT_NAME("Quit")
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )    PORT_NAME("Odd")
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )     PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) // switches to next screen in attract mode
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "S1:1" )
+	PORT_DIPNAME( 0x01, 0x01, "Setup (1 of 4)" ) PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "S1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "S1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "S1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "S1:5" )
+	PORT_DIPNAME( 0x08, 0x08, "Setup (2 of 4)" ) PORT_DIPLOCATION("S1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Setup (3 of 4)" ) PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "S1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "S1:7" )
+	PORT_DIPNAME( 0x40, 0x40, "Setup (4 of 4)" ) PORT_DIPLOCATION("S1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "S1:8" )
 INPUT_PORTS_END
 
@@ -181,6 +239,10 @@ void kingpin_state::kingpin(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8912(config, "aysnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+
+	config.set_default_layout(layout_kingpin);
 }
 
 void kingpin_state::dealracl(machine_config &config)
@@ -203,7 +265,7 @@ ROM_START( kingpin )
 	ROM_LOAD( "7.u22", 0x0000, 0x2000, CRC(077f533d) SHA1(74d0115b2cef5c35294ecb29771689b40ad1c25a) )
 
 	ROM_REGION( 0x0800, "nvram", 0 ) // default nvram
-	ROM_LOAD( "nvram.u19", 0x0000, 0x0800, CRC(59de96fe) SHA1(0fcbd8305b66db4d3e9c8070d70ad673d30610a3) )
+	ROM_LOAD( "nvram.u19", 0x0000, 0x0800, CRC(391453cf) SHA1(22f2df50e1c87d3d04f44c9b88a4f7ccfb893d5f) )
 
 	ROM_REGION( 0x40, "user1", 0 )
 	ROM_LOAD( "n82s123n.u29", 0x00, 0x20, CRC(ce8b1a6f) SHA1(9b8f564efa4efea867884970f4a5850d598bc7a7) )
@@ -224,7 +286,7 @@ ROM_START( maxideal )
 	ROM_LOAD( "7.u22", 0x0000, 0x2000, CRC(077f533d) SHA1(74d0115b2cef5c35294ecb29771689b40ad1c25a) )
 
 	ROM_REGION( 0x0800, "nvram", 0 ) // default nvram
-	ROM_LOAD( "nvram.u19", 0x0000, 0x0800, CRC(30a08f13) SHA1(a87d21c333bb8bc2e714aa843319643a84928269) )
+	ROM_LOAD( "nvram.u19", 0x0000, 0x0800, CRC(d11c75bd) SHA1(80cd63fdbc8f02800aaabc43f869562b88203274) )
 
 	ROM_REGION( 0x40, "user1", 0 )
 	ROM_LOAD( "n82s123n.u29", 0x00, 0x20, CRC(ce8b1a6f) SHA1(9b8f564efa4efea867884970f4a5850d598bc7a7) )

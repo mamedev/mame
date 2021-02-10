@@ -32,7 +32,7 @@ public:
 		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
 		m_novram(*this, "x2212"),
-		m_slapstic_device(*this, "slapstic"),
+		m_slapstic(*this, "slapstic"),
 		m_slapstic_bank(*this, "slapstic_bank")
 	{ }
 
@@ -54,7 +54,7 @@ private:
 	required_device_array<pokey_device, 4> m_pokey;
 	required_device<tms5220_device> m_tms;
 	required_device<x2212_device> m_novram;
-	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_device<atari_slapstic_device> m_slapstic;
 	optional_memory_bank m_slapstic_bank;
 
 	int m_MPA;

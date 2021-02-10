@@ -1605,7 +1605,7 @@ INPUT_PORTS_END
 void ttfball_state::ttfball(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
+	PIC1655(config, m_maincpu, 500000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
 	m_maincpu->read_a().set(FUNC(ttfball_state::read_a));
 	m_maincpu->write_b().set(FUNC(ttfball_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1614,7 +1614,7 @@ void ttfball_state::ttfball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x7f, 0xff);
-	m_display->set_bri_levels(0.003, 0.03); // player led is brighter
+	m_display->set_bri_levels(0.002, 0.02); // player led is brighter
 	config.set_default_layout(layout_ttfball);
 
 	/* sound hardware */
