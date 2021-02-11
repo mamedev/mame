@@ -19,7 +19,7 @@
 
     MicroTouch ISA
     ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
-    S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
+    PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
     Parallel port dongle HASP4
     Creative Video Blaster camera (parallel port)
     HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
