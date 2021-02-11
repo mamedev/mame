@@ -1141,7 +1141,6 @@ WRITE_LINE_MEMBER(firebeat_spu_state::spu_ata_dmarq)
 		if (m_spu_ata_dmarq)
 		{
 			m_spuata->write_dmack(ASSERT_LINE);
-			m_dma_timer->enable(true);
 			m_dma_timer->adjust(attotime::zero);
 		}
 	}
