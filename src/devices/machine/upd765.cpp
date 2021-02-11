@@ -1890,8 +1890,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				break;
 			}
 
-			if ((st2 & ST2_CM) && !(command[0] & 0x20))
-			{
+			if ((st2 & ST2_CM) && !(command[0] & 0x20)) {
 				// Encountered terminating sector while in non-skip mode.
 				// This will stop reading when a normal data sector is encountered during read deleted data,
 				// or when a deleted sector is encountered during a read data command.
