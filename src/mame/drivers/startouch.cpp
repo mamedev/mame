@@ -80,9 +80,6 @@ ROM_START(europl01)
 	ROM_SYSTEM_BIOS(3, "bst_m5atd1228b_2", "Biostar M5ATD (Award BIOS ATD1228B, set 2)")                                                           // Biostar M5ATD
 	ROMX_LOAD("award_1998_pci-pnp_586_149278871.bin", 0x00000, 0x20000, CRC(3c6aea4d) SHA1(9e56b0f27c204a0eaaf1174070fc95faacc84b0b), ROM_BIOS(3)) //   W29C011
 
-	ROM_REGION(0x8000, "vga_bios", 0)
-	ROM_LOAD("s3_86c775-86c785_video_bios_v1.01.04.u5", 0x0000, 0x8000, CRC(e718418f) SHA1(1288ce51bb732a346eb7c61d5bdf80ea22454d45))
-
 	ROM_REGION(0x20000, "hd_firmware", 0) // Samsung SV0322A
 	ROM_LOAD("jk200-35.bin", 0x00000, 0x20000, CRC(601fa709) SHA1(13ded4826a64209faac8bc81708172b81195ab96))
 
