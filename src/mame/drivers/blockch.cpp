@@ -10,12 +10,14 @@ Hardware notes:
 - NEC 8228, 2*NEC 8255C
 - 4KB ROM (4*MB8518)
 - 256 bytes SRAM(2*MB8101), 1KB SRAM(2*M58754S)
-- 1bpp bitmap + ball sprite
+- 1bpp bitmap + ball sprite, paddle sprite
 - discrete sound
 - 15 switches (not the usual small dipswitches, but separate large switches)
 
 TODO:
-- paddle sprite and missing (presumed) ball vs paddle collision detection
+- missing paddle position read (or maybe ball vs paddle collision detection)
+- interrupts are wrong, it looks like it expects IN.2 0x40 to be low for a while before the 2nd irq
+- is mirror(0x08) on the PPIs correct? it reads from 0x1c what may be paddle related too
 - video timing is wrong
 - identify remaining switches
 - the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
@@ -113,8 +115,13 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	// draw paddle
 	// TODO: preliminary
 	int py = m_inputs[3]->read();
-	if (cliprect.contains(py, 10))
-		bitmap.pix(py, 10) = rgb_t::white();
+	int px[2] = { 186, 46 };
+
+	for (int y = py; y < (py + 20); y++)
+		for (int i = 0; i < 2; i++)
+			for (int x = px[i]; x < (px[i] + 2); x++)
+				if (cliprect.contains(x, y))
+					bitmap.pix(y, x) = rgb_t::white();
 
 	return 0;
 }
@@ -224,7 +231,7 @@ static INPUT_PORTS_START( blockch )
 	PORT_DIPNAME( 0x10, 0x10, "Unknown 2_10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 2_20" )
+	PORT_DIPNAME( 0x20, 0x00, "Unknown 2_20" ) // collision related?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -233,7 +240,7 @@ static INPUT_PORTS_START( blockch )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN.3")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 
