@@ -258,8 +258,10 @@ LLVM:
 #endif
 
 #if defined _MSC_VER
+#if !defined __clang__
 #  define POSH_COMPILER_STRING "Microsoft Visual C++"
 #  define POSH_COMPILER_MSVC 1
+#endif
 #endif
 
 #if defined __SUNPRO_C
