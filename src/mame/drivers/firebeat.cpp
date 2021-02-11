@@ -1140,8 +1140,8 @@ TIMER_CALLBACK_MEMBER(firebeat_spu_state::spu_dma_callback)
 	// These values were picked because they roughly match real in-game footage of
 	// when sounds start playing, and more importantly to free up CPU time for the
 	// main CPU during DMAs to avoid stuttering.
-	auto next_dma_timing = attotime::from_usec(75);
-	auto dma_end_target = m_spu_ata_dma + 128;
+	auto next_dma_timing = attotime::from_usec(5);
+	auto dma_end_target = m_spu_ata_dma + 16;
 
 	while (m_spu_ata_dmarq && m_spu_ata_dma < dma_end_target)
 	{
