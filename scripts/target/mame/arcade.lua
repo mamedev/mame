@@ -3940,6 +3940,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/arabian.cpp",
 	MAME_DIR .. "src/mame/includes/arabian.h",
 	MAME_DIR .. "src/mame/video/arabian.cpp",
+	MAME_DIR .. "src/mame/drivers/blockch.cpp",
 	MAME_DIR .. "src/mame/drivers/dai3wksi.cpp",
 	MAME_DIR .. "src/mame/drivers/ikki.cpp",
 	MAME_DIR .. "src/mame/includes/ikki.h",

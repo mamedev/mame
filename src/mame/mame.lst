@@ -9372,6 +9372,9 @@ hustle                          // 16-21 [1977 Gremlin]
 mineswpr                        // [1977 Amutech]
 mineswpr4                       // [1977 Amutech]
 
+@source:blockch.cpp
+blockch
+
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
 quarth                          // GX973 (c) 1989 (Japan)
