@@ -290,7 +290,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_resolve_objects() override;
 
 	void firebeat_spu_base(machine_config &config);
@@ -942,7 +941,7 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 
 void firebeat_spu_state::machine_start()
 {
-	m_dma_timer = timer_alloc(TIMER_SPU_DMA);
+	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
 }
 
 void firebeat_spu_state::machine_reset()
@@ -951,16 +950,6 @@ void firebeat_spu_state::machine_reset()
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
 	m_sync_ata_irq = 0;
-}
-
-void firebeat_spu_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_SPU_DMA:
-		spu_dma_callback(ptr, param);
-		break;
-	}
 }
 
 void firebeat_spu_state::device_resolve_objects()
