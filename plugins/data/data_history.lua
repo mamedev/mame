@@ -7,7 +7,7 @@ local function init()
 	local filepath
 	local dbver
 	local fh
-	
+
 	for path in mame_manager.ui.options.entries.historypath:value():gmatch("([^;]+)") do
 		filepath = emu.subst_env(path) .. "/" .. file
 		fh = io.open(filepath, "r")
@@ -29,7 +29,7 @@ local function init()
 	end
 	stmt:finalize()
 
-	
+
 	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
 	db.check("reading history version")
 	stmt:bind_values(file)

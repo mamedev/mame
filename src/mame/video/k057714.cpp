@@ -71,8 +71,13 @@ void k057714_device::device_start()
 
 void k057714_device::device_reset()
 {
-	m_display_width = 0;
-	m_display_height = 0;
+	// Default display width/height are a guess.
+	// All Firebeat games except beatmania III, which uses 640x480, will set the
+	// display width/height through registers.
+	// The assumption here is that since beatmania III doesn't set the display width/height
+	// then the game is assuming that it's already at the correct settings upon boot.
+	m_display_width = 639;
+	m_display_height = 479;
 
 	m_vram_read_addr = 0;
 	m_command_fifo0_ptr = 0;
@@ -468,7 +473,8 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	bool inverse_trans = false;
 
 	// most likely wrong, inverse transparency is only used by kbm
-	if ((m_reg_6c & 0xf) != 0)
+	// beatmania III sets m_reg_6c to 0xfff but it doesn't use inverse transparency
+	if ((m_reg_6c & 0xf) != 0 && m_reg_6c != 0xfff)
 		inverse_trans = true;
 
 	draw_frame((m_layer_select >> 8) & 3, bitmap, cliprect, inverse_trans);

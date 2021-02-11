@@ -21,7 +21,7 @@
 #define LOG_GPIO        (1 << 10)
 #define LOG_INTC        (1 << 11)
 #define LOG_CARD        (1 << 12)
-#define LOG_AUDIO_DMA	(1 << 13)
+#define LOG_AUDIO_DMA   (1 << 13)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_SBI | LOG_SK | LOG_USB | LOG_AUDIO | LOG_SSP | LOG_TRACK | LOG_MOUSE | LOG_GPIO | LOG_INTC | LOG_CARD)
 
 #define VERBOSE         (0)

@@ -411,12 +411,6 @@ int sdl_window_info::window_init()
 
 	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
 
-	// make the window title
-	if (video_config.numscreens == 1)
-		sprintf(m_title, "%s: %s [%s]", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name);
-	else
-		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name, index());
-
 	int result = complete_create();
 
 	// handle error conditions
@@ -691,7 +685,7 @@ int sdl_window_info::complete_create()
 	osd_rect work = monitor()->usuable_position_size();
 
 	// create the SDL window
-	auto sdlwindow = SDL_CreateWindow(m_title,
+	auto sdlwindow = SDL_CreateWindow(title().c_str(),
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), m_extra_flags);

@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "natkeyboard.h"
+
+#include "corestr.h"
 #include "emuopts.h"
 #include "unicode.h"
 
@@ -1013,7 +1015,6 @@ void natural_keyboard::dump(std::ostream &str) const
 		firstdev = false;
 
 		// loop through all codes
-		bool firstkey(true);
 		for (auto &code : devinfo.codemap)
 		{
 			// describe the character code
@@ -1025,12 +1026,15 @@ void natural_keyboard::dump(std::ostream &str) const
 			for (auto &entry : code.second)
 			{
 				// identify the keys used
+				bool firstkey(true);
 				for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
+				{
 					util::stream_format(str, "%s'%s'", firstkey ? "" : ", ", entry.field[field]->name());
+					firstkey = false;
+				}
 
 				// carriage return
 				str << '\n';
-				firstkey = false;
 			}
 		}
 	}

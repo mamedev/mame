@@ -164,7 +164,7 @@ void main()
   // Of all the pixels that are mapped onto the texel we are
   // currently rendering, which pixel are we currently rendering?
   vec2 ratio_scale = xy * u_tex_size0.xy - vec2_splat(0.5);
-  
+
 #ifdef OVERSAMPLE
   float filter = fwidth(ratio_scale.y);
 #endif
@@ -180,7 +180,7 @@ void main()
 
   // Prevent division by zero.
   coeffs = FIX(coeffs);
-  
+
   // Lanczos2 kernel.
   coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
 
@@ -194,7 +194,7 @@ void main()
                    TEX2D(xy)*coeffs.y +
 		   TEX2D(xy +vec2(v_one.x, 0.0))*coeffs.z +
 		   TEX2D(xy + vec2(2.0 * v_one.x, 0.0))*coeffs.w , 0.0, 1.0);
-			 
+
   vec4 col2 = clamp(TEX2D(xy + vec2(-v_one.x, v_one.y))*coeffs.x +
 		    TEX2D(xy + vec2(0.0, v_one.y))*coeffs.y +
 		    TEX2D(xy + v_one)*coeffs.z +

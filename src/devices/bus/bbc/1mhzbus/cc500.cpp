@@ -61,7 +61,7 @@ ROM_END
 
 void bbc_cc500_device::device_add_mconfig(machine_config &config)
 {
-	VIA6522(config, m_via, DERIVED_CLOCK(1, 1));
+	MOS6522(config, m_via, DERIVED_CLOCK(1, 1));
 	m_via->readpa_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepa_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));

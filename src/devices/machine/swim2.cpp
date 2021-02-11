@@ -128,7 +128,6 @@ u8 swim2_device::read(offs_t offset)
 	sync();
 
 	static const char *const names[] = {
-		"?0", "?1", "?2", "?3", "?4", "?5", "?6", "?7",
 		"data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
 	};
 	switch(offset & 7) {
@@ -150,7 +149,7 @@ u8 swim2_device::read(offs_t offset)
 		return r;
 	}
 
-	case 0x2: { // errpr
+	case 0x2: { // error
 		u8 err = m_error;
 		m_error = 0;
 		return err;
@@ -158,7 +157,7 @@ u8 swim2_device::read(offs_t offset)
 
 	case 0x3: { // param
 		u8 r = m_param[m_param_idx];
-		m_param_idx = (m_param_idx + 1) & 15;
+		m_param_idx = (m_param_idx + 1) & 3;
 		return r;
 	}
 
@@ -201,7 +200,7 @@ u8 swim2_device::read(offs_t offset)
 	}
 
 	default:
-		logerror("read %s\n", names[offset & 15]);
+		logerror("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;
@@ -215,7 +214,6 @@ void swim2_device::write(offs_t offset, u8 data)
 
 	static const char *const names[] = {
 		"data", "mark", "crc", "param", "phases", "setup", "mode0", "mode1",
-		"?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
 	};
 
 	switch(offset & 7) {
@@ -233,7 +231,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		if(fifo_push(M_CRC) && !m_error)
 			m_error |= 0x04;
 		break;
-		
+
 	case 3: { // param
 		static const char *const pname[4] = {
 			"late", "time0", "early", "time1"
@@ -275,7 +273,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		break;
 
 	default:
-		logerror("write %s, %02x\n", names[offset], data);
+		logerror("write %s, %02x\n", names[offset & 7], data);
 		break;
 	}
 
@@ -325,11 +323,6 @@ void swim2_device::write(offs_t offset, u8 data)
 	}
 }
 
-u64 swim2_device::time_to_cycles(const attotime &tm) const
-{
-	return tm.as_ticks(clock());
-}
-
 void swim2_device::crc_clear()
 {
 	m_crc = 0xcdb4;
@@ -342,6 +335,11 @@ void swim2_device::crc_update(int bit)
 	else
 		m_crc = m_crc << 1;
 
+}
+
+u64 swim2_device::time_to_cycles(const attotime &tm) const
+{
+	return tm.as_ticks(clock());
 }
 
 attotime swim2_device::cycles_to_time(u64 cycles) const
@@ -373,21 +371,6 @@ u16 swim2_device::fifo_pop()
 	return r;
 }
 
-// cell times
-// 1 us:           31.32
-// 1.5us:          47.32
-// 2us:    31.16   63.32
-// 3us:    47.16   94.32
-// 4us:    63.16  125.32
-// 6us:    94.16  188.32
-
-// time1 = 31, time0 = 16 for clock /1 mfm
-// time1 = 
-
-// 32 mfm, t1=63, t0=31
-// 16 mfm, t1=31.5, t0=15.5
-// 16 gcr, t1=31.5, t0=31.5
-
 void swim2_device::sync()
 {
 	u64 next_sync = time_to_cycles(machine().time());
@@ -412,7 +395,6 @@ void swim2_device::sync()
 					break;
 				}
 			}
-			
 
 			if(m_tss_output & 0xc) {
 				bool bit;
@@ -424,7 +406,7 @@ void swim2_device::sync()
 					m_tss_output = 0;
 				}
 				if(bit) {
-					if(m_flux_write_count == 32)
+					if(m_flux_write_count == m_flux_write.size())
 						flush_write(next_sync - (cycles >> 1));
 					m_flux_write[m_flux_write_count ++] = next_sync - (cycles >> 1);
 					m_half_cycles_before_change = 63;
@@ -538,12 +520,13 @@ void swim2_device::sync()
 								crc_clear();
 							else if(!m_crc)
 								m_sr |= M_CRC0;
+							logerror("DATAR %03x %04x\n", m_sr, m_crc);
 							if(fifo_push(m_sr) && !m_error)
 								m_error |= 0x01;
 						}
 					}
 				}
-			}				
+			}
 		}
 	}
 

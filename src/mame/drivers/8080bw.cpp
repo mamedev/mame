@@ -1976,6 +1976,8 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
+
+	m_polaris_cloud_pos = m_polaris_cloud_speed = 0;
 }
 
 uint8_t _8080bw_state::polaris_port00_r()
@@ -3892,13 +3894,13 @@ void cane_state::cane_unknown_port0_w(u8 data)
 
 ***********************************************************************************************************************************/
 
-u8 orbite_state::orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)
+u8 orbite_state::orbite_scattered_colorram_r(address_space &space, offs_t offset, u8 mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
 
-void orbite_state::orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask)
+void orbite_state::orbite_scattered_colorram_w(address_space &space, offs_t offset, u8 data, u8 mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }
@@ -5651,8 +5653,8 @@ GAMEL(1978, invadernc,   invaders, invaders,  sicv,      mw8080bw_state, empty_i
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)", "Space War (Leisure and Allied)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "Taito / Leijac Corporation", "Space King", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
-GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "Taito / Universal", "Cosmic Monsters (version II)", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
-GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "Taito / Universal", "Cosmic Monsters 2", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
+GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)", "Cosmic Monsters (version II)", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
+GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)", "Cosmic Monsters 2", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   mw8080bw_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1980, ultrainv,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "Taito / Konami", "Ultra Invaders", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )

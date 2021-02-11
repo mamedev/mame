@@ -53,13 +53,13 @@ void bbc_tube_casper_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_m68000, 4_MHz_XTAL);
 	m_m68000->set_addrmap(AS_PROGRAM, &bbc_tube_casper_device::tube_casper_mem);
 
-	VIA6522(config, m_via6522_0, 4_MHz_XTAL / 2);
+	MOS6522(config, m_via6522_0, 4_MHz_XTAL / 2);
 	m_via6522_0->writepb_handler().set(m_via6522_1, FUNC(via6522_device::write_pa));
 	m_via6522_0->ca2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
 	m_via6522_0->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
 	m_via6522_0->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 
-	VIA6522(config, m_via6522_1, 4_MHz_XTAL / 2);
+	MOS6522(config, m_via6522_1, 4_MHz_XTAL / 2);
 	m_via6522_1->writepb_handler().set(m_via6522_0, FUNC(via6522_device::write_pa));
 	m_via6522_1->ca2_handler().set(m_via6522_0, FUNC(via6522_device::write_cb1));
 	m_via6522_1->cb2_handler().set(m_via6522_0, FUNC(via6522_device::write_ca1));

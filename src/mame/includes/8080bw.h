@@ -91,6 +91,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(claybust_gun_on_r);
 
 protected:
+	virtual void video_start() override { m_color_map = m_screen_red = m_flip_screen = 0; }
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
 
@@ -333,8 +334,8 @@ protected:
 
 	virtual void machine_start() override;
 
-	u8 orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff);
-	void orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff);
+	u8 orbite_scattered_colorram_r(address_space &space, offs_t offset, u8 mem_mask = 0xff);
+	void orbite_scattered_colorram_w(address_space &space, offs_t offset, u8 data, u8 mem_mask = 0xff);
 
 private:
 	void orbite_io_map(address_map &map);

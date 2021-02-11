@@ -522,6 +522,7 @@ void hektor_state::hektor(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	EF9364(config, m_ef9364, 6.144_MHz_XTAL / 6);
+	m_ef9364->set_screen(m_screen);
 	m_ef9364->set_palette_tag("palette");
 	m_ef9364->set_nb_of_pages(1);
 	m_ef9364->set_erase(0x20);

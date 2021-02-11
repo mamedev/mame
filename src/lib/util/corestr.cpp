@@ -11,6 +11,7 @@
 #include "corestr.h"
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 
 #include <cctype>
@@ -125,8 +126,6 @@ bool core_iswildstr(const char *sp)
     std::string helpers
 -------------------------------------------------*/
 
-#include <algorithm>
-
 void strdelchr(std::string& str, char chr)
 {
 	for (size_t i = 0; i < str.length(); i++)
@@ -147,10 +146,10 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-static std::string &internal_strtrimspace(std::string& str, bool right_only)
+static std::string_view internal_strtrimspace(std::string_view str, bool right_only)
 {
 	// identify the start
-	std::string::iterator start = str.begin();
+	std::string_view::iterator start = str.begin();
 	if (!right_only)
 	{
 		start = std::find_if(
@@ -160,48 +159,49 @@ static std::string &internal_strtrimspace(std::string& str, bool right_only)
 	}
 
 	// identify the end
-	std::string::iterator end = std::find_if(
+	std::string_view::iterator end = std::find_if(
 		str.rbegin(),
-		std::string::reverse_iterator(start),
+		std::string_view::reverse_iterator(start),
 		[](char c) { return !isspace(uint8_t(c)); }).base();
 
 	// extract the string
-	str = end > start
+	return end > start
 		? str.substr(start - str.begin(), end - start)
-		: "";
-	return str;
+		: std::string_view();
 }
 
-std::string &strtrimspace(std::string& str)
+std::string_view strtrimspace(std::string_view str)
 {
 	return internal_strtrimspace(str, false);
 }
 
-std::string &strtrimrightspace(std::string& str)
+std::string_view strtrimrightspace(std::string_view str)
 {
 	return internal_strtrimspace(str, true);
 }
 
-std::string &strmakeupper(std::string& str)
+std::string strmakeupper(std::string_view str)
 {
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-	return str;
+	std::string result;
+	std::transform(str.begin(), str.end(), std::back_inserter(result), ::toupper);
+	return result;
 }
 
 /**
- * @fn  std::string &strmakelower(std::string& str)
+ * @fn  std::string &strmakelower(std::string_view str)
  *
- * @brief   Changes the given string to lower case.
+ * @brief   Returns a lower case version of the given string.
  *
  * @param [in,out]  str The string to make lower case
  *
- * @return  A reference to the original std::string having been changed to lower case
+ * @return  A new std::string having been changed to lower case
  */
 
-std::string &strmakelower(std::string& str)
+std::string strmakelower(std::string_view str)
 {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	return str;
+	std::string result;
+	std::transform(str.begin(), str.end(), std::back_inserter(result), ::tolower);
+	return result;
 }
 
 /**
@@ -233,7 +233,7 @@ int strreplace(std::string &str, const std::string& search, const std::string& r
 namespace util {
 
 /**
- * @fn  double edit_distance(std::u32string const &lhs, std::u32string const &rhs)
+ * @fn  double edit_distance(std::u32string_view lhs, std::u32string_view rhs)
  *
  * @brief   Compares strings and returns prefix-weighted similarity score (smaller is more similar).
  *
@@ -243,7 +243,7 @@ namespace util {
  * @return  Similarity score ranging from 0.0 (totally dissimilar) to 1.0 (identical).
  */
 
-double edit_distance(std::u32string const &lhs, std::u32string const &rhs)
+double edit_distance(std::u32string_view lhs, std::u32string_view rhs)
 {
 	// based on Jaro-Winkler distance
 	// TODO: this breaks if the lengths don't fit in a long int, but that's not a big limitation
@@ -251,8 +251,8 @@ double edit_distance(std::u32string const &lhs, std::u32string const &rhs)
 	constexpr double PREFIX_WEIGHT(0.1);
 	constexpr double PREFIX_THRESHOLD(0.7);
 
-	std::u32string const &longer((lhs.length() >= rhs.length()) ? lhs : rhs);
-	std::u32string const &shorter((lhs.length() < rhs.length()) ? lhs : rhs);
+	std::u32string_view const &longer((lhs.length() >= rhs.length()) ? lhs : rhs);
+	std::u32string_view const &shorter((lhs.length() < rhs.length()) ? lhs : rhs);
 
 	// find matches
 	long const range((std::max)(long(longer.length() / 2) - 1, 0L));

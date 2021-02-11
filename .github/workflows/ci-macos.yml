@@ -15,8 +15,8 @@ jobs:
           TOOLS: 1
         run: make -j2
       - name: Validate
-        run: ./mame64 -validate
+        run: ./mame -validate
       - uses: actions/upload-artifact@master
         with:
-          name: mame64-macos-${{ github.sha }}
-          path: mame64
+          name: mame-macos-${{ github.sha }}
+          path: mame

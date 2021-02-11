@@ -59,10 +59,10 @@ void output_manager::output_item::notify(s32 value)
 //  OUTPUT ITEM PROXY
 //**************************************************************************
 
-void output_manager::item_proxy::resolve(device_t &device, std::string const &name)
+void output_manager::item_proxy::resolve(device_t &device, std::string_view name)
 {
 	assert(!m_item);
-	m_item = &device.machine().output().find_or_create_item(name.c_str(), 0);
+	m_item = &device.machine().output().find_or_create_item(name, 0);
 }
 
 
@@ -118,7 +118,7 @@ void output_manager::register_save()
     find_item - find an item based on a string
 -------------------------------------------------*/
 
-output_manager::output_item *output_manager::find_item(char const *string)
+output_manager::output_item *output_manager::find_item(std::string_view string)
 {
 	auto item = m_itemtable.find(std::string(string));
 	if (item != m_itemtable.end())
@@ -132,7 +132,7 @@ output_manager::output_item *output_manager::find_item(char const *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item &output_manager::create_new_item(char const *outname, s32 value)
+output_manager::output_item &output_manager::create_new_item(std::string_view outname, s32 value)
 {
 	if (OUTPUT_VERBOSE)
 		osd_printf_verbose("Creating output %s = %d%s\n", outname, value, m_save_data ? " (will not be saved)" : "");
@@ -140,12 +140,12 @@ output_manager::output_item &output_manager::create_new_item(char const *outname
 	auto const ins(m_itemtable.emplace(
 			std::piecewise_construct,
 			std::forward_as_tuple(outname),
-			std::forward_as_tuple(*this, outname, m_uniqueid++, value)));
+			std::forward_as_tuple(*this, std::string(outname), m_uniqueid++, value)));
 	assert(ins.second);
 	return ins.first->second;
 }
 
-output_manager::output_item &output_manager::find_or_create_item(char const *outname, s32 value)
+output_manager::output_item &output_manager::find_or_create_item(std::string_view outname, s32 value)
 {
 	output_item *const item = find_item(outname);
 	return item ? *item : create_new_item(outname, value);
@@ -193,7 +193,7 @@ void output_manager::postload()
     output_set_value - set the value of an output
 -------------------------------------------------*/
 
-void output_manager::set_value(char const *outname, s32 value)
+void output_manager::set_value(std::string_view outname, s32 value)
 {
 	output_item *const item = find_item(outname);
 
@@ -210,7 +210,7 @@ void output_manager::set_value(char const *outname, s32 value)
     output
 -------------------------------------------------*/
 
-s32 output_manager::get_value(char const *outname)
+s32 output_manager::get_value(std::string_view outname)
 {
 	output_item const *const item = find_item(outname);
 
@@ -219,24 +219,27 @@ s32 output_manager::get_value(char const *outname)
 }
 
 
-/*-------------------------------------------------
-    output_set_notifier - sets a notifier callback
-    for a particular output, or for all outputs
-    if nullptr is specified
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_notifier - sets a notifier callback for a
+//  particular output
+//-------------------------------------------------
 
-void output_manager::set_notifier(char const *outname, notifier_func callback, void *param)
+void output_manager::set_notifier(std::string_view outname, notifier_func callback, void *param)
 {
 	// if an item is specified, find/create it
-	if (outname)
-	{
-		output_item *const item = find_item(outname);
-		(item ? *item : create_new_item(outname, 0)).set_notifier(callback, param);
-	}
-	else
-	{
-		m_global_notifylist.emplace_back(callback, param);
-	}
+	output_item *const item = find_item(outname);
+	(item ? *item : create_new_item(outname, 0)).set_notifier(callback, param);
+}
+
+
+//-------------------------------------------------
+//  set_global_notifier - sets a notifier callback
+//  for all outputs
+//-------------------------------------------------
+
+void output_manager::set_global_notifier(notifier_func callback, void *param)
+{
+	m_global_notifylist.emplace_back(callback, param);
 }
 
 
@@ -245,7 +248,7 @@ void output_manager::set_notifier(char const *outname, notifier_func callback, v
     a given name
 -------------------------------------------------*/
 
-u32 output_manager::name_to_id(char const *outname)
+u32 output_manager::name_to_id(std::string_view outname)
 {
 	// if no item, ID is 0
 	output_item const *const item = find_item(outname);

@@ -31,6 +31,8 @@
 #include "saiyukip.lh"
 
 
+namespace {
+
 class umipoker_state : public driver_device
 {
 public:
@@ -121,6 +123,7 @@ void umipoker_state::video_start()
 	m_tilemap[3]->set_transparent_pen(0);
 
 	save_item(NAME(m_scrolly));
+	std::fill(std::begin(m_scrolly), std::end(m_scrolly), 0);
 }
 
 uint32_t umipoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -715,6 +718,8 @@ ROM_START( saiyukip )
 	ROM_LOAD( "slm.u17",      0x000000, 0x040000, CRC(b50eb70b) SHA1(342fcb307844f4d0a02a85b2c61e73b5e8bacd44) ) // first half 1-filled
 	ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
+
+} // Anonymous namespace
 
 
 /******************************************

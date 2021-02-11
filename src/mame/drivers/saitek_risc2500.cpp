@@ -305,7 +305,9 @@ void risc2500_state::risc2500(machine_config &config)
 	m_board->set_delay(attotime::from_msec(100));
 	m_board->set_nvram_enable(true);
 
-	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
+	RAM(config, m_ram).set_extra_options("128K, 256K, 512K, 1M, 2M");
+	m_ram->set_default_size("2M");
+	m_ram->set_default_value(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 

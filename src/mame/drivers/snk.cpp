@@ -6937,6 +6937,7 @@ ROM_END
 /***********************************************************************/
 
 
+// TODO: according to Kold at very least Athena is ROT180 not ROT0
 GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, empty_init, ROT270, "SNK",     "Marvin's Maze", 0 )
 GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, empty_init, ROT270, "SNK",     "Vanguard II", 0 )
 GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crasher", 0 )

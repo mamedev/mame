@@ -11,6 +11,30 @@
       i.e. Paddle Mania draws a middle line there, which isn't shown on real HW.
     - Paddle Mania: ranking screen is unreadable, maybe
 
+***************************************************************************
+
+The Next Space:
+ Mainboard A8004-1
+  MC68000P10 @ 9MHz
+  Z80A @ 4MHz
+  YM3812 @ 4MHz + YM3014 DAC
+  24MHz, 18MHz & 4MHz OSCs
+  8 switch Dipswitch x 2
+  Custom SNK CLK chip
+  Custom SNK I/O chip x 2
+ Many PCBs feature a A8004-2 daughtercard with 4 smaller mask ROMs, labeled
+  NS 5, NS 6, NS 7 & NS 8 instead of the single larger mask ROM
+
+***************************************************************************
+
+Paddle Mania
+ Mainboard 68K-96-I
+  MC68000-8 @ 6MHz
+  Z80A @ 4MHz
+  YM3812 @ 4MHz + YM3014 DAC
+  24MHz OSC
+  8 switch Dipswitch x 2
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -350,7 +374,7 @@ void alpha68k_I_state::base_config(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 4000000));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(24'000'000)/6)); // 4MHz (24MHz/6) verified
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -374,11 +398,11 @@ void paddlemania_state::paddlema(machine_config &config)
 {
 	base_config(config);
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 6000000); /* 24MHz/4? */
+	M68000(config, m_maincpu, XTAL(24'000'000)/4); // 6MHz (24MHz/4) verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &paddlemania_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(paddlemania_state::irq1_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, 4000000); // 4Mhz seems to yield the correct tone
+	Z80(config, m_audiocpu, XTAL(24'000'000)/6); // 4MHz (24MHz/6) verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &paddlemania_state::sound_map);
 
 	video_config(config, 0);
@@ -390,11 +414,11 @@ void thenextspace_state::tnextspc(machine_config &config)
 {
 	base_config(config);
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 9000000); /* Confirmed 18 MHz/2 */
+	M68000(config, m_maincpu, XTAL(18'000'000)/2); // 9MHz (18MHz/2) verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &thenextspace_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(thenextspace_state::irq1_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL(4'000'000)); // 4Mhz verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thenextspace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &thenextspace_state::sound_iomap);
 
@@ -408,6 +432,7 @@ void thenextspace_state::tnextspc(machine_config &config)
  *
  */
 
+// Several bootleg boards with identical ROMs have been found.
 ROM_START( paddlema )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "padlem.6g",  0x00000, 0x10000, CRC(c227a6e8) SHA1(9c98be6e82a0dd76fd5b786601456b060407c57f) )
@@ -415,11 +440,8 @@ ROM_START( paddlema )
 	ROM_LOAD16_BYTE( "padlem.6h",  0x20000, 0x10000, CRC(8897555f) SHA1(7d30aa56a727700a6e02af92b065ed982a39ccc2) )
 	ROM_LOAD16_BYTE( "padlem.3h",  0x20001, 0x10000, CRC(f0fe9b9d) SHA1(2e7a80dc25c549e57b7698052f53562a9a608205) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
 	ROM_LOAD( "padlem.18c", 0x000000, 0x10000, CRC(9269778d) SHA1(bdc9100827f2e018db943d9f7d81b7936c155bf0) )
-
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "padlem.9m",       0x00001, 0x10000, CRC(4ee4970d) SHA1(d57d9178129236dfb3a18688e8544e5e555ce559) )
@@ -432,51 +454,52 @@ ROM_START( paddlema )
 	ROM_LOAD16_BYTE( "padlem.13n",      0x60000, 0x10000, CRC(1d460486) SHA1(4ade817a036447e7e6d4fe56fa2c5712f198c625) )
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "padlem.a",        0x0000,  0x0100,  CRC(cae6bcd6) SHA1(da3b3bdcdc7fefae80b0ef8365565bbe5ff0d5d2) ) /* R */
-	ROM_LOAD( "padlem.b",        0x0100,  0x0100,  CRC(b6df8dcb) SHA1(318ca20fab6608aa2956ec3bb82e8ae77c250d51) ) /* G */
-	ROM_LOAD( "padlem.c",        0x0200,  0x0100,  CRC(39ca9b86) SHA1(8b8d7aae85830e69366e86f8b6cccfb8140cd526) ) /* B */
+	ROM_LOAD( "padlem.a",        0x0000,  0x0100,  CRC(cae6bcd6) SHA1(da3b3bdcdc7fefae80b0ef8365565bbe5ff0d5d2) ) // R
+	ROM_LOAD( "padlem.b",        0x0100,  0x0100,  CRC(b6df8dcb) SHA1(318ca20fab6608aa2956ec3bb82e8ae77c250d51) ) // G
+	ROM_LOAD( "padlem.c",        0x0200,  0x0100,  CRC(39ca9b86) SHA1(8b8d7aae85830e69366e86f8b6cccfb8140cd526) ) // B
 
 	ROM_REGION( 0x800, "clut_proms", 0 )
-	ROM_LOAD( "padlem.17j",      0x0000,  0x0400,  CRC(86170069) SHA1(8e2ad7afa50453e9a2dc89386ce02d10e7c89fbc) ) /* Clut low nibble */
-	ROM_LOAD( "padlem.16j",      0x0400,  0x0400,  CRC(8da58e2c) SHA1(6012715a2d3ba4cf8bc5a8250e7f28cb59913092) ) /* Clut high nibble */
+	ROM_LOAD( "padlem.17j",      0x0000,  0x0400,  CRC(86170069) SHA1(8e2ad7afa50453e9a2dc89386ce02d10e7c89fbc) ) // Clut low nibble
+	ROM_LOAD( "padlem.16j",      0x0400,  0x0400,  CRC(8da58e2c) SHA1(6012715a2d3ba4cf8bc5a8250e7f28cb59913092) ) // Clut high nibble
 
 	ROM_REGION( 0x8000, "color_proms", 0 )
-	ROM_LOAD( "padlem.18n",      0x0000,  0x8000,  CRC(06506200) SHA1(d43337e5611cb0d3432942539ccf04bff2bdd345) ) /* Colour lookup */
+	ROM_LOAD( "padlem.18n",      0x0000,  0x8000, CRC(488df971) SHA1(fe1436ddc63ffb37fcc9e57aeb923c8c96fd6ac3) ) // Colour lookup
+	// The dump with the following hashes has a bad bit 3 at 0x7de6: CRC(06506200) SHA1(d43337e5611cb0d3432942539ccf04bff2bdd345)
 ROM_END
 
-ROM_START( tnextspc ) /* mask ROM for gfx */
+ROM_START( tnextspc )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) )
-	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) )
+	ROM_LOAD16_BYTE( "ns_4.4", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) // Silkscreened "4" @ 14L
+	ROM_LOAD16_BYTE( "ns_3.3", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) // Silkscreened "3" @ 11L
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
-	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) )
+	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) ) // single mask ROM for gfx
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "2.p2",        0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) /* R */
-	ROM_LOAD( "3.p3",        0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) /* G */
-	ROM_LOAD( "1.p1",        0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) /* B */
+	ROM_LOAD( "2.p2", 0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) // R
+	ROM_LOAD( "3.p3", 0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) // G
+	ROM_LOAD( "1.p1", 0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) // B
 
 	ROM_REGION( 0x800, "clut_proms", 0 )
-	ROM_LOAD( "5.p5",        0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) /* Clut high nibble */
-	ROM_LOAD( "4.p4",        0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
+	ROM_LOAD( "5.p5", 0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) // Clut high nibble
+	ROM_LOAD( "4.p4", 0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) // Clut low nibble
 
 	ROM_REGION( 0x8000, "color_proms", 0 )
-	ROM_LOAD( "ns_2.bin",    0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) /* Colour lookup */
+	ROM_LOAD( "ns_2.bin", 0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) // Colour lookup
 ROM_END
 
 ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as this set, the only difference being ns_2.bin being double sized with 1st and 2nd half identical
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) /* b18.ic13 */
-	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) /* b17.ic11 */
+	ROM_LOAD16_BYTE( "ns_4.4", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) // == b18.ic13
+	ROM_LOAD16_BYTE( "ns_3.3", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) // == b17.ic11
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
-	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) /* b1.ic129 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_LOAD( "ns_1.1",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // == b1.ic129
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* EPROMs, graphics are odd/even interleaved */
+	ROM_REGION( 0x080000, "gfx1", 0 )   // EPROMs, graphics are odd/even interleaved
 	ROM_LOAD16_BYTE( "b3.ic49",  0x00001, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
 	ROM_LOAD16_BYTE( "b7.ic53",  0x00000, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
 	ROM_LOAD16_BYTE( "b4.ic50",  0x20001, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )
@@ -487,40 +510,40 @@ ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as
 	ROM_LOAD16_BYTE( "b10.ic56", 0x60000, 0x10000, CRC(f48819df) SHA1(86d688590379316638ef4c3094c11629931cd69e) )
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "2.p2",        0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) /* R */
-	ROM_LOAD( "3.p3",        0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) /* G */
-	ROM_LOAD( "1.p1",        0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) /* B */
+	ROM_LOAD( "2.p2", 0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) // R
+	ROM_LOAD( "3.p3", 0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) // G
+	ROM_LOAD( "1.p1", 0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) // B
 
 	ROM_REGION( 0x800, "clut_proms", 0 )
-	ROM_LOAD( "5.p5",        0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) /* Clut high nibble */
-	ROM_LOAD( "4.p4",        0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
+	ROM_LOAD( "5.p5", 0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) // Clut high nibble
+	ROM_LOAD( "4.p4", 0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) // Clut low nibble
 
 	ROM_REGION( 0x8000, "color_proms", 0 )
-	ROM_LOAD( "ns_2.bin",    0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) /* b2.ic90 - Colour lookup */
+	ROM_LOAD( "ns_2.bin", 0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) // b2.ic90 - Colour lookup
 ROM_END
 
 ROM_START( tnextspcj )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ns_ver1_j4.bin", 0x00000, 0x20000, CRC(5cdf710d) SHA1(c744e532f2f5a248d7b50a2e62cc77a0888d8dff) )
-	ROM_LOAD16_BYTE( "ns_ver1_j3.bin", 0x00001, 0x20000, CRC(cd9532d0) SHA1(dbd7ced8f015334f0acb8d760f4d9d0299feef70) )
+	ROM_LOAD16_BYTE( "ns_ver1_j4.4", 0x00000, 0x20000, CRC(5cdf710d) SHA1(c744e532f2f5a248d7b50a2e62cc77a0888d8dff) ) // Silkscreened "4" @ 14L
+	ROM_LOAD16_BYTE( "ns_ver1_j3.3", 0x00001, 0x20000, CRC(cd9532d0) SHA1(dbd7ced8f015334f0acb8d760f4d9d0299feef70) ) // Silkscreened "3" @ 11L
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
-	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) )
+	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) ) // single mask ROM for gfx
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "2.p2",        0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) /* R */
-	ROM_LOAD( "3.p3",        0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) /* G */
-	ROM_LOAD( "1.p1",        0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) /* B */
+	ROM_LOAD( "2.p2", 0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) // R
+	ROM_LOAD( "3.p3", 0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) // G
+	ROM_LOAD( "1.p1", 0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) // B
 
 	ROM_REGION( 0x800, "clut_proms", 0 )
-	ROM_LOAD( "5.p5",        0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) /* Clut high nibble */
-	ROM_LOAD( "4.p4",        0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
+	ROM_LOAD( "5.p5", 0x0000,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) // Clut high nibble
+	ROM_LOAD( "4.p4", 0x0400,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) // Clut low nibble
 
 	ROM_REGION( 0x8000, "color_proms", 0 )
-	ROM_LOAD( "ns_2.bin",    0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) /* Colour lookup */
+	ROM_LOAD( "ns_2.bin", 0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) // Colour lookup
 ROM_END
 
 void paddlemania_state::init_paddlema()
@@ -537,9 +560,9 @@ void thenextspace_state::init_tnextspc()
 	m_game_id = 0;
 }
 
-GAME( 1988, paddlema,   0,       paddlema,       paddlema,  paddlemania_state,  init_paddlema,  ROT90, "SNK",                                               "Paddle Mania", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, paddlema,   0,       paddlema,       paddlema,  paddlemania_state,  init_paddlema,  ROT90, "SNK",                                        "Paddle Mania", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                               "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                               "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK (Pasadena International Corp. license)",        "The Next Space (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                        "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                        "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK (Pasadena International Corp. license)", "The Next Space (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 

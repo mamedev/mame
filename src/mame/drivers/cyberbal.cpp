@@ -421,6 +421,7 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	SLAPSTIC(config, m_slapstic, 116);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x18000, 0x1ffff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::tournament_map);
 }
@@ -1002,10 +1003,6 @@ ROM_END
 void cyberbal_state::init_cyberbalt()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x18000, 0x2000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x18000, 0x1ffff, 0, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
-
 }
 
 

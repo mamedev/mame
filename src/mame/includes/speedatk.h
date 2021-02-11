@@ -23,6 +23,10 @@ public:
 
 	void speedatk(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -47,8 +51,6 @@ private:
 	void m6845_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void speedatk_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

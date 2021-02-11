@@ -109,59 +109,48 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 						}
 
 						// get directory of file
-						std::string directory_path = std::string(chains.options().art_path());
-						std::string file_directory = "";
 						const size_t last_slash = texture_name.rfind('/');
-						if (last_slash != std::string::npos)
+						const std::string file_directory = last_slash != std::string::npos ? texture_name.substr(0, last_slash) : std::string();
+						file_enumerator directory_path(chains.options().art_path());
+						while (const osd::directory::entry *entry = directory_path.next(file_directory.empty() ? nullptr : file_directory.c_str()))
 						{
-							file_directory = texture_name.substr(0, last_slash);
-
-							directory_path += "/" + file_directory;
-						}
-
-						osd::directory::ptr directory = osd::directory::open(directory_path);
-						if (directory)
-						{
-							for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
+							if (entry->type == osd::directory::entry::entry_type::FILE)
 							{
-								if (entry->type == osd::directory::entry::entry_type::FILE)
+								std::string file(entry->name);
+								std::string extension(".png");
+
+								// split into file name and extension
+								std::string file_name;
+								std::string file_extension;
+								const size_t last_dot = file.rfind('.');
+								if (last_dot != std::string::npos)
 								{
-									std::string file(entry->name);
-									std::string extension(".png");
+									file_name = file.substr(0, last_dot);
+									file_extension = file.substr(last_dot, file.length() - last_dot);
+								}
 
-									// split into file name and extension
-									std::string file_name;
-									std::string file_extension;
-									const size_t last_dot = file.rfind('.');
-									if (last_dot != std::string::npos)
-									{
-										file_name = file.substr(0, last_dot);
-										file_extension = file.substr(last_dot, file.length() - last_dot);
-									}
+								std::string file_path;
+								if (file_directory == "")
+								{
+									file_path = file;
+								}
+								else
+								{
+									file_path = file_directory + PATH_SEPARATOR + file;
+								}
 
-									std::string file_path;
-									if (file_directory == "")
+								// check for .png extension
+								if (file_extension == extension && std::find(texture_names.begin(), texture_names.end(), file_path) == texture_names.end())
+								{
+									// create textures for all files containd in the path of the specified file name
+									uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+									flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
+									bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
+									if (texture == nullptr)
 									{
-										file_path = file;
+										return nullptr;
 									}
-									else
-									{
-										file_path = file_directory + "/" + file;
-									}
-
-									// check for .png extension
-									if (file_extension == extension)
-									{
-										// create textures for all files containd in the path of the specified file name
-										uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
-										flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
-										bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
-										if (texture == nullptr)
-										{
-											return nullptr;
-										}
-										texture_names.push_back(file_path);
-									}
+									texture_names.push_back(file_path);
 								}
 							}
 						}

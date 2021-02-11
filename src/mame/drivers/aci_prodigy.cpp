@@ -258,7 +258,7 @@ void prodigy_state::prodigy(machine_config &config)
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prodigy_state::main_map);
 
-	VIA6522(config, m_via, 2_MHz_XTAL); // DDRA = 0x00, DDRB = 0x8f
+	MOS6522(config, m_via, 2_MHz_XTAL); // DDRA = 0x00, DDRB = 0x8f
 	m_via->readpa_handler().set(FUNC(prodigy_state::input1_r));
 	m_via->readpb_handler().set(FUNC(prodigy_state::input2_r));
 	m_via->writepb_handler().set(FUNC(prodigy_state::control_w));

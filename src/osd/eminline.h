@@ -29,6 +29,8 @@
 #include "eigccarm.h"
 #endif
 
+#include "eigcc.h"
+
 #elif defined(_MSC_VER)
 
 #if (defined(_M_IX86) || defined(_M_X64))
@@ -323,12 +325,8 @@ inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 #ifndef addu_32x32_co
 inline bool addu_32x32_co(uint32_t a, uint32_t b, uint32_t &sum)
 {
-#if defined(__GNUC__)
-	return __builtin_add_overflow(a, b, &sum);
-#else
 	sum = a + b;
 	return (a > sum) || (b > sum);
-#endif
 }
 #endif
 
@@ -342,12 +340,8 @@ inline bool addu_32x32_co(uint32_t a, uint32_t b, uint32_t &sum)
 #ifndef addu_64x64_co
 inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 {
-#if defined(__GNUC__)
-	return __builtin_add_overflow(a, b, &sum);
-#else
 	sum = a + b;
 	return (a > sum) || (b > sum);
-#endif
 }
 #endif
 
@@ -398,10 +392,6 @@ inline unsigned population_count_32(uint32_t val)
 {
 #if defined(__NetBSD__)
 	return popcount32(val);
-#elif defined(__GNUC__)
-	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
-	return unsigned(__builtin_popcount(static_cast<unsigned>(val)));
 #else
 	// optimal Hamming weight assuming fast 32*32->32
 	constexpr uint32_t m1(0x55555555);
@@ -427,10 +417,6 @@ inline unsigned population_count_64(uint64_t val)
 {
 #if defined(__NetBSD__)
 	return popcount64(val);
-#elif defined(__GNUC__)
-	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
-	return unsigned(__builtin_popcountll(static_cast<unsigned long long>(val)));
 #else
 	// guess that architectures with 64-bit pointers have 64-bit multiplier
 	if (sizeof(void *) >= sizeof(uint64_t))

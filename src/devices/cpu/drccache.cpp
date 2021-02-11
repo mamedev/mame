@@ -39,7 +39,7 @@ template <typename T, typename U> constexpr T *ALIGN_PTR_DOWN(T *p, U align)
 //-------------------------------------------------
 
 drc_cache::drc_cache(size_t bytes) :
-	m_cache({ NEAR_CACHE_SIZE, bytes - NEAR_CACHE_SIZE }),
+	m_cache({ NEAR_CACHE_SIZE, bytes - NEAR_CACHE_SIZE }, osd::virtual_memory_allocation::READ_WRITE_EXECUTE),
 	m_near(reinterpret_cast<drccodeptr>(m_cache.get())),
 	m_neartop(m_near),
 	m_base(ALIGN_PTR_UP(m_near + NEAR_CACHE_SIZE, m_cache.page_size())),
@@ -68,7 +68,7 @@ drc_cache::drc_cache(size_t bytes) :
 	{
 		throw emu_fatalerror("drc_cache: Error marking cache read/write");
 	}
-	else if (m_cache.set_access(m_base - m_near, m_end - m_base, osd::virtual_memory_allocation::READ_WRITE | osd::virtual_memory_allocation::EXECUTE))
+	else if (m_cache.set_access(m_base - m_near, m_end - m_base, osd::virtual_memory_allocation::READ_WRITE_EXECUTE))
 	{
 		osd_printf_verbose("drc_cache: RWX pages supported\n");
 		m_rwx = true;

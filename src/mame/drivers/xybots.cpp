@@ -121,12 +121,6 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* 256H */
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* Xybots uses a swapped version */
-// todo:
-//  PORT_MODIFY("jsa:JSAI")
-//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -182,6 +176,7 @@ void xybots_state::xybots(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
 	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x8000, 0xffff, 0x7c0000);
 	m_slapstic->set_bank(m_slapstic_bank);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
@@ -214,6 +209,7 @@ void xybots_state::xybots(machine_config &config)
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
+	m_jsa->set_inverted_coins();
 	m_jsa->add_route(0, "rspeaker", 1.0);
 	m_jsa->add_route(1, "lspeaker", 1.0);
 	config.device_remove("jsa:pokey");
@@ -388,10 +384,6 @@ ROM_END
 void xybots_state::machine_start()
 {
 	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x2000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xffff, 0x7c0000, "slapstic",
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); },
-													   [this](offs_t offset, u16 &data, u16 mem_mask) { m_slapstic->tweak(offset >> 1); });
-
 	m_h256 = 0x0400;
 }
 

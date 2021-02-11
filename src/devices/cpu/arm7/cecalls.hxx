@@ -3,7 +3,7 @@
 /*****************************************************************************
  *
  *   cecalls.hxx
- *   
+ *
  *   Addresses of certain Windows CE kernel calls, for use in debugging
  *   the bring-up of ARM-based Windows CE systems, e.g. Jornada 7xx.
  *

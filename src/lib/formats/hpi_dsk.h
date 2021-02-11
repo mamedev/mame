@@ -47,8 +47,8 @@ private:
 	void write_sector(std::vector<uint32_t> &buffer , uint8_t track_no , uint8_t sect_head_no , const uint8_t *sect_data);
 	void fill_with_gap3(std::vector<uint32_t> &buffer);
 	static unsigned chs_to_lba(unsigned cylinder , unsigned head , unsigned sector , unsigned heads);
-	std::vector<uint8_t> get_next_id_n_block(const uint8_t *bitstream , int bitstream_size , int& pos , int& start_pos);
-	bool get_next_sector(const uint8_t *bitstream , int bitstream_size , int& pos , unsigned& track , unsigned& head , unsigned& sector , uint8_t *sector_data);
+	std::vector<uint8_t> get_next_id_n_block(const std::vector<bool> &bitstream , int& pos , int& start_pos);
+	bool get_next_sector(const std::vector<bool> &bitstream , int& pos , unsigned& track , unsigned& head , unsigned& sector , uint8_t *sector_data);
 
 	static const uint8_t m_track_skew[ HPI_SECTORS - 1 ][ HPI_HEADS ];
 };

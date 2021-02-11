@@ -548,7 +548,7 @@ void c8050_device::add_common_devices(machine_config &config)
 	// controller
 	M6504(config, m_fdccpu, XTAL(12'000'000)/12);
 
-	VIA6522(config, m_via, XTAL(12'000'000)/12);
+	MOS6522(config, m_via, XTAL(12'000'000)/12);
 	m_via->readpa_handler().set(m_fdc, FUNC(c8050_fdc_device::read));
 	m_via->writepb_handler().set(FUNC(c8050_device::via_pb_w));
 	m_via->ca2_handler().set(m_fdc, FUNC(c8050_fdc_device::mode_sel_w));

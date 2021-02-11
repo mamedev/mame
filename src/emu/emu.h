@@ -38,7 +38,6 @@
 #include "http.h"
 
 // commonly-referenced utilities imported from lib/util
-#include "corestr.h"
 #include "palette.h"
 
 // emulator-specific utilities

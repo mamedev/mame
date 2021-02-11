@@ -286,12 +286,12 @@ u8 i8244_device::read(offs_t offset)
 		default:
 			data = m_vdc.reg[offset];
 
-			// object x/y/attr registers are not readable when display is enabled
+			// object x/y/attr registers are not accessible when display is enabled
 			// (sprite shape registers still are)
 			if (offset < 0x80 && m_vdc.s.control & 0x20)
 				data = 0;
 
-			// grid registers are not readable when grid is enabled
+			// grid registers are not accessible when grid is enabled
 			else if (offset >= 0xc0 && m_vdc.s.control & 0x08)
 				data = 0;
 
@@ -306,8 +306,9 @@ void i8244_device::write(offs_t offset, u8 data)
 {
 	offset = fix_register_mirrors(offset);
 
-	// object registers are not accessible when display is enabled
-	if (offset < 0xa0 && m_vdc.s.control & 0x20)
+	// object x/y/attr registers are not accessible when display is enabled
+	// (sprite shape registers still are)
+	if (offset < 0x80 && m_vdc.s.control & 0x20)
 		return;
 
 	// grid registers are not accessible when grid is enabled
@@ -316,7 +317,7 @@ void i8244_device::write(offs_t offset, u8 data)
 		return;
 
 	// update screen before accessing video registers
-	if ((offset == 0xa0 || offset == 0xa2 || offset == 0xa3) && data != m_vdc.reg[offset])
+	if ((offset <= 0xa0 || offset == 0xa2 || offset == 0xa3) && data != m_vdc.reg[offset])
 		screen().update_now();
 
 	// color registers d4-d7 are not connected

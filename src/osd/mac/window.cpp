@@ -313,12 +313,6 @@ int mac_window_info::window_init()
 
 	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
 
-	// make the window title
-	if (video_config.numscreens == 1)
-		sprintf(m_title, "%s: %s [%s]", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name);
-	else
-		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine().system().type.fullname(), machine().system().name, index());
-
 	result = complete_create();
 
 	// handle error conditions
@@ -515,7 +509,7 @@ void mac_window_info::update()
 //  complete_create
 //============================================================
 
-extern void *CreateMAMEWindow(char *title, int x, int y, int w, int h, bool isFullscreen);
+extern void *CreateMAMEWindow(const char *title, int x, int y, int w, int h, bool isFullscreen);
 extern void *GetOSWindow(void *wincontroller);
 
 int mac_window_info::complete_create()
@@ -552,7 +546,7 @@ int mac_window_info::complete_create()
 	// get monitor work area for centering
 	osd_rect work = monitor()->usuable_position_size();
 
-	auto window = CreateMAMEWindow(m_title,
+	auto window = CreateMAMEWindow(title().c_str(),
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), fullscreen());

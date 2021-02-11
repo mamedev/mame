@@ -453,20 +453,20 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 	{
 		case 0x06 / 2:
 			/* EEPROM address lower bits port/EEPROM address and command port
-		             1KBit EEPROM:
-		             Bit 0-5 - EEPROM address bit 1-6
-		             Bit 6-7 - Command
-		             00 - Extended command address bit 4-5:
-		             00 - Write disable
-		             01 - Write all
-		             10 - Erase all
-		             11 - Write enable
-		             01 - Write
-		             10 - Read
-		             11 - Erase
-		             16KBit EEPROM:
-		             Bit 0-7 - EEPROM address bit 1-8
-		             */
+			         1KBit EEPROM:
+			         Bit 0-5 - EEPROM address bit 1-6
+			         Bit 6-7 - Command
+			         00 - Extended command address bit 4-5:
+			         00 - Write disable
+			         01 - Write all
+			         10 - Erase all
+			         11 - Write enable
+			         01 - Write
+			         10 - Read
+			         11 - Erase
+			         16KBit EEPROM:
+			         Bit 0-7 - EEPROM address bit 1-8
+			         */
 			if (ACCESSING_BITS_0_7)
 			{
 				switch (m_eeprom_mode)
@@ -489,23 +489,23 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 				}
 			}
 			/* EEPROM higher bits/command bits port
-		             1KBit EEPROM:
-		             Bit 0   - Start
-		             Bit 1-7 - Unknown
-		             16KBit EEPROM:
-		             Bit 0-1 - EEPROM address bit 9-10
-		             Bit 2-3 - Command
-		             00 - Extended command address bit 0-1:
-		             00 - Write disable
-		             01 - Write all
-		             10 - Erase all
-		             11 - Write enable
-		             01 - Write
-		             10 - Read
-		             11 - Erase
-		             Bit 4   - Start
-		             Bit 5-7 - Unknown
-		             */
+			         1KBit EEPROM:
+			         Bit 0   - Start
+			         Bit 1-7 - Unknown
+			         16KBit EEPROM:
+			         Bit 0-1 - EEPROM address bit 9-10
+			         Bit 2-3 - Command
+			         00 - Extended command address bit 0-1:
+			         00 - Write disable
+			         01 - Write all
+			         10 - Erase all
+			         11 - Write enable
+			         01 - Write
+			         10 - Read
+			         11 - Erase
+			         Bit 4   - Start
+			         Bit 5-7 - Unknown
+			         */
 			if (ACCESSING_BITS_8_15)
 			{
 				switch (m_eeprom_mode)
@@ -539,14 +539,14 @@ void ws_rom_eeprom_device::write_io(offs_t offset, u16 data, u16 mem_mask)
 
 		case 0x08 / 2:
 			/* EEPROM command
-		             Bit 0   - Read complete (read only)
-		             Bit 1   - Write complete (read only)
-		             Bit 2-3 - Unknown
-		             Bit 4   - Read
-		             Bit 5   - Write
-		             Bit 6   - Protect
-		             Bit 7   - Initialize
-		             */
+			         Bit 0   - Read complete (read only)
+			         Bit 1   - Write complete (read only)
+			         Bit 2-3 - Unknown
+			         Bit 4   - Read
+			         Bit 5   - Write
+			         Bit 6   - Protect
+			         Bit 7   - Initialize
+			         */
 			if (ACCESSING_BITS_0_7)
 			{
 				if (data & 0x80)    // Initialize
@@ -686,7 +686,7 @@ void ws_wwitch_device::write_ram(offs_t offset, u16 data, u16 mem_mask)
 				m_flash_mode = COMMAND_MODE;
 			}
 			break;
-		case 0x80:	// Erase (chip or block)
+		case 0x80:  // Erase (chip or block)
 			m_flash_command = data;
 			break;
 		default:    // Unknown command

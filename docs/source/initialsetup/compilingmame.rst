@@ -43,15 +43,13 @@ All Platforms
 Putting all of these together, we get a couple of examples:
 
 Rebuilding MAME for just the Pac-Man driver, with tools, on a quad-core
-(e.g. i5 or i7) machine:
+(e.g. i5 or i7) machine::
 
-| **make SOURCES=src/mame/drivers/pacman.cpp TOOLS=1 REGENIE=1 -j5**
-|
+    make SOURCES=src/mame/drivers/pacman.cpp TOOLS=1 REGENIE=1 -j5
 
-Rebuilding MAME on a dual-core (e.g. i3 or laptop i5) machine:
+Rebuilding MAME on a dual-core (e.g. i3 or laptop i5) machine::
 
-| **make -j3**
-|
+    make -j3
 
 
 .. _compiling-windows:
@@ -73,7 +71,7 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   window management, audio/video output, font rendering, etc.  If you want to
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
   add **OSD=sdl** to the make options.  The main emulator binary will have an
-  ``sdl`` prefix prepended (e.g. ``sdlmame64.exe`` or ``sdlmame.exe``).  You
+  ``sdl`` prefix prepended (e.g. ``sdlmame.exe``).  You
   will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
 * By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
@@ -93,23 +91,33 @@ with MSYS2 and the **pacman** package manager.
   using the **pacman** command.
 * Add the ``mame`` repository to ``/etc/pacman.conf`` using
   ``/etc/pacman.d/mirrorlist.mame`` for locations.
-* Install packages necessary to build MAME.  At the very least, you'll need
+* Install packages necessary to build MAME.  At the very least, you’ll need
   ``bash``, ``git``, ``make``.
-* For 64-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
+* For 64-bit builds you’ll need ``mingw-w64-x86_64-gcc`` and
   ``mingw-w64-x86_64-python``.
-* For 32-bit builds you'll need ``mingw-w64-i686-gcc`` and
+* For 32-bit builds you’ll need ``mingw-w64-i686-gcc`` and
   ``mingw-w64-i686-python``.
 * For debugging you may want to install ``gdb``.
 * To link using the LLVM linker (generally much faster than the GNU linker),
-  you'll need ``mingw-w64-x86_64-lld`` and ``mingw-w64-x86_64-libc++`` for
+  you’ll need ``mingw-w64-x86_64-lld`` and ``mingw-w64-x86_64-libc++`` for
   64-bit builds, or ``mingw-w64-i686-lld`` and ``mingw-w64-i686-libc++`` for
   32-bit builds.
-* To build against the portable SDL interfaces, you'll need
+* To build against the portable SDL interfaces, you’ll need
   ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
   or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
-* To build the Qt debugger, you'll need ``mingw-w64-x86_64-qt5`` for 64-bit
+* To build the Qt debugger, you’ll need ``mingw-w64-x86_64-qt5`` for 64-bit
   builds, or ``mingw-w64-i686-qt5`` for 32-bit builds.
-* To generate API documentation from source, you'll need ``doxygen``.
+* To build the HTML user/developer documentation, you’ll need
+  ``mingw-w64-x86_64-librsvg``, ``mingw-w64-x86_64-python-sphinx``,
+  ``mingw-w64-x86_64-python-sphinx_rtd_theme`` and
+  ``mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter`` for a 64-bit MinGW
+  environment (or alternatively ``mingw-w64-i686-librsvg``,
+  ``mingw-w64-i686-python-sphinx``, ``mingw-w64-i686-python-sphinx_rtd_theme``
+  and ``mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter`` a 32-bit MinGW
+  environment).
+* To generate API documentation from source, you’ll need ``doxygen``.
+* If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
+  you’ll need ``bison``.
 * For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu, and set
   up the environment variables ``MINGW64`` to ``/mingw64`` and ``MINGW32`` to an
   empty string (e.g. using the command **export MINGW64=/mingw64 MINGW32=** in
@@ -209,12 +217,21 @@ imposed by the PE/COFF object file format.
 Fedora Linux
 ------------
 
-You'll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.4 or later as earlier versions are buggy.
+You’ll need a few prerequisites from your Linux distribution.  Make sure you get
+SDL2 2.0.4 or later as earlier versions are buggy::
 
-**sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel**
+    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel
 
 Compilation is exactly as described above in All Platforms.
+
+To build the HTML user/developer documentation, you’ll need Sphinx, as well as
+the theme and the SVG converter::
+
+    sudo dnf install python3-sphinx python3-sphinx_rtd_theme python3-sphinxcontrib-rsvgconverter
+
+The HTML documentation can be built with this command::
+
+    make -C docs SPHINXBUILD=sphinx-build-3 html
 
 
 .. _compiling-ubuntu:
@@ -222,12 +239,14 @@ Compilation is exactly as described above in All Platforms.
 Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 -------------------------------------------------------------
 
-You'll need a few prerequisites from your Linux distribution.  Make sure you get
-SDL2 2.0.4 or later as earlier versions are buggy.
+You’ll need a few prerequisites from your Linux distribution.  Make sure you get
+SDL2 2.0.4 or later as earlier versions are buggy::
 
-**sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default**
+    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default
 
-Compilation is exactly as described above in All Platforms.
+Compilation is exactly as described above in All Platforms.  Note the Ubuntu
+Linux modifies GCC to enable the GNU C Library “fortify source” feature by
+default, which may cause issues compiling MAME (see :ref:`compiling-issues`).
 
 
 .. _compiling-arch:
@@ -235,44 +254,37 @@ Compilation is exactly as described above in All Platforms.
 Arch Linux
 ----------
 
-You'll need a few prerequisites from your distro.
+You’ll need a few prerequisites from your distro::
 
-**sudo pacman -S base-devel git sdl2 gconf sdl2_ttf gcc qt5**
+    sudo pacman -S base-devel git sdl2 gconf sdl2_ttf gcc qt5
 
 Compilation is exactly as described above in All Platforms.
 
 
 .. _compiling-macos:
 
-Apple Mac OS X
---------------
+Apple macOS
+-----------
 
-You'll need a few prerequisites to get started. Make sure you're on OS X 10.9 Mavericks or later. You will need SDL2 2.0.4 or later for OS X.
+You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
+Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
 
-* Install **Xcode** from the Mac App Store
-* Launch **Xcode**. It will download a few additional prerequisites. Let this run through before proceeding.
-* Once that's done, quit **Xcode** and open a **Terminal** window
-* Type **xcode-select --install** to install additional tools necessary for MAME
+* Install **Xcode** from the Mac App Store or `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
+* To find the corresponding Xcode for your MacOS release please visit `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of Xcode available to you.
+* Launch **Xcode**. It will download a few additional prerequisites.  Let this
+  run through before proceeding.
+* Once that’s done, quit **Xcode** and open a **Terminal** window
+* Type **xcode-select --install** to install additional tools necessary for MAME (also available as a package on ADC).
 
-Next you'll need to get SDL2 installed.
+Next you’ll need to get SDL2 installed.
 
 * Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *Mac OS X* .dmg file
-* If the .dmg doesn't auto-open, open it
-* Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder
+* If the .dmg doesn’t auto-open, open it
+* Click “Macintosh HD” (your Mac’s hard disk) in the Locations sidebar of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder. You will have to authenticate with your user password.
 
-Lastly to begin compiling, use Terminal to navigate to where you have the MAME source tree (*cd* command) and follow the normal compilation instructions from above in All Platforms.
-
-It's possible to get MAME working from 10.6, but a bit more complicated:
-
-* You'll need to install clang-3.7, ld64, libcxx and python27 from MacPorts
-* Then add these options to your make command or useroptions.mak:
-
-|
-| OVERRIDE_CC=/opt/local/bin/clang-mp-3.7
-| OVERRIDE_CXX=/opt/local/bin/clang++-mp-3.7
-| PYTHON_EXECUTABLE=/opt/local/bin/python2.7
-| ARCHOPTS=-stdlib=libc++
-|
+Lastly to begin compiling, use Terminal to navigate to where you have the MAME
+source tree (*cd* command) and follow the normal compilation instructions from
+above in All Platforms.
 
 
 .. _compiling-emscripten:
@@ -280,59 +292,114 @@ It's possible to get MAME working from 10.6, but a bit more complicated:
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 1.37.29 or later by following the instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
+First, download and install Emscripten 1.37.29 or later by following the
+instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
 
-Once Emscripten has been installed, it should be possible to compile MAME out-of-the-box using Emscripten's '**emmake**' tool. Because a full MAME compile is too large to load into a web browser at once, you will want to use the SOURCES parameter to compile only a subset of the project, e.g. (in the mame directory):
+Once Emscripten has been installed, it should be possible to compile MAME
+out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME compile
+is too large to load into a web browser at once, you will want to use the
+**SOURCES** parameter to compile only a subset of the project, e.g. (in the mame
+directory):
 
-**emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp**
+.. code-block:: bash
 
-The SOURCES parameter should have the path to at least one driver .cpp file. The make process will attempt to locate and include all dependencies necessary to produce a complete build including the specified driver(s). However, sometimes it is necessary to manually specify additional files (using commas) if this process misses something. E.g.:
+    emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp
 
-**emmake make SUBTARGET=apple2e SOURCES=src/mame/drivers/apple2e.cpp,src/mame/machine/applefdc.cpp**
+The **SOURCES** parameter should have the path to at least one driver **.cpp**
+file.  The make process will attempt to locate and include all dependencies
+necessary to produce a complete build including the specified driver(s).
+However, sometimes it is necessary to manually specify additional files (using
+commas) if this process misses something. e.g.
 
-The value of the SUBTARGET parameter serves only to differentiate multiple builds and need not be set to any specific value.
+.. code-block:: bash
 
-Emscripten supports compiling to WebAssembly with a JavaScript loader instead of all-JavaScript, and in later versions this is actually the default. To force WebAssembly on or off, add WEBASSEMBLY=1 or WEBASSEMBLY=0 to the make command line.
+    emmake make SUBTARGET=apple2e SOURCES=src/mame/drivers/apple2e.cpp,src/mame/machine/applefdc.cpp
 
-Other make parameters can also be used, e.g. *-j* for multithreaded compilation as described earlier.
+The value of the **SUBTARGET** parameter serves only to differentiate multiple
+builds and need not be set to any specific value.
 
-When the compilation reaches the emcc phase, you may see a number of *"unresolved symbol"* warnings. At the moment, this is expected for OpenGL-related functions such as glPointSize. Any others may indicate that an additional dependency file needs to be specified in the SOURCES list. Unfortunately this process is not automated and you will need to search the source tree to locate the files supplying the missing symbols. You may also be able to get away with ignoring the warnings if the code path referencing them is not used at run-time.
+Emscripten supports compiling to WebAssembly with a JavaScript loader instead of
+all-JavaScript, and in later versions this is actually the default.  To force
+WebAssembly on or off, add **WEBASSEMBLY=1** or **WEBASSEMBLY=0** to the make
+command line.
 
-If all goes well, a .js file will be output to the current directory. This file cannot be run by itself, but requires an HTML loader to provide it with a canvas to output to and pass in command-line parameters. The `Emularity project <https://github.com/db48x/emularity>`_ provides such a loader.
+Other make parameters can also be used, e.g. **-j** for parallel compilation, as
+described earlier.
 
-There are example .html files in that repository which can be edited to point to your newly compiled MAME js filename and pass in whatever parameters you desire. You will then need to place all of the following on a web server:
+When the compilation reaches the emcc phase, you may see a number of
+*"unresolved symbol"* warnings.  At the moment, this is expected for
+OpenGL-related functions such as glPointSize.  Any others may indicate that an
+additional dependency file needs to be specified in the **SOURCES** list.
+Unfortunately this process is not automated and you will need to search the
+source tree to locate the files supplying the missing symbols.  You may also be
+able to get away with ignoring the warnings if the code path referencing them is
+not used at run-time.
 
-* The compiled MAME .js file
-* The compiled MAME .wasm file if using WebAssembly
-* The .js files from the Emularity package (loader.js, browserfs.js, etc.)
-* A .zip file with the ROMs for the MAME driver you would like to run (if any)
+If all goes well, a **.js** file will be output to the current directory.  This
+file cannot be run by itself, but requires an HTML loader to provide it with a
+canvas to draw to and to pass in command-line parameters.  The
+`Emularity project <https://github.com/db48x/emularity>`_ provides such a loader.
+
+There are example **.html** files in that repository which can be edited to
+point to your newly compiled MAME **.js** file and pass in whatever parameters
+you desire. You will then need to place all of the following on a web server:
+
+* The compiled MAME **.js** file
+* The compiled MAME **.wasm** file if using WebAssembly
+* The **.js** files from the Emularity package (**loader.js**, **browserfs.js**,
+  etc.)
+* A **.zip** file with the ROMs for the MAME driver you would like to run (if
+  any)
 * Any software files you would like to run with the MAME driver
-* An Emularity loader .html modified to point to all of the above
+* An Emularity loader **.html** modified to point to all of the above
 
-You need to use a web server instead of opening the local files directly due to security restrictions in modern web browsers.
+You need to use a web server instead of opening the local files directly due to
+security restrictions in modern web browsers.
 
-If the result fails to run, you can open the Web Console in your browser to see any error output which may have been produced (e.g. missing or incorrect ROM files). A "ReferenceError: foo is not defined" error most likely indicates that a needed source file was omitted from the SOURCES list.
+If the result fails to run, you can open the Web Console in your browser to see
+any error output which may have been produced (e.g. missing or incorrect ROM
+files).  A “ReferenceError: foo is not defined” error most likely indicates that
+a needed source file was omitted from the **SOURCES** list.
+
 
 .. _compiling-docs:
 
 Compiling the Documentation
 ---------------------------
 
-Compiling the documentation will require you to install several packages depending on your operating system.
+Compiling the documentation will require you to install several packages
+depending on your operating system.
 
-On Debian/Ubuntu flavors of Linux, you'll need python3-sphinx/python-sphinx and the python3-pip/python-pip packages.
+On Debian/Ubuntu flavors of Linux, you’ll need python3-sphinx/python-sphinx
+and the python3-pip/python-pip packages, depending on whether you’re using
+Python 3 or Python 2::
 
-**sudo apt-get install python3-sphinx python3-pip** or **sudo apt-get install python-sphinx python-pip** depending on whether you're using Python 3 or Python 2.
+    sudo apt-get install python3-sphinx python3-pip
 
-You'll then need to install the SVG handler.
+or::
 
-**pip3 install sphinxcontrib-svg2pdfconverter** or **pip install sphinxcontrib-svg2pdfconverter** depending on whether you're using Python 3 or Python 2.
+    sudo apt-get install python-sphinx python-pip
 
-If you intend on making a PDF via LaTeX, you'll need to install a LaTeX distribution such as TeX Live.
+You’ll then need to install the SVG handler::
 
-**sudo apt-get install latexmk texlive texlive-science texlive-formats-extra**
+    pip3 install sphinxcontrib-svg2pdfconverter
 
-From this point you can do **make html** or **make latexpdf** from the docs folder to generate the output of your choice. Typing **make** by itself will tell you all available formats. The output will be in the docs/build folder in a subfolder based on the type chosen (e.g. **make html** will create *docs/build/html* with the output.)
+or::
+
+    pip install sphinxcontrib-svg2pdfconverter
+
+depending on whether you’re using Python 3 or Python 2.
+
+If you intend on making a PDF via LaTeX, you’ll need to install a LaTeX
+distribution such as TeX Live::
+
+    sudo apt-get install latexmk texlive texlive-science texlive-formats-extra
+
+From this point, you can do **make html** or **make latexpdf** from the docs
+folder to generate the output of your choice.  Typing **make** by itself will
+tell you all available formats.  The output will be in the docs/build folder in
+a subfolder based on the type chosen (e.g. **make html** will create
+*docs/build/html* containing the output).
 
 
 .. _compiling-options:
@@ -399,8 +466,8 @@ TOOLS
 NO_USE_PORTAUDIO
    Set to **1** to disable building the PortAudio sound output module.
 USE_QTDEBUG
-   Set to **1** to include the Qt debugger on platforms where it's not built by
-   default (e.g. Windows or MacOS), or to **0** to disable it.  You'll need to
+   Set to **1** to include the Qt debugger on platforms where it’s not built by
+   default (e.g. Windows or MacOS), or to **0** to disable it.  You’ll need to
    install Qt development libraries and tools to build the Qt debugger.  The
    process depends on the platform.
 
@@ -419,10 +486,10 @@ DEBUG
 OPTIMIZE
    Set optimisation level.  The default is **3** to favour performance at the
    expense of larger executable size.  Set to **0** to disable optimisation (can
-   make debugging easier), **1** for basic optimisation that doesn't have a
-   space/speed trade-off and doesn't have a large impact on compile time, **2**
+   make debugging easier), **1** for basic optimisation that doesn’t have a
+   space/speed trade-off and doesn’t have a large impact on compile time, **2**
    to enable most optimisation that improves performance and reduces size, or
-   **s** to enable only optimisations that generally don't increase executable
+   **s** to enable only optimisations that generally don’t increase executable
    size.  The exact set of supported values depends on your compiler.
 SYMBOLS
    Set to **1** to include additional debugging symbols over the default for the
@@ -519,9 +586,6 @@ Issues with specific compiler versions
 * GCC 7 for 32-bit x86 targets produces spurious out-of-bounds access warnings.
   Adding **NOWERROR=1** to your build options works around this by not treating
   warnings as errors.
-* Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
-  implementation.  If you encounter errors with ``std::unique_ptr`` you need to
-  upgrade to a newer version of libstdc++ that fixes the issue.
 
 GNU C Library fortify source feature
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -535,12 +599,12 @@ support building with ``_FORTIFY_SOURCE`` defined.
 Some Linux distributions (including Gentoo and Ubuntu) have patched GCC to
 define ``_FORTIFY_SOURCE`` to ``1`` as a built-in macro.  This is problematic
 for more projects than just MAME, as it makes it hard to disable the additional
-checks (e.g. if you don't want the performance impact of the run-time checks),
+checks (e.g. if you don’t want the performance impact of the run-time checks),
 and it also makes it hard to define ``_FORTIFY_SOURCE`` to ``2`` if you want to
 enable stricter checks.  You should really take it up with the distribution
-maintainers, and make it clear you don't want non-standard GCC behaviour. It
+maintainers, and make it clear you don’t want non-standard GCC behaviour. It
 would be better if these distributions defined this macro by default in their
-packaging environments if they think it's important, rather than trying to force
+packaging environments if they think it’s important, rather than trying to force
 it on everything compiled on their distributions. (This is what Red Hat does:
 the ``_FORTIFY_SOURCE`` macro is set in the RPM build environment, and not by
 distributing a modified version of GCC.)
@@ -577,15 +641,15 @@ installed and add ``-fuse-ld=lld`` to the linker options (e.g. in the
 Cross-compiling MAME
 ~~~~~~~~~~~~~~~~~~~~
 
-MAME's build system has basic support for cross-compilation.  Set
+MAME’s build system has basic support for cross-compilation.  Set
 **CROSS_BUILD=1** to enable separate host and target compilers, set
 **OVERRIDE_CC** and **OVERRIDE_CXX** to the target C/C++ compiler commands, and
 if necessary set **CC** and **CXX** to the host C/C++ compiler commands.  If the
 target OS is different to the host OS, set it with **TARGETOS**.  For example it
 may be possible to build a MinGW32 x64 build on a Linux host using a command
-like this:
+like this::
 
-**make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
+    make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
 
 (The additional packages required for producing a standard MinGW32 x64 build on
 a Fedora Linux host are ``mingw64-gcc-c++``, ``mingw64-winpthreads-static`` and
@@ -594,14 +658,14 @@ their dependencies.  Non-standard builds may require additional packages.)
 Using libc++ on Linux
 ~~~~~~~~~~~~~~~~~~~~~
 
-MAME may be built using the LLVM project's "libc++" C++ Standard Library.  The
+MAME may be built using the LLVM project’s “libc++” C++ Standard Library.  The
 prerequisites are a working clang/LLVM installation, and the libc++ development
 libraries.  On Fedora Linux, the necessary packages are **libcxx**,
 **libcxx-devel**, **libcxxabi** and **libcxxabi-devel**.  Set the C and C++
 compiler commands to use clang, and add **-stdlib=libc++** to the C++ compiler
-and linker options.  You could use a command like this:
+and linker options.  You could use a command like this::
 
-**env LDFLAGS=-stdlib=libc++ make OVERRIDE_CC=clang OVERRIDE_CXX=clang++ ARCHOPTS_CXX=-stdlib=libc++ ARCHOPTS_OBJCXX=-stdlib=libc++**
+    env LDFLAGS=-stdlib=libc++ make OVERRIDE_CC=clang OVERRIDE_CXX=clang++ ARCHOPTS_CXX=-stdlib=libc++ ARCHOPTS_OBJCXX=-stdlib=libc++
 
 The options following the **make** command may be placed in a prefix makefile if
 you want to use this configuration regularly, but **LDFLAGS** needs to be be set
@@ -616,9 +680,9 @@ want to build MAME on a Linux distribution that still uses a version of GNU
 libstdC++ that predates C++17 support.  To use an alternate GCC installation to,
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
-installed GCC in /opt/local/gcc72, you might use a command like this:
+installed GCC in /opt/local/gcc72, you might use a command like this::
 
-**make OVERRIDE_CC=/opt/local/gcc72/bin/gcc OVERRIDE_CXX=/opt/local/gcc72/bin/g++ ARCHOPTS=-Wl,-R,/opt/local/gcc72/lib64**
+    make OVERRIDE_CC=/opt/local/gcc72/bin/gcc OVERRIDE_CXX=/opt/local/gcc72/bin/g++ ARCHOPTS=-Wl,-R,/opt/local/gcc72/lib64
 
 You can add these options to a prefix makefile if you plan to use this
 configuration regularly.

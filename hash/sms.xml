@@ -157,6 +157,19 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Note from the dumper: The dump could seem bad because CRC in the header is wrong, it's normal because the ROM must be seen as two
+	     banks of 16KB (selected with A14, controlled by the PAL in the Action Replay -->
+	<software name="ar" supported="no">
+		<description>Action Replay (v. 1.02)</description>
+		<year>1993</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ms_ar_rom.bin" size="32768" crc="7d731851" sha1="d222c556b8a993879de222d095e08c2376f0b7cc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="addfam">
 		<description>The Addams Family (Euro)</description>

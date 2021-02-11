@@ -94,6 +94,7 @@
 	ROM_LOAD( "m1a-mcu.bin", 0x0000, 0x1000, CRC(ae957b00) SHA1(83267b64335b4ab33cc033d5003c4c93c813fc37) ) \
 	ROM_REGION( 0x100000, "gals", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "gal16v8a.m1a.a.u32", 0x0000, 0x000117, CRC(5da2b5ab) SHA1(7af5ee675e280905fa41aee23b06394a59c8758d) ) /* M1a,b mainboards */  \
+	ROM_LOAD( "gal16v8.digi.a.u5", 0x0000, 0x000117, CRC(137c8d65) SHA1(c86d8ae7e0c99c4f179810dd12e7f412f167093e) ) /* FM + DIGITAL sound/rom card */  \
 	ROM_LOAD( "gal16v8.digi.b.u5", 0x0000, 0x000117, CRC(98dc995a) SHA1(13056e0b2a979a92279b668ce570b80bb75654f9) ) /* DIGITAL sound/rom card */  \
 	ROM_LOAD( "gal16v8.esp.b.u9", 0x0000, 0x000117, CRC(d0ea9b54) SHA1(b7611fb4004431a21f81be10934392bea8dc00a0) ) /* E.S.P. sound/rom card */  \
 	ROM_END

@@ -258,6 +258,7 @@ _count_leading_zeros(uint32_t value)
 
 	return result;
 }
+#endif
 
 
 /*-------------------------------------------------

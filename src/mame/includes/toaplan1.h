@@ -56,7 +56,7 @@ protected:
 	optional_ioport m_dswb_io;
 	optional_ioport m_tjump_io;
 
-	int m_intenable;
+	u8 m_intenable;
 
 	std::unique_ptr<u16[]> m_tilevram[4];
 	/*

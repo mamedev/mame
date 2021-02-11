@@ -27,9 +27,8 @@ public:
 	bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
 
 protected:
-	int decode_bitstream(const uint8_t *bitstream, uint8_t *trackdata, int *sector, int cell_count, int encoding, uint8_t gapbytes, int track_size);
 	uint8_t get_data_from_encoding(uint16_t raw);
-	int get_sectors(const uint8_t *bitstream, int cell_count, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber);
+	int get_sectors(const std::vector<bool> &bitstream, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber);
 
 	virtual int min_heads() =0;
 

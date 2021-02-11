@@ -15,12 +15,6 @@
 #include "emuopts.h"
 #include "ui/menu.h"
 
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
-#include "../osd/windows/winmain.h"
-#else
-#include "../osd/modules/lib/osdobj_common.h"
-#endif
-
 #include <string>
 #include <vector>
 

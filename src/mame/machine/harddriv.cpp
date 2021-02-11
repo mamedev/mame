@@ -1693,26 +1693,6 @@ void harddriv_state::hddspcom_control_w(offs_t offset, uint16_t data)
 
 /*************************************
  *
- *  Race Drivin' slapstic handling
- *
- *************************************/
-
-void harddriv_state::rd68k_slapstic_w(offs_t offset, uint16_t data)
-{
-	m_slapstic_device->tweak(offset & 0x3fff);
-}
-
-
-uint16_t harddriv_state::rd68k_slapstic_r(offs_t offset)
-{
-	int bank = m_slapstic_device->tweak(offset & 0x3fff) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
-}
-
-
-
-/*************************************
- *
  *  Steel Talons SLOOP handling
  *
  *************************************/
@@ -1753,7 +1733,7 @@ void harddriv_state::st68k_sloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_sloop_r(offs_t offset)
 {
 	int bank = st68k_sloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 
@@ -1818,7 +1798,7 @@ void harddriv_state::st68k_protosloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_protosloop_r(offs_t offset)
 {
 	int bank = st68k_protosloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 

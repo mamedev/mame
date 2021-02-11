@@ -10,7 +10,7 @@
 #include "sa1110.h"
 
 #define LOG_UNKNOWN     (1 << 1)
-#define LOG_ICP			(1 << 2)
+#define LOG_ICP         (1 << 2)
 #define LOG_UART3       (1 << 3)
 #define LOG_UART3_HF    (1 << 4)
 #define LOG_MCP         (1 << 5)
@@ -18,16 +18,16 @@
 #define LOG_OSTIMER     (1 << 7)
 #define LOG_OSTIMER_HF  (1 << 8)
 #define LOG_RTC         (1 << 9)
-#define LOG_RTC_HF		(1 << 10)
+#define LOG_RTC_HF      (1 << 10)
 #define LOG_POWER       (1 << 11)
-#define LOG_POWER_HF	(1 << 12)
+#define LOG_POWER_HF    (1 << 12)
 #define LOG_RESET       (1 << 13)
 #define LOG_GPIO        (1 << 14)
 #define LOG_GPIO_HF     (1 << 15)
 #define LOG_INTC        (1 << 16)
-#define LOG_PPC			(1 << 17)
-#define LOG_DMA			(1 << 18)
-#define LOG_UDC			(1 << 19)
+#define LOG_PPC         (1 << 17)
+#define LOG_DMA         (1 << 18)
+#define LOG_UDC         (1 << 19)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_ICP | LOG_UART3 | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC | LOG_PPC | LOG_DMA | LOG_UDC)
 
 #define VERBOSE         (0)
@@ -297,7 +297,7 @@ void sa1110_periphs_device::icp_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		//parity_t parity = PARITY_NONE;
 		//if (BIT(data, 0))
 		//{
-		//	parity = (BIT(data, 1) ? PARITY_EVEN : PARITY_ODD);
+		//  parity = (BIT(data, 1) ? PARITY_EVEN : PARITY_ODD);
 		//}
 
 		//set_data_frame(1, BIT(data, 3) ? 8 : 7, parity, stop_bits);
@@ -314,7 +314,7 @@ void sa1110_periphs_device::icp_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		//const uint8_t old = m_uart_regs.utcr[1] & 0x0f;
 		COMBINE_DATA(&m_icp_regs.uart.utcr[1]);
 		//if ((m_uart_regs.utcr[1] & 0x0f) != old)
-		//	icp_uart_recalculate_divisor();
+		//  icp_uart_recalculate_divisor();
 		break;
 	}
 	case REG_UTCR2:
@@ -324,7 +324,7 @@ void sa1110_periphs_device::icp_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		//const uint8_t old = m_uart_regs.utcr[2] & 0xff;
 		COMBINE_DATA(&m_icp_regs.uart.utcr[2]);
 		//if ((m_uart_regs.utcr[2] & 0xff) != old)
-		//	icp_uart_recalculate_divisor();
+		//  icp_uart_recalculate_divisor();
 		break;
 	}
 	case REG_UTCR3:

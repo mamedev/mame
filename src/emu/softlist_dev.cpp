@@ -16,6 +16,7 @@
 #include "romload.h"
 #include "validity.h"
 
+#include "corestr.h"
 #include "unicode.h"
 
 #include <cctype>
@@ -48,7 +49,7 @@ image_software_list_loader image_software_list_loader::s_instance;
 //  false_software_list_loader::load_software
 //-------------------------------------------------
 
-bool false_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+bool false_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
 	return false;
 }
@@ -58,7 +59,7 @@ bool false_software_list_loader::load_software(device_image_interface &image, so
 //  rom_software_list_loader::load_software
 //-------------------------------------------------
 
-bool rom_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+bool rom_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
 	swlist.machine().rom_load().load_software_part_region(image.device(), swlist, swname, start_entry);
 	return true;
@@ -69,7 +70,7 @@ bool rom_software_list_loader::load_software(device_image_interface &image, soft
 //  image_software_list_loader::load_software
 //-------------------------------------------------
 
-bool image_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+bool image_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
 	return image.load_software(swlist, swname, start_entry);
 }
@@ -109,7 +110,7 @@ void software_list_device::device_start()
 //  and optional interface
 //-------------------------------------------------
 
-void software_list_device::find_approx_matches(const std::string &name, int matches, const software_info **list, const char *interface)
+void software_list_device::find_approx_matches(std::string_view name, int matches, const software_info **list, const char *interface)
 {
 	// if no name, return
 	if (name.empty())
@@ -188,7 +189,7 @@ void software_list_device::release()
 //  across all software list devices
 //-------------------------------------------------
 
-software_list_device *software_list_device::find_by_name(const machine_config &config, const std::string &name)
+software_list_device *software_list_device::find_by_name(const machine_config &config, std::string_view name)
 {
 	// iterate over each device in the system and find a match
 	for (software_list_device &swlistdev : software_list_device_enumerator(config.root_device()))
@@ -204,13 +205,13 @@ software_list_device *software_list_device::find_by_name(const machine_config &c
 //  name, across all software list devices
 //-------------------------------------------------
 
-void software_list_device::display_matches(const machine_config &config, const char *interface, const std::string &name)
+void software_list_device::display_matches(const machine_config &config, const char *interface, std::string_view name)
 {
 	// check if there is at least one software list
 	software_list_device_enumerator deviter(config.root_device());
 	if (deviter.first() != nullptr)
 		osd_printf_error("\n\"%s\" approximately matches the following\n"
-			"supported software items (best match first):\n\n", name.c_str());
+			"supported software items (best match first):\n\n", name);
 
 	// iterate through lists
 	for (software_list_device &swlistdev : deviter)

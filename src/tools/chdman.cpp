@@ -1270,7 +1270,7 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_track_info &info, const char *filename, uint32_t frameoffs, uint64_t discoffs)
+void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_track_info &info, const std::string &filename, uint32_t frameoffs, uint64_t discoffs)
 {
 	if (mode == MODE_GDI)
 	{
@@ -1318,8 +1318,9 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 				size = 2352;
 				break;
 		}
-		bool needquote = strchr(filename, ' ') != nullptr;
-		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
+		const bool needquote = filename.find(' ') != std::string::npos;
+		const char *const quotestr = needquote ? "\"" : "";
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, quotestr, filename, quotestr, discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
@@ -2491,11 +2492,11 @@ static void do_extract_cd(parameters_map &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(trackbin_name)), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(*output_bin_file_str).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, std::string(core_filename_extract_base(*output_bin_file_str)), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include

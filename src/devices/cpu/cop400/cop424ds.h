@@ -2,9 +2,9 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    cop424ds.c
+    cop424ds.h
 
-    National Semiconductor COP424 Emulator.
+    National Semiconductor COP424 disassembler.
 
 ***************************************************************************/
 

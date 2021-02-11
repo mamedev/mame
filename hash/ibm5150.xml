@@ -9949,6 +9949,38 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="harerh">
+		<description>Hare Raising Havoc (USA)</description>
+		<year>1991</year>
+		<publisher>Walt Disney Computer Software</publisher>
+		<info name="developer" value="BlueSky Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 1 of 5].img" size="737280" crc="b2a86b4d" sha1="8acdd64db86de385305ca0a59a18d6c1776c38d6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 2 of 5].img" size="737280" crc="17e9eff7" sha1="9c4f8131020ff1f08cd6141601f7c34cf4bda5e4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 3 of 5].img" size="737280" crc="f6076db5" sha1="1964c6558aaa9fefa1b1482cc094943a5060a503"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 4 of 5].img" size="737280" crc="7ffa1c24" sha1="eb3547889420d697d241bad8320c4ab1692943d0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 5 of 5].img" size="737280" crc="84e8dff3" sha1="3bfb15045dea49b4e7074ab4b08e1533430daa03"/>
+			</dataarea>
+		</part>
+	</software>	
+
 	<software name="harpoon">
 		<description>Harpoon</description>
 		<year>1989</year>
@@ -13886,6 +13918,67 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Weird Dreams [MicroProse] [1989] [3.5].img" size="737280" crc="cc8996dd" sha1="ecd07fbf4b23ffac08f50c970a9f0acdaf86781c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnpst">
+		<description>Where in America's Past is Carmen Sandiego? (5.25")</description>
+		<year>1991</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Brøderbund Software" />
+		<info name="version" value="version 1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 1 of 6] [Program Disk].img" size="368640" crc="b174ee8f" sha1="5fa044ad95a4e75095a905643fc23c262d068745"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 2 of 6] [Data Disk 1].img" size="368640" crc="cafe01ce" sha1="7308c00fef3ccc5ed919ac231190829147355149"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 3 of 6] [Data Disk 2].img" size="368640" crc="b9e6caab" sha1="9937d8c704a5c9946c801c7d6c99d2740dafa351"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 4 of 6] [Data Disk 3].img" size="368640" crc="baa92637" sha1="83da9bfb0bf5c0bb42f2349530920db714385adb"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 5 of 6] [Data Disk 4].img" size="368640" crc="f1ee72ed" sha1="0cf04314bc0005796a59b03a09706102654f8c62"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [5.25DD] [Disk 6 of 6] [Data Disk 5].img" size="368640" crc="8b96ddd4" sha1="34cf4192d523eeb8c824212509ffaecffe1a081b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnpst35" cloneof="carmnpst">
+		<description>Where in America's Past is Carmen Sandiego? (3.5")</description>
+		<year>1991</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Brøderbund Software" />
+		<info name="version" value="version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [3.5DD] [Disk 1 of 3] [Program Disk].img" size="737280" crc="328f5eaa" sha1="83d6cb0afebf9a1c54b6dd3e0cb8ddc27f13fd00"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [3.5DD] [Disk 2 of 3] [Data Disk 1].img" size="737280" crc="98345e6e" sha1="3afb0cb237b15ba0323af01ce1f7259f9c9ba804"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Where in America's Past is Carmen Sandiego [Broderbund] [1991] [3.5DD] [Disk 3 of 3] [Data Disk 2].img" size="737280" crc="122b40b0" sha1="7f5441ea4e350408a8fd2555b020e643392b511a"/>
 			</dataarea>
 		</part>
 	</software>

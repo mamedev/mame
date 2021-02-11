@@ -59,7 +59,7 @@
 
 #define USE_ABI_REG_NAMES 1
 
-// cpu instruction fiels
+// cpu instruction fields
 #define RSREG ((op >> 21) & 31)
 #define RTREG ((op >> 16) & 31)
 #define RDREG ((op >> 11) & 31)
@@ -94,6 +94,9 @@ r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
+	, m_r{}
+	, m_cp0{}
+	, m_f{}
 	, m_fcr0(fcr)
 {
 	m_cp0[CP0_PRId] = prid;
@@ -194,14 +197,17 @@ void r4000_base_device::device_start()
 
 void r4000_base_device::device_reset()
 {
+	if (!m_hard_reset)
+	{
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
+		m_cp0[CP0_ErrorEPC] = m_pc;
+	}
+	else
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+
 	m_branch_state = NONE;
 	m_pc = s64(s32(0xbfc00000));
 	m_r[0] = 0;
-
-	if (m_hard_reset)
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
-	else
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
 
 	m_cp0[CP0_Wired] = 0;
 	m_cp0[CP0_Compare] = 0;

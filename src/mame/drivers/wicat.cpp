@@ -640,7 +640,7 @@ void wicat_state::wicat(machine_config &config)
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	VIA6522(config, m_via, 8_MHz_XTAL);
+	MOS6522(config, m_via, 8_MHz_XTAL);
 	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);

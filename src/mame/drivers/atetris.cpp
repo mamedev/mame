@@ -98,52 +98,21 @@ void atetris_state::irq_ack_w(uint8_t data)
  *
  *************************************/
 
-void atetris_state::reset_bank()
-{
-	memcpy(m_slapstic_base, &m_slapstic_source[m_current_bank * 0x4000], 0x4000);
-}
-
-
 void atetris_state::machine_start()
 {
+	/* Prepare the rom bank */
+	m_slapstic_bank->configure_entries(0, 2, m_slapstic_region, 0x4000);
+	m_slapstic_bank->configure_entries(2, 2, m_slapstic_region, 0x4000);
+
 	/* Allocate interrupt timer */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atetris_state::interrupt_gen),this));
-
-	/* Set up save state */
-	save_item(NAME(m_current_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(atetris_state::reset_bank), this));
 }
 
 
 void atetris_state::machine_reset()
 {
-	m_current_bank = m_slapstic->bank() & 1;
-	reset_bank();
-
 	/* start interrupts going (32V clocked by 16V) */
 	m_interrupt_timer->adjust(m_screen->time_until_pos(48), 48);
-}
-
-
-
-/*************************************
- *
- *  Slapstic handler
- *
- *************************************/
-
-uint8_t atetris_state::slapstic_r(offs_t offset)
-{
-	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = m_slapstic->tweak(offset) & 1;
-
-	/* update for the new bank */
-	if (new_bank != m_current_bank)
-	{
-		m_current_bank = new_bank;
-		reset_bank();
-	}
-	return result;
 }
 
 
@@ -168,16 +137,7 @@ void atetris_bartop_state::output_w(uint8_t data)
 	/* atetrisbp: $3c00 also handles ROM bank selection */
 	/* game writes 0x4 to select bank 0, 0x5 to select bank 1 */
 	if (data & 4)
-	{
-		int new_bank = data & 1;
-
-		/* update for the new bank */
-		if (new_bank != m_current_bank)
-		{
-			m_current_bank = new_bank;
-			reset_bank();
-		}
-	}
+		m_slapstic_bank->set_entry(data & 1);
 }
 
 
@@ -200,8 +160,7 @@ void atetris_state::main_map(address_map &map)
 	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_state::irq_ack_w));
 	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_state::coincount_w));
-	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(FUNC(atetris_state::slapstic_r));
+	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -223,8 +182,7 @@ void atetris_state::atetrisb2_map(address_map &map)
 	map(0x3400, 0x3400).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).w(FUNC(atetris_state::irq_ack_w));
 	map(0x3c00, 0x3c00).w(FUNC(atetris_state::coincount_w));
-	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(FUNC(atetris_state::slapstic_r));
+	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -242,8 +200,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 	map(0x3400, 0x3400).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).w(FUNC(atetris_mcu_state::irq_ack_w));
 	map(0x3c00, 0x3c00).w(FUNC(atetris_mcu_state::coincount_w));
-	map(0x4000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(FUNC(atetris_mcu_state::slapstic_r));
+	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -260,7 +217,8 @@ void atetris_bartop_state::atetrisbp_map(address_map &map)
 	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_bartop_state::irq_ack_w));
 	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_bartop_state::output_w));
-	map(0x4000, 0xffff).rom();
+	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
+	map(0x8000, 0xffff).rom();
 }
 
 
@@ -380,8 +338,6 @@ void atetris_state::atetris_base(machine_config &config)
 	M6502(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 101);
-
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -400,7 +356,7 @@ void atetris_state::atetris_base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
-void atetris_state::atetris(machine_config &config)
+void atetris_state::atetris_pokey(machine_config &config)
 {
 	atetris_base(config);
 
@@ -415,6 +371,14 @@ void atetris_state::atetris(machine_config &config)
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void atetris_state::atetris(machine_config &config)
+{
+	atetris_pokey(config);
+
+	SLAPSTIC(config, m_slapstic, 101);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x6000, 0x7fff, 0);
+	m_slapstic->set_bank(m_slapstic_bank);
+}
 
 void atetris_state::atetrisb2(machine_config &config)
 {
@@ -460,7 +424,7 @@ void atetris_mcu_state::atetrisb3(machine_config &config)
 
 void atetris_bartop_state::atetrisbp(machine_config &config)
 {
-	atetris(config);
+	atetris_pokey(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_bartop_state::atetrisbp_map);
 }
@@ -473,9 +437,8 @@ void atetris_bartop_state::atetrisbp(machine_config &config)
  *************************************/
 
 ROM_START( atetris )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "136066-1100.45f", 0x10000, 0x8000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
-	ROM_CONTINUE(                0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "136066-1100.45f", 0x0000, 0x10000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
@@ -483,9 +446,8 @@ ROM_END
 
 
 ROM_START( atetrisa )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "d1",           0x10000, 0x8000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
-	ROM_CONTINUE(             0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d1",           0x0000, 0x10000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "136066-1101.35a",     0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
@@ -493,9 +455,8 @@ ROM_END
 
 
 ROM_START( atetrisb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "tetris.01",    0x10000, 0x8000, CRC(944d15f6) SHA1(926fa5cb26b6e6a50bea455eec1f6d3fb92aa95c) )
-	ROM_CONTINUE(             0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris.01",    0x0000, 0x10000, CRC(944d15f6) SHA1(926fa5cb26b6e6a50bea455eec1f6d3fb92aa95c) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "tetris.02",    0x0000, 0x10000, CRC(5c4e7258) SHA1(58060681a728e74d69b2b6f5d02faa597ca6c226) )
@@ -508,9 +469,8 @@ ROM_END
 
 
 ROM_START( atetrisb2 )
-	ROM_REGION( 0x18000, "maincpu", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
-	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) ) // 27512
-	ROM_CONTINUE(         0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "k1-01",    0x0000, 0x10000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) ) // 27512
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
 	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) ) // 27512
@@ -561,9 +521,8 @@ The MCU XTAL is 10.73835 MHz rather than 10 MHz on this PCB.
 */
 
 ROM_START( atetrisb3 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "prg.bin",           0x10000, 0x8000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
-	ROM_CONTINUE(             0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.bin",           0x0000, 0x10000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "gfx.bin",     0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
@@ -587,9 +546,8 @@ ROM_START( atetrisb3 )
 ROM_END
 
 ROM_START( atetrisb4 ) // bootleg on an unusually big PCB for this game
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",    0x10000, 0x8000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
-	ROM_CONTINUE(         0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",    0x0000, 0x10000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x10000, CRC(70859030) SHA1(bb6bf88b75be3a81672e0aa30a8cbd7181bc87d0) ) // unique, but extremely similar to the one of the original
@@ -630,9 +588,8 @@ N |PAL16R4 74LS??? 4017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
     1      2      3       4       5       6       7      8      9
 */
 ROM_START( atetb3482 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "i4-d1.bin", 0x10000, 0x8000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
-	ROM_CONTINUE(          0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "i4-d1.bin", 0x0000, 0x10000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "f8-d2.bin", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
@@ -696,18 +653,16 @@ wasn't a viable game to make, its the only known example.
 */
 
 ROM_START( atetrisbp )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "tet_rom_rev1.40f", 0x10000, 0x8000, CRC(b6224e6c) SHA1(6b549317499e91a2f19ec282d927fba08f217488) )
-	ROM_CONTINUE(                 0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tet_rom_rev1.40f", 0x0000, 0x10000, CRC(b6224e6c) SHA1(6b549317499e91a2f19ec282d927fba08f217488) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "8901-136066-1101.40p", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) BAD_DUMP ) // "© 1988 ATARI"; not dumped from this set
 ROM_END
 
 ROM_START( atetrisc )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "tetcktl1.rom", 0x10000, 0x8000, CRC(9afd1f4a) SHA1(323d1576d92c905e8e95108b39cabf6fa0c10db6) )
-	ROM_CONTINUE(             0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetcktl1.rom", 0x0000, 0x10000, CRC(9afd1f4a) SHA1(323d1576d92c905e8e95108b39cabf6fa0c10db6) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "136066-1103.35a", 0x0000, 0x10000, CRC(ec2a7f93) SHA1(cb850141ffd1504f940fa156a39e71a4146d7fea) )
@@ -715,29 +670,12 @@ ROM_END
 
 
 ROM_START( atetrisc2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "136066-1102.45f", 0x10000, 0x8000, CRC(1bd28902) SHA1(ae8c34f082bce1f827bf60830f207c46cb282421) )
-	ROM_CONTINUE(                0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "136066-1102.45f", 0x0000, 0x10000, CRC(1bd28902) SHA1(ae8c34f082bce1f827bf60830f207c46cb282421) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "136066-1103.35a", 0x0000, 0x10000, CRC(ec2a7f93) SHA1(cb850141ffd1504f940fa156a39e71a4146d7fea) )
 ROM_END
-
-
-
-/*************************************
- *
- *  Driver init
- *
- *************************************/
-
-void atetris_state::init_atetris()
-{
-	uint8_t *rgn = memregion("maincpu")->base();
-
-	m_slapstic_source = &rgn[0x10000];
-	m_slapstic_base = &rgn[0x04000];
-}
 
 
 
@@ -747,13 +685,13 @@ void atetris_state::init_atetris()
  *
  *************************************/
 
-GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state,    init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 5, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, atetrisbp, atetris, atetrisbp, atetris,  atetris_bartop_state, init_atetris, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,        init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,        init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 5, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, atetrisbp, atetris, atetrisbp, atetris,  atetris_bartop_state, empty_init, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

@@ -14,6 +14,12 @@
 #include "ui/utils.h"
 #include "ui/menuitem.h"
 
+#if defined(UI_WINDOWS) && !defined(UI_SDL)
+#include "../osd/windows/winmain.h"
+#else
+#include "../osd/modules/lib/osdobj_common.h"
+#endif
+
 #include <limits>
 
 

@@ -1884,7 +1884,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 
 	if (!newfname)
 	{
-		basename = core_filename_extract_base(source);
+		basename = std::string(core_filename_extract_base(source));
 		newfname = basename.c_str();
 	}
 

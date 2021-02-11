@@ -240,7 +240,7 @@ void concept_state::concept(machine_config &config)
 	MM58174(config, m_mm58174, 32.768_kHz_XTAL);
 
 	/* via */
-	VIA6522(config, m_via0, 16.364_MHz_XTAL / 16);
+	MOS6522(config, m_via0, 16.364_MHz_XTAL / 16);
 	m_via0->readpa_handler().set(FUNC(concept_state::via_in_a));
 	m_via0->readpb_handler().set(FUNC(concept_state::via_in_b));
 	m_via0->writepa_handler().set(FUNC(concept_state::via_out_a));

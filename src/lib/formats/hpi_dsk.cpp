@@ -199,13 +199,11 @@ bool hpi_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 	for (int cyl = 0; cyl < tracks; cyl++) {
 		for (int head = 0; head < heads; head++) {
-			uint8_t bitstream[ 21000 ];
-			int bitstream_size;
-			generate_bitstream_from_track(cyl , head , CELL_SIZE , bitstream , bitstream_size , image , 0);
+			auto bitstream = generate_bitstream_from_track(cyl , head , CELL_SIZE , image , 0);
 			int pos = 0;
 			unsigned track_no , head_no , sector_no;
 			uint8_t sector_data[ HPI_SECTOR_SIZE ];
-			while (get_next_sector(bitstream , bitstream_size , pos , track_no , head_no , sector_no , sector_data)) {
+			while (get_next_sector(bitstream , pos , track_no , head_no , sector_no , sector_data)) {
 				if (track_no == cyl && head_no == head && sector_no < HPI_SECTORS) {
 					unsigned offset_in_image = chs_to_lba(cyl, head, sector_no, heads) * HPI_SECTOR_SIZE;
 					io_generic_write(io, sector_data, offset_in_image, HPI_SECTOR_SIZE);
@@ -367,17 +365,16 @@ unsigned hpi_format::chs_to_lba(unsigned cylinder , unsigned head , unsigned sec
 	return sector + (head + cylinder * heads) * HPI_SECTORS;
 }
 
-std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , int bitstream_size , int& pos , int& start_pos)
+std::vector<uint8_t> hpi_format::get_next_id_n_block(const std::vector<bool> &bitstream , int& pos , int& start_pos)
 {
 	std::vector<uint8_t> res;
 	uint32_t sr = 0;
 	// Look for either sync + ID AM or sync + DATA AM
-	while (pos < bitstream_size && sr != ID_CD_PATTERN && sr != DATA_CD_PATTERN) {
-		bool bit = util::BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+	while (pos < bitstream.size() && sr != ID_CD_PATTERN && sr != DATA_CD_PATTERN) {
+		sr = (sr << 1) | bitstream[pos];
 		pos++;
-		sr = (sr << 1) | bit;
 	}
-	if (pos == bitstream_size) {
+	if (pos == bitstream.size()) {
 		// End of track reached
 		return res;
 	}
@@ -394,11 +391,11 @@ std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , 
 	}
 	// Align to data cells
 	pos++;
-	for (unsigned i = 0; i < to_dump && pos < bitstream_size; i++) {
+	for (unsigned i = 0; i < to_dump && pos < bitstream.size(); i++) {
 		uint8_t byte = 0;
 		unsigned j;
-		for (j = 0; j < 8 && pos < bitstream_size; j++) {
-			bool bit = util::BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+		for (j = 0; j < 8 && pos < bitstream.size(); j++) {
+			bool bit = bitstream[pos];
 			pos += 2;
 			byte >>= 1;
 			if (bit) {
@@ -412,7 +409,7 @@ std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , 
 	return res;
 }
 
-bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size , int& pos , unsigned& track , unsigned& head , unsigned& sector , uint8_t *sector_data)
+bool hpi_format::get_next_sector(const std::vector<bool> &bitstream , int& pos , unsigned& track , unsigned& head , unsigned& sector , uint8_t *sector_data)
 {
 	std::vector<uint8_t> block;
 	while (true) {
@@ -420,7 +417,7 @@ bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size ,
 		int id_pos = 0;
 		while (true) {
 			if (block.size() == 0) {
-				block = get_next_id_n_block(bitstream , bitstream_size , pos , id_pos);
+				block = get_next_id_n_block(bitstream , pos , id_pos);
 				if (block.size() == 0) {
 					return false;
 				}
@@ -436,7 +433,7 @@ bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size ,
 		}
 		// Then for DATA block
 		int data_pos = 0;
-		block = get_next_id_n_block(bitstream , bitstream_size , pos , data_pos);
+		block = get_next_id_n_block(bitstream , pos , data_pos);
 		if (block.size() == 0) {
 			return false;
 		}

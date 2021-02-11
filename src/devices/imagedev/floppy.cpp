@@ -346,6 +346,7 @@ void floppy_image_device::device_start()
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
+	phases = 0;
 
 	setup_characteristics();
 
@@ -377,6 +378,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(cache_weak));
 	save_item(NAME(image_dirty));
 	save_item(NAME(ready_counter));
+	save_item(NAME(phases));
 }
 
 void floppy_image_device::device_reset()
@@ -558,10 +560,13 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	return image_init_result::PASS;
 }
 
-/* write protect, active high */
+/* write protect, active high
+   phase 1 can force it to 1 for drive detection
+   on the rare drives that actually use phases.
+ */
 bool floppy_image_device::wpt_r()
 {
-	return wpt;
+	return wpt || (phases & 2);
 }
 
 /* motor on, active low */
@@ -725,8 +730,10 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
-void floppy_image_device::seek_phase_w(int phases)
+void floppy_image_device::seek_phase_w(int _phases)
 {
+	phases = _phases;
+
 	int cur_pos = (cyl << 2) | subcyl;
 	int req_pos;
 	switch(phases) {
@@ -759,8 +766,10 @@ void floppy_image_device::seek_phase_w(int phases)
 
 	cache_clear();
 
-	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("track %d.%d\n", cyl, subcyl);
+	if(next_pos != cur_pos) {
+		if (TRACE_STEP) logerror("track %d.%d\n", cyl, subcyl);
+		if (m_make_sound) m_sound_out->step(subcyl);
+	}
 
 	/* Update disk detection if applicable */
 	if (exists() && !dskchg_writable)
@@ -923,16 +932,14 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	if(from_when < cache_start_time || (!cache_end_time.is_never() && from_when >= cache_end_time))
+	if(from_when < cache_start_time || cache_start_time.is_zero() || (!cache_end_time.is_never() && from_when >= cache_end_time))
 		cache_fill(from_when);
 
 	if(!cache_weak)
 		return cache_end_time;
 
 	// Put a flux transition in the middle of a 4us interval with a 50% probability
-	int interval_index = (from_when - cache_weak_start).as_ticks(250000);
-	if(interval_index < 0)
-		interval_index = 0;
+	uint64_t interval_index = (from_when < cache_weak_start) ? 0 : (from_when - cache_weak_start).as_ticks(250000);
 	attotime weak_time = cache_weak_start + attotime::from_ticks(interval_index*2+1, 500000);
 	for(;;) {
 		if(weak_time >= cache_end_time)
@@ -2385,6 +2392,7 @@ void ibm_6360::setup_characteristics()
 mac_floppy_device::mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : floppy_image_device(mconfig, type, tag, owner, clock)
 {
 	m_has_mfm = false;
+	dskchg_writable = true;
 }
 
 void mac_floppy_device::device_start()
@@ -2422,16 +2430,22 @@ bool mac_floppy_device::wpt_r()
 	// actual_ss may have changed after the phases were set
 	m_reg = (m_reg & 7) | (actual_ss ? 8 : 0);
 
-	if(m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13)
+	if(0 && (m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13))
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
+	case 0x0: // Step direction
+		return dir;
+
 	case 0x1: // Step signal
 		// We don't do the delay
 		return true;
 
 	case 0x2: // Is the motor on?
 		return mon;
+
+	case 0x3: // Disk change signal
+		return dskchg;
 
 	case 0x4:
 	case 0xc: // Index pulse, probably only on the superdrive though
@@ -2455,6 +2469,16 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return cyl != 0;
 
+	case 0xb:{// Tachometer, 60 pulses/rotation
+		if(image.get() != nullptr && !mon) {
+			attotime base;
+			uint32_t pos = find_position(base, machine().time());
+			uint32_t subpos = pos % 3333334;
+			return subpos < 20000;
+		} else
+			return false;
+	}
+
 	case 0xd: // Is the current mode GCR or MFM?
 		return m_mfm;
 
@@ -2475,7 +2499,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 		"DirNext", "StepOn", "MotorOn", "EjectOff",
 		"DirPrev", "StepOff", "MotorOff", "EjectOn",
 		"-", "MFMModeOn", "-", "-",
-		"-", "GCRModeOn", "-", "-"
+		"DskchgClear", "GCRModeOn", "-", "-"
 	};
 
 	bool prev_strb = m_strb;
@@ -2499,7 +2523,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0x2: // Motor on
 			logerror("cmd motor on\n");
-			mon_w(0);
+			floppy_image_device::mon_w(0);
 			break;
 
 		case 0x3: // End eject
@@ -2513,12 +2537,12 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0x6: // Motor off
 			logerror("cmd motor off\n");
-			mon_w(1);
+			floppy_image_device::mon_w(1);
 			break;
 
 		case 0x7: // Start eject
 			logerror("cmd start eject\n");
-			call_unload();
+			unload();
 			break;
 
 		case 0x9: // MFM mode on
@@ -2527,6 +2551,11 @@ void mac_floppy_device::seek_phase_w(int phases)
 				m_mfm = true;
 				track_changed();
 			}
+			break;
+
+		case 0xc: // Clear dskchg
+			logerror("cmd clear dskchg\n");
+			dskchg = 0;
 			break;
 
 		case 0xd: // GCR mode on
@@ -2564,6 +2593,10 @@ void mac_floppy_device::track_changed()
 		set_rpm(new_rpm);
 }
 
+void mac_floppy_device::mon_w(int)
+{
+	// Motor control is through commands
+}
 
 oa_d34v_device::oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, OAD34V, tag, owner, clock)
 {

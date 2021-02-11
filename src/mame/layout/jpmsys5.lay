@@ -41,22 +41,25 @@ license:CC0
 			<param name="x" start="10" increment="9" />
 			<param name="i" start="0" increment="1" />
 			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"></color>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"></color>
 				<bounds x="~x~" y="200" width="9" height="17" />
 			</element>
-		</repeat>	
+		</repeat>
 		<repeat count="6">
 			<param name="x" start="10" increment="52" />
 			<param name="i" start="1" increment="1" />
 			<element name="reel~i~" ref="Steppers" state="0">
 				<bounds x="~x~" y="300" width="50" height="50" />
 			</element>
-		</repeat>		
+		</repeat>
 		<repeat count="16">
 			<param name="y" start="0" increment="8" />
-			<param name="j" start="0" increment="16" />	
+			<param name="j" start="0" increment="16" />
 			<repeat count="16">
 				<param name="x" start="0" increment="8" />
-				<param name="i" start="~j~" increment="1" />				
+				<param name="i" start="~j~" increment="1" />
 				<element name="lamp~i~" ref="matrixlamp" state="0">
 					<bounds x="~x~" y="~y~" width="7" height="7" />
 				</element>
@@ -68,21 +71,24 @@ license:CC0
 			<element name="digit~i~" ref="digit">
 				<bounds x="~x~" y="140" width="14" height="26" />
 			</element>
-		</repeat>	
+		</repeat>
 		<repeat count="32">
 			<param name="x" start="10" increment="8" />
 			<param name="i" start="0" increment="1" />
 			<element name="reellamp~i~" ref="matrixlamp">
 				<bounds x="~x~" y="170" width="7" height="7" />
 			</element>
-		</repeat>		
+		</repeat>
 	</view>
-	
+
 	<view name="VFD Display Output Only">
 		<repeat count="16">
 			<param name="x" start="10" increment="9" />
 			<param name="i" start="0" increment="1" />
 			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"></color>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"></color>
 				<bounds x="~x~" y="200" width="9" height="17" />
 			</element>
 		</repeat>

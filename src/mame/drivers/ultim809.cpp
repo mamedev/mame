@@ -139,7 +139,8 @@ void ultim809_state::ultim809(machine_config &config)
 	m_crtc->int_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	VIA6522(config, m_via, 8000000 / 4);
+	// TBD: what type of VIA is this? It replaced a MC68B21P at some point in development.
+	MOS6522(config, m_via, 8000000 / 4);
 	// Memory banking: up to 32 banks with inbuilt U8, or replace it with external memory to get the full 4 MB
 	m_via->writepa_handler().set([this] (u8 data) { m_membank = data & 0x1F; });   // memory banking
 	//m_via->readpb_handler().set(FUNC(ultim809_state::portb_r));    // serial
