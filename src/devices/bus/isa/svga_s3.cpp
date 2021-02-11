@@ -25,7 +25,7 @@ ROM_START( s3_764 )
 
 	// S3 86C765 Video BIOS. Version 1.03-08N Copyright 1996 S3 Incorporated.
 	ROM_SYSTEM_BIOS( 1, "trio64v2_765", "PCI S3 86C765 v1.03-08N (S3 Trio64V2/DX)" )
-	ROMX_LOAD("pci_9503-62_s3.bin", 0x00000, 0x8000, CRC(0e9d79d8) maSHA1(274b5b98cc998f2783567000cdb12b14308bc290), ROM_BIOS(1) )
+	ROMX_LOAD("pci_9503-62_s3.bin", 0x00000, 0x8000, CRC(0e9d79d8) SHA1(274b5b98cc998f2783567000cdb12b14308bc290), ROM_BIOS(1) )
 
 	// ELSA WINNER 1000/T2D VBE 2.0 DDC2B DPMS Video BIOS  Ver. 6.01.00  (IP/-/-) Copyright (c) 1994-97 ELSA GmbH, Aachen (Germany) All Rights Reserved
 	ROM_SYSTEM_BIOS( 2, "winner1k", "PCI Elsa Winner 1000/T2D 6.01.00 (S3 Trio64V2/DX)" )
