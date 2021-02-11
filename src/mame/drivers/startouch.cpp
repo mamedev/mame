@@ -30,6 +30,7 @@
 #include "cpu/i386/i386.h"
 #include "speaker.h"
 
+namespace {
 
 class startouch_state : public driver_device
 {
@@ -90,5 +91,6 @@ ROM_START(europl01)
 	DISK_IMAGE("sleic-petaco_startouch_2001_v2.0", 0, SHA1(3164a5786d6b9bb0dd9910b4d27a77a6b746dedf)) // Labeled "Star Touch 2001" but when run game title is EuroPlay 2001
 ROM_END
 
+} // Anonymous namespace
 
 GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_IS_SKELETON)
