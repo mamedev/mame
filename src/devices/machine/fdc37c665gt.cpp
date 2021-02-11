@@ -22,16 +22,6 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 
 DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")
 
-static void pc_hd_floppies(device_slot_interface &device)
-{
-	device.option_add("35hd", FLOPPY_35_HD);
-	device.option_add("35dd", FLOPPY_35_DD);
-}
-
-FLOPPY_FORMATS_MEMBER(fdc37c665gt_device::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode)
 	: device_t(mconfig, FDC37C665GT, tag, owner, clock)
 	, mode(OperatingMode::Run)
@@ -50,7 +40,6 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 	, m_ndtr2_callback(*this)
 	, m_nrts2_callback(*this)
 	, m_fdc(*this, "fdc")
-	, m_floppy(*this, "fdc:%u", 0)
 	, m_serial(*this, "uart%u", 1)
 	, m_lpt(*this, "lpt")
 {
@@ -102,10 +91,6 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	// floppy disc controller
 	N82077AA(config, m_fdc, 24_MHz_XTAL, m_floppy_mode);
 	m_fdc->intrq_wr_callback().set(FUNC(fdc37c665gt_device::irq_floppy_w));
-
-	for (int i = 0; i < 4; i++) {
-		FLOPPY_CONNECTOR(config, m_floppy[i], pc_hd_floppies, "35hd", fdc37c665gt_device::floppy_formats);
-	}
 
 	// parallel port
 	PC_LPT(config, m_lpt);
@@ -176,7 +161,6 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 
 	return 0;
 }
-
 
 void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 {

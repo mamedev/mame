@@ -75,8 +75,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nri2_w);
 	DECLARE_WRITE_LINE_MEMBER(ncts2_w);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,7 +122,6 @@ private:
 	devcb_write_line m_nrts2_callback;
 
 	required_device<n82077aa_device> m_fdc;
-	required_device_array<floppy_connector, 4> m_floppy;
 	required_device_array<ns16550_device, 2> m_serial;
 	required_device<pc_lpt_device> m_lpt;
 
