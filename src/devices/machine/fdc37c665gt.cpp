@@ -14,7 +14,7 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 #define LOG_CONFIG (1U << 1) // Show global configuration changes
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG )
-#define LOG_OUTPUT_STREAM std::cout
+// #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
