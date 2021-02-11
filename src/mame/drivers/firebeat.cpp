@@ -1137,22 +1137,15 @@ WRITE_LINE_MEMBER(firebeat_spu_state::spu_ata_dmarq)
 
 TIMER_CALLBACK_MEMBER(firebeat_spu_state::spu_dma_callback)
 {
-	// These values were picked because they roughly match real in-game footage of
-	// when sounds start playing, and more importantly to free up CPU time for the
-	// main CPU during DMAs to avoid stuttering.
-	auto next_dma_timing = attotime::from_usec(5);
-	auto dma_end_target = m_spu_ata_dma + 16;
-
-	while (m_spu_ata_dmarq && m_spu_ata_dma < dma_end_target)
-	{
-		uint16_t data = m_spuata->read_dma();
-		m_waveram[m_wave_bank+m_spu_ata_dma] = data;
-		m_spu_ata_dma++;
-	}
+	uint16_t data = m_spuata->read_dma();
+	m_waveram[m_wave_bank+m_spu_ata_dma] = data;
+	m_spu_ata_dma++;
 
 	if (m_spu_ata_dmarq)
 	{
-		m_dma_timer->adjust(next_dma_timing);
+		// This timer adjust value was picked because
+		// it reduces stuttering issues/performance issues
+		m_dma_timer->adjust(attotime::from_nsec(350));
 	}
 	else
 	{
