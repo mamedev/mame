@@ -14,7 +14,7 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 #define LOG_CONFIG (1U << 1) // Show global configuration changes
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG )
-// #define LOG_OUTPUT_STREAM std::cout
+#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -91,10 +91,7 @@ void fdc37c665gt_device::device_start()
 
 	// Set the value first and then use write_configuration_register because some flags
 	// rely on other flags being initialized properly first
-	for (int i = 0; i < sizeof(configuration_registers_defaults); i++) {
-		configuration_registers[i] = configuration_registers_defaults[i];
-	}
-
+	std::copy(std::begin(configuration_registers_defaults), std::end(configuration_registers_defaults), std::begin(configuration_registers));
 	for (int i = 0; i < sizeof(configuration_registers_defaults); i++) {
 		write_configuration_register(i, configuration_registers_defaults[i]);
 	}
