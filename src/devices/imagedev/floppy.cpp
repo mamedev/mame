@@ -2461,7 +2461,7 @@ bool mac_floppy_device::wpt_r()
 		return mon;
 
 	case 0x3: // Disk change signal
-		return dskchg;
+		return !dskchg;
 
 	case 0x4:
 	case 0xc: // Index pulse, probably only on the superdrive though
@@ -2571,7 +2571,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0xc: // Clear dskchg
 			logerror("cmd clear dskchg\n");
-			dskchg = 0;
+			dskchg = 1;
 			break;
 
 		case 0xd: // GCR mode on
