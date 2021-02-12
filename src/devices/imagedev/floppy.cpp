@@ -954,10 +954,21 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	}
 }
 
+bool floppy_image_device::writing_disabled() const
+{
+	// Disable writing when write protect is on or when, in the diskii
+	// case, phase 1 is 1
+	return wpt || (phases & 2);
+}
+
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
 {
 	if(!image || mon)
 		return;
+
+	if(writing_disabled())
+		return;
+
 	image_dirty = true;
 	cache_clear();
 
@@ -2417,6 +2428,11 @@ void mac_floppy_device::device_reset()
 //    1010 - 800K GCR drive
 //    1110 - HD-20 drive
 //    1111 - No drive (pull-up on the sense line)
+
+bool mac_floppy_device::writing_disabled() const
+{
+	return wpt;
+}
 
 bool mac_floppy_device::wpt_r()
 {

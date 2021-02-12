@@ -100,9 +100,6 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
-	if(floppy && std::string(floppy->tag()) == ":fdc:0:525")
-		machine().debug_break();
-
 	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
 
 	if(m_floppy && (m_control & 0x10))
