@@ -96,17 +96,17 @@ void main()
     for (int i = 0; i < 3; i++) { // 3 is sufficient for dimensions up to 4k
       // place subsequent levels to the right
       if (pix.x > dx * 0.5) {
-	dx = dx * 0.5;
-	newsize = ceil(newsize*v05*v05*v05); // size of sampled texture is eighthed
-	fac *= 8.0;
-	offset0 = offset;
-	offset.x = offset.x + dx;
-	pix.x -= dx;
-	x = pix * vec2_splat(8.0);
-	if (newsize.x < 8.5 && newsize.y < 8.5) { // reducing to a single pixel
-	  fc = true;
-	  break;
-	}
+        dx = dx * 0.5;
+        newsize = ceil(newsize*v05*v05*v05); // size of sampled texture is eighthed
+        fac *= 8.0;
+        offset0 = offset;
+        offset.x = offset.x + dx;
+        pix.x -= dx;
+        x = pix * vec2_splat(8.0);
+        if (newsize.x < 8.5 && newsize.y < 8.5) { // reducing to a single pixel
+          fc = true;
+          break;
+        }
       } else break;
     }
 
@@ -135,11 +135,11 @@ void main()
       float f = fac*fac / (u_tex_size0.x * u_tex_size0.y);
       vec3 col = tex * vec3_splat(f);
       if (v_texCoord.y * u_tex_size1.y < ( offset0.y + u_tex_size1.y ) * 0.5) {
-	gl_FragColor = vec4(col,1.0);
+        gl_FragColor = vec4(col,1.0);
       } else {
-	// we are near (1,1): in this region include the temporal filter
-	vec4 old = texture2D(s_mipmap, v_texCoord.xy);
-	gl_FragColor = vec4(mix(col,old.rgb,u_smooth.x),1.0);
+        // we are near (1,1): in this region include the temporal filter
+        vec4 old = texture2D(s_mipmap, v_texCoord.xy);
+        gl_FragColor = vec4(mix(col,old.rgb,u_smooth.x),1.0);
       }
     } else {
       gl_FragColor = vec4(tex.rgb,1.0);

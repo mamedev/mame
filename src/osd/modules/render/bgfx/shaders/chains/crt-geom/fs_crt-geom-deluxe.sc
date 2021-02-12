@@ -218,13 +218,13 @@ void main()
   // using the Lanczos coefficients above.
   vec4 col = clamp(TEX2D(xy + vec2(-v_one.x, 0.0))*coeffs.x +
                    TEX2D(xy)*coeffs.y +
-		   TEX2D(xy +vec2(v_one.x, 0.0))*coeffs.z +
-		   TEX2D(xy + vec2(2.0 * v_one.x, 0.0))*coeffs.w , 0.0, 1.0);
+                   TEX2D(xy +vec2(v_one.x, 0.0))*coeffs.z +
+                   TEX2D(xy + vec2(2.0 * v_one.x, 0.0))*coeffs.w , 0.0, 1.0);
 
   vec4 col2 = clamp(TEX2D(xy + vec2(-v_one.x, v_one.y))*coeffs.x +
-		    TEX2D(xy + vec2(0.0, v_one.y))*coeffs.y +
-		    TEX2D(xy + v_one)*coeffs.z +
-		    TEX2D(xy + vec2(2.0 * v_one.x, v_one.y))*coeffs.w , 0.0, 1.0);
+                    TEX2D(xy + vec2(0.0, v_one.y))*coeffs.y +
+                    TEX2D(xy + v_one)*coeffs.z +
+                    TEX2D(xy + vec2(2.0 * v_one.x, v_one.y))*coeffs.w , 0.0, 1.0);
 
 
 #ifndef LINEAR_PROCESSING
