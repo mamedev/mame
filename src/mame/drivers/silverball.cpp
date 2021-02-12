@@ -48,6 +48,8 @@ private:
 
 void silverball_state::mem_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0xfffc0000, 0xffffffff).rom().region("mb_bios", 0);
 }
 
 void silverball_state::io_map(address_map &map)
@@ -68,7 +70,7 @@ ROM_START(slvrball806)
 
 	// Silverball machines used different motherboards. By now, we're adding the all the known BIOSes here
 
-	ROM_REGION(0x40000, "mb_bios", 0)
+	ROM_REGION32_LE(0x40000, "mb_bios", 0)
 
 
 	// Acorp 694XT/694XT1 (all of them from the Silverball software update files)
