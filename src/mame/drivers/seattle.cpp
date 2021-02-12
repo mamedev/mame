@@ -2281,14 +2281,14 @@ void seattle_state::hyprdriv(machine_config &config)
 
 #define WG3DH_BIOS \
 		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
-		ROM_DEFAULT_BIOS("bios0") \
-		ROM_SYSTEM_BIOS( 0, "bios0", "Boot Code L1.2" ) \
-		ROMX_LOAD( "l1.2_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131), ROM_BIOS(0) ) /* Boot Code Version L1.2 (Oct  8 1996 12:55:39 @ 0x5CDE0 in ROM) */\
-		ROM_SYSTEM_BIOS( 1, "bios1", "Boot Code L0.1?" ) \
-		ROMX_LOAD( "l0.1_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(80fb6dfd) SHA1(b78d1c8abdb875196c5cd9afc986f54865a90aba), ROM_BIOS(1) ) // Boot Code Version ? (Aug 13 1996 16:59:47 @ 0x599D0 in ROM)
+		ROM_SYSTEM_BIOS( 0, "l01", "Boot Code L0.1?" ) \
+		ROMX_LOAD( "l0.1_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(80fb6dfd) SHA1(b78d1c8abdb875196c5cd9afc986f54865a90aba), ROM_BIOS(0) ) /* Boot Code Version ? (Aug 13 1996 16:59:47 @ 0x599D0 in ROM) */ \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "l1.2_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131), ROM_BIOS(1) ) /* Boot Code Version L1.2 (Oct  8 1996 12:55:39 @ 0x5CDE0 in ROM) */
 
 ROM_START( wg3dh )
 	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l12")
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
@@ -2302,10 +2302,11 @@ ROM_END
 
 ROM_START( wg3dhfe ) // Original PCB board with PIC security chip labeled as  310  Gretzky Hockey  U96   *310300003*   (IE: serial number 00003)
 	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l01") // disk was paired with a board populated with this early boot ROM
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	 // Disk caddy stickered:  3DHOCKEY FATALITY EDITION, another sticker stated:  PHX-HDsisk -0006    <-- Yes, it's "HDsisk" and not HDisk
+	// Disk caddy stickered:  3DHOCKEY FATALITY EDITION, another sticker stated:  PHX-HDsisk -0006    <-- Yes, it's "HDsisk" and not HDisk
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version ? (Guts: Feb 4 1997 17:08:22, Main: Mar 21 1997 12:15:39)
 	DISK_IMAGE( "wg3dhfe", 0, SHA1(49b72e7e76036b119bfc8b9a0ef8b9acd346d0be) ) // ST94420AG hard drive
 
@@ -2545,11 +2546,11 @@ ROM_END
 
 #define BLITZ_BIOS \
 		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
-		ROM_DEFAULT_BIOS("bios0") \
-		ROM_SYSTEM_BIOS( 0, "bios0", "Boot Code L1.2" ) \
-		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(0) ) \
-		ROM_SYSTEM_BIOS( 1, "bios1", "Boot Code L1.1" ) \
-		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(1) )
+		ROM_DEFAULT_BIOS("l12") \
+		ROM_SYSTEM_BIOS( 0, "l11", "Boot Code L1.1" ) \
+		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(0) ) \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) )
 
 ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
