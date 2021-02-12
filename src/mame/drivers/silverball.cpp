@@ -18,8 +18,7 @@
     HDD Samsung Maxtor G1021U2 or other IDE HDD with similar capacity.
 
     The manual points to a HardLock parallel port security dongle, but it was missing
-    from
-    the dumped machine.
+    from the dumped machine.
 
 *******************************************************************************/
 
