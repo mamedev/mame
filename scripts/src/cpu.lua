@@ -1235,7 +1235,7 @@ end
 
 if (CPUS["DIABLO"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/diablo1300dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.h")
 end
 
 --------------------------------------------------
