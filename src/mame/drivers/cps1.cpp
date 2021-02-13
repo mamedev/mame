@@ -11626,7 +11626,7 @@ ROM_START( varthb2 )
 	// pcb picture shows 4x 42-pin mask roms which suggests 4x 27c800 (4MB) for gfx vs originals 4x 27c400 (2MB)
 	// roms u18,19 might just be duplicates of u68,70 (although markings are different?) or just half empty
 	// games expects sprites to start at 0x8000 so reloading in upper region
-	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_REGION( 0x600000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, BAD_DUMP CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
 	ROM_RELOAD(                  0x400000, 0x80000)
 	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, BAD_DUMP CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )

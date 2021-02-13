@@ -46,7 +46,6 @@ private:
 	static const uint8_t em_bits[];
 	static const uint32_t em_flags[];
 	static const uint8_t m58846_opmap[0xc0];
-
 };
 
 #endif

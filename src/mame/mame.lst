@@ -9372,6 +9372,9 @@ hustle                          // 16-21 [1977 Gremlin]
 mineswpr                        // [1977 Amutech]
 mineswpr4                       // [1977 Amutech]
 
+@source:blockch.cpp
+blockch
+
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
 quarth                          // GX973 (c) 1989 (Japan)
@@ -13550,6 +13553,7 @@ famibox                         // 1986
 
 @source:fantland.cpp
 borntofi                        // (c) International Games?
+borntofiv                       // (c) International Games (Vifico license)
 fantland                        // (c) 198? Electronic Devices Italy
 fantlanda                       // (c) 198? Electronic Devices Italy
 galaxygn                        // (c) 1989 Electronic Devices Italy
@@ -14303,6 +14307,7 @@ galaxiana                       // (c) Namco
 galaxianbl                      // bootleg
 galaxianbl2                     // bootleg
 galaxianbl3                     // bootleg
+galaxianem                      // bootleg (Electromar Madrid)
 galaxiani                       // (c) Irem
 galaxianm                       // (c) Midway
 galaxianmo                      // (c) Midway
@@ -32894,8 +32899,6 @@ sfortec1                        //
 
 @source:novag_snova.cpp
 nsnova
-
-@source:novag_supremo.cpp
 supremo
 
 @source:ns5652.cpp
@@ -36660,7 +36663,6 @@ snowbwar                         // (c) 201? Sealy
 @source:seattle.cpp
 biofreak                        // (c) 1997 Midway Games (prototype)
 blitz                           // (c) 1997 Midway Games
-blitz11                         // (c) 1997 Midway Games
 blitz2k                         // (c) 1999 Midway Games
 blitz99                         // (c) 1998 Midway Games
 blitz99a                        // (c) 1998 Midway Games
@@ -36680,6 +36682,7 @@ sfrushrkwo                      // (c) 1996 Atari Games
 vaportrx                        // (c) 1998 Atari Games
 vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games
+wg3dhfe                         // (c) 1996 Atari Games
 
 @source:seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
@@ -38529,6 +38532,9 @@ jak_nick                        //
 jak_sbfc                        //
 
 @source:spg2xx_jakks_sharp.cpp
+jsc_dora
+jsc_gdg
+jsc_sdoo
 jsc_spid
 jsc_thom
 
@@ -38641,6 +38647,7 @@ bushido                         //
 bushidoa                        //
 jolypark                        //
 mach2                           //
+mach2a                          //
 vrnwrld                         //
 
 @source:spirit76.cpp

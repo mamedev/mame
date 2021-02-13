@@ -145,6 +145,7 @@ blktiger.cpp
 blktiger_ms.cpp
 blmbycar.cpp
 blockade.cpp
+blockch.cpp
 blockhl.cpp
 blockout.cpp
 blocktax.cpp

@@ -715,6 +715,7 @@ void mc10_state::alice32(machine_config &config)
 	PALETTE(config, "palette").set_entries(8);
 
 	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(mc10_state::alice32_scanline), "screen", 0, 10);
 

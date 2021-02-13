@@ -7673,6 +7673,7 @@ void pacman_state::init_mspacman()
 void pacman_state::init_mschamp()
 {
 	save_item(NAME(m_counter));
+	m_counter = 0;
 }
 
 void pacman_state::init_woodpek()

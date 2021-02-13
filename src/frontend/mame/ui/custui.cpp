@@ -42,6 +42,7 @@ const char *const menu_custom_ui::HIDE_STATUS[] = {
 menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
+	, m_currlang(0)
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());

@@ -96,7 +96,8 @@ public:
 	void setup_led_cb(led_cb cb);
 
 	std::vector<uint32_t> &get_buffer() { return image->get_buffer(cyl, ss, subcyl); }
-	int get_cyl() { return cyl; }
+	int get_cyl() const { return cyl; }
+	bool on_track() const { return !subcyl; }
 
 	virtual void mon_w(int state);
 	bool ready_r();
@@ -110,6 +111,8 @@ public:
 	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
+
+	virtual bool writing_disabled() const;
 
 	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
@@ -285,6 +288,7 @@ public:
 	virtual void mon_w(int) override;
 	virtual void seek_phase_w(int phases) override;
 	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
+	virtual bool writing_disabled() const override;
 
 protected:
 	u8 m_reg;

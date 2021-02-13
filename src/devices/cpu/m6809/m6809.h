@@ -207,10 +207,12 @@ protected:
 	// read_opcode() and bump the program counter
 	inline uint8_t read_opcode()                           { return read_opcode(m_pc.w++); }
 	inline uint8_t read_opcode_arg()                       { return read_opcode_arg(m_pc.w++); }
+	inline void dummy_read_opcode_arg(uint16_t delta)      { read_opcode_arg(m_pc.w + delta); }
+	inline void dummy_vma(int count)                       { for(int i=0; i != count; i++) { read_opcode_arg(0xffff); } }
 
 	// state stack - implemented as a uint32_t
-	void push_state(uint8_t state)                    { m_state = (m_state << 8) | state; }
-	uint8_t pop_state()                               { uint8_t result = (uint8_t) m_state; m_state >>= 8; return result; }
+	void push_state(uint16_t state)                    { m_state = (m_state << 9) | state; }
+	uint16_t pop_state()                               { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
 	void reset_state()                              { m_state = 0; }
 
 	// effective address reading/writing

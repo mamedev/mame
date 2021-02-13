@@ -100,9 +100,6 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 
 	sync();
 
-	if(floppy && std::string(floppy->tag()) == ":fdc:0:525")
-		machine().debug_break();
-
 	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
 
 	if(m_floppy && (m_control & 0x10))
@@ -130,7 +127,7 @@ void iwm_device::write(offs_t offset, u8 data)
 
 void iwm_device::flush_write()
 {
-	if(m_floppy && m_last_sync > m_flux_write_start) {
+	if(m_floppy && m_flux_write_start && m_last_sync > m_flux_write_start) {
 		if(m_flux_write_count && m_flux_write[m_flux_write_count-1] == m_last_sync)
 			m_flux_write_count--;
 		attotime start = cycles_to_time(m_flux_write_start);
@@ -139,14 +136,15 @@ void iwm_device::flush_write()
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
+		m_flux_write_start = m_last_sync;
 	}
 	m_flux_write_count = 0;
-	m_flux_write_start = m_last_sync;
 }
 
 u8 iwm_device::control(int offset, u8 data)
 {
 	sync();
+	
 	//	logerror("control trigger %x, %02x\n", offset, data);
 	u8 changed = m_control | (m_phases & 0xf);
 	if(offset < 8) {
@@ -176,6 +174,7 @@ u8 iwm_device::control(int offset, u8 data)
 		} else {
 			if(m_mode & 0x04) {
 				flush_write();
+				m_flux_write_start = 0;
 				m_active = MODE_IDLE;
 				m_status &= ~0x20;
 				m_whd &= ~0x40;
@@ -191,8 +190,10 @@ u8 iwm_device::control(int offset, u8 data)
 
 	if(changed & 0xd0) {
 		if((m_control & 0xc0) == 0x00 && m_active) {
-			if(m_rw == MODE_WRITE)
+			if(m_rw == MODE_WRITE) {
 				flush_write();
+				m_flux_write_start = 0;
+			}
 			m_rw = MODE_READ;
 			m_rw_state = S_IDLE;
 			m_next_state_change = 0;
@@ -213,6 +214,7 @@ u8 iwm_device::control(int offset, u8 data)
 		} else if(m_rw == MODE_WRITE) {
 			if(!(m_control & 0x80)) {
 				flush_write();
+				m_flux_write_start = 0;
 				m_rw = MODE_IDLE;
 			}
 		} else
@@ -335,6 +337,8 @@ u64 iwm_device::write_sync_half_window_size() const
 	return m_mode & 0x08 ? 2 : 4;
 }
 
+static u64 ssx1 = 0, ssx2 = 0;
+
 void iwm_device::sync()
 {
 	if(!m_active)
@@ -354,6 +358,12 @@ void iwm_device::sync()
 				next_flux_change = flux.is_never() ? u64(-1) : time_to_cycles(flux);
 				if(next_flux_change <= m_last_sync)
 					next_flux_change = m_last_sync+1;
+				if(!ssx1)
+					ssx1 = ssx2 = next_flux_change;
+				if(ssx2 != next_flux_change) {
+					ssx1 = ssx2;
+					ssx2 = next_flux_change;
+				}
 			}
 			if(next_sync < m_next_state_change) {
 				m_last_sync = next_sync;
@@ -398,7 +408,6 @@ void iwm_device::sync()
 				} else if(m_rsh >= 0x80) {
 					m_data = m_rsh;
 					m_async_update = 0;
-					//					logerror("%s %010d DATAR %s %02x\n", cycles_to_time(m_last_sync).to_string(), m_last_sync, m_floppy->tag(), m_data);
 					m_rsh = 0;
 				}
 				break;
@@ -428,7 +437,6 @@ void iwm_device::sync()
 				m_last_sync = m_next_state_change;
 			switch(m_rw_state) {
 			case S_IDLE:
-				//				logerror("%s: idle\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				m_flux_write_count = 0;
 				if(m_mode & 0x02) {
 					m_rw_state = SW_WINDOW_LOAD;
@@ -445,9 +453,7 @@ void iwm_device::sync()
 				break;
 
 			case SW_WINDOW_LOAD:
-				//				logerror("%s: window load\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				if(m_whd & 0x80) {
-					//					logerror("Underrun\n");
 					m_whd &= ~0x40;
 					m_rw_state = S_IDLE;
 					m_last_sync = next_sync;
@@ -460,7 +466,6 @@ void iwm_device::sync()
 				break;
 
 			case SW_WINDOW_MIDDLE:
-				//				logerror("%s: window middle\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				if(m_wsh & 0x80)
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_wsh <<= 1;
@@ -472,7 +477,6 @@ void iwm_device::sync()
 				break;
 
 			case SW_WINDOW_END:
-				//				logerror("%s: window end\n", attotime::from_ticks(m_last_sync, clock()).to_string());
 				if(m_flux_write_count == m_flux_write.size())
 					flush_write();
 				if(m_mode & 0x02) {

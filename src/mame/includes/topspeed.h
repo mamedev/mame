@@ -86,7 +86,7 @@ private:
 	u8   m_msm2_vck2;
 
 #ifdef MAME_DEBUG
-	u8   m_dislayer[5];
+	u8   m_dislayer[5] = { 0, 0, 0, 0, 0 };
 #endif
 
 	void msm5205_update(int chip);
