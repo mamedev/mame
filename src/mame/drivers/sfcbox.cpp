@@ -205,8 +205,8 @@ void sfcbox_state::port_80_w(uint8_t data)
     ---- ---x   SNES Transfer STAT to SNES  (Bit2 of WRIO/RDIO on SNES side)
 */
 	SNES_CPU_REG(WRIO) = ((data & 4) >> 1) | (SNES_CPU_REG(WRIO) & ~0x02); // DATA
-	SNES_CPU_REG(WRIO) = ((data & 2) << 4) | (SNES_CPU_REG(WRIO) & ~0x20); // CLOCK
-	SNES_CPU_REG(WRIO) = ((data & 1) << 2) | (SNES_CPU_REG(WRIO) & ~0x04); // STAT
+	SNES_CPU_REG(WRIO) |= (((data & 2) << 4) | (SNES_CPU_REG(WRIO) & ~0x20)); // CLOCK
+	SNES_CPU_REG(WRIO) |= (((data & 1) << 2) | (SNES_CPU_REG(WRIO) & ~0x04)); // STAT
 }
 
 
@@ -222,16 +222,15 @@ uint8_t sfcbox_state::port_81_r()
     ---- --x-   SNES Transfer ACK from SNES  (Bit3 of WRIO/RDIO on SNES side)
     ---- ---x   Int0 Request (Coin-Input, Low for 44ms..80ms) (0=IRQ, 1=No)
 */
-	uint8_t res;
 
-	res = (m_screen->vblank() & 1) << 7;
-	res = 1 << 6;
-	res = 0 << 5;
-	res = 0 << 4;
-	res = 0 << 3;
+	u8 res = (m_screen->vblank() & 1) << 7;
+	res |= 1 << 6;
+	//res |= 0 << 5;
+	//res |= 0 << 4;
+	//res |= 0 << 3;
 	res |= ((SNES_CPU_REG(WRIO) & 0x10) >> 4) << 2; // DATA to main
 	res |= ((SNES_CPU_REG(WRIO) & 0x08) >> 3) << 1; // ACK to main
-	res = 1 << 0;
+	res |= 1 << 0;
 
 	return res;
 }
