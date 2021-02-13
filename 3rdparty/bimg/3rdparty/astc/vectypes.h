@@ -16,11 +16,11 @@
 #include <string.h>
 #include <stdint.h>
 
-typedef unsigned int uint;
-typedef unsigned short ushort;
-typedef unsigned long ulong;
-typedef unsigned char uchar;
-typedef signed char schar;
+typedef uint32_t uint;
+typedef uint16_t ushort;
+typedef uint64_t ulong;
+typedef uint8_t uchar;
+typedef int8_t schar;
 
 template < typename vtype > class vtype2;
 
@@ -9756,21 +9756,21 @@ typedef vtype4 < float >float4;
 typedef vtype2 < double >double2;
 typedef vtype3 < double >double3;
 typedef vtype4 < double >double4;
-typedef vtype2 < int >int2;
-typedef vtype3 < int >int3;
-typedef vtype4 < int >int4;
+typedef vtype2 < int32_t >int2;
+typedef vtype3 < int32_t >int3;
+typedef vtype4 < int32_t >int4;
 typedef vtype2 < uint > uint2;
 typedef vtype3 < uint > uint3;
 typedef vtype4 < uint > uint4;
-typedef vtype2 < short >short2;
-typedef vtype3 < short >short3;
-typedef vtype4 < short >short4;
+typedef vtype2 < int16_t >short2;
+typedef vtype3 < int16_t >short3;
+typedef vtype4 < int16_t >short4;
 typedef vtype2 < ushort > ushort2;
 typedef vtype3 < ushort > ushort3;
 typedef vtype4 < ushort > ushort4;
-typedef vtype2 < long >long2;
-typedef vtype3 < long >long3;
-typedef vtype4 < long >long4;
+typedef vtype2 < int64_t >long2;
+typedef vtype3 < int64_t >long3;
+typedef vtype4 < int64_t >long4;
 typedef vtype2 < ulong > ulong2;
 typedef vtype3 < ulong > ulong3;
 typedef vtype4 < ulong > ulong4;
