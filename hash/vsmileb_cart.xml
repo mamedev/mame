@@ -38,7 +38,7 @@ VTech V.Smile Baby cartridges
 |   XX   | 80-099020(US)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   NA   | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur (no-ROM cartridge)                       |
 |        | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure                                         |
-|   NA   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald (no-ROM cartridge)                               |
+|   XX   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald                                                  |
 |        | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus (no-ROM cart exists, unknown if a regular cart was sold too)
 |   NA   | 80-099027(SP)     | Aventuras en el Bosque de los Cien Acres (no-ROM cartridge)                |
 |   XX   | 80-099034(SE)     | Nalle Puhs Äventyr i Sjumilaskogen                                         |
@@ -237,6 +237,21 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="poohhawage" cloneof="poohhawa" supported="no">
+		<description>Puuhs Hundert-Morgen-Wald (Germany)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099024(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707154" />
+			<feature name="pcb_model" value="707154-4" />
+			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="099024.bin" size="8388608" crc="22261569" sha1="8918a905af4bb186beb5577b1d295d9c037584f7" />
 			</dataarea>
 		</part>
 	</software>
