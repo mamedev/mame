@@ -153,6 +153,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 	m_cart->set_device_load(FUNC(vtech_innotv_innotabmax_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotv_innotabmax_cart");
+	SOFTWARE_LIST(config, "cart_list").set_compatible("vtech_innotab_cart");
 }
 
 ROM_START( innotv )
@@ -160,4 +161,4 @@ ROM_START( innotv )
 	DISK_IMAGE( "8gb_sdhc_internal", 0, SHA1(443a0a9cc830387317d3218955b72295ee5a88eb) )
 ROM_END
 
-CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_IS_SKELETON )
+CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_NO_SOUND )
