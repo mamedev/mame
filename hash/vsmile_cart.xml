@@ -969,7 +969,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="backyardigfr"> <!-- Will be clone of "backyardig" once found and dumped. -->
-		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (France)</description>
+		<description>Nickelodeon The Backyardigans - Les explorateurs vikings (France)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092585(FR)" />
@@ -1141,7 +1141,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="bobbdayge" cloneof="bobbday">
-		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Germany)</description>
+		<description>Bob the Builder - Bobs spannender Arbeitstag (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092304(GE)" />
@@ -1175,7 +1175,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="bobbdayfr" cloneof="bobbday">
-		<description>Bob le Bricoleur - Les P'tits chantiers de Bob (France)</description>
+		<description>Bob the Builder - Les P'tits chantiers de Bob (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092305(FR)" />
@@ -2920,8 +2920,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="upger004">
-		<description>Disney/Pixar Oben (Germany, rev. 004)</description>
+	<software name="oben">
+		<description>Disney/Pixar Up! (Germany, rev. 004)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090004-004(GE)" />
@@ -2937,8 +2937,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="upfrr005" cloneof="upger004">
-		<description>Disney/Pixar Là-Haut (France, rev. 005)</description>
+	<software name="lahaut" cloneof="oben">
+		<description>Disney/Pixar Up (France, rev. 005)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090005-005(FR)" />
@@ -2952,7 +2952,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="upukr3" cloneof="upger004">
+	<software name="up2" cloneof="oben">
 		<description>Disney/Pixar Up (UK, rev. 003)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2965,8 +2965,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="upspr022" cloneof="upger004">
-		<description>Disney/Pixar Up (Spain, rev. 022)</description>
+	<software name="up" cloneof="oben">
+		<description>Disney/Pixar Oben (Spain, rev. 022)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090007-022(UK)" />
