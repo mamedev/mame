@@ -1432,6 +1432,7 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, uint16_t *source)
 void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
 	return;
+#ifdef UNUSED
 	int dst_pitch;
 
 	uint32_t *pal_ptr, *edi;
@@ -1467,6 +1468,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 		edi += dst_pitch;
 	}
 	while (--edx);
+#endif
 }
 
 
