@@ -204,7 +204,9 @@ void special_state::specimx_disk_ctrl_w(offs_t offset, uint8_t data)
 		floppy = con->get_device();
 
 	m_fdc->set_floppy(floppy);
-	floppy->mon_w(0);
+
+	if (floppy)
+		floppy->mon_w(0);
 
 	switch(offset)
 	{
