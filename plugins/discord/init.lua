@@ -52,8 +52,8 @@ function discord.startplugin()
 		local details = running and manager.machine.system.description or nil
 		if emu.softname() ~= "" then
 			for name, dev in pairs(manager.machine.images) do
-				if dev:longname() then
-					details = details .. " (" .. dev:longname() .. ")"
+				if dev.software_longname then
+					details = details .. " (" .. dev.software_longname .. ")"
 					break
 				end
 			end
