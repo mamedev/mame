@@ -229,7 +229,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
-		m_soundlatch(*this, "soundlatch%u", 1)
+		m_soundlatch(*this, "soundlatch%u", 1),
+		m_soundbank(*this, "sound_bank")
 	{ }
 
 	void raidenm(machine_config &config);
@@ -256,6 +257,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_memory_bank m_soundbank;
 
 	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
 	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
@@ -269,8 +271,10 @@ private:
 
 	u8 sound_status_r();
 	void adpcm_w(u8 data);
+	void ym_w(offs_t offset, u8 data);
 	void audio_map(address_map& map);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	bool m_audio_select;
 	u8 m_adpcm_data;
 
 	void unk_snd_dffx_w(offs_t offset, u8 data);
@@ -344,14 +348,26 @@ u8 raiden_ms_state::sound_status_r()
 
 void raiden_ms_state::adpcm_w(u8 data)
 {
-//  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
+	m_audio_select = BIT(data, 7);
+	m_soundbank->set_entry(m_audio_select);
 	m_msm->reset_w(BIT(data, 4));
 
 	m_adpcm_data = data & 0xf;
-	//m_msm->data_w(data & 0xf);
-//  m_msm->vclk_w(BIT(data, 7));
-	//m_msm->vclk_w(1);
-	//m_msm->vclk_w(0);
+}
+
+void raiden_ms_state::ym_w(offs_t offset, u8 data)
+{
+	if (!m_audio_select)
+	{
+		if (!BIT(offset, 1))
+			m_ym1->write(offset & 1, data);
+		else
+			m_ym2->write(offset & 1, data);
+	}
+	else
+	{
+		// ??? (written during ADPCM IRQ)
+	}
 }
 
 void raiden_ms_state::unk_snd_dffx_w(offs_t offset, u8 data)
@@ -371,8 +387,7 @@ void raiden_ms_state::audio_map(address_map &map)
 	map(0xdff0, 0xdff7).w(FUNC(raiden_ms_state::unk_snd_dffx_w));
 	map(0xdff8, 0xdff8).rw(m_soundlatch[1], FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
 	map(0xdff9, 0xdff9).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
-	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
+	map(0xe000, 0xe003).w(FUNC(raiden_ms_state::ym_w));
 	map(0xe008, 0xe009).r(m_ym1, FUNC(ym2203_device::read));
 	map(0xe00a, 0xe00b).r(m_ym2, FUNC(ym2203_device::read));
 }
@@ -386,7 +401,7 @@ WRITE_LINE_MEMBER(raiden_ms_state::adpcm_int)
 
 void raiden_ms_state::machine_start()
 {
-	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
 
@@ -673,8 +688,8 @@ void raiden_ms_state::raidenm(machine_config &config)
 
 	MSM5205(config, m_msm, XTAL(384'000)); // unknown clock
 	m_msm->vck_legacy_callback().set(FUNC(raiden_ms_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unverified
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // unverified
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 }
 
