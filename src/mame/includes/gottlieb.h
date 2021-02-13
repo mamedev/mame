@@ -46,7 +46,10 @@ public:
 		, m_paletteram(*this, "paletteram")
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
+		, m_ramrom_config(*this, "ROMRAM_CONFIG")
 		, m_leds(*this, "led%u", 0U)
+		, m_view_1000(*this, "view_1000")
+		, m_view_2000(*this, "view_2000")
 	{ }
 
 	void gottlieb_core(machine_config &config);
@@ -71,6 +74,12 @@ public:
 
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum
@@ -116,11 +125,6 @@ private:
 	void gottlieb_map(address_map &map);
 	void reactor_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<pioneer_pr8210_device> m_laserdisc;
@@ -139,7 +143,11 @@ private:
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
+	optional_ioport m_ramrom_config;
 	output_finder<3> m_leds;  // only used by reactor
+
+	memory_view m_view_1000;
+	memory_view m_view_2000;
 
 	u8 m_knocker_prev;
 	u8 m_joystick_select;
