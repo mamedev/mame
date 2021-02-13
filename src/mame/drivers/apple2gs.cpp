@@ -2437,7 +2437,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if (m_lastchar >= 0x32 && m_lastchar <= 0x3f)
+				else if (m_lastchar >= 0x32 && m_lastchar <= 0x37)
+				{
+					ret |= 0x10;
+				}
+				else if (m_lastchar >= 0x3c && m_lastchar <= 0x3f)
 				{
 					ret |= 0x10;
 				}
