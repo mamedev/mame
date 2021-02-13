@@ -674,7 +674,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkr101">
 		<description>Alphabet Park Adventure (USA, rev. 101)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092000-101(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -689,7 +689,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkr2" cloneof="alphaprkr101">
 		<description>Alphabet Park Adventure (USA, rev. 2)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092000(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -708,7 +708,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprk" cloneof="alphaprkr101">
 		<description>Alphabet Park Adventure (USA)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092000(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -725,7 +725,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprka" cloneof="alphaprkr101">
 		<description>Alphabet Park Adventure (USA, alt)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092000(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -742,7 +742,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkit" cloneof="alphaprkr101">
 		<description>Avventura nel Parco Alfabeto (Italy)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092001(IT)" /> <!-- Not printed on cart -->
 		<part name="cart" interface="vsmile_cart">
@@ -757,7 +757,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprknl" cloneof="alphaprkr101">
 		<description>Alfabet Pretpark (NL)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092002(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -774,7 +774,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkge" cloneof="alphaprkr101">
 		<description>Abenteuer im ABC Park (Germany)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092004(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -791,7 +791,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkger3" cloneof="alphaprkr101">
 		<description>Abenteuer im ABC Park (Germany, rev. 3)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092004(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -808,7 +808,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprkfr" cloneof="alphaprkr101">
 		<description>ABC Land Aventure (France)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092005(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -825,7 +825,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="alphaprksp" cloneof="alphaprkr101">
 		<description>Aventuras en el Parque Alfabeto (Spain)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092007(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -856,7 +856,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="arielger3" cloneof="arieluk">
 		<description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Germany, rev. 3?)</description>
-		<year>2004?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -873,7 +873,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="arielge" cloneof="arieluk">
 		<description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Germany)</description>
-		<year>2004?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -890,7 +890,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="arielfr" cloneof="arieluk">
 		<description>Disney La Petite Sirene - Ariel devient une princesse (France)</description>
-		<year>2004?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092125(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -924,7 +924,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="arieldk" cloneof="arieluk">
 		<description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Denmark)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092133(DK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -941,7 +941,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="arielse" cloneof="arieluk">
 		<description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Sweden)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092134(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1111,7 +1111,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="bobbday">
 		<description>Bob the Builder - Bob's Busy Day (USA)</description>
-		<year>2005?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092300(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1208,7 +1208,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="bobbdaydk" cloneof="bobbday">
 		<description>Byggemand Bob - Bobs travle dag (Denmark)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092313(DK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1225,7 +1225,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="bobbdayse" cloneof="bobbday">
 		<description>Byggare Bob - Bobs stressiga dag (Sweden)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092314(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1257,7 +1257,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carebearsp" cloneof="carebearfr"> <!-- Will be clone of "carebear" once found and dumped. -->
 		<description>Osos Amorosos - Una Lección de Amor (Spain)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092187(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1274,7 +1274,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carsr201">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, rev. 201)</description>
-		<year>2006?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092660-201(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1289,7 +1289,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="cars" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092660(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1306,7 +1306,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carsuk" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (UK)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092663(UK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1320,7 +1320,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carsge" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Germany)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092664(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1337,7 +1337,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carsfr" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Quatre Roues (France)</description>
-		<year>2006?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092665(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1369,7 +1369,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="carssp" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Acelera el Motor en Radiador Springs (Spain)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092667(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1421,7 +1421,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="cinderla">
 		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA)</description>
-		<year>2005?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092240(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1438,7 +1438,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="cinderlaa" cloneof="cinderla">
 		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA, alt)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092240(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2030,9 +2030,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="fredge">
+	<software name="lwheelge">
 		<description>Freds Zahlen Rallye (Germany)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092044(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2047,9 +2047,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="fredfr" cloneof="fredge">
+	<software name="lwheelfr" cloneof="lwheelge">
 		<description>Apprenti' pilote (France)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092045(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2096,7 +2096,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="jamgymge" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Tanz Mit Center (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091324(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2113,7 +2113,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="jamgymfr" cloneof="jamgymge" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Défi Gym (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091325(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2128,7 +2128,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="jamgymsp" cloneof="jamgymge" supported="yes">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091327(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2209,7 +2209,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="lionking">
 		<description>Disney's The Lion King - Simba's Big Adventure (USA)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
@@ -2226,7 +2226,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- where did the last 2MB in this come from? the cart is confirmed as having a 4MB blob and a 2MB blob -->
 	<software name="lionkinga" cloneof="lionking">
 		<description>Disney's The Lion King - Simba's Big Adventure (USA, alt)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092100(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2260,7 +2260,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="lionkingfr" cloneof="lionking">
 		<description>Le Roi Lion - Simba Découvre la Jungle (France)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092105(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2294,7 +2294,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="lionkingdk" cloneof="lionking">
 		<description>Disney Løvernes Konge - Simbas store eventyr (Denmark)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092113(DK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2311,7 +2311,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="lionkingse" cloneof="lionking">
 		<description>Disney Lejonkungen - Simbas stora äventyr (Sweden)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092114(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2557,7 +2557,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickymagse" cloneof="mickymag">
 		<description>Disneys Musse Pigg - Musses magiska äventyr (Sweden)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092094(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2574,7 +2574,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickeychger3">
 		<description>Micky Maus Wunderhaus (Germany, rev. 3?)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092944(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2591,7 +2591,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickeychfr" cloneof="mickeychger3">
 		<description>Disney La Maison De Mickey (France)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092945(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2606,7 +2606,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickeychsp" cloneof="mickeychger3">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092947(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2623,7 +2623,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickeychnl" cloneof="mickeychger3">
 		<description>Mickey Mouse Clubhouse (Netherlands)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092942(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2640,7 +2640,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mickeychse" cloneof="mickeychger3">
 		<description>Mickey Mouse Clubhouse (Sweden)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092954(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2657,7 +2657,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="monstalnge">
 		<description>DreamWorks Monsters vs Aliens (Germany)</description>
-		<year>2009?</year>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090164(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2706,7 +2706,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mypuppyge">
 		<description>Mein erster Hund (Germany)</description>
-		<year>200?</year>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090144(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2723,7 +2723,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="mypuppysp" cloneof="mypuppyge">
 		<description>Dakota y su mascota (Spain)</description>
-		<year>200?</year>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090147(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2757,7 +2757,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="noddy">
 		<description>Noddy - Detective for a Day (USA)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092540(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2774,7 +2774,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="noddyuk" cloneof="noddy">
 		<description>Noddy - Detective for a Day (UK)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092543(UK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2788,7 +2788,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="noddyger104" cloneof="noddy">
 		<description>Noddy - Detektiv für einen Tag (Germany, rev. 104)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092544-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2804,8 +2804,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="noddyfr" cloneof="noddy">
-		<description>Oui-Oui - Détective d'un Jour (France)</description>
-		<year>200?</year>
+		<description>Noddy - Détective d'un Jour (France)</description>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092545(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2821,8 +2821,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="noddyfrr105" cloneof="noddy">
-		<description>Oui-Oui - Détective d'un Jour (France, rev. 105)</description>
-		<year>200?</year>
+		<description>Noddy - Détective d'un Jour (France, rev. 105)</description>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092545-105(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2837,7 +2837,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="noddypt" cloneof="noddy">
 		<description>Noddy - Detective Por um Dia (Portugal)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092556(Port)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2855,7 +2855,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisr3" supported="no">
 		<description>V.Smile PC Pal Island (USA, rev. 3?)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-036800(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2871,7 +2871,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisge" cloneof="pcpalisr3" supported="no">
 		<description>V.Smile Mein erster Mausklick (Germany)</description>
-		<year>200?</year>
+		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-036804(GER)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2889,7 +2889,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisfr" cloneof="pcpalisr3" supported="no">
 		<description>V.Smile Mes Premiers Clics (France)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-036805(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2905,7 +2905,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalissp" cloneof="pcpalisr3" supported="no">
 		<description>V.Smile PC (Spain)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-036822(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3144,7 +3144,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydo" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092160(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3161,7 +3161,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydoit" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Avventura a Funland (Italy)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092161(IT)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3217,7 +3217,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydoge" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Im Lernpark (Germany)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092164(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3266,7 +3266,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydosp" cloneof="scoobydor301">
 		<description>Scooby-Doo - Misterio en el Parque (Spain)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092167(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3300,7 +3300,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydodk" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Sjov i forlystelsesparken (Denmark)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092173(DK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3317,7 +3317,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="scoobydose" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Tivoli-tokerier (Sweden)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092174(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3560,7 +3560,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="soccerch">
 		<description>V.Smile Soccer Challenge (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092820(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3577,7 +3577,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="soccerchit" cloneof="soccerch">
 		<description>V.Smile Football Club (Italy)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092831(IT)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3592,7 +3592,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="soccerchge" cloneof="soccerch">
 		<description>V.Smile Fußball Schule (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092824(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3609,7 +3609,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="soccerchfr" cloneof="soccerch">
 		<description>V.Smile Football Challenge (France)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092825(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3624,7 +3624,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="soccerchsp" cloneof="soccerch">
 		<description>Campeonato de Futbol V.Smile (Spain)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092827(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -3991,7 +3991,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="supermange" cloneof="superman">
 		<description>Superman - Der Superheld (Germany)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092644(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4008,7 +4008,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="supermannl" cloneof="superman">
 		<description>Superman - De Grootste Held (Netherlands)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092642(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4025,7 +4025,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="supermanfr" cloneof="superman">
 		<description>Superman - À la rescousse ! (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092645(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4575,7 +4575,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="poohdk" cloneof="pooh">
 		<description>Disney Peter Plys - Honningjagten (Denmark)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092073(DK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4592,7 +4592,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="poohse" cloneof="pooh">
 		<description>Disney Nalle Puh - Honungsjakten (Sweden)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092074(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4609,7 +4609,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="redhoodge">
 		<description>Entdecke die Welt von Rotkäppchen (Germany)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092024(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4626,7 +4626,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="redhoodfr" cloneof="redhoodge">
 		<description>Les aventures du Petit Chaperon Rouge (France)</description>
-		<year>200?</year>
+		<year>2004</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092025(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4642,7 +4642,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkb" supported="no">
 		<description>V.Smile Smart Keyboard (USA)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4658,7 +4658,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkbge" cloneof="smartkb" supported="no">
 		<description>V.Smile Schreibspaß (Germany)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4676,7 +4676,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkbfr" cloneof="smartkb" supported="no">
 		<description>V.Smile Clavier Tip Tap (France)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091445(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4691,7 +4691,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="techart">
 		<description>V.Smile Art Studio (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067000(USA)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4711,7 +4711,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="techartge" cloneof="techart">
 		<description>V.Smile Zeichenatelier (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067004(GER)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4731,7 +4731,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="techartfr" cloneof="techart">
 		<description>V.Smile Studio De Dessin (France)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067005(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4749,7 +4749,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="techartse" cloneof="techart">
 		<description>V.Smile Tecknarstudio (Sweden)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067021(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4769,7 +4769,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="techartsp" cloneof="techart">
 		<description>V.Smile Estudio De Arte (Spain)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067022(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4789,7 +4789,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="wkwheelnl"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Truckie's Rekenrace (Netherlands)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092502(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4804,7 +4804,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="wkwheelge" cloneof="wkwheelnl"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Flitzers Schlaue Städtetour (Germany)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092504(GER)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4821,7 +4821,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="wkwheelfr" cloneof="wkwheelnl"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Mission Pilote (France)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092505(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4836,7 +4836,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="wkwheelsp" cloneof="wkwheelnl"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Conducción Divertida (Spain)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092507(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4853,7 +4853,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="wwavesge"> <!-- Will be clone of "wwaves" once found and dumped. -->
 		<description>Dolphis Wasser-abenteuer (Germany)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090224(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4870,7 +4870,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="zayzaear101">
 		<description>Zayzoo: An Earth Adventure (USA, rev. 101)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092360-101(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4887,7 +4887,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="zayzaea" cloneof="zayzaear101">
 		<description>Zayzoo - My Alien Classmate (USA)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092360(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4900,7 +4900,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="zayzaeage" cloneof="zayzaear101">
 		<description>Zayzoos Lernall (Germany)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092364(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4918,7 +4918,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	<!-- Found also with the same ROM as "80-092360-101(US)" -->
 	<software name="zayzaeaukr103" cloneof="zayzaear101">
 		<description>Zayzoo: An Earth Adventure (UK, rev. 103)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092363-103(UK)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4931,7 +4931,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="zayzaeafr" cloneof="zayzaear101">
 		<description>Zézou - Notre Ami Venu d'Ailleurs (France)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092365(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -4948,7 +4948,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<software name="zayzaeasp" cloneof="zayzaear101">
 		<description>Zayzoo - Mi Amiga del Espacio (Spain)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092367(SP)" />
 		<part name="cart" interface="vsmile_cart">
