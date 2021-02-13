@@ -22,4 +22,14 @@ license:CC0
 		</part>
 	</software>
 
+		<software name="penmada" supported="no">
+		<description>The Penguins Of Madagascar (UK)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x8400000">
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
