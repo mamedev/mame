@@ -95,7 +95,7 @@ license:CC0
 	       | 80-281905(FR)   | Disney/Pixar Cars 2
 	       | 80-281907(??)   | Disney/Pixar Cars 2 (Italy)
 	       | 80-281922(SP)   | Disney/Pixar Cars 2
-	       | 80-281923(??)   | Disney/Pixar Cars 2 (Netherlands)
+	  XX   | 80-281923(??)   | Disney/Pixar Cars 2 (Netherlands)
 	       | 80-282000(US)   | Winnie the Pooh
 	       | 80-282003(UK)   | Winnie the Pooh
 	       | 80-282004(GER)  | Winnie Puuh
@@ -169,6 +169,16 @@ license:CC0
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281404 - Spongebob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="cars2nl" supported="no">
+		<description>Disney/Pixar Cars 2 (Netherlands)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
 			</dataarea>
 		</part>
 	</software>
