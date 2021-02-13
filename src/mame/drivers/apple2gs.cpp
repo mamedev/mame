@@ -581,6 +581,7 @@ private:
 	u8 m_adb_command;
 	u8 m_adb_mode;
 	u8 m_adb_kmstatus;
+	u8 m_adb_pending_status;
 	u8 m_adb_latent_result;
 	s32 m_adb_command_length;
 	s32 m_adb_command_pos;
@@ -856,12 +857,14 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		}
 		m_lastchar = m_ay3600->b_r();
 
+		u8 special = m_kbspecial->read();
+
 		trans = m_lastchar & ~(0x1c0);  // clear the 3600's control/shift stuff
 		trans |= (m_lastchar & 0x100)>>2;   // bring the 0x100 bit down to the 0x40 place
 		trans <<= 2;                    // 4 entries per key
-		trans |= (m_kbspecial->read() & 0x06) ? 0x00 : 0x01;    // shift is bit 1 (active low)
-		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
-		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
+		trans |= (special & 0x06) ? 0x00 : 0x01;    // shift is bit 1 (active low)
+		trans |= (special & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
+		trans |= (special & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
 		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
 		if (m_lastchar == 0x146)
@@ -875,6 +878,24 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		m_strobe = 0x80;
 
 //      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+
+		/* check for command-control-esc and command-control delete */
+		if ((special & 0x18) == 0x18)
+		{
+			if (m_transchar == 0x1b)
+			{
+				m_adb_pending_status |= 0x20;
+			}
+			else if (m_transchar == 0x7f)
+			{
+				m_adb_pending_status |= 0x10;
+			}
+			if (m_adb_pending_status && m_adb_state == ADBSTATE_IDLE)
+			{
+				adb_post_response_1(m_adb_pending_status);
+				m_adb_pending_status = 0;
+			}
+		}
 	}
 }
 
@@ -936,6 +957,9 @@ void apple2gs_state::adb_post_response(const u8 *bytes, size_t length)
 	m_adb_state = ADBSTATE_INRESPONSE;
 	m_adb_response_length = length;
 	m_adb_response_pos = 0;
+	m_adb_kmstatus |= 0x20;
+	if (m_adb_kmstatus & 0x10)
+		raise_irq(IRQS_ADB);
 }
 
 void apple2gs_state::adb_post_response_1(u8 b)
@@ -1078,7 +1102,6 @@ void apple2gs_state::adb_do_command()
 		default:
 			fatalerror("ADB command 0x%02x unimplemented\n", m_adb_command);
 	}
-	m_adb_kmstatus |= 0x20;
 }
 
 u8 apple2gs_state::adb_read_datareg()
@@ -1093,7 +1116,10 @@ u8 apple2gs_state::adb_read_datareg()
 			{
 				m_adb_state = ADBSTATE_IDLE;
 				m_adb_latent_result = result;
+
 				m_adb_kmstatus &= ~0x20;
+				if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54) == 0)
+					lower_irq(IRQS_ADB);
 			}
 			break;
 
@@ -1265,6 +1291,11 @@ void apple2gs_state::adb_write_kmstatus(u8 data)
 {
 	m_adb_kmstatus &= ~0x54;
 	m_adb_kmstatus |= data & 0x54;
+
+	if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54))
+		raise_irq(IRQS_ADB);
+	else
+		lower_irq(IRQS_ADB);
 }
 
 
@@ -1282,7 +1313,8 @@ u8 apple2gs_state::adb_read_mousedata()
 			absolute = m_mouse_y;
 			delta = m_mouse_dy;
 			m_adb_kmstatus &= ~0x82;
-			lower_irq(IRQS_ADB);
+			if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54) == 0)
+				lower_irq(IRQS_ADB);
 		}
 		else
 		{
@@ -1483,6 +1515,7 @@ void apple2gs_state::machine_start()
 	save_item(m_adb_command, "ADB/m_adb_command");
 	save_item(m_adb_mode, "ADB/m_adb_mode");
 	save_item(m_adb_kmstatus, "ADB/m_adb_kmstatus");
+	save_item(m_adb_pending_status, "ADB/m_adb_pending_status");
 	save_item(m_adb_latent_result, "ADB/m_adb_latent_result");
 	save_item(m_adb_command_length, "ADB/m_adb_command_length");
 	save_item(m_adb_command_pos, "ADB/m_adb_command_pos");
@@ -1751,6 +1784,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		#if !RUN_ADB_MICRO
 		adb_check_mouse();
+
+		if (m_adb_state == ADBSTATE_IDLE && m_adb_pending_status)
+		{
+			adb_post_response_1(m_adb_pending_status);
+			m_adb_pending_status = 0;
+		}
 		#endif
 	}
 
