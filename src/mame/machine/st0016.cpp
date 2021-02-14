@@ -277,6 +277,30 @@ void st0016_cpu_device::vregs_w(offs_t offset, uint8_t data)
 
 		$60-$6f video timing related
 
+		$60 \
+		$61 - H sync start?
+
+		$62 \
+		$63 - H screen start?
+
+		$64 \
+		$65 - H screen end >> 1?
+
+		$66 \
+		$67 - H total
+
+		$68 \
+		$69 - V sync start?
+
+		$6a \
+		$6b - V screen start?
+
+		$6c \
+		$6d - V screen end?
+
+		$6e \
+		$6f - V total
+
 	    $74 x--- ---- global flip screen
 	        -xx- ---- individual flip screen x/y
 	        i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
