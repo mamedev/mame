@@ -325,11 +325,6 @@ private:
 	required_shared_ptr<uint16_t> m_waveram;
 
 	output_finder<8> m_spu_status_leds;
-
-	enum
-	{
-		TIMER_SPU_DMA
-	};
 };
 
 /*****************************************************************************/
