@@ -207,7 +207,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 			if ((c == '\r') || (c == '\n'))
 				break;
 
-			if (pos <= ARRAY_LENGTH(buf) - 1)
+			if (pos <= std::size(buf) - 1)
 			{
 				buf[pos++] = c;
 			}
@@ -2943,8 +2943,8 @@ static const char *const basic_100[] = /* "BASIC 10.0" - supported by c65 & clon
 
 static const basictoken_tableent cocobas_tokenents[] =
 {
-	{ 0x00, 0x80,   cocobas_statements, ARRAY_LENGTH(cocobas_statements) },
-	{ 0xff, 0x80,   cocobas_functions,  ARRAY_LENGTH(cocobas_functions) }
+	{ 0x00, 0x80,   cocobas_statements, std::size(cocobas_statements) },
+	{ 0xff, 0x80,   cocobas_functions,  std::size(cocobas_functions) }
 };
 
 static const basictokens cocobas_tokens =
@@ -2955,7 +2955,7 @@ static const basictokens cocobas_tokens =
 	{0xFF, 0x00, 0x00},
 	true,
 	cocobas_tokenents,
-	ARRAY_LENGTH(cocobas_tokenents)
+	std::size(cocobas_tokenents)
 };
 
 static imgtoolerr_t cocobas_readfile(imgtool::partition &partition, const char *filename,
@@ -2989,8 +2989,8 @@ void filter_cocobas_getinfo(uint32_t state, union filterinfo *info)
 
 static const basictoken_tableent dragonbas_tokenents[] =
 {
-	{ 0x00, 0x80,   dragonbas_statements,   ARRAY_LENGTH(dragonbas_statements) },
-	{ 0xff, 0x80,   dragonbas_functions,    ARRAY_LENGTH(dragonbas_functions) }
+	{ 0x00, 0x80,   dragonbas_statements,   std::size(dragonbas_statements) },
+	{ 0xff, 0x80,   dragonbas_functions,    std::size(dragonbas_functions) }
 };
 
 static const basictokens dragonbas_tokens =
@@ -3001,7 +3001,7 @@ static const basictokens dragonbas_tokens =
 	{0x55, 0x01, 0x24, 0x01, 0x00, 0x2A, 0x8B, 0x8D, 0xAA},
 	true,
 	dragonbas_tokenents,
-	ARRAY_LENGTH(dragonbas_tokenents)
+	std::size(dragonbas_tokenents)
 };
 
 static imgtoolerr_t dragonbas_readfile(imgtool::partition &partition, const char *filename,
@@ -3035,7 +3035,7 @@ void filter_dragonbas_getinfo(uint32_t state, union filterinfo *info)
 
 static const basictoken_tableent vzbas_tokenents[] =
 {
-	{ 0x00, 0x80,   vzbas,  ARRAY_LENGTH(vzbas) }
+	{ 0x00, 0x80,   vzbas,  std::size(vzbas) }
 };
 
 
@@ -3048,7 +3048,7 @@ static const basictokens vzbas_tokens =
 	{0x00},
 	false,
 	vzbas_tokenents,
-	ARRAY_LENGTH(vzbas_tokenents)
+	std::size(vzbas_tokenents)
 };
 
 static imgtoolerr_t vzbas_readfile(imgtool::partition &partition, const char *filename,
@@ -3082,8 +3082,8 @@ void filter_vzbas_getinfo(uint32_t state, union filterinfo *info)
 
 static const basictoken_tableent bml3bas_tokenents[] =
 {
-	{ 0x00, 0x80,   bml3bas_statements, ARRAY_LENGTH(bml3bas_statements) },
-	{ 0xff, 0x80,   bml3bas_functions,  ARRAY_LENGTH(bml3bas_functions) }
+	{ 0x00, 0x80,   bml3bas_statements, std::size(bml3bas_statements) },
+	{ 0xff, 0x80,   bml3bas_functions,  std::size(bml3bas_functions) }
 };
 
 static const basictokens bml3bas_tokens =
@@ -3094,7 +3094,7 @@ static const basictokens bml3bas_tokens =
 	{0xFF, 0x00, 0x00},
 	true,
 	bml3bas_tokenents,
-	ARRAY_LENGTH(bml3bas_tokenents)
+	std::size(bml3bas_tokenents)
 };
 
 static imgtoolerr_t bml3bas_readfile(imgtool::partition &partition, const char *filename,

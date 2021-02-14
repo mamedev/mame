@@ -256,7 +256,7 @@ void i82730_device::execute_command()
 	uint8_t command = read_byte(m_cbp + 1);
 	uint16_t tmp;
 
-	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(s_command_names))
+	if (VERBOSE_COMMANDS && command < std::size(s_command_names))
 		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), s_command_names[command], m_cbp);
 
 	tmp = read_word(m_cbp + 2);

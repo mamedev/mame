@@ -1119,7 +1119,7 @@ static const uint8_t atari_colors[256*3] =
 /* Initialise the palette */
 void a400_state::a400_palette(palette_device &palette) const
 {
-	for (unsigned i = 0; i < ARRAY_LENGTH(atari_colors) / 3; i++)
+	for (unsigned i = 0; i < std::size(atari_colors) / 3; i++)
 		palette.set_pen_color(i, atari_colors[i * 3], atari_colors[i * 3 + 1], atari_colors[i * 3 + 2]);
 }
 /******************************************************************
@@ -2103,7 +2103,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(a400_state::a400_palette), ARRAY_LENGTH(atari_colors) / 3);
+	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set_ioport("djoy_0_1");

@@ -491,7 +491,7 @@ void device_palette_interface::configure_rgb_shadows(int mode, float factor)
 	assert(m_format != BITMAP_FORMAT_IND16);
 
 	// verify the shadow table
-	assert(mode >= 0 && mode < ARRAY_LENGTH(m_shadow_tables));
+	assert(mode >= 0 && mode < std::size(m_shadow_tables));
 	shadow_table_data &stable = m_shadow_tables[mode];
 	assert(stable.base != nullptr);
 

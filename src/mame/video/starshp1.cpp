@@ -37,7 +37,7 @@ void starshp1_state::starshp1_palette(palette_device &palette) const
 		5, 7        // 0x11        - circle
 	};
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (unsigned i = 0; i < std::size(colortable_source); i++)
 		palette.set_pen_indirect(i, colortable_source[i]);
 }
 

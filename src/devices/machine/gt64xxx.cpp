@@ -243,10 +243,8 @@ void gt64xxx_device::device_start()
 	save_item(NAME(m_cpu_stalled_mem_mask));
 	save_item(NAME(m_prev_addr));
 	save_item(NAME(m_reg));
-	for (int i = 0; i < ARRAY_LENGTH(m_timer); i++) {
-		save_item(NAME(m_timer[i].active), i);
-		save_item(NAME(m_timer[i].count), i);
-	}
+	save_item(STRUCT_MEMBER(m_timer, active));
+	save_item(STRUCT_MEMBER(m_timer, count));
 	save_item(NAME(m_dma_active));
 	// m_ram[4]
 	save_pointer(NAME(m_ram[0].data()), m_simm_size[0] / 4);

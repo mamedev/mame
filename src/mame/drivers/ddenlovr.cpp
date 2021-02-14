@@ -9701,7 +9701,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
 
-	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+	std::fill(std::begin(m_palram), std::end(m_palram), 0);
 
 	m_blitter_irq_handler(1);
 }

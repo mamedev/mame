@@ -653,7 +653,7 @@ void menu_select_game::build_available_list()
 		char const *src;
 
 		// build a name for it
-		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
+		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[std::size(drivername) - 1]; ++src)
 			*dst++ = tolower(uint8_t(*src));
 
 		*dst = 0;

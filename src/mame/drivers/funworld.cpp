@@ -8402,7 +8402,7 @@ void chinatow_state::init_rcdino4()
 	decrypt_rcdino4(rom, memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
 
 	int j = 0;
-	for (int i = 0x40; i < (0x40 + ARRAY_LENGTH(rcdino4_keys40));)
+	for (int i = 0x40; i < (0x40 + std::size(rcdino4_keys40));)
 	{
 		uint8_t key = rcdino4_keys40[i - 0x40];
 
@@ -8492,10 +8492,10 @@ void chinatow_state::init_rcdino4()
 
 		j &= 0xff;
 
-		do {} while (((++i - 0x81) < ARRAY_LENGTH(rcdino4_keys80))
+		do {} while (((++i - 0x81) < std::size(rcdino4_keys80))
 				&& !rcdino4_keys80[i - 0x81]);
 
-		if ((i - 0x81) == ARRAY_LENGTH(rcdino4_keys80))
+		if ((i - 0x81) == std::size(rcdino4_keys80))
 		{
 			break;
 		}

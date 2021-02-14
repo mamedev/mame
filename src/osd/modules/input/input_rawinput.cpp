@@ -82,7 +82,7 @@ public:
 	std::wstring enum_key(int index) const
 	{
 		WCHAR keyname[256];
-		DWORD namelen = ARRAY_LENGTH(keyname);
+		DWORD namelen = std::size(keyname);
 		if (RegEnumKeyEx(m_key, index, keyname, &namelen, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS)
 			return std::wstring(keyname, namelen);
 		else
@@ -653,8 +653,8 @@ protected:
 			WCHAR keyname[100];
 
 			// generate the name
-			if (GetKeyNameTextW(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
-				_snwprintf(keyname, ARRAY_LENGTH(keyname), L"Scan%03d", keynum);
+			if (GetKeyNameTextW(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
+				_snwprintf(keyname, std::size(keyname), L"Scan%03d", keynum);
 			std::string name = osd::text::from_wstring(keyname);
 
 			// add the item to the device

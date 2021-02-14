@@ -1509,7 +1509,7 @@ uint16_t jalmah_state::urashima_mcu_r()
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%s: mcu_r %02x\n",machine().dscribe_context(),res);
 
@@ -1568,7 +1568,7 @@ uint16_t jalmah_state::daireika_mcu_r()
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%s: mcu_r %02x\n",machine().describe_context(),res);
 
@@ -1636,7 +1636,7 @@ uint16_t jalmah_state::mjzoomin_mcu_r()
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%04x: mcu_r %02x\n",machine().describe_context(),res);
 
@@ -1689,7 +1689,7 @@ uint16_t jalmah_state::kakumei_mcu_r()
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  popmessage("%s: mcu_r %02x",machine().describe_context(),res);
 
@@ -1710,7 +1710,7 @@ uint16_t jalmah_state::suchiesp_mcu_r()
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  popmessage("%s: mcu_r %02x",machine().describe_context(),res);
 

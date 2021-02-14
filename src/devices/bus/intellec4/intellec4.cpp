@@ -127,7 +127,7 @@ void univ_bus_device::device_start()
 
 unsigned univ_bus_device::add_card(device_univ_card_interface &card)
 {
-	for (unsigned i = 0; ARRAY_LENGTH(m_cards) > i; ++i)
+	for (unsigned i = 0; std::size(m_cards) > i; ++i)
 	{
 		if (!m_cards[i])
 		{
@@ -135,12 +135,12 @@ unsigned univ_bus_device::add_card(device_univ_card_interface &card)
 			return i;
 		}
 	}
-	throw emu_fatalerror("univ_bus_device: maximum number of cards (%u) exceeded\n", unsigned(ARRAY_LENGTH(m_cards)));
+	throw emu_fatalerror("univ_bus_device: maximum number of cards (%u) exceeded\n", unsigned(std::size(m_cards)));
 }
 
 void univ_bus_device::set_test(unsigned index, int state)
 {
-	assert(ARRAY_LENGTH(m_cards) >= index);
+	assert(std::size(m_cards) >= index);
 	bool const changed(bool(state) != !BIT(m_test, index));
 	if (changed)
 	{
@@ -150,10 +150,10 @@ void univ_bus_device::set_test(unsigned index, int state)
 		else
 			m_test |= u16(1U) << index;
 
-		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+		if ((std::size(m_cards) != index) && !(other & ~(u16(1U) << std::size(m_cards))))
 			m_test_out_cb(state);
 
-		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		for (unsigned card = 0U; (std::size(m_cards) > card) && m_cards[card]; ++card)
 		{
 			if ((index != card) && !(other & ~(u16(1U) << index)))
 				m_cards[card]->test_in(state);
@@ -163,7 +163,7 @@ void univ_bus_device::set_test(unsigned index, int state)
 
 void univ_bus_device::set_stop(unsigned index, int state)
 {
-	assert(ARRAY_LENGTH(m_cards) >= index);
+	assert(std::size(m_cards) >= index);
 	bool const changed(bool(state) != !BIT(m_stop, index));
 	if (changed)
 	{
@@ -173,10 +173,10 @@ void univ_bus_device::set_stop(unsigned index, int state)
 		else
 			m_stop |= u16(1U) << index;
 
-		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+		if ((std::size(m_cards) != index) && !(other & ~(u16(1U) << std::size(m_cards))))
 			m_stop_out_cb(state);
 
-		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		for (unsigned card = 0U; (std::size(m_cards) > card) && m_cards[card]; ++card)
 		{
 			if ((index != card) && !(other & ~(u16(1U) << index)))
 				m_cards[card]->stop_in(state);
@@ -186,7 +186,7 @@ void univ_bus_device::set_stop(unsigned index, int state)
 
 void univ_bus_device::set_reset_4002(unsigned index, int state)
 {
-	assert(ARRAY_LENGTH(m_cards) >= index);
+	assert(std::size(m_cards) >= index);
 	bool const changed(bool(state) != !BIT(m_reset_4002, index));
 	if (changed)
 	{
@@ -196,10 +196,10 @@ void univ_bus_device::set_reset_4002(unsigned index, int state)
 		else
 			m_reset_4002 |= u16(1U) << index;
 
-		if ((ARRAY_LENGTH(m_cards) != index) && !(other & ~(u16(1U) << ARRAY_LENGTH(m_cards))))
+		if ((std::size(m_cards) != index) && !(other & ~(u16(1U) << std::size(m_cards))))
 			m_reset_4002_out_cb(state);
 
-		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		for (unsigned card = 0U; (std::size(m_cards) > card) && m_cards[card]; ++card)
 		{
 			if ((index != card) && !(other & ~(u16(1U) << index)))
 				m_cards[card]->reset_4002_in(state);
@@ -209,7 +209,7 @@ void univ_bus_device::set_reset_4002(unsigned index, int state)
 
 void univ_bus_device::set_user_reset(unsigned index, int state)
 {
-	assert(ARRAY_LENGTH(m_cards) > index);
+	assert(std::size(m_cards) > index);
 	bool const changed(bool(state) != !BIT(m_user_reset, index));
 	if (changed)
 	{
@@ -222,7 +222,7 @@ void univ_bus_device::set_user_reset(unsigned index, int state)
 		if (!other)
 			m_user_reset_out_cb(state);
 
-		for (unsigned card = 0U; (ARRAY_LENGTH(m_cards) > card) && m_cards[card]; ++card)
+		for (unsigned card = 0U; (std::size(m_cards) > card) && m_cards[card]; ++card)
 		{
 			if ((index != card) && !(other & ~(u16(1U) << index)))
 				m_cards[card]->user_reset_in(state);

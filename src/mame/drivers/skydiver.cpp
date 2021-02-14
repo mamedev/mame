@@ -118,9 +118,9 @@ static constexpr unsigned colortable_source[] =
 void skydiver_state::skydiver_palette(palette_device &palette) const
 {
 	constexpr rgb_t colors[]{ rgb_t::black(), rgb_t::white(), rgb_t(0xa0, 0xa0, 0xa0) }; // black, white, grey
-	for (unsigned i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (unsigned i = 0; i < std::size(colortable_source); i++)
 	{
-		assert(colortable_source[i] < ARRAY_LENGTH(colors));
+		assert(colortable_source[i] < std::size(colors));
 		palette.set_pen_color(i, colors[colortable_source[i]]);
 	}
 }
@@ -378,7 +378,7 @@ void skydiver_state::skydiver(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skydiver);
-	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), ARRAY_LENGTH(colortable_source));
+	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), std::size(colortable_source));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1740,7 +1740,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 			if ((c == '\r') || (c == '\n'))
 				break;
 
-			if (pos <= ARRAY_LENGTH(buf) - 1)
+			if (pos <= std::size(buf) - 1)
 			{
 				buf[pos++] = c;
 			}

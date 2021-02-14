@@ -893,7 +893,7 @@ void x07_state::printer_w()
 
 inline uint8_t x07_state::kb_get_index(uint8_t char_code)
 {
-	for(uint8_t i=0 ; i< ARRAY_LENGTH(x07_keycodes); i++)
+	for(uint8_t i=0 ; i< std::size(x07_keycodes); i++)
 		if (x07_keycodes[i].codes[0] == char_code)
 			return i;
 

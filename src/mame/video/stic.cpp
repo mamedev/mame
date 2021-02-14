@@ -1314,7 +1314,7 @@ void stic_device::write(offs_t offset, uint16_t data)
 			break;
 	}
 
-	if (offset < ARRAY_LENGTH(m_stic_registers))
+	if (offset < std::size(m_stic_registers))
 		m_stic_registers[offset] = data;
 }
 

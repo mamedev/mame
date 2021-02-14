@@ -97,7 +97,7 @@ public:
 		char buffer[2048];
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{
-			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
+			vsnprintf(buffer, std::size(buffer), msg, args);
 
 			std::wstring wcbuffer(osd::text::to_wstring(buffer));
 			std::wstring wcappname(osd::text::to_wstring(emulator_info::get_appname()));
@@ -107,7 +107,7 @@ public:
 		}
 		else if (channel == OSD_OUTPUT_CHANNEL_VERBOSE)
 		{
-			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
+			vsnprintf(buffer, std::size(buffer), msg, args);
 			std::wstring wcbuffer = osd::text::to_wstring(buffer);
 			OutputDebugString(wcbuffer.c_str());
 
@@ -421,7 +421,7 @@ void MameMainApp::Run()
 	GetModuleFileNameA(nullptr, exe_path, MAX_PATH);
 	char* args[3] = { exe_path, (char*)"-verbose", (char*)"-mouse" };
 
-	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);
+	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), std::size(args), args);
 	osd_output::pop(&winerror);
 }
 

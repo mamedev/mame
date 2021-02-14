@@ -470,8 +470,6 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 
 void adsp21062_device::device_start()
 {
-	int saveindex;
-
 	m_core = (sharc_internal_state *)m_cache.alloc_near(sizeof(sharc_internal_state));
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
@@ -672,8 +670,8 @@ void adsp21062_device::device_start()
 	m_core->fp1 = 1.0f;
 
 	save_item(NAME(m_core->pc));
-	save_pointer(NAME(&m_core->r[0].r), ARRAY_LENGTH(m_core->r));
-	save_pointer(NAME(&m_core->reg_alt[0].r), ARRAY_LENGTH(m_core->reg_alt));
+	save_pointer(NAME(&m_core->r[0].r), std::size(m_core->r));
+	save_pointer(NAME(&m_core->reg_alt[0].r), std::size(m_core->reg_alt));
 	save_item(NAME(m_core->mrf));
 	save_item(NAME(m_core->mrb));
 
@@ -709,18 +707,15 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->dag2_alt.b));
 	save_item(NAME(m_core->dag2_alt.l));
 
-	for (saveindex = 0; saveindex < ARRAY_LENGTH(m_core->dma); saveindex++)
-	{
-		save_item(NAME(m_core->dma[saveindex].control), saveindex);
-		save_item(NAME(m_core->dma[saveindex].int_index), saveindex);
-		save_item(NAME(m_core->dma[saveindex].int_modifier), saveindex);
-		save_item(NAME(m_core->dma[saveindex].int_count), saveindex);
-		save_item(NAME(m_core->dma[saveindex].chain_ptr), saveindex);
-		save_item(NAME(m_core->dma[saveindex].gen_purpose), saveindex);
-		save_item(NAME(m_core->dma[saveindex].ext_index), saveindex);
-		save_item(NAME(m_core->dma[saveindex].ext_modifier), saveindex);
-		save_item(NAME(m_core->dma[saveindex].ext_count), saveindex);
-	}
+	save_item(STRUCT_MEMBER(m_core->dma, control));
+	save_item(STRUCT_MEMBER(m_core->dma, int_index));
+	save_item(STRUCT_MEMBER(m_core->dma, int_modifier));
+	save_item(STRUCT_MEMBER(m_core->dma, int_count));
+	save_item(STRUCT_MEMBER(m_core->dma, chain_ptr));
+	save_item(STRUCT_MEMBER(m_core->dma, gen_purpose));
+	save_item(STRUCT_MEMBER(m_core->dma, ext_index));
+	save_item(STRUCT_MEMBER(m_core->dma, ext_modifier));
+	save_item(STRUCT_MEMBER(m_core->dma, ext_count));
 
 	save_item(NAME(m_core->mode1));
 	save_item(NAME(m_core->mode2));
@@ -737,11 +732,8 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->syscon));
 	save_item(NAME(m_core->sysstat));
 
-	for (saveindex = 0; saveindex < ARRAY_LENGTH(m_core->status_stack); saveindex++)
-	{
-		save_item(NAME(m_core->status_stack[saveindex].mode1), saveindex);
-		save_item(NAME(m_core->status_stack[saveindex].astat), saveindex);
-	}
+	save_item(STRUCT_MEMBER(m_core->status_stack, mode1));
+	save_item(STRUCT_MEMBER(m_core->status_stack, astat));
 	save_item(NAME(m_core->status_stkp));
 
 	save_item(NAME(m_core->px));
@@ -754,19 +746,16 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->irq_pending));
 	save_item(NAME(m_core->active_irq_num));
 
-	for (saveindex = 0; saveindex < ARRAY_LENGTH(m_core->dma_op); saveindex++)
-	{
-		save_item(NAME(m_core->dma_op[saveindex].src), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].dst), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].chain_ptr), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].src_modifier), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].dst_modifier), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].src_count), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].dst_count), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].pmode), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].chained_direction), saveindex);
-		save_item(NAME(m_core->dma_op[saveindex].active), saveindex);
-	}
+	save_item(STRUCT_MEMBER(m_core->dma_op, src));
+	save_item(STRUCT_MEMBER(m_core->dma_op, dst));
+	save_item(STRUCT_MEMBER(m_core->dma_op, chain_ptr));
+	save_item(STRUCT_MEMBER(m_core->dma_op, src_modifier));
+	save_item(STRUCT_MEMBER(m_core->dma_op, dst_modifier));
+	save_item(STRUCT_MEMBER(m_core->dma_op, src_count));
+	save_item(STRUCT_MEMBER(m_core->dma_op, dst_count));
+	save_item(STRUCT_MEMBER(m_core->dma_op, pmode));
+	save_item(STRUCT_MEMBER(m_core->dma_op, chained_direction));
+	save_item(STRUCT_MEMBER(m_core->dma_op, active));
 
 	save_item(NAME(m_core->dma_status));
 

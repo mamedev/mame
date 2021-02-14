@@ -538,7 +538,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 			break;
 		case 0x05:
 		case 0x25:
-			assert(vga.crtc.index < ARRAY_LENGTH(m_crtc_regs));
+			assert(vga.crtc.index < std::size(m_crtc_regs));
 			m_crtc_regs[vga.crtc.index] = data;
 			switch(vga.crtc.index)
 			{

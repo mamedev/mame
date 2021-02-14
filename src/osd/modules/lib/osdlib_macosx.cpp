@@ -67,7 +67,7 @@ void osd_break_into_debugger(const char *message)
 	struct kinfo_proc info;
 	info.kp_proc.p_flag = 0;
 	std::size_t infosz = sizeof(info);
-	sysctl(mib, ARRAY_LENGTH(mib), &info, &infosz, nullptr, 0);
+	sysctl(mib, std::size(mib), &info, &infosz, nullptr, 0);
 	if (info.kp_proc.p_flag & P_TRACED)
 	{
 		printf("MAME exception: %s\n", message);

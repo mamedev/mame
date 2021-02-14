@@ -1672,7 +1672,7 @@ machine_filter::ptr machine_filter::create(type n, machine_filter_data const &da
 machine_filter::ptr machine_filter::create(emu_file &file, machine_filter_data const &data, unsigned indent)
 {
 	char buffer[MAX_CHAR_INFO];
-	if (!file.gets(buffer, ARRAY_LENGTH(buffer)))
+	if (!file.gets(buffer, std::size(buffer)))
 		return nullptr;
 
 	// split it into a key/value or bail
@@ -1780,7 +1780,7 @@ software_filter::ptr software_filter::create(type n, software_filter_data const 
 software_filter::ptr software_filter::create(emu_file &file, software_filter_data const &data, unsigned indent)
 {
 	char buffer[MAX_CHAR_INFO];
-	if (!file.gets(buffer, ARRAY_LENGTH(buffer)))
+	if (!file.gets(buffer, std::size(buffer)))
 		return nullptr;
 
 	// split it into a key/value or bail

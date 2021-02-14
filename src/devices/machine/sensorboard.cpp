@@ -127,7 +127,7 @@ void sensorboard_device::device_start()
 	m_upointer = 0;
 	m_ufirst = 0;
 	m_ulast = 0;
-	m_usize = ARRAY_LENGTH(m_history);
+	m_usize = std::size(m_history);
 
 	// register for savestates
 	save_item(NAME(m_nosensors));

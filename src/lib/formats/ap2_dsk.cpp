@@ -67,7 +67,7 @@ static const uint8_t *get_untranslate6_map(void)
 	if (!map_inited)
 	{
 		memset(map, 0xff, sizeof(map));
-		for (i = 0; i < ARRAY_LENGTH(translate6); i++)
+		for (i = 0; i < std::size(translate6); i++)
 			map[translate6[i]] = i;
 		map_inited = 1;
 	}

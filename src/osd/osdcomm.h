@@ -13,11 +13,10 @@
 
 #pragma once
 
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 
-#include <array>
-#include <cstdint>
 #include <type_traits>
 
 
@@ -80,19 +79,6 @@ using s64 = std::int64_t;
 constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | uint32_t(lo); }
 constexpr uint32_t extract_64hi(uint64_t val) { return uint32_t(val >> 32); }
 constexpr uint32_t extract_64lo(uint64_t val) { return uint32_t(val); }
-
-// Highly useful template for compile-time knowledge of an array size
-template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(T (&)[N]) { return N;}
-template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(std::array<T, N> const &) { return N; }
-
-// For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
-template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };
-template <typename T, typename U, std::size_t N> struct equivalent_array_or_type<T, U[N]> { typedef typename equivalent_array_or_type<T, U>::type type[N]; };
-template <typename T, typename U> using equivalent_array_or_type_t = typename equivalent_array_or_type<T, U>::type;
-template <typename T, typename U> struct equivalent_array { };
-template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]> { typedef equivalent_array_or_type_t<T, U> type[N]; };
-template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
-#define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
 // Macros for normalizing data into big or little endian formats
 constexpr uint16_t swapendian_int16(uint16_t val) { return (val << 8) | (val >> 8); }

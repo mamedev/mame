@@ -1275,7 +1275,7 @@ offs_t coco_state::os9_dasm_override(std::ostream &stream, offs_t pc, const util
 	if ((opcodes.r8(pc) == 0x10) && (opcodes.r8(pc+1) == 0x3F))
 	{
 		call = opcodes.r8(pc+2);
-		if ((call < ARRAY_LENGTH(os9syscalls)) && (os9syscalls[call] != nullptr))
+		if ((call < std::size(os9syscalls)) && (os9syscalls[call] != nullptr))
 		{
 			util::stream_format(stream, "OS9   %s", os9syscalls[call]);
 			result = 3;
