@@ -16090,6 +16090,11 @@ qkracer                         // National Semiconductor
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
+@source:hh_cops1.cpp
+mbaskb                          // Mattel
+qkracerm                        // National Semiconductor
+qkspeller                       // National Semiconductor
+
 @source:hh_hmcs40.cpp
 alnattck                        // Coleco
 bambball                        // Bambino

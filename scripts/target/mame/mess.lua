@@ -166,6 +166,7 @@ CPUS["M88000"] = true
 CPUS["XAVIX2"] = true
 CPUS["UPD78K"] = true
 CPUS["ROMP"] = true
+CPUS["COPS1"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -3012,6 +3013,7 @@ files {
 createMESSProjects(_target, _subtarget, "natsemi")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_cops1.cpp",
 	MAME_DIR .. "src/mame/drivers/ns5652.cpp",
 }
 

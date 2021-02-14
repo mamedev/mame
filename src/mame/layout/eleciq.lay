@@ -49,7 +49,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="1.01" right="27.99" top="0.75" bottom="54" />
 
-	<!-- element, buttons -->
+	<!-- bezel, buttons -->
 
 		<element ref="text_time"><bounds x="17.5" y="2.75" width="6" height="1.5" /></element>
 		<element ref="static_white"><bounds x="11" y="1.25" width="7" height="4.5" /></element>

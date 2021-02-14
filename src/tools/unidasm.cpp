@@ -112,6 +112,7 @@ using util::BIT;
 #include "cpu/minx/minxd.h"
 #include "cpu/mips/mips3dsm.h"
 #include "cpu/mips/mips1dsm.h"
+#include "cpu/cops1/cops1d.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
 #include "cpu/msm65x2/msm65x2d.h"
@@ -496,6 +497,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips1le",         le,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
 	{ "mips3be",         be,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mips3le",         le,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
+	{ "mm5799",          le,  0, []() -> util::disasm_interface * { return new mm5799_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
 	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
 	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },
