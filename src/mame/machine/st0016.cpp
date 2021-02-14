@@ -88,6 +88,7 @@ void st0016_cpu_device::device_reset()
 
 	switch (m_game_flag & 0x3f)
 	{
+		// TODO: controlled by video timing registers
 		case 0: //renju kizoku
 			m_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
 			spr_dx=0;
@@ -235,7 +236,7 @@ uint8_t st0016_cpu_device::vregs_r(offs_t offset)
 	/*
 	    $0, $1 = max scanline(including vblank)/timer? ($3e7)
 
-	    $8-$40 = bg tilemaps  (8 bytes each) :
+	    $8-$3f = bg tilemaps  (8 bytes each) :
 	               0 - ? = usually 0/20/ba*
 	               1 - 0 = disabled , !zero = address of tilemap in spriteram /$1000  (for example: 3 -> tilemap at $3000 )
 	               2 - ? = usually ff/1f/af*
@@ -245,7 +246,7 @@ uint8_t st0016_cpu_device::vregs_r(offs_t offset)
 	               6 - ? = 0
 	               7 - ? =$20/$10/$12*
 
-	    $40-$60 = scroll registers , X.w, Y.w
+	    $40-$5f = scroll registers , X.w, Y.w
 	*/
 
 	switch (offset)
@@ -273,6 +274,8 @@ void st0016_cpu_device::vregs_w(offs_t offset, uint8_t data)
 	/*
 
 	   I/O ports:
+
+		$60-$6f video timing related
 
 	    $74 x--- ---- global flip screen
 	        -xx- ---- individual flip screen x/y
