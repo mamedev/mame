@@ -276,7 +276,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 			// build a mask of changed variables
 			int numchanged = 0;
 			uint32_t varmask = 0;
-			for (int varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
+			for (int varnum = 0; varnum < std::size(changed); varnum++)
 				if (changed[varnum])
 				{
 					changed[varnum] = false;
@@ -298,7 +298,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 			*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
 
 			// now output updated variable values
-			for (int varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
+			for (int varnum = 0; varnum < std::size(changed); varnum++)
 				if ((varmask >> varnum) & 1)
 					*dest++ = curvalue[varnum];
 

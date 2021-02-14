@@ -808,7 +808,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 // ======================> m6x09_disassembler
 
 m6x09_disassembler::m6x09_disassembler(m6x09_instruction_level level, const char teregs[16][4])
-	: m6x09_base_disassembler(m6x09_opcodes, ARRAY_LENGTH(m6x09_opcodes), level)
+	: m6x09_base_disassembler(m6x09_opcodes, std::size(m6x09_opcodes), level)
 	, m_teregs(*reinterpret_cast<const std::array<std::array<char, 4>, 16> *>(teregs))
 {
 }
@@ -1237,7 +1237,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 
 // ======================> konami_disassembler
 
-konami_disassembler::konami_disassembler() : m6x09_base_disassembler(konami_opcodes, ARRAY_LENGTH(konami_opcodes), M6x09_GENERAL)
+konami_disassembler::konami_disassembler() : m6x09_base_disassembler(konami_opcodes, std::size(konami_opcodes), M6x09_GENERAL)
 {
 }
 

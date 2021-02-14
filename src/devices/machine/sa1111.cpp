@@ -478,7 +478,7 @@ TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
 {
 	const uint32_t buf = BIT(m_audio_regs.sadtcs, SADTCS_TBIU_BIT);
 	const uint32_t remaining = m_audio_regs.sadtcc >> 2;
-	const uint32_t avail = ARRAY_LENGTH(m_audio_regs.tx_fifo) - m_audio_regs.tx_fifo_count;
+	const uint32_t avail = std::size(m_audio_regs.tx_fifo) - m_audio_regs.tx_fifo_count;
 	if (remaining == 0 || avail == 0)
 		return;
 
@@ -655,12 +655,12 @@ void sa1111_device::audio_start_rx_dma(const uint32_t buf)
 void sa1111_device::audio_update_tx_fifo_levels()
 {
 	uint32_t &status = BIT(m_sbi_regs.skcr, SKCR_SACMDSL_BIT) ? m_audio_regs.sasr1 : m_audio_regs.sasr0;
-	if (m_audio_regs.tx_fifo_count < ARRAY_LENGTH(m_audio_regs.tx_fifo))
+	if (m_audio_regs.tx_fifo_count < std::size(m_audio_regs.tx_fifo))
 		status |= (1 << SASR_TNF_BIT);
 	else
 		status &= ~(1 << SASR_TNF_BIT);
 
-	const uint32_t tfl = ((m_audio_regs.tx_fifo_count == ARRAY_LENGTH(m_audio_regs.tx_fifo)) ? (m_audio_regs.tx_fifo_count - 1) : m_audio_regs.tx_fifo_count);
+	const uint32_t tfl = ((m_audio_regs.tx_fifo_count == std::size(m_audio_regs.tx_fifo)) ? (m_audio_regs.tx_fifo_count - 1) : m_audio_regs.tx_fifo_count);
 	status &= ~SASR_TFL_MASK;
 	status |= (tfl << SASR_TFL_BIT);
 
@@ -685,7 +685,7 @@ void sa1111_device::audio_update_rx_fifo_levels()
 	else
 		status &= ~(1 << SASR_RNE_BIT);
 
-	const uint32_t rfl = ((m_audio_regs.rx_fifo_count == ARRAY_LENGTH(m_audio_regs.rx_fifo)) ? (m_audio_regs.rx_fifo_count - 1) : m_audio_regs.rx_fifo_count);
+	const uint32_t rfl = ((m_audio_regs.rx_fifo_count == std::size(m_audio_regs.rx_fifo)) ? (m_audio_regs.rx_fifo_count - 1) : m_audio_regs.rx_fifo_count);
 	status &= ~SASR_RFL_MASK;
 	status |= (rfl << SASR_RFL_BIT);
 
@@ -713,10 +713,10 @@ void sa1111_device::audio_update_busy_flag()
 
 void sa1111_device::audio_tx_fifo_push(uint32_t data)
 {
-	if (m_audio_regs.tx_fifo_count < ARRAY_LENGTH(m_audio_regs.tx_fifo))
+	if (m_audio_regs.tx_fifo_count < std::size(m_audio_regs.tx_fifo))
 	{
 		m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_write_idx] = data;
-		m_audio_regs.tx_fifo_write_idx = (m_audio_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_audio_regs.tx_fifo);
+		m_audio_regs.tx_fifo_write_idx = (m_audio_regs.tx_fifo_write_idx + 1) % std::size(m_audio_regs.tx_fifo);
 		m_audio_regs.tx_fifo_count++;
 		audio_update_tx_fifo_levels();
 		if (m_audio_regs.tx_timer->remaining() == attotime::never)
@@ -734,7 +734,7 @@ uint32_t sa1111_device::audio_tx_fifo_pop()
 	if (m_audio_regs.tx_fifo_count > 0)
 	{
 		const uint32_t data = m_audio_regs.tx_fifo[m_audio_regs.tx_fifo_read_idx];
-		m_audio_regs.tx_fifo_read_idx = (m_audio_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_audio_regs.tx_fifo);
+		m_audio_regs.tx_fifo_read_idx = (m_audio_regs.tx_fifo_read_idx + 1) % std::size(m_audio_regs.tx_fifo);
 		m_audio_regs.tx_fifo_count--;
 		audio_update_tx_fifo_levels();
 		if (m_audio_regs.tx_fifo_count == 0)
@@ -754,10 +754,10 @@ uint32_t sa1111_device::audio_tx_fifo_pop()
 
 void sa1111_device::audio_rx_fifo_push(uint32_t data)
 {
-	if (m_audio_regs.rx_fifo_count < ARRAY_LENGTH(m_audio_regs.rx_fifo))
+	if (m_audio_regs.rx_fifo_count < std::size(m_audio_regs.rx_fifo))
 	{
 		m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_write_idx] = data;
-		m_audio_regs.rx_fifo_write_idx = (m_audio_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_audio_regs.rx_fifo);
+		m_audio_regs.rx_fifo_write_idx = (m_audio_regs.rx_fifo_write_idx + 1) % std::size(m_audio_regs.rx_fifo);
 		m_audio_regs.rx_fifo_count++;
 		audio_update_rx_fifo_levels();
 	}
@@ -774,7 +774,7 @@ uint32_t sa1111_device::audio_rx_fifo_pop()
 	if (m_audio_regs.rx_fifo_count > 0)
 	{
 		const uint32_t data = m_audio_regs.rx_fifo[m_audio_regs.rx_fifo_read_idx];
-		m_audio_regs.rx_fifo_read_idx = (m_audio_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_audio_regs.rx_fifo);
+		m_audio_regs.rx_fifo_read_idx = (m_audio_regs.rx_fifo_read_idx + 1) % std::size(m_audio_regs.rx_fifo);
 		m_audio_regs.rx_fifo_count--;
 		audio_update_rx_fifo_levels();
 		return data;
@@ -1247,7 +1247,7 @@ TIMER_CALLBACK_MEMBER(sa1111_device::ssp_tx_callback)
 		const uint16_t data = m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_read_idx];
 		m_ssp_out(data);
 
-		m_ssp_regs.tx_fifo_read_idx = (m_ssp_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_read_idx = (m_ssp_regs.tx_fifo_read_idx + 1) % std::size(m_ssp_regs.tx_fifo);
 		m_ssp_regs.tx_fifo_count--;
 
 		m_ssp_regs.sspsr |= (1 << SSPSR_TNF_BIT);
@@ -1265,7 +1265,7 @@ void sa1111_device::ssp_update_enable_state()
 		const uint32_t tft = (m_ssp_regs.sspsr & SSPCR1_TFT_MASK) >> SSPCR1_TFT_BIT;
 		const uint32_t rft = (m_ssp_regs.sspsr & SSPCR1_RFT_MASK) >> SSPCR1_RFT_BIT;
 
-		if (tfl != (ARRAY_LENGTH(m_ssp_regs.tx_fifo) - 1))
+		if (tfl != (std::size(m_ssp_regs.tx_fifo) - 1))
 			m_ssp_regs.sspsr |= (1 << SSPSR_TNF_BIT);
 		else
 			m_ssp_regs.sspsr &= ~(1 << SSPSR_TNF_BIT);
@@ -1328,10 +1328,10 @@ void sa1111_device::ssp_update_rx_level()
 
 void sa1111_device::ssp_rx_fifo_push(const uint16_t data)
 {
-	if (m_ssp_regs.rx_fifo_count < ARRAY_LENGTH(m_ssp_regs.rx_fifo))
+	if (m_ssp_regs.rx_fifo_count < std::size(m_ssp_regs.rx_fifo))
 	{
 		m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_write_idx] = data;
-		m_ssp_regs.rx_fifo_write_idx = (m_ssp_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_write_idx = (m_ssp_regs.rx_fifo_write_idx + 1) % std::size(m_ssp_regs.rx_fifo);
 		m_ssp_regs.rx_fifo_count++;
 
 		m_ssp_regs.sspsr |= (1 << SSPSR_RNE_BIT);
@@ -1355,13 +1355,13 @@ void sa1111_device::ssp_update_tx_level()
 
 void sa1111_device::ssp_tx_fifo_push(const uint16_t data)
 {
-	if (m_ssp_regs.tx_fifo_count < ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+	if (m_ssp_regs.tx_fifo_count < std::size(m_ssp_regs.tx_fifo))
 	{
 		m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_write_idx] = data;
-		m_ssp_regs.tx_fifo_write_idx = (m_ssp_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_write_idx = (m_ssp_regs.tx_fifo_write_idx + 1) % std::size(m_ssp_regs.tx_fifo);
 		m_ssp_regs.tx_fifo_count++;
 
-		if (m_ssp_regs.tx_fifo_count != ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+		if (m_ssp_regs.tx_fifo_count != std::size(m_ssp_regs.tx_fifo))
 			m_ssp_regs.sspsr |= (1 << SSPSR_TNF_BIT);
 		else
 			m_ssp_regs.sspsr &= ~(1 << SSPSR_TNF_BIT);
@@ -1375,7 +1375,7 @@ uint16_t sa1111_device::ssp_rx_fifo_pop()
 	uint16_t data = m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_read_idx];
 	if (m_ssp_regs.rx_fifo_count)
 	{
-		m_ssp_regs.rx_fifo_read_idx = (m_ssp_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_read_idx = (m_ssp_regs.rx_fifo_read_idx + 1) % std::size(m_ssp_regs.rx_fifo);
 		m_ssp_regs.rx_fifo_count--;
 
 		if (m_ssp_regs.rx_fifo_count == 0)
@@ -2112,11 +2112,11 @@ void sa1111_device::device_reset()
 	m_sk_regs.skpen1 = 0;
 	m_sk_regs.skpwm1 = 0;
 
-	memset(m_usb_regs.ohci, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_usb_regs.ohci));
+	std::fill(std::begin(m_usb_regs.ohci), std::end(m_usb_regs.ohci), 0);
 	m_usb_regs.status = 0;
 	m_usb_regs.reset = (1 << USBRST_FHR_BIT) | (1 << USBRST_FIR_BIT);
 	m_usb_regs.int_test = 0;
-	memset(m_usb_regs.fifo, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_usb_regs.fifo));
+	std::fill(std::begin(m_usb_regs.fifo), std::end(m_usb_regs.fifo), 0);
 
 	m_audio_regs.sacr0 = (0x7 << SACR0_RFTH_BIT) | (0x7 << SACR0_TFTH_BIT);
 	m_audio_regs.sacr1 = 0;
@@ -2130,23 +2130,23 @@ void sa1111_device::device_reset()
 	m_audio_regs.acsar = 0;
 	m_audio_regs.acsdr = 0;
 	m_audio_regs.sadtcs = 0;
-	memset(m_audio_regs.sadts, 0, sizeof(uint32_t) * 2);
-	memset(m_audio_regs.sadtc, 0, sizeof(uint32_t) * 2);
+	std::fill_n(&m_audio_regs.sadts[0], 2, 0);
+	std::fill_n(&m_audio_regs.sadtc[0], 2, 0);
 	m_audio_regs.sadta = 0;
 	m_audio_regs.sadtcc = 0;
 	m_audio_regs.sadrcs = 0;
-	memset(m_audio_regs.sadrs, 0, sizeof(uint32_t) * 2);
-	memset(m_audio_regs.sadrc, 0, sizeof(uint32_t) * 2);
+	std::fill_n(&m_audio_regs.sadrs[0], 2, 0);
+	std::fill_n(&m_audio_regs.sadrc[0], 2, 0);
 	m_audio_regs.sadra = 0;
 	m_audio_regs.sadrcc = 0;
 	m_audio_regs.saitr = 0;
-	memset(m_audio_regs.rx_fifo, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_audio_regs.rx_fifo));
+	std::fill(std::begin(m_audio_regs.rx_fifo), std::end(m_audio_regs.rx_fifo), 0);
 	m_audio_regs.rx_fifo_read_idx = 0;
 	m_audio_regs.rx_fifo_write_idx = 0;
 	m_audio_regs.rx_fifo_count = 0;
 	m_audio_regs.rx_timer->adjust(attotime::never);
 	m_audio_regs.rx_dma_timer->adjust(attotime::never);
-	memset(m_audio_regs.tx_fifo, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_audio_regs.tx_fifo));
+	std::fill(std::begin(m_audio_regs.tx_fifo), std::end(m_audio_regs.tx_fifo), 0);
 	m_audio_regs.tx_fifo_read_idx = 0;
 	m_audio_regs.tx_fifo_write_idx = 0;
 	m_audio_regs.tx_fifo_count = 0;
@@ -2157,35 +2157,43 @@ void sa1111_device::device_reset()
 	m_ssp_regs.sspcr1 = (0x7 << SSPCR1_RFT_BIT) | (0x7 << SSPCR1_TFT_BIT);
 	m_ssp_regs.sspsr = 0;
 	m_ssp_regs.sspitr = 0;
-	memset(m_ssp_regs.rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.rx_fifo));
+	std::fill(std::begin(m_ssp_regs.rx_fifo), std::end(m_ssp_regs.rx_fifo), 0);
 	m_ssp_regs.rx_fifo_read_idx = 0;
 	m_ssp_regs.rx_fifo_write_idx = 0;
 	m_ssp_regs.rx_fifo_count = 0;
 	m_ssp_regs.rx_timer->adjust(attotime::never);
-	memset(m_ssp_regs.tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.tx_fifo));
+	std::fill(std::begin(m_ssp_regs.tx_fifo), std::end(m_ssp_regs.tx_fifo), 0);
 	m_ssp_regs.tx_fifo_read_idx = 0;
 	m_ssp_regs.tx_fifo_write_idx = 0;
 	m_ssp_regs.tx_fifo_count = 0;
 	m_ssp_regs.tx_timer->adjust(attotime::never);
 
-	memset(&m_track_regs, 0, sizeof(ps2_regs));
-	memset(&m_mouse_regs, 0, sizeof(ps2_regs));
+	for (ps2_regs &regs : { std::ref(m_track_regs), std::ref(m_mouse_regs) })
+	{
+		regs.kbdcr = 0;
+		regs.kbdstat = 0;
+		regs.kbddata_tx = 0;
+		regs.kbddata_rx = 0;
+		regs.kbdclkdiv = 0;
+		regs.kbdprecnt = 0;
+		regs.kbditr = 0;
+	}
 
-	memset(m_gpio_regs.ddr, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.ddr));
-	memset(m_gpio_regs.level, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.level));
-	memset(m_gpio_regs.sdr, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.sdr));
-	memset(m_gpio_regs.ssr, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.ssr));
-	memset(m_gpio_regs.out_latch, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.out_latch));
-	memset(m_gpio_regs.in_latch, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_gpio_regs.in_latch));
+	std::fill(std::begin(m_gpio_regs.ddr), std::end(m_gpio_regs.ddr), 0);
+	std::fill(std::begin(m_gpio_regs.level), std::end(m_gpio_regs.level), 0);
+	std::fill(std::begin(m_gpio_regs.sdr), std::end(m_gpio_regs.sdr), 0);
+	std::fill(std::begin(m_gpio_regs.ssr), std::end(m_gpio_regs.ssr), 0);
+	std::fill(std::begin(m_gpio_regs.out_latch), std::end(m_gpio_regs.out_latch), 0);
+	std::fill(std::begin(m_gpio_regs.in_latch), std::end(m_gpio_regs.in_latch), 0);
 
-	memset(m_intc_regs.inttest, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.inttest));
-	memset(m_intc_regs.inten, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.inten));
-	memset(m_intc_regs.intpol, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.intpol));
+	std::fill(std::begin(m_intc_regs.inttest), std::end(m_intc_regs.inttest), 0);
+	std::fill(std::begin(m_intc_regs.inten), std::end(m_intc_regs.inten), 0);
+	std::fill(std::begin(m_intc_regs.intpol), std::end(m_intc_regs.intpol), 0);
 	m_intc_regs.inttstsel = 0;
-	memset(m_intc_regs.intstat, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.intstat));
-	memset(m_intc_regs.wake_en, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.wake_en));
-	memset(m_intc_regs.wake_pol, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.wake_pol));
-	memset(m_intc_regs.intraw, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_intc_regs.intraw));
+	std::fill(std::begin(m_intc_regs.intstat), std::end(m_intc_regs.intstat), 0);
+	std::fill(std::begin(m_intc_regs.wake_en), std::end(m_intc_regs.wake_en), 0);
+	std::fill(std::begin(m_intc_regs.wake_pol), std::end(m_intc_regs.wake_pol), 0);
+	std::fill(std::begin(m_intc_regs.intraw), std::end(m_intc_regs.intraw), 0);
 
 	m_card_regs.pccr = 0;
 	m_card_regs.pcssr = 0;

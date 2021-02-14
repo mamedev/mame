@@ -1605,52 +1605,47 @@ void ym2413_device::device_start()
 	save_item(NAME(inst_tab));
 	save_item(NAME(address));
 
-	for (int chnum = 0; chnum < ARRAY_LENGTH(P_CH); chnum++)
+	save_item(STRUCT_MEMBER(P_CH, block_fnum));
+	save_item(STRUCT_MEMBER(P_CH, fc));
+	save_item(STRUCT_MEMBER(P_CH, ksl_base));
+	save_item(STRUCT_MEMBER(P_CH, kcode));
+	save_item(STRUCT_MEMBER(P_CH, sus));
+
+	for (int chnum = 0; chnum < std::size(P_CH); chnum++)
 	{
-		OPLL_CH *ch = &P_CH[chnum];
+		OPLL_CH &ch = P_CH[chnum];
 
-		save_item(NAME(ch->block_fnum), chnum);
-		save_item(NAME(ch->fc), chnum);
-		save_item(NAME(ch->ksl_base), chnum);
-		save_item(NAME(ch->kcode), chnum);
-		save_item(NAME(ch->sus), chnum);
-
-		for (int slotnum = 0; slotnum < ARRAY_LENGTH(ch->SLOT); slotnum++)
-		{
-			OPLL_SLOT *sl = &ch->SLOT[slotnum];
-
-			save_item(NAME(sl->ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->KSR), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->ksl), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->ksr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->mul), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->phase), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->freq), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->fb_shift), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->op1_out), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_type), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->state), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->TL), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->TLL), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->volume), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->sl), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sh_dp), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sel_dp), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sh_ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sel_ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sh_dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sel_dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sh_rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sel_rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sh_rs), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->eg_sel_rs), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->key), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->AMmask), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->vib), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-			save_item(NAME(sl->wavetable), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
-		}
+		save_item(STRUCT_MEMBER(ch.SLOT, ar), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, dr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, rr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, KSR), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, ksl), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, ksr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, mul), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, phase), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, freq), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, fb_shift), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, op1_out), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_type), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, state), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, TL), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, TLL), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, volume), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, sl), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sh_dp), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sel_dp), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sh_ar), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sel_ar), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sh_dr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sel_dr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sh_rr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sel_rr), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sh_rs), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, eg_sel_rs), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, key), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, AMmask), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, vib), chnum);
+		save_item(STRUCT_MEMBER(ch.SLOT, wavetable), chnum);
 	}
 }
 

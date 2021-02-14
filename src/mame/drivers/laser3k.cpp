@@ -967,7 +967,7 @@ void laser3k_state::laser3k(machine_config &config)
 	m_screen->set_screen_update(FUNC(laser3k_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), ARRAY_LENGTH(laser3k_pens));
+	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), std::size(laser3k_pens));
 
 	/* memory banking */
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);

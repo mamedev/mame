@@ -3820,7 +3820,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 		if (!entry.second->is_function())
 		{
 			namelist[count++] = entry.second->name();
-			if (count >= ARRAY_LENGTH(namelist))
+			if (count >= std::size(namelist))
 				break;
 		}
 	}

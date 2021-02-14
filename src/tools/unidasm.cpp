@@ -1180,14 +1180,14 @@ usage:
 	printf("Supported architectures:");
 	const int colwidth = 1 + std::strlen(std::max_element(std::begin(dasm_table), std::end(dasm_table), [](const dasm_table_entry &a, const dasm_table_entry &b) { return std::strlen(a.name) < std::strlen(b.name); })->name);
 	const int columns = std::max(1, 80 / colwidth);
-	const int numrows = (ARRAY_LENGTH(dasm_table) + columns - 1) / columns;
+	const int numrows = (std::size(dasm_table) + columns - 1) / columns;
 	for(unsigned curarch = 0; curarch < numrows * columns; curarch++) {
 		const int row = curarch / columns;
 		const int col = curarch % columns;
 		const int index = col * numrows + row;
 		if(col == 0)
 			printf("\n  ");
-		printf("%-*s", colwidth, (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
+		printf("%-*s", colwidth, (index < std::size(dasm_table)) ? dasm_table[index].name : "");
 	}
 	printf("\n");
 	return 1;

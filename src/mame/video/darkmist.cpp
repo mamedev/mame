@@ -71,7 +71,7 @@ void darkmist_state::darkmist_palette(palette_device &palette) const
 			{ &m_spr_clut[0], 0x40 },
 			{ &m_tx_clut[0], 0xc0 } };
 
-	for (unsigned plane = 0; ARRAY_LENGTH(planes) > plane; ++plane)
+	for (unsigned plane = 0; std::size(planes) > plane; ++plane)
 	{
 		for (unsigned i = 0; 0x100 > i; ++i)
 		{

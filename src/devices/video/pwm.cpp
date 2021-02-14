@@ -84,9 +84,10 @@ void pwm_display_device::device_start()
 	}
 
 	// initialize
-	std::fill_n(m_rowdata, ARRAY_LENGTH(m_rowdata), 0);
-	std::fill_n(m_rowdata_prev, ARRAY_LENGTH(m_rowdata_prev), 0);
-	std::fill_n(*m_bri, ARRAY_LENGTH(m_bri) * ARRAY_LENGTH(m_bri[0]), 0.0);
+	std::fill(std::begin(m_rowdata), std::end(m_rowdata), 0);
+	std::fill(std::begin(m_rowdata_prev), std::end(m_rowdata_prev), 0);
+	for (auto &bri : m_bri)
+		std::fill(std::begin(bri), std::end(bri), 0.0);
 
 	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwm_display_device::frame_tick),this));
 	m_update_time = machine().time();
@@ -215,7 +216,7 @@ void pwm_display_device::update()
 
 void pwm_display_device::schedule_frame()
 {
-	std::fill_n(*m_acc, m_height * ARRAY_LENGTH(m_acc[0]), attotime::zero);
+	std::fill_n(*m_acc, m_height * std::size(m_acc[0]), attotime::zero);
 
 	m_framerate = m_framerate_set;
 	m_frame_timer->adjust(m_framerate);

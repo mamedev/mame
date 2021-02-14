@@ -937,7 +937,7 @@ char *imgtool_temp_str(void)
 {
 	static int index;
 	static char temp_string_pool[32][256];
-	return temp_string_pool[index++ % ARRAY_LENGTH(temp_string_pool)];
+	return temp_string_pool[index++ % std::size(temp_string_pool)];
 }
 
 
@@ -1603,7 +1603,7 @@ imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer
 	chain[0].block = ~0;
 	last_block = chain[0].block;
 
-	err = get_chain(path, chain, ARRAY_LENGTH(chain));
+	err = get_chain(path, chain, std::size(chain));
 	if (err)
 		return err;
 
@@ -2362,7 +2362,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 		{
 			return imgtoolerr_t(IMGTOOLERR_BADFILENAME);
 		}
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname.c_str());
+		snprintf(ent.filename, std::size(ent.filename), "%s", new_fname.c_str());
 	}
 
 	// don't trust the module!

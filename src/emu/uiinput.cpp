@@ -138,11 +138,11 @@ bool ui_input_manager::push_event(ui_event evt)
 	}
 
 	// is the queue filled up?
-	if ((m_events_end + 1) % ARRAY_LENGTH(m_events) == m_events_start)
+	if ((m_events_end + 1) % std::size(m_events) == m_events_start)
 		return false;
 
 	m_events[m_events_end++] = evt;
-	m_events_end %= ARRAY_LENGTH(m_events);
+	m_events_end %= std::size(m_events);
 	return true;
 }
 
@@ -156,7 +156,7 @@ bool ui_input_manager::pop_event(ui_event *evt)
 	if (m_events_start != m_events_end)
 	{
 		*evt = m_events[m_events_start++];
-		m_events_start %= ARRAY_LENGTH(m_events);
+		m_events_start %= std::size(m_events);
 		return true;
 	}
 	else

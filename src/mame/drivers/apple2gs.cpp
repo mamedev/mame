@@ -929,7 +929,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::ay3600_repeat)
 
 u8 apple2gs_state::adb_read_memory(u32 address)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		return m_adb_memory[address];
 	else
 		return 0x00;
@@ -937,7 +937,7 @@ u8 apple2gs_state::adb_read_memory(u32 address)
 
 void apple2gs_state::adb_write_memory(u32 address, u8 data)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		m_adb_memory[address] = data;
 }
 
@@ -953,7 +953,7 @@ void apple2gs_state::adb_set_config(u8 b1, u8 b2, u8 b3)
 
 void apple2gs_state::adb_post_response(const u8 *bytes, size_t length)
 {
-	assert(length < ARRAY_LENGTH(m_adb_response_bytes));
+	assert(length < std::size(m_adb_response_bytes));
 	memcpy(m_adb_response_bytes, bytes, length);
 
 	m_adb_state = ADBSTATE_INRESPONSE;
@@ -1261,7 +1261,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 			break;
 
 		case ADBSTATE_INCOMMAND:
-			assert(m_adb_command_pos < ARRAY_LENGTH(m_adb_command_bytes));
+			assert(m_adb_command_pos < std::size(m_adb_command_bytes));
 //          printf("ADB param %02x\n", data);
 			m_adb_command_bytes[m_adb_command_pos++] = data;
 			break;

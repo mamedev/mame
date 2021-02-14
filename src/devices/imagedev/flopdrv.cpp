@@ -456,7 +456,7 @@ image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool i
 	return image_init_result::PASS;
 
 error:
-	for (i = 0; i < ARRAY_LENGTH(errmap); i++)
+	for (i = 0; i < std::size(errmap); i++)
 	{
 		if (err == errmap[i].ferr)
 			seterror(errmap[i].ierr, errmap[i].message);

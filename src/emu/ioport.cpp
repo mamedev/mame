@@ -633,7 +633,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
 
-	for (int i = 0; i < ARRAY_LENGTH(m_chars); i++)
+	for (int i = 0; i < std::size(m_chars); i++)
 		std::fill(std::begin(m_chars[i]), std::end(m_chars[i]), char32_t(0));
 
 	// for DIP switches and configs, look for a default value from the owner
@@ -782,11 +782,11 @@ ioport_type_class ioport_field::type_class() const noexcept
 
 std::vector<char32_t> ioport_field::keyboard_codes(int which) const
 {
-	if (which >= ARRAY_LENGTH(m_chars))
+	if (which >= std::size(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
 	std::vector<char32_t> result;
-	for (int i = 0; i < ARRAY_LENGTH(m_chars[which]) && m_chars[which][i] != 0; i++)
+	for (int i = 0; i < std::size(m_chars[which]) && m_chars[which][i] != 0; i++)
 		result.push_back(m_chars[which][i]);
 
 	return result;
@@ -3012,12 +3012,9 @@ const char *ioport_configurer::string_from_token(const char *string)
 #if false // Set true, If you want to take care missing-token or wrong-sorting
 
 	// otherwise, scan the list for a matching string and return it
-	{
-	int index;
-	for (index = 0; index < ARRAY_LENGTH(input_port_default_strings); index++)
+	for (int index = 0; index < std::size(input_port_default_strings); index++)
 		if (input_port_default_strings[index].id == uintptr_t(string))
 			return input_port_default_strings[index].string;
-	}
 	return "(Unknown Default)";
 
 #else
@@ -3096,10 +3093,10 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char32_t> charlist)
 {
-	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
+	for (int index = 0; index < std::size(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index][0] == 0)
 		{
-			const size_t char_count = ARRAY_LENGTH(m_curfield->m_chars[index]);
+			const size_t char_count = std::size(m_curfield->m_chars[index]);
 			assert(charlist.size() > 0 && charlist.size() <= char_count);
 
 			for (size_t i = 0; i < char_count; i++)
@@ -3782,7 +3779,7 @@ std::string ioport_manager::input_type_to_token(ioport_type type, int player)
 input_seq_type ioport_manager::token_to_seq_type(const char *string)
 {
 	// look up the string in the table of possible sequence types and return the index
-	for (int seqindex = 0; seqindex < ARRAY_LENGTH(seqtypestrings); seqindex++)
+	for (int seqindex = 0; seqindex < std::size(seqtypestrings); seqindex++)
 		if (!core_stricmp(string, seqtypestrings[seqindex]))
 			return input_seq_type(seqindex);
 	return SEQ_TYPE_INVALID;

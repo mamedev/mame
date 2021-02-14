@@ -161,7 +161,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 {
 	SDL_Color const fcol = { 0xff, 0xff, 0xff };
 	char ustr[16];
-	ustr[utf8_from_uchar(ustr, ARRAY_LENGTH(ustr), chnum)] = '\0';
+	ustr[utf8_from_uchar(ustr, std::size(ustr), chnum)] = '\0';
 	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderUTF8_Solid(m_font.get(), ustr, fcol), &SDL_FreeSurface);
 
 	// was nothing returned?

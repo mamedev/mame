@@ -1626,7 +1626,7 @@ chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *confi
 	try
 	{
 		// find the codec and call its configuration
-		for (int codecnum = 0; codecnum < ARRAY_LENGTH(m_compression); codecnum++)
+		for (int codecnum = 0; codecnum < std::size(m_compression); codecnum++)
 			if (m_compression[codecnum] == codec)
 			{
 				m_decompressor[codecnum]->configure(param, config);
@@ -2453,7 +2453,7 @@ chd_error chd_file::open_common(bool writeable)
 void chd_file::create_open_common()
 {
 	// verify the compression types and initialize the codecs
-	for (int decompnum = 0; decompnum < ARRAY_LENGTH(m_compression); decompnum++)
+	for (int decompnum = 0; decompnum < std::size(m_compression); decompnum++)
 	{
 		m_decompressor[decompnum] = chd_codec_list::new_decompressor(m_compression[decompnum], *this);
 		if (m_decompressor[decompnum] == nullptr && m_compression[decompnum] != 0)
@@ -3071,7 +3071,7 @@ void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 {
 	// use our thread's codec
-	assert(threadid < ARRAY_LENGTH(m_codecs));
+	assert(threadid < std::size(m_codecs));
 	item.m_codecs = m_codecs[threadid];
 
 	// compute CRC-16 and SHA-1 hashes
@@ -3278,7 +3278,7 @@ uint64_t chd_file_compressor::hashmap::find(util::crc16_t crc16, util::sha1_t sh
 void chd_file_compressor::hashmap::add(uint64_t itemnum, util::crc16_t crc16, util::sha1_t sha1)
 {
 	// add to the appropriate map
-	if (m_block_list->m_nextalloc == ARRAY_LENGTH(m_block_list->m_array))
+	if (m_block_list->m_nextalloc == std::size(m_block_list->m_array))
 		m_block_list = new entry_block(m_block_list);
 	entry_t *entry = &m_block_list->m_array[m_block_list->m_nextalloc++];
 	entry->m_itemnum = itemnum;

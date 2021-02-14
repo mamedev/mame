@@ -83,8 +83,8 @@ public:
 			TCHAR keyname[100];
 
 			// generate the name
-			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
-				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
+			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
+				_sntprintf(keyname, std::size(keyname), TEXT("Scan%03d"), keynum);
 			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device

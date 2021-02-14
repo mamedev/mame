@@ -152,7 +152,7 @@ uint16_t m68307_cpu_device::m68307_timer::read_tcn(uint16_t mem_mask, int which)
 
 void m68307_cpu_device::m68307_timer::write_ter(uint16_t data, uint16_t mem_mask, int which)
 {
-	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
+	assert(which >= 0 && which < std::size(singletimer));
 	single_timer* tptr = &singletimer[which];
 	if (data & 0x2)
 	{
@@ -167,7 +167,7 @@ void m68307_cpu_device::m68307_timer::write_ter(uint16_t data, uint16_t mem_mask
 void m68307_cpu_device::m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask, int which)
 {
 	m68307_cpu_device* m68k = parent;
-	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
+	assert(which >= 0 && which < std::size(singletimer));
 	single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TMR]);
@@ -216,7 +216,7 @@ void m68307_cpu_device::m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask
 
 void m68307_cpu_device::m68307_timer::write_trr(uint16_t data, uint16_t mem_mask, int which)
 {
-	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
+	assert(which >= 0 && which < std::size(singletimer));
 	single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TRR]);
@@ -248,7 +248,7 @@ void m68307_cpu_device::m68307_timer::reset()
 
 bool m68307_cpu_device::m68307_timer::timer_int_pending(int which) const
 {
-	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
+	assert(which >= 0 && which < std::size(singletimer));
 	const single_timer* tptr = &singletimer[which];
 
 	return BIT(tptr->regs[m68307TIMER_TER], 1) && BIT(tptr->regs[m68307TIMER_TMR], 4);

@@ -538,7 +538,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_reshi(0)
 {
 	// compute hi pointers for each register
-	for (int regnum = 0; regnum < ARRAY_LENGTH(int_register_map); regnum++)
+	for (int regnum = 0; regnum < std::size(int_register_map); regnum++)
 		if (int_register_map[regnum] != 0)
 		{
 			m_reglo[int_register_map[regnum]] = &m_state.r[regnum].w.l;
@@ -546,7 +546,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		}
 
 	// build the flags map (static but it doesn't hurt to regenerate it)
-	for (int entry = 0; entry < ARRAY_LENGTH(flags_map); entry++)
+	for (int entry = 0; entry < std::size(flags_map); entry++)
 	{
 		uint8_t flags = 0;
 		if (entry & 0x001) flags |= FLAG_C;
@@ -556,7 +556,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & 0x800) flags |= FLAG_V;
 		flags_map[entry] = flags;
 	}
-	for (int entry = 0; entry < ARRAY_LENGTH(flags_unmap); entry++)
+	for (int entry = 0; entry < std::size(flags_unmap); entry++)
 	{
 		uint32_t flags = 0;
 		if (entry & FLAG_C) flags |= 0x001;
@@ -712,7 +712,7 @@ void drcbe_x86::reset()
 	a.mov(ptr(ecx, offsetof(drcuml_machine_state, fmod)), al);                          // mov    state->fmod,al
 	a.mov(eax, MABS(&m_state.exp));                                                     // mov    eax,[exp]
 	a.mov(ptr(ecx, offsetof(drcuml_machine_state, exp)), eax);                          // mov    state->exp,eax
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
 		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
@@ -726,7 +726,7 @@ void drcbe_x86::reset()
 		a.mov(eax, MABS(&m_state.r[regnum].w.h));
 		a.mov(ptr(ecx, regoffsh), eax);
 	}
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
 		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
@@ -740,7 +740,7 @@ void drcbe_x86::reset()
 	// generate a restore subroutine
 	m_restore = dst + a.offset();
 	a.bind(a.newNamedLabel("restore"));
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
 		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
@@ -754,7 +754,7 @@ void drcbe_x86::reset()
 		a.mov(eax, ptr(ecx, regoffsh));
 		a.mov(MABS(&m_state.r[regnum].w.h), eax);
 	}
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		uintptr_t regoffsl = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
 		uintptr_t regoffsh = (uintptr_t)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
@@ -843,7 +843,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
-		assert(inst.opcode() < ARRAY_LENGTH(s_opcode_table));
+		assert(inst.opcode() < std::size(s_opcode_table));
 
 		// must remain in scope until output
 		std::string dasm;
