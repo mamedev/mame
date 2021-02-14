@@ -349,7 +349,7 @@ u8 raiden_ms_state::sound_status_r()
 void raiden_ms_state::adpcm_w(u8 data)
 {
 	m_audio_select = BIT(data, 7);
-	m_soundbank->set_entry(m_audio_select);
+	m_soundbank->set_entry(m_audio_select ? 1 : 0);
 	m_msm->reset_w(BIT(data, 4));
 
 	m_adpcm_data = data & 0xf;
