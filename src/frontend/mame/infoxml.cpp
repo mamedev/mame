@@ -1815,23 +1815,15 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 
 	if (flags & machine_flags::REQUIRES_ARTWORK)
 		out << " requiresartwork=\"yes\"";
-	else
-		out << " requiresartwork=\"no\"";
 
 	if (flags & machine_flags::UNOFFICIAL)
 		out << " unofficial=\"yes\"";
-	else
-		out << " unofficial=\"no\"";
 
 	if (flags & machine_flags::NO_SOUND_HW)
 		out << " nosoundhardware=\"yes\"";
-	else
-		out << " nosoundhardware=\"no\"";
 
 	if (flags & machine_flags::IS_INCOMPLETE)
 		out << " incomplete=\"yes\"";
-	else
-		out << " incomplete=\"no\"";
 
 	out << "/>\n";
 }
