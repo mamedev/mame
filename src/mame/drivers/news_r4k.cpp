@@ -140,9 +140,6 @@ protected:
     // machine init
     void init_common();
 
-    // Bitmap update (not implemented yet)
-    u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
-
     // Interrupts
     // See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
     void inten_w(offs_t offset, uint32_t data);
@@ -194,7 +191,6 @@ protected:
     const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
 #endif
 
-    // Devices
     // MIPS R4400 CPU
 #ifndef NO_MIPS3
     required_device<r4400be_device> m_cpu;
@@ -242,13 +238,8 @@ protected:
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
     uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
-    // Hardware timer
-    // emu_timer *m_itimer;
-    emu_timer *m_freerun_timer;
-    void itimer_w(u8 data);
-    void itimer(void *ptr, s32 param);
-
     // Freerun timer
+    emu_timer* m_freerun_timer;
     uint32_t freerun_timer_val;
     const int FREERUN_FREQUENCY = 1000000; // one tick per us, see comments in freerun function
     TIMER_CALLBACK_MEMBER(freerun_clock);
@@ -373,7 +364,7 @@ void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); 
  * Assign the address map for the CPU
  * References:
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
- *  - MROM device table
+ *  - MROM device table (Run MROM command `ss -d` for details)
  */
 void news_r4k_state::cpu_map(address_map &map)
 {
@@ -446,8 +437,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
     // but, anything that uses these *should* just use the LSBs (famous last words)
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
-    // TODO: Floppy aux registers
-    map(0x1ed60200, 0x1ed6020f).noprw();
+    map(0x1ed60200, 0x1ed6020f).noprw(); // TODO: Floppy aux registers
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -458,7 +448,7 @@ void news_r4k_state::cpu_map(address_map &map)
  *
  * Method with temporary address map assignments. Everything in this function can be moved to the main memory
  * map function once it is understood. This separates the "real" mapping from the hacks required to get the
- * monitor ROM to boot.
+ * monitor ROM to boot due to missing information or incomplete emulation.
  */
 void news_r4k_state::cpu_map_debug(address_map &map)
 {
@@ -482,24 +472,19 @@ void news_r4k_state::cpu_map_debug(address_map &map)
             map_shift = false;
         }
     }));
+
     // I have suspicions about addresses near these playing into the memory configuration
     //map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
 
-    // APBus region
+    // APbus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
-    // map(0x1f520004, 0x1f520007); // WBFLUSH
-    // map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
-    // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK - interrupt mask
-    // map(0x14c00014, 0x14c00014); // APBUS_INTST - interrupt status
-    // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A - Bus error address
-    // map(0x14c00034, 0x14c00034); // APBUS_CTRL - configuration control
-    // map(0x1400005c, 0x1400005c); // APBUS_DER_A - DMA error address
-    // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
-    // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
-    // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
+    // 0x14c00000-0x14c40000 also has APbus stuff
 
-    map(0x1e980000, 0x1e9fffff).ram();                                // is this mirrored?
-    map(0x1fe00000, 0x1fffffff).ram();                                // determine mirror of this RAM - it is smaller than this size
+    map(0x1e980000, 0x1e9fffff).ram(); // This is the RAM that is used before main memory is initialized
+                                       // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
+
+    // More onboard devices that needs to be mapped for the platform to boot
+    map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
@@ -537,11 +522,13 @@ void news_r4k_state::machine_start()
     // Init front panel LEDs
     m_led.resolve();
 
+    // Save state support (incomplete)
     save_item(NAME(m_inten));
     save_item(NAME(m_intst));
     save_item(NAME(m_int_state));
+    save_item(NAME(freerun_timer_val));
 
-    // Allocate freerunning clock (disabled for now)
+    // Allocate freerunning clock
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
@@ -584,10 +571,10 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 {
-    // ugly hack, like everything else about this driver right now
-    // these values came from my NWS-5000X after it booted to the monitor
-    // so this is pretending to be fully initialized. Needless to say, that
-    // *might* cause problems with the monitor
+    // Hack to get the monitor ROM to boot.
+    // This is pretending to be fully initialized.
+    // Needless to say, that might be causing problems with the monitor
+    // but this is enough for it to boot to the monitor shell
     uint8_t value = 0x0;
     if (offset == 7)
     {
@@ -626,9 +613,9 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
-// With an unscientific method, I calculated the timer value to increment roughly once per us
-// NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-// The timer callback seemed to be too slow (although I could easily be doing something wrong)
+    // With an unscientific method, I calculated the timer value to increment roughly once per us
+    // NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
+    // The timer callback seemed to be too slow (although I could easily be doing something wrong)
 #ifdef USE_ACCURATE_FREERUN
     return freerun_timer_val;
 #else
@@ -641,8 +628,6 @@ void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
     LOG("freerun_w: Set freerun timer to 0x%x\n", data);
     freerun_timer_val = data;
 }
-
-u32 news_r4k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) { return 0; }
 
 void news_r4k_state::inten_w(offs_t offset, uint32_t data)
 {
@@ -714,35 +699,16 @@ u32 news_r4k_state::bus_error()
     return 0;
 }
 
-void news_r4k_state::itimer_w(u8 data)
-{
-    /*
-    LOG("itimer_w 0x%02x (%s)\n", data, machine().describe_context());
-
-    // TODO: assume 0xff stops the timer
-    u8 const ticks = data + 1;
-
-    m_itimer->adjust(attotime::from_ticks(ticks, 800), 0, attotime::from_ticks(ticks, 800));
-    */
-}
-
-void news_r4k_state::itimer(void *ptr, s32 param)
-{
-    /*
-    irq_w<TIMER>(ASSERT_LINE);
-    */
-}
-
 /*
  * NWS-5000X DIP switches
  *
  * 1. Console - switch between serial and bitmap console. Bitmap is not implemented yet.
  * 2. Bitmap Disable - Enable or disable the internal video card
- * 3. Abort/Resume Enable - Unknown
+ * 3. Abort/Resume Enable - Unknown, NEWS-OS refers to this but doesn't elaborate
  * 4. Clear NVRAM - Upon boot, clear NVRAM contents and restore default values if set
  * 5. Auto Boot - Upon boot, automatically attempt to boot from the disk specified by the bootdev NVRAM variable
  * 6. Run Diagnostic Test - Attempt to run diagnostic test after ROM monitor has booted
- * 7. External APSlot Probe Disable - If set, do not attempt to probe the expansion APBus slots
+ * 7. External APbus Slot Probe Disable - If set, do not attempt to probe the expansion APbus slots
  * 8. No Memory Mode - If set, do not use the main memory (limits system to 128KiB)
  */
 static INPUT_PORTS_START(nws5000)
@@ -751,13 +717,13 @@ PORT_DIPNAME(0x01, 0x00, "Console") PORT_DIPLOCATION("FRONT_PANEL:1")
 PORT_DIPSETTING(0x00, "Serial Terminal")
 PORT_DIPSETTING(0x01, "Bitmap")
 PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
-PORT_DIPSETTING(0x00, "Enable built-in bitmap")
-PORT_DIPSETTING(0x02, "Disable built-in bitmap")
+PORT_DIPSETTING(0x00, "Enable Built-in Bitmap")
+PORT_DIPSETTING(0x02, "Disable Built-in Bitmap")
 PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
 PORT_DIPSETTING(0x00, "Disable Abort/Resume")
 PORT_DIPSETTING(0x04, "Enable Abort/Resume")
 PORT_DIPNAME(0x08, 0x00, "Clear NVRAM") PORT_DIPLOCATION("FRONT_PANEL:4")
-PORT_DIPSETTING(0x00, "Do not clear")
+PORT_DIPSETTING(0x00, "Normal Operation (No Clear)")
 PORT_DIPSETTING(0x08, "Clear NVRAM")
 PORT_DIPNAME(0x10, 0x00, "Auto Boot") PORT_DIPLOCATION("FRONT_PANEL:5")
 PORT_DIPSETTING(0x00, "Auto Boot Disable")
@@ -765,9 +731,9 @@ PORT_DIPSETTING(0x10, "Auto Boot Enable")
 PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
 PORT_DIPSETTING(0x00, "No Diagnostic Test")
 PORT_DIPSETTING(0x20, "Run Diagnostic Test")
-PORT_DIPNAME(0x40, 0x00, "External APSlot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
-PORT_DIPSETTING(0x00, "Enable External APSlot Probe")
-PORT_DIPSETTING(0x40, "Disable External APSlot Probe")
+PORT_DIPNAME(0x40, 0x00, "External APbus Slot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
+PORT_DIPSETTING(0x00, "Enable External Slot Probe")
+PORT_DIPSETTING(0x40, "Disable External Slot Probe")
 PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
 PORT_DIPSETTING(0x00, "Main Memory Enabled")
 PORT_DIPSETTING(0x80, "Main Memory Disabled");
@@ -785,4 +751,4 @@ ROM_END
 
 // Machine definitions
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

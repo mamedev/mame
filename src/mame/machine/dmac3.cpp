@@ -171,7 +171,7 @@ void dmac3_device::dma_check(void *ptr, s32 param)
 uint32_t dmac3_device::cstat_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].cstat;
-	LOG("dmac%d cstat_r: 0x%x\n", controller, val);
+	LOG("dmac3-%d cstat_r: 0x%x\n", controller, val);
 	return val;
 }
 uint32_t dmac3_device::ictl_r(DMAC3_Controller controller)
@@ -179,49 +179,49 @@ uint32_t dmac3_device::ictl_r(DMAC3_Controller controller)
 	uint32_t val = m_controllers[controller].ictl;
 	// hack
 	val |= 0x1;
-	LOG("dmac%d ictl_r: 0x%x\n", controller, val);
+	LOG("dmac3-%d ictl_r: 0x%x\n", controller, val);
 	return val;
 }
 uint32_t dmac3_device::trc_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].trc;
-	LOG("dmac%d trc_r: 0x%x\n", controller, val);
+	LOG("dmac3-%d trc_r: 0x%x\n", controller, val);
 	return val;
 }
 uint32_t dmac3_device::tra_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].tra;
-	LOG("dmac%d tra_r: 0x%x\n", controller, val);
+	LOG("dmac3-%d tra_r: 0x%x\n", controller, val);
 	return val;
 }
 uint32_t dmac3_device::cnf_r(DMAC3_Controller controller)
 {
 	uint32_t val = m_controllers[controller].cnf;
-	LOG("dmac%d cnf_r: 0x%x\n", controller, val);
+	LOG("dmac3-%d cnf_r: 0x%x\n", controller, val);
 	return val;
 }
 
 void dmac3_device::cstat_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac%d cstat_w: 0x%x\n", controller, data);
+	LOG("dmac3-%d cstat_w: 0x%x\n", controller, data);
 	m_controllers[controller].cstat = data;
 }
 
 void dmac3_device::ictl_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac%d ictl_w: 0x%x\n", controller, data);
+	LOG("dmac3-%d ictl_w: 0x%x\n", controller, data);
 	m_controllers[controller].ictl = data;
 }
 
 void dmac3_device::trc_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac%d trc_w: 0x%x\n", controller, data);
+	LOG("dmac3-%d trc_w: 0x%x\n", controller, data);
 	m_controllers[controller].trc = data;
 }
 
 void dmac3_device::tra_w(DMAC3_Controller controller, uint32_t data)
 {
-	LOG("dmac%d tra_w: 0x%x\n", controller, data);
+	LOG("dmac3-%d tra_w: 0x%x\n", controller, data);
 	m_controllers[controller].tra = data;
 }
 
@@ -232,7 +232,7 @@ void dmac3_device::cnf_w(DMAC3_Controller controller, uint32_t data)
 	// DMAC+SPIFI3 users (MROM, NEWS-OS, and NetBSD) to follow this correctly
 	if(data != CNF_FASTACCESS && data != CNF_SLOWACCESS)
 	{
-		LOG("dmac%d cnf_w: 0x%x\n", controller, data);
+		LOG("dmac3-%d cnf_w: 0x%x\n", controller, data);
 	}
 	m_controllers[controller].cnf = data;
 }
