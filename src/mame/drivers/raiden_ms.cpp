@@ -278,6 +278,7 @@ private:
 	u8 m_adpcm_data;
 
 	void unk_snd_dffx_w(offs_t offset, u8 data);
+	void soundlatch_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -375,6 +376,12 @@ void raiden_ms_state::unk_snd_dffx_w(offs_t offset, u8 data)
 
 }
 
+void raiden_ms_state::soundlatch_w(u8 data)
+{
+	m_soundlatch[0]->clear_w(data);
+	m_soundlatch[1]->clear_w(data);
+}
+
 void raiden_ms_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -385,7 +392,7 @@ void raiden_ms_state::audio_map(address_map &map)
 	// area 0xdff0-5 is never ever readback, applying a RAM mirror causes sound to go significantly worse,
 	// what they are even for?  (offset select bankswitch rather than data select?)
 	map(0xdff0, 0xdff7).w(FUNC(raiden_ms_state::unk_snd_dffx_w));
-	map(0xdff8, 0xdff8).rw(m_soundlatch[1], FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
+	map(0xdff8, 0xdff8).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(raiden_ms_state::soundlatch_w));
 	map(0xdff9, 0xdff9).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe003).w(FUNC(raiden_ms_state::ym_w));
 	map(0xe008, 0xe009).r(m_ym1, FUNC(ym2203_device::read));
