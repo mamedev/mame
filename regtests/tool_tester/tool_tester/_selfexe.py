@@ -24,7 +24,7 @@ class SelfExeTests(ABC):
         if it needs finer logging granularity (such as printing with logging.debug)
 
         Returns:
-            Dict: key for test_handle, value is an arbitrary list or dataclass driven object (preferably latter)
+            Dict: key for test_handle, value is an arbitrary list or dataclass driven object.
         """
         test_pool = self._collect_tests()
         logging.info("Detected %s tests", len(test_pool))
@@ -35,7 +35,7 @@ class SelfExeTests(ABC):
         """Mapping fn that the client must override
 
         Returns:
-            Dict: key for test_handle, value is an arbitrary list or dataclass driven object (preferably latter)
+            Dict: key for test_handle, value is an arbitrary list or dataclass driven object.
         """
 
     def execute_tests(self, test_pool: Dict) -> bool:
@@ -58,8 +58,11 @@ class SelfExeTests(ABC):
                     __launch_fullpath, 
                     encoding="utf-8",
                     capture_output=True,
-                    # TODO: we need to disable check here cause pngcmp has a returncode of 1 when diverging snapshots occurs (wtf)
-                    #check=True,
+                    # we need to disable check=True here, it would be hairy to handle
+                    # for several reasons, namely:
+                    # - pngcmp returns a status of 1 when diverging snapshots occurs.
+                    # - (eventually) usage instruction test, which technically should return a non-zero status code.
+                    #   (which one is tbd)
                     check=False,
                     text=True,
                     shell=False
@@ -67,7 +70,7 @@ class SelfExeTests(ABC):
                 logging.debug("Subprocess test %s pass", __test_name)
                 self._assert_test_result(launch_result, test_handle, test_params)
                 logging.info("Test %s passed", __test_name)
-            except (subprocess.CalledProcessError, AssertionError) as ex:
+            except (subprocess.CalledProcessError, AssertionError, FileNotFoundError) as ex:
                 logging.exception(str(ex)) 
                 test_result = False
         return test_result
@@ -87,7 +90,7 @@ class SelfExeTests(ABC):
 
     @abstractmethod
     def _assert_test_result(self, launch_result: subprocess.CompletedProcess, test_handle: str, test_params: List):
-        """Unit test fn an actual test against the resulting output from subprocess
+        """Factory fn for testing out if expected behaviour is satisfied.
 
         A bare minimum is to assert against returncode, stdout and stderr.
         If you need to check against binary formats give extra carefulness that the test
