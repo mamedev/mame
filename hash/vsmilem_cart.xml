@@ -50,7 +50,7 @@ Language:
 |        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
-|   XX   | 80-084045(FR)     | Scooby-Doo! - Panique à Funland                                                            |
+|   XX   | 80-084045(FR)     | Scooby-Doo! - Panique à Funland                                                           |
 |   XX   | 80-084047(SP)     | ¡¡Scooby-Doo!! - Misterio en el Parque                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
@@ -1115,6 +1115,19 @@ Language:
 		</part>
 	</software>
 
+	
+	<software name="tangledmge" supported="no">
+		<description>Disney Rapunzel - Neu verföhnt (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251704(GE)"/>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251704 - rapunzel - neu verfohnt (ger).bin" size="0x1000000" crc="23cd9cd4" sha1="ef9ee2f21ff741668d65ea343f4b47e4472fada7"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="thomasmge">
 		<description>Thomas - Freunde halten zusammen (Germany)</description>
 		<year>2007?</year>
