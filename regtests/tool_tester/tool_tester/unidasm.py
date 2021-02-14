@@ -38,9 +38,10 @@ class UnidasmTests(SelfExeTests):
     Args:
         SelfExeTests ([type]): [description]
     """
+    identifier = "unidasm"
 
-    def __init__(self, assets_path: str):
-        super().__init__("unidasm", assets_path)
+    def __init__(self, work_path: str, assets_path: str):
+        super().__init__(work_path, assets_path)
         self._asm_test_folder = os.path.join(assets_path, self.identifier, "asm")
         self._bin_test_folder = os.path.join(assets_path, self.identifier, "bin")
         logging.debug(self._asm_test_folder)

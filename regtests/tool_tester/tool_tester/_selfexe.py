@@ -9,11 +9,13 @@ import subprocess
 from typing import Dict, List
 
 class SelfExeTests(ABC):
-    def __init__(self, id_exe: str, assets_folder: str):
-        self.identifier = id_exe
-        self._exec_path = os.path.join(os.getcwd(), "{0}{1}".format(id_exe, ".exe" if os.name == 'nt' else ""))
-        self._assets_path = assets_folder
-        logging.debug("Setup %s executable exe at %s", id_exe, self._exec_path)
+    identifier: str
+
+    def __init__(self, work_path: str, assets_path: str):
+        __id_exe = self.identifier
+        self._exec_path = os.path.join(work_path, "{0}{1}".format(__id_exe, ".exe" if os.name == 'nt' else ""))
+        self._assets_path = assets_path
+        logging.debug("Setup %s executable exe at %s", __id_exe, self._exec_path)
 
     def compose_tests(self) -> Dict:
         """Compose a list of tests to be later reused.

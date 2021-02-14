@@ -22,9 +22,10 @@ class PngCmpTests(SelfExeTests):
     Args:
         SelfExeTests ([type]): [description]
     """
+    identifier = "pngcmp"
 
-    def __init__(self, assets_path: str):
-        super().__init__("pngcmp", assets_path)
+    def __init__(self, work_path: str, assets_path: str):
+        super().__init__(work_path, assets_path)
         self._png_test_folder = os.path.join(assets_path, "png")
 
     def _collect_tests(self):

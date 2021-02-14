@@ -1,19 +1,36 @@
+##
+## license:BSD-3-Clause
+## copyright-holders:Angelo Salese
+##
+
 import os
 from subprocess import CompletedProcess
 from dataclasses import dataclass
 import logging
 from tool_tester._selfexe import SelfExeTests
-import difflib
+#import difflib
 
 class RomCmpTests(SelfExeTests):
-    def __init__(self, assets_path: str):
-        super().__init__("romcmp", assets_path)
+    """Test out romcmp usage.
+
+    Simple tests, just verify output from a dummy binary format.
+
+    Args:
+        SelfExeTests ([type]): [description]
+    """
+    identifier = "romcmp"
+
+    def __init__(self, work_path: str, assets_path: str):
+        super().__init__(work_path, assets_path)
         self._logs_folder = os.path.join(assets_path, self.identifier)
         self._bin_test_folder = os.path.join(assets_path, self.identifier, "bin")
         logging.debug(self._bin_test_folder)
 
     def _collect_tests(self):
         return {
+            # FIXME: on at least Windows this causes readback at root drive
+            # is it subprocess or romcmp fault?
+#           "normal": ["", self._bin_test_folder],
             "normal": [self._bin_test_folder],
             "slower": ["-d", self._bin_test_folder],
             "hash": ["-h", self._bin_test_folder]

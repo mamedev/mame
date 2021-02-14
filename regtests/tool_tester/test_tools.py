@@ -4,31 +4,66 @@
 ## copyright-holders:Angelo Salese
 ##
 import sys
+import os
 from os.path import join, dirname, realpath
+import argparse
 import logging
-from tool_tester.pngcmp import PngCmpTests
-from tool_tester.romcmp import RomCmpTests
-from tool_tester.unidasm import UnidasmTests
+from tool_tester import (
+    ORCHESTRATOR_POOL
+)
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        dest="verbose",
+        action="store_true",
+        help="Enable debug logging messages if enabled"
+    )
+    parser.add_argument(
+        "-work_dir",
+        dest="work_dir",
+        type=str,
+        default=os.getcwd(),
+        help="Work directory where tools lies"
+    )
+    parser.add_argument(
+        "-id",
+        dest="test_id",
+        type=str,
+        default=None,
+        help="If non-default run this test suite only, supported values: {0}".format(
+            repr([item.identifier for item in ORCHESTRATOR_POOL])
+        )
+    )
+    return parser.parse_args()
 
 if __name__ == "__main__":
+    args = get_args()
+
     # TODO: proper requirements.txt / setup.py or virtual env management
     # dataclasses aren't supported in anything prior to 3.7 (dacite lib 3.6)
     assert sys.version_info >= (3, 7), f"python version {sys.version_info.major}.{sys.version_info.minor} < 3.7"
+    log_level = logging.DEBUG if args.verbose else logging.INFO
 
     # TODO: add colorized messages
-    # TODO: argparse the logging level
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+    # consider either using colorlog or make one that has support for all terminal flavours
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
-    # TODO: for now I'll just use class handlers here to chain test sources
-    # In an ideal world you want to collect items thru inspect module instead
-    # https://docs.python.org/3/library/inspect.html
-    # and isolate by handler name, so that an optional arg can be passed here and launch
-    # a given test module on user demand
-    chained_results = []
-    # TODO: point to $(regtests)\assets, configure if necessary
+    # TODO: currently points to $(regtests)/assets, make it a configurable option?
     assets_folder = join(dirname(dirname(realpath(__file__))), "assets")
-    for test_cls in [PngCmpTests, RomCmpTests, UnidasmTests]:
-        test_fn = test_cls(assets_folder)
+
+    chained_results = []
+    __single_test = args.test_id
+    if __single_test is None:
+        __EXECUTE_TESTS = ORCHESTRATOR_POOL 
+    else:
+        __EXECUTE_TESTS = [item for item in ORCHESTRATOR_POOL if item.identifier == args.test_id]
+    assert __EXECUTE_TESTS, f"{args.test_id} not found in available tests"
+
+    for test_cls in __EXECUTE_TESTS:
+        test_fn = test_cls(args.work_dir, assets_folder)
         logging.info("Start test suite: %s", test_fn.identifier)
         chained_results.append(test_fn.execute_tests(test_fn.compose_tests()))
     logging.debug("test results %s", repr(chained_results))
