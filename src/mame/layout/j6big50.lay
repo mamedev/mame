@@ -454,7 +454,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -478,7 +478,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -502,7 +502,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -526,7 +526,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -550,7 +550,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -574,7 +574,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -598,7 +598,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -622,7 +622,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="NUDG">
+		<text string="NUDGES">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>

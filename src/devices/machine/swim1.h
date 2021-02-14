@@ -44,7 +44,7 @@ private:
 		MODE_READ, MODE_WRITE    // m_iwm_rw modes
 	};
 
-	// state machine states
+	// iwm state machine states
 	enum {
 		S_IDLE,
 		SR_WINDOW_EDGE_0,
@@ -52,6 +52,28 @@ private:
 		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
 		SW_WINDOW_END
+	};
+
+	// ism buffered byte marks
+	enum {
+		M_MARK = 0x100,
+		M_CRC  = 0x200,
+		M_CRC0 = 0x400
+	};
+
+	// parameter ram addresses
+	enum {
+		P_MINCT, P_MULT, P_SSL, P_SSS, P_SLL, P_SLS, P_RPT, P_CSLS,
+		P_LSL, P_LSS, P_LLL, P_LLS, P_LATE, P_TIME0, P_EARLY, P_TIME1
+	};
+
+	// CSM states
+	enum {
+		CSM_INIT,
+		CSM_COUNT_MIN,
+		CSM_WAIT_NON_MIN,
+		CSM_CHECK_MARK,
+		CSM_SYNCHRONIZED
 	};
 
 	floppy_image_device *m_floppy;
@@ -64,14 +86,22 @@ private:
 
 	u8 m_ism_param[16];
 	u8 m_ism_mode, m_ism_setup;
-	//u8 m_ism_error;
+	u8 m_ism_error;
 	u8 m_ism_param_idx, m_ism_fifo_pos;
-	//u8 m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
+	u8 m_ism_tss_sr, m_ism_tss_output, m_ism_current_bit;
 	u16 m_ism_fifo[2];
-	//u16 m_ism_sr;
+	u16 m_ism_sr;
 	u16 m_ism_crc;
-	//u16 m_ism_mfm_sync_counter;
-	//u32 m_ism_half_cycles_before_change;
+	u32 m_ism_half_cycles_before_change;
+	u8 m_ism_correction_factor[2];
+
+	u64 m_ism_latest_edge;
+	u8 m_ism_prev_ls;
+	u8 m_ism_csm_state;
+	u32 m_ism_csm_error_counter[2];
+	u8 m_ism_csm_pair_side, m_ism_csm_min_count;
+	u8 m_ism_tsm_out, m_ism_tsm_bits;
+	bool m_ism_tsm_mark;
 
 	u64 m_iwm_next_state_change, m_iwm_sync_update, m_iwm_async_update;
 	int m_iwm_active, m_iwm_rw, m_iwm_rw_state;

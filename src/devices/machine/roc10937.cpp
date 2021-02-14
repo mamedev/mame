@@ -3,7 +3,7 @@
 /**********************************************************************
 
     Rockwell 10937/10957 interface and emulation by J.Wallace
-    OKI MSC1937 is a clone of this chip
+    OKI MSC1937 is a clone of this chip, used in many displays
 
 **********************************************************************/
 
@@ -14,7 +14,7 @@
 
 
 /*
-   Rockwell 10937 16 segment charset lookup table
+   Rockwell 10937 16 segment charset lookup table (from MCU)
      0     1
     ---- ----
    |\   |   /|
@@ -33,7 +33,8 @@ a charset.
 
 Note that, although we call this a '16 segment' display,
 we actually have 18 segments, including the semicolon portions.
-16-bit tables are used to hold the main characters, the rest are OR'd in
+16-bit tables are used to hold the main characters in the MCU memory,
+the other characters come in separate to this lookup.
 */
 
 static const uint16_t roc10937charset[]=
@@ -142,13 +143,15 @@ void rocvfd_device::device_start()
 	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val * 16));
 	m_outputs->resolve();
 
+	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
+	m_brightness->resolve();
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
 	save_item(NAME(m_chars));
-	save_item(NAME(m_brightness));
 	save_item(NAME(m_count));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_data));
@@ -163,7 +166,6 @@ void rocvfd_device::device_reset()
 	m_shift_count = 0;
 	m_shift_data = 0;
 	m_pcursor_pos = 0;
-	m_brightness =31;
 	m_count=0;
 	m_duty=31;
 	m_disp = 0;
@@ -172,13 +174,15 @@ void rocvfd_device::device_reset()
 
 	std::fill(std::begin(m_chars), std::end(m_chars), 0);
 	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
+
+	(*m_brightness)[0] = 0;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////
 uint32_t rocvfd_device::set_display(uint32_t segin)
 {
 	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -190,6 +194,7 @@ void rocvfd_device::device_post_load()
 void rocvfd_device::update_display()
 {
 	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(*m_outputs), set_display);
+	(*m_brightness)[0] = m_duty;
 }
 
 WRITE_LINE_MEMBER( rocvfd_device::sclk )
@@ -241,7 +246,7 @@ DEFINE_DEVICE_TYPE(ROC10937, roc10937_device, "roc10937", "Rockwell 10937 VFD co
 DEFINE_DEVICE_TYPE(MSC1937,  msc1937_device,  "msc1937",  "OKI MSC1937 VFD controller")
 DEFINE_DEVICE_TYPE(MIC10937, mic10937_device, "mic10937", "Micrel MIC10937 VFD controller")
 DEFINE_DEVICE_TYPE(ROC10957, roc10957_device, "roc10957", "Rockwell 10957 VFD controller") // and compatible
-DEFINE_DEVICE_TYPE(S16LF01,  s16lf01_device,  "s16lf01",  "Samsung 16LF01 Series VFD controller") // and compatible
+DEFINE_DEVICE_TYPE(S16LF01,  s16lf01_device,  "s16lf01",  "Samsung 16LF01 Series VFD") // and compatible, basically the MSC1937 on a 16 seg display
 
 roc10937_device::roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, ROC10937, tag, owner, clock)
@@ -279,12 +284,13 @@ void rocvfd_device::write_char(int data)
 			else             m_window_size = data;
 		}
 		else if ( (data & 0xE0) == 0xE0 ) // 111x xxxx
-		{ // 111x xxxx Set duty cycle ( brightness )
-			m_brightness = (data & 0x1F);
+		{ // 111x xxxx Set duty cycle ( power to display )
+			m_duty = (data & 0x1F);
 		}
 		else if ( (data & 0xE0) == 0x80 ) // 100x ---
 		{ // 100x xxxx Test mode
-			m_duty =4;
+			popmessage("TEST MODE ENABLED!");
+			m_duty = 4;
 		}
 	}
 	else
@@ -335,8 +341,8 @@ void roc10957_device::write_char(int data)
 			else             m_window_size = data;
 		}
 		else if ( (data & 0xE0) == 0xE0 ) // 111x xxxx
-		{ // 111x xxxx Set duty cycle ( brightness )
-			m_brightness = (data & 0x1F);
+		{ // 111x xxxx Set duty cycle ( power to display )
+			m_duty = (data & 0x1F);
 		}
 		else if ( (data & 0xE0) == 0x80 ) // 100x ---
 		{ // 100x xxxx Test mode
@@ -361,9 +367,7 @@ void roc10957_device::write_char(int data)
 			m_chars[m_pcursor_pos] |= (1<<16);//.
 			break;
 			case 0x6E: //
-			{
-				m_chars[m_pcursor_pos] = 0;
-			}
+			m_chars[m_pcursor_pos] |= (1<<17);//,
 			break;
 			default :
 			m_pcursor_pos = m_cursor_pos;

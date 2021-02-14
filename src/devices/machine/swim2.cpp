@@ -149,7 +149,7 @@ u8 swim2_device::read(offs_t offset)
 		return r;
 	}
 
-	case 0x2: { // errpr
+	case 0x2: { // error
 		u8 err = m_error;
 		m_error = 0;
 		return err;
@@ -157,7 +157,7 @@ u8 swim2_device::read(offs_t offset)
 
 	case 0x3: { // param
 		u8 r = m_param[m_param_idx];
-		m_param_idx = (m_param_idx + 1) & 15;
+		m_param_idx = (m_param_idx + 1) & 3;
 		return r;
 	}
 
@@ -520,6 +520,7 @@ void swim2_device::sync()
 								crc_clear();
 							else if(!m_crc)
 								m_sr |= M_CRC0;
+							logerror("DATAR %03x %04x\n", m_sr, m_crc);
 							if(fifo_push(m_sr) && !m_error)
 								m_error |= 0x01;
 						}

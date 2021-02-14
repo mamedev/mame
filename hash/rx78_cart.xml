@@ -133,6 +133,18 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="exbaseb" supported="no"><!-- gfx issues -->
+		<description>Excite Baseball</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="exbaseb1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
+				<rom name="exbaseb2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gundam">
 		<description>Mobile Suit Gundam</description>
 		<year>1983</year>
@@ -161,7 +173,7 @@ The monitor will expect you to load a program from cassette.
 		<description>Sekigahara</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Wait for small beep. Press Space. Press G." />
+		<info name="usage" value="Wait for small beep. Press Space(keyboard) or S(joystick). Press G." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sekigahara.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
@@ -185,6 +197,19 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="senemy">
+		<description>Space Enemy</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Press Space to begin and fire. QWEADZXC to steer. S toggle guidance system." />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="senemy1.bin" size="0x2000" crc="d9ff07dd" sha1="6397ce1a301e1e2a7d30e1fe76621373e3f74ea8" offset="0x4000" />
+				<rom name="senemy2.bin" size="0x2000" crc="2fee4171" sha1="f06a68b1a844f390378a78b363c8a62d6c161073" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="theprowr">
 		<description>The Prowrestling</description>
 		<year>1983</year>
@@ -201,6 +226,7 @@ The monitor will expect you to load a program from cassette.
 		<description>Ultraman</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="usage" value="1 player: Use P[];./ticPGDN to move, Space to fire. 2 players: P1 use Arrows,Ctrl,Alt; P2 use RDFGAS" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="ultraman.bin" size="16384" crc="0ba54dfb" sha1="5ba7eb4779d5c362e4751102b31d8e0083e06310" />

@@ -607,6 +607,7 @@ edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_c
 	, device_srx_card_interface(mconfig, *this)
 	, m_dsp1(*this, "dsp1")
 	, m_screen(nullptr)
+	, m_sram(nullptr)
 {
 }
 
@@ -702,12 +703,11 @@ void edge2plus_framebuffer_device_base::device_start()
 		LOG("found processor device %s\n", processor->tag());
 
 		processor->register_screen(m_screen, m_sram);
+		processor->m_dsp1->set_addrmap(0, address_map_constructor(&edge2plus_framebuffer_device_base::map_dynamic, processor->m_dsp1->tag(), this));
 	}
 
 	// FIXME: dynamically allocate SR region 4
 	m_bus->install_map(*this, 0x90000000, 0x93ffffff, &edge2plus_framebuffer_device_base::map_dynamic);
-
-	processor->m_dsp1->set_addrmap(0, address_map_constructor(&edge2plus_framebuffer_device_base::map_dynamic, processor->m_dsp1->tag(), this));
 }
 
 u32 mpcb849_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -833,8 +833,8 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
 void edge2plus_processor_device_base::dsp1_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).lrw8(
-			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
-			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram ? m_sram->read(offset) : 0; }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { if (m_sram) m_sram->write(offset, data); }));
 
 	map(0x40000, 0x7ffff).lr32(
 			NAME([this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); }));
@@ -896,7 +896,8 @@ void edge2plus_processor_device_base::kernel_w(offs_t offset, u32 data, u32 mem_
 
 u32 edge2plus_processor_device_base::reg0_r()
 {
-	LOG("reg0_r vblank %d\n", m_screen->vblank());
+	if (m_screen)
+		LOG("reg0_r vblank %d\n", m_screen->vblank());
 
 	return (m_screen == nullptr) ? (m_reg0 & ~VBLANK) : ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }

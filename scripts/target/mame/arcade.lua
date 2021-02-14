@@ -487,6 +487,7 @@ MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
 MACHINES["DS75160A"] = true
 MACHINES["DS75161A"] = true
+--MACHINES["DS8874"] = true
 MACHINES["E0516"] = true
 MACHINES["E05A03"] = true
 MACHINES["E05A30"] = true
@@ -3939,6 +3940,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/arabian.cpp",
 	MAME_DIR .. "src/mame/includes/arabian.h",
 	MAME_DIR .. "src/mame/video/arabian.cpp",
+	MAME_DIR .. "src/mame/drivers/blockch.cpp",
 	MAME_DIR .. "src/mame/drivers/dai3wksi.cpp",
 	MAME_DIR .. "src/mame/drivers/ikki.cpp",
 	MAME_DIR .. "src/mame/includes/ikki.h",

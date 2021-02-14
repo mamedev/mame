@@ -449,10 +449,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
-	screen.set_size(64*8, 30*8);
-	screen.set_visarea(0, 64*8-1, 0, 30*8-1);
+	screen.set_raw(ES_VIDEO_CLOCK, 806, 0, 512, 261, 0, 240); // TODO: 313 lines in 50 Hz mode
 	screen.set_screen_update(FUNC(sorcerer_state::screen_update));
 	screen.set_palette("palette");
 

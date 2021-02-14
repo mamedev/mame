@@ -180,7 +180,7 @@ void chaknpop_state::chaknpop_map(address_map &map)
 	map(0x9800, 0x983f).ram().w(FUNC(chaknpop_state::attrram_w)).share("attr_ram");      // Color attribute
 	map(0x9840, 0x98ff).ram().share("spr_ram"); // sprite
 	map(0xa000, 0xbfff).rom();
-	map(0xc000, 0xffff).bankrw("bank1");                               // bitmap plane 1-4
+	map(0xc000, 0xffff).bankrw(m_vram_bank);                               // bitmap plane 1-4
 }
 
 /***************************************************************************
@@ -346,9 +346,7 @@ GFXDECODE_END
 
 void chaknpop_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	m_vram_bank->configure_entries(0, 2, m_vram, 0x4000);
 
 	save_item(NAME(m_gfxmode));
 	save_item(NAME(m_flip_x));
@@ -406,7 +404,7 @@ void chaknpop_state::chaknpop(machine_config &config)
 ***************************************************************************/
 
 ROM_START( chaknpop )
-	ROM_REGION( 0x18000, "maincpu", 0 ) // Main CPU
+	ROM_REGION( 0xc000, "maincpu", 0 ) // Main CPU
 	ROM_LOAD( "ao4_01.ic28", 0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
 	ROM_LOAD( "ao4_02.ic27", 0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
 	ROM_LOAD( "ao4_03.ic26", 0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )

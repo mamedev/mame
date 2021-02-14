@@ -7,6 +7,7 @@
  *
  *   TODO
  *      ridingf, ringrage and clones: Exception after logo is displayed (MT #06894)
+ *      gunlock and clones: Glitch sound after game over once (MT #07861)
  *      DRAM Size isn't verified, differs per machines?
  *
  ***************************************************************************************/
@@ -172,6 +173,7 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	, instr_latch(0)
 	, ram_sel(0)
 	, host_control(0)
+	, host_serial(0)
 {
 	dol[0] = dol[1] = 0;
 	memset(&alu, 0, sizeof(alu));
@@ -395,9 +397,9 @@ uint8_t es5510_device::host_r(address_space &space, offs_t offset)
 	case 0x10: LOG("ES5510: Host Read DADR latch[1]: %02x\n", (dadr_latch >>  8) & 0xff); return (dadr_latch >>  8) & 0xff;
 	case 0x11: LOG("ES5510: Host Read DADR latch[0]: %02x\n", (dadr_latch >>  0) & 0xff); return (dadr_latch >>  0) & 0xff;
 
-	case 0x12: LOG("ES5510: Host Reading Host Control\n"); return 0; // Host Control
+	case 0x12: LOG("ES5510: Host Reading Host Control\n"); return 0/* host_control */; // Host Control
 
-	case 0x16: return 0x27; // Program Counter, for test purposes only
+	case 0x16: return 0x27/* pc */; // Program Counter, for test purposes only
 	}
 
 	// default: 0.
@@ -453,6 +455,19 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0x11: dadr_latch = (dadr_latch&0xffff00) | ((data&0xff)<< 0); break;
 
 		/* 0x12 Host Control */
+	case 0x12: host_control = (host_control & 0x4) | (data & 0x3);
+		if (BIT(host_control, 1)) // RAM clear
+		{
+			// TODO: Timing, MEMSIZ and DLENGTH behavior
+			if (state == STATE_HALTED) // only in halted
+			{
+				for (int i = 0; i < DRAM_SIZE; i++)
+					dram[i] = 0;
+			}
+			host_control &= ~0x2;
+		}
+		// bit 0 is RAM refresh disable flag
+		break;
 
 	case 0x14: ram_sel = data & 0x80; /* bit 6 is i/o select, everything else is undefined */break;
 
@@ -467,6 +482,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 			data & 0x10 ? "Out" : "In",
 			data & 0x08 ? "Out" : "In",
 			data & 0x04 ? "Out" : "In");
+		host_serial = data;
 		break;
 
 		/* 0x1f Halt enable (w) / Frame Counter (r) */
@@ -599,6 +615,7 @@ void es5510_device::device_start() {
 	save_item(NAME(instr_latch));
 	save_item(NAME(ram_sel));
 	save_item(NAME(host_control));
+	save_item(NAME(host_serial));
 
 	save_item(NAME(alu.aReg));
 	save_item(NAME(alu.bReg));
@@ -637,7 +654,8 @@ void es5510_device::device_reset() {
 	dil_latch = dol_latch = dadr_latch = gpr_latch = 0;
 	instr_latch = uint64_t(0);
 	ram_sel = 0;
-	host_control = 0;
+	host_control = 0x04; // Signal Host Access not OK
+	host_serial = 0;
 	memset(&ram, 0, sizeof(ram_t));
 	memset(&ram_p, 0, sizeof(ram_t));
 	memset(&ram_pp, 0, sizeof(ram_t));
@@ -764,11 +782,11 @@ void es5510_device::execute_run() {
 			// Currently halted, sample the HALT line
 			if (halt_asserted) {
 				// remain halted
-				host_control |= 0x04; // Signal Host Access OK
+				host_control &= ~0x04; // Signal Host Access OK
 			} else {
 				// start from the beginning at PC 0
 				state = STATE_RUNNING;
-				host_control &= ~0x04; // Signal Host Access not OK
+				host_control |= 0x04; // Signal Host Access not OK
 				pc = 0;
 			}
 		} else {
@@ -1200,7 +1218,7 @@ void es5510_device::alu_operation_end() {
 	if (halt_asserted) {
 		// halt
 		state = STATE_HALTED;
-		host_control |= 0x04; // Signal Host Access OK
+		host_control &= ~0x04; // Signal Host Access OK
 	}
 	// update the delay line base pointer
 	dbase -= memincrement;

@@ -40,7 +40,7 @@
 
 #define LOG_GENERAL (1U << 0)
 
-#define VERBOSE 0
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 namespace {
@@ -55,9 +55,9 @@ public:
 		, m_ram(*this, "ram")
 		, m_novram(*this, "novram")
 		, m_uart(*this, "uart")
-		, m_kbd(*this, "kbd")
+		, m_kbdc(*this, "kbdc")
 		, m_duart(*this, "duart%u", 0U)
-		, m_async(*this, { "console", "seriala", "mouse", "serialb" })
+		, m_async(*this, { "console_port", "seriala", "mouse_port", "serialb" })
 		, m_duscc(*this, "duscc")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:ncr53c700")
@@ -80,6 +80,26 @@ protected:
 	// address maps
 	void cpu_map(address_map &map);
 
+	void pit_timer(void *ptr, int param) { LOG("pit_timer<%d> expired\n", param); }
+
+	template <unsigned N> u32 pit_cnt_r() { return m_pit[N]->enabled() ? m_pit[N]->elapsed().as_ticks(m_cpu->clock()) : 0; }
+	template <unsigned N> u32 pit_sts_r() { return m_pit_cmd[N]; }
+	template <unsigned N> void pit_cnt_w(u32 data) { LOG("pit_cnt_w<%d> 0x%08x\n", N, data); m_pit_cnt[N] = data & 0xffffff00U; }
+	template <unsigned N> void pit_cmd_w(u32 data)
+	{
+		LOG("pit_cmd_w<%d> 0x%x\n", N, data & 15); m_pit_cmd[N] = data & 15;
+
+		// reset
+		if (BIT(data, 0))
+			m_pit[N]->adjust(attotime::from_ticks(-m_pit_cnt[N], m_cpu->clock()), N);
+
+		// count enable
+		if (BIT(data, 3) && !m_pit[N]->enabled())
+			m_pit[N]->enable(true);
+		else if (!BIT(data, 3) && m_pit[N]->enabled())
+			m_pit[N]->enable(false);
+	}
+
 private:
 	// processors and memory
 	required_device<mc88100_device> m_cpu;
@@ -89,7 +109,7 @@ private:
 	// i/o devices
 	required_device<timekeeper_device> m_novram;
 	required_device<scn_pci_device> m_uart;
-	required_device<pc_kbdc_device> m_kbd;
+	required_device<pc_kbdc_device> m_kbdc;
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device_array<rs232_port_device, 4> m_async;
 	required_device<duscc68562_device> m_duscc;
@@ -100,17 +120,29 @@ private:
 	output_finder<3> m_leds;
 
 	memory_view m_mbus;
+
+	u32 m_ucs;
+
+	emu_timer *m_pit[4];
+
+	u32 m_pit_cmd[4];
+	u32 m_pit_cnt[4] = {};
 };
 
 void aviion88k_state::machine_start()
 {
 	m_leds.resolve();
+
+	for (emu_timer *&pit : m_pit)
+		pit = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aviion88k_state::pit_timer), this));
 }
 
 void aviion88k_state::machine_reset()
 {
 	// disable mbus address decode
 	m_mbus.select(0);
+
+	m_ucs = 0b000'0110'0001'1011;
 }
 
 void aviion88k_state::init()
@@ -123,6 +155,12 @@ void aviion88k_state::cpu_map(address_map &map)
 {
 	map(0x00000000, 0xffc7ffff).view(m_mbus);
 
+	/*
+	 * utility space (4M) 0xffc0'0000-ffff'ffff
+	 *
+	 * madv=0: only utility space available, mapped to 0x0000'0000-ffc7'ffff
+	 * madv=1: utility space 0xffc7'0000-ffc7'ffff
+	 */
 	// mbus address decode disabled
 	m_mbus[0](0x00000000, 0x0007ffff).rw(m_prom[0], FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).mirror(0xffc00000).umask32(0xff000000);
 	m_mbus[0](0x00000000, 0x0007ffff).rw(m_prom[1], FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).mirror(0xffc00000).umask32(0x00ff0000);
@@ -150,10 +188,28 @@ void aviion88k_state::cpu_map(address_map &map)
 
 			// reset the keyboard or the uart?
 			if (!BIT(data, 3))
+			{
+				LOG("uart reset\n");
 				m_uart->reset();
+			}
 		}, "srst_w");
 
+	map(0xfff8'7000, 0xfff8'7003).lr32([this]() { return m_ucs; }, "ucs_r");
+	map(0xfff8'8000, 0xfff8'8003).lw32([this](u32 data) { LOG("madv %d\n", BIT(data, 1)); if (BIT(data, 1)) m_mbus.select(BIT(data, 1)); }, "ccs_w");
 	map(0xfff8'8018, 0xfff8'801b).lr32([]() { return 0xa1; }, "whoami_r");
+
+	map(0xfff8'f004, 0xfff8'f007).rw(FUNC(aviion88k_state::pit_cnt_r<0>), FUNC(aviion88k_state::pit_cnt_w<0>));
+	map(0xfff8'f008, 0xfff8'f00b).rw(FUNC(aviion88k_state::pit_cnt_r<1>), FUNC(aviion88k_state::pit_cnt_w<1>));
+	map(0xfff8'f010, 0xfff8'f013).rw(FUNC(aviion88k_state::pit_cnt_r<2>), FUNC(aviion88k_state::pit_cnt_w<2>));
+	map(0xfff8'f020, 0xfff8'f023).rw(FUNC(aviion88k_state::pit_cnt_r<3>), FUNC(aviion88k_state::pit_cnt_w<3>));
+	map(0xfff8'f044, 0xfff8'f047).rw(FUNC(aviion88k_state::pit_sts_r<0>), FUNC(aviion88k_state::pit_cmd_w<0>));
+	map(0xfff8'f048, 0xfff8'f04b).rw(FUNC(aviion88k_state::pit_sts_r<1>), FUNC(aviion88k_state::pit_cmd_w<1>));
+	map(0xfff8'f050, 0xfff8'f053).rw(FUNC(aviion88k_state::pit_sts_r<2>), FUNC(aviion88k_state::pit_cmd_w<2>));
+	map(0xfff8'f060, 0xfff8'f063).rw(FUNC(aviion88k_state::pit_sts_r<3>), FUNC(aviion88k_state::pit_cmd_w<3>));
+
+	map(0xfff8'ff00, 0xfff8'ff03).lrw32(
+		[]() { return 0b1110'0000'0001'1000; }, "mds_r",
+		[](u32 data) {}, "mcs_w");
 }
 
 static void aviion88k_scsi_devices(device_slot_interface &device)
@@ -184,10 +240,9 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	SCN2661A(config, m_uart, 0);
 
 	// keyboard connector
-	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);
-	m_kbd->out_clock_cb().set(m_uart, FUNC(scn2661a_device::rxc_w)).invert();
-	m_kbd->out_clock_cb().append(m_uart, FUNC(scn2661a_device::txc_w)).invert();
-	m_kbd->out_data_cb().set(m_uart, FUNC(scn2661a_device::rxd_w));
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, nullptr);
+	m_kbdc->out_clock_cb().set(m_uart, FUNC(scn2661a_device::rxc_w));
+	m_kbdc->out_data_cb().set(m_uart, FUNC(scn2661a_device::rxd_w));
 
 	// duart 1
 	SCN2681(config, m_duart[0], 14.7456_MHz_XTAL / 4); // SCC2692

@@ -199,8 +199,12 @@ using util::BIT;
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #ifdef _WIN32
 #include <fcntl.h>

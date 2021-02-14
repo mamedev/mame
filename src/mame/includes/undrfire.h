@@ -68,7 +68,9 @@ private:
 	int m_frame_counter;
 	std::unique_ptr<uf_tempsprite[]> m_spritelist;
 	u16 m_rotate_ctrl[8];
-	u8 m_dislayer[6];
+#ifdef MAME_DEBUG
+	u8 m_dislayer[6] = { 0, 0, 0, 0, 0, 0 };
+#endif
 	required_shared_ptr<u32> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

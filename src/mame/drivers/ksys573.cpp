@@ -1034,6 +1034,8 @@ void ksys573_state::driver_start()
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
+
+	m_h8_index = 0;
 }
 
 void ksys573_state::machine_reset()

@@ -198,6 +198,9 @@ void jungleyo_state::video_start()
 		reel->set_scroll_cols(64);
 		reel->set_transparent_pen(0xff);
 	}
+
+	m_layer_enable = 0;
+	m_video_priority = 0;
 }
 
 uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

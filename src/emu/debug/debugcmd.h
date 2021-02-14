@@ -180,7 +180,6 @@ private:
 	void execute_dumpkbd(int ref, const std::vector<std::string> &params);
 
 	running_machine&    m_machine;
-	debugger_cpu&       m_cpu;
 	debugger_console&   m_console;
 
 	std::unique_ptr<global_entry []> m_global_array;

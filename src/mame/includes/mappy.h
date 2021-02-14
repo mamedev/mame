@@ -6,7 +6,6 @@
 #pragma once
 
 #include "machine/namcoio.h"
-#include "sound/dac.h"
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
@@ -24,7 +23,6 @@ public:
 		m_subcpu2(*this, "sub2"),
 		m_namcoio(*this, "namcoio_%u", 1),
 		m_namco_15xx(*this, "namco"),
-		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -56,7 +54,6 @@ private:
 	optional_device<cpu_device> m_subcpu2;
 	required_device_array<namcoio_device, 2> m_namcoio;
 	required_device<namco_15xx_device> m_namco_15xx;
-	optional_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -103,7 +100,6 @@ private:
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
-	void grobda_cpu2_map(address_map &map);
 	void mappy_cpu1_map(address_map &map);
 	void mappy_cpu2_map(address_map &map);
 	void phozon_cpu1_map(address_map &map);

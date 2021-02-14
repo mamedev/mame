@@ -476,8 +476,7 @@ void elite_state::pc(machine_config &config)
 {
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::div_trampoline);
-	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&elite_state::pc_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	const attotime irq_period = attotime::from_hz(38.4_kHz_XTAL/64); // through 4060 IC, 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(elite_state::irq_on<M6502_IRQ_LINE>), irq_period);
@@ -512,7 +511,7 @@ void elite_state::eas(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(3_MHz_XTAL);
-	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eas_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::eas_map);
 
 	I8255(config, m_ppi8255); // port B: input, port A & C: output
 	m_ppi8255->out_pa_callback().set(FUNC(elite_state::ppi_porta_w));
@@ -545,7 +544,7 @@ void eag_state::eag(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
-	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
 	config.device_remove("nvram");
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
@@ -561,7 +560,7 @@ void eag_state::eag2100(machine_config &config)
 	eag(config);
 
 	/* basic machine hardware */
-	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
 }
 
 
@@ -571,7 +570,7 @@ void eag_state::eag2100(machine_config &config)
 ******************************************************************************/
 
 ROM_START( feasbu )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("hm_6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -601,7 +600,7 @@ ROM_START( feasbu )
 ROM_END
 
 ROM_START( feasbua ) // model EWC
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("white_a", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // HN482764G-2
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -637,7 +636,7 @@ ROM_START( feasbua ) // model EWC
 ROM_END
 
 ROM_START( feasgla )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("4.0_86", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -673,7 +672,7 @@ ROM_START( feasgla )
 ROM_END
 
 ROM_START( feasglaa ) // model EAS-C
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("orange", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -709,7 +708,7 @@ ROM_START( feasglaa ) // model EAS-C
 ROM_END
 
 ROM_START( feasglab )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("6a", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -746,7 +745,7 @@ ROM_END
 
 
 ROM_START( fpres )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
@@ -775,7 +774,7 @@ ROM_START( fpres )
 ROM_END
 
 ROM_START( fpresbu )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
@@ -805,7 +804,7 @@ ROM_END
 
 
 ROM_START( feag ) // model 6081, aka "Mobile Master"
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("eg_orange.ic9", 0xa000, 0x2000, CRC(df9e7e74) SHA1(db76750eba5515213ecce07402c4d974c14e1a23) ) // M5L2764K, orange sticker
 	ROM_LOAD("eg_black.ic5",  0xc000, 0x2000, CRC(a5f6f295) SHA1(319f00d4b7a1704a3ca722c40f4096004b4b89d2) ) // M5L2764K, black sticker
 	ROM_LOAD("eg_green.ic4",  0xe000, 0x2000, CRC(1dc6508a) SHA1(6f2e730b216bfb900074d1d786124fc3cb038a8d) ) // M5L2764K, green sticker
@@ -832,7 +831,7 @@ ROM_START( feag ) // model 6081, aka "Mobile Master"
 ROM_END
 
 ROM_START( feag2100 )
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("el2100_2.ic5", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100_3.ic4", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -861,7 +860,7 @@ ROM_START( feag2100 )
 ROM_END
 
 ROM_START( feag2100a ) // model 6088
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("2100_c_black.ic5",  0xc000, 0x2000, CRC(454eb839) SHA1(83d206464c194b022d43913b5f4092a8201f36b9) )
 	ROM_LOAD("2100_c_green.ic4",  0xe000, 0x2000, CRC(f1f76a63) SHA1(337b4572b743d383c6a12c360875d37682de3647) )
 

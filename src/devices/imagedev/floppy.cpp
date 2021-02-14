@@ -346,6 +346,7 @@ void floppy_image_device::device_start()
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
+	phases = 0;
 
 	setup_characteristics();
 
@@ -377,6 +378,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(cache_weak));
 	save_item(NAME(image_dirty));
 	save_item(NAME(ready_counter));
+	save_item(NAME(phases));
 }
 
 void floppy_image_device::device_reset()
@@ -558,10 +560,13 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	return image_init_result::PASS;
 }
 
-/* write protect, active high */
+/* write protect, active high
+   phase 1 can force it to 1 for drive detection
+   on the rare drives that actually use phases.
+ */
 bool floppy_image_device::wpt_r()
 {
-	return wpt;
+	return wpt || (phases & 2);
 }
 
 /* motor on, active low */
@@ -725,8 +730,10 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
-void floppy_image_device::seek_phase_w(int phases)
+void floppy_image_device::seek_phase_w(int _phases)
 {
+	phases = _phases;
+
 	int cur_pos = (cyl << 2) | subcyl;
 	int req_pos;
 	switch(phases) {
@@ -947,10 +954,21 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	}
 }
 
+bool floppy_image_device::writing_disabled() const
+{
+	// Disable writing when write protect is on or when, in the diskii
+	// case, phase 1 is 1
+	return wpt || (phases & 2);
+}
+
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
 {
 	if(!image || mon)
 		return;
+
+	if(writing_disabled())
+		return;
+
 	image_dirty = true;
 	cache_clear();
 
@@ -2385,6 +2403,7 @@ void ibm_6360::setup_characteristics()
 mac_floppy_device::mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : floppy_image_device(mconfig, type, tag, owner, clock)
 {
 	m_has_mfm = false;
+	dskchg_writable = true;
 }
 
 void mac_floppy_device::device_start()
@@ -2410,6 +2429,11 @@ void mac_floppy_device::device_reset()
 //    1110 - HD-20 drive
 //    1111 - No drive (pull-up on the sense line)
 
+bool mac_floppy_device::writing_disabled() const
+{
+	return wpt;
+}
+
 bool mac_floppy_device::wpt_r()
 {
 	static const char *const regnames[16] = {
@@ -2422,7 +2446,7 @@ bool mac_floppy_device::wpt_r()
 	// actual_ss may have changed after the phases were set
 	m_reg = (m_reg & 7) | (actual_ss ? 8 : 0);
 
-	if(m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13)
+	if(0 && (m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13))
 		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], image.get());
 
 	switch(m_reg) {
@@ -2435,6 +2459,9 @@ bool mac_floppy_device::wpt_r()
 
 	case 0x2: // Is the motor on?
 		return mon;
+
+	case 0x3: // Disk change signal
+		return !dskchg;
 
 	case 0x4:
 	case 0xc: // Index pulse, probably only on the superdrive though
@@ -2458,6 +2485,16 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return cyl != 0;
 
+	case 0xb:{// Tachometer, 60 pulses/rotation
+		if(image.get() != nullptr && !mon) {
+			attotime base;
+			uint32_t pos = find_position(base, machine().time());
+			uint32_t subpos = pos % 3333334;
+			return subpos < 20000;
+		} else
+			return false;
+	}
+
 	case 0xd: // Is the current mode GCR or MFM?
 		return m_mfm;
 
@@ -2478,7 +2515,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 		"DirNext", "StepOn", "MotorOn", "EjectOff",
 		"DirPrev", "StepOff", "MotorOff", "EjectOn",
 		"-", "MFMModeOn", "-", "-",
-		"-", "GCRModeOn", "-", "-"
+		"DskchgClear", "GCRModeOn", "-", "-"
 	};
 
 	bool prev_strb = m_strb;
@@ -2530,6 +2567,11 @@ void mac_floppy_device::seek_phase_w(int phases)
 				m_mfm = true;
 				track_changed();
 			}
+			break;
+
+		case 0xc: // Clear dskchg
+			logerror("cmd clear dskchg\n");
+			dskchg = 1;
 			break;
 
 		case 0xd: // GCR mode on

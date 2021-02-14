@@ -14,6 +14,8 @@
 
 #include "ui/menu.h"
 
+#include "lrucache.h"
+
 #include <map>
 #include <memory>
 #include <mutex>

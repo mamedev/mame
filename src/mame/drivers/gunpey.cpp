@@ -250,6 +250,7 @@ public:
 	void gunpey(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -308,6 +309,12 @@ private:
 	required_region_ptr<uint8_t> m_blit_rom;
 };
 
+
+void gunpey_state::machine_start()
+{
+	m_irq_cause = 0;
+	m_irq_mask = 0;
+}
 
 void gunpey_state::video_start()
 {

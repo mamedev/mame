@@ -48,5 +48,5 @@ void portfolio_rom_card_device::device_start()
 
 uint8_t portfolio_rom_card_device::nrdi_r(offs_t offset)
 {
-	return m_rom[offset];
+	return (m_rom) ? m_rom[offset] : 0xff;
 }

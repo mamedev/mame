@@ -222,6 +222,8 @@ void toaplan1_state::register_common()
 	save_item(NAME(m_tiles_offsety));
 	save_item(NAME(m_pf_voffs));
 	save_item(NAME(m_spriteram_offs));
+
+	m_pf_voffs = 0;
 }
 
 

@@ -1064,18 +1064,9 @@ void snes_ppu_device::update_mode_1( uint16_t curline )
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	if (!m_bg_priority)
-	{
-		update_line(curline, SNES_BG1, 0);
-		update_line(curline, SNES_BG2, 0);
-		update_line(curline, SNES_BG3, 0);
-	}
-	else
-	{
-		update_line(curline, SNES_BG1, 0);
-		update_line(curline, SNES_BG2, 0);
-		update_line(curline, SNES_BG3, 0);
-	}
+	update_line(curline, SNES_BG1, 0);
+	update_line(curline, SNES_BG2, 0);
+	update_line(curline, SNES_BG3, 0);
 }
 
 void snes_ppu_device::update_mode_2( uint16_t curline )
