@@ -168,8 +168,8 @@ image_init_result c64_expansion_slot_device::call_load()
 				// Ultimax (VIC-10) cartridge
 				load_software_region("lorom", m_card->m_roml);
 				load_software_region("uprom", m_card->m_romh);
-				m_card->m_roml_size = get_software_region_length("roml");
-				m_card->m_romh_size = get_software_region_length("romh");
+				m_card->m_roml_size = get_software_region_length("lorom");
+				m_card->m_romh_size = get_software_region_length("uprom");
 
 				m_card->m_exrom = 1;
 				m_card->m_game = 0;
