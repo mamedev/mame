@@ -22,7 +22,7 @@ license:CC0
 	</software>
 
 	<software name="brave" supported="no">
-		<description>Disney/Pixar Brave (USA)</description>
+		<description>Disney/Pixar Up (USA)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252600(US)"/>
@@ -34,7 +34,7 @@ license:CC0
 	</software>
 
 	<software name="braveg" cloneof="brave" supported="no">
-		<description>Disney/Pixar Merida - Legende der Highlands (Germany)</description>
+		<description>Disney/Pixar Oben (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252604(GER)"/>
@@ -226,7 +226,7 @@ license:CC0
 	</software>
 
 	<software name="mickey" supported="no"> <!-- part #? full title? region? -->
-		<description>Mickey Mouse</description>
+		<description>Mickey Mouse clubhouse</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
@@ -489,7 +489,7 @@ license:CC0
 
 	<software name="tstory3g" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Germany)</description>
-		<year>201?</year>
+		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-250104(GER)"/>
 		<part name="cart" interface="mobigo_cart">
