@@ -56,12 +56,12 @@ license:CC0
 	       | 80-280905(FR)   | Dora l'exploratrice - Dora et les trois petit cochons
 	       | 80-280922(SP)   | Dora la exploradora - Dora y los Tres Cerditos
 	       | 80-280923(??)   | Dora - Dora en de Drie Kleine Biggetjes (Netherlands)
-	       | 80-281000(US)   | Mickey Mouse Clubhouse
-	       | 80-281003(UK)   | Mickey Mouse Clubhouse
-	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
-	       | 80-281005(FR)   | La Maison de Mickey
-	       | 80-281022(SP)   | La casa de Mickey Mouse
-	       | 80-281023(??)   | Mickey Mouse Clubhuis - Mickey zoekt en vindt! (Netherlands)
+	       | 80-281000(US)   | Bob the Builder - project build it! - Bob and Wendy, Saves The Day!
+	       | 80-281003(UK)   | Bob the Builder -  Bob and Wendy, Saves The Day!
+	  XX   | 80-281004(GER)  | Bob der Baumeister - Bob und Heppo, Alles im Griff!
+	       | 80-281005(FR)   | Bob Le Bricoleur - Bob et Wendy, sauve la journée!
+	       | 80-281022(SP)   | Bob y sus amigos: Bob y Wendy, ¡salvan el día!
+	       | 80-281023(??)   | Bob de Bouwer - Bob en Wendy, redt de dag! (Netherlands)
 	       | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenk
@@ -152,7 +152,7 @@ license:CC0
 	</software>
 
 	<software name="mickeychgr" supported="no">
-		<description>Micky Maus Wunderhaus (Germany)</description>
+		<description>Bob der Baumeister - Bob und Heppo, Alles im Griff! (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
