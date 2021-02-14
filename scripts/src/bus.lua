@@ -3254,7 +3254,6 @@ end
 
 if (BUSES["TI99"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/992board.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/992board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
@@ -4214,7 +4213,7 @@ if (BUSES["HP_IPC_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.cpp",
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.h",
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/82919.cpp",
-		MAME_DIR .. "src/devices/bus/hp_ipc_io/829919.h",
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/82919.h",
 	}
 end
 
