@@ -182,7 +182,7 @@ void cops1_base_device::op_axo()
 
 void cops1_base_device::op_ldf()
 {
-	// LDF: load F pin(s)
+	// LDF x: load F pin(s)
 	u8 mask = bitswap<4>(~m_arg, 7,5,3,1);
 	u8 f = bitswap<4>(~m_arg, 6,4,2,0);
 	m_f = (m_f & ~mask) | (f & mask);
@@ -211,7 +211,7 @@ void cops1_base_device::op_go()
 
 void cops1_base_device::op_call()
 {
-	// CALL: call subroutine
+	// CALL x: call subroutine
 
 	// calls from page 0x1e/0x1f don't push PC
 	if ((m_pc & 0x780) != 0x780)

@@ -1691,8 +1691,8 @@ ROM_END
   * COP420 MCU label COP420-NPG/N
   * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
 
-  This is the COP420 version, the first release was on a MM5799 MCU,
-  see hh_cops1.cpp.
+  This is the COP420 version, they removed support for the link cable.
+  The first release was on a MM5799 MCU, see hh_cops1.cpp.
 
 ***************************************************************************/
 

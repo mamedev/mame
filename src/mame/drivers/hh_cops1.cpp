@@ -5,6 +5,8 @@
 
   National Semiconductor COPS(MM57 MCU series) handhelds
 
+  MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
+
   TODO:
   - qkracerm RAM configuration is unknown (it also works fine with 8x12)
   - qkracerm link cable
@@ -299,8 +301,8 @@ void qkracerm_state::ds8874_output_w(u16 data)
 
 void qkracerm_state::write_do(u8 data)
 {
-	// DO1: DS8874N CP
-	// DO4: DS8874N _DATA
+	// DO1: DS8874 CP
+	// DO4: DS8874 _DATA
 	m_ds8874->cp_w(BIT(data, 0));
 	m_ds8874->data_w(BIT(data, 3));
 }

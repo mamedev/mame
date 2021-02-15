@@ -58,7 +58,7 @@ public:
 	// read SI directly with AXO (default false)
 	auto &set_option_axo_si(bool b) { m_option_axo_si = b; return *this; }
 
-	// K and INB pins can be active high or active low (default high)
+	// K and INB pins can be active high or active low (default true)
 	auto &set_option_k_active_high(bool b) { m_option_k_active_high = b; return *this; }
 	auto &set_option_inb_active_high(bool b) { m_option_inb_active_high = b; return *this; }
 
