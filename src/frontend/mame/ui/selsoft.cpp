@@ -16,7 +16,6 @@
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
-#include "audit.h"
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -475,9 +474,9 @@ void menu_select_software::inkey_select(const event *menu_event)
 
 	// audit the system ROMs first to see if we're going to work
 	media_auditor::summary const sysaudit = auditor.audit_media(AUDIT_VALIDATE_FAST);
-	if (sysaudit != media_auditor::CORRECT && sysaudit != media_auditor::BEST_AVAILABLE && sysaudit != media_auditor::NONE_NEEDED)
+	if (!audit_passed(sysaudit))
 	{
-		set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != sysaudit, auditor));
+		set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, sysaudit));
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
@@ -489,13 +488,12 @@ void menu_select_software::inkey_select(const event *menu_event)
 	}
 	else
 	{
-		// first audit the software
+		// now audit the software
 		software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
 		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
-
 		media_auditor::summary const swaudit = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
 
-		if (swaudit == media_auditor::CORRECT || swaudit == media_auditor::BEST_AVAILABLE || swaudit == media_auditor::NONE_NEEDED)
+		if (audit_passed(swaudit))
 		{
 			if (!select_bios(*ui_swinfo, false) && !select_part(*swinfo, *ui_swinfo))
 			{
@@ -506,15 +504,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			std::ostringstream str;
-			str << _("The selected software is missing one or more required files. Please select a different software item.\n\n");
-			if (media_auditor::NOTFOUND != swaudit)
-			{
-				auditor.summarize(nullptr, &str);
-				str << '\n';
-			}
-			str << _("Press any key to continue."),
-			set_error(reset_options::REMEMBER_POSITION, str.str());
+			set_error(reset_options::REMEMBER_REF, make_software_audit_fail_text(auditor, swaudit));
 		}
 	}
 }
