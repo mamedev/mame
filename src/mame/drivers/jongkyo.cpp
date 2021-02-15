@@ -65,7 +65,7 @@ protected:
 private:
 	// misc
 	uint8_t m_rom_bank;
-	uint8_t m_mux_data;
+	uint8_t m_key_rows;
 	uint8_t m_flip_screen;
 
 	// memory pointers
@@ -161,8 +161,8 @@ void jongkyo_state::bank_select_w(offs_t offset, uint8_t data)
 
 void jongkyo_state::mux_w(uint8_t data)
 {
-	m_mux_data = ~data;
-	//  printf("%02x\n", m_mux_data);
+	m_key_rows = data;
+	//  printf("%02x\n", m_key_rows);
 }
 
 void jongkyo_state::coin_counter_w(uint8_t data)
@@ -178,40 +178,26 @@ void jongkyo_state::coin_counter_w(uint8_t data)
 
 uint8_t jongkyo_state::input_1p_r()
 {
-	uint8_t cr_clear = m_credit_clear->read();
-
-	switch (m_mux_data)
+	uint8_t keys = 0x3f;
+	for (unsigned i = 0; m_pl1_inputs.size() > i; ++i)
 	{
-		case 0x01: return m_pl1_inputs[0]->read() | cr_clear;
-		case 0x02: return m_pl1_inputs[1]->read() | cr_clear;
-		case 0x04: return m_pl1_inputs[2]->read() | cr_clear;
-		case 0x08: return m_pl1_inputs[3]->read() | cr_clear;
-		case 0x10: return m_pl1_inputs[4]->read() | cr_clear;
-		case 0x20: return m_pl1_inputs[5]->read() | cr_clear;
+		if (!BIT(m_key_rows, i))
+			keys &= m_pl1_inputs[i]->read();
 	}
-	//  printf("%04x\n", m_mux_data);
 
-	return (m_pl1_inputs[0]->read() & m_pl1_inputs[1]->read() & m_pl1_inputs[2]->read() &
-			m_pl1_inputs[3]->read() & m_pl1_inputs[4]->read() & m_pl1_inputs[5]->read()) | cr_clear;
+	return keys | m_credit_clear->read();
 }
 
 uint8_t jongkyo_state::input_2p_r()
 {
-	uint8_t coin_port = m_coin_port->read();
-
-	switch (m_mux_data)
+	uint8_t keys = 0x3f;
+	for (unsigned i = 0; m_pl2_inputs.size() > i; ++i)
 	{
-		case 0x01: return m_pl2_inputs[0]->read() | coin_port;
-		case 0x02: return m_pl2_inputs[1]->read() | coin_port;
-		case 0x04: return m_pl2_inputs[2]->read() | coin_port;
-		case 0x08: return m_pl2_inputs[3]->read() | coin_port;
-		case 0x10: return m_pl2_inputs[4]->read() | coin_port;
-		case 0x20: return m_pl2_inputs[5]->read() | coin_port;
+		if (!BIT(m_key_rows, i))
+			keys &= m_pl2_inputs[i]->read();
 	}
-	//  printf("%04x\n", m_mux_data);
 
-	return (m_pl2_inputs[0]->read() & m_pl2_inputs[1]->read() & m_pl2_inputs[2]->read() &
-			m_pl2_inputs[3]->read() & m_pl2_inputs[4]->read() & m_pl2_inputs[5]->read()) | coin_port;
+	return keys | m_coin_port->read();
 }
 
 void jongkyo_state::videoram2_w(offs_t offset, uint8_t data)
@@ -367,11 +353,11 @@ static INPUT_PORTS_START( jongkyo )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
 	PORT_START("PL1_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) //PORT_NAME("1P Option 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) //PORT_NAME("1P Option 2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) //PORT_NAME("1P Option 3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) //PORT_NAME("1P Option 4")
 	PORT_START("PL1_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Pass") //???
@@ -406,11 +392,11 @@ static INPUT_PORTS_START( jongkyo )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
 	PORT_START("PL2_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 1") PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 2") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2) //PORT_NAME("2P Option 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2) //PORT_NAME("2P Option 2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 3") PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 4") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2) //PORT_NAME("2P Option 3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2) //PORT_NAME("2P Option 4")
 	PORT_START("PL2_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Pass") PORT_PLAYER(2) //???
@@ -420,9 +406,7 @@ static INPUT_PORTS_START( jongkyo )
 	PORT_DIPNAME( 0x01, 0x00, "Note" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Memory Reset" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
 	PORT_DIPNAME( 0x04, 0x00, "Analyzer" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
@@ -494,14 +478,14 @@ void jongkyo_state::machine_start()
 {
 	save_item(NAME(m_videoram2));
 	save_item(NAME(m_rom_bank));
-	save_item(NAME(m_mux_data));
+	save_item(NAME(m_key_rows));
 	save_item(NAME(m_flip_screen));
 }
 
 void jongkyo_state::machine_reset()
 {
 	m_rom_bank = 0;
-	m_mux_data = 0;
+	m_key_rows = 0xff;
 	m_flip_screen = 1;
 }
 
