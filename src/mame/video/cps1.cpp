@@ -1867,6 +1867,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2mkot",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthb2",     HACK_B_3,     mapper_sfzch, 0, 0, 0, 0x80 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
