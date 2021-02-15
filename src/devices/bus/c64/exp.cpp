@@ -29,6 +29,8 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "c64exp"),
+	m_roml_size(0),
+	m_romh_size(0),
 	m_game(1),
 	m_exrom(1)
 {
@@ -166,6 +168,8 @@ image_init_result c64_expansion_slot_device::call_load()
 				// Ultimax (VIC-10) cartridge
 				load_software_region("lorom", m_card->m_roml);
 				load_software_region("uprom", m_card->m_romh);
+				m_card->m_roml_size = get_software_region_length("lorom");
+				m_card->m_romh_size = get_software_region_length("uprom");
 
 				m_card->m_exrom = 1;
 				m_card->m_game = 0;
@@ -177,6 +181,8 @@ image_init_result c64_expansion_slot_device::call_load()
 				load_software_region("romh", m_card->m_romh);
 				load_software_region("romx", m_card->m_romx);
 				load_software_region("nvram", m_card->m_nvram);
+				m_card->m_roml_size = get_software_region_length("roml");
+				m_card->m_romh_size = get_software_region_length("romh");
 
 				if (get_feature("exrom") != nullptr) m_card->m_exrom = atol(get_feature("exrom"));
 				if (get_feature("game") != nullptr) m_card->m_game = atol(get_feature("game"));

@@ -65,6 +65,9 @@ public:
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	struct math_t
 	{
@@ -197,10 +200,8 @@ private:
 	void resume_math_w(uint16_t data);
 	void halt_math_w(uint16_t data);
 	u16 dipswitches_r();
-	DECLARE_MACHINE_RESET(tx1);
 	DECLARE_VIDEO_START(tx1);
 	void tx1_palette(palette_device &palette) const;
-	DECLARE_MACHINE_RESET(buggyboy);
 	DECLARE_VIDEO_START(buggyboy);
 	void buggyboy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(buggybjr);

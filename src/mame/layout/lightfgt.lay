@@ -193,7 +193,7 @@ license:CC0
 		<element ref="buttonm" inputtag="IN.3" inputmask="0x04"><bounds x="19" y="13" width="1" height="1" /><color alpha="0.2" /></element>
 		<element ref="buttonm" inputtag="IN.4" inputmask="0x04"><bounds x="19" y="14" width="1" height="1" /><color alpha="0.2" /></element>
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="static_cyan"><bounds x="15" y="4.9" width="5.1" height="5.1" /></element>
 		<element ref="static_cyan"><bounds x="4.9" y="15" width="5.1" height="5.1" /></element>

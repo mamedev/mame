@@ -118,7 +118,7 @@ license:CC0
 		<element name="0.11" ref="sym_spade"><bounds x="103" y="28" width="3" height="3" /></element>
 		<element name="0.9" ref="sym_diamond"><bounds x="106.5" y="28" width="3" height="3" /></element>
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="static_white"><bounds x="0" y="6" width="54" height="0.5" /></element>
 		<element ref="static_white"><bounds x="0" y="32.5" width="54" height="0.5" /></element>

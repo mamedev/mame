@@ -71,7 +71,7 @@ license:CC0
 			<bounds left="0" right="100" top="0" bottom="114" />
 		</element>
 
-	<!-- outer element -->
+	<!-- outer bezel -->
 
 		<element ref="text_score"><bounds x="5.5" y="2" width="8" height="3" /></element>
 		<element ref="text_count"><bounds x="86" y="2" width="8" height="3" /></element>
@@ -90,7 +90,6 @@ license:CC0
 		<element ref="text_o"><bounds x="82.5" y="15.2" width="2" height="2.5" /></element>
 		<element name="7.2" ref="led"><bounds x="86" y="15" width="3" height="3" /></element>
 		<element name="7.3" ref="led"><bounds x="90" y="15" width="3" height="3" /></element>
-
 
 	<!-- board -->
 

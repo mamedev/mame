@@ -225,7 +225,7 @@ int apple35_sectors_per_track(floppy_image_legacy *image, int track)
 	int sectors;
 
 	assert(track >= 0);
-	assert(track < ARRAY_LENGTH(apple35_tracklen_800kb));
+	assert(track < std::size(apple35_tracklen_800kb));
 
 	if (get_apple35_tag(image)->is_1440k)
 		sectors = 18;
@@ -454,7 +454,7 @@ static uint32_t apple35_get_offset(floppy_image_legacy *floppy, int head, int tr
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return ~0;
 	if (head >= tag->sides)
 		return ~0;
@@ -616,7 +616,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -628,7 +628,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 	for (sector = 0; sector < sector_count; sector++)
 	{
 		/* read the sector */
-		err = apple35_read_sector_td(floppy, head, track, sector, sector_data, ARRAY_LENGTH(sector_data));
+		err = apple35_read_sector_td(floppy, head, track, sector, sector_data, std::size(sector_data));
 		if (err)
 		{
 			return err;
@@ -636,7 +636,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 
 		sony_nibblize35(sector_data, nibble_data, checksum);
 
-		for (i = 0; i < ARRAY_LENGTH(blk1); i++)
+		for (i = 0; i < std::size(blk1); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk1[i]);
 
 		sum = (track ^ sector ^ side ^ tag->format_byte) & 0x3F;
@@ -647,18 +647,18 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[tag->format_byte]);
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[sum]);
 
-		for (i = 0; i < ARRAY_LENGTH(blk2); i++)
+		for (i = 0; i < std::size(blk2); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk2[i]);
 
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[sector]);
 
-		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
+		for (i = 0; i < std::size(nibble_data); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[nibble_data[i]]);
 
 		for (i = 3; i >= 0; i--)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[checksum[i]]);
 
-		for (i = 0; i < ARRAY_LENGTH(blk3); i++)
+		for (i = 0; i < std::size(blk3); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk3[i]);
 	}
 
@@ -681,7 +681,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -756,7 +756,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 			continue;
 		j++;
 
-		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
+		for (i = 0; i < std::size(nibble_data); i++)
 		{
 			nibble_data[i] = rev_diskbytes[sony_fetchtrack((uint8_t*)buffer, buflen, &pos)];
 			j++;
@@ -778,7 +778,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 			sony_denibblize35(sector_data, nibble_data, checksum);
 
 			/* write the sector */
-			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, ARRAY_LENGTH(sector_data), 0);
+			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, std::size(sector_data), 0);
 			if (err)
 				return err;
 

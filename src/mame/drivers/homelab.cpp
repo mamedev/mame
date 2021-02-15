@@ -690,7 +690,7 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 
 	while((ch = image.fgetc()))
 	{
-		if (i >= (ARRAY_LENGTH(pgmname) - 1))
+		if (i >= (std::size(pgmname) - 1))
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 			image.message(" File name too long");
@@ -731,7 +731,7 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 		if (image.fread(&ch, 1) != 1)
 		{
 			char message[512];
-			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
+			snprintf(message, std::size(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return image_init_result::FAIL;

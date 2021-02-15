@@ -94,7 +94,7 @@ registers
 inline void dspp_device::load_fast_iregs(drcuml_block &block)
 {
 #if 0 // TODO
-	for (uint32_t regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (uint32_t regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -115,7 +115,7 @@ void dspp_device::save_fast_iregs(drcuml_block &block)
 #if 0 // TODO
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{

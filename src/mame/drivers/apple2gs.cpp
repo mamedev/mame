@@ -886,10 +886,18 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
 		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
-		m_transchar = decode[trans];
+		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
+		if (m_lastchar == 0x146)
+		{
+			m_transchar = '=';
+		}
+		else
+		{
+			m_transchar = decode[trans];
+		}
 		m_strobe = 0x80;
 
-		//printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+//      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
 	}
 }
 
@@ -921,7 +929,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::ay3600_repeat)
 
 u8 apple2gs_state::adb_read_memory(u32 address)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		return m_adb_memory[address];
 	else
 		return 0x00;
@@ -929,7 +937,7 @@ u8 apple2gs_state::adb_read_memory(u32 address)
 
 void apple2gs_state::adb_write_memory(u32 address, u8 data)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		m_adb_memory[address] = data;
 }
 
@@ -945,7 +953,7 @@ void apple2gs_state::adb_set_config(u8 b1, u8 b2, u8 b3)
 
 void apple2gs_state::adb_post_response(const u8 *bytes, size_t length)
 {
-	assert(length < ARRAY_LENGTH(m_adb_response_bytes));
+	assert(length < std::size(m_adb_response_bytes));
 	memcpy(m_adb_response_bytes, bytes, length);
 
 	m_adb_state = ADBSTATE_INRESPONSE;
@@ -1253,7 +1261,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 			break;
 
 		case ADBSTATE_INCOMMAND:
-			assert(m_adb_command_pos < ARRAY_LENGTH(m_adb_command_bytes));
+			assert(m_adb_command_pos < std::size(m_adb_command_bytes));
 //          printf("ADB param %02x\n", data);
 			m_adb_command_bytes[m_adb_command_pos++] = data;
 			break;
@@ -2437,7 +2445,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if (m_lastchar >= 0x32 && m_lastchar <= 0x3f)
+				else if (m_lastchar >= 0x32 && m_lastchar <= 0x37)
+				{
+					ret |= 0x10;
+				}
+				else if (m_lastchar >= 0x3c && m_lastchar <= 0x3f)
 				{
 					ret |= 0x10;
 				}
@@ -2445,7 +2457,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if (m_lastchar >= 0x109 && m_lastchar <= 0x10a)
+				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x146))
 				{
 					ret |= 0x10;
 				}
@@ -4839,7 +4851,7 @@ INPUT_PORTS_START( apple2gs )
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
 
 	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
@@ -5138,8 +5150,9 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
 	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
-	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
-	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+#if NEW_IWM
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+#endif
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 }
 

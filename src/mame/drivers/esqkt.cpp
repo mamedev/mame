@@ -204,6 +204,8 @@ u16 esqkt_state::esq5506_read_adc()
 			return 0;
 	}
 
+#ifdef UNUSED
+	// Coverity 315636
 	if (m_duart_io & 1)
 	{
 		return 0x5b00;              // vRef
@@ -212,6 +214,7 @@ u16 esqkt_state::esq5506_read_adc()
 	{
 		return 0x7f00;              // vBattery
 	}
+#endif
 }
 
 void esqkt_state::es5506_clock_changed(u32 data)

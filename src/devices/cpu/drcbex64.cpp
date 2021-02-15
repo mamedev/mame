@@ -654,7 +654,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	m_near.drcmap_get_value = (x86code *)&drc_map_variables::static_get_value;
 
 	// build the flags map
-	for (int entry = 0; entry < ARRAY_LENGTH(m_near.flagsmap); entry++)
+	for (int entry = 0; entry < std::size(m_near.flagsmap); entry++)
 	{
 		uint8_t flags = 0;
 		if (entry & 0x001) flags |= FLAG_C;
@@ -664,7 +664,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & 0x800) flags |= FLAG_V;
 		m_near.flagsmap[entry] = flags;
 	}
-	for (int entry = 0; entry < ARRAY_LENGTH(m_near.flagsunmap); entry++)
+	for (int entry = 0; entry < std::size(m_near.flagsunmap); entry++)
 	{
 		uint64_t flags = 0;
 		if (entry & FLAG_C) flags |= 0x001;
@@ -873,7 +873,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
-		assert(inst.opcode() < ARRAY_LENGTH(s_opcode_table));
+		assert(inst.opcode() < std::size(s_opcode_table));
 
 		// must remain in scope until output
 		std::string dasm;
@@ -1883,7 +1883,7 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
 			a.mov(ptr(rcx, regoffs + 8 * regnum), Gpq(regnum));
@@ -1896,7 +1896,7 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 
 	// copy FP registers
 	regoffs = offsetof(drcuml_machine_state, f);
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
 			a.movsd(ptr(rcx, regoffs + 8 * regnum), Xmm(regnum));
@@ -1927,7 +1927,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
 			a.mov(Gpq(regnum), ptr(rcx, regoffs + 8 * regnum));
@@ -1940,7 +1940,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 
 	// copy FP registers
 	regoffs = offsetof(drcuml_machine_state, f);
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
+	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
 			a.movsd(Xmm(regnum), ptr(rcx, regoffs + 8 * regnum));

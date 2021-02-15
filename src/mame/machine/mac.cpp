@@ -2334,7 +2334,7 @@ const char *lookup_trap(uint16_t opcode)
 
 	int i;
 
-	for (i = 0; i < ARRAY_LENGTH(traps); i++)
+	for (i = 0; i < std::size(traps); i++)
 	{
 		if (traps[i].trap == opcode)
 			return traps[i].name;
@@ -2431,7 +2431,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		csCode = *((uint16_t*) (mem + a0 + 26));
 		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
-		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
+		for (i = 0; i < std::size(cscodes); i++)
 		{
 			if (cscodes[i].csCode == csCode)
 			{
@@ -2467,7 +2467,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	case 0xa815:    /* _SCSIDispatch */
 		i = *((uint16_t*) (mem + a7));
-		if (i < ARRAY_LENGTH(scsisels))
+		if (i < std::size(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);
 		break;

@@ -408,10 +408,10 @@ void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 	if (which != 0)
 		return;
 
-	int autobuf_reg = which ? S1_AUTOBUF_REG : S0_AUTOBUF_REG;
+	int autobuf_reg = which ? S1_AUTOBUF_REG : S0_AUTOBUF_REG; // "which" must equal 0 here, invalid test: Coverity 315932
 
 	/* check if SPORT1 is enabled */
-	if (m_control_regs[SYSCONTROL_REG] & (which ? 0x0800 : 0x1000)) /* bit 11 */
+	if (m_control_regs[SYSCONTROL_REG] & (which ? 0x0800 : 0x1000)) /* bit 11 */ // invalid test here too
 	{
 		/* we only support autobuffer here (which is what this thing uses), bail if not enabled */
 		if (m_control_regs[autobuf_reg] & 0x0002) /* bit 1 */
@@ -458,7 +458,7 @@ void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 
 void acclaim_rax_device::dmovlay_callback(uint32_t data)
 {
-	if (data < 0 || data > 1)
+	if (data > 1)
 	{
 		fatalerror("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
 	}

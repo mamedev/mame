@@ -191,7 +191,7 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 		}
 	}
 	if(!(m_latch & 0x40) && (diff & 0x20)) {
-		if(m_write_position == ARRAY_LENGTH(m_write_buffer)) {
+		if(m_write_position == std::size(m_write_buffer)) {
 			update_latching_inverter();
 			flush_writes(true);
 		}

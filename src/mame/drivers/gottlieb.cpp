@@ -773,10 +773,10 @@ void gottlieb_state::reactor_map(address_map &map)
 }
 
 
-void gottlieb_state::gottlieb_map(address_map &map)
+void gottlieb_state::gottlieb_base_map(address_map &map)
 {
 	map.global_mask(0xffff);
-	map(0x0000, 0x2fff).ram().share("nvram");
+	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share("spriteram");                           /* FRSEL */
 	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
 	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
@@ -792,6 +792,31 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x5803, 0x5803).mirror(0x07f8).portr("IN3");                                      /* trackball V */
 	map(0x5804, 0x5804).mirror(0x07f8).portr("IN4");                                      /* IP40-47 */
 	map(0x6000, 0xffff).rom();
+}
+
+
+void gottlieb_state::gottlieb_ram_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x2fff).ram();
+}
+
+
+void gottlieb_state::gottlieb_ram_rom_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x1fff).ram();
+	map(0x2000, 0x2fff).rom().region("maincpu", 0x2000);
+}
+
+
+void gottlieb_state::gottlieb_rom_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x2fff).rom().region("maincpu", 0x1000);
 }
 
 
@@ -1759,10 +1784,10 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 {
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
@@ -1784,10 +1809,22 @@ void gottlieb_state::gottlieb1(machine_config &config)
 	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void gottlieb_state::gottlieb1_rom(machine_config &config)
+{
+	gottlieb1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_rom_map);
+}
+
 void gottlieb_state::gottlieb2(machine_config &config)
 {
 	gottlieb_core(config);
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
+void gottlieb_state::gottlieb2_ram_rom(machine_config &config)
+{
+	gottlieb2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_rom_map);
 }
 
 void gottlieb_state::g2laser(machine_config &config)
@@ -1912,9 +1949,6 @@ ROM_END
 
 
 ROM_START( qbert )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(fe434526) SHA1(4cfc5d52dd6c82163e035af82d6112c0c93a3797) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
@@ -1937,9 +1971,6 @@ ROM_START( qbert )
 ROM_END
 
 ROM_START( qberta )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qrom_2.bin",  0xa000, 0x2000, CRC(b54a8ffc) SHA1(5e19690f141d3db8f3bfa6c7de75026256758c1f) )
 	ROM_LOAD( "qrom_1.bin",  0xc000, 0x2000, CRC(19d924e3) SHA1(af55ecb5b650e7b069d8be67eb9a9d0f3e69e3f1) )
@@ -1961,9 +1992,6 @@ ROM_START( qberta )
 ROM_END
 
 ROM_START( qbertj )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbj-rom2.bin", 0xa000, 0x2000, CRC(67bb1cb2) SHA1(23a7f8c86d6db9220a98b3f630c5d000e80f2d53) )
 	ROM_LOAD( "qbj-rom1.bin", 0xc000, 0x2000, CRC(c61216e7) SHA1(e727b85dddc2963e33af6c02b675243f6fbe2710) )
@@ -1985,9 +2013,6 @@ ROM_START( qbertj )
 ROM_END
 
 ROM_START( myqbert )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mqb-rom2.bin",  0xa000, 0x2000, CRC(6860f957) SHA1(ebd68aeb6d54868295bd20cf64ee0187a52df0e3) )
 	ROM_LOAD( "mqb-rom1.bin",  0xc000, 0x2000, CRC(11f0a4e4) SHA1(a805e51c40042fae209ace277abd9b35a990905b) )
@@ -2009,9 +2034,6 @@ ROM_START( myqbert )
 ROM_END
 
 ROM_START( qberttst )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qbtst2.bin",   0xa000, 0x2000, CRC(55307b02) SHA1(8a41820211093779d9010b4c9e7d667ad3a31f23) )
 	ROM_LOAD( "qbtst1.bin",   0xc000, 0x2000, CRC(e97fdd78) SHA1(98dd07043a72273240c593650aa9947199347870) )
@@ -2034,9 +2056,6 @@ ROM_END
 
 /* test rom, not a game */
 ROM_START( qbtrktst )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(fe434526) SHA1(4cfc5d52dd6c82163e035af82d6112c0c93a3797) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
@@ -2059,9 +2078,6 @@ ROM_END
 
 
 ROM_START( insector )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom3",         0x8000, 0x2000, CRC(640881fd) SHA1(2832183e41ae7e631b61e4845fa68ce1c49edf29) )
 	ROM_LOAD( "rom2",         0xa000, 0x2000, CRC(456bc3f4) SHA1(b61a56a65639f97399a8a3a4293ac2292edfd159) )
@@ -2084,9 +2100,6 @@ ROM_END
 
 
 ROM_START( tylz )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tylz.s4t",        0x8000, 0x2000, CRC(28ed146d) SHA1(52d72503b456b1411cd91724c6d524b78ca6fe03) )
 	ROM_LOAD( "tylz.s4b",        0xa000, 0x2000, CRC(18ee09f9) SHA1(632896bfe7e14f93665671dbcc17b7cabc754a98) )
@@ -2109,11 +2122,9 @@ ROM_END
 
 
 ROM_START( argusg )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "arg_ram2_2732.c7",         0x1000, 0x1000, CRC(5d35b83e) SHA1(5a1c3b2ae138d5509b8daaf03036f000bd09d0fc) )
 	ROM_LOAD( "arg_ram4_2732.c9c10",      0x2000, 0x1000, CRC(7180e823) SHA1(47124925d863b9b3784c0c990d4a4344e8d09372) )
-
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "arg_rom4_2764.c16",        0x6000, 0x2000, CRC(2f48bd78) SHA1(b625a03b5a4989b67d5180fca7e9f6b7a24e6d2c) )
 	ROM_LOAD( "arg_rom3_2764.c14c15",     0x8000, 0x2000, CRC(4dc2914c) SHA1(8ca0fd2ce1fc9f00afd30a638ff2f8787ef7e3d4) )
 	ROM_LOAD( "arg_rom2_2764.c13c14",     0xa000, 0x2000, CRC(b5e9ee77) SHA1(dbdc176e3ca6be17b78eb98c07d5a9b5eaa28ba1) )
@@ -2136,9 +2147,6 @@ ROM_END
 
 
 ROM_START( mplanets )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom4.c16",     0x6000, 0x2000, CRC(5402077f) SHA1(f4e8699ab3c6dfc0f86b6df86d2a5b35caf2ca73) )
 	ROM_LOAD( "rom3.c14-15",  0x8000, 0x2000, CRC(5d18d740) SHA1(30307d98704c49dec5aecd0a1ec2f06f1869a5d2) )
@@ -2164,9 +2172,6 @@ ROM_START( mplanets )
 ROM_END
 
 ROM_START( mplanetsuk )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpt_rom4.bin", 0x6000, 0x2000, CRC(cd88e23c) SHA1(03222e2600f7fb1c6844340d4a56eedfcdeaa3c8) )
 	ROM_LOAD( "mpt_rom3.bin", 0x8000, 0x2000, CRC(dc355b2d) SHA1(ae3e376afc7a8cb049d0dd28bf3959cb76780999) )
@@ -2191,11 +2196,9 @@ ROM_END
 
 
 ROM_START( krull )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gv-105_ram_2.c7",      0x1000, 0x1000, CRC(302feadf) SHA1(9d70de35e4f0490dc4e601070993ad146f250dea) )
 	ROM_LOAD( "gv-105_ram_4.c9-10",   0x2000, 0x1000, CRC(79355a60) SHA1(57ad5c904b9ac4bf7c7d828bf755bbcbba6a4fd7) )
-
-	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gv-105_rom_4.c16",     0x6000, 0x2000, CRC(2b696394) SHA1(b18270f4ad97743f6ff8c4cbc93e523c77a8e794) )
 	ROM_LOAD( "gv-105_rom_3.c14-15",  0x8000, 0x2000, CRC(14b0ee42) SHA1(276c4008a013806b3989c529f41cbc358ec49fd6) )
 	ROM_LOAD( "gv-105_rom_2.c13-14",  0xa000, 0x2000, CRC(b5fad94a) SHA1(1bae895fbdd658cfb56c53cc2139282cc1e778de) )
@@ -2218,9 +2221,6 @@ ROM_END
 
 
 ROM_START( kngtmare )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gv112_rom3_2764.c14c15", 0x8000, 0x2000, CRC(47351270) SHA1(e6ca0b27b8f703cf73aad5f82d3b986823fbda88) )
 	ROM_LOAD( "gv112_rom2_2764.c13c14", 0xa000, 0x2000, CRC(53e01f97) SHA1(0fbb92789609ba1df6e4ae56b2fc77a004e3a4ea) )
@@ -2243,9 +2243,6 @@ ROM_END
 
 
 ROM_START( sqbert )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(1e3d4038) SHA1(d4402c5d16c0aa55efbceb83f0b30082b8434df7) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(eaf3076c) SHA1(749a87b3c40ba0a2ecd2ca962786e066daf63e30) )
@@ -2268,9 +2265,6 @@ ROM_END
 
 
 ROM_START( qbertqub )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_FILL( 0x1000, 0x2000, 0x00)
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qq-rom3.bin",  0x8000, 0x2000, CRC(c4dbdcd7) SHA1(34aaa4762073680e2b4d024ce7106315ffc6bcf3) )
 	ROM_LOAD( "qq-rom2.bin",  0xa000, 0x2000, CRC(21a6c6cc) SHA1(6d4d81d9ad85be3792584e39dbeaf0dfeeda1503) )
@@ -2512,10 +2506,8 @@ ROM_END
 
 
 ROM_START( 3stooges )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_LOAD( "gv113ram.4",   0x2000, 0x1000, CRC(533bff2a) SHA1(58d0be8add4b02dc3e27cf6b17a05baf4304f3ce) )
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv113ram.4",   0x2000, 0x1000, CRC(533bff2a) SHA1(58d0be8add4b02dc3e27cf6b17a05baf4304f3ce) )
 	ROM_LOAD( "gv113rom.4",   0x6000, 0x2000, CRC(8b6e52b8) SHA1(6e17e11afce92a7fa1735a724f0c0faf9375ac89) )
 	ROM_LOAD( "gv113rom.3",   0x8000, 0x2000, CRC(b816d8c4) SHA1(86e16888492390034ac04e3f6a9f56422575c778) )
 	ROM_LOAD( "gv113rom.2",   0xa000, 0x2000, CRC(b45b2a79) SHA1(7d0b19bec462ab67f518361afdf4b6982829ed07) )
@@ -2541,10 +2533,8 @@ ROM_END
 
 
 ROM_START( 3stoogesa )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_LOAD( "gv113ram4.bin",   0x2000, 0x1000, CRC(a00365be) SHA1(a151e1dfd8a251e6558968ea1df5a8516286d2c1) ) /* Came from PCB with low serial # */
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv113ram4.bin",   0x2000, 0x1000, CRC(a00365be) SHA1(a151e1dfd8a251e6558968ea1df5a8516286d2c1) ) /* Came from PCB with low serial # */
 	ROM_LOAD( "gv113rom4.bin",   0x6000, 0x2000, CRC(a8f9d51d) SHA1(c9b18e31fea6fd01171528dd583b4d4f9b9078ed) )
 	ROM_LOAD( "gv113rom3.bin",   0x8000, 0x2000, CRC(60bda7b6) SHA1(7dd7633397d3ccdbd7885a5436f422f575ecd0cc) )
 	ROM_LOAD( "gv113rom2.bin",   0xa000, 0x2000, CRC(9bb95798) SHA1(91cf203cf59c5a96ed5de8f4c5743bd91350c16f) )
@@ -2570,10 +2560,8 @@ ROM_END
 
 
 ROM_START( vidvince )
-	ROM_REGION( 0x3000, "nvram", ROMREGION_ERASEFF)
-	ROM_LOAD( "gv132_ram4_2732.c9c10",   0x2000, 0x1000, CRC(67a4927b) SHA1(41dfd13ea24bb3b0f8f917f4af5f6b33af1bc2e7) )
-
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv132_ram4_2732.c9c10",   0x2000, 0x1000, CRC(67a4927b) SHA1(41dfd13ea24bb3b0f8f917f4af5f6b33af1bc2e7) )
 	ROM_LOAD( "gv132_rom4_2764.c16",     0x6000, 0x2000, CRC(3c5f39f5) SHA1(3722c30bcd60fc0c1c4ca4dd800a3654fba67599) )
 	ROM_LOAD( "gv132_rom3_2764.c14c15",  0x8000, 0x2000, CRC(3983cb79) SHA1(3c527ed2428b8cb86a6896a74c873317a9f7b411) )
 	ROM_LOAD( "gv132_rom2_2764.c13c14",  0xa000, 0x2000, CRC(0f5ebab9) SHA1(680874b9857565857375096d05203997669a7215) )
@@ -2687,33 +2675,33 @@ void gottlieb_state::init_vidvince()
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,    0,        reactor,   reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbert,      0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberta,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbertj,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, myqbert,    qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberttst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, insector,   0,        gottlieb1, insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
-GAME( 1982, tylz,       0,        tylz,      tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,     0,        gottlieb1, argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,   0,        gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
-GAME( 1983, mplanetsuk, mplanets, gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,      0,        gottlieb1, krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
-GAME( 1983, kngtmare,   0,        gottlieb1, kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
-GAME( 1983, sqbert,     0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,   0,        qbert,     qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
-GAME( 1984, curvebal,   0,        gottlieb1, curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
+GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
+GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
+GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
+GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
+GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
+GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo,   0,        screwloo,  screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
-GAME( 1983, mach3,      0,        g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
-GAME( 1983, mach3a,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
-GAME( 1983, mach3b,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
-GAME( 1984, cobram3,    cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
-GAME( 1984, cobram3a,   cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
-GAME( 1984, usvsthem,   0,        g2laser,   usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
-GAME( 1984, 3stooges,   0,        gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
-GAME( 1984, 3stoogesa,  3stooges, gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
-GAME( 1984, vidvince,   0,        gottlieb2, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,    0,        gottlieb2, wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )
+GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
+GAME( 1983, mach3,      0,        g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
+GAME( 1983, mach3a,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
+GAME( 1983, mach3b,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
+GAME( 1984, cobram3,    cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
+GAME( 1984, cobram3a,   cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
+GAME( 1984, usvsthem,   0,        g2laser,           usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
+GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
+GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
+GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
+GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )

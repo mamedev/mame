@@ -177,7 +177,6 @@ void tx1_state::tx1(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::tx1_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
@@ -222,7 +221,6 @@ void tx1_state::buggyboy(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_triphsxs);
@@ -260,7 +258,6 @@ void tx1_state::buggybjr(machine_config &config)
 	I8086(config, m_mathcpu, CPU_MASTER_CLOCK / 3);
 	m_mathcpu->set_addrmap(AS_PROGRAM, &tx1_state::buggyboy_math);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

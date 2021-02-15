@@ -62,7 +62,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 	{
 		s32 lsum = 0;
 		s32 rsum = 0;
-		for (int j = 0; j < ARRAY_LENGTH(m_channel); j++)
+		for (int j = 0; j < std::size(m_channel); j++)
 		{
 			CHANNEL &channel(m_channel[j]);
 			if (channel.size != 0)

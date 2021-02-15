@@ -45,7 +45,6 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
-//#include "speaker.h"
 
 
 namespace {
@@ -114,7 +113,7 @@ void getaway_state::machine_start()
     Video
 ******************************************************************************/
 
-uint32_t getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// apparently score overlay covers only the rightmost 3 columns
 	const int x_overlay = 29*8;

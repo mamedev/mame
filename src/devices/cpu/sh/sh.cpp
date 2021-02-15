@@ -2009,7 +2009,7 @@ void cfunc_printf_probe(void *param) { ((sh_common_execution *)param)->func_prin
 
 void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
-	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
+	if (m_fastram_select < std::size(m_fastram))
 	{
 		m_fastram[m_fastram_select].start = start;
 		m_fastram[m_fastram_select].end = end;
@@ -2051,7 +2051,7 @@ void sh_common_execution::alloc_handle(uml::code_handle *&handleptr, const char 
 
 void sh_common_execution::load_fast_iregs(drcuml_block &block)
 {
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (int regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -2068,7 +2068,7 @@ void sh_common_execution::load_fast_iregs(drcuml_block &block)
 
 void sh_common_execution::save_fast_iregs(drcuml_block &block)
 {
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (int regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -4293,6 +4293,6 @@ void sh_common_execution::sh2drc_add_pcflush(offs_t address)
 {
 	if (!allow_drc()) return;
 
-	if (m_pcfsel < ARRAY_LENGTH(m_pcflushes))
+	if (m_pcfsel < std::size(m_pcflushes))
 		m_pcflushes[m_pcfsel++] = address;
 }

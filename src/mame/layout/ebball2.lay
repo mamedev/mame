@@ -74,7 +74,7 @@ license:CC0
 			<bounds left="0" right="100" top="0" bottom="114" />
 		</element>
 
-	<!-- outer element -->
+	<!-- outer bezel -->
 
 		<element ref="text_count"><bounds x="16" y="2" width="8" height="3" /></element>
 

@@ -170,7 +170,6 @@ void superdq_state::superdq_videoram_w(offs_t offset, uint8_t data)
 
 void superdq_state::superdq_io_w(uint8_t data)
 {
-	int             i;
 	static const uint8_t black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
@@ -181,7 +180,7 @@ void superdq_state::superdq_io_w(uint8_t data)
 
 	m_color_bank = ( data & 2 ) ? 1 : 0;
 
-	for( i = 0; i < ARRAY_LENGTH( black_color_entries ); i++ )
+	for (int i = 0; i < std::size(black_color_entries); i++)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)

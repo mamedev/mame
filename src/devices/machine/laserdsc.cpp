@@ -201,7 +201,7 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		}
 
 		// swap to the next bitmap
-		m_overindex = (m_overindex + 1) % ARRAY_LENGTH(m_overbitmap);
+		m_overindex = (m_overindex + 1) % std::size(m_overbitmap);
 	}
 	return 0;
 }
@@ -870,7 +870,7 @@ laserdisc_device::frame_data &laserdisc_device::current_frame()
 	// determine the most recent live set of frames
 	frame_data *frame = &m_frame[m_videoindex];
 	if (frame->m_numfields < 2)
-		frame = &m_frame[(m_videoindex + ARRAY_LENGTH(m_frame) - 1) % ARRAY_LENGTH(m_frame)];
+		frame = &m_frame[(m_videoindex + std::size(m_frame) - 1) % std::size(m_frame)];
 	return *frame;
 }
 
@@ -906,7 +906,7 @@ void laserdisc_device::read_track_data()
 	if ((vbidata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 	{
 		if (frame->m_numfields >= 2)
-			m_videoindex = (m_videoindex + 1) % ARRAY_LENGTH(m_frame);
+			m_videoindex = (m_videoindex + 1) % std::size(m_frame);
 		frame = &m_frame[m_videoindex];
 		frame->m_numfields = 0;
 	}

@@ -31,7 +31,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="3.26" right="21.74" top="0.75" bottom="25.74" />
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="static_white"><bounds x="3.25" y="5" width="18.5" height="23" /></element>
 		<element ref="static_black"><bounds x="3.5" y="5.5" width="18" height="23" /></element>

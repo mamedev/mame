@@ -52,7 +52,7 @@ license:CC0
 		<element name="digit0" ref="digit"><bounds x="28.7" y="37.4" width="3" height="4.5" /></element>
 		<element name="digit1" ref="digit"><bounds x="31.7" y="37.4" width="3" height="4.5" /></element>
 
-	<!-- main element -->
+	<!-- main bezel -->
 
 		<element ref="static_white"><bounds x="18.8" y="80.8" width="6" height="0.45" /></element>
 		<element ref="text_out"><bounds x="20.3" y="80.5" width="3" height="1.1" /></element>

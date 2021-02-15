@@ -860,7 +860,7 @@ u8 rosetta_device::compute_ecc(u32 const data) const
 {
 	u8 result = 0;
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(ecc_bits); i++)
+	for (unsigned i = 0; i < std::size(ecc_bits); i++)
 		result ^= BIT(data, 31 - i) ? ecc_bits[i] : 0;
 
 	return result;
@@ -872,7 +872,7 @@ unsigned rosetta_device::check_ecc(u32 &data, u8 const ecc) const
 
 	if (error)
 	{
-		for (unsigned i = 0; i < ARRAY_LENGTH(ecc_bits); i++)
+		for (unsigned i = 0; i < std::size(ecc_bits); i++)
 		{
 			if (error == ecc_bits[i])
 			{

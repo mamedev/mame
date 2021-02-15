@@ -1919,7 +1919,7 @@ void S3C24_CLASS_NAME::s3c24xx_gpio_w(offs_t offset, uint32_t data, uint32_t mem
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_memcon_r(offs_t offset, uint32_t mem_mask)
 {
-	assert(offset < ARRAY_LENGTH(m_memcon.regs.data));
+	assert(offset < std::size(m_memcon.regs.data));
 	uint32_t data = m_memcon.regs.data[offset];
 	LOGMASKED(LOG_MEMCON, "%s: memcon read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_MEMCON + (offset << 2), data, mem_mask);
 	return data;

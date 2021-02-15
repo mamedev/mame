@@ -1968,11 +1968,11 @@ void supracan_state::machine_reset()
 	m_soundcpu_irq_enable = 0;
 	m_soundcpu_irq_source = 0;
 	m_sound_cpu_shift_ctrl = 0;
-	memset(m_sound_cpu_shift_regs, 0, ARRAY_LENGTH(m_sound_cpu_shift_regs));
-	memset(m_latched_controls, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_latched_controls));
+	std::fill(std::begin(m_sound_cpu_shift_regs), std::end(m_sound_cpu_shift_regs), 0);
+	std::fill(std::begin(m_latched_controls), std::end(m_latched_controls), 0);
 	m_sound_status = 0;
 	m_sound_reg_addr = 0;
-	memset(m_sound_regs, 0, ARRAY_LENGTH(m_sound_regs));
+	std::fill(std::begin(m_sound_regs), std::end(m_sound_regs), 0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 

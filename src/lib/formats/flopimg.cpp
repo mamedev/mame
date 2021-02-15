@@ -876,7 +876,7 @@ const char *floppy_error(floperr_t err)
 		"Required parameter not specified"
 	};
 
-	if ((err < 0) || (err >= ARRAY_LENGTH(error_messages)))
+	if ((err < 0) || (err >= std::size(error_messages)))
 		return nullptr;
 	return error_messages[err];
 }

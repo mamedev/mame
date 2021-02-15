@@ -246,7 +246,7 @@ internal:
 			char temp[256];
 			if (keyname == nullptr)
 			{
-				snprintf(temp, ARRAY_LENGTH(temp), "Scan%03d", keynum);
+				snprintf(temp, std::size(temp), "Scan%03d", keynum);
 				keyname = temp;
 			}
 

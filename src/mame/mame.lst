@@ -9372,6 +9372,9 @@ hustle                          // 16-21 [1977 Gremlin]
 mineswpr                        // [1977 Amutech]
 mineswpr4                       // [1977 Amutech]
 
+@source:blockch.cpp
+blockch
+
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
 quarth                          // GX973 (c) 1989 (Japan)
@@ -10887,6 +10890,7 @@ sf2m5                           // hack
 sf2m6                           // hack
 sf2m7                           // hack
 sf2m8                           // bootleg
+sf2mkot                         // hack
 sf2qp1                          // hack
 sf2qp2                          // hack
 sf2rb                           // hack
@@ -16087,6 +16091,11 @@ qkracer                         // National Semiconductor
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
+@source:hh_cops1.cpp
+mbaskb                          // Mattel
+qkracerm                        // National Semiconductor
+qkspeller                       // National Semiconductor
+
 @source:hh_hmcs40.cpp
 alnattck                        // Coleco
 bambball                        // Bambino
@@ -16280,6 +16289,7 @@ amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
 bcheetah                        // Bandai
+ebknight                        // Entex
 bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
@@ -36660,7 +36670,6 @@ snowbwar                         // (c) 201? Sealy
 @source:seattle.cpp
 biofreak                        // (c) 1997 Midway Games (prototype)
 blitz                           // (c) 1997 Midway Games
-blitz11                         // (c) 1997 Midway Games
 blitz2k                         // (c) 1999 Midway Games
 blitz99                         // (c) 1998 Midway Games
 blitz99a                        // (c) 1998 Midway Games
@@ -38535,6 +38544,7 @@ jsc_gdg
 jsc_sdoo
 jsc_spid
 jsc_thom
+jsc_thomu
 
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw

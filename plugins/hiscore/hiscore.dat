@@ -940,7 +940,7 @@ hyperspc:
 aerolitos:
 asteroid:
 asteroid2:
-asteroidb:
+asteroidb1:
 @:maincpu,program,001d,35,00,00
 @:maincpu,program,4030,01,01,01
 
@@ -2620,7 +2620,7 @@ speedfrk:
 ;@s:circus.cpp
 
 circus:
-circusb:
+circuso:
 springbd:
 @:maincpu,program,0036,2,00,00
 
@@ -2876,6 +2876,14 @@ panich:
 @:maincpu,program,4004,2,00,00
 
 
+;******magical spot
+magspot:
+@:maincpu,program,6007,3,00,00
+@:maincpu,program,6008,1,20,20
+
+
+;@s:cosmicg.cpp
+
 ;cosmicgi:****** fixed ******
 cosmicg:
 cosmicgi:
@@ -2911,12 +2919,6 @@ cosmicgi:
 @:maincpu,program,329d,01,82,82
 @:maincpu,program,32bd,01,82,82
 @:maincpu,program,32dd,01,7c,7c
-
-
-;******magical spot
-magspot:
-@:maincpu,program,6007,3,00,00
-@:maincpu,program,6008,1,20,20
 
 
 ;@s:cps1.cpp
@@ -6642,6 +6644,77 @@ ladybugg:
 @:maincpu,program,5884,64,01,47
 
 
+;******bongo
+bongo:
+@:maincpu,program,8300,11,0,15
+@:maincpu,program,8301,1,05,05
+
+
+;*******ozon1
+ozon1:
+@:maincpu,program,4047,3,00,00
+@:maincpu,program,4300,4e,01,10
+
+
+;******mighty monkey
+;mimonsco:******mighty monkey (bootleg on super cobra hardware)
+mimonkey:
+mimonkeyug:
+mimonsco:
+@:maincpu,program,84a1,2,d0,07
+@:maincpu,program,8981,1,00,00
+@:maincpu,program,89a1,1,00,00
+@:maincpu,program,89c1,1,00,00
+@:maincpu,program,89e1,1,00,00
+@:maincpu,program,8a01,1,02,02
+@:maincpu,program,8a21,1,10,10
+@:maincpu,program,8a41,1,10,10
+@:maincpu,program,8920,1,10,10
+@:maincpu,program,8940,1,10,10
+@:maincpu,program,8960,1,15,15
+@:maincpu,program,8980,1,22,22
+@:maincpu,program,89a0,1,1f,1f
+@:maincpu,program,89c0,1,13,13
+@:maincpu,program,89e0,1,23,23
+@:maincpu,program,8a00,1,10,10
+@:maincpu,program,8a20,1,18,18
+@:maincpu,program,8a40,1,17,17
+@:maincpu,program,8a60,1,19,19
+@:maincpu,program,8a80,1,18,18
+@:maincpu,program,8aa0,1,10,10
+@:maincpu,program,8ac0,1,10,10
+@:maincpu,program,8ae0,1,10,10
+
+
+;******mighty monkey (bootleg on scramble hardware)
+;** very dodgy hiscore saving, possibly because of it been a **
+;** poorly put together bootleg **
+mimonscr:
+@:maincpu,program,44a1,2,d0,07
+@:maincpu,program,4981,1,00,00
+@:maincpu,program,49a1,1,00,00
+@:maincpu,program,49c1,1,00,00
+@:maincpu,program,49e1,1,00,00
+@:maincpu,program,4a01,1,02,02
+@:maincpu,program,4a21,1,10,10
+@:maincpu,program,4a41,1,10,10
+@:maincpu,program,4920,1,10,10
+@:maincpu,program,4940,1,10,10
+@:maincpu,program,4960,1,15,15
+@:maincpu,program,4980,1,22,22
+@:maincpu,program,49a0,1,1f,1f
+@:maincpu,program,49c0,1,13,13
+@:maincpu,program,49e0,1,23,23
+@:maincpu,program,4a00,1,10,10
+@:maincpu,program,4a20,1,18,18
+@:maincpu,program,4a40,1,17,17
+@:maincpu,program,4a60,1,19,19
+@:maincpu,program,4a80,1,18,18
+@:maincpu,program,4aa0,1,10,10
+@:maincpu,program,4ac0,1,10,10
+@:maincpu,program,4ae0,1,10,10
+
+
 ;@s:galaxold.cpp
 
 hunchbkg:
@@ -6686,12 +6759,6 @@ guttangt:
 @:maincpu,program,41c6,3,00,01
 
 
-;******bongo
-bongo:
-@:maincpu,program,8300,11,0,15
-@:maincpu,program,8301,1,05,05
-
-
 ;Video Hustler and clones (by GeoMan)
 billiard:
 hustlerb:
@@ -6732,12 +6799,6 @@ racknrol:
 hexpool:
 hexpoola:
 @:maincpu,program,1db8,45,1d,13
-
-
-;*******ozon1
-ozon1:
-@:maincpu,program,4047,3,00,00
-@:maincpu,program,4300,4e,01,10
 
 
 ;*******rock climber
@@ -12387,36 +12448,6 @@ sbrkoutct:
 
 ;@s:scobra.cpp
 
-;******mighty monkey
-;mimonsco:******mighty monkey (bootleg on super cobra hardware)
-mimonkey:
-mimonkeyug:
-mimonsco:
-@:maincpu,program,84a1,2,d0,07
-@:maincpu,program,8981,1,00,00
-@:maincpu,program,89a1,1,00,00
-@:maincpu,program,89c1,1,00,00
-@:maincpu,program,89e1,1,00,00
-@:maincpu,program,8a01,1,02,02
-@:maincpu,program,8a21,1,10,10
-@:maincpu,program,8a41,1,10,10
-@:maincpu,program,8920,1,10,10
-@:maincpu,program,8940,1,10,10
-@:maincpu,program,8960,1,15,15
-@:maincpu,program,8980,1,22,22
-@:maincpu,program,89a0,1,1f,1f
-@:maincpu,program,89c0,1,13,13
-@:maincpu,program,89e0,1,23,23
-@:maincpu,program,8a00,1,10,10
-@:maincpu,program,8a20,1,18,18
-@:maincpu,program,8a40,1,17,17
-@:maincpu,program,8a60,1,19,19
-@:maincpu,program,8a80,1,18,18
-@:maincpu,program,8aa0,1,10,10
-@:maincpu,program,8ac0,1,10,10
-@:maincpu,program,8ae0,1,10,10
-
-
 ;(video hustler)
 hustler:
 hustlerb3:
@@ -12552,35 +12583,6 @@ mrkougb2:
 ad2083:
 @:maincpu,program,4600,64,0a,04
 @:maincpu,program,40a8,3,00,06
-
-
-;******mighty monkey (bootleg on scramble hardware)
-;** very dodgy hiscore saving, possibly because of it been a **
-;** poorly put together bootleg **
-mimonscr:
-@:maincpu,program,44a1,2,d0,07
-@:maincpu,program,4981,1,00,00
-@:maincpu,program,49a1,1,00,00
-@:maincpu,program,49c1,1,00,00
-@:maincpu,program,49e1,1,00,00
-@:maincpu,program,4a01,1,02,02
-@:maincpu,program,4a21,1,10,10
-@:maincpu,program,4a41,1,10,10
-@:maincpu,program,4920,1,10,10
-@:maincpu,program,4940,1,10,10
-@:maincpu,program,4960,1,15,15
-@:maincpu,program,4980,1,22,22
-@:maincpu,program,49a0,1,1f,1f
-@:maincpu,program,49c0,1,13,13
-@:maincpu,program,49e0,1,23,23
-@:maincpu,program,4a00,1,10,10
-@:maincpu,program,4a20,1,18,18
-@:maincpu,program,4a40,1,17,17
-@:maincpu,program,4a60,1,19,19
-@:maincpu,program,4a80,1,18,18
-@:maincpu,program,4aa0,1,10,10
-@:maincpu,program,4ac0,1,10,10
-@:maincpu,program,4ae0,1,10,10
 
 
 ;@s:scregg.cpp
@@ -15453,8 +15455,8 @@ spacedxj:
 
 ;@s:taito_f2.cpp
 
-ssib:
 majest12j:
+ssib:
 @:maincpu,program,205812,31,00,5a
 @:maincpu,program,203606,4,00,00
 

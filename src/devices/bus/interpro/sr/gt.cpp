@@ -1571,7 +1571,7 @@ u32 gtdb_device::vram_r(offs_t offset, const bool linear) const
 		return gt_device_base::vram_r(offset, linear);
 }
 
-void gtdb_device::vram_w(const offs_t offset, const u32 data, u32 mem_mask, const bool linear) const
+void gtdb_device::vram_w(offs_t offset, const u32 data, u32 mem_mask, const bool linear) const
 {
 	if (m_control & GFX_HILITE_SEL)
 	{

@@ -14,7 +14,6 @@
 
 #include "ioprocs.h"
 
-#include "coretmpl.h"
 #include "osdcore.h"
 
 #include <memory>

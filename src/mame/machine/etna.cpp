@@ -54,8 +54,8 @@ void etna_device::device_reset()
 
 	m_pending_ints = 0;
 
-	memset(m_regs, 0, ARRAY_LENGTH(m_regs));
-	memset(m_prom, 0, ARRAY_LENGTH(m_prom));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	std::fill(std::begin(m_prom), std::end(m_prom), 0);
 
 	// defaults expected by the touchscreen code
 	m_prom[0x0a] = 20;
@@ -237,7 +237,7 @@ WRITE_LINE_MEMBER(etna_device::eeprom_clk_in)
 			if (m_prom_addr_count == 10)
 			{
 				LOGMASKED(LOG_PROM, "PROM Address: %03x\n", m_prom_addr);
-				uint16_t byte_addr = (m_prom_addr << 1) % ARRAY_LENGTH(m_prom);
+				uint16_t byte_addr = (m_prom_addr << 1) % std::size(m_prom);
 				m_prom_value = m_prom[byte_addr] | (m_prom[byte_addr + 1] << 8);
 				LOGMASKED(LOG_PROM, "PROM Value: %04x\n", m_prom_value);
 			}

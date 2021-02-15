@@ -170,7 +170,7 @@ TILEMAP_MAPPER_MEMBER(m58_state::tilemap_scan_rows)
 void m58_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m58_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(m58_state::tilemap_scan_rows)), 8, 8, 64, 32);
-	m_bg_tilemap->set_scrolldy(32, 32);
+	m_bg_tilemap->set_scrolldy(26, 26);
 
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
@@ -215,7 +215,7 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = m_spriteram[offs + 3];
-		int sy1 = 233 - m_spriteram[offs];
+		int sy1 = 210 - m_spriteram[offs];
 		int sy2 = 0;
 
 		if (flipy)
