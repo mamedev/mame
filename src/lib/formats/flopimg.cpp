@@ -955,6 +955,21 @@ int floppy_image::get_resolution() const
 	return 0;
 }
 
+bool floppy_image::track_is_formatted(int track, int head, int subtrack)
+{
+	int idx = track*4 + subtrack;
+	if(int(track_array.size()) <= idx)
+		return false;
+	if(int(track_array[idx].size()) <= head)
+		return false;
+	const auto &data = track_array[idx][head].cell_data;
+	if(data.empty())
+		return false;
+	if(data.size() == 1 && (data[0] & MG_MASK) == MG_N)
+		return false;
+	return true;	
+}
+
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
 {
 	switch(variant) {
