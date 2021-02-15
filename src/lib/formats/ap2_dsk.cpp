@@ -1690,11 +1690,11 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, const std::vector
 
 				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
 
-				if (r16(img, trks_off + 4) == 0)
+				if (r32(img, trks_off + 4) == 0)
 					return false;
 
 				// TODO: when write capability is added, use the WRIT chunk data if it's present
-				generate_track_from_bitstream(track, head, &img[boff], r16(img, trks_off + 4), image, subtrack, 0xffff);
+				generate_track_from_bitstream(track, head, &img[boff], r32(img, trks_off + 4), image, subtrack, 0xffff);
 			}
 		}
 	}
