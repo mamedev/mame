@@ -503,5 +503,5 @@ void iwm_device::sync()
 		}
 		break;
 	}
-}
+	}
 }
