@@ -101,6 +101,7 @@ static const help_item static_help_list[] =
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
+		"  cls -- clears the console text buffer\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
 	{
