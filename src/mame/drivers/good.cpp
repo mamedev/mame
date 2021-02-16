@@ -41,6 +41,8 @@ voice.rom - VOICE ROM
 #include "tilemap.h"
 
 
+namespace {
+
 class good_state : public driver_device
 {
 public:
@@ -59,11 +61,11 @@ protected:
 	virtual void video_start() override;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
 
-	/* video-related */
+	// video-related
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	void fg_tilemapram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -221,12 +223,12 @@ static INPUT_PORTS_START( good )
 	PORT_DIPSETTING(  0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
 
-	/*The following appears to be DSW*/
+	// The following appears to be DSW
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds) )
 	PORT_DIPSETTING(  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000e, 0x000e, "Credits per Coin" )
+	PORT_DIPNAME( 0x000e, 0x000e, "Credits at Start" )
 	PORT_DIPSETTING(  0x000e, "50"  )
 	PORT_DIPSETTING(  0x000c, "60"  )
 	PORT_DIPSETTING(  0x000a, "70"  )
@@ -247,12 +249,11 @@ static INPUT_PORTS_START( good )
 	PORT_DIPNAME( 0x0080, 0x0080, "Double Up Test Mode" )
 	PORT_DIPSETTING(  0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(  0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(  0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(  0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(  0x0100, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(  0x0200, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(  0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(  0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
@@ -262,9 +263,9 @@ static INPUT_PORTS_START( good )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(  0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(  0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Maximum Bet" )
+	PORT_DIPSETTING(  0x2000, "100" )
+	PORT_DIPSETTING(  0x0000, "150" )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(  0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x0000, DEF_STR( On ) )
@@ -287,8 +288,8 @@ static const gfx_layout good_layout2 =
 
 
 static GFXDECODE_START( gfx_good )
-	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) /* fg tiles */
-	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) /* fg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) // fg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) // bg tiles
 GFXDECODE_END
 
 
@@ -320,11 +321,11 @@ void good_state::good(machine_config &config)
 
 
 ROM_START( good )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "system1", 0x00001, 0x10000, CRC(128374cb) SHA1(a6521f506a6e4f8e62936ec0e66b080106a43f36) )
 	ROM_LOAD16_BYTE( "system2", 0x00000, 0x10000, CRC(c4eada4e) SHA1(2d9875487626796db8633520625ad6ad642723ef) )
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) // Samples
 	ROM_LOAD( "voice.rom", 0x00000, 0x40000, CRC(a5a23482) SHA1(51ca69589086c1da44d64575ee9a4da7b88ba669) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -333,5 +334,8 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-03", 0x40000, 0x20000, CRC(41da3bf4) SHA1(e7d1973951d4470fd2e0fa3c4690633219b71c06) )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1998, good, 0, good, good, good_state, empty_init, ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
