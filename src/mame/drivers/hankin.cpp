@@ -26,6 +26,9 @@ ToDo:
 
 #include "hankin.lh"
 
+
+namespace {
+
 class hankin_state : public genpin_class
 {
 public:
@@ -46,6 +49,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	void hankin(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
@@ -62,9 +69,6 @@ private:
 	uint8_t ic2_a_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void hankin_map(address_map &map);
 	void hankin_sub_map(address_map &map);
@@ -419,6 +423,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 void hankin_state::machine_start()
 {
 	m_display.resolve();
+
+	m_timer_x = false;
+	m_timer_sb = false;
+	m_ic10b = 0;
 }
 
 void hankin_state::machine_reset()
@@ -598,6 +606,8 @@ ROM_START(empsback)
 	ROM_REGION(0x0200, "prom", 0)
 	ROM_LOAD("sw_ic3.snd",   0x0000, 0x0200, CRC(db214f65) SHA1(1a499cf2059a5c0d860d5a4251a89a5735937ef8))
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

@@ -48,6 +48,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class goldart_state : public driver_device
 {
 public:
@@ -304,8 +306,13 @@ INPUT_PORTS_END
 
 void goldart_state::machine_start()
 {
+	save_item(NAME(m_port1));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram2));
+
+	m_port1 = 0;
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+	std::fill(std::begin(m_ram2), std::end(m_ram2), 0);
 }
 
 void goldart_state::machine_reset()
@@ -384,6 +391,8 @@ ROM_START( goldartp )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1994, goldart,       0,        goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Spain)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

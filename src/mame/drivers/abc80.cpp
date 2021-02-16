@@ -453,6 +453,11 @@ void abc80_state::machine_start()
 	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
+
+	//zero-fill
+	m_key_data = 0;
+	m_key_strobe = 0;
+	m_blink = 0;
 }
 
 QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)

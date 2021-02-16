@@ -40,6 +40,10 @@ public:
 
 	void init_namco86();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	void bankswitch1_w(uint8_t data);
 	void bankswitch1_ext_w(uint8_t data);
@@ -87,9 +91,6 @@ private:
 	void rthunder_mcu_map(address_map &map);
 	void wndrmomo_cpu2_map(address_map &map);
 	void wndrmomo_mcu_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
