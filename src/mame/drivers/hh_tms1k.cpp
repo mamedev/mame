@@ -4412,8 +4412,9 @@ ROM_END
   * TMS1100 MP1221 (die label same)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
-  Entex Black Knight (a licensed handheld version of Williams' Black Knight pinball)
-  is on the same hardware. MCU label: MP1296 (no decap).
+  Entex Black Knight (licensed handheld version of Williams' pinball game)
+  * TMS1100 MP1296 (no decap)
+  * same hardware as Raise The Devil
 
   raisedvl led translation table: led zz from game PCB = MAME y.x:
   (no led labels on ebknight PCB)

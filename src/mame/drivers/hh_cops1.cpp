@@ -23,6 +23,8 @@
 
 // internal artwork
 #include "mbaskb.lh"
+#include "mhockey.lh"
+#include "msoccer.lh"
 #include "qkracerm.lh"
 #include "qkspeller.lh"
 
@@ -120,10 +122,16 @@ namespace {
   * 4001 and 74145, also bonded to PCB
   * 2-digit 7seg led display, 21 leds, 2-bit sound
 
+  Mattel Soccer (model 2678)
+  * MCU die label MM4799 C NDC
+  * same hardware as Basketball
+
+  Mattel Hockey (model 2946)
+  * MCU die label MM4799 C NFR
+  * same hardware as Basketball
+
   Judging from videos online, there are two versions of Basketball. One where
   the display shows "12" at power-on(as on MAME), and one that shows "15".
-
-  Mattel Hockey and Soccer are on nearly identical hardware.
 
 ***************************************************************************/
 
@@ -140,7 +148,10 @@ public:
 	void write_s(u8 data);
 	void write_f(u8 data);
 	u8 read_f();
+
 	void mbaskb(machine_config &config);
+	void msoccer(machine_config &config);
+	void mhockey(machine_config &config);
 };
 
 // handlers
@@ -227,7 +238,7 @@ void mbaskb_state::mbaskb(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(3, 0x7f);
-	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
+	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
 	config.set_default_layout(layout_mbaskb);
 
 	/* sound hardware */
@@ -238,6 +249,18 @@ void mbaskb_state::mbaskb(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void mbaskb_state::msoccer(machine_config &config)
+{
+	mbaskb(config);
+	config.set_default_layout(layout_msoccer);
+}
+
+void mbaskb_state::mhockey(machine_config &config)
+{
+	mbaskb(config);
+	config.set_default_layout(layout_mhockey);
+}
+
 // roms
 
 ROM_START( mbaskb )
@@ -246,7 +269,25 @@ ROM_START( mbaskb )
 	ROM_CONTINUE(             0x0400, 0x0400 )
 
 	ROM_REGION( 254, "maincpu:opla", 0 )
-	ROM_LOAD( "mm5799_mbaskb_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+ROM_END
+
+ROM_START( msoccer )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mm4799_c_ndc", 0x0000, 0x0200, CRC(4b5ce604) SHA1(6b3d58f633b4b36f533e9a3b3ca091b2e5ea5018) )
+	ROM_CONTINUE(             0x0400, 0x0400 )
+
+	ROM_REGION( 254, "maincpu:opla", 0 )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+ROM_END
+
+ROM_START( mhockey )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mm4799_c_nfr", 0x0000, 0x0200, CRC(979e5c5b) SHA1(e6c81572f47d93f4c13472f477aac67e05841976) )
+	ROM_CONTINUE(             0x0400, 0x0400 )
+
+	ROM_REGION( 254, "maincpu:opla", 0 )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
 ROM_END
 
 
@@ -559,7 +600,7 @@ ROM_START( qkspeller )
 	ROM_CONTINUE(             0x0400, 0x0400 )
 
 	ROM_REGION( 254, "maincpu:opla", 0 )
-	ROM_LOAD( "mm5799_qkspeller_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
+	ROM_LOAD( "mm5799_common1_output.pla", 0, 254, CRC(c8d225f1) SHA1(4f1e1977e96e53d1d716b7785c4c3971ed9ff65b) )
 ROM_END
 
 
@@ -574,6 +615,8 @@ ROM_END
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
