@@ -4493,3 +4493,25 @@ if (BUSES["SAMCOUPE_MOUSE_PORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/samcoupe/mouse/mouse.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/thomson/extension.h,BUSES["THOMSON"] = true
+---------------------------------------------------
+
+if (BUSES["THOMSON"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/thomson/extension.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/extension.h",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_015.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_015.h",
+		MAME_DIR .. "src/devices/bus/thomson/cq90_028.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/cq90_028.h",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_351.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_351.h",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_640.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/cd90_640.h",
+		MAME_DIR .. "src/devices/bus/thomson/nanoreseau.cpp",
+		MAME_DIR .. "src/devices/bus/thomson/nanoreseau.h",
+	}
+end
