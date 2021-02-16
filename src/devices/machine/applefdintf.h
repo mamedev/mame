@@ -78,6 +78,12 @@ public:
 	template<typename T> static void add_35(machine_config &config, T &floppy) {
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35).enable_sound(true);
 	}
+	template<typename T> static void add_35_sd(machine_config &config, T &floppy) {
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35sd", formats_35).enable_sound(true);
+	}
+	template<typename T> static void add_35_hd(machine_config &config, T &floppy) {
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35hd", formats_35).enable_sound(true);
+	}
 	template<typename T> static void add_35_nc(machine_config &config, T &floppy) {
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, nullptr, formats_35).enable_sound(true);
 	}
