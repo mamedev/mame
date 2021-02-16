@@ -1796,7 +1796,7 @@ bool a2_woz_format::save(io_generic *io, const std::vector<uint32_t> &variants, 
 		data[88 + i] = tracks[i].empty() ? 0xff : tcount++;
 
 	w32(data, 248, 0x534B5254); // TRKS
-	w32(data, 252, 8*tcount);   // size
+	w32(data, 252, 1280 + total_blocks*512);   // size
 
 	uint8_t tid = 0;
 	uint16_t tb = 3;
