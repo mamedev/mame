@@ -66,17 +66,17 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 		else
 		{
+			// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+			// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+			// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+			// Could also be draw order related, check if it inverts the z value?
 			if (m_spriteregs[0] & 0x01000000)
-		// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
-		// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
-		// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
-		// Could also be draw order related, check if it inverts the z value?
 			{
 				// sort by spriteram entry order
 				// not sure if z priority field has another interpretation here
 				if ((source[2]&0x07ff0000)>>16 != 0x7ff)
 				{
-					sortlist.insert(std::pair <int, uint32_t*> (finish - source, source));				
+					sortlist.emplace(std::pair <int, uint32_t*> (finish - source, source));
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
@@ -90,7 +90,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				// sort by z priority
 				if ((source[2]&0x07ff0000)>>16 != 0)
 				{
-					sortlist.insert(std::pair <int, uint32_t*> ((source[2]&0x07ff0000)>>16, source));
+					sortlist.emplace(std::pair <int, uint32_t*> ((source[2]&0x07ff0000)>>16, source));
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
