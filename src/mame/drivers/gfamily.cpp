@@ -111,7 +111,7 @@ ROM_START( gmfamily )
 	ROM_LOAD("pic12f508.u6", 0x8000, 0x2000, NO_DUMP ) // 1 Kbytes internal ROM
 
 	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
-	DISK_IMAGE( "gamesfamily_1.1", 0, SHA1(627584c5fceaa2649a4fbc9670fbf8aa036f82be) )
+	DISK_IMAGE( "gamesfamily_1.1", 0, SHA1(cd6b8d19f430c510a95a838d7b8c578f89ccf834) )
 ROM_END
 
 } // Anonymous namespace
