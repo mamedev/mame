@@ -22,7 +22,6 @@
     Since the security involves hardware unique serial numbers, each PIC program
     is unique for each single machine (and these hardware parts are not
     replaceble by the user / operator).
-    
 
 *******************************************************************************/
 
