@@ -5035,7 +5035,7 @@ files {
 	MAME_DIR .. "src/mame/includes/pass.h",
 	MAME_DIR .. "src/mame/video/pass.cpp",
 	MAME_DIR .. "src/mame/drivers/photon.cpp",
-	MAME_DIR .. "src/mame/drivers/piggypas.cpp",+
+	MAME_DIR .. "src/mame/drivers/piggypas.cpp",
 	MAME_DIR .. "src/mame/video/pk8000.cpp",
 	MAME_DIR .. "src/mame/drivers/photon2.cpp",
 	MAME_DIR .. "src/mame/drivers/photoply.cpp",
