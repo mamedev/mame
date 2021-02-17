@@ -9,6 +9,21 @@
     Unknown RAM size, AMD K6 processor (unknown speed)
     PCI Ethernet card (unknown chipset)
 
+    The security scheme is quite simple: 
+    Each minigame is a VisualBasic executable that receives three numbers when
+    invoked, the hard disk serial number (readed through the Windows enumerator
+    file), the Ethernet MAC address, and a third one, and concatenates them
+    moving some bits around.
+    Then, calls the security board via RS-232 (it's a simple PCB with a PIC and
+    a serial port), getting another number (the PIC always returns the same
+    number, there are no states or logic).
+    Finally, the game compares both numbers with a simple formula, refusing to
+    work if there's a mismatch.
+    Since the security involves hardware unique serial numbers, each PIC program
+    is unique for each single machine (and these hardware parts are not
+    replaceble by the user / operator).
+    
+
 *******************************************************************************/
 
 #include "emu.h"
