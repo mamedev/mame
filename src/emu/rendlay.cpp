@@ -2034,150 +2034,167 @@ public:
 
 		// calculate the position and size
 		render_bounds const curbounds = bounds(state);
-		float const xcenter = (curbounds.x0 + curbounds.x1) * float(dest.width()) * 0.5F;
-		float const ycenter = (curbounds.y0 + curbounds.y1) * float(dest.height()) * 0.5F;
-		float const xradius = curbounds.width() * float(dest.width()) * 0.5F;
-		float const yradius = curbounds.height() * float(dest.height()) * 0.5F;
-		s32 const miny = s32(curbounds.y0 * float(dest.height()));
-		s32 const maxy = s32(std::ceil(curbounds.y1 * float(dest.height()))) - 1;
+		double const xcenter = (curbounds.x0 + curbounds.x1) * double(dest.width()) * 0.5;
+		double const ycenter = (curbounds.y0 + curbounds.y1) * double(dest.height()) * 0.5;
+		double const xradius = curbounds.width() * double(dest.width()) * 0.5;
+		double const yradius = curbounds.height() * double(dest.height()) * 0.5;
+		s32 const miny = s32(curbounds.y0 * double(dest.height()));
+		s32 const maxy = s32(std::ceil(curbounds.y1 * double(dest.height()))) - 1;
 		LOGMASKED(LOG_DISK_DRAW, "Draw disk: bounds (%s %s %s %s); (((x - %s) ** 2) / (%s ** 2) + ((y - %s) ** 2) / (%s ** 2)) = 1; rows [%s %s]\n",
 				curbounds.x0, curbounds.y0, curbounds.x1, curbounds.y1, xcenter, xradius, ycenter, yradius, miny, maxy);
 
 		if (miny == maxy)
 		{
 			// fits in a single row of pixels - integrate entire area of ellipse
-			float const scale = xradius * yradius * 0.5F;
-			s32 const minx = s32(curbounds.x0 * float(dest.width()));
-			s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
-			float x1 = (float(minx) - xcenter) / xradius;
+			double const scale = xradius * yradius * 0.5;
+			s32 const minx = s32(curbounds.x0 * double(dest.width()));
+			s32 const maxx = s32(std::ceil(curbounds.x1 * double(dest.width()))) - 1;
+			double x1 = (double(minx) - xcenter) / xradius;
 			u32 *dst = &dest.pix(miny, minx);
 			for (s32 x = minx; maxx >= x; ++x, ++dst)
 			{
-				float const x0 = x1;
-				x1 = (float(x + 1) - xcenter) / xradius;
-				float const val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F)) * scale;
+				double const x0 = x1;
+				x1 = (double(x + 1) - xcenter) / xradius;
+				double const val = integral((std::max)(x0, -1.0), (std::min)(x1, 1.0)) * scale;
 				alpha_blend(*dst, c, val);
 			}
 		}
 		else
 		{
-			float const scale = xradius * yradius * 0.25F;
-			float const ooyradius2 = 1.0F / (yradius * yradius);
+			double const scale = xradius * yradius * 0.25;
+			double const ooyradius2 = 1.0 / (yradius * yradius);
 			auto const draw_edge_row =
-					[&dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, float ycoord, bool cross_axis)
+					[&dest, &c, &curbounds, xcenter, xradius, scale, ooyradius2] (s32 row, double ycoord, bool cross_axis)
 					{
-						float const xval = xradius * std::sqrt((std::max)(1.0F - (ycoord * ycoord) * ooyradius2, 0.0F));
-						float const l = xcenter - xval;
-						float const r = xcenter + xval;
+						double const xval = xradius * std::sqrt((std::max)(1.0 - (ycoord * ycoord) * ooyradius2, 0.0));
+						double const l = xcenter - xval;
+						double const r = xcenter + xval;
 						if (!cross_axis)
 						{
 							s32 minx = s32(l);
 							s32 maxx = s32(std::ceil(r)) - 1;
-							float x1 = float(minx) - xcenter;
+							double x1 = double(minx) - xcenter;
 							u32 *dst = &dest.pix(row, minx);
 							for (s32 x = minx; maxx >= x; ++x, ++dst)
 							{
-								float const x0 = x1;
-								x1 = float(x + 1) - xcenter;
-								float val = integral((std::max)(x0, -xval) / xradius, (std::min)(x1, xval) / xradius) * scale;
-								val -= ((std::min)(float(x + 1), r) - (std::max)(float(x), l)) * ycoord;
+								double const x0 = x1;
+								x1 = double(x + 1) - xcenter;
+								double val = integral((std::max)(x0, -xval) / xradius, (std::min)(x1, xval) / xradius) * scale;
+								val -= ((std::min)(double(x + 1), r) - (std::max)(double(x), l)) * ycoord;
 								alpha_blend(*dst, c, val);
 							}
 						}
 						else
 						{
-							s32 const minx = s32(curbounds.x0 * float(dest.width()));
-							s32 const maxx = s32(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
-							float x1 = (float(minx) - xcenter) / xradius;
+							s32 const minx = s32(curbounds.x0 * double(dest.width()));
+							s32 const maxx = s32(std::ceil(curbounds.x1 * double(dest.width()))) - 1;
+							double x1 = (double(minx) - xcenter) / xradius;
 							u32 *dst = &dest.pix(row, minx);
 							for (s32 x = minx; maxx >= x; ++x, ++dst)
 							{
-								float const x0 = x1;
-								x1 = (float(x + 1) - xcenter) / xradius;
-								float val = integral((std::max)(x0, -1.0F), (std::min)(x1, 1.0F));
-								if (float(x + 1) <= l)
-									val += integral((std::max)(x0, -1.0F), x1);
-								else if (float(x) <= l)
-									val += integral((std::max)(x0, -1.0F), -xval / xradius);
-								if (float(x) >= r)
-									val += integral(x0, (std::min)(x1, 1.0F));
-								else if (float(x + 1) >= r)
-									val += integral(xval / xradius, (std::min)(x1, 1.0F));
+								double const x0 = x1;
+								x1 = (double(x + 1) - xcenter) / xradius;
+								double val = integral((std::max)(x0, -1.0), (std::min)(x1, 1.0));
+								if (double(x + 1) <= l)
+									val += integral((std::max)(x0, -1.0), x1);
+								else if (double(x) <= l)
+									val += integral((std::max)(x0, -1.0), -xval / xradius);
+								if (double(x) >= r)
+									val += integral(x0, (std::min)(x1, 1.0));
+								else if (double(x + 1) >= r)
+									val += integral(xval / xradius, (std::min)(x1, 1.0));
 								val *= scale;
-								val -= (std::max)(((std::min)(float(x + 1), r) - (std::max)(float(x), l)), 0.0F) * ycoord;
+								val -= (std::max)(((std::min)(double(x + 1), r) - (std::max)(double(x), l)), 0.0) * ycoord;
 								alpha_blend(*dst, c, val);
 							}
 						}
 					};
 
 			// draw the top row - in a thin ellipse it may extend below the axis
-			draw_edge_row(miny, ycenter - float(miny + 1), float(miny + 1) > ycenter);
+			draw_edge_row(miny, ycenter - double(miny + 1), double(miny + 1) > ycenter);
 
 			// draw rows above the axis
 			s32 y = miny + 1;
-			float ycoord1 = ycenter - float(y);
-			float xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
-			float l1 = xcenter - (xval1 * xradius);
-			float r1 = xcenter + (xval1 * xradius);
-			for ( ; (maxy > y) && (float(y + 1) <= ycenter); ++y)
+			double ycoord1 = ycenter - double(y);
+			double xval1 = std::sqrt((std::max)(1.0 - (ycoord1 * ycoord1) * ooyradius2, 0.0));
+			double l1 = xcenter - (xval1 * xradius);
+			double r1 = xcenter + (xval1 * xradius);
+			for ( ; (maxy > y) && (double(y + 1) <= ycenter); ++y)
 			{
-				float const xval0 = xval1;
-				float const l0 = l1;
-				float const r0 = r1;
-				ycoord1 = ycenter - float(y + 1);
-				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				double const xval0 = xval1;
+				double const l0 = l1;
+				double const r0 = r1;
+				ycoord1 = ycenter - double(y + 1);
+				xval1 = std::sqrt((std::max)(1.0 - (ycoord1 * ycoord1) * ooyradius2, 0.0));
 				l1 = xcenter - (xval1 * xradius);
 				r1 = xcenter + (xval1 * xradius);
-				s32 minx = int(l1);
-				s32 maxx = int(std::ceil(r1)) - 1;
+				s32 const minx = s32(l1);
+				s32 const maxx = s32(std::ceil(r1)) - 1;
+				s32 const minfill = s32(std::ceil(l0));
+				s32 const maxfill = s32(r0) - 1;
 				u32 *dst = &dest.pix(y, minx);
 				for (s32 x = minx; maxx >= x; ++x, ++dst)
 				{
-					if ((float(x) >= l0) && (float(x + 1) <= r0))
+					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-							*dst = f;
+						{
+							dst = std::fill_n(dst, maxfill - x + 1, f);
+							x = maxfill;
+						}
 						else
-							alpha_blend(*dst, a, r, g, b, inva);
+						{
+							while (x++ <= maxfill)
+								alpha_blend(*dst++, a, r, g, b, inva);
+							--x;
+						}
+						--dst;
 					}
 					else
 					{
-						float val = 0.0F;
-						if (float(x + 1) <= l0)
-							val += integral((std::max)((float(x) - xcenter) / xradius, -xval1), (float(x + 1) - xcenter) / xradius);
-						else if (float(x) <= l0)
-							val += integral((std::max)((float(x) - xcenter) / xradius, -xval1), -xval0);
-						else if (float(x) >= r0)
-							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, xval1));
-						else if (float(x + 1) >= r0)
-							val += integral(xval0, (std::min)((float(x + 1) - xcenter) / xradius, xval1));
+						double val = 0.0;
+
+						// integrate where perimeter passes through pixel cell
+						if (double(x + 1) <= l0) // perimeter intercepts right edge of pixel cell (left side)
+							val += integral((std::max)((double(x) - xcenter) / xradius, -xval1), (double(x + 1) - xcenter) / xradius);
+						else if (double(x) <= l0) // perimeter intercepts top edge of pixel cell (left side)
+							val += integral((std::max)((double(x) - xcenter) / xradius, -xval1), -xval0);
+						else if (double(x) >= r0) // perimeter intercepts left edge of pixel cell (right side)
+							val += integral((double(x) - xcenter) / xradius, (std::min)((double(x + 1) - xcenter) / xradius, xval1));
+						else if (double(x + 1) >= r0) // perimeter intercepts top edge of pixel cell (right side)
+							val += integral(xval0, (std::min)((double(x + 1) - xcenter) / xradius, xval1));
 						val *= scale;
-						if (float(x) <= l0)
-							val -= ((std::min)(float(x + 1), l0) - (std::max)(float(x), l1)) * ycoord1;
-						else if (float(x + 1) >= r0)
-							val -= ((std::min)(float(x + 1), r1) - (std::max)(float(x), r0)) * ycoord1;
-						val += (std::max)((std::min)(float(x + 1), r0) - (std::max)(float(x), l0), 0.0F);
-						alpha_blend(*dst, c, val);
+
+						// subtract area between vertical centre and bottom of pixel cell
+						if (double(x) <= l0)
+							val -= ((std::min)(double(x + 1), l0) - (std::max)(double(x), l1)) * ycoord1;
+						else if (double(x + 1) >= r0)
+							val -= ((std::min)(double(x + 1), r1) - (std::max)(double(x), r0)) * ycoord1;
+
+						// add in the fully covered part of the pixel
+						val += (std::max)((std::min)(double(x + 1), r0) - (std::max)(double(x), l0), 0.0);
+
+						alpha_blend(*dst, c, (std::min)(val, 1.0));
 					}
 				}
 			}
 
 			// row spanning the axis
-			if ((maxy > y) && (float(y) < ycenter))
+			if ((maxy > y) && (double(y) < ycenter))
 			{
-				float const xval0 = xval1;
-				float const l0 = l1;
-				float const r0 = r1;
-				ycoord1 = float(y + 1) - ycenter;
-				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				double const xval0 = xval1;
+				double const l0 = l1;
+				double const r0 = r1;
+				ycoord1 = double(y + 1) - ycenter;
+				xval1 = std::sqrt((std::max)(1.0 - (ycoord1 * ycoord1) * ooyradius2, 0.0));
 				l1 = xcenter - (xval1 * xradius);
 				r1 = xcenter + (xval1 * xradius);
-				s32 const minx = int(curbounds.x0 * float(dest.width()));
-				s32 const maxx = int(std::ceil(curbounds.x1 * float(dest.width()))) - 1;
+				s32 const minx = s32(curbounds.x0 * double(dest.width()));
+				s32 const maxx = s32(std::ceil(curbounds.x1 * double(dest.width()))) - 1;
 				u32 *dst = &dest.pix(y, minx);
 				for (s32 x = minx; maxx >= x; ++x, ++dst)
 				{
-					if ((float(x) >= (std::max)(l0, l1)) && (float(x + 1) <= (std::min)(r0, r1)))
+					if ((double(x) >= (std::max)(l0, l1)) && (double(x + 1) <= (std::min)(r0, r1)))
 					{
 						if (255 <= a)
 							*dst = f;
@@ -2186,26 +2203,26 @@ public:
 					}
 					else
 					{
-						float val = 0.0F;
-						if (float(x + 1) <= l0)
-							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
-						else if (float(x) <= l0)
-							val += integral(xval0, (std::min)((xcenter - float(x)) / xradius, 1.0F));
-						else if (float(x) >= r0)
-							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
-						else if (float(x + 1) >= r0)
-							val += integral(xval0, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
-						if (float(x + 1) <= l1)
-							val += integral((xcenter - float(x + 1)) / xradius, (std::min)((xcenter - float(x)) / xradius, 1.0F));
-						else if (float(x) <= l1)
-							val += integral(xval1, (std::min)((xcenter - float(x)) / xradius, 1.0F));
-						else if (float(x) >= r1)
-							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
-						else if (float(x + 1) >= r1)
-							val += integral(xval1, (std::min)((float(x + 1) - xcenter) / xradius, 1.0F));
+						double val = 0.0;
+						if (double(x + 1) <= l0)
+							val += integral((xcenter - double(x + 1)) / xradius, (std::min)((xcenter - double(x)) / xradius, 1.0));
+						else if (double(x) <= l0)
+							val += integral(xval0, (std::min)((xcenter - double(x)) / xradius, 1.0));
+						else if (double(x) >= r0)
+							val += integral((double(x) - xcenter) / xradius, (std::min)((double(x + 1) - xcenter) / xradius, 1.0));
+						else if (double(x + 1) >= r0)
+							val += integral(xval0, (std::min)((double(x + 1) - xcenter) / xradius, 1.0));
+						if (double(x + 1) <= l1)
+							val += integral((xcenter - double(x + 1)) / xradius, (std::min)((xcenter - double(x)) / xradius, 1.0));
+						else if (double(x) <= l1)
+							val += integral(xval1, (std::min)((xcenter - double(x)) / xradius, 1.0));
+						else if (double(x) >= r1)
+							val += integral((double(x) - xcenter) / xradius, (std::min)((double(x + 1) - xcenter) / xradius, 1.0));
+						else if (double(x + 1) >= r1)
+							val += integral(xval1, (std::min)((double(x + 1) - xcenter) / xradius, 1.0));
 						val *= scale;
-						val += (std::max)(((std::min)(float(x + 1), r0) - (std::max)(float(x), l0)), 0.0F) * (ycenter - float(y));
-						val += (std::max)(((std::min)(float(x + 1), r1) - (std::max)(float(x), l1)), 0.0F) * (float(y + 1) - ycenter);
+						val += (std::max)(((std::min)(double(x + 1), r0) - (std::max)(double(x), l0)), 0.0) * (ycenter - double(y));
+						val += (std::max)(((std::min)(double(x + 1), r1) - (std::max)(double(x), l1)), 0.0) * (double(y + 1) - ycenter);
 						alpha_blend(*dst, c, val);
 					}
 				}
@@ -2215,62 +2232,79 @@ public:
 			// draw rows below the axis
 			for ( ; maxy > y; ++y)
 			{
-				float const ycoord0 = ycoord1;
-				float const xval0 = xval1;
-				float const l0 = l1;
-				float const r0 = r1;
-				ycoord1 = float(y + 1) - ycenter;
-				xval1 = std::sqrt((std::max)(1.0F - (ycoord1 * ycoord1) * ooyradius2, 0.0F));
+				double const ycoord0 = ycoord1;
+				double const xval0 = xval1;
+				double const l0 = l1;
+				double const r0 = r1;
+				ycoord1 = double(y + 1) - ycenter;
+				xval1 = std::sqrt((std::max)(1.0 - (ycoord1 * ycoord1) * ooyradius2, 0.0));
 				l1 = xcenter - (xval1 * xradius);
 				r1 = xcenter + (xval1 * xradius);
-				s32 minx = int(l0);
-				s32 maxx = int(std::ceil(r0)) - 1;
+				s32 const minx = s32(l0);
+				s32 const maxx = s32(std::ceil(r0)) - 1;
+				s32 const minfill = s32(std::ceil(l1));
+				s32 const maxfill = s32(r1) - 1;
 				u32 *dst = &dest.pix(y, minx);
 				for (s32 x = minx; maxx >= x; ++x, ++dst)
 				{
-					if ((float(x) >= l1) && (float(x + 1) <= r1))
+					if ((x >= minfill) && (x <= maxfill))
 					{
 						if (255 <= a)
-							*dst = f;
+						{
+							dst = std::fill_n(dst, maxfill - x + 1, f);
+							x = maxfill;
+						}
 						else
-							alpha_blend(*dst, a, r, g, b, inva);
+						{
+							while (x++ <= maxfill)
+								alpha_blend(*dst++, a, r, g, b, inva);
+							--x;
+						}
+						--dst;
 					}
 					else
 					{
-						float val = 0.0F;
-						if (float(x + 1) <= l1)
-							val += integral((std::max)((float(x) - xcenter) / xradius, -xval0), (float(x + 1) - xcenter) / xradius);
-						else if (float(x) <= l1)
-							val += integral((std::max)((float(x) - xcenter) / xradius, -xval0), -xval1);
-						else if (float(x) >= r1)
-							val += integral((float(x) - xcenter) / xradius, (std::min)((float(x + 1) - xcenter) / xradius, xval0));
-						else if (float(x + 1) >= r1)
-							val += integral(xval1, (std::min)((float(x + 1) - xcenter) / xradius, xval0));
+						double val = 0.0;
+
+						// integrate where perimeter passes through pixel cell
+						if (double(x + 1) <= l1) // perimeter intercepts right edge of pixel cell (left side)
+							val += integral((std::max)((double(x) - xcenter) / xradius, -xval0), (double(x + 1) - xcenter) / xradius);
+						else if (double(x) <= l1) // perimeter intercepts bottom edge of pixel cell (left side)
+							val += integral((std::max)((double(x) - xcenter) / xradius, -xval0), -xval1);
+						else if (double(x) >= r1) // perimeter intercepts left edge of pixel cell (right side)
+							val += integral((double(x) - xcenter) / xradius, (std::min)((double(x + 1) - xcenter) / xradius, xval0));
+						else if (double(x + 1) >= r1) // perimeter intercepts bottom edge of pixel cell (right side)
+							val += integral(xval1, (std::min)((double(x + 1) - xcenter) / xradius, xval0));
 						val *= scale;
-						if (float(x) <= l1)
-							val -= ((std::min)(float(x + 1), l1) - (std::max)(float(x), l0)) * ycoord0;
-						else if (float(x + 1) >= r1)
-							val -= ((std::min)(float(x + 1), r0) - (std::max)(float(x), r1)) * ycoord0;
-						val += (std::max)((std::min)(float(x + 1), r1) - (std::max)(float(x), l1), 0.0F);
-						alpha_blend(*dst, c, val);
+
+						// subtract area between vertical centre and top of pixel cell
+						if (double(x) <= l1)
+							val -= ((std::min)(double(x + 1), l1) - (std::max)(double(x), l0)) * ycoord0;
+						else if (double(x + 1) >= r1)
+							val -= ((std::min)(double(x + 1), r0) - (std::max)(double(x), r1)) * ycoord0;
+
+						// add in the fully covered part of the pixel
+						val += (std::max)((std::min)(double(x + 1), r1) - (std::max)(double(x), l1), 0.0);
+
+						alpha_blend(*dst, c, (std::min)(val, 1.0));
 					}
 				}
 			}
 
 			// last row is an inversion of the first
-			draw_edge_row(maxy, float(maxy) - ycenter, float(maxy) < ycenter);
+			draw_edge_row(maxy, double(maxy) - ycenter, double(maxy) < ycenter);
 		}
 	}
 
 private:
-	static float integral(float x0, float x1)
+	static double integral(double x0, double x1)
 	{
 		return integral(x1) - integral(x0);
 	}
 
-	static float integral(float x)
+	static double integral(double x)
 	{
-		float const u(2.0F * std::asin(x));
+		double const u(2.0 * std::asin(x));
 		return u + std::sin(u);
 	};
 };
