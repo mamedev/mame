@@ -48,6 +48,8 @@ private:
 
 void silverball_state::mem_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0xfffc0000, 0xffffffff).rom().region("mb_bios", 0);
 }
 
 void silverball_state::io_map(address_map &map)
@@ -67,7 +69,7 @@ void silverball_state::silverball(machine_config &config)
 
 // Silverball machines used different motherboards. By now, we're adding the all the known BIOSes here
 #define SILVERBALL_BIOS \
-	ROM_REGION(0x40000, "mb_bios", 0) \
+	ROM_REGION32_LE(0x40000, "mb_bios", 0) \
 	/* Acorp 694XT/694XT1 (all of them from the Silverball software update files) */ \
 	ROM_SYSTEM_BIOS(0, "bios47", "BIOS47 (Acorp 694XT/694XT1)") \
 	ROMX_LOAD("bios47.bin", 0x00000, 0x40000, CRC(248910ed) SHA1(2901c94fb003e5eaea7e91127ad1f7953826a248), ROM_BIOS(0)) /* 09/03/2001-694X-686A-6A6LJX3AC-00 */ \
@@ -158,9 +160,9 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1997?, slvrball806,    0,           silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",        MACHINE_IS_SKELETON)
-GAME(1997?, slvrball720,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",        MACHINE_IS_SKELETON)
-GAME(1997?, slvrball632,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",        MACHINE_IS_SKELETON)
+GAME(1997?, slvrball806,    0,           silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball720,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball632,    slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_IS_SKELETON)
 
 GAME(199?,  slvrballbu409,  slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_IS_SKELETON)
 GAME(199?,  slvrballbu409b, slvrball806, silverball, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_IS_SKELETON) // Probably the same as set 1
