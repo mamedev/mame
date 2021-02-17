@@ -239,6 +239,7 @@ SOUNDS["CDDA"] = true
 SOUNDS["ICS2115"] = true
 SOUNDS["I5000_SND"] = true
 SOUNDS["ST0016"] = true
+SOUNDS["ST0032"] = true
 SOUNDS["NILE"] = true
 SOUNDS["X1_010"] = true
 SOUNDS["VRENDER0"] = true
