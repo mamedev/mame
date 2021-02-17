@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_CPU_COPS1_MM57D_H
-#define MAME_CPU_COPS1_MM57D_H
+#ifndef MAME_CPU_COPS1_COPS1D_H
+#define MAME_CPU_COPS1_COPS1D_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 
 };
 
-#endif // MAME_CPU_COPS1_MM57D_H
+#endif // MAME_CPU_COPS1_COPS1D_H

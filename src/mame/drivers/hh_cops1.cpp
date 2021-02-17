@@ -334,7 +334,7 @@ void qkracerm_state::update_display()
 
 void qkracerm_state::ds8874_output_w(u16 data)
 {
-	// DS8874N outputs: digit select, input mux
+	// DS8874 outputs: digit select, input mux
 	m_grid = ~data;
 	m_inp_mux = m_grid >> 3;
 	update_display();

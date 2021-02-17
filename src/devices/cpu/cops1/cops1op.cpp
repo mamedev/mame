@@ -163,7 +163,7 @@ void cops1_base_device::op_dspa()
 
 void cops1_base_device::op_dsps()
 {
-	// DSPA: transfer A+C to segment output latches, via PLA
+	// DSPS: transfer A+C to segment output latches, via PLA
 	u8 segs = ~m_opla->read((m_a + 1) & 0xf) & 0x7f;
 	m_write_s((m_c << 7 ^ 0x80) | segs);
 }
