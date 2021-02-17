@@ -1920,7 +1920,43 @@ void dkong_state::drktnjr(machine_config &config)
  *
  *************************************/
 
-ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a 5 pcb stack with trs-03 (no voice) sound board on top, and a 4 board as well as a 2 board pcb stack */
+// A newer revision based on ROM labels, legitimate looking code changes, although in MAME it has some misplaced sprites flicking in the top left part of the screen near the score as the enemies appear
+// Does this glitch happen on the PCB?
+ROM_START( radarscp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trs2c5fd",     0x0000, 0x1000, CRC(80bbcbb3) SHA1(3af0ac3a267cdc819ccf5a279a78cdb16ee0360b) )
+	ROM_LOAD( "trs2c5gd",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) ) // == trs2c5gc
+	ROM_LOAD( "trs2c5hd",     0x2000, 0x1000, CRC(e3ad4239) SHA1(f28469bc3388b4fdc14e2a095d8e117af6643b46) )
+	ROM_LOAD( "trs2c5kd",     0x3000, 0x1000, CRC(260a3ec4) SHA1(d5e7941a56457cd222cb018ab17a8eee2a9134b9) )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
+	/* socket 3J is empty */
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "trs2v3gc",     0x0000, 0x0800, CRC(f095330e) SHA1(dd3de744f28ff108630d3336bd246d3323fa34af) )
+	ROM_LOAD( "trs2v3hc",     0x0800, 0x0800, CRC(15a316f0) SHA1(8785a996c6433882a0a7150693c329a4247bb77e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "trs2v3dc",     0x0000, 0x0800, CRC(e0bb0db9) SHA1(b570439ea1b5d34d0ac938ac9157f22f319b786d) )
+	ROM_LOAD( "trs2v3cc",     0x0800, 0x0800, CRC(6c4e7dad) SHA1(54e6a5005c44261dc4ba845dcd5ff62ea1402d26) )
+	ROM_LOAD( "trs2v3bc",     0x1000, 0x0800, CRC(6fdd63f1) SHA1(2eb09ab0759e4c8df9188fb833440d8fc94f6172) )
+	ROM_LOAD( "trs2v3ac",     0x1800, 0x0800, CRC(bbf62755) SHA1(cb4ca8d4fe689ca0011a4b6c0a2dbd4c764ac70a) )
+
+	ROM_REGION( 0x0800, "gfx3", 0 ) /* radar/star timing table */
+	ROM_LOAD( "trs2v3ec",     0x0000, 0x0800, CRC(0eca8d6b) SHA1(8358b5131d082b2fb8dd793d2e5382daeef6f75c) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "rs2-x.xxx",    0x0000, 0x0100, CRC(54609d61) SHA1(586620ecc61f3e55258fe6360bcacad5f570f29c) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "rs2-c.xxx",    0x0100, 0x0100, CRC(79a7d831) SHA1(475ec991929d43b2bcd4b5aee144249f487d0b5b) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
+ROM_END
+
+// unclear which boardset this comes from, probably a TRS-02 based on ROM labels; there existed a 5 pcb stack with TRS-03 (no voice) sound board on top, and a 4 board as well as a 2 board pcb stack
+ROM_START( radarscpc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs2c5fc",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -1953,7 +1989,8 @@ ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a
 	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( radarscp1 ) /* TRS01 5-pcb stack with TRS01 "Voice" pcb on top containing the sound cpu and the m58817 speech chip and the m58819 speech serial rom emulator chip */
+// TRS01 5-pcb stack with TRS01 "Voice" pcb on top containing the sound cpu and the m58817 speech chip and the m58819 speech serial rom emulator chip
+ROM_START( radarscp1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -3680,7 +3717,8 @@ void dkong_state::init_dkingjr()
  *
  *************************************/
 
-GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS02, rev. D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscpc, radarscp, radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS02?, rev. C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS01)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, dkong,     0,        dkong2b,   dkong,    dkong_state, empty_init,    ROT270, "Nintendo of America", "Donkey Kong (US set 1)",    MACHINE_SUPPORTS_SAVE )
