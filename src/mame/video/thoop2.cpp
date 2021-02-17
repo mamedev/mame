@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "includes/thoop2.h"
-
+#include "screen.h"
 
 /***************************************************************************
 
@@ -75,13 +75,6 @@ void thoop2_state::video_start()
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
-
-	for (int i = 0; i < 5; i++){
-		m_sprite_table[i] = std::make_unique<int[]>(512);
-		save_pointer(NAME(m_sprite_table[i]), 512, i);
-	}
-
-	save_item(NAME(m_sprite_count));
 }
 
 /***************************************************************************
@@ -89,30 +82,6 @@ void thoop2_state::video_start()
     Sprites
 
 ***************************************************************************/
-
-void thoop2_state::sort_sprites()
-{
-	m_sprite_count[0] = 0;
-	m_sprite_count[1] = 0;
-	m_sprite_count[2] = 0;
-	m_sprite_count[3] = 0;
-	m_sprite_count[4] = 0;
-
-	for (int i = 3; i < (0x1000 - 6)/2; i += 4){
-		int color = (m_spriteram[i+2] & 0x7e00) >> 9;
-		int priority = (m_spriteram[i] & 0x3000) >> 12;
-
-		/* palettes 0x38-0x3f are used for high priority sprites in Big Karnak */
-		if (color >= 0x38){
-			m_sprite_table[4][m_sprite_count[4]] = i;
-			m_sprite_count[4]++;
-		}
-
-		/* save sprite number in the proper array for later */
-		m_sprite_table[priority][m_sprite_count[priority]] = i;
-		m_sprite_count[priority]++;
-	}
-}
 
 /*
     Sprite Format
@@ -133,44 +102,64 @@ void thoop2_state::sort_sprites()
       3  | xxxxxxxx xxxxxx-- | sprite code (low bits)
 */
 
-void thoop2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void thoop2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int j, x, y, ex, ey;
+	int i, x, y, ex, ey;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	static const int x_offset[2] = {0x0,0x2};
 	static const int y_offset[2] = {0x0,0x1};
 
-	for (j = 0; j < m_sprite_count[pri]; j++){
-		int i = m_sprite_table[pri][j];
+	for (i = 0x800 - 4 - 1; i >= 3; i -= 4)
+	{
 		int sx = m_spriteram[i+2] & 0x01ff;
 		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
 		int number = m_spriteram[i+3];
 		int color = (m_spriteram[i+2] & 0x7e00) >> 9;
 		int attr = (m_spriteram[i] & 0xfe00) >> 9;
+		int priority = (m_spriteram[i] & 0x3000) >> 12;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
-		int spr_size;
+		int spr_size, pri_mask;
+
+		/* palettes 0x38-0x3f are used for high priority sprites */
+		if (color >= 0x38)
+			priority = 4;
+
+		switch (priority)
+		{
+			case 0: pri_mask = 0xff00; break;
+			case 1: pri_mask = 0xff00 | 0xf0f0; break;
+			case 2: pri_mask = 0xff00 | 0xf0f0 | 0xcccc; break;
+			case 3: pri_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa; break;
+			default:
+			case 4: pri_mask = 0; break;
+		}
 
 		number |= ((number & 0x03) << 16);
 
-		if (attr & 0x04){
+		if (attr & 0x04)
+		{
 			spr_size = 1;
 		}
-		else{
+		else
+		{
 			spr_size = 2;
 			number &= (~3);
 		}
 
-		for (y = 0; y < spr_size; y++){
-			for (x = 0; x < spr_size; x++){
+		for (y = 0; y < spr_size; y++)
+		{
+			for (x = 0; x < spr_size; x++)
+			{
 				ex = xflip ? (spr_size-1-x) : x;
 				ey = yflip ? (spr_size-1-y) : y;
 
-				gfx->transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
+				gfx->prio_transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
-						sx-0x0f+x*8,sy+y*8,0);
+						sx-0x0f+x*8,sy+y*8,
+						screen.priority(),pri_mask,0);
 			}
 		}
 	}
@@ -190,34 +179,33 @@ uint32_t thoop2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_pant[1]->set_scrolly(0, m_vregs[2]);
 	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
-	sort_sprites();
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
-	bitmap.fill(0, cliprect );
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3,0);
-	draw_sprites(bitmap,cliprect,3);
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
 
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2,0);
-	draw_sprites(bitmap,cliprect,2);
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
 
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1,0);
-	draw_sprites(bitmap,cliprect,1);
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
 
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0,0);
-	draw_sprites(bitmap,cliprect,0);
-	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0,0);
-	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
 
-	draw_sprites(bitmap,cliprect,4);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
+
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
+
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
+
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
