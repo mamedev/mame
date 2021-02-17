@@ -201,6 +201,8 @@ void jaguar_state::sound_start()
 {
 	m_serial_timer = timer_alloc(TID_SERIAL);
 
+	m_gpu_irq_state = 0;
+
 #if ENABLE_SPEEDUP_HACKS
 	if (m_hacks_enabled)
 		m_dsp->space(AS_PROGRAM).install_write_handler(0xf1a100, 0xf1a103, write32_delegate(*this, FUNC(jaguar_state::dsp_flags_w)));
