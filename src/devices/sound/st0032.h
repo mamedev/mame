@@ -35,7 +35,7 @@ private:
 	static constexpr unsigned ST0032_VOICES = 16;
 
 	sound_stream *m_stream;
-	required_region_ptr<uint8_t> m_sound_ram;
+	required_region_ptr<uint8_t> m_rom;
 	uint16_t m_sound_regs[0x100];
 	int m_vpos[ST0032_VOICES];
 	int m_frac[ST0032_VOICES];

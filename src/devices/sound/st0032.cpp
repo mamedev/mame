@@ -68,7 +68,7 @@ st0032_sound_device::st0032_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, ST0032_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
-		m_sound_ram(*this, DEVICE_SELF),
+		m_rom(*this, DEVICE_SELF),
 		m_ctrl(0)
 {
 }
@@ -96,7 +96,6 @@ void st0032_sound_device::device_start()
 
 void st0032_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	uint8_t *sound_ram = &m_sound_ram[0];
 	int v, i, snum;
 	uint16_t *slot;
 	int32_t mix[4800*2];
@@ -126,7 +125,7 @@ void st0032_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 			for (snum = 0; snum < outputs[0].samples(); snum++)
 			{
-				sample = sound_ram[sptr + m_vpos[v]]<<8;
+				sample = m_rom[sptr + m_vpos[v]]<<8;
 
 				*mixp++ += (sample * (int32_t)slot[ST0032_REG_VOL_R]) >> 16;
 				*mixp++ += (sample * (int32_t)slot[ST0032_REG_VOL_L]) >> 16;
