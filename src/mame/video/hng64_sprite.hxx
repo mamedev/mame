@@ -46,7 +46,8 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	uint32_t *source = m_spriteram;
 	uint32_t *finish = m_spriteram + 0xc000/4;
 
-	std::multimap<int, uint32_t*> sortlist;
+	std::vector< std::pair <int, uint32_t *> > sortlist;
+	sortlist.reserve(0xc000/0x20);
 	
 	// global offsets in sprite regs
 	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
@@ -57,6 +58,8 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		osd_printf_debug("%.8x ", m_videoregs[iii]);
 	osd_printf_debug("\n");
 #endif
+
+	auto it = sortlist.begin();
 
 	while(source < finish)
 	{
@@ -76,7 +79,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				// not sure if z priority field has another interpretation here
 				if ((source[2]&0x07ff0000)>>16 != 0x7ff)
 				{
-					sortlist.emplace(std::pair <int, uint32_t*> (finish - source, source));
+					sortlist.emplace(it, finish - source, source);
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
@@ -90,7 +93,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				// sort by z priority
 				if ((source[2]&0x07ff0000)>>16 != 0)
 				{
-					sortlist.emplace(std::pair <int, uint32_t*> ((source[2]&0x07ff0000)>>16, source));
+					sortlist.emplace(it, (source[2]&0x07ff0000)>>16, source);
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
@@ -102,6 +105,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 	}
 
+	std::sort(sortlist.begin(), sortlist.end());
 
 	for(auto itr = sortlist.rbegin(); itr != sortlist.rend(); itr++)
 	{
