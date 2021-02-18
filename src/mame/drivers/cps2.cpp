@@ -7,8 +7,8 @@ Driver by Paul Leaman (paul@vortexcomputing.demon.co.uk)
 Thanks to Andreas Naive and Nicola Salmoria for understanding the
 encryption mechanism.
 
-Thanks to Raz, Crashtest and the CPS2 decryption team for their
-initial work on extracting decrypted code.
+Thanks to Razoola, Ange 'Crashtest' Albertini and the CPS2 decryption team
+for their initial work on extracting decrypted code.
 
 
   Capcom System 2
