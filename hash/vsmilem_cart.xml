@@ -12,7 +12,7 @@ V.Baby                        80-22****  (Smartridges are orange, incompatible w
 Language:
 ********0 = US                (White labels on back)
 ********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
-********2 = Netherlands       (Red or White labels on back)
+********2 = Japan       (Red or White labels on back)
 ********3 = UK                (Red labels on back)
 ********4 = Germany           (Blue labels on back)
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
@@ -29,7 +29,7 @@ Language:
 |   XX   | 80-084000(US)     | Action Mania (Rev, 4?)                                                                    |
 |   XX   | 80-084000(US)     | Action Mania (Rev, 6?)                                                                    |
 |        |          (IT)     | ?????                                                                                     |
-|   XX   | 80-084002(NL)     | Sports Games                                                                              |
+|   XX   | 80-084002(JP)     | Sports Games                                                                              |
 |        | 80-084003(UK)     | Action Mania                                                                              |
 |   XX   | 80-084004(GE)     | Sportskanone                                                                              |
 |   XX   | 80-084005(FR)     | Sporti'Folies                                                                             |
@@ -39,7 +39,7 @@ Language:
 +========+===================+===========================================================================================+
 |   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
-|   XX   | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                                           |
+|   XX   | 80-084022(JP)     | Dora: Dora no shuri adobencha                                                             |
 |        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                                           |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                                  |
@@ -85,7 +85,7 @@ Language:
 |        | 80-084167(SP)     | Little Einsteins de Disney: El Baile del Zapatito de Cristal                              |
 +========+===================+===========================================================================================+
 |   XX   | 80-084180(US)     | Mickey Mouse Clubhouse                                                                    |
-|        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
+|        | 80-084182(JP)     | Mikkimausukurabuhausu                                                                     |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
 |   XX   | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
 |        | 80-084185(FR)     | La Maison de Mickey (ever released?)                                                      |
@@ -97,7 +97,7 @@ Language:
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
 +========+===================+===========================================================================================+
 |        | 80-084220(US)     | Snow Park Challenge                                                                       |
-|        | 80-084222(NL)     | Wintersport Games                                                                         |
+|        | 80-084222(JP)     | U~intasupotsugemu                                                                         |
 |        | 80-084223(UK)     | Snow Park Challenge                                                                       |
 |   XX   | 80-084224(GE)     | Wintersport                                                                               |
 |        | 80-084225(FR)     | ?????? picture too fuzzy for positive confirm                                             |
@@ -106,14 +106,14 @@ Language:
 |   XX   | 80-084245(FR)     | Ni Hao Kai Lan - Joyeux Nouvel an chinois!                                                |
 +========+===================+===========================================================================================+
 |        | 80-084260(US)     | My Pet Puppy (unreleased in USA? UK version plays OK on NTSC console)                     |
-|   XX   | 80-084262(NL)     | Mijn Puppy!                                                                               |
+|   XX   | 80-084262(JP)     | Watashi no koinu!                                                                         |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
 |   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
 |   XX   | 80-084265(FR)     | Mon Toutou tout fou!                                                                      |
 |        | 80-084267(SP)     | Dakota y su Mascota                                                                       |
 +========+===================+===========================================================================================+
 |        | 80-084280(US)     | Wild Waves                                                                                |
-|        | 80-084282(NL)     | Water-sport Games                                                                         |
+|        | 80-084282(JP)     | U~otasupotsugemu                                                                          |
 |        | 80-084283(UJ)     | Wild Waves                                                                                |
 |        | 80-084284(GE)     | Dolphis Wasser-abenteuer                                                                  |
 |   XX   | 80-084285(FR)     | Martin le Dauphin                                                                         |
@@ -128,7 +128,7 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084320(US)     | Disney Fairies: TinkerBell                                                                |
 |        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)                                               |
-|        | 80-084322(NL)     | TinkerBell                                                                                |
+|        | 80-084322(JP)     | Dizunifearizu: Tinkaberu                                                                  |
 |        | 80-084323(UK)     | TinkerBell                                                                                |
 |   XX   | 80-084324(GE)     | TinkerBell                                                                                |
 |   XX   | 80-084325(FR)     | La fée Clochette                                                                          |
@@ -136,14 +136,14 @@ Language:
 |        | 80-084327(SP)     | Campanilla                                                                                |
 +========+===================+===========================================================================================+
 |        | 80-084340(US)     | Up!                                                                                       |
-|        | 80-084342(NL)     | Up!                                                                                       |
+|        | 80-084342(JP)     | Appu!                                                                                     |
 |        | 80-084344(GE)     | Oben                                                                                      |
 |   XX   | 80-084345(FR)     | Là-Haut                                                                                   |
 |   XX   | 80-084347(SP)     | Up!                                                                                       |
 |        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084360(US)     | Handy Manny                                                                               |
-|        | 80-084362(NL)     | Handy Manny                                                                               |
+|        | 80-084362(JP)     | O tasuke mani                                                                             |
 |        | 80-084363(UK)     | Handy Manny                                                                               |
 |   XX   | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
 |   XX   | 80-084365(FR)     | Manny et ses outils                                                                       |
@@ -158,25 +158,25 @@ Language:
 |        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                                  |
 |   XX   | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
 +========+===================+===========================================================================================+
-|        | 80-084400(US)     | Cars - Rev It Up in Radiator Springs                                                       |
-|        | 80-084402(NL)     | Cars - Spektakel in Radiator Springs                                                       |
-|        | 80-084403(UK)     | Cars - Rev it up in Radiator Springs                                                       |
-|   XX   | 80-084404(GE)     | Cars - Vollgas in Radiator Springs                                                         |
-|   XX   | 80-084405(FR)     | Cars - Quatre Roues                                                                        |
-|        | 80-084406(PT)     | Cars - Aventura Em Radiator Springs (84416 on cart)                                        |
-|   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                                |
+|        | 80-084400(US)     | Cars - Rev It Up in Radiator Springs                                                      |
+|        | 80-084402(JP)     | Cars - rajietasupuringu no supekutakuru                                                   |
+|        | 80-084403(UK)     | Cars - Rev it up in Radiator Springs                                                      |
+|   XX   | 80-084404(GE)     | Cars - Vollgas in Radiator Springs                                                        |
+|   XX   | 80-084405(FR)     | Cars - Quatre Roues                                                                       |
+|        | 80-084406(PT)     | Cars - Aventura Em Radiator Springs (84416 on cart)                                       |
+|   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084420(US)     | Toy Story 3                                                                               |
 |        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
 |        |          (IT)     | Toy Story 3 (EAN 8033836704196, GP470419?)                                                |
-|        | 80-084422(NL)     | Toy Story 3                                                                               |
+|        | 80-084422(JP)     | Toisutori 3                                                                               |
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
 |   XX   | 80-084424(GE)     | Toy Story 3                                                                               |
 |   XX   | 80-084425(FR)     | Toy Story 3                                                                               |
 |   XX   | 80-084427(SP)     | Toy Story 3                                                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
-|        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
+|        | 80-084442(JP)     | Monsuta VS eirian                                                                         |
 |        | 80-084443(UK)     | Monsters vs. Aliens                                                                       |
 |   XX   | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
 |   XX   | 80-084445(FR)     | Monstres contre Aliens                                                                    |
@@ -189,14 +189,14 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                               |
-|        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
+|        | 80-084482(JP)     | Purinsesutomahonokisu (label in english)                                                  |
 |   XX   | 80-084483(UK)     | The Princess and the Frog                                                                 |
 |   XX   | 80-084484(GE)     | Kuess den Frosch                                                                          |
 |   XX   | 80-084485(FR)     | La Princesse Et La Grenouille - Le grand rêve de Tiana                                    |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
 +========+===================+===========================================================================================+
 |   XX   | 80-084500(US)     | Shrek Forever After                                                                       |
-|        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                               |
+|        | 80-084502(JP)     | Eien ni shurekku                                                                          |
 |        | 80-084503(UK)     | Shrek Forever After                                                                       |
 |   XX   | 80-084504(GE)     | Fuer immer Shrek                                                                          |
 |   XX   | 80-084505(FR)     | Shrek 4 - Il était une fin                                                                |
