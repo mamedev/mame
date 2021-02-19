@@ -970,6 +970,7 @@ playmark.cpp
 play_1.cpp
 play_2.cpp
 play_3.cpp
+playcenter.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp

@@ -34623,6 +34623,9 @@ theraida                        // (c) 1984 Playmatic / EFOSA
 trailer                         //
 ufo_x                           //
 
+@source:playcenter.cpp
+plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+
 @source:playch10.cpp
 pc_1942                         // (c) 1985 Capcom
 pc_bball                        // (c) 1984 Nintendo of America
