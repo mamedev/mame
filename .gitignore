@@ -48,3 +48,4 @@ regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
 /samples
+/3rdparty

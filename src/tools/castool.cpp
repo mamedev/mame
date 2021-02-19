@@ -114,7 +114,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"to7", to7_cassette_formats               ,"Thomson TO-series"},
 	{"trs80l2", trs80l2_cassette_formats       ,"TRS-80 Level 2"},
 	{"tvc64", tvc64_cassette_formats           ,"Videoton TVC 64"},
-	{"tsx", tzx_cassette_formats               ,"MSX"},
+	{"tsx", tsx_cassette_formats               ,"MSX"},
 	{"tzx", tzx_cassette_formats               ,"Sinclair ZX Spectrum"},
 	{"vg5k", vg5k_cassette_formats             ,"Philips VG 5000"},
 	{"vtech1", vtech1_cassette_formats         ,"Video Technology Laser 110-310"},

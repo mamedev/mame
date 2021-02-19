@@ -57,7 +57,6 @@ static const uint8_t TZX_HEADER[8] = { 'Z','X','T','a','p','e','!',0x1a };
 static int16_t    wave_data = 0; // FIXME: global variables prevent multiple instances
 static int  block_count = 0;
 static uint8_t**  blocks = nullptr;
-static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
 
 static void toggle_wave_data(void)
 {
@@ -206,9 +205,9 @@ static inline int millisec_to_samplecount( int millisec )
 	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-static inline int tcycles_to_samplecount( int tcycles )
+static inline int tcycles_to_samplecount( int tcycles, float t_scale )
 {
-	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double) t_scale);
+	return (int)((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double)t_scale);
 }
 
 static void tzx_output_wave( int16_t **buffer, int length )
@@ -234,11 +233,12 @@ static int pause_one_millisec( int16_t **buffer )
 
 static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int sync1, int sync2, int bit0, int bit1, int bits_in_last_byte )
 {
-	int pilot_samples = tcycles_to_samplecount(pilot);
-	int sync1_samples = tcycles_to_samplecount(sync1);
-	int sync2_samples = tcycles_to_samplecount(sync2);
-	int bit0_samples = tcycles_to_samplecount(bit0);
-	int bit1_samples = tcycles_to_samplecount(bit1);
+	float t_scale=1;
+	int pilot_samples = tcycles_to_samplecount(pilot,t_scale);
+	int sync1_samples = tcycles_to_samplecount(sync1,t_scale);
+	int sync2_samples = tcycles_to_samplecount(sync2,t_scale);
+	int bit0_samples = tcycles_to_samplecount(bit0, t_scale);
+	int bit1_samples = tcycles_to_samplecount(bit1,t_scale);
 	int data_index;
 	int size = 0;
 
@@ -299,9 +299,10 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 
 static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int bitcfg, int bytecfg, int bit0, int bit1)
 {
-	int pilot_samples = tcycles_to_samplecount(pilot);
-	int bit0_samples = tcycles_to_samplecount(bit0);
-	int bit1_samples = tcycles_to_samplecount(bit1);
+	float t_scale = 1.44f;
+	int pilot_samples = tcycles_to_samplecount(pilot,t_scale);
+	int bit0_samples = tcycles_to_samplecount(bit0,t_scale);
+	int bit1_samples = tcycles_to_samplecount(bit1,t_scale);
 	int data_index;
 	int size = 0;
 	int bit1_pulses = (bitcfg & 0b00001111);
@@ -388,7 +389,8 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 static int tzx_handle_direct(int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int tstates, int bits_in_last_byte)
 {
 	int size = 0;
-	int samples = tcycles_to_samplecount(tstates);
+	float t_scale = 1.0f;
+	int samples = tcycles_to_samplecount(tstates, t_scale);
 
 	/* data */
 	for (int data_index = 0; data_index < data_size; data_index++)
@@ -460,7 +462,8 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 		// shorter lists can be terminated with a pulse_length of 0
 		if (pulse_length != 0)
 		{
-			int samples = tcycles_to_samplecount(pulse_length);
+			float t_scale = 1.0f;
+			int samples = tcycles_to_samplecount(pulse_length,t_scale);
 			tzx_output_wave(buffer, samples);
 			size += samples;
 			toggle_wave_data();
@@ -889,7 +892,6 @@ static int tzx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
-	t_scale = 1.0;
 	size = tzx_cas_do_work(&p);
 	return size;
 }
@@ -898,7 +900,6 @@ static int cdt_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
-	t_scale = (40 / 35);  /* scale to 4MHz */
 	size = tzx_cas_do_work(&p);
 	return size;
 }
@@ -907,7 +908,6 @@ static int tsx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 {
 	int16_t *p = buffer;
 	int size = 0;
-	t_scale = (50 / 35);
 	size = tzx_cas_do_work(&p);
 	return size;
 }
