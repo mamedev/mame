@@ -515,7 +515,7 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
-	// TODO : is this correct?
+	// TODO : is this correct? // Note layers_ctrl is hardcoded to -1 above: Coverity 315110
 	if (layers_ctrl & 1)
 		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
 	else if (layers_ctrl & 2)
@@ -635,7 +635,7 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bit
 		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
-	// TODO : is this correct?
+	// TODO : is this correct? // Note layers_ctrl is hardcoded to -1 above: Coverity 315935
 	if (layers_ctrl & 1)
 		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
 	else if (layers_ctrl & 2)

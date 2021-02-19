@@ -127,7 +127,7 @@ bool fdc_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *flop
 	if(etime > limit)
 		return true;
 
-	if(bit && write_position < ARRAY_LENGTH(write_buffer))
+	if(bit && write_position < std::size(write_buffer))
 		write_buffer[write_position++] = ctime + period/2;
 
 	tm = etime;

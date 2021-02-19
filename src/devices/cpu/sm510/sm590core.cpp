@@ -73,7 +73,7 @@ void sm590_device::device_reset()
 	m_clk_div = 4; // 4 clock oscillations per cycle on SM59x, see datasheet page 30/pdf page 39
 
 	m_rports[0] = m_rports[1] = m_rports[2] = m_rports[3] = 0;
-	//m_write_r(0, 0, 0xff); // TODO: are the four ports zeroed on reset?
+	//m_write_r(0); // TODO: are the four ports zeroed on reset?
 }
 
 //-------------------------------------------------

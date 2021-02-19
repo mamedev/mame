@@ -519,7 +519,7 @@ void vegas_state::machine_reset()
 	m_dcs->reset_w(1);
 
 	// Clear CPU IO registers
-	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
+	std::fill(std::begin(m_cpuio_data), std::end(m_cpuio_data), 0);
 	// Clear SIO registers
 	reset_sio();
 	m_duart_irq_state = 0;
@@ -2592,7 +2592,7 @@ void vegas_state::init_nbanfl()
 	// The first three bytes of the blitz00_nov30_1999.u27 ROM are FF's which breaks the reset vector.
 	// These bytes are from blitz00_sep22_1999.u27 which allows the other ROM to start.
 	// The last byte which is part of the checksum is also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
-	uint8_t *romPtr = machine().root_device().memregion(PCI_ID_NILE":rom")->base();
+	uint8_t *romPtr = memregion(PCI_ID_NILE":rom")->base();
 	romPtr[0x0] = 0xe2;
 	romPtr[0x1] = 0x00;
 	romPtr[0x2] = 0xf0;

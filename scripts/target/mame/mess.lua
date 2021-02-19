@@ -166,6 +166,7 @@ CPUS["M88000"] = true
 CPUS["XAVIX2"] = true
 CPUS["UPD78K"] = true
 CPUS["ROMP"] = true
+CPUS["COPS1"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -1665,13 +1666,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/super6.cpp",
 	MAME_DIR .. "src/mame/includes/super6.h",
 	MAME_DIR .. "src/mame/drivers/superslave.cpp",
-	MAME_DIR .. "src/mame/includes/superslave.h",
 }
 
 createMESSProjects(_target, _subtarget, "agat")
 files {
 	MAME_DIR .. "src/mame/drivers/agat.cpp",
-	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/machine/agatkeyb.cpp",
 	MAME_DIR .. "src/mame/machine/agatkeyb.h",
 	MAME_DIR .. "src/mame/video/agat7.cpp",
@@ -1855,7 +1854,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "atari")
 files {
-	MAME_DIR .. "src/mame/drivers/a2600.h",
+	MAME_DIR .. "src/mame/includes/a2600.h",
 	MAME_DIR .. "src/mame/drivers/a2600.cpp",
 	MAME_DIR .. "src/mame/drivers/a7800.cpp",
 	MAME_DIR .. "src/mame/video/maria.cpp",
@@ -2199,7 +2198,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/nanos.cpp",
 	MAME_DIR .. "src/mame/drivers/pcm.cpp",
 	MAME_DIR .. "src/mame/drivers/vcs80.cpp",
-	MAME_DIR .. "src/mame/includes/vcs80.h",
 	MAME_DIR .. "src/mame/machine/k7659kb.cpp",
 	MAME_DIR .. "src/mame/machine/k7659kb.h",
 }
@@ -2507,7 +2505,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "h01x")
 files {
-	MAME_DIR .. "src/mame/include/h01x.h",
+	MAME_DIR .. "src/mame/includes/h01x.h",
 	MAME_DIR .. "src/mame/drivers/h01x.cpp",
 	MAME_DIR .. "src/mame/video/h01x.cpp",
 }
@@ -2836,11 +2834,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/abc80x.cpp",
 	MAME_DIR .. "src/mame/includes/abc80x.h",
 	MAME_DIR .. "src/mame/video/abc800.cpp",
-	MAME_DIR .. "src/mame/video/abc800.h",
 	MAME_DIR .. "src/mame/video/abc802.cpp",
-	MAME_DIR .. "src/mame/video/abc802.h",
 	MAME_DIR .. "src/mame/video/abc806.cpp",
-	MAME_DIR .. "src/mame/video/abc806.h",
 	MAME_DIR .. "src/mame/drivers/abc1600.cpp",
 	MAME_DIR .. "src/mame/includes/abc1600.h",
 	MAME_DIR .. "src/mame/machine/abc1600mac.cpp",
@@ -3018,6 +3013,7 @@ files {
 createMESSProjects(_target, _subtarget, "natsemi")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_cops1.cpp",
 	MAME_DIR .. "src/mame/drivers/ns5652.cpp",
 }
 
@@ -3179,7 +3175,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_snova.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_supremo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "novation")
@@ -3213,7 +3208,6 @@ files {
 createMESSProjects(_target, _subtarget, "omnibyte")
 files {
 	MAME_DIR .. "src/mame/drivers/msbc1.cpp",
-	MAME_DIR .. "src/mame/includes/msbc1.h",
 	MAME_DIR .. "src/mame/drivers/ob68k1a.cpp",
 	MAME_DIR .. "src/mame/includes/ob68k1a.h",
 }
@@ -3664,7 +3658,6 @@ files {
 	MAME_DIR .. "src/mame/machine/pce220_ser.h",
 	MAME_DIR .. "src/mame/drivers/mz6500.cpp",
 	MAME_DIR .. "src/mame/drivers/zaurus.cpp",
-	MAME_DIR .. "src/mame/machine/pxa255.h",
 	MAME_DIR .. "src/mame/drivers/fontwriter.cpp",
 }
 
@@ -3755,7 +3748,6 @@ files {
 createMESSProjects(_target, _subtarget, "sord")
 files {
 	MAME_DIR .. "src/mame/drivers/m5.cpp",
-	MAME_DIR .. "src/mame/includes/m5.h",
 }
 
 createMESSProjects(_target, _subtarget, "special")
@@ -4317,7 +4309,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/bullet.cpp",
 	MAME_DIR .. "src/mame/includes/bullet.h",
 	MAME_DIR .. "src/mame/drivers/jupiter.cpp",
-	MAME_DIR .. "src/mame/includes/jupiter.h",
 }
 
 createMESSProjects(_target, _subtarget, "wyse")

@@ -242,7 +242,9 @@ protected:
 	virtual void video_start() override;
 
 private:
+	std::unique_ptr<uint16_t[]> m_render_layer_alloc;
 	uint16_t *m_render_layer[MAX_LAYERS];
+	std::unique_ptr<uint8_t[]> m_gfx_plane_alloc;
 	uint8_t *m_gfx_plane02;
 	uint8_t *m_gfx_plane13;
 	std::unique_ptr<uint8_t[]> m_collision_list;
@@ -1432,6 +1434,7 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, uint16_t *source)
 void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
 	return;
+#ifdef UNUSED
 	int dst_pitch;
 
 	uint32_t *pal_ptr, *edi;
@@ -1467,6 +1470,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 		edi += dst_pitch;
 	}
 	while (--edx);
+#endif
 }
 
 
@@ -2169,14 +2173,15 @@ void halleys_state::init_common()
 
 
 	// allocate memory for unpacked graphics
-	buf = auto_alloc_array(machine(), uint8_t, 0x100000);
-	m_gfx_plane02 = buf;
-	m_gfx_plane13 = buf + 0x80000;
+	m_gfx_plane_alloc = std::make_unique<uint8_t[]>(0x100000);
+	m_gfx_plane02 = &m_gfx_plane_alloc[0];
+	m_gfx_plane13 = &m_gfx_plane_alloc[0x80000];
 
 
 	// allocate memory for render layers
-	buf = auto_alloc_array(machine(), uint8_t, SCREEN_BYTESIZE * MAX_LAYERS);
-	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) m_render_layer[i] = (uint16_t*)buf;
+	m_render_layer_alloc = std::make_unique<uint16_t[]>(SCREEN_BYTESIZE * MAX_LAYERS / 2);
+	for (i=0; i<MAX_LAYERS; i++)
+		m_render_layer[i] = &m_render_layer_alloc[SCREEN_BYTESIZE * i / 2];
 
 
 	// allocate memory for pre-processed ROMs

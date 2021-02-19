@@ -453,7 +453,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, im
 		default:   type = "Unknown";
 		}
 
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
+		snprintf(ent.attr, std::size(ent.attr), "%s", type);
 
 		iter->index++;
 	}

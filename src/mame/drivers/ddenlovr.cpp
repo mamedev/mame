@@ -2867,11 +2867,6 @@ uint8_t ddenlovr_state::hanakanz_rand_r()
 void hanakanz_state::hanakanz_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2889,11 +2884,6 @@ void hanakanz_state::hanakanz_portmap(address_map &map)
 void hanakanz_state::hkagerou_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2912,11 +2902,6 @@ void hanakanz_state::hkagerou_portmap(address_map &map)
 void hanakanz_state::kotbinyo_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2937,11 +2922,6 @@ void hanakanz_state::kotbinyo_portmap(address_map &map)
 void hanakanz_state::kotbinsp_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2971,11 +2951,6 @@ uint8_t hanakanz_state::mjreach1_protection_r()
 void hanakanz_state::mjreach1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -3966,11 +3941,6 @@ uint8_t hanakanz_state::jongtei_busy_r()
 void hanakanz_state::jongtei_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x43, 0x43).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
@@ -4023,11 +3993,6 @@ uint8_t hanakanz_state::mjgnight_protection_r()
 void hanakanz_state::mjgnight_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x46, 0x46).w(FUNC(hanakanz_state::mjgnight_coincounter_w));
@@ -4600,11 +4565,6 @@ uint8_t hanakanz_state::daimyojn_year_hack_r(offs_t offset)
 void hanakanz_state::daimyojn_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::daimyojn_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::daimyojn_palette_sel_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
 	map(0x42, 0x44).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -9701,7 +9661,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
 
-	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+	std::fill(std::begin(m_palram), std::end(m_palram), 0);
 
 	m_blitter_irq_handler(1);
 }
@@ -10092,9 +10052,15 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, 20'000'000); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10137,9 +10103,15 @@ void hanakanz_state::hkagerou(machine_config &config)
 void hanakanz_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000))); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10540,9 +10512,15 @@ void ddenlovr_state::hparadis(machine_config &config)
 void hanakanz_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::jongtei_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10754,9 +10732,15 @@ void ddenlovr_state::seljan2(machine_config &config)
 void hanakanz_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::daimyojn_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)

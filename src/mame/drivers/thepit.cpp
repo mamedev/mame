@@ -928,8 +928,8 @@ ROM_START( thehole ) // uses many components (i.e. the Z80s) marked by SGS, an I
 	ROM_LOAD( "8.3l",     0x0000, 0x0800, CRC(2ff010ca) SHA1(67dfa8ac3f52c7a502ba24d2cbeae932e57b854e) )
 	ROM_LOAD( "7.1l",     0x1000, 0x0800, CRC(d901b353) SHA1(4a35dd857ca352e0260361376fe666af4b3315af) )
 
-	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
-	// no PROMs on PCB according to the dumper, where does the colour come from? They are different from the original
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.5a",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 ROM_END
 
 ROM_START( roundup )
@@ -1252,8 +1252,8 @@ ROM_START( theportr ) // uses many components (i.e. the Z80s) marked by SGS, an 
 	ROM_LOAD( "pm8.3l", 0x0000, 0x1000, CRC(51097dde) SHA1(afaba4ec8612949f0b3dc551f32195e16b74c3dc) )
 	ROM_LOAD( "pm9.1l", 0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
 
-	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
-	// no PROMs on PCB according to the dumper, where does the colour come from? They are different from the original
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.5a",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 ROM_END
 
 ROM_START( suprmous )
@@ -1423,14 +1423,14 @@ GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, empty_init, 
 GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
 GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thehole,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no PROM on PCB. Where do the colours come from?
+GAME( 1982, thehole,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
 GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, theportr,   dockman,  theportr, dockman,  thepit_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no PROM on PCB. Where do the colours come from?
+GAME( 1982, theportr,   dockman,  theportr, dockman,  thepit_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PROM has been dumped, but colours seem wrong
 
 GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB

@@ -313,7 +313,7 @@ The Amstrad Plus has a 4096 colour palette
 
 void amstrad_state::amstrad_plus_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3); // FIXME: isn't this overwritten by the loop?
+	palette.set_pen_colors(0, amstrad_palette, std::size(amstrad_palette) / 3); // FIXME: isn't this overwritten by the loop?
 	for (int i = 0; i < 0x1000; i++)
 	{
 		int const g = ( i >> 8 ) & 0x0f;

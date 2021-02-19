@@ -11,7 +11,6 @@ hardware JPEG decompression chips.
 
 TODO:
 - verify OKI rom banking  (bank num inverted or not)
-- DIPS
 - fix transparency problems in some stages
 
 
@@ -79,6 +78,8 @@ Notes:
 #include "jpeglib.h"
 
 
+namespace {
+
 #define FIFO_SIZE 1024
 #define IO_SIZE     0x100
 #define COMMAND_SIZE 8
@@ -97,6 +98,11 @@ public:
 		m_colorram(*this, "colorram") { }
 
 	void sliver(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override;
 
 private:
 	uint16_t m_io_offset;
@@ -132,16 +138,11 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
-
-	void postload();
 
 	void oki_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -417,10 +418,13 @@ void sliver_state::video_start()
 	save_item(NAME(m_jpeg_x));
 	save_item(NAME(m_jpeg_y));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(sliver_state::postload), this));
+	m_jpeg1 = 0;
+	m_jpeg2 = 0;
+	m_jpeg_x = 0;
+	m_jpeg_y = 0;
 }
 
-void sliver_state::postload()
+void sliver_state::device_post_load()
 {
 	render_jpeg();
 }
@@ -597,6 +601,8 @@ ROM_START( slivera )
 	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) ) // sldh
 	// no rom 12 on PCB, played through the game and doesn't seem to be required for this gfx set, all girls present.
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

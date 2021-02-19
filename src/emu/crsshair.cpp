@@ -172,7 +172,7 @@ void render_crosshair::set_default_bitmap()
 
 void render_crosshair::create_bitmap()
 {
-	rgb_t color = m_player < ARRAY_LENGTH(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
+	rgb_t color = m_player < std::size(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
 
 	// if we have a bitmap and texture for this player, kill it
 	if (!m_bitmap)

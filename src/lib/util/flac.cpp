@@ -10,7 +10,7 @@
 
 #include "flac.h"
 
-#include "osdcomm.h"
+#include "corefile.h"
 
 #include <cassert>
 #include <new>
@@ -129,7 +129,7 @@ bool flac_encoder::encode_interleaved(const int16_t *samples, uint32_t samples_p
 		// process in batches of 2k samples
 		FLAC__int32 converted_buffer[2048];
 		FLAC__int32 *dest = converted_buffer;
-		uint32_t cur_samples = (std::min<size_t>)(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
+		uint32_t cur_samples = (std::min<size_t>)(std::size(converted_buffer) / num_channels, samples_per_channel);
 
 		// convert a buffers' worth
 		for (uint32_t sampnum = 0; sampnum < cur_samples; sampnum++)
@@ -162,7 +162,7 @@ bool flac_encoder::encode(int16_t *const *samples, uint32_t samples_per_channel,
 		// process in batches of 2k samples
 		FLAC__int32 converted_buffer[2048];
 		FLAC__int32 *dest = converted_buffer;
-		uint32_t cur_samples = (std::min<size_t>)(ARRAY_LENGTH(converted_buffer) / num_channels, samples_per_channel);
+		uint32_t cur_samples = (std::min<size_t>)(std::size(converted_buffer) / num_channels, samples_per_channel);
 
 		// convert a buffers' worth
 		for (uint32_t sampnum = 0; sampnum < cur_samples; sampnum++, srcindex++)
@@ -464,7 +464,7 @@ bool flac_decoder::decode(int16_t **samples, uint32_t num_samples, bool swap_end
 {
 	// make sure we don't have too many channels
 	int chans = channels();
-	if (chans > ARRAY_LENGTH(m_uncompressed_start))
+	if (chans > std::size(m_uncompressed_start))
 		return false;
 
 	// configure the uncompressed buffer

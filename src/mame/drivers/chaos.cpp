@@ -35,6 +35,8 @@
 #include "machine/terminal.h"
 
 
+namespace {
+
 class chaos_state : public driver_device
 {
 public:
@@ -47,6 +49,10 @@ public:
 
 	void chaos(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	u8 port1e_r();
 	void port1f_w(u8 data);
@@ -57,8 +63,6 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 m_term_data;
-	void machine_reset() override;
-	void machine_start() override;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<u8> m_p_ram;
 	required_device<cpu_device> m_maincpu;
@@ -144,6 +148,8 @@ void chaos_state::kbd_put(u8 data)
 void chaos_state::machine_start()
 {
 	save_item(NAME(m_term_data));
+
+	m_term_data = 0;
 }
 
 void chaos_state::machine_reset()
@@ -175,6 +181,9 @@ ROM_START( chaos )
 	ROM_LOAD( "chaos.003", 0x2000, 0x1000, CRC(5880db81) SHA1(29b8f1b03c83953f66464ad1fbbfe2e019637ce1))
 	ROM_LOAD( "chaos.004", 0x3000, 0x1000, CRC(5d6839d6) SHA1(237f52f0780ac2e29d57bf06d0f7a982eb523084))
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

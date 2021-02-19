@@ -28,6 +28,10 @@ public:
 
 	void thoop2(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	void oki_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
@@ -46,14 +50,8 @@ private:
 	void oki_map(address_map &map);
 	void thoop2_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sort_sprites();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-
-	int m_sprite_count[5];
-	std::unique_ptr<int[]> m_sprite_table[5];
 	tilemap_t *m_pant[2];
 
 	required_device<cpu_device> m_maincpu;

@@ -145,14 +145,14 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 				"%s: discarding byte %02X because FIFO is full (length %u, Tx %sactive)\n",
 				machine().describe_context(),
 				data,
-				ARRAY_LENGTH(m_tx_fifo),
+				std::size(m_tx_fifo),
 				m_tx_active ? "" : "in");
 		return false;
 	}
 
 	// queue the byte
 	m_tx_fifo[m_tx_fifo_tail] = data;
-	m_tx_fifo_tail = (m_tx_fifo_tail + 1) % ARRAY_LENGTH(m_tx_fifo);
+	m_tx_fifo_tail = (m_tx_fifo_tail + 1) % std::size(m_tx_fifo);
 	m_tx_fifo_empty = false;
 
 	// assert RTS and start transmitting if necessary
@@ -173,7 +173,7 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 	}
 	else
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("%s: queued byte %02X (%u bytes queued, Tx %sactive)\n", machine().describe_context(), data, fifo_used, m_tx_active ? "" : "in");
 	}
 
@@ -188,7 +188,7 @@ void vsmile_ctrl_device_base::select_w(int state)
 		if (state && !m_tx_fifo_empty && !m_tx_active)
 		{
 			m_rts_timer->reset();
-			unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+			unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 			LOG("%s: select asserted, starting transmission (%u bytes queued)\n", machine().describe_context(), fifo_used);
 			m_tx_active = true;
 			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
@@ -219,7 +219,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 
 	// deliver the byte to the host (bits have shifted out now)
 	uint8_t const data(m_tx_fifo[m_tx_fifo_head]);
-	m_tx_fifo_head = (m_tx_fifo_head + 1) % ARRAY_LENGTH(m_tx_fifo);
+	m_tx_fifo_head = (m_tx_fifo_head + 1) % std::size(m_tx_fifo);
 	if (m_tx_fifo_head == m_tx_fifo_tail)
 		m_tx_fifo_empty = true;
 	data_out(data);
@@ -232,7 +232,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 	}
 	else
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("transmitted byte %02X (%u bytes queued, select %sasserted)\n", data, fifo_used, m_select ? "" : "de");
 	}
 
@@ -265,7 +265,7 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 	// clear out anything queued and let the implementation deal with it
 	if (!m_tx_fifo_empty)
 	{
-		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		unsigned const fifo_used((m_tx_fifo_tail + std::size(m_tx_fifo) - m_tx_fifo_head) % std::size(m_tx_fifo));
 		LOG("timeout waiting for select after asserting RTS (%u bytes queued)\n", fifo_used);
 		m_tx_fifo_head = m_tx_fifo_tail = 0U;
 		m_tx_fifo_empty = true;

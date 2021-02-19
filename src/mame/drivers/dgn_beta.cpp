@@ -320,7 +320,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
-	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
+	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), std::size(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	PIA6821(config, m_pia_0, 0);

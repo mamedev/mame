@@ -203,7 +203,7 @@ void sm510_base_device::op_lax()
 void sm510_base_device::op_ptw()
 {
 	// PTW: output W latch
-	m_write_s(0, m_w, 0xff);
+	m_write_s(m_w);
 }
 
 void sm510_base_device::op_wr()
@@ -226,7 +226,7 @@ void sm510_base_device::op_ws()
 void sm510_base_device::op_kta()
 {
 	// KTA: input K to ACC
-	m_acc = m_read_k(0, 0xff) & 0xf;
+	m_acc = m_read_k() & 0xf;
 }
 
 void sm510_base_device::op_atbp()

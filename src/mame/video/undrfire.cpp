@@ -14,6 +14,8 @@ void undrfire_state::video_start()
 
 	for (int i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
+
+	m_frame_counter = 0;
 }
 
 /***************************************************************

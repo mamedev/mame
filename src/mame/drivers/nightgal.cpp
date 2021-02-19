@@ -780,7 +780,7 @@ void nightgal_state::machine_reset()
 	m_z80_latch = 0;
 	m_mux_data = 0;
 
-	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
+	std::fill(std::begin(m_blit_raw_data), std::end(m_blit_raw_data), 0);
 }
 
 void nightgal_state::royalqn(machine_config &config)

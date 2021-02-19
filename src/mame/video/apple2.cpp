@@ -1451,13 +1451,13 @@ static const rgb_t apple2_palette[] =
 
 void a2_video_device::init_palette()
 {
-	for (int i = 0; i < ARRAY_LENGTH(apple2_palette); i++)
+	for (int i = 0; i < std::size(apple2_palette); i++)
 		set_pen_color(i, apple2_palette[i]);
 }
 
 uint32_t a2_video_device::palette_entries() const
 {
-	return ARRAY_LENGTH(apple2_palette);
+	return std::size(apple2_palette);
 }
 
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

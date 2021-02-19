@@ -9336,7 +9336,7 @@ ROM_START( galkamika )
 	ROM_LOAD( "kl.bin",  0x0800, 0x0800, BAD_DUMP CRC(5cd7df03) SHA1(77873408c89546a17b1da3f64b7e96e314fadb17) ) // Missing on the PCB, taken from Galaktron (causes some bad graphics)
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "m866l.bin", 0x000, 0x020, BAD_DUMP CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Not dumped, but original Midway PCB with original soldered PROM
+	ROM_LOAD( "m866l_im5610.6l",  0x0000, 0x0020, CRC(b549ad5a) SHA1(5990ca42a57f04d0f246e179c295f6199cd866a1) )
 ROM_END
 
 // Late-to-market bootleg with PCB mods to use a single program rom
@@ -12252,8 +12252,8 @@ ROM_START( olibug ) // bootleg on an original Midway Galaxian PCB
 	ROM_LOAD( "b8.bin",  0x2800, 0x0800, CRC(9a9d35b3) SHA1(c363fae7108e0bb0d3e1bb4b1c9af62a3e3f654f) )
 	ROM_CONTINUE(        0x2000, 0x0800 )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // uses the original Midway Galaxian PROM
-	ROM_LOAD( "6l.bpr",  0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "m866l_im5610.6l",  0x0000, 0x0020, CRC(b549ad5a) SHA1(5990ca42a57f04d0f246e179c295f6199cd866a1) )
 ROM_END
 
 ROM_START( levers )

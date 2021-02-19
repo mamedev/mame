@@ -200,6 +200,7 @@ void systel1_state::systel1(machine_config &config)
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
 
 	i8276_device &crtc(I8276(config, "crtc", 10.8864_MHz_XTAL / 7)); // WD8276PL-00
+	crtc.set_screen("screen");
 	crtc.set_character_width(7);
 	crtc.set_display_callback(FUNC(systel1_state::draw_character));
 	crtc.drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));

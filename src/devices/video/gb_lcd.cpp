@@ -429,15 +429,12 @@ void dmg_ppu_device::common_start()
 	save_item(NAME(m_next_state));
 	save_item(NAME(m_old_curline));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_layer); i++)
-	{
-		save_item(NAME(m_layer[i].enabled), i);
-		save_item(NAME(m_layer[i].xindex), i);
-		save_item(NAME(m_layer[i].xshift), i);
-		save_item(NAME(m_layer[i].xstart), i);
-		save_item(NAME(m_layer[i].xend), i);
-		save_item(NAME(m_layer[i].bgline), i);
-	}
+	save_item(STRUCT_MEMBER(m_layer, enabled));
+	save_item(STRUCT_MEMBER(m_layer, xindex));
+	save_item(STRUCT_MEMBER(m_layer, xshift));
+	save_item(STRUCT_MEMBER(m_layer, xstart));
+	save_item(STRUCT_MEMBER(m_layer, xend));
+	save_item(STRUCT_MEMBER(m_layer, bgline));
 
 	save_item(NAME(m_line.tile_cycle));
 	save_item(NAME(m_line.tile_count));
@@ -465,16 +462,13 @@ void dmg_ppu_device::common_start()
 	save_item(NAME(m_line.window_enable));
 	save_item(NAME(m_line.window_enable_index));
 	save_item(NAME(m_line.window_should_trigger));
-	for (int i = 0; i < ARRAY_LENGTH(m_line.sprite); i++)
-	{
-		save_item(NAME(m_line.sprite[i].enabled), i);
-		save_item(NAME(m_line.sprite[i].x), i);
-		save_item(NAME(m_line.sprite[i].y), i);
-		save_item(NAME(m_line.sprite[i].pattern), i);
-		save_item(NAME(m_line.sprite[i].flags), i);
-		save_item(NAME(m_line.sprite[i].tile_plane_0), i);
-		save_item(NAME(m_line.sprite[i].tile_plane_1), i);
-	}
+	save_item(STRUCT_MEMBER(m_line.sprite, enabled));
+	save_item(STRUCT_MEMBER(m_line.sprite, x));
+	save_item(STRUCT_MEMBER(m_line.sprite, y));
+	save_item(STRUCT_MEMBER(m_line.sprite, pattern));
+	save_item(STRUCT_MEMBER(m_line.sprite, flags));
+	save_item(STRUCT_MEMBER(m_line.sprite, tile_plane_0));
+	save_item(STRUCT_MEMBER(m_line.sprite, tile_plane_1));
 	save_item(NAME(m_frame_window_active));
 }
 
@@ -1034,14 +1028,14 @@ void dmg_ppu_device::check_start_of_window()
 	}
 
 	// 4 makes most tests pass
-	m_line.window_start_y[(m_line.window_start_y_index + 4) % ARRAY_LENGTH(m_line.window_start_y)] = WNDPOSY;
+	m_line.window_start_y[(m_line.window_start_y_index + 4) % std::size(m_line.window_start_y)] = WNDPOSY;
 	// 2-4 makes most tests pass
-	m_line.window_start_x[(m_line.window_start_y_index + 4) % ARRAY_LENGTH(m_line.window_start_x)] = WNDPOSX;
-	m_line.window_start_y_index = (m_line.window_start_y_index + 1) % ARRAY_LENGTH(m_line.window_start_y);
+	m_line.window_start_x[(m_line.window_start_y_index + 4) % std::size(m_line.window_start_x)] = WNDPOSX;
+	m_line.window_start_y_index = (m_line.window_start_y_index + 1) % std::size(m_line.window_start_y);
 
 	// 3 makes most tests pass
-	m_line.window_enable[(m_line.window_enable_index + 3) % ARRAY_LENGTH(m_line.window_enable)] = LCDCONT;
-	m_line.window_enable_index = (m_line.window_enable_index + 1) % ARRAY_LENGTH(m_line.window_enable);
+	m_line.window_enable[(m_line.window_enable_index + 3) % std::size(m_line.window_enable)] = LCDCONT;
+	m_line.window_enable_index = (m_line.window_enable_index + 1) % std::size(m_line.window_enable);
 
 	if (!m_line.starting && m_line.tile_cycle < 8)
 	{
@@ -1545,7 +1539,7 @@ void sgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 				while (i > 0)
 				{
 					/* Figure out which palette we're using */
-					assert(((m_end_x - i) >> 3) >= 0 && ((m_end_x - i) >> 3) < ARRAY_LENGTH(m_sgb_pal_map));
+					assert(((m_end_x - i) >> 3) >= 0 && ((m_end_x - i) >> 3) < std::size(m_sgb_pal_map));
 					sgb_palette = m_sgb_pal_map[(m_end_x - i) >> 3][m_current_line >> 3] << 2;
 
 					while ((m_layer[l].xshift < 8) && i)
@@ -2209,13 +2203,13 @@ void dmg_ppu_device::update_state()
 				break;
 
 			case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
-				for (int i = 0; i < ARRAY_LENGTH(m_line.window_start_y); i++)
+				for (int i = 0; i < std::size(m_line.window_start_y); i++)
 				{
 					m_line.window_start_y[i] = WNDPOSY;
 					m_line.window_start_x[i] = WNDPOSX;
 				}
 				m_line.window_start_y_index = 0;
-				for (int i = 0; i < ARRAY_LENGTH(m_line.window_enable); i++)
+				for (int i = 0; i < std::size(m_line.window_enable); i++)
 				{
 					m_line.window_enable[i] = LCDCONT;
 				}
@@ -2640,13 +2634,13 @@ void cgb_ppu_device::update_state()
 				break;
 
 			case GB_LCD_STATE_LYXX_M3:      /* Switch to mode 3 */
-				for (int i = 0; i < ARRAY_LENGTH(m_line.window_start_y); i++)
+				for (int i = 0; i < std::size(m_line.window_start_y); i++)
 				{
 					m_line.window_start_y[i] = WNDPOSY;
 					m_line.window_start_x[i] = WNDPOSX;
 				}
 				m_line.window_start_y_index = 0;
-				for (int i = 0; i < ARRAY_LENGTH(m_line.window_enable); i++)
+				for (int i = 0; i < std::size(m_line.window_enable); i++)
 				{
 					m_line.window_enable[i] = LCDCONT;
 				}

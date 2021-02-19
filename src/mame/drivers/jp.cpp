@@ -29,6 +29,8 @@ ToDo:
 #include "jp.lh"
 
 
+namespace {
+
 class jp_state : public genpin_class
 {
 public:
@@ -47,6 +49,10 @@ public:
 	void jp(machine_config &config);
 	void jps(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t porta_r();
 	uint8_t portb_r();
@@ -60,9 +66,6 @@ private:
 	void adpcm_reset_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void jp_map(address_map &map);
 	void jp_sound_map(address_map &map);
@@ -319,6 +322,12 @@ void jp_state::machine_start()
 
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
+
+	m_disp_data = 0;
+	m_adpcm_ff = false;
+
+	save_item(NAME(m_disp_data));
+	save_item(NAME(m_adpcm_ff));
 }
 
 void jp_state::machine_reset()
@@ -617,6 +626,9 @@ ROM_START(petaco2)
 	ROM_LOAD("jpsonid6.dat", 0x28000, 0x8000, CRC(53c3f0b4) SHA1(dcf4c63636e2b7ff5cd2db99d949db9e33b78fc7))
 	ROM_LOAD("jpsonid7.dat", 0x30000, 0x8000, CRC(ff430b1b) SHA1(423592a40eba174108dfc6817e549c643bb3c80f))
 ROM_END
+
+} // Anonymous namespace
+
 
 // different hardware
 GAME(1984,  petaco,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco",                               MACHINE_IS_SKELETON_MECHANICAL)

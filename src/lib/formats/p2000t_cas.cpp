@@ -3,6 +3,8 @@
 
 #include "p2000t_cas.h"
 
+#include "coretmpl.h" // BIT
+
 #include <cassert>
 #include <ostream>
 
@@ -294,7 +296,7 @@ static cassette_image::error p2000t_cas_load(cassette_image *cassette)
 
 		// Insert sync header.. 0xAA, 0x00, 0x00, 0xAA
 		CHR(p2000t_silence(cassette, &time_idx, P2000_BOB_GAP));
-		CHR(p2000t_put_bytes(cassette, &time_idx, &unused, BLOCK_MARK, ARRAY_LENGTH(BLOCK_MARK)));
+		CHR(p2000t_put_bytes(cassette, &time_idx, &unused, BLOCK_MARK, std::size(BLOCK_MARK)));
 		CHR(p2000t_silence(cassette, &time_idx, P2000_MARK_GAP));
 
 		// Insert data block

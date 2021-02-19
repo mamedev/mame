@@ -113,7 +113,7 @@ uint32_t const toolbar_bitmap_bmp[][1024] = {
 	}
 };
 
-#define UI_TOOLBAR_BUTTONS    (ARRAY_LENGTH(toolbar_bitmap_bmp))
+#define UI_TOOLBAR_BUTTONS    (std::size(toolbar_bitmap_bmp))
 
 } // anonymous namespace
 } // namespace ui

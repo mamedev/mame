@@ -28,7 +28,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="4.4" right="43.7" top="0.3" bottom="38.7" />
 
-	<!-- element and digits -->
+	<!-- bezel and digits -->
 
 		<element ref="static_white"><bounds x="6.8" y="1.8" width="35.4" height="35.4" /></element>
 		<element ref="static_black"><bounds x="7.6" y="2.6" width="33.8" height="33.8" /></element>

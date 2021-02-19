@@ -333,14 +333,14 @@ uint8_t mtech_state::sms_ioport_dc_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
+	return (ioport("PAD1")->read() & 0x3f) | ((ioport("PAD2")->read() & 0x03) << 6);
 }
 
 uint8_t mtech_state::sms_ioport_dd_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+	return ((ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
 }
 
 

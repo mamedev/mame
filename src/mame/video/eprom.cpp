@@ -122,11 +122,14 @@ const atari_motion_objects_config eprom_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(eprom_state,eprom)
+void eprom_state::video_start()
 {
 	/* save states */
 	save_item(NAME(m_screen_intensity));
 	save_item(NAME(m_video_disable));
+
+	m_screen_intensity = 0;
+	m_video_disable = 0;
 }
 
 
@@ -163,14 +166,6 @@ const atari_motion_objects_config eprom_state::s_guts_mob_config =
 	{{ 0 }},            /* mask for the special value */
 	0                   /* resulting value to indicate "special" */
 };
-
-VIDEO_START_MEMBER(eprom_state,guts)
-{
-	/* save states */
-	save_item(NAME(m_screen_intensity));
-	save_item(NAME(m_video_disable));
-}
-
 
 
 /*************************************

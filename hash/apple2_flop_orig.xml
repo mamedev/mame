@@ -16421,4 +16421,211 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lslibrary">
+		<description>Library Skills: Let's Learn About The Library</description>
+		<year>1986</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-01-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 1.woz" size="234775" crc="1825591a" sha1="f5f1b26710f87c9aba3d3fdaba5cc348d9151fe9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 2.woz" size="234775" crc="56ff0e2f" sha1="2a87f73c0b3b8a393b86b58c03cc730dc86f6cc9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="234775">
+				<rom name="let's learn about the library disk 3.woz" size="234775" crc="a1a49df0" sha1="d5b2cf6ff3a64df41c09c1ec140dee3eb1d1df97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdfbcons">
+		<description>Reading Fun: Beginning Consonant Sounds</description>
+		<year>1988</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="reading fun- beginning consonant sounds.woz" size="234777" crc="8826fdd0" sha1="e17c0230d1249a1cd6823bc10d423b8239ada3c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmc3md">
+		<description>Troll Math Class Level 3: I Can Multiply and Divide</description>
+		<year>1988</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234831">
+				<rom name="troll math class level 3- i can multiply and divide.woz" size="234831" crc="d148b33d" sha1="bc56b8fa23f0ebedcb5760fadfe0bafef383525f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raskncst">
+		<description>Read and Spell: In the Days of Knights and Castles</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234861">
+				<rom name="read and spell- in the days of knights and castles disk 1.woz" size="234861" crc="be4bed3d" sha1="54ee6208b98b08ab1e5dfe53ba1c549c8ae69744"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234861">
+				<rom name="read and spell- in the days of knights and castles disk 2.woz" size="234861" crc="58995d23" sha1="706f8297adf8d64d8533e6814fd03a91944e9f26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmc4aaas">
+		<description>Troll Math Class Level 4: Advanced Addition and Subtraction</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234952">
+				<rom name="troll math class level 4- advanced addition and subtraction.woz" size="234952" crc="044d7026" sha1="adbf4ddeefa25b179c3b278595c1652a3a2f6b41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmc5amad">
+		<description>Troll Math Class Level 5: Advanced Multiplication and Division</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234882">
+				<rom name="troll math class level 5- advanced multiplication and division.woz" size="234882" crc="affa1976" sha1="1624838bed675a5afe3f5fe3743c4d434cd23cea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thbdigex">
+		<description>The Human Body and How It Works: The Digestive and Excretory Systems</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234884">
+				<rom name="the human body and how it works- the digestive and excretory systems.woz" size="234884" crc="324c6b54" sha1="f7da08e97d5856e20e1064d54be8d56305883003"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thbsklms">
+		<description>The Human Body and How It Works: The Skeletal and Muscular Systems</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234899">
+				<rom name="the human body and how it works- the skeletal and muscular systems.woz" size="234899" crc="879443d6" sha1="ffeae22f1ace747d1670487b12cba5c841eb7c9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfunlta">
+		<description>Alphabet Fun: Learning The Alphabet</description>
+		<year>1990</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241486">
+				<rom name="alphabet fun- learning the alphabet.woz" size="241486" crc="4ea03524" sha1="a9ac293a69862d1bbcab965216ff8f25ad1fe0c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="posfwvrb">
+		<description>Parts of Speech: Fun with Verbs</description>
+		<year>1991</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234847">
+				<rom name="parts of speech- fun with verbs.woz" size="234847" crc="14c86953" sha1="fd647f827339f65fe625c4a5c9604ece8fed8330"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="umapglbs">
+		<description>Understanding Maps and Globes</description>
+		<year>1987</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-01-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234757">
+				<rom name="understanding maps and globes disk 1.woz" size="234757" crc="98205b76" sha1="23a8b270179f5ff72282a4b083de89e427bf5575"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234757">
+				<rom name="understanding maps and globes disk 2.woz" size="234757" crc="f68503e1" sha1="c8d6c5ba3db7c385c00a4e24cf022dbdf3e5fff0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tacauseeff">
+		<description>Cause and Effect: What Makes It Happen</description>
+		<year>1988</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="cause and effect- what makes it happen.woz" size="234776" crc="5b2d7be8" sha1="0348efd142a48068b27b0937dd623ab94145eeb4"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

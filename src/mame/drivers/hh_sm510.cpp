@@ -578,7 +578,7 @@ INPUT_PORTS_END
 
 void gnw_ball_state::gnw_ball(machine_config &config)
 {
-	sm5a_common(config, 1671, 1080); // R option mask confirmed
+	sm5a_common(config, 1671, 1080); // R mask option confirmed
 }
 
 // roms

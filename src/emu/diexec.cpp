@@ -416,7 +416,7 @@ void device_execute_interface::interface_post_start()
 	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
 
 	// fill in the input states and IRQ callback information
-	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
+	for (int line = 0; line < std::size(m_input); line++)
 		m_input[line].start(*this, line);
 }
 
@@ -679,7 +679,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 	// if we're full of events, flush the queue and log a message
 	int event_index = m_qindex++;
-	if (event_index >= ARRAY_LENGTH(m_queue))
+	if (event_index >= std::size(m_queue))
 	{
 		m_qindex--;
 		empty_event_queue(nullptr,0);
@@ -688,7 +688,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 	}
 
 	// enqueue the event
-	if (event_index < ARRAY_LENGTH(m_queue))
+	if (event_index < std::size(m_queue))
 	{
 		if (vector == USE_STORED_VECTOR)
 			vector = m_stored_vector;

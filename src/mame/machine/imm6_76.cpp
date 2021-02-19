@@ -50,9 +50,9 @@ void intel_imm6_76_device::device_start()
 
 image_init_result intel_imm6_76_device::call_load()
 {
-	if (length() != ARRAY_LENGTH(m_data))
+	if (length() != std::size(m_data))
 		return image_init_result::FAIL;
-	else if (fread(m_data, ARRAY_LENGTH(m_data)) != ARRAY_LENGTH(m_data))
+	else if (fread(m_data, std::size(m_data)) != std::size(m_data))
 		return image_init_result::FAIL;
 	else
 		return image_init_result::PASS;
@@ -61,7 +61,7 @@ image_init_result intel_imm6_76_device::call_load()
 image_init_result intel_imm6_76_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
-	if (fwrite(m_data, ARRAY_LENGTH(m_data)) != ARRAY_LENGTH(m_data))
+	if (fwrite(m_data, std::size(m_data)) != std::size(m_data))
 		return image_init_result::FAIL;
 	else
 		return image_init_result::PASS;
@@ -72,7 +72,7 @@ void intel_imm6_76_device::call_unload()
 	if (!is_readonly())
 	{
 		fseek(0, SEEK_SET);
-		fwrite(m_data, ARRAY_LENGTH(m_data));
+		fwrite(m_data, std::size(m_data));
 	}
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
 }

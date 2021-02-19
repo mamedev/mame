@@ -171,8 +171,7 @@ uint8_t spyhuntertec_state::ay2_porta_r()
 
 void spyhuntertec_state::spyhunt_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -229,8 +228,7 @@ TILEMAP_MAPPER_MEMBER(spyhuntertec_state::spyhunt_bg_scan)
 
 TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
 	tileinfo.set(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
@@ -257,6 +255,8 @@ void spyhuntertec_state::video_start()
 	save_item(NAME(m_spyhunt_scrollx));
 	save_item(NAME(m_spyhunt_scrolly));
 	save_item(NAME(m_spyhunt_scroll_offset));
+
+	mcr_cocktail_flip = 0; // TODO: this doesn't get set anywhere, code at line 322 is effectively unreachable
 }
 
 
@@ -264,18 +264,15 @@ void spyhuntertec_state::video_start()
 
 void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced)
 {
-	uint8_t *spriteram = m_spriteram;
-	int offs;
-
 	m_screen->priority().fill(1, cliprect);
 
 	/* loop over sprite RAM */
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, flipx, flipy, sx, sy, flags;
 
 		/* skip if zero */
-		if (spriteram[offs] == 0)
+		if (m_spriteram[offs] == 0)
 			continue;
 
 /*
@@ -290,13 +287,13 @@ void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16
 */
 
 		/* extract the bits of information */
-		flags = spriteram[offs + 1];
-		code = spriteram[offs + 2] + 256 * ((flags >> 3) & 0x01);
+		flags = m_spriteram[offs + 1];
+		code = m_spriteram[offs + 2] + 256 * ((flags >> 3) & 0x01);
 		color = ~flags & color_mask;
 		flipx = flags & 0x10;
 		flipy = flags & 0x20;
-		sx = (spriteram[offs + 3] - 3) * 2;
-		sy = (241 - spriteram[offs]);
+		sx = (m_spriteram[offs + 3] - 3) * 2;
+		sy = (241 - m_spriteram[offs]);
 
 		if (interlaced == 1) sy *= 2;
 

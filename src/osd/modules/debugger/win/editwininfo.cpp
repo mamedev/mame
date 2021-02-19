@@ -185,7 +185,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 				case 13: // carriage return
 					{
 						// fetch the text
-						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(ARRAY_LENGTH(buffer)), LPARAM(buffer));
+						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(std::size(buffer)), LPARAM(buffer));
 
 						// add to the history if it's not a repeat of the last one
 						if (buffer[0] && (m_history.empty() || _tcscmp(buffer, m_history[0].c_str())))

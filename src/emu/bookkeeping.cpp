@@ -157,7 +157,7 @@ void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node
 
 void bookkeeping_manager::coin_counter_w(int num, int on)
 {
-	if (num >= ARRAY_LENGTH(m_coin_count))
+	if (num >= std::size(m_coin_count))
 		return;
 
 	/* Count it only if the data has changed from 0 to non-zero */
@@ -174,7 +174,7 @@ void bookkeeping_manager::coin_counter_w(int num, int on)
 
 int bookkeeping_manager::coin_counter_get_count(int num)
 {
-	if (num >= ARRAY_LENGTH(m_coin_count))
+	if (num >= std::size(m_coin_count))
 		return 0;
 	return m_coin_count[num];
 }
@@ -186,7 +186,7 @@ int bookkeeping_manager::coin_counter_get_count(int num)
 
 void bookkeeping_manager::coin_lockout_w(int num,int on)
 {
-	if (num >= ARRAY_LENGTH(m_coinlockedout))
+	if (num >= std::size(m_coinlockedout))
 		return;
 	m_coinlockedout[num] = on;
 }
@@ -199,7 +199,7 @@ void bookkeeping_manager::coin_lockout_w(int num,int on)
 
 int bookkeeping_manager::coin_lockout_get_state(int num)
 {
-	if (num >= ARRAY_LENGTH(m_coinlockedout))
+	if (num >= std::size(m_coinlockedout))
 		return false;
 	return m_coinlockedout[num];
 }
@@ -212,6 +212,6 @@ int bookkeeping_manager::coin_lockout_get_state(int num)
 
 void bookkeeping_manager::coin_lockout_global_w(int on)
 {
-	for (int i = 0; i < ARRAY_LENGTH(m_coinlockedout); i++)
+	for (int i = 0; i < std::size(m_coinlockedout); i++)
 		coin_lockout_w(i, on);
 }

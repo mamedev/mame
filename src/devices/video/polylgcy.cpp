@@ -360,8 +360,8 @@ void poly_free(legacy_poly_manager *poly)
 {
 #if KEEP_STATISTICS
 {
-	int i, conflicts = 0, resolved = 0;
-	for (i = 0; i < ARRAY_LENGTH(poly->conflicts); i++)
+	int conflicts = 0, resolved = 0;
+	for (int i = 0; i < std::size(poly->conflicts); i++)
 	{
 		conflicts += poly->conflicts[i];
 		resolved += poly->resolved[i];

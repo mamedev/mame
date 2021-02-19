@@ -392,7 +392,7 @@ uint8_t pioneer_ldv1000_device::z80_decoder_display_port_r(offs_t offset)
 		if (m_portselect == 4)
 		{
 			m_vbiready = false;
-			result = m_vbi[m_vbiindex++ % ARRAY_LENGTH(m_vbi)];
+			result = m_vbi[m_vbiindex++ % std::size(m_vbi)];
 		}
 	}
 	return result;

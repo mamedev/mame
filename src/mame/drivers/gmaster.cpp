@@ -135,7 +135,7 @@ void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
 			break;
 		case 1:
 			m_video.delayed = false;
-			if (m_video.x < ARRAY_LENGTH(m_video.pixels[0])) // continental galaxy flutlicht
+			if (m_video.x < std::size(m_video.pixels[0])) // continental galaxy flutlicht
 			{
 				m_video.pixels[m_video.y][m_video.x] = data;
 			}
@@ -280,9 +280,9 @@ void gmaster_state::gmaster_palette(palette_device &palette) const
 
 uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
+	for (int y = 0; y < std::size(m_video.pixels); y++)
 	{
-		for (int x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
+		for (int x = 0; x < std::size(m_video.pixels[0]); x++)
 		{
 			uint8_t const d = m_video.pixels[y][x];
 
@@ -339,7 +339,7 @@ void gmaster_state::gmaster(machine_config &config)
 	screen.set_screen_update(FUNC(gmaster_state::screen_update_gmaster));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), ARRAY_LENGTH(gmaster_pens));
+	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), std::size(gmaster_pens));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);

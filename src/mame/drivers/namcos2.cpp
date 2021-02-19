@@ -5497,6 +5497,7 @@ void namcos2_state::init_finallap()
 	m_gametype = NAMCOS2_FINAL_LAP;
 
 	save_item(NAME(m_finallap_prot_count));
+	m_finallap_prot_count = 0;
 }
 
 void namcos2_state::init_finalap2()
@@ -5504,6 +5505,7 @@ void namcos2_state::init_finalap2()
 	m_gametype = NAMCOS2_FINAL_LAP_2;
 
 	save_item(NAME(m_finallap_prot_count));
+	m_finallap_prot_count = 0;
 }
 
 void namcos2_state::init_finalap3()
@@ -5511,6 +5513,7 @@ void namcos2_state::init_finalap3()
 	m_gametype = NAMCOS2_FINAL_LAP_3;
 
 	save_item(NAME(m_finallap_prot_count));
+	m_finallap_prot_count = 0;
 }
 
 void namcos2_state::init_finehour()

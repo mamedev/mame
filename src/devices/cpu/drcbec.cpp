@@ -528,7 +528,7 @@ int drcbe_c::execute(code_handle &entry)
 				newinst = (const drcbec_instruction *)m_hash.get_codeptr(PARAM0, PARAM1);
 				if (newinst == nullptr)
 				{
-					assert(sp < ARRAY_LENGTH(callstack));
+					assert(sp < std::size(callstack));
 					m_state.exp = PARAM1;
 					newinst = (const drcbec_instruction *)inst[2].handle->codeptr();
 					callstack[sp++] = inst;
@@ -562,7 +562,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_CALLH, 4, 0):
-				assert(sp < ARRAY_LENGTH(callstack));
+				assert(sp < std::size(callstack));
 				newinst = (const drcbec_instruction *)inst[0].handle->codeptr();
 				assert_in_cache(m_cache, newinst);
 				callstack[sp++] = inst + OPCODE_GET_PWORDS(opcode);
@@ -587,7 +587,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXH, 4, 0):
-				assert(sp < ARRAY_LENGTH(callstack));
+				assert(sp < std::size(callstack));
 				newinst = (const drcbec_instruction *)inst[0].handle->codeptr();
 				assert_in_cache(m_cache, newinst);
 				m_state.exp = PARAM1;

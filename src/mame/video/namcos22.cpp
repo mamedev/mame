@@ -261,7 +261,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 
 		clipverts = zclip_if_less(4, v, clipv, 4, 10.0f);
-		assert(clipverts <= ARRAY_LENGTH(clipv));
+		assert(clipverts <= std::size(clipv));
 		if (clipverts < 3)
 			return;
 

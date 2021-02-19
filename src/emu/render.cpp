@@ -442,7 +442,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		// is it a size we already have?
 		scaled_texture *scaled = nullptr;
 		int scalenum;
-		for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+		for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 		{
 			scaled = &m_scaled[scalenum];
 
@@ -452,12 +452,12 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		}
 
 		// did we get one?
-		if (scalenum == ARRAY_LENGTH(m_scaled))
+		if (scalenum == std::size(m_scaled))
 		{
 			int lowest = -1;
 
 			// didn't find one -- take the entry with the lowest seqnum
-			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+			for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap.get()))
 					lowest = scalenum;
 			if (-1 == lowest)
@@ -697,7 +697,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			out_length = ARRAY_LENGTH(m_bcglookup256);
+			out_length = std::size(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
@@ -1318,7 +1318,7 @@ render_primitive_list &render_target::get_primitives()
 
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
-	m_listindex = (m_listindex + 1) % ARRAY_LENGTH(m_primlist);
+	m_listindex = (m_listindex + 1) % std::size(m_primlist);
 	list.acquire_lock();
 
 	// free any previous primitives

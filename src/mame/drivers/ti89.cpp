@@ -488,8 +488,8 @@ void ti68k_state::machine_reset()
 	m_lcd_height = 0;
 	m_lcd_on = 0;
 	m_lcd_contrast = 0;
-	memset(m_io_hw1, 0, ARRAY_LENGTH(m_io_hw1) * sizeof(uint16_t));
-	memset(m_io_hw2, 0, ARRAY_LENGTH(m_io_hw2) * sizeof(uint16_t));
+	std::fill(std::begin(m_io_hw1), std::end(m_io_hw1), 0);
+	std::fill(std::begin(m_io_hw2), std::end(m_io_hw2), 0);
 	m_timer_on = 0;
 	m_timer_mask = 0xf;
 	m_timer_val = 0;

@@ -432,12 +432,12 @@ P1KEY11  29|30  P2KEY11
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
 		u32 const start_depressed = ~value & 0x01000000;
-		keys |= start_depressed ? 1 << (ARRAY_LENGTH(key_codes) - 1) : 0; // and bung it in at the end
+		keys |= start_depressed ? 1 << (std::size(key_codes) - 1) : 0; // and bung it in at the end
 
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
-			if ((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
+			if ((keys & which_key) && (count < std::size(key_codes)))
 			{
 				value &= ~((u32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
