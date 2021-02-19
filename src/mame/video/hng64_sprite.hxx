@@ -46,9 +46,6 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	uint32_t *source = m_spriteram;
 	uint32_t *finish = m_spriteram + 0xc000/4;
 
-	std::vector< std::pair <int, uint32_t *> > sortlist;
-	sortlist.reserve(0xc000/0x20);
-	
 	// global offsets in sprite regs
 	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
 	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
@@ -59,6 +56,9 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	osd_printf_debug("\n");
 #endif
 
+	// start with empty list
+	m_spritelist.clear();
+
 	while(source < finish)
 	{
 		if (source[4]&0x04000000) // disable bit, ss64 rankings ?
@@ -67,46 +67,28 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 		else
 		{
-			// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
-			// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
-			// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
-			// Could also be draw order related, check if it inverts the z value?
-			if (m_spriteregs[0] & 0x01000000)
+			if ( ((m_spriteregs[0] & 0x01000000) && ((source[2]&0x07ff0000) != 0x07ff0000))
+				|| (!(m_spriteregs[0] & 0x01000000) && (source[2]&0x07ff0000) != 0) )
 			{
-				// sort by spriteram entry order
-				// not sure if z priority field has another interpretation here
-				if ((source[2]&0x07ff0000)>>16 != 0x7ff)
-				{
-					sortlist.emplace_back(finish - source, source);
-					if (source[2]&0x00000100)
-						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
-					else
-						source += 8;
-				}
+				m_spritelist.emplace_back((source[2]&0x7ff0000)>>16, source);
+				if (source[2]&0x00000100)
+					source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 				else
 					source += 8;
 			}
-			else	
-			{
-				// sort by z priority
-				if ((source[2]&0x07ff0000)>>16 != 0)
-				{
-					sortlist.emplace_back((source[2]&0x07ff0000)>>16, source);
-					if (source[2]&0x00000100)
-						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
-					else
-						source += 8;
-				}					
-				else
-					source += 8;
-			}	
+			else
+				source += 8;
 		}
 	}
 
+	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+	// Could also be draw order related, check if it inverts the z value?
 	if (!(m_spriteregs[0] & 0x01000000))
-		std::sort(sortlist.begin(), sortlist.end(), std::greater<>());
+		std::sort(m_spritelist.begin(), m_spritelist.end(), std::greater<>());
 
-	for(auto it = sortlist.begin(); it != sortlist.end(); it++)
+	for(auto it = m_spritelist.begin(); it != m_spritelist.end(); it++)
 	{
 		source = it->second;
 		

@@ -305,6 +305,8 @@ private:
 
 	//uint32_t *q2;
 
+	std::vector< std::pair <int, uint32_t *> > m_spritelist;
+
 	uint8_t m_screen_dis;
 
 	struct hng64_tilemap {
