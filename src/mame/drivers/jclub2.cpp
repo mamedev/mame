@@ -105,7 +105,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "sound/st0032.h"
+#include "sound/setapcm.h"
 #include "sound/okim6295.h"
 #include "video/st0020.h"
 #include "emupal.h"
@@ -752,8 +752,8 @@ void jclub2_state::jclub2_map(address_map &map)
 	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
 	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
-	map(0x8e0000, 0x8e01ff).rw("st0032_snd", FUNC(st0032_sound_device::st0032_snd_r), FUNC(st0032_sound_device::st0032_snd_w));
-	map(0x8e0200, 0x8e0201).rw("st0032_snd", FUNC(st0032_sound_device::st0032_sndctrl_r), FUNC(st0032_sound_device::st0032_sndctrl_w));
+	map(0x8e0000, 0x8e01ff).rw("st0032_snd", FUNC(st0032_sound_device::snd_r), FUNC(st0032_sound_device::snd_w));
+	map(0x8e0200, 0x8e0201).rw("st0032_snd", FUNC(st0032_sound_device::sndctrl_r), FUNC(st0032_sound_device::sndctrl_w));
 	map(0x8e0210, 0x8e0213).ram(); // sound?
 	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
 }
@@ -1219,7 +1219,7 @@ void jclub2_state::jclub2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	st0032_sound_device &st0032_snd(ST0032_SOUND(config, "st0032_snd", XTAL(42'954'545) / 3));
+	st0032_sound_device &st0032_snd(ST0032_SOUND(config, "st0032_snd", XTAL(42'954'545) / 3 / 384)); // verified
 	st0032_snd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	st0032_snd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

@@ -853,8 +853,7 @@ end
 ---------------------------------------------------
 -- Seta custom sound chips
 --@src/devices/sound/st0016.h,SOUNDS["ST0016"] = true
---@src/devices/sound/st0032.h,SOUNDS["ST0032"] = true
---@src/devices/sound/nile.h,SOUNDS["NILE"] = true
+--@src/devices/sound/setapcm.h,SOUNDS["SETAPCM"] = true
 --@src/devices/sound/x1_010.h,SOUNDS["X1_010"] = true
 ---------------------------------------------------
 
@@ -865,17 +864,10 @@ if (SOUNDS["ST0016"]~=null) then
 	}
 end
 
-if (SOUNDS["ST0032"]~=null) then
+if (SOUNDS["SETAPCM"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/st0032.cpp",
-		MAME_DIR .. "src/devices/sound/st0032.h",
-	}
-end
-
-if (SOUNDS["NILE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/nile.cpp",
-		MAME_DIR .. "src/devices/sound/nile.h",
+		MAME_DIR .. "src/devices/sound/setapcm.cpp",
+		MAME_DIR .. "src/devices/sound/setapcm.h",
 	}
 end
 
