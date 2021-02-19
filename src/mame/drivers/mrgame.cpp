@@ -449,7 +449,7 @@ GFXDECODE_END
 void mrgame_state::mrgame_palette(palette_device &palette) const
 {
 	static constexpr int resistances[3] = { 1000, 470, 220 };
-	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	// compute the color output resistor weights
 	double rweights[3], gweights[3], bweights[2];
