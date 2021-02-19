@@ -59,8 +59,6 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	osd_printf_debug("\n");
 #endif
 
-	auto it = sortlist.begin();
-
 	while(source < finish)
 	{
 		if (source[4]&0x04000000) // disable bit, ss64 rankings ?
@@ -79,7 +77,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				// not sure if z priority field has another interpretation here
 				if ((source[2]&0x07ff0000)>>16 != 0x7ff)
 				{
-					sortlist.emplace(it, finish - source, source);
+					sortlist.emplace_back(finish - source, source);
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
@@ -93,7 +91,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				// sort by z priority
 				if ((source[2]&0x07ff0000)>>16 != 0)
 				{
-					sortlist.emplace(it, (source[2]&0x07ff0000)>>16, source);
+					sortlist.emplace_back((source[2]&0x07ff0000)>>16, source);
 					if (source[2]&0x00000100)
 						source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 					else
@@ -105,11 +103,12 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 	}
 
-	std::sort(sortlist.begin(), sortlist.end());
+	if (!(m_spriteregs[0] & 0x01000000))
+		std::sort(sortlist.begin(), sortlist.end(), std::greater<>());
 
-	for(auto itr = sortlist.rbegin(); itr != sortlist.rend(); itr++)
+	for(auto it = sortlist.begin(); it != sortlist.end(); it++)
 	{
-		source = itr->second;
+		source = it->second;
 		
 		int tileno,chainx,chainy,xflip;
 		int pal,xinc,yinc,yflip;
