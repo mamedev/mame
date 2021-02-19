@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-u8 chbase() const { return m_chbase; }
+	u8 chbase() const { return m_chbase; }
 
 	// direct read/write access
 	u8 read(u8 index) { return m_regdata[index]; }
