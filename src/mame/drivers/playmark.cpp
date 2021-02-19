@@ -1419,10 +1419,10 @@ ROM_START( wbeachvla ) // same as wbeachvl but with S87C751 audio CPU
 	ROM_LOAD16_BYTE( "wbv_03.bin",   0x000001, 0x40000, CRC(db4e69d5) SHA1(119bf35a463d279ddde67ab08f6f1bab9f05cf0c) )
 
 	ROM_REGION( 0x1000, "audiomcs", ROMREGION_ERASE00 ) // sound (S87C751)
-	ROM_LOAD( "s87c751",   0x000, 0x800, CRC(bc4daa35) SHA1(89f64cfdf1c2318d263ac08bf510aac11e0f85b4) )
+	ROM_LOAD( "s87c751.u36",   0x000, 0x800, CRC(bc4daa35) SHA1(89f64cfdf1c2318d263ac08bf510aac11e0f85b4) )
 
 	ROM_REGION( 0x1000, "extracpu", ROMREGION_ERASE00 ) // on a small sub PCB with the second JAMMA connector
-	ROM_LOAD( "s87c751",   0x000, 0x800, CRC(54a6004f) SHA1(b7b24e5a812f284099946fcbddd3cf804332f230) )
+	ROM_LOAD( "s87c751.u5",   0x000, 0x800, CRC(54a6004f) SHA1(b7b24e5a812f284099946fcbddd3cf804332f230) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )
 	ROM_LOAD( "wbv_10.bin",   0x000000, 0x80000, CRC(50680f0b) SHA1(ed76ef6ced70ba7e9558162aa94bbe9f19bbabe6) )
