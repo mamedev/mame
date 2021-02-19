@@ -71,7 +71,6 @@ public:
 
 private:
 	u16 m_error_class, m_error_offset;
-
 };
 
 

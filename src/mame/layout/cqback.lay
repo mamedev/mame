@@ -77,7 +77,7 @@ license:CC0
 			<bounds left="-9" right="393" top="-130" bottom="156" />
 		</element>
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="static_white"><bounds left="-9" right="393" top="-130" bottom="-60" /></element>
 		<element ref="static_green"><bounds left="-9" right="393" top="111" bottom="156" /></element>

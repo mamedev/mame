@@ -14,8 +14,9 @@ They can be divided in three "families":
    The hardware consists of two 6809, and several Namco custom ICs that provide
    a static tilemap and 2bpp sprites.
    Grobda is the only Namco game of this era that has speech (just a short
-   sample). At this time, it is still unknown how speech samples are transmitted
-   to the DAC (almost certainly the same resistor network used by the 15XX).
+   sample). It appears to do this by manipulating 15XX channels to deliver
+   non-waveform outputs (removing the 15XX from the board causes sound to
+   disappear completely).
 2) Phozon. This game runs on an unique board: the large number of sprites on
    screen at the same time required a 3rd 6809 to help with the calculations.
    The sprite hardware is also different from Super Pacman, featuring 8x8 sprites.
@@ -63,7 +64,7 @@ The I/O interface chips vary from game to game (see machine/namcoio.c)
 
 Super Pac-Man memory map
 ------------------------
-Pac & Pal is the same. Grobda appears to have a DAC hacked in.
+Pac & Pal and Grobda are the same.
 Note: Part of the address decoding is done by PALs (SPC-5 and SPC-6) so the
 tables are inferred by program behaviour.
 
@@ -678,23 +679,6 @@ void mappy_state::superpac_cpu2_map(address_map &map)
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the main CPU (also sound registers) */
 	map(0x2000, 0x200f).w("mainlatch", FUNC(ls259_device::write_a0));   /* various control bits */
 	map(0xe000, 0xffff).rom();
-}
-
-/*
-   The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
-   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
-   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
-   to locations not used by the sound hardware).
-   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
-   However, removing the 15XX from the board causes sound to disappear completely, so
-   the 15XX may still play some part in conveying speech to the DAC.
-*/
-
-void mappy_state::grobda_cpu2_map(address_map &map)
-{
-	superpac_cpu2_map(map);
-
-	map(0x0002, 0x0002).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void mappy_state::phozon_cpu2_map(address_map &map)
@@ -1417,8 +1401,6 @@ void mappy_state::grobda(machine_config &config)
 {
 	superpac_common(config);
 
-	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::grobda_cpu2_map);
-
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
@@ -1431,9 +1413,6 @@ void mappy_state::grobda(machine_config &config)
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
 	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
-
-	/* sound hardware */
-	DAC_4BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275); // alternate route to 15XX-related DAC?
 }
 
 void mappy_state::phozon(machine_config &config)

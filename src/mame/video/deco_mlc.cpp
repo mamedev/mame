@@ -161,7 +161,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 	for (int offs = 0; offs < (0x3000 / 4); offs += 8)
 	{
 		/* If this bit is set, combine this block with the next one */
-		use8bppMode = (offs + 8 < (0x3000 / 4)) && (spriteram[offs + 8 + 1] & 0x1000);
+		use8bppMode = (offs + 8 < (0x3000 / 4)) && (spriteram[offs + 8 + 1] & 0x1000) && (spriteram[offs + 8 + 0] & 0x8000);
 		if (use8bppMode)
 			offs += 8;
 
@@ -200,7 +200,8 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		            0x1000 - Y flip
 		            0x0f00 - Height in tiles (0==16)
 		            0x00ff - Y position offset
-		    Word 2: 0xff00 - ? (Always 0?)
+		    Word 2: 0xfe00 - ? (Always 0?)
+		            0x0100 - Autoflicker
 		            0x00c0 - If set use tile index as pointer into tile index array, else use as tile index directly
 		            0x0080 - If set tile index array format is 12 bit tile, 4 bit colour
 		            0x0040 - If set tile index array is 16 bit tile, 0 bit colour
@@ -273,6 +274,10 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		if (indx & 0x4000)
 		{
 			index_ptr8 = m_gfx2 + indx * 8; /* Byte ptr */
+
+			if (index_ptr8[5] & 0x01 && m_screen->frame_number() & 1)
+				continue;
+
 			h = (index_ptr8[1] >> 0) & 0xf;
 			w = (index_ptr8[3] >> 0) & 0xf;
 
@@ -282,7 +287,6 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			sprite = (index_ptr8[7] << 8) | index_ptr8[6];
 			sprite |= (index_ptr8[4] & 3) << 16;
 
-			//unused byte 5
 			yoffs = index_ptr8[0] & 0xff;
 			xoffs = index_ptr8[2] & 0xff;
 
@@ -302,6 +306,10 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		{
 			indx &= 0x1fff;
 			index_ptr = m_vram + indx * 4;
+
+			if (index_ptr[2] & 0x0100 && m_screen->frame_number() & 1)
+				continue;
+
 			h = (index_ptr[0] >> 8) & 0xf;
 			w = (index_ptr[1] >> 8) & 0xf;
 

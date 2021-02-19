@@ -9372,6 +9372,9 @@ hustle                          // 16-21 [1977 Gremlin]
 mineswpr                        // [1977 Amutech]
 mineswpr4                       // [1977 Amutech]
 
+@source:blockch.cpp
+blockch
+
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
 quarth                          // GX973 (c) 1989 (Japan)
@@ -10887,6 +10890,7 @@ sf2m5                           // hack
 sf2m6                           // hack
 sf2m7                           // hack
 sf2m8                           // bootleg
+sf2mkot                         // hack
 sf2qp1                          // hack
 sf2qp2                          // hack
 sf2rb                           // hack
@@ -12305,6 +12309,7 @@ jrking                          // bootleg
 maguila                         // bootleg
 pestplce                        // bootleg on donkey kong hw
 radarscp                        // (c) 1980 Nintendo
+radarscpc                       // (c) 1980 Nintendo
 radarscp1                       // (c) 1980 Nintendo
 sbdk                            // (c) 1984 Century
 shootgal                        // (c) 1984 Seatongrove Ltd (Zaccaria license)
@@ -13771,6 +13776,7 @@ finalizrb                       // bootleg
 fireball                        //
 
 @source:firebeat.cpp
+bm3                             // GQ972 (c) 2000 (Japan)
 bm36th                          // GCA21 (c) 2001 (Japan)
 bm37th                          // GCB07 (c) 2002 (Japan JCA)
 bm3core                         // GCA05 (c) 2000 (Japan)
@@ -13783,6 +13789,9 @@ popn5                           // GCA04 (c) 2000 (Japan)
 popn6                           // GQA16 (c) 2001 (Japan)
 popn7                           // GCB00 (c) 2001 (Japan)
 popn8                           // GQB30 (c) 2002 (Japan)
+popnmt                          // GQ976 (c) 2000 (Japan)
+popnmt2                         // GQ976 (c) 2000 (Japan)
+popnanm                         // GQ987 (c) 2000 (Japan)
 popnanm2                        // GEA02 (c) 2001 (Japan)
 ppd                             // GQ977 (c) 2000 (Korea)
 ppp                             // GQ977 (c) 2000 (Japan)
@@ -16087,6 +16096,13 @@ qkracer                         // National Semiconductor
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
+@source:hh_cops1.cpp
+mbaskb                          // Mattel
+mhockey                         // Mattel
+msoccer                         // Mattel
+qkracerm                        // National Semiconductor
+qkspeller                       // National Semiconductor
+
 @source:hh_hmcs40.cpp
 alnattck                        // Coleco
 bambball                        // Bambino
@@ -16280,6 +16296,7 @@ amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
 bcheetah                        // Bandai
+ebknight                        // Entex
 bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
@@ -19072,6 +19089,7 @@ cryptklr                        // Crypt Killer (GQ420 UAA)
 @source:konamigs.cpp
 ddrkids                         // 2000.?? Dance Dance Revolution Kids
 musclhit                        // 2000.11 Muscle Ranking Kinniku Banzuke Spray Hitter
+runpuppy                        // 2000.?? Run Run Puppy
 
 @source:konamigv.cpp
 btchamp                         // GV053, UAA01
@@ -32896,8 +32914,6 @@ sfortec1                        //
 
 @source:novag_snova.cpp
 nsnova
-
-@source:novag_supremo.cpp
 supremo
 
 @source:ns5652.cpp
@@ -33195,6 +33211,7 @@ mspacmbmc                       // bootleg (Marti Colls / Falgas)
 mspacmbn                        // bootleg
 mspacmnf                        // hack
 mspacpls                        // hack
+mspactwin                       // (c) 1992 SUSILU
 newpuc2                         // hack
 newpuc2b                        // hack
 newpuckx                        // hack
@@ -33761,6 +33778,7 @@ pepp0103a                       // (c) 1987 IGT - International Game Technology
 pepp0103b                       // (c) 1987 IGT - International Game Technology
 pepp0103c                       // (c) 1987 IGT - International Game Technology
 pepp0104                        // (c) 1987 IGT - International Game Technology
+pepp0104a                       // (c) 1987 IGT - International Game Technology
 pepp0116                        // (c) 1987 IGT - International Game Technology
 pepp0116a                       // (c) 1987 IGT - International Game Technology
 pepp0118                        // (c) 1987 IGT - International Game Technology
@@ -34605,6 +34623,9 @@ theraida                        // (c) 1984 Playmatic / EFOSA
 trailer                         //
 ufo_x                           //
 
+@source:playcenter.cpp
+plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+
 @source:playch10.cpp
 pc_1942                         // (c) 1985 Capcom
 pc_bball                        // (c) 1984 Nintendo of America
@@ -34676,6 +34697,7 @@ luckboomh                       // (c) 1995
 wbeachvl                        // (c) 1995
 wbeachvl2                       // (c) 1995
 wbeachvl3                       // (c) 1995
+wbeachvla                       // (c) 1995
 
 @source:plus4.cpp
 c116                            //
@@ -36662,7 +36684,6 @@ snowbwar                         // (c) 201? Sealy
 @source:seattle.cpp
 biofreak                        // (c) 1997 Midway Games (prototype)
 blitz                           // (c) 1997 Midway Games
-blitz11                         // (c) 1997 Midway Games
 blitz2k                         // (c) 1999 Midway Games
 blitz99                         // (c) 1998 Midway Games
 blitz99a                        // (c) 1998 Midway Games
@@ -36682,6 +36703,7 @@ sfrushrkwo                      // (c) 1996 Atari Games
 vaportrx                        // (c) 1998 Atari Games
 vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games
+wg3dhfe                         // (c) 1996 Atari Games
 
 @source:seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
@@ -38533,8 +38555,10 @@ jak_sbfc                        //
 @source:spg2xx_jakks_sharp.cpp
 jsc_dora
 jsc_gdg
+jsc_sdoo
 jsc_spid
 jsc_thom
+jsc_thomu
 
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw
@@ -42328,6 +42352,7 @@ defenderb                       // (c) 1980
 defenderg                       // (c) 1980
 defenderj                       // (c) 1980
 defenderw                       // (c) 1980
+defenseb                        // bootleg
 defndjeu                        // bootleg
 galwars2                        // bootleg
 inferno                         // (c) 1984

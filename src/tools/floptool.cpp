@@ -131,7 +131,7 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 	va_end(arg);
 }
 
-enum { FORMAT_COUNT = ARRAY_LENGTH(floppy_formats) };
+static constexpr size_t FORMAT_COUNT = std::size(floppy_formats);
 
 static floppy_image_format_t *formats[FORMAT_COUNT];
 static std::vector<uint32_t> variants;

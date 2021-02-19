@@ -31,6 +31,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scroll(*this, "scroll"),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -63,6 +64,7 @@ protected:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_scroll;
+	required_memory_bank m_mainbank;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

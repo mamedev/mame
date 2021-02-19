@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="overlay">
+		<rect><color red="0.25" green="1.0" blue="0.25" /></rect>
+	</element>
+
+	<view name="Color Overlay">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+		<element ref="overlay" blend="multiply">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</element>
+	</view>
+</mamelayout>

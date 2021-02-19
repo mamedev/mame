@@ -1069,7 +1069,7 @@ void k056832_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 
 void k056832_device::b_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	assert(offset < ARRAY_LENGTH(m_regsb));
+	assert(offset < std::size(m_regsb));
 	COMBINE_DATA(&m_regsb[offset]);
 }
 

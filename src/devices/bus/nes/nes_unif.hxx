@@ -158,8 +158,7 @@ static const unif unif_list[] =
 
 const unif *nes_unif_lookup( const char *board )
 {
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(unif_list); i++)
+	for (int i = 0; i < std::size(unif_list); i++)
 	{
 		if (!core_stricmp(unif_list[i].board, board))
 			return &unif_list[i];

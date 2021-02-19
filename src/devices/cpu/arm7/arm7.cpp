@@ -92,7 +92,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	, m_vectorbase(0)
 	, m_pc(0)
 {
-	memset(m_r, 0x00, sizeof(m_r));
+	std::fill(std::begin(m_r), std::end(m_r), 0);
 	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
 	if (m_archFlags & ARCHFLAG_T)
 		arch = ARM9_COPRO_ID_ARCH_V4T;
@@ -102,9 +102,9 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	// TODO[RH]: Default to 3-instruction prefetch for unknown ARM variants. Derived cores should set the appropriate value in their constructors.
 	m_insn_prefetch_depth = 3;
 
-	memset(m_insn_prefetch_buffer, 0, sizeof(uint32_t) * 3);
-	memset(m_insn_prefetch_address, 0, sizeof(uint32_t) * 3);
-	memset(m_insn_prefetch_valid, 0, sizeof(bool) * 3);
+	std::fill_n(&m_insn_prefetch_buffer[0], 3, 0);
+	std::fill_n(&m_insn_prefetch_address[0], 3, 0);
+	std::fill_n(&m_insn_prefetch_valid[0], 3, false);
 	m_insn_prefetch_count = 0;
 	m_insn_prefetch_index = 0;
 	m_tlb_log = 0;
@@ -198,8 +198,8 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_t
 		| ARM9_COPRO_ID_PART_ARM946
 		| ARM9_COPRO_ID_STEP_ARM946_A0;
 
-	memset(ITCM, 0, 0x8000);
-	memset(DTCM, 0, 0x4000);
+	std::fill_n(&ITCM[0], 0x8000, 0);
+	std::fill_n(&DTCM[0], 0x4000, 0);
 
 	cp15_itcm_base = 0xffffffff;
 	cp15_itcm_size = 0;
@@ -1080,7 +1080,7 @@ void arm7_cpu_device::state_string_export(const device_state_entry &entry, std::
 
 void arm7_cpu_device::device_reset()
 {
-	memset(m_r, 0, sizeof(m_r));
+	std::fill(std::begin(m_r), std::end(m_r), 0);
 	m_pendingIrq = false;
 	m_pendingFiq = false;
 	m_pendingAbtD = false;
@@ -1097,7 +1097,7 @@ void arm7_cpu_device::device_reset()
 	m_fcsePID = 0;
 	m_pid_offset = 0;
 	m_domainAccessControl = 0;
-	memset(m_decoded_access_control, 0, sizeof(uint8_t) * 16);
+	std::fill_n(&m_decoded_access_control[0], 16, 0);
 
 	/* start up in SVC mode with interrupts disabled. */
 	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
@@ -1106,10 +1106,26 @@ void arm7_cpu_device::device_reset()
 
 	m_impstate.cache_dirty = true;
 
-	memset(m_dtlb_entries, 0, sizeof(tlb_entry) * ARRAY_LENGTH(m_dtlb_entries));
-	memset(m_itlb_entries, 0, sizeof(tlb_entry) * ARRAY_LENGTH(m_itlb_entries));
-	memset(m_dtlb_entry_index, 0, ARRAY_LENGTH(m_dtlb_entry_index));
-	memset(m_itlb_entry_index, 0, ARRAY_LENGTH(m_itlb_entry_index));
+	for (auto &entry : m_dtlb_entries)
+	{
+		entry.valid = false;
+		entry.domain = 0;
+		entry.access = 0;
+		entry.table_bits = 0;
+		entry.base_addr = 0;
+		entry.type = 0;
+	}
+	for (auto &entry : m_itlb_entries)
+	{
+		entry.valid = false;
+		entry.domain = 0;
+		entry.access = 0;
+		entry.table_bits = 0;
+		entry.base_addr = 0;
+		entry.type = 0;
+	}
+	std::fill(std::begin(m_dtlb_entry_index), std::end(m_dtlb_entry_index), 0);
+	std::fill(std::begin(m_itlb_entry_index), std::end(m_itlb_entry_index), 0);
 }
 
 void arm1176jzf_s_cpu_device::device_reset()
@@ -1789,21 +1805,21 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 					{
 						case 5:
 							// Flush I
-							for (uint32_t i = 0; i < ARRAY_LENGTH(m_itlb_entries); i++)
+							for (uint32_t i = 0; i < std::size(m_itlb_entries); i++)
 							{
 								m_itlb_entries[i].valid = false;
 							}
 							break;
 						case 6:
 							// Flush D
-							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
+							for (uint32_t i = 0; i < std::size(m_dtlb_entries); i++)
 							{
 								m_dtlb_entries[i].valid = false;
 							}
 							break;
 						case 7:
 							// Flush I+D
-							for (uint32_t i = 0; i < ARRAY_LENGTH(m_dtlb_entries); i++)
+							for (uint32_t i = 0; i < std::size(m_dtlb_entries); i++)
 							{
 								m_dtlb_entries[i].valid = false;
 								m_itlb_entries[i].valid = false;

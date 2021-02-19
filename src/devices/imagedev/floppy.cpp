@@ -954,10 +954,21 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	}
 }
 
+bool floppy_image_device::writing_disabled() const
+{
+	// Disable writing when write protect is on or when, in the diskii
+	// case, phase 1 is 1
+	return wpt || (phases & 2);
+}
+
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
 {
 	if(!image || mon)
 		return;
+
+	if(writing_disabled())
+		return;
+
 	image_dirty = true;
 	cache_clear();
 
@@ -1121,7 +1132,7 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 
 void floppy_image_device::set_write_splice(const attotime &when)
 {
-	if(image) {
+	if(image && !mon) {
 		image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);
@@ -2418,6 +2429,11 @@ void mac_floppy_device::device_reset()
 //    1110 - HD-20 drive
 //    1111 - No drive (pull-up on the sense line)
 
+bool mac_floppy_device::writing_disabled() const
+{
+	return wpt;
+}
+
 bool mac_floppy_device::wpt_r()
 {
 	static const char *const regnames[16] = {
@@ -2445,7 +2461,7 @@ bool mac_floppy_device::wpt_r()
 		return mon;
 
 	case 0x3: // Disk change signal
-		return dskchg;
+		return !dskchg;
 
 	case 0x4:
 	case 0xc: // Index pulse, probably only on the superdrive though
@@ -2555,7 +2571,7 @@ void mac_floppy_device::seek_phase_w(int phases)
 
 		case 0xc: // Clear dskchg
 			logerror("cmd clear dskchg\n");
-			dskchg = 0;
+			dskchg = 1;
 			break;
 
 		case 0xd: // GCR mode on

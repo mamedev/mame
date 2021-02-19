@@ -53,6 +53,8 @@ void hexion_state::video_start()
 	m_unkram = m_vram[1] + 0x2000;
 
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
+
+	m_gfxrom_select = 0;
 }
 
 

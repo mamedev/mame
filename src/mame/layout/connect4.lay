@@ -662,52 +662,52 @@ license:CC0
 		<element name="lamp123" ref="drop" state="0">
 			<bounds x="20" y="90" width="28" height="14"/>
 		</element>
-		<element name="vfd0" ref="vfd0" state="0">
+		<element name="vfd15" ref="vfd0" state="0">
 			<bounds x="0" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd1" ref="vfd0" state="0">
+		<element name="vfd14" ref="vfd0" state="0">
 			<bounds x="9" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd2" ref="vfd0" state="0">
+		<element name="vfd13" ref="vfd0" state="0">
 			<bounds x="18" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd3" ref="vfd0" state="0">
+		<element name="vfd12" ref="vfd0" state="0">
 			<bounds x="27" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd4" ref="vfd0" state="0">
+		<element name="vfd11" ref="vfd0" state="0">
 			<bounds x="36" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd5" ref="vfd0" state="0">
+		<element name="vfd10" ref="vfd0" state="0">
 			<bounds x="45" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd6" ref="vfd0" state="0">
+		<element name="vfd9" ref="vfd0" state="0">
 			<bounds x="54" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd7" ref="vfd0" state="0">
+		<element name="vfd8" ref="vfd0" state="0">
 			<bounds x="63" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd8" ref="vfd0" state="0">
+		<element name="vfd7" ref="vfd0" state="0">
 			<bounds x="72" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd9" ref="vfd0" state="0">
+		<element name="vfd6" ref="vfd0" state="0">
 			<bounds x="81" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd10" ref="vfd0" state="0">
+		<element name="vfd5" ref="vfd0" state="0">
 			<bounds x="90" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd11" ref="vfd0" state="0">
+		<element name="vfd4" ref="vfd0" state="0">
 			<bounds x="99" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd12" ref="vfd0" state="0">
+		<element name="vfd3" ref="vfd0" state="0">
 			<bounds x="108" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd13" ref="vfd0" state="0">
+		<element name="vfd2" ref="vfd0" state="0">
 			<bounds x="117" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd14" ref="vfd0" state="0">
+		<element name="vfd1" ref="vfd0" state="0">
 			<bounds x="126" y="120" width="9" height="14"/>
 		</element>
-		<element name="vfd15" ref="vfd0" state="0">
+		<element name="vfd0" ref="vfd0" state="0">
 			<bounds x="135" y="120" width="9" height="14"/>
 		</element>
 	</view>

@@ -571,7 +571,7 @@ static void set_default_key_params(running_machine &machine)
 	int keynum;
 
 	/* look for a matching game and set the key appropriately */
-	for (keynum = 0; keynum < ARRAY_LENGTH(default_keys); keynum++)
+	for (keynum = 0; keynum < std::size(default_keys); keynum++)
 		if (strcmp(machine.system().name, default_keys[keynum].gamename) == 0)
 		{
 			fd1094_global = default_keys[keynum].global;
@@ -1873,8 +1873,8 @@ static uint32_t reconstruct_base_seed(int keybaseaddr, uint32_t startseed)
 	{
 		seed = seed * 0x29;
 		seed += seed << 16;
-		window[index++ % ARRAY_LENGTH(window)] = seed;
-	} while (((startseed ^ seed) & 0x3fffff) != 0 || index < ARRAY_LENGTH(window));
+		window[index++ % std::size(window)] = seed;
+	} while (((startseed ^ seed) & 0x3fffff) != 0 || index < std::size(window));
 
 	/* when we break, we have overshot */
 	index--;
@@ -1882,10 +1882,10 @@ static uint32_t reconstruct_base_seed(int keybaseaddr, uint32_t startseed)
 	/* back up to where we would have been at address 3 */
 	index -= keybaseaddr - 3;
 	if (index < 0)
-		index += ARRAY_LENGTH(window);
+		index += std::size(window);
 
 	/* return the value from the window at that location */
-	return window[index % ARRAY_LENGTH(window)] & 0x3fffff;
+	return window[index % std::size(window)] & 0x3fffff;
 }
 
 
@@ -2095,7 +2095,7 @@ static void build_optable(running_machine &machine)
 	}
 
 	/* now iterate over entries in our intruction table */
-	for (inum = 0; inum < ARRAY_LENGTH(instr_table); inum++)
+	for (inum = 0; inum < std::size(instr_table); inum++)
 	{
 		const char *bitstring = instr_table[inum].bitstring;
 		const char *eastring = instr_table[inum].eastring;

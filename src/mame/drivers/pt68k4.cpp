@@ -239,11 +239,13 @@ void pt68k4_state::fdc_select_w(uint8_t data)
 	switch (drive)
 	{
 		case 0:
-			floppy->ss_w((data & 0x40) ? 1 : 0);
+			if (floppy)
+				floppy->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		case 1:
-			floppy2->ss_w((data & 0x40) ? 1 : 0);
+			if (floppy2)
+				floppy2->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		default:

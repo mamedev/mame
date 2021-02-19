@@ -94,7 +94,7 @@ void nile_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 	lsptr=leptr=0;
 
-	sound_assert(outputs[0].samples() * 2 < ARRAY_LENGTH(mix));
+	sound_assert(outputs[0].samples() * 2 < std::size(mix));
 	std::fill_n(&mix[0], outputs[0].samples()*2, 0);
 
 	for (v = 0; v < NILE_VOICES; v++)

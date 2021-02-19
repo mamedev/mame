@@ -67,6 +67,7 @@ private:
 	int m_active, m_rw, m_rw_state;
 	u8 m_data, m_whd, m_mode, m_status, m_control, m_rw_bit_count;
 	u8 m_rsh, m_wsh;
+	u8 m_devsel;
 
 	u8 control(int offset, u8 data);
 	u64 time_to_cycles(const attotime &tm) const;

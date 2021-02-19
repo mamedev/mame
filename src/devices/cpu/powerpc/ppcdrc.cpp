@@ -118,7 +118,7 @@ inline void ppc_device::load_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -137,7 +137,7 @@ void ppc_device::save_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -149,7 +149,7 @@ void ppc_device::save_fast_iregs(drcuml_block &block)
 
 inline void ppc_device::load_fast_fregs(drcuml_block &block)
 {
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_fdregmap); regnum++)
+	for (int regnum = 0; regnum < std::size(m_fdregmap); regnum++)
 	{
 		if (m_fdregmap[regnum].is_float_register())
 		{
@@ -160,7 +160,7 @@ inline void ppc_device::load_fast_fregs(drcuml_block &block)
 
 void ppc_device::save_fast_fregs(drcuml_block &block)
 {
-	for (int regnum = 0; regnum < ARRAY_LENGTH(m_fdregmap); regnum++)
+	for (int regnum = 0; regnum < std::size(m_fdregmap); regnum++)
 	{
 		if (m_fdregmap[regnum].is_float_register())
 		{
@@ -268,7 +268,7 @@ void ppc_device::ppcdrc_set_options(uint32_t options)
 
 void ppc_device::ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
-	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
+	if (m_fastram_select < std::size(m_fastram))
 	{
 		m_fastram[m_fastram_select].start = start;
 		m_fastram[m_fastram_select].end = end;
@@ -285,7 +285,7 @@ void ppc_device::ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, 
 
 void ppc_device::ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles)
 {
-	if (m_hotspot_select < ARRAY_LENGTH(m_hotspot))
+	if (m_hotspot_select < std::size(m_hotspot))
 	{
 		m_hotspot[m_hotspot_select].pc = pc;
 		m_hotspot[m_hotspot_select].opcode = opcode;

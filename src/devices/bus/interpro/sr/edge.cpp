@@ -896,7 +896,8 @@ void edge2plus_processor_device_base::kernel_w(offs_t offset, u32 data, u32 mem_
 
 u32 edge2plus_processor_device_base::reg0_r()
 {
-	LOG("reg0_r vblank %d\n", m_screen->vblank());
+	if (m_screen)
+		LOG("reg0_r vblank %d\n", m_screen->vblank());
 
 	return (m_screen == nullptr) ? (m_reg0 & ~VBLANK) : ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }

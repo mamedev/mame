@@ -357,8 +357,8 @@ static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgt
 		int len = iter->image->dev_dir.file_dir[iter->index].filename[0];
 		const char *type;
 
-		if (len > ARRAY_LENGTH(ent.filename))
-			len = ARRAY_LENGTH(ent.filename);
+		if (len > std::size(ent.filename))
+			len = std::size(ent.filename);
 		memcpy(ent.filename, iter->image->dev_dir.file_dir[iter->index].filename + 1, len);
 		ent.filename[len] = 0;
 
@@ -382,7 +382,7 @@ static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgt
 			type = "???";
 			break;
 		}
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
+		snprintf(ent.attr, std::size(ent.attr), "%s", type);
 
 		/* len in physrecs */
 		ent.filesize = get_UINT16xE(iter->image->dev_dir.vol_hdr.disk_flipped, iter->image->dev_dir.file_dir[iter->index].next_block)

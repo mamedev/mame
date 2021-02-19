@@ -1334,18 +1334,12 @@ uint16_t tx1_state::buggyboy_spcs_ram_r(offs_t offset)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(tx1_state,buggyboy)
+void tx1_state::machine_reset()
 {
 	// TODO: This is connected to the /BUSACK line of the Z80
 	m_maincpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 
 	memset(&m_math, 0, sizeof(m_math));
-}
 
-MACHINE_RESET_MEMBER(tx1_state,tx1)
-{
-	// TODO: This is connected to the /BUSACK line of the Z80
-	m_maincpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
-
-	memset(&m_math, 0, sizeof(m_math));
+	m_sn74s516.state = 0;
 }

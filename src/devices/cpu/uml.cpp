@@ -766,7 +766,7 @@ void uml::instruction::validate()
 	}
 
 	// make sure we aren't missing any parameters
-	if (m_numparams < ARRAY_LENGTH(opinfo.param))
+	if (m_numparams < std::size(opinfo.param))
 		assert(opinfo.param[m_numparams].typemask == 0);
 #endif // MAME_DEBUG
 }

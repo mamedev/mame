@@ -1066,7 +1066,7 @@ const char_info *char_info::find(char32_t target)
 {
 	// perform a simple binary search to find the proper alternate
 	int low = 0;
-	int high = ARRAY_LENGTH(charinfo);
+	int high = std::size(charinfo);
 	while (high > low)
 	{
 		int middle = (high + low) / 2;
@@ -1096,7 +1096,7 @@ bool validate_natural_keyboard_statics(void)
     const char_info *ci;
 
     // check to make sure that charinfo is in order
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
+    for (i = 0; i < std::size(charinfo); i++)
     {
         if (last_char >= charinfo[i].ch)
         {
@@ -1107,7 +1107,7 @@ bool validate_natural_keyboard_statics(void)
     }
 
     // check to make sure that I can look up everything on alternate_charmap
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
+    for (i = 0; i < std::size(charinfo); i++)
     {
         ci = char_info::find(charinfo[i].ch);
         if (ci != &charinfo[i])

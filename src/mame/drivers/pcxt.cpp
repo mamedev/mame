@@ -17,7 +17,6 @@ TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1. (seems fixed?)
 - Add a proper FDC device.
-- Filetto: Add UM5100 sound chip, might be connected to the prototyping card;
 - buzzer sound has issues in both games
 
 ********************************************************************************************
@@ -79,6 +78,11 @@ public:
 	void tetriskr(machine_config &config);
 	void filetto(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	int m_lastvalue;
 	uint8_t m_disk_data[2];
@@ -101,9 +105,6 @@ private:
 	void port_b_w(uint8_t data);
 	void voice_start_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
@@ -524,6 +525,9 @@ void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 void pcxt_state::machine_start()
 {
 	m_sample = timer_alloc();
+
+	m_status = 0;
+	m_clr_status = 0;
 }
 
 void pcxt_state::machine_reset()

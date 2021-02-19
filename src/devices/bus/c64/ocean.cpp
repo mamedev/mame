@@ -87,12 +87,12 @@ uint8_t c64_ocean_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sp
 	if (!roml && m_roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_roml[addr];
+		data = m_roml[addr & (m_roml_size - 1)];
 	}
 	else if (!romh && m_romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_romh[addr];
+		data = m_romh[addr & (m_romh_size - 1)];
 	}
 	else if (!io1)
 	{

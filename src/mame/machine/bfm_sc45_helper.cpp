@@ -215,7 +215,7 @@ int find_input_strings(running_machine &machine)
 
 					//if (pos <= 5)
 					{
-						assert(pos >= 0 && pos < ARRAY_LENGTH(sc4inputs[port]));
+						assert(pos >= 0 && pos < std::size(sc4inputs[port]));
 						if (sc4inputs[port][pos].used == false)
 						{
 							sc4inputs[port][pos].used = true;
@@ -614,9 +614,9 @@ int find_lamp_strings(running_machine &machine)
 		{
 			char tempname2[64];
 
-			if (pos == 0) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%stop", tempname);
-			if (pos == 1) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%smid", tempname);
-			if (pos == 2) snprintf(tempname2, ARRAY_LENGTH(tempname2), "%sbot", tempname);
+			if (pos == 0) snprintf(tempname2, std::size(tempname2), "%stop", tempname);
+			if (pos == 1) snprintf(tempname2, std::size(tempname2), "%smid", tempname);
+			if (pos == 2) snprintf(tempname2, std::size(tempname2), "%sbot", tempname);
 
 
 			for (auto & lamp : lamps)

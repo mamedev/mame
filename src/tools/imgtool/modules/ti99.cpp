@@ -1837,7 +1837,7 @@ static int dsk_read_catalog(struct ti99_lvl2_imgref *l2_img, int aphysrec, ti99_
 			|| ((dest->files[i].fdr_ptr && dest->files[i+1].fdr_ptr) && (memcmp(dest->files[i].name, dest->files[i+1].name, 10) >= 0)))
 		{
 			/* if the catalog is not sorted, we repair it */
-			qsort(dest->files, ARRAY_LENGTH(dest->files), sizeof(dest->files[0]),
+			qsort(dest->files, std::size(dest->files), sizeof(dest->files[0]),
 					cat_file_compare_qsort);
 			break;
 		}
@@ -4275,10 +4275,10 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 	{
 		if (iter->listing_subdirs)
 		{
-			fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, std::size(ent.filename));
 
 			/* set type of DIR */
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
+			snprintf(ent.attr, std::size(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
@@ -4299,7 +4299,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent.filename, fdr.name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, fdr.name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4307,19 +4307,19 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 				ent.filename[0] = '\0';
 				if (iter->level)
 				{
-					fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, ARRAY_LENGTH(ent.filename));
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, std::size(ent.filename));
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, fdr.name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
+				snprintf(ent.attr, std::size(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
+				snprintf(ent.attr, std::size(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,
@@ -4399,7 +4399,7 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 		if (iter->listing_subdirs)
 		{
 #if 0
-			fname_to_str(ent.filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4408,16 +4408,16 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, buf, std::size(ent.filename) - 1);
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 
 			/* set type of DIR */
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
+			snprintf(ent.attr, std::size(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
@@ -4442,7 +4442,7 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent.filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4451,19 +4451,19 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, buf, std::size(ent.filename) - 1);
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].files[iter->index[iter->level]].name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
+				snprintf(ent.attr, std::size(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
+				snprintf(ent.attr, std::size(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,

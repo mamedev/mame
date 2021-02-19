@@ -154,6 +154,8 @@ void namcos86_state::video_start()
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_backcolor));
 	save_item(NAME(m_copy_sprites));
+
+	m_backcolor = 0;
 }
 
 

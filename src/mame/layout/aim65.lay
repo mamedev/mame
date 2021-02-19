@@ -26,7 +26,7 @@ copyright-holders:Dirk Best, Eric Roberts
 			<bounds left="50" top="20" right="770" bottom="141" />
 		</element>
 
-		<!-- element -->
+		<!-- bezel -->
 
 		<element ref="static_white"><bounds left="50" top="20" right="770" bottom="141" /></element>
 		<element ref="static_black"><bounds left="53" top="23" right="767" bottom="138" /></element>

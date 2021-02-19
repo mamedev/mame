@@ -540,7 +540,7 @@ public:
 			// register ourself to handle events from event manager
 			int event_types[] = { motion_type, button_press_type, button_release_type };
 			osd_printf_verbose("Events types to register: motion:%d, press:%d, release:%d\n", motion_type, button_press_type, button_release_type);
-			x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+			x11_event_manager::instance().subscribe(event_types, std::size(event_types), this);
 		}
 
 		osd_printf_verbose("Lightgun: End initialization\n");
@@ -604,7 +604,7 @@ private:
 		{
 			if (m_lightgun_map.initialized)
 			{
-				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
+				snprintf(tempname, std::size(tempname), "NC%d", index);
 				return devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
 			} else
 				return nullptr;

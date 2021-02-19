@@ -86,7 +86,7 @@ void xmap9_device::device_reset()
 	m_cursor_cmap = 0;
 	m_popup_cmap = 0;
 	m_mode_table_idx = 0;
-	memset(m_mode_table, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_mode_table));
+	std::fill(std::begin(m_mode_table), std::end(m_mode_table), 0);
 }
 
 void xmap9_device::serialize(FILE *file)
@@ -233,7 +233,7 @@ void cmap_device::device_reset()
 {
 	m_status = 8;
 	m_palette_idx = 0;
-	memset(m_palette, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_palette));
+	std::fill(std::begin(m_palette), std::end(m_palette), 0);
 }
 
 void cmap_device::serialize(FILE *file)

@@ -613,7 +613,6 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 
 		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 		{
-			u8 i;
 			static const u8 data[]={
 				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
 				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
@@ -621,7 +620,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 				0xc3, 0x89, 0xc6    // JP C689  ;run program
 			};
 
-			for (i = 0; i < ARRAY_LENGTH(data); i++)
+			for (u8 i = 0; i < std::size(data); i++)
 				space.write_byte(0xf01f + i, data[i]);
 
 			if (!autorun)

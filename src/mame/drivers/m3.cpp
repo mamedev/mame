@@ -27,13 +27,15 @@
 
     TODO:
     - Initial PC is currently hacked to f000
-	- Finish floppy hookup
+	- Verify/fix floppy hookup (CPU needs to be overclocked?)
 	- Printer interface
 	- Buzzer
 	- Map the rest of the keys, verify existing keys
 
     Notes:
-    - No software available
+    - No offical software available, but a custom version of CP/M
+	- Y to boot from floppy, ESC to enter monitor, any other key to
+	  boot from IDE
 
 ***************************************************************************/
 
@@ -64,6 +66,7 @@ public:
 	m3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ctc(*this, "ctc"),
 		m_ppi(*this, "ppi%u", 0U),
 		m_chargen(*this, "chargen"),
 		m_vram(*this, "vram"),
@@ -83,6 +86,7 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_region_ptr<uint8_t> m_chargen;
 	required_shared_ptr<uint8_t> m_vram;
@@ -112,6 +116,12 @@ private:
 	uint8_t ppi2_pb_r();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	uint8_t fdc_data_r(offs_t offset);
+	void fdc_data_w(offs_t offset, uint8_t data);
+	bool m_nmi_taken;
 };
 
 
@@ -128,11 +138,15 @@ void m3_state::mem_map(address_map &map)
 
 void m3_state::io_map(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x83).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x84, 0x84).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x85, 0x85).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x88, 0x8b).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x88, 0x88).rw(m_fdc, FUNC(fd1793_device::status_r), FUNC(fd1793_device::cmd_w));
+	map(0x89, 0x89).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0x8a, 0x8a).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0x8b, 0x8b).rw(FUNC(m3_state::fdc_data_r), FUNC(m3_state::fdc_data_w));
 	map(0x8c, 0x8d).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x94, 0x97).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -420,13 +434,64 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START(chars)
-	GFXDECODE_ENTRY("chargen", 0x0000, charlayout, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, charlayout, 0, 1)
 GFXDECODE_END
 
 
 //**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
+
+void m3_state::fdc_intrq_w(int state)
+{
+	if (state)
+	{
+		m_nmi_taken = false;
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+
+	m_ctc->trg1(state);
+}
+
+void m3_state::fdc_drq_w(int state)
+{
+	if (state)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+
+	if (state && !m_nmi_taken)
+	{
+		m_nmi_taken = true;
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
+uint8_t m3_state::fdc_data_r(offs_t offset)
+{
+	if ((m_fdc->drq_r() == 0) && m_nmi_taken)
+	{
+		// cpu tries to read data without drq, halt it and reset pc
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
+		
+		return 0;
+	}
+
+	return m_fdc->data_r();
+}
+
+void m3_state::fdc_data_w(offs_t offset, uint8_t data)
+{
+	if ((m_fdc->drq_r() == 0) && m_nmi_taken)
+	{
+		// cpu tries to write data without drq, halt it and reset pc
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
+		
+		return;
+	}
+
+	m_fdc->data_w(data);
+}
 
 void m3_state::ppi2_pa_w(uint8_t data)
 {
@@ -435,9 +500,9 @@ void m3_state::ppi2_pa_w(uint8_t data)
 	// 7-------  not used?
 	// -6------  buzzer
 	// --5-----  not used?
-	// ---4----  unknown
+	// ---4----  unknown (motor?)
 	// ----3---  unknown
-	// -----2--  unknown (side?)
+	// -----2--  floppy side
 	// ------10  drive select
 
 	logerror("ppi2_pa_w: %02x\n", data);
@@ -449,7 +514,8 @@ void m3_state::ppi2_pa_w(uint8_t data)
 
 	m_fdc->set_floppy(floppy);
 
-	// todo: side select, motor
+	if (floppy)
+		floppy->ss_w(BIT(data, 2));
 }
 
 uint8_t m3_state::ppi2_pb_r()
@@ -463,11 +529,14 @@ void m3_state::machine_start()
 	save_item(NAME(m_kbd_col));
 	save_item(NAME(m_kbd_row));
 	save_item(NAME(m_kbd_data));
+	save_item(NAME(m_nmi_taken));
 }
 
 void m3_state::machine_reset()
 {
 	m_maincpu->set_pc(0xf000);
+
+	m_nmi_taken = false;
 
 	// floppy motor is always on
 	if (m_floppy[0])
@@ -507,16 +576,16 @@ static void m3_floppies(device_slot_interface &device)
 
 void m3_state::m3(machine_config &config)
 {
-	Z80(config, m_maincpu, 2'500'000); // unknown divisor
+	Z80(config, m_maincpu, 3'000'000); // should be 2.5 MHz, but then it's too slow for the floppy
 	m_maincpu->set_addrmap(AS_PROGRAM, &m3_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m3_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", 0)); // unknown clock
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.set_clk<0>(2'457'600 / 2); // unknown clock. this gives the usart 9600 baud by default
-	ctc.zc_callback<0>().set("usart", FUNC(i8251_device::write_txc));
-	ctc.zc_callback<0>().append("usart", FUNC(i8251_device::write_rxc));
+	Z80CTC(config, m_ctc, 0); // unknown clock
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(2'457'600 / 2); // unknown clock. this gives the usart 9600 baud by default
+	m_ctc->zc_callback<0>().set("usart", FUNC(i8251_device::write_txc));
+	m_ctc->zc_callback<0>().append("usart", FUNC(i8251_device::write_rxc));
 
 	I8255(config, m_ppi[0]);
 
@@ -549,11 +618,12 @@ void m3_state::m3(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(7);
 	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row));
-	crtc.out_vsync_callback().set("ctc", FUNC(z80ctc_device::trg2));
+	crtc.out_vsync_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
 
 	// floppy
 	FD1793(config, m_fdc, 2'000'000); // unknown clock
-	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_fdc->intrq_wr_callback().set(FUNC(m3_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(m3_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
 
@@ -578,7 +648,7 @@ ROM_START( m3 )
 	ROM_LOAD("bootstrap_prom_034.bin", 0x0000, 0x0800, CRC(7fdb051e) SHA1(7aa24d4f44b6a0c8f7f647667f4997432c186cac))
 	
 	// Homebrew Monitor ROM, written by Steve Hunt. Uses the socket of the HDD ROM.
-	ROM_LOAD("monitor_prom_v17_2015-12-09.bin", 0x0800, 0x0800, CRC(85b5c541) SHA1(92b4ec87a4d0d8c0f7b49eec0c5457f237de0a01))
+	ROM_LOAD("monitor_prom_v19_2017-07-05.bin", 0x0800, 0x0800, CRC(0608848f) SHA1(9a82cb49056ff1a1d53ce2bd026537a6914a4847))
 
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("6845crt_font_prom_033.bin", 0x000, 0x800, CRC(cc29f664) SHA1(4197530d9455d665fd4773f95bb6394f6b056dec))

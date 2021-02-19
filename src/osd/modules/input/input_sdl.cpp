@@ -786,7 +786,7 @@ public:
 			static_cast<int>(SDL_TEXTINPUT)
 		};
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+		sdl_event_manager::instance().subscribe(event_types, std::size(event_types), this);
 
 		sdl_keyboard_device *devinfo;
 
@@ -921,7 +921,7 @@ public:
 			static_cast<int>(SDL_MOUSEWHEEL)
 		};
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+		sdl_event_manager::instance().subscribe(event_types, std::size(event_types), this);
 
 		sdl_mouse_device *devinfo;
 		char defname[20];
@@ -1148,7 +1148,7 @@ public:
 			static_cast<int>(SDL_JOYBUTTONUP)
 		};
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+		sdl_event_manager::instance().subscribe(event_types, std::size(event_types), this);
 
 		osd_printf_verbose("Joystick: End initialization\n");
 	}
@@ -1182,7 +1182,7 @@ private:
 			// only map place holders if there were mappings specified
 			if (devmap->initialized)
 			{
-				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
+				snprintf(tempname, std::size(tempname), "NC%d", index);
 				m_sixaxis_mode
 					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
 					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);

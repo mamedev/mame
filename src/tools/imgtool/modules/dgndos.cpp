@@ -539,8 +539,8 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 		err = dgndos_count_dirents(entire_track20, dgnent, &dir_ent_count);
 		if (err) return err;
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c (%03d)",
+		snprintf(ent.filename, std::size(ent.filename), "%s", fname.c_str());
+		snprintf(ent.attr, std::size(ent.attr), "%c (%03d)",
 			(char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'),
 			dir_ent_count);
 	}
