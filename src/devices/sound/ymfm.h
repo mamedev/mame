@@ -207,12 +207,12 @@ class ymopm_registers : public ymfm_registers_base
 {
 public:
 	// constants
-	static const u8 DEFAULT_PRESCALE = 2;
-	static const u8 CHANNELS = 8;
-	static const u8 CSM_TRIGGER_MASK = 0xff;
-	static const u16 REGISTERS = 0x100;
-	static const u16 REG_MODE = 0x14;
-	static const u16 REG_KEYON = 0x08;
+	static constexpr u8 DEFAULT_PRESCALE = 2;
+	static constexpr u8 CHANNELS = 8;
+	static constexpr u8 CSM_TRIGGER_MASK = 0xff;
+	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REG_MODE = 0x14;
+	static constexpr u16 REG_KEYON = 0x08;
 
 	// constructor
 	ymopm_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
@@ -366,12 +366,12 @@ class ymopn_registers : public ymfm_registers_base
 {
 public:
 	// constants
-	static const u8 DEFAULT_PRESCALE = 6;
-	static const u8 CHANNELS = 3;
-	static const u8 CSM_TRIGGER_MASK = 1 << 2;
-	static const u16 REGISTERS = 0x100;
-	static const u16 REG_MODE = 0x27;
-	static const u16 REG_KEYON = 0x28;
+	static constexpr u8 DEFAULT_PRESCALE = 6;
+	static constexpr u8 CHANNELS = 3;
+	static constexpr u8 CSM_TRIGGER_MASK = 1 << 2;
+	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REG_MODE = 0x27;
+	static constexpr u16 REG_KEYON = 0x28;
 
 	// constructor
 	ymopn_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
@@ -535,8 +535,8 @@ class ymopna_registers : public ymopn_registers
 {
 public:
 	// constants
-	static const u8 CHANNELS = 6;
-	static const u16 REGISTERS = 0x200;
+	static constexpr u8 CHANNELS = 6;
+	static constexpr u16 REGISTERS = 0x200;
 
 	// constructor
 	ymopna_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
