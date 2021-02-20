@@ -8,8 +8,8 @@
 #include "coreutil.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2612.h"
 #include "sound/sn76496.h"
+#include "sound/ym2612.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */

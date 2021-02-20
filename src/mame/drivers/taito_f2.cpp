@@ -272,9 +272,9 @@ Notes:
 #include "machine/rp5c01.h"
 #include "machine/te7750.h"
 #include "machine/watchdog.h"
+#include "sound/okim6295.h"
 #include "sound/ym2203.h"
 #include "sound/ym2610.h"
-#include "sound/okim6295.h"
 #include "speaker.h"
 
 

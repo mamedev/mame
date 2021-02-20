@@ -32,8 +32,8 @@
 
 #include "machine/clock.h"
 
-#include "sound/ym2610.h"
 #include "sound/okim6295.h"
+#include "sound/ym2610.h"
 
 #include "video/vsystem_gga.h"
 

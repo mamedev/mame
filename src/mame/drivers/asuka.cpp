@@ -224,9 +224,9 @@ DIP locations verified for:
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2610.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -27,8 +27,8 @@
 #include "machine/te7750.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
-#include "sound/ym2203.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

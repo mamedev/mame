@@ -36,8 +36,8 @@
 #include "includes/segaipt.h"
 
 #include "machine/nvram.h"
-#include "sound/ym2612.h"
 #include "sound/rf5c68.h"
+#include "sound/ym2612.h"
 #include "speaker.h"
 
 /*************************************
