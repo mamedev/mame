@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifndef MAME_SOUND_ADPCM_H
-#define MAME_SOUND_ADPCM_H
+#ifndef MAME_SOUND_YMADPCM_H
+#define MAME_SOUND_YMADPCM_H
 
 #pragma once
 
@@ -331,4 +331,4 @@ private:
 	ymadpcm_b_registers m_regs;      // register accessor
 };
 
-#endif // MAME_SOUND_ADPCM_H
+#endif // MAME_SOUND_YMADPCM_H

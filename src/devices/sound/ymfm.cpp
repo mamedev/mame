@@ -129,7 +129,6 @@
 #define LOG_KEY_ONS (0)
 
 
-
 //*********************************************************
 //  GLOBAL TABLE LOOKUPS
 //*********************************************************
@@ -334,7 +333,7 @@ u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 	//
 	//    3579545 / 8(channels) / 4(operators) / 2(prescale) = 55930Hz FM clock
 	//
-	// To correct for this, the YM2608 formula was adjusted to usea clock of
+	// To correct for this, the YM2608 formula was adjusted to use a clock of
 	// 8053920Hz, giving this equation for the fnum:
 	//
 	//    fnum = (double(144) * freq * (1 << 20)) / double(8053920) / 4;

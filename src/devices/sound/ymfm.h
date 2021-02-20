@@ -792,7 +792,15 @@ private:
 };
 
 
-// ======================> derived classes
+// ======================> template instantiations
+
+// Ideally we would declare these via extern template, but this prevents
+// specialization from working in the actual implementation. Leaving this
+// commented pending the best way to work around the compiler here.
+
+//extern template class ymfm_engine_base<ymopm_registers>;
+//extern template class ymfm_engine_base<ymopn_registers>;
+//extern template class ymfm_engine_base<ymopna_registers>;
 
 using ymopm_engine = ymfm_engine_base<ymopm_registers>;
 using ymopn_engine = ymfm_engine_base<ymopn_registers>;
