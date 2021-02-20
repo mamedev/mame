@@ -193,7 +193,7 @@ key_trans_entry keyboard_trans_table::s_default_table[] =
 keyboard_trans_table::keyboard_trans_table()
 {
 	m_table = s_default_table;
-	m_table_size = ARRAY_LENGTH(s_default_table);
+	m_table_size = std::size(s_default_table);
 }
 #else
 keyboard_trans_table::keyboard_trans_table()

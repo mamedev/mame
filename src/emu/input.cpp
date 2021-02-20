@@ -668,7 +668,7 @@ bool input_manager::code_pressed_once(input_code code)
 	// look for the code in the memory
 	bool curvalue = code_pressed(code);
 	int empty = -1;
-	for (int memnum = 0; memnum < ARRAY_LENGTH(m_switch_memory); memnum++)
+	for (int memnum = 0; memnum < std::size(m_switch_memory); memnum++)
 	{
 		// were we previous pressed on the last time through here?
 		if (m_switch_memory[memnum] == code)
@@ -876,7 +876,7 @@ input_code input_manager::code_from_token(std::string_view _token)
 	// copy the token and break it into pieces
 	std::string token[6];
 	int numtokens = 0;
-	while (numtokens < ARRAY_LENGTH(token))
+	while (numtokens < std::size(token))
 	{
 		// make a token up to the next underscore
 		std::string_view::size_type score = _token.find('_');
@@ -1327,7 +1327,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 		std::string token[2];
 		int numtokens = 0;
 		std::string_view _token = controllername;
-		while (numtokens < ARRAY_LENGTH(token))
+		while (numtokens < std::size(token))
 		{
 			// make a token up to the next underscore
 			std::string_view::size_type score = _token.find('_');

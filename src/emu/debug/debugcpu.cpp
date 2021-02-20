@@ -1380,7 +1380,7 @@ offs_t device_debug::history_pc(int index) const
 		index = 0;
 	if (index <= -HISTORY_SIZE)
 		index = -HISTORY_SIZE + 1;
-	return m_pc_history[(m_pc_history_index + ARRAY_LENGTH(m_pc_history) - 1 + index) % ARRAY_LENGTH(m_pc_history)];
+	return m_pc_history[(m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history)];
 }
 
 

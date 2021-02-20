@@ -704,10 +704,10 @@ static void validate_backend(drcuml_state *drcuml)
 
 	// iterate over test entries
 	printf("Backend validation....\n");
-	for (tnum = 31; tnum < ARRAY_LENGTH(bevalidate_test_list); tnum++)
+	for (tnum = 31; tnum < std::size(bevalidate_test_list); tnum++)
 	{
 		const bevalidate_test *test = &bevalidate_test_list[tnum];
-		parameter param[ARRAY_LENGTH(test->param)];
+		parameter param[std::size(test->param)];
 		char mnemonic[20], *dst;
 		const char *src;
 
@@ -726,7 +726,7 @@ static void validate_backend(drcuml_state *drcuml)
 				*dst++ = *src;
 		}
 		*dst = 0;
-		printf("Executing test %d/%d (%s)", tnum + 1, (int)ARRAY_LENGTH(bevalidate_test_list), mnemonic);
+		printf("Executing test %d/%d (%s)", tnum + 1, (int)std::size(bevalidate_test_list), mnemonic);
 
 		// reset parameter list and iterate
 		memset(param, 0, sizeof(param));
@@ -750,7 +750,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, uml::code_handl
 	drcuml_ptype ptype;
 
 	// if no parameters, execute now
-	if (pnum >= ARRAY_LENGTH(opinfo->param) || opinfo->param[pnum].typemask == PTYPES_NONE)
+	if (pnum >= std::size(opinfo->param) || opinfo->param[pnum].typemask == PTYPES_NONE)
 	{
 		bevalidate_iterate_over_flags(drcuml, handles, test, paramlist);
 		return;
@@ -838,7 +838,7 @@ static void bevalidate_iterate_over_flags(drcuml_state *drcuml, uml::code_handle
 
 static void bevalidate_execute(drcuml_state *drcuml, uml::code_handle **handles, const bevalidate_test *test, const parameter *paramlist, uint8_t flagmask)
 {
-	parameter params[ARRAY_LENGTH(test->param)];
+	parameter params[std::size(test->param)];
 	drcuml_machine_state istate, fstate;
 	instruction testinst;
 	drcuml_block *block;
@@ -846,7 +846,7 @@ static void bevalidate_execute(drcuml_state *drcuml, uml::code_handle **handles,
 	int numparams;
 
 	// allocate memory for parameters
-	parammem = (uint64_t *)drcuml->cache->alloc_near(sizeof(uint64_t) * (ARRAY_LENGTH(test->param) + 1));
+	parammem = (uint64_t *)drcuml->cache->alloc_near(sizeof(uint64_t) * (std::size(test->param) + 1));
 
 	// flush the cache
 	drcuml->reset();
@@ -888,7 +888,7 @@ static void bevalidate_execute(drcuml_state *drcuml, uml::code_handle **handles,
 	}
 	testinst = block->inst[block->nextinst - 1];
 	UML_HANDLE(block, handles[2]);
-	UML_GETFLGS(block, MEM(&parammem[ARRAY_LENGTH(test->param)]), flagmask);
+	UML_GETFLGS(block, MEM(&parammem[std::size(test->param)]), flagmask);
 	UML_SAVE(block, &fstate);
 	UML_EXIT(block, IMM(0));
 
@@ -899,10 +899,10 @@ static void bevalidate_execute(drcuml_state *drcuml, uml::code_handle **handles,
 	drcuml->execute(*handles[0]);
 
 	// verify the results
-	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(uint32_t *)&parammem[ARRAY_LENGTH(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
+	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(uint32_t *)&parammem[std::size(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
 
 	// free memory
-	drcuml->cache->dealloc(parammem, sizeof(uint64_t) * (ARRAY_LENGTH(test->param) + 1));
+	drcuml->cache->dealloc(parammem, sizeof(uint64_t) * (std::size(test->param) + 1));
 }
 
 
@@ -922,14 +922,14 @@ static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_bloc
 	state->exp = machine.rand();
 
 	// initialize integer registers to random values
-	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
+	for (regnum = 0; regnum < std::size(state->r); regnum++)
 	{
 		state->r[regnum].w.h = machine.rand();
 		state->r[regnum].w.l = machine.rand();
 	}
 
 	// initialize float registers to random values
-	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
+	for (regnum = 0; regnum < std::size(state->f); regnum++)
 	{
 		*(uint32_t *)&state->f[regnum].s.h = machine.rand();
 		*(uint32_t *)&state->f[regnum].s.l = machine.rand();
@@ -950,14 +950,14 @@ static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_bloc
 static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const parameter *paramlist, parameter *params, uint64_t *parammem)
 {
 	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	int numparams = ARRAY_LENGTH(test->param);
+	int numparams = std::size(test->param);
 	int pnum;
 
 	// copy flags as-is
 	state->flags = test->iflags;
 
 	// iterate over parameters
-	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
+	for (pnum = 0; pnum < std::size(test->param); pnum++)
 	{
 		int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
 		parameter *curparam = &params[pnum];
@@ -1046,7 +1046,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	}
 
 	// check destination parameters
-	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
+	for (pnum = 0; pnum < std::size(test->param); pnum++)
 		if (opinfo->param[pnum].output & PIO_OUT)
 		{
 			int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
@@ -1094,14 +1094,14 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		}
 
 	// check source integer parameters for unexpected alterations
-	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
+	for (regnum = 0; regnum < std::size(state->r); regnum++)
 		if (ireg[regnum] == 0 && istate->r[regnum].d != state->r[regnum].d)
 			errend += sprintf(errend, "  Register i%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
 								(uint32_t)(state->r[regnum].d >> 32), (uint32_t)state->r[regnum].d,
 								(uint32_t)(istate->r[regnum].d >> 32), (uint32_t)istate->r[regnum].d);
 
 	// check source float parameters for unexpected alterations
-	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
+	for (regnum = 0; regnum < std::size(state->f); regnum++)
 		if (freg[regnum] == 0 && *(uint64_t *)&istate->f[regnum].d != *(uint64_t *)&state->f[regnum].d)
 			errend += sprintf(errend, "  Register f%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
 								(uint32_t)(*(uint64_t *)&state->f[regnum].d >> 32), (uint32_t)*(uint64_t *)&state->f[regnum].d,

@@ -170,7 +170,7 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 	/* extract vertices */
 	data = 0;
-	for (vertnum = 0; vertnum < ARRAY_LENGTH(vert) && !IS_POLYEND(data); vertnum++)
+	for (vertnum = 0; vertnum < std::size(vert) && !IS_POLYEND(data); vertnum++)
 	{
 		/* extract vertex data */
 		data = polydata[13 + vertnum * 2];

@@ -369,8 +369,8 @@ void md_rom_svp_device::set_bank_to_rom(const char *banktag, uint32_t offset)
 
 void md_rom_svp_device::device_start()
 {
-	memset(m_pmac_read, 0, ARRAY_LENGTH(m_pmac_read));
-	memset(m_pmac_write, 0, ARRAY_LENGTH(m_pmac_write));
+	std::fill(std::begin(m_pmac_read), std::end(m_pmac_read), 0);
+	std::fill(std::begin(m_pmac_write), std::end(m_pmac_write), 0);
 	m_pmc.d = 0;
 	m_pmc.w.l = 0;
 	m_pmc.w.h = 0;

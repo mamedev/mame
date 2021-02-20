@@ -298,7 +298,7 @@ protected:
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
-	virtual void update_w_latch() override { m_write_s(0, m_w, 0xff); } // W is connected directly to S
+	virtual void update_w_latch() override { m_write_s(m_w); } // W is connected directly to S
 
 	virtual void clock_melody() override;
 };

@@ -386,6 +386,7 @@ hektor.cpp
 hhtiger.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
+hh_cops1.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp

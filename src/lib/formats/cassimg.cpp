@@ -94,12 +94,12 @@ const int8_t *choose_wave(const cassette_image::Modulation &modulation, size_t &
 
 	if (modulation.flags & cassette_image::MODULATION_SINEWAVE)
 	{
-		wave_bytes_length = ARRAY_LENGTH(sine_wave);
+		wave_bytes_length = std::size(sine_wave);
 		return sine_wave;
 	}
 	else
 	{
-		wave_bytes_length = ARRAY_LENGTH(square_wave);
+		wave_bytes_length = std::size(square_wave);
 		return square_wave;
 	}
 }

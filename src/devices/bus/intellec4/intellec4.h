@@ -168,17 +168,17 @@ public:
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER(sync_in);
-	DECLARE_WRITE_LINE_MEMBER(test_in) {set_test(ARRAY_LENGTH(m_cards), state); }
-	DECLARE_WRITE_LINE_MEMBER(stop_in) {set_stop(ARRAY_LENGTH(m_cards), state); }
+	DECLARE_WRITE_LINE_MEMBER(test_in) {set_test(std::size(m_cards), state); }
+	DECLARE_WRITE_LINE_MEMBER(stop_in) {set_stop(std::size(m_cards), state); }
 	DECLARE_WRITE_LINE_MEMBER(stop_acknowledge_in);
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset_in);
-	DECLARE_WRITE_LINE_MEMBER(reset_4002_in) { set_reset_4002(ARRAY_LENGTH(m_cards), state); }
+	DECLARE_WRITE_LINE_MEMBER(reset_4002_in) { set_reset_4002(std::size(m_cards), state); }
 
 	// output lines
-	DECLARE_READ_LINE_MEMBER(test_out) const        { return (m_test        & ~(u16(1U) << ARRAY_LENGTH(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(stop_out) const        { return (m_stop        & ~(u16(1U) << ARRAY_LENGTH(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(reset_4002_out) const  { return (m_reset_4002  & ~(u16(1U) << ARRAY_LENGTH(m_cards))) ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(user_reset_out) const  { return (m_user_reset  & ~(u16(1U) << ARRAY_LENGTH(m_cards))) ? 0 : 1; }
+	DECLARE_READ_LINE_MEMBER(test_out) const        { return (m_test        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	DECLARE_READ_LINE_MEMBER(stop_out) const        { return (m_stop        & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	DECLARE_READ_LINE_MEMBER(reset_4002_out) const  { return (m_reset_4002  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
+	DECLARE_READ_LINE_MEMBER(user_reset_out) const  { return (m_user_reset  & ~(u16(1U) << std::size(m_cards))) ? 0 : 1; }
 
 protected:
 	// device_t implementation

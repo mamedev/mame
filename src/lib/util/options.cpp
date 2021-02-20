@@ -12,7 +12,6 @@
 
 #include "corefile.h"
 #include "corestr.h"
-#include "osdcomm.h"
 
 #include <locale>
 #include <string>
@@ -732,7 +731,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 
 	// loop over lines in the file
 	char buffer[4096];
-	while (inifile.gets(buffer, ARRAY_LENGTH(buffer)) != nullptr)
+	while (inifile.gets(buffer, std::size(buffer)) != nullptr)
 	{
 		// find the extent of the name
 		char *optionname;

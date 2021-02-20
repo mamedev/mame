@@ -492,6 +492,8 @@ void aussiebyte_state::machine_start()
 	m_bank1->configure_entries(0, 16, m_p_mram, 0x4000);
 	m_bank2->configure_entries(0, 16, m_p_mram, 0x4000);
 	m_bankr0->configure_entry(16, memregion("roms")->base());
+
+	m_cnt = 0;
 }
 
 

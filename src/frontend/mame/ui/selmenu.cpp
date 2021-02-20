@@ -2493,17 +2493,72 @@ void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, fl
 }
 
 
-std::string menu_select_launch::make_audit_fail_text(bool found, media_auditor const &auditor)
+std::string menu_select_launch::make_system_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary)
 {
 	std::ostringstream str;
-	str << _("The selected machine is missing one or more required ROM or CHD images. Please select a different machine.\n\n");
-	if (found)
+	if (!auditor.records().empty())
 	{
+		str << "System media audit failed:\n";
 		auditor.summarize(nullptr, &str);
-		str << "\n";
+		osd_printf_info(str.str());
+		str.str("");
+	}
+	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please select a different system.\n\n");
+	make_audit_fail_text(str, auditor, summary);
+	return str.str();
+}
+
+
+std::string menu_select_launch::make_software_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary)
+{
+	std::ostringstream str;
+	if (!auditor.records().empty())
+	{
+		str << "System media audit failed:\n";
+		auditor.summarize(nullptr, &str);
+		osd_printf_info(str.str());
+		str.str("");
+	}
+	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please select a different software item.\n\n");
+	make_audit_fail_text(str, auditor, summary);
+	return str.str();
+}
+
+
+void menu_select_launch::make_audit_fail_text(std::ostream &str, media_auditor const &auditor, media_auditor::summary summary)
+{
+	if ((media_auditor::NOTFOUND != summary) && !auditor.records().empty())
+	{
+		char const *message = nullptr;
+		for (media_auditor::audit_record const &record : auditor.records())
+		{
+			switch (record.substatus())
+			{
+			case media_auditor::audit_substatus::FOUND_BAD_CHECKSUM:
+				message = _("incorrect checksum");
+				break;
+			case media_auditor::audit_substatus::FOUND_WRONG_LENGTH:
+				message = _("incorrect length");
+				break;
+			case media_auditor::audit_substatus::NOT_FOUND:
+				message = _("not found");
+				break;
+			case media_auditor::audit_substatus::GOOD:
+			case media_auditor::audit_substatus::GOOD_NEEDS_REDUMP:
+			case media_auditor::audit_substatus::FOUND_NODUMP:
+			case media_auditor::audit_substatus::NOT_FOUND_NODUMP:
+			case media_auditor::audit_substatus::NOT_FOUND_OPTIONAL:
+			case media_auditor::audit_substatus::UNVERIFIED:
+				continue;
+			}
+			if (record.shared_device())
+				util::stream_format(str, _("%1$s (%2$s) - %3$s\n"), record.name(), record.shared_device()->shortname(), message);
+			else
+				util::stream_format(str, _("%1$s - %2$s\n"), record.name(), message);
+		}
+		str << '\n';
 	}
 	str << _("Press any key to continue.");
-	return str.str();
 }
 
 

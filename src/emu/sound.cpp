@@ -105,7 +105,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
 	sample_t buffer[64];
-	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(ARRAY_LENGTH(buffer))));
+	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(std::size(buffer))));
 
 	// if the new rate is lower, downsample into our holding buffer;
 	// otherwise just copy into our holding buffer for later upsampling
@@ -203,12 +203,12 @@ void stream_buffer::flush_wav()
 
 	// iterate over chunks for conversion
 	s16 buffer[1024];
-	for (int samplebase = 0; samplebase < view.samples(); samplebase += ARRAY_LENGTH(buffer))
+	for (int samplebase = 0; samplebase < view.samples(); samplebase += std::size(buffer))
 	{
 		// clamp to the buffer size
 		int cursamples = view.samples() - samplebase;
-		if (cursamples > ARRAY_LENGTH(buffer))
-			cursamples = ARRAY_LENGTH(buffer);
+		if (cursamples > std::size(buffer))
+			cursamples = std::size(buffer);
 
 		// convert and fill
 		for (int sampindex = 0; sampindex < cursamples; sampindex++)

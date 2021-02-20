@@ -3,8 +3,8 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  National Semiconductor COP400 MCU handhelds or other simple devices,
-  mostly LED electronic games/toys.
+  National Semiconductor COPS(COP400 MCU series) handhelds or other simple
+  devices, mostly LED electronic games/toys.
 
   TODO:
   - why does h2hbaskbc(and clones) need a workaround on writing L pins?
@@ -1691,7 +1691,8 @@ ROM_END
   * COP420 MCU label COP420-NPG/N
   * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
 
-  This is the COP420 version, the first release was on a MM5799 MCU.
+  This is the COP420 version, they removed support for the link cable.
+  The first release was on a MM5799 MCU, see hh_cops1.cpp.
 
 ***************************************************************************/
 
@@ -1720,8 +1721,8 @@ void qkracer_state::update_display()
 
 void qkracer_state::write_d(u8 data)
 {
-	// D: select digit, D3: input mux high bit
-	m_inp_mux = (m_inp_mux & 0xf) | (data << 1 & 0x10);
+	// D: select digit, D3: input mux low bit
+	m_inp_mux = (m_inp_mux & ~1) | (data >> 3 & 1);
 	m_d = data & 0xf;
 	update_display();
 }
@@ -1729,7 +1730,7 @@ void qkracer_state::write_d(u8 data)
 void qkracer_state::write_g(u8 data)
 {
 	// G: select digit, input mux
-	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
+	m_inp_mux = (m_inp_mux & 1) | (data << 1 & 0x1e);
 	m_g = data & 0xf;
 	update_display();
 }
@@ -1757,42 +1758,42 @@ WRITE_LINE_MEMBER(qkracer_state::write_sk)
 // config
 
 static INPUT_PORTS_START( qkracer )
-	PORT_START("IN.0") // G0 port IN
+	PORT_START("IN.0") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Complex")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
+
+	PORT_START("IN.1") // G0 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
-	PORT_START("IN.1") // G1 port IN
+	PORT_START("IN.2") // G1 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
 
-	PORT_START("IN.2") // G2 port IN
+	PORT_START("IN.3") // G2 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 
-	PORT_START("IN.3") // G3 port IN
+	PORT_START("IN.4") // G3 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Slow")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Fast")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
-
-	PORT_START("IN.4") // D3 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Complex")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
 INPUT_PORTS_END
 
 void qkracer_state::qkracer(machine_config &config)
 {
 	/* basic machine hardware */
-	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=100pF
-	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
 	m_maincpu->write_g().set(FUNC(qkracer_state::write_g));
 	m_maincpu->write_l().set(FUNC(qkracer_state::write_l));
@@ -1948,7 +1949,7 @@ CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     e
 CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1978, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

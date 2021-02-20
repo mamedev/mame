@@ -601,10 +601,14 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80186.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80286.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_80286.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_a500.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_a500.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_cms6809.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_cms6809.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
@@ -3254,7 +3258,6 @@ end
 
 if (BUSES["TI99"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/992board.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/992board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
@@ -4214,7 +4217,7 @@ if (BUSES["HP_IPC_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.cpp",
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/hp_ipc_io.h",
 		MAME_DIR .. "src/devices/bus/hp_ipc_io/82919.cpp",
-		MAME_DIR .. "src/devices/bus/hp_ipc_io/829919.h",
+		MAME_DIR .. "src/devices/bus/hp_ipc_io/82919.h",
 	}
 end
 

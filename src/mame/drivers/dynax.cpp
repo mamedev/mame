@@ -4162,7 +4162,7 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_gekisha_val[0] = 0;
 	m_gekisha_val[1] = 0;
 
-	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
+	std::fill(std::begin(m_palette_ram), std::end(m_palette_ram), 0);
 }
 
 MACHINE_START_MEMBER(dynax_state,hjingi)

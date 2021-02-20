@@ -1132,7 +1132,7 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 
 void floppy_image_device::set_write_splice(const attotime &when)
 {
-	if(image) {
+	if(image && !mon) {
 		image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);

@@ -161,7 +161,7 @@ void sm510_base_device::device_reset()
 	m_y = 0;
 
 	m_r = m_r_out = 0;
-	m_write_r(0, 0, 0xff);
+	m_write_r(0);
 }
 
 

@@ -65,7 +65,7 @@ license:CC0
 			<bounds left="-8" right="298" top="-46" bottom="121" />
 		</element>
 
-	<!-- outer element -->
+	<!-- outer bezel -->
 
 		<element ref="static_white"><bounds left="-8" right="298" top="-42" bottom="117" /></element>
 		<element ref="static_green"><bounds left="-8" right="298" top="-22" bottom="-20" /></element>
@@ -265,8 +265,7 @@ license:CC0
 		<element name="9.8" ref="seg"><bounds x="285" y="26" width="5" height="17" /></element>
 		<element name="9.6" ref="seg"><bounds x="285" y="50" width="5" height="17" /></element>
 
-
-	<!-- inner element -->
+	<!-- inner bezel -->
 
 		<element ref="static_white"><bounds x="24" y="-4" width="2" height="83" /></element>
 		<element ref="static_white"><bounds x="54" y="-4" width="2" height="83" /></element>

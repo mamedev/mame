@@ -161,6 +161,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2));
 	m_console.register_command("tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracelog, this, _1, _2));
 	m_console.register_command("tracesym",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracesym, this, _1, _2));
+	m_console.register_command("cls",       CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cls, this, _1, _2));
 	m_console.register_command("quit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
 	m_console.register_command("exit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
 	m_console.register_command("do",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_do, this, _1, _2));
@@ -893,6 +894,16 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
 	char buffer[1024];
 	if (mini_printf(buffer, format.str().c_str(), params.size(), values))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+}
+
+
+/*-------------------------------------------------
+    execute_cls - execute the cls command
+-------------------------------------------------*/
+
+void debugger_commands::execute_cls(int ref, const std::vector<std::string> &params)
+{
+	text_buffer_clear(m_console.get_console_textbuf());
 }
 
 
@@ -3820,7 +3831,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 		if (!entry.second->is_function())
 		{
 			namelist[count++] = entry.second->name();
-			if (count >= ARRAY_LENGTH(namelist))
+			if (count >= std::size(namelist))
 				break;
 		}
 	}

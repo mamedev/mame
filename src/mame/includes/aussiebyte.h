@@ -74,6 +74,10 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
@@ -108,8 +112,6 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 

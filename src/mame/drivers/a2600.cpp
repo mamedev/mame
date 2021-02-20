@@ -226,7 +226,7 @@ static const rectangle visarea[4] = {
 
 void a2600_base_state::a2600_tia_vsync_callback(uint16_t data)
 {
-	for ( int i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
+	for ( int i = 0; i < std::size(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
@@ -241,7 +241,7 @@ void a2600_base_state::a2600_tia_vsync_callback(uint16_t data)
 
 void a2600_base_state::a2600_tia_vsync_callback_pal(uint16_t data)
 {
-	for ( int i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
+	for ( int i = 0; i < std::size(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
