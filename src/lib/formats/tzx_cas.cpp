@@ -301,8 +301,8 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 {
 	float t_scale = 1.44f;
 	int pilot_samples = tcycles_to_samplecount(pilot,t_scale);
-	int bit0_samples = tcycles_to_samplecount(bit0,t_scale);
-	int bit1_samples = tcycles_to_samplecount(bit1,t_scale);
+	int bit0_samples  = tcycles_to_samplecount(bit0 ,t_scale);
+	int bit1_samples  = tcycles_to_samplecount(bit1 ,t_scale);
 	int data_index;
 	int size = 0;
 	int bit1_pulses = (bitcfg & 0b00001111);
