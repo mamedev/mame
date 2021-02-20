@@ -703,6 +703,8 @@ void ymfm_operator<RegisterType>::start_release()
 template<class RegisterType>
 void ymfm_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 {
+	assert(keystate == 0 || keystate == 1);
+
 	// has the key changed?
 	if ((keystate ^ m_key_state) != 0)
 	{
@@ -975,6 +977,7 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 template<class RegisterType>
 ymfm_channel<RegisterType>::ymfm_channel(RegisterType regs) :
 	m_feedback{ 0, 0 },
+	m_feedback_in(0),
 	m_op1(regs.operator_registers(0)),
 	m_op2(regs.operator_registers(1)),
 	m_op3(regs.operator_registers(2)),
@@ -993,6 +996,7 @@ void ymfm_channel<RegisterType>::save(device_t &device, u8 index)
 {
 	// save our data
 	device.save_item(YMFM_NAME(m_feedback), index);
+	device.save_item(YMFM_NAME(m_feedback_in), index);
 
 	// save operator data
 	m_op1.save(device, index * 4 + 0);
@@ -1011,6 +1015,7 @@ void ymfm_channel<RegisterType>::reset()
 {
 	// reset our data
 	m_feedback[0] = m_feedback[1] = 0;
+	m_feedback_in = 0;
 
 	// reset the operators
 	m_op1.reset();
@@ -1060,7 +1065,7 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 
 	// clock the feedback through
 	m_feedback[0] = m_feedback[1];
-	m_feedback[1] = m_feedback[2];
+	m_feedback[1] = m_feedback_in;
 
 	// in multi-frequency mode, the first 3 channels use independent block/fnum values
 	if (is_multi_freq)
@@ -1093,10 +1098,6 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 template<class RegisterType>
 void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
 {
-	// skip if both pans are clear; no need to do all this work for nothing
-	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
-		return;
-
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
 
@@ -1147,7 +1148,12 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 		modulation = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
-	opout[1] = m_feedback[2] = m_op1.compute_volume(modulation, am_offset);
+	opout[1] = m_feedback_in = m_op1.compute_volume(modulation, am_offset);
+
+	// no that the feedback has been computed, skip the rest if both pans are clear;
+	// no need to do all this work for nothing
+	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
+		return;
 
 	// compute the 14-bit volume/value of operator 2
 	opout[2] = m_op2.compute_volume(opout[BIT(algorithm_inputs, 0, 1)] >> 1, am_offset);

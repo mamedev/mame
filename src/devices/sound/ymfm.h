@@ -306,10 +306,10 @@ public:
 
 protected:
 	// convert a channel number into a register offset; channel goes into the low 3 bits
-	static u8 channel_offset(u8 chnum) { return BIT(chnum, 0, 3); }
+	static constexpr u8 channel_offset(u8 chnum) { return BIT(chnum, 0, 3); }
 
 	// convert an operator number into a register offset; operator goes into bits 3-4
-	static u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 4) | (BIT(opnum, 1) << 3); }
+	static constexpr u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 4) | (BIT(opnum, 1) << 3); }
 };
 
 
@@ -467,10 +467,10 @@ public:
 
 protected:
 	// convert a channel number into a register offset; channel goes in low 2 bits
-	static u16 channel_offset(u8 chnum) { return BIT(chnum, 0, 2); }
+	static constexpr u16 channel_offset(u8 chnum) { return BIT(chnum, 0, 2); }
 
 	// convert an operator number into a register offset; operator goes into bits 2-3
-	static u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 3) | (BIT(opnum, 1) << 2); }
+	static constexpr u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 3) | (BIT(opnum, 1) << 2); }
 };
 
 
@@ -580,7 +580,7 @@ public:
 
 protected:
 	// convert a channel number into a register offset
-	static u16 channel_offset(u8 chnum) { return chnum % 3 + ((chnum / 3) << 8); }
+	static constexpr u16 channel_offset(u8 chnum) { return chnum % 3 + ((chnum / 3) << 8); }
 };
 
 
@@ -691,7 +691,8 @@ private:
 	u16 lfo_am_offset(u8 am_value) const;
 
 	// internal state
-	mutable s16 m_feedback[3];            // feedback memory for operator 1
+	s16 m_feedback[2];                    // feedback memory for operator 1
+	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
 	ymfm_operator<RegisterType> m_op1;    // operator 1
 	ymfm_operator<RegisterType> m_op2;    // operator 2
 	ymfm_operator<RegisterType> m_op3;    // operator 3

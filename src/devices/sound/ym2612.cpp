@@ -141,7 +141,7 @@ void ym2612_device::device_start()
 	save_item(YMFM_NAME(m_dac_enable));
 	save_item(YMFM_NAME(m_channel));
 
-	// save the the engines
+	// save the engines
 	m_opn.save(*this);
 }
 
@@ -152,7 +152,7 @@ void ym2612_device::device_start()
 
 void ym2612_device::device_reset()
 {
-	// reset the the engines
+	// reset the engines
 	m_opn.reset();
 
 	// reset our internal state

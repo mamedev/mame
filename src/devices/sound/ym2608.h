@@ -17,24 +17,16 @@ DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 
 class ym2608_device : public ay8910_device, public device_rom_interface<21>
 {
-	enum : u8
-	{
-		STATUS_ADPCM_B_EOS = 0x04,
-		STATUS_ADPCM_B_BRDY = 0x08,
-		STATUS_ADPCM_B_ZERO = 0x10,
-		STATUS_ADPCM_B_PLAYING = 0x20
-	};
-
 public:
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
 	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-
-	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
 
 protected:
 	// device-level overrides

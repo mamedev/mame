@@ -20,6 +20,9 @@ public:
 	// constructor
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
 	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -29,9 +32,6 @@ public:
 	u8 read_port_r() { return read(1); }
 	void control_port_w(u8 data) { write(0, data); }
 	void write_port_w(u8 data) { write(1, data); }
-
-	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
 
 protected:
 	// device-level overrides

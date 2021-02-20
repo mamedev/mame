@@ -21,21 +21,21 @@ public:
 	// constructor
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2610, u8 opn_mask = 0x36);
 
-	// read/write access
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
-
 	// configuration helpers
 	auto irq_handler() { return m_opn.irq_handler(); }
 
-	// memory space configuration
-	virtual space_config_vector memory_space_config() const override;
+	// read/write access
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+
+	// memory space configuration
+	virtual space_config_vector memory_space_config() const override;
 
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

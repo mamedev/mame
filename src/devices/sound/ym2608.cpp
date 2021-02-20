@@ -9,6 +9,19 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 
 
 //*********************************************************
+//  CONSTANTS
+//*********************************************************
+
+enum : u8
+{
+	STATUS_ADPCM_B_EOS = 0x04,
+	STATUS_ADPCM_B_BRDY = 0x08,
+	STATUS_ADPCM_B_ZERO = 0x10,
+	STATUS_ADPCM_B_PLAYING = 0x20
+};
+
+
+//*********************************************************
 //  YM2608 DEVICE
 //*********************************************************
 
@@ -186,7 +199,7 @@ void ym2608_device::device_start()
 	save_item(YMFM_NAME(m_irq_enable));
 	save_item(YMFM_NAME(m_flag_control));
 
-	// save the the engines
+	// save the engines
 	m_opn.save(*this);
 	m_adpcm_a.save(*this);
 	m_adpcm_b.save(*this);
@@ -210,7 +223,7 @@ void ym2608_device::device_reset()
 	// call our parent
 	ay8910_device::device_reset();
 
-	// reset the the engines
+	// reset the engines
 	m_opn.reset();
 	m_adpcm_a.reset();
 	m_adpcm_b.reset();

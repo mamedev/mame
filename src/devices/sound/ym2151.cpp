@@ -23,20 +23,19 @@ DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "YM2414 OPZ")
 inline s16 linear_to_fp(s32 value)
 {
 	// start with the absolute value
-	s32 avalue = (value < 0) ? -value : value;
-	u8 shift = 0;
+	s32 avalue = std::abs(value);
 
-	// shift until absolute value fits in 9 bits (bit 10 is the sign)
-	while (avalue != (avalue & 0x1ff))
-	{
-		avalue >>= 1;
-		shift++;
-	}
+	// compute shift to fit in 9 bits (bit 10 is the sign)
+	int shift = (32 - 9) - count_leading_zeros(avalue);
 
 	// if out of range, just return maximum; note that YM3012 DAC does
 	// not support a shift count of 7, so we clamp at 6
 	if (shift >= 7)
 		shift = 6, avalue = 0x1ff;
+	else if (shift > 0)
+		avalue >>= shift;
+	else
+		shift = 0;
 
 	// encode with shift in low 3 bits and signed mantissa in upper
 	return shift | (((value < 0) ? -avalue : avalue) << 3);
@@ -119,14 +118,14 @@ void ym2151_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPN
+			// write to OPM
 			m_opm.write(m_address, value);
 
 			// writes to the test register can reset the LFO
 			if (m_address == 0x01 && BIT(value, 1))
 				m_opm.reset_lfo();
 
-			// writes to register 0x1B send the upper 2 bits
+			// writes to register 0x1B send the upper 2 bits to the output lines
 			else if (m_address == 0x1b)
 				m_port_w(0, value >> 6, 0xff);
 
@@ -169,7 +168,7 @@ void ym2151_device::device_start()
 	save_item(YMFM_NAME(m_address));
 	save_item(YMFM_NAME(m_reset_state));
 
-	// save the the engines
+	// save the engines
 	m_opm.save(*this);
 }
 
@@ -180,7 +179,7 @@ void ym2151_device::device_start()
 
 void ym2151_device::device_reset()
 {
-	// reset the the engines
+	// reset the engines
 	m_opm.reset();
 }
 
@@ -207,12 +206,12 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		// clock the system
 		m_opm.clock(0xff);
 
-		// update the OPN content; OPN is full 14-bit with no intermediate clipping
+		// update the OPM content; OPM is full 14-bit with no intermediate clipping
 		s32 lsum = 0, rsum = 0;
 		m_opm.output(lsum, rsum, 0, 32767, 0xff);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPN is mono, so only the left sum matters
+		// OPM is mono, so only the left sum matters
 		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
 		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(rsum)), 32768);
 	}
@@ -256,11 +255,12 @@ void ym2164_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPN
+			// write to OPM
 			m_opm.write(m_address, value);
 
-			// writes to register 0x1B send the upper 2 bits
-			m_port_w(0, value >> 6, 0xff);
+			// writes to register 0x1B send the upper 2 bits to the output lines
+			if (m_address == 0x1b)
+				m_port_w(0, value >> 6, 0xff);
 
 			// mark busy for a bit
 			m_opm.set_busy();

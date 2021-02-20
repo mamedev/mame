@@ -21,20 +21,19 @@ DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")
 inline s16 linear_to_fp(s32 value)
 {
 	// start with the absolute value
-	s32 avalue = (value < 0) ? -value : value;
-	u8 shift = 0;
+	s32 avalue = std::abs(value);
 
-	// shift until absolute value fits in 9 bits (bit 10 is the sign)
-	while (avalue != (avalue & 0x1ff))
-	{
-		avalue >>= 1;
-		shift++;
-	}
+	// compute shift to fit in 9 bits (bit 10 is the sign)
+	int shift = (32 - 9) - count_leading_zeros(avalue);
 
 	// if out of range, just return maximum; note that YM3012 DAC does
 	// not support a shift count of 7, so we clamp at 6
 	if (shift >= 7)
 		shift = 6, avalue = 0x1ff;
+	else if (shift > 0)
+		avalue >>= shift;
+	else
+		shift = 0;
 
 	// encode with shift in low 3 bits and signed mantissa in upper
 	return shift | (((value < 0) ? -avalue : avalue) << 3);

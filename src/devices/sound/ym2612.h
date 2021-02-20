@@ -19,12 +19,12 @@ public:
 	// constructor
 	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2612);
 
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
 	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-
-	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
 
 protected:
 	// device-level overrides
