@@ -56,10 +56,6 @@
 #include "emu.h"
 #include "setapcm.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 // template class definition
 template class setapcm_device<8, 371>;
 template class setapcm_device<16, 384>;
