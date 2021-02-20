@@ -5078,6 +5078,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/shangkid.cpp",
 	MAME_DIR .. "src/mame/includes/shangkid.h",
 	MAME_DIR .. "src/mame/video/shangkid.cpp",
+	MAME_DIR .. "src/mame/drivers/silverball.cpp",
 	MAME_DIR .. "src/mame/drivers/skeetsht.cpp",
 	MAME_DIR .. "src/mame/drivers/skimaxx.cpp",
 	MAME_DIR .. "src/mame/drivers/skopro.cpp",
