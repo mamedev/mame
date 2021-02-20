@@ -8891,4 +8891,3 @@ COMP(19??, hbf9sp,     0,        0,     hbf9sp,     msx2jp,   msx2_state, empty_
 /* Temporary placeholders, Turbo-R hardware is not supported yet */
 COMP(19??, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1GT (MSX Turbo-R)", MACHINE_NOT_WORKING)
 COMP(19??, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1ST (MSX Turbo-R)", MACHINE_NOT_WORKING)
-
