@@ -211,7 +211,7 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_opm.output(lsum, rsum, 0, 32767, 0xff);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPM is mono, so only the left sum matters
+		// OPM is stereo
 		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
 		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(rsum)), 32768);
 	}
