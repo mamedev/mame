@@ -786,7 +786,7 @@ private:
 	attotime m_busy_end;             // end of the busy time
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
- 	std::vector<std::unique_ptr<ymfm_channel<RegisterType>>> m_channel; // channel pointers
+ 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[RegisterType::CHANNELS]; // channel pointers
 	std::vector<u8> m_regdata;       // raw register data
 	RegisterType m_regs;             // register accessor
 };

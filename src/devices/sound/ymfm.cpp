@@ -1276,7 +1276,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 {
 	// create the channels
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
-		m_channel.push_back(std::make_unique<ymfm_channel<RegisterType>>(m_regs.channel_registers(chnum)));
+		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(m_regs.channel_registers(chnum));
 }
 
 
