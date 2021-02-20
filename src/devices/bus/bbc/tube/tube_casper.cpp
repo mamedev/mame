@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device, "bbc_tube_casper", "
 void bbc_tube_casper_device::tube_casper_mem(address_map &map)
 {
 	map(0x00000, 0x03fff).rom().region("casper_rom", 0);
-	map(0x10000, 0x1001f).m("via6522_1", FUNC(via6522_device::map)).umask16(0x00ff);
+	map(0x10000, 0x1001f).m(m_via[1], FUNC(via6522_device::map)).umask16(0x00ff);
 	map(0x20000, 0x3ffff).ram();
 }
 
@@ -53,19 +53,18 @@ void bbc_tube_casper_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_m68000, 4_MHz_XTAL);
 	m_m68000->set_addrmap(AS_PROGRAM, &bbc_tube_casper_device::tube_casper_mem);
 
-	MOS6522(config, m_via6522_0, 4_MHz_XTAL / 2);
-	m_via6522_0->writepb_handler().set(m_via6522_1, FUNC(via6522_device::write_pa));
-	m_via6522_0->ca2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
-	m_via6522_0->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
-	m_via6522_0->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
+	MOS6522(config, m_via[0], 4_MHz_XTAL / 2);
+	m_via[0]->writepb_handler().set(m_via[1], FUNC(via6522_device::write_pa));
+	m_via[0]->ca2_handler().set(m_via[1], FUNC(via6522_device::write_cb1));
+	m_via[0]->cb2_handler().set(m_via[1], FUNC(via6522_device::write_ca1));
+	m_via[0]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 
-	MOS6522(config, m_via6522_1, 4_MHz_XTAL / 2);
-	m_via6522_1->writepb_handler().set(m_via6522_0, FUNC(via6522_device::write_pa));
-	m_via6522_1->ca2_handler().set(m_via6522_0, FUNC(via6522_device::write_cb1));
-	m_via6522_1->cb2_handler().set(m_via6522_0, FUNC(via6522_device::write_ca1));
-	m_via6522_1->irq_handler().set_inputline(m_m68000, M68K_IRQ_1);
+	MOS6522(config, m_via[1], 4_MHz_XTAL / 2);
+	m_via[1]->writepb_handler().set(m_via[0], FUNC(via6522_device::write_pa));
+	m_via[1]->ca2_handler().set(m_via[0], FUNC(via6522_device::write_cb1));
+	m_via[1]->cb2_handler().set(m_via[0], FUNC(via6522_device::write_ca1));
+	m_via[1]->irq_handler().set_inputline(m_m68000, M68K_IRQ_1);
 
-	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_casper").set_original("bbc_flop_68000");
 }
 
@@ -90,8 +89,7 @@ bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, co
 	: device_t(mconfig, BBC_TUBE_CASPER, tag, owner, clock),
 		device_bbc_tube_interface(mconfig, *this),
 		m_m68000(*this, "m68000"),
-		m_via6522_0(*this, "via6522_0"),
-		m_via6522_1(*this, "via6522_1"),
+		m_via(*this, "via%u", 0),
 		m_casper_rom(*this, "casper_rom")
 {
 }
@@ -111,10 +109,14 @@ void bbc_tube_casper_device::device_start()
 
 uint8_t bbc_tube_casper_device::host_r(offs_t offset)
 {
-	return m_via6522_0->read(offset & 0xf);
+	if (offset & 0x10)
+		return m_via[0]->read(offset & 0xf);
+	else
+		return 0xfe;
 }
 
 void bbc_tube_casper_device::host_w(offs_t offset, uint8_t data)
 {
-	m_via6522_0->write(offset & 0xf, data);
+	if (offset & 0x10)
+		m_via[0]->write(offset & 0xf, data);
 }
