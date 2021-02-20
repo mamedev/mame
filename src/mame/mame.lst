@@ -34490,6 +34490,9 @@ photoply2ksp                    // (c) 2000 Funworld
 photoply2k1it                   // (c) 2001 Funworld
 photoply2k4                     // (c) 2004 Funworld
 
+@source:photoplys.cpp
+photoply2k1sp                   // (c) 2001 Funworld
+
 @source:photoplysx.cpp
 photopsxsp                      // (c) 2004 Funworld
 photopsxusp                     // (c) 200? Funworld
