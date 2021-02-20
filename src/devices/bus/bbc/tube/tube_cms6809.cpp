@@ -58,7 +58,6 @@ void bbc_tube_cms6809_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_cms6809_device::tube_cms6809_mem);
 
 	MOS6522(config, m_via[0], 4_MHz_XTAL / 4);
-	m_via[0]->readpb_handler().set_constant(0xff);
 	m_via[0]->writepb_handler().set(m_via[1], FUNC(via6522_device::write_pa));
 	m_via[0]->ca2_handler().set(m_via[1], FUNC(via6522_device::write_cb1));
 	m_via[0]->cb2_handler().set(m_via[1], FUNC(via6522_device::write_ca1));
@@ -113,10 +112,14 @@ void bbc_tube_cms6809_device::device_start()
 
 uint8_t bbc_tube_cms6809_device::host_r(offs_t offset)
 {
-	return m_via[0]->read(offset & 0xf);
+	if (offset & 0x10)
+		return m_via[0]->read(offset & 0xf);
+	else
+		return 0xfe;
 }
 
 void bbc_tube_cms6809_device::host_w(offs_t offset, uint8_t data)
 {
-	m_via[0]->write(offset & 0xf, data);
+	if (offset & 0x10)
+		m_via[0]->write(offset & 0xf, data);
 }
