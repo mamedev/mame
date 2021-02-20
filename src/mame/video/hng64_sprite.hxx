@@ -87,11 +87,11 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 
 	if (zsort)
-		std::sort(m_spritelist.begin(), m_spritelist.end(), std::greater<>());
+		std::stable_sort(m_spritelist.begin(), m_spritelist.end(), std::greater<>());
 
-	for(auto it = m_spritelist.begin(); it != m_spritelist.end(); it++)
+	for(auto it : m_spritelist)
 	{
-		source = it->second;
+		source = it.second;
 		
 		int tileno,chainx,chainy,xflip;
 		int pal,xinc,yinc,yflip;
