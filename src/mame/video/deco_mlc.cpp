@@ -307,7 +307,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			indx &= 0x1fff;
 			index_ptr = m_vram + indx * 4;
 
-			if (index_ptr8[2] & 0x0100 && m_screen->frame_number() & 1)
+			if (index_ptr[2] & 0x0100 && m_screen->frame_number() & 1)
 				continue;
 
 			h = (index_ptr[0] >> 8) & 0xf;
