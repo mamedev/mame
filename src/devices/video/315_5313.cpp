@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	Sega 315-5313 VDP emulation, used by Mega Drive/Genesis
+    Sega 315-5313 VDP emulation, used by Mega Drive/Genesis
 
-	TODO:
-    - Video, DMA timing and HV counter is seems to incorrect,
-      Needs verifications from real hardware.
-    - Support 128KB VRAM configuration, Any hardware used it?
-    - Border area is displayable?
-    - 32X overlay with H32 mode, all known software used this?
+    TODO:
+    - Video, DMA timing and HV counter seem incorrect,
+      they need verification on real hardware.
+    - Support 128KB VRAM configuration, did any hardware use it?
+    - Is border area displayable?
+    - 32X overlay with H32 mode, did all known software use this?
 */
 
 #include "emu.h"

@@ -7,10 +7,10 @@
     connects to other PCBs with various types of slots (USB, SD etc.)
     (ADD FULL DETAILS)
 
-	Specifications (incomplete and unconfirmed):
-	CPU: 450 MHz ATJ227X with intergrated GPU
-	SDRAM: 256MB
-	(source: http://wecmuseum.org/index.php?title=Retro-Bit_Generations)
+    Specifications (incomplete and unconfirmed):
+    CPU: 450 MHz ATJ227X with intergrated GPU
+    SDRAM: 256MB
+    (source: http://wecmuseum.org/index.php?title=Retro-Bit_Generations)
 
     TODO: everything - emulate the SoC
 

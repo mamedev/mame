@@ -67,7 +67,7 @@ void silverball_state::silverball(machine_config &config)
 }
 
 
-// Silverball machines used different motherboards. By now, we're adding the all the known BIOSes here
+// Silverball machines used different motherboards. By now, we're adding all the known BIOSes here
 #define SILVERBALL_BIOS \
 	ROM_REGION32_LE(0x40000, "mb_bios", 0) \
 	/* Acorp 694XT/694XT1 (all of them from the Silverball software update files) */ \

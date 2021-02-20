@@ -3388,6 +3388,7 @@ void rainbow_modelb_state::rainbow_modelb(machine_config &config)
 ROM_START(rainbow100a)
 	ROM_REGION(0x100000, "maincpu", 0)
 
+	ROM_DEFAULT_BIOS("040311a")
 	// printer and comm. port error messages, keyboard works, machine boots
 	ROM_SYSTEM_BIOS(0, "040311a", "Version 04.03.11A")
 	ROMX_LOAD("23-176e4-00.e89", 0xfa000, 0x2000, CRC(405e9619) SHA1(86604dccea84b46e05d705abeda25b12f7cc8c59), ROM_BIOS(0)) // ROM (FA000-FBFFF) (E89) 8 K
