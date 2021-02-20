@@ -1065,6 +1065,7 @@ static const cassette_image::Format cdt_cassette_format =
 	cdt_cassette_load,
 	nullptr
 };
+
 static const cassette_image::Format tsx_cassette_format =
 {
 	"tsx",
