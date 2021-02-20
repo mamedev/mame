@@ -53,7 +53,7 @@ u8 ym2612_device::read(offs_t offset)
 		case 1: // data port (unused)
 		case 2:	// status port, extended
 		case 3:	// data port (unused)
-			printf("Unexpected read from YM2612 offset %d\n", offset & 3);
+			logerror("Unexpected read from YM2612 offset %d\n", offset & 3);
 			break;
 	}
 	return result;

@@ -86,7 +86,7 @@ u8 ym2151_device::read(offs_t offset)
 	switch (offset & 1)
 	{
 		case 0: // data port (unused)
-			printf("Unexpected read from YM2151 offset %d\n", offset & 3);
+			logerror("Unexpected read from YM2151 offset %d\n", offset & 3);
 			break;
 
 		case 1:	// status port, YM2203 compatible

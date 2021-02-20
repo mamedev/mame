@@ -330,7 +330,7 @@ void ym2608_device::update_prescale(u8 newval)
 	// inform the OPN engine and refresh our clock rate
 	m_opn.set_clock_prescale(newval);
 	m_stream->set_sample_rate(clock() / (4 * 6 * newval));
-	printf("Prescale = %d; sample_rate = %d\n", newval, clock() / (4 * 6 * newval));
+	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (4 * 6 * newval));
 
 	// also scale the SSG streams
 	// mapping is (OPN->SSG): 6->4, 3->2, 2->1
