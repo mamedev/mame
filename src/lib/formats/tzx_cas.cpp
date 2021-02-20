@@ -205,7 +205,7 @@ static inline int millisec_to_samplecount( int millisec )
 	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-static inline int tcycles_to_samplecount( int tcycles, float t_scale )
+static inline int tcycles_to_samplecount( int tcycles, double t_scale )
 {
 	return (int)((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double)t_scale);
 }
