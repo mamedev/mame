@@ -50,6 +50,12 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
 	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
 
+	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+	// Could also be draw order related, check if it inverts the z value?
+	bool zsort = !(m_spriteregs[0] & 0x01000000);
+
 #if 0
 	for (int iii = 0; iii < 0x0f; iii++)
 		osd_printf_debug("%.8x ", m_videoregs[iii]);
@@ -67,11 +73,10 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 		else
 		{
-			if ( ((m_spriteregs[0] & 0x01000000) && ((source[2]&0x07ff0000) != 0x07ff0000))
-				|| (!(m_spriteregs[0] & 0x01000000) && (source[2]&0x07ff0000) != 0) )
+			if ((!zsort && (source[2]&0x07ff0000) != 0x07ff0000) || (zsort && (source[2]&0x07ff0000) != 0))
 			{
 				m_spritelist.emplace_back((source[2]&0x7ff0000)>>16, source);
-				if (source[2]&0x00000100)
+				if (source[2]&0x00000100) // inline chain mode
 					source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
 				else
 					source += 8;
@@ -81,11 +86,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 	}
 
-	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
-	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
-	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
-	// Could also be draw order related, check if it inverts the z value?
-	if (!(m_spriteregs[0] & 0x01000000))
+	if (zsort)
 		std::sort(m_spritelist.begin(), m_spritelist.end(), std::greater<>());
 
 	for(auto it = m_spritelist.begin(); it != m_spritelist.end(); it++)
