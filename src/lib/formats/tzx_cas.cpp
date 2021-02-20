@@ -207,7 +207,7 @@ static inline int millisec_to_samplecount( int millisec )
 
 static inline int tcycles_to_samplecount( int tcycles, double t_scale )
 {
-	return (int)((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double)t_scale);
+	return (int)((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * t_scale);
 }
 
 static void tzx_output_wave( int16_t **buffer, int length )
