@@ -237,8 +237,8 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	int pilot_samples = tcycles_to_samplecount(pilot,t_scale);
 	int sync1_samples = tcycles_to_samplecount(sync1,t_scale);
 	int sync2_samples = tcycles_to_samplecount(sync2,t_scale);
-	int bit0_samples = tcycles_to_samplecount(bit0, t_scale);
-	int bit1_samples = tcycles_to_samplecount(bit1,t_scale);
+	int bit0_samples  = tcycles_to_samplecount(bit0 ,t_scale);
+	int bit1_samples  = tcycles_to_samplecount(bit1 ,t_scale);
 	int data_index;
 	int size = 0;
 
