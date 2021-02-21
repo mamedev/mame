@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders:Tomasz Slanina,cam900
 #ifndef MAME_SOUND_SETAPCM_H
 #define MAME_SOUND_SETAPCM_H
 
@@ -73,8 +73,8 @@ private:
 
 	sound_stream *m_stream;
 
-	voice_t m_voice[MaxVoices];
-	u16 m_ctrl;
+	voice_t m_voice[MaxVoices];           // 8 or 16 Voice engines
+	u16 m_keyctrl;                        // Key on/off control bit
 };
 
 // ======================> nile_sound_device

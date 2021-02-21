@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders:Tomasz Slanina,cam900
 /************************************
       Seta PCM emulation
       sound emulation by Tomasz Slanina
@@ -84,7 +84,7 @@ setapcm_device<MaxVoices, Divider>::setapcm_device(const machine_config &mconfig
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_ctrl(0)
+	, m_keyctrl(0)
 {
 }
 
@@ -126,7 +126,7 @@ void setapcm_device<MaxVoices, Divider>::device_start()
 	save_item(STRUCT_MEMBER(m_voice, m_keyon));
 	save_item(STRUCT_MEMBER(m_voice, m_out));
 
-	save_item(NAME(m_ctrl));
+	save_item(NAME(m_keyctrl));
 }
 
 //-------------------------------------------------
@@ -395,24 +395,24 @@ u16 setapcm_device<MaxVoices, Divider>::snd_r(offs_t offset)
 template<unsigned MaxVoices, unsigned Divider>
 void setapcm_device<MaxVoices, Divider>::key_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	u16 ctrl = m_ctrl;
+	const u16 prev = m_keyctrl;
 
 	m_stream->update();
 
-	COMBINE_DATA(&m_ctrl);
+	COMBINE_DATA(&m_keyctrl);
 
-	//  logerror("CTRL: %04x -> %04x %s\n", ctrl, m_ctrl, machine().describe_context());
+	//  logerror("CTRL: %04x -> %04x %s\n", ctrl, m_keyctrl, machine().describe_context());
 
-	u16 delta = ctrl ^ m_ctrl;
+	u16 delta = prev ^ m_keyctrl;
 	for (int v = 0; v < MAX_VOICES; v++)
 	{
 		if (BIT(delta, v))
 		{
-			if (BIT(m_ctrl, v) && (!(BIT(ctrl, v)))) // keyon
+			if (BIT(m_keyctrl, v) && (!(BIT(prev, v)))) // keyon
 			{
 				m_voice[v].keyon();
 			}
-			else if ((!(BIT(m_ctrl, v))) && BIT(ctrl, v)) // keyoff
+			else if ((!(BIT(m_keyctrl, v))) && BIT(prev, v)) // keyoff
 			{
 				m_voice[v].keyoff();
 			}
@@ -429,5 +429,5 @@ template<unsigned MaxVoices, unsigned Divider>
 u16 setapcm_device<MaxVoices, Divider>::key_r()
 {
 	m_stream->update();
-	return m_ctrl;
+	return m_keyctrl;
 }
