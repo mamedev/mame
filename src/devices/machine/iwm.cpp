@@ -133,23 +133,33 @@ void iwm_device::write(offs_t offset, u8 data)
 
 void iwm_device::flush_write()
 {
-	if(m_floppy && m_flux_write_start && m_last_sync > m_flux_write_start) {
-		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == m_last_sync;
+	if(!m_flux_write_start)
+		return;
+
+	if(!when)
+		when = m_last_sync;
+
+	if(when > m_flux_write_start) {
+		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
 		if(last_on_edge)
 			m_flux_write_count--;
+
 		attotime start = cycles_to_time(m_flux_write_start);
-		attotime end = cycles_to_time(m_last_sync);
+		attotime end = cycles_to_time(when);
 		std::vector<attotime> fluxes(m_flux_write_count);
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
-		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-		m_flux_write_start = m_last_sync;
+
+		if(m_floppy)
+			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
+
 		m_flux_write_count = 0;
 		if(last_on_edge)
-			m_flux_write[m_flux_write_count++] = m_last_sync;
+			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
+
 	} else
 		m_flux_write_count = 0;
-
 }
 
 u8 iwm_device::control(int offset, u8 data)

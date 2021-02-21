@@ -376,10 +376,13 @@ void swim1_device::device_timer(emu_timer &, device_timer_id, int, void *)
 
 void swim1_device::flush_write(u64 when)
 {
+	if(!m_flux_write_start)
+		return;
+
 	if(!when)
 		when = m_last_sync;
 
-	if(m_floppy && m_flux_write_start && when > m_flux_write_start) {
+	if(when > m_flux_write_start) {
 		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
 		if(last_on_edge)
 			m_flux_write_count--;
@@ -389,11 +392,15 @@ void swim1_device::flush_write(u64 when)
 		std::vector<attotime> fluxes(m_flux_write_count);
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
-		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-		m_flux_write_start = m_last_sync;
+
+		if(m_floppy)
+			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
+
 		m_flux_write_count = 0;
 		if(last_on_edge)
 			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
+
 	} else
 		m_flux_write_count = 0;
 }
