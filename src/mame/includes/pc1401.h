@@ -19,7 +19,9 @@ public:
 	pc1401_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pocketc_state(mconfig, type, tag)
 		, m_keys(*this, "KEY%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void init_pc1401();
 

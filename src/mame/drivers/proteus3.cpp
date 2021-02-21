@@ -61,6 +61,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class proteus3_state : public driver_device
 {
 public:
@@ -77,6 +79,10 @@ public:
 	{ }
 
 	void proteus3(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
@@ -106,8 +112,6 @@ private:
 
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	u8 m_video_data;
 	u8 m_flashcnt;
 	u16 m_curs_pos;
@@ -385,6 +389,8 @@ void proteus3_state::machine_start()
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassinbit));
+
+	m_flashcnt = 0;
 }
 
 /******************************************************************************
@@ -491,6 +497,8 @@ ROM_START(proteus3)
 	// Proteus III - pbug F800-FFFF, expects RAM at F000-F7FF
 	ROM_LOAD( "proteus3_pbug.bin", 0x0000, 0x0800, CRC(1118694d) SHA1(2dfc08d405e8f2936f5b0bd1c4007995151abbba) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /******************************************************************************
