@@ -79,7 +79,7 @@ private:
 
 // ======================> nile_sound_device
 
-class nile_sound_device : public setapcm_device<8, 371>
+class nile_sound_device : public setapcm_device<8, 160>
 {
 public:
 	nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -97,7 +97,7 @@ public:
 //  EXTERNAL TEMPLATE INSTANTIATIONS
 //**************************************************************************
 
-extern template class setapcm_device<8, 371>;
+extern template class setapcm_device<8, 160>;
 extern template class setapcm_device<16, 384>;
 
 #endif // MAME_SOUND_SETAPCM_H

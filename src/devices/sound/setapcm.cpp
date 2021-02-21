@@ -57,7 +57,7 @@
 #include "setapcm.h"
 
 // template class definition
-template class setapcm_device<8, 371>;
+template class setapcm_device<8, 160>;
 template class setapcm_device<16, 384>;
 
 // constants
@@ -89,7 +89,7 @@ setapcm_device<MaxVoices, Divider>::setapcm_device(const machine_config &mconfig
 }
 
 nile_sound_device::nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: setapcm_device<8, 371>(mconfig, NILE_SOUND, tag, owner, clock)
+	: setapcm_device<8, 160>(mconfig, NILE_SOUND, tag, owner, clock)
 {
 }
 
@@ -403,19 +403,15 @@ void setapcm_device<MaxVoices, Divider>::key_w(offs_t offset, u16 data, u16 mem_
 
 	//logerror("KEYCTRL: %04x -> %04x %s\n", prev, m_keyctrl, machine().describe_context());
 
-	u16 delta = prev ^ m_keyctrl;
 	for (int v = 0; v < MAX_VOICES; v++)
 	{
-		if (BIT(delta, v))
+		if (BIT(m_keyctrl, v) && (!(BIT(prev, v)))) // keyon
 		{
-			if (BIT(m_keyctrl, v) && (!(BIT(prev, v)))) // keyon
-			{
-				m_voice[v].keyon();
-			}
-			else if ((!(BIT(m_keyctrl, v))) && BIT(prev, v)) // keyoff
-			{
-				m_voice[v].keyoff();
-			}
+			m_voice[v].keyon();
+		}
+		else if ((!(BIT(m_keyctrl, v))) && BIT(prev, v)) // keyoff
+		{
+			m_voice[v].keyoff();
 		}
 	}
 }

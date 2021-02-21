@@ -704,7 +704,7 @@ void srmp6_state::srmp6(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	nile_sound_device &nile(NILE_SOUND(config, "nile", XTAL(42'954'545) / 3)); // 14.318181MHz (42.954545MHz / 3)
+	nile_sound_device &nile(NILE_SOUND(config, "nile", XTAL(42'954'545) / 7)); // matches video, needs to verified
 	nile.add_route(0, "lspeaker", 1.0);
 	nile.add_route(1, "rspeaker", 1.0);
 }
