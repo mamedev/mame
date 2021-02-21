@@ -658,6 +658,12 @@ private:
 	RegisterType m_regs;             // operator-specific registers
 };
 
+template<>
+u8 ymfm_operator<ymopm_registers>::block_freq_to_keycode(u16 block_freq);
+
+template<>
+void ymfm_operator<ymopm_registers>::clock_phase(s8 lfo_raw_pm, u16 block_freq);
+
 
 // ======================> ymfm_channel
 
@@ -699,6 +705,9 @@ private:
 	ymfm_operator<RegisterType> m_op4;    // operator 4
 	RegisterType m_regs;                  // channel-specific registers
 };
+
+template<>
+u16 ymfm_channel<ymopm_registers>::lfo_am_offset(u8 lfo_raw_am) const;
 
 
 // ======================> ymfm_engine_base
@@ -791,16 +800,18 @@ private:
 	RegisterType m_regs;             // register accessor
 };
 
+template<>
+s8 ymfm_engine_base<ymopm_registers>::clock_lfo();
+
+template<>
+void ymfm_engine_base<ymopm_registers>::clock_noise();
+
 
 // ======================> template instantiations
 
-// Ideally we would declare these via extern template, but this prevents
-// specialization from working in the actual implementation. Leaving this
-// commented pending the best way to work around the compiler here.
-
-//extern template class ymfm_engine_base<ymopm_registers>;
-//extern template class ymfm_engine_base<ymopn_registers>;
-//extern template class ymfm_engine_base<ymopna_registers>;
+extern template class ymfm_engine_base<ymopm_registers>;
+extern template class ymfm_engine_base<ymopn_registers>;
+extern template class ymfm_engine_base<ymopna_registers>;
 
 using ymopm_engine = ymfm_engine_base<ymopm_registers>;
 using ymopn_engine = ymfm_engine_base<ymopn_registers>;
