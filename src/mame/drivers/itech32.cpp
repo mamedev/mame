@@ -1045,9 +1045,9 @@ void shoottv_state::shoottv_map(address_map &map)
 
 void itech32_state::pubball_map(address_map &map)
 {
-    itech020_map(map);
-    map(0x300000, 0x300003).w(FUNC(itech32_state::color_w<0>)).umask32(0x00ff00ff);
-    map(0x380000, 0x380003).w(FUNC(itech32_state::color_w<1>)).umask32(0x00ff00ff);
+	itech020_map(map);
+	map(0x300000, 0x300003).w(FUNC(itech32_state::color_w<0>)).umask32(0x00ff00ff);
+	map(0x380000, 0x380003).w(FUNC(itech32_state::color_w<1>)).umask32(0x00ff00ff);
 }
 
 
@@ -4645,13 +4645,13 @@ ROM_START( gtclasscs )  /* Version 1.00S for the 3 tier type PCB with short ROM 
 ROM_END
 
 /***************************************************************************
-	The ROM images for both sets below were found by analyzing the contents
-	of archived source-code CDs acquired at auction. This is why the ROM
-	definitions in question are not sized to a power of two, as most ROM
-	dumps typically are.
-	However, the provided dump of Power Up Baseball has been proven to
-	work as-is on a properly-configured itech32 board, and passes all
-	relevant ROM tests, and so can be considered authoritative.
+    The ROM images for both sets below were found by analyzing the contents
+    of archived source-code CDs acquired at auction. This is why the ROM
+    definitions in question are not sized to a power of two, as most ROM
+    dumps typically are.
+    However, the provided dump of Power Up Baseball has been proven to
+    work as-is on a properly-configured itech32 board, and passes all
+    relevant ROM tests, and so can be considered authoritative.
 ****************************************************************************/
 
 ROM_START( shoottv )

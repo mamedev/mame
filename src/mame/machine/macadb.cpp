@@ -1155,10 +1155,10 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				if (m_adb_datasize > 0)
 				{
 					LOGMASKED(LOG_LINESTATE, "Device has %d bytes of data:\n", m_adb_datasize);
-                    for (int i = 0; i < m_adb_datasize; i++)
-                    {
-                        LOGMASKED(LOG_LINESTATE, "  %02x\n", m_adb_buffer[i]);
-                    }
+					for (int i = 0; i < m_adb_datasize; i++)
+					{
+						LOGMASKED(LOG_LINESTATE, "  %02x\n", m_adb_buffer[i]);
+					}
 					m_adb_linestate = LST_TSTOPSTART;   // T1t
 					m_adb_timer->adjust(attotime::from_ticks(324/4, adb_timebase));
 					m_adb_stream_ptr = 0;

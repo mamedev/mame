@@ -154,7 +154,7 @@ MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 			// layer 2 (fixed)
 			offs_t offset_p2= ((y * 0x80) | (ra << 7)) + (x << 2) + (i >> 1);
 			uint8_t p2 = (m_vram[0x8000 + offset_p2] >> ((i & 1) * 4)) & 0x0f;
-			
+
 			// priority: p2 > p1 > background
 			uint8_t p = p2 ? p2 : p1 ? (p1 + 16) : m_bset;
 

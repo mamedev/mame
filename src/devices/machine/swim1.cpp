@@ -157,11 +157,11 @@ u8 swim1_device::ism_read(offs_t offset)
 {
 	ism_sync();
 
-	//	static const char *const names[] = {
-	//		"data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
-	//	};
+	//  static const char *const names[] = {
+	//      "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
+	//  };
 
-	//	logerror("read ism %s\n", names[offset & 7]);
+	//  logerror("read ism %s\n", names[offset & 7]);
 	switch(offset & 7) {
 	case 0x0: { // data
 		u16 r = ism_fifo_pop();
@@ -438,7 +438,7 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 				m_iwm_async_update = 0;
 				m_iwm_data = 0x00;
 			}
-			
+
 		} else {
 			if(m_iwm_rw != MODE_WRITE) {
 				m_iwm_rw = MODE_WRITE;
@@ -758,7 +758,7 @@ void swim1_device::iwm_sync()
 				if(m_iwm_whd & 0x80) {
 					logerror("underrun\n");
 					flush_write();
-					m_flux_write_start = 0;					
+					m_flux_write_start = 0;
 					m_iwm_whd &= ~0x40;
 					m_last_sync = next_sync;
 				} else {
@@ -1022,7 +1022,7 @@ void swim1_device::ism_sync()
 						if(sct == 1)
 							resolved_ls_type[resolved_ls_count++] = sct;
 						else
-							resolved_ls_type[resolved_ls_count++] = lct;						
+							resolved_ls_type[resolved_ls_count++] = lct;
 					}
 				}
 
@@ -1129,7 +1129,7 @@ void swim1_device::ism_sync()
 					break;
 				}
 
-				m_ism_csm_pair_side = !m_ism_csm_pair_side;						
+				m_ism_csm_pair_side = !m_ism_csm_pair_side;
 			}
 
 
