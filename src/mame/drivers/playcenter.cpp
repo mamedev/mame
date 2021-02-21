@@ -9,7 +9,7 @@
     Unknown RAM size, AMD K6 processor (unknown speed)
     PCI Ethernet card (unknown chipset)
 
-    The security scheme is quite simple: 
+    The security scheme is quite simple:
     Each minigame is a VisualBasic executable that receives three numbers when
     invoked, the hard disk serial number (readed through the Windows enumerator
     file), the Ethernet MAC address, and a third one, and concatenates them

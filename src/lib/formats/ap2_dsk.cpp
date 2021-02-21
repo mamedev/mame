@@ -1820,7 +1820,7 @@ bool a2_woz_format::save(io_generic *io, const std::vector<uint32_t> &variants, 
 					data[off + (j >> 3)] |= 0x80 >> (j & 7);
 			tb += (size + 4095) / 4096;
 		}
-	
+
 	w32(data, 8, crc32r(&data[12], data.size() - 12));
 
 	io_generic_write(io, data.data(), 0, data.size());
@@ -1979,7 +1979,7 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 	const auto trailing_padding_size = count_trailing_padding(nibbles);
 	const auto trailing_FF_count =
 		count_leading_FFs(nibbles.rbegin() + trailing_padding_size,
-		                  nibbles.rend());
+						  nibbles.rend());
 	const auto wrapped_FF_count = leading_FF_count + trailing_FF_count;
 	const bool wrapped_FF_are_syncs = wrapped_FF_count >= min_sync_bytes;
 
@@ -2042,11 +2042,11 @@ bool a2_nib_format::load(io_generic *io, uint32_t form_factor, const std::vector
 	std::vector<uint8_t> nibbles(nibbles_per_track);
 	for (unsigned track = 0; track < nr_tracks; ++track) {
 		io_generic_read(io, &nibbles[0],
-		                track * nibbles_per_track, nibbles_per_track);
+						track * nibbles_per_track, nibbles_per_track);
 		auto levels = generate_levels_from_nibbles(nibbles);
 		generate_track_from_levels(track, 0,
-		                           levels,
-		                           0, image);
+								   levels,
+								   0, image);
 	}
 
 	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);

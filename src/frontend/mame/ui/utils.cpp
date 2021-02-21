@@ -906,7 +906,7 @@ public:
 		if (m_include_clones)
 		{
 			int const found(driver_list::find(system.driver->parent));
-			return m_cache.end() != m_cache.find(&driver_list::driver(found));
+			return found >= 0 && m_cache.end() != m_cache.find(&driver_list::driver(found));
 		}
 
 		return false;

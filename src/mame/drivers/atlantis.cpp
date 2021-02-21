@@ -116,7 +116,7 @@ public:
 		m_ide(*this, PCI_ID_IDE),
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
-	{ 
+	{
 		std::fill(std::begin(board_ctrl), std::end(board_ctrl), 0);
 	}
 

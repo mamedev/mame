@@ -775,7 +775,7 @@ ROM_START( loopingv )
 	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -799,7 +799,7 @@ ROM_START( loopingva )
 	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -825,7 +825,7 @@ ROM_START( looping )
 	ROM_LOAD( "loopa11.bin",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
+	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "loopaa8.bin",    0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -848,7 +848,7 @@ ROM_START( skybump )
 	ROM_LOAD( "snd.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-    ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "vid.8a",         0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )

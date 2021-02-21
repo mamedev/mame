@@ -69,7 +69,7 @@ private:
 	uint32_t                m_compressed_offset;    // current offset with the compressed stream
 	FLAC__byte *            m_compressed_start;     // start of compressed data
 	uint32_t                m_compressed_length;    // length of the compressed stream
-	
+
 	// parameters
 	uint32_t                m_sample_rate;          // sample rate
 	uint8_t                 m_channels;             // number of channels

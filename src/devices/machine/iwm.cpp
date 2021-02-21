@@ -155,7 +155,7 @@ void iwm_device::flush_write()
 u8 iwm_device::control(int offset, u8 data)
 {
 	sync();
-	
+
 	if(offset < 8) {
 		if(offset & 1)
 			m_phases |= 1 << (offset >> 1);
@@ -190,7 +190,7 @@ u8 iwm_device::control(int offset, u8 data)
 				m_async_update = 0;
 				m_data = 0x00;
 			}
-			
+
 		} else {
 			if(m_rw != MODE_WRITE) {
 				m_rw = MODE_WRITE;
@@ -456,7 +456,7 @@ void iwm_device::sync()
 				if(m_whd & 0x80) {
 					logerror("underrun\n");
 					flush_write();
-					m_flux_write_start = 0;					
+					m_flux_write_start = 0;
 					m_whd &= ~0x40;
 					m_last_sync = next_sync;
 				} else {

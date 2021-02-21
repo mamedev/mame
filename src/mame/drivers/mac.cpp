@@ -1076,6 +1076,16 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
+#if NEW_SWIM
+	SWIM1(config.replace(), m_fdc, C15M);
+	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
+	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
+#endif
+
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 }

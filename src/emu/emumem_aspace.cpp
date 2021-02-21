@@ -897,12 +897,15 @@ void address_space::prepare_map()
 
 void address_space::prepare_device_map(address_map &map)
 {
-	// device maps are not supposed to set global parameters
-	if (map.m_unmapval)
-		fatalerror("Device maps should not set the unmap value\n");
+	// Disable the test for now, some cleanup needed before
+	if(0) {
+		// device maps are not supposed to set global parameters
+		if (map.m_unmapval)
+			fatalerror("Device maps should not set the unmap value\n");
 
-	if (map.m_globalmask && map.m_globalmask != m_addrmask)
-		fatalerror("Device maps should not set the global mask\n");
+		if (map.m_globalmask && map.m_globalmask != m_addrmask)
+			fatalerror("Device maps should not set the global mask\n");
+	}
 
 	prepare_map_generic(map, false);
 }

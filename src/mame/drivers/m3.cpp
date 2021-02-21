@@ -5,37 +5,37 @@
     LSI M-THREE
 
     Models:
-	- M-THREE/100 (SA400, 5.25" single sided)
-	- M-THREE/110 (SA410, 5.25" single sided)
-	- M-THREE/150 (SA450, 5.25" double sided)
-	- M-THREE/160 (SA460, 5.25" double sided)
-	- M-THREE/200 (SA800, 8" single sided)
-	- M-THREE/250 (SA850, 8" double sided) [emulated by default]
-	- M-THREE/320 (SA800, 8" single sided, Winchester 5 MB)
-	- M-THREE/325 (SA850, 8" double sided, Winchester 5 MB)
-	- M-THREE/340 (SA800, 8" single sided, Winchester 10 MB)
-	- M-THREE/345 (SA850, 8" double sided, Winchester 10 MB)
+    - M-THREE/100 (SA400, 5.25" single sided)
+    - M-THREE/110 (SA410, 5.25" single sided)
+    - M-THREE/150 (SA450, 5.25" double sided)
+    - M-THREE/160 (SA460, 5.25" double sided)
+    - M-THREE/200 (SA800, 8" single sided)
+    - M-THREE/250 (SA850, 8" double sided) [emulated by default]
+    - M-THREE/320 (SA800, 8" single sided, Winchester 5 MB)
+    - M-THREE/325 (SA850, 8" double sided, Winchester 5 MB)
+    - M-THREE/340 (SA800, 8" single sided, Winchester 10 MB)
+    - M-THREE/345 (SA850, 8" double sided, Winchester 10 MB)
 
     Hardware:
     - Z80
-	- 64 KB RAM
-	- Z80 CTC
-	- 2x D8255AC PPI
-	- D8251A
-	- MC6845P CRTC
-	- FD1793 FDC
+    - 64 KB RAM
+    - Z80 CTC
+    - 2x D8255AC PPI
+    - D8251A
+    - MC6845P CRTC
+    - FD1793 FDC
 
     TODO:
     - Initial PC is currently hacked to f000
-	- Verify/fix floppy hookup (CPU needs to be overclocked?)
-	- Printer interface
-	- Buzzer
-	- Map the rest of the keys, verify existing keys
+    - Verify/fix floppy hookup (CPU needs to be overclocked?)
+    - Printer interface
+    - Buzzer
+    - Map the rest of the keys, verify existing keys
 
     Notes:
     - No offical software available, but a custom version of CP/M
-	- Y to boot from floppy, ESC to enter monitor, any other key to
-	  boot from IDE
+    - Y to boot from floppy, ESC to enter monitor, any other key to
+      boot from IDE
 
 ***************************************************************************/
 
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( m3 )
 	PORT_START("K06")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)     PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') 
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("92")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)   PORT_CHAR(9)
@@ -374,7 +374,7 @@ void m3_state::kbd_p1_w(uint8_t data)
 {
 	// 765-----  row select
 
-	m_kbd_row = data >> 5;		
+	m_kbd_row = data >> 5;
 }
 
 void m3_state::kbd_p2_w(uint8_t data)
@@ -472,7 +472,7 @@ uint8_t m3_state::fdc_data_r(offs_t offset)
 		// cpu tries to read data without drq, halt it and reset pc
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
-		
+
 		return 0;
 	}
 
@@ -486,7 +486,7 @@ void m3_state::fdc_data_w(offs_t offset, uint8_t data)
 		// cpu tries to write data without drq, halt it and reset pc
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
-		
+
 		return;
 	}
 
@@ -646,7 +646,7 @@ void m3_state::m3(machine_config &config)
 ROM_START( m3 )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("bootstrap_prom_034.bin", 0x0000, 0x0800, CRC(7fdb051e) SHA1(7aa24d4f44b6a0c8f7f647667f4997432c186cac))
-	
+
 	// Homebrew Monitor ROM, written by Steve Hunt. Uses the socket of the HDD ROM.
 	ROM_LOAD("monitor_prom_v19_2017-07-05.bin", 0x0800, 0x0800, CRC(0608848f) SHA1(9a82cb49056ff1a1d53ce2bd026537a6914a4847))
 
