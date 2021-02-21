@@ -401,7 +401,7 @@ void setapcm_device<MaxVoices, Divider>::key_w(offs_t offset, u16 data, u16 mem_
 
 	COMBINE_DATA(&m_keyctrl);
 
-	//  logerror("CTRL: %04x -> %04x %s\n", ctrl, m_keyctrl, machine().describe_context());
+	//logerror("KEYCTRL: %04x -> %04x %s\n", prev, m_keyctrl, machine().describe_context());
 
 	u16 delta = prev ^ m_keyctrl;
 	for (int v = 0; v < MAX_VOICES; v++)
