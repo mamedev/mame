@@ -87,7 +87,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 
 	if (zsort)
-		std::stable_sort(m_spritelist.begin(), m_spritelist.end(), std::greater<>());
+		std::stable_sort(m_spritelist.begin(), m_spritelist.end(), [] (auto const &a, auto const &b) { return a.first > b.first; });
 
 	for(auto it : m_spritelist)
 	{
