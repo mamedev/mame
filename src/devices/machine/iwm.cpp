@@ -465,7 +465,7 @@ void iwm_device::sync()
 			case SW_WINDOW_LOAD:
 				if(m_whd & 0x80) {
 					logerror("underrun\n");
-					flush_write();
+					flush_write(next_sync);
 					m_flux_write_start = 0;
 					m_whd &= ~0x40;
 					m_last_sync = next_sync;
@@ -490,7 +490,7 @@ void iwm_device::sync()
 
 			case SW_WINDOW_END:
 				if(m_flux_write_count == m_flux_write.size())
-					flush_write();
+					flush_write(next_sync);
 				if(m_mode & 0x02) {
 					m_rw_bit_count --;
 					if(m_rw_bit_count == 0) {
