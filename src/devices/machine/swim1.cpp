@@ -544,7 +544,7 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 
 	switch(m_iwm_control & 0xc0) {
 	case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
-	case 0x40: return (m_iwm_status & 0x7f) | ((m_floppy && m_floppy->wpt_r()) ? 0x80 : 0x00);
+	case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
 	case 0x80: return m_iwm_whd;
 	case 0xc0: if(offset & 1) { if(m_iwm_active) iwm_data_w(data); else iwm_mode_w(data); } return 0xff;
 	}
