@@ -131,7 +131,7 @@ void iwm_device::write(offs_t offset, u8 data)
 	control(offset, data);
 }
 
-void iwm_device::flush_write()
+void iwm_device::flush_write(u64 when)
 {
 	if(!m_flux_write_start)
 		return;
