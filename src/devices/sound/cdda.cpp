@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cdda.h"
 
-#define MAX_SECTORS ( 1 )
+#define MAX_SECTORS ( 4 )
 
 
 //-------------------------------------------------
@@ -114,7 +114,7 @@ void cdda_device::pause_audio(int pause)
 uint32_t cdda_device::get_audio_lba()
 {
 	m_stream->update();
-	return m_audio_lba;
+	return m_audio_lba - (m_audio_samples / (CD_MAX_SECTOR_DATA / 4));
 }
 
 
