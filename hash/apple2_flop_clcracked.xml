@@ -16227,25 +16227,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcorgtrl" supported="no">
+	<software name="mcorgtrl">
 		<description>MECC-A157 Oregon Trail (Version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2019-05-29"/>
-		<!-- As of 8/16/2020 changed to not working; this disk image looks like
-		it may be bad. I've gotten in touch with 4am to investigate as the disk
-		image doesn't seem to work on multiple Apple emulators. - FH -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side a.dsk" size="143360" crc="c4cfd4aa" sha1="ec0a9ad7cec071f3fccef8a7a4207e2930025f88" />
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side a.dsk" size="143360" crc="c4cfd4aa" sha1="3762550258fbc0656783fac49bd7a24c4a32b599" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side b.dsk" size="143360" crc="edd6f8a7" sha1="e58fbb135b17b36df7437f6ee2988b0de8cc5ea3" />
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side b.dsk" size="143360" crc="edd6f8a7" sha1="69643b521e6fa7f2e41a90f0e49881e311a42c55" />
 			</dataarea>
 		</part>
 	</software>
@@ -37928,6 +37925,110 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lfstfrog">
+		<description>Life Story Frog (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="life story frog (4am crack).dsk" size="143360" crc="e107f2f8" sha1="f15828fe236a02b0ce18346e2c7c041010f1fb4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsmokng">
+		<description>MECC-A103 Smoking: It's Up To You (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a103 smoking- it's up to you v1.0 (4am crack).dsk" size="143360" crc="4057a91b" sha1="cd6c091e4e776aca98178d1f2cdff712e60b1550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpayrol">
+		<description>MECC-A104 Payroll System: A Business Simulation (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a104 payroll system- a business simulation v1.2 (4am crack).dsk" size="143360" crc="d212f43f" sha1="93087105dfe4b4e9c62b2ccf88de205bc663c454"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwhsa10">
+		<description>MECC-A106 Word Herd: Sound-Alikes (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a106 word herd- sound-alikes v1.0 (4am crack).dsk" size="143360" crc="5ef8fd83" sha1="fe4d68431bafb5e2c94086de575e0775d0c630cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdcks11">
+		<description>MECC-A107 Ducks (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a107 ducks v1.1 (4am crack).dsk" size="143360" crc="e6a1db28" sha1="f03efeb3d7bf262c7fc6b59910c507293be973d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmat10">
+		<description>MECC-A109 Circus Math (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a109 circus math v1.0 (4am crack).dsk" size="143360" crc="188da76b" sha1="a1631ac7a3cb7059f44b80522f9929076aa62f69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsort11">
+		<description>MECC-A110 Exploring Sorting Routines (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a110 exploring sorting routines v1.1 (4am crack).dsk" size="143360" crc="4f531c1c" sha1="9c4f8ddb2e345d822f0b7bc588cf8240f6817279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpets10">
+		<description>MECC-A111 Pets, Ltd. (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a111 pets, ltd. v1.0 (4am crack).dsk" size="143360" crc="6e15b0c4" sha1="78881bc772f48ac282ec732e8d1a20d1bd20d412"/>
 			</dataarea>
 		</part>
 	</software>
