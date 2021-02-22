@@ -307,6 +307,7 @@ private:
 	void rbv_recalc_irqs();
 	void update_volume();
 
+	void mac_via_sync();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mac_via2_r(offs_t offset);
