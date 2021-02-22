@@ -301,13 +301,13 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	const float near_    = uToF(packet[5]) * uToF(packet[4]) + uToF(packet[5]);
 	const float far_     = -(screenZ_*near_)/(screenZ_-2.0f*near_);
 
-	m_projectionMatrix[0]  = (2.0f*near_)/(right-left);
+	m_projectionMatrix[0]  = (2.0f*screenZ_)/(right-left);
 	m_projectionMatrix[1]  = 0.0f;
 	m_projectionMatrix[2]  = 0.0f;
 	m_projectionMatrix[3]  = 0.0f;
 
 	m_projectionMatrix[4]  = 0.0f;
-	m_projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
+	m_projectionMatrix[5]  = (2.0f*screenZ_)/(top-bottom);
 	m_projectionMatrix[6]  = 0.0f;
 	m_projectionMatrix[7]  = 0.0f;
 
