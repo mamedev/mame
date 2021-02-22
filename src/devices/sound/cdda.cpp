@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cdda.h"
 
-#define MAX_SECTORS ( 4 )
+#define MAX_SECTORS ( 1 )
 
 
 //-------------------------------------------------
