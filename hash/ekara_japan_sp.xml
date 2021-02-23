@@ -28,7 +28,7 @@ license:CC0
 	*SP-02  'Super Cartridge' SP-2
 	*SP-03  'Super Cartridge' SP-3 TV Pop
 	*SP-04  'Super Cartridge' SP-4
-	*SP-05  'Super Cartridge' SP-5 TV Pop
+	*SP-05  'Super Cartridge' SP-5 TV POP Junior with Chibi Marukochan & Anpanman
 	 SP-06  (seen)
 	 SP-07  (seen)
 
@@ -73,7 +73,7 @@ license:CC0
 	</software>
 	
 	<software name="sp05">
-		<description>SP-05 Super Cartridge - TV Pop (Japan)</description>
+		<description>SP-05 Super Cartridge - TV POP Junior with Chibi Marukochan &amp; Anpanman (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
