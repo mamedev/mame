@@ -15,7 +15,7 @@ license:CC0
 
 	*GK-1  Detective Conan
 	*GK-2  Disney Princess
-	*GK-3  Disney
+	*GK-3  Disney Tinkerbell to Tinkle Star Uranai
 
 	(more? what's the GK highest number?)
 
@@ -45,7 +45,7 @@ license:CC0
 	</software>
 	
 	<software name="gk3">
-		<description>GK-3 - Disney (Japan)</description>
+		<description>GK-3 - Disney Tinkerbell to Tinkle Star Uranai (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
