@@ -641,7 +641,7 @@ m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *ta
 			owner,
 			clock,
 			M68HC05EG,
-			{ s_hmos_s_ops, s_hmos_cycles, 13, 0x00ff, 0x00c0, 0xfffc }) // completely wrong, but it preserves existing behaviour
+			{ s_hc_s_ops, s_hc_cycles, 13, 0x00ff, 0x00c0, 0xfffc })
 {
 }
 
