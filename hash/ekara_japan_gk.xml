@@ -14,7 +14,7 @@ license:CC0
 	(check what units these are for)
 
 	*GK-1  Detective Conan
-	*GK-2  Disney Princess
+	*GK-2  Disney Princess: Princess Debut
 	*GK-3  Disney Tinkerbell to Tinkle Star Uranai
 
 	(more? what's the GK highest number?)
@@ -33,7 +33,7 @@ license:CC0
 	</software>
 	
 	<software name="gk2">
-		<description>GK-2 - Disney Princess (Japan)</description>
+		<description>GK-2 - Disney Princess: Princess Debut (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
