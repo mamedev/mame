@@ -390,6 +390,7 @@ public:
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void init_kbh();
 	void init_kbm();
 	void firebeat_kbm(machine_config &config);
 
@@ -1507,6 +1508,12 @@ void firebeat_kbm_state::init_kbm()
 	m_cabinet_info = 2;
 }
 
+void firebeat_kbm_state::init_kbh()
+{
+	init_kbm();
+	m_cabinet_info = 3;
+}
+
 void firebeat_kbm_state::init_keyboard()
 {
 	// set keyboard timer
@@ -2040,13 +2047,13 @@ ROM_START( kbh )
 	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea)) // is this correct for this set?
+	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(af4e8182f6a984895d9a9a00bbfb6c65fb7b4738) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) )
+	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) ) // identical to jaa02 image
 ROM_END
 
 ROM_START( kbm2nd )
@@ -2327,7 +2334,7 @@ GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, 
 GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
 
 GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat ) // gives E940 Hardware Error
+GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbh, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
 GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
 GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
 
