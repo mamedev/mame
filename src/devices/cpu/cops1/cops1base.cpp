@@ -25,6 +25,8 @@ TODO:
 - documentation says that LB 10 is either 0 or 4, depending on RAM configuration,
   but on qkracerm it's 5 (also confirmed in patent source code), so I assume
   LB 10 is fully configurable as mask option
+- MM5799 RAM layout is derived from MCU decap, documentation suggests that the
+  secondary option is literally 6x16 but according to the decap it's 4x16 + 4x8
 
 */
 
