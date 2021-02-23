@@ -1066,6 +1066,81 @@ static INPUT_PORTS_START( hotwheels )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START( doraphone )
+	PORT_START("P1")
+	PORT_CONFNAME( 0x0070, 0x0060, "On/Off Mode Slider" )
+	PORT_CONFSETTING(      0x0030, "Play Alone (no video)" )
+	PORT_CONFSETTING(      0x0060, "Play on TV" )
+
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Lift Handset") // this could be done as a toggle, although note, handset being down is treated like a button being held
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED ) // this setting is US NTSC, ACTIVE_LOW gives US PAL (invalid?) no way to switch to non-US?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // must be 0x0200 or resets over and over
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+
+	PORT_START("P1_FE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1_FC")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 'Repeat'") PORT_CODE(KEYCODE_PLUS_PAD)
+
+	PORT_START("P1_FA")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 0") PORT_CODE(KEYCODE_0_PAD)
+
+	PORT_START("P1_F6")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 'Help'") PORT_CODE(KEYCODE_MINUS_PAD)
+
+	PORT_START("P1_F4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // must be 0 to access test mode with UP+ENTER on boot (uncertain what real hardware state is)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) // ^^
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1_EE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Show Answer") // Not 'answer phone'
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Enter")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_PLAYER(1) PORT_NAME("Reset")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME("Hear Dora (non-TV mode only)")
+
+	PORT_START("P1_DE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Dora The Explorer Logo Button (non-TV mode only)")  // manual doesn't list this? speech says 'Dora the Explorer' in alone mode, presumably when you press the logo
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Exit")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("Adventure Mode")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(1) PORT_NAME("Hear Boots (non-TV mode only)")
+
+	PORT_START("P1_BE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Amusement Park")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("Quck Play")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Big Drum Parade")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("Banana Grove")
+
+	PORT_START("P2")
+	PORT_BIT( 0xff7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1709,7 +1784,42 @@ void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
 	m_screen->set_refresh_hz(50);
 }
 
+uint16_t spg2xx_game_doraphone_state::porta_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = m_io_p1->read() & 0xfff0;
 
+	switch (m_portb_data & 0xfe)
+	{
+	case 0xfe: data |= m_io_p1_fe->read() & 0x000f; break;
+	case 0xfc: data |= m_io_p1_fc->read() & 0x000f; break;
+	case 0xfa: data |= m_io_p1_fa->read() & 0x000f; break;
+	case 0xf6: data |= m_io_p1_f6->read() & 0x000f; break;
+	case 0xf4: data |= m_io_p1_f4->read() & 0x000f; break;
+	case 0xee: data |= m_io_p1_ee->read() & 0x000f; break;
+	case 0xde: data |= m_io_p1_de->read() & 0x000f; break;
+	case 0xbe: data |= m_io_p1_be->read() & 0x000f; break;
+	}
+
+	return data;
+}
+
+void spg2xx_game_doraphone_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_portb_data = data;
+}
+
+void spg2xx_game_doraphone_state::doraphone(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_doraphone_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_doraphone_state::porta_r));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_doraphone_state::portb_w));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_doraphone_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_doraphone_state::base_portc_r));
+}
 
 
 ROM_START( rad_skat )
@@ -1867,6 +1977,12 @@ ROM_START( jouet )
 	ROM_LOAD16_WORD_SWAP( "jouet.bin", 0x000000, 0x400000, CRC(da46097e) SHA1(f760f4d126a8291b7dacdea7a70691b25ad8b989) )
 ROM_END
 
+ROM_START( doraphon )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraphone.bin", 0x000000, 0x800000, CRC(a79c154b) SHA1(f5b9bf63ea52d058252ab6702508b519fbdee0cc) )
+ROM_END
+
+
 ROM_START( senspeed )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "speedracer.bin", 0x000000, 0x800000, CRC(4efbcd39) SHA1(2edffbaa9ea309ad308fa60f32d8b7a98ee313c7) )
@@ -1993,6 +2109,9 @@ CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_s
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+
+// "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
+CONS( 200?, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
 
 // ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
 CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )
