@@ -185,6 +185,9 @@ void news_r3k_state::machine_start()
 		int_state = false;
 	m_lcd_enable = false;
 	m_lcd_dim = false;
+
+	m_inten = 0;
+	m_intst = 0;
 }
 
 void news_r3k_state::machine_reset()
