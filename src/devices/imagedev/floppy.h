@@ -311,6 +311,7 @@ public:
 	virtual ~oa_d34v_device() = default;
 protected:
 	virtual void setup_characteristics() override;
+	virtual void track_changed() override;
 
 	virtual bool is_2m() const override;
 };
