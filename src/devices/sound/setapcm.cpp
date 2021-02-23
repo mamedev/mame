@@ -56,10 +56,6 @@
 #include "emu.h"
 #include "setapcm.h"
 
-// template class definition
-template class setapcm_device<8, 160>;
-template class setapcm_device<16, 384>;
-
 // constants
 template<unsigned MaxVoices, unsigned Divider>
 constexpr unsigned setapcm_device<MaxVoices, Divider>::MAX_VOICES;
@@ -427,3 +423,7 @@ u16 setapcm_device<MaxVoices, Divider>::key_r()
 	m_stream->update();
 	return m_keyctrl;
 }
+
+// template class definition
+template class setapcm_device<8, 160>;
+template class setapcm_device<16, 384>;
