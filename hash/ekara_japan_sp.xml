@@ -26,13 +26,13 @@ license:CC0
 
 	 SP-01  (unknown)
 	*SP-02  'Super Cartridge' SP-2
-	*SP-03  'Super Cartridge' SP-3
+	*SP-03  'Super Cartridge' SP-3 TV Pop
 	*SP-04  'Super Cartridge' SP-4
-	 SP-05
+	*SP-05  'Super Cartridge' SP-5 TV Pop
 	 SP-06  (seen)
 	 SP-07  (seen)
 
-	(more? what's the SP highest number?)
+	(more? what's the SP highest number? correct titles for each of these etc.)
 
 	-->
 
@@ -49,7 +49,7 @@ license:CC0
 	</software>
 
 	<software name="sp03">
-		<description>SP-03 Super Cartridge (Japan)</description>
+		<description>SP-03 Super Cartridge - TV Pop (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -71,5 +71,17 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="sp05">
+		<description>SP-05 Super Cartridge - TV Pop (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp05.u1" size="0x200000" crc="f5ae63b2" sha1="d471ee862aa2ab790defb57873a10862531fd76b"/>
+			</dataarea>
+		</part>
+	</software>	
 
 </softwarelist>
