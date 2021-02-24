@@ -1067,7 +1067,7 @@ static INPUT_PORTS_START( hotwheels )
 INPUT_PORTS_END
 
 
-
+// TODO: work out how to access hidden test mode again
 static INPUT_PORTS_START( doraphone )
 	PORT_START("P1")
 	PORT_CONFNAME( 0x0070, 0x0060, "On/Off Mode Slider" )
@@ -1084,49 +1084,37 @@ static INPUT_PORTS_START( doraphone )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
-	PORT_START("P1_FE")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P1_FC")
+	PORT_START("P1_ROW1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 4") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 'Repeat'") PORT_CODE(KEYCODE_PLUS_PAD)
 
-	PORT_START("P1_FA")
+	PORT_START("P1_ROW2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 5") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 0") PORT_CODE(KEYCODE_0_PAD)
 
-	PORT_START("P1_F6")
+	PORT_START("P1_ROW3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 'Help'") PORT_CODE(KEYCODE_MINUS_PAD)
 
-	PORT_START("P1_F4")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) // must be 0 to access test mode with UP+ENTER on boot (uncertain what real hardware state is)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) // ^^
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P1_EE")
+	PORT_START("P1_ROW4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Show Answer") // Not 'answer phone'
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Enter")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_PLAYER(1) PORT_NAME("Reset")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(1) PORT_NAME("Hear Dora (non-TV mode only)")
 
-	PORT_START("P1_DE")
+	PORT_START("P1_ROW5")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Dora The Explorer Logo Button (non-TV mode only)")  // manual doesn't list this? speech says 'Dora the Explorer' in alone mode, presumably when you press the logo
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Exit")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("Adventure Mode")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(1) PORT_NAME("Hear Boots (non-TV mode only)")
 
-	PORT_START("P1_BE")
+	PORT_START("P1_ROW6")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Amusement Park")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("Quick Play")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Big Drum Parade")
@@ -1786,21 +1774,14 @@ void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
 
 uint16_t spg2xx_game_doraphone_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t data = m_io_p1->read() & 0xfff0;
+    uint16_t matrix = 0x000f;
+    for (int b = 1; 6 >= b; ++b)
+    {
+        if (!BIT(m_portb_data, b))
+            matrix &= m_io_p1_rows[b - 1]->read();
+    }
 
-	switch (m_portb_data & 0xfe)
-	{
-	case 0xfe: data |= m_io_p1_fe->read() & 0x000f; break;
-	case 0xfc: data |= m_io_p1_fc->read() & 0x000f; break;
-	case 0xfa: data |= m_io_p1_fa->read() & 0x000f; break;
-	case 0xf6: data |= m_io_p1_f6->read() & 0x000f; break;
-	case 0xf4: data |= m_io_p1_f4->read() & 0x000f; break;
-	case 0xee: data |= m_io_p1_ee->read() & 0x000f; break;
-	case 0xde: data |= m_io_p1_de->read() & 0x000f; break;
-	case 0xbe: data |= m_io_p1_be->read() & 0x000f; break;
-	}
-
-	return data;
+    return matrix | (m_io_p1->read() & 0xfff0);
 }
 
 void spg2xx_game_doraphone_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)

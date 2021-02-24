@@ -341,14 +341,7 @@ public:
 	spg2xx_game_doraphone_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_portb_data(0),
-		m_io_p1_fe(*this, "P1_FE"),
-		m_io_p1_fc(*this, "P1_FC"),
-		m_io_p1_fa(*this, "P1_FA"),
-		m_io_p1_f6(*this, "P1_F6"),
-		m_io_p1_f4(*this, "P1_F4"),
-		m_io_p1_ee(*this, "P1_EE"),
-		m_io_p1_de(*this, "P1_DE"),
-		m_io_p1_be(*this, "P1_BE")
+		m_io_p1_rows(*this, "P1_ROW%u", 1U)
 	{ }
 
 	void doraphone(machine_config &config);
@@ -359,14 +352,7 @@ private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	uint16_t m_portb_data;
 
-	required_ioport m_io_p1_fe;
-	required_ioport m_io_p1_fc;
-	required_ioport m_io_p1_fa;
-	required_ioport m_io_p1_f6;
-	required_ioport m_io_p1_f4;
-	required_ioport m_io_p1_ee;
-	required_ioport m_io_p1_de;
-	required_ioport m_io_p1_be;
+	required_ioport_array<6> m_io_p1_rows;
 };
 
 
