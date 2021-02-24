@@ -317,7 +317,7 @@ inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_r
 //  phase step, after applying the given delta
 //-------------------------------------------------
 
-u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
+inline u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
 {
 	// The phase step is essentially the fnum in OPN-speak. To compute this table,
 	// we used the standard formula for computing the frequency of a note, and
@@ -1430,7 +1430,7 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 template<class RegisterType>
 u8 ymfm_engine_base<RegisterType>::status() const
 {
-	u8 result = m_status;
+	u8 result = m_status & ~STATUS_BUSY;
 
 	// synthesize the busy flag if we're still busy
 	if (m_device.machine().time() < m_busy_end)
