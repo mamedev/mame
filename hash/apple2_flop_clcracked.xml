@@ -15718,10 +15718,12 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2016-08-02"/>
+		<!-- This was updated on Feb 23rd, 2021 to fix the hidden CTRL-A
+		administrative menu crashing due to an incomplete crack. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="7085b661" sha1="2f0afa37c569d6f6e2ece14e73794c618c2c77b7" />
+				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="7085b661" sha1="8b65a6841d5615ecf39806478d7a355f09484ab5" />
 			</dataarea>
 		</part>
 	</software>
@@ -16232,6 +16234,8 @@ license:CC0
 		<year>1985</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2019-05-29"/>
+		<!-- This was redumped on Feb 21st, 2021 to fix data corruption
+		that would cause the game to crash immediately on leaving town. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
