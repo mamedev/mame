@@ -96,6 +96,8 @@
 #include "machine/rx01.h"
 
 
+namespace {
+
 class pdp11_state : public driver_device
 {
 public:
@@ -111,6 +113,10 @@ public:
 	void pdp11qb(machine_config &config);
 	void sms1000(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -120,7 +126,6 @@ private:
 	void kbd_put(u8 data);
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
@@ -281,6 +286,14 @@ static INPUT_PORTS_START( pdp11 )
 	M9312_PORT_CONFSETTING
 INPUT_PORTS_END
 
+void pdp11_state::machine_start()
+{
+	m_teletype_data = 0;
+	m_teletype_status = 0;
+
+	save_item(NAME(m_teletype_data));
+	save_item(NAME(m_teletype_status));
+}
 
 void pdp11_state::machine_reset()
 {
@@ -506,6 +519,9 @@ ROM_START( sms1000 )
 	ROM_LOAD( "2124010",      0x1f000, 0x000100, NO_DUMP )
 	ROM_LOAD( "2127001b",     0x1f000, 0x000100, NO_DUMP ) // has 3 of these
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

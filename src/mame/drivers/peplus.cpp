@@ -219,6 +219,8 @@ A Note about Best Bet Products.
 #include "pe_slots.lh"
 
 
+namespace {
+
 class peplus_state : public driver_device
 {
 public:
@@ -1367,6 +1369,8 @@ void peplus_state::machine_start()
 	save_item(NAME(m_bv_data_bit));
 	save_item(NAME(m_bv_loop_count));
 	save_item(NAME(m_id023_data));
+
+	m_door_open = 0;
 }
 
 /*************************
@@ -14476,6 +14480,8 @@ ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) - PSR Verified
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /*************************
