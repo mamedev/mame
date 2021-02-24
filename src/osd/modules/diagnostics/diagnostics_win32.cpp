@@ -101,7 +101,7 @@ private:
 	void scan_cache_for_address(uintptr_t address);
 	void format_symbol(const char *name, uint32_t displacement, const char *filename = nullptr, int linenumber = 0);
 
-	static uintptr_t get_text_section_base();
+	static uintptr_t get_text_section_base(ULONG &size);
 
 	struct cache_entry
 	{
@@ -117,8 +117,9 @@ private:
 	std::string     m_symfile;
 	std::string     m_buffer;
 	HANDLE          m_process;
-	uintptr_t            m_last_base;
-	uintptr_t            m_text_base;
+	uintptr_t       m_last_base;
+	uintptr_t       m_text_base;
+	ULONG           m_text_size;
 
 	osd::dynamic_module::ptr m_dbghelp_dll;
 
@@ -310,7 +311,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	m_symfile.append(".sym");
 
 	// figure out the base of the .text section
-	m_text_base = get_text_section_base();
+	m_text_base = get_text_section_base(m_text_size);
 #endif
 
 	// expand the buffer to be decently large up front
@@ -379,6 +380,10 @@ bool symbol_manager::query_system_for_address(uintptr_t address)
 	info.MaxNameLen = sizeof(info_buffer) - sizeof(info);
 	if ((*m_sym_from_addr)(m_process, address, &displacement, &info))
 	{
+		// if the address is within our image, but the symbol is at or below the text base, it's useless (lld produces these)
+		if (info.Address <= m_text_base && address > m_text_base && address < m_text_base + m_text_size)
+			return false;
+
 		// try to get source info as well; again we are returned an ANSI string
 		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
 		DWORD linedisp;
@@ -604,7 +609,7 @@ void symbol_manager::format_symbol(const char *name, uint32_t displacement, cons
 //  of the .text section
 //-------------------------------------------------
 
-uintptr_t symbol_manager::get_text_section_base()
+uintptr_t symbol_manager::get_text_section_base(ULONG &size)
 {
 	osd::dynamic_module::ptr m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
 
@@ -625,10 +630,14 @@ uintptr_t symbol_manager::get_text_section_base()
 		// look ourself up (assuming we are in the .text section)
 		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<uintptr_t>(get_text_section_base) - reinterpret_cast<uintptr_t>(base));
 		if (section != nullptr)
+		{
+			size = section->SizeOfRawData;
 			return reinterpret_cast<uintptr_t>(base) + section->VirtualAddress;
+		}
 	}
 
 	// fallback to returning the image base (wrong)
+	size = 0;
 	return reinterpret_cast<uintptr_t>(base);
 }
 

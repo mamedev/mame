@@ -405,8 +405,6 @@ void eprom_state::eprom(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 	m_screen->screen_vblank().append_inputline(m_extra, M68K_IRQ_4, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -450,8 +448,6 @@ void eprom_state::klaxp(machine_config &config)
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_eprom));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
-
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -501,8 +497,6 @@ void eprom_state::guts(machine_config &config)
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_guts));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
-
-	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

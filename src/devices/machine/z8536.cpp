@@ -748,7 +748,7 @@ void cio_base_device::external_port_w(int port, int bit, int state)
 	case PORT_A:
 	case PORT_B:
 		{
-		assert((PORT_A_DATA_DIRECTION + (port << 3)) >= 0 && (PORT_A_DATA_DIRECTION + (port << 3)) < ARRAY_LENGTH(m_register));
+		assert((PORT_A_DATA_DIRECTION + (port << 3)) >= 0 && (PORT_A_DATA_DIRECTION + (port << 3)) < std::size(m_register));
 		u8 ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
 
 		if (!BIT(ddr, bit)) return;

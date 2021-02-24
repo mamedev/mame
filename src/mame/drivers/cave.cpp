@@ -27,7 +27,7 @@ Year + Game               License       PCB         Tilemaps        Sprites     
 95 Sailor Moon            Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
 95 Donpachi               Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
 96 Air Gallet             Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96 Hotdog Storm           Marble        ASTC9501    038 9341EX702   013             Z80
+96 Hotdog Storm           Marble        ASCT9501    038 9341EX702   013             Z80
 96 Pac-Slot               Namco         N-44 EM     038 9444WX010   013 9345E7006
 96 Poka Poka Satan        Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
 97 Tekken Card World      Namco         EMG4        038 9701WX001   013 9651EX001
@@ -3733,30 +3733,30 @@ Hotdog Storm
 Marble 1996
 
 +------------------------------------------------------+
-|       6296   MP1     MP2        6264 6264  LED 68257 |
-|                     68257                      68257 |
-|  VOL          Z80               +--------+           |
-|            YM2203               |        |       9 8 |
+|       6295   MP1     MP2        6264 6264  LED 68257 |
+|            GAL      68257                      68257 |
+|  VOL    Y3014 Z80               +--------+           |
+|LA4460N     YM2203               |        |       9 8 |
 |                                 |  013   |       P P |
 |                                 |        |       M M |
 |                     68257       +--------+           |
-|           68000-16  68257                            |
-|                                                      |
-|                                                      |
-|J 93C46     MP3        +------+  +------+  +------+   |
-|A           MP4        | 038  |  | 038  |  | 038  |   |
+|           68000P12  68257                            |
+|J                                                     |
+|A 93C46     MP3        +------+  +------+  +------+   |
+|M           MP4        | 038  |  | 038  |  | 038  |   |
 |M                      |      |  |      |  |      |   |
-|M                      +------+  +------+  +------+   |
-|A                                                     |
+|A                      +------+  +------+  +------+   |
+|                                                      |
 |                             4  4      4  4      4  4 |
 |                 6264     5  6  6   6  6  6   7  6  6 |
 | P1 P2           6264     P  2  2   P  2  2   P  2  2 |
 |                    32MHz M  6  6   M  6  6   M  6  6 |
 +------------------------------------------------------+
 
-BOARD #:      ASTC9501
-CPU:          TMP68HC000-16
-Sound:        M6295 + YM2203
+BOARD #:      ASCT9501
+CPU:          MC68HC00P12, Z0840006PSC
+Sound:        M6295, YM2203C + Y3014B
+              LA4460N Sanyo High Gain 51dB, 12W AF Power Amplifier
 OSC:          32.000MHz
 EEPROM:       ATMEL 93C46
 CUSTOM:       038 9341EX702 x3
@@ -3800,7 +3800,7 @@ ROM_START( hotdogst )
 	ROM_LOAD( "mp1.u65", 0x00000, 0x80000, CRC(4868be1b) SHA1(32b8234b19fdbe07fa5057fa7965e36807e35e77) )   // 1xxxxxxxxxxxxxxxxxx = 0xFF, 4 x 0x20000
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-hotdogst.bin", 0x0000, 0x0080, CRC(12b4f934) SHA1(5b28d8fbd78869db78ce49e541a9d65558841966) )
+	ROM_LOAD16_WORD( "eeprom-hotdogst.u14", 0x0000, 0x0080, CRC(12b4f934) SHA1(5b28d8fbd78869db78ce49e541a9d65558841966) )
 ROM_END
 
 

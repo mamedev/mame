@@ -69,7 +69,7 @@ void osd_break_into_debugger(const char *message)
 }
 
 #ifdef SDLMAME_ANDROID
-std::string osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text()
 {
 	return std::string();
 }
@@ -78,7 +78,7 @@ std::string osd_get_clipboard_text(void)
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text()
 {
 	std::string result;
 
@@ -97,7 +97,7 @@ std::string osd_get_clipboard_text(void)
 //  osd_getpid
 //============================================================
 
-int osd_getpid(void)
+int osd_getpid()
 {
 	return getpid();
 }
@@ -172,7 +172,7 @@ bool invalidate_instruction_cache(void const *start, std::size_t size)
 }
 
 
-void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, std::size_t &size, std::size_t &page_size)
+void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size)
 {
 	long const p(sysconf(_SC_PAGE_SIZE));
 	if (0 >= p)
@@ -183,13 +183,25 @@ void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blo
 	s *= p;
 	if (!s)
 		return nullptr;
+#if defined __NetBSD__
+	int req((NONE == intent) ? PROT_NONE : 0);
+	if (intent & READ)
+		req |= PROT_READ;
+	if (intent & WRITE)
+		req |= PROT_WRITE;
+	if (intent & EXECUTE)
+		req |= PROT_EXEC;
+	int const prot(PROT_MPROTECT(req));
+#else
+	int const prot(PROT_NONE);
+#endif
 #if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX) || defined(SDLMAME_EMSCRIPTEN)
 	int const fd(-1);
 #else
 	// TODO: portable applications are supposed to use -1 for anonymous mappings - detect whatever requires 0 specifically
 	int const fd(0);
 #endif
-	void *const result(mmap(nullptr, s, PROT_NONE, MAP_ANON | MAP_SHARED, fd, 0));
+	void *const result(mmap(nullptr, s, prot, MAP_ANON | MAP_SHARED, fd, 0));
 	if (result == (void *)-1)
 		return nullptr;
 	size = s;

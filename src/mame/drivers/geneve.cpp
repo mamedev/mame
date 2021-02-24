@@ -632,16 +632,15 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
 
 	if (machine().side_effects_disabled())
 	{
-		// TODO: add method to tms9995
-//      if (m_cpu->is_onchip(offset))
-//      {
-//          m_cpu->debug_write_onchip_memory(offset, data);
-//          return;
-//      }
+		if (m_cpu->is_onchip(offset))
+		{
+			m_cpu->debug_write_onchip_memory(offset, data);
+			return;
+		}
 
 		// The debugger does not call setaddress, so we do it here
 		// Also, the decode result is replaced by the debugger version
-		setaddress_debug(true, addr13, 0);
+		setaddress_debug(true, offset, 0);
 	}
 
 	// Video write (never by debugger)

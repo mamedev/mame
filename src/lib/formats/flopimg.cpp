@@ -876,7 +876,7 @@ const char *floppy_error(floperr_t err)
 		"Required parameter not specified"
 	};
 
-	if ((err < 0) || (err >= ARRAY_LENGTH(error_messages)))
+	if ((err < 0) || (err >= std::size(error_messages)))
 		return nullptr;
 	return error_messages[err];
 }
@@ -953,6 +953,21 @@ int floppy_image::get_resolution() const
 	if(mask & 0x4)
 		return 1;
 	return 0;
+}
+
+bool floppy_image::track_is_formatted(int track, int head, int subtrack)
+{
+	int idx = track*4 + subtrack;
+	if(int(track_array.size()) <= idx)
+		return false;
+	if(int(track_array[idx].size()) <= head)
+		return false;
+	const auto &data = track_array[idx][head].cell_data;
+	if(data.empty())
+		return false;
+	if(data.size() == 1 && (data[0] & MG_MASK) == MG_N)
+		return false;
+	return true;
 }
 
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
@@ -2986,8 +3001,14 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 		auto &sdata = sector_data[se];
 		uint8_t ca = 0, cb = 0, cc = 0;
 
-		uint32_t hstate = (nib[pos] << 8) | nib[pos + 1];
-		pos += 2;
+		uint32_t hstate = (nib[pos] << 8);
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
+		hstate |= nib[pos];
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
 		for(;;) {
 			hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
 			pos ++;

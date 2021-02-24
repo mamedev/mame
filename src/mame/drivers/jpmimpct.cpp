@@ -19,9 +19,6 @@
     ROMS wanted:
         * Snakes and Ladders
 
-    Known issues:
-        * Digital volume control is not emulated.
-
     Mechanical games note:
 
     Anything writing to 4800a0 within the first few instructions is guessed
@@ -292,10 +289,31 @@ void jpmimpct_state::machine_reset()
  *************************************/
 void jpmimpct_state::volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+
 	if (ACCESSING_BITS_0_7)
 	{
+		int changed = m_volume_latch^(data&0xf0);
 		m_upd7759->set_rom_bank((data >> 1) & 3);
 		m_upd7759->reset_w(BIT(data, 0));
+
+		if ( changed & 0x10)
+		{ // digital volume clock line changed
+			if ( !(data & 0x10) )
+			{ // changed from high to low,
+				if ( !(data & 0x20) )//down
+				{
+					if ( m_global_volume > 0  ) m_global_volume--;
+				}
+				else
+				{
+					if ( m_global_volume < 99 ) m_global_volume++;
+				}
+
+				float percent = (m_global_volume)/99.0;
+				m_upd7759->set_output_gain(0, percent);
+			}
+		}
+		m_volume_latch = (data & 0xf0);
 	}
 }
 

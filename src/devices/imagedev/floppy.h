@@ -96,9 +96,10 @@ public:
 	void setup_led_cb(led_cb cb);
 
 	std::vector<uint32_t> &get_buffer() { return image->get_buffer(cyl, ss, subcyl); }
-	int get_cyl() { return cyl; }
+	int get_cyl() const { return cyl; }
+	bool on_track() const { return !subcyl; }
 
-	void mon_w(int state);
+	virtual void mon_w(int state);
 	bool ready_r();
 	void set_ready(bool state);
 	double get_pos();
@@ -110,6 +111,8 @@ public:
 	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
+
+	virtual bool writing_disabled() const;
 
 	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
@@ -176,6 +179,8 @@ protected:
 	int mon;  /* motor on */
 	int ss, actual_ss; /* side select (forced to 0 if single-sided drive / actual value) */
 	int ds; /* drive select */
+
+	int phases; /* phases lines, when they exist */
 
 	/* state of output lines */
 	int idx;  /* index pulse */
@@ -280,8 +285,10 @@ public:
 	virtual ~mac_floppy_device() = default;
 
 	virtual bool wpt_r() override;
+	virtual void mon_w(int) override;
 	virtual void seek_phase_w(int phases) override;
 	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
+	virtual bool writing_disabled() const override;
 
 protected:
 	u8 m_reg;

@@ -837,7 +837,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
-	<software name="volley">
+	<software name="volley" supported="partial">
 		<description>Electronic Volleyball (Europe, US)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
@@ -852,7 +852,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
-	<software name="volleyf" cloneof="volley">
+	<software name="volleyf" cloneof="volley" supported="partial">
 		<description>Volleyball (France)</description>
 		<year>1979</year>
 		<publisher>Radiola</publisher>

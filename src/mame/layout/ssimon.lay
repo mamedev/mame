@@ -162,7 +162,7 @@ license:CC0
 			<bounds x="36" y="32" width="10" height="20" />
 		</element>
 
-	<!-- middle element -->
+	<!-- middle bezel -->
 
 		<element ref="static_grey"><bounds x="1" y="22" width="45" height="9" /></element>
 

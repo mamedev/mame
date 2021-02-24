@@ -42,6 +42,7 @@ const char *const menu_custom_ui::HIDE_STATUS[] = {
 menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
+	, m_currlang(0)
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
@@ -124,7 +125,7 @@ void menu_custom_ui::handle()
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				std::vector<std::string> s_sel(ARRAY_LENGTH(HIDE_STATUS));
+				std::vector<std::string> s_sel(std::size(HIDE_STATUS));
 				std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
 				menu::stack_push<menu_selector>(
 						ui(), container(), std::move(s_sel), ui_globals::panels_status,
@@ -984,7 +985,7 @@ void menu_palette_sel::handle()
 
 void menu_palette_sel::populate(float &customtop, float &custombottom)
 {
-	for (unsigned x = 0; x < ARRAY_LENGTH(s_palette); ++x)
+	for (unsigned x = 0; x < std::size(s_palette); ++x)
 		item_append(_(s_palette[x].first), s_palette[x].second, FLAG_COLOR_BOX, (void *)(uintptr_t)(x + 1));
 
 	item_append(menu_item_type::SEPARATOR);

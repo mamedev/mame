@@ -383,11 +383,8 @@ public:
 	// write a sample to the buffer, clamping to +/- the clamp value
 	void put_clamp(s32 index, sample_t sample, sample_t clamp = 1.0)
 	{
-		if (sample > clamp)
-			sample = clamp;
-		if (sample < -clamp)
-			sample = -clamp;
-		put(index, sample);
+		assert(clamp >= sample_t(0));
+		put(index, std::clamp(sample, -clamp, clamp));
 	}
 
 	// write a sample to the buffer, converting from an integer with the given maximum
@@ -399,11 +396,8 @@ public:
 	// write a sample to the buffer, converting from an integer with the given maximum
 	void put_int_clamp(s32 index, s32 sample, s32 maxclamp)
 	{
-		if (sample > maxclamp)
-			sample = maxclamp;
-		else if (sample < -maxclamp)
-			sample = -maxclamp;
-		put_int(index, sample, maxclamp);
+		assert(maxclamp >= 0);
+		put_int(index, std::clamp(sample, -maxclamp, maxclamp), maxclamp);
 	}
 
 	// safely add a sample to the buffer

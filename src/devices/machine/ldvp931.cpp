@@ -233,7 +233,7 @@ void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, 
 			m_fromcontroller_pending = true;
 
 			// track the commands for debugging purposes
-			if (m_cmdcount < ARRAY_LENGTH(m_cmdbuf))
+			if (m_cmdcount < std::size(m_cmdbuf))
 			{
 				m_cmdbuf[m_cmdcount++ % 3] = param;
 				if (LOG_COMMANDS && m_cmdcount % 3 == 0)

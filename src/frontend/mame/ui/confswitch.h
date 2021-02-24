@@ -55,8 +55,6 @@ protected:
 	switch_group_vector const &switch_groups() { return m_switch_groups; }
 	unsigned active_switch_groups() const { return m_active_switch_groups; }
 
-	int m_dipcount;
-
 private:
 	virtual void handle() override;
 

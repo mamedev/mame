@@ -146,7 +146,7 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 
 	mode = "w";
 	/* opening for append? */
-	if ((filename[0] == '>') && (filename[1] == '>'))
+	if (filename.length() >= 2 && filename[0] == '>' && filename[1] == '>')
 	{
 		mode = "a";
 		filename = filename.substr(2);
@@ -155,7 +155,7 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 	FILE* f = fopen(filename.c_str(), mode);
 	if (!f)
 	{
-		printf("Error opening file '%s'\n", filename.c_str());
+		printf("Error opening file '%s'\n", filename);
 		return;
 	}
 
@@ -166,7 +166,7 @@ void debugger_console::execute_condump(int ref, const std::vector<std::string>& 
 	}
 
 	fclose(f);
-	printf("Wrote console contents to '%s'\n", filename.c_str());
+	printf("Wrote console contents to '%s'\n", filename);
 }
 
 //-------------------------------------------------
@@ -275,7 +275,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 	len = strlen(command);
 	debug_command *found = nullptr;
 	for (debug_command &cmd : m_commandlist)
-		if (!strncmp(command, cmd.command, len))
+		if (!core_strnicmp(command, cmd.command, len))
 		{
 			foundcount++;
 			found = &cmd;
@@ -363,7 +363,7 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = true; *p = c; break;
 					case '=':   if (parendex == 0 && paramcount == 1) isexpr = true; *p = c; break;
 					case 0:     foundend = true; break;
-					default:    *p = tolower(u8(c)); break;
+					default:    *p = c; break;
 				}
 			}
 		}
@@ -419,7 +419,7 @@ CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 {
 	/* echo if requested */
 	if (echo)
-		printf(">%s\n", command.c_str());
+		printf(">%s\n", command);
 
 	/* parse and execute */
 	const CMDERR result = internal_parse_command(command, true);
@@ -428,9 +428,9 @@ CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 	if (result.error_class() != CMDERR::NONE)
 	{
 		if (!echo)
-			printf(">%s\n", command.c_str());
+			printf(">%s\n", command);
 		printf(" %*s^\n", result.error_offset(), "");
-		printf("%s\n", cmderr_to_string(result).c_str());
+		printf("%s\n", cmderr_to_string(result));
 	}
 
 	/* update all views */

@@ -306,7 +306,7 @@ WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
 	{
 		m_mux_col = m_ram0_output;
 		m_digits[m_mux_col] = led_digits[m_rom0_output];
-		if (ARRAY_LENGTH(lamp_matrix) > m_mux_col)
+		if (std::size(lamp_matrix) > m_mux_col)
 		{
 			if (lamp_matrix[m_mux_col][0])
 				output().set_value(lamp_matrix[m_mux_col][0], BIT(m_rom1_output, 0));

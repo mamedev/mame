@@ -698,7 +698,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	}
 
 	/* iterate over buckets and output them */
-	for (bucknum = 0; bucknum < ARRAY_LENGTH(bucket_output_order); bucknum++)
+	for (bucknum = 0; bucknum < std::size(bucket_output_order); bucknum++)
 	{
 		int curbucket = bucket_output_order[bucknum];
 

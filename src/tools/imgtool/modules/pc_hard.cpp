@@ -193,7 +193,6 @@ done:
 static imgtoolerr_t pc_chd_read_partition_header(imgtool::image &image)
 {
 	imgtoolerr_t err;
-	int i;
 	const uint8_t *partition_info;
 	pc_chd_image_info *info;
 	uint8_t buffer[FAT_SECLEN];
@@ -209,7 +208,7 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool::image &image)
 	if ((buffer[510] != 0x55) || (buffer[511] != 0xAA))
 		return IMGTOOLERR_CORRUPTIMAGE;
 
-	for (i = 0; i < ARRAY_LENGTH(info->partitions); i++)
+	for (int i = 0; i < std::size(info->partitions); i++)
 	{
 		partition_info = &buffer[446 + i * 16];
 

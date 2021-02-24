@@ -341,7 +341,7 @@ poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::~poly_manager()
 {
 	// accumulate stats over the entire collection
 	int conflicts = 0, resolved = 0;
-	for (int i = 0; i < ARRAY_LENGTH(m_conflicts); i++)
+	for (int i = 0; i < std::size(m_conflicts); i++)
 	{
 		conflicts += m_conflicts[i];
 		resolved += m_resolved[i];

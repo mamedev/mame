@@ -574,7 +574,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 {
 	uint8_t collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
 	const rectangle &visarea = m_screen->visible_area();
-	assert(ARRAY_LENGTH(collision) >= m_screen->width());
+	assert(std::size(collision) >= m_screen->width());
 
 	m_video.line++;
 	if (m_irq_pause) m_irq_pause++;

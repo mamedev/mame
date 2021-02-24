@@ -656,6 +656,9 @@ uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 
 	uint16_t result = m_fdc->read(offset >> 8);
 
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
+
 	if (LOG_MAC_IWM)
 		printf("%s mac_iwm_r: offset=0x%08x mem_mask %04x = %02x\n", machine().describe_context().c_str(), offset, mem_mask, result);
 
@@ -671,6 +674,9 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_fdc->write((offset >> 8), data & 0xff);
 	else
 		m_fdc->write((offset >> 8), data>>8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
@@ -853,7 +859,7 @@ void mac_state::mac_via_out_a(uint8_t data)
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
 #if NEW_SWIM
-	if (m_cur_floppy && (m_fdc->type() == IWM || m_fdc->type() == SWIM1))
+	if (m_cur_floppy)
 		m_cur_floppy->ss_w((data & 0x20) >> 5);
 #else
 	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
@@ -2328,7 +2334,7 @@ const char *lookup_trap(uint16_t opcode)
 
 	int i;
 
-	for (i = 0; i < ARRAY_LENGTH(traps); i++)
+	for (i = 0; i < std::size(traps); i++)
 	{
 		if (traps[i].trap == opcode)
 			return traps[i].name;
@@ -2425,7 +2431,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		csCode = *((uint16_t*) (mem + a0 + 26));
 		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
-		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
+		for (i = 0; i < std::size(cscodes); i++)
 		{
 			if (cscodes[i].csCode == csCode)
 			{
@@ -2461,7 +2467,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	case 0xa815:    /* _SCSIDispatch */
 		i = *((uint16_t*) (mem + a7));
-		if (i < ARRAY_LENGTH(scsisels))
+		if (i < std::size(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);
 		break;
@@ -2509,14 +2515,12 @@ void mac_state::devsel_w(uint8_t devsel)
 	else
 		m_cur_floppy = nullptr;
 	m_fdc->set_floppy(m_cur_floppy);
-	if(m_cur_floppy && (m_fdc->type() == IWM || m_fdc->type() == SWIM1))
+	if(m_cur_floppy)
 		m_cur_floppy->ss_w((m_via1->read_pa() & 0x20) >> 5);
 }
 
 void mac_state::hdsel_w(int hdsel)
 {
-	if(m_cur_floppy)
-		m_cur_floppy->ss_w(hdsel);
 }
 
 #endif

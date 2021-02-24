@@ -108,7 +108,7 @@ std::string win_get_window_text_utf8(HWND window)
 	{
 		TCHAR t_buffer[256];
 		auto title = Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->Title;
-		wcsncpy(t_buffer, title->Data(), ARRAY_LENGTH(t_buffer));
+		wcsncpy(t_buffer, title->Data(), std::size(t_buffer));
 		return osd::text::from_tstring(t_buffer);
 	}
 #endif

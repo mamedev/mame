@@ -67,7 +67,7 @@ void osd_break_into_debugger(const char *message)
 	struct kinfo_proc info;
 	info.kp_proc.p_flag = 0;
 	std::size_t infosz = sizeof(info);
-	sysctl(mib, ARRAY_LENGTH(mib), &info, &infosz, nullptr, 0);
+	sysctl(mib, std::size(mib), &info, &infosz, nullptr, 0);
 	if (info.kp_proc.p_flag & P_TRACED)
 	{
 		printf("MAME exception: %s\n", message);
@@ -85,7 +85,7 @@ void osd_break_into_debugger(const char *message)
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text()
 {
 	std::string result;
 	bool has_result = false;
@@ -161,7 +161,7 @@ std::string osd_get_clipboard_text(void)
 //  osd_getpid
 //============================================================
 
-int osd_getpid(void)
+int osd_getpid()
 {
 	return getpid();
 }
@@ -234,7 +234,7 @@ bool invalidate_instruction_cache(void const *start, std::size_t size)
 }
 
 
-void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, std::size_t &size, std::size_t &page_size)
+void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size)
 {
 	long const p(sysconf(_SC_PAGE_SIZE));
 	if (0 >= p)

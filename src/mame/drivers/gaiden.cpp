@@ -194,7 +194,7 @@ void gaiden_state::wildfang_protection_w(offs_t offset, uint16_t data, uint16_t 
 				break;
 			case 0x20:  /* low 4 bits of jump code */
 				m_jumpcode |= data & 0x0f;
-				if (m_jumpcode >= ARRAY_LENGTH(wildfang_jumppoints))
+				if (m_jumpcode >= std::size(wildfang_jumppoints))
 				{
 					logerror("unknown jumpcode %02x\n", m_jumpcode);
 					m_jumpcode = 0;

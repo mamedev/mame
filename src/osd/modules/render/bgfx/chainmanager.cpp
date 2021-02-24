@@ -377,7 +377,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
+int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -405,18 +405,16 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::unique_ptr<slider_state> state = std::make_unique<slider_state>();
+	int32_t minval = 0;
+	int32_t defval = m_current_chain[screen_index];
+	int32_t maxval = m_available_chains.size() - 1;
+	int32_t incval = 1;
 
-	state->minval = 0;
-	state->defval = m_current_chain[screen_index];
-	state->maxval = m_available_chains.size() - 1;
-	state->incval = 1;
+	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 
 	using namespace std::placeholders;
-	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
-	state->arg = this;
-	state->id = screen_index;
-	state->description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
+	auto state = std::make_unique<slider_state>(std::move(description), minval, defval, maxval, incval,
+												std::bind(&chain_manager::slider_changed, this, screen_index, _1, _2));
 
 	ui::menu_item item;
 	item.text = state->description;

@@ -224,7 +224,7 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, const std::vector
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
-	image->set_variant(f.variant);
+	image->set_form_variant(f.form_factor, f.variant);
 
 	return true;
 }

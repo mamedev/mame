@@ -95,7 +95,7 @@ void arm7_cpu_device::load_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_impstate.regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_impstate.regmap); regnum++)
 		if (m_impstate.regmap[regnum].is_int_register())
 			UML_DMOV(block, uml::ireg(m_impstate.regmap[regnum].ireg() - uml::REG_I0), uml::mem(&m_r[regnum]));
 }
@@ -110,7 +110,7 @@ void arm7_cpu_device::save_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_impstate.regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_impstate.regmap); regnum++)
 		if (m_impstate.regmap[regnum].is_int_register())
 			UML_DMOV(block, uml::mem(&m_r[regnum]), uml::ireg(m_impstate.regmap[regnum].ireg() - uml::REG_I0));
 }
@@ -251,7 +251,7 @@ void arm7_cpu_device::arm7drc_set_options(uint32_t options)
 
 void arm7_cpu_device::arm7drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
 {
-	if (m_impstate.fastram_select < ARRAY_LENGTH(m_impstate.fastram))
+	if (m_impstate.fastram_select < std::size(m_impstate.fastram))
 	{
 		m_impstate.fastram[m_impstate.fastram_select].start = start;
 		m_impstate.fastram[m_impstate.fastram_select].end = end;
@@ -268,7 +268,7 @@ void arm7_cpu_device::arm7drc_add_fastram(offs_t start, offs_t end, uint8_t read
 
 void arm7_cpu_device::arm7drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles)
 {
-	if (m_impstate.hotspot_select < ARRAY_LENGTH(m_impstate.hotspot))
+	if (m_impstate.hotspot_select < std::size(m_impstate.hotspot))
 	{
 		m_impstate.hotspot[m_impstate.hotspot_select].pc = pc;
 		m_impstate.hotspot[m_impstate.hotspot_select].opcode = opcode;

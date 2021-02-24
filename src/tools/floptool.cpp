@@ -90,10 +90,12 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_APPLE_GCR_FORMAT,
+	FLOPPY_APPLE_2MG_FORMAT,
 	FLOPPY_A216S_FORMAT,
 	FLOPPY_RWTS18_FORMAT,
 	FLOPPY_EDD_FORMAT,
 	FLOPPY_WOZ_FORMAT,
+	FLOPPY_NIB_FORMAT,
 
 	FLOPPY_ATOM_FORMAT,
 	FLOPPY_ACORN_SSD_FORMAT,
@@ -129,7 +131,7 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 	va_end(arg);
 }
 
-enum { FORMAT_COUNT = ARRAY_LENGTH(floppy_formats) };
+static constexpr size_t FORMAT_COUNT = std::size(floppy_formats);
 
 static floppy_image_format_t *formats[FORMAT_COUNT];
 static std::vector<uint32_t> variants;

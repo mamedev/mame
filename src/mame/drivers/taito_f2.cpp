@@ -697,6 +697,16 @@ void taitof2_state::cameltry_map(address_map &map)
 	map(0xd00000, 0xd0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 }
 
+void taitof2_state::driftoutct_map(address_map &map)
+{
+	cameltry_map(map);
+
+	map(0x040000, 0x07ffff).rom();
+	map(0x300018, 0x30001f).unmapr();
+	map(0x300018, 0x300019).portr("PADDLE1");
+	map(0x30001a, 0x30001b).portr("PADDLE2");
+}
+
 void taitof2_state::cameltrya_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -2009,6 +2019,16 @@ static INPUT_PORTS_START( driftout )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( driftoutct )
+	PORT_INCLUDE(driftout)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gunfront )
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
@@ -2961,6 +2981,13 @@ void taitof2_state::cameltry(machine_config &config)
 	m_tc0280grd->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
+}
+
+void taitof2_state::driftoutct(machine_config &config)
+{
+	cameltry(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::driftoutct_map);
 }
 
 void taitof2_state::qtorimon(machine_config &config)
@@ -5301,6 +5328,35 @@ ROM_START( driftoutj )
 	/* no Delta-T samples */
 ROM_END
 
+ROM_START( driftoutct ) // conversion on Cameltry hardware
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "l.ic10",  0x00000, 0x80000, CRC(d1f779d3) SHA1(d70a52b74bed88e33da6bdaf34467c0353bef9a8) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "h.ic11",  0x00001, 0x80000, CRC(6ff1c660) SHA1(54e86795a166e49bf472577faddad5c640434414) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x080000, "tc0100scn_1", ROMREGION_ERASEFF )
+	// empty
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "do_obj.ic1", 0x00000, 0x80000, CRC(5491f1c4) SHA1(a2e92a9a1e77d9f683f6720947e0622dde48287f) )
+
+	ROM_REGION( 0x080000, "tc0280grd", 0 ) // two identical ROMs here, probably one for each ROZ layer, load them both to reflect this even if MAME only uses one
+	ROM_LOAD( "do_piv.ic27", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
+	ROM_LOAD( "do_piv.ic29", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "do_50.ic25",  0x00000, 0x10000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_LOAD( "do_snd.ic2", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
+
+	// no Delta-T samples
+
+	ROM_REGION( 0x600, "plds", 0 ) // brute-forced
+	ROM_LOAD( "pal16l8b.ic8",         0x0000, 0x0117, CRC(b2c1d05f) SHA1(163dcf1615098d7ecbd9725f9e679817b51175ba) )
+	ROM_LOAD( "pal16l8b.ic9",         0x0200, 0x0117, CRC(0dd34b78) SHA1(c6f3483b3b3091332f4919a269a727b3809ab12a) )
+	ROM_LOAD( "pal16l8b.c38-07.ic24", 0x0400, 0x0117, CRC(47fc77a9) SHA1(82372b7d60ccffbc4a5ec18d240e473a08940643) )
+ROM_END
+
 ROM_START( driveout )
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "4.u3", 0x00000, 0x80000, CRC(dc431e4e) SHA1(6002cb7a2bd05e28a2413942998a5c7e11fc1432) )
@@ -5494,5 +5550,6 @@ GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, empty_in
 GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Cameltry conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, init_driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )

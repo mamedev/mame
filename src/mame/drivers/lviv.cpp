@@ -453,7 +453,7 @@ void lviv_state::lviv(machine_config &config)
 	m_screen->set_screen_update(FUNC(lviv_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), std::size(s_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

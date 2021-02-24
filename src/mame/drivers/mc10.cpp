@@ -650,7 +650,6 @@ INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -716,6 +715,7 @@ void mc10_state::alice32(machine_config &config)
 	PALETTE(config, "palette").set_entries(8);
 
 	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(mc10_state::alice32_scanline), "screen", 0, 10);
 

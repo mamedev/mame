@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "sound/okim6295.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "cpu/pic16c5x/pic16c5x.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -59,13 +61,15 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_txtvideoram(*this, "txtvideoram"),
 		m_rowscroll(*this, "rowscroll"),
-		m_audiocpu(*this, "audiocpu"),
+		m_audio_pic(*this, "audiopic"),
+		m_audio_mcs(*this, "audiomcs"),
 		m_eeprom(*this, "eeprom"),
 		m_ticket(*this, "ticket"),
 		m_token(*this, "token")
 	{ }
 
-	void wbeachvl(machine_config &config);
+	void wbeachvl_mcs(machine_config &config);
+	void wbeachvl_pic(machine_config &config);
 	void hrdtimes(machine_config &config);
 	void luckboomh(machine_config &config);
 	void bigtwin(machine_config &config);
@@ -113,7 +117,8 @@ private:
 	u8 m_dispenser_latch; // hotmind luckboomh
 
 	// devices
-	required_device<pic16c57_device> m_audiocpu; // all
+	optional_device<pic16c57_device> m_audio_pic; // all but wbeachvla;
+	optional_device<i87c51_device> m_audio_mcs; // wbeachvla
 	optional_device<eeprom_serial_93cxx_device> m_eeprom; // wbeachvl hotmind
 	optional_device<ticket_dispenser_device> m_ticket; // hotmind luckboomh
 	optional_device<ticket_dispenser_device> m_token; // hotmind luckboomh
@@ -175,6 +180,8 @@ private:
 	void luckboomh_main_map(address_map &map);
 	void oki_map(address_map &map);
 	void wbeachvl_main_map(address_map &map);
+
+	void wbeachvl_base(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_PLAYMARK_H

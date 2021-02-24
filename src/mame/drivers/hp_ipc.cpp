@@ -374,6 +374,7 @@ Software to look for
 #include "sound/dac.h"
 #include "machine/input_merger.h"
 #include "bus/hp_ipc_io/hp_ipc_io.h"
+#include "machine/hp_ipc_optrom.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -398,6 +399,7 @@ public:
 		, m_irq6_merger(*this , "merge_irq6")
 		, m_io_slot_a(*this , "slot_a")
 		, m_io_slot_b(*this , "slot_b")
+		, m_rom_slots(*this , "rom%u" , 0)
 	{ }
 
 	void hp_ipc_base(machine_config &config);
@@ -452,6 +454,7 @@ private:
 	required_device<input_merger_any_high_device> m_irq6_merger;
 	required_device<hp_ipc_io_slot_device> m_io_slot_a;
 	required_device<hp_ipc_io_slot_device> m_io_slot_b;
+	required_device_array<hp_ipc_optrom_device , 2> m_rom_slots;
 
 	uint32_t m_mmu[4], m_lowest_ram_addr;
 	uint16_t *m_internal_ram;
@@ -744,6 +747,15 @@ void hp_ipc_state::machine_reset()
 	m_spkr->cs_w(1);
 	m_spkr->sk_w(0);
 	m_spkr->di_w(0);
+
+	// Load optional ROMs (if any)
+	// But first unload anything in opt ROM range
+	m_bankdev->space().unmap_read(0x100000 , 0x4fffff);
+	m_bankdev->space().unmap_read(0x100000 + 0x1800000, 0x4fffff + 0x1800000);
+
+	for (auto& slot : m_rom_slots) {
+		slot->install_read_handler(m_bankdev->space());
+	}
 }
 
 
@@ -781,6 +793,7 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("hp_ipc");
+	SOFTWARE_LIST(config, "rom_list").set_original("hp_ipc_rom");
 
 	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
 	rtc.irq().set(FUNC(hp_ipc_state::irq_1));
@@ -840,6 +853,11 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	m_io_slot_b->irq4_cb().set(m_irq4_merger , FUNC(input_merger_any_high_device::in_w<2>));
 	m_io_slot_b->irq5_cb().set(m_irq5_merger , FUNC(input_merger_any_high_device::in_w<2>));
 	m_io_slot_b->irq6_cb().set(m_irq6_merger , FUNC(input_merger_any_high_device::in_w<2>));
+
+	// Optional ROMs
+	for (auto& finder : m_rom_slots) {
+		HP_IPC_OPTROM(config, finder);
+	}
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 }

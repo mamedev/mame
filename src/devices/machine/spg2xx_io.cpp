@@ -179,7 +179,7 @@ void spg2xx_io_device::device_start()
 
 void spg2xx_io_device::device_reset()
 {
-	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
+	std::fill_n(&m_io_regs[0], 0x100, 0);
 
 	m_timer_a_preload = 0;
 	m_timer_b_preload = 0;
@@ -190,7 +190,7 @@ void spg2xx_io_device::device_reset()
 	m_io_regs[REG_PRNG1] = 0x1418;
 	m_io_regs[REG_PRNG2] = 0x1658;
 
-	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
+	std::fill(std::begin(m_uart_rx_fifo), std::end(m_uart_rx_fifo), 0);
 	m_uart_rx_fifo_start = 0;
 	m_uart_rx_fifo_end = 0;
 	m_uart_rx_fifo_count = 0;
@@ -198,14 +198,14 @@ void spg2xx_io_device::device_reset()
 	m_uart_tx_irq = false;
 	m_uart_rx_irq = false;
 
-	memset(m_spi_tx_fifo, 0, ARRAY_LENGTH(m_spi_tx_fifo));
+	std::fill(std::begin(m_spi_tx_fifo), std::end(m_spi_tx_fifo), 0);
 	m_spi_tx_fifo_start = 0;
 	m_spi_tx_fifo_end = 0;
 	m_spi_tx_fifo_count = 0;
 	m_spi_tx_buf = 0x00;
 	m_spi_tx_bit = 8;
 
-	memset(m_spi_rx_fifo, 0, ARRAY_LENGTH(m_spi_rx_fifo));
+	std::fill(std::begin(m_spi_rx_fifo), std::end(m_spi_rx_fifo), 0);
 	m_spi_rx_fifo_start = 0;
 	m_spi_rx_fifo_end = 0;
 	m_spi_rx_fifo_count = 0;
@@ -214,7 +214,7 @@ void spg2xx_io_device::device_reset()
 
 	m_spi_rate = 0;
 
-	memset(m_extint, 0, sizeof(bool) * 2);
+	std::fill_n(&m_extint[0], 2, false);
 
 	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
 
@@ -252,7 +252,7 @@ void spg2xx_io_device::uart_rx(uint8_t data)
 	if (BIT(m_io_regs[REG_UART_CTRL], 6))
 	{
 		m_uart_rx_fifo[m_uart_rx_fifo_end] = data;
-		m_uart_rx_fifo_end = (m_uart_rx_fifo_end + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+		m_uart_rx_fifo_end = (m_uart_rx_fifo_end + 1) % std::size(m_uart_rx_fifo);
 		m_uart_rx_fifo_count++;
 		if (m_uart_rx_timer->remaining() == attotime::never)
 			m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[REG_UART_CTRL], 5) ? 11 : 10, m_uart_baud_rate));
@@ -535,7 +535,7 @@ uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 					LOGMASKED(LOG_UART, "%s: Remaining count %d, value %02x\n", machine().describe_context(), m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
 					m_io_regs[REG_UART_RXBUF] = m_uart_rx_fifo[m_uart_rx_fifo_start];
 					val = m_io_regs[REG_UART_RXBUF];
-					m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+					m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % std::size(m_uart_rx_fifo);
 					m_uart_rx_fifo_count--;
 
 					if (m_uart_rx_fifo_count == 0)

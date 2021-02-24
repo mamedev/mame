@@ -111,7 +111,7 @@ static const vectrex_slot slot_list[] =
 #if 0
 static int vectrex_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
 		if (!strcmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;

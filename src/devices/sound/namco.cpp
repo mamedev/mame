@@ -492,6 +492,11 @@ void namco_device::polepos_sound_w(offs_t offset, uint8_t data)
     0x3b        ch 7    volume
     0x3c-0x3d   ch 7    frequency
     0x3e        ch 7    waveform select & frequency
+
+Grobda also stuffs values into register offset 0x02 with a frequency of zero
+to make 15XX channels act like a 4-bit DAC instead of waveform voices. This
+has been emulated by allowing writes to set the upper counter bits directly.
+Possibly offsets 0x00 and 0x01 can be used to set the fractional bits.
 */
 
 void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
@@ -516,6 +521,11 @@ void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 	voice = m_channel_list + ch;
 	switch (offset - ch * 8)
 	{
+	case 0x02:
+		voice->counter &= util::make_bitmask<uint32_t>(m_f_fracbits);
+		voice->counter |= uint32_t(data & 0x1f) << m_f_fracbits;
+		break;
+
 	case 0x03:
 		voice->volume[0] = data & 0x0f;
 		break;
@@ -688,8 +698,8 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			{
 				int f = voice->frequency & 0xff;
 
-				/* only update if we have non-zero volume and frequency */
-				if ((lv || rv) && f)
+				/* only update if we have non-zero volume */
+				if (lv || rv)
 				{
 					int hold_time = 1 << (m_f_fracbits - 16);
 					int hold = voice->noise_hold;
@@ -741,33 +751,29 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			}
 			else
 			{
-				/* only update if we have non-zero frequency */
-				if (voice->frequency)
+				/* save the counter for this voice */
+				uint32_t c = voice->counter;
+
+				/* only update if we have non-zero left volume */
+				if (lv)
 				{
-					/* save the counter for this voice */
-					uint32_t c = voice->counter;
+					const int16_t *lw = &m_waveform[lv][voice->waveform_select * 32];
 
-					/* only update if we have non-zero left volume */
-					if (lv)
-					{
-						const int16_t *lw = &m_waveform[lv][voice->waveform_select * 32];
-
-						/* generate sound into the buffer */
-						c = namco_update_one(lmix, lw, voice->counter, voice->frequency);
-					}
-
-					/* only update if we have non-zero right volume */
-					if (rv)
-					{
-						const int16_t *rw = &m_waveform[rv][voice->waveform_select * 32];
-
-						/* generate sound into the buffer */
-						c = namco_update_one(rmix, rw, voice->counter, voice->frequency);
-					}
-
-					/* update the counter for this voice */
-					voice->counter = c;
+					/* generate sound into the buffer */
+					c = namco_update_one(lmix, lw, voice->counter, voice->frequency);
 				}
+
+				/* only update if we have non-zero right volume */
+				if (rv)
+				{
+					const int16_t *rw = &m_waveform[rv][voice->waveform_select * 32];
+
+					/* generate sound into the buffer */
+					c = namco_update_one(rmix, rw, voice->counter, voice->frequency);
+				}
+
+				/* update the counter for this voice */
+				voice->counter = c;
 			}
 		}
 	}
@@ -790,8 +796,9 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			if (voice->noise_sw)
 			{
 				int f = voice->frequency & 0xff;
-					/* only update if we have non-zero volume and frequency */
-				if (v && f)
+
+				/* only update if we have non-zero volume */
+				if (v)
 				{
 					int hold_time = 1 << (m_f_fracbits - 16);
 					int hold = voice->noise_hold;
@@ -836,8 +843,8 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			}
 			else
 			{
-				/* only update if we have non-zero volume and frequency */
-				if (v && voice->frequency)
+				/* only update if we have non-zero volume */
+				if (v)
 				{
 					const int16_t *w = &m_waveform[v][voice->waveform_select * 32];
 

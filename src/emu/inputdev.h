@@ -164,7 +164,7 @@ public:
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
-	bool match_device_id(const char *deviceid) const;
+	bool match_device_id(std::string_view deviceid) const;
 
 protected:
 	// specific overrides

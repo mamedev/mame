@@ -54,11 +54,11 @@ private:
 	u16      m_bg0_gfxset;
 	u16      m_bg1_gfxset;
 #ifdef MAME_DEBUG
-	uint8_t       m_dislayer[4];
+	u8       m_dislayer[4] = { 0, 0, 0, 0 };
 #endif
 
 	/* sound-related */
-	uint32_t      m_msm_bank;
+	u32      m_msm_bank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

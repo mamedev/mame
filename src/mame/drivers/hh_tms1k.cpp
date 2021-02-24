@@ -56,7 +56,7 @@
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
- *MP1296   TMS1100?  1982, Entex Black Knight
+ @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  *MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
@@ -158,15 +158,17 @@
 #include "emu.h"
 #include "includes/hh_tms1k.h"
 
-#include "machine/tms1024.h"
 #include "machine/clock.h"
+#include "machine/ds8874.h"
 #include "machine/timer.h"
+#include "machine/tms1024.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -198,6 +200,7 @@
 #include "ebball2.lh"
 #include "ebball3.lh"
 #include "ebaskb2.lh"
+#include "ebknight.lh"
 #include "efootb4.lh"
 #include "einvader.lh"
 #include "elecbowl.lh"
@@ -2779,8 +2782,12 @@ class cnfball_state : public hh_tms1k_state
 {
 public:
 	cnfball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_ds8874(*this, "ds8874")
 	{ }
+
+	required_device<ds8874_device> m_ds8874;
+	void ds8874_output_w(u16 data);
 
 	void update_display();
 	void write_r(u16 data);
@@ -2793,7 +2800,13 @@ public:
 
 void cnfball_state::update_display()
 {
-	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
+	m_display->matrix(~m_grid, m_o | (m_r << 6 & 0x700));
+}
+
+void cnfball_state::ds8874_output_w(u16 data)
+{
+	m_grid = data;
+	update_display();
 }
 
 void cnfball_state::write_r(u16 data)
@@ -2805,14 +2818,10 @@ void cnfball_state::write_r(u16 data)
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
 
-	// R0: DS8874N CP: clock pulse edge-triggered
-	// note: DS8874N CP goes back to K8 too, game relies on it
-	if ((data ^ m_r) & 1)
-		m_grid = m_grid << 1 & 0x1ff;
-
-	// R1: DS8874N _DATA: reset shift register
-	if (~data & 2)
-		m_grid = 1;
+	// R0: DS8874N CP (note: it goes back to K8 too, game relies on it)
+	// R1: DS8874N _DATA
+	m_ds8874->cp_w(BIT(data, 0));
+	m_ds8874->data_w(BIT(data, 1));
 
 	// R2-R4: led data
 	m_r = data;
@@ -2863,7 +2872,8 @@ void cnfball_state::cnfball(machine_config &config)
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
+	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 8+3);
 	m_display->set_segmask(0xc3, 0x7f);
 	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
@@ -4402,7 +4412,12 @@ ROM_END
   * TMS1100 MP1221 (die label same)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
-  led translation table: led zz from game PCB = MAME y.x:
+  Entex Black Knight (licensed handheld version of Williams' pinball game)
+  * TMS1100 MP1296 (no decap)
+  * same hardware as Raise The Devil
+
+  raisedvl led translation table: led zz from game PCB = MAME y.x:
+  (no led labels on ebknight PCB)
 
     0 = -     10 = 4.4   20 = 5.3   30 = 9.5   40 = 9.2
     1 = 3.0   11 = 4.5   21 = 5.4   31 = 8.5   41 = 9.3
@@ -4434,6 +4449,7 @@ public:
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void raisedvl(machine_config &config);
+	void ebknight(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -4519,13 +4535,18 @@ void raisedvl_state::raisedvl(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(7, 0x7f);
-	m_display->set_bri_levels(0.01, 0.125); // ball is brighter
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void raisedvl_state::ebknight(machine_config &config)
+{
+	raisedvl(config);
+	config.set_default_layout(layout_ebknight);
 }
 
 // roms
@@ -4538,6 +4559,16 @@ ROM_START( raisedvl )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_raisedvl_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
+
+ROM_START( ebknight )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1296", 0x0000, 0x0800, CRC(bc57a46a) SHA1(f60843779f49a8bd28291df3390086e54b9e3f40) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified, taken from raisedvl
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ebknight_output.pla", 0, 365, BAD_DUMP CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) ) // "
 ROM_END
 
 
@@ -12594,7 +12625,8 @@ CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  emp
 CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, ebknight,   0,         0, ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

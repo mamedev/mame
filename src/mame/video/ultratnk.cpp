@@ -50,6 +50,8 @@ void ultratnk_state::video_start()
 	m_screen->register_screen_bitmap(m_helper);
 
 	m_playfield = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ultratnk_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	std::fill(std::begin(m_collision), std::end(m_collision), 0);
 }
 
 

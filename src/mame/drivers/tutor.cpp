@@ -304,13 +304,13 @@ uint8_t tutor_state::key_r(offs_t offset)
 	char port[12];
 	uint8_t value;
 
-	snprintf(port, ARRAY_LENGTH(port), "LINE%d", (offset & 0x007e) >> 3);
+	snprintf(port, std::size(port), "LINE%d", (offset & 0x007e) >> 3);
 	value = ioport(port)->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", (offset & 0x007e) >> 3);
+		snprintf(port, std::size(port), "LINE%d_alt", (offset & 0x007e) >> 3);
 		value |= ioport(port)->read();
 	}
 

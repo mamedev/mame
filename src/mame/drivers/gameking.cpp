@@ -299,7 +299,7 @@ void gameking_state::gameking(machine_config &config)
 	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
+	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), std::size(gameking_pens));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

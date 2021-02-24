@@ -182,35 +182,35 @@ protected:
 	clock_update_delegate m_t0_clk_func;
 	devcb_write_line m_prog_out_cb;
 
-	uint16_t      m_prevpc;             /* 16-bit previous program counter */
-	uint16_t      m_pc;                 /* 16-bit program counter */
+	uint16_t      m_prevpc;             // 16-bit previous program counter
+	uint16_t      m_pc;                 // 16-bit program counter
 
-	uint8_t       m_a;                  /* 8-bit accumulator */
-	uint8_t *     m_regptr;             /* pointer to r0-r7 */
-	uint8_t       m_psw;                /* 8-bit PSW */
-	bool          m_f1;                 /* F1 flag (F0 is in PSW) */
-	uint8_t       m_p1;                 /* 8-bit latched port 1 */
-	uint8_t       m_p2;                 /* 8-bit latched port 2 */
-	uint8_t       m_ea;                 /* 1-bit latched ea input */
-	uint8_t       m_timer;              /* 8-bit timer */
-	uint8_t       m_prescaler;          /* 5-bit timer prescaler */
-	uint8_t       m_t1_history;         /* 8-bit history of the T1 input */
-	uint8_t       m_sts;                /* 4-bit status register + OBF/IBF flags (UPI-41 only) */
-	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
-	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
+	uint8_t       m_a;                  // 8-bit accumulator
+	uint8_t *     m_regptr;             // pointer to r0-r7
+	uint8_t       m_psw;                // 8-bit PSW
+	bool          m_f1;                 // F1 flag (F0 is in PSW)
+	uint8_t       m_p1;                 // 8-bit latched port 1
+	uint8_t       m_p2;                 // 8-bit latched port 2
+	uint8_t       m_ea;                 // 1-bit latched ea input
+	uint8_t       m_timer;              // 8-bit timer
+	uint8_t       m_prescaler;          // 5-bit timer prescaler
+	uint8_t       m_t1_history;         // 8-bit history of the T1 input
+	uint8_t       m_sts;                // 4-bit status register + OBF/IBF flags (UPI-41 only)
+	uint8_t       m_dbbi;               // 8-bit input data buffer (UPI-41 only)
+	uint8_t       m_dbbo;               // 8-bit output data buffer (UPI-41 only)
 
-	bool          m_irq_state;          /* true if the IRQ line is active */
-	bool          m_irq_polled;         /* true if last instruction was JNI (and not taken) */
-	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
-	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
-	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
-	bool          m_tirq_enabled;       /* true if the timer IRQ is enabled */
-	bool          m_xirq_enabled;       /* true if the external IRQ is enabled */
-	uint8_t       m_timecount_enabled;  /* bitmask of timer/counter enabled */
-	bool          m_flags_enabled;      /* true if I/O flags have been enabled (UPI-41 only) */
-	bool          m_dma_enabled;        /* true if DMA has been enabled (UPI-41 only) */
+	bool          m_irq_state;          // true if the IRQ line is active
+	bool          m_irq_polled;         // true if last instruction was JNI (and not taken)
+	bool          m_irq_in_progress;    // true if an IRQ is in progress
+	bool          m_timer_overflow;     // true on a timer overflow; cleared by taking interrupt
+	bool          m_timer_flag;         // true on a timer overflow; cleared on JTF
+	bool          m_tirq_enabled;       // true if the timer IRQ is enabled
+	bool          m_xirq_enabled;       // true if the external IRQ is enabled
+	uint8_t       m_timecount_enabled;  // bitmask of timer/counter enabled
+	bool          m_flags_enabled;      // true if I/O flags have been enabled (UPI-41 only)
+	bool          m_dma_enabled;        // true if DMA has been enabled (UPI-41 only)
 
-	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
+	uint16_t      m_a11;                // A11 value, either 0x000 or 0x800
 
 	int           m_icount;
 
@@ -221,10 +221,10 @@ protected:
 
 	required_shared_ptr<uint8_t> m_dataptr;
 
-	uint8_t       m_feature_mask;       /* processor feature flags */
-	uint16_t      m_int_rom_size;       /* internal rom size */
+	uint8_t       m_feature_mask;       // processor feature flags
+	uint16_t      m_int_rom_size;       // internal rom size
 
-	uint8_t       m_rtemp;              /* temporary for import/export */
+	uint8_t       m_rtemp;              // temporary for import/export
 
 	static const mcs48_ophandler s_mcs48_opcodes[256];
 	static const mcs48_ophandler s_upi41_opcodes[256];

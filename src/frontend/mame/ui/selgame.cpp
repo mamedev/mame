@@ -24,7 +24,6 @@
 #include "luaengine.h"
 #include "mame.h"
 
-#include "audit.h"
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -653,7 +652,7 @@ void menu_select_game::build_available_list()
 		char const *src;
 
 		// build a name for it
-		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
+		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[std::size(drivername) - 1]; ++src)
 			*dst++ = tolower(uint8_t(*src));
 
 		*dst = 0;
@@ -806,7 +805,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		// if everything looks good, schedule the new driver
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		if (audit_passed(summary))
 		{
 			if (!select_bios(*driver, false))
 				launch_system(*driver);
@@ -814,7 +813,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, summary));
 		}
 	}
 }
@@ -878,7 +877,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		media_auditor auditor(enumerator);
 		media_auditor::summary const summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		if (audit_passed(summary))
 		{
 			// if everything looks good, schedule the new driver
 			if (!select_bios(*ui_swinfo->driver, false))
@@ -890,29 +889,39 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		else
 		{
 			// otherwise, display an error
-			set_error(reset_options::REMEMBER_REF, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
+			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, summary));
 		}
 	}
 	else
 	{
-		// first validate
+		// first audit the system ROMs
 		driver_enumerator drv(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drv);
 		drv.next();
-		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname);
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
-
-		media_auditor::summary const summary = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
-
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		media_auditor::summary const sysaudit = auditor.audit_media(AUDIT_VALIDATE_FAST);
+		if (!audit_passed(sysaudit))
 		{
-			if (!select_bios(*ui_swinfo, false) && !select_part(*swinfo, *ui_swinfo))
-				launch_system(drv.driver(), *ui_swinfo, ui_swinfo->part);
+			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, sysaudit));
 		}
 		else
 		{
-			// otherwise, display an error
-			set_error(reset_options::REMEMBER_POSITION, make_audit_fail_text(media_auditor::NOTFOUND != summary, auditor));
+			// now audit the software
+			software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname);
+			const software_info *swinfo = swlist->find(ui_swinfo->shortname);
+
+			media_auditor::summary const swaudit = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
+
+			if (audit_passed(swaudit))
+			{
+				reselect_last::reselect(true);
+				if (!select_bios(*ui_swinfo, false) && !select_part(*swinfo, *ui_swinfo))
+					launch_system(drv.driver(), *ui_swinfo, ui_swinfo->part);
+			}
+			else
+			{
+				// otherwise, display an error
+				set_error(reset_options::REMEMBER_REF, make_software_audit_fail_text(auditor, swaudit));
+			}
 		}
 	}
 }
@@ -1190,14 +1199,14 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 		media_auditor::summary summary_samples = auditor.audit_samples();
 
 		// if everything looks good, schedule the new driver
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		if (audit_passed(summary))
 			str << _("ROM Audit Result\tOK\n");
 		else
 			str << _("ROM Audit Result\tBAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
 			str << _("Samples Audit Result\tNone Needed\n");
-		else if (summary_samples == media_auditor::CORRECT || summary_samples == media_auditor::BEST_AVAILABLE)
+		else if (audit_passed(summary_samples))
 			str << _("Samples Audit Result\tOK\n");
 		else
 			str << _("Samples Audit Result\tBAD\n");

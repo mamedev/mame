@@ -2541,6 +2541,8 @@ void tmnt_state::sunsetbl(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
+	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
+
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);

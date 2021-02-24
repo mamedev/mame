@@ -1141,11 +1141,11 @@ void voodoo_device::tmu_state::init(uint8_t vdt, tmu_shared_state &share, voodoo
 void voodoo_device::voodoo_postload()
 {
 	fbi.clut_dirty = true;
-	for (int index = 0; index < ARRAY_LENGTH(tmu); index++)
+	for (tmu_state &tm : tmu)
 	{
-		tmu[index].regdirty = true;
-		for (int subindex = 0; subindex < ARRAY_LENGTH(tmu[index].ncc); subindex++)
-			tmu[index].ncc[subindex].dirty = true;
+		tm.regdirty = true;
+		for (tmu_state::ncc_table &ncc : tm.ncc)
+			ncc.dirty = true;
 	}
 
 	/* recompute video memory to get the FBI FIFO base recomputed */
@@ -1160,7 +1160,7 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 
 	/* register states: core */
 	vd->save_item(NAME(vd->extra_cycles));
-	vd->save_pointer(NAME(&vd->reg[0].u), ARRAY_LENGTH(vd->reg));
+	vd->save_pointer(NAME(&vd->reg[0].u), std::size(vd->reg));
 	vd->save_item(NAME(vd->alt_regmap));
 
 	/* register states: pci */
@@ -1264,7 +1264,7 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 	vd->save_item(NAME(vd->fbi.clut));
 
 	/* register states: tmu */
-	for (int index = 0; index < ARRAY_LENGTH(vd->tmu); index++)
+	for (int index = 0; index < std::size(vd->tmu); index++)
 	{
 		tmu_state *tmu = &vd->tmu[index];
 		if (tmu->ram == nullptr)
@@ -4872,7 +4872,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 	{
 		/* attribute access */
 		case 0x3c0:
-			if (banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(banshee.att))
+			if (banshee.vga[0x3c1 & 0x1f] < std::size(banshee.att))
 				result = banshee.att[banshee.vga[0x3c1 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_att_r(%X)\n", machine().describe_context(), banshee.vga[0x3c1 & 0x1f]);
@@ -4893,7 +4893,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(banshee.seq))
+			if (banshee.vga[0x3c4 & 0x1f] < std::size(banshee.seq))
 				result = banshee.seq[banshee.vga[0x3c4 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_seq_r(%X)\n", machine().describe_context(), banshee.vga[0x3c4 & 0x1f]);
@@ -4916,7 +4916,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(banshee.gc))
+			if (banshee.vga[0x3ce & 0x1f] < std::size(banshee.gc))
 				result = banshee.gc[banshee.vga[0x3ce & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_gc_r(%X)\n", machine().describe_context(), banshee.vga[0x3ce & 0x1f]);
@@ -4924,7 +4924,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* CRTC access */
 		case 0x3d5:
-			if (banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(banshee.crtc))
+			if (banshee.vga[0x3d4 & 0x1f] < std::size(banshee.crtc))
 				result = banshee.crtc[banshee.vga[0x3d4 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_crtc_r(%X)\n", machine().describe_context(), banshee.vga[0x3d4 & 0x1f]);
@@ -5440,7 +5440,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 			}
 			else
 			{
-				if (banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(banshee.att))
+				if (banshee.vga[0x3c1 & 0x1f] < std::size(banshee.att))
 					banshee.att[banshee.vga[0x3c1 & 0x1f]] = data;
 				if (LOG_REGISTERS)
 					logerror("%s:banshee_att_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3c1 & 0x1f], data);
@@ -5450,7 +5450,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(banshee.seq))
+			if (banshee.vga[0x3c4 & 0x1f] < std::size(banshee.seq))
 				banshee.seq[banshee.vga[0x3c4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_seq_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3c4 & 0x1f], data);
@@ -5458,7 +5458,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(banshee.gc))
+			if (banshee.vga[0x3ce & 0x1f] < std::size(banshee.gc))
 				banshee.gc[banshee.vga[0x3ce & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_gc_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3ce & 0x1f], data);
@@ -5466,7 +5466,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* CRTC access */
 		case 0x3d5:
-			if (banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(banshee.crtc))
+			if (banshee.vga[0x3d4 & 0x1f] < std::size(banshee.crtc))
 				banshee.crtc[banshee.vga[0x3d4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_crtc_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3d4 & 0x1f], data);
@@ -5840,7 +5840,6 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	uint16_t dithermatrix[16];
 	uint16_t *drawbuf = nullptr;
 	uint32_t pixels = 0;
-	int extnum, x, y;
 
 	/* if we're not clearing either, take no time */
 	if (!FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u))
@@ -5866,11 +5865,11 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 		}
 
 		/* determine the dither pattern */
-		for (y = 0; y < 4; y++)
+		for (int y = 0; y < 4; y++)
 		{
 			DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
 			COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(vd->reg[fbzMode].u, y);
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				int r = vd->reg[color1].rgb.r;
 				int g = vd->reg[color1].rgb.g;
@@ -5885,14 +5884,13 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	/* fill in a block of extents */
 	extents[0].startx = sx;
 	extents[0].stopx = ex;
-	for (extnum = 1; extnum < ARRAY_LENGTH(extents); extnum++)
-		extents[extnum] = extents[0];
+	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	/* iterate over blocks of extents */
-	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
+	for (int y = sy; y < ey; y += std::size(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = (std::min)(ey - y, int(ARRAY_LENGTH(extents)));
+		int count = (std::min)(ey - y, int(std::size(extents)));
 
 		extra->device = vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));

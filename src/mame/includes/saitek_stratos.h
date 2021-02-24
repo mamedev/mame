@@ -44,7 +44,7 @@ protected:
 	output_finder<4, 16, 4> m_out_lcd;
 
 	// common handlers
-	void clear_lcd() { std::fill_n(m_lcd_data, ARRAY_LENGTH(m_lcd_data), 0); }
+	void clear_lcd() { std::fill(std::begin(m_lcd_data), std::end(m_lcd_data), 0); }
 	void update_lcd();
 	void power_off();
 	void set_cpu_freq();

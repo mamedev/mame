@@ -900,7 +900,7 @@ function cheatfind.startplugin()
 						pokevalue = 65535
 					end
 
-					local cheat = { desc = string.format(_("Test Cheat %08X:%02X"), match.addr, pokevalue), script = {} }
+					local cheat = { desc = string.format(_("Test Cheat %08X_%02X"), match.addr, pokevalue), script = {} }
 
 					if wid == "2" then
 						wid = "u16"
@@ -974,9 +974,12 @@ function cheatfind.startplugin()
 						return true
 					else
 						local func = "return space:read"
-						local env = { space = devtable[devcur].space }
+						local env = {}
 						if not getmetatable(dev.space).__name:match("device_t") then
+							env.space = devtable[devcur].space;
 							func = func .. "_" .. wid
+						else
+							env.space = emu.item(dev.space.items["0/m_pointer"])
 						end
 						func = func .. "(" .. match.addr .. ")"
 						watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }

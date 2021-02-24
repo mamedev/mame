@@ -67,7 +67,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 
 	if (bitmap.width() == 0 || bitmap.height() == 0)
 	{
-		printf("Unable to load PNG '%s' from path '%s'\n", path.c_str(), file_name.c_str());
+		printf("Unable to load PNG '%s' from path '%s'\n", file_name.c_str(), path.c_str());
 		return nullptr;
 	}
 

@@ -31,6 +31,8 @@
           - Some raster effects are imperfect (off by a couple of lines)
         * 68000 waitstates on ROM region access, determined by jumpers on cart
           (garou train stage 3 background bug is probably related to this)
+        * AES Input clock is incorrect (24.167829MHz for NTSC systems, PAL is same?)
+        * PAL region AES behavior is not verified
 
 
     Confirmed non-bugs:
@@ -726,7 +728,7 @@ public:
 	{
 	}
 
-	void aes(machine_config &config);
+	void aes_ntsc(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -2141,8 +2143,8 @@ void aes_state::device_post_load()
 		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
-
-void aes_state::aes(machine_config &config)
+// NTSC region
+void aes_state::aes_ntsc(machine_config &config)
 {
 	neogeo_base(config);
 	neogeo_stereo(config);
@@ -2416,14 +2418,14 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT        CLASS             INIT
-CONS( 1990, neogeo,   0,       0,      mv6f,    neogeo_mvs6, mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-6F",   MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv4f,  neogeo,  0,      mv4f,    neogeo_mvs,  mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-4F",   MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv2f,  neogeo,  0,      mv2f,    neogeo_mvs,  mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-2F",   MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv1,   neogeo,  0,      mv1,     neogeo,      mvs_led_state,    empty_init, "SNK", "Neo-Geo MV-1",    MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv1f,  ng_mv1,  0,      mv1f,    neogeo,      mvs_led_state,    empty_init, "SNK", "Neo-Geo MV-1F",   MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv1fz, ng_mv1,  0,      mv1fz,   neogeo,      mvs_state,        empty_init, "SNK", "Neo-Geo MV-1FZ",  MACHINE_SUPPORTS_SAVE )
-CONS( 1990, aes,      0,       0,      aes,     aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT        CLASS             INIT
+CONS( 1990, neogeo,   0,       0,      mv6f,     neogeo_mvs6, mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-6F",      MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv4f,  neogeo,  0,      mv4f,     neogeo_mvs,  mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-4F",      MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv2f,  neogeo,  0,      mv2f,     neogeo_mvs,  mvs_led_el_state, empty_init, "SNK", "Neo-Geo MV-2F",      MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv1,   neogeo,  0,      mv1,      neogeo,      mvs_led_state,    empty_init, "SNK", "Neo-Geo MV-1",       MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv1f,  ng_mv1,  0,      mv1f,     neogeo,      mvs_led_state,    empty_init, "SNK", "Neo-Geo MV-1F",      MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv1fz, ng_mv1,  0,      mv1fz,    neogeo,      mvs_state,        empty_init, "SNK", "Neo-Geo MV-1FZ",     MACHINE_SUPPORTS_SAVE )
+CONS( 1990, aes,      0,       0,      aes_ntsc, aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES (NTSC)", MACHINE_SUPPORTS_SAVE )
 
 
 
