@@ -288,37 +288,37 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	////////////*/
 
 	// Heisted from GLFrustum - 6 parameters...
-	// Gives the x,y extents for the projection plane at screen Z
+	// Gives the x,y extents for the projection plane at screenZ
 	const float left    = uToF(packet[11]);
 	const float right   = uToF(packet[10]);
 	const float top     = uToF(packet[12]);
 	const float bottom  = uToF(packet[13]);
 
 	// Mapping to a canonical view volume of the cube from (-1,-1,-1) to (1,1,1)
-	// near maps to z value -1, screen Z (the projection plane) maps to z value 0
-	// and far (which can be determined from near and screen Z) maps to z value of +1
-	const float screenZ_ = uToF(packet[6]) * uToF(packet[4]) + uToF(packet[6]);
-	const float near_    = uToF(packet[5]) * uToF(packet[4]) + uToF(packet[5]);
-	const float far_     = -(screenZ_*near_)/(screenZ_-2.0f*near_);
+	// near maps to z value -1, screenZ (the projection plane) maps to z value 0
+	// and far (which can be determined from near and screenZ) maps to z value of +1
+	const float screenZ = uToF(packet[6]) * uToF(packet[4]) + uToF(packet[6]);
+	const float near    = uToF(packet[5]) * uToF(packet[4]) + uToF(packet[5]);
+	const float far     = -(screenZ * near)/(screenZ - 2.0f*near);
 
-	m_projectionMatrix[0]  = (2.0f*screenZ_)/(right-left);
+	m_projectionMatrix[0]  = (2.0f*screenZ)/(right-left);
 	m_projectionMatrix[1]  = 0.0f;
 	m_projectionMatrix[2]  = 0.0f;
 	m_projectionMatrix[3]  = 0.0f;
 
 	m_projectionMatrix[4]  = 0.0f;
-	m_projectionMatrix[5]  = (2.0f*screenZ_)/(top-bottom);
+	m_projectionMatrix[5]  = (2.0f*screenZ)/(top-bottom);
 	m_projectionMatrix[6]  = 0.0f;
 	m_projectionMatrix[7]  = 0.0f;
 
 	m_projectionMatrix[8]  = (right+left)/(right-left);
 	m_projectionMatrix[9]  = (top+bottom)/(top-bottom);
-	m_projectionMatrix[10] = -((far_+near_)/(far_-near_));
+	m_projectionMatrix[10] = -((far+near)/(far-near));
 	m_projectionMatrix[11] = -1.0f;
 
 	m_projectionMatrix[12] = 0.0f;
 	m_projectionMatrix[13] = 0.0f;
-	m_projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
+	m_projectionMatrix[14] = -((2.0f*far*near)/(far-near));
 	m_projectionMatrix[15] = 0.0f;
 }
 
