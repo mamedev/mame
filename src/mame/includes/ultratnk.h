@@ -36,6 +36,12 @@ public:
 	void ultratnk(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	enum
 	{
 		TIMER_NMI
@@ -54,9 +60,6 @@ protected:
 	void attract_w(uint8_t data);
 	void explosion_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void ultratnk_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(tile_info);
@@ -64,7 +67,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void ultratnk_cpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;

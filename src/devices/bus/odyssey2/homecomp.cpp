@@ -12,6 +12,9 @@ Hardware notes:
 - 2*8KB ROM, 16KB RAM(2*TMS4416, 2 unpopulated sockets)
 - optional data recorder
 
+The RAM can be expanded to 32KB by simply adding two more TMS4416. To enable it,
+enter command CLEAR 50,-2
+
 TODO:
 - lots of unacknowledged writes to latch 1, probably harmless
 - cassette data saved from MAME can be loaded fine, but other WAVs can't, even
@@ -41,12 +44,46 @@ o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char
 void o2_homecomp_device::device_start()
 {
 	save_item(NAME(m_control));
+	save_item(NAME(m_installed));
+
+	// allocate maximum RAM beforehand
+	m_ram = std::make_unique<u8[]>(0x8000);
+	save_pointer(NAME(m_ram), 0x8000);
+}
+
+void o2_homecomp_device::device_reset()
+{
+	if (!m_installed)
+	{
+		// install RAM
+		u32 ramsize = ioport("RAM")->read() ? 0x8000 : 0x4000;
+		m_maincpu->space(AS_PROGRAM).install_ram(0x8000, ramsize - 1 + 0x8000, m_ram.get());
+
+		m_installed = true;
+	}
 }
 
 void o2_homecomp_device::cart_init()
 {
 	if (m_rom_size != 0x800 || m_exrom_size != 0x4000)
 		fatalerror("o2_homecomp_device: Wrong ROM region size\n");
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( homecomp )
+	PORT_START("RAM")
+	PORT_CONFNAME( 0x01, 0x00, "RAM Size" )
+	PORT_CONFSETTING( 0x00, "16KB" )
+	PORT_CONFSETTING( 0x01, "32KB" ) // unofficial
+INPUT_PORTS_END
+
+ioport_constructor o2_homecomp_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(homecomp);
 }
 
 
@@ -107,7 +144,6 @@ void o2_homecomp_device::internal_io_w(offs_t offset, u8 data)
 void o2_homecomp_device::homecomp_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).r(FUNC(o2_homecomp_device::internal_rom_r));
-	map(0x8000, 0xbfff).ram();
 }
 
 void o2_homecomp_device::homecomp_io(address_map &map)

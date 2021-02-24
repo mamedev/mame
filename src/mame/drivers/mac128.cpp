@@ -1024,7 +1024,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
 	#if NEW_IWM
-	IWM(config, m_iwm, C7M, 1021800*2, true);
+	IWM(config, m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(mac128_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));

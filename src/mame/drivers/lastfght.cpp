@@ -42,7 +42,7 @@ Notes:
       EPM7032 - Altera EPM7032LC44-15T CPLD (PLCC44)
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
     KM428C256 - Samsung Semiconductor KM428C256 256k x8 Dual Port DRAM (SOJ40)
-     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlinton pairs (DIP16)
+     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlington pairs (DIP16)
       HM86171 - Hualon Microelectronics HMC HM86171 VGA 256 colour RAMDAC (DIP28)
       3V_BATT - 3 Volt Coin Battery. This is tied to the CXK58257 SRAM. It appears to be used as an EEPROM, as the game
                 has on-board settings in test mode and there's no DIPs and no EEPROM.
@@ -72,6 +72,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 class lastfght_state : public driver_device
 {
 public:
@@ -85,6 +87,11 @@ public:
 	void lastfght(machine_config &config);
 
 	void init_lastfght();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory */
@@ -110,10 +117,6 @@ private:
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
 	int m_dest;
@@ -131,8 +134,8 @@ private:
 	int m_w;
 	int m_h;
 #ifdef MAME_DEBUG
-	unsigned m_base;
-	int m_view_roms;
+	unsigned m_base = 0;
+	int m_view_roms = 0;
 #endif
 
 	/* misc */
@@ -602,5 +605,8 @@ void lastfght_state::init_lastfght()
 	// rts -> rte
 	rom[0x01b86 / 2] = 0x5670;
 }
+
+} // Anonymous namespace
+
 
 GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

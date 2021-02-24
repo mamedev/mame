@@ -235,9 +235,6 @@ protected:
 	/* DSPCOM board */
 	void hddspcom_control_w(offs_t offset, uint16_t data);
 
-	void rd68k_slapstic_w(offs_t offset, uint16_t data);
-	uint16_t rd68k_slapstic_r(offs_t offset);
-
 	/* Game-specific protection */
 	void st68k_sloop_w(offs_t offset, uint16_t data);
 	uint16_t st68k_sloop_r(offs_t offset);
@@ -317,7 +314,7 @@ protected:
 	optional_device<eeprom_parallel_28xx_device> m_dsk_30c;
 	uint8_t                   m_dsk_pio_access;
 
-	uint16_t *                m_m68k_slapstic_base;
+	uint16_t *                m_m68k_sloop_base;
 	uint16_t *                m_m68k_sloop_alt_base;
 
 	required_device<timekeeper_device> m_200e;
@@ -491,7 +488,8 @@ protected:
 
 	optional_device<palette_device> m_palette;
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
-	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_device<atari_slapstic_device> m_slapstic;
+	memory_bank_creator m_slapstic_bank;
 
 	optional_device<rs232_port_device> m_rs232;
 

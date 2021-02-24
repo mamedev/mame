@@ -123,7 +123,7 @@ private:
 	png_error process(std::list<image_data_chunk> const &idata)
 	{
 		// do some basic checks for unsupported images
-		if (!pnginfo.bit_depth || (ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+		if (!pnginfo.bit_depth || (std::size(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
 			return png_error::UNSUPPORTED_FORMAT; // unknown colour format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return png_error::UNSUPPORTED_FORMAT; // unknown interlace method
@@ -474,7 +474,7 @@ public:
 		// do some basic checks for unsupported images
 		if ((8 > pnginfo.bit_depth) || (pnginfo.bit_depth % 8))
 			return png_error::UNSUPPORTED_FORMAT; // only do multiples of 8bps here - expand lower bit depth first
-		if ((ARRAY_LENGTH(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
+		if ((std::size(samples) <= pnginfo.color_type) || !samples[pnginfo.color_type])
 			return png_error::UNSUPPORTED_FORMAT; // unknown colour sample format
 		if ((0 != pnginfo.interlace_method) && (1 != pnginfo.interlace_method))
 			return png_error::UNSUPPORTED_FORMAT; // unknown interlace method
@@ -721,7 +721,7 @@ public:
 
 	static png_error verify_header(core_file &fp)
 	{
-		EQUIVALENT_ARRAY(PNG_SIGNATURE, std::uint8_t) signature;
+		std::uint8_t signature[sizeof(PNG_SIGNATURE)];
 
 		// read 8 bytes
 		if (fp.read(signature, sizeof(signature)) != sizeof(signature))

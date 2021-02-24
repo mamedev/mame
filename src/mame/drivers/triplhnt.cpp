@@ -92,6 +92,8 @@ uint8_t triplhnt_state::da_latch_r(offs_t offset)
 void triplhnt_state::machine_start()
 {
 	m_lamp.resolve();
+
+	m_hit_code = 0;
 }
 
 

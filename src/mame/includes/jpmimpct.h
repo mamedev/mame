@@ -151,6 +151,8 @@ private:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
+	int m_volume_latch;
+	int m_global_volume;
 	uint16_t m_coinstate;
 	required_device_array<timer_device, 6> m_cointimer;
 

@@ -674,7 +674,7 @@ void mac_state::pwrmac_map(address_map &map)
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-
+#if !NEW_SWIM
 static const applefdc_interface mac_iwm_interface =
 {
 	sony_set_lines,
@@ -684,7 +684,7 @@ static const applefdc_interface mac_iwm_interface =
 	sony_write_data,
 	sony_read_status
 };
-
+#endif
 static void mac_nubus_cards(device_slot_interface &device)
 {
 	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
@@ -722,14 +722,14 @@ static void mac_lcpds_cards(device_slot_interface &device)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-
+#if !NEW_SWIM
 static const floppy_interface mac_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
 	"floppy_3_5"
 };
-
+#endif
 void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
@@ -738,10 +738,10 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 #if NEW_SWIM
 	switch (woz_version) {
 	case 0:
-		IWM(config, m_fdc, C7M, 1021800*2, true);
+		IWM(config, m_fdc, C15M);
 		break;
 	case 1:
-		SWIM1(config, m_fdc, C15M, 1021800*2);
+		SWIM1(config, m_fdc, C15M);
 		break;
 	case 2:
 		SWIM2(config, m_fdc, C15M);
@@ -1076,6 +1076,16 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
+#if NEW_SWIM
+	SWIM1(config.replace(), m_fdc, C15M);
+	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
+	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
+#endif
+
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 }
@@ -1151,7 +1161,7 @@ void mac_state::macclas2(machine_config &config)
 
 void mac_state::maciici(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, true, false, true);
+	macii(config, false, asc_device::asc_type::ASC, true, false, true, 1);
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);

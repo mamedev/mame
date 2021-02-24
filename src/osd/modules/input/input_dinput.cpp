@@ -312,7 +312,7 @@ public:
 			std::string name;
 
 			// generate/fetch the name
-			snprintf(defname, ARRAY_LENGTH(defname), "Scan%03d", keynum);
+			snprintf(defname, std::size(defname), "Scan%03d", keynum);
 			name = device_item_name(devinfo, keynum, defname, nullptr);
 
 			// add the item to the device

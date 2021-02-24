@@ -145,6 +145,7 @@ blktiger.cpp
 blktiger_ms.cpp
 blmbycar.cpp
 blockade.cpp
+blockch.cpp
 blockhl.cpp
 blockout.cpp
 blocktax.cpp
@@ -472,6 +473,7 @@ gberet.cpp
 gcpinbal.cpp
 gei.cpp
 getaway.cpp
+gfamily.cpp
 ggconnie.cpp
 ghosteo.cpp
 giclassic.cpp
@@ -951,6 +953,7 @@ phoenix.cpp
 photon.cpp
 photon2.cpp
 photoply.cpp
+photoplys.cpp
 photoplysx.cpp
 piggypas.cpp
 pinball2k.cpp
@@ -968,6 +971,7 @@ playmark.cpp
 play_1.cpp
 play_2.cpp
 play_3.cpp
+playcenter.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp
@@ -1148,6 +1152,7 @@ sigmab31.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
+silverball.cpp
 silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp

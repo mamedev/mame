@@ -502,7 +502,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 	}
 
 	/* remaining sources are level triggered */
-	else if (irqline < ARRAY_LENGTH(m_irq_state))
+	else if (irqline < std::size(m_irq_state))
 		m_irq_state[irqline] = state;
 }
 

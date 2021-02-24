@@ -217,7 +217,7 @@ void debug_view_breakpoints::view_update()
 	gather_breakpoints();
 
 	// Set the view region so the scroll bars update
-	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
+	m_total.x = tableBreaks[std::size(tableBreaks) - 1];
 	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
@@ -225,7 +225,7 @@ void debug_view_breakpoints::view_update()
 	// Draw
 	debug_view_char     *dest = &m_viewdata[0];
 	util::ovectorstream linebuf;
-	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
+	linebuf.reserve(std::size(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)

@@ -19,6 +19,8 @@
 
 #include "winutil.h"
 
+#include <mmsystem.h>
+
 
 // debugger view styles
 #define DEBUG_VIEW_STYLE    WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
@@ -46,14 +48,15 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 	m_view(nullptr),
 	m_wnd(nullptr),
 	m_hscroll(nullptr),
-	m_vscroll(nullptr)
+	m_vscroll(nullptr),
+	m_contextmenu(nullptr)
 {
 	register_window_class();
 
 	// create the child view
 	m_wnd = CreateWindowEx(DEBUG_VIEW_STYLE_EX, TEXT("MAMEDebugView"), nullptr, DEBUG_VIEW_STYLE,
 			0, 0, 100, 100, parent, nullptr, GetModuleHandleUni(), this);
-	if (m_wnd == nullptr)
+	if (!m_wnd)
 		goto cleanup;
 
 	// create the scroll bars
@@ -61,27 +64,27 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 			0, 0, 100, CW_USEDEFAULT, m_wnd, nullptr, GetModuleHandleUni(), this);
 	m_vscroll = CreateWindowEx(VSCROLL_STYLE_EX, TEXT("SCROLLBAR"), nullptr, VSCROLL_STYLE,
 			0, 0, CW_USEDEFAULT, 100, m_wnd, nullptr, GetModuleHandleUni(), this);
-	if ((m_hscroll == nullptr) || (m_vscroll == nullptr))
+	if (!m_hscroll || !m_vscroll)
 		goto cleanup;
 
 	// create the debug view
 	m_view = machine().debug_view().alloc_view(type, &debugview_info::static_update, this);
-	if (m_view == nullptr)
+	if (!m_view)
 		goto cleanup;
 
 	return;
 
 cleanup:
-	if (m_hscroll != nullptr)
+	if (m_hscroll)
 		DestroyWindow(m_hscroll);
 	m_hscroll = nullptr;
-	if (m_vscroll != nullptr)
+	if (m_vscroll)
 		DestroyWindow(m_vscroll);
 	m_vscroll = nullptr;
-	if (m_wnd != nullptr)
+	if (m_wnd)
 		DestroyWindow(m_wnd);
 	m_wnd = nullptr;
-	if (m_view != nullptr)
+	if (m_view)
 		machine().debug_view().free_view(*m_view);
 	m_view = nullptr;
 }
@@ -89,7 +92,9 @@ cleanup:
 
 debugview_info::~debugview_info()
 {
-	if (m_wnd != nullptr)
+	if (m_contextmenu)
+		DestroyMenu(m_contextmenu);
+	if (m_wnd)
 		DestroyWindow(m_wnd);
 	if (m_view)
 		machine().debug_view().free_view(*m_view);
@@ -119,7 +124,7 @@ uint32_t debugview_info::maxwidth()
 		if (max < chars)
 			max = chars;
 	}
-	if (cursource != nullptr)
+	if (cursource)
 		m_view->set_source(*cursource);
 	return (max * metrics().debug_font_width()) + metrics().vscroll_width();
 }
@@ -164,27 +169,23 @@ void debugview_info::send_vscroll(int delta)
 void debugview_info::send_pageup()
 {
 	if (m_vscroll)
-	{
 		SendMessage(m_wnd, WM_VSCROLL, SB_PAGELEFT, (LPARAM)m_vscroll);
-	}
 }
 
 
 void debugview_info::send_pagedown()
 {
 	if (m_vscroll)
-	{
 		SendMessage(m_wnd, WM_VSCROLL, SB_PAGERIGHT, (LPARAM)m_vscroll);
-	}
 }
 
 
 char const *debugview_info::source_name() const
 {
-	if (m_view != nullptr)
+	if (m_view)
 	{
 		debug_view_source const *const source = m_view->source();
-		if (source != nullptr)
+		if (source)
 			return source->name();
 	}
 	return "";
@@ -193,10 +194,10 @@ char const *debugview_info::source_name() const
 
 device_t *debugview_info::source_device() const
 {
-	if (m_view != nullptr)
+	if (m_view)
 	{
 		debug_view_source const *const source = m_view->source();
-		if (source != nullptr)
+		if (source)
 			return source->device();
 	}
 	return nullptr;
@@ -205,10 +206,10 @@ device_t *debugview_info::source_device() const
 
 bool debugview_info::source_is_visible_cpu() const
 {
-	if (m_view != nullptr)
+	if (m_view)
 	{
 		const debug_view_source *const source = m_view->source();
-		return (source != nullptr) && (machine().debugger().console().get_visible_cpu() == source->device());
+		return source && (machine().debugger().console().get_visible_cpu() == source->device());
 	}
 	return false;
 }
@@ -216,10 +217,10 @@ bool debugview_info::source_is_visible_cpu() const
 
 bool debugview_info::set_source_index(int index)
 {
-	if (m_view != nullptr)
+	if (m_view)
 	{
 		const debug_view_source *const source = m_view->source(index);
-		if (source != nullptr)
+		if (source)
 		{
 			m_view->set_source(*source);
 			return true;
@@ -231,10 +232,10 @@ bool debugview_info::set_source_index(int index)
 
 bool debugview_info::set_source_for_device(device_t &device)
 {
-	if (m_view != nullptr)
+	if (m_view)
 	{
 		const debug_view_source *const source = m_view->source_for_device(&device);
-		if (source != nullptr)
+		if (source)
 		{
 			m_view->set_source(*source);
 			return true;
@@ -247,7 +248,7 @@ bool debugview_info::set_source_for_device(device_t &device)
 bool debugview_info::set_source_for_visible_cpu()
 {
 	device_t *const curcpu = machine().debugger().console().get_visible_cpu();
-	if (curcpu != nullptr)
+	if (curcpu)
 		return set_source_for_device(*curcpu);
 	else
 		return false;
@@ -273,13 +274,122 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 		auto t_name = osd::text::to_tstring(source->name());
 		SendMessage(result, CB_ADDSTRING, 0, (LPARAM)t_name.c_str());
 	}
-	if (cursource != nullptr)
+	if (cursource)
 	{
 		SendMessage(result, CB_SETCURSEL, m_view->source_index(*cursource), 0);
 		SendMessage(result, CB_SETDROPPEDWIDTH, ((maxlength + 2) * metrics().debug_font_width()) + metrics().vscroll_width(), 0);
 		m_view->set_source(*cursource);
 	}
 	return result;
+}
+
+
+void debugview_info::add_items_to_context_menu(HMENU menu)
+{
+	AppendMenu(menu, MF_ENABLED, ID_CONTEXT_COPY_VISIBLE, TEXT("Copy Visible"));
+	AppendMenu(menu, MF_ENABLED, ID_CONTEXT_PASTE, TEXT("Paste"));
+}
+
+
+void debugview_info::update_context_menu(HMENU menu)
+{
+	EnableMenuItem(menu, ID_CONTEXT_PASTE, MF_BYCOMMAND | (IsClipboardFormatAvailable(CF_UNICODETEXT) ? MF_ENABLED : MF_GRAYED));
+}
+
+
+void debugview_info::handle_context_menu(unsigned command)
+{
+	switch (command)
+	{
+	case ID_CONTEXT_COPY_VISIBLE:
+		{
+			// get visible text
+			debug_view_xy const visarea = m_view->visible_size();
+			debug_view_char const *viewdata = m_view->viewdata();
+			if (!viewdata)
+			{
+				PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+				break;
+			}
+
+			// turn into a plain string, trimming trailing whitespace
+			std::wstring text;
+			for (uint32_t row = 0; row < visarea.y; row++, viewdata += visarea.x)
+			{
+				std::wstring::size_type const start = text.length();
+				for (uint32_t col = 0; col < visarea.x; ++col)
+					text += wchar_t(viewdata[col].byte);
+				std::wstring::size_type const nonblank = text.find_last_not_of(L"\t\n\v\r ");
+				if ((nonblank != std::wstring::npos) && (nonblank >= start))
+					text.resize(nonblank + 1);
+				text += L"\r\n";
+			}
+
+			// copy to the clipboard
+			HGLOBAL const clip = GlobalAlloc(GMEM_MOVEABLE, (text.length() + 1) * sizeof(wchar_t));
+			if (!clip)
+			{
+				PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+				break;
+			}
+			if (!OpenClipboard(m_wnd))
+			{
+				GlobalFree(clip);
+				PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+				break;
+			}
+			EmptyClipboard();
+			LPWSTR const lock = reinterpret_cast<LPWSTR>(GlobalLock(clip));
+			std::copy_n(text.c_str(), text.length() + 1, lock);
+			GlobalUnlock(clip);
+			if (!SetClipboardData(CF_UNICODETEXT, clip))
+			{
+				GlobalFree(clip);
+				PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+			}
+			CloseClipboard();
+			break;
+		}
+
+	case ID_CONTEXT_PASTE:
+		if (!IsClipboardFormatAvailable(CF_UNICODETEXT) || !OpenClipboard(m_wnd))
+		{
+			PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+		}
+		else
+		{
+			HGLOBAL const clip = GetClipboardData(CF_UNICODETEXT);
+			LPCWSTR lock = clip ? reinterpret_cast<LPCWSTR>(GlobalLock(clip)) : nullptr;
+			if (!clip || !lock)
+			{
+				PlaySound(TEXT("SystemAsterisk"), nullptr, SND_SYNC);
+			}
+			else
+			{
+				try
+				{
+					while (*lock)
+					{
+						if ((32 <= *lock) && (127 >= *lock))
+							m_view->process_char(*lock);
+						++lock;
+					}
+				}
+				catch (...)
+				{
+					GlobalUnlock(clip);
+					CloseClipboard();
+					throw;
+				}
+				GlobalUnlock(clip);
+			}
+			CloseClipboard();
+		}
+		break;
+
+	default:
+		osd_printf_warning("debugview_info: unhandled context menu item %u\n", command);
+	}
 }
 
 
@@ -291,18 +401,22 @@ void debugview_info::draw_contents(HDC windc)
 	// get the client rect
 	RECT client;
 	GetClientRect(m_wnd, &client);
+	bool const need_filldown = client.bottom > (metrics().debug_font_height() * visarea.y);
 
 	// create a compatible DC and an offscreen bitmap
 	HDC const dc = CreateCompatibleDC(windc);
-	if (dc == nullptr)
+	if (!dc)
 		return;
 	HBITMAP const bitmap = CreateCompatibleBitmap(windc, client.right, client.bottom);
-	if (bitmap == nullptr)
+	if (!bitmap)
 	{
 		DeleteDC(dc);
 		return;
 	}
 	HGDIOBJ const oldbitmap = SelectObject(dc, bitmap);
+	bool const show_hscroll = m_hscroll && IsWindowVisible(m_hscroll);
+	if (show_hscroll)
+		client.bottom -= metrics().hscroll_height();
 
 	// set the font
 	HGDIOBJ const oldfont = SelectObject(dc, metrics().debug_font());
@@ -313,6 +427,8 @@ void debugview_info::draw_contents(HDC windc)
 	// iterate over rows and columns
 	for (uint32_t row = 0; row < visarea.y; row++)
 	{
+		bool do_filldown = (row == (visarea.y - 1)) && need_filldown;
+
 		// loop twice; once to fill the background and once to draw the text
 		for (int iter = 0; iter < 2; iter++)
 		{
@@ -341,16 +457,16 @@ void debugview_info::draw_contents(HDC windc)
 				{
 					COLORREF oldbg = bgcolor;
 
-					// reset to standard colors
-					fgcolor = RGB(0x00,0x00,0x00);
+					// pick new background color
 					bgcolor = RGB(0xff,0xff,0xff);
-
-					// pick new fg/bg colors
 					if (viewdata[col].attrib & DCA_VISITED) bgcolor = RGB(0xc6, 0xe2, 0xff);
 					if (viewdata[col].attrib & DCA_ANCILLARY) bgcolor = RGB(0xe0,0xe0,0xe0);
 					if (viewdata[col].attrib & DCA_SELECTED) bgcolor = RGB(0xff,0x80,0x80);
 					if (viewdata[col].attrib & DCA_CURRENT) bgcolor = RGB(0xff,0xff,0x00);
 					if ((viewdata[col].attrib & DCA_SELECTED) && (viewdata[col].attrib & DCA_CURRENT)) bgcolor = RGB(0xff,0xc0,0x80);
+
+					// pick new foreground color
+					fgcolor = RGB(0x00,0x00,0x00);
 					if (viewdata[col].attrib & DCA_CHANGED) fgcolor = RGB(0xff,0x00,0x00);
 					if (viewdata[col].attrib & DCA_INVALID) fgcolor = RGB(0x00,0x00,0xff);
 					if (viewdata[col].attrib & DCA_DISABLED) fgcolor = RGB((GetRValue(fgcolor) + GetRValue(bgcolor)) / 2, (GetGValue(fgcolor) + GetGValue(bgcolor)) / 2, (GetBValue(fgcolor) + GetBValue(bgcolor)) / 2);
@@ -361,21 +477,41 @@ void debugview_info::draw_contents(HDC windc)
 					{
 						bounds.right = bounds.left + (count * metrics().debug_font_width());
 						if (iter == 0)
+						{
 							FillRect(dc, &bounds, bgbrush);
+							if (do_filldown)
+							{
+								COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+								if (oldbg != filldown)
+								{
+									DeleteObject(bgbrush);
+									bgbrush = CreateSolidBrush(filldown);
+									oldbg = filldown;
+								}
+								RECT padding = bounds;
+								padding.top = padding.bottom;
+								padding.bottom = client.bottom;
+								FillRect(dc, &padding, bgbrush);
+							}
+						}
 						else
+						{
 							ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
+						}
 						bounds.left = bounds.right;
 						count = 0;
 					}
 
 					// set the new colors
-					if (iter == 0 && oldbg != bgcolor)
+					if (iter == 1)
+					{
+						SetTextColor(dc, fgcolor);
+					}
+					else if (oldbg != bgcolor)
 					{
 						DeleteObject(bgbrush);
 						bgbrush = CreateSolidBrush(bgcolor);
 					}
-					else if (iter == 1)
-						SetTextColor(dc, fgcolor);
 					last_attrib = viewdata[col].attrib;
 				}
 
@@ -384,22 +520,29 @@ void debugview_info::draw_contents(HDC windc)
 			}
 
 			// flush any remaining stuff
-			if (count > 0)
-			{
-				bounds.right = bounds.left + (count * metrics().debug_font_width());
-				if (iter == 0)
-					FillRect(dc, &bounds, bgbrush);
-				else
-					ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
-			}
-
-			// erase to the end of the line
+			bounds.right = bounds.left + (count * metrics().debug_font_width());
 			if (iter == 0)
 			{
-				bounds.left = bounds.right;
+				// erase to the end of the line
 				bounds.right = client.right;
 				FillRect(dc, &bounds, bgbrush);
+				if (do_filldown)
+				{
+					COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+					if (bgcolor != filldown)
+					{
+						DeleteObject(bgbrush);
+						bgbrush = CreateSolidBrush(filldown);
+					}
+					bounds.top = bounds.bottom;
+					bounds.bottom = client.bottom;
+					FillRect(dc, &bounds, bgbrush);
+				}
 				DeleteObject(bgbrush);
+			}
+			else if (count > 0)
+			{
+				ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
 			}
 		}
 
@@ -407,10 +550,13 @@ void debugview_info::draw_contents(HDC windc)
 		viewdata += visarea.x;
 	}
 
-	// erase anything beyond the bottom with white
-	GetClientRect(m_wnd, &client);
-	client.top = visarea.y * metrics().debug_font_height();
-	FillRect(dc, &client, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	// prevent garbage from showing in the corner
+	if (show_hscroll)
+	{
+		client.top = client.bottom;
+		client.bottom = client.top + metrics().hscroll_height();
+		FillRect(dc, &client, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	}
 
 	// reset the font
 	SetBkMode(dc, oldbkmode);
@@ -429,47 +575,48 @@ void debugview_info::draw_contents(HDC windc)
 
 void debugview_info::update()
 {
-	RECT bounds, vscroll_bounds, hscroll_bounds;
-	debug_view_xy totalsize, visiblesize, topleft;
-	bool show_vscroll, show_hscroll;
 	SCROLLINFO scrollinfo;
 
+	// get the updated total rows/cols and left row/col
+	debug_view_xy const totalsize = m_view->total_size();
+	debug_view_xy topleft = m_view->visible_position();
+
 	// get the view window bounds
+	RECT bounds;
 	GetClientRect(m_wnd, &bounds);
+	debug_view_xy visiblesize;
 	visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
 	visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
 
-	// get the updated total rows/cols and left row/col
-	totalsize = m_view->total_size();
-	topleft = m_view->visible_position();
-
 	// determine if we need to show the scrollbars
-	show_vscroll = show_hscroll = false;
-	if (totalsize.x > visiblesize.x && bounds.bottom >= metrics().hscroll_height())
+	bool const fit_hscroll = (bounds.bottom - bounds.top) > metrics().hscroll_height();
+	bool show_hscroll = fit_hscroll && (totalsize.x > visiblesize.x);
+	if (show_hscroll)
 	{
 		bounds.bottom -= metrics().hscroll_height();
 		visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
-		show_hscroll = true;
 	}
-	if (totalsize.y > visiblesize.y && bounds.right >= metrics().vscroll_width())
+	bool const fit_vscroll = (bounds.right - bounds.left) > metrics().vscroll_width();
+	bool const show_vscroll = fit_vscroll && (totalsize.y > visiblesize.y);
+	if (show_vscroll)
 	{
 		bounds.right -= metrics().vscroll_width();
 		visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
-		show_vscroll = true;
-	}
-	if (!show_vscroll && totalsize.y > visiblesize.y && bounds.right >= metrics().vscroll_width())
-	{
-		bounds.right -= metrics().vscroll_width();
-		visiblesize.x = (bounds.right - bounds.left) / metrics().debug_font_width();
-		show_vscroll = true;
+		if (fit_hscroll && !show_hscroll && (totalsize.x > visiblesize.x))
+		{
+			bounds.bottom -= metrics().hscroll_height();
+			visiblesize.y = (bounds.bottom - bounds.top) / metrics().debug_font_height();
+			show_hscroll = true;
+		}
 	}
 
 	// compute the bounds of the scrollbars
+	RECT vscroll_bounds;
 	GetClientRect(m_wnd, &vscroll_bounds);
 	vscroll_bounds.left = vscroll_bounds.right - metrics().vscroll_width();
 	if (show_hscroll)
 		vscroll_bounds.bottom -= metrics().hscroll_height();
-
+	RECT hscroll_bounds;
 	GetClientRect(m_wnd, &hscroll_bounds);
 	hscroll_bounds.top = hscroll_bounds.bottom - metrics().hscroll_height();
 	if (show_vscroll)
@@ -482,26 +629,34 @@ void debugview_info::update()
 		topleft.x = std::max(totalsize.x - visiblesize.x, 0);
 
 	// fill out the scroll info struct for the vertical scrollbar
-	scrollinfo.cbSize = sizeof(scrollinfo);
-	scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-	scrollinfo.nMin = 0;
-	scrollinfo.nMax = totalsize.y - 1;
-	scrollinfo.nPage = visiblesize.y;
-	scrollinfo.nPos = topleft.y;
-	SetScrollInfo(m_vscroll, SB_CTL, &scrollinfo, TRUE);
+	if (m_vscroll)
+	{
+		scrollinfo.cbSize = sizeof(scrollinfo);
+		scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+		scrollinfo.nMin = 0;
+		scrollinfo.nMax = totalsize.y - 1;
+		scrollinfo.nPage = visiblesize.y;
+		scrollinfo.nPos = topleft.y;
+		SetScrollInfo(m_vscroll, SB_CTL, &scrollinfo, TRUE);
+	}
 
 	// fill out the scroll info struct for the horizontal scrollbar
-	scrollinfo.cbSize = sizeof(scrollinfo);
-	scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
-	scrollinfo.nMin = 0;
-	scrollinfo.nMax = totalsize.x - 1;
-	scrollinfo.nPage = visiblesize.x;
-	scrollinfo.nPos = topleft.x;
-	SetScrollInfo(m_hscroll, SB_CTL, &scrollinfo, TRUE);
+	if (m_hscroll)
+	{
+		scrollinfo.cbSize = sizeof(scrollinfo);
+		scrollinfo.fMask = SIF_PAGE | SIF_POS | SIF_RANGE;
+		scrollinfo.nMin = 0;
+		scrollinfo.nMax = totalsize.x - 1;
+		scrollinfo.nPage = visiblesize.x;
+		scrollinfo.nPos = topleft.x;
+		SetScrollInfo(m_hscroll, SB_CTL, &scrollinfo, TRUE);
+	}
 
 	// update window info
-	visiblesize.y++;
-	visiblesize.x++;
+	if (((bounds.right - bounds.left) > (visiblesize.x * metrics().debug_font_width())) && ((topleft.x + visiblesize.x) < totalsize.x))
+		visiblesize.x++;
+	if (((bounds.bottom - bounds.top) > (visiblesize.y * metrics().debug_font_height())) && ((topleft.y + visiblesize.y) < totalsize.y))
+		visiblesize.y++;
 	m_view->set_visible_size(visiblesize);
 	m_view->set_visible_position(topleft);
 
@@ -581,7 +736,41 @@ uint32_t debugview_info::process_scroll(WORD type, HWND wnd)
 	scrollinfo.nPos = result;
 	SetScrollInfo(wnd, SB_CTL, &scrollinfo, TRUE);
 
-	return (uint32_t)result;
+	return uint32_t(result);
+}
+
+
+bool debugview_info::process_context_menu(int x, int y)
+{
+	// don't show a menu if not in client rect
+	RECT clientrect;
+	GetClientRect(m_wnd, &clientrect);
+	POINT loc{ x, y };
+	ScreenToClient(m_wnd, &loc);
+	if (!PtInRect(&clientrect, loc))
+		return false;
+
+	// create the context menu if we haven’t already
+	if (!m_contextmenu)
+	{
+		m_contextmenu = CreatePopupMenu();
+		if (!m_contextmenu)
+			return false;
+		add_items_to_context_menu(m_contextmenu);
+	}
+
+	// show the context menu
+	update_context_menu(m_contextmenu);
+	BOOL const command(TrackPopupMenu(
+				m_contextmenu,
+				(GetSystemMetrics(SM_MENUDROPALIGNMENT) ? TPM_RIGHTALIGN : TPM_LEFTALIGN) | TPM_LEFTBUTTON | TPM_NONOTIFY | TPM_RETURNCMD,
+				x, y,
+				0,
+				m_wnd,
+				nullptr));
+	if (command)
+		handle_context_menu(command);
+	return true;
 }
 
 
@@ -718,17 +907,33 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 	// mouse click
 	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
 		{
-			debug_view_xy topleft = m_view->visible_position();
+			debug_view_xy const topleft = m_view->visible_position();
+			debug_view_xy const visiblesize = m_view->visible_size();
 			debug_view_xy newpos;
-			newpos.x = topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width();
-			newpos.y = topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height();
-			m_view->process_click(DCK_LEFT_CLICK, newpos);
+			newpos.x = std::max(std::min<int>(topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width(), topleft.x + visiblesize.x - 1), 0);
+			newpos.y = std::max(std::min<int>(topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height(), topleft.y + visiblesize.y - 1), 0);
+			m_view->process_click((message == WM_LBUTTONDOWN) ? DCK_LEFT_CLICK : DCK_MIDDLE_CLICK, newpos);
 			SetFocus(m_wnd);
 			break;
 		}
 
-	// hscroll
+	// right click
+	case WM_RBUTTONDOWN:
+		if (m_view->cursor_supported())
+		{
+			debug_view_xy const topleft = m_view->visible_position();
+			debug_view_xy const visiblesize = m_view->visible_size();
+			debug_view_xy newpos;
+			newpos.x = std::max(std::min<int>(topleft.x + GET_X_LPARAM(lparam) / metrics().debug_font_width(), topleft.x + visiblesize.x - 1), 0);
+			newpos.y = std::max(std::min<int>(topleft.y + GET_Y_LPARAM(lparam) / metrics().debug_font_height(), topleft.y + visiblesize.y - 1), 0);
+			m_view->set_cursor_position(newpos);
+			m_view->set_cursor_visible(true);
+		}
+		return DefWindowProc(m_wnd, message, wparam, lparam);
+
+	// horizontal scroll
 	case WM_HSCROLL:
 		{
 			debug_view_xy topleft = m_view->visible_position();
@@ -738,7 +943,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			break;
 		}
 
-	// vscroll
+	// vertical scroll
 	case WM_VSCROLL:
 		{
 			debug_view_xy topleft = m_view->visible_position();
@@ -747,6 +952,11 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			machine().debug_view().flush_osd_updates();
 			break;
 		}
+
+	case WM_CONTEXTMENU:
+		if (!process_context_menu(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam)))
+			return DefWindowProc(m_wnd, message, wparam, lparam);
+		break;
 
 	// everything else: defaults
 	default:

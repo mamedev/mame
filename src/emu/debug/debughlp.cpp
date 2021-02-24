@@ -101,6 +101,7 @@ static const help_item static_help_list[] =
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
+		"  cls -- clears the console text buffer\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
 	{
@@ -1637,7 +1638,7 @@ const char *debug_get_help(const char *tag)
 	size_t taglen = strlen(tag);
 
 	/* find a match */
-	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
+	for (i = 0; i < std::size(static_help_list); i++)
 		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 		{
 			foundcount++;
@@ -1659,7 +1660,7 @@ const char *debug_get_help(const char *tag)
 
 	/* otherwise, indicate ambiguous help */
 	msglen = sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
-	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
+	for (i = 0; i < std::size(static_help_list); i++)
 		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;

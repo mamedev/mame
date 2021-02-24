@@ -904,7 +904,10 @@ void telestrat_state::telstrat(machine_config &config)
 
 ROM_START(oric1)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016))
+	ROM_SYSTEM_BIOS( 0, "ver10", "Basic 1.0")
+	ROMX_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "ver10uk", "Basic 1.0 UK")
+	ROMX_LOAD( "basic10uk.rom", 0, 0x04000, CRC(d6006a01) SHA1(84759cc8faae53070f1c8ce8408982a0edcb0796), ROM_BIOS(1))
 ROM_END
 
 ROM_START(orica)

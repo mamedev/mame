@@ -26,11 +26,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
+		m_slapstic_region(*this, "maincpu"),
 		m_videoram(*this, "videoram")
 	{
 	}
 
 	void atetris_base(machine_config &config);
+	void atetris_pokey(machine_config &config);
 	void atetris(machine_config &config);
 	void atetrisb2(machine_config &config);
 
@@ -45,17 +48,15 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
+	required_region_ptr<uint8_t> m_slapstic_region;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t *m_slapstic_source;
-	uint8_t *m_slapstic_base;
-	uint8_t m_current_bank;
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
 
 	void irq_ack_w(uint8_t data);
-	uint8_t slapstic_r(offs_t offset);
 	void coincount_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);

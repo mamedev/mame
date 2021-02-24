@@ -29,6 +29,8 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "c64exp"),
+	m_roml_size(0),
+	m_romh_size(0),
 	m_game(1),
 	m_exrom(1)
 {
@@ -103,6 +105,11 @@ image_init_result c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
+		m_card->m_roml_size = 0;
+		m_card->m_romh_size = 0;
+		m_card->m_exrom = 1;
+		m_card->m_game = 1;
+
 		size_t size;
 
 		if (!loaded_through_softlist())
@@ -112,7 +119,8 @@ image_init_result c64_expansion_slot_device::call_load()
 			if (is_filetype("80"))
 			{
 				fread(m_card->m_roml, size);
-				m_card->m_exrom = (0);
+				m_card->m_roml_size = size;
+				m_card->m_exrom = 0;
 
 				if (size == 0x4000)
 				{
@@ -122,6 +130,7 @@ image_init_result c64_expansion_slot_device::call_load()
 			else if (is_filetype("a0"))
 			{
 				fread(m_card->m_romh, 0x2000);
+				m_card->m_romh_size = 0x2000;
 
 				m_card->m_exrom = 0;
 				m_card->m_game = 0;
@@ -129,32 +138,25 @@ image_init_result c64_expansion_slot_device::call_load()
 			else if (is_filetype("e0"))
 			{
 				fread(m_card->m_romh, 0x2000);
+				m_card->m_romh_size = 0x2000;
 
 				m_card->m_game = 0;
 			}
 			else if (is_filetype("crt"))
 			{
-				size_t roml_size = 0;
-				size_t romh_size = 0;
-				int exrom = 1;
-				int game = 1;
-
-				if (cbm_crt_read_header(image_core_file(), &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(image_core_file(), &m_card->m_roml_size, &m_card->m_romh_size, &m_card->m_exrom, &m_card->m_game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
 
-					m_card->m_roml = std::make_unique<uint8_t[]>(roml_size);
-					m_card->m_romh = std::make_unique<uint8_t[]>(romh_size);
+					m_card->m_roml = std::make_unique<uint8_t[]>(m_card->m_roml_size);
+					m_card->m_romh = std::make_unique<uint8_t[]>(m_card->m_romh_size);
 
-					if (roml_size) roml = m_card->m_roml.get();
-					if (romh_size) romh = m_card->m_romh.get();
+					if (m_card->m_roml_size) roml = m_card->m_roml.get();
+					if (m_card->m_romh_size) romh = m_card->m_romh.get();
 
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
-
-				m_card->m_exrom = exrom;
-				m_card->m_game = game;
 			}
 		}
 		else
@@ -166,6 +168,8 @@ image_init_result c64_expansion_slot_device::call_load()
 				// Ultimax (VIC-10) cartridge
 				load_software_region("lorom", m_card->m_roml);
 				load_software_region("uprom", m_card->m_romh);
+				m_card->m_roml_size = get_software_region_length("lorom");
+				m_card->m_romh_size = get_software_region_length("uprom");
 
 				m_card->m_exrom = 1;
 				m_card->m_game = 0;
@@ -177,10 +181,18 @@ image_init_result c64_expansion_slot_device::call_load()
 				load_software_region("romh", m_card->m_romh);
 				load_software_region("romx", m_card->m_romx);
 				load_software_region("nvram", m_card->m_nvram);
+				m_card->m_roml_size = get_software_region_length("roml");
+				m_card->m_romh_size = get_software_region_length("romh");
 
 				if (get_feature("exrom") != nullptr) m_card->m_exrom = atol(get_feature("exrom"));
 				if (get_feature("game") != nullptr) m_card->m_game = atol(get_feature("game"));
 			}
+		}
+
+		if ((m_card->m_roml_size & (m_card->m_roml_size - 1)) || (m_card->m_romh_size & (m_card->m_romh_size - 1)))
+		{
+			seterror(IMAGE_ERROR_UNSPECIFIED, "ROM size must be power of 2");
+			return image_init_result::FAIL;
 		}
 	}
 

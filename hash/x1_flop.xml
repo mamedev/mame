@@ -1018,7 +1018,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="はーりぃふぉっくす"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="harry fox.d88" size="348848" crc="493c9699" sha1="0fa37d988d20dd698d096025b645994b874ca8cb"/>
+				<rom name="hurry fox.d88" size="348848" crc="493c9699" sha1="0fa37d988d20dd698d096025b645994b874ca8cb"/>
 			</dataarea>
 		</part>
 	</software>

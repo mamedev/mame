@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="hp_ipc_rom" description="HP Integral PC optional ROMs">
+
+	<software name="se">
+		<description>Software Engineering ROM</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="serial" value="82987A" />
+
+		<part name="rom" interface="hp_ipc_rom">
+			<feature name="base" value="0x200000" />
+			<dataarea name="rom" size="0x200000" width="16" endianness="big">
+				<rom name="se_rom.bin" size="0x200000" crc="58da10cf" sha1="04995e1a615a28f54392107a8ffe0e715086ce26" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

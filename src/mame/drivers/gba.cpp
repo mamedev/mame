@@ -727,7 +727,7 @@ uint32_t gba_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 			break;
 	}
 
-//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < std::size(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -749,7 +749,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	COMBINE_DATA(&m_regs[offset]);
 
-//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < std::size(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{

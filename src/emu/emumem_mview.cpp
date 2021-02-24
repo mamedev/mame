@@ -503,20 +503,13 @@ memory_view::memory_view_entry::memory_view_entry(const address_space_config &co
 	m_map = std::make_unique<address_map>(m_view);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
+void memory_view::memory_view_entry::prepare_map_generic(address_map &map, bool allow_alloc)
 {
-	// no map specified, use the space-specific one
-	if (map == nullptr)
-		map = m_map.get();
-
 	memory_region *devregion = (m_view.m_space->spacenum() == 0) ? m_view.m_device.memregion(DEVICE_SELF) : nullptr;
 	u32 devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
 
-	// merge in the submaps
-	map->import_submaps(m_manager.machine(), m_view.m_device.owner() ? *m_view.m_device.owner() : m_view.m_device, data_width(), endianness(), addr_shift());
-
 	// make a pass over the address map, adjusting for the device and getting memory pointers
-	for (address_map_entry &entry : map->m_entrylist)
+	for (address_map_entry &entry : map.m_entrylist)
 	{
 		// computed adjusted addresses first
 		adjust_addresses(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror);
@@ -524,17 +517,19 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 		// if we have a share entry, add it to our map
 		if (entry.m_share != nullptr)
 		{
-			// if we can't find it, add it to our map
+			// if we can't find it, add it to our map if we're allowed to
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
 			memory_share *share = m_manager.share_find(fulltag);
 			if (!share)
 			{
+				if (!allow_alloc)
+					fatalerror("Trying to create share '%s' too late\n", fulltag);
 				VPRINTF("Creating share '%s' of length 0x%X\n", fulltag, entry.m_addrend + 1 - entry.m_addrstart);
-				share = m_manager.share_alloc(m_view.m_device, fulltag, data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				share = m_manager.share_alloc(m_view.m_device, fulltag, m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 			}
 			else
 			{
-				std::string result = share->compare(data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				std::string result = share->compare(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 				if (!result.empty())
 					fatalerror("%s\n", result);
 			}
@@ -561,14 +556,14 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag);
 			if (region == nullptr)
-				fatalerror("device '%s' %s view memory map entry %X-%X references nonexistent region \"%s\"\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
-				fatalerror("device '%s' %s view memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, region->bytes());
+				fatalerror("device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend, entry.m_region, region->bytes());
 
 			if (entry.m_share != nullptr)
-				fatalerror("device '%s' %s view memory map entry %X-%X has both .region() and .share()\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend);
+				fatalerror("device '%s' %s space memory map entry %X-%X has both .region() and .share()\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend);
 		}
 
 		// convert any region-relative entries to their memory pointers
@@ -583,8 +578,38 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 
 		// allocate anonymous ram when needed
 		if (!entry.m_memory && (entry.m_read.m_type == AMH_RAM || entry.m_write.m_type == AMH_RAM))
-			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend, key());
+		{
+			if (!allow_alloc)
+				fatalerror("Trying to create memory in range %X-%X too late\n", entry.m_addrstart, entry.m_addrend);
+
+			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend);
+		}
 	}
+}
+
+void memory_view::memory_view_entry::prepare_device_map(address_map &map)
+{
+	// Disable the test for now, some cleanup needed before
+	if(0) {
+		// device maps are not supposed to set global parameters
+		if (map.m_unmapval)
+			fatalerror("Device maps should not set the unmap value\n");
+
+		if (map.m_globalmask && map.m_globalmask != m_view.m_space->addrmask())
+			fatalerror("Device maps should not set the global mask\n");
+	}
+
+	prepare_map_generic(map, false);
+}
+
+
+template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
+{
+	// no map specified, use the space-specific one
+	if (map == nullptr)
+		map = m_map.get();
+
+	prepare_map_generic(*map, true);
 
 	// Force the slot to exist, in case the map is empty
 	r()->select_u(m_id);
@@ -928,6 +953,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	check_range_address("install_device_delegate", addrstart, addrend);
 	address_map map(*m_view.m_space, addrstart, addrend, unitmask, cswidth, m_view.m_device, delegate);
 	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
+	prepare_device_map(map);
 	populate_from_map(&map);
 }
 

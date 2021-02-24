@@ -273,7 +273,7 @@ void news_38xx_state::int_check()
 	static int const int_line[] = { INPUT_LINE_IRQ7, INPUT_LINE_IRQ4, INPUT_LINE_IRQ3 };
 	static u8 const int_mask[] = { 0x80, 0x78, 0x07 };
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
+	for (unsigned i = 0; i < std::size(m_int_state); i++)
 	{
 		bool const int_state = m_intst & m_inten & int_mask[i];
 

@@ -337,12 +337,12 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 				if (width == 0)
 					throw emu_fatalerror("Width required for %%u formats\n");
 				hitnonzero = false;
-				while (leadzero && width > ARRAY_LENGTH(k_decimal_divisor))
+				while (leadzero && width > std::size(k_decimal_divisor))
 				{
 					dest.append(" ");
 					width--;
 				}
-				for (int digitnum = ARRAY_LENGTH(k_decimal_divisor) - 1; digitnum >= 0; digitnum--)
+				for (int digitnum = std::size(k_decimal_divisor) - 1; digitnum >= 0; digitnum--)
 				{
 					int digit = (result >= k_decimal_divisor[digitnum]) ? (result / k_decimal_divisor[digitnum]) % 10 : 0;
 					if (digit != 0)

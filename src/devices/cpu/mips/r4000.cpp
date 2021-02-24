@@ -59,7 +59,7 @@
 
 #define USE_ABI_REG_NAMES 1
 
-// cpu instruction fiels
+// cpu instruction fields
 #define RSREG ((op >> 21) & 31)
 #define RTREG ((op >> 16) & 31)
 #define RDREG ((op >> 11) & 31)
@@ -94,6 +94,9 @@ r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
+	, m_r{}
+	, m_cp0{}
+	, m_f{}
 	, m_fcr0(fcr)
 {
 	m_cp0[CP0_PRId] = prid;
@@ -194,14 +197,17 @@ void r4000_base_device::device_start()
 
 void r4000_base_device::device_reset()
 {
+	if (!m_hard_reset)
+	{
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
+		m_cp0[CP0_ErrorEPC] = m_pc;
+	}
+	else
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+
 	m_branch_state = NONE;
 	m_pc = s64(s32(0xbfc00000));
 	m_r[0] = 0;
-
-	if (m_hard_reset)
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
-	else
-		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
 
 	m_cp0[CP0_Wired] = 0;
 	m_cp0[CP0_Compare] = 0;
@@ -219,7 +225,7 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_WatchHi] = 0;
 
 	// initialize tlb mru index with identity mapping
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		m_tlb_mru[TRANSLATE_READ][i] = i;
 		m_tlb_mru[TRANSLATE_WRITE][i] = i;
@@ -1405,10 +1411,10 @@ u64 r4000_base_device::cp0_get(unsigned const reg)
 		{
 			u8 const wired = m_cp0[CP0_Wired] & 0x3f;
 
-			if (wired < ARRAY_LENGTH(m_tlb))
-				return ((total_cycles() - m_cp0_timer_zero) % (ARRAY_LENGTH(m_tlb) - wired) + wired) & 0x3f;
+			if (wired < std::size(m_tlb))
+				return ((total_cycles() - m_cp0_timer_zero) % (std::size(m_tlb) - wired) + wired) & 0x3f;
 			else
-				return ARRAY_LENGTH(m_tlb) - 1;
+				return std::size(m_tlb) - 1;
 		}
 		break;
 
@@ -1519,7 +1525,7 @@ void r4000_base_device::cp0_tlbr()
 {
 	u8 const index = m_cp0[CP0_Index] & 0x3f;
 
-	if (index < ARRAY_LENGTH(m_tlb))
+	if (index < std::size(m_tlb))
 	{
 		tlb_entry const &entry = m_tlb[index];
 
@@ -1532,7 +1538,7 @@ void r4000_base_device::cp0_tlbr()
 
 void r4000_base_device::cp0_tlbwi(u8 const index)
 {
-	if (index < ARRAY_LENGTH(m_tlb))
+	if (index < std::size(m_tlb))
 	{
 		tlb_entry &entry = m_tlb[index];
 
@@ -1557,9 +1563,9 @@ void r4000_base_device::cp0_tlbwi(u8 const index)
 void r4000_base_device::cp0_tlbwr()
 {
 	u8 const wired = m_cp0[CP0_Wired] & 0x3f;
-	u8 const unwired = ARRAY_LENGTH(m_tlb) - wired;
+	u8 const unwired = std::size(m_tlb) - wired;
 
-	u8 const index = (unwired > 0) ? ((total_cycles() - m_cp0_timer_zero) % unwired + wired) & 0x3f : (ARRAY_LENGTH(m_tlb) - 1);
+	u8 const index = (unwired > 0) ? ((total_cycles() - m_cp0_timer_zero) % unwired + wired) & 0x3f : (std::size(m_tlb) - 1);
 
 	cp0_tlbwi(index);
 }
@@ -1567,7 +1573,7 @@ void r4000_base_device::cp0_tlbwr()
 void r4000_base_device::cp0_tlbp()
 {
 	m_cp0[CP0_Index] = 0x80000000;
-	for (u8 index = 0; index < ARRAY_LENGTH(m_tlb); index++)
+	for (u8 index = 0; index < std::size(m_tlb); index++)
 	{
 		tlb_entry const &entry = m_tlb[index];
 
@@ -3609,7 +3615,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 
 	bool invalid = false;
 	bool modify = false;
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		unsigned const index = mru[i];
 		tlb_entry const &entry = m_tlb[index];

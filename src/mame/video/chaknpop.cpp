@@ -78,7 +78,7 @@ void chaknpop_state::gfxmode_w(uint8_t data)
 		int all_dirty = 0;
 
 		m_gfxmode = data;
-		membank("bank1")->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);   /* Select 2 banks of 16k */
+		m_vram_bank->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);   /* Select 2 banks of 16k */
 
 		if (m_flip_x != (m_gfxmode & GFX_FLIP_X))
 		{
@@ -147,22 +147,13 @@ TILE_GET_INFO_MEMBER(chaknpop_state::get_tx_tile_info)
 
 void chaknpop_state::video_start()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
-
-	/*                          info                       offset             type             w   h  col row */
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chaknpop_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
-	m_vram1 = &RAM[0x10000];
-	m_vram2 = &RAM[0x12000];
-	m_vram3 = &RAM[0x14000];
-	m_vram4 = &RAM[0x16000];
+	m_gfxmode = 0;
+	m_flip_x = 0;
+	m_flip_y = 0;
 
-	save_pointer(NAME(m_vram1), 0x2000);
-	save_pointer(NAME(m_vram2), 0x2000);
-	save_pointer(NAME(m_vram3), 0x2000);
-	save_pointer(NAME(m_vram4), 0x2000);
-
-	membank("bank1")->set_entry(0);
+	m_vram_bank->set_entry(0);
 	tx_tilemap_mark_all_dirty();
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(chaknpop_state::tx_tilemap_mark_all_dirty), this));
@@ -224,13 +215,13 @@ void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			pen_t color = 0;
 
-			if (m_vram1[offs] & i)
+			if (m_vram[offs] & i)
 				color |= 0x200; // green lower cage
-			if (m_vram2[offs] & i)
+			if (m_vram[0x2000 + offs] & i)
 				color |= 0x080;
-			if (m_vram3[offs] & i)
+			if (m_vram[0x4000 + offs] & i)
 				color |= 0x100; // green upper cage
-			if (m_vram4[offs] & i)
+			if (m_vram[0x6000 + offs] & i)
 				color |= 0x040; // tx mask
 
 			if (color)

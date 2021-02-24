@@ -91,7 +91,7 @@ inline void rsp_device::load_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 		if (m_regmap[regnum].is_int_register())
 			UML_MOV(block, ireg(m_regmap[regnum].ireg() - REG_I0), mem(&m_rsp_state->r[regnum]));
 }
@@ -106,7 +106,7 @@ inline void rsp_device::save_fast_iregs(drcuml_block &block)
 {
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 		if (m_regmap[regnum].is_int_register())
 			UML_MOV(block, mem(&m_rsp_state->r[regnum]), ireg(m_regmap[regnum].ireg() - REG_I0));
 }

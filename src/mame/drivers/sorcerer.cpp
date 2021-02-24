@@ -435,7 +435,6 @@ static const floppy_interface sorcerer_floppy_interface =
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -450,10 +449,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
-	screen.set_size(64*8, 30*8);
-	screen.set_visarea(0, 64*8-1, 0, 30*8-1);
+	screen.set_raw(ES_VIDEO_CLOCK, 806, 0, 512, 261, 0, 240); // TODO: 313 lines in 50 Hz mode
 	screen.set_screen_update(FUNC(sorcerer_state::screen_update));
 	screen.set_palette("palette");
 

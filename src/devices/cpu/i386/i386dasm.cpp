@@ -2847,7 +2847,7 @@ void i386_disassembler::decode_opcode(std::ostream &stream, const I386_OPCODE *o
 
 		case GROUP:
 			handle_modrm(modrm_string, base_pc, pc, opcodes);
-			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
+			for( i=0; i < std::size(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
 					if (op->flags & GROUP_MOD)
 						decode_opcode(stream, &group_op_table[i].opcode[MODRM_MOD()], op1, base_pc, pc, opcodes);

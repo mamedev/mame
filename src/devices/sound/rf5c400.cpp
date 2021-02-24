@@ -5,16 +5,6 @@
 
     Written by Ville Linde
     Improvements by the hoot development team
-
-    history -
-    2007-02-08 hoot development team
-        looping
-        stereo panning
-        8-bit sample support
-
-    2007-02-16 hoot development team
-        envelope
-        fixed volume table
 */
 
 #include "emu.h"
@@ -149,15 +139,33 @@ void rf5c400_device::device_start()
 	// init channel info
 	for (rf5c400_channel &chan : m_channels)
 	{
+		chan.startH = 0;
+		chan.startL = 0;
+		chan.freq = 0;
+		chan.endL = 0;
+		chan.endHloopH = 0;
+		chan.loopL = 0;
+		chan.pan = 0;
+		chan.effect = 0;
+		chan.volume = 0;
+		chan.attack = 0;
+		chan.decay = 0;
+		chan.release = 0;
+		chan.pos = 0;
+		chan.step = 0;
+		chan.keyon = 0;
 		chan.env_phase = PHASE_NONE;
 		chan.env_level = 0.0;
 		chan.env_step = 0.0;
 		chan.env_scale = 1.0;
 	}
 
+	m_req_channel = 0;
+
 	save_item(NAME(m_rf5c400_status));
 	save_item(NAME(m_ext_mem_address));
 	save_item(NAME(m_ext_mem_data));
+	save_item(NAME(m_req_channel));
 
 	save_item(STRUCT_MEMBER(m_channels, startH));
 	save_item(STRUCT_MEMBER(m_channels, startL));
@@ -201,7 +209,7 @@ void rf5c400_device::device_clock_changed()
 void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, ch;
-	uint64_t end, loop;
+	uint64_t start, end, loop;
 	uint64_t pos;
 	uint8_t vol, lvol, rvol, type;
 	uint8_t env_phase;
@@ -216,9 +224,9 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		auto &buf0 = outputs[0];
 		auto &buf1 = outputs[1];
 
-//      start = ((channel->startH & 0xFF00) << 8) | channel->startL;
-		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
-		loop = ((channel->endHloopH & 0xFF00) << 8) | channel->loopL;
+		start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
+		end = ((uint32_t)(channel->endHloopH & 0xFF) << 16) | channel->endL;
+		loop = ((uint32_t)(channel->endHloopH & 0xFF00) << 8) | channel->loopL;
 		pos = channel->pos;
 		vol = channel->volume & 0xFF;
 		lvol = channel->pan & 0xFF;
@@ -229,6 +237,12 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		env_level = channel->env_level;
 		env_step = channel->env_step;
 		env_rstep = env_step * channel->env_scale;
+
+		if (start == end)
+		{
+			// This occurs in pop'n music when trying to play a non-existent sample on the sound test menu
+			continue;
+		}
 
 		for (i=0; i < buf0.samples(); i++)
 		{
@@ -308,6 +322,15 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			{
 				pos -= loop<<16;
 				pos &= 0xFFFFFF0000ULL;
+
+				if (pos < (start<<16))
+				{
+					// This case only shows up in Firebeat games from what I could tell.
+					// The loop value will be higher than the actual buffer size.
+					// This is used when DMAs will be overwriting the current buffer.
+					// It expects the buffer to be looped without any additional commands.
+					pos = start<<16;
+				}
 			}
 
 		}
@@ -342,6 +365,32 @@ uint16_t rf5c400_device::rf5c400_r(offs_t offset, uint16_t mem_mask)
 			case 0x04:      // unknown read
 			{
 				return 0;
+			}
+
+			case 0x09:      // position read?
+			{
+				// The game will always call rf5c400_w 0x08 with a channel number and some other value before reading this register.
+				// The call to rf5c400_w 0x08 contains additional information, potentially what information it's expecting to be returned here.
+				// This implementation assumes all commands want the same information as command 6.
+				m_stream->update();
+
+				rf5c400_channel* channel = &m_channels[m_req_channel];
+				if (channel->env_phase == PHASE_NONE)
+				{
+					return 0;
+				}
+
+				// pop'n music's SPU program expects to read this register 6 times with the same value between every read before it will send the next DMA request.
+				//
+				// This register is polled while a streaming BGM is being played.
+				// For pop'n music specifically, the game starts off by reading 0x200000 into 0x00780000 - 0x00880000.
+				// When 2xxx is found (pos - start = 0x00080000), it will trigger the next DMA of 0x100000 overwriting 0x00780000 - 0x00800000, and continues polling the register until it reads 1xxx next.
+				// When 1xxx is found (pos - start = 0x00040000), it will trigger the next DMA of 0x100000 overwriting 0x00800000 - 0x00880000, and continues polling the register until it reads 2xxx next.
+				// ... repeat until song is finished, alternating between 2xxx and 1xxx ...
+				// This ends up so that it'll always be buffering new sample data into the sections of memory that aren't being used.
+				auto start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
+				auto ch_offset = (channel->pos >> 16) - start;
+				return ch_offset >> 6;
 			}
 
 			case 0x13:      // memory read
@@ -391,7 +440,7 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				{
 					case 0x60:
 						m_channels[ch].pos =
-							((m_channels[ch].startH & 0xFF00) << 8) | m_channels[ch].startL;
+							((uint32_t)(m_channels[ch].startH & 0xFF00) << 8) | m_channels[ch].startL;
 						m_channels[ch].pos <<= 16;
 
 						m_channels[ch].env_phase = PHASE_ATTACK;
@@ -421,8 +470,16 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 			}
 
-			case 0x08:      // relative to env attack (channel no)
-			case 0x09:      // relative to env attack (0x0c00/ 0x1c00)
+			case 0x08:
+			{
+				// There's some other data stuffed in the upper bits beyond the channel: data >> 5
+				// The other data might be some kind of register or command. I've seen 0, 4, 5, and 6.
+				// Firebeat uses 6 when polling rf5c400_r 0x09.
+				m_req_channel = data & 0x1f;
+				break;
+			}
+
+			case 0x09:      // relative to env attack (0x0c00/ 0x1c00/ 0x1e00)
 
 			case 0x11:      // memory r/w address, bits 15 - 0
 			{

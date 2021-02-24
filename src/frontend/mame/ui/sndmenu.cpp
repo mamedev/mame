@@ -29,7 +29,7 @@ menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container &c
 	m_sound = (strcmp(options.sound(), OSDOPTVAL_NONE) && strcmp(options.sound(), "0"));
 	m_samples = mui.machine().options().samples();
 
-	int total = ARRAY_LENGTH(m_sound_rate);
+	int total = std::size(m_sound_rate);
 
 	for (m_cur_rates = 0; m_cur_rates < total; m_cur_rates++)
 		if (m_sample_rate == m_sound_rate[m_cur_rates])
@@ -92,7 +92,7 @@ void menu_sound_options::handle()
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				int total = ARRAY_LENGTH(m_sound_rate);
+				int total = std::size(m_sound_rate);
 				std::vector<std::string> s_sel(total);
 				for (int index = 0; index < total; index++)
 					s_sel[index] = std::to_string(m_sound_rate[index]);
@@ -128,7 +128,7 @@ void menu_sound_options::handle()
 
 void menu_sound_options::populate(float &customtop, float &custombottom)
 {
-	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(ARRAY_LENGTH(m_sound_rate) - 1), m_cur_rates);
+	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(std::size(m_sound_rate) - 1), m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
 
 	// add options items

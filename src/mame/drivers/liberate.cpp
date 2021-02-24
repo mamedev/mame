@@ -733,7 +733,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 
 MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
+	std::fill(std::begin(m_io_ram), std::end(m_io_ram), 0);
 
 	m_background_disable = 0;
 	m_background_color = 0;

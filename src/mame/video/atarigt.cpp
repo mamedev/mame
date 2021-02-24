@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(atarigt_state::get_playfield_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
+TILEMAP_MAPPER_MEMBER(atarigt_state::playfield_scan)
 {
 	return (((col & 0x40) ^ 0x40) << 6) | ((row & 0x3f) << 6) | (col & 0x3f);
 }
@@ -75,7 +75,7 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
  *
  *************************************/
 
-VIDEO_START_MEMBER(atarigt_state,atarigt)
+void atarigt_state::video_start()
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
@@ -103,7 +103,7 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
  *
  *************************************/
 
-void atarigt_state::atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
+void atarigt_state::colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata;
 
@@ -127,7 +127,7 @@ void atarigt_state::atarigt_colorram_w(offs_t address, uint16_t data, uint16_t m
 }
 
 
-uint16_t atarigt_state::atarigt_colorram_r(offs_t address)
+uint16_t atarigt_state::colorram_r(offs_t address)
 {
 	address &= 0x7ffff;
 	return m_colorram[address >> 1];

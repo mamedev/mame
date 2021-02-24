@@ -429,7 +429,7 @@ void sa1110_periphs_device::rcv_complete()
 void sa1110_periphs_device::tra_complete()
 {
 	m_uart_regs.tx_fifo_count--;
-	m_uart_regs.tx_fifo_read_idx = (m_uart_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_uart_regs.tx_fifo);
+	m_uart_regs.tx_fifo_read_idx = (m_uart_regs.tx_fifo_read_idx + 1) % std::size(m_uart_regs.tx_fifo);
 	m_uart_regs.utsr1 |= (1 << UTSR1_TNF_BIT);
 
 	if (m_uart_regs.tx_fifo_count)
@@ -463,7 +463,7 @@ void sa1110_periphs_device::uart_update_eif_status()
 	bool has_error = false;
 	for (int i = 0; i < 4 && i < m_uart_regs.rx_fifo_count; i++)
 	{
-		const int read_idx = (m_uart_regs.rx_fifo_read_idx + i) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+		const int read_idx = (m_uart_regs.rx_fifo_read_idx + i) % std::size(m_uart_regs.rx_fifo);
 		if (m_uart_regs.rx_fifo[read_idx] & 0x700)
 		{
 			has_error = true;
@@ -485,7 +485,7 @@ void sa1110_periphs_device::uart_update_eif_status()
 
 void sa1110_periphs_device::uart_write_receive_fifo(uint16_t data_and_flags)
 {
-	if (m_uart_regs.rx_fifo_count >= ARRAY_LENGTH(m_uart_regs.rx_fifo))
+	if (m_uart_regs.rx_fifo_count >= std::size(m_uart_regs.rx_fifo))
 		return;
 	if (!BIT(m_uart_regs.utcr[3], UTCR3_RXE_BIT))
 		return;
@@ -493,7 +493,7 @@ void sa1110_periphs_device::uart_write_receive_fifo(uint16_t data_and_flags)
 	// fill FIFO entry
 	m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_write_idx] = data_and_flags;
 	m_uart_regs.rx_fifo_count++;
-	m_uart_regs.rx_fifo_write_idx = (m_uart_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+	m_uart_regs.rx_fifo_write_idx = (m_uart_regs.rx_fifo_write_idx + 1) % std::size(m_uart_regs.rx_fifo);
 
 	// update error flags
 	uart_update_eif_status();
@@ -507,7 +507,7 @@ uint8_t sa1110_periphs_device::uart_read_receive_fifo()
 	const uint8_t data = m_uart_regs.rx_fifo[m_uart_regs.rx_fifo_read_idx];
 	if (m_uart_regs.rx_fifo_count)
 	{
-		m_uart_regs.rx_fifo_read_idx = (m_uart_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_uart_regs.rx_fifo);
+		m_uart_regs.rx_fifo_read_idx = (m_uart_regs.rx_fifo_read_idx + 1) % std::size(m_uart_regs.rx_fifo);
 		m_uart_regs.rx_fifo_count--;
 		if (m_uart_regs.rx_fifo_count)
 		{
@@ -545,7 +545,7 @@ void sa1110_periphs_device::uart_check_rx_fifo_service()
 
 void sa1110_periphs_device::uart_write_transmit_fifo(uint8_t data)
 {
-	if (m_uart_regs.tx_fifo_count >= ARRAY_LENGTH(m_uart_regs.tx_fifo))
+	if (m_uart_regs.tx_fifo_count >= std::size(m_uart_regs.tx_fifo))
 		return;
 	if (!BIT(m_uart_regs.utcr[3], UTCR3_TXE_BIT))
 		return;
@@ -560,7 +560,7 @@ void sa1110_periphs_device::uart_write_transmit_fifo(uint8_t data)
 	// fill FIFO entry
 	m_uart_regs.tx_fifo[m_uart_regs.tx_fifo_write_idx] = data;
 	m_uart_regs.tx_fifo_count++;
-	m_uart_regs.tx_fifo_write_idx = (m_uart_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_uart_regs.tx_fifo);
+	m_uart_regs.tx_fifo_write_idx = (m_uart_regs.tx_fifo_write_idx + 1) % std::size(m_uart_regs.tx_fifo);
 
 	// update FIFO-service interrupt
 	uart_check_tx_fifo_service();
@@ -568,7 +568,7 @@ void sa1110_periphs_device::uart_write_transmit_fifo(uint8_t data)
 
 void sa1110_periphs_device::uart_check_tx_fifo_service()
 {
-	if (m_uart_regs.tx_fifo_count < ARRAY_LENGTH(m_uart_regs.tx_fifo))
+	if (m_uart_regs.tx_fifo_count < std::size(m_uart_regs.tx_fifo))
 		m_uart_regs.utsr1 |= (1 << UTSR1_TNF_BIT);
 	else
 		m_uart_regs.utsr1 &= ~(1 << UTSR1_TNF_BIT);
@@ -808,7 +808,7 @@ TIMER_CALLBACK_MEMBER(sa1110_periphs_device::mcp_audio_tx_callback)
 	if (m_mcp_regs.audio_tx_fifo_count)
 	{
 		m_mcp_regs.audio_tx_fifo_count--;
-		m_mcp_regs.audio_tx_fifo_read_idx = (m_mcp_regs.audio_tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo);
+		m_mcp_regs.audio_tx_fifo_read_idx = (m_mcp_regs.audio_tx_fifo_read_idx + 1) % std::size(m_mcp_regs.audio_tx_fifo);
 
 		m_mcp_regs.mcsr &= ~(1 << MCSR_ATU_BIT);
 		m_mcp_irqs->in_w<MCP_AUDIO_UNDERRUN>(0);
@@ -833,7 +833,7 @@ TIMER_CALLBACK_MEMBER(sa1110_periphs_device::mcp_telecom_tx_callback)
 	if (m_mcp_regs.telecom_tx_fifo_count)
 	{
 		m_mcp_regs.telecom_tx_fifo_count--;
-		m_mcp_regs.telecom_tx_fifo_read_idx = (m_mcp_regs.telecom_tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo);
+		m_mcp_regs.telecom_tx_fifo_read_idx = (m_mcp_regs.telecom_tx_fifo_read_idx + 1) % std::size(m_mcp_regs.telecom_tx_fifo);
 
 		m_mcp_regs.mcsr &= ~(1 << MCSR_TTU_BIT);
 		m_mcp_irqs->in_w<MCP_TELECOM_UNDERRUN>(0);
@@ -853,7 +853,7 @@ uint16_t sa1110_periphs_device::mcp_read_audio_fifo()
 	if (m_mcp_regs.audio_rx_fifo_count)
 	{
 		m_mcp_regs.audio_rx_fifo_count--;
-		m_mcp_regs.audio_rx_fifo_read_idx = (m_mcp_regs.audio_rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_rx_fifo);
+		m_mcp_regs.audio_rx_fifo_read_idx = (m_mcp_regs.audio_rx_fifo_read_idx + 1) % std::size(m_mcp_regs.audio_rx_fifo);
 
 		const bool half_full = m_mcp_regs.audio_rx_fifo_count >= 4;
 		m_mcp_regs.mcsr &= ~(1 << MCSR_ARS_BIT);
@@ -878,7 +878,7 @@ uint16_t sa1110_periphs_device::mcp_read_telecom_fifo()
 	if (m_mcp_regs.telecom_rx_fifo_count)
 	{
 		m_mcp_regs.telecom_rx_fifo_count--;
-		m_mcp_regs.telecom_rx_fifo_read_idx = (m_mcp_regs.telecom_rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_rx_fifo);
+		m_mcp_regs.telecom_rx_fifo_read_idx = (m_mcp_regs.telecom_rx_fifo_read_idx + 1) % std::size(m_mcp_regs.telecom_rx_fifo);
 
 		const bool half_full = m_mcp_regs.telecom_rx_fifo_count >= 4;
 		m_mcp_regs.mcsr &= ~(1 << MCSR_TRS_BIT);
@@ -935,14 +935,14 @@ void sa1110_periphs_device::mcp_set_enabled(bool enabled)
 
 void sa1110_periphs_device::mcp_audio_tx_fifo_push(const uint16_t value)
 {
-	if (m_mcp_regs.audio_rx_fifo_count == ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo))
+	if (m_mcp_regs.audio_rx_fifo_count == std::size(m_mcp_regs.audio_tx_fifo))
 		return;
 
 	m_mcp_regs.audio_tx_fifo[m_mcp_regs.audio_tx_fifo_write_idx] = value;
-	m_mcp_regs.audio_rx_fifo_write_idx = (m_mcp_regs.audio_tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo);
+	m_mcp_regs.audio_rx_fifo_write_idx = (m_mcp_regs.audio_tx_fifo_write_idx + 1) % std::size(m_mcp_regs.audio_tx_fifo);
 	m_mcp_regs.audio_rx_fifo_count++;
 
-	if (m_mcp_regs.audio_tx_fifo_count == ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo))
+	if (m_mcp_regs.audio_tx_fifo_count == std::size(m_mcp_regs.audio_tx_fifo))
 		m_mcp_regs.mcsr &= ~(1 << MCSR_ANF_BIT);
 
 	if (m_mcp_regs.audio_tx_fifo_count >= 4)
@@ -961,14 +961,14 @@ void sa1110_periphs_device::mcp_audio_tx_fifo_push(const uint16_t value)
 
 void sa1110_periphs_device::mcp_telecom_tx_fifo_push(const uint16_t value)
 {
-	if (m_mcp_regs.telecom_rx_fifo_count == ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo))
+	if (m_mcp_regs.telecom_rx_fifo_count == std::size(m_mcp_regs.telecom_tx_fifo))
 		return;
 
 	m_mcp_regs.telecom_tx_fifo[m_mcp_regs.telecom_tx_fifo_write_idx] = value;
-	m_mcp_regs.telecom_rx_fifo_write_idx = (m_mcp_regs.telecom_tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo);
+	m_mcp_regs.telecom_rx_fifo_write_idx = (m_mcp_regs.telecom_tx_fifo_write_idx + 1) % std::size(m_mcp_regs.telecom_tx_fifo);
 	m_mcp_regs.telecom_rx_fifo_count++;
 
-	if (m_mcp_regs.telecom_tx_fifo_count == ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo))
+	if (m_mcp_regs.telecom_tx_fifo_count == std::size(m_mcp_regs.telecom_tx_fifo))
 		m_mcp_regs.mcsr &= ~(1 << MCSR_TNF_BIT);
 
 	if (m_mcp_regs.audio_tx_fifo_count >= 4)
@@ -1156,7 +1156,7 @@ TIMER_CALLBACK_MEMBER(sa1110_periphs_device::ssp_tx_callback)
 		const uint16_t data = m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_read_idx];
 		m_ssp_out(data);
 
-		m_ssp_regs.tx_fifo_read_idx = (m_ssp_regs.tx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_read_idx = (m_ssp_regs.tx_fifo_read_idx + 1) % std::size(m_ssp_regs.tx_fifo);
 		m_ssp_regs.tx_fifo_count--;
 
 		m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
@@ -1169,7 +1169,7 @@ void sa1110_periphs_device::ssp_update_enable_state()
 {
 	if (BIT(m_ssp_regs.sscr0, SSCR0_SSE_BIT))
 	{
-		if (m_ssp_regs.tx_fifo_count != ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+		if (m_ssp_regs.tx_fifo_count != std::size(m_ssp_regs.tx_fifo))
 			m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
 		else
 			m_ssp_regs.sssr &= ~(1 << SSSR_TNF_BIT);
@@ -1227,10 +1227,10 @@ void sa1110_periphs_device::ssp_update_rx_level()
 
 void sa1110_periphs_device::ssp_rx_fifo_push(const uint16_t data)
 {
-	if (m_ssp_regs.rx_fifo_count < ARRAY_LENGTH(m_ssp_regs.rx_fifo))
+	if (m_ssp_regs.rx_fifo_count < std::size(m_ssp_regs.rx_fifo))
 	{
 		m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_write_idx] = data;
-		m_ssp_regs.rx_fifo_write_idx = (m_ssp_regs.rx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_write_idx = (m_ssp_regs.rx_fifo_write_idx + 1) % std::size(m_ssp_regs.rx_fifo);
 		m_ssp_regs.rx_fifo_count++;
 
 		m_ssp_regs.sssr |= (1 << SSSR_RNE_BIT);
@@ -1249,13 +1249,13 @@ void sa1110_periphs_device::ssp_update_tx_level()
 
 void sa1110_periphs_device::ssp_tx_fifo_push(const uint16_t data)
 {
-	if (m_ssp_regs.tx_fifo_count < ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+	if (m_ssp_regs.tx_fifo_count < std::size(m_ssp_regs.tx_fifo))
 	{
 		m_ssp_regs.tx_fifo[m_ssp_regs.tx_fifo_write_idx] = data;
-		m_ssp_regs.tx_fifo_write_idx = (m_ssp_regs.tx_fifo_write_idx + 1) % ARRAY_LENGTH(m_ssp_regs.tx_fifo);
+		m_ssp_regs.tx_fifo_write_idx = (m_ssp_regs.tx_fifo_write_idx + 1) % std::size(m_ssp_regs.tx_fifo);
 		m_ssp_regs.tx_fifo_count++;
 
-		if (m_ssp_regs.tx_fifo_count != ARRAY_LENGTH(m_ssp_regs.tx_fifo))
+		if (m_ssp_regs.tx_fifo_count != std::size(m_ssp_regs.tx_fifo))
 			m_ssp_regs.sssr |= (1 << SSSR_TNF_BIT);
 		else
 			m_ssp_regs.sssr &= ~(1 << SSSR_TNF_BIT);
@@ -1274,7 +1274,7 @@ uint16_t sa1110_periphs_device::ssp_rx_fifo_pop()
 	uint16_t data = m_ssp_regs.rx_fifo[m_ssp_regs.rx_fifo_read_idx];
 	if (m_ssp_regs.rx_fifo_count)
 	{
-		m_ssp_regs.rx_fifo_read_idx = (m_ssp_regs.rx_fifo_read_idx + 1) % ARRAY_LENGTH(m_ssp_regs.rx_fifo);
+		m_ssp_regs.rx_fifo_read_idx = (m_ssp_regs.rx_fifo_read_idx + 1) % std::size(m_ssp_regs.rx_fifo);
 		m_ssp_regs.rx_fifo_count--;
 
 		if (m_ssp_regs.rx_fifo_count == 0)
@@ -2464,15 +2464,15 @@ void sa1110_periphs_device::device_reset()
 	m_udc_regs.udcsr = 0;
 
 	// init ICP
-	memset(m_icp_regs.uart.utcr, 0, sizeof(uint32_t) * 4);
+	std::fill_n(&m_icp_regs.uart.utcr[0], 4, 0);
 	m_icp_regs.uart.utsr0 = 0;
 	m_icp_regs.uart.utsr1 = 0;
-	memset(m_icp_regs.uart.rx_fifo, 0, sizeof(uint16_t) * 12);
+	std::fill_n(&m_icp_regs.uart.rx_fifo[0], 12, 0);
 	m_icp_regs.uart.rx_fifo_read_idx = 0;
 	m_icp_regs.uart.rx_fifo_write_idx = 0;
 	m_icp_regs.uart.rx_fifo_count = 0;
 	m_icp_regs.uart_rx_timer->adjust(attotime::never);
-	memset(m_icp_regs.uart.tx_fifo, 0, 8);
+	std::fill_n(&m_icp_regs.uart.tx_fifo[0], 8, 0);
 	m_icp_regs.uart.tx_fifo_read_idx = 0;
 	m_icp_regs.uart.tx_fifo_write_idx = 0;
 	m_icp_regs.uart.tx_fifo_count = 0;
@@ -2484,26 +2484,26 @@ void sa1110_periphs_device::device_reset()
 	m_icp_regs.hssp.hscr1 = 0;
 	m_icp_regs.hssp.hssr0 = 0;
 	m_icp_regs.hssp.hssr1 = 0;
-	memset(m_icp_regs.hssp.rx_fifo, 0, sizeof(uint16_t) * 8);
+	std::fill_n(&m_icp_regs.hssp.rx_fifo[0], 4, 0);
 	m_icp_regs.hssp.rx_fifo_read_idx = 0;
 	m_icp_regs.hssp.rx_fifo_write_idx = 0;
 	m_icp_regs.hssp.rx_fifo_count = 0;
 	m_icp_regs.hssp.rx_timer->adjust(attotime::never);
-	memset(m_icp_regs.hssp.tx_fifo, 0, sizeof(uint16_t) * 8);
+	std::fill_n(&m_icp_regs.hssp.tx_fifo[0], 12, 0);
 	m_icp_regs.hssp.tx_fifo_read_idx = 0;
 	m_icp_regs.hssp.tx_fifo_write_idx = 0;
 	m_icp_regs.hssp.tx_fifo_count = 0;
 	m_icp_regs.hssp.tx_timer->adjust(attotime::never);
 
 	// init UART3
-	memset(m_uart_regs.utcr, 0, sizeof(uint32_t) * 4);
+	std::fill_n(&m_uart_regs.utcr[0], 4, 0);
 	m_uart_regs.utsr0 = 0;
 	m_uart_regs.utsr1 = 0;
-	memset(m_uart_regs.rx_fifo, 0, sizeof(uint16_t) * 12);
+	std::fill_n(&m_uart_regs.rx_fifo[0], 12, 0);
 	m_uart_regs.rx_fifo_read_idx = 0;
 	m_uart_regs.rx_fifo_write_idx = 0;
 	m_uart_regs.rx_fifo_count = 0;
-	memset(m_uart_regs.tx_fifo, 0, 8);
+	std::fill_n(&m_uart_regs.tx_fifo[0], 8, 0);
 	m_uart_regs.tx_fifo_read_idx = 0;
 	m_uart_regs.tx_fifo_write_idx = 0;
 	m_uart_regs.tx_fifo_count = 0;
@@ -2517,20 +2517,20 @@ void sa1110_periphs_device::device_reset()
 	m_mcp_regs.mccr1 = 0;
 	m_mcp_regs.mcdr2 = 0;
 	m_mcp_regs.mcsr = (1 << MCSR_ANF_BIT) | (1 << MCSR_TNF_BIT);
-	memset(m_mcp_regs.audio_rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.audio_rx_fifo));
+	std::fill(std::begin(m_mcp_regs.audio_rx_fifo), std::end(m_mcp_regs.audio_rx_fifo), 0);
 	m_mcp_regs.audio_rx_fifo_read_idx = 0;
 	m_mcp_regs.audio_rx_fifo_write_idx = 0;
 	m_mcp_regs.audio_rx_fifo_count = 0;
-	memset(m_mcp_regs.audio_tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.audio_tx_fifo));
+	std::fill(std::begin(m_mcp_regs.audio_tx_fifo), std::end(m_mcp_regs.audio_tx_fifo), 0);
 	m_mcp_regs.audio_tx_fifo_read_idx = 0;
 	m_mcp_regs.audio_tx_fifo_write_idx = 0;
 	m_mcp_regs.audio_tx_fifo_count = 0;
 	m_mcp_regs.audio_tx_timer->adjust(attotime::never);
-	memset(m_mcp_regs.telecom_rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.telecom_rx_fifo));
+	std::fill(std::begin(m_mcp_regs.telecom_rx_fifo), std::end(m_mcp_regs.telecom_rx_fifo), 0);
 	m_mcp_regs.telecom_rx_fifo_read_idx = 0;
 	m_mcp_regs.telecom_rx_fifo_write_idx = 0;
 	m_mcp_regs.telecom_rx_fifo_count = 0;
-	memset(m_mcp_regs.telecom_tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_mcp_regs.telecom_tx_fifo));
+	std::fill(std::begin(m_mcp_regs.telecom_tx_fifo), std::end(m_mcp_regs.telecom_tx_fifo), 0);
 	m_mcp_regs.telecom_tx_fifo_read_idx = 0;
 	m_mcp_regs.telecom_tx_fifo_write_idx = 0;
 	m_mcp_regs.telecom_tx_fifo_count = 0;
@@ -2540,19 +2540,19 @@ void sa1110_periphs_device::device_reset()
 	m_ssp_regs.sscr0 = 0;
 	m_ssp_regs.sscr1 = 0;
 	m_ssp_regs.sssr = (1 << SSSR_TNF_BIT);
-	memset(m_ssp_regs.rx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.rx_fifo));
+	std::fill(std::begin(m_ssp_regs.rx_fifo), std::end(m_ssp_regs.rx_fifo), 0);
 	m_ssp_regs.rx_fifo_read_idx = 0;
 	m_ssp_regs.rx_fifo_write_idx = 0;
 	m_ssp_regs.rx_fifo_count = 0;
 	m_ssp_regs.rx_timer->adjust(attotime::never);
-	memset(m_ssp_regs.tx_fifo, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_ssp_regs.tx_fifo));
+	std::fill(std::begin(m_ssp_regs.tx_fifo), std::end(m_ssp_regs.tx_fifo), 0);
 	m_ssp_regs.tx_fifo_read_idx = 0;
 	m_ssp_regs.tx_fifo_write_idx = 0;
 	m_ssp_regs.tx_fifo_count = 0;
 	m_ssp_regs.tx_timer->adjust(attotime::never);
 
 	// init OS timers
-	memset(m_ostmr_regs.osmr, 0, sizeof(uint32_t) * 4);
+	std::fill_n(&m_ostmr_regs.osmr[0], 4, 0);
 	m_ostmr_regs.ower = 0;
 	m_ostmr_regs.ossr = 0;
 	m_ostmr_regs.oier = 0;
@@ -2570,7 +2570,13 @@ void sa1110_periphs_device::device_reset()
 	m_rtc_regs.tick_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	// init power regs
-	memset(&m_power_regs, 0, sizeof(m_power_regs));
+	m_power_regs.pmcr = 0;
+	m_power_regs.pssr = 0;
+	m_power_regs.pspr = 0;
+	m_power_regs.pwer = 0;
+	m_power_regs.pcfr = 0;
+	m_power_regs.ppcr = 0;
+	m_power_regs.pgsr = 0;
 	m_power_regs.posr = 1; // flag oscillator OK
 
 	// init PPC regs
@@ -2581,17 +2587,34 @@ void sa1110_periphs_device::device_reset()
 	m_ppc_regs.ppfr = 0x0007f001;
 
 	// init DMA regs
-	for (int channel = 0; channel < 6; channel++)
+	for (dma_regs &regs : m_dma_regs)
 	{
-		m_dma_regs[channel].ddar = 0;
-		m_dma_regs[channel].dsr = 0;
-		memset(m_dma_regs[channel].dbs, 0, sizeof(uint32_t) * 2);
-		memset(m_dma_regs[channel].dbt, 0, sizeof(uint32_t) * 2);
+		regs.ddar = 0;
+		regs.dsr = 0;
+		std::fill_n(&regs.dbs[0], 2, 0);
+		std::fill_n(&regs.dbt[0], 2, 0);
 	}
-	// bulk-init other registers
+
 	m_rcsr = 0x00000001; // indicate hardware reset
-	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
-	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
+
+	m_gpio_regs.gplr = 0;
+	m_gpio_regs.gpdr = 0;
+	m_gpio_regs.grer = 0;
+	m_gpio_regs.gfer = 0;
+	m_gpio_regs.gedr = 0;
+	m_gpio_regs.gafr = 0;
+	m_gpio_regs.any_edge_mask = 0;
+	m_gpio_regs.output_latch = 0;
+	m_gpio_regs.input_latch = 0;
+	m_gpio_regs.alt_output_latch = 0;
+	m_gpio_regs.alt_input_latch = 0;
+
+	m_intc_regs.icip = 0;
+	m_intc_regs.icmr = 0;
+	m_intc_regs.iclr = 0;
+	m_intc_regs.iccr = 0;
+	m_intc_regs.icfp = 0;
+	m_intc_regs.icpr = 0;
 
 	uart_check_rx_fifo_service();
 	uart_check_tx_fifo_service();

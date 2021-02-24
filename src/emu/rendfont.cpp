@@ -478,7 +478,7 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 	static glyph dummy_glyph;
 
 	unsigned const page(chnum / 256);
-	if (page >= ARRAY_LENGTH(m_glyphs))
+	if (page >= std::size(m_glyphs))
 	{
 		if ((0 <= m_defchar) && (chnum != m_defchar))
 			return get_char(m_defchar);
@@ -1292,7 +1292,7 @@ bool render_font::load_bdf()
 			{
 				LOG("render_font::load_bdf: ignoring character with negative x advance\n");
 			}
-			else if ((256 * ARRAY_LENGTH(m_glyphs)) <= encoding)
+			else if ((256 * std::size(m_glyphs)) <= encoding)
 			{
 				LOG("render_font::load_bdf: ignoring character with encoding outside range\n");
 			}
@@ -1505,7 +1505,7 @@ bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 
 		// loop over all characters
 		bdc_table_entry table_entry(chartable.empty() ? nullptr : &chartable[0]);
-		for (unsigned chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
+		for (unsigned chnum = 0; chnum < (256 * std::size(m_glyphs)); chnum++)
 		{
 			if (m_glyphs[chnum / 256] && (0 < m_glyphs[chnum / 256][chnum % 256].width))
 			{

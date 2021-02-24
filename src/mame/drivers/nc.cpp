@@ -297,8 +297,8 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 	int mem_bank;
 	char bank1[20];
 	char bank5[20];
-	snprintf(bank1,ARRAY_LENGTH(bank1),"bank%d",bank+1);
-	snprintf(bank5,ARRAY_LENGTH(bank5),"bank%d",bank+5);
+	snprintf(bank1,std::size(bank1),"bank%d",bank+1);
+	snprintf(bank5,std::size(bank5),"bank%d",bank+5);
 
 	mem_type = (m_memory_config[bank]>>6) & 0x03;
 	mem_bank = m_memory_config[bank] & 0x03f;
