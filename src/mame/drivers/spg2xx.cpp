@@ -1075,8 +1075,8 @@ static INPUT_PORTS_START( doraphone )
 	PORT_CONFSETTING(      0x0060, "Play on TV" )
 
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Lift Handset") // this could be done as a toggle, although note, handset being down is treated like a button being held
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED ) // this setting is US NTSC, ACTIVE_LOW gives US PAL (invalid?) no way to switch to non-US?
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // must be 0x0200 or resets over and over
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) // this setting is US NTSC, ACTIVE_LOW gives US PAL (invalid?) no way to switch to non-US?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // must be 0x0200 or resets over and over
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1109,9 +1109,9 @@ static INPUT_PORTS_START( doraphone )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 'Help'") PORT_CODE(KEYCODE_MINUS_PAD)
 
 	PORT_START("P1_F4")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // must be 0 to access test mode with UP+ENTER on boot (uncertain what real hardware state is)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) // must be 0 to access test mode with UP+ENTER on boot (uncertain what real hardware state is)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) // ^^
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) // ^^
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_EE")
@@ -1134,7 +1134,7 @@ static INPUT_PORTS_START( doraphone )
 
 	PORT_START("P2")
 	PORT_BIT( 0xff7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // battery state
 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
