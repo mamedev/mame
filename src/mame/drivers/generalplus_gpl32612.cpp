@@ -172,7 +172,7 @@ void generalplus_gpl32612_game_state::bootstrap()
 
 void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // unknown core / frequency, but ARM based
+	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl32612_game_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -212,7 +212,7 @@ void generalplus_zippity_game_state::zippity(machine_config &config)
 {
 	// don't inherit from gpl32612 as in reality this is GPL32300A and could differ
 
-	ARM9(config, m_maincpu, 240000000); // unknown core / frequency, but ARM based
+	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_zippity_game_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
