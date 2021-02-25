@@ -1128,63 +1128,6 @@ void mac_state::machine_reset()
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 	}
 
-	// we use the CPU clock divided by the VIA clock (783360 Hz) rounded up as
-	// an approximation for the right number of wait states.  this yields good
-	// results - it's towards the end of the worst-case delay on h/w.
-	switch (m_maincpu->clock())
-	{
-		case 7833600:   // C7M on classic Macs
-			m_via_cycles = -10;
-			break;
-
-		case 7833600*2: // "16 MHz" Macs
-			m_via_cycles = -32;
-			break;
-
-		case 20000000:  // 20 MHz Macs
-			m_via_cycles = -40;
-			break;
-
-		case 25000000:  // 25 MHz Macs
-			m_via_cycles = -50;
-			break;
-
-		case 7833600*4: // 32 MHz Macs (these are C7M * 4 like IIvx)
-			m_via_cycles = -62;
-			break;
-
-		case 33000000:  // 33 MHz Macs ('040s)
-			m_via_cycles = -64;
-			break;
-
-		case 40000000:  // 40 MHz Macs
-			m_via_cycles = -80;
-			break;
-
-		case 60000000:  // 60 MHz PowerMac
-			m_via_cycles = -120;
-			break;
-
-		case 66000000:  // 66 MHz PowerMac
-			m_via_cycles = -128;
-			break;
-
-		default:
-			fatalerror("mac: unknown clock\n");
-	}
-
-	// Egret currently needs a larger VIA slowdown
-	if (ADB_IS_EGRET)
-	{
-		m_via_cycles *= 2;
-	}
-
-	// And a little more for Cuda.
-	if (ADB_IS_CUDA)
-	{
-		m_via_cycles *= 3;
-	}
-
 	// default to 32-bit mode on LC
 	if (m_model == MODEL_MAC_LC)
 	{

@@ -33,7 +33,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define NEW_SWIM 0
+#define NEW_SWIM 1
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -377,9 +377,6 @@ private:
 	void pwrmac_map(address_map &map);
 
 	inline bool has_adb() { return m_model >= MODEL_MAC_SE; }
-
-	// wait states for accessing the VIA
-	int m_via_cycles;
 
 	uint8_t m_oss_regs[0x400];
 
