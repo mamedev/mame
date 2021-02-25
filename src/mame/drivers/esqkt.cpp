@@ -116,8 +116,6 @@ public:
 		, m_duart(*this, "duart")
 		, m_sq1panel(*this, "sq1panel")
 		, m_mdout(*this, "mdout")
-		, m_rom(*this, "osrom")
-		, m_ram(*this, "osram")
 	{ }
 
 	void kt(machine_config &config);
@@ -134,14 +132,13 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
-	required_region_ptr<u16> m_rom;
-	required_shared_ptr<u16> m_ram;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	void duart_output(u8 data);
 
+	u16 *m_rom, *m_ram;
 	u8 m_duart_io;
 	bool  m_bCalibSecondByte; // only set to false on machine_reset()?
 
@@ -154,6 +151,8 @@ private:
 
 void esqkt_state::machine_start()
 {
+	m_rom = (u16 *)(void *)memregion("osrom")->base();
+	m_ram = (u16 *)(void *)memshare("osram")->ptr();
 	m_duart_io = 0;
 
 	save_item(NAME(m_duart_io));
