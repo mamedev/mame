@@ -33,7 +33,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define NEW_SWIM 1
+#define NEW_SWIM 0
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -119,6 +119,7 @@ public:
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
 		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
+	void maciihd(machine_config &config);
 
 	void init_maclc2();
 	void init_maciifdhd();

@@ -757,8 +757,16 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
-	applefdintf_device::add_35(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
+	if (woz_version == 0)
+	{
+		applefdintf_device::add_35(config, m_floppy[0]);
+		applefdintf_device::add_35_nc(config, m_floppy[1]);
+	}
+	else
+	{
+		applefdintf_device::add_35_hd(config, m_floppy[0]);
+		applefdintf_device::add_35_nc(config, m_floppy[1]);
+	}
 #else
 	if (woz_version)
 		LEGACY_SWIM(config, m_fdc, &mac_iwm_interface);
@@ -920,6 +928,21 @@ void mac_state::maciihmu(machine_config &config)
 	M68020HMMU(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+}
+
+void mac_state::maciihd(machine_config &config)
+{
+	macii(config, true);
+
+#if NEW_SWIM
+	SWIM1(config.replace(), m_fdc, C15M);
+	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
+	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
+#endif
 }
 
 void mac_state::maciifx(machine_config &config)
@@ -1384,7 +1407,7 @@ ROM_END
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
 COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_NOT_WORKING )
 COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_NOT_WORKING )
-COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
+COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
 COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_NOT_WORKING )
 COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_NOT_WORKING )
 COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_NOT_WORKING )
