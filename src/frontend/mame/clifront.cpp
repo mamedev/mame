@@ -819,7 +819,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-16s %-16s %-10s ", first ? drivlist.driver().name : "", imagedev.instance_name().c_str(), paren_shortname.c_str());
+			printf("%-16s %-16s %-10s ", drivlist.driver().name, imagedev.instance_name().c_str(), paren_shortname.c_str());
 
 			// get the extensions and print them
 			std::string extensions(imagedev.file_extensions());

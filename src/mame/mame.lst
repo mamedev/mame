@@ -34490,6 +34490,9 @@ photoply2ksp                    // (c) 2000 Funworld
 photoply2k1it                   // (c) 2001 Funworld
 photoply2k4                     // (c) 2004 Funworld
 
+@source:photoplys.cpp
+photoply2k1sp                   // (c) 2001 Funworld
+
 @source:photoplysx.cpp
 photopsxsp                      // (c) 2004 Funworld
 photopsxusp                     // (c) 200? Funworld
@@ -34622,6 +34625,9 @@ theraid                         //
 theraida                        // (c) 1984 Playmatic / EFOSA
 trailer                         //
 ufo_x                           //
+
+@source:playcenter.cpp
+plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
 
 @source:playch10.cpp
 pc_1942                         // (c) 1985 Capcom
@@ -37909,6 +37915,13 @@ ucytokyu                        // b9809 (c) 1997 Sigma
 @source:silkroad.cpp
 silkroad                        // (c) 1999
 silkroada                       // (c) 1999
+
+@source:silverball.cpp
+slvrball806                     // (c) 1997? TAB Austria
+slvrball720                     // (c) 1997? TAB Austria
+slvrball632                     // (c) 1997? TAB Austria
+slvrballbu409                   // (c) 199?  TAB Austria
+slvrballbu409b                  // (c) 199?  TAB Austria
 
 @source:silvmil.cpp
 puzzlove                        // (c) 1994 Para

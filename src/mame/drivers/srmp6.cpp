@@ -73,7 +73,7 @@ Dumped 06/15/2000
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
-#include "sound/nile.h"
+#include "sound/setapcm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -568,8 +568,8 @@ void srmp6_state::srmp6_map(address_map &map)
 
 	map(0x4c0000, 0x4c006f).rw(FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share(m_video_regs);    // ? gfx regs ST-0026 NiLe
 	map(0x4d0000, 0x4d0001).r(FUNC(srmp6_state::irq_ack_r));
-	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
-	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
+	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_sound_device::snd_r), FUNC(nile_sound_device::snd_w));
+	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_sound_device::key_r), FUNC(nile_sound_device::key_w));
 	//map(0x4e0110, 0x4e0111).noprw(); // ? accessed once ($268dc, written $b.w)
 
 	// CHR RAM: checked [$500000-$5fffff]
@@ -704,7 +704,8 @@ void srmp6_state::srmp6(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	nile_device &nile(NILE(config, "nile", 0));
+	// matches video, needs to verified; playback rate: (42.9545Mhz / 7) / 160 or (42.9545Mhz / 5) / 224 or (42.9545Mhz / 4) / 280?
+	nile_sound_device &nile(NILE_SOUND(config, "nile", XTAL(42'954'545) / 7));
 	nile.add_route(0, "lspeaker", 1.0);
 	nile.add_route(1, "rspeaker", 1.0);
 }

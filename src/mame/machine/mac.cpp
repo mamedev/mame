@@ -624,6 +624,9 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
  * *************************************************************************/
 uint16_t mac_state::mac_scc_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	uint16_t result;
 
 	result = m_scc->reg_r(offset);
@@ -632,11 +635,13 @@ uint16_t mac_state::mac_scc_r(offs_t offset)
 
 void mac_state::mac_scc_w(offs_t offset, uint16_t data)
 {
+	mac_via_sync();
 	m_scc->reg_w(offset, data);
 }
 
 void mac_state::mac_scc_2_w(offs_t offset, uint16_t data)
 {
+	mac_via_sync();
 	m_scc->reg_w(offset, data >> 8);
 }
 
@@ -925,8 +930,34 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
+void mac_state::mac_via_sync()
+{
+	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
+	// more, so we need to sync the access with the via clock.  Plus
+	// the whole access takes half a (via) cycle and ends when synced
+	// with the main cpu again.
+
+	// Get the main cpu time
+	u64 cycle = m_maincpu->total_cycles();
+
+	// Get the number of the cycle the via is in at that time
+	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+
+	// The access is going to start at via_cycle+1 and end at
+	// via_cycle+1.5, compute what that means in maincpu cycles (the
+	// +1 rounds up, since the clocks are too different to ever be
+	// synced).
+	u64 main_cycle = (via_cycle*2+3) * m_maincpu->clock() / (2*m_via1->clock()) + 1;
+
+	// Finally adjust the main cpu icount as needed.
+	m_maincpu->adjust_icount(-int(main_cycle - cycle));
+}
+
 uint16_t mac_state::mac_via_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	uint16_t data;
 
 	offset >>= 8;
@@ -936,14 +967,13 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
 	data = m_via1->read(offset);
 
-	if (!machine().side_effects_disabled())
-		m_maincpu->adjust_icount(m_via_cycles);
-
 	return (data & 0xff) | (data << 8);
 }
 
 void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	mac_via_sync();
+
 	offset >>= 8;
 	offset &= 0x0f;
 
@@ -954,8 +984,6 @@ void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(offset, (data >> 8) & 0xff);
-
-	m_maincpu->adjust_icount(m_via_cycles);
 }
 
 /* *************************************************************************
@@ -1098,63 +1126,6 @@ void mac_state::machine_reset()
 	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
 	{
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
-	}
-
-	// we use the CPU clock divided by the VIA clock (783360 Hz) rounded up as
-	// an approximation for the right number of wait states.  this yields good
-	// results - it's towards the end of the worst-case delay on h/w.
-	switch (m_maincpu->clock())
-	{
-		case 7833600:   // C7M on classic Macs
-			m_via_cycles = -10;
-			break;
-
-		case 7833600*2: // "16 MHz" Macs
-			m_via_cycles = -32;
-			break;
-
-		case 20000000:  // 20 MHz Macs
-			m_via_cycles = -40;
-			break;
-
-		case 25000000:  // 25 MHz Macs
-			m_via_cycles = -50;
-			break;
-
-		case 7833600*4: // 32 MHz Macs (these are C7M * 4 like IIvx)
-			m_via_cycles = -62;
-			break;
-
-		case 33000000:  // 33 MHz Macs ('040s)
-			m_via_cycles = -64;
-			break;
-
-		case 40000000:  // 40 MHz Macs
-			m_via_cycles = -80;
-			break;
-
-		case 60000000:  // 60 MHz PowerMac
-			m_via_cycles = -120;
-			break;
-
-		case 66000000:  // 66 MHz PowerMac
-			m_via_cycles = -128;
-			break;
-
-		default:
-			fatalerror("mac: unknown clock\n");
-	}
-
-	// Egret currently needs a larger VIA slowdown
-	if (ADB_IS_EGRET)
-	{
-		m_via_cycles *= 2;
-	}
-
-	// And a little more for Cuda.
-	if (ADB_IS_CUDA)
-	{
-		m_via_cycles *= 3;
 	}
 
 	// default to 32-bit mode on LC

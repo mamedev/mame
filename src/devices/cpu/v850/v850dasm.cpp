@@ -345,7 +345,7 @@ offs_t v850es_disassembler::dasm_000011(std::ostream &stream, u16 opcode, offs_t
 		return 2 | SUPPORTED;
 	}
 	else
-		return v850_disassembler::dasm_000011(stream, opcode, pc, opcodes);	
+		return v850_disassembler::dasm_000011(stream, opcode, pc, opcodes);
 }
 
 offs_t v850_disassembler::dasm_0001(std::ostream &stream, u16 opcode, offs_t pc, const v850_disassembler::data_buffer &opcodes)

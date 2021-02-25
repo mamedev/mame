@@ -967,7 +967,7 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack)
 		return false;
 	if(data.size() == 1 && (data[0] & MG_MASK) == MG_N)
 		return false;
-	return true;	
+	return true;
 }
 
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)

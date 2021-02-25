@@ -9025,6 +9025,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cyrus3dsw">
+		<description>Cyrus 3-D Chess (shareware, Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>Titanium Seal</publisher>
+		<info name="developer" value="Intelligent Chess Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Cyrus 3D Chess (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6fc30a26" sha1="6a0eb93fc40fac5d5b65212fb85e0e415cf728c4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dgenerat">
 		<description>D/Generation</description>
 		<year>1991</year>
@@ -9979,7 +9991,7 @@ has been replaced with an all-zero block. -->
 				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 5 of 5].img" size="737280" crc="84e8dff3" sha1="3bfb15045dea49b4e7074ab4b08e1533430daa03"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="harpoon">
 		<description>Harpoon</description>
@@ -11248,6 +11260,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="manhunt2_35_3.img" size="737280" crc="37ff2d02" sha1="10bba12e2a353787b2f4468d2197786afe8e9f7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmansion">
+		<description>Maniac Mansion</description>
+		<year>1989</year>
+		<publisher>LucasFilm</publisher>
+		<info name="developer" value="LucasFilm" />
+		<info name="version" value="Enhanced version" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Maniac Mansion [LucasFilm] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="e5355b2b" sha1="6cd16056c12de5755b18a591c896a9f8b26a3c97"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Maniac Mansion [LucasFilm] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="6db940fc" sha1="f25b841d8628d42501c93ddcadafa72a7d452c0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13780,6 +13810,28 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="tntkhazan">
+		<description>Tunnels &amp; Trolls: Crusaders of Khazan</description>
+		<year>1990</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="StarCraft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Tunnels and Trolls - Crusaders of Khazan [New World Computing] [1990] [3.5DD] [Disk 1 of 3] [disks 1-2].img" size="737280" crc="409eb50d" sha1="09fc911aa66ca15b0f11b42ef663d0535c23f698"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Tunnels and Trolls - Crusaders of Khazan [New World Computing] [1990] [3.5DD] [Disk 2 of 3] [disks 3-4].img" size="737280" crc="168ea4bf" sha1="56746dd5b47858bcaa17110c3d3dc0fa00abda5c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Tunnels and Trolls - Crusaders of Khazan [New World Computing] [1990] [3.5DD] [Disk 3 of 3] [disks 5-6].img" size="737280" crc="5ca8aadc" sha1="1b8149e2be72f75cbf8e9837451078185ae00d8b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turbdriv" supported="no">
 		<!-- Dumped from a copied disk -->
 		<description>Turbo Driver</description>
@@ -13870,6 +13922,44 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="unnkulia.img" size="737280" crc="b5332f4b" sha1="052d7068981bfef95fb6b6bd1d35e6f3e3c22e61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valhalla">
+		<description>Valhalla - Ragnarok</description>
+		<year>1992</year>
+		<publisher>Optyk</publisher>
+		<info name="developer" value="Norsehelm Production" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ragnarok [Optyk] [1992] [3.5DD] [Disk 1 of 4].img" size="737280" crc="22beacc2" sha1="f9c0c9d34b899eef61cb76f1f0d541060ca1c02c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ragnarok [Optyk] [1992] [3.5DD] [Disk 2 of 4].img" size="737280" crc="ded396f8" sha1="ce1b50d9e35247953226e080ef9c142f8d20fbfb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ragnarok [Optyk] [1992] [3.5DD] [Disk 3 of 4].img" size="737280" crc="d70c978e" sha1="c07ff63cbc3fe3ca0eeae925e03f670a7b2aab55"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Ragnarok [Optyk] [1992] [3.5DD] [Disk 4 of 4].img" size="737280" crc="3a2b0fe1" sha1="d481cdb0fb607edca79f023a72637c98646a65a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vgaslot">
+		<description>VGA Slot Machine (Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>Titanium Seal</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="VGA Slot Machine [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a55c4c1f" sha1="5a54ca9da5e565afbc920261d6b785e13aba37c2"/>
 			</dataarea>
 		</part>
 	</software>

@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER(mspactwin_state::flipscreen_w)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
-//	logerror("Flip: %02x\n", state);
+//  logerror("Flip: %02x\n", state);
 }
 
 

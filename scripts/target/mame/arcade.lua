@@ -239,7 +239,7 @@ SOUNDS["CDDA"] = true
 SOUNDS["ICS2115"] = true
 SOUNDS["I5000_SND"] = true
 SOUNDS["ST0016"] = true
-SOUNDS["NILE"] = true
+SOUNDS["SETAPCM"] = true
 SOUNDS["X1_010"] = true
 SOUNDS["VRENDER0"] = true
 SOUNDS["VOTRAX"] = true
@@ -2003,6 +2003,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/funworld.cpp",
 	MAME_DIR .. "src/mame/includes/funworld.h",
 	MAME_DIR .. "src/mame/video/funworld.cpp",
+	MAME_DIR .. "src/mame/drivers/photoply.cpp",
+	MAME_DIR .. "src/mame/drivers/photoplys.cpp",
+	MAME_DIR .. "src/mame/drivers/photoplysx.cpp",
 	MAME_DIR .. "src/mame/drivers/snookr10.cpp",
 	MAME_DIR .. "src/mame/includes/snookr10.h",
 	MAME_DIR .. "src/mame/video/snookr10.cpp",
@@ -3819,7 +3822,6 @@ files {
 	MAME_DIR .. "src/mame/machine/st0016.cpp",
 	MAME_DIR .. "src/mame/machine/st0016.h",
 	MAME_DIR .. "src/mame/drivers/simple_st0016.cpp",
-	MAME_DIR .. "src/mame/includes/simple_st0016.h",
 	MAME_DIR .. "src/mame/video/seta001.cpp",
 	MAME_DIR .. "src/mame/video/seta001.h",
 	MAME_DIR .. "src/mame/video/x1_012.cpp",
@@ -5038,10 +5040,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/piggypas.cpp",
 	MAME_DIR .. "src/mame/video/pk8000.cpp",
 	MAME_DIR .. "src/mame/drivers/photon2.cpp",
-	MAME_DIR .. "src/mame/drivers/photoply.cpp",
-	MAME_DIR .. "src/mame/drivers/photoplysx.cpp",
 	MAME_DIR .. "src/mame/drivers/pipeline.cpp",
 	MAME_DIR .. "src/mame/drivers/pkscram.cpp",
+	MAME_DIR .. "src/mame/drivers/playcenter.cpp",
 	MAME_DIR .. "src/mame/drivers/pntnpuzl.cpp",
 	MAME_DIR .. "src/mame/drivers/policetr.cpp",
 	MAME_DIR .. "src/mame/includes/policetr.h",
@@ -5076,6 +5077,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/shangkid.cpp",
 	MAME_DIR .. "src/mame/includes/shangkid.h",
 	MAME_DIR .. "src/mame/video/shangkid.cpp",
+	MAME_DIR .. "src/mame/drivers/silverball.cpp",
 	MAME_DIR .. "src/mame/drivers/skeetsht.cpp",
 	MAME_DIR .. "src/mame/drivers/skimaxx.cpp",
 	MAME_DIR .. "src/mame/drivers/skopro.cpp",

@@ -4783,9 +4783,9 @@ ROM_END
 
 
 /*****************************************************************************
-  
-  Ms PacMan Twin (SUSILU) 
-  ----------------------- 
+
+  Ms PacMan Twin (SUSILU)
+  -----------------------
 
   Argentine official hack of Ms. PacMan that allows 2 players simultaneously.
   Very rare PCB. Was avoiding us for more of 22 years...
@@ -4793,12 +4793,12 @@ ROM_END
   (normal in mspacman boards) plugged in the Z80 socket.
 
 
-  Here the specs: 
+  Here the specs:
 
-  Mini daughterboard 3" x 5.5" aprox. 
+  Mini daughterboard 3" x 5.5" aprox.
 
   In the upper-left corner is vertically printed "SUSILU" and "NMPT008",
-  and across: "MOD REG 294535" and "INDUSTRIA ARGENTINA". 
+  and across: "MOD REG 294535" and "INDUSTRIA ARGENTINA".
 
   .----------------------------.
   |      .----------.          |
@@ -4830,7 +4830,7 @@ ROM_END
   |        '--------------'    |
   '----------------------------'
 
-  Viewing from the top you can find: U5 U3 U1 U2 U4 
+  Viewing from the top you can find: U5 U3 U1 U2 U4
 
   U5: 74LS245N (Octal Bus Tranceivers with 3-state outputs, DIP20),
       with a decoupling cap soldered from leg 10 to leg 20.
@@ -4838,7 +4838,7 @@ ROM_END
   U3: Unknown 40 pins IC, scratched to avoid recognition. Could be either
       a big PLD/CPLD/EPLD, or a kind of protection device.
 
-  U1: 40 pins male connector, to plug the kit into Z80's mainboard socket. 
+  U1: 40 pins male connector, to plug the kit into Z80's mainboard socket.
 
   U2: NEC D780C (Z80).
 
@@ -4879,7 +4879,7 @@ ROM_END
   NEC D780C (Z80) @ U2:
 
                                    NEC D780C (Z80)
-                              .-----------v-----------.  
+                              .-----------v-----------.
     connector pin 01 (A11) ---|01 (A11)       (A10) 40|--- connector pin 40 (A10)
     connector pin 02 (A12) ---|02 (A12)       (A09) 39|--- connector pin 39 (A09)
     connector pin 03 (A13) ---|03 (A13)       (A08) 38|--- connector pin 38 (A08)
@@ -4911,7 +4911,7 @@ ROM_END
 
 
                               unknown DIL40
-                              .-----v-----.  
+                              .-----v-----.
                          GND -|01   ?   40|- VCC
   connector/Z80 pin 21 (/RD) -|02       39|- GND
         74LS245 pin 19 (/OE) -|03-.     38|- GND
@@ -4920,7 +4920,7 @@ ROM_END
         74LS245 pin 19 (/OE) -|06-'     35|- GND
                          N/C -|07       34|- M27256 pin 20 (/CE)
   connector/Z80 pin 03 (A13) -|08       33|- connector/Z80 pin 30 (A0)
-         74LS245 pin 02 (D4) -|09       32|- Z80 pin 07 (D4) 
+         74LS245 pin 02 (D4) -|09       32|- Z80 pin 07 (D4)
          74LS245 pin 03 (D3) -|10       31|- Z80 pin 08 (D3)
          74LS245 pin 04 (D5) -|11       30|- Z80 pin 09 (D5)
          74LS245 pin 05 (D6) -|12       29|- Z80 pin 10 (D6)
@@ -4930,7 +4930,7 @@ ROM_END
          74LS245 pin 09 (D1) -|16       25|- Z80 pin 15 (D1)
   connector/Z80 pin 04 (A14) -|17       24|- GND
   connector/Z80 pin 05 (A15) -|18       23|- GND
-                         GND -|19       22|- GND 
+                         GND -|19       22|- GND
                          GND -|20       21|- GND
                               '-----------'
 
@@ -4938,7 +4938,7 @@ ROM_END
   M27256 @ U4:
 
                                    M27256
-                              .-------v-------.  
+                              .-------v-------.
                          VCC -|01 VPP   VCC 28|- VCC
   connector/Z80 pin 02 (A12) -|02 A12   A14 27|- connector/Z80 pin 05 (A15) & unknown DIP40 pin 18
   connector/Z80 pin 37 (A07) -|03 A07   A13 26|- connector/Z80 pin 03 (A13)
@@ -4946,22 +4946,22 @@ ROM_END
   connector/Z80 pin 35 (A05) -|05 A05   A09 24|- connector/Z80 pin 39 (A09)
   connector/Z80 pin 34 (A04) -|06 A04   A11 23|- connector/Z80 pin 01 (A11)
   connector/Z80 pin 33 (A03) -|07 A03   /OE 22|- connector/Z80 pin 21 (/RD) & unknown DIP40 pin 02
-  connector/Z80 pin 32 (A02) -|08 A02   A10 21|- connector/Z80 pin 40 (A10) 
+  connector/Z80 pin 32 (A02) -|08 A02   A10 21|- connector/Z80 pin 40 (A10)
   connector/Z80 pin 31 (A01) -|09 A01   /CE 20|- unknown DIP40 pin 34
   connector/Z80 pin 30 (A00) -|10 A00    O7 19|- 74LS245 pin 07 (D7)
          74LS245 pin 08 (D0) -|11 O0     O6 18|- 74LS245 pin 05 (D6)
          74LS245 pin 09 (D1) -|12 O1     O5 17|- 74LS245 pin 04 (D5)
          74LS245 pin 06 (D2) -|13 O2     O4 16|- 74LS245 pin 02 (D4)
-                         GND -|14 GND    O3 15|- 74LS245 pin 03 (D3) 
+                         GND -|14 GND    O3 15|- 74LS245 pin 03 (D3)
                               '---------------'
 
 
   74LS245N @ U5:
 
                               74LS245
-                         .-------v-------.  
+                         .-------v-------.
                     GND -|01 DIR   VCC 20|- VCC
-  connector pin 07 (D4) -|02 A1    /OE 19|- unknown DIP40 pins 03 & 06  
+  connector pin 07 (D4) -|02 A1    /OE 19|- unknown DIP40 pins 03 & 06
   connector pin 08 (D3) -|03 A2     B1 18|- Z80 pin 07 (D4)
   connector pin 09 (D5) -|04 A3     B2 17|- Z80 pin 08 (D3)
   connector pin 10 (D6) -|05 A4     B3 16|- Z80 pin 09 (D5)

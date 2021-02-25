@@ -96,6 +96,9 @@ public:
 	void t1000hx(machine_config &config);
 	void t1000tx(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 
@@ -124,8 +127,6 @@ private:
 	int tandy1000_read_eeprom();
 	void tandy1000_write_eeprom(uint8_t data);
 	void tandy1000_set_bios_bank();
-
-	void machine_start() override;
 
 	DECLARE_MACHINE_RESET(tandy1000rl);
 
@@ -437,6 +438,8 @@ void tandy1000_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+
+	m_eeprom_state = 0;
 }
 
 uint8_t tandy1000_state::tandy1000_bank_r(offs_t offset)

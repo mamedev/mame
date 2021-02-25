@@ -65,13 +65,13 @@ private:
 	struct slapstic_data {
 		u8 bankstart;
 		u16 bank[4];
-		
+
 		mask_value alt1;
 		mask_value alt2;
 		mask_value alt3;
 		mask_value alt4;
 		int altshift;
-		
+
 		mask_value bit1;
 		mask_value bit2;
 		mask_value bit3c0;
@@ -79,7 +79,7 @@ private:
 		mask_value bit3c1;
 		mask_value bit3s1;
 		mask_value bit4;
-		
+
 		mask_value add1;
 		mask_value add2;
 		mask_value addplus1;
@@ -270,7 +270,7 @@ private:
 	std::unique_ptr<state> m_s_alt_valid;
 	std::unique_ptr<state> m_s_alt_select;
 	std::unique_ptr<state> m_s_alt_commit;
-	
+
 	std::unique_ptr<state> m_s_bit_load;
 	std::unique_ptr<state> m_s_bit_set_odd;
 	std::unique_ptr<state> m_s_bit_set_even;

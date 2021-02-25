@@ -2,8 +2,8 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    esqkt.c - Ensoniq KT-76, KT-88, and E-Prime
-              Ensoniq TS-10 and TS-12
+    esqkt.cpp - Ensoniq KT-76, KT-88, and E-Prime
+                Ensoniq TS-10 and TS-12
 
     Driver by R. Belmont
 
@@ -134,8 +134,8 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
-	required_region_ptr<uint16_t> m_rom;
-	required_shared_ptr<uint16_t> m_ram;
+	required_region_ptr<u16> m_rom;
+	required_shared_ptr<u16> m_ram;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);

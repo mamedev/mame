@@ -2087,6 +2087,7 @@ void validity_checker::validate_devices(machine_config &config)
 				{
 					m_current_device = &card_dev;
 					card_dev.findit(this);
+					validate_tag(card_dev.basetag());
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}

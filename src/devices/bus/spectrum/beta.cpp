@@ -410,8 +410,8 @@ spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, 
 
 spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
-	, m_ppi(*this, "PPI")
-	, m_acia(*this, "ACIA")
+	, m_ppi(*this, "ppi")
+	, m_acia(*this, "acia")
 	, m_centronics(*this, "centronics")
 	, m_centronics_busy(0)
 {

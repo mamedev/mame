@@ -1010,39 +1010,39 @@ void firebeat_spu_state::rf5c400_map(address_map& map)
 
     IRQ2: Executes one command stored in a different buffer from IRQ1.
           The buffer can contain up to 8 commands.
-	      The command index counter increments after each IRQ2 call.
-		  If there is no command in the slot at the current counter then it just increments without executing a command.
+          The command index counter increments after each IRQ2 call.
+          If there is no command in the slot at the current counter then it just increments without executing a command.
 
-		  Timing matters. In particular if the speed of the IRQ 2 calls is too fast then the volume and frequency animations will be wrong.
-		  The most common issue with bad timing is keysounds will be cut off.
-		  pop'n music Animelo 2 also has an issue when playing CHA-LA HEAD CHA-LA where one of the beginning keysounds will stay on a
-		  very high pitched frequency. The lower(?) the IRQ 2 frequency, the longer the keysound stays played it seems.
+          Timing matters. In particular if the speed of the IRQ 2 calls is too fast then the volume and frequency animations will be wrong.
+          The most common issue with bad timing is keysounds will be cut off.
+          pop'n music Animelo 2 also has an issue when playing CHA-LA HEAD CHA-LA where one of the beginning keysounds will stay on a
+          very high pitched frequency. The lower(?) the IRQ 2 frequency, the longer the keysound stays played it seems.
 
-		  For beatmania III:
-			cmd[0] = nop
-			cmd[1] = 0x91bc -> Send stop command for all rf5c400 channels that are done playing
-			cmd[2] = 0x310a -> Error checking? Sending some kind of state to main CPU???
-			cmd[3] = 0x29c6 -> Increment a timer for each running DMA(ATA command?)
-				Each timer must count up to 0x02e8 (744) before it will move on to the next DMA, which I believe is the time out counter.
+          For beatmania III:
+            cmd[0] = nop
+            cmd[1] = 0x91bc -> Send stop command for all rf5c400 channels that are done playing
+            cmd[2] = 0x310a -> Error checking? Sending some kind of state to main CPU???
+            cmd[3] = 0x29c6 -> Increment a timer for each running DMA(ATA command?)
+                Each timer must count up to 0x02e8 (744) before it will move on to the next DMA, which I believe is the time out counter.
 
-				In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
+                In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
 
-				start_dma();
-				while (get_dma_timer() < dma_max_timer) {
-					if (irq6_called_flag) {
-						break;
-					}
-				}
-				end_dma();
+                start_dma();
+                while (get_dma_timer() < dma_max_timer) {
+                    if (irq6_called_flag) {
+                        break;
+                    }
+                }
+                end_dma();
 
-				irq6_called_flag is set only when IRQ6 is called.
-				get_dma_timer is the timer that is incremented by 0x29c6.
-			cmd[4] = 0x94de -> Animates rf5c400 channel volumes
-			cmd[5] = 0x7b2c -> Send some kind of buffer status flags to spu_status_led_w. Related to IRQ4 since commands come from PPC to set buffer data
-			cmd[6] = 0x977e -> Animates rf5c400 channel frequencies
-			cmd[7] = 0x9204 -> Sends current state of rf5c400 channels as well as a list (bitmask integer) of usable channels up to main CPU memory.
-			                   Also sends a flag to to spu_status_led_w that shows if there are available SE slots.
-							   If there are no available SE slots then it will set bit 3 to .
+                irq6_called_flag is set only when IRQ6 is called.
+                get_dma_timer is the timer that is incremented by 0x29c6.
+            cmd[4] = 0x94de -> Animates rf5c400 channel volumes
+            cmd[5] = 0x7b2c -> Send some kind of buffer status flags to spu_status_led_w. Related to IRQ4 since commands come from PPC to set buffer data
+            cmd[6] = 0x977e -> Animates rf5c400 channel frequencies
+            cmd[7] = 0x9204 -> Sends current state of rf5c400 channels as well as a list (bitmask integer) of usable channels up to main CPU memory.
+                               Also sends a flag to to spu_status_led_w that shows if there are available SE slots.
+                               If there are no available SE slots then it will set bit 3 to .
 
     IRQ4: Dual-port RAM mailbox (when PPC writes to 0x3FE)
           Handles commands from PPC (bytes 0x00 and 0x01)

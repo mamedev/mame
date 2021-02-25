@@ -359,6 +359,9 @@ Super Missile Attack Board Layout
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class missile_state : public driver_device
 {
 public:
@@ -379,6 +382,8 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
+		, m_mainrom(*this, "maincpu")
+		, m_writeprom(*this, "proms")
 	{ }
 
 	void missileb(machine_config &config);
@@ -389,6 +394,10 @@ public:
 	void init_suprmatk();
 
 	DECLARE_READ_LINE_MEMBER(vblank_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	void missile_w(address_space &space, offs_t offset, uint8_t data);
@@ -410,9 +419,6 @@ private:
 	void bootleg_main_map(address_map &map);
 	void main_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -429,8 +435,8 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 
-	const uint8_t *m_mainrom;
-	const uint8_t *m_writeprom;
+	required_region_ptr<uint8_t> m_mainrom;
+	required_region_ptr<uint8_t> m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
 	uint8_t m_irq_state;
@@ -541,9 +547,8 @@ void missile_state::machine_start()
 	m_leds.resolve();
 
 	/* initialize globals */
-	m_mainrom = memregion("maincpu")->base();
-	m_writeprom = memregion("proms")->base();
 	m_flipscreen = 0;
+	m_ctrld = 0;
 
 	/* create a timer to speed/slow the CPU */
 	m_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::adjust_cpu_speed),this));
@@ -1490,6 +1495,8 @@ void missile_state::init_missilem()
 		dest[a] = d;
 	}
 }
+
+} // Anonymous namespace
 
 
 /*************************************

@@ -29,11 +29,14 @@ void mm5799_device::data_map(address_map &map)
 		// 8x12x4
 		for (int i = 0; i < 0x80; i += 0x10)
 			map(i | 0x04, i | 0x0f).ram();
+		map(0x00, 0x03).mirror(0x70).noprw();
 	}
 	else
 	{
 		// 6x16x4
-		map(0x00, 0x5f).ram();
+		map(0x00, 0x3f).ram();
+		for (int i = 0x40; i < 0x80; i += 0x10)
+			map(i | 0x00, i | 0x07).ram().mirror(0x08);
 	}
 }
 
