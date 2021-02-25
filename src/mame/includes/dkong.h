@@ -194,8 +194,8 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	/* machine states */
-	uint8_t               m_hardware_type=0;
-	uint8_t               m_nmi_mask=0;
+	uint8_t               m_hardware_type;
+	uint8_t               m_nmi_mask;
 
 	std::unique_ptr<uint8_t[]> m_decrypted;
 
@@ -208,31 +208,31 @@ private:
 	bitmap_ind16  m_bg_bits;
 	const uint8_t *     m_color_codes;
 	emu_timer *       m_scanline_timer;
-	int8_t              m_vidhw=0;          /* Selected video hardware RS Conversion / TKG04 */
+	int8_t              m_vidhw;          /* Selected video hardware RS Conversion / TKG04 */
 
 	/* radar scope */
 
 	uint8_t *           m_gfx4;
 	uint8_t *           m_gfx3;
-	int               m_gfx3_len=0;
+	int               m_gfx3_len;
 
-	uint8_t             m_sig30Hz=0;
-	uint8_t             m_lfsr_5I=0;
-	uint8_t             m_grid_sig=0;
-	uint8_t             m_rflip_sig=0;
-	uint8_t             m_star_ff=0;
-	uint8_t             m_blue_level=0;
-	double            m_cd4049_a=0;
-	double            m_cd4049_b=0;
+	uint8_t             m_sig30Hz;
+	uint8_t             m_lfsr_5I;
+	uint8_t             m_grid_sig;
+	uint8_t             m_rflip_sig;
+	uint8_t             m_star_ff;
+	uint8_t             m_blue_level;
+	double            m_cd4049_a;
+	double            m_cd4049_b;
 
 	/* Specific states */
-	int8_t              m_decrypt_counter=0;
+	int8_t              m_decrypt_counter;
 
 	/* 2650 protection */
-	uint8_t             m_protect_type=0;
-	uint8_t             m_hunchloopback=0;
-	uint8_t             m_prot_cnt=0;
-	uint8_t             m_main_fo=0;
+	uint8_t             m_protect_type;
+	uint8_t             m_hunchloopback;
+	uint8_t             m_prot_cnt;
+	uint8_t             m_main_fo;
 
 	/* Save state relevant */
 	uint8_t             m_gfx_bank;
