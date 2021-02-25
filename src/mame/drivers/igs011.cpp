@@ -621,6 +621,7 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 void igs011_state::machine_start()
 {
 	m_prot1_addr = 0;
+	m_lhb_irq_enable = 0;
 
 	save_item(NAME(m_igs_dips_sel));
 	save_item(NAME(m_igs_input_sel));

@@ -86,10 +86,12 @@ public:
 	void interact(machine_config &config);
 	void interact_common(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	void hector_reset(bool hr, bool with_d2);
-	void video_start() override;
 	void keyboard_w(uint8_t data);
 	uint8_t keyboard_r(offs_t offset);
 	void sn_2000_w(offs_t offset, uint8_t data);
