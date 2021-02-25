@@ -320,6 +320,10 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void interrupt_vector() override;
+
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 // ======================> hd63705_device
