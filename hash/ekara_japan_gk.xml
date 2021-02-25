@@ -31,8 +31,8 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
-	<software name="gk2">
+
+	<software name="gk2" supported="no">
 		<description>GK-2 - Disney Princess: Princess Debut (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
@@ -43,16 +43,17 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
-	<software name="gk3">
+
+	<software name="gk3" supported="no">
 		<description>GK-3 - Disney Tinkerbell to Tinkle Star Uranai (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="gk3.u1" size="0x200000" crc="5877877b" sha1="c789b96ffcb3c303d552b236e01fd5fb587df7d3"/>
 			</dataarea>
 		</part>
-	</software>		
+	</software>
 
 </softwarelist>
