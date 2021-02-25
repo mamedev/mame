@@ -15079,7 +15079,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcgrph11">
+	<software name="mcgrpp11">
 		<description>MECC-A136 MECC Graphing Primer (Version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
@@ -38033,6 +38033,419 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a111 pets, ltd. v1.0 (4am crack).dsk" size="143360" crc="6e15b0c4" sha1="78881bc772f48ac282ec732e8d1a20d1bd20d412"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckeyb10">
+		<description>MECC-A130 MECC Keyboarding Primer (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Keyboarding Primer" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Student program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a130 mecc keyboarding primer v1.0 (4am crack) side a - student program.dsk" size="143360" crc="7bbe8cfa" sha1="4649e91f9fa2f27a19a2feda256781458f4b62a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Teacher utilities disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a130 mecc keyboarding primer v1.0 (4am crack) side b - teacher utilities.dsk" size="143360" crc="3a65c5f6" sha1="e4abeb8d9164380b6192e00a303abdd9cde0ff49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckbgd11">
+		<description>MECC-A131 MECC Keyboarding Master: Games and Drills (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Keyboarding Master: Games and Drills" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a131 mecc keyboarding master v1.1 (4am crack).dsk" size="143360" crc="ac24dc09" sha1="0f3fe347c30c24de41cf77e59695a857edf51382"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtr11">
+		<description>MECC-A132 MECC Writer (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Writer" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a132 mecc writer v1.1 (4am crack).dsk" size="143360" crc="28017f79" sha1="0180842ef43818de7164eb5f661f7aa5859b3c83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtr12">
+		<description>MECC-A132 MECC Writer (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Writer" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a132 mecc writer v1.2 (4am crack).dsk" size="143360" crc="41eeb966" sha1="6b6cd31dbc640781691f6b1e1e886f9c6e54394c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrst12">
+		<description>MECC-A133 MECC Writer (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Write Start" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a133 mecc write start v1.2 (4am crack).dsk" size="143360" crc="4c9f233d" sha1="a4773b48762922b92c92c9e90007b865d4296e93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl10">
+		<description>MECC-A134 MECC Speller (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Speller" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a134 mecc speller v1.0 (4am crack) side a - program.dsk" size="143360" crc="c8f08b29" sha1="5f6a776ed6ec12cc025b886c7f036807d841aea4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Dictionary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a134 mecc speller v1.0 (4am crack) side b - dictionary.dsk" size="143360" crc="fbdc252e" sha1="df2f44ba88fcf848e7a4ff98398d7707f97b39ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcedtr10">
+		<description>MECC-A135 MECC Editor (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Editor" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a135 mecc editor v1.0 (4am crack).dsk" size="143360" crc="74c0c894" sha1="2a01af093ffff94e1c413ad86538704b61864ba2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrpr10">
+		<description>MECC-A136 MECC Graphing Primer (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Graphing Primer" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a136 mecc graphing primer v1.0 (4am crack).dsk" size="143360" crc="cbd0f138" sha1="4ff15fee49110d574f44122007bf3ef100ef01f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz10">
+		<description>MECC-A112 Word Wizards (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v.1.0 (4am crack).dsk" size="143360" crc="02e3f328" sha1="4d1904f2711439e76b838fbc4657743742936258"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz12">
+		<description>MECC-A112 Word Wizards (Version 1.2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v1.2 (4am crack).dsk" size="143360" crc="f3ad8aa1" sha1="0e6ac325614ed5f8b42eeac49c68b9ee985cd5c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwopn10">
+		<description>MECC-A114 Writing an Opinion Paper (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Writing an Opinion Paper" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a114 writing an opinion paper v1.0 (4am crack).dsk" size="143360" crc="25b83423" sha1="5a2e3c54034e3ac807c8ee35d4ea05cb5420643e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz13">
+		<description>MECC-A112 Word Wizards (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v1.3 (4am crack).dsk" size="143360" crc="43f0413f" sha1="5357ba86600e5c8058534fcfb3ce26c8dc9975ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcrow11">
+		<description>MECC-A115 Right of Way (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Right of Way" is a 1984 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a115 right of way v1.1 (4am crack).dsk" size="143360" crc="e64255e7" sha1="e0a1ebfb396d9f9a5f99177509d9a6fcf46bc0a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps11">
+		<description>MECC-A116 Puzzles and Posters (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.1 (4am crack).dsk" size="143360" crc="d9721f88" sha1="d4fea3b907a53896befb53787c02e728470e62f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps13">
+		<description>MECC-A116 Puzzles and Posters (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.3 (4am crack).dsk" size="143360" crc="d479a5c6" sha1="a5e6034ce85ecb300dc953a8fb176eaf83733b58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps16">
+		<description>MECC-A116 Puzzles and Posters (Version 1.6) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.6.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.6 (4am crack).dsk" size="143360" crc="e6cf894b" sha1="603850fd85b0a828d373f3a46e4a0629fc5da5cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmspl10">
+		<description>MECC-A119 Master Spell (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Master Spell" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a119 master spell v1.0 (4am crack).dsk" size="143360" crc="c243091d" sha1="e5dde217fcd983ac1a828d929bd0887a05ed5ae1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrph11">
+		<description>MECC-A137 MECC Graph (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Graph" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a137 mecc graph v1.1 (4am crack).dsk" size="143360" crc="f173770c" sha1="faa4cda7a04e4054c11dd4f17a1f12028cc904a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmspl13">
+		<description>MECC-A119 Master Spell (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Master Spell" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a119 master spell v1.3 (4am crack).dsk" size="143360" crc="896a59e6" sha1="a861bd31f676ad312e7a8af7b1af6c96dcb80f1d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwhla10">
+		<description>MECC-A120 Word Herd: Look-Alikes (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Herd: Look-Alikes" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a120 word herd- look-alikes v1.0 (4am crack).dsk" size="143360" crc="043afc42" sha1="d7164db876e6917b680fb235692241194162616c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcjmc10">
+		<description>MECC-A121 Jeux Mathematiques Classiques (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Jeux Mathematiques Classiques" (Classic Math Games) is a 1984 French educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a121 jeux mathematiques classiques v1.0 (4am crack).dsk" size="143360" crc="b5dc1790" sha1="9d9cd5c59ab4118ae95d222dc59f5967d73a3eea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprnm10">
+		<description>MECC-A123 Prime Numbers (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Prime Numbers" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a123 prime numbers v1.0 (4am crack).dsk" size="143360" crc="f0ceda44" sha1="b6a650ab7b8e2719df6b26dcde8f4d4af3827a09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcestm10">
+		<description>MECC-A124 Estimation (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Estimation" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a124 estimation v1.0 (4am crack).dsk" size="143360" crc="c5bfc791" sha1="dbcb239e725ce2daf739a69cda5582a0a26c5b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcadlg10">
+		<description>MECC-A125 Addition Logician (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Addition Logician" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a125 addition logician v1.0 (4am crack).dsk" size="143360" crc="b75534aa" sha1="788263abea98ffaf2ec39c6a8ca17489fc9878c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstdg15">
+		<description>MECC-A126 Study Guide (Version 1.5) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Study Guide" is a 1984 educational program developed and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a126 study guide v1.5 (4am crack) disk 1 - program.dsk" size="143360" crc="ce0f7fd0" sha1="f225f519109453cbfba80e4bd605b6ff5d3acc15"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a126 study guide v1.5 (4am crack) disk 2 - data master.dsk" size="143360" crc="4bc0b40e" sha1="b0158d83f12cd5266e18e1ff367449a063c43141"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsalt10">
+		<description>MECC-A127 Salt and You (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Salt and You" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a127 salt and you v1.0 (4am crack).dsk" size="143360" crc="1194d56a" sha1="5323eed0ba08cf9cd002d83713c8e8c85764190d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdscl10">
+		<description>MECC-A128 Discovery Lab (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Discovery Lab" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a128 discovery lab v1.0 (4am crack).dsk" size="143360" crc="f9478038" sha1="a72c97834e8e978de439702551c7767c5065234c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdthd10">
+		<description>MECC-A129 Data Handler (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Data Handler" is a 1983 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a129 data handler v1.0 (4am crack).dsk" size="143360" crc="1b9af318" sha1="1dc867f65473b316722abd9d5fdefd61b0f07cbd"/>
 			</dataarea>
 		</part>
 	</software>
