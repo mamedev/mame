@@ -933,9 +933,6 @@ void cvs_state::machine_start()
 	start_393hz_timer();
 
 	/* register state save */
-	save_item(NAME(m_color_ram));
-	save_item(NAME(m_palette_ram));
-	save_item(NAME(m_character_ram));
 	save_item(NAME(m_character_banking_mode));
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_speech_rom_bit_address));
@@ -986,8 +983,6 @@ void cvs_state::cvs(machine_config &config)
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
 
 	PALETTE(config, m_palette, FUNC(cvs_state::cvs_palette), (256 + 4) * 8 + 8 + 1, 16);
@@ -1558,6 +1553,7 @@ void cvs_state::init_huncholy()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
 
 	save_item(NAME(m_protection_counter));
+	m_protection_counter = 0;
 }
 
 
