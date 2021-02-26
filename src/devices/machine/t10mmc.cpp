@@ -229,7 +229,7 @@ void t10mmc::ExecCommand()
 			// A request for LBA 0 will return something different depending on the type of media being played.
 			// For data and mixed media, LBA 0 is assigned to MSF 00:02:00 (= LBA 150).
 			// For audio media, LBA 0 is assigned to the actual starting address of track 1.
-			if (cdrom_get_media_type(m_cdrom) == CD_MEDIA_AUDIO)
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
 				m_lba = cdrom_get_track_start(m_cdrom, 0);
 			else
 				m_lba = 150;
@@ -265,7 +265,7 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (cdrom_get_media_type(m_cdrom) == CD_MEDIA_AUDIO)
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
 				m_lba = cdrom_get_track_start(m_cdrom, 0);
 			else
 				m_lba = 150;
@@ -382,7 +382,7 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (cdrom_get_media_type(m_cdrom) == CD_MEDIA_AUDIO)
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
 				m_lba = cdrom_get_track_start(m_cdrom, 0);
 			else
 				m_lba = 150;

@@ -55,14 +55,6 @@ enum
 	CD_SUB_NONE                 /* no subcode data stored */
 };
 
-enum
-{
-	CD_MEDIA_UNKNOWN = 0,
-	CD_MEDIA_DATA,
-	CD_MEDIA_AUDIO,
-	CD_MEDIA_MIXED // CD_MEDIA_DATA | CD_MEDIA_AUDIO
-};
-
 #define CD_FLAG_GDROM   0x00000001  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
 #define CD_FLAG_GDROMLE 0x00000002  // legacy GD-ROM, with little-endian CDDA data
 
@@ -135,7 +127,6 @@ chd_file *cdrom_get_chd(cdrom_file *file);
 int cdrom_get_last_track(cdrom_file *file);
 int cdrom_get_adr_control(cdrom_file *file, int track);
 int cdrom_get_track_type(cdrom_file *file, int track);
-int cdrom_get_media_type(cdrom_file *file);
 const cdrom_toc *cdrom_get_toc(cdrom_file *file);
 
 /* extra utilities */
