@@ -17,7 +17,8 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_bytes_per_tile_entry(4),
 	m_vrambase(0x600),
 	m_spritebase(0x3e00),
-	m_use_spritepages(false)
+	m_use_spritepages(false),
+	m_force_transpen_ff(false)
 {
 }
 
@@ -204,7 +205,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		   where the transpen needs to be 0x00 and Space Invaders has it set to 0x04
 		   it could be a global register rather than something in the spritelist?
 		*/
-		if ((attr == 0xff) && (unk2 == 0xff))
+		if (((attr == 0xff) && (unk2 == 0xff)) || m_force_transpen_ff)
 			transpen = 0xff;
 
 
