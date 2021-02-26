@@ -962,8 +962,6 @@ void amstrad_state::amstrad_base(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_vsync_changed));
 	m_crtc->out_cur_callback().set("exp", FUNC(cpc_expansion_slot_device::cursor_w));
 
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 16_MHz_XTAL / 16);
@@ -1087,8 +1085,6 @@ void amstrad_state::cpcplus(machine_config &config)
 	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
 
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 40_MHz_XTAL / 40);
@@ -1165,8 +1161,6 @@ void amstrad_state::gx4000(machine_config &config)
 	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
 	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
-
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

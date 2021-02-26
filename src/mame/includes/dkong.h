@@ -121,6 +121,7 @@ public:
 		, m_snd_rom(*this, "soundcpu")
 		, m_vidhw(DKONG_BOARD)
 		, m_sig30Hz(0)
+		, m_star_ff(0)
 		, m_blue_level(0)
 		, m_cv1(0)
 		, m_cv2(0)

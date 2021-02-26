@@ -43,6 +43,9 @@
 
 #include "softlist.h"
 
+
+namespace {
+
 class m24_state : public driver_device
 {
 public:
@@ -58,7 +61,8 @@ public:
 		m_kbc(*this, "kbc"),
 		m_keyboard(*this, "keyboard"),
 		m_z8000_apb(*this, "z8000_apb"),
-		m_dsw0(*this, "DSW0")
+		m_dsw0(*this, "DSW0"),
+		m_nmi_enable(false)
 	{ }
 
 	void olivetti(machine_config &config);
@@ -657,6 +661,9 @@ ROM_START( m240 )
 	ROM_REGION(0x800, "kbc", 0)
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
+
+} // Anonymous namespace
+
 
 COMP( 1984, m21,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M21",  MACHINE_NOT_WORKING )
 COMP( 1983, m24,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M24",  MACHINE_NOT_WORKING )
