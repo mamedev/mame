@@ -24,7 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
-		//m_sound(*this, "eu3a05sound"),
+		m_sound(*this, "eu3a05sound"),
 		m_vid(*this, "vid"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -61,7 +61,7 @@ private:
 	virtual void video_start() override;
 
 	required_shared_ptr<uint8_t> m_ram;
-	//required_device<elan_eu3a05_sound_device> m_sound;
+	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05vid_device> m_vid;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -115,7 +115,7 @@ void elan_ep3a19a_state::elan_ep3a19a_map(address_map &map)
 	//map(0x5060, 0x506d).ram(); // read/written by tetris (ADC?)
 
 	// 508x sound
-	//map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
+	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
@@ -322,11 +322,11 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/*
+	
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
 	m_sound->space_read_callback().set(FUNC(elan_ep3a19a_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
-	*/
+	
 	/*
 	m_sound->sound_end_cb<0>().set(FUNC(elan_ep3a19a_state::sound_end0));
 	m_sound->sound_end_cb<1>().set(FUNC(elan_ep3a19a_state::sound_end1));
