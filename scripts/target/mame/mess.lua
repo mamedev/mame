@@ -4060,6 +4060,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "tvgames")
 files {
+	MAME_DIR .. "src/mame/drivers/elan_ep3a19a.cpp",
 	MAME_DIR .. "src/mame/drivers/elan_eu3a14.cpp",
 	MAME_DIR .. "src/mame/drivers/elan_eu3a05.cpp",
 	MAME_DIR .. "src/mame/audio/elan_eu3a05.cpp",
