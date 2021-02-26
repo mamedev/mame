@@ -11,7 +11,7 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/elan_eu3a05gpio.h"
-#include "machine/elan_eu3a05sys.h"
+#include "machine/elan_ep3a19asys.h"
 #include "video/elan_eu3a05vid.h"
 
 class elan_ep3a19a_state : public driver_device
@@ -19,13 +19,13 @@ class elan_ep3a19a_state : public driver_device
 public:
 	elan_ep3a19a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		//m_sys(*this, "sys"),
+		m_sys(*this, "sys"),
 		//m_gpio(*this, "gpio"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
 		//m_sound(*this, "eu3a05sound"),
-		//m_vid(*this, "vid"),
+		m_vid(*this, "vid"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -40,7 +40,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	//required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_ep3a19asys_device> m_sys;
 	//required_device<elan_eu3a05gpio_device> m_gpio;
 
 	required_device<cpu_device> m_maincpu;
@@ -62,7 +62,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_ram;
 	//required_device<elan_eu3a05_sound_device> m_sound;
-	//required_device<elan_eu3a05vid_device> m_vid;
+	required_device<elan_eu3a05vid_device> m_vid;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -73,6 +73,12 @@ private:
 	//DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
 	//DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
 	//DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
+
+	uint8_t nmi_vector_r(offs_t offset)
+	{
+		return 0xffd4 >> (offset * 8);
+	}
+
 };
 
 void elan_ep3a19a_state::video_start()
@@ -81,7 +87,7 @@ void elan_ep3a19a_state::video_start()
 
 uint32_t elan_ep3a19a_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	return 0; // m_vid->screen_update(screen, bitmap, cliprect);
+	return m_vid->screen_update(screen, bitmap, cliprect);
 }
 
 // sound callback
@@ -95,9 +101,9 @@ void elan_ep3a19a_state::elan_ep3a19a_map(address_map &map)
 {
 	// can the addresses move around?
 	map(0x0000, 0x3fff).ram().share("ram");
-	//map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
+	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
-	//map(0x5000, 0x501f).m(m_sys, FUNC(elan_eu3a05sys_device::map)); // including DMA controller
+	map(0x5000, 0x5014).m(m_sys, FUNC(elan_ep3a19asys_device::map)); // including DMA controller
 	//map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
 
 	// 504x GPIO area?
@@ -117,6 +123,8 @@ void elan_ep3a19a_state::elan_ep3a19a_map(address_map &map)
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 	// not sure how these work, might be a modified 6502 core instead.
 	//map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	map(0xfffa, 0xfffb).r(FUNC(elan_ep3a19a_state::nmi_vector_r)); // custom vectors handled with NMI for now
+
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
@@ -203,6 +211,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(elan_ep3a19a_state::interrupt)
 {
 	//m_sys->generate_custom_interrupt(9);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
@@ -233,19 +242,18 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_gpio->read_2_callback().set_ioport("IN2");
 	*/
 
-	/*
-	ELAN_EU3A05_SYS(config, m_sys, 0);
+	ELAN_EP3A19A_SYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
-	*/
+	
 
-	/*
+	
 	ELAN_EU3A05_VID(config, m_vid, 0);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
 	m_vid->set_entries(256);
-	*/
+	
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
