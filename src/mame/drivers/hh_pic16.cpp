@@ -1121,7 +1121,8 @@ ROM_END
   * PIC 1655A-51
   * 2 7seg LEDs + 21 other LEDs, 1-bit sound
 
-  The ROM is nearly identical to hccbaskb, the shell/overlay is the same as
+  It is a clone of Mattel Basketball, but at lower speed.
+  The ROM is nearly identical to hccbaskb, the housing/overlay is the same as
   U.S. Games/Tandy Trick Shot Basketball.
 
 ***************************************************************************/
@@ -1204,7 +1205,7 @@ INPUT_PORTS_END
 void tbaskb_state::tbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=18K, C=47pF
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=18K, C=47pF
 	m_maincpu->read_a().set(FUNC(tbaskb_state::read_a));
 	m_maincpu->write_b().set(FUNC(tbaskb_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1443,7 +1444,7 @@ INPUT_PORTS_END
 void hccbaskb_state::hccbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=15K, C=47pF
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=15K, C=47pF
 	m_maincpu->read_a().set(FUNC(hccbaskb_state::read_a));
 	m_maincpu->write_b().set(FUNC(hccbaskb_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1605,7 +1606,7 @@ INPUT_PORTS_END
 void ttfball_state::ttfball(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
+	PIC1655(config, m_maincpu, 500000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
 	m_maincpu->read_a().set(FUNC(ttfball_state::read_a));
 	m_maincpu->write_b().set(FUNC(ttfball_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1614,7 +1615,7 @@ void ttfball_state::ttfball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x7f, 0xff);
-	m_display->set_bri_levels(0.003, 0.03); // player led is brighter
+	m_display->set_bri_levels(0.002, 0.02); // player led is brighter
 	config.set_default_layout(layout_ttfball);
 
 	/* sound hardware */

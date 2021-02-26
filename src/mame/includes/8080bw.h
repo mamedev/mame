@@ -91,6 +91,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(claybust_gun_on_r);
 
 protected:
+	virtual void video_start() override { m_color_map = m_screen_red = m_flip_screen = 0; }
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
 

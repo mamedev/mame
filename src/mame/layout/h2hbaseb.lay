@@ -138,7 +138,7 @@ license:CC0
 		<element ref="static_white"><bounds x="36.3" y="6.8" width="0.4" height="35.4" /></element>
 
 
-	<!-- main element -->
+	<!-- main bezel -->
 
 		<element ref="static_whitec"><bounds x="0" y="50" width="80" height="80" /></element>
 		<element ref="static_yellowc"><bounds x="1" y="51" width="78" height="78" /></element>

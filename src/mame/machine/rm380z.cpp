@@ -128,16 +128,6 @@ uint8_t rm380z_state::port_read_1b00(offs_t offset)
 	return port_read(offset+0xfc);
 }
 
-uint8_t rm380z_state::hiram_read(offs_t offset)
-{
-	return hiram[offset];
-}
-
-void rm380z_state::hiram_write(offs_t offset, uint8_t data)
-{
-	hiram[offset]=data;
-}
-
 uint8_t rm380z_state::rm380z_portlow_r()
 {
 	return 0xff;

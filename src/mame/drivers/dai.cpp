@@ -210,7 +210,7 @@ void dai_state::dai(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
-	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
+	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), std::size(s_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

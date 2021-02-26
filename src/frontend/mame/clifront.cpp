@@ -296,7 +296,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
 			int matches[16];
-			drivlist.find_approximate_matches(m_options.attempted_system_name(), ARRAY_LENGTH(matches), matches);
+			drivlist.find_approximate_matches(m_options.attempted_system_name(), std::size(matches), matches);
 
 			// work out how wide the titles need to be
 			int titlelen(0);
@@ -819,7 +819,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-16s %-16s %-10s ", first ? drivlist.driver().name : "", imagedev.instance_name().c_str(), paren_shortname.c_str());
+			printf("%-16s %-16s %-10s ", drivlist.driver().name, imagedev.instance_name().c_str(), paren_shortname.c_str());
 
 			// get the extensions and print them
 			std::string extensions(imagedev.file_extensions());

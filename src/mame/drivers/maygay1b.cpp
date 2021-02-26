@@ -7,11 +7,11 @@
     This only loads the basic stuff - there needs to be more done to make this run.
 
     There are 3 Mainboards, original M1 uses 2x TMP82C79P's, M1A and M1B use 1x TMP82C79P and 1x 80c51 microcontroller with a 12MHz crystal
-    
+
     There are 4 sound options,
     1: AY3-8930 on the mainboard.
     2: "Digital Sound Board" sound ROM + NEC D7759 on the romcard.
-	3: "FM & Digital Sound Board" sound ROM + NEC D7759 & YM2413 (3.579Mhz) on the romcard.
+    3: "FM & Digital Sound Board" sound ROM + NEC D7759 & YM2413 (3.579Mhz) on the romcard.
     4: "E.S.P. Board" sound ROMS + OKI M6376, + NEC C1892
     ** later ESP boards also have a sub-board marked "RAM Protection Board"
 

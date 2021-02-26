@@ -218,7 +218,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 	{
 		// get the top 16 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
 		const software_info *matches[16] = { nullptr };
-		swlistdev.find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
+		swlistdev.find_approx_matches(name, std::size(matches), matches, interface);
 
 		// if we found some, print them
 		if (matches[0] != nullptr)

@@ -29,6 +29,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BBC_TUBE_32016, bbc_tube_32016_device, "bbc_tube_32016", "Acorn 32016 2nd processor")
+DEFINE_DEVICE_TYPE(BBC_TUBE_16032, bbc_tube_16032_device, "bbc_tube_16032", "Acorn 16032 2nd processor (prototype)")
 DEFINE_DEVICE_TYPE(BBC_TUBE_32016L, bbc_tube_32016l_device, "bbc_tube_32016l", "Acorn Large 32016 2nd processor")
 
 
@@ -57,6 +58,20 @@ ROM_START(tube_32016)
 	ROM_SYSTEM_BIOS(2, "061", "Pandora v0.61")
 	ROMX_LOAD("pan061lo.rom", 0x0000, 0x4000, CRC(6f801b35) SHA1(ce31f7c10603f3d15a06a8e32bde40df0639e446), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("pan061hi.rom", 0x0001, 0x4000, CRC(c00b1ab0) SHA1(e6a705232278c518340ddc69ea51af91965fa332), ROM_SKIP(1) | ROM_BIOS(2))
+ROM_END
+
+ROM_START(tube_16032)
+	ROM_REGION16_LE(0x8000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "052", "Tiny Kernel v0.52")
+	ROMX_LOAD("tk052lo.rom", 0x0000, 0x2000, CRC(4daa7bfd) SHA1(c5f3dffc87f828e2420a036b6bc49ec07d712010), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_RELOAD(              0x4000, 0x2000)
+	ROMX_LOAD("tk052hi.rom", 0x0001, 0x2000, CRC(8611ff90) SHA1(bb1852fb2f3e7b3eb135ef52b8cbb6ebc521831a), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_RELOAD(              0x4001, 0x2000)
+	ROM_SYSTEM_BIOS(1, "060", "Pandora v0.60")
+	ROMX_LOAD("pan060lo.rom", 0x0000, 0x2000, CRC(76c9984e) SHA1(05346f9dbcba52ed12d8ce3a84cacc522ae07a67), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_RELOAD(               0x4000, 0x2000)
+	ROMX_LOAD("pan060hi.rom", 0x0001, 0x2000, CRC(2d49514c) SHA1(2ec67a74a81811d8c4ffaa3583e7a9c5fb2485ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_RELOAD(               0x4001, 0x2000)
 ROM_END
 
 ROM_START(tube_32016l)
@@ -121,11 +136,19 @@ void bbc_tube_32016_device::device_add_mconfig(machine_config &config)
 	m_ula->pnmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	/* internal ram */
 	RAM(config, m_ram).set_default_size("1M").set_extra_options("256K").set_default_value(0);
 
-	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
+}
+
+
+void bbc_tube_16032_device::device_add_mconfig(machine_config &config)
+{
+	bbc_tube_32016_device::device_add_mconfig(config);
+
+	m_maincpu->set_clock(16_MHz_XTAL / 2);
+
+	m_ram->set_default_size("256K").set_extra_options("1M").set_default_value(0);
 }
 
 
@@ -135,7 +158,6 @@ void bbc_tube_32016l_device::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_clock(16_MHz_XTAL / 2);
 
-	/* internal ram */
 	m_ram->set_default_size("4M").set_extra_options("1M").set_default_value(0);
 }
 
@@ -146,6 +168,11 @@ void bbc_tube_32016l_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *bbc_tube_32016_device::device_rom_region() const
 {
 	return ROM_NAME( tube_32016 );
+}
+
+const tiny_rom_entry *bbc_tube_16032_device::device_rom_region() const
+{
+	return ROM_NAME( tube_16032 );
 }
 
 const tiny_rom_entry *bbc_tube_32016l_device::device_rom_region() const
@@ -183,6 +210,11 @@ bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, devi
 
 bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_tube_32016_device(mconfig, BBC_TUBE_32016, tag, owner, clock)
+{
+}
+
+bbc_tube_16032_device::bbc_tube_16032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_tube_32016_device(mconfig, BBC_TUBE_16032, tag, owner, clock)
 {
 }
 

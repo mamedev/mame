@@ -55,7 +55,7 @@ static void a3_floppies(device_slot_interface &device)
 }
 
 FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
+	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT, FLOPPY_NIB_FORMAT
 FLOPPY_FORMATS_END
 
 void apple3_state::apple3(machine_config &config)

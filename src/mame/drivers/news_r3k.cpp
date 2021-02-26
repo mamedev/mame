@@ -185,6 +185,9 @@ void news_r3k_state::machine_start()
 		int_state = false;
 	m_lcd_enable = false;
 	m_lcd_dim = false;
+
+	m_inten = 0;
+	m_intst = 0;
 }
 
 void news_r3k_state::machine_reset()
@@ -333,7 +336,7 @@ void news_r3k_state::int_check()
 	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
 	static u16 const int_mask[] = { 0x001f, 0x00e0, 0x1f00, 0xe000 };
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
+	for (unsigned i = 0; i < std::size(m_int_state); i++)
 	{
 		bool const int_state = m_intst & m_inten & int_mask[i];
 

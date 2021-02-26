@@ -19,6 +19,8 @@ void apexc_state::machine_start()
 
 	m_input_timer = timer_alloc(TIMER_POLL_INPUTS);
 	m_input_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+
+	m_panel_data_reg = 0;
 }
 
 /*
@@ -377,7 +379,7 @@ void apexc_state::apexc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apexc);
 
-	PALETTE(config, m_palette, FUNC(apexc_state::apexc_palette), ARRAY_LENGTH(palette_table));
+	PALETTE(config, m_palette, FUNC(apexc_state::apexc_palette), std::size(palette_table));
 
 	APEXC_CYLINDER(config, m_cylinder);
 	APEXC_TAPE_PUNCHER(config, m_tape_puncher);

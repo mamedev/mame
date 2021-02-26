@@ -97,17 +97,22 @@ void swim2_device::flush_write(u64 when)
 		when = m_last_sync;
 
 	if(m_floppy && when > m_flux_write_start) {
-		if(m_flux_write_count && m_flux_write[m_flux_write_count-1] == when)
+		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
+		if(last_on_edge)
 			m_flux_write_count--;
+
 		attotime start = cycles_to_time(m_flux_write_start);
 		attotime end = cycles_to_time(when);
 		std::vector<attotime> fluxes(m_flux_write_count);
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-	}
-	m_flux_write_count = 0;
-	m_flux_write_start = when;
+
+		m_flux_write_count = 0;
+		if(last_on_edge)
+			m_flux_write[m_flux_write_count++] = when;
+	} else
+		m_flux_write_count = 0;
 }
 
 void swim2_device::show_mode() const
@@ -149,7 +154,7 @@ u8 swim2_device::read(offs_t offset)
 		return r;
 	}
 
-	case 0x2: { // errpr
+	case 0x2: { // error
 		u8 err = m_error;
 		m_error = 0;
 		return err;
@@ -157,7 +162,7 @@ u8 swim2_device::read(offs_t offset)
 
 	case 0x3: { // param
 		u8 r = m_param[m_param_idx];
-		m_param_idx = (m_param_idx + 1) & 15;
+		m_param_idx = (m_param_idx + 1) & 3;
 		return r;
 	}
 

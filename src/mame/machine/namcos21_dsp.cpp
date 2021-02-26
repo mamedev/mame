@@ -30,8 +30,12 @@ void namcos21_dsp_device::device_start()
 {
 	m_winrun_dspcomram = std::make_unique<uint16_t[]>(0x1000*2);
 	m_suspend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos21_dsp_device::suspend_callback),this));
+
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_pointram_idx = 0;
+
+	m_winrun_poly_index = 0;
+	std::fill(std::begin(m_winrun_dspcomram_control), std::end(m_winrun_dspcomram_control), 0);
 
 	save_pointer(NAME(m_pointram), PTRAM_SIZE);
 	save_item(NAME(m_pointram_idx));

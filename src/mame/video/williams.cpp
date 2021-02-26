@@ -667,6 +667,7 @@ void blaster_state::video_control_w(u8 data)
 
 void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 {
+	std::fill(std::begin(m_blitterram), std::end(m_blitterram), 0);
 	static const uint8_t dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 
 	/* by default, there is no clipping window - this will be touched only by games that have one */

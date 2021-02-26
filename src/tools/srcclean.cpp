@@ -51,7 +51,6 @@
 
 #include "corefile.h"
 #include "corestr.h"
-#include "osdcomm.h"
 #include "strformat.h"
 
 #include <algorithm>
@@ -597,7 +596,7 @@ void cleaner_base::output_utf8(char32_t ch)
 
 void cleaner_base::commit_character(char32_t ch)
 {
-	assert(ARRAY_LENGTH(m_buffer) > m_position);
+	assert(std::size(m_buffer) > m_position);
 	assert(1U <= m_code_length);
 	assert(6U >= m_code_length);
 
@@ -697,7 +696,7 @@ void cleaner_base::commit_character(char32_t ch)
 
 void cleaner_base::process_if_full()
 {
-	if (ARRAY_LENGTH(m_buffer) == m_position)
+	if (std::size(m_buffer) == m_position)
 	{
 		process_characters(m_buffer, m_buffer + m_position);
 		m_position = 0U;

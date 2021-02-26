@@ -452,6 +452,26 @@ if (CPUS["COSMAC"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- National Semiconductor COPS1 family
+--@src/devices/cpu/cops1/mm5799.h,CPUS["COPS1"] = true
+--------------------------------------------------
+
+if (CPUS["COPS1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/cops1/cops1base.cpp",
+		MAME_DIR .. "src/devices/cpu/cops1/cops1base.h",
+		MAME_DIR .. "src/devices/cpu/cops1/cops1op.cpp",
+		MAME_DIR .. "src/devices/cpu/cops1/mm5799.cpp",
+		MAME_DIR .. "src/devices/cpu/cops1/mm5799.h",
+	}
+end
+
+if (CPUS["COPS1"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cops1/cops1d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cops1/cops1d.h")
+end
+
+--------------------------------------------------
 -- National Semiconductor COP400 family
 --@src/devices/cpu/cop400/cop400.h,CPUS["COP400"] = true
 --------------------------------------------------
@@ -1235,7 +1255,7 @@ end
 
 if (CPUS["DIABLO"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/diablo1300dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.h")
 end
 
 --------------------------------------------------
@@ -2015,6 +2035,15 @@ end
 if (CPUS["V810"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v810/v810dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v810/v810dasm.h")
+end
+
+--------------------------------------------------
+-- NEC V850, disassembler only
+--------------------------------------------------
+
+if (_OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v850/v850dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v850/v850dasm.h")
 end
 
 --------------------------------------------------

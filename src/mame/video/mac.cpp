@@ -367,6 +367,35 @@ uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
+uint32_t mac_state::screen_update_pwrmac(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const vram8 = (uint8_t *)m_vram64.target();
+	int hres, vres;
+
+	hres = 640;
+	vres = 480;
+
+	for (int y = 0; y < vres; y++)
+	{
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < hres; x += 8)
+		{
+			uint8_t const pixels = vram8[(y * (hres / 8)) + ((x / 8) ^ 3)];
+
+			*scanline++ = m_rbv_palette[0x7f | (pixels & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 1) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 2) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 3) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 4) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 5) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 6) & 0x80)];
+			*scanline++ = m_rbv_palette[0x7f | ((pixels << 7) & 0x80)];
+		}
+	}
+
+	return 0;
+}
+
 uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int hres, vres;

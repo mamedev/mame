@@ -2,28 +2,28 @@
 // copyright-holders:Angelo Salese
 /******************************************************************************
 
-	Jungle (c) 2001 Yonshi
+    Jungle (c) 2001 Yonshi
 
-	TODO:
-	- with a clean NVRAM MAME needs to be soft reset after init or the game 
-	    will trip a '1111 exception' (caused by invalid opcode executed at
-	    0x102, incomplete decryption most likely);
-	- Likewise anything in the 0x100-0x1f7 range doesn't seem valid at all;
-	- game sometimes expects 1+ coins even if player has available points
-	  (and freezing with "COIN" text blinking), very unlikely to be intended
-	  behaviour?
-	- system setting screen shows the following settings that don't seem to be
-	    affected by dips:
-	  * Min. Bet (always 1), 
-	  * Credit X Ticket Mode (always Cencel (sic)), 
-	  * Max. 10 Mode (always Max. 10);
-	- sound doesn't seem to work 100% correctly (i.e. coin sound only seems 
-	    to work from 3rd coin on, lots of invalid sample msgs in error.log).
-	    fwiw there's no extra OKI bank in the ROM, must be either invalid 
-		decryption or fancy OKI status readback instead. 
+    TODO:
+    - with a clean NVRAM MAME needs to be soft reset after init or the game
+        will trip a '1111 exception' (caused by invalid opcode executed at
+        0x102, incomplete decryption most likely);
+    - Likewise anything in the 0x100-0x1f7 range doesn't seem valid at all;
+    - game sometimes expects 1+ coins even if player has available points
+      (and freezing with "COIN" text blinking), very unlikely to be intended
+      behaviour?
+    - system setting screen shows the following settings that don't seem to be
+        affected by dips:
+      * Min. Bet (always 1),
+      * Credit X Ticket Mode (always Cencel (sic)),
+      * Max. 10 Mode (always Max. 10);
+    - sound doesn't seem to work 100% correctly (i.e. coin sound only seems
+        to work from 3rd coin on, lots of invalid sample msgs in error.log).
+        fwiw there's no extra OKI bank in the ROM, must be either invalid
+        decryption or fancy OKI status readback instead.
         Latter may be confirmed by video display stalling at the end of a
-		normal round, OSD coin counter gets updated after the BGM completes
-		playback.
+        normal round, OSD coin counter gets updated after the BGM completes
+        playback.
     - outputs (lamps & ticket dispenser at very least);
 
 ===============================================================================
@@ -198,12 +198,15 @@ void jungleyo_state::video_start()
 		reel->set_scroll_cols(64);
 		reel->set_transparent_pen(0xff);
 	}
+
+	m_layer_enable = 0;
+	m_video_priority = 0;
 }
 
 uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	
+
 	if (m_layer_enable == 0)
 		return 0;
 
@@ -214,10 +217,10 @@ uint32_t jungleyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			u16 scroll = m_reel_vram[Layer][i*2] >> 8;
 			m_reel_tilemap[Layer]->set_scrolly(i, scroll);
 		}
-		
+
 		m_reel_tilemap[Layer]->draw(screen, bitmap, cliprect, 0, 0);
 	}
-	
+
 	if ((m_video_priority & 1) == 0)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

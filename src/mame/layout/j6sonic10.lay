@@ -3561,6 +3561,32 @@
 			<color red="0.25" green="0.25" blue="0.00">
 			</color>
 		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0">
+			</color>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
+			</bounds>
+		</text>
+	</element>
+	<element name="colour_button_150a_border">
+		<rect state="1">
+			<color red="0.50" green="0.50" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.00">
+			</color>
+		</rect>
+	</element>
+	<element name="colour_button_150a">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.00">
+			</color>
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.00">
+			</color>
+		</rect>
 		<text string="COLLECT">
 			<color red="0.0" green="0.0" blue="0.0">
 			</color>
@@ -3660,17 +3686,178 @@
 			</color>
 		</led7seg>
 	</element>
-	<element name="vfd0">
-		<led16segsc>
-			<color red="0.0" green="1.0" blue="1.0">
-			</color>
-		</led16segsc>
-	</element>
-	<element name="vfd0_background">
-		<rect>
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-		</rect>
+	<element name="vfd0" defstate="0x7ffff">
+		<image statemask="0x40000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 5.5751489,10.110863 H 9.2604166 L 8.4572172,16.772693 H 6.2366072 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00001">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 12.898437,10.15811 H 27.403274 L 24.960266,13.078828 15.950415,13.117958 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00002">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 42.749575,10.323971 28.846094,10.223745 31.289102,13.144463 39.998275,13.150163 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00004">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 42.041575,37.421477 44.179731,12.225859 41.259013,14.668866 39.415835,35.906298 C 40.081949,36.93419 40.845977,37.717294 42.041575,37.421477 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00008">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 39.447351,64.530474 41.585507,39.334856 38.664789,41.777863 36.821611,63.015295 C 37.487725,64.043187 38.251753,64.826291 39.447351,64.530474 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00010">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 37.554617,66.846348 23.651136,66.946574 26.094144,64.025856 34.803317,64.020156 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00020">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 7.6083278,66.846614 22.063635,66.946574 19.523665,64.03349 10.468826,64.02779 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00040">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 8.5178274,39.889769 6.3796714,65.194461 9.3003894,62.740878 11.143568,41.411507 C 10.477453,40.379165 9.7134253,39.592671 8.5178274,39.889769 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00080">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 9.0129335,37.364834 11.315997,11.79124 14.142221,14.423235 12.205637,34.951962 C 11.539523,35.979854 10.208531,37.660651 9.0129335,37.364834 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00100">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 12.992931,37.136159 22.584077,37.183409 23.906994,38.695313 22.489583,40.112723 12.945685,40.159973 11.528274,38.600823 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00200">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 37.649496,37.177873 28.483255,37.092673 27.05925,38.63486 28.434606,39.959389 37.69534,40.003549 39.070697,38.546569 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00400">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 24.237412,35.484203 26.278328,14.695194 27.820515,13.271189 29.145044,14.646546 27.252076,34.868589 25.606108,36.999898 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x00800">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 21.697521,62.566148 23.738437,41.777139 25.314033,40.219499 26.605153,41.728491 24.645368,62.518482 23.066217,64.081843 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x01000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 20.980658,42.896758 20.813614,48.776688 11.860085,61.739261 12.227581,55.592061 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x02000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 22.311153,34.885786 22.419813,28.438892 16.054297,15.334578 15.956987,21.623519 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x04000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 29.950185,34.249843 30.125007,28.795136 38.522145,16.163293 38.38322,21.601787 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x08000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 28.919024,42.61391 28.344314,48.210359 34.685754,61.692648 35.051744,55.970672 Z" i/>
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x10000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<ellipse fill="#ffffff" fill-opacity="1" stroke="#ffffff" stroke-width="0.265px" id="path464" cx="44.458858" cy="66.347984" rx="1.7706606" ry="1.837478" />
+				</svg>
+			]]>
+		</data>
+		</image>
+		<image statemask="0x20000">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="50" height="80">
+				<path fill="#ffffff" stroke="#ffffff" stroke-width="0.265px" d="M 46.104124,70.525342 C 45.100018,72.080805 43.656399,74.554957 41.796361,74.717598 42.552502,73.33236 43.003896,71.969087 42.701352,70.476596 43.739076,71.153376 44.909534,71.06457 46.104124,70.525346 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
 	</element>
 	<element name="reel_lamp_layer_0" defstate="0">
 		<rect>
@@ -5118,6 +5305,7 @@
 			<bounds x="738" y="3" width="38" height="23">
 			</bounds>
 		</element>
+
 		<element name="lamp209" ref="colour_button_145_border" state="0" inputtag="J9_0" inputmask="0x20">
 			<bounds x="190" y="604" width="82" height="38">
 			</bounds>
@@ -5126,12 +5314,12 @@
 			<bounds x="192" y="606" width="78" height="34">
 			</bounds>
 		</element>
-		<element name="lamp193" ref="colour_button_146_border" state="0" inputtag="J9_0" inputmask="0x02">
-			<bounds x="432" y="604" width="78" height="38">
+		<element name="lamp212" ref="colour_button_147_border" state="0" inputtag="J9_0" inputmask="0x08">
+			<bounds x="352" y="604" width="82" height="38">
 			</bounds>
 		</element>
-		<element name="lamp193" ref="colour_button_146" state="0" inputtag="J9_0" inputmask="0x02">
-			<bounds x="434" y="606" width="74" height="34">
+		<element name="lamp212" ref="colour_button_147" state="0" inputtag="J9_0" inputmask="0x08">
+			<bounds x="354" y="606" width="78" height="34">
 			</bounds>
 		</element>
 		<element name="lamp195" ref="colour_button_147_border" state="0" inputtag="J9_0" inputmask="0x08">
@@ -5142,6 +5330,14 @@
 			<bounds x="354" y="606" width="78" height="34">
 			</bounds>
 		</element>
+		<element name="lamp213" ref="colour_button_148_border" state="0" inputtag="J9_0" inputmask="0x10">
+			<bounds x="271" y="604" width="82" height="38">
+			</bounds>
+		</element>
+		<element name="lamp213" ref="colour_button_148" state="0" inputtag="J9_0" inputmask="0x10">
+			<bounds x="273" y="606" width="78" height="34">
+			</bounds>
+		</element>
 		<element name="lamp208" ref="colour_button_148_border" state="0" inputtag="J9_0" inputmask="0x10">
 			<bounds x="271" y="604" width="82" height="38">
 			</bounds>
@@ -5150,90 +5346,59 @@
 			<bounds x="273" y="606" width="78" height="34">
 			</bounds>
 		</element>
-		<element name="lamp210" ref="colour_button_150_border" state="0" inputtag="J9_0" inputmask="0x04">
+		<element name="lamp210" ref="colour_button_150_border" state="0" inputtag="J9_0" inputmask="0x40">
 			<bounds x="112" y="603" width="78" height="38">
 			</bounds>
 		</element>
-		<element name="lamp210" ref="colour_button_150" state="0" inputtag="J9_0" inputmask="0x04">
+		<element name="lamp210" ref="colour_button_150" state="0" inputtag="J9_0" inputmask="0x40">
 			<bounds x="114" y="605" width="74" height="34">
 			</bounds>
 		</element>
+
+		<element name="lamp194" ref="colour_button_150a_border" state="0" inputtag="J9_0" inputmask="0x04">
+			<bounds x="424" y="604" width="78" height="38">
+			</bounds>
+		</element>
+		<element name="lamp194" ref="colour_button_150a" state="0" inputtag="J9_0" inputmask="0x04">
+			<bounds x="426" y="606" width="74" height="34">
+			</bounds>
+		</element>
+		<element name="lamp193" ref="colour_button_146_border" state="0" inputtag="J9_0" inputmask="0x02">
+			<bounds x="498" y="604" width="78" height="38">
+			</bounds>
+		</element>
+		<element name="lamp193" ref="colour_button_146" state="0" inputtag="J9_0" inputmask="0x02">
+			<bounds x="500" y="606" width="74" height="34">
+			</bounds>
+		</element>
 		<element name="lamp192" ref="colour_button_151_border" state="0" inputtag="J9_0" inputmask="0x01">
-			<bounds x="509" y="604" width="80" height="38">
+			<bounds x="589" y="604" width="80" height="38">
 			</bounds>
 		</element>
 		<element name="lamp192" ref="colour_button_151" state="0" inputtag="J9_0" inputmask="0x01">
-			<bounds x="511" y="606" width="76" height="34">
+			<bounds x="591" y="606" width="76" height="34">
 			</bounds>
 		</element>
-		<element ref="vfd0_background">
-			<bounds x="185" y="364" width="272" height="30">
-			</bounds>
-		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="185" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="202" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="219" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="236" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="253" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="270" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="287" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="304" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="321" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="338" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="355" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="372" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="389" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="406" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="423" y="364" width="17" height="30">
-			</bounds>
-		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="440" y="364" width="17" height="30">
-			</bounds>
-		</element>
+
+
+		<repeat count="16">
+			<param name="i" start="0" increment="1" />
+			<param name="x" start="185" increment="17" />
+			<element name="vfdblank~i~" ref="vfd0">
+				<color red="0.14" green="0.14" blue="0.14"></color>
+				<bounds x="~x~" y="364" width="17" height="29">
+				</bounds>
+			</element>
+
+			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="1.00" blue="1.00" alpha="0.0"></color>
+				<color state="31" red="0.00" green="1.00" blue="1.00" alpha="1.0"></color>
+				<bounds x="~x~" y="364" width="17" height="29">
+				</bounds>
+			</element>
+		</repeat>
+
 		<element name="label15" ref="label_15">
 			<bounds x="65" y="371" width="27" height="13">
 			</bounds>

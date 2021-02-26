@@ -727,6 +727,7 @@ void namcona1_state::port8_w(u8 data)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
+	std::fill(std::begin(m_mcu_mailbox), std::end(m_mcu_mailbox), 0);
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));

@@ -91,6 +91,10 @@ void mz_state::machine_start()
 {
 	/* reset memory map to defaults */
 	mz700_bank_4_w(0);
+
+	m_cursor_bit = 0;
+	m_speaker_level = 0;
+	m_prev_state = 0;
 }
 
 MACHINE_RESET_MEMBER( mz_state, mz700 )

@@ -55,6 +55,9 @@
 #include "coreutil.h"
 #include "emupal.h"
 
+
+namespace {
+
 // Reset bits
 #define RESET_IOASIC        0x01
 #define RESET_ROMBUS        0x02
@@ -113,16 +116,18 @@ public:
 		m_ide(*this, PCI_ID_IDE),
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
-	{ }
+	{
+		std::fill(std::begin(board_ctrl), std::end(board_ctrl), 0);
+	}
 
 	void mwskins(machine_config &config);
 
-	void init_mwskins();
-
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	required_device<mips3_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
@@ -143,7 +148,7 @@ private:
 	uint32_t m_serial_count;
 
 
-	void asic_fifo_w(uint32_t data); // unused?
+	[[maybe_unused]] void asic_fifo_w(uint32_t data);
 
 	uint8_t exprom_r(offs_t offset);
 	void exprom_w(offs_t offset, uint8_t data);
@@ -926,15 +931,8 @@ ROM_START( mwskinst )
 	// another dump with data SHA1 cba09f0240dd797b554ae28b74416472d2327e5b is available, both have latest version 1.15 in the changelog at 0x934687
 ROM_END
 
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
+} // Anonymous namespace
 
-void atlantis_state::init_mwskins()
-{
-}
 
 /*************************************
  *
@@ -942,7 +940,7 @@ void atlantis_state::init_mwskins()
  *
  *************************************/
 
-GAME( 2000, mwskins,  0,       mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mwskinsa, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.06, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, mwskinso, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game (1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, mwskinst, mwskins, mwskins, mwskins, atlantis_state, init_mwskins, ROT0, "Midway", "Skins Game Tournament Edition", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, mwskins,  0,       mwskins, mwskins, atlantis_state, empty_init, ROT0, "Midway", "Skins Game (1.06)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mwskinsa, mwskins, mwskins, mwskins, atlantis_state, empty_init, ROT0, "Midway", "Skins Game (1.06, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, mwskinso, mwskins, mwskins, mwskins, atlantis_state, empty_init, ROT0, "Midway", "Skins Game (1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, mwskinst, mwskins, mwskins, mwskins, atlantis_state, empty_init, ROT0, "Midway", "Skins Game Tournament Edition", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

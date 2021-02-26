@@ -134,7 +134,7 @@ void i8271_device::set_floppies(floppy_connector *f0, floppy_connector *f1)
 		flopi[0].dev = nullptr;
 
 	if (f1) {
-		flopi[1].dev = f0->get_device();
+		flopi[1].dev = f1->get_device();
 		if (flopi[1].dev != nullptr)
 			flopi[1].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 	}

@@ -30,7 +30,7 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 
 		if (ch != '\0')
 		{
-			if (i >= (ARRAY_LENGTH(pgmname) - 1))
+			if (i >= (std::size(pgmname) - 1))
 			{
 				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 				image.message(" File name too long");
@@ -65,7 +65,7 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 		j = (start_addr + i) & 0xffff;
 		if (image.fread(&data, 1) != 1)
 		{
-			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
+			snprintf(message, std::size(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return image_init_result::FAIL;

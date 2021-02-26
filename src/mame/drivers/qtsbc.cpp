@@ -14,8 +14,10 @@ Chips: P8251, D8253C, MK3880N-4 (Z80). 3x 6-sw dips. Unmarked crystal.
 
 A blue jumper marked 4M and 2M (between U11 and U12) selects the CPU clock.
 
-The RS232 port uses a 26-pin header (J1) rather than the conventional DB25
-connector. The second 26-pin header (J2) is for the parallel port.
+The RS232 port uses a 26-pin right-angle header (J1) rather than the
+conventional DB25 connector. The second 26-pin header (J2) mostly carries
+data and handshake signals for two unidirectional parallel ports, but also
+includes a few timer outputs.
 
 Feature list from QT ad:
 - 1K RAM (which can be located at any 1K boundary) plus one each
@@ -30,6 +32,35 @@ Feature list from QT ad:
 - Two programmable timers available for use by programs run with the
   SBC+2/4 (timer output and controls available at parallel I/O connector;
   parallel input and output ports available for use on CPU board).
+
+List of signals on pin headers (from CompuTime manual):
+
+        J1                                  J2
+
+     2  RS232 Transmit Data              1  Output Port Data Bit 0
+     3  RS232 Receive Data               2  Output Port Data Bit 1
+     4  Request to Send                  3  Output Port Data Bit 2
+     5  Clear to Send                    4  Output Port Data Bit 3
+     6  Data Set Ready                   5  Output Port Data Bit 4
+     7  Signal Ground                    6  Output Port Data Bit 5
+     8  Carrier Detect                   7  Output Port Data Bit 6
+    11  Reverse Channel Transmit         8  Output Port Data Bit 7
+    20  Data Terminal Ready              9  Signal Ground
+                                        10  Output Port Clock
+                                        11  Counter 1 Gate Input
+                                        12  Counter 2 Gate Input
+                                        14  Input Port Data Bit 0
+                                        15  Input Port Data Bit 1
+                                        16  Input Port Data Bit 2
+                                        17  Input Port Data Bit 3
+                                        18  Input Port Data Bit 4
+                                        19  Input Port Data Bit 5
+                                        20  Input Port Data Bit 6
+                                        21  Input Port Data Bit 7
+                                        22  Signal Ground
+                                        23  Input Port Strobe
+                                        24  Counter 1 Output
+                                        25  Counter 2 Output
 
 ****************************************************************************/
 
@@ -56,6 +87,7 @@ public:
 		, m_eprom(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_rts(true)
+		, m_dtr(true)
 	{ }
 
 	void qtsbc(machine_config &config);
@@ -67,6 +99,7 @@ private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_loopback_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,6 +114,7 @@ private:
 	required_shared_ptr<u8> m_p_ram;
 	bool m_power_on;
 	bool m_rts;
+	bool m_dtr;
 };
 
 
@@ -210,6 +244,16 @@ WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
 	{
 		m_rts = state;
 		m_rs232->write_rts(m_rts);
+	}
+}
+
+WRITE_LINE_MEMBER(qtsbc_state::dtr_loopback_w)
+{
+	// Filtered through this routine to avoid infinite loops
+	if (state != bool(m_dtr))
+	{
+		m_dtr = state;
+		m_rs232->write_dtr(m_dtr);
 	}
 }
 
@@ -481,7 +525,7 @@ void qtsbc_state::qtsbc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &qtsbc_state::io_map);
 
 	/* video hardware */
-	PIT8253(config, m_pit, 0); // U9
+	PIT8253(config, m_pit); // U9
 	m_pit->set_clk<0>(4_MHz_XTAL / 2); /* Timer 0: baud rate gen for 8251 */
 	m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::write_txc));
 	m_pit->out_handler<0>().append(m_usart, FUNC(i8251_device::write_rxc));
@@ -495,7 +539,7 @@ void qtsbc_state::qtsbc(machine_config &config)
 	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr)); // actually from pin 11, "Reverse Channel Transmit"
 	m_rs232->cts_handler().set(FUNC(qtsbc_state::rts_loopback_w));
-	m_rs232->dcd_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_rs232->dcd_handler().set(FUNC(qtsbc_state::dtr_loopback_w));
 	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
@@ -508,4 +552,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                     FULLNAME     FLAGS
-COMP( 19??, qtsbc, 0,      0,      qtsbc,   qtsbc, qtsbc_state, empty_init, "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, qtsbc, 0,      0,      qtsbc,   qtsbc, qtsbc_state, empty_init, "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

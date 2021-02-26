@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
-    savquest.c
+    savquest.cpp
 
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
@@ -59,6 +59,9 @@
 #include "machine/ds128x.h"
 #include "bus/isa/sblaster.h"
 
+
+namespace {
+
 class savquest_state : public pcat_base_state
 {
 public:
@@ -67,9 +70,17 @@ public:
 		m_vga(*this, "vga"),
 		m_voodoo(*this, "voodoo")
 	{
+		std::fill(std::begin(m_mtxc_config_reg), std::end(m_mtxc_config_reg), 0);
 	}
 
 	void savquest(machine_config &config);
+
+protected:
+	// driver_device overrides
+//  virtual void video_start();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
@@ -119,11 +130,6 @@ private:
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
 
-	// driver_device overrides
-//  virtual void video_start();
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void vid_3dfx_init();
 
@@ -791,6 +797,9 @@ void savquest_state::machine_start()
 
 	intel82439tx_init();
 	vid_3dfx_init();
+
+	for (int i = 0; i < 8; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void savquest_state::machine_reset()
@@ -864,6 +873,8 @@ ROM_START( savquest )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

@@ -264,7 +264,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 	filectx.curcmd = data;
 	switch (data) {
 	case kFileCmdGetDir:
-		strncpy(filectx.filename, filectx.curdir.c_str(), ARRAY_LENGTH(filectx.filename));
+		strncpy(filectx.filename, filectx.curdir.c_str(), std::size(filectx.filename));
 		break;
 	case kFileCmdSetDir:
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
@@ -281,7 +281,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();
 			if (dp) {
-				strncpy(filectx.filename, dp->name, ARRAY_LENGTH(filectx.filename));
+				strncpy(filectx.filename, dp->name, std::size(filectx.filename));
 			} else {
 				std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
 			}

@@ -128,6 +128,11 @@ public:
 		assert(&target.first == &m_devbase);
 		return share(target.second);
 	}
+	template<typename _ptrt> address_map_entry &share(const memory_share_creator<_ptrt> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		return share(target.second);
+	}
 
 	address_map_entry &rom() { m_read.m_type = AMH_ROM; return *this; }
 	address_map_entry &ram() { m_read.m_type = AMH_RAM; m_write.m_type = AMH_RAM; return *this; }
@@ -160,6 +165,22 @@ public:
 	address_map_entry &bankr(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
 	address_map_entry &bankw(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }
 	address_map_entry &bankrw(const char *tag) { bankr(tag); bankw(tag); return *this; }
+
+	address_map_entry &bankr(const memory_bank_creator &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		return bankr(target.second);
+	}
+	address_map_entry &bankw(const memory_bank_creator &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		return bankw(target.second);
+	}
+	address_map_entry &bankrw(const memory_bank_creator &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		return bankrw(target.second);
+	}
 
 	template<bool _reqd> address_map_entry &bankr(const memory_bank_finder<_reqd> &finder) {
 		const std::pair<device_t &, const char *> target(finder.finder_target());

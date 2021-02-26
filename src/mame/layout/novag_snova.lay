@@ -467,12 +467,12 @@ license:CC0
 		<element name="1.7" ref="led"><bounds x="78.25" y="84" width="1.5" height="1.5" /></element>
 
 		<!-- bottom side -->
+		<screen index="0"><bounds x="3.675" y="89" width="26" height="8" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="3" y="88" width="28" height="10" /></element>
+
 		<element ref="cyan"><bounds x="3.675" y="88.05" width="80.65" height="0.325" /></element>
 		<element ref="cyan"><bounds x="31.975" y="94.5" width="52.35" height="0.325" /></element>
 		<group ref="buttons"><bounds x="27.5" y="82.3" width="65" height="19.5" /></group>
-
-		<screen index="0"><bounds x="3.675" y="89" width="26" height="8" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds x="3.675" y="89" width="26" height="8" /></element>
 
 	</view>
 </mamelayout>

@@ -57,6 +57,14 @@ Summary of Monitor commands.
             using handshaking similar to a centronics printer. The incoming file is loaded into
             memory and it appears that the operator is not provided any information of what happened.
 
+==============================================================================================================
+
+Known issues:
+- Excite baseball: Graphics issues, unplayable
+- Sekigahara: Joystick problem
+- Mobile Gundam: Bad sound at the intro screen
+- Champion Racer: Graphics and Colour.
+
 *************************************************************************************************************/
 
 #include "emu.h"

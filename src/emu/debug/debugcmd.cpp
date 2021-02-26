@@ -111,12 +111,11 @@ u64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
 	: m_machine(machine)
-	, m_cpu(cpu)
 	, m_console(console)
 {
 	m_global_array = std::make_unique<global_entry []>(MAX_GLOBALS);
 
-	symbol_table &symtable = m_cpu.global_symtable();
+	symbol_table &symtable = cpu.global_symtable();
 
 	/* add a few simple global functions */
 	using namespace std::placeholders;
@@ -162,6 +161,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2));
 	m_console.register_command("tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracelog, this, _1, _2));
 	m_console.register_command("tracesym",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracesym, this, _1, _2));
+	m_console.register_command("cls",       CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cls, this, _1, _2));
 	m_console.register_command("quit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
 	m_console.register_command("exit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2));
 	m_console.register_command("do",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_do, this, _1, _2));
@@ -541,7 +541,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	}
 
 	/* first look for a tag match */
-	result = m_machine.root_device().subdevice(param);
+	result = m_machine.root_device().subdevice(strmakelower(param));
 	if (result)
 		return true;
 
@@ -609,7 +609,7 @@ bool debugger_commands::validate_cpu_space_parameter(const char *param, int spac
 bool debugger_commands::validate_memory_region_parameter(const std::string &param, memory_region *&result)
 {
 	auto &regions = m_machine.memory().regions();
-	auto iter = regions.find(param);
+	auto iter = regions.find(strmakelower(param));
 	if(iter == regions.end()) {
 		m_console.printf("No matching memory region found for '%s'\n", param);
 		return false;
@@ -873,10 +873,10 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
-		symbol_entry *sym = m_console.visible_symtable().find(params[i].c_str());
+		symbol_entry *sym = m_console.visible_symtable().find(strmakelower(params[i]).c_str());
 		if (!sym)
 		{
-			m_console.printf("Unknown symbol: %s\n", params[i].c_str());
+			m_console.printf("Unknown symbol: %s\n", params[i]);
 			return;
 		}
 
@@ -894,6 +894,16 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
 	char buffer[1024];
 	if (mini_printf(buffer, format.str().c_str(), params.size(), values))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+}
+
+
+/*-------------------------------------------------
+    execute_cls - execute the cls command
+-------------------------------------------------*/
+
+void debugger_commands::execute_cls(int ref, const std::vector<std::string> &params)
+{
+	text_buffer_clear(m_console.get_console_textbuf());
 }
 
 
@@ -1108,7 +1118,7 @@ void debugger_commands::execute_ignore(int ref, const std::vector<std::string> &
 		/* special message for none */
 		if (buffer.empty())
 			buffer = string_format("Not currently ignoring any devices");
-		m_console.printf("%s\n", buffer.c_str());
+		m_console.printf("%s\n", buffer);
 	}
 
 	/* otherwise clear the ignore flag on all requested CPUs */
@@ -1171,7 +1181,7 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
 		/* special message for none */
 		if (buffer.empty())
 			buffer = string_format("Not currently observing any devices");
-		m_console.printf("%s\n", buffer.c_str());
+		m_console.printf("%s\n", buffer);
 	}
 
 	/* otherwise set the ignore flag on all requested CPUs */
@@ -1219,7 +1229,7 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
 		/* special message for none */
 		if (buffer.empty())
 			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer.c_str());
+		m_console.printf("%s\n", buffer);
 	}
 	else
 	{
@@ -1278,7 +1288,7 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 		/* special message for none */
 		if (buffer.empty())
 			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer.c_str());
+		m_console.printf("%s\n", buffer);
 	}
 	else
 	{
@@ -1396,7 +1406,7 @@ void debugger_commands::execute_comment_commit(int ref, const std::vector<std::s
 
 void debugger_commands::execute_comment_save(int ref, const std::vector<std::string> &params)
 {
-	if (m_cpu.comment_save())
+	if (m_machine.debugger().cpu().comment_save())
 		m_console.printf("Comment successfully saved\n");
 	else
 		m_console.printf("Comment not saved\n");
@@ -1547,7 +1557,7 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 					buffer.append(string_format(" if %s", bp.condition()));
 				if (std::string(bp.action()).compare("") != 0)
 					buffer.append(string_format(" do %s", bp.action()));
-				m_console.printf("%s\n", buffer.c_str());
+				m_console.printf("%s\n", buffer);
 				printed++;
 			}
 		}
@@ -1583,11 +1593,11 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 		return;
 
 	/* param 3 is the type */
-	if (params[2] == "r")
+	if (!core_stricmp(params[2].c_str(), "r"))
 		type = read_or_write::READ;
-	else if (params[2] == "w")
+	else if (!core_stricmp(params[2].c_str(), "w"))
 		type = read_or_write::WRITE;
-	else if (params[2] == "rw" || params[2] == "wr")
+	else if (!core_stricmp(params[2].c_str(), "rw") || !core_stricmp(params[2].c_str(), "wr"))
 		type = read_or_write::READWRITE;
 	else
 	{
@@ -1712,7 +1722,7 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 						buffer.append(string_format(" if %s", wp->condition()));
 					if (std::string(wp->action()).compare("") != 0)
 						buffer.append(string_format(" do %s", wp->action()));
-					m_console.printf("%s\n", buffer.c_str());
+					m_console.printf("%s\n", buffer);
 					printed++;
 				}
 			}
@@ -1845,7 +1855,7 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 				buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
 				if (rp.action() != nullptr)
 					buffer.append(string_format(" do %s", rp.action()));
-				m_console.printf("%s\n", buffer.c_str());
+				m_console.printf("%s\n", buffer);
 				printed++;
 			}
 		}
@@ -1975,7 +1985,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	f = fopen(params[0].c_str(), "wb");
 	if (!f)
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
@@ -2067,7 +2077,7 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
 	FILE *f = fopen(params[0].c_str(), "wb");
 	if (!f)
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 	fwrite(region->base() + offset, 1, length, f);
@@ -2099,7 +2109,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	f.open(params[0], std::ifstream::in | std::ifstream::binary);
 	if (f.fail())
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
@@ -2214,7 +2224,7 @@ void debugger_commands::execute_loadregion(int ref, const std::vector<std::strin
 	FILE *f = fopen(params[0].c_str(), "rb");
 	if (!f)
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
@@ -2295,7 +2305,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	FILE* f = fopen(params[0].c_str(), "w");
 	if (!f)
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
@@ -2431,7 +2441,7 @@ void debugger_commands::execute_strdump(int ref, const std::vector<std::string> 
 	FILE *f = fopen(params[0].c_str(), "w");
 	if (!f)
 	{
-		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
 
@@ -2601,9 +2611,10 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 		{
 			char *srtpnt = (char*)params[0].c_str();
 
-			if (*srtpnt == 's')
+			char sspec = std::tolower((unsigned char)*srtpnt);
+			if (sspec == 's')
 				m_cheat.signed_cheat = true;
-			else if (*srtpnt == 'u')
+			else if (sspec == 'u')
 				m_cheat.signed_cheat = false;
 			else
 			{
@@ -2611,13 +2622,14 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 				return;
 			}
 
-			if (*(++srtpnt) == 'b')
+			char wspec = std::tolower((unsigned char)*(++srtpnt));
+			if (wspec == 'b')
 				m_cheat.width = 1;
-			else if (*srtpnt == 'w')
+			else if (wspec == 'w')
 				m_cheat.width = 2;
-			else if (*srtpnt == 'd')
+			else if (wspec == 'd')
 				m_cheat.width = 4;
-			else if (*srtpnt == 'q')
+			else if (wspec == 'q')
 				m_cheat.width = 8;
 			else
 			{
@@ -2625,7 +2637,7 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 				return;
 			}
 
-			if (*(++srtpnt) == 's')
+			if (std::tolower((unsigned char)*(++srtpnt)) == 's')
 				m_cheat.swapped_cheat = true;
 			else
 				m_cheat.swapped_cheat = false;
@@ -2769,25 +2781,25 @@ void debugger_commands::execute_cheatnext(int ref, const std::vector<std::string
 	comp_value = cheat_sign_extend(&m_cheat, comp_value);
 
 	/* decode condition */
-	if (params[0] == "all")
+	if (!core_stricmp(params[0].c_str(), "all"))
 		condition = CHEAT_ALL;
-	else if (params[0] == "equal" || params[0] == "eq")
+	else if (!core_stricmp(params[0].c_str(), "equal") || !core_stricmp(params[0].c_str(), "eq"))
 		condition = (params.size() > 1) ? CHEAT_EQUALTO : CHEAT_EQUAL;
-	else if (params[0] == "notequal" || params[0] == "ne")
+	else if (!core_stricmp(params[0].c_str(), "notequal") || !core_stricmp(params[0].c_str(), "ne"))
 		condition = (params.size() > 1) ? CHEAT_NOTEQUALTO : CHEAT_NOTEQUAL;
-	else if (params[0] == "decrease" || params[0] == "de" || params[0] == "-")
+	else if (!core_stricmp(params[0].c_str(), "decrease") || !core_stricmp(params[0].c_str(), "de") || params[0] == "-")
 		condition = (params.size() > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
-	else if (params[0] == "increase" || params[0] == "in" || params[0] == "+")
+	else if (!core_stricmp(params[0].c_str(), "increase") || !core_stricmp(params[0].c_str(), "in") || params[0] == "+")
 		condition = (params.size() > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
-	else if (params[0] == "decreaseorequal" || params[0] == "deeq")
+	else if (!core_stricmp(params[0].c_str(), "decreaseorequal") || !core_stricmp(params[0].c_str(), "deeq"))
 		condition = CHEAT_DECREASE_OR_EQUAL;
-	else if (params[0] == "increaseorequal" || params[0] == "ineq")
+	else if (!core_stricmp(params[0].c_str(), "increaseorequal") || !core_stricmp(params[0].c_str(), "ineq"))
 		condition = CHEAT_INCREASE_OR_EQUAL;
-	else if (params[0] == "smallerof" || params[0] == "lt" || params[0] == "<")
+	else if (!core_stricmp(params[0].c_str(), "smallerof") || !core_stricmp(params[0].c_str(), "lt") || params[0] == "<")
 		condition = CHEAT_SMALLEROF;
-	else if (params[0] == "greaterof" || params[0] == "gt" || params[0] == ">")
+	else if (!core_stricmp(params[0].c_str(), "greaterof") || !core_stricmp(params[0].c_str(), "gt") || params[0] == ">")
 		condition = CHEAT_GREATEROF;
-	else if (params[0] == "changedby" || params[0] == "ch" || params[0] == "~")
+	else if (!core_stricmp(params[0].c_str(), "changedby") || !core_stricmp(params[0].c_str(), "ch") || params[0] == "~")
 		condition = CHEAT_CHANGEDBY;
 	else
 	{
@@ -3389,7 +3401,7 @@ void debugger_commands::execute_trace_internal(int ref, const std::vector<std::s
 				logerror = true;
 			else
 			{
-				m_console.printf("Invalid flag '%s'\n", flag.c_str());
+				m_console.printf("Invalid flag '%s'\n", flag);
 				return;
 			}
 		}
@@ -3412,7 +3424,7 @@ void debugger_commands::execute_trace_internal(int ref, const std::vector<std::s
 		f = fopen(filename.c_str(), mode);
 		if (!f)
 		{
-			m_console.printf("Error opening file '%s'\n", params[0].c_str());
+			m_console.printf("Error opening file '%s'\n", params[0]);
 			return;
 		}
 	}
@@ -3420,7 +3432,7 @@ void debugger_commands::execute_trace_internal(int ref, const std::vector<std::s
 	/* do it */
 	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action);
 	if (f)
-		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
+		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
 	else
 		m_console.printf("Stopped tracing on CPU '%s'\n", cpu->tag());
 }
@@ -3452,7 +3464,7 @@ void debugger_commands::execute_traceover(int ref, const std::vector<std::string
 
 void debugger_commands::execute_traceflush(int ref, const std::vector<std::string> &params)
 {
-	m_cpu.flush_traces();
+	m_machine.debugger().cpu().flush_traces();
 }
 
 
@@ -3808,7 +3820,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 	}
 	else
 	{
-		symtable = &m_cpu.global_symtable();
+		symtable = &m_machine.debugger().cpu().global_symtable();
 		m_console.printf("Global symbols:\n");
 	}
 
@@ -3819,7 +3831,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 		if (!entry.second->is_function())
 		{
 			namelist[count++] = entry.second->name();
-			if (count >= ARRAY_LENGTH(namelist))
+			if (count >= std::size(namelist))
 				break;
 		}
 	}
@@ -3899,7 +3911,7 @@ void debugger_commands::execute_mount(int ref, const std::vector<std::string> &p
 		}
 	}
 	if (!done)
-		m_console.printf("There is no image device :%s\n", params[0].c_str());
+		m_console.printf("There is no image device :%s\n", params[0]);
 }
 
 /*-------------------------------------------------
@@ -3963,7 +3975,7 @@ void debugger_commands::execute_dumpkbd(int ref, const std::vector<std::string> 
 	if (file != nullptr)
 		fprintf(file, "%s\n", buffer.c_str());
 	else
-		m_console.printf("%s\n", buffer.c_str());
+		m_console.printf("%s\n", buffer);
 
 	// cleanup
 	if (file != nullptr)

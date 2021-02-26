@@ -10,6 +10,7 @@
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 /*************************************************************************
@@ -291,5 +292,39 @@ protected:
 	required_device<generic_latch_8_device> m_sublatch;
 	required_ioport_array<2> m_players;
 };
+
+class mspactwin_state : public clubpacm_state
+{
+public:
+	mspactwin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: clubpacm_state(mconfig, type, tag)
+		, m_screen(*this, "screen")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_decrypted_opcodes_mirror(*this, "decrypted_opcodes_mirror")
+		, m_decrypted_opcodes_high(*this, "decrypted_opcodes_high")
+	{ }
+
+	void mspactwin(machine_config &config);
+
+	void init_mspactwin();
+
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+
+private:
+	required_device<screen_device> m_screen;
+
+protected:
+
+	void mspactwin_map(address_map &map);
+	void mspactwin_decrypted_map(address_map &map);
+
+	void mspactwin_videoram_w(offs_t offset, uint8_t data);
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes_mirror;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes_high;
+
+};
+
 
 #endif // MAME_INCLUDES_PACMAN_H

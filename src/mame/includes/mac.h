@@ -81,6 +81,7 @@ public:
 		m_main_buffer(true),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
+		m_vram64(*this,"vram64"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -117,8 +118,9 @@ public:
 	void maciifx(machine_config &config);
 	void macclas2(machine_config &config);
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
-		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 1);
+		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
+	void maciihd(machine_config &config);
 
 	void init_maclc2();
 	void init_maciifdhd();
@@ -290,6 +292,7 @@ private:
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<uint64_t> m_vram64;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
@@ -307,6 +310,7 @@ private:
 	void rbv_recalc_irqs();
 	void update_volume();
 
+	void mac_via_sync();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mac_via2_r(offs_t offset);
@@ -377,9 +381,6 @@ private:
 
 	inline bool has_adb() { return m_model >= MODEL_MAC_SE; }
 
-	// wait states for accessing the VIA
-	int m_via_cycles;
-
 	uint8_t m_oss_regs[0x400];
 
 	// AMIC for x100 PowerMacs
@@ -416,6 +417,7 @@ private:
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pwrmac(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

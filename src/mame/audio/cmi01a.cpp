@@ -252,7 +252,7 @@ void cmi01a_device::pulse_gzx()
 void cmi01a_device::reset_waveform_segment()
 {
 	m_segment_cnt &= 0x007f;
-	m_segment_cnt = 0x4000 | (m_ws << 7);
+	m_segment_cnt |= (0x4000 | (m_ws << 7));
 }
 
 void cmi01a_device::load_w(int state)

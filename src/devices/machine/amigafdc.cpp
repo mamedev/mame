@@ -629,7 +629,7 @@ bool amiga_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_imag
 		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
-			if(write_position < ARRAY_LENGTH(write_buffer))
+			if(write_position < std::size(write_buffer))
 				write_buffer[write_position++] = etime;
 		slot++;
 		tm = etime;

@@ -129,6 +129,8 @@ public:
 		, m_vg3(0)
 		, m_cv3(0)
 		, m_cv4(0)
+		, m_vc17(0)
+		, m_pixelcnt(0)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")

@@ -9,23 +9,25 @@
 #include "emu.h"
 #include "macadb.h"
 
-#define LOG_ADB             0
-#define LOG_ADB_MCU_CMD     0
-#define LOG_ADB_TALK_LISTEN 0
+#define LOG_TALK_LISTEN     (1 << 1U)
+#define LOG_STATE           (1 << 2U)
+#define LOG_LINESTATE       (1 << 3U)
+#define VERBOSE             (0)
+#include "logmacro.h"
 
 // ADB states
-#define ADB_STATE_NEW_COMMAND   (0)
-#define ADB_STATE_XFER_EVEN (1)
-#define ADB_STATE_XFER_ODD  (2)
-#define ADB_STATE_IDLE      (3)
-#define ADB_STATE_NOTINIT   (4)
+static constexpr int32_t ADB_STATE_NEW_COMMAND  = 0;
+static constexpr int32_t ADB_STATE_XFER_EVEN    = 1;
+static constexpr int32_t ADB_STATE_XFER_ODD     = 2;
+static constexpr int32_t ADB_STATE_IDLE         = 3;
+static constexpr int32_t ADB_STATE_NOTINIT      = 4;
 
 // ADB commands
-#define ADB_CMD_RESET       (0)
-#define ADB_CMD_FLUSH       (1)
+static constexpr int ADB_CMD_RESET              = 0;
+static constexpr int ADB_CMD_FLUSH              = 1;
 
-// use 1 MHz base to get microseconds
-static constexpr int adb_timebase = 1000000;
+// use 1 MHz base to get microseconds (hack: *2 to get old wrong HC05 numbers to all realign to reality)
+static constexpr int adb_timebase = 2000000;
 
 static constexpr int adb_short = 85;
 static constexpr int adb_long = 157;
@@ -223,6 +225,14 @@ void macadb_device::device_start()
 	this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macadb_device::mac_adb_tick),this));
 	this->m_adb_timer->adjust(attotime::never);
 
+	std::fill(std::begin(m_adb_buffer), std::end(m_adb_buffer), 0);
+	m_adb_listenreg = 0;
+	m_adb_listenaddr = 0;
+	m_adb_stream_ptr = 0;
+	m_adb_linein = 0;
+	std::fill(std::begin(m_adb_keybuf), std::end(m_adb_keybuf), 0);
+	std::fill(std::begin(m_adb_pram), std::end(m_adb_pram), 0);
+
 	save_item(NAME(m_last_adb_time));
 	save_item(NAME(m_key_matrix));
 	save_item(NAME(m_adb_waiting_cmd));
@@ -253,6 +263,7 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_pram));
+	save_item(NAME(m_adb_linein));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -275,9 +286,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_data_w)
  * High-level ADB primitives used by all lower-level implementations
  * *************************************************************************/
 
-#if LOG_ADB
 static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
-#endif
 
 int macadb_device::adb_pollkbd(int update)
 {
@@ -498,17 +507,13 @@ void macadb_device::adb_talk()
 				switch (reg)
 				{
 					case ADB_CMD_RESET:
-						#if LOG_ADB || LOG_ADB_TALK_LISTEN
-						printf("ADB RESET: reg %x address %x\n", reg, addr);
-						#endif
+						LOGMASKED(LOG_TALK_LISTEN, "ADB RESET: reg %x address %x\n", reg, addr);
 						m_adb_direction = 0;
 						m_adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
-						#if LOG_ADB || LOG_ADB_TALK_LISTEN
-						printf("ADB FLUSH: reg %x address %x\n", reg, addr);
-						#endif
+						LOGMASKED(LOG_TALK_LISTEN, "ADB FLUSH: reg %x address %x\n", reg, addr);
 
 						m_adb_direction = 0;
 						m_adb_send = 0;
@@ -523,9 +528,7 @@ void macadb_device::adb_talk()
 				m_adb_datasize = 0;
 				if ((addr == m_adb_keybaddr) || (addr == m_adb_mouseaddr))
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB LISTEN: reg %x address %x\n", reg, addr);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN: reg %x address %x\n", reg, addr);
 					m_adb_direction = 1;    // input from Mac
 					m_adb_command = 0;
 					m_adb_listenreg = reg;
@@ -535,17 +538,13 @@ void macadb_device::adb_talk()
 				}
 				else
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB LISTEN to unknown device, timing out\n");
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN to unknown device, timing out\n");
 					m_adb_direction = 0;
 				}
 				break;
 
 			case 3: // talk
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
 
 				// keep track of what device the Mac last TALKed to
 				m_adb_last_talk = addr;
@@ -555,9 +554,7 @@ void macadb_device::adb_talk()
 				{
 					uint8_t mouseX, mouseY;
 
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("Talking to mouse, register %x\n", reg);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "Talking to mouse, register %x\n", reg);
 
 					switch (reg)
 					{
@@ -599,9 +596,7 @@ void macadb_device::adb_talk()
 				else if (addr == m_adb_keybaddr)
 				{
 					int kbd_has_data = 1;
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("Talking to keyboard, register %x\n", reg);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
 					{
@@ -686,9 +681,7 @@ void macadb_device::adb_talk()
 				}
 				else
 				{
-					#if LOG_ADB || LOG_ADB_TALK_LISTEN
-					printf("ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
-					#endif
+					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
 
@@ -704,9 +697,7 @@ void macadb_device::adb_talk()
 	}
 	else
 	{
-		#if LOG_ADB || LOG_ADB_TALK_LISTEN
-		printf("Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
-		#endif
+		LOGMASKED(LOG_TALK_LISTEN, "Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
 
 		m_adb_direction = 0;
 
@@ -714,9 +705,7 @@ void macadb_device::adb_talk()
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("MOUSE: moving to address %x\n", m_adb_command);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
 				m_adb_mouseaddr = m_adb_command&0x0f;
 			}
 		}
@@ -724,9 +713,7 @@ void macadb_device::adb_talk()
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB || LOG_ADB_TALK_LISTEN
-				printf("KEYBOARD: moving to address %x\n", m_adb_command);
-				#endif
+				LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
 				m_adb_keybaddr = m_adb_command&0x0f;
 			}
 		}
@@ -894,9 +881,7 @@ void macadb_device::mac_adb_newaction(int state)
 {
 	if (state != m_adb_state)
 	{
-		#if LOG_ADB
-		printf("New ADB state: %s\n", adb_statenames[state]);
-		#endif
+		LOGMASKED(LOG_STATE, "New ADB state: %s\n", adb_statenames[state]);
 
 		m_adb_state = state;
 		m_adb_timer_ticks = 8;
@@ -1041,7 +1026,7 @@ void macadb_device::device_reset()
 
 WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 {
-  /*  static char const *const states[] =
+/*	static char const *const states[] =
     {
         "idle",
         "attention",
@@ -1059,10 +1044,16 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
         "srqnodata"
     };*/
 
+	if (state == m_adb_linein)
+	{
+		return;
+	}
+	m_adb_linein = state;
+
 	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
 	m_last_adb_time = machine().time().as_ticks(adb_timebase);
 
-	/*if (m_adb_linestate <= 12)
+/*	if (m_adb_linestate <= 12)
 	{
 	    printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
 	}
@@ -1093,11 +1084,11 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_IDLE:
 			if ((state) && (dtime >= 4500))     // reset
 			{
-//                printf("ADB RESET\n");
+				//printf("ADB RESET\n");
 			}
 			else if ((state) && (dtime >= 1200))    // attention
 			{
-//                printf("ADB ATTENTION\n");
+				//printf("ADB ATTENTION\n");
 				m_adb_waiting_cmd = 1;
 				m_adb_direction = 0;
 				m_adb_linestate++;
@@ -1107,7 +1098,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_ATTENTION:
 			if ((!state) && (dtime >= 90))     // Tsync
 			{
-//                printf("ADB Tsync\n");
+				//printf("ADB Tsync\n");
 				m_adb_command = 0;
 				m_adb_linestate++;
 			}
@@ -1127,7 +1118,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				{
 					m_adb_command |= 1;
 				}
-//                printf("ADB bit %d\n", m_adb_command & 1);
+				LOGMASKED(LOG_LINESTATE, "ADB bit %d\n", m_adb_command & 1);
 
 				if (m_adb_linestate != LST_BIT7)
 				{
@@ -1137,7 +1128,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				{
 					if (m_adb_direction)
 					{
-//                        printf("listen byte[%d] = %02x\n", m_adb_stream_ptr, m_adb_command);
+						LOGMASKED(LOG_LINESTATE, "listen byte[%d] = %02x\n", m_adb_stream_ptr, m_adb_command);
 						m_adb_buffer[m_adb_stream_ptr++] = m_adb_command;
 						m_adb_command = 0;
 					}
@@ -1150,7 +1141,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_TSTOP:
 			if (state)
 			{
-//                printf("ADB TSTOP, command byte %02x\n", m_adb_command);
+				LOGMASKED(LOG_LINESTATE, "ADB TSTOP, command byte %02x\n", m_adb_command);
 
 				if (m_adb_direction)
 				{
@@ -1171,11 +1162,11 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 
 				if (m_adb_datasize > 0)
 				{
-/*                    printf("Device has %d bytes of data: ", m_adb_datasize);
-                    for (int i = 0; i < m_adb_datasize; i++)
-                    {
-                        printf("%02x ", m_adb_buffer[i]);
-                    }*/
+					LOGMASKED(LOG_LINESTATE, "Device has %d bytes of data:\n", m_adb_datasize);
+					for (int i = 0; i < m_adb_datasize; i++)
+					{
+						LOGMASKED(LOG_LINESTATE, "  %02x\n", m_adb_buffer[i]);
+					}
 					m_adb_linestate = LST_TSTOPSTART;   // T1t
 					m_adb_timer->adjust(attotime::from_ticks(324/4, adb_timebase));
 					m_adb_stream_ptr = 0;
@@ -1202,7 +1193,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_WAITT1T:
 			if ((!state) && (dtime >= 300))     // T1t
 			{
-//                printf("ADB T1t\n");
+				LOGMASKED(LOG_LINESTATE, "ADB T1t\n");
 				m_adb_linestate++;
 			}
 			break;
@@ -1210,7 +1201,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_RCVSTARTBIT:
 			if ((!state) && (dtime >= 90))       // start
 			{
-//                printf("ADB start\n");
+				LOGMASKED(LOG_LINESTATE, "ADB start\n");
 				m_adb_linestate = LST_BIT0;
 				m_adb_command = 0;
 			}

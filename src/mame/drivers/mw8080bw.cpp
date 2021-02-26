@@ -2209,6 +2209,8 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 
 	/* setup for save states */
 	save_item(NAME(m_phantom2_cloud_counter));
+
+	m_phantom2_cloud_counter = 0;
 }
 
 

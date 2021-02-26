@@ -317,6 +317,7 @@ void overdriv_state::machine_reset()
 	m_zoom_colorbase[1] = 0;
 	m_road_colorbase[0] = 0;
 	m_road_colorbase[1] = 0;
+	m_fake_timer = 0;
 
 	/* start with cpu B halted */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

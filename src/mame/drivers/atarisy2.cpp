@@ -799,28 +799,14 @@ void atarisy2_state::main_map(address_map &map)
 	map(0014000, 0014001).mirror(01776).r(FUNC(atarisy2_state::switch_r));
 	map(0014000, 0014000).mirror(01776).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0016000, 0016001).mirror(01776).r(FUNC(atarisy2_state::sound_r));
-	map(0020000, 0037777).m(m_vrambank, FUNC(address_map_bank_device::amap16));
+	map(0020000, 0037777).view(m_vmmu);
+	m_vmmu[0](020000, 033777).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	m_vmmu[0](034000, 037777).ram().w(FUNC(atarisy2_state::spriteram_w)).share("mob");
+	m_vmmu[2](020000, 037777).ram().w(FUNC(atarisy2_state::playfieldt_w)).share(m_playfieldt);
+	m_vmmu[3](020000, 037777).ram().w(FUNC(atarisy2_state::playfieldb_w)).share(m_playfieldb);
 	map(0040000, 0057777).bankr("rombank1");
 	map(0060000, 0077777).bankr("rombank2");
 	map(0100000, 0177777).rom();
-	map(0100000, 0100777).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w));
-}
-
-
-/*************************************
- *
- *  Bankswitched VRAM handlers
- *
- *************************************/
-
-// full memory map derived from schematics
-void atarisy2_state::vrambank_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(000000, 013777).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(014000, 017777).ram().w(FUNC(atarisy2_state::spriteram_w)).share("mob");
-	map(020000, 037777).ram();
-	map(040000, 077777).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 }
 
 
@@ -1275,8 +1261,6 @@ void atarisy2_state::atarisy2(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(atarisy2_state::vblank_int));
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 020000);
-
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1309,6 +1293,8 @@ void atarisy2_state::paperboy(machine_config &config)
 {
 	atarisy2(config);
 	SLAPSTIC(config, m_slapstic, 105);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
 }
 
 
@@ -1320,6 +1306,8 @@ void atarisy2_state::_720(machine_config &config)
 	   to ~2.2MHz "fixes" the problem */
 
 	SLAPSTIC(config, m_slapstic, 107);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
 }
 
 
@@ -1327,6 +1315,8 @@ void atarisy2_state::ssprint(machine_config &config)
 {
 	atarisy2(config);
 	SLAPSTIC(config, m_slapstic, 108);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
 
 	// sound hardware
 	config.device_remove("tms");
@@ -1337,6 +1327,8 @@ void atarisy2_state::csprint(machine_config &config)
 {
 	atarisy2(config);
 	SLAPSTIC(config, m_slapstic, 109);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
 
 	// sound hardware
 	config.device_remove("tms");
@@ -1347,6 +1339,8 @@ void atarisy2_state::apb(machine_config &config)
 {
 	atarisy2(config);
 	SLAPSTIC(config, m_slapstic, 110);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
 }
 
 

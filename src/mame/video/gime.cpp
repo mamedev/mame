@@ -154,13 +154,13 @@ void gime_device::device_start(void)
 	m_gime_clock_timer = timer_alloc(TIMER_GIME_CLOCK);
 
 	// setup banks
-	assert(ARRAY_LENGTH(m_read_banks) == ARRAY_LENGTH(m_write_banks));
-	for (int i = 0; i < ARRAY_LENGTH(m_read_banks); i++)
+	assert(std::size(m_read_banks) == std::size(m_write_banks));
+	for (int i = 0; i < std::size(m_read_banks); i++)
 	{
 		char buffer[8];
-		snprintf(buffer, ARRAY_LENGTH(buffer), "rbank%d", i);
+		snprintf(buffer, std::size(buffer), "rbank%d", i);
 		m_read_banks[i] = machine().root_device().membank(buffer);
-		snprintf(buffer, ARRAY_LENGTH(buffer), "wbank%d", i);
+		snprintf(buffer, std::size(buffer), "wbank%d", i);
 		m_write_banks[i] = machine().root_device().membank(buffer);
 	}
 
@@ -180,8 +180,8 @@ void gime_device::device_start(void)
 	update_composite_palette();
 
 	// set up save states
-	save_pointer(NAME(m_gime_registers), ARRAY_LENGTH(m_gime_registers));
-	save_pointer(NAME(m_mmu), ARRAY_LENGTH(m_mmu));
+	save_item(NAME(m_gime_registers));
+	save_item(NAME(m_mmu));
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_ff22_value));
 	save_item(NAME(m_interrupt_value));
@@ -506,7 +506,7 @@ inline void gime_device::update_memory(void)
 void gime_device::update_memory(int bank)
 {
 	// choose bank
-	assert((bank >= 0) && (bank < ARRAY_LENGTH(m_read_banks)) && (bank < ARRAY_LENGTH(m_write_banks)));
+	assert((bank >= 0) && (bank < std::size(m_read_banks)) && (bank < std::size(m_write_banks)));
 	memory_bank *read_bank = m_read_banks[bank];
 	memory_bank *write_bank = m_write_banks[bank];
 
@@ -1036,10 +1036,10 @@ inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 		if (m_palette_rotated_position_used)
 		{
 			/* identify the new position */
-			uint16_t new_palette_rotated_position = (m_palette_rotated_position + 1) % ARRAY_LENGTH(m_palette_rotated);
+			uint16_t new_palette_rotated_position = (m_palette_rotated_position + 1) % std::size(m_palette_rotated);
 
 			/* copy the palette */
-			for (int i = 0; i < ARRAY_LENGTH(m_palette_rotated[0]); i++)
+			for (int i = 0; i < std::size(m_palette_rotated[0]); i++)
 				m_palette_rotated[new_palette_rotated_position][i] = m_palette_rotated[m_palette_rotated_position][i];
 
 			/* and advance */

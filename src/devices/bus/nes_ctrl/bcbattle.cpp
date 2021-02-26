@@ -119,7 +119,7 @@ void nes_bcbattle_device::device_reset()
 	m_transmitting = 0;
 	m_cur_bit = 0;
 	m_cur_byte = 0;
-	memset(m_current_barcode, 0, ARRAY_LENGTH(m_current_barcode));
+	std::fill(std::begin(m_current_barcode), std::end(m_current_barcode), 0);
 }
 
 
