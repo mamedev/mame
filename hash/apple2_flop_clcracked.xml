@@ -3276,20 +3276,26 @@ license:CC0
 		<year>1983</year>
 		<publisher>Davka Corporation</publisher>
 		<info name="release" value="2017-08-29"/>
+		<!-- On Feb 25th 2021, 4AM recracked "All About Purim" from the original
+		disks to fix some data corruption in disk 2 that was introduced during
+		the original (pre-Applesauce) disk imaging process. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1, Side 1"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 1.dsk" size="143360" crc="2d9fbe91" sha1="9572fb9474a21a347e4f8ebe2ebad75a46d247f4" />
+				<rom name="all about purim (4am crack) disk 1 side 1.dsk" size="143360" crc="0d1e25a0" sha1="5a6370115e51d63193dd47b98e40e8a12720fac5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1, Side 2"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 2.dsk" size="143360" crc="e5fc68c9" sha1="e6f29aca09461d841d1ead8b9157887948cec8e5" />
+				<rom name="all about purim (4am crack) disk 1 side 2.dsk" size="143360" crc="c32d6d3e" sha1="9d52c53ba85e995bf661c5dba684dc11a9ece7aa" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2, Side 1"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 3.dsk" size="143360" crc="8ef26463" sha1="823b87aae72902d8c1d358123b4cc2d4ffeffe1b" />
+				<rom name="all about purim (4am crack) disk 2 side 1.dsk" size="143360" crc="c6eb7822" sha1="c439413d73f8bb3c5d4aea60da60464d35544b67" />
 			</dataarea>
 		</part>
 	</software>
