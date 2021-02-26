@@ -878,6 +878,7 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"capcom",
 		"ces",
 		"cinemat",
+		"cirsa",
 		"comad",
 		"cvs",
 		"dataeast",
@@ -1641,6 +1642,15 @@ files {
 	MAME_DIR .. "src/mame/audio/leland.cpp",
 	MAME_DIR .. "src/mame/audio/leland.h",
 	MAME_DIR .. "src/mame/video/leland.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "cirsa")
+files {
+	MAME_DIR .. "src/mame/drivers/cirsa820xxx.cpp",
+	MAME_DIR .. "src/mame/drivers/cirsa910510.cpp",
+	MAME_DIR .. "src/mame/drivers/miniguay.cpp",
+	MAME_DIR .. "src/mame/drivers/missbamby.cpp",
+	MAME_DIR .. "src/mame/drivers/neptunp2.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "comad")
@@ -4815,7 +4825,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
 	MAME_DIR .. "src/mame/drivers/chsuper.cpp",
-	MAME_DIR .. "src/mame/drivers/cirsa820xxx.cpp",
 	MAME_DIR .. "src/mame/drivers/clowndwn.cpp",
 	MAME_DIR .. "src/mame/drivers/clpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
@@ -4995,10 +5004,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
-	MAME_DIR .. "src/mame/drivers/miniguay.cpp",
 	MAME_DIR .. "src/mame/drivers/minivideo.cpp",
 	MAME_DIR .. "src/mame/drivers/mirax.cpp",
-	MAME_DIR .. "src/mame/drivers/missbamby.cpp",
 	MAME_DIR .. "src/mame/drivers/mjsenpu.cpp",
 	MAME_DIR .. "src/mame/drivers/mole.cpp",
 	MAME_DIR .. "src/mame/drivers/mosaic.cpp",
@@ -5011,7 +5018,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/murogem.cpp",
 	MAME_DIR .. "src/mame/drivers/murogmbl.cpp",
 	MAME_DIR .. "src/mame/drivers/neoprint.cpp",
-	MAME_DIR .. "src/mame/drivers/neptunp2.cpp",
 	MAME_DIR .. "src/mame/drivers/news.cpp",
 	MAME_DIR .. "src/mame/includes/news.h",
 	MAME_DIR .. "src/mame/video/news.cpp",
