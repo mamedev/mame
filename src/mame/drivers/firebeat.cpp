@@ -390,6 +390,7 @@ public:
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void init_kbh();
 	void init_kbm();
 	void firebeat_kbm(machine_config &config);
 
@@ -1507,6 +1508,12 @@ void firebeat_kbm_state::init_kbm()
 	m_cabinet_info = 2;
 }
 
+void firebeat_kbm_state::init_kbh()
+{
+	init_kbm();
+	m_cabinet_info = 3;
+}
+
 void firebeat_kbm_state::init_keyboard()
 {
 	// set keyboard timer
@@ -2029,10 +2036,24 @@ ROM_START( kbm )
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "974jac01", 0, BAD_DUMP SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
+	DISK_IMAGE_READONLY( "gq974-ja c01", 0, SHA1(46b766b5ed75de4139df369b414692919de244c7) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "974jaa02", 1, BAD_DUMP SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
+	DISK_IMAGE_READONLY( "gq974-ja a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) )
+ROM_END
+
+ROM_START( kbh )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea))
+
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(af4e8182f6a984895d9a9a00bbfb6c65fb7b4738) )
+
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) ) // identical to jaa02 image
 ROM_END
 
 ROM_START( kbm2nd )
@@ -2043,10 +2064,10 @@ ROM_START( kbm2nd )
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(25784881) SHA1(99ba9456a91af3043baed2bbf72feed73df564b2))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "a01jaa01", 0, BAD_DUMP SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
+	DISK_IMAGE_READONLY( "a01 ja a01", 0, SHA1(0aabc0c03f7ae7e7633bf6056de833ace68f9163) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "a01jaa02", 1, BAD_DUMP SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
+	DISK_IMAGE_READONLY( "a01 ja a02", 1, SHA1(4d62f6ecfbf5ab0b014feb7b01014cba440c87f8) )
 ROM_END
 
 ROM_START( kbm3rd )
@@ -2312,9 +2333,10 @@ GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppd, ROT0, 
 GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_NOT_WORKING )
 GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
 
-GAMEL( 2000, kbm,    0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbm2nd, 0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2001, kbm3rd, 0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbh, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
 
 GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING )
 GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING )
