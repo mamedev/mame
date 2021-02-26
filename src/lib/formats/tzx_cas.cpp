@@ -323,7 +323,7 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 	}
 	
 	
-		/* data */
+	/* data */
 	int start_bits = (startvalue & 0x01) ? bit1_samples : bit0_samples;
 	int stop_bits  = (stopvalue  & 0x01) ? bit1_samples : bit0_samples;
 	int multistart = startbits * ((startvalue & 0x01) ? bit1_pulses : bit0_pulses)/2;
