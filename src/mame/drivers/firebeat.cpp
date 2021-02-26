@@ -74,6 +74,15 @@
         GQ972 Main Board
         2x CD-ROM drive in Slot 1
 
+	Pop'n Music
+	------------
+        GQ986 Backplane
+        GQ971 SPU
+        GQ972 Main Board
+        CD-ROM drive in Slot 1
+        DVD-ROM drive in Slot 2
+
+
 
 
     Games that run on this hardware:
@@ -86,6 +95,7 @@
     GCA21      GCB07          2002    Beatmania III Append 7th Mix
     GCA21      GCC01          2003    Beatmania III The Final
     GQ974      GQ974          2000    Keyboardmania
+    ???        GU974          2000    Keyboard Heaven
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
     GQ974      GCA12          2001    Keyboardmania 3rd Mix
     GQ977      GQ977          2000    Para Para Paradise
@@ -101,17 +111,6 @@
     ???        GQ976          2000    Pop'n Music Mickey Tunes!
     ???        GQ987          2000    Pop'n Music Animelo
     ???        GEA02          2001    Pop'n Music Animelo 2
-
-Dumpable pieces missing
------------------------
-Beatmania III - CD, HDD, EPROM on main board, EPROM on SPU board
-Beatmania III Append 6th Mix - HDD, dongle, EPROM on main board, EPROM on SPU board
-Para Para Paradise - dongle, program CD
-Para Para Paradise 1.1 - dongle
-Para Para Dancing - dongle, program CD
-Pop'n Music Animelo - dongle, CD, DVD
-Keyboard Mania  - dongle, program CD, audio CD
-Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
     TODO:
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
