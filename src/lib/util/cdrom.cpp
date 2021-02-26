@@ -824,6 +824,29 @@ int cdrom_get_track_type(cdrom_file *file, int track)
 
 
 /*-------------------------------------------------
+    cdrom_is_audio_media - heuristically determine
+    type of media based on track types
+-------------------------------------------------*/
+
+int cdrom_get_media_type(cdrom_file *file)
+{
+	int media_type = CD_MEDIA_UNKNOWN;
+
+	if (file == nullptr)
+		return media_type;
+
+	for (int i = 0; i < file->cdtoc.numtrks; i++) {
+		if (file->cdtoc.tracks[i].trktype == CD_TRACK_AUDIO) {
+			media_type |= CD_MEDIA_AUDIO;
+		} else {
+			media_type |= CD_MEDIA_DATA;
+		}
+	}
+
+	return media_type;
+}
+
+/*-------------------------------------------------
     cdrom_get_toc - return the TOC data for a
     CD-ROM
 -------------------------------------------------*/
