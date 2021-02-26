@@ -357,8 +357,6 @@ static int tsx_msx_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 				size += bit_samples;
 				toggle_wave_data();
 			}
-			
-			
 		}
 		for (int stoploop = 0; stoploop < multistop; stoploop++)
 		{
