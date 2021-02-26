@@ -42,7 +42,7 @@ void mm5799_device::data_map(address_map &map)
 
 
 // device definitions
-mm5799_device::mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5799_device::mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	cops1_base_device(mconfig, MM5799, tag, owner, clock, 11, address_map_constructor(FUNC(mm5799_device::program_map), this), 7, address_map_constructor(FUNC(mm5799_device::data_map), this))
 { }
 

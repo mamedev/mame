@@ -131,6 +131,7 @@ using util::BIT;
 #include "cpu/pic17/pic17d.h"
 #include "cpu/powerpc/ppc_dasm.h"
 #include "cpu/pps4/pps4dasm.h"
+#include "cpu/pps41/pps41d.h"
 #include "cpu/psx/psxdasm.h"
 #include "cpu/rii/riidasm.h"
 #include "cpu/romp/rompdasm.h"
@@ -498,6 +499,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips3be",         be,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mips3le",         le,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mm5799",          le,  0, []() -> util::disasm_interface * { return new mm5799_disassembler; } },
+	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
 	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
 	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },

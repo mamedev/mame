@@ -16162,6 +16162,9 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
+@source:hh_pps41.cpp
+mastmind                        // Invicta
+
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
 bassmate                        // Telko

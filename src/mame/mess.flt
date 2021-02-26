@@ -390,6 +390,7 @@ hh_cops1.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
+hh_pps41.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp

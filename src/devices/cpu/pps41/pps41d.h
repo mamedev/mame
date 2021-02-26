@@ -2,21 +2,21 @@
 // copyright-holders:hap
 /*
 
-  National Semiconductor COPS(MM57 MCU family) disassembler
+  Rockwell PPS-4/1 disassembler
 
 */
 
-#ifndef MAME_CPU_COPS1_COPS1D_H
-#define MAME_CPU_COPS1_COPS1D_H
+#ifndef MAME_CPU_PPS41_PPS41D_H
+#define MAME_CPU_PPS41_PPS41D_H
 
 #pragma once
 
 
-class cops1_common_disassembler : public util::disasm_interface
+class pps41_common_disassembler : public util::disasm_interface
 {
 public:
-	cops1_common_disassembler();
-	virtual ~cops1_common_disassembler() = default;
+	pps41_common_disassembler();
+	virtual ~pps41_common_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override { return 1; }
 	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED; }
@@ -29,13 +29,14 @@ protected:
 	enum e_mnemonics
 	{
 		em_ILL,
-		em_AD, em_ADD, em_SUB, em_COMP, em_0TA, em_ADX, em_HXA, em_TAM, em_SC, em_RSC, em_TC,
-		em_TIN, em_TF, em_TKB, em_TIR,
-		em_BTD, em_DSPA, em_DSPS, em_AXO, em_LDF, em_READ,
-		em_GO, em_CALL, em_RET, em_RETS, em_LG, em_LGCALL, em_NOP,
-		em_EXC, em_EXCM, em_EXCP, em_MTA, em_LM,
-		em_SM1, em_SM2, em_SM4, em_SM8, em_RSM1, em_RSM2, em_RSM4, em_RSM8, em_TM,
-		em_LB, em_LBL, em_ATB, em_BTA, em_HXBR
+		em_XAB, em_LBA, em_LB, em_EOB,
+		em_SB, em_RB, em_SKBF,
+		em_XAS, em_LSA,
+		em_L, em_X, em_XDSK, em_XNSK,
+		em_A, em_AC, em_ACSK, em_ASK, em_COM, em_RC, em_SC, em_SKNC, em_LAI, em_AISK,
+		em_RT, em_RTSK, em_T, em_NOP, em_TL, em_TM, em_TML, em_TR,
+		em_SKMEA, em_SKBEI, em_SKAEI,
+		em_SOS, em_ROS, em_SKISL, em_IBM, em_OB, em_IAM, em_OA, em_IOS, em_I1, em_I2C, em_INT1H, em_DIN1, em_INT0L, em_DIN0, em_SEG1, em_SEG2,
 	};
 
 	static const char *const s_name[];
@@ -49,17 +50,17 @@ protected:
 	offs_t common_disasm(const u8 *lut_opmap, std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params);
 };
 
-class mm5799_disassembler : public cops1_common_disassembler
+class mm76_disassembler : public pps41_common_disassembler
 {
 public:
-	mm5799_disassembler() = default;
-	virtual ~mm5799_disassembler() = default;
+	mm76_disassembler() = default;
+	virtual ~mm76_disassembler() = default;
 
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const u8 mm5799_opmap[0x100];
+	static const u8 mm76_opmap[0x100];
 
 };
 
-#endif // MAME_CPU_COPS1_COPS1D_H
+#endif // MAME_CPU_PPS41_PPS41D_H

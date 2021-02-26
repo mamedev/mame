@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-National Semiconductor COPS(MM57 MCU family) cores
+  National Semiconductor COPS(MM57 MCU family) cores
 
 This is the first "COPS" series (Controller Oriented Processor Systems),
 4-bit MCUs with internal RAM and most of them internal ROM too.
@@ -36,7 +36,7 @@ TODO:
 #include "debugger.h"
 
 
-cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
@@ -192,8 +192,9 @@ void cops1_base_device::cycle()
 void cops1_base_device::increment_pc()
 {
 	// low part is LFSR
-	u8 feed = (m_pc & 0x3f) == 0 || ((m_pc >> 1 ^ m_pc) & 1) ? 0x20 : 0;
-	m_pc = (m_pc & ~0x3f) | (m_pc >> 1 & 0x1f) | feed;
+	int feed = ((m_pc & 0x3e) == 0) ? 1 : 0;
+	feed ^= (m_pc >> 1 ^ m_pc) & 1;
+	m_pc = (m_pc & ~0x3f) | (m_pc >> 1 & 0x1f) | (feed << 5);
 }
 
 void cops1_base_device::execute_run()
@@ -209,7 +210,8 @@ void cops1_base_device::execute_run()
 			m_write_blk(0);
 
 		// fetch next opcode
-		debugger_instruction_hook(m_pc);
+		if (!m_skip)
+			debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		cycle();
