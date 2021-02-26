@@ -249,7 +249,7 @@ ROM_START( ccorsario ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "cirsa_corsario_b-2057-a_s127_1.0.u14", 0x00000, 0x80000, CRC(f15ccc6b) SHA1(08f2f0129634075297d4a6b9697ba5bd0c8455ce) )
-	ROM_LOAD( "cirsa_corsario_b-2057-a_s128_1.0.u15", 0x10000, 0x80000, CRC(061dc7c8) SHA1(a9c8da9c2e7cecd8800974ce70546cc60391cfe8) )
+	ROM_LOAD( "cirsa_corsario_b-2057-a_s128_1.0.u15", 0x80000, 0x80000, CRC(061dc7c8) SHA1(a9c8da9c2e7cecd8800974ce70546cc60391cfe8) )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(0212ae8f) SHA1(d1db767bd4314894e0cbf8063290fe3260646843) )
