@@ -104,7 +104,7 @@ void elan_ep3a19a_state::elan_ep3a19a_map(address_map &map)
 	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	map(0x5000, 0x5014).m(m_sys, FUNC(elan_ep3a19asys_device::map)); // including DMA controller
-	//map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
+	map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
 
 	// 504x GPIO area?
 	//map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
@@ -245,15 +245,13 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	ELAN_EP3A19A_SYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
-	
-
-	
+		
 	ELAN_EU3A05_VID(config, m_vid, 0);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
 	m_vid->set_entries(256);
-	
+	m_vid->set_is_pvmilfin();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
