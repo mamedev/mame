@@ -646,7 +646,7 @@ void mac_state::maciifx_map(address_map &map)
 
 void mac_state::pwrmac_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram(); // 8 MB standard
+	map(0x00000000, 0x007fffff).ram().share("vram64"); // 8 MB standard
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
 
@@ -1244,7 +1244,7 @@ void mac_state::pwrmac(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_size(1024, 768);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
+	m_screen->set_screen_update(FUNC(mac_state::screen_update_pwrmac));
 
 	PALETTE(config, m_palette).set_entries(256);
 

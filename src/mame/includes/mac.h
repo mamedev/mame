@@ -81,6 +81,7 @@ public:
 		m_main_buffer(true),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
+		m_vram64(*this,"vram64"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -291,6 +292,7 @@ private:
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<uint64_t> m_vram64;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
@@ -415,6 +417,7 @@ private:
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pwrmac(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
