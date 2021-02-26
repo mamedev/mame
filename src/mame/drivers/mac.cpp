@@ -1208,7 +1208,7 @@ void mac_state::maciici(machine_config &config)
 
 void mac_state::maciisi(machine_config &config)
 {
-	macii(config, false, asc_device::asc_type::ASC, false);
+	macii(config, false, asc_device::asc_type::ASC, false, true, true, 1);
 
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);

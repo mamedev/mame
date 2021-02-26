@@ -31,7 +31,7 @@ static constexpr int adb_timebase = 2000000;
 
 static constexpr int adb_short = 85;
 static constexpr int adb_long = 157;
-static constexpr int adb_srq = ((85+157)*4);
+static constexpr int adb_srq = ((85+157)*3);
 
 // ADB line states
 enum
