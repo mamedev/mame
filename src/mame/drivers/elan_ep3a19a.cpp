@@ -281,7 +281,7 @@ void elan_ep3a19a_state::init_tvbg()
 	}
 }
 
-CONS( 200?, tvbg6a, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_NOT_WORKING )
+CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_NOT_WORKING ) // https://www.youtube.com/watch?v=zajzQo47YYA
 // TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over  https://www.youtube.com/watch?v=JbrR67kY8MI
 
 // TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em
