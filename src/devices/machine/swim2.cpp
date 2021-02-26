@@ -525,7 +525,6 @@ void swim2_device::sync()
 								crc_clear();
 							else if(!m_crc)
 								m_sr |= M_CRC0;
-							logerror("DATAR %03x %04x\n", m_sr, m_crc);
 							if(fifo_push(m_sr) && !m_error)
 								m_error |= 0x01;
 						}
