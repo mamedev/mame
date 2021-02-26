@@ -3665,8 +3665,6 @@ files {
 	MAME_DIR .. "src/mame/machine/fd1089.h",
 	MAME_DIR .. "src/mame/machine/fd1094.cpp",
 	MAME_DIR .. "src/mame/machine/fd1094.h",
-	MAME_DIR .. "src/mame/machine/fddebug.cpp",
-	MAME_DIR .. "src/mame/machine/fddebug.h",
 	MAME_DIR .. "src/mame/machine/mc8123.cpp",
 	MAME_DIR .. "src/mame/machine/mc8123.h",
 	MAME_DIR .. "src/mame/machine/segaic16.cpp",
