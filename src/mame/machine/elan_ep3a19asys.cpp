@@ -22,9 +22,25 @@ device_memory_interface::space_config_vector elan_ep3a19asys_device::memory_spac
 	};
 }
 
+
+void elan_ep3a19asys_device::rombank_w(offs_t offset, uint8_t data)
+{
+	m_rombank_lo = data;
+	m_bank->set_bank(m_rombank_lo);
+}
+
+uint8_t elan_ep3a19asys_device::rombank_r(offs_t offset)
+{
+	return m_rombank_lo;
+}
+
+
 void elan_ep3a19asys_device::map(address_map& map)
 {
 //	elan_eu3a05commonsys_device::map(map); // 00 - 0e
+
+	map(0x0c, 0x0c).rw(FUNC(elan_ep3a19asys_device::rombank_r), FUNC(elan_ep3a19asys_device::rombank_w));
+
 	map(0x0d, 0x13).rw(FUNC(elan_ep3a19asys_device::dma_param_r), FUNC(elan_ep3a19asys_device::dma_param_w));
 	map(0x14, 0x14).rw(FUNC(elan_ep3a19asys_device::elan_eu3a05_dmatrg_r), FUNC(elan_ep3a19asys_device::elan_eu3a05_dmatrg_w));
 }

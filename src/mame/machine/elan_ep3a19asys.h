@@ -25,6 +25,9 @@ protected:
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
 
+	void rombank_w(offs_t offset, uint8_t data);
+	uint8_t rombank_r(offs_t offset);
+
 private:
 	const address_space_config      m_space_config;
 	uint8_t m_dmaparams[7];
