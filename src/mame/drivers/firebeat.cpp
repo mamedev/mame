@@ -345,8 +345,9 @@ public:
 	{ }
 
 	void firebeat_ppp(machine_config &config);
-	void init_ppd();
-	void init_ppp();
+	void init_ppp_base();
+	void init_ppp_jp();
+	void init_ppp_overseas();
 
 private:
 	virtual void device_resolve_objects() override;
@@ -389,8 +390,9 @@ public:
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_kbh();
-	void init_kbm();
+	void init_kbm_base();
+	void init_kbm_jp();
+	void init_kbm_overseas();
 	void firebeat_kbm(machine_config &config);
 
 private:
@@ -464,7 +466,9 @@ public:
 	{ }
 
 	void firebeat_popn(machine_config &config);
-	void init_popn();
+	void init_popn_base();
+	void init_popn_jp();
+	void init_popn_rental();
 };
 
 /*****************************************************************************/
@@ -495,6 +499,12 @@ void firebeat_state::init_firebeat()
 	m_extend_board_irq_enable = 0x3f;
 	m_extend_board_irq_active = 0x00;
 
+	// Set to defaults here, but overridden for most specific games. It represents various bits of
+	// data, such as the firebeat's ability to play certain games at all, whether the firebeat is
+	// meant as a rental unit or normal unit, and whether the unit is meant as a JP firebeat or
+	// overseas firebeat. Unfortunately, some of the bits seem to change meaning depending on the
+	// game series. Different dongles force games to check for different bits set in this info.
+	// Specifics of the bitmask are documented in the various game series init functions.
 	m_cabinet_info = 0;
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
@@ -600,15 +610,32 @@ uint32_t firebeat_state::cabinet_r(offs_t offset, uint32_t mem_mask)
 
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
-/* popn7 supports 8 different dongles:
-   - Manufacture
-   - Service
-   - Event
-   - Oversea
-   - No Hardware
-   - Rental
-   - Debug
-   - Normal
+/*
+	Each DS1991 dongle has 3 secure enclaves. The first enclave is always the game
+	serial number. This is a 9 digit alphanumeric ID. The first three characters are
+	always the game's code, and the rest of the characters are all digits. The fourth
+	character seems to be a region specifier and causes many games to check against
+	values in the m_cabinet_info register to verify that the hardware matches. This was
+	used to region lock JP and overseas data as well as specify that certain firebeats
+	only accept e-Amusement dongles (Konami's rental service before it was an online network).
+
+	Odd numbers in the 4th position correspond to JP data, with 1 and 3 being observed
+	values in the wild. Some games also accept a 7 and a few games also accept a 5.
+	Even numbers in the 4th position correspond to overseas data, with 4 being the only
+	observed value. A 0 or 9 in the 4th position is game-specific (much like the handling of
+	m_cabinet_info) but generally correspond to rental data.
+
+	The second enclave is license data for some Pop'n Music games and specifies the length
+	of time a dongle is valid for. The RTCRAM is used for this check which is why there is
+	no operator menu to change the RTC. Instead, the time is set using the license check
+	screen that appears on some series such as Pop'n Music and Firebeat. It is encoded in
+	the password that is given to the operator to pass the check. For games which do not use
+	extended license information, this enclave is left blank.
+
+	The third enclave is a mode switch. Every game looks for some unique set of data here
+	and will turn on manufacture/service mode if the right value is set. Some games also
+	look for overseas and rental strings here and a few also have no hardware check dongles
+	and debug dongles. In the case of normal retail dongles, this enclave is left blank.
 */
 
 enum
@@ -1195,6 +1222,12 @@ void firebeat_bm3_state::init_bm3()
 {
 	init_firebeat();
 	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
+
+	// No cabinet info changes for BMIII are needed at this point. All sourced data is for JP region
+	// non-rental firebeat stacks. So, no region-specific overrides are present for BMIII. If we
+	// were to ever find rental or overseas data for BMIII, we should break this out and document
+	// the bitfield as used by BMIII series.
+	m_cabinet_info = 0x0;
 }
 
 void firebeat_bm3_state::firebeat_bm3_map(address_map &map)
@@ -1329,10 +1362,28 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 	TIMER(config, "spu_timer").configure_periodic(FUNC(firebeat_popn_state::spu_timer_callback), attotime::from_hz(500));
 }
 
-void firebeat_popn_state::init_popn()
+void firebeat_popn_state::init_popn_base()
 {
 	init_firebeat();
 	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
+}
+
+void firebeat_popn_state::init_popn_jp()
+{
+	init_popn_base();
+
+	// Non-rental, JP data.
+	m_cabinet_info = 0x0;
+}
+
+void firebeat_popn_state::init_popn_rental()
+{
+	init_popn_base();
+
+	// Like all other firebeat types, bit 0 is the JP/overseas switch. Pop'n seems to use
+	// bits 1 and 2 to designate a rental cabinet. Rental data does not seem to care about
+	// the region bit, so will accept value 0x6 or 0x7. Arbitrarily choose "JP".
+	m_cabinet_info = 0x6;
 }
 
 
@@ -1358,20 +1409,28 @@ void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_ppp_state::firebeat_ppp_map);
 }
 
-void firebeat_ppp_state::init_ppp()
+void firebeat_ppp_state::init_ppp_base()
 {
 	init_firebeat();
 	init_lights(write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output3_ppp_w)));
-
-	m_cabinet_info = 8;
 }
 
-void firebeat_ppp_state::init_ppd()
+void firebeat_ppp_state::init_ppp_jp()
 {
-	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output3_ppp_w)));
+	init_ppp_base();
 
-	m_cabinet_info = 9;
+	// PPP Seems to use bit 3 to specify a PPP-compatible firebeat. It still uses
+	// bit 0 to represent JP/overseas. We specify JP data here.
+	m_cabinet_info = 0x8;
+}
+
+void firebeat_ppp_state::init_ppp_overseas()
+{
+	init_ppp_base();
+
+	// We specify bit 3 set here as well to make this firebeat compatible with
+	// PPP data. We also set the overseas bit for Korea/Asia region games.
+	m_cabinet_info = 0x9;
 }
 
 void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
@@ -1496,21 +1555,31 @@ void firebeat_kbm_state::device_resolve_objects()
 	m_lamp_neon.resolve();
 }
 
-void firebeat_kbm_state::init_kbm()
+void firebeat_kbm_state::init_kbm_base()
 {
 	init_firebeat();
 	init_lights(write32s_delegate(*this, FUNC(firebeat_kbm_state::lamp_output_kbm_w)), write32s_delegate(*this), write32s_delegate(*this));
 	init_keyboard();
 
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
-
-	m_cabinet_info = 2;
 }
 
-void firebeat_kbm_state::init_kbh()
+void firebeat_kbm_state::init_kbm_jp()
 {
-	init_kbm();
-	m_cabinet_info = 3;
+	init_kbm_base();
+
+	// KBM Seems to use bit 1 to specify a KBM-compatible firebeat. It still uses
+	// bit 0 to represent JP/overseas. We specify JP data here.
+	m_cabinet_info = 0x2;
+}
+
+void firebeat_kbm_state::init_kbm_overseas()
+{
+	init_kbm_base();
+
+	// We specify bit 1 set here as well to make this firebeat compatible with
+	// KBM data. We also set the overseas bit for Korea/Asia region games.
+	m_cabinet_info = 0x3;
 }
 
 void firebeat_kbm_state::init_keyboard()
@@ -2206,8 +2275,8 @@ ROM_START( popnmt )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP( "a02jaa03.21e", 0x000000, 0x080000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599) )
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD("gq976-ja", 0x00, 0xc0, BAD_DUMP CRC(673c2478) SHA1(97e7952a503a93f5334faf1882e8b0394148cf84))
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq976", 0x00, 0xc8, CRC(c626cf9a) SHA1(a47a1a2f57a207223a3a08060b75e2744a036d13))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
@@ -2224,8 +2293,8 @@ ROM_START( popnmt2 )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP( "a02jaa03.21e", 0x000000, 0x080000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599) )
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
-	ROM_LOAD("gq976-ja", 0x00, 0xc0, BAD_DUMP CRC(673c2478) SHA1(97e7952a503a93f5334faf1882e8b0394148cf84))
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq976", 0x00, 0xc8, CRC(c626cf9a) SHA1(a47a1a2f57a207223a3a08060b75e2744a036d13))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
@@ -2327,25 +2396,25 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 2000, ppp,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise", MACHINE_NOT_WORKING )
-GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppd, ROT0, "Konami", "ParaParaDancing", MACHINE_NOT_WORKING )
-GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_NOT_WORKING )
-GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
+GAME( 2000, ppp,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise", MACHINE_NOT_WORKING )
+GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_overseas, ROT0, "Konami", "ParaParaDancing", MACHINE_NOT_WORKING )
+GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_NOT_WORKING )
+GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
 
-GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbh, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_overseas, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
 
-GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING )
-GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING )
-GAME( 2001, popn6,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 6", MACHINE_NOT_WORKING )
-GAME( 2001, popn7,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 7", MACHINE_NOT_WORKING )
-GAME( 2002, popn8,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 8", MACHINE_NOT_WORKING )
-GAME( 2000, popnmt,   0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_NOT_WORKING )
-GAME( 2000, popnmt2,  popnmt, firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_NOT_WORKING )
-GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_NOT_WORKING )
-GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING )
+GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING )
+GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING )
+GAME( 2001, popn6,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 6", MACHINE_NOT_WORKING )
+GAME( 2001, popn7,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 7", MACHINE_NOT_WORKING )
+GAME( 2002, popn8,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 8", MACHINE_NOT_WORKING )
+GAME( 2000, popnmt,   0,      firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_NOT_WORKING )
+GAME( 2000, popnmt2,  popnmt, firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_NOT_WORKING )
+GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_NOT_WORKING )
+GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING )
 
 GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_NOT_WORKING )
 GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_NOT_WORKING )
