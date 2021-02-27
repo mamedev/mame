@@ -69,6 +69,7 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 	m_opm(*this),
 	m_stream(nullptr),
 	m_port_w(*this),
+	m_busy_duration(m_opm.compute_busy_duration()),
 	m_address(0),
 	m_reset_state(1)
 {
@@ -134,7 +135,7 @@ void ym2151_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opm.set_busy();
+			m_opm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -195,6 +196,7 @@ void ym2151_device::device_reset()
 void ym2151_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / (2 * 4 * 8));
+	m_busy_duration = m_opm.compute_busy_duration();
 }
 
 
@@ -220,7 +222,6 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(rsum)), 32768);
 	}
 }
-
 
 
 //*********************************************************
@@ -267,7 +268,7 @@ void ym2164_device::write(offs_t offset, u8 value)
 				m_port_w(0, value >> 6, 0xff);
 
 			// mark busy for a bit
-			m_opm.set_busy();
+			m_opm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }

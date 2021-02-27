@@ -29,6 +29,7 @@ ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, dev
 	device_sound_interface(mconfig, *this),
 	m_opn(*this),
 	m_stream(nullptr),
+	m_busy_duration(m_opn.compute_busy_duration()),
 	m_address(0),
 	m_dac_data(0),
 	m_dac_enable(0),
@@ -104,7 +105,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 
 		case 2: // upper address port
@@ -122,7 +123,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 			m_opn.write(m_address, value);
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -173,6 +174,9 @@ void ym2612_device::device_reset()
 void ym2612_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / (4 * 6 * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6)));
+
+	// recompute the busy duration
+	m_busy_duration = m_opn.compute_busy_duration();
 }
 
 

@@ -28,6 +28,7 @@ ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, dev
 	m_adpcm_a(*this, read8sm_delegate(*this, FUNC(ym2610_device::adpcm_a_read)), 8),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(ym2610_device::adpcm_b_read)), write8sm_delegate(*this), 8),
 	m_stream(nullptr),
+	m_busy_duration(m_opn.compute_busy_duration()),
 	m_address(0),
 	m_opn_mask(opn_mask),
 	m_eos_status(0x00),
@@ -126,7 +127,7 @@ void ym2610_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 
 		case 2: // upper address port
@@ -153,7 +154,7 @@ void ym2610_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -242,6 +243,9 @@ void ym2610_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / (4 * 6 * 6));
 	ay_set_clock(clock() / 4);
+
+	// recompute the busy duration
+	m_busy_duration = m_opn.compute_busy_duration();
 }
 
 

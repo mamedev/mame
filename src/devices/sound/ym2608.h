@@ -59,6 +59,7 @@ private:
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream
+	attotime m_busy_duration;        // precomputed busy signal duration
 	u16 m_address;                   // address register
 	u8 m_irq_enable;                 // IRQ enable register
 	u8 m_flag_control;               // flag control register

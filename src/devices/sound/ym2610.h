@@ -55,6 +55,7 @@ private:
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream
+	attotime m_busy_duration;        // precomputed busy signal duration
 	u16 m_address;                   // address register
 	u8 const m_opn_mask;             // OPN channel mask
 	u8 m_eos_status;                 // end-of-sample signals

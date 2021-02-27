@@ -1440,20 +1440,6 @@ u8 ymfm_engine_base<RegisterType>::status() const
 
 
 //-------------------------------------------------
-//  set_busy - set the busy flag in the status
-//  register
-//-------------------------------------------------
-
-template<class RegisterType>
-void ymfm_engine_base<RegisterType>::set_busy()
-{
-	// according to hardware tests, BUSY is set for 32 * prescaled clock
-	// regardless of actual data consumption
-	m_busy_end = m_device.machine().time() + attotime::from_hz(m_device.clock()) * (32 * m_clock_prescale);
-}
-
-
-//-------------------------------------------------
 //  clock_lfo - clock the LFO, handling clock
 //  division, depth, and waveform computations
 //-------------------------------------------------

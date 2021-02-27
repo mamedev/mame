@@ -750,8 +750,14 @@ public:
 	// set the IRQ mask
 	void set_irq_mask(u8 mask) { m_irq_mask = mask; check_interrupts(); }
 
-	// set the busy flag in the status register
-	void set_busy();
+	// helper to compute the busy duration
+	attotime compute_busy_duration(u32 cycles = 32)
+	{
+		return attotime::from_hz(m_device.clock()) * (cycles * m_clock_prescale);
+	}
+
+	// set the time when the busy flag in the status register should be cleared
+	void set_busy_end(attotime end) { m_busy_end = end; }
 
 	// return the current clock prescale
 	u8 clock_prescale() const { return m_clock_prescale; }

@@ -65,6 +65,7 @@ ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, dev
 	ay8910_device(mconfig, YM2203, tag, owner, clock, PSG_TYPE_YM, 3, 2),
 	m_opn(*this),
 	m_stream(nullptr),
+	m_busy_duration(m_opn.compute_busy_duration()),
 	m_address(0)
 {
 }
@@ -134,7 +135,7 @@ void ym2203_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -232,4 +233,7 @@ void ym2203_device::update_prescale(u8 newval)
 	u8 ssg_scale = 2 * newval / 3;
 	// QUESTION: where does the *2 come from??
 	ay_set_clock(clock() * 2 / ssg_scale);
+
+	// recompute the busy duration
+	m_busy_duration = m_opn.compute_busy_duration();
 }

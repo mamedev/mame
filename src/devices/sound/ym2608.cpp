@@ -37,6 +37,7 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	m_adpcm_a(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_a_read)), 0),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_write))),
 	m_stream(nullptr),
+	m_busy_duration(m_opn.compute_busy_duration()),
 	m_address(0),
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c)
@@ -137,7 +138,7 @@ void ym2608_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 
 		case 2: // upper address port
@@ -176,7 +177,7 @@ void ym2608_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy();
+			m_opn.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -350,6 +351,9 @@ void ym2608_device::update_prescale(u8 newval)
 	u8 ssg_scale = 2 * newval / 3;
 	// QUESTION: where does the *2 come from??
 	ay_set_clock(clock() / ssg_scale);
+
+	// recompute the busy duration
+	m_busy_duration = m_opn.compute_busy_duration();
 }
 
 

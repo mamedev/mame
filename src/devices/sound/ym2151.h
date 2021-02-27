@@ -42,13 +42,11 @@ protected:
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// internal helpers
-	void sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity);
-
 	// internal state
 	ymopm_engine m_opm;              // core OPM engine
 	sound_stream *m_stream;          // sound stream
 	devcb_write8 m_port_w;           // port write handler
+	attotime m_busy_duration;        // precomputed busy signal duration
 	u8 m_address;                    // address register
 	u8 m_reset_state;                // reset state
 };

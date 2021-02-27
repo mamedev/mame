@@ -41,6 +41,7 @@ protected:
 	// internal state
 	ymopna_engine m_opn;             // core OPN engine
 	sound_stream *m_stream;          // sound stream
+	attotime m_busy_duration;        // precomputed busy signal duration
 	u16 m_address;                   // address register
 	u16 m_dac_data;                  // 9-bit DAC data
 	u8 m_dac_enable;                 // DAC enabled?

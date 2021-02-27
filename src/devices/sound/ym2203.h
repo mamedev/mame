@@ -49,6 +49,7 @@ private:
 	// internal state
 	ymopn_engine m_opn;              // core OPN engine
 	sound_stream *m_stream;          // sound stream
+	attotime m_busy_duration;        // precomputed busy signal duration
 	u8 m_address;                    // address register
 };
 
