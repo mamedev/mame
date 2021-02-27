@@ -152,7 +152,7 @@ Colscroll effects?
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 
 #include "layout/generic.h"
 #include "screen.h"
@@ -583,11 +583,11 @@ ROM_START( sagaia )
 	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
 	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 
 	ROM_REGION( 0x001000, "user1", 0 )  /* unknown roms */
@@ -625,11 +625,11 @@ ROM_START( darius2d )
 	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
 	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 
 	ROM_REGION( 0x001000, "user1", 0 )  /* unknown roms */
@@ -667,11 +667,11 @@ ROM_START( darius2do )
 	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
 	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 
 	ROM_REGION( 0x001000, "user1", 0 )  /* unknown roms */
@@ -706,7 +706,7 @@ ROM_START( warriorb )
 	ROM_LOAD16_WORD_SWAP( "d24-07.47", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR B, screen 2 */
 	ROM_LOAD16_WORD_SWAP( "d24-08.48", 0x100000, 0x100000, CRC(1e6d1528) SHA1(d6843aa67befd7db44f468be16ba2f0efb85d40f) )
 
-	ROM_REGION( 0x300000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x300000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d24-12.107", 0x000000, 0x100000, CRC(279203a1) SHA1(ed75e811a1f0863c134034457ce2e97372726bdb) )
 	ROM_LOAD( "d24-10.95",  0x100000, 0x100000, CRC(0e0c716d) SHA1(5e2f334dd484678766c5a71196d9bad0ba0fe8d9) )
 	ROM_LOAD( "d24-11.118", 0x200000, 0x100000, CRC(15362573) SHA1(8602c9f24134cac6fe1375fb189b152f0c68aeb7) )

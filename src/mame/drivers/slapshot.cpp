@@ -138,7 +138,7 @@ Region byte at offset 0x031:
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/timekpr.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 

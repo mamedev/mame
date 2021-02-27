@@ -403,7 +403,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -966,10 +966,10 @@ ROM_START( wgp ) // labels actually have the character * instead of +
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c32-12.7",  0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
 //  Pals (Guru dump)
@@ -1018,10 +1018,10 @@ ROM_START( wgpu )
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c32-12.7",  0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
 //  Pals (Guru dump)
@@ -1070,10 +1070,10 @@ ROM_START( wgpj )
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1105,10 +1105,10 @@ ROM_START( wgpjoy )
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1140,10 +1140,10 @@ ROM_START( wgpjoya )    /* Older joystick version ??? */
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1175,10 +1175,10 @@ ROM_START( wgp2 )
 	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
 	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
 //  WGP2 security board (has TC0190FMC)

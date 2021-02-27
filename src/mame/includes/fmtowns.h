@@ -18,10 +18,10 @@
 #include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "machine/msm58321.h"
-#include "sound/2612intf.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
+#include "sound/ym2612.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

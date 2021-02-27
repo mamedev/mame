@@ -39,7 +39,7 @@ TODO:
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 

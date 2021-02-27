@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
@@ -157,10 +157,10 @@ ROM_START( hexapres )
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD( "ghp_snd.bin",  0x0000, 0x10000, CRC(8933b6ea) SHA1(a66157f2b7407ab374db07bcda34f066740f14dc) )
 
-	ROM_REGION(0x80000, "ymsnd", 0)
+	ROM_REGION(0x80000, "ymsnd:adpcma", 0)
 	ROM_LOAD( "ghp_voia.bin",  0x00000, 0x80000, CRC(cf3e4c43) SHA1(6d348054704d1d0082d6166701ab84cb162b3a26) )
 
-	ROM_REGION(0x80000, "ymsnd.deltat", 0)
+	ROM_REGION(0x80000, "ymsnd:adpcmb", 0)
 	ROM_LOAD( "ghp_voib.bin",  0x00000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
 ROM_END
 

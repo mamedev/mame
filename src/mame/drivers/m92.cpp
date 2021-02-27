@@ -214,8 +214,8 @@ psoldier dip locations still need verification.
 #include "machine/eeprompar.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
-#include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 

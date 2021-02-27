@@ -82,9 +82,9 @@ are almost identical, except for much darker BG layer colors).
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 
 #include "emupal.h"
 #include "screen.h"
