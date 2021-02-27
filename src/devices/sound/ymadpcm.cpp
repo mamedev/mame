@@ -214,7 +214,7 @@ ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8
 {
 	// create the channels
 	for (int chnum = 0; chnum < 6; chnum++)
-		m_channel.push_back(std::make_unique<ymadpcm_a_channel>(m_regs.channel_registers(chnum), reader, addrshift));
+		m_channel[chnum] = std::make_unique<ymadpcm_a_channel>(m_regs.channel_registers(chnum), reader, addrshift);
 }
 
 
@@ -228,7 +228,7 @@ void ymadpcm_a_engine::save(device_t &device)
 	device.save_item(ADPCM_A_NAME(m_regdata));
 
 	// save channel state
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		m_channel[chnum]->save(device, chnum);
 }
 
@@ -253,7 +253,7 @@ u8 ymadpcm_a_engine::clock(u8 chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
 	u8 result = 0;
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
 			if (m_channel[chnum]->clock())
 				result |= 1 << chnum;
@@ -270,7 +270,7 @@ u8 ymadpcm_a_engine::clock(u8 chanmask)
 void ymadpcm_a_engine::output(s32 &lsum, s32 &rsum, u8 chanmask)
 {
 	// compute the output of each channel
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
 			m_channel[chnum]->output(lsum, rsum);
 }
@@ -288,7 +288,7 @@ void ymadpcm_a_engine::write(u8 regnum, u8 data)
 
 	// actively handle writes to the control register
 	if (regnum == 0x00)
-		for (int chnum = 0; chnum < m_channel.size(); chnum++)
+		for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 			if (BIT(data, chnum))
 				m_channel[chnum]->keyonoff(BIT(~data, 7));
 }
@@ -605,7 +605,7 @@ ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, wr
 	m_regs(m_regdata)
 {
 	// create the channel (only one supported for now, but leaving possibilities open)
-	m_channel.push_back(std::make_unique<ymadpcm_b_channel>(m_regs, reader, writer, addrshift));
+	m_channel[0] = std::make_unique<ymadpcm_b_channel>(m_regs, reader, writer, addrshift);
 }
 
 
@@ -619,7 +619,7 @@ void ymadpcm_b_engine::save(device_t &device)
 	device.save_item(ADPCM_B_NAME(m_regdata));
 
 	// save channel state
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		m_channel[chnum]->save(device, chnum);
 }
 
@@ -643,7 +643,7 @@ void ymadpcm_b_engine::reset()
 void ymadpcm_b_engine::clock(u8 chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
 			m_channel[chnum]->clock();
 }
@@ -656,7 +656,7 @@ void ymadpcm_b_engine::clock(u8 chanmask)
 void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask)
 {
 	// compute the output of each channel
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
 			m_channel[chnum]->output(lsum, rsum, rshift);
 }

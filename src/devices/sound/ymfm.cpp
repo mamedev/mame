@@ -1178,19 +1178,19 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 	{
 		s16 clipmin = -clipmax - 1;
 		result += opout[2] >> rshift;
-		result = std::max(std::min(result, clipmax), clipmin);
+		result = std::clamp(result, clipmin, clipmax);
 
 		// agorithms 5-7 add in OP3 output
 		if (algorithm >= 5)
 		{
 			result += opout[3] >> rshift;
-			result = std::max(std::min(result, clipmax), clipmin);
+			result = std::clamp(result, clipmin, clipmax);
 
 			// algorithm 7 adds in OP1 output
 			if (algorithm == 7)
 			{
 				result += opout[1] >> rshift;
-				result = std::max(std::min(result, clipmax), clipmin);
+				result = std::clamp(result, clipmin, clipmax);
 			}
 		}
 	}

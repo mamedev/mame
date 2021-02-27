@@ -121,6 +121,8 @@ private:
 
 class ymadpcm_a_engine
 {
+	static constexpr int CHANNELS = 6;
+
 public:
 	// constructor
 	ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8 addrshift);
@@ -145,7 +147,7 @@ public:
 
 private:
 	// internal state
-	std::vector<std::unique_ptr<ymadpcm_a_channel>> m_channel; // vector of channels
+	std::unique_ptr<ymadpcm_a_channel> m_channel[CHANNELS]; // array of channels
 	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_a_registers m_regs;      // register accessor
 };
@@ -299,6 +301,8 @@ private:
 
 class ymadpcm_b_engine
 {
+	static constexpr int CHANNELS = 1;
+
 public:
 	// constructor
 	ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift = 0);
@@ -326,7 +330,7 @@ public:
 
 private:
 	// internal state
-	std::vector<std::unique_ptr<ymadpcm_b_channel>> m_channel; // vector of channels
+	std::unique_ptr<ymadpcm_b_channel> m_channel[CHANNELS]; // array of channels
 	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_b_registers m_regs;      // register accessor
 };
