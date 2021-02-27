@@ -3369,6 +3369,8 @@ createMESSProjects(_target, _subtarget, "regnecentralen")
 files {
 	MAME_DIR .. "src/mame/drivers/rc702.cpp",
 	MAME_DIR .. "src/mame/drivers/rc759.cpp",
+	MAME_DIR .. "src/mame/machine/rc759_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/rc759_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "ritam")
