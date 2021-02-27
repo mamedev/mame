@@ -483,12 +483,10 @@ void swim2_device::sync()
 		} else {
 			// MFM mode
 			for(;;) {
-				static u16 xinf = 0xffff;
 				attotime when;
 				int bit = m_pll.get_next_bit(when, m_floppy, limit);
 				if(bit == -1)
 					break;
-				xinf = (xinf << 1) | bit;
 				if(m_mfm_sync_counter < 64) {
 					if(bit != (m_mfm_sync_counter & 1))
 						m_mfm_sync_counter ++;
