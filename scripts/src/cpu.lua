@@ -3482,3 +3482,20 @@ if (CPUS["LC57"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.h")
 end
+
+--------------------------------------------------
+-- Mark I (Andrew Holme)
+--@src/devices/cpu/mk1/mk1.h,CPUS["MK1"] = true
+--------------------------------------------------
+
+if (CPUS["MK1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/mk1/mk1.cpp",
+		MAME_DIR .. "src/devices/cpu/mk1/mk1.h",
+	}
+end
+
+if (CPUS["MK1"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.h")
+end
