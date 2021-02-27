@@ -4,6 +4,10 @@
 #include "emu.h"
 #include "ymfm.h"
 
+//#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
+
 //
 // This emulator is written from the ground-up based on analysis and deduction
 // by Nemesis, particularly in this thread:
@@ -119,14 +123,6 @@
 // $2C:6: Select function of TEST pin input--both unknown functions.
 // $2C:7: Set the TEST pin to be an output (1) instead of input (0).
 //
-
-
-//*********************************************************
-//  DEBUGGING
-//*********************************************************
-
-// turn this on to output all key on events
-#define LOG_KEY_ONS (0)
 
 
 //*********************************************************
@@ -645,33 +641,30 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 		m_env_attenuation = 0;
 
 	// log keys
-	if (LOG_KEY_ONS)
-	{
-		printf("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
-			m_regs.chnum(), m_regs.opnum(),
-			m_regs.block_freq(),
-			m_regs.detune2(),
-			m_regs.feedback(),
-			m_regs.algorithm(),
-			m_regs.detune(),
-			m_regs.multiple(),
-			m_regs.total_level(),
-			m_regs.ksr(),
-			m_regs.attack_rate(),
-			m_regs.decay_rate(),
-			m_regs.sustain_rate(),
-			m_regs.release_rate(),
-			m_regs.sustain_level(),
-			m_regs.pan_left() ? 'L' : '-',
-			m_regs.pan_right() ? 'R' : '-');
-		if (m_regs.ssg_eg_enabled())
-			printf(" ssg=%X", m_regs.ssg_eg_mode());
-		if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-			printf(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
-		if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
-			printf(" noise=1");
-		printf("\n");
-	}
+	LOG("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
+		m_regs.chnum(), m_regs.opnum(),
+		m_regs.block_freq(),
+		m_regs.detune2(),
+		m_regs.feedback(),
+		m_regs.algorithm(),
+		m_regs.detune(),
+		m_regs.multiple(),
+		m_regs.total_level(),
+		m_regs.ksr(),
+		m_regs.attack_rate(),
+		m_regs.decay_rate(),
+		m_regs.sustain_rate(),
+		m_regs.release_rate(),
+		m_regs.sustain_level(),
+		m_regs.pan_left() ? 'L' : '-',
+		m_regs.pan_right() ? 'R' : '-');
+	if (m_regs.ssg_eg_enabled())
+		LOG(" ssg=%X", m_regs.ssg_eg_mode());
+	if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+		LOG(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
+	if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
+		LOG(" noise=1");
+	LOG("\n");
 }
 
 

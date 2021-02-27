@@ -4,13 +4,9 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-
-//*********************************************************
-//  DEBUGGING
-//*********************************************************
-
-// turn this on to output all key on events
-#define LOG_KEY_ONS (0)
+//#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
 
 
 //*********************************************************
@@ -91,8 +87,7 @@ void ymadpcm_a_channel::keyonoff(bool on)
 		m_curbyte = 0;
 		m_accumulator = 0;
 		m_step_index = 0;
-		if (LOG_KEY_ONS)
-			printf("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n", m_regs.chbase(), m_regs.pan_left(), m_regs.pan_right(), m_regs.start(), m_regs.end(), m_regs.instrument_level());
+		LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n", m_regs.chbase(), m_regs.pan_left(), m_regs.pan_right(), m_regs.start(), m_regs.end(), m_regs.instrument_level());
 	}
 }
 
@@ -510,8 +505,7 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 		if (m_regs.execute())
 		{
 			load_start();
-			if (LOG_KEY_ONS)
-				printf("KeyOn ADPCM-B: repeat=%d speaker=%d pan=%d%d dac=%d 8bit=%d rom=%d start=%04X end=%04X prescale=%04X deltan=%04X level=%02X limit=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
+			LOG("KeyOn ADPCM-B: repeat=%d speaker=%d pan=%d%d dac=%d 8bit=%d rom=%d start=%04X end=%04X prescale=%04X deltan=%04X level=%02X limit=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
 		}
 		if (m_regs.reset())
 			reset();
