@@ -88,18 +88,21 @@ void ym2608_device::write(offs_t offset, u8 value)
 	{
 		case 0:	// address port
 			m_address = value;
-
-			// write register to SSG emulator
 			if (m_address < 0x10)
+			{
+				// write register to SSG emulator
 				ay8910_write_ym(0, m_address);
-
-			// prescaler select : 2d,2e,2f
-			else if (m_address == 0x2d)
-				update_prescale(6);
-			else if (m_address == 0x2e && m_opn.clock_prescale() == 6)
-				update_prescale(3);
-			else if (m_address == 0x2f)
-				update_prescale(2);
+			}
+			else if (m_address >= 0x2d && m_address <= 0x2f)
+			{
+				// prescaler select : 2d,2e,2f
+				if (m_address == 0x2d)
+					update_prescale(6);
+				else if (m_address == 0x2e && m_opn.clock_prescale() == 6)
+					update_prescale(3);
+				else if (m_address == 0x2f)
+					update_prescale(2);
+			}
 			break;
 
 		case 1: // data port
@@ -108,28 +111,27 @@ void ym2608_device::write(offs_t offset, u8 value)
 			if (BIT(m_address, 8))
 				break;
 
-			// write to SSG
 			if (m_address < 0x10)
+			{
+				// write to SSG
 				ay8910_write_ym(1, value);
-
-			// write to ADPCM-A
+			}
 			else if (m_address < 0x20)
 			{
+				// write to ADPCM-A
 				m_stream->update();
 				m_adpcm_a.write(m_address & 0x0f, value);
 			}
-
-			// special IRQ mask register
 			else if (m_address == 0x29)
 			{
+				// special IRQ mask register
 				m_stream->update();
 				m_irq_enable = value;
 				m_opn.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
 			}
-
-			// write to OPN
 			else
 			{
+				// write to OPN
 				m_stream->update();
 				m_opn.write(m_address, value);
 			}
@@ -148,16 +150,15 @@ void ym2608_device::write(offs_t offset, u8 value)
 			if (!BIT(m_address, 8))
 				break;
 
-			// write to ADPCM-B
 			if (m_address < 0x110)
 			{
+				// write to ADPCM-B
 				m_stream->update();
 				m_adpcm_b.write(m_address & 0x0f, value);
 			}
-
-			// IRQ flag control
 			else if (m_address == 0x110)
 			{
+				// IRQ flag control
 				m_stream->update();
 				if (BIT(value, 7))
 					m_opn.set_reset_status(0, 0xff);
@@ -167,10 +168,9 @@ void ym2608_device::write(offs_t offset, u8 value)
 					m_opn.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
 				}
 			}
-
-			// write to OPN
 			else
 			{
+				// write to OPN
 				m_stream->update();
 				m_opn.write(m_address, value);
 			}

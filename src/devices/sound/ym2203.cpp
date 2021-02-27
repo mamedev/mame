@@ -103,29 +103,32 @@ void ym2203_device::write(offs_t offset, u8 value)
 	{
 		case 0:	// address port
 			m_address = value;
-
-			// write register to SSG
 			if (m_address < 0x10)
+			{
+				// write register to SSG
 				ay8910_write_ym(0, m_address);
-
-			// prescaler select : 2d,2e,2f
-			else if (m_address == 0x2d)
-				update_prescale(6);
-			else if (m_address == 0x2e && m_opn.clock_prescale() == 6)
-				update_prescale(3);
-			else if (m_address == 0x2f)
-				update_prescale(2);
+			}
+			else if (m_address >= 0x2d && m_address <= 0x2f)
+			{
+				// prescaler select : 2d,2e,2f
+				if (m_address == 0x2d)
+					update_prescale(6);
+				else if (m_address == 0x2e && m_opn.clock_prescale() == 6)
+					update_prescale(3);
+				else if (m_address == 0x2f)
+					update_prescale(2);
+			}
 			break;
 
 		case 1: // data port
-
-			// write to SSG
 			if (m_address < 0x10)
+			{
+				// write to SSG
 				ay8910_write_ym(1, value);
-
-			// write to OPN
+			}
 			else
 			{
+				// write to OPN
 				m_stream->update();
 				m_opn.write(m_address, value);
 			}

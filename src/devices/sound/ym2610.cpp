@@ -100,28 +100,27 @@ void ym2610_device::write(offs_t offset, u8 value)
 			if (BIT(m_address, 8))
 				break;
 
-			// write to SSG
 			if (m_address < 0x10)
+			{
+				// write to SSG
 				ay8910_write_ym(1, value);
-
-			// write to ADPCM-B
+			}
 			else if (m_address < 0x1c)
 			{
+				// write to ADPCM-B
 				m_stream->update();
 				m_adpcm_b.write(m_address & 0x0f, value);
 			}
-
-			// EOS flag reset
 			else if (m_address == 0x1c)
 			{
+				// EOS flag reset
 				m_stream->update();
 				m_flag_mask = ~value;
 				m_eos_status &= ~value;
 			}
-
-			// write to OPN
 			else
 			{
+				// write to OPN
 				m_stream->update();
 				m_opn.write(m_address, value);
 			}
@@ -140,16 +139,15 @@ void ym2610_device::write(offs_t offset, u8 value)
 			if (!BIT(m_address, 8))
 				break;
 
-			// write to ADPCM-B
 			if (m_address < 0x130)
 			{
+				// write to ADPCM-B
 				m_stream->update();
 				m_adpcm_a.write(m_address & 0x3f, value);
 			}
-
-			// write to OPN
 			else
 			{
+				// write to OPN
 				m_stream->update();
 				m_opn.write(m_address, value);
 			}

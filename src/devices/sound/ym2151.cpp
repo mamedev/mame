@@ -121,13 +121,17 @@ void ym2151_device::write(offs_t offset, u8 value)
 			// write to OPM
 			m_opm.write(m_address, value);
 
-			// writes to the test register can reset the LFO
+			// special cases
 			if (m_address == 0x01 && BIT(value, 1))
+			{
+				// writes to the test register can reset the LFO
 				m_opm.reset_lfo();
-
-			// writes to register 0x1B send the upper 2 bits to the output lines
+			}
 			else if (m_address == 0x1b)
+			{
+				// writes to register 0x1B send the upper 2 bits to the output lines
 				m_port_w(0, value >> 6, 0xff);
+			}
 
 			// mark busy for a bit
 			m_opm.set_busy();

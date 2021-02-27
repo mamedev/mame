@@ -82,21 +82,26 @@ void ym2612_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// DAC data
 			if (m_address == 0x2a)
+			{
+				// DAC data
 				m_dac_data = (m_dac_data & ~0x1fe) | ((value ^ 0x80) << 1);
-
-			// DAC enable
+			}
 			else if (m_address == 0x2b)
+			{
+				// DAC enable
 				m_dac_enable = BIT(value, 7);
-
-			// test/low DAC bit
+			}
 			else if (m_address == 0x2c)
+			{
+				// test/low DAC bit
 				m_dac_data = (m_dac_data & ~1) | BIT(value, 3);
-
-			// write to OPN
+			}
 			else
+			{
+				// write to OPN
 				m_opn.write(m_address, value);
+			}
 
 			// mark busy for a bit
 			m_opn.set_busy();
