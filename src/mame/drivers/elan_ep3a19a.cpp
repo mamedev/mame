@@ -345,6 +345,12 @@ ROM_START( tvbg6a )
 	ROM_RELOAD(0x200000,0x200000)
 ROM_END
 
+ROM_START( tvbg6b )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bship_simon_mousetrap.bin", 0x00000, 0x200000, CRC(b0627a98) SHA1(6157e26916bb415037a4d122d3075cbfb8e61dcf) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
 void elan_ep3a19a_state::init_tvbg()
 {
 	// is this swapping internal to the ep3a19a type ELAN, or external; ROM glob had standard TSOP pinout pads that were used for dumping.
@@ -356,7 +362,7 @@ void elan_ep3a19a_state::init_tvbg()
 }
 
 CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_NOT_WORKING ) // https://www.youtube.com/watch?v=zajzQo47YYA
-// TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over  https://www.youtube.com/watch?v=JbrR67kY8MI
+CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_NOT_WORKING ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
 // TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em
 // TV Board Games 3-in-1: Simon, Battleship, Checkers    https://www.youtube.com/watch?v=Q7nwKJfVavU
