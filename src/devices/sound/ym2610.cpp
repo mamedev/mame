@@ -110,7 +110,12 @@ void ym2610_device::write(offs_t offset, u8 value)
 			{
 				// write to ADPCM-B
 				m_stream->update();
-				m_adpcm_b.write(m_address & 0x0f, value);
+				u8 address = m_address & 0x0f;
+
+				// YM2610 effectively forces external mode on, and disables recording
+				if (address == 0)
+					value = (value | 0x20) & ~0x40;
+				m_adpcm_b.write(address, value);
 			}
 			else if (m_address == 0x1c)
 			{
@@ -142,7 +147,7 @@ void ym2610_device::write(offs_t offset, u8 value)
 
 			if (m_address < 0x130)
 			{
-				// write to ADPCM-B
+				// write to ADPCM-A
 				m_stream->update();
 				m_adpcm_a.write(m_address & 0x3f, value);
 			}

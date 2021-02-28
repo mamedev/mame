@@ -366,13 +366,10 @@ void ymadpcm_b_channel::clock()
 	}
 
 	// otherwise, advance the step
-	else
-	{
-		u16 oldpos = m_position;
-		m_position += m_regs.delta_n();
-		if (m_position >= oldpos)
-			return;
-	}
+	u32 position = m_position + m_regs.delta_n();
+	m_position = u16(position);
+	if (position < 0x10000)
+		return;
 
 	// if playing from RAM/ROM, check the end address and process
 	if (m_regs.external())
@@ -430,11 +427,7 @@ void ymadpcm_b_channel::clock()
 
 	// scale the ADPCM step: 0.9, 0.9, 0.9, 0.9, 1.2, 1.6, 2.0, 2.4
 	static u8 const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
-	m_adpcm_step = (m_adpcm_step * s_step_scale[BIT(data, 0, 3)]) / 64;
-	if (m_adpcm_step > STEP_MAX)
-		m_adpcm_step = STEP_MAX;
-	else if (m_adpcm_step < STEP_MIN)
-		m_adpcm_step = STEP_MIN;
+	m_adpcm_step = std::clamp((m_adpcm_step * s_step_scale[BIT(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
 }
 
 
