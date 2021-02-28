@@ -4273,7 +4273,7 @@ ROM_START( ssib ) // this is identical to majest12u, but the region-defining byt
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c64-09.ic38",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   // ADPCM samples
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   // ADPCM samples
 	ROM_LOAD( "c64-02.ic1",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	// no Delta-T samples
@@ -5346,7 +5346,7 @@ ROM_START( driftoutct ) // conversion on Cameltry hardware
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "do_50.ic25",  0x00000, 0x10000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "do_snd.ic2", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
 
 	// no Delta-T samples

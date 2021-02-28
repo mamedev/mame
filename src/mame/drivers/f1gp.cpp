@@ -542,10 +542,10 @@ ROM_START( f1gp )
 	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )    /* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* sound samples */
 	ROM_LOAD( "rom14-a.09",   0x000000, 0x100000, CRC(b4c1ac31) SHA1(acab2e1b5ce4ca3a5c4734562481b54db4b46995) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "rom17-a.08",   0x000000, 0x100000, CRC(ea70303d) SHA1(8de1a0e6d47cd80a622663c1745a1da54cd0ea05) )
 ROM_END
 
