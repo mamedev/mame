@@ -87,6 +87,7 @@ public:
 		, m_gfx(*this, "gfx")
 		, m_softlist(*this, "softlist")
 		, m_leds(*this, "led%u", 0U)
+		, m_vme_isr(0)
 	{
 	}
 
@@ -248,6 +249,7 @@ public:
 		, m_serial(*this, "serial%u", 1U)
 		, m_dsp(*this, "dsp")
 	{
+		std::fill(std::begin(m_lio_isr), std::end(m_lio_isr), 0 );
 	}
 
 	void pi4d30(machine_config &config);

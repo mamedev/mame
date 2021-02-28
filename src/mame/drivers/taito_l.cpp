@@ -66,9 +66,9 @@ puzznici note
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
 
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
+#include "sound/ym2610.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -1602,7 +1602,7 @@ ROM_START( raimais )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
@@ -1621,7 +1621,7 @@ ROM_START( raimaisj )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
@@ -1640,7 +1640,7 @@ ROM_START( raimaisjo )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 

@@ -40,8 +40,8 @@ help with figuring out the encryption on the coin-op parts of the program.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2612intf.h"
 #include "sound/sn76496.h"
+#include "sound/ym2612.h"
 #include "includes/megadriv.h"
 #include "includes/megadriv_acbl.h"
 

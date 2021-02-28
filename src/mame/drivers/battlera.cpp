@@ -94,7 +94,7 @@ Notes:
 
 #include "emu.h"
 #include "includes/battlera.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 

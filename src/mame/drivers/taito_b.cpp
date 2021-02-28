@@ -187,9 +187,9 @@ TODO!
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -2684,10 +2684,10 @@ ROM_START( rastsag2 )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2705,10 +2705,10 @@ ROM_START( nastarw )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2726,10 +2726,10 @@ ROM_START( nastar )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -2751,7 +2751,7 @@ ROM_START( crimec )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2769,7 +2769,7 @@ ROM_START( crimecu )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2787,7 +2787,7 @@ ROM_START( crimecj )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2805,7 +2805,7 @@ ROM_START( ashura )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2823,7 +2823,7 @@ ROM_START( ashuraj )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2841,7 +2841,7 @@ ROM_START( ashurau )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2867,10 +2867,10 @@ ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with 
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2991,7 +2991,7 @@ ROM_START( rambo3 ) /* all of the following roms should most likely have the nam
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
 	ROM_LOAD( "ramb3-02.bin",  0x180000, 0x80000, CRC(9dd014c6) SHA1(0f046d9de57db0272810adde7d49cc348b78f1f7) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ramb3-05.bin", 0x00000, 0x80000, CRC(0179dc40) SHA1(89feb708618ae7fa96883473d5c7a09dcc6f452a) )
 ROM_END
 
@@ -3011,7 +3011,7 @@ ROM_START( rambo3u )
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
 	ROM_LOAD( "ramb3-02.bin",  0x180000, 0x80000, CRC(9dd014c6) SHA1(0f046d9de57db0272810adde7d49cc348b78f1f7) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ramb3-05.bin", 0x00000, 0x80000, CRC(0179dc40) SHA1(89feb708618ae7fa96883473d5c7a09dcc6f452a) )
 ROM_END
 
@@ -3049,7 +3049,7 @@ ROM_START( rambo3p ) /* Is this set a prototype or possible bootleg? */
 	ROM_LOAD16_BYTE( "r3-ch2lh.rom", 0x180001, 0x020000, CRC(df3bc48f) SHA1(6747a453da4bca0b837f4ef1f1bbe871f15332ed) )
 	ROM_LOAD16_BYTE( "r3-ch2hh.rom", 0x1c0001, 0x020000, CRC(bf37dfac) SHA1(27e825bd0a4d7ae65714fefeb6fedac501984ba9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "r3-a1.rom", 0x00000, 0x20000, CRC(4396fa19) SHA1(cb6d983f210249676c500723041d74fa3fdc517d) )
 	ROM_LOAD( "r3-a2.rom", 0x20000, 0x20000, CRC(41fe53a8) SHA1(1723046111d0115d3f64c3111c50d51306e88ad0) )
 	ROM_LOAD( "r3-a3.rom", 0x40000, 0x20000, CRC(e89249ba) SHA1(cd94492a0643e9e1e25b121160914822a6a7723e) )
@@ -3068,7 +3068,7 @@ ROM_START( pbobble )
 	ROM_LOAD( "pb-ic14.bin", 0x00000, 0x80000, CRC(55f90ea4) SHA1(793c79e5b72171124368ad09dd31235252c541f5) )
 	ROM_LOAD( "pb-ic9.bin",  0x80000, 0x80000, CRC(3253aac9) SHA1(916d85aa96e2914630833292a0655b0389b4a39b) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "pb-ic15.bin", 0x000000, 0x100000, CRC(0840cbc4) SHA1(1adbd7aef44fa80832f63dfb8efdf69fd7256a57) )
 ROM_END
 
@@ -3084,7 +3084,7 @@ ROM_START( spacedx )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3108,7 +3108,7 @@ ROM_START( spacedxj )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3132,7 +3132,7 @@ ROM_START( spacedxo ) // different PCB type, similar to Silent Dragon
 	ROM_LOAD( "d89-12.bin",0x00000, 0x80000, CRC(53df86f1) SHA1(f03d77dd54eb455462133a29dd8fec007abedcfd) )
 	ROM_LOAD( "d89-13.bin",0x80000, 0x80000, CRC(c44c1352) SHA1(78a04fe0ade6e8f9e6bbda7652a54a79b6208fdd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 ROM_END
 
@@ -3148,7 +3148,7 @@ ROM_START( qzshowby )
 	ROM_LOAD( "d72-03.bin", 0x000000, 0x200000, CRC(1de257d0) SHA1(df03b1fb5cd69e2d2eb2088f96f26b0ea9756fb7) )
 	ROM_LOAD( "d72-02.bin", 0x200000, 0x200000, CRC(bf0da640) SHA1(2b2493904ed0b94dc12b56dae71cc5c25701aef9) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "d72-01.bin", 0x00000, 0x200000, CRC(b82b8830) SHA1(4b2dca16fe072a5ee51de5cf40637e3f1b39f695) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3315,10 +3315,10 @@ ROM_START( silentd ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3338,10 +3338,10 @@ ROM_START( silentdj ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3361,10 +3361,10 @@ ROM_START( silentdu ) /* Dumped from an original Taito PCB (ET910000B) */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3380,7 +3380,7 @@ ROM_START( selfeena ) /* Silkscreened PCB number ET910000A */
 	ROM_LOAD( "se-04.2",  0x000000, 0x80000, CRC(920ad100) SHA1(69cd2af6218db90632f09a131d2956ab69034643) )
 	ROM_LOAD( "se-05.1",  0x080000, 0x80000, CRC(d297c995) SHA1(e5ad5a8ce222621c9156c2949916bee6b3099c4e) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "se-06.11", 0x00000, 0x80000, CRC(80d5e772) SHA1(bee4982a3d65210ff86495e36a0b656934b00c7d) )
 ROM_END
 
@@ -3398,7 +3398,7 @@ ROM_START( ryujin ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "ryujin-07.ic28", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
 	ROM_LOAD( "ryujin-06.ic39", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "ryujin-08.ic1", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 
 	ROM_REGION( 0x00400, "plds", 0 )
@@ -3420,7 +3420,7 @@ ROM_START( ryujina ) /* Silkscreened PCB number ET910000A */
 	ROM_LOAD( "ryujin-07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
 	ROM_LOAD( "ryujin-06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "ryujin-08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 ROM_END
 
@@ -3444,7 +3444,7 @@ ROM_START( sbm )
 	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
 	/* 340000-3fffff empty */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c69-26.ic36", 0x00000, 0x80000, CRC(8784058b) SHA1(c3d9c620704fb5e80719e996e97f6191a5bd9f8c) )
 
 	ROM_REGION( 0x1800, "plds", 0 )
@@ -3473,7 +3473,7 @@ ROM_START( sbmj )
 	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
 	/* 340000-3fffff empty */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c69-03.36", 0x00000, 0x80000, CRC(63e6b6e7) SHA1(72574ca7505eee15fabc4996f253505d9dd65898) )
 ROM_END
 
@@ -3489,7 +3489,7 @@ ROM_START( realpunc )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )      /* ADPCM samples */
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 
@@ -3505,7 +3505,7 @@ ROM_START( realpuncj )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )      /* ADPCM samples */
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 

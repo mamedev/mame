@@ -1068,12 +1068,13 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 }
 
 
-VIDEO_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::video_start()
 {
 	amstrad_init_lookups();
 
 	m_gate_array.bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 	m_gate_array.hsync_after_vsync_counter = 3;
+	std::fill(std::begin(m_GateArray_render_colours), std::end(m_GateArray_render_colours), 0);
 }
 
 
@@ -3017,6 +3018,9 @@ void amstrad_state::amstrad_common_init()
 
 	m_aleste_mode = 0;
 
+	m_asic.enabled = 0;
+
+	m_gate_array.romdis = 0;
 	m_gate_array.mrer = 0;
 	m_gate_array.vsync = 0;
 	m_gate_array.hsync = 0;

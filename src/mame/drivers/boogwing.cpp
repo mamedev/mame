@@ -89,8 +89,8 @@
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 #define MAIN_XTAL XTAL(28'000'000)

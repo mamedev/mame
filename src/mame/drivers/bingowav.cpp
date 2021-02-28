@@ -44,7 +44,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/te7750.h"
 #include "machine/tmp68301.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "audio/taitosnd.h"
 
 class bingowav_state : public driver_device
@@ -153,7 +153,7 @@ ROM_START( bingowav )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic66", 0x00000, 0x10000, CRC(9fa09b9a) SHA1(e333b11129141649a18906120805842c2dcccd05) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ic69", 0x00000, 0x80000, CRC(5d86d5bd) SHA1(81ebb63f984690e63e45c8b1fe4251fac8d5cf04) )
 
 	ROM_REGION( 0x40000, "termcpu", 0 )

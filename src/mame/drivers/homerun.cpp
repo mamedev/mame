@@ -113,8 +113,8 @@ This version of Homerun is not dumped.
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/2203intf.h"
 #include "sound/samples.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 

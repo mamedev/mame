@@ -13,7 +13,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
-//#include "sound/2203intf.h"
+//#include "sound/ym2203.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"

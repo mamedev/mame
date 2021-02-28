@@ -31,7 +31,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "machine/gen_latch.h"
 #include "machine/bankdev.h"
 #include "sound/msm5205.h"

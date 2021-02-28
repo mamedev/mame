@@ -19,7 +19,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2608intf.h"
+#include "sound/ym2608.h"
 #include "video/vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
@@ -317,7 +317,7 @@ ROM_START( tail2nos )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
@@ -349,7 +349,7 @@ ROM_START( sformula )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
@@ -383,7 +383,7 @@ ROM_START( sformulaa )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 

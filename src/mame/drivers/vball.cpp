@@ -89,8 +89,8 @@ VBlank = 58Hz
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 #define MAIN_CLOCK      XTAL(12'000'000)

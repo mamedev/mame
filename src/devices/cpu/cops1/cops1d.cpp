@@ -24,8 +24,9 @@ cops1_common_disassembler::cops1_common_disassembler()
 
 offs_t cops1_common_disassembler::increment_pc(offs_t pc)
 {
-	u8 feed = (pc & 0x3f) == 0 || ((pc >> 1 ^ pc) & 1) ? 0x20 : 0;
-	return (pc & ~0x3f) | (pc >> 1 & 0x1f) | feed;
+	int feed = ((pc & 0x3e) == 0) ? 1 : 0;
+	feed ^= (pc >> 1 ^ pc) & 1;
+	return (pc & ~0x3f) | (pc >> 1 & 0x1f) | (feed << 5);
 }
 
 

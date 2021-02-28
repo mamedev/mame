@@ -142,8 +142,8 @@ Notes:
 #include "includes/djboy.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

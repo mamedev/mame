@@ -10390,6 +10390,9 @@ circusce                        // GX380 (c) 1984 + Centuri license
 @source:cirsa820xxx.cpp
 unk820501
 
+@source:cirsa910510.cpp
+minimony
+
 @source:cischeat.cpp
 armchmp2                        // (c) 1992 Jaleco
 armchmp2o                       // (c) 1992 Jaleco
@@ -13785,6 +13788,7 @@ bm36th                          // GCA21 (c) 2001 (Japan)
 bm37th                          // GCB07 (c) 2002 (Japan JCA)
 bm3core                         // GCA05 (c) 2000 (Japan)
 bm3final                        // GCC01 (c) 2003 (Japan JCA)
+kbh                             // GU974 (c) 2000 (Korea)
 kbm                             // GQ974 (c) 2000 (Japan)
 kbm2nd                          // GCA01 (c) 2000 (Japan)
 kbm3rd                          // GCA12 (c) 2001 (Japan)
@@ -16161,6 +16165,9 @@ ttfball                         // Toytronic
 ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
+
+@source:hh_pps41.cpp
+mastmind                        // Invicta
 
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
@@ -23349,6 +23356,9 @@ mjsenpu
 
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
+
+@source:mk1forth.cpp
+mk1forth                        // (c) 2003 Andrew Holme
 
 @source:mk14.cpp
 mk14                            //
@@ -33865,6 +33875,8 @@ pepp0417                        // (c) 1987 IGT - International Game Technology
 pepp0417a                       // (c) 1987 IGT - International Game Technology
 pepp0418                        // (c) 1987 IGT - International Game Technology
 pepp0419                        // (c) 1987 IGT - International Game Technology
+pepp0419a                       // (c) 1987 IGT - International Game Technology
+pepp0419b                       // (c) 1987 IGT - International Game Technology
 pepp0420                        // (c) 1987 IGT - International Game Technology
 pepp0423                        // (c) 1987 IGT - International Game Technology
 pepp0423a                       // (c) 1987 IGT - International Game Technology
@@ -38517,6 +38529,7 @@ tmntbftc
 gssytts
 senwfit
 jjstrip
+doraglob                        // (c) 2007 VTech
 doraphon                        // (c) 2006 VTech
 vtechtvssp                      // (c) 2006 VTech
 vtechtvsgr                      // (c) 2006 VTech

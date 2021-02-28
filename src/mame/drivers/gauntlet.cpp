@@ -126,9 +126,9 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
-#include "sound/pokey.h"
 #include "emupal.h"
 #include "speaker.h"
 

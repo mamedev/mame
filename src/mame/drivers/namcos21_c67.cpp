@@ -305,6 +305,10 @@ public:
 
 	void init_solvalou();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -347,9 +351,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	DECLARE_WRITE_LINE_MEMBER(yield_hack);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -761,6 +762,7 @@ void namcos21_c67_state::machine_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_item(NAME(m_video_enable));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
@@ -812,7 +814,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(49.152_MHz_XTAL / 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
 	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
 	m_screen->set_palette(m_palette);
 

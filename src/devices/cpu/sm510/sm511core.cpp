@@ -153,7 +153,7 @@ void sm511_device::init_melody()
 	{
 		u8 data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
-			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
+			logerror("unknown melody ROM data $%02X at $%02X\n", data, i);
 	}
 }
 

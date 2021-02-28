@@ -224,10 +224,15 @@ void t10mmc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
-		// special cases: lba of 0 means MSF of 00:02:00
 		if (m_lba == 0)
 		{
-			m_lba = 150;
+			// A request for LBA 0 will return something different depending on the type of media being played.
+			// For data and mixed media, LBA 0 is assigned to MSF 00:02:00 (= LBA 150).
+			// For audio media, LBA 0 is assigned to the actual starting address of track 1.
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
+				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			else
+				m_lba = 150;
 		}
 		else if (m_lba == 0xffffffff)
 		{
@@ -258,10 +263,12 @@ void t10mmc::ExecCommand()
 		m_lba = (command[5] % 75) + ((command[4] * 75) % (60*75)) + (command[3] * (75*60));
 		m_blocks = (command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
 
-		// special cases: lba of 0 means MSF of 00:02:00
 		if (m_lba == 0)
 		{
-			m_lba = 150;
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
+				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			else
+				m_lba = 150;
 		}
 		else if (m_lba == 0xffffffff)
 		{
@@ -373,10 +380,12 @@ void t10mmc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
 
-		// special cases: lba of 0 means MSF of 00:02:00
 		if (m_lba == 0)
 		{
-			m_lba = 150;
+			if (cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_AUDIO)
+				m_lba = cdrom_get_track_start(m_cdrom, 0);
+			else
+				m_lba = 150;
 		}
 		else if (m_lba == 0xffffffff)
 		{

@@ -880,7 +880,7 @@ void swim1_device::ism_sync()
 					ism_crc_clear();
 			}
 			m_ism_current_bit --;
-			bool bit = (m_ism_sr >> m_ism_current_bit) & 1;
+			int bit = (m_ism_sr >> m_ism_current_bit) & 1;
 			if(!(m_ism_sr & M_MARK))
 				ism_crc_update(bit);
 			m_ism_tss_sr = (m_ism_tss_sr << 1) | bit;
