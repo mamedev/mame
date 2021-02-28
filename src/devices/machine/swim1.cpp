@@ -880,12 +880,12 @@ void swim1_device::ism_sync()
 					ism_crc_clear();
 			}
 			m_ism_current_bit --;
-			bool bit = (m_ism_sr >> m_ism_current_bit) & 1;
+			int bit = (m_ism_sr >> m_ism_current_bit) & 1;
 			if(!(m_ism_sr & M_MARK))
 				ism_crc_update(bit);
 			m_ism_tss_sr = (m_ism_tss_sr << 1) | bit;
 			if(m_ism_setup & 0x40)
-				m_ism_tss_output = 4 | int(bit);
+				m_ism_tss_output = 4 | bit;
 			else {
 				static const u8 tss[4] = { 5, 0xd, 4, 5 };
 				if((m_ism_sr & M_MARK) && ((m_ism_tss_sr & 0xf) == 8))
