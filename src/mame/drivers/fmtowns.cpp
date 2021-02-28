@@ -2883,8 +2883,8 @@ void towns_state::towns_base(machine_config &config)
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
 	pcm.set_addrmap(0, &towns_state::pcm_mem);
-	pcm.add_route(0, "lspeaker", 3.00);
-	pcm.add_route(1, "rspeaker", 3.00);
+	pcm.add_route(0, "lspeaker", 1.00);
+	pcm.add_route(1, "rspeaker", 1.00);
 
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, "lspeaker", 1.00);
