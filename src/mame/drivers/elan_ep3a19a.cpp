@@ -369,4 +369,4 @@ CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_t
 // TV Board Games 3-in-1: Simon, Battleship, Checkers    https://www.youtube.com/watch?v=Q7nwKJfVavU
 // TV Board Games 3-in-1: Boggle, Connect 4, Roll Over   https://www.youtube.com/watch?v=SoKKIKSDGhY
 
-// some packaging also advertises a Monopoly unit, but this does not appear to have been released.
+// The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.
