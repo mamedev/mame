@@ -99,7 +99,7 @@ void bbc_tube_slot_device::host_w(offs_t offset, uint8_t data)
 #include "tube_cms6809.h"
 //#include "tube_pmsb2p.h"
 #include "tube_rc6502.h"
-//#include "tube_x25.h"
+#include "tube_x25.h"
 #include "tube_z80.h"
 #include "tube_zep100.h"
 
@@ -124,7 +124,7 @@ void bbc_tube_devices(device_slot_interface &device)
 	device.option_add("cms6809", BBC_TUBE_CMS6809); /* CMS 6809 2nd processor */
 	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);  /* PMS B2P-6502 */
 	device.option_add("pcplus", BBC_TUBE_PCPLUS);  /* Solidisk PC-Plus co-processor */
-	//device.option_add("x25",    BBC_TUBE_X25);     /* Econet X25 Gateway */
+	device.option_add("x25",    BBC_TUBE_X25);     /* Econet X25 Gateway */
 	device.option_add("zep100", BBC_TUBE_ZEP100);  /* Torch Z80 Communicator (ZEP100) (Torch) */
 	device.option_add("zep100l", BBC_TUBE_ZEP100L); /* Torch Z80 Communicator (ZEP100) (Model B) */
 	device.option_add("zep100w", BBC_TUBE_ZEP100W); /* Torch Z80 Communicator (ZEP100) (Model B+) */
