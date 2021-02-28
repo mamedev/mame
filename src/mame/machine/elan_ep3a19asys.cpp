@@ -92,13 +92,24 @@ void elan_ep3a19asys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 		uint16_t dest = m_dmaparams[3] | (m_dmaparams[4] << 8);
 		uint16_t size = m_dmaparams[5] | (m_dmaparams[6] << 8);
 
-		logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
+		logerror(" Doing %02x DMA %06x to %04x size %04x\n", data, src, dest, size);
 
 		for (int i = 0; i < size; i++)
 		{
-			uint8_t dat = fullbankspace.read_byte(src + i);
-			destspace.write_byte(dest + i, dat);
+			uint8_t dat = fullbankspace.read_byte(src);
+			src++;
+			destspace.write_byte(dest, dat);
+			dest++;
 		}
+		
+		m_dmaparams[0] = src & 0xff;
+		m_dmaparams[1] = (src >> 8) & 0xff;
+		m_dmaparams[2] = (src >> 16) & 0xff;
+		m_dmaparams[3] = dest & 0xff;
+		m_dmaparams[4] = (dest >> 8) & 0xff;
+
+		m_dmaparams[5] = 0;
+		m_dmaparams[6] = 0;
 	}
 }
 
