@@ -14,6 +14,7 @@ dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
 The first 128k of RF5C400 bank 0 is uploaded by the 68000, the rest is unused. It may be using 16J & 18J
 emulate dvd player and video mixing
 16seg led font
+The SPU has an IRQ2 handler that doesn't do anything, find out if or to what it is connected.
 
 
 Konami Twinkle Hardware Overview
