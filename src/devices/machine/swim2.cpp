@@ -453,7 +453,7 @@ void swim2_device::sync()
 				crc_update(bit);
 			m_tss_sr = (m_tss_sr << 1) | bit;
 			if(m_setup & 0x40)
-				m_tss_output = 4 | bit;
+				m_tss_output = 4 | int(bit);
 			else {
 				static const u8 tss[4] = { 5, 0xd, 4, 5 };
 				if((m_sr & M_MARK) && ((m_tss_sr & 0xf) == 8))
