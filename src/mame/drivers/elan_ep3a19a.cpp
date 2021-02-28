@@ -311,7 +311,7 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	ELAN_EP3A19A_SYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
-		
+
 	ELAN_EU3A05_VID(config, m_vid, 0);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
@@ -325,11 +325,11 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	
+
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
 	m_sound->space_read_callback().set(FUNC(elan_ep3a19a_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
-	
+
 	/*
 	m_sound->sound_end_cb<0>().set(FUNC(elan_ep3a19a_state::sound_end0));
 	m_sound->sound_end_cb<1>().set(FUNC(elan_ep3a19a_state::sound_end1));

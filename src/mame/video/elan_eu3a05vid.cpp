@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "El
 
 // tilemaps start at 0x0600 in mainram, sprites at 0x3e00, unlike eu3a14 these could be fixed addresses
 
-elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
@@ -158,8 +158,8 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	*/
 
-//	later in list with AA == 0f   aa == 07 takes priority over earlier in the list with AA == 0f and aa ==  07
-//	later in the list with AA == 0e and aa == 17 is under AA == 0f aa == and 07
+//  later in list with AA == 0f   aa == 07 takes priority over earlier in the list with AA == 0f and aa ==  07
+//  later in the list with AA == 0e and aa == 17 is under AA == 0f aa == and 07
 
 	for (int i = 512-8; i >=0; i -= 8)
 	{
@@ -196,7 +196,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		int priority = (attr & 0x0f)^0xf;
 
 		int colour = attr & 0xf0;
-		
+
 		// ? game select has this set to 0xff, but clearly doesn't want the palette to change!
 		// while in Space Invaders this has to be palette for the UFO to be red.
 		if (colour & 0x80)
@@ -342,21 +342,21 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 
 
-void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri,	int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint16_t* row)
+void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint16_t* row)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	int colour = attr & 0xf0;
 
 	/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom
-		each texture line in 8bpp mode is 256 bytes
-		each texture line in 4bpp mode is 128 bytes
-		in 8x8 mode these pages are 32 tiles wide
-		in 16x16 mode these pages are 16 tiles wide
-		tiles can start on any line
+	    each texture line in 8bpp mode is 256 bytes
+	    each texture line in 4bpp mode is 128 bytes
+	    in 8x8 mode these pages are 32 tiles wide
+	    in 16x16 mode these pages are 16 tiles wide
+	    tiles can start on any line
 
-		it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
+	    it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
 
-		this is eu3a05 specific, eu3a14 uses a more traditional approach
+	    this is eu3a05 specific, eu3a14 uses a more traditional approach
 	*/
 
 	const int tilespersrcline = 256 / tilexsize;
