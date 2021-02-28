@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "El
 
 // tilemaps start at 0x0600 in mainram, sprites at 0x3e00, unlike eu3a14 these could be fixed addresses
 
-elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
@@ -18,7 +18,8 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_vrambase(0x600),
 	m_spritebase(0x3e00),
 	m_use_spritepages(false),
-	m_force_transpen_ff(false)
+	m_force_transpen_ff(false),
+	m_force_basic_scroll(false)
 {
 }
 
@@ -361,12 +362,10 @@ void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri,	int tile, int at
 			int drawxpos;
 
 			drawxpos = xpos + xx + 0;
-			drawxpos &= 0x1ff;
 			if ((drawxpos >= 0) && (drawxpos < 256))
 				row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
 
 			drawxpos = xpos + xx + 1;
-			drawxpos &= 0x1ff;
 			if ((drawxpos >= 0) && (drawxpos < 256))
 				row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
 		}
@@ -379,11 +378,123 @@ void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri,	int tile, int at
 			uint8_t pix = fullbankspace.read_byte(realaddr);
 
 			int drawxpos = xpos + xx;
-			drawxpos &= 0x1ff;
 			if ((drawxpos >= 0) && (drawxpos < 256))
 				row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 		}
 	}
+}
+
+uint16_t elan_eu3a05vid_device::get_tilemapindex_from_xy(uint16_t x, uint16_t y)
+{
+	// for mousetrap and candyland the pages in RAM (16x16 tile mode, 4 pages) are
+	// top left
+	// top right
+	// bottom left
+	// bottom right
+
+	// for airblaster joystick 3d stagess the pages in RAM (8x8 tile mode, 2 pages) are
+	// left
+	// right
+
+	// for airblaster joystick scrolling stages (8x8 tile mode, 2 pages)
+	// top
+	// bottom
+
+	uint16_t tilemapsizey;
+	uint16_t tilemapsizex;
+	uint16_t pagesizey, pagesizex;
+
+	pagesizey = 14; pagesizex = 16;
+
+	switch (m_vidctrl & 0x03)
+	{
+	case 0x00: tilemapsizey = 14 * 2; tilemapsizex = 16 * 2; break; // double height & double width
+	case 0x02: tilemapsizey = 14 * 2; tilemapsizex = 16; break; // double height
+	case 0x01: tilemapsizey = 14; tilemapsizex = 16 * 2; break; // double width
+	case 0x03: tilemapsizey = 14; tilemapsizex = 16;  break; // normal
+	}
+
+	if (!(m_vidctrl & 0x40)) // 16x16 tiles
+	{
+		pagesizey <<= 1;
+		pagesizex <<= 1;
+		tilemapsizey <<= 1;
+		tilemapsizex <<= 1;
+	}
+
+	while (y >= tilemapsizey)
+		y -= tilemapsizey;
+
+	while (x >= tilemapsizex)
+		x -= tilemapsizex;
+
+	int index = 0;
+	int page = 0;
+
+	switch (m_vidctrl & 0x03)
+	{
+	case 0x00:  // double height & double width
+		if (y < pagesizey)
+		{
+			if (x < pagesizex)
+			{
+				page = 0;
+			}
+			else
+			{
+				page = 1;
+			}
+		}
+		else
+		{
+			if (x < pagesizex)
+			{
+				page = 2;
+			}
+			else
+			{
+				page = 3;
+			}
+		}
+		break;
+
+	case 0x02: // double height
+		if (y < pagesizey)
+		{
+			page = 0;
+		}
+		else
+		{
+			page = 1;
+		}
+		break;
+
+	case 0x01: // double width
+		if (x < pagesizex)
+		{
+			page = 0;
+		}
+		else
+		{
+			page = 1;
+		}
+		break;
+
+	case 0x03:
+		page = 0;
+		break;
+	}
+
+	while (y >= pagesizey)
+		y -= pagesizey;
+
+	while (x >= pagesizex)
+		x -= pagesizex;
+
+	index = x + y * pagesizex;
+	index += page * pagesizey * pagesizex;
+
+	return index;
 }
 
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
@@ -391,124 +502,86 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 	/*
 	    this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
-
-	int scroll = get_scroll(1);
-
 	//popmessage("%02x: %04x %04x %04x %04x", m_vidctrl, get_scroll(0), get_scroll(1), get_scroll(2), get_scroll(3));
 
-	// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
+	int scrolly = get_scroll(1);
 
-	int totalyrow;
-	int totalxcol;
-	int mapyrowsbase;
-	int tileysize;
-	int tilexsize;
-	int startrow;
+	for (int screenline = 0; screenline < 224; screenline++)
+	{
+		int scrollx;
+		int coursescrollx;
+		int finescrollx;
+		int realline = screenline + scrolly;
 
-	if (m_vidctrl & 0x40) // 16x16 tiles
-	{
-		totalyrow = 16;
-		totalxcol = 16;
-		mapyrowsbase = 14;
-		tileysize = 16;
-		tilexsize = 16;
-		startrow = (scroll >> 4) & 0x1f;
-	}
-	else // 8x8 tiles
-	{
-		totalyrow = 32;
-		totalxcol = 32;
-		mapyrowsbase = 28;
-		tileysize = 8;
-		tilexsize = 8;
-		startrow = (scroll >> 3) & 0x3f;
-	}
-
-	for (int y = 0; y < totalyrow; y++)
-	{
-		for (int x = 0; x < totalxcol * 2; x++)
+		// split can be probably configured in more ways than this
+		// exact enable conditions unclear
+		// this logic is needed for Air Blaster Joystick
+		if (screenline < m_splitpos[0])
 		{
-			int realstartrow = (startrow + y);
+			scrollx = get_scroll(0);
+		}
+		else if (screenline < m_splitpos[1])
+		{
+			scrollx = get_scroll(2);
+		}
+		else
+		{
+			scrollx = get_scroll(3);
+		}
 
-			int yrows;
+		// Candy Land and Mouse Trap in the TV Board Games units don't like the above logic, so force them to just use the
+		// first scroll register for now, there must be more complex enable conditions for the above
+		if (m_force_basic_scroll)
+			scrollx = get_scroll(0);
 
-			if (m_vidctrl & 0x01)  // double width
-				yrows = mapyrowsbase;
+		uint16_t* row = &bitmap.pix(screenline);
+
+		int xtiles;
+		int xtilesize;
+		if (m_vidctrl & 0x40) // 16x16 tiles
+		{
+			xtiles = 16; // number of tilemap entries per row
+			xtilesize = 16; // width of tile
+			coursescrollx = scrollx >> 4;
+			finescrollx = scrollx & 0xf;
+		}
+		else
+		{
+			xtiles = 32;
+			xtilesize = 8;
+			coursescrollx = scrollx >> 3;
+			finescrollx = scrollx & 0x7;
+		}
+
+		for (int xtile = 0; xtile <= xtiles; xtile++)
+		{
+
+			int realxtile = xtile + coursescrollx;
+
+			int tilemaprow;
+			int tileline;
+
+			if (m_vidctrl & 0x40) // 16x16 tiles
+			{
+				tilemaprow = realline >> 4;
+				tileline = realline & 0xf;
+			}
 			else
-				yrows = mapyrowsbase * 2;
-
-			if (realstartrow >= yrows)
-				realstartrow -= yrows;
-
-			// in double width & double height mode the page addressing needs adjusting
-			if (!(m_vidctrl & 0x02)) // double height
 			{
-				if (!(m_vidctrl & 0x01))  // double width
-				{
-					if (realstartrow >= (yrows / 2))  
-					{
-						realstartrow += yrows / 2;
-					}
-				}
+				tilemaprow = realline >> 3;
+				tileline = realline & 0x7;
 			}
 
-			for (int tileline = 0; tileline < tileysize; tileline++)
-			{
-				int screenline = (y * tileysize) + tileline;
-				screenline -= scroll & (tileysize - 1);
+			int tilemap_entry_index = get_tilemapindex_from_xy(realxtile, tilemaprow);
 
-				if ((screenline >= 0) && (screenline < 256))
-				{
-					int scrollx;
+			int tile, attr, unk2;
 
-					// split can be probably configured in more ways than this
-					// exact enable conditions unclear
-					if (screenline < m_splitpos[0])
-					{
-						scrollx = get_scroll(0);
-					}
-					else if (screenline < m_splitpos[1])
-					{
-						scrollx = get_scroll(2);
-					}
-					else
-					{
-						scrollx = get_scroll(3);
-					}
+			if (!get_tile_data(tilemap_entry_index, drawpri, tile, attr, unk2))
+				continue;
 
-					//scrollx = get_scroll(0);
+			int xpos = xtile * xtilesize - finescrollx;
+			draw_tilemaps_tileline(drawpri, tile, attr, unk2, xtilesize, tileline, xpos, row);
 
-					int tilemap_entry_index;
-
-					if (m_vidctrl & 0x40) // 16x16 tiles
-					{
-						tilemap_entry_index = (((realstartrow + y) & 0x3f) * 8) + x;
-					}
-					else
-					{
-						tilemap_entry_index = (((realstartrow) & 0x7f) * totalxcol) + (x & (totalxcol - 1));
-					}
-
-					if (!(m_vidctrl & 0x02))  // double height
-					{
-						if (x & totalxcol)
-						{
-							tilemap_entry_index += totalxcol * mapyrowsbase;
-						}
-					}
-
-					int tile, attr, unk2;
-
-					if (!get_tile_data(tilemap_entry_index, drawpri, tile, attr, unk2))
-						continue;
-
-					int xpos = x * tilexsize - scrollx;
-					uint16_t* row = &bitmap.pix(screenline);
-
-					draw_tilemaps_tileline(drawpri, tile, attr, unk2, tilexsize, tileline, xpos, row);
-
-				}
-			}
 		}
 	}
 }
@@ -517,9 +590,9 @@ uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0, cliprect);
 
-	draw_tilemaps(screen,bitmap,cliprect,0);
+	draw_tilemaps(screen,bitmap,cliprect,0); // 'low priority'
 	draw_sprites(screen,bitmap,cliprect);
-	draw_tilemaps(screen,bitmap,cliprect,1);
+	draw_tilemaps(screen,bitmap,cliprect,1); // 'high priority'
 
 	return 0;
 }
