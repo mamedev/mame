@@ -320,8 +320,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 
 
-void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri,
-	int base, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint16_t* row)
+void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri,	int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint16_t* row)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	int colour = attr & 0xf0;
@@ -479,34 +478,34 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					//scrollx = get_scroll(0);
 
-					int base;
+					int tilemap_entry_index;
 
 					if (m_vidctrl & 0x40) // 16x16 tiles
 					{
-						base = (((realstartrow + y) & 0x3f) * 8) + x;
+						tilemap_entry_index = (((realstartrow + y) & 0x3f) * 8) + x;
 					}
 					else
 					{
-						base = (((realstartrow) & 0x7f) * totalxcol) + (x & (totalxcol - 1));
+						tilemap_entry_index = (((realstartrow) & 0x7f) * totalxcol) + (x & (totalxcol - 1));
 					}
 
 					if (!(m_vidctrl & 0x02))  // double height
 					{
 						if (x & totalxcol)
 						{
-							base += totalxcol * mapyrowsbase;
+							tilemap_entry_index += totalxcol * mapyrowsbase;
 						}
 					}
 
 					int tile, attr, unk2;
 
-					if (!get_tile_data(base, drawpri, tile, attr, unk2))
+					if (!get_tile_data(tilemap_entry_index, drawpri, tile, attr, unk2))
 						continue;
 
 					int xpos = x * tilexsize - scrollx;
 					uint16_t* row = &bitmap.pix(screenline);
 
-					draw_tilemaps_tileline(drawpri, base, tile, attr, unk2, tilexsize, tileline, xpos, row);
+					draw_tilemaps_tileline(drawpri, tile, attr, unk2, tilexsize, tileline, xpos, row);
 
 				}
 			}
