@@ -1736,6 +1736,10 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 
 static INPUT_PORTS_START( firebeat )
 	PORT_START("IN3")
+	// popn6/popn7/popn8/others?: Requires debug type dongle (not included in ROMs)
+	//   DIPSW 8 = Auto play mode
+	//   DIPSW 6 = Mute song BGM
+	// kbm3rd: Set to 0xDE (UUdUUUUd) pattern to enable debug view mode
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "DIP SW:8" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "DIP SW:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "DIP SW:6" )
