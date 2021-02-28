@@ -141,11 +141,11 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    XX = texture x start
 	    YY = texture y start
 	    bb = sometimes set in invaders
-	    AA = same as attr on tiles (colour / priority?)
+	    AA = same as attr on tiles (cccc pppp) (c = colour / p = priority?)
 
 
 	    aa = same as unk2 on tiles? ( --pp ---- )
-	    p = page
+	    p = page (some hardware types only? or selectable meaning)
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
@@ -161,7 +161,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 //	later in list with AA == 0f   aa == 07 takes priority over earlier in the list with AA == 0f and aa ==  07
 //	later in the list with AA == 0e and aa == 17 is under AA == 0f aa == and 07
 
-	for (int i = 0; i < 512; i += 8)
+	for (int i = 512-8; i >=0; i -= 8)
 	{
 		uint8_t x = read_spriteram(i + 2);
 		uint8_t y = read_spriteram(i + 1);
@@ -193,7 +193,8 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		const int doubleX = (flags & 0x10)>>4;
 		const int doubleY = (flags & 0x20)>>5;
 
-		int priority = (unk2 & 0xf0)>>4;
+		int priority = (attr & 0x0f)^0xf;
+
 		int colour = attr & 0xf0;
 		
 		// ? game select has this set to 0xff, but clearly doesn't want the palette to change!
