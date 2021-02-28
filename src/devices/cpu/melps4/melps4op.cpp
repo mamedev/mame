@@ -696,5 +696,5 @@ void melps4_cpu_device::op_nop()
 
 void melps4_cpu_device::op_illegal()
 {
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
+	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
 }

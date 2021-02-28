@@ -44,9 +44,9 @@ ClawGrip, Jul 2006
 #include "includes/pokechmp.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 
 #include "screen.h"
 #include "speaker.h"

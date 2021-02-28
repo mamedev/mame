@@ -33,7 +33,7 @@ TODO:
 #include "audio/taitosnd.h"
 #include "machine/te7750.h"
 #include "machine/z80ctc.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 

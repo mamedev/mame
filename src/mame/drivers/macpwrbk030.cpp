@@ -267,8 +267,9 @@ private:
 	int m_adb_line;
 	void set_adb_line(int state) { m_adb_line = state; }
 	u8 pmu_adb_r() { return (m_adb_line<<1); }
-	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w(data & 1); }
-	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled on the PB100
+	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w((data & 1) ^ 1); }
+
+	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled
 };
 
 // 4-level grayscale
@@ -520,6 +521,7 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
+	m_macadb->adb_vblank();
 
 	if (++m_irq_count == 60)
 	{

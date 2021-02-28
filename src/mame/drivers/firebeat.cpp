@@ -390,6 +390,7 @@ public:
 
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void init_kbh();
 	void init_kbm();
 	void firebeat_kbm(machine_config &config);
 
@@ -1010,39 +1011,39 @@ void firebeat_spu_state::rf5c400_map(address_map& map)
 
     IRQ2: Executes one command stored in a different buffer from IRQ1.
           The buffer can contain up to 8 commands.
-	      The command index counter increments after each IRQ2 call.
-		  If there is no command in the slot at the current counter then it just increments without executing a command.
+          The command index counter increments after each IRQ2 call.
+          If there is no command in the slot at the current counter then it just increments without executing a command.
 
-		  Timing matters. In particular if the speed of the IRQ 2 calls is too fast then the volume and frequency animations will be wrong.
-		  The most common issue with bad timing is keysounds will be cut off.
-		  pop'n music Animelo 2 also has an issue when playing CHA-LA HEAD CHA-LA where one of the beginning keysounds will stay on a
-		  very high pitched frequency. The lower(?) the IRQ 2 frequency, the longer the keysound stays played it seems.
+          Timing matters. In particular if the speed of the IRQ 2 calls is too fast then the volume and frequency animations will be wrong.
+          The most common issue with bad timing is keysounds will be cut off.
+          pop'n music Animelo 2 also has an issue when playing CHA-LA HEAD CHA-LA where one of the beginning keysounds will stay on a
+          very high pitched frequency. The lower(?) the IRQ 2 frequency, the longer the keysound stays played it seems.
 
-		  For beatmania III:
-			cmd[0] = nop
-			cmd[1] = 0x91bc -> Send stop command for all rf5c400 channels that are done playing
-			cmd[2] = 0x310a -> Error checking? Sending some kind of state to main CPU???
-			cmd[3] = 0x29c6 -> Increment a timer for each running DMA(ATA command?)
-				Each timer must count up to 0x02e8 (744) before it will move on to the next DMA, which I believe is the time out counter.
+          For beatmania III:
+            cmd[0] = nop
+            cmd[1] = 0x91bc -> Send stop command for all rf5c400 channels that are done playing
+            cmd[2] = 0x310a -> Error checking? Sending some kind of state to main CPU???
+            cmd[3] = 0x29c6 -> Increment a timer for each running DMA(ATA command?)
+                Each timer must count up to 0x02e8 (744) before it will move on to the next DMA, which I believe is the time out counter.
 
-				In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
+                In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
 
-				start_dma();
-				while (get_dma_timer() < dma_max_timer) {
-					if (irq6_called_flag) {
-						break;
-					}
-				}
-				end_dma();
+                start_dma();
+                while (get_dma_timer() < dma_max_timer) {
+                    if (irq6_called_flag) {
+                        break;
+                    }
+                }
+                end_dma();
 
-				irq6_called_flag is set only when IRQ6 is called.
-				get_dma_timer is the timer that is incremented by 0x29c6.
-			cmd[4] = 0x94de -> Animates rf5c400 channel volumes
-			cmd[5] = 0x7b2c -> Send some kind of buffer status flags to spu_status_led_w. Related to IRQ4 since commands come from PPC to set buffer data
-			cmd[6] = 0x977e -> Animates rf5c400 channel frequencies
-			cmd[7] = 0x9204 -> Sends current state of rf5c400 channels as well as a list (bitmask integer) of usable channels up to main CPU memory.
-			                   Also sends a flag to to spu_status_led_w that shows if there are available SE slots.
-							   If there are no available SE slots then it will set bit 3 to .
+                irq6_called_flag is set only when IRQ6 is called.
+                get_dma_timer is the timer that is incremented by 0x29c6.
+            cmd[4] = 0x94de -> Animates rf5c400 channel volumes
+            cmd[5] = 0x7b2c -> Send some kind of buffer status flags to spu_status_led_w. Related to IRQ4 since commands come from PPC to set buffer data
+            cmd[6] = 0x977e -> Animates rf5c400 channel frequencies
+            cmd[7] = 0x9204 -> Sends current state of rf5c400 channels as well as a list (bitmask integer) of usable channels up to main CPU memory.
+                               Also sends a flag to to spu_status_led_w that shows if there are available SE slots.
+                               If there are no available SE slots then it will set bit 3 to .
 
     IRQ4: Dual-port RAM mailbox (when PPC writes to 0x3FE)
           Handles commands from PPC (bytes 0x00 and 0x01)
@@ -1505,6 +1506,12 @@ void firebeat_kbm_state::init_kbm()
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
 
 	m_cabinet_info = 2;
+}
+
+void firebeat_kbm_state::init_kbh()
+{
+	init_kbm();
+	m_cabinet_info = 3;
 }
 
 void firebeat_kbm_state::init_keyboard()
@@ -2029,10 +2036,24 @@ ROM_START( kbm )
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "974jac01", 0, BAD_DUMP SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
+	DISK_IMAGE_READONLY( "gq974-ja c01", 0, SHA1(46b766b5ed75de4139df369b414692919de244c7) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "974jaa02", 1, BAD_DUMP SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
+	DISK_IMAGE_READONLY( "gq974-ja a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) )
+ROM_END
+
+ROM_START( kbh )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4bda8987) SHA1(9c5c89808a57aa5aeb7976a3cf3ca96e9797beea))
+
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(af4e8182f6a984895d9a9a00bbfb6c65fb7b4738) )
+
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) ) // identical to jaa02 image
 ROM_END
 
 ROM_START( kbm2nd )
@@ -2043,10 +2064,10 @@ ROM_START( kbm2nd )
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(25784881) SHA1(99ba9456a91af3043baed2bbf72feed73df564b2))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "a01jaa01", 0, BAD_DUMP SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
+	DISK_IMAGE_READONLY( "a01 ja a01", 0, SHA1(0aabc0c03f7ae7e7633bf6056de833ace68f9163) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "a01jaa02", 1, BAD_DUMP SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
+	DISK_IMAGE_READONLY( "a01 ja a02", 1, SHA1(4d62f6ecfbf5ab0b014feb7b01014cba440c87f8) )
 ROM_END
 
 ROM_START( kbm3rd )
@@ -2312,9 +2333,10 @@ GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppd, ROT0, 
 GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_NOT_WORKING )
 GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
 
-GAMEL( 2000, kbm,    0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbm2nd, 0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2001, kbm3rd, 0, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbh, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
 
 GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING )
 GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING )

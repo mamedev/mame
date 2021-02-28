@@ -1,32 +1,27 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Regnecentralen RC759 Piccoline
 
-    Status: Error 32 (cassette data error)
-
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/i86/i186.h"
-#include "imagedev/cassette.h"
-#include "imagedev/floppy.h"
 #include "machine/i8255.h"
-#include "machine/keyboard.h"
 #include "machine/mm58167.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "machine/rc759_kbd.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
 #include "video/i82730.h"
-
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
-
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,11 +51,11 @@ public:
 		m_floppy1(*this, "fdc:1"),
 		m_vram(*this, "vram"),
 		m_config(*this, "config"),
+		m_kbd(*this, "kbd"),
 		m_cas_enabled(0), m_cas_data(0),
 		m_drq_source(0),
 		m_nvram_bank(0),
 		m_gfx_mode(0),
-		m_keyboard_enable(0), m_keyboard_key(0x00),
 		m_centronics_strobe(0), m_centronics_init(0), m_centronics_select_in(0), m_centronics_busy(0),
 		m_centronics_ack(0), m_centronics_fault(0), m_centronics_perror(0), m_centronics_select(0),
 		m_centronics_data(0xff)
@@ -131,6 +126,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_shared_ptr<uint16_t> m_vram;
 	required_ioport m_config;
+	required_device<rc759_kbd_hle_device> m_kbd;
 
 	std::vector<uint8_t> m_nvram_mem;
 
@@ -139,8 +135,6 @@ private:
 	int m_drq_source;
 	int m_nvram_bank;
 	int m_gfx_mode;
-	int m_keyboard_enable;
-	uint8_t m_keyboard_key;
 
 	int m_centronics_strobe;
 	int m_centronics_init;
@@ -157,24 +151,6 @@ private:
 //**************************************************************************
 //  I/O
 //**************************************************************************
-
-void rc759_state::keyb_put(u8 data)
-{
-	m_keyboard_key = data;
-	m_pic->ir1_w(1);
-}
-
-uint8_t rc759_state::keyboard_r()
-{
-	logerror("keyboard_r\n");
-
-	m_pic->ir1_w(0);
-
-	if (m_keyboard_enable)
-		return m_keyboard_key;
-	else
-		return 0x00;
-}
 
 uint8_t rc759_state::ppi_porta_r()
 {
@@ -209,15 +185,19 @@ uint8_t rc759_state::ppi_portb_r()
 
 void rc759_state::ppi_portc_w(uint8_t data)
 {
-	m_cas_enabled = BIT(data, 0);
-	m_cas->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-	m_drq_source = (data >> 2) & 0x03;
-	m_nvram_bank = (data >> 4) & 0x03;
-	m_gfx_mode = BIT(data, 6);
-	m_keyboard_enable = BIT(data, 7);
+	// 7-------  keyboard enable
+	// -6------  gfx mode
+	// --54----  nvram bank
+	// ----32--  drq source
+	// ------1-  cassette motor
+	// -------0  cassette enable
 
-	logerror("ppi_portc_w: cas_enabled: %d, cas_motor: %d, drq_source: %d, nvram_bank: %d, gfx_mode: %d, keyb_enable: %d\n",
-		m_cas_enabled, BIT(data, 1), m_drq_source, m_nvram_bank, m_gfx_mode, m_keyboard_enable);
+	m_kbd->enable_w(BIT(data, 7));
+	m_gfx_mode = BIT(data, 6);
+	m_nvram_bank = (data >> 4) & 0x03;
+	m_drq_source = (data >> 2) & 0x03;
+	m_cas->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cas_enabled = BIT(data, 0);
 }
 
 WRITE_LINE_MEMBER( rc759_state::centronics_busy_w )
@@ -406,11 +386,12 @@ void rc759_state::rtc_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER( rc759_state::i186_timer0_w )
 {
+	m_cas_data = 1;
+
 	if (m_cas_enabled)
-	{
-		m_cas_data = state;
-		m_cas->output(state ? -1.0 : 1.0);
-	}
+		m_cas_data = state ? 0 : 1;
+
+	m_cas->output(m_cas_data ? -1.0 : 1.0);
 }
 
 WRITE_LINE_MEMBER( rc759_state::i186_timer1_w )
@@ -480,7 +461,7 @@ void rc759_state::rc759_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x020, 0x020).r(FUNC(rc759_state::keyboard_r));
+	map(0x020, 0x020).r(m_kbd, FUNC(rc759_kbd_hle_device::read));
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
 	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
@@ -568,8 +549,8 @@ void rc759_state::rc759(machine_config &config)
 	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	// keyboard
-	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
-	keyb.set_keyboard_callback(FUNC(rc759_state::keyb_put));
+	RC759_KBD_HLE(config, m_kbd);
+	m_kbd->int_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	// sound
 	SPEAKER(config, "mono").front_center();

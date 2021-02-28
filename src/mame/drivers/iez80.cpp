@@ -4,12 +4,12 @@
 
     Insight Enterprises Z80 Single Board Computer
 
-	Possibly a prototype or part of a larger system. A video with more
-	info is available at https://www.youtube.com/watch?v=_z1kBb-Zwpg.
+    Possibly a prototype or part of a larger system. A video with more
+    info is available at https://www.youtube.com/watch?v=_z1kBb-Zwpg.
 
     TODO:
     - Verify device hookup
-	- Figure out what's at 0x20, 0x21, 0x3c, 0x3d
+    - Figure out what's at 0x20, 0x21, 0x3c, 0x3d
     - Hook up FDC
     - Hook up CRT8002 (video attributes)
     - Much more
@@ -81,15 +81,15 @@ void iez80_state::mem_map(address_map &map)
 void iez80_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//	map(0x20, 0x20).lr8([this]() { return machine().rand(); }, "unk20");
-//	map(0x21, 0x21).lr8([this]() { return machine().rand(); }, "unk21");
+//  map(0x20, 0x20).lr8([this]() { return machine().rand(); }, "unk20");
+//  map(0x21, 0x21).lr8([this]() { return machine().rand(); }, "unk21");
 	map(0x24, 0x27).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x28, 0x2b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x2c, 0x2f).rw("dart1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x32, 0x32).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x38, 0x3b).rw("dart2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//	map(0x3c, 0x3c).lr8([this]() { return machine().rand(); }, "unk3c");
-//	map(0x3d, 0x3d).lr8([this]() { return machine().rand(); }, "unk3d");
+//  map(0x3c, 0x3c).lr8([this]() { return machine().rand(); }, "unk3c");
+//  map(0x3d, 0x3d).lr8([this]() { return machine().rand(); }, "unk3d");
 	map(0x40, 0x4f).rw("crtc", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
 }
 
@@ -215,7 +215,7 @@ void iez80_state::iez80(machine_config &config)
 ROM_START( iez80 )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("iez80.bin", 0x0000, 0x1000, CRC(d73137d2) SHA1(a340a47c5f37bbef244d35d581ff0beeeec5d677))
-	
+
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("8002.bin", 0x0000, 0x0800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690))
 ROM_END
@@ -229,4 +229,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME                FLAGS
-COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (Prototype?)", MACHINE_IS_SKELETON )
+COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (prototype?)", MACHINE_IS_SKELETON )

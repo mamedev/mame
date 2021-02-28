@@ -88,7 +88,7 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -334,10 +334,10 @@ ROM_START( suprslam )
 	ROM_LOAD( "eb26ic38.bin", 0x000000, 0x020000, CRC(153f2c50) SHA1(b70f248cfb18239fcd26e36fb36159f219debf2c) )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8x4 'Screen' Layer GFX */

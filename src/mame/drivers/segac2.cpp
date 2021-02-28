@@ -83,8 +83,8 @@
 #include "machine/315_5296.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "sound/ym2612.h"
 #include "emupal.h"
 #include "speaker.h"
 

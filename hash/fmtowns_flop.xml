@@ -1675,7 +1675,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="3444631">
-				<rom name="lord_monarch_program_disk.mfm" size="3444631" crc="bb147cdd" sha1="237d354338d44e199a2f89f15157bafb5c1b31fa" />
+				<rom name="lord_monarch_program_disk.mfm" size="3444631" crc="bb147cdd" sha1="4fef91880ac4d2a17baf534caa02d3b29f71afc6" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">

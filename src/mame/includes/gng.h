@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "tilemap.h"

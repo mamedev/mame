@@ -10390,6 +10390,9 @@ circusce                        // GX380 (c) 1984 + Centuri license
 @source:cirsa820xxx.cpp
 unk820501
 
+@source:cirsa910510.cpp
+minimony
+
 @source:cischeat.cpp
 armchmp2                        // (c) 1992 Jaleco
 armchmp2o                       // (c) 1992 Jaleco
@@ -13781,6 +13784,7 @@ bm36th                          // GCA21 (c) 2001 (Japan)
 bm37th                          // GCB07 (c) 2002 (Japan JCA)
 bm3core                         // GCA05 (c) 2000 (Japan)
 bm3final                        // GCC01 (c) 2003 (Japan JCA)
+kbh                             // GU974 (c) 2000 (Korea)
 kbm                             // GQ974 (c) 2000 (Japan)
 kbm2nd                          // GCA01 (c) 2000 (Japan)
 kbm3rd                          // GCA12 (c) 2001 (Japan)
@@ -16157,6 +16161,9 @@ ttfball                         // Toytronic
 ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
+
+@source:hh_pps41.cpp
+mastmind                        // Invicta
 
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
@@ -23346,6 +23353,9 @@ mjsenpu
 @source:mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
+@source:mk1forth.cpp
+mk1forth                        // (c) 2003 Andrew Holme
+
 @source:mk14.cpp
 mk14                            //
 
@@ -23465,9 +23475,10 @@ vf2                             // 1995.09 Virtua Fighter (Version 2.1)
 vf2a                            // 1995.?? Virtua Fighter 2 (Revision A)
 vf2b                            // 1995.?? Virtua Fighter 2 (Revision B)
 vf2o                            // 1994.11 Virtua Fighter 2
-von                             // 1996.01 Cyber Troopers Virtual-On (USA, Revision B)
+von                             // 1996.01 Cyber Troopers Virtual-On (Export)
 vonj                            // 1996.01 Cyber Troopers Virtual-On (Japan, Revision B)
 vonr                            // 1996.01 Cyber Troopers Virtual-On Relay (Japan)
+vonu                            // 1996.01 Cyber Troopers Virtual-On (USA, Revision B)
 vstriker                        // 1995.05 Virtua Striker (Revision A)
 vstrikero                       // 1995.05 Virtua Striker
 waverunr                        // 1996.10 Wave Runner (Japan, Revision A)
@@ -32517,6 +32528,7 @@ msiwwea
 msidd
 msimpac
 msimm2
+msinamco
 msisinv
 msifrog
 rcapnp
@@ -38511,6 +38523,8 @@ tmntbftc
 gssytts
 senwfit
 jjstrip
+doraglob                        // (c) 2007 VTech
+doraphon                        // (c) 2006 VTech
 vtechtvssp                      // (c) 2006 VTech
 vtechtvsgr                      // (c) 2006 VTech
 tmntmutm

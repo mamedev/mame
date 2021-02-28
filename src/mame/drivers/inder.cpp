@@ -43,6 +43,8 @@
 #include "inder.lh"
 
 
+namespace {
+
 class inder_state : public genpin_class
 {
 public:
@@ -58,6 +60,7 @@ public:
 		, m_13(*this, "13")
 		, m_switches(*this, "SW.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_p_speech(*this, "speech")
 	{ }
 
 	void inder(machine_config &config);
@@ -67,6 +70,10 @@ public:
 
 	void init_inder();
 	void init_inder1();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	uint8_t ppic_r();
@@ -106,9 +113,7 @@ private:
 	uint8_t m_sndcmd;
 	uint8_t m_sndbank;
 	uint32_t m_sound_addr;
-	uint8_t *m_p_speech;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
@@ -119,6 +124,7 @@ private:
 	optional_device<hct157_device> m_13;
 	required_ioport_array<11> m_switches;
 	output_finder<50> m_digits;
+	optional_region_ptr<uint8_t> m_p_speech;
 };
 
 void inder_state::brvteam_map(address_map &map)
@@ -1321,6 +1327,13 @@ void inder_state::ppic_w(uint8_t data)
 }
 
 
+void inder_state::machine_start()
+{
+	m_digits.resolve();
+
+	std::fill(std::begin(m_segment), std::end(m_segment), 0);
+}
+
 void inder_state::machine_reset()
 {
 	m_sound_addr = 0;
@@ -1335,7 +1348,6 @@ void inder_state::machine_reset()
 
 void inder_state::init_inder()
 {
-	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
 	{
 		m_7a->d_w(0);
@@ -1347,7 +1359,6 @@ void inder_state::init_inder()
 
 void inder_state::init_inder1()
 {
-	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
 	{
 		m_7a->d_w(0);
@@ -1630,6 +1641,8 @@ ROM_START(metalman)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
+
+} // Anonymous namespace
 
 
 // old cpu board, 6 digits, sn76489

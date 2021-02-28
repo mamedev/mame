@@ -29,9 +29,9 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
-#include "sound/2608intf.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "sound/ym2608.h"
 
 #include "video/upd7220.h"
 

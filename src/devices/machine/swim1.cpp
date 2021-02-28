@@ -157,11 +157,11 @@ u8 swim1_device::ism_read(offs_t offset)
 {
 	ism_sync();
 
-	//	static const char *const names[] = {
-	//		"data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
-	//	};
+	//  static const char *const names[] = {
+	//      "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
+	//  };
 
-	//	logerror("read ism %s\n", names[offset & 7]);
+	//  logerror("read ism %s\n", names[offset & 7]);
 	switch(offset & 7) {
 	case 0x0: { // data
 		u16 r = ism_fifo_pop();
@@ -376,10 +376,13 @@ void swim1_device::device_timer(emu_timer &, device_timer_id, int, void *)
 
 void swim1_device::flush_write(u64 when)
 {
+	if(!m_flux_write_start)
+		return;
+
 	if(!when)
 		when = m_last_sync;
 
-	if(m_floppy && m_flux_write_start && when > m_flux_write_start) {
+	if(when > m_flux_write_start) {
 		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
 		if(last_on_edge)
 			m_flux_write_count--;
@@ -389,11 +392,15 @@ void swim1_device::flush_write(u64 when)
 		std::vector<attotime> fluxes(m_flux_write_count);
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
-		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-		m_flux_write_start = m_last_sync;
+
+		if(m_floppy)
+			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
+
 		m_flux_write_count = 0;
 		if(last_on_edge)
 			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
+
 	} else
 		m_flux_write_count = 0;
 }
@@ -438,7 +445,7 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 				m_iwm_async_update = 0;
 				m_iwm_data = 0x00;
 			}
-			
+
 		} else {
 			if(m_iwm_rw != MODE_WRITE) {
 				m_iwm_rw = MODE_WRITE;
@@ -537,7 +544,7 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 
 	switch(m_iwm_control & 0xc0) {
 	case 0x00: return m_iwm_active ? m_iwm_data : 0xff;
-	case 0x40: return (m_iwm_status & 0x7f) | ((m_floppy && m_floppy->wpt_r()) ? 0x80 : 0x00);
+	case 0x40: return (m_iwm_status & 0x7f) | ((!m_floppy || m_floppy->wpt_r()) ? 0x80 : 0x00);
 	case 0x80: return m_iwm_whd;
 	case 0xc0: if(offset & 1) { if(m_iwm_active) iwm_data_w(data); else iwm_mode_w(data); } return 0xff;
 	}
@@ -758,7 +765,7 @@ void swim1_device::iwm_sync()
 				if(m_iwm_whd & 0x80) {
 					logerror("underrun\n");
 					flush_write();
-					m_flux_write_start = 0;					
+					m_flux_write_start = 0;
 					m_iwm_whd &= ~0x40;
 					m_last_sync = next_sync;
 				} else {
@@ -1022,7 +1029,7 @@ void swim1_device::ism_sync()
 						if(sct == 1)
 							resolved_ls_type[resolved_ls_count++] = sct;
 						else
-							resolved_ls_type[resolved_ls_count++] = lct;						
+							resolved_ls_type[resolved_ls_count++] = lct;
 					}
 				}
 
@@ -1129,7 +1136,7 @@ void swim1_device::ism_sync()
 					break;
 				}
 
-				m_ism_csm_pair_side = !m_ism_csm_pair_side;						
+				m_ism_csm_pair_side = !m_ism_csm_pair_side;
 			}
 
 

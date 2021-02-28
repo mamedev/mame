@@ -66,9 +66,9 @@ puzznici note
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
 
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
+#include "sound/ym2610.h"
 
 #include "screen.h"
 #include "speaker.h"

@@ -121,6 +121,7 @@ CPUS["COSMAC"] = true
 CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
 CPUS["PPS4"] = true
+CPUS["PPS41"] = true
 CPUS["UPD7725"] = true
 CPUS["HD61700"] = true
 CPUS["LC8670"] = true
@@ -167,6 +168,7 @@ CPUS["XAVIX2"] = true
 CPUS["UPD78K"] = true
 CPUS["ROMP"] = true
 CPUS["COPS1"] = true
+CPUS["MK1"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -259,7 +261,7 @@ SOUNDS["CDDA"] = true
 --SOUNDS["ICS2115"] = true
 --SOUNDS["I5000_SND"] = true
 --SOUNDS["ST0016"] = true
---SOUNDS["NILE"] = true
+--SOUNDS["SETAPCM"] = true
 --SOUNDS["X1_010"] = true
 --SOUNDS["VRENDER0"] = true
 SOUNDS["VOTRAX"] = true
@@ -2561,6 +2563,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/lft_phasor.cpp",
 	MAME_DIR .. "src/mame/drivers/dcebridge.cpp",
 	MAME_DIR .. "src/mame/drivers/homez80.cpp",
+	MAME_DIR .. "src/mame/drivers/mk1forth.cpp",
 	MAME_DIR .. "src/mame/drivers/p112.cpp",
 	MAME_DIR .. "src/mame/drivers/phunsy.cpp",
 	MAME_DIR .. "src/mame/drivers/pimps.cpp",
@@ -3368,6 +3371,8 @@ createMESSProjects(_target, _subtarget, "regnecentralen")
 files {
 	MAME_DIR .. "src/mame/drivers/rc702.cpp",
 	MAME_DIR .. "src/mame/drivers/rc759.cpp",
+	MAME_DIR .. "src/mame/machine/rc759_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/rc759_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "ritam")
@@ -3456,6 +3461,7 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_pps41.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rtpc")

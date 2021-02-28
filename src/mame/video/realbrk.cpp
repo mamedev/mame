@@ -135,6 +135,7 @@ void realbrk_state::video_start()
 	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
 
 	save_item(NAME(m_disable_video));
+	m_disable_video = 0;
 }
 
 /***************************************************************************

@@ -2633,6 +2633,14 @@ bool oa_d34v_device::is_2m() const
 	return false;
 }
 
+void oa_d34v_device::track_changed()
+{
+	// Skip the rpm-setting mac generic version, the single-sided
+	// drive's rpm is externally controlled through a PWM signal.
+
+	floppy_image_device::track_changed();
+}
+
 mfd51w_device::mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, MFD51W, tag, owner, clock)
 {
 }
@@ -2671,5 +2679,11 @@ void mfd75w_device::setup_characteristics()
 
 bool mfd75w_device::is_2m() const
 {
+	if(!image)
+		return false;
+
+	if(image->get_variant() == floppy_image::SSDD || image->get_variant() == floppy_image::DSDD)
+		return true;
+
 	return false;
 }

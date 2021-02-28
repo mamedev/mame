@@ -769,43 +769,43 @@ void atari_slapstic_device::device_start()
 		m_space->install_readwrite_tap(0, m_space->addrmask(), 0, "slapstic",
 									   [this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_state->test(offset); },
 									   [this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_state->test(offset); });
-	
+
 	checker check(m_start, m_end, m_mirror, m_space->data_width(), m_chipnum == 101 ? 13 : 14);
 	const auto *info = slapstic_table[m_chipnum - 101];
-	
+
 	m_s_idle = std::make_unique<idle>(this, check, info);
-	
+
 	if(m_chipnum <= 102) {
 		m_s_active = std::make_unique<active_101_102>(this, check, info);
 		m_s_alt_valid = std::make_unique<alt_valid_101_102>(this, check, info);
-		
+
 	} else if(m_chipnum <= 110) {
 		m_s_active = std::make_unique<active_103_110>(this, check, info);
 		m_s_alt_valid = std::make_unique<alt_valid_103_110>(this, check, info);
-		
+
 	} else {
 		m_s_active = std::make_unique<active_111_118>(this, check, info);
 		m_s_alt_valid = std::make_unique<alt_valid_111_118>(this, check, info);
 	}
-	
+
 	if(m_chipnum <= 110)
 		m_s_alt_select = std::make_unique<alt_select_101_110>(this, check, info, m_space->data_width() == 16 ? 1 : 0);
 	else
 		m_s_alt_select = std::make_unique<alt_select_111_118>(this, check, info, m_space->data_width() == 16 ? 1 : 0);
-	
+
 	m_s_alt_commit = std::make_unique<alt_commit>(this, check, info);
-	
+
 	if(m_chipnum <= 110) {
 		m_s_bit_load = std::make_unique<bit_load>(this, check, info);
 		m_s_bit_set_odd  = std::make_unique<bit_set>(this, check, info, true);
 		m_s_bit_set_even = std::make_unique<bit_set>(this, check, info, false);
 	}
-	
+
 	if(m_chipnum >= 111) {
 		m_s_add_load = std::make_unique<add_load>(this, check, info);
 		m_s_add_set  = std::make_unique<add_set> (this, check, info);
 	}
-	
+
 	m_state = m_s_idle.get();
 }
 
@@ -917,7 +917,7 @@ void atari_slapstic_device::active_101_102::test(offs_t addr) const
 		m_sl->m_state = m_sl->m_s_idle.get();
 	} else if(m_alt(addr)) {
 		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
-		m_sl->m_state = m_sl->m_s_alt_valid.get();		
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
 	} else if(m_bit(addr)) {
 		m_sl->logerror("bitwise start (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_bit_load.get();
@@ -955,7 +955,7 @@ void atari_slapstic_device::active_103_110::test(offs_t addr) const
 		m_sl->m_state = m_sl->m_s_idle.get();
 	} else if(m_alt(addr)) {
 		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
-		m_sl->m_state = m_sl->m_s_alt_valid.get();		
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
 	} else if(m_bit(addr)) {
 		m_sl->logerror("bitwise start (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_bit_load.get();
@@ -993,7 +993,7 @@ void atari_slapstic_device::active_111_118::test(offs_t addr) const
 		m_sl->m_state = m_sl->m_s_idle.get();
 	} else if(m_alt(addr)) {
 		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
-		m_sl->m_state = m_sl->m_s_alt_valid.get();		
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
 	} else if(m_add(addr)) {
 		m_sl->logerror("add start (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_add_load.get();
@@ -1203,7 +1203,7 @@ void atari_slapstic_device::bit_set::test(offs_t addr) const
 		m_sl->logerror("bitwise commit %d (%s)\n", m_sl->m_loaded_bank, m_sl->machine().describe_context());
 		m_sl->commit_bank();
 		m_sl->m_state = m_sl->m_s_idle.get();
-	}		
+	}
 }
 
 

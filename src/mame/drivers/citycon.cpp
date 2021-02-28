@@ -15,7 +15,7 @@ Dip locations added from dip listing at crazykong.com
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

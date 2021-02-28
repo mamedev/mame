@@ -317,7 +317,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "video/vsystem_gga.h"
 #include "emupal.h"
 #include "screen.h"
@@ -745,12 +745,12 @@ ROM_START( welltris )
 	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
 	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
-
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
+
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 ROM_END
 
 ROM_START( welltrisj )
@@ -771,12 +771,12 @@ ROM_START( welltrisj )
 	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
 	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
-
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
+
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 ROM_END
 
 ROM_START( quiz18k )
@@ -799,12 +799,12 @@ ROM_START( quiz18k )
 	ROM_LOAD( "ic93.bin", 0x000000, 0x80000, CRC(4d387c5e) SHA1(e77aea06b9b2dc8ada5618aaf83bb80f63670363) )
 	ROM_LOAD( "ic94.bin", 0x080000, 0x80000, CRC(6be2f164) SHA1(6a3ca63d6238d587a50718d2a6c76f01932c76c3) )
 
-	ROM_REGION( 0x040000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "ic126.bin", 0x00000, 0x40000, CRC(7a92fbc9) SHA1(c13be1e84fc8e74c85d25d3357e078bc9e264682) )
-
-	ROM_REGION( 0x140000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x140000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "ic123.bin", 0x00000, 0x80000, CRC(ee4995cf) SHA1(1b47938ddc87709f8d118b86fe62602972c77ced) )
 	ROM_LOAD( "ic124.bin", 0x80000, 0x40000, CRC(076f58c3) SHA1(bd78f39b85b2697e733896705355e21b8d2a141d) )
+
+	ROM_REGION( 0x040000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "ic126.bin", 0x00000, 0x40000, CRC(7a92fbc9) SHA1(c13be1e84fc8e74c85d25d3357e078bc9e264682) )
 ROM_END
 
 

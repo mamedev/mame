@@ -974,7 +974,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	if (rtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(rtag);
+		ioport_port *port = m_view.m_device.ioport(rtag);
 		if (port == nullptr)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_view.m_name, m_view.m_device.tag());
 
@@ -986,7 +986,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	if (wtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(wtag);
+		ioport_port *port = m_view.m_device.ioport(wtag);
 		if (port == nullptr)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_view.m_name, m_view.m_device.tag());
 

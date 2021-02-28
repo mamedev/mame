@@ -9991,7 +9991,7 @@ has been replaced with an all-zero block. -->
 				<rom name="Hare Raising Havoc (USA) [Walt Disney] [1991] [3.5DD] [Disk 5 of 5].img" size="737280" crc="84e8dff3" sha1="3bfb15045dea49b4e7074ab4b08e1533430daa03"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="harpoon">
 		<description>Harpoon</description>

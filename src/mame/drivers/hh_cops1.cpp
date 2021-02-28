@@ -8,7 +8,6 @@
   MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
   TODO:
-  - qkracerm RAM configuration is unknown (it also works fine with 8x12)
   - qkracerm link cable
 
 ***************************************************************************/
@@ -399,6 +398,7 @@ void qkracerm_state::qkracerm(machine_config &config)
 {
 	/* basic machine hardware */
 	MM5799(config, m_maincpu, 220000); // approximation
+	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
 	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkracerm_state::write_s));

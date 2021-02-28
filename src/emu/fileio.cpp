@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "emucore.h"
 #include "fileio.h"
 
 #include "unzip.h"
