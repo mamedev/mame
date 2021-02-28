@@ -128,7 +128,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
    that space (Tetris seems to rely on mirroring? as it sets all addresses up for the lower 1MB instead)
 */
 
-void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
@@ -157,6 +157,9 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    f = FlipY (assumed, not seen)
 
 	*/
+
+//	later in list with AA == 0f   aa == 07 takes priority over earlier in the list with AA == 0f and aa ==  07
+//	later in the list with AA == 0e and aa == 17 is under AA == 0f aa == and 07
 
 	for (int i = 0; i < 512; i += 8)
 	{
@@ -190,9 +193,9 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		const int doubleX = (flags & 0x10)>>4;
 		const int doubleY = (flags & 0x20)>>5;
 
-		//int priority = attr & 0x0f;
+		int priority = (unk2 & 0xf0)>>4;
 		int colour = attr & 0xf0;
-
+		
 		// ? game select has this set to 0xff, but clearly doesn't want the palette to change!
 		// while in Space Invaders this has to be palette for the UFO to be red.
 		if (colour & 0x80)
@@ -244,14 +247,19 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		for (int yy = 0; yy < sizey; yy++)
 		{
 			uint16_t* row;
+			uint8_t* rowpri;
 
 			if (flags & 0x08) // guess flipy
 			{
-				row = &bitmap.pix((y + (sizey - 1 - yy)) & 0xff);
+				int drawypos = (y + (sizey - 1 - yy)) & 0xff;
+				row = &bitmap.pix(drawypos);
+				rowpri = &priority_bitmap.pix(drawypos);
 			}
 			else
 			{
-				row = &bitmap.pix((y + yy) & 0xff);
+				int drawypos = (y + yy) & 0xff;
+				row = &bitmap.pix(drawypos);
+				rowpri = &priority_bitmap.pix(drawypos);
 			}
 
 			for (int xx = 0; xx < sizex; xx++)
@@ -274,11 +282,23 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 				{
 					if (flags & 0x04) // flipx
 					{
-						row[(x + (sizex - 1 - xx)) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						int xdrawpos = (x + (sizex - 1 - xx)) & 0xff;
+
+						if (rowpri[xdrawpos] > priority)
+						{
+							rowpri[xdrawpos] = priority;
+							row[xdrawpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						}
 					}
 					else
 					{
-						row[(x + xx) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						int xdrawpos = (x + xx) & 0xff;
+
+						if (rowpri[xdrawpos] > priority)
+						{
+							rowpri[xdrawpos] = priority;
+							row[xdrawpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						}
 					}
 				}
 			}
@@ -589,9 +609,10 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+	screen.priority().fill(0xff, cliprect);
 
 	draw_tilemaps(screen,bitmap,cliprect,0); // 'low priority'
-	draw_sprites(screen,bitmap,cliprect);
+	draw_sprites(screen,bitmap,screen.priority(),cliprect);
 	draw_tilemaps(screen,bitmap,cliprect,1); // 'high priority'
 
 	return 0;

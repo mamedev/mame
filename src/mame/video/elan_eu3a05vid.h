@@ -7,6 +7,7 @@
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
+#include "screen.h"
 
 class elan_eu3a05vid_device : public elan_eu3a05commonvid_device, public device_memory_interface
 {
@@ -53,7 +54,7 @@ private:
 
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	void draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int tileline, int xpos, uint16_t *row);
 	uint16_t get_tilemapindex_from_xy(uint16_t x, uint16_t y);
 
