@@ -22865,8 +22865,9 @@ realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:merits.cpp
-scrpiond                        //
-scrpionda                       //
+scrpiond                        // (c) 1999 Merit Industries, Inc.
+scrpionda                       // (c) 1997 Merit Industries, Inc.
+scrpiondb                       // (c) 1993 Merit Industries, Inc.
 
 @source:meritsdx.cpp
 scrpndx                        //
