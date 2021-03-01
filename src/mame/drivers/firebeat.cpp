@@ -1736,6 +1736,10 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 
 static INPUT_PORTS_START( firebeat )
 	PORT_START("IN3")
+	// popn6/popn7/popn8/others?: Requires debug type dongle (not included in ROMs)
+	//   DIPSW 8 = Auto play mode
+	//   DIPSW 6 = Mute song BGM
+	// kbm3rd: Set to 0xDE (UUdUUUUd) pattern to enable debug view mode
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "DIP SW:8" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "DIP SW:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "DIP SW:6" )
@@ -1746,8 +1750,9 @@ static INPUT_PORTS_START( firebeat )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "DIP SW:1" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Fixes "FLASH RAM DATA ERROR" in some games (Mickey Tunes)
+	// Only read by pop'n music?
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( firebeat_spu )
@@ -1891,6 +1896,10 @@ static INPUT_PORTS_START(popn)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )            // Switch 6
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )            // Switch 7
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )            // Switch 8
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )            // vwatch, some kind of voltage check
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            // When combined with a debug dongle, this will disable songs from working. Debug switch?
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )            // Switch 9
