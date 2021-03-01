@@ -14,7 +14,7 @@
  Pace Race (1974?)
  RTH (1976)
  UFO Chase (1975)                             EG-1010
- Wings / Wings Cocktail (1976)
+ Wings / Wings Cocktail (1976)                EG-1040B
 
 ***************************************************************************/
 
