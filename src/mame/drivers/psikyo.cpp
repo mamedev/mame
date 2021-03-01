@@ -1832,8 +1832,8 @@ ROM_END
 void psikyo_state::init_sngkace()
 {
 	{
-		u8 *RAM = memregion("ymsnd")->base();
-		int len = memregion("ymsnd")->bytes();
+		u8 *RAM = memregion("ymsnd:adpcma")->base();
+		int len = memregion("ymsnd:adpcma")->bytes();
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
 		for (int i = 0; i < len; i++)
