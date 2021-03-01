@@ -15189,10 +15189,12 @@ license:CC0
 		<year>1986</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2017-04-10"/>
+		<!-- This was re-cracked on Feb 28th, 2021 to patch additional RWTS
+		swappers that affected the self-booting data disks it creates. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a172 mecc dataquest composer v1.1 (4am crack).dsk" size="143360" crc="2ab4729b" sha1="7f618da046c0bc9c3ae49bd407c1181913211203" />
+				<rom name="mecc-a172 mecc dataquest composer v1.1 (4am crack).dsk" size="143360" crc="ee94e2fd" sha1="4e2a864d46648752230079f36f56ca7034da0823" />
 			</dataarea>
 		</part>
 	</software>
