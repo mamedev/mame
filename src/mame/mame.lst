@@ -1226,6 +1226,7 @@ altos8600
 @source:alvg.cpp
 agsoccer                        //
 agsoccer07                      //
+agsoccera                       //
 dinoeggs                        //
 mystcast                        //
 mystcasta                       //
@@ -12519,13 +12520,13 @@ dvk_kcgd                        //
 dvk_ksm                         //
 
 @source:dwarfd.cpp
-dwarfd                          // (c) 198? Electro-Sports
-dwarfda                         // (c) 198? Electro-Sports
-pokeresp                        // (c) 198? Electro-Sports
+dwarfd                          // (c) 198? Electro-Sport
+dwarfda                         // (c) 198? Electro-Sport
+pokeresp                        // (c) 198? Electro-Sport
 qc                              // (c) 1995 ArJay Exports/Prestige Games
-quarterh                        // (c) 1983 Electro-Sports
-quarterha                       // (c) 1983 Electro-Sports
-quarterhb                       // (c) 1983 Electro-Sports
+quarterh                        // (c) 1983 Electro-Sport
+quarterha                       // (c) 1983 Electro-Sport
+quarterhb                       // (c) 1983 Electro-Sport
 
 @source:dynadice.cpp
 dynadice                        // ?
@@ -19547,6 +19548,7 @@ lc80_2                          //
 
 @source:lckydraw.cpp
 lckydraw                        // (c) 1979 Mirco
+lckydrawa                       // (c) 1979 Mirco
 
 @source:lcmate2.cpp
 lcmate2                         //
@@ -36012,6 +36014,7 @@ pb_l5                           //
 pb_p4                           //
 
 @source:s11b.cpp
+bcats_g4                        //
 bcats_l2                        //
 bcats_l5                        //
 bguns_l7                        //
@@ -42705,6 +42708,7 @@ corv_px3                        //
 corv_px4                        //
 dh_lf2                          //
 dh_lx2                          //
+fs_la5                          //
 fs_lx2                          //
 fs_lx3                          //
 fs_lx4                          //
@@ -42719,6 +42723,7 @@ jb_10r                          //
 jm_05r                          //
 jm_12b                          //
 jm_12r                          //
+nf_08x                          //
 nf_10                           //
 nf_20                           //
 nf_22                           //
@@ -42736,6 +42741,7 @@ tfs_12                          //
 tom_06                          //
 tom_10f                         //
 tom_12                          //
+tom_12a                         //
 tom_13                          //
 tom_14h                         //
 ts_la2                          //
