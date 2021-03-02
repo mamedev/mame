@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "elan_ep3a19asys.h"
 
-// like EP3A19A but with the DMA at a lower address where the code bank register would usually be?
+// like EU3A05 but with the DMA at a lower address where the code bank register would usually be, and a single byte for bank register rather than 2 - any other changes?
 
 DEFINE_DEVICE_TYPE(ELAN_EP3A19A_SYS, elan_ep3a19asys_device, "elan_ep3a19asys", "Elan EP3A19A System")
 
