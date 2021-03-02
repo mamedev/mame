@@ -1619,12 +1619,30 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 
 
 //-------------------------------------------------
+//  schedule_check_interrupts - schedule an
+//  interrupt check via timer
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::schedule_check_interrupts()
+{
+	// if we're currently executing a CPU, schedule the interrupt check;
+	// otherwise, do it directly
+	auto &scheduler = m_device.machine().scheduler();
+	if (scheduler.currently_executing())
+		scheduler.synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this), 0);
+	else
+		check_interrupts(nullptr, 0);
+}
+
+
+//-------------------------------------------------
 //  check_interrupts - check the interrupt sources
 //  for interrupts
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_engine_base<RegisterType>::check_interrupts()
+TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 {
 	// update the state
 	u8 old_state = m_irq_state;
