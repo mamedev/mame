@@ -769,8 +769,6 @@ void dgn_beta_state::machine_reset()
 {
 	logerror("dgn_beta_state::machine_reset()\n");
 
-	m_system_rom = memregion(MAINCPU_TAG)->base();
-
 	/* Make sure CPU 1 is started out halted ! */
 	m_dmacpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -813,6 +811,7 @@ void dgn_beta_state::machine_start()
 		machine().debugger().console().register_command("beta_key_dump", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_key_dump, this, _1, _2));
 	}
 	m_LogDatWrites = false;
+	m_wd2797_written = 0;
 }
 
 

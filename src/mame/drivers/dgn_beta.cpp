@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    drivers/dgn_beta.c
+    drivers/dgn_beta.cpp
 
     Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
 
@@ -383,7 +383,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 }
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,MAINCPU_TAG,0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon Beta OS-9 Boot ROM (15.6.84)" )
 	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon Beta Test ROM (1984?)" )

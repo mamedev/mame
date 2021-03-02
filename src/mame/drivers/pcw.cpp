@@ -979,6 +979,8 @@ TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 void pcw_state::machine_start()
 {
 	m_fdc_interrupt_code = 2;
+	m_vdu_video_control_register = 0;
+	m_nmi_flag = 0;
 }
 
 void pcw_state::machine_reset()

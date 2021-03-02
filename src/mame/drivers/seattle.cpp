@@ -333,6 +333,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
@@ -424,9 +428,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 	void update_vblank_irq();
@@ -485,6 +486,11 @@ void seattle_state::machine_start()
 	m_leds.resolve();
 
 	m_pending_analog_read = 0;
+	m_ethernet_irq_state = 0;
+
+	m_widget.ethernet_addr = 0;
+	m_widget.irq_num = 0;
+	m_widget.irq_mask = 0;
 }
 
 

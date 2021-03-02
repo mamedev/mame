@@ -199,6 +199,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "screen.h"
 
 
+namespace {
+
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -253,15 +255,16 @@ public:
 
 	void ncr5380(device_t *device);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr5380n_device> m_scsi;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	optional_shared_ptr<uint32_t> m_p_ram;
 	optional_shared_ptr<uint32_t> m_bw2_vram;
@@ -960,6 +963,7 @@ void sun3_state::machine_start()
 	m_idprom_ptr = (uint8_t *)m_idprom->base();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
+	std::fill(std::begin(m_parregs), std::end(m_parregs), 0);
 }
 
 void sun3_state::machine_reset()
@@ -1277,6 +1281,9 @@ ROM_START( sun3_e )
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                    FLAGS
 COMP( 198?, sun3_50,  0,      0,      sun3_50, sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25
