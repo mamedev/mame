@@ -63,6 +63,22 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	// for the internal floppy controller
+	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
+
+	// for the internal parallel port
+	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
+
+	// for the internal uarts
+	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
+
 private:
 	// put your private members here
 	enum OperatingMode
@@ -110,22 +126,6 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 
 	void write_configuration_register(int index, int data);
-
-	// for the internal floppy controller
-	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
-
-	// for the internal parallel port
-	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
-
-	// for the internal uarts
-	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
 };
 
 DECLARE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device);
