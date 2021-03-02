@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 		/* keyboard shift clock */
 		m_key_shift++;
 
-		if (m_key_shift < 10)
+		if (m_key_shift < 9)
 		{
 			m_key_sin = m_key_data[m_key_shift];
 		}
