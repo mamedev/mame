@@ -56,6 +56,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/mfi_dsk.h",
 		MAME_DIR .. "src/lib/formats/imd_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/imd_dsk.h",
+		MAME_DIR .. "src/lib/formats/upd765_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/upd765_dsk.h",
 		MAME_DIR .. "src/lib/formats/pc_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/pc_dsk.h",
 		MAME_DIR .. "src/lib/formats/d88_dsk.cpp",
@@ -1911,18 +1913,6 @@ if (FORMATS["UEF_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/uef_cas.cpp",
 		MAME_DIR.. "src/lib/formats/uef_cas.h",
-	}
-end
-
---------------------------------------------------
---
---@src/lib/formats/upd765_dsk.h,FORMATS["UPD765_DSK"] = true
---------------------------------------------------
-
-if (FORMATS["UPD765_DSK"]~=null  or _OPTIONS["with-tools"]) then
-	files {
-		MAME_DIR.. "src/lib/formats/upd765_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/upd765_dsk.h",
 	}
 end
 
