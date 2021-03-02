@@ -47,22 +47,6 @@ public:
 	auto ndtr2() { return m_ndtr2_callback.bind(); }
 	auto nrts2() { return m_nrts2_callback.bind(); }
 
-	// for the internal floppy controller
-	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
-
-	// for the internal parallel port
-	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
-
-	// for the internal uarts
-	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
-
 	// chip pins for uarts
 	DECLARE_WRITE_LINE_MEMBER(rxd1_w);
 	DECLARE_WRITE_LINE_MEMBER(ndcd1_w);
@@ -126,6 +110,22 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 
 	void write_configuration_register(int index, int data);
+
+	// for the internal floppy controller
+	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
+
+	// for the internal parallel port
+	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
+
+	// for the internal uarts
+	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
 };
 
 DECLARE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device);
