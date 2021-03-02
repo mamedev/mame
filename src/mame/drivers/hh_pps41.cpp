@@ -141,7 +141,7 @@ void mastmind_state::mastmind(machine_config &config)
 
 ROM_START( mastmind )
 	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, BAD_DUMP CRC(d144ee6b) SHA1(1e0b521b1e79f94377780470a52e22ee2deaf1d4) ) // wrong byte/bit ordering
+	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, BAD_DUMP CRC(53253dac) SHA1(bae8c65fe4968f24ea9ebe397d4cbcde2022ce9b) ) // not sure about page layout
 	ROM_CONTINUE(              0x0380, 0x0080 )
 
 	ROM_REGION( 100, "maincpu:opla", 0 )
