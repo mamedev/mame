@@ -4614,7 +4614,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/applefdc.h,MACHINES["APPLE_FDINTF"] = true
+--@src/devices/machine/applefdintf.h,MACHINES["APPLE_FDINTF"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_FDINTF"]~=null) then
 	files {
