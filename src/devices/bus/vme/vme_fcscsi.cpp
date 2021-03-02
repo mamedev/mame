@@ -245,10 +245,6 @@ void vme_fcscsi1_card_device::cpu_space_map(address_map &map)
 	map(0xfffff5, 0xfffff5).r(FUNC(vme_fcscsi1_card_device::dma_iack));
 }
 
-FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void fcscsi_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -283,10 +279,10 @@ void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
 	WD1772(config, m_fdc, PIT_CRYSTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(vme_fcscsi1_card_device::fdc_irq));
 	m_fdc->drq_wr_callback().set("mc68450", FUNC(hd63450_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
 
 	/* PIT Parallel Interface and Timer device */
 	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */

@@ -254,9 +254,11 @@ void luxor_55_21046_device::io_write_byte(offs_t offset, uint8_t data)
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-FLOPPY_FORMATS_MEMBER( luxor_55_21046_device::floppy_formats )
-	FLOPPY_ABC800_FORMAT
-FLOPPY_FORMATS_END
+void luxor_55_21046_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800_FORMAT);
+}
 
 static void abc_floppies(device_slot_interface &device)
 {

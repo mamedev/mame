@@ -141,10 +141,10 @@ void ht68k_state::ht68k(machine_config &config)
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", ht68k_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ht68k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", ht68k_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", ht68k_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", ht68k_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop525_list").set_original("ht68k");
 }

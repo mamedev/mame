@@ -328,15 +328,17 @@ static DEVICE_INPUT_DEFAULTS_START( dc5 )
 DEVICE_INPUT_DEFAULTS_END
 
 
-FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_flex_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_FLEX_FORMAT
-FLOPPY_FORMATS_END
+void swtpc09_state::floppy_flex_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+}
 
-FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_uniflex_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_UNIFLEX_FORMAT
-FLOPPY_FORMATS_END
+void swtpc09_state::floppy_uniflex_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_UNIFLEX_FORMAT);
+}
 
 
 // todo: implement floppy controller cards as slot devices and do this properly

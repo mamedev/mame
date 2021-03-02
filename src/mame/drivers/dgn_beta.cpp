@@ -289,10 +289,12 @@ static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
-FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void dgn_beta_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void dgnbeta_floppies(device_slot_interface &device)
 {

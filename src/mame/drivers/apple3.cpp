@@ -54,9 +54,14 @@ static void a3_floppies(device_slot_interface &device)
 	device.option_add("525", FLOPPY_525_SD);
 }
 
-FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT, FLOPPY_NIB_FORMAT
-FLOPPY_FORMATS_END
+void apple3_state::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_RWTS18_FORMAT);
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
 void apple3_state::apple3(machine_config &config)
 {

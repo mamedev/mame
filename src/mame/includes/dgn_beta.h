@@ -105,7 +105,7 @@ public:
 	void dgnbeta(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<mc6845_device> m_mc6845;
 	required_device<cpu_device> m_maincpu;

@@ -106,7 +106,6 @@ private:
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void alphatro_io(address_map &map);
 	void alphatro_map(address_map &map);
@@ -717,11 +716,6 @@ WRITE_LINE_MEMBER(alphatro_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-FLOPPY_FORMATS_MEMBER( alphatro_state::floppy_formats )
-	FLOPPY_DSK_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void alphatro_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
@@ -753,8 +747,8 @@ void alphatro_state::alphatro(machine_config &config)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
 	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatro_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatro_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("alphatro_flop");
 
 	I8257(config, m_dmac, 16_MHz_XTAL / 4);

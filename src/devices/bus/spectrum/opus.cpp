@@ -44,9 +44,11 @@ ioport_constructor spectrum_opus_device::device_input_ports() const
 //  MACHINE_DRIVER( opus )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( spectrum_opus_device::floppy_formats )
-	FLOPPY_OPD_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_opus_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_OPD_FORMAT);
+}
 
 static void spectrum_floppies(device_slot_interface &device)
 {

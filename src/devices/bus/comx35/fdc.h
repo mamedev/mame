@@ -48,7 +48,7 @@ protected:
 	virtual void comx_io_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// internal state
 	required_device<wd1770_device> m_fdc;

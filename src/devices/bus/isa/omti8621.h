@@ -73,7 +73,7 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void fd_moten_w(uint8_t data);
 	void fd_rate_w(uint8_t data);

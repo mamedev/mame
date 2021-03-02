@@ -426,7 +426,7 @@ private:
 
 	uint8_t floppy_id_r();
 	void floppy_id_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_1);
 	DECLARE_WRITE_LINE_MEMBER(irq_2);
@@ -763,9 +763,11 @@ void hp_ipc_state::machine_reset()
 }
 
 
-FLOPPY_FORMATS_MEMBER( hp_ipc_state::floppy_formats )
-	FLOPPY_HP_IPC_FORMAT
-FLOPPY_FORMATS_END
+void hp_ipc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_HP_IPC_FORMAT);
+}
 
 static void hp_ipc_floppies(device_slot_interface &device)
 {

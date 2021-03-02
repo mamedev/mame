@@ -38,6 +38,7 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 #include "bus/rs232/keyboard.h"
 #include "emupal.h"
 #include "screen.h"
+#include "formats/imd_dsk.h"
 
 class peoplepc_state : public driver_device
 {
@@ -87,7 +88,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
@@ -248,9 +249,11 @@ static void peoplepc_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-FLOPPY_FORMATS_MEMBER( peoplepc_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void peoplepc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void peoplepc_keyboard_devices(device_slot_interface &device)
 {

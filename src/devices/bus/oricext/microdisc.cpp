@@ -11,9 +11,11 @@ ROM_START( microdisc )
 	ROM_LOAD ("microdis.rom", 0, 0x02000, CRC(a9664a9c) SHA1(0d2ef6e67322f48f4b7e08d8bbe68827e2074561) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( oric_microdisc_device::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void oric_microdisc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void microdisc_floppies(device_slot_interface &device)
 {

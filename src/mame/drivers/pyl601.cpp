@@ -92,7 +92,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void mem_map(address_map &map);
 
 	uint8_t m_rom_page;
@@ -503,9 +503,11 @@ INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
-	FLOPPY_PYLDIN_FORMAT
-FLOPPY_FORMATS_END
+void pyl601_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PYLDIN_FORMAT);
+}
 
 static void pyl601_floppies(device_slot_interface &device)
 {

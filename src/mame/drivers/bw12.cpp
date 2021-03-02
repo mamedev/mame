@@ -469,18 +469,22 @@ static void bw12_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_SSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( bw12_state::bw12_floppy_formats )
-	FLOPPY_BW12_FORMAT
-FLOPPY_FORMATS_END
+void bw12_state::bw12_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW12_FORMAT);
+}
 
 static void bw14_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
-	FLOPPY_BW12_FORMAT
-FLOPPY_FORMATS_END
+void bw12_state::bw14_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW12_FORMAT);
+}
 
 
 /* F4 Character Displayer */

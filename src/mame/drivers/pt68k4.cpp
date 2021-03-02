@@ -131,7 +131,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void pt68k2_mem(address_map &map);
 	void pt68k4_mem(address_map &map);
@@ -158,9 +158,11 @@ private:
 	bool m_irq5_duart1, m_irq5_isa;
 };
 
-FLOPPY_FORMATS_MEMBER( pt68k4_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void pt68k4_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 static void pt68k_floppies(device_slot_interface &device)
 {

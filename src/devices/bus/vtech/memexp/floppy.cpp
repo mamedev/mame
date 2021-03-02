@@ -53,8 +53,8 @@ static void laser_floppies(device_slot_interface &device)
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 {
 	VTECH_MEMEXP_SLOT(config, m_memexp);
-	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
 }
 
 

@@ -698,9 +698,11 @@ static void atom_floppies(device_slot_interface &device)
 	device.option_add("525sssd", FLOPPY_525_SSSD);
 }
 
-FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
-	FLOPPY_ATOM_FORMAT
-FLOPPY_FORMATS_END0
+void atom_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ATOM_FORMAT);
+}
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atom )

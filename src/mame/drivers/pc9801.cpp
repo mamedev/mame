@@ -2194,14 +2194,16 @@ WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
 }
 
 
-FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
-	FLOPPY_PC98_FORMAT,
-	FLOPPY_PC98FDI_FORMAT,
-	FLOPPY_FDD_FORMAT,
-	FLOPPY_DCP_FORMAT,
-	FLOPPY_DIP_FORMAT,
-	FLOPPY_NFD_FORMAT
-FLOPPY_FORMATS_END
+void pc9801_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PC98_FORMAT);
+	fr.add(FLOPPY_PC98FDI_FORMAT);
+	fr.add(FLOPPY_FDD_FORMAT);
+	fr.add(FLOPPY_DCP_FORMAT);
+	fr.add(FLOPPY_DIP_FORMAT);
+	fr.add(FLOPPY_NFD_FORMAT);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 {

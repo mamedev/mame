@@ -630,8 +630,8 @@ void m3_state::m3(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(m3_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(m3_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
 
 	// keyboard
 	I8035(config, m_kbdmcu, 6.144_MHz_XTAL);

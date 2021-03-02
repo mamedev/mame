@@ -75,7 +75,7 @@ public:
 
 private:
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void mirage_via_write_porta(uint8_t data);
 	void mirage_via_write_portb(uint8_t data);
@@ -95,9 +95,11 @@ private:
 	int last_sndram_bank;
 };
 
-FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
-	FLOPPY_ESQ8IMG_FORMAT
-FLOPPY_FORMATS_END
+void enmirage_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ESQ8IMG_FORMAT);
+}
 
 static void ensoniq_floppies(device_slot_interface &device)
 {

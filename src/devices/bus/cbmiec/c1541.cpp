@@ -907,10 +907,11 @@ WRITE_LINE_MEMBER( c1541_device_base::byte_w )
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1541_device_base::floppy_formats )
-	FLOPPY_D64_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c1541_device_base::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D64_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 uint8_t c1541_prologic_dos_classic_device::pia_r(offs_t offset)

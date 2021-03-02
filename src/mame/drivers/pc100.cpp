@@ -672,8 +672,8 @@ void pc100_state::pc100(machine_config &config)
 	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
 	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

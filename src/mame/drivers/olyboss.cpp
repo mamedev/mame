@@ -443,7 +443,7 @@ void olyboss_state::olybossd(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdd0->enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
@@ -475,14 +475,14 @@ void olyboss_state::olybossb(machine_config &config)
 {
 	olybossd(config);
 	config.device_remove("fdc:0");
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::olybossc(machine_config &config)
 {
 	olybossd(config);
-	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::bossb85(machine_config &config)
@@ -509,8 +509,8 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
@@ -536,8 +536,8 @@ void olyboss_state::bossb85(machine_config &config)
 void olyboss_state::bossa85(machine_config &config)
 {
 	bossb85(config);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 //**************************************************************************
