@@ -1261,6 +1261,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_irq_mask(STATUS_TIMERA | STATUS_TIMERB),
 	m_irq_state(0),
 	m_busy_end(attotime::zero),
+	m_last_irq_update(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device),
 	m_regdata(RegisterType::REGISTERS),
@@ -1632,7 +1633,17 @@ void ymfm_engine_base<RegisterType>::check_interrupts()
 
 	// if changed, signal the new state
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
+	{
+		// if writes to registers aren't synchronized, it is possible to induce
+		// scheduling errors handling IRQs; ensure that all IRQ handler updates
+		// are monotonically increasing in time
+		attotime curtime = m_device.machine().time();
+		if (m_last_irq_update > curtime)
+			fatalerror("IRQ signalling time went backwards; writes need to be synchronized");
+		m_last_irq_update = curtime;
+
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 

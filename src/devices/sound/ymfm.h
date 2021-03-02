@@ -799,6 +799,7 @@ private:
 	u8 m_irq_mask;                   // mask of which bits signal IRQs
 	u8 m_irq_state;                  // current IRQ state
 	attotime m_busy_end;             // end of the busy time
+	attotime m_last_irq_update;      // time of last IRQ update
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
  	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[RegisterType::CHANNELS]; // channel pointers

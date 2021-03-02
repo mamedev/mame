@@ -196,9 +196,14 @@ u8 seibu_sound_device::ym_r(offs_t offset)
 	return m_ym_read_cb(offset);
 }
 
+TIMER_CALLBACK_MEMBER(seibu_sound_device::ym_w_synced)
+{
+	m_ym_write_cb(param >> 8, param & 0xff);
+}
+
 void seibu_sound_device::ym_w(offs_t offset, u8 data)
 {
-	m_ym_write_cb(offset, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(seibu_sound_device::ym_w_synced), this), data | (offset << 8));
 }
 
 void seibu_sound_device::bank_w(u8 data)
