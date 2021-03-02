@@ -51,7 +51,8 @@ private:
 		SR_WINDOW_EDGE_1,
 		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
-		SW_WINDOW_END
+		SW_WINDOW_END,
+		SW_UNDERRUN,
 	};
 
 	// ism buffered byte marks
