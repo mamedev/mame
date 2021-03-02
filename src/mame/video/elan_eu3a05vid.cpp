@@ -17,7 +17,9 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_bytes_per_tile_entry(4),
 	m_vrambase(0x600),
 	m_spritebase(0x3e00),
-	m_use_spritepages(false)
+	m_use_spritepages(false),
+	m_force_transpen_ff(false),
+	m_force_basic_scroll(false)
 {
 }
 
@@ -126,7 +128,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
    that space (Tetris seems to rely on mirroring? as it sets all addresses up for the lower 1MB instead)
 */
 
-void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
@@ -139,11 +141,11 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    XX = texture x start
 	    YY = texture y start
 	    bb = sometimes set in invaders
-	    AA = same as attr on tiles (colour / priority?)
+	    AA = same as attr on tiles (cccc pppp) (c = colour / p = priority?)
 
 
 	    aa = same as unk2 on tiles? ( --pp ---- )
-	    p = page
+	    p = page (some hardware types only? or selectable meaning)
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
@@ -156,7 +158,10 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	*/
 
-	for (int i = 0; i < 512; i += 8)
+//  later in list with AA == 0f   aa == 07 takes priority over earlier in the list with AA == 0f and aa ==  07
+//  later in the list with AA == 0e and aa == 17 is under AA == 0f aa == and 07
+
+	for (int i = 512-8; i >=0; i -= 8)
 	{
 		uint8_t x = read_spriteram(i + 2);
 		uint8_t y = read_spriteram(i + 1);
@@ -188,7 +193,8 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		const int doubleX = (flags & 0x10)>>4;
 		const int doubleY = (flags & 0x20)>>5;
 
-		//int priority = attr & 0x0f;
+		int priority = (attr & 0x0f)^0xf;
+
 		int colour = attr & 0xf0;
 
 		// ? game select has this set to 0xff, but clearly doesn't want the palette to change!
@@ -204,7 +210,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		   where the transpen needs to be 0x00 and Space Invaders has it set to 0x04
 		   it could be a global register rather than something in the spritelist?
 		*/
-		if ((attr == 0xff) && (unk2 == 0xff))
+		if (((attr == 0xff) && (unk2 == 0xff)) || m_force_transpen_ff)
 			transpen = 0xff;
 
 
@@ -242,14 +248,19 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		for (int yy = 0; yy < sizey; yy++)
 		{
 			uint16_t* row;
+			uint8_t* rowpri;
 
 			if (flags & 0x08) // guess flipy
 			{
-				row = &bitmap.pix((y + (sizey - 1 - yy)) & 0xff);
+				int drawypos = (y + (sizey - 1 - yy)) & 0xff;
+				row = &bitmap.pix(drawypos);
+				rowpri = &priority_bitmap.pix(drawypos);
 			}
 			else
 			{
-				row = &bitmap.pix((y + yy) & 0xff);
+				int drawypos = (y + yy) & 0xff;
+				row = &bitmap.pix(drawypos);
+				rowpri = &priority_bitmap.pix(drawypos);
 			}
 
 			for (int xx = 0; xx < sizex; xx++)
@@ -272,11 +283,23 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 				{
 					if (flags & 0x04) // flipx
 					{
-						row[(x + (sizex - 1 - xx)) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						int xdrawpos = (x + (sizex - 1 - xx)) & 0xff;
+
+						if (rowpri[xdrawpos] > priority)
+						{
+							rowpri[xdrawpos] = priority;
+							row[xdrawpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						}
 					}
 					else
 					{
-						row[(x + xx) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						int xdrawpos = (x + xx) & 0xff;
+
+						if (rowpri[xdrawpos] > priority)
+						{
+							rowpri[xdrawpos] = priority;
+							row[xdrawpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
+						}
 					}
 				}
 			}
@@ -317,183 +340,269 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 
 	return true;
 }
+
+
+void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint16_t* row)
+{
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	int colour = attr & 0xf0;
+
+	/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom
+	    each texture line in 8bpp mode is 256 bytes
+	    each texture line in 4bpp mode is 128 bytes
+	    in 8x8 mode these pages are 32 tiles wide
+	    in 16x16 mode these pages are 16 tiles wide
+	    tiles can start on any line
+
+	    it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
+
+	    this is eu3a05 specific, eu3a14 uses a more traditional approach
+	*/
+
+	const int tilespersrcline = 256 / tilexsize;
+	const int tilespersrcline_mask = tilespersrcline - 1;
+
+	tile = (tile & tilespersrcline_mask) + ((tile & ~tilespersrcline_mask) * tilexsize);
+
+	if (!(m_vidctrl & 0x20)) // 8bpp
+		tile <<= 1;
+
+	if (!(m_vidctrl & 0x40)) // 8*8 tiles
+		tile >>= 1;
+
+	tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+
+
+	if (m_vidctrl & 0x20) // 4bpp
+	{
+		for (int xx = 0; xx < tilexsize; xx += 2)
+		{
+			int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
+			uint8_t pix = fullbankspace.read_byte(realaddr);
+
+			int drawxpos;
+
+			drawxpos = xpos + xx + 0;
+			if ((drawxpos >= 0) && (drawxpos < 256))
+				row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
+
+			drawxpos = xpos + xx + 1;
+			if ((drawxpos >= 0) && (drawxpos < 256))
+				row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
+		}
+	}
+	else // 8bpp
+	{
+		for (int xx = 0; xx < tilexsize; xx++)
+		{
+			int realaddr = ((tile + i * 32) << 3) + xx;
+			uint8_t pix = fullbankspace.read_byte(realaddr);
+
+			int drawxpos = xpos + xx;
+			if ((drawxpos >= 0) && (drawxpos < 256))
+				row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
+		}
+	}
+}
+
+uint16_t elan_eu3a05vid_device::get_tilemapindex_from_xy(uint16_t x, uint16_t y)
+{
+	// for mousetrap and candyland the pages in RAM (16x16 tile mode, 4 pages) are
+	// top left
+	// top right
+	// bottom left
+	// bottom right
+
+	// for airblaster joystick 3d stagess the pages in RAM (8x8 tile mode, 2 pages) are
+	// left
+	// right
+
+	// for airblaster joystick scrolling stages (8x8 tile mode, 2 pages)
+	// top
+	// bottom
+
+	uint16_t tilemapsizey;
+	uint16_t tilemapsizex;
+	uint16_t pagesizey, pagesizex;
+
+	pagesizey = 14; pagesizex = 16;
+
+	switch (m_vidctrl & 0x03)
+	{
+	case 0x00: tilemapsizey = 14 * 2; tilemapsizex = 16 * 2; break; // double height & double width
+	case 0x02: tilemapsizey = 14 * 2; tilemapsizex = 16; break; // double height
+	case 0x01: tilemapsizey = 14; tilemapsizex = 16 * 2; break; // double width
+	case 0x03: tilemapsizey = 14; tilemapsizex = 16;  break; // normal
+	}
+
+	if (!(m_vidctrl & 0x40)) // 16x16 tiles
+	{
+		pagesizey <<= 1;
+		pagesizex <<= 1;
+		tilemapsizey <<= 1;
+		tilemapsizex <<= 1;
+	}
+
+	while (y >= tilemapsizey)
+		y -= tilemapsizey;
+
+	while (x >= tilemapsizex)
+		x -= tilemapsizex;
+
+	int index = 0;
+	int page = 0;
+
+	switch (m_vidctrl & 0x03)
+	{
+	case 0x00:  // double height & double width
+		if (y < pagesizey)
+		{
+			if (x < pagesizex)
+			{
+				page = 0;
+			}
+			else
+			{
+				page = 1;
+			}
+		}
+		else
+		{
+			if (x < pagesizex)
+			{
+				page = 2;
+			}
+			else
+			{
+				page = 3;
+			}
+		}
+		break;
+
+	case 0x02: // double height
+		if (y < pagesizey)
+		{
+			page = 0;
+		}
+		else
+		{
+			page = 1;
+		}
+		break;
+
+	case 0x01: // double width
+		if (x < pagesizex)
+		{
+			page = 0;
+		}
+		else
+		{
+			page = 1;
+		}
+		break;
+
+	case 0x03:
+		page = 0;
+		break;
+	}
+
+	while (y >= pagesizey)
+		y -= pagesizey;
+
+	while (x >= pagesizex)
+		x -= pagesizex;
+
+	index = x + y * pagesizex;
+	index += page * pagesizey * pagesizex;
+
+	return index;
+}
+
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
 	/*
 	    this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
+	//popmessage("%02x: %04x %04x %04x %04x", m_vidctrl, get_scroll(0), get_scroll(1), get_scroll(2), get_scroll(3));
 
-	int scroll = get_scroll(1);
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	int scrolly = get_scroll(1);
 
-	// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
-
-	int totalyrow;
-	int totalxcol;
-	int mapyrowsbase;
-	int tileysize;
-	int tilexsize;
-	int startrow;
-
-	if (m_vidctrl & 0x40) // 16x16 tiles
+	for (int screenline = 0; screenline < 224; screenline++)
 	{
-		totalyrow = 16;
-		totalxcol = 16;
-		mapyrowsbase = 14;
-		tileysize = 16;
-		tilexsize = 16;
-		startrow = (scroll >> 4) & 0x1f;
-	}
-	else
-	{
-		totalyrow = 32;
-		totalxcol = 32;
-		mapyrowsbase = 28;
-		tileysize = 8;
-		tilexsize = 8;
-		startrow = (scroll >> 3) & 0x3f;
-	}
+		int scrollx;
+		int coursescrollx;
+		int finescrollx;
+		int realline = screenline + scrolly;
 
-	for (int y = 0; y < totalyrow; y++)
-	{
-		for (int x = 0; x < totalxcol * 2; x++)
+		// split can be probably configured in more ways than this
+		// exact enable conditions unclear
+		// this logic is needed for Air Blaster Joystick
+		if (screenline < m_splitpos[0])
 		{
-			int realstartrow = (startrow + y);
+			scrollx = get_scroll(0);
+		}
+		else if (screenline < m_splitpos[1])
+		{
+			scrollx = get_scroll(2);
+		}
+		else
+		{
+			scrollx = get_scroll(3);
+		}
 
-			int yrows;
+		// Candy Land and Mouse Trap in the TV Board Games units don't like the above logic, so force them to just use the
+		// first scroll register for now, there must be more complex enable conditions for the above
+		if (m_force_basic_scroll)
+			scrollx = get_scroll(0);
 
-			if (m_vidctrl & 0x01)
-				yrows = mapyrowsbase;
+		uint16_t* row = &bitmap.pix(screenline);
+
+		int xtiles;
+		int xtilesize;
+		if (m_vidctrl & 0x40) // 16x16 tiles
+		{
+			xtiles = 16; // number of tilemap entries per row
+			xtilesize = 16; // width of tile
+			coursescrollx = scrollx >> 4;
+			finescrollx = scrollx & 0xf;
+		}
+		else
+		{
+			xtiles = 32;
+			xtilesize = 8;
+			coursescrollx = scrollx >> 3;
+			finescrollx = scrollx & 0x7;
+		}
+
+		for (int xtile = 0; xtile <= xtiles; xtile++)
+		{
+
+			int realxtile = xtile + coursescrollx;
+
+			int tilemaprow;
+			int tileline;
+
+			if (m_vidctrl & 0x40) // 16x16 tiles
+			{
+				tilemaprow = realline >> 4;
+				tileline = realline & 0xf;
+			}
 			else
-				yrows = mapyrowsbase * 2;
-
-			if (realstartrow >= yrows)
-				realstartrow -= yrows;
-
-			// in double width & double height mode the page addressing needs adjusting
-			if (!(m_vidctrl & 0x02))
 			{
-				if (!(m_vidctrl & 0x01))
-				{
-					if (realstartrow >= (yrows / 2))
-					{
-						realstartrow += yrows / 2;
-					}
-				}
+				tilemaprow = realline >> 3;
+				tileline = realline & 0x7;
 			}
 
-			for (int i = 0; i < tileysize; i++)
-			{
-				int drawline = (y * tileysize) + i;
-				drawline -= scroll & (tileysize - 1);
+			int tilemap_entry_index = get_tilemapindex_from_xy(realxtile, tilemaprow);
 
-				if ((drawline >= 0) && (drawline < 256))
-				{
-					int scrollx;
+			int tile, attr, unk2;
 
-					// split can be probably configured in more ways than this
-					// exact enable conditions unclear
-					if (drawline < m_splitpos[0])
-					{
-						scrollx = get_scroll(0);
-					}
-					else if (drawline < m_splitpos[1])
-					{
-						scrollx = get_scroll(2);
-					}
-					else
-					{
-						scrollx = get_scroll(3);
-					}
+			if (!get_tile_data(tilemap_entry_index, drawpri, tile, attr, unk2))
+				continue;
 
-					int base;
+			int xpos = xtile * xtilesize - finescrollx;
+			draw_tilemaps_tileline(drawpri, tile, attr, unk2, xtilesize, tileline, xpos, row);
 
-					if (m_vidctrl & 0x40) // 16x16 tiles
-					{
-						base = (((realstartrow + y) & 0x3f) * 8) + x;
-					}
-					else
-					{
-						base = (((realstartrow) & 0x7f) * totalxcol) + (x & (totalxcol - 1));
-					}
-
-					if (!(m_vidctrl & 0x02))
-					{
-						if (x & totalxcol)
-						{
-							base += totalxcol * mapyrowsbase;
-						}
-					}
-
-					int tile, attr, unk2;
-
-					if (!get_tile_data(base, drawpri, tile, attr, unk2))
-						continue;
-
-					int colour = attr & 0xf0;
-
-					/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom
-					   each texture line in 8bpp mode is 256 bytes
-					   each texture line in 4bpp mode is 128 bytes
-					   in 8x8 mode these pages are 32 tiles wide
-					   in 16x16 mode these pages are 16 tiles wide
-					   tiles can start on any line
-
-					   it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
-
-					   this is eu3a05 specific, eu3a14 uses a more traditional approach
-					*/
-
-					const int tilespersrcline = 256 / tilexsize;
-					const int tilespersrcline_mask = tilespersrcline - 1;
-
-					tile = (tile & tilespersrcline_mask) + ((tile & ~tilespersrcline_mask) * tilexsize);
-
-					if (!(m_vidctrl & 0x20)) // 8bpp
-						tile <<= 1;
-
-					if (!(m_vidctrl & 0x40)) // 8*8 tiles
-						tile >>= 1;
-
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
-					uint16_t *const row = &bitmap.pix(drawline);
-
-					if (m_vidctrl & 0x20) // 4bpp
-					{
-						for (int xx = 0; xx < tilexsize; xx += 2)
-						{
-							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-
-							int drawxpos;
-
-							drawxpos = x * tilexsize + xx + 0 - scrollx;
-							drawxpos &= 0x1ff;
-							if ((drawxpos >= 0) && (drawxpos < 256))
-								row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
-
-							drawxpos = x * tilexsize + xx + 1 - scrollx;
-							drawxpos &= 0x1ff;
-							if ((drawxpos >= 0) && (drawxpos < 256))
-								row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
-						}
-					}
-					else // 8bpp
-					{
-						for (int xx = 0; xx < tilexsize; xx++)
-						{
-							int realaddr = ((tile + i * 32) << 3) + xx;
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-
-							int drawxpos = x * tilexsize + xx - scrollx;
-							drawxpos &= 0x1ff;
-							if ((drawxpos >= 0) && (drawxpos < 256))
-								row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
-						}
-					}
-				}
-			}
 		}
 	}
 }
@@ -501,10 +610,11 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+	screen.priority().fill(0xff, cliprect);
 
-	draw_tilemaps(screen,bitmap,cliprect,0);
-	draw_sprites(screen,bitmap,cliprect);
-	draw_tilemaps(screen,bitmap,cliprect,1);
+	draw_tilemaps(screen,bitmap,cliprect,0); // 'low priority'
+	draw_sprites(screen,bitmap,screen.priority(),cliprect);
+	draw_tilemaps(screen,bitmap,cliprect,1); // 'high priority'
 
 	return 0;
 }
@@ -572,6 +682,7 @@ uint8_t elan_eu3a05vid_device::tile_scroll_r(offs_t offset)
 
 void elan_eu3a05vid_device::tile_scroll_w(offs_t offset, uint8_t data)
 {
+	//logerror("tile_scroll_w %02x %02x\n", offset, data);
 	m_tile_scroll[offset] = data;
 }
 
