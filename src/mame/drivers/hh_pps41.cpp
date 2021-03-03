@@ -141,11 +141,11 @@ void mastmind_state::mastmind(machine_config &config)
 
 ROM_START( mastmind )
 	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, BAD_DUMP CRC(53253dac) SHA1(bae8c65fe4968f24ea9ebe397d4cbcde2022ce9b) ) // not sure about page layout
+	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, CRC(39dbdd50) SHA1(72fa5781e9df62d91d57437ded2931fab8253c3c) )
 	ROM_CONTINUE(              0x0380, 0x0080 )
 
-	ROM_REGION( 100, "maincpu:opla", 0 )
-	ROM_LOAD( "mm76_mastmind_output.pla", 0, 100, NO_DUMP ) // that's a lie
+	ROM_REGION( 314, "maincpu:opla", 0 )
+	ROM_LOAD( "mm76_mastmind_output.pla", 0, 314, CRC(84a3a6f2) SHA1(a3baf9a174a02d186769a1a2d81982e6dbdcf1ed) )
 ROM_END
 
 
