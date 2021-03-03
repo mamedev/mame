@@ -1388,25 +1388,19 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 {
+	// special case: writes to the mode register can impact IRQs;
+	// schedule these writes to ensure ordering with timers
+	if (regnum == RegisterType::REG_MODE)
+	{
+		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this), data);
+		return;
+	}
+
 	// most writes are passive, consumed only when needed
 	m_regs.write(regnum, data);
 
-	// handle writes to the mode register
-	if (regnum == RegisterType::REG_MODE)
-	{
-		// reset timer status
-		if (m_regs.reset_timer_b())
-			set_reset_status(0, STATUS_TIMERB);
-		if (m_regs.reset_timer_a())
-			set_reset_status(0, STATUS_TIMERA);
-
-		// load timers
-		update_timer(1, m_regs.load_timer_b());
-		update_timer(0, m_regs.load_timer_a());
-	}
-
 	// handle writes to the keyon registers
-	else if (regnum == RegisterType::REG_KEYON)
+	if (regnum == RegisterType::REG_KEYON)
 	{
 		u8 chnum = m_regs.keyon_channel();
 		if (chnum < RegisterType::CHANNELS)
@@ -1651,6 +1645,29 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 	// if changed, signal the new state
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  synced_mode_w - handle a mode register write
+//  via timer callback
+//-------------------------------------------------
+
+template<class RegisterType>
+TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
+{
+	// actually write the mode register now
+	m_regs.write(RegisterType::REG_MODE, param);
+
+	// reset timer status
+	if (m_regs.reset_timer_b())
+		set_reset_status(0, STATUS_TIMERB);
+	if (m_regs.reset_timer_a())
+		set_reset_status(0, STATUS_TIMERA);
+
+	// load timers
+	update_timer(1, m_regs.load_timer_b());
+	update_timer(0, m_regs.load_timer_a());
 }
 
 

@@ -790,6 +790,9 @@ private:
 	// check interrupts
 	TIMER_CALLBACK_MEMBER(check_interrupts);
 
+	// handle a mode register write
+	TIMER_CALLBACK_MEMBER(synced_mode_w);
+
 	// internal state
 	device_t &m_device;              // reference to the owning device
 	u32 m_env_counter;               // envelope counter; low 2 bits are sub-counter
