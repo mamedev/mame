@@ -799,6 +799,8 @@ private:
 	u32 m_lfo_counter;               // LFO counter
 	u32 m_noise_lfsr;                // noise LFSR state
 	u8 m_noise_counter;              // noise counter
+	u8 m_noise_state;                // latched noise state
+	u8 m_noise_lfo;                  // latched LFO noise value
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_status;                     // current status register
 	u8 m_clock_prescale;             // prescale factor (2/3/6)
