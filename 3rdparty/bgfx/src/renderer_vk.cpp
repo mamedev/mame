@@ -660,7 +660,7 @@ VK_IMPORT_DEVICE
 			;
 	}
 
-	void dumpExtensions(VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE)
+	void dumpExtensions(VkPhysicalDevice _physicalDevice)
 	{
 		{ // Global extensions.
 			uint32_t numExtensionProperties;
@@ -695,7 +695,7 @@ VK_IMPORT_DEVICE
 					BX_TRACE("\tv%-3d %s%s"
 						, extensionProperties[extension].specVersion
 						, extensionProperties[extension].extensionName
-						, supported ? " (supported)" : "", extensionProperties[extension].extensionName // FIXME: maybe include here the layer name?
+						, supported ? " (supported)" : "", extensionProperties[extension].extensionName
 						);
 
 					BX_UNUSED(supported);
@@ -1553,7 +1553,7 @@ VK_IMPORT
 			}
 
 			{
-				dumpExtensions();
+				dumpExtensions(VK_NULL_HANDLE);
 
 				uint32_t numEnabledLayers = 0;
 
