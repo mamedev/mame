@@ -549,6 +549,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 
 static const int rtc_days_in_each_month[]=
 {
+	0, //dummy value
 	31,/* jan */
 	28, /* feb */
 	31, /* march */
