@@ -361,7 +361,7 @@ uint8_t firebeat_extend_spectrum_analyzer_device::read(offs_t offset)
 	return val & 0xff;
 }
 
-DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_extend_spectrum_analyzer", "Firebeat Extend Board Spectrum Analyzer Circuit")
+DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_extend_spectrum_analyzer", "Firebeat Spectrum Analyzer")
 
 /*****************************************************************************/
 namespace {
