@@ -310,31 +310,16 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
 		int sy = m_spriteram[offs + 1];
 
-		int dir;
 		if (flip_screen())
 		{
 			sx = 240 - sx;
-			dir = -1;
 		}
 		else
 		{
 			sy = 240 - sy;
-			dir = 1;
 		}
 
-		/* handle double / quadruple height */
-		int i = (m_spriteram[offs + 3] & 0xc0) >> 6;
-		if (i == 2)
-			i = 3;
-
-		i = 0;
-
-		do
-		{
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
-
-			i--;
-		} while (i >= 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, col, flip_screen(), flip_screen(), sx, sy, 15);
 	}
 
 }
