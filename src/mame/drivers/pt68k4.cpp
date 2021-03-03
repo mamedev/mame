@@ -361,7 +361,9 @@ void pt68k4_state::machine_reset()
 		floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
 
 		m_wdfdc->set_floppy(floppy);
-		floppy->ss_w(0);
+
+		if (floppy)
+			floppy->ss_w(0);
 
 		m_lastdrive = 0;
 	}
