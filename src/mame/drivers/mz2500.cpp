@@ -534,10 +534,10 @@ void mz2500_state::mz2500_reconfigure_screen()
 	m_screen->configure(720, 480, visarea, m_screen->frame_period().attoseconds());
 
 	/* calculate CG window parameters here */
-	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
-	m_cg_ve = (m_cg_reg[0x0a]) | ((m_cg_reg[0x0b]<<8) & 1);
-	m_cg_hs = ((m_cg_reg[0x0c] & 0x7f)*8);
-	m_cg_he = ((m_cg_reg[0x0d] & 0x7f)*8);
+	m_cg_vs = m_cg_reg[0x08] | (BIT(m_cg_reg[0x09], 0)<<8);
+	m_cg_ve = m_cg_reg[0x0a] | (BIT(m_cg_reg[0x0b], 0)<<8);
+	m_cg_hs = (m_cg_reg[0x0c] & 0x7f)*8;
+	m_cg_he = (m_cg_reg[0x0d] & 0x7f)*8;
 
 	if(m_scr_x_size == 320)
 	{
