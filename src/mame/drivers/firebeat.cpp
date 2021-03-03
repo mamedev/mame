@@ -136,8 +136,6 @@
         it appears to be a 4-dword FIFO or something along those lines.
 */
 
-#include <cmath>
-
 #include "emu.h"
 
 #include "bus/ata/ataintf.h"
@@ -163,6 +161,8 @@
 #include "osdcomm.h"
 
 #include "wdlfft/fft.h"
+
+#include <cmath>
 
 #include "firebeat.lh"
 
@@ -221,10 +221,10 @@ void firebeat_extend_spectrum_analyzer_device::device_reset()
 	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
 	{
 		for (int i = 0; i < TOTAL_BUFFERS; i++) {
-			memset(m_audio_buf[i][ch], 0, sizeof(float) * FFT_LENGTH);
+			std::fill(std::begin(m_audio_buf[i][ch]), std::end(m_audio_buf[i][ch]), 0);
 		}
 
-		memset(m_fft_buf[ch], 0, sizeof(float) * FFT_LENGTH);
+		std::fill(std::begin(m_fft_buf[ch]), std::end(m_fft_buf[ch]), 0);
 
 		m_audio_count[ch] = 0;
 
@@ -361,7 +361,7 @@ uint8_t firebeat_extend_spectrum_analyzer_device::read(offs_t offset)
 	return val & 0xff;
 }
 
-DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_extend_spectrum_analyzer", "Firebeat Spectrum Analyzer")
+DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_spectrum_analyzer", "Firebeat Spectrum Analyzer")
 
 /*****************************************************************************/
 namespace {
