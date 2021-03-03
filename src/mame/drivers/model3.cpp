@@ -1364,7 +1364,16 @@ void model3_state::model3_init(int step)
 	m_sound_irq_enable = 0;
 	m_sound_timer->adjust(attotime::never);
 
+	m_irq_enable = 0;
+
+	m_pci_bus = 0;
+	m_pci_device = 0;
+	m_pci_function = 0;
+	m_pci_reg = 0;
+
 	m_dma_busy = 0;
+	m_dma_irq = 0;
+	m_dma_endian = 0;
 	m_real3d_dma_timer->adjust(attotime::never);
 
 	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
