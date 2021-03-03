@@ -160,6 +160,9 @@ protected:
 	void ux_mem(address_map &map);
 
 	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -276,9 +279,6 @@ private:
 	optional_shared_ptr<uint32_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_nvram16;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -457,8 +457,10 @@ class marty_state : public towns_state
 		: towns_state(mconfig, type, tag)
 	{ }
 
-	virtual void driver_start() override;
 	void marty(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
 };
 
 #endif // MAME_INCLUDES_FMTOWNS_H
