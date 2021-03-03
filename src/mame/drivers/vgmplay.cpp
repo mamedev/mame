@@ -1329,7 +1329,7 @@ void vgmplay_device::execute_run()
 				uint8_t id = m_file->read_byte(m_pc + 1);
 				if (id == 0xff)
 					for (int i = 0; i < 0xff; i++)
-						m_streams[id].timer->enable(false);
+						m_streams[i].timer->enable(false);
 				else
 					m_streams[id].timer->enable(false);
 
