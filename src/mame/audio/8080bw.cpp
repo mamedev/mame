@@ -1223,8 +1223,6 @@ void _8080bw_state::schasercv_sh_port_2_w(uint8_t data)
 
 void _8080bw_state::crashrd_port03_w(uint8_t data)
 {
-	int effect;
-
 	/* bit 0 - Dot Sound Pitch (SX1)
 	   bit 2 - Explosion (SX5)
 	   bit 4 - Dot Sound Enable (SX0)
@@ -1234,61 +1232,23 @@ void _8080bw_state::crashrd_port03_w(uint8_t data)
 	machine().sound().system_mute(!BIT(data, 5));
 	m_discrete->write(SCHASER_DOT_EN, BIT(data, 4));
 	m_discrete->write(SCHASER_DOT_SEL, BIT(data, 0));
-
-	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
-	 * select the frequency.  Because of the diode voltage drop, we can not use the
-	 * standard 555 time formulas.  Also, when effect=0, the charge resistor
-	 * is disconnected.  This causes the charge on the cap to slowly bleed off, but
-	 * but the bleed time is so long, that we can just cheat and put the time on hold
-	 * when effect = 0. */
-	effect = 0; //(data >> 2) & 0x07;
-	if (m_schaser_last_effect != effect)
-	{
-		if (effect)
-		{
-			if (m_schaser_effect_555_time_remain != attotime::zero)
-			{
-				/* timer re-enabled, use up remaining 555 high time */
-				m_schaser_effect_555_timer->adjust(m_schaser_effect_555_time_remain, effect);
-			}
-			else if (!m_schaser_effect_555_is_low)
-			{
-				/* set 555 high time */
-				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
-				m_schaser_effect_555_timer->adjust(new_time, effect);
-			}
-		}
-		else
-		{
-			/* disable effect - stops at end of low cycle */
-			if (!m_schaser_effect_555_is_low)
-			{
-				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->time_left();
-				m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
-				m_schaser_effect_555_timer->adjust(attotime::never);
-			}
-		}
-		m_schaser_last_effect = effect;
-	}
-
 	m_schaser_explosion = BIT(data, 2);
+
 	if (m_schaser_explosion)
-	{
 		m_sn->amplitude_res_w(1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
-	}
 	else
-	{
 		m_sn->amplitude_res_w(RES_K(200));
-	}
-	m_sn->enable_w(!(m_schaser_effect_555_is_low || m_schaser_explosion));
-	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
+
+	m_sn->enable_w(!m_schaser_explosion);
+	m_sn->one_shot_cap_voltage_w(!m_schaser_explosion ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
 void _8080bw_state::crashrd_port05_w(uint8_t data)
 {
 	// bit 0 = bitstream audio
-	// bit 4 = not sure
+	// bit 4 = indicates when enemy goes faster toward end of level
+	// bit 5 = pulses once when flipscreen needed
 	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 }
 
