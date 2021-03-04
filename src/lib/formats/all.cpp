@@ -516,6 +516,10 @@
 #include "ql_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_RC759_DSK
+#include "rc759_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_RK_CAS
 #include "rk_cas.h"
 #endif
@@ -1144,6 +1148,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Pyldin");
 #ifdef HAS_FORMATS_PYLDIN_DSK
 	en.add(FLOPPY_PYLDIN_FORMAT); // pyldin_dsk.h
+#endif
+
+	en.category("Regnecentralen");
+#ifdef HAS_FORMATS_RC759_DSK
+	en.add(FLOPPY_RC759_FORMAT); // rc759_dsk.h
 #endif
 
 	en.category("DEC");
