@@ -69,6 +69,11 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/dfi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.h",
 		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
+
+		MAME_DIR .. "src/lib/formats/fsmgr.h",
+		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
+		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
+		MAME_DIR .. "src/lib/formats/fs_unformatted.cpp",
 	}
 
 --------------------------------------------------
@@ -1598,10 +1603,10 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/rc759_dsk.h,FORMATS["RC759_DSK"] = true
+--@src/lib/formats/rc759_dsk.h,FORMATS["RC759"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "RC759_DSK") then
+if (FORMATS["APRIDISK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/rc759_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/rc759_dsk.h",
@@ -2049,6 +2054,18 @@ if opt_tool(FORMATS, "ZX81_P") then
 	files {
 		MAME_DIR.. "src/lib/formats/zx81_p.cpp",
 		MAME_DIR.. "src/lib/formats/zx81_p.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_prodos.h,FORMATS["FS_PRODOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_PRODOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_prodos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_prodos.h",
 	}
 end
 

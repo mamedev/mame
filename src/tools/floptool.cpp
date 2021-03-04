@@ -22,16 +22,131 @@
 #include "corestr.h"
 #include "osdcomm.h"
 
+using u8  = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
+
 #include "formats/all.h"
 
+struct fs_info {
+	const filesystem_manager_t *m_manager;
+	floppy_format_type m_type;
+	u32 m_image_size;
+	const char *m_name;
+	u32 m_key;
+	const char *m_description;
+
+	fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+		m_manager(manager),
+		m_type(type),
+		m_image_size(image_size),
+		m_name(name),
+		m_key(key),
+		m_description(description)
+	{}
+
+	fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
+		m_manager(manager),
+		m_type(nullptr),
+		m_image_size(0),
+		m_name(name),
+		m_key(key),
+		m_description(description)
+	{}
+};
+
+struct iofile_ram {
+	std::vector<u8> *data;
+	int64_t pos;
+};
+
+static void ram_closeproc(void *file)
+{
+	auto f = (iofile_ram *)file;
+	delete f;
+}
+
+static int ram_seekproc(void *file, int64_t offset, int whence)
+{
+	auto f = (iofile_ram *)file;
+	switch(whence) {
+	case SEEK_SET: f->pos = offset; break;
+	case SEEK_CUR: f->pos += offset; break;
+	case SEEK_END: f->pos = f->data->size() + offset; break;
+	}
+
+	f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
+	return 0;
+}
+
+static size_t ram_readproc(void *file, void *buffer, size_t length)
+{
+	auto f = (iofile_ram *)file;
+	size_t l = std::min(length, f->data->size() - f->pos);
+	memcpy(buffer, f->data->data() + f->pos, l);
+	return l;
+}
+
+static size_t ram_writeproc(void *file, const void *buffer, size_t length)
+{
+	auto f = (iofile_ram *)file;
+	size_t l = std::min(length, f->data->size() - f->pos);
+	memcpy(f->data->data() + f->pos, buffer, l);
+	return l;
+}
+
+static uint64_t ram_filesizeproc(void *file)
+{
+	auto f = (iofile_ram *)file;
+	return f->data->size();
+}
+
+
+static const io_procs iop_ram = {
+	ram_closeproc,
+	ram_seekproc,
+	ram_readproc,
+	ram_writeproc,
+	ram_filesizeproc
+};
+
+static io_generic *ram_open(std::vector<u8> &data)
+{
+	iofile_ram *f = new iofile_ram;
+	f->data = &data;
+	f->pos = 0;
+	return new io_generic({ &iop_ram, f });
+}
+	
 std::map<std::string, std::vector<floppy_image_format_t *>> formats_by_category;
 std::map<std::string, floppy_image_format_t *> formats_by_key;
 
+std::map<std::string, std::vector<fs_info>> fs_by_category;
+std::map<std::string, fs_info> fs_by_key;
+
+static std::vector<uint32_t> variants;
+
+struct enumerator;
+
+struct fs_enum : public filesystem_manager_t::floppy_enumerator {
+	enumerator *m_en;
+	fs_enum(enumerator *en) : filesystem_manager_t::floppy_enumerator(), m_en(en) {};
+
+	void reg(const fs_info &fsi) const;
+	virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
+	virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+};
+
 struct enumerator : public mame_formats_enumerator {
+	fs_enum fse;
+
+	enumerator() : mame_formats_enumerator(), fse(this) {}
+
 	virtual ~enumerator() = default;
 	virtual void add(const cassette_image::Format *const *formats) {}
 
 	std::vector<floppy_image_format_t *> *cf = nullptr;
+	std::vector<fs_info> *cfs = nullptr;
 	virtual void category(const char *name) {
 		auto i = formats_by_category.find(name);
 		if(i != formats_by_category.end()) {
@@ -39,6 +154,7 @@ struct enumerator : public mame_formats_enumerator {
 			exit(1);
 		}
 		cf = &formats_by_category[name];
+		cfs = &fs_by_category[name];
 	}
 
 	virtual void add(floppy_format_type format) {
@@ -46,7 +162,7 @@ struct enumerator : public mame_formats_enumerator {
 		std::string key = f->name();
 		auto i = formats_by_key.find(key);
 		if(i != formats_by_key.end()) {
-			fprintf(stderr, "Collision on key %s between \"%s\" and \"%s\".\n",
+			fprintf(stderr, "Collision on format key %s between \"%s\" and \"%s\".\n",
 					key.c_str(),
 					i->second->description(),
 					f->description());
@@ -55,7 +171,39 @@ struct enumerator : public mame_formats_enumerator {
 		cf->push_back(f);
 		formats_by_key[key] = f;
 	}
+
+	virtual void add(filesystem_manager_type fs) {
+		auto ff = fs();
+		ff->enumerate(fse, floppy_image::FF_UNKNOWN, variants);
+	}		
 };
+
+void fs_enum::reg(const fs_info &fsi) const
+{
+	std::string key = fsi.m_name;
+	auto i = fs_by_key.find(key);
+	if(i != fs_by_key.end()) {
+		fprintf(stderr, "Collision on fs key %s between \"%s\" and \"%s\".\n",
+				key.c_str(),
+				i->second.m_description,
+				fsi.m_description);
+		exit(1);
+	}
+	m_en->cfs->push_back(fsi);
+	fs_by_key.emplace(key, fsi);
+}
+
+void fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description)
+{
+	fs_info fsi(manager, type, image_size, name, key, description);
+	reg(fsi);
+}
+
+void fs_enum::add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description)
+{
+	fs_info fsi(manager, name, key, description);
+	reg(fsi);
+}
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 {
@@ -65,7 +213,6 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 	va_end(arg);
 }
 
-static std::vector<uint32_t> variants;
 
 static void init_formats()
 {
@@ -97,17 +244,32 @@ static floppy_image_format_t *find_format_by_identify(io_generic *image)
 	return best_fif;
 }
 
+static const fs_info *find_fs_by_name(const char *name)
+{
+	auto i = fs_by_key.find(name);
+	if(i == fs_by_key.end())
+		return nullptr;
+	return &i->second;
+}
+
+
 static void display_usage()
 {
 	fprintf(stderr, "Usage: \n");
 	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]\n");
 	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
+	fprintf(stderr, "       floptool.exe create output_format filesystem <outputfile>\n");
 }
 
 static void display_formats()
 {
 	int sk = 0;
 	for(const auto &e : formats_by_key) {
+		int sz = e.first.size();
+		if(sz > sk)
+			sk = sz;
+	}
+	for(const auto &e : fs_by_key) {
 		int sz = e.first.size();
 		if(sz > sk)
 			sk = sz;
@@ -119,6 +281,15 @@ static void display_formats()
 			fprintf(stderr, "%s:\n", e.first.c_str());
 			for(floppy_image_format_t *fif : e.second)
 				fprintf(stderr, "  %-*s - %s [%s]\n", sk, fif->name(), fif->description(), fif->extensions());
+		}
+
+	fprintf(stderr, "\n\n");
+	fprintf(stderr, "Supported filesystems:\n\n");
+	for(const auto &e : fs_by_category)
+		if(!e.second.empty()) {
+			fprintf(stderr, "%s:\n", e.first.c_str());
+			for(const fs_info &fs : e.second)
+				fprintf(stderr, "  %-*s - %s\n", sk, fs.m_name, fs.m_description);
 		}
 }
 
@@ -240,6 +411,63 @@ static int convert(int argc, char *argv[])
 	return 0;
 }
 
+static int create(int argc, char *argv[])
+{
+	if (argc!=5) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	auto dest_format = find_format_by_name(argv[2]);
+	if(!dest_format) {
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	auto source_fs = find_fs_by_name(argv[3]);
+	if(!source_fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
+
+	if(source_fs->m_type) {
+		std::vector<u8> img(source_fs->m_image_size);
+		source_fs->m_manager->floppy_instantiate(source_fs->m_key, img);
+		auto iog = ram_open(img);
+		auto source_format = source_fs->m_type();
+		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, &image);
+		delete source_format;
+		delete iog;
+
+	} else
+		source_fs->m_manager->floppy_instantiate_raw(source_fs->m_key, &image);
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for writing", argv[4]);
+	auto f = fopen(argv[4], "wb");
+	if (!f) {
+		perror(msg);
+		return 1;
+	}
+
+	io_generic dest_io;
+	dest_io.file = f;
+	dest_io.procs = &stdio_ioprocs_noclose;
+	dest_io.filler = 0xff;
+
+	if(!dest_format->save(&dest_io, variants, &image)) {
+		fprintf(stderr, "Error: writing output file as '%s' failed\n", dest_format->name());
+		return 1;
+	}
+
+	fclose((FILE *)dest_io.file);
+	
+	return 0;
+}
+
 int CLIB_DECL main(int argc, char *argv[])
 {
 	init_formats();
@@ -253,6 +481,8 @@ int CLIB_DECL main(int argc, char *argv[])
 		return identify(argc, argv);
 	else if (!core_stricmp("convert", argv[1]))
 		return convert(argc, argv);
+	else if (!core_stricmp("create", argv[1]))
+		return create(argc, argv);
 	else {
 		fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
 		display_usage();

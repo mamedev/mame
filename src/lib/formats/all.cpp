@@ -19,6 +19,7 @@
 #include "pc_dsk.h"
 #include "d88_dsk.h"
 #include "dfi_dsk.h"
+#include "fs_unformatted.h"
 
 #ifdef HAS_FORMATS_2D_DSK
 #include "2d_dsk.h"
@@ -664,9 +665,14 @@
 #include "zx81_p.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_PRODOS
+#include "fs_prodos.h"
+#endif
+
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
+	en.add(FS_UNFORMATTED);
 	en.add(cassette_default_formats);
 #ifdef HAS_FORMATS_UEF_CAS
 	en.add(uef_cassette_formats); // uef_cas.h
@@ -689,6 +695,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Apple");
+#ifdef HAS_FORMATS_FS_PRODOS
+	en.add(FS_PRODOS);
+#endif
 #ifdef HAS_FORMATS_AP2_DSK
 	en.add(FLOPPY_A216S_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_RWTS18_FORMAT); // ap2_dsk.h

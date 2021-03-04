@@ -33,7 +33,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define NEW_SWIM 0
+#define NEW_SWIM 1
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"

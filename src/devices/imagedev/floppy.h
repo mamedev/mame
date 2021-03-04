@@ -12,6 +12,7 @@
 #pragma once
 
 #include "formats/flopimg.h"
+#include "formats/fsmgr.h"
 #include "sound/samples.h"
 #include "softlist_dev.h"
 
@@ -26,12 +27,14 @@ public:
 	format_registration();
 
 	void add(floppy_format_type format);
+	void add(filesystem_manager_type fs);
 
 	void add_fm_containers();
 	void add_mfm_containers();
 	void add_pc_formats();
 
 	std::vector<floppy_format_type> m_formats;
+	std::vector<filesystem_manager_type> m_fs;
 };
 
 class floppy_image_device : public device_t,
@@ -45,14 +48,44 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 	typedef delegate<void (floppy_image_device *, int)> led_cb;
 
+	struct fs_info {
+		const filesystem_manager_t *m_manager;
+		floppy_format_type m_type;
+		u32 m_image_size;
+		const char *m_name;
+		u32 m_key;
+		const char *m_description;
+		
+		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+			m_manager(manager),
+			m_type(type),
+			m_image_size(image_size),
+			m_name(name),
+			m_key(key),
+			m_description(description)
+		{}
+		
+		fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
+			m_manager(manager),
+			m_type(nullptr),
+			m_image_size(0),
+			m_name(name),
+			m_key(key),
+			m_description(description)
+		{}
+	};
+
 	// construction/destruction
 	virtual ~floppy_image_device();
 
 	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_format_t *get_formats() const;
+	const std::vector<fs_info> &get_fs() const { return m_fs; }
 	floppy_image_format_t *get_load_format() const;
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
+
+	void init_fs(const fs_info *fs);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -120,6 +153,14 @@ public:
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
+	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
+		floppy_image_device *m_fid;
+		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
+		
+		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
+		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+	};
+
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -137,12 +178,15 @@ protected:
 
 	void init_floppy_load(bool write_supported);
 
+	std::function<void (format_registration &fr)> format_registration_cb;
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
 	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
+	std::vector<fs_info>  m_fs;
+	std::vector<std::unique_ptr<filesystem_manager_t>> m_fs_managers;
 	emu_timer             *index_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
@@ -196,6 +240,8 @@ protected:
 	ready_cb cur_ready_cb;
 	wpt_cb cur_wpt_cb;
 	led_cb cur_led_cb;
+
+	void register_formats();
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);

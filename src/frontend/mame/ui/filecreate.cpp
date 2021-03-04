@@ -291,4 +291,59 @@ void menu_select_format::handle()
 }
 
 
+/***************************************************************************
+SELECT FORMAT MENU
+***************************************************************************/
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_device::fs_info> &fs, int *result)
+	: menu(mui, container),
+	  m_fs(fs),
+	  m_result(result)
+	  
+{
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+menu_select_floppy_init::~menu_select_floppy_init()
+{
+}
+
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void menu_select_floppy_init::populate(float &customtop, float &custombottom)
+{
+	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
+	int id = 0;
+	for (const auto &fmt : m_fs)
+		item_append(fmt.m_description, fmt.m_name, 0, (void *)(uintptr_t)(id++));
+}
+
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void menu_select_floppy_init::handle()
+{
+	// process the menu
+	const event *event = process(0);
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	{
+		*m_result = int(uintptr_t(event->itemref));
+		stack_pop();
+	}
+}
+
+
 } // namespace ui
