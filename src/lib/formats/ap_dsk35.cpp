@@ -1403,7 +1403,7 @@ bool apple_gcr_format::supports_save() const
 int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
-	if(size == 409600 || size == 819200)
+	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
 		return 50;
 
 	return 0;
@@ -1422,9 +1422,10 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	uint64_t size = io_generic_size(io);
 	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
+	image->set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+
 	if(!head_count)
 		return false;
-
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < head_count; head++) {
 			int ns = 12 - (track/16);
