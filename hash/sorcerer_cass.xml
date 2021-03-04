@@ -1471,4 +1471,17 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<!-- Added 2021-03-04 -->
+	<software name="cosmc">
+		<description>Cosmic Fighter (ported from TRS-80)</description>
+		<year>1980</year>
+		<publisher>Big Five Software</publisher>
+		<info name="developer" value="Bill Hogue and Jeff Konyu"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xa2b02c">
+				<rom name="defcm.wav" size="0xa2b02c" crc="24bd0b6f" sha1="5aaa0f01ed86d8db22871fb456c3c795a6495291" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
