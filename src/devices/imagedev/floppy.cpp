@@ -2644,7 +2644,7 @@ void mac_floppy_device::track_changed()
 
 	float new_rpm;
 	if(m_mfm)
-		new_rpm = 300;
+		new_rpm = is_2m() ? 600 : 300;
 	else if(cyl <= 15)
 		new_rpm = 394;
 	else if(cyl <= 31)
