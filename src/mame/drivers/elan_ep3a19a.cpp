@@ -139,7 +139,7 @@ void elan_ep3a19a_state::elan_ep3a19a_bank_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( tvbg6 )
+static INPUT_PORTS_START( tvbg_1button )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -151,17 +151,17 @@ static INPUT_PORTS_START( tvbg6 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // the 6-in-1 units have a single button marked with both A and B
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // the 6-in-1 units have a single button marked with both A and B (unless it depends which side of the button you press?)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tvbg3 )
-	PORT_INCLUDE( tvbg6 )
+static INPUT_PORTS_START( tvbg_2button )
+	PORT_INCLUDE( tvbg_1button )
 	
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END
 
 
@@ -318,6 +318,14 @@ ROM_START( tvbg3a )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( tvbg3b )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "simonbship.bin", 0x00000, 0x100000, CRC(9b10a87a) SHA1(f2022ac07468d911cfb3d32887d6e59e60d48d51) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
 ROM_START( tvbg3c )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "boggle_connect4.bin", 0x00000, 0x100000, CRC(c2374eea) SHA1(c6971cb5108828bc72fd1cf7edeb53915d196db7) )
@@ -336,11 +344,11 @@ void elan_ep3a19a_state::init_tvbg()
 	}
 }
 
-CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
-CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
+CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
+CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
-CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// TV Board Games 3-in-1: Simon, Battleship, Checkers    https://www.youtube.com/watch?v=Q7nwKJfVavU
-CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a, tvbg3, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
+CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Simon, Battleship, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=Q7nwKJfVavU
+CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
 // The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.
