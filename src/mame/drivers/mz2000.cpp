@@ -867,7 +867,7 @@ uint8_t mz2000_state::mz2000_pio1_porta_r()
 
 void mz2000_state::floppy_formats(format_registration &fr)
 {
-	fr.add_fm_containers();
+	fr.add_mfm_containers();
 	fr.add(FLOPPY_2D_FORMAT);
 }
 
